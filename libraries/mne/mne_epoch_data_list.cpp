@@ -326,6 +326,12 @@ bool MNEEpochDataList::checkForArtifact(MatrixXd& data,
         }
     }
 
+    if(lchData.isEmpty()) {
+        qDebug() << "MNEEpochDataList::checkForArtifact - No channels found to scan for artifacts. Returning.";
+
+        return bReject;
+    }
+
 //    qDebug() << "MNEEpochDataList::checkForArtifact - lchData.size()" << lchData.size();
 //    qDebug() << "MNEEpochDataList::checkForArtifact - iChType" << iChType;
 

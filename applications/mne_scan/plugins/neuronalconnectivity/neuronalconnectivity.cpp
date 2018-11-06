@@ -236,6 +236,11 @@ QWidget* NeuronalConnectivity::setupWidget()
 
 void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
+    qDebug() << "----------------------------------";
+    qDebug() << "----------------------------------";
+    qDebug() << "NeuronalConnectivity::updateSource";
+    qDebug() << "----------------------------------";
+    qDebug() << "----------------------------------";
     QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
 
     if(pRTSE) {
@@ -307,6 +312,11 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
 
 void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
+    qDebug() << "----------------------------------";
+    qDebug() << "----------------------------------";
+    qDebug() << "NeuronalConnectivity::updateRTMSA";
+    qDebug() << "----------------------------------";
+    qDebug() << "----------------------------------";
     QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {

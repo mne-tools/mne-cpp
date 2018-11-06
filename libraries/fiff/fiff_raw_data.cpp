@@ -463,8 +463,10 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
 {
     bool projAvailable = true;
 
-    if (this->proj.size() == 0)
+    if (this->proj.size() == 0) {
+        qDebug() << "FiffRawData::read_raw_segment - No projectors set";
         projAvailable = false;
+    }
 
     if(from == -1)
         from = this->first_samp;

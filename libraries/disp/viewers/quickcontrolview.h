@@ -109,7 +109,7 @@ public:
     * @param [in] bDraggable    Flag specifying whether this widget is draggable.
     */
     QuickControlView(const QString& name = "",
-                     Qt::WindowFlags flags = Qt::Window | Qt::CustomizeWindowHint,
+                     Qt::WindowFlags flags = Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
                      QWidget *parent = Q_NULLPTR,
                      bool bDraggable = true);
 
