@@ -241,9 +241,9 @@ int main(int argc, char *argv[])
         // Pick relevant channels
         if(sChType.contains("EEG", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(false,true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
-        } else if(sCoilType == "grad", Qt::CaseInsensitive) {
+        } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(QString("grad"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
-        } else if (sCoilType == "mag", Qt::CaseInsensitive) {
+        } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(QString("mag"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
         }
 
@@ -283,7 +283,7 @@ int main(int argc, char *argv[])
         // Load data
         MNESourceEstimate sourceEstimate;
 
-        double lambda2 = 1.0 / pow(dSnr, 2);
+        float lambda2 = 1.0 / pow(dSnr, 2);
         QString method(sSourceLocMethod);
 
         // regularize noise covariance
