@@ -131,28 +131,8 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
     fiff_int_t dropCount = 0;
     MatrixXd timesDummy;
     MatrixXd times;
-    double min, max;
 
     MNEEpochData* epoch = Q_NULLPTR;
-
-//    int iChType = FIFFV_EOG_CH;
-//    int iEOGChIdx = -1;
-
-//    for(int i = 0; i < raw.info.chs.size(); ++i) {
-//        if(raw.info.chs.at(i).kind == iChType) {
-//            for(int j = 0; j < picksNew.cols(); ++j) {
-//                if(i == picksNew(j)) {
-//                    iEOGChIdx = j;
-//                    break;
-//                }
-//            }
-//            break;
-//        }
-//    }
-
-//    if(iEOGChIdx == -1) {
-//        qDebug() << "No EOG channel found for epoch rejection";
-//    }
 
     for (p = 0; p < count; ++p) {
         // Read a data segment
@@ -182,26 +162,6 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
             if (epoch->bReject) {
                 dropCount++;
             }
-
-//            if(iEOGChIdx >= 0 &&
-//               iEOGChIdx < epoch->epoch.rows() &&
-//               dEOGThreshold > 0.0) {
-//                RowVectorXd vecRow = epoch->epoch.row(iEOGChIdx);
-//                //vecRow = vecRow.array() - vecRow(0);
-//                vecRow = vecRow.array() - vecRow.mean();
-
-//                min = vecRow.minCoeff();
-//                max = vecRow.maxCoeff();
-
-//                //qDebug() << "std::fabs(min)" << std::fabs(min);
-//                //qDebug() << "std::fabs(max)" << std::fabs(max);
-
-//                //If absolute vaue of min or max if bigger than threshold -> reject
-//                if((std::fabs(min) > dEOGThreshold) || (std::fabs(max) > dEOGThreshold)) {
-//                    epoch->bReject = true;
-//                    //qDebug() << "Epoch at sample" << event_samp << "rejected based on EOG channel";
-//                }
-//            }
 
             //Check if data block has the same size as the previous one
             if(!data.isEmpty()) {
@@ -326,7 +286,8 @@ bool MNEEpochDataList::checkForArtifact(MatrixXd& data,
 
     int iChType = FIFFV_EOG_CH;
 
-    if(sChType.contains("meg", Qt::CaseInsensitive)) {
+    if(sChType.contains("grad", Qt::CaseInsensitive) ||
+       sChType.contains("mag", Qt::CaseInsensitive) ) {
         iChType = FIFFV_MEG_CH;
     }
 
@@ -339,11 +300,29 @@ bool MNEEpochDataList::checkForArtifact(MatrixXd& data,
            && !pFiffInfo.bads.contains(pFiffInfo.chs.at(i).ch_name)
            && pFiffInfo.chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG
            && pFiffInfo.chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG2) {
-            ArtifactRejectionData tempData;
-            tempData.bRejected = false;
-            tempData.data = data.row(i);
-            tempData.dThreshold = dThreshold;
-            lchData.append(tempData);
+            if(iChType == FIFFV_MEG_CH) {
+                if(sChType.contains("grad", Qt::CaseInsensitive) &&
+                   pFiffInfo.chs.at(i).unit == FIFF_UNIT_T_M) {
+                    ArtifactRejectionData tempData;
+                    tempData.bRejected = false;
+                    tempData.data = data.row(i);
+                    tempData.dThreshold = dThreshold;
+                    lchData.append(tempData);
+                } else if(sChType.contains("mag", Qt::CaseInsensitive) &&
+                          pFiffInfo.chs.at(i).unit == FIFF_UNIT_T) {
+                    ArtifactRejectionData tempData;
+                    tempData.bRejected = false;
+                    tempData.data = data.row(i);
+                    tempData.dThreshold = dThreshold;
+                    lchData.append(tempData);
+                }
+            } else {
+                ArtifactRejectionData tempData;
+                tempData.bRejected = false;
+                tempData.data = data.row(i);
+                tempData.dThreshold = dThreshold;
+                lchData.append(tempData);
+            }
         }
     }
 
