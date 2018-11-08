@@ -46,6 +46,7 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
+#include "../connectivitysettings.h"
 
 #include <utils/spectral.h>
 
@@ -96,15 +97,13 @@ Coherency::Coherency()
 //*************************************************************************************************************
 
 void Coherency::computeCoherencyReal(Network& finalNetwork,
-                                     const QList<MatrixXd> &matDataList,
-                                     int iNfft,
-                                     const QString &sWindowType)
+                                     const ConnectivitySettings &connectivitySettings)
 {
     QElapsedTimer timer;
     qint64 iTime = 0;
     timer.start();
 
-    if(matDataList.empty()) {
+    if(connectivitySettings.m_matDataList.empty()) {
         qDebug() << "Coherency::computeCoherencyReal - Input data is empty";
         return;
     }
@@ -114,17 +113,18 @@ void Coherency::computeCoherencyReal(Network& finalNetwork,
     #endif
 
     // Check that iNfft >= signal length
-    int iSignalLength = matDataList.at(0).cols();
-    if (iNfft < iSignalLength) {
+    int iSignalLength = connectivitySettings.m_matDataList.at(0).cols();
+    int iNfft = connectivitySettings.m_iNfft;
+    if (connectivitySettings.m_iNfft < iSignalLength) {
         iNfft = iSignalLength;
     }
 
     // Generate tapers
-    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, sWindowType);
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.m_sWindowType);
 
     // Initialize vecPsdAvg and vecCsdAvg
-    int iNRows = matDataList.at(0).rows();
-    int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+    int iNRows = connectivitySettings.m_matDataList.at(0).rows();
+    int iNFreqs = int(floor(connectivitySettings.m_iNfft / 2.0)) + 1;
 
     std::function<AbstractMetricResultData(const MatrixXd&)> computeLambda = [&](const MatrixXd& matInputData) {
         return compute(matInputData,
@@ -147,7 +147,7 @@ void Coherency::computeCoherencyReal(Network& finalNetwork,
 
     // Parallel
 
-    QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(matDataList,
+    QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(connectivitySettings.m_matDataList,
                                                                            computeLambda,
                                                                            reduce);
     result.waitForFinished();
@@ -190,15 +190,13 @@ void Coherency::computeCoherencyReal(Network& finalNetwork,
 //*************************************************************************************************************
 
 void Coherency::computeCoherencyImag(Network& finalNetwork,
-                                     const QList<MatrixXd> &matDataList,
-                                     int iNfft,
-                                     const QString &sWindowType)
+                                     const ConnectivitySettings &connectivitySettings)
 {
 //        QElapsedTimer timer;
 //        qint64 iTime = 0;
 //        timer.start();
 
-    if(matDataList.empty()) {
+    if(connectivitySettings.m_matDataList.empty()) {
         qDebug() << "Coherency::computeCoherencyImag - Input data is empty";
         return;
     }
@@ -208,16 +206,17 @@ void Coherency::computeCoherencyImag(Network& finalNetwork,
     #endif
 
     // Check that iNfft >= signal length
-    int iSignalLength = matDataList.at(0).cols();
-    if (iNfft < iSignalLength) {
+    int iSignalLength = connectivitySettings.m_matDataList.at(0).cols();
+    int iNfft = connectivitySettings.m_iNfft;
+    if (connectivitySettings.m_iNfft < iSignalLength) {
         iNfft = iSignalLength;
     }
 
     // Generate tapers
-    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, sWindowType);
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.m_sWindowType);
 
     // Initialize vecPsdAvg and vecCsdAvg
-    int iNRows = matDataList.at(0).rows();
+    int iNRows = connectivitySettings.m_matDataList.at(0).rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     std::function<AbstractMetricResultData(const MatrixXd&)> computeLambda = [&](const MatrixXd& matInputData) {
@@ -240,7 +239,7 @@ void Coherency::computeCoherencyImag(Network& finalNetwork,
 //        qDebug() << "Coherency::computeCoherencyImag timer - Preparation:" << iTime;
 //        timer.restart();
 
-    QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(matDataList,
+    QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(connectivitySettings.m_matDataList,
                                                                            computeLambda,
                                                                            reduce);
     result.waitForFinished();
@@ -283,15 +282,13 @@ void Coherency::computeCoherencyImag(Network& finalNetwork,
 //*************************************************************************************************************
 
 void Coherency::computeCoherency(QVector<QPair<int,MatrixXcd> >& vecCoherency,
-                                 const QList<MatrixXd> &matDataList,
-                                 int iNfft,
-                                 const QString &sWindowType)
+                                 const ConnectivitySettings &connectivitySettings)
 {
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;
 //    timer.start();
 
-    if(matDataList.empty()) {
+    if(connectivitySettings.m_matDataList.empty()) {
         qDebug() << "Coherency::computeCoherency - Input data is empty";
         return;
     }
@@ -301,16 +298,17 @@ void Coherency::computeCoherency(QVector<QPair<int,MatrixXcd> >& vecCoherency,
     #endif
 
     // Check that iNfft >= signal length
-    int iSignalLength = matDataList.at(0).cols();
-    if (iNfft < iSignalLength) {
+    int iSignalLength = connectivitySettings.m_matDataList.at(0).cols();
+    int iNfft = connectivitySettings.m_iNfft;
+    if (connectivitySettings.m_iNfft < iSignalLength) {
         iNfft = iSignalLength;
     }
 
     // Generate tapers
-    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, sWindowType);
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.m_sWindowType);
 
     // Initialize vecPsdAvg and vecCsdAvg
-    int iNRows = matDataList.at(0).rows();
+    int iNRows = connectivitySettings.m_matDataList.at(0).rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     std::function<AbstractMetricResultData(const MatrixXd&)> computeLambda = [&](const MatrixXd& matInputData) {
@@ -333,7 +331,7 @@ void Coherency::computeCoherency(QVector<QPair<int,MatrixXcd> >& vecCoherency,
 //    qDebug() << "Coherency::computeCoherency timer - Preparation:" << iTime;
 //    timer.restart();
 
-    QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(matDataList,
+    QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(connectivitySettings.m_matDataList,
                                                                            computeLambda,
                                                                            reduce);
     result.waitForFinished();

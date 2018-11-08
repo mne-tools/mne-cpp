@@ -118,9 +118,7 @@ Network ImagCoherence::imagCoherence(const ConnectivitySettings& connectivitySet
 
     //Calculate all-to-all imaginary coherence matrix over epochs
     Coherency::computeCoherencyImag(finalNetwork,
-                                    connectivitySettings.m_matDataList,
-                                    connectivitySettings.m_iNfft,
-                                    connectivitySettings.m_sWindowType);
+                                    connectivitySettings);
 
     return finalNetwork;
 }
@@ -134,10 +132,12 @@ QVector<MatrixXd> ImagCoherence::computeImagCoherence(const QList<MatrixXd> &mat
 {
     QVector<QPair<int,Eigen::MatrixXcd> > vecCoh;
 
+    ConnectivitySettings connectivitySettings;
+    connectivitySettings.m_matDataList = matDataList;
+    connectivitySettings.m_iNfft = iNfft;
+    connectivitySettings.m_sWindowType = sWindowType;
     Coherency::computeCoherency(vecCoh,
-                                matDataList,
-                                iNfft,
-                                sWindowType);
+                                connectivitySettings);
 
 
     QVector<MatrixXd> result;
