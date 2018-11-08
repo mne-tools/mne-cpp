@@ -226,7 +226,7 @@ IPlugin::PluginType NoiseReduction::getType() const
 
 QString NoiseReduction::getName() const
 {
-    return "NoiseReduction";
+    return "Noise Reduction";
 }
 
 

@@ -426,7 +426,8 @@ void MneEstimateTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
     data.setValue(tSourceEstimate.data);
     this->setData(data, Data3DTreeModelItemRoles::Data);
 
-    if(m_pRtSourceDataController) {
+    // Only draw activation if item is checked
+    if(m_pRtSourceDataController && this->checkState() == Qt::Checked) {
         m_pRtSourceDataController->addData(tSourceEstimate.data);
     }
 }

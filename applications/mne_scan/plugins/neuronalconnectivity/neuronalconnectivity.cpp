@@ -557,14 +557,14 @@ void NeuronalConnectivity::run()
         {
             //QMutexLocker locker(&m_mutex);
             //Do connectivity estimation here
-            Network connectivityResult = m_pCircularNetworkBuffer->pop();
+            m_currentConnectivityResult = m_pCircularNetworkBuffer->pop();
 
             //Send the data to the connected plugins and the online display
-            if(!connectivityResult.isEmpty()) {
+            if(!m_currentConnectivityResult.isEmpty()) {
                 //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
-                connectivityResult.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
-                connectivityResult.normalize();
-                m_pRTCEOutput->data()->setValue(connectivityResult);
+                m_currentConnectivityResult.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
+                m_currentConnectivityResult.normalize();
+                m_pRTCEOutput->data()->setValue(m_currentConnectivityResult);
             }
         }
 
@@ -628,6 +628,13 @@ void NeuronalConnectivity::onFrequencyBandChanged(int iFreqLow, int iFreqHigh)
     // Convert to frequency bins
     m_iFreqBandLow = iFreqLow * dScaleFactor;
     m_iFreqBandHigh = iFreqHigh * dScaleFactor;
+
+    //QMutexLocker locker(&m_mutex);
+    if(!m_currentConnectivityResult.isEmpty()) {
+        m_currentConnectivityResult.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
+        m_currentConnectivityResult.normalize();
+        m_pCircularNetworkBuffer->push(m_currentConnectivityResult);
+    }
 
     //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_iFreqBandLow" << m_iFreqBandLow;
     //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_iFreqBandHigh" << m_iFreqBandHigh;

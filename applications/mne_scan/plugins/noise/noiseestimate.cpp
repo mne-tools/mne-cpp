@@ -224,7 +224,7 @@ IPlugin::PluginType NoiseEstimate::getType() const
 
 QString NoiseEstimate::getName() const
 {
-    return "Noise Estimation";
+    return "Spectrum";
 }
 
 
