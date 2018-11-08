@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 using namespace MNELIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -81,4 +82,32 @@ MNEEpochData::MNEEpochData(const MNEEpochData &p_MNEEpochData)
 MNEEpochData::~MNEEpochData()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void MNEEpochData::pick_channels(const RowVectorXi& sel)
+{
+    if (sel.cols() == 0) {
+        qWarning("MNEEpochData::pick_channels - Warning : No channels were provided.\n");
+        return;
+    }
+
+    // Reduce data set
+    MatrixXd selBlock(1,1);
+
+    if(selBlock.rows() != sel.cols() || selBlock.cols() != epoch.cols()) {
+        selBlock.resize(sel.cols(), epoch.cols());
+    }
+
+    for(qint32 l = 0; l < sel.cols(); ++l) {
+        if(sel(l) <= epoch.rows()) {
+            selBlock.row(l) = epoch.row(sel(0,l));
+        } else {
+            qWarning("FiffEvoked::pick_channels - Warning : Selected channel index out of bound.\n");
+        }
+    }
+
+    epoch = selBlock;
 }

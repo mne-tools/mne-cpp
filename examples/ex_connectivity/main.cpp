@@ -51,6 +51,7 @@
 
 #include <disp3D/engine/model/items/network/networktreeitem.h>
 #include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -118,22 +119,22 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
 
     QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
+    QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
+    QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
+    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
+    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
+    QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
+    QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
+    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.4");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
     QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
-    QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "WPLI");
-    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
-    QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
-    QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
-    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "1.57");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -190,7 +191,6 @@ int main(int argc, char *argv[])
     MatrixX3f matNodePositions;
     MatrixXi events;
     RowVectorXi picks;
-    qint32 kind, unit;
 
     MNEForwardSolution t_clusteredFwd;
     MNEForwardSolution t_Fwd;
@@ -207,73 +207,9 @@ int main(int argc, char *argv[])
     // Create sensor level data
     QFile t_fileRaw(sRaw);
     FiffRawData raw(t_fileRaw);
-    QVector<int> chIdx;
-    QStringList include,exclude;
 
     // Select bad channels
     //raw.info.bads << "MEG2412" << "MEG2413";
-
-    if (!bDoSourceLoc) {
-        for(int i = 0; i < raw.info.chs.size(); ++i) {
-            unit = raw.info.chs.at(i).unit;
-            kind = raw.info.chs.at(i).kind;
-
-            if(unit == FIFF_UNIT_T_M &&
-               kind == FIFFV_MEG_CH &&
-               sChType == "meg"&&
-               sCoilType == "grad") {
-                if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
-                    include << raw.info.chs.at(i).ch_name;
-                    chIdx << i;
-
-                    //Skip second gradiometer in triplet
-                    i += 1;
-                }
-            } else if(unit == FIFF_UNIT_T &&
-                      kind == FIFFV_MEG_CH &&
-                      sChType == "meg"&&
-                      sCoilType == "mag") {
-                if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
-                    include << raw.info.chs.at(i).ch_name;
-                    chIdx << i;
-                }
-            } else if (unit == FIFF_UNIT_V &&
-                       kind == FIFFV_EEG_CH &&
-                       sChType == "eeg") {
-                if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
-                    include << raw.info.chs.at(i).ch_name;
-                    chIdx << i;
-                }
-            }
-
-            if(kind == FIFFV_EOG_CH) {
-                if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
-                    include << raw.info.chs.at(i).ch_name;
-                }
-            }
-        }
-
-        picks = raw.info.pick_channels(raw.info.ch_names,
-                                       include,
-                                       exclude);
-    } else {
-        for(int i = 0; i < raw.info.chs.size(); ++i) {
-            if(!raw.info.bads.contains(raw.info.chs.at(i).ch_name)) {
-                if(noise_cov.names.contains(raw.info.chs.at(i).ch_name)) {
-                    include << raw.info.chs.at(i).ch_name;
-                    chIdx << i;
-                }
-
-                if(raw.info.chs.at(i).kind == FIFFV_EOG_CH) {
-                    include << raw.info.chs.at(i).ch_name;
-                }
-            }
-        }
-
-        picks = raw.info.pick_channels(raw.info.ch_names,
-                                       include,
-                                       exclude);
-    }
 
     MNE::setup_compensators(raw,
                             dest_comp,
@@ -287,34 +223,33 @@ int main(int argc, char *argv[])
     // Read the epochs and reject bad epochs
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
                                                          events,
-                                                         picks,
                                                          fTMin,
                                                          fTMax,
                                                          iEvent,
-                                                         50.0*0.0000010);
+                                                         150.0*pow(10.0,-6),
+                                                         "eog");
     data.dropRejected();
 
-    // Transform to a more generic data matrix list and remove EOG channel
-    MatrixXd matData;
-
-    int iNumberEpochs = data.size(); //data.size() 25
-    int iNumberRows = 32; //chIdx.size() 32
-
-    for(int i = 0; i < iNumberEpochs; ++i) {
-        matData.resize(iNumberRows, data.at(i)->epoch.cols());
-
-        for(qint32 j = 0; j < iNumberRows; ++j) {
-            matData.row(j) = data.at(i)->epoch.row(j);
-        }
-
-        matDataList << matData;
-    }
+    FiffEvoked evoked = data.average(raw.info,
+                                     0,
+                                     data.first()->epoch.cols()-1);
+    MNESourceEstimate sourceEstimateEvoked;
 
     if(!bDoSourceLoc) {
+        // Pick relevant channels
+        if(sChType.contains("EEG", Qt::CaseInsensitive)) {
+            picks = raw.info.pick_types(false,true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        } else if(sCoilType == "grad", Qt::CaseInsensitive) {
+            picks = raw.info.pick_types(QString("grad"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        } else if (sCoilType == "mag", Qt::CaseInsensitive) {
+            picks = raw.info.pick_types(QString("mag"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        }
+
         // Generate nodes for 3D network visualization
         matNodePositions = MatrixX3f(picks.cols(),3);
 
         // Get the 3D positions and exclude EOG channels
+        qint32 kind;
         for(int i = 0; i < picks.cols(); ++i) {
             kind = raw.info.chs.at(i).kind;
             if(kind == FIFFV_EEG_CH ||
@@ -323,6 +258,20 @@ int main(int argc, char *argv[])
                 matNodePositions(i,1) = raw.info.chs.at(picks(i)).chpos.r0(1);
                 matNodePositions(i,2) = raw.info.chs.at(picks(i)).chpos.r0(2);
             }
+        }
+
+        // Transform to a more generic data matrix list, pick only channels of interest and remove EOG channel
+        MatrixXd matData;
+        int iNumberRows = picks.cols(); //picks.cols() 32
+
+        for(int i = 0; i < data.size(); ++i) {
+            matData.resize(iNumberRows, data.at(i)->epoch.cols());
+
+            for(qint32 j = 0; j < iNumberRows; ++j) {
+                matData.row(j) = data.at(i)->epoch.row(picks(j));
+            }
+
+            matDataList << matData;
         }
     } else {
         //Create source level data
@@ -351,8 +300,11 @@ int main(int argc, char *argv[])
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
         minimumNorm.doInverseSetup(1,false);
 
-        for(int i = 0; i < matDataList.size(); i++) {
-            sourceEstimate = minimumNorm.calculateInverse(matDataList.at(i),
+        picks = raw.info.pick_types(QString("all"),true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        data.pick_channels(picks);
+
+        for(int i = 0; i < data.size(); i++) {
+            sourceEstimate = minimumNorm.calculateInverse(data.at(i)->epoch,
                                                           0.0f,
                                                           1/raw.info.sfreq);
 
@@ -360,8 +312,11 @@ int main(int argc, char *argv[])
                 printf("Source estimate is empty");
             }
 
-            matDataList.replace(i, sourceEstimate.data);
+            matDataList << sourceEstimate.data;
         }
+
+        MinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
+        sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked);
 
         //Generate node vertices
         MatrixX3f matNodeVertLeft, matNodeVertRight;
@@ -394,7 +349,7 @@ int main(int argc, char *argv[])
     }
 
     //Do connectivity estimation and visualize results
-    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(raw.info.sfreq);
+    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matDataList.first().cols(), raw.info.sfreq);
 
     pConnectivitySettingsManager->m_settings.m_sConnectivityMethods << sConnectivityMethod;
     pConnectivitySettingsManager->m_settings.m_matDataList = matDataList;
@@ -425,21 +380,35 @@ int main(int argc, char *argv[])
     QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
                      &tNetworkView, &NetworkView::addData);
 
-
-    if(bDoSourceLoc) {
-        QList<FsSurfaceTreeItem*> pFsSurfaceTreeItem;
-
-        pFsSurfaceTreeItem = tNetworkView.getTreeModel()->addSurfaceSet(sSubj,
-                                                                        "Inflated",
-                                                                        tSurfSetInflated,
-                                                                        tAnnotSet);
-
-        for(int i = 0; i < pFsSurfaceTreeItem.size(); i++) {
-            pFsSurfaceTreeItem.at(i)->setAlpha(0.5f);
+    //Read and show sensor helmets
+    if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
+        QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+        MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+        tNetworkView.getTreeModel()->addMegSensorInfo("Sensors",
+                                                      "VectorView",
+                                                      raw.info.chs,
+                                                      t_sensorSurfaceVV);
+    } else {
+        //Add source loc data and init some visualization values
+        if(MneEstimateTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
+                                                                                         evoked.comment,
+                                                                                         sourceEstimateEvoked,
+                                                                                         t_clusteredFwd,
+                                                                                         tSurfSetInflated,
+                                                                                         tAnnotSet)) {
+            pRTDataItem->setLoopState(true);
+            pRTDataItem->setTimeInterval(17);
+            pRTDataItem->setNumberAverages(1);
+            pRTDataItem->setStreamingState(false);
+            pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
+            pRTDataItem->setVisualizationType("Interpolation based");
+            pRTDataItem->setColormapType("Jet");
+            pRTDataItem->setAlpha(0.5f);
         }
     }
 
     pConnectivitySettingsView->setNumberTrials(1);
+    pConnectivitySettingsManager->onNumberTrialsChanged(1);
 
     return a.exec();
 }

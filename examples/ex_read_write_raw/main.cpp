@@ -89,8 +89,10 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Read Write Raw Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/test_output.fif");
+    //QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    //QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/test_output.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "/cluster/fusion/lesch/data/MEG/jgs-20160519/assr_40_223_raw.fif");
+    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", "/cluster/fusion/lesch/data/MEG/jgs-20160519/assr_40_223_cut_raw.fif");
 
     parser.addOption(inputOption);
     parser.addOption(outputOption);
@@ -112,8 +114,8 @@ int main(int argc, char *argv[])
     //
     //
     bool want_meg   = true;
-    bool want_eeg   = false;
-    bool want_stim  = false;
+    bool want_eeg   = true;
+    bool want_stim  = true;
     QStringList include;
     include << "STI 014";
 
@@ -134,12 +136,13 @@ int main(int argc, char *argv[])
     //
     RowVectorXd cals;
 
-    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut,raw.info, cals/*, picks*/);
+    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut,raw.info, cals, picks, true);
     //
     //   Set up the reading parameters
     //
     fiff_int_t from = raw.first_samp;
-    fiff_int_t to = raw.last_samp;
+    //fiff_int_t to = raw.last_samp;
+    fiff_int_t to = raw.info.sfreq * 101;
     float quantum_sec = 10.0f;//read and write in 10 sec junks
     fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);
     //
@@ -164,7 +167,7 @@ int main(int argc, char *argv[])
             last = to;
         }
 
-        if (!raw.read_raw_segment(data,times,first,last/*,picks*/))
+        if (!raw.read_raw_segment(data,times,first,last,picks))
         {
                 printf("error during read_raw_segment\n");
                 return -1;
@@ -179,6 +182,11 @@ int main(int argc, char *argv[])
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
            first_buffer = false;
         }
+
+//        for(int i = 0; i < data.rows(); ++i) {
+//            qDebug() << data(0,i);
+//        }
+
         outfid->write_raw_buffer(data,cals);
         printf("[done]\n");
     }

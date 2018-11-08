@@ -54,6 +54,7 @@
 #include <disp/viewers/modalityselectionview.h>
 #include <disp/viewers/channeldatasettingsview.h>
 #include <disp/viewers/averageselectionview.h>
+#include <disp/viewers/averagingsettingsview.h>
 
 #include <scMeas/realtimeevokedset.h>
 
@@ -158,7 +159,7 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     m_pRTESetLayout->addWidget(m_pToolBox);
 
     // Init quick control view
-    m_pQuickControlView = QSharedPointer<QuickControlView>::create("RT Averaging", Qt::Window | Qt::CustomizeWindowHint, this);
+    m_pQuickControlView = QSharedPointer<QuickControlView>::create("RT Averaging", Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint, this);
     QSettings settings;
     m_pQuickControlView->setOpacityValue(settings.value(QString("RTESW/%1/viewOpacity").arg(m_pRTESet->getName()), 100).toInt());
     m_pActionQuickControl->setVisible(true);
@@ -167,6 +168,7 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTESet->getControlWidgets();
     if(!lControlWidgets.isEmpty()) {
         if(lControlWidgets.first()) {
+            m_pAveragingSettingsView = qSharedPointerDynamicCast<DISPLIB::AveragingSettingsView>(lControlWidgets.first());
             m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.first(), "Averaging", "Settings");
         }
     }
@@ -308,6 +310,11 @@ void RealTimeEvokedSetWidget::getData()
         m_pEvokedSetModel->setEvokedSet(pEvokedSet);
 
         m_pEvokedSetModel->updateData();
+
+        // Update number of trials in GUI
+        if(m_pAveragingSettingsView) {
+            m_pAveragingSettingsView->setDetectedEpochs(pEvokedSet);
+        }
     }
 }
 

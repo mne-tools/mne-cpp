@@ -40,6 +40,8 @@
 
 #include "mne_epoch_data_list.h"
 
+#include <utils/mnemath.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -47,6 +49,7 @@
 //=============================================================================================================
 
 #include <QPointer>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -56,6 +59,7 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -85,11 +89,12 @@ MNEEpochDataList::~MNEEpochDataList()
 
 MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
                                               const MatrixXi& events,
-                                              const RowVectorXi& picks,
                                               float tmin,
                                               float tmax,
                                               qint32 event,
-                                              double dEOGThreshold)
+                                              double dEOGThreshold,
+                                              const QString& sChType,
+                                              const RowVectorXi& picks)
 {
     MNEEpochDataList data;
 
@@ -113,32 +118,21 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
         return MNEEpochDataList();
     }
 
+    // If picks are empty, pick all
+    RowVectorXi picksNew = picks;
+    if(picks.cols() <= 0) {
+        picksNew.resize(raw.info.chs.size());
+        for(int i = 0; i < raw.info.chs.size(); ++i) {
+            picksNew(i) = i;
+        }
+    }
+
     fiff_int_t event_samp, from, to;
     fiff_int_t dropCount = 0;
     MatrixXd timesDummy;
     MatrixXd times;
-    double min, max;
 
     MNEEpochData* epoch = Q_NULLPTR;
-
-    int iChType = FIFFV_EOG_CH;
-    int iEOGChIdx = -1;
-
-    for(int i = 0; i < raw.info.chs.size(); ++i) {
-        if(raw.info.chs.at(i).kind == iChType) {
-            for(int j = 0; j < picks.cols(); ++j) {
-                if(i == picks(j)) {
-                    iEOGChIdx = j;
-                    break;
-                }
-            }
-            break;
-        }
-    }
-
-    if(iEOGChIdx == -1) {
-        qDebug() << "No EOG channel found for epoch rejection";
-    }
 
     for (p = 0; p < count; ++p) {
         // Read a data segment
@@ -148,7 +142,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
 
         epoch = new MNEEpochData();
 
-        if(raw.read_raw_segment(epoch->epoch, timesDummy, from, to, picks)) {
+        if(raw.read_raw_segment(epoch->epoch, timesDummy, from, to, picksNew)) {
             if (p == 0) {
                 times.resize(1, to-from+1);
                 for (qint32 i = 0; i < times.cols(); ++i)
@@ -159,28 +153,24 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
             epoch->tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
             epoch->tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
 
-            if(iEOGChIdx >= 0 &&
-               iEOGChIdx < epoch->epoch.rows() &&
-               dEOGThreshold > 0.0) {
-                RowVectorXd vecRow = epoch->epoch.row(iEOGChIdx);
-                //vecRow = vecRow.array() - vecRow(0);
-                vecRow = vecRow.array() - vecRow.mean();
+            epoch->bReject = checkForArtifact(epoch->epoch,
+                                              raw.info,
+                                              dEOGThreshold,
+                                              "threshold",
+                                              sChType);
 
-                min = vecRow.minCoeff();
-                max = vecRow.maxCoeff();
-
-                //qDebug() << "std::fabs(min)" << std::fabs(min);
-                //qDebug() << "std::fabs(max)" << std::fabs(max);
-
-                //If absolute vaue of min or max if bigger than threshold -> reject
-                if((std::fabs(min) > dEOGThreshold) || (std::fabs(max) > dEOGThreshold)) {
-                    epoch->bReject = true;
-                    dropCount++;
-                    //qDebug() << "Epoch at sample" << event_samp << "rejected based on EOG channel";
-                }
+            if (epoch->bReject) {
+                dropCount++;
             }
 
-            data.append(MNEEpochData::SPtr(epoch));//List takes ownwership of the pointer - no delete need
+            //Check if data block has the same size as the previous one
+            if(!data.isEmpty()) {
+                if(epoch->epoch.size() == data.last()->epoch.size()) {
+                    data.append(MNEEpochData::SPtr(epoch));//List takes ownwership of the pointer - no delete need
+                }
+            } else {
+                data.append(MNEEpochData::SPtr(epoch));//List takes ownwership of the pointer - no delete need
+            }
         } else {
             printf("Can't read the event data segments");
         }
@@ -201,27 +191,26 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
     printf("Calculate evoked... ");
 
     MatrixXd matAverage;
-    if(this->size() > 0)
+
+    if(this->size() > 0) {
         matAverage = MatrixXd::Zero(this->at(0)->epoch.rows(), this->at(0)->epoch.cols());
-    else
-    {
+    } else {
         p_evoked.aspect_kind = FIFFV_ASPECT_STD_ERR;
         return p_evoked;
     }
 
-    if(sel.size() > 0)
-    {
+    if(sel.size() > 0) {
         p_evoked.nave = sel.size();
 
-        for(qint32 i = 0; i < sel.size(); ++i)
+        for(qint32 i = 0; i < sel.size(); ++i) {
             matAverage.array() += this->at(sel(i))->epoch.array();
-    }
-    else
-    {
+        }
+    } else {
         p_evoked.nave = this->size();
 
-        for(qint32 i = 0; i < this->size(); ++i)
+        for(qint32 i = 0; i < this->size(); ++i) {
             matAverage.array() += this->at(i)->epoch.array();
+        }
     }
     matAverage.array() /= p_evoked.nave;
 
@@ -235,19 +224,24 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
     p_evoked.last = last;
 
     RowVectorXf times = RowVectorXf(last-first+1);
-    for (qint32 k = 0; k < times.size(); ++k)
+    for (qint32 k = 0; k < times.size(); ++k) {
         times[k] = ((float)(first+k)) / info.sfreq;
+    }
+
     p_evoked.times = times;
 
     p_evoked.comment = QString::number(this->at(0)->event);
 
-    if(p_evoked.proj.rows() > 0)
-    {
+    if(p_evoked.proj.rows() > 0) {
         matAverage = p_evoked.proj * matAverage;
         printf("\tSSP projectors applied to the evoked data\n");
     }
 
-    p_evoked.data = matAverage;
+    QPair<QVariant,QVariant> pairBaselineSec;
+    pairBaselineSec.first = this->first()->tmin;
+    pairBaselineSec.second = this->first()->tmax;
+
+    p_evoked.data = MNEMath::rescale(matAverage, times, pairBaselineSec, QString("mean"));
 
     return p_evoked;
 }
@@ -262,5 +256,158 @@ void MNEEpochDataList::dropRejected()
         if (i.next()->bReject) {
             i.remove();
         }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MNEEpochDataList::pick_channels(const RowVectorXi& sel)
+{
+    QMutableListIterator<MNEEpochData::SPtr> i(*this);
+    while (i.hasNext()) {
+        i.next()->pick_channels(sel);
+    }
+}
+
+
+//*************************************************************************************************************
+
+bool MNEEpochDataList::checkForArtifact(MatrixXd& data,
+                                        const FiffInfo& pFiffInfo,
+                                        double dThreshold,
+                                        const QString& sCheckType,
+                                        const QString& sChType)
+{
+    bool bReject = false;
+
+    //Prepare concurrent data handling
+    QList<ArtifactRejectionData> lchData;
+
+    int iChType = FIFFV_EOG_CH;
+
+    if(sChType.contains("grad", Qt::CaseInsensitive) ||
+       sChType.contains("mag", Qt::CaseInsensitive) ) {
+        iChType = FIFFV_MEG_CH;
+    }
+
+    if(sChType.contains("eeg", Qt::CaseInsensitive)) {
+        iChType = FIFFV_EEG_CH;
+    }
+
+    for(int i = 0; i < pFiffInfo.chs.size(); ++i) {
+        if(pFiffInfo.chs.at(i).kind == iChType
+           && !pFiffInfo.bads.contains(pFiffInfo.chs.at(i).ch_name)
+           && pFiffInfo.chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG
+           && pFiffInfo.chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG2) {
+            if(iChType == FIFFV_MEG_CH) {
+                if(sChType.contains("grad", Qt::CaseInsensitive) &&
+                   pFiffInfo.chs.at(i).unit == FIFF_UNIT_T_M) {
+                    ArtifactRejectionData tempData;
+                    tempData.bRejected = false;
+                    tempData.data = data.row(i);
+                    tempData.dThreshold = dThreshold;
+                    lchData.append(tempData);
+                } else if(sChType.contains("mag", Qt::CaseInsensitive) &&
+                          pFiffInfo.chs.at(i).unit == FIFF_UNIT_T) {
+                    ArtifactRejectionData tempData;
+                    tempData.bRejected = false;
+                    tempData.data = data.row(i);
+                    tempData.dThreshold = dThreshold;
+                    lchData.append(tempData);
+                }
+            } else {
+                ArtifactRejectionData tempData;
+                tempData.bRejected = false;
+                tempData.data = data.row(i);
+                tempData.dThreshold = dThreshold;
+                lchData.append(tempData);
+            }
+        }
+    }
+
+    if(lchData.isEmpty()) {
+        qDebug() << "MNEEpochDataList::checkForArtifact - No channels found to scan for artifacts. Returning.";
+
+        return bReject;
+    }
+
+//    qDebug() << "MNEEpochDataList::checkForArtifact - lchData.size()" << lchData.size();
+//    qDebug() << "MNEEpochDataList::checkForArtifact - iChType" << iChType;
+
+    if(sCheckType.contains("threshold", Qt::CaseInsensitive)) {
+        //Start the concurrent processing
+        QFuture<void> future = QtConcurrent::map(lchData, checkChThreshold);
+        future.waitForFinished();
+
+        for(int i = 0; i < lchData.size(); ++i) {
+            if(lchData.at(i).bRejected) {
+                bReject = true;
+                qDebug() << "MNEEpochDataList::checkForArtifact - Reject trial";
+                break;
+            }
+        }
+    } else if(sCheckType.contains("variance", Qt::CaseInsensitive)) {
+        //Start the concurrent processing
+        QFuture<void> future = QtConcurrent::map(lchData, checkChVariance);
+        future.waitForFinished();
+
+        for(int i = 0; i < lchData.size(); ++i) {
+            if(lchData.at(i).bRejected) {
+                bReject = true;
+                qDebug() << "MNEEpochDataList::checkForArtifact - Reject trial";
+                break;
+            }
+        }
+    }
+
+    return bReject;
+}
+
+
+//*************************************************************************************************************
+
+void MNEEpochDataList::checkChVariance(ArtifactRejectionData& inputData)
+{
+    RowVectorXd temp = inputData.data;
+
+    double dMedian = temp.norm() / temp.cols();
+
+    temp = temp.array() - dMedian;
+    temp.array().square();
+
+//    qDebug() << "MNEEpochDataList::checkChVariance - dMedian" << abs(dMedian);
+//    qDebug() << "MNEEpochDataList::checkChVariance - m_iValueVariance * dMedian" << m_iValueVariance * abs(dMedian);
+//    qDebug() << "MNEEpochDataList::checkChVariance - compare value " << abs(pairData.second.norm() / pairData.second.cols());
+
+    //If variance is 3 times bigger than median -> reject
+    if(temp.norm() / temp.cols() > (inputData.dThreshold * std::fabs(dMedian))) {
+        inputData.bRejected = true;
+    } else {
+        inputData.bRejected = false;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MNEEpochDataList::checkChThreshold(ArtifactRejectionData& inputData)
+{
+    RowVectorXd temp = inputData.data;
+
+    temp = temp.array() - temp(0);
+
+    double min = temp.minCoeff();
+    double max = temp.maxCoeff();
+
+//    qDebug() << "MNEEpochDataList::checkChVariance - min" << min;
+//    qDebug() << "MNEEpochDataList::checkChVariance - max" << max;
+//    qDebug() << "MNEEpochDataList::checkChVariance - m_dValueThreshold" << m_dValueThreshold;
+
+    //If absolute vaue of min or max if bigger than threshold -> reject
+    if((std::fabs(min) > inputData.dThreshold) || (std::fabs(max) > inputData.dThreshold)) {
+        inputData.bRejected = true;
+    } else {
+        inputData.bRejected = false;
     }
 }

@@ -95,6 +95,192 @@ Coherency::Coherency()
 
 //*************************************************************************************************************
 
+void Coherency::computeCoherencyReal(Network& finalNetwork,
+                                     const QList<MatrixXd> &matDataList,
+                                     int iNfft,
+                                     const QString &sWindowType)
+{
+//        QElapsedTimer timer;
+//        qint64 iTime = 0;
+//        timer.start();
+
+        if(matDataList.empty()) {
+            qDebug() << "Coherency::computeCoherencyReal - Input data is empty";
+            return;
+        }
+
+        #ifdef EIGEN_FFTW_DEFAULT
+            fftw_make_planner_thread_safe();
+        #endif
+
+        // Check that iNfft >= signal length
+        int iSignalLength = matDataList.at(0).cols();
+        if (iNfft < iSignalLength) {
+            iNfft = iSignalLength;
+        }
+
+        // Generate tapers
+        QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, sWindowType);
+
+        // Initialize vecPsdAvg and vecCsdAvg
+        int iNRows = matDataList.at(0).rows();
+        int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+
+        std::function<AbstractMetricResultData(const MatrixXd&)> computeLambda = [&](const MatrixXd& matInputData) {
+            return compute(matInputData,
+                           iNRows,
+                           iNFreqs,
+                           iNfft,
+                           tapers);
+        };
+
+    //    // Sequential
+    //    AbstractMetricResultData finalResult;
+
+    //    for (int i = 0; i < matDataList.length(); ++i) {
+    //        reduce(finalResult, computeLambda(matDataList.at(i)));
+    //    }
+
+        // Parallel
+//        iTime = timer.elapsed();
+//        qDebug() << "Coherency::computeCoherencyReal timer - Preparation:" << iTime;
+//        timer.restart();
+
+        QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(matDataList,
+                                                                               computeLambda,
+                                                                               reduce);
+        result.waitForFinished();
+
+//        iTime = timer.elapsed();
+//        qDebug() << "Coherency::computeCoherencyReal timer - Parallel computation:" << iTime;
+//        timer.restart();
+
+        AbstractMetricResultData finalResult = result.result();
+
+//        iTime = timer.elapsed();
+//        qDebug() << "Coherency::computeCoherencyReal timer - Result copy:" << iTime;
+//        timer.restart();
+
+        finalResult.matPsdAvg = finalResult.matPsdAvg.cwiseSqrt();
+
+//        iTime = timer.elapsed();
+//        qDebug() << "Coherency::computeCoherencyReal timer - Cwise sqrt:" << iTime;
+//        timer.restart();
+
+        // Compute CSD/(PSD_X * PSD_Y)
+        QMutex mutex;
+        std::function<void(QPair<int,MatrixXcd>&)> computePSDCSDLambda = [&](QPair<int,MatrixXcd>& pairInput) {
+            computePSDCSDReal(mutex,
+                              finalNetwork,
+                              pairInput,
+                              finalResult.matPsdAvg);
+        };
+
+        QFuture<void> resultCSDPSD = QtConcurrent::map(finalResult.vecPairCsdAvg,
+                                                       computePSDCSDLambda);
+        resultCSDPSD.waitForFinished();
+
+//        iTime = timer.elapsed();
+//        qDebug() << "Coherency::computeCoherencyReal timer - CSD/(PSD_X * PSD_Y):" << iTime;
+//        timer.restart();
+}
+
+
+//*************************************************************************************************************
+
+void Coherency::computeCoherencyImag(Network& finalNetwork,
+                                     const QList<MatrixXd> &matDataList,
+                                     int iNfft,
+                                     const QString &sWindowType)
+{
+//        QElapsedTimer timer;
+//        qint64 iTime = 0;
+//        timer.start();
+
+        if(matDataList.empty()) {
+            qDebug() << "Coherency::computeCoherencyImag - Input data is empty";
+            return;
+        }
+
+        #ifdef EIGEN_FFTW_DEFAULT
+            fftw_make_planner_thread_safe();
+        #endif
+
+        // Check that iNfft >= signal length
+        int iSignalLength = matDataList.at(0).cols();
+        if (iNfft < iSignalLength) {
+            iNfft = iSignalLength;
+        }
+
+        // Generate tapers
+        QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, sWindowType);
+
+        // Initialize vecPsdAvg and vecCsdAvg
+        int iNRows = matDataList.at(0).rows();
+        int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+
+        std::function<AbstractMetricResultData(const MatrixXd&)> computeLambda = [&](const MatrixXd& matInputData) {
+            return compute(matInputData,
+                           iNRows,
+                           iNFreqs,
+                           iNfft,
+                           tapers);
+        };
+
+    //    // Sequential
+    //    AbstractMetricResultData finalResult;
+
+    //    for (int i = 0; i < matDataList.length(); ++i) {
+    //        reduce(finalResult, computeLambda(matDataList.at(i)));
+    //    }
+
+        // Parallel
+//        iTime = timer.elapsed();
+//        qDebug() << "Coherency::computeCoherencyImag timer - Preparation:" << iTime;
+//        timer.restart();
+
+        QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(matDataList,
+                                                                               computeLambda,
+                                                                               reduce);
+        result.waitForFinished();
+
+//        iTime = timer.elapsed();
+//        qDebug() << "Coherency::computeCoherencyImag timer - Parallel computation:" << iTime;
+//        timer.restart();
+
+        AbstractMetricResultData finalResult = result.result();
+
+//        iTime = timer.elapsed();
+//        qDebug() << "Coherency::computeCoherencyImag timer - Result copy:" << iTime;
+//        timer.restart();
+
+        finalResult.matPsdAvg = finalResult.matPsdAvg.cwiseSqrt();
+
+//        iTime = timer.elapsed();
+//        qDebug() << "Coherency::computeCoherencyImag timer - Cwise sqrt:" << iTime;
+//        timer.restart();
+
+        // Compute CSD/(PSD_X * PSD_Y)
+        QMutex mutex;
+        std::function<void(QPair<int,MatrixXcd>&)> computePSDCSDLambda = [&](QPair<int,MatrixXcd>& pairInput) {
+            computePSDCSDImag(mutex,
+                              finalNetwork,
+                              pairInput,
+                              finalResult.matPsdAvg);
+        };
+
+        QFuture<void> resultCSDPSD = QtConcurrent::map(finalResult.vecPairCsdAvg,
+                                                       computePSDCSDLambda);
+        resultCSDPSD.waitForFinished();
+
+//        iTime = timer.elapsed();
+//        qDebug() << "Coherency::computeCoherencyImag timer - CSD/(PSD_X * PSD_Y):" << iTime;
+//        timer.restart();
+}
+
+
+//*************************************************************************************************************
+
 void Coherency::computeCoherency(QVector<QPair<int,MatrixXcd> >& vecCoherency,
                                  const QList<MatrixXd> &matDataList,
                                  int iNfft,
@@ -103,6 +289,11 @@ void Coherency::computeCoherency(QVector<QPair<int,MatrixXcd> >& vecCoherency,
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;
 //    timer.start();
+
+    if(matDataList.empty()) {
+        qDebug() << "Coherency::computeCoherency - Input data is empty";
+        return;
+    }
 
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
@@ -294,7 +485,6 @@ void Coherency::reduce(AbstractMetricResultData& finalData,
 }
 
 
-
 //*************************************************************************************************************
 
 void Coherency::computePSDCSD(QPair<int,MatrixXcd>& pairInput,
@@ -308,4 +498,72 @@ void Coherency::computePSDCSD(QPair<int,MatrixXcd>& pairInput,
     }
 
     pairInput.second = pairInput.second.cwiseQuotient(matPSDtmp);
+}
+
+
+//*************************************************************************************************************
+
+void Coherency::computePSDCSDReal(QMutex& mutex,
+                                  Network& finalNetwork,
+                                  QPair<int,MatrixXcd>& pairInput,
+                                  const MatrixXd& matPsdAvg)
+{
+    MatrixXd matPSDtmp(matPsdAvg.rows(), matPsdAvg.cols());
+    RowVectorXd vecPsdAvg = matPsdAvg.row(pairInput.first);
+
+    for(int j = 0; j < matPSDtmp.rows(); ++j) {
+        matPSDtmp.row(j) = vecPsdAvg.cwiseProduct(matPsdAvg.row(j));
+    }
+
+    MatrixXcd matCohy = pairInput.second.cwiseQuotient(matPSDtmp);
+
+    QSharedPointer<NetworkEdge> pEdge;
+    MatrixXd matWeight;
+    int j;
+    int i = pairInput.first;
+
+    for(j = i; j < matCohy.rows(); ++j) {
+        matWeight = matCohy.row(j).cwiseAbs().transpose();
+        pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
+
+        mutex.lock();
+        finalNetwork.getNodeAt(i)->append(pEdge);
+        finalNetwork.getNodeAt(j)->append(pEdge);
+        finalNetwork.append(pEdge);
+        mutex.unlock();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Coherency::computePSDCSDImag(QMutex& mutex,
+                                  Network& finalNetwork,
+                                  QPair<int,MatrixXcd>& pairInput,
+                                  const MatrixXd& matPsdAvg)
+{
+    MatrixXd matPSDtmp(matPsdAvg.rows(), matPsdAvg.cols());
+    RowVectorXd vecPsdAvg = matPsdAvg.row(pairInput.first);
+
+    for(int j = 0; j < matPSDtmp.rows(); ++j) {
+        matPSDtmp.row(j) = vecPsdAvg.cwiseProduct(matPsdAvg.row(j));
+    }
+
+    MatrixXcd matCohy = pairInput.second.cwiseQuotient(matPSDtmp);
+
+    QSharedPointer<NetworkEdge> pEdge;
+    MatrixXd matWeight;
+    int j;
+    int i = pairInput.first;
+
+    for(j = i; j < matCohy.rows(); ++j) {
+        matWeight = matCohy.row(j).imag().transpose();
+        pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
+
+        mutex.lock();
+        finalNetwork.getNodeAt(i)->append(pEdge);
+        finalNetwork.getNodeAt(j)->append(pEdge);
+        finalNetwork.append(pEdge);
+        mutex.unlock();
+    }
 }

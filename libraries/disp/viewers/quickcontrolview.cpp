@@ -118,9 +118,9 @@ void QuickControlView::addWidget(QWidget* pWidget)
 //*************************************************************************************************************
 
 void QuickControlView::addGroupBox(QSharedPointer<QWidget> pWidget,
-                                   QString sGroupBoxName)
+                                   const QString& sGroupBoxName)
 {
-    //Store a reference here so we can unparent them in the destructor. Unparenting is neded because we do not want
+    //Store a reference here so we can unparent them in the destructor. Unparenting is needed because we do not want
     //to mix the memory management of QObject and QSharedPointer
     m_lControlWidgets << pWidget;
 
@@ -131,7 +131,7 @@ void QuickControlView::addGroupBox(QSharedPointer<QWidget> pWidget,
 //*************************************************************************************************************
 
 void QuickControlView::addGroupBox(QWidget* pWidget,
-                                   QString sGroupBoxName)
+                                   const QString& sGroupBoxName)
 {
     QGroupBox* pGroupBox = new QGroupBox(sGroupBoxName);
     pGroupBox->setObjectName(sGroupBoxName);
@@ -151,8 +151,8 @@ void QuickControlView::addGroupBox(QWidget* pWidget,
 //*************************************************************************************************************
 
 void QuickControlView::addGroupBoxWithTabs(QSharedPointer<QWidget> pWidget,
-                                           QString sGroupBoxName,
-                                           QString sTabName)
+                                           const QString& sGroupBoxName,
+                                           const QString& sTabName)
 {
     m_lControlWidgets << pWidget;
 
@@ -163,8 +163,8 @@ void QuickControlView::addGroupBoxWithTabs(QSharedPointer<QWidget> pWidget,
 //*************************************************************************************************************
 
 void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,
-                                           QString sGroupBoxName,
-                                           QString sTabName)
+                                           const QString& sGroupBoxName,
+                                           const QString& sTabName)
 {
     QGroupBox* pGroupBox = ui->m_widget_groupBoxes->findChild<QGroupBox *>(sGroupBoxName);
 

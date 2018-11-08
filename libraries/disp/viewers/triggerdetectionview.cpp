@@ -52,6 +52,7 @@
 
 #include <QColorDialog>
 #include <QPalette>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -74,10 +75,12 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TriggerDetectionView::TriggerDetectionView(QWidget *parent,
-                         Qt::WindowFlags f)
+TriggerDetectionView::TriggerDetectionView(const QString& sSettingsPath,
+                                           QWidget *parent,
+                                           Qt::WindowFlags f)
 : QWidget(parent, f)
 , ui(new Ui::TriggerDetectionViewWidget)
+, m_sSettingsPath(sSettingsPath)
 {
     ui->setupUi(this);
 
@@ -91,6 +94,8 @@ TriggerDetectionView::TriggerDetectionView(QWidget *parent,
 
 TriggerDetectionView::~TriggerDetectionView()
 {
+    saveSettings(m_sSettingsPath);
+
     delete ui;
 }
 
@@ -103,7 +108,7 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
         m_pFiffInfo = pFiffInfo;
         //Trigger detection
         connect(ui->m_checkBox_activateTriggerDetection, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
-                this, &TriggerDetectionView::onRealTimeTriggerActiveChanged);
+                this, &TriggerDetectionView::onTriggerInfoChanged);
 
         for(int i = 0; i<m_pFiffInfo->chs.size(); i++) {
             if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
@@ -112,7 +117,7 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
         }
 
         connect(ui->m_comboBox_triggerChannels, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-                this, &TriggerDetectionView::onRealTimeTriggerCurrentChChanged);
+                this, &TriggerDetectionView::onTriggerInfoChanged);
 
         connect(ui->m_comboBox_triggerColorType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
                 this, &TriggerDetectionView::onRealTimeTriggerColorTypeChanged);
@@ -128,13 +133,15 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
         ui->m_pushButton_triggerColor->update();
 
         connect(ui->m_doubleSpinBox_detectionThresholdFirst, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this, &TriggerDetectionView::onRealTimeTriggerThresholdChanged);
+                this, &TriggerDetectionView::onTriggerInfoChanged);
 
         connect(ui->m_spinBox_detectionThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                    this, &TriggerDetectionView::onRealTimeTriggerThresholdChanged);
+                    this, &TriggerDetectionView::onTriggerInfoChanged);
 
         connect(ui->m_pushButton_resetNumberTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &TriggerDetectionView::onResetTriggerNumbers);
+
+        loadSettings(m_sSettingsPath);
     }
 }
 
@@ -158,6 +165,58 @@ void TriggerDetectionView::setNumberDetectedTriggersAndTypes(int numberDetection
             }
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void TriggerDetectionView::saveSettings(const QString& settingsPath)
+{
+    QSettings settings;
+
+    settings.setValue(settingsPath + QString("/triggerDetectionActivated"), ui->m_checkBox_activateTriggerDetection->isChecked());
+    settings.setValue(settingsPath + QString("/triggerDetectionChannelIndex"), ui->m_comboBox_triggerChannels->currentIndex());
+    settings.setValue(settingsPath + QString("/triggerDetectionFirstThresholdValue"), ui->m_doubleSpinBox_detectionThresholdFirst->value());
+    settings.setValue(settingsPath + QString("/triggerDetectionSecondThresholdValue"), ui->m_spinBox_detectionThresholdSecond->value());
+
+    settings.beginGroup(settingsPath + QString("/triggerDetectionColors"));
+    QMap<double, QColor>::const_iterator i = m_qMapTriggerColor.constBegin();
+    while (i != m_qMapTriggerColor.constEnd()) {
+         settings.setValue(QString::number(i.key()), i.value());
+         ++i;
+    }
+    settings.endGroup();
+}
+
+
+//*************************************************************************************************************
+
+void TriggerDetectionView::loadSettings(const QString& settingsPath)
+{
+    QSettings settings;
+
+    ui->m_checkBox_activateTriggerDetection->setChecked(settings.value(settingsPath + QString("/triggerDetectionActivated"), false).toBool());
+    ui->m_comboBox_triggerChannels->setCurrentIndex(settings.value(settingsPath + QString("/triggerDetectionChannelIndex"), 0).toInt());
+    ui->m_doubleSpinBox_detectionThresholdFirst->setValue(settings.value(settingsPath + QString("/triggerDetectionFirstThresholdValue"), 0.1).toDouble());
+    ui->m_spinBox_detectionThresholdSecond->setValue(settings.value(settingsPath + QString("/triggerDetectionSecondThresholdValue"), -1).toInt());
+
+    settings.beginGroup(settingsPath + QString("/triggerDetectionColors"));
+    QStringList keys = settings.childKeys();
+    foreach (QString key, keys) {
+        double dKey = key.toDouble();
+        m_qMapTriggerColor[dKey] = settings.value(key).value<QColor>();
+    }
+    settings.endGroup();
+
+    onTriggerInfoChanged();
+}
+
+
+//*************************************************************************************************************
+
+void TriggerDetectionView::onTriggerInfoChanged()
+{
+    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
 }
 
 
@@ -195,7 +254,7 @@ void TriggerDetectionView::onRealTimeTriggerColorChanged(bool state)
 
     m_qMapTriggerColor[ui->m_comboBox_triggerColorType->currentText().toDouble()] = color;
 
-    emit triggerInfoChanged(m_qMapTriggerColor, ui->m_checkBox_activateTriggerDetection->isChecked(), ui->m_comboBox_triggerChannels->currentText(), ui->m_doubleSpinBox_detectionThresholdFirst->value()*pow(10, ui->m_spinBox_detectionThresholdSecond->value()));
+    onTriggerInfoChanged();
 }
 
 

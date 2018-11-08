@@ -153,12 +153,13 @@ RowVectorXi FiffInfoBase::pick_types(const QString meg, bool eeg, bool stim, con
 
         if ((kind == FIFFV_MEG_CH || kind == FIFFV_REF_MEG_CH))
         {
-            if(meg.compare("all") == 0)
+            if(meg.compare("all") == 0) {
                 pick(k) = 1;
-            else if(meg.compare("grad") == 0 && this->chs[k].unit == FIFF_UNIT_T_M)
+            } else if(meg.compare("grad") == 0 && this->chs[k].unit == FIFF_UNIT_T_M) {
                 pick(k) = 1;
-            else if(meg.compare("mag") == 0 && this->chs[k].unit == FIFF_UNIT_T)
+            } else if(meg.compare("mag") == 0 && this->chs[k].unit == FIFF_UNIT_T) {
                 pick(k) = 1;
+            }
         }
         else if (kind == FIFFV_EEG_CH && eeg)
             pick(k) = 1;

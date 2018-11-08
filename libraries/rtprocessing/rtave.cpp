@@ -42,6 +42,8 @@
 
 #include "rtave.h"
 
+#include <mne/mne_epoch_data_list.h>
+
 #include <utils/ioutils.h>
 #include <utils/detecttrigger.h>
 #include <utils/mnemath.h>
@@ -76,6 +78,7 @@ using namespace FIFFLIB;
 using namespace IOBUFFER;
 using namespace UTILSLIB;
 using namespace Eigen;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -539,7 +542,21 @@ void RtAve::mergeData(double dTriggerType)
     mergedData << m_mapDataPre[dTriggerType], m_mapDataPost[dTriggerType];
 
     //Perform artifact threshold
-    bool bArtifactedDetected = checkForArtifact(mergedData);
+    bool bArtifactedDetected = false;
+
+    if(m_bActivateThreshold) {
+        bArtifactedDetected = MNEEpochDataList::checkForArtifact(mergedData,
+                                                                 *m_pFiffInfo,
+                                                                 m_dValueThreshold,
+                                                                 "threshold");
+    }
+
+    if(m_bActivateVariance) {
+        bArtifactedDetected = MNEEpochDataList::checkForArtifact(mergedData,
+                                                                 *m_pFiffInfo,
+                                                                 m_dValueVariance,
+                                                                 "variance");
+    }
 
     if(bArtifactedDetected == false) {
         //Add cut data to average buffer
@@ -557,114 +574,6 @@ void RtAve::mergeData(double dTriggerType)
             m_mapStimAve[dTriggerType].pop_front();
         }
     }
-}
-
-
-//*************************************************************************************************************
-
-void checkChVariance(QPair<bool, RowVectorXd>& pairData)
-{
-    RowVectorXd temp = pairData.second;
-
-    double dMedian = temp.norm() / temp.cols();
-
-    temp = temp.array() - dMedian;
-    temp.array().square();
-
-//    qDebug() << "RtAve::checkForArtifact - dMedian" << abs(dMedian);
-//    qDebug() << "RtAve::checkForArtifact - m_iValueVariance * dMedian" << m_iValueVariance * abs(dMedian);
-//    qDebug() << "RtAve::checkForArtifact - compare value " << abs(pairData.second.norm() / pairData.second.cols());
-
-    //If variance is 3 times bigger than median -> reject
-    if(temp.norm() / temp.cols() > (m_dValueVariance * std::fabs(dMedian))) {
-        pairData.first = true;
-    } else {
-        pairData.first = false;
-    }
-}
-
-
-
-//*************************************************************************************************************
-
-void checkChThreshold(QPair<bool, RowVectorXd>& pairData)
-{
-    RowVectorXd temp = pairData.second;
-
-    temp = temp.array() - temp(0);
-
-    double min = temp.minCoeff();
-    double max = temp.maxCoeff();
-
-//    qDebug() << "RtAve::checkForArtifact - min" << min;
-//    qDebug() << "RtAve::checkForArtifact - max" << max;
-//    qDebug() << "RtAve::checkForArtifact - m_dValueThreshold" << m_dValueThreshold;
-
-    //If absolute vaue of min or max if bigger than threshold -> reject
-    if((std::fabs(min) > m_dValueThreshold) || (std::fabs(max) > m_dValueThreshold)) {
-        pairData.first = true;
-    } else {
-        pairData.first = false;
-    }
-}
-
-
-//*************************************************************************************************************
-
-bool RtAve::checkForArtifact(MatrixXd& data)
-{
-    bool bReject = false;
-
-    if(m_bActivateThreshold || m_bActivateVariance) {
-        //Prepare concurrent data handling
-        QList<QPair<bool, RowVectorXd> > lchData;
-
-        int iChType = FIFFV_EOG_CH; //FIFFV_MEG_CH FIFFV_EEG_CH FIFFV_EOG_CH
-
-        for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
-            if(m_pFiffInfo->chs.at(i).kind == iChType
-               && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)
-               && m_pFiffInfo->chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG
-               && m_pFiffInfo->chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG2) {
-                QPair<bool, RowVectorXd> pair;
-                pair.first = false;
-                pair.second = data.row(i);
-                lchData.append(pair);
-            }
-        }
-
-        //qDebug() << "RtAve::checkForArtifact - lchData.size()" << lchData.size();
-
-        if(m_bActivateVariance) {
-            //Start the concurrent processing
-            QFuture<void> future = QtConcurrent::map(lchData, checkChVariance);
-            future.waitForFinished();
-
-            for(int i = 0; i < lchData.size(); ++i) {
-                if(lchData.at(i).first) {
-                    bReject = true;
-                    qDebug() << "RtAve::checkForArtifact - Reject trial";
-                    break;
-                }
-            }
-        }
-
-        if(m_bActivateThreshold && !bReject) {
-            //Start the concurrent processing
-            QFuture<void> future = QtConcurrent::map(lchData, checkChThreshold);
-            future.waitForFinished();
-
-            for(int i = 0; i < lchData.size(); ++i) {
-                if(lchData.at(i).first) {
-                    bReject = true;
-                    qDebug() << "RtAve::checkForArtifact - Reject trial";
-                    break;
-                }
-            }
-        }
-    }
-
-    return bReject;
 }
 
 
@@ -704,8 +613,8 @@ void RtAve::generateEvoked(double dTriggerType)
             evoked.times[i] = evoked.times[i-1] + T;
         }
         evoked.times[m_iPreStimSamples] = 0.0f;
-        evoked.first = evoked.times[0];
-        evoked.last = evoked.times[evoked.times.size()-1];
+        evoked.first = 0;
+        evoked.last = m_iPreStimSamples + m_iPostStimSamples;
         evoked.comment = QString::number(dTriggerType);
     }
 

@@ -115,8 +115,9 @@ public:
     *
     * @param [in] parent        parent of widget
     */
-    TriggerDetectionView(QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
+    TriggerDetectionView(const QString& sSettingsPath = "",
+                         QWidget *parent = 0,
+                         Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
@@ -139,7 +140,16 @@ public:
     */
     void setNumberDetectedTriggersAndTypes(int totalNumberDetections, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 
+    void saveSettings(const QString& settingsPath);
+    void loadSettings(const QString& settingsPath);
+
 protected:
+    //=========================================================================================================
+    /**
+    * Slot called when trigger info changed
+    */
+    void onTriggerInfoChanged();
+
     //=========================================================================================================
     /**
     * Slot called when trigger detection check box was toggled
@@ -181,6 +191,8 @@ protected:
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
 
     QMap<double, QColor>                                m_qMapTriggerColor;             /**< Trigger colors per detected type. */
+
+    QString                                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
 signals:
     //=========================================================================================================
