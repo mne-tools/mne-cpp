@@ -90,17 +90,20 @@ class ConnectivitySettingsManager : public QObject
 
 public:
 
-    ConnectivitySettingsManager(float sFreq = 1000.0f, QObject *parent = 0)
+    ConnectivitySettingsManager(int iBlockSize, float sFreq = 1000.0f, QObject *parent = 0)
     : QObject(parent)
     , m_pRtConnectivity(RtConnectivity::SPtr::create())
-    , m_iFreqBandLow(1)
-    , m_iFreqBandHigh(50)
     , m_fSFreq(sFreq)
     {
         QObject::connect(m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
                          this, &ConnectivitySettingsManager::onNewConnectivityResultAvailable);
 
-        onFreqBandChanged(m_iFreqBandLow, m_iFreqBandHigh);
+        // By default the number of frequency bins is half the signal since we only use the half spectrum
+        double dScaleFactor = iBlockSize/m_fSFreq;
+
+        // Convert to frequency bins
+        m_iFreqBandLow = 1 * dScaleFactor;
+        m_iFreqBandHigh = 50 * dScaleFactor;
     }
 
     ConnectivitySettings    m_settings;
@@ -157,6 +160,7 @@ public:
     {
         m_networkData = tNetworkData;
         m_networkData.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
+        m_networkData.normalize();
 
         if(!m_networkData.isEmpty()) {
             emit newConnectivityResultAvailable(m_networkData);

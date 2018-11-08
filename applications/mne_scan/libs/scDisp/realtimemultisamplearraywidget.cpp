@@ -351,7 +351,7 @@ void RealTimeMultiSampleArrayWidget::init()
             slFlags << "projections" << "view" << "scaling";
         #endif
 
-        m_pQuickControlView = QuickControlView::SPtr::create("RT Display", Qt::Window | Qt::CustomizeWindowHint, this);
+        m_pQuickControlView = QuickControlView::SPtr::create("RT Display", Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint, this);
         m_pQuickControlView->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
 
         // Quick control scaling
@@ -443,8 +443,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         // Quick control trigger detection settings
         if(slFlags.contains("triggerdetection")) {
-            TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView();
-            pTriggerDetectionView->init(m_pFiffInfo);
+            TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView(QString("RTMSAW/%1").arg(t_sRTMSAWName));
             m_pQuickControlView->addGroupBoxWithTabs(pTriggerDetectionView, "Other", "Triggers");
 
             connect(pTriggerDetectionView, &TriggerDetectionView::triggerInfoChanged,
@@ -455,6 +454,8 @@ void RealTimeMultiSampleArrayWidget::init()
 
             connect(m_pChannelDataView.data(), &ChannelDataView::triggerDetected,
                     pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
+
+            pTriggerDetectionView->init(m_pFiffInfo);
         }
 
         //Initialized

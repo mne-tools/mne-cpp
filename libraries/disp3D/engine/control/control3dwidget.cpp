@@ -205,7 +205,7 @@ void Control3DWidget::init(QSharedPointer<Data3DTreeModel> pData3DTreeModel,
             pView3D.data(), &View3D::setLightIntensity);
 
     //Set description hidden as default
-    this->onTreeViewDescriptionHide();
+    ui->m_treeView_loadedData->setColumnHidden(1, true);
 }
 
 
@@ -296,9 +296,9 @@ void Control3DWidget::onCustomContextMenuRequested(QPoint pos)
     connect(pHideHeader, &QAction::triggered,
             this, &Control3DWidget::onTreeViewHeaderHide);
 
-    QAction* pHideDesc = menu->addAction(tr("Toggle description"));
-    connect(pHideDesc, &QAction::triggered,
-            this, &Control3DWidget::onTreeViewDescriptionHide);
+//    QAction* pHideDesc = menu->addAction(tr("Toggle description"));
+//    connect(pHideDesc, &QAction::triggered,
+//            this, &Control3DWidget::onTreeViewDescriptionHide);
 
     //show context menu
     menu->popup(ui->m_treeView_loadedData->viewport()->mapToGlobal(pos));

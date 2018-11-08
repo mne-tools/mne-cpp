@@ -143,6 +143,14 @@ double NetworkEdge::getWeight() const
 
 //*************************************************************************************************************
 
+void NetworkEdge::setWeight(double dAveragedWeight)
+{
+    m_dAveragedWeight = dAveragedWeight;
+}
+
+
+//*************************************************************************************************************
+
 void NetworkEdge::calculateAveragedWeight()
 {
     int iStartWeightBin = m_iMinMaxFreqBins.first;

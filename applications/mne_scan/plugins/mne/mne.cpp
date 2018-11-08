@@ -145,15 +145,18 @@ void MNE::init()
 
     // Input
     m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
-    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &MNE::updateRTMSA, Qt::DirectConnection);
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify,
+            this, &MNE::updateRTMSA, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
     m_pRTESInput = PluginInputData<RealTimeEvokedSet>::create(this, "MNE RTE In", "MNE real-time evoked input data");
-    connect(m_pRTESInput.data(), &PluginInputConnector::notify, this, &MNE::updateRTE, Qt::DirectConnection);
+    connect(m_pRTESInput.data(), &PluginInputConnector::notify,
+            this, &MNE::updateRTE, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTESInput);
 
     m_pRTCInput = PluginInputData<RealTimeCov>::create(this, "MNE RTC In", "MNE real-time covariance input data");
-    connect(m_pRTCInput.data(), &PluginInputConnector::notify, this, &MNE::updateRTC, Qt::DirectConnection);
+    connect(m_pRTCInput.data(), &PluginInputConnector::notify,
+            this, &MNE::updateRTC, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTCInput);
 
     // Output
@@ -471,7 +474,14 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
         for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
             if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
                 m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTES->getValue()->evoked.at(i).info));
-                m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
+
+                if(pRTES->getValue()->evoked.at(i).nave != m_iNumAverages) {
+                    m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
+
+                    if(m_pMinimumNorm){
+                        m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
+                    }
+                }
 
                 break;
             }
@@ -485,7 +495,14 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
             if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
                 //qDebug()<<"MNE::updateRTE - average found type - " << m_sAvrType;
                 m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
-                m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
+
+                if(pRTES->getValue()->evoked.at(i).nave != m_iNumAverages) {
+                    m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
+
+                    if(m_pMinimumNorm){
+                        m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
+                    }
+                }
 
                 break;
             }
@@ -517,6 +534,15 @@ void MNE::updateInvOp(const MNEInverseOperator& invOp)
 void MNE::onMethodChanged(const QString& method)
 {
     m_sMethod = method;
+
+    if(m_pMinimumNorm) {
+        double snr = 3.0;
+        double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
+        m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
+
+        //Set up the inverse according to the parameters
+        m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
+    }
 }
 
 
@@ -590,18 +616,15 @@ void MNE::run()
 //    // TEMP INV LOADING END
 //    //
 
-    while(m_bIsRunning)
-    {
+    while(m_bIsRunning) {
         m_qMutex.lock();
         qint32 t_evokedSize = m_qVecFiffEvoked.size();
         m_qMutex.unlock();
 
         //Process data raw data from a RTMSA
-        if(m_pMatrixDataBuffer)
-        {
+        if(m_pMatrixDataBuffer) {
             //qDebug()<<"MNE::run - Processing RTMSA data";
-            if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0))
-            {
+            if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0)) {
                 MatrixXd rawSegment = m_pMatrixDataBuffer->pop();
 
                 //Pick the same channels as in the inverse operator
@@ -624,9 +647,7 @@ void MNE::run()
                 if(!sourceEstimate.isEmpty()) {
                     m_pRTSEOutput->data()->setValue(sourceEstimate);
                 }
-            }
-            else
-            {
+            } else {
                 m_qMutex.lock();
                 m_qVecFiffEvoked.pop_front();
                 m_qMutex.unlock();
@@ -635,11 +656,9 @@ void MNE::run()
         }
 
         //Process data from averaging
-        if(t_evokedSize > 0)
-        {
+        if(t_evokedSize > 0) {
             //qDebug() << "MNE::run - Processing RTE data - t_evokedSize" << t_evokedSize;
-            if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0))
-            {
+            if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0)) {
                 m_qMutex.lock();
                 FiffEvoked t_fiffEvoked = m_qVecFiffEvoked.takeFirst();
                 //qDebug()<<"MNE::run - t_fiffEvoked.data.rows()"<<t_fiffEvoked.data.rows();
@@ -659,9 +678,7 @@ void MNE::run()
                 if(!sourceEstimate.isEmpty()) {
                     m_pRTSEOutput->data()->setValue(sourceEstimate);
                 }
-            }
-            else
-            {
+            } else {
                 m_qMutex.lock();
                 m_qVecFiffEvoked.pop_front();
                 m_qMutex.unlock();

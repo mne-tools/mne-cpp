@@ -66,6 +66,11 @@
 namespace MNELIB
 {
 
+struct ArtifactRejectionData {
+    bool bRejected;
+    Eigen::RowVectorXd data;
+    double dThreshold;
+};
 
 //=============================================================================================================
 /**
@@ -75,6 +80,7 @@ namespace MNELIB
 */
 class MNESHARED_EXPORT MNEEpochDataList : public QList<MNEEpochData::SPtr>
 {
+
 public:
     typedef QSharedPointer<MNEEpochDataList> SPtr;              /**< Shared pointer type for MNEEpochDataList. */
     typedef QSharedPointer<const MNEEpochDataList> ConstSPtr;   /**< Const shared pointer type for MNEEpochDataList. */
@@ -97,21 +103,23 @@ public:
     *
     * @param[in] raw            The raw data.
     * @param[in] events         The events provided in samples and event kind.
-    * @param[in] picks          Which channels to pick.
     * @param[in] tmin           The start time relative to the event in samples.
     * @param[in] tmax           The end time relative to the event in samples.
     * @param[in] event          The event kind.
     * @param[in] dEOGThreshold  The threshold value to use to reject epochs based on the EOG channel.
     *                           No filtering is performed on the EOG channel. Default is set to no rejection.
     *                           The mean is subtracted from the EOG channel data before checking the threshold.
+    * @param[in] sChType        The channel data type to scan for. EEG, MEG or EOG (default is EOG).
+    * @param[in] picks          Which channels to pick.
     */
     static MNEEpochDataList readEpochs(const FIFFLIB::FiffRawData& raw,
                                        const Eigen::MatrixXi& events,
-                                       const Eigen::RowVectorXi& picks,
                                        float tmin,
                                        float tmax,
                                        qint32 event,
-                                       double dEOGThreshold = 0.0);
+                                       double dEOGThreshold = 0.0,
+                                       const QString& sChType = QString("eog"),
+                                       const Eigen::RowVectorXi& picks = Eigen::RowVectorXi());
 
     //=========================================================================================================
     /**
@@ -126,7 +134,7 @@ public:
     FIFFLIB::FiffEvoked average(FIFFLIB::FiffInfo& p_info,
                                 FIFFLIB::fiff_int_t first,
                                 FIFFLIB::fiff_int_t last,
-                                VectorXi sel = FIFFLIB::defaultVectorXi,
+                                Eigen::VectorXi sel = FIFFLIB::defaultVectorXi,
                                 bool proj = false);
 
     //=========================================================================================================
@@ -134,6 +142,35 @@ public:
     * Drop/Remove all epochs tagged as rejected
     */
     void dropRejected();
+
+    //=========================================================================================================
+    /**
+    * Reduces alld epochs to the selected rows.
+    *
+    * @param[in] sel     The selected rows to keep.
+    */
+    void pick_channels(const Eigen::RowVectorXi& sel);
+
+    //=========================================================================================================
+    /**
+    * Checks the givven matrix for artifacts beyond a threshold value.
+    *
+    * @param[in] data           The data matrix.
+    * @param[in] pFiffInfo      The fiff info.
+    * @param[in] dThreshold     The thresholded value.
+    * @param[in] sCheckType     The detection type. Threshold or variance based (default is Threshold).
+    * @param[in] sChType        The channel data type to scan for. EEG, MEG or EOG (default is EOG).
+    *
+    * @return   Whether a threshold artifact was detected.
+    */
+    static bool checkForArtifact(Eigen::MatrixXd& data,
+                                 const FIFFLIB::FiffInfo& pFiffInfo,
+                                 double dThreshold,
+                                 const QString& sCheckType = QString("threshold"),
+                                 const QString& sChType = QString("eog"));
+
+    static void checkChVariance(ArtifactRejectionData& inputData);
+    static void checkChThreshold(ArtifactRejectionData& inputData);
 };
 
 } // NAMESPACE

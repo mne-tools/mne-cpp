@@ -7,134 +7,17 @@
     <x>0</x>
     <y>0</y>
     <width>296</width>
-    <height>525</height>
+    <height>522</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0">
-    <widget class="QPushButton" name="m_pushButton_reset">
-     <property name="text">
-      <string>RESET</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>General</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Stiumulus Channel:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="m_pComboBoxChSelection"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>Average mode:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="m_comboBox_runningAvr">
-        <item>
-         <property name="text">
-          <string>Running</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Cumulative</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Number of averages:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QSpinBox" name="m_pSpinBoxNumAverages">
-        <property name="minimum">
-         <number>0</number>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Pre-stimulus in ms:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QSpinBox" name="m_pSpinBoxPreStimSamples">
-        <property name="prefix">
-         <string>-</string>
-        </property>
-        <property name="minimum">
-         <number>10</number>
-        </property>
-        <property name="maximum">
-         <number>10000</number>
-        </property>
-        <property name="singleStep">
-         <number>10</number>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Post-stimulus in ms:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QSpinBox" name="m_pSpinBoxPostStimSamples">
-        <property name="minimum">
-         <number>10</number>
-        </property>
-        <property name="maximum">
-         <number>10000</number>
-        </property>
-        <property name="singleStep">
-         <number>10</number>
-        </property>
-       </widget>
-      </item>
-     </layout>
-     <zorder>label</zorder>
-     <zorder>m_pComboBoxChSelection</zorder>
-     <zorder>label_7</zorder>
-     <zorder>label_2</zorder>
-     <zorder>label_3</zorder>
-     <zorder>label_4</zorder>
-     <zorder>m_comboBox_runningAvr</zorder>
-     <zorder>m_pSpinBoxNumAverages</zorder>
-     <zorder>m_pSpinBoxPreStimSamples</zorder>
-     <zorder>m_pSpinBoxPostStimSamples</zorder>
-    </widget>
-   </item>
    <item row="1" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>EOG artifact rejection</string>
+      <string>Artifact rejection</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="1" column="1">
@@ -272,6 +155,130 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>General</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Stiumulus Channel:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="m_pComboBoxChSelection"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_label_averageMethod">
+        <property name="text">
+         <string>Average mode:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="m_comboBox_runningAvr">
+        <item>
+         <property name="text">
+          <string>Running</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Cumulative</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="m_label_numberAverages">
+        <property name="text">
+         <string>Number of trials:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="m_pSpinBoxNumAverages">
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Pre-stimulus in ms:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QSpinBox" name="m_pSpinBoxPreStimSamples">
+        <property name="prefix">
+         <string>-</string>
+        </property>
+        <property name="minimum">
+         <number>10</number>
+        </property>
+        <property name="maximum">
+         <number>10000</number>
+        </property>
+        <property name="singleStep">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Post-stimulus in ms:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QSpinBox" name="m_pSpinBoxPostStimSamples">
+        <property name="minimum">
+         <number>10</number>
+        </property>
+        <property name="maximum">
+         <number>10000</number>
+        </property>
+        <property name="singleStep">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+     <zorder>label</zorder>
+     <zorder>m_pComboBoxChSelection</zorder>
+     <zorder>m_label_averageMethod</zorder>
+     <zorder>m_label_numberAverages</zorder>
+     <zorder>label_3</zorder>
+     <zorder>label_4</zorder>
+     <zorder>m_comboBox_runningAvr</zorder>
+     <zorder>m_pSpinBoxNumAverages</zorder>
+     <zorder>m_pSpinBoxPreStimSamples</zorder>
+     <zorder>m_pSpinBoxPostStimSamples</zorder>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QPushButton" name="m_pushButton_reset">
+     <property name="text">
+      <string>RESET</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QGroupBox" name="m_groupBox_detectedTrials">
+     <property name="title">
+      <string>Detected Trials</string>
+     </property>
     </widget>
    </item>
   </layout>

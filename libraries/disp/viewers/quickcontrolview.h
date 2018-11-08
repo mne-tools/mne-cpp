@@ -109,7 +109,7 @@ public:
     * @param [in] bDraggable    Flag specifying whether this widget is draggable.
     */
     QuickControlView(const QString& name = "",
-                     Qt::WindowFlags flags = Qt::Window | Qt::CustomizeWindowHint,
+                     Qt::WindowFlags flags = Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
                      QWidget *parent = Q_NULLPTR,
                      bool bDraggable = true);
 
@@ -138,7 +138,7 @@ public:
     * @param [in] sGroupBoxName     The name of the new group box.
     */
     void addGroupBox(QSharedPointer<QWidget> pWidget,
-                     QString sGroupBoxName);
+                     const QString& sGroupBoxName);
 
     //=========================================================================================================
     /**
@@ -148,7 +148,7 @@ public:
     * @param [in] sGroupBoxName     The name of the new group box.
     */
     void addGroupBox(QWidget* pWidget,
-                     QString sGroupBoxName);
+                     const QString& sGroupBoxName);
 
     //=========================================================================================================
     /**
@@ -161,8 +161,8 @@ public:
     * @param [in] sTabName          The name of the new tab.
     */
     void addGroupBoxWithTabs(QSharedPointer<QWidget> pWidget,
-                             QString sGroupBoxName,
-                             QString sTabName);
+                             const QString& sGroupBoxName,
+                             const QString& sTabName);
 
     //=========================================================================================================
     /**
@@ -174,8 +174,8 @@ public:
     * @param [in] sTabName          The name of the new tab.
     */
     void addGroupBoxWithTabs(QWidget* pWidget,
-                             QString sGroupBoxName,
-                             QString sTabName);
+                             const QString& sGroupBoxName,
+                             const QString& sTabName);
 
     //=========================================================================================================
     /**

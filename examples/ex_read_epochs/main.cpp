@@ -172,11 +172,12 @@ int main(int argc, char *argv[])
     // Read the epochs and reject epochs with EOG higher than 250e-06
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
                                                          events,
-                                                         picks,
                                                          fTMin,
                                                          fTMax,
                                                          event,
-                                                         250.0*0.0000010);
+                                                         250.0*0.0000010,
+                                                         "eog",
+                                                         picks);
 
     // Drop rejected epochs
     data.dropRejected();

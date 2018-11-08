@@ -202,7 +202,7 @@ MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin
     }
 
     if(K.cols() != data.rows()) {
-        qWarning() << "MinimumNorm::calculateInverse - Dimension mismatch between K.cols() and data.rows() -" << K.cols() << "x" << data.rows();
+        qWarning() << "MinimumNorm::calculateInverse - Dimension mismatch between K.cols() and data.rows() -" << K.cols() << "and" << data.rows();
         return MNESourceEstimate();
     }
 
