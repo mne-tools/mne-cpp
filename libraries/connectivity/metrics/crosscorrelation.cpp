@@ -93,7 +93,7 @@ CrossCorrelation::CrossCorrelation()
 
 //*************************************************************************************************************
 
-Network CrossCorrelation::crossCorrelation(const ConnectivitySettings& connectivitySettings)
+Network CrossCorrelation::calculate(const ConnectivitySettings& connectivitySettings)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
@@ -125,15 +125,15 @@ Network CrossCorrelation::crossCorrelation(const ConnectivitySettings& connectiv
 
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iNfft, "Ones");
 
-    std::function<MatrixXd(const MatrixXd&)> calculateLambda = [&](const MatrixXd& matInputData) {
-        return calculate(matInputData,
+    std::function<MatrixXd(const MatrixXd&)> computeLambda = [&](const MatrixXd& matInputData) {
+        return compute(matInputData,
                          iNfft,
                          tapers);
     };
 
     // Calculate connectivity matrix over epochs and average afterwards
     QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.m_matDataList,
-                                                              calculateLambda,
+                                                              computeLambda,
                                                               sum);
     resultMat.waitForFinished();
 
@@ -163,7 +163,7 @@ Network CrossCorrelation::crossCorrelation(const ConnectivitySettings& connectiv
 
 //*************************************************************************************************************
 
-MatrixXd CrossCorrelation::calculate(const MatrixXd& matInputData,
+MatrixXd CrossCorrelation::compute(const MatrixXd& matInputData,
                                      int iNfft,
                                      const QPair<MatrixXd, VectorXd>& tapers)
 {

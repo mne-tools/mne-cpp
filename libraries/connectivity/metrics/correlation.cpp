@@ -91,7 +91,7 @@ Correlation::Correlation()
 
 //*************************************************************************************************************
 
-Network Correlation::correlationCoeff(const ConnectivitySettings& connectivitySettings)
+Network Correlation::calculate(const ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("Correlation");
 

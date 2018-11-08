@@ -98,23 +98,23 @@ Network Connectivity::calculate(const ConnectivitySettings& connectivitySettings
 {
     //TODO: Use multithreading to work on multiple connectivity methods at the same time
     if(connectivitySettings.m_sConnectivityMethods.contains("COR")) {
-        return Correlation::correlationCoeff(connectivitySettings);
+        return Correlation::calculate(connectivitySettings);
     } else if(connectivitySettings.m_sConnectivityMethods.contains("XCOR")) {
-        return CrossCorrelation::crossCorrelation(connectivitySettings);
+        return CrossCorrelation::calculate(connectivitySettings);
     } else if(connectivitySettings.m_sConnectivityMethods.contains("PLI")) {
-        return PhaseLagIndex::phaseLagIndex(connectivitySettings);
+        return PhaseLagIndex::calculate(connectivitySettings);
     } else if(connectivitySettings.m_sConnectivityMethods.contains("COH")) {
-        return Coherence::coherence(connectivitySettings);
+        return Coherence::calculate(connectivitySettings);
     } else if(connectivitySettings.m_sConnectivityMethods.contains("IMAGCOH")) {
-        return ImagCoherence::imagCoherence(connectivitySettings);
+        return ImagCoherence::calculate(connectivitySettings);
     } else if(connectivitySettings.m_sConnectivityMethods.contains("PLV")) {
-        return PhaseLockingValue::phaseLockingValue(connectivitySettings);
+        return PhaseLockingValue::calculate(connectivitySettings);
     } else if(connectivitySettings.m_sConnectivityMethods.contains("WPLI")) {
-        return WeightedPhaseLagIndex::weightedPhaseLagIndex(connectivitySettings);
+        return WeightedPhaseLagIndex::calculate(connectivitySettings);
     } else if(connectivitySettings.m_sConnectivityMethods.contains("USPLI")) {
-        return UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(connectivitySettings);
+        return UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings);
     } else if(connectivitySettings.m_sConnectivityMethods.contains("DSWPLI")) {
-        return DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex(connectivitySettings);
+        return DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings);
     }
 
     qDebug() << "Connectivity::calculateConnectivity - Connectivity method unknown.";

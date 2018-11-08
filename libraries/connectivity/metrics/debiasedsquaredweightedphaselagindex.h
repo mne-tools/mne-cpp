@@ -116,7 +116,7 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network debiasedSquaredWeightedPhaseLagIndex(const ConnectivitySettings &connectivitySettings);
+    static Network calculate(const ConnectivitySettings &connectivitySettings);
 
     //==========================================================================================================
     /**
@@ -129,10 +129,10 @@ public:
     *
     * @return                   The DebiasedSquaredWPLI value.
     */
-    static void computeDebiasedSquaredWPLI(QVector<Eigen::MatrixXd>& vecDebiasedSquaredWPLI,
-                                           const QList<Eigen::MatrixXd> &matDataList,
-                                           int iNfft,
-                                           const QString &sWindowType);
+    static void calculate(QVector<Eigen::MatrixXd>& vecDebiasedSquaredWPLI,
+                          const QList<Eigen::MatrixXd> &matDataList,
+                          int iNfft,
+                          const QString &sWindowType);
 
 protected:
     //=========================================================================================================

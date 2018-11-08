@@ -116,7 +116,7 @@ public:
     * @param[out] finalNetwork          The resulting network.
     * @param[in] connectivitySettings   The input data and parameters.
     */
-    static void computeCoherencyReal(Network& finalNetwork,
+    static void calculateReal(Network& finalNetwork,
                                      const ConnectivitySettings &connectivitySettings);
 
     //=========================================================================================================
@@ -126,7 +126,7 @@ public:
     * @param[out] finalNetwork          The resulting network.
     * @param[in] connectivitySettings   The input data and parameters.
     */
-    static void computeCoherencyImag(Network& finalNetwork,
+    static void calculateImag(Network& finalNetwork,
                                      const ConnectivitySettings &connectivitySettings);
 
     //=========================================================================================================
@@ -136,7 +136,7 @@ public:
     * @param[out] finalNetwork          The resulting network.
     * @param[in] connectivitySettings   The input data and parameters.
     */
-    static void computeCoherency(QVector<QPair<int,Eigen::MatrixXcd> >& vecCoherency,
+    static void calculate(QVector<QPair<int,Eigen::MatrixXcd> >& vecCoherency,
                                  const ConnectivitySettings &connectivitySettings);
 
 private:

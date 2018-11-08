@@ -96,7 +96,7 @@ Coherency::Coherency()
 
 //*************************************************************************************************************
 
-void Coherency::computeCoherencyReal(Network& finalNetwork,
+void Coherency::calculateReal(Network& finalNetwork,
                                      const ConnectivitySettings &connectivitySettings)
 {
     QElapsedTimer timer;
@@ -189,8 +189,8 @@ void Coherency::computeCoherencyReal(Network& finalNetwork,
 
 //*************************************************************************************************************
 
-void Coherency::computeCoherencyImag(Network& finalNetwork,
-                                     const ConnectivitySettings &connectivitySettings)
+void Coherency::calculateImag(Network& finalNetwork,
+                              const ConnectivitySettings &connectivitySettings)
 {
 //        QElapsedTimer timer;
 //        qint64 iTime = 0;
@@ -281,8 +281,8 @@ void Coherency::computeCoherencyImag(Network& finalNetwork,
 
 //*************************************************************************************************************
 
-void Coherency::computeCoherency(QVector<QPair<int,MatrixXcd> >& vecCoherency,
-                                 const ConnectivitySettings &connectivitySettings)
+void Coherency::calculate(QVector<QPair<int,MatrixXcd> >& vecCoherency,
+                          const ConnectivitySettings &connectivitySettings)
 {
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;

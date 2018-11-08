@@ -91,7 +91,7 @@ UnbiasedSquaredPhaseLagIndex::UnbiasedSquaredPhaseLagIndex()
 
 //*******************************************************************************************************
 
-Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const ConnectivitySettings& connectivitySettings)
+Network UnbiasedSquaredPhaseLagIndex::calculate(const ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("Unbiased Squared Phase Lag Index");
 
@@ -116,10 +116,10 @@ Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const Connect
 
     //Calculate all-to-all coherence matrix over epochs
     QVector<MatrixXd> vecUnbiasedSquaredPLI;
-    UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(vecUnbiasedSquaredPLI,
-                                                            connectivitySettings.m_matDataList,
-                                                            connectivitySettings.m_iNfft,
-                                                            connectivitySettings.m_sWindowType);
+    UnbiasedSquaredPhaseLagIndex::calculate(vecUnbiasedSquaredPLI,
+                                            connectivitySettings.m_matDataList,
+                                            connectivitySettings.m_iNfft,
+                                            connectivitySettings.m_sWindowType);
 
     //Add edges to network
     QSharedPointer<NetworkEdge> pEdge;
@@ -144,19 +144,19 @@ Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const Connect
 
 //*************************************************************************************************************
 
-void UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(QVector<MatrixXd>& vecUnbiasedSquaredPLI,
-                                                             const QList<MatrixXd> &matDataList,
-                                                             int iNfft,
-                                                             const QString &sWindowType)
+void UnbiasedSquaredPhaseLagIndex::calculate(QVector<MatrixXd>& vecUnbiasedSquaredPLI,
+                                             const QList<MatrixXd> &matDataList,
+                                             int iNfft,
+                                             const QString &sWindowType)
 {
     int iNRows = matDataList.at(0).rows();
     int iNTrials = matDataList.length();
 
     // Compute standard PLI
-    PhaseLagIndex::computePLI(vecUnbiasedSquaredPLI,
-                              matDataList,
-                              iNfft,
-                              sWindowType);
+    PhaseLagIndex::calculate(vecUnbiasedSquaredPLI,
+                             matDataList,
+                             iNfft,
+                             sWindowType);
 
     // Compute unbiased estimator according to Vinck et al., NeuroImage 55, pp. 1548-65, 2011
     for (int j = 0; j < iNRows; ++j) {

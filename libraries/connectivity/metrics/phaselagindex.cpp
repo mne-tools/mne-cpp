@@ -96,7 +96,7 @@ PhaseLagIndex::PhaseLagIndex()
 
 //*******************************************************************************************************
 
-Network PhaseLagIndex::phaseLagIndex(const ConnectivitySettings& connectivitySettings)
+Network PhaseLagIndex::calculate(const ConnectivitySettings& connectivitySettings)
 {
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;
@@ -129,10 +129,10 @@ Network PhaseLagIndex::phaseLagIndex(const ConnectivitySettings& connectivitySet
 
     //Calculate all-to-all coherence matrix over epochs
     QVector<MatrixXd> vecPLI;
-    PhaseLagIndex::computePLI(vecPLI,
-                              connectivitySettings.m_matDataList,
-                              connectivitySettings.m_iNfft,
-                              connectivitySettings.m_sWindowType);
+    PhaseLagIndex::calculate(vecPLI,
+                             connectivitySettings.m_matDataList,
+                             connectivitySettings.m_iNfft,
+                             connectivitySettings.m_sWindowType);
 
 //    iTime = timer.elapsed();
 //    qDebug() << "PhaseLagIndex::phaseLagIndex timer - Actual computation:" << iTime;
@@ -165,10 +165,10 @@ Network PhaseLagIndex::phaseLagIndex(const ConnectivitySettings& connectivitySet
 
 //*************************************************************************************************************
 
-void PhaseLagIndex::computePLI(QVector<MatrixXd>& vecPLI,
-                               const QList<MatrixXd> &matDataList,
-                               int iNfft,
-                               const QString &sWindowType)
+void PhaseLagIndex::calculate(QVector<MatrixXd>& vecPLI,
+                              const QList<MatrixXd> &matDataList,
+                              int iNfft,
+                              const QString &sWindowType)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
