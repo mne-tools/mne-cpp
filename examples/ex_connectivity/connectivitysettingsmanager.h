@@ -132,10 +132,26 @@ public:
         }
 
         m_settings.m_matDataList.clear();
+        QVector<int> indexList;
 
         for(int i = 0; i < iNumberTrials; i++) {
-            m_settings.m_matDataList << m_matDataListOriginal.at(i);
+            bool finish = false;
+            int index = 0;
+
+            while(!finish) {
+                index = rand() % iNumberTrials;
+
+                if(!indexList.contains(index)) {
+                    indexList.append(index);
+                    finish = true;
+                }
+            }
+
+            m_settings.m_matDataList << m_matDataListOriginal.at(index);
+            //m_settings.m_matDataList << m_matDataListOriginal.at(i);
         }
+
+        //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - indexList" << indexList;
 
         m_pRtConnectivity->append(m_settings);
     }

@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "4");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
@@ -285,7 +285,11 @@ int main(int argc, char *argv[])
         QString method(sSourceLocMethod);
 
         // regularize noise covariance
-        noise_cov = noise_cov.regularize(raw.info, 0.05, 0.05, 0.1, true);
+        noise_cov = noise_cov.regularize(raw.info,
+                                         0.05,
+                                         0.05,
+                                         0.1,
+                                         true);
 
         // Cluster forward solution;
         if(bDoClust) {
@@ -294,7 +298,11 @@ int main(int argc, char *argv[])
             t_clusteredFwd = t_Fwd;
         }
 
-        MNEInverseOperator inverse_operator(raw.info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+        MNEInverseOperator inverse_operator(raw.info,
+                                            t_clusteredFwd,
+                                            noise_cov,
+                                            0.2f,
+                                            0.8f);
 
         // Compute inverse solution
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
@@ -306,7 +314,7 @@ int main(int argc, char *argv[])
         for(int i = 0; i < data.size(); i++) {
             sourceEstimate = minimumNorm.calculateInverse(data.at(i)->epoch,
                                                           0.0f,
-                                                          1/raw.info.sfreq);
+                                                          1.0/raw.info.sfreq);
 
             if(sourceEstimate.isEmpty()) {
                 printf("Source estimate is empty");

@@ -266,12 +266,14 @@ private:
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
 
-    CONNECTIVITYLIB::Network    m_connectivityEstimate;     /**< The current connectivity estimate.*/
-    Eigen::MatrixX3f            m_matNodeVertLeft;          /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f            m_matNodeVertRight;         /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f            m_matNodeVertComb;          /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    CONNECTIVITYLIB::Network    m_connectivityEstimate;         /**< The current connectivity estimate.*/
+    Eigen::MatrixX3f            m_matNodeVertLeft;              /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f            m_matNodeVertRight;             /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f            m_matNodeVertComb;              /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
 
-    QVector<int>                m_chIdx;                    /**< The channel indeces to pick from the incoming data.*/
+    QVector<int>                m_chIdx;                        /**< The channel indeces to pick from the incoming data.*/
+
+    CONNECTIVITYLIB::Network    m_currentConnectivityResult;    /**< The current connectivity result.*/
 };
 
 } // NAMESPACE
