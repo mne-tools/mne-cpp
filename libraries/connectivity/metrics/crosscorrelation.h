@@ -113,7 +113,7 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network crossCorrelation(const ConnectivitySettings &connectivitySettings);
+    static Network calculate(const ConnectivitySettings &connectivitySettings);
 
 protected:
     //=========================================================================================================
@@ -124,7 +124,7 @@ protected:
     *
     * @return               The connectivity matrix.
     */
-    static Eigen::MatrixXd calculate(const Eigen::MatrixXd& matInputData,
+    static Eigen::MatrixXd compute(const Eigen::MatrixXd& matInputData,
                                      int iNfft,
                                      const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
 

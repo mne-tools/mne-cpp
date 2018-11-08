@@ -116,7 +116,7 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network phaseLagIndex(const ConnectivitySettings& connectivitySettings);
+    static Network calculate(const ConnectivitySettings& connectivitySettings);
 
     //==========================================================================================================
     /**
@@ -129,10 +129,10 @@ public:
     *
     * @return                   The PLI value.
     */
-    static void computePLI(QVector<Eigen::MatrixXd>& vecPLI,
-                           const QList<Eigen::MatrixXd> &matDataList,
-                           int iNfft,
-                           const QString &sWindowType);
+    static void calculate(QVector<Eigen::MatrixXd>& vecPLI,
+                          const QList<Eigen::MatrixXd> &matDataList,
+                          int iNfft,
+                          const QString &sWindowType);
 
 protected:
     //=========================================================================================================

@@ -116,7 +116,7 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network weightedPhaseLagIndex(const ConnectivitySettings &connectivitySettings);
+    static Network calculate(const ConnectivitySettings &connectivitySettings);
 
     //==========================================================================================================
     /**
@@ -129,10 +129,10 @@ public:
     *
     * @return                   The WPLI value.
     */
-    static void computeWPLI(QVector<Eigen::MatrixXd>& vecWPLI,
-                            const QList<Eigen::MatrixXd> &matDataList,
-                            int iNfft,
-                            const QString &sWindowType);
+    static void calculate(QVector<Eigen::MatrixXd>& vecWPLI,
+                          const QList<Eigen::MatrixXd> &matDataList,
+                          int iNfft,
+                          const QString &sWindowType);
 
 protected:
     //=========================================================================================================

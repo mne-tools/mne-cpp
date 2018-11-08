@@ -116,7 +116,7 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network imagCoherence(const ConnectivitySettings &connectivitySettings);
+    static Network calculate(const ConnectivitySettings &connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ public:
     *
     * @return                   The connectivity information in form of a QVector of matrices.
     */
-    static QVector<Eigen::MatrixXd> computeImagCoherence(const QList<Eigen::MatrixXd> &matDataList,
+    static QVector<Eigen::MatrixXd> calculate(const QList<Eigen::MatrixXd> &matDataList,
                                                          int iNfft,
                                                          const QString &sWindowType="hanning");
 };

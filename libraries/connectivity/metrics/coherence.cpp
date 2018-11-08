@@ -93,7 +93,7 @@ Coherence::Coherence()
 
 //*******************************************************************************************************
 
-Network Coherence::coherence(const ConnectivitySettings& connectivitySettings)
+Network Coherence::calculate(const ConnectivitySettings& connectivitySettings)
 {
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;
@@ -129,8 +129,8 @@ Network Coherence::coherence(const ConnectivitySettings& connectivitySettings)
 //    timer.restart();
 
     //Calculate all-to-all coherence matrix over epochs
-    Coherency::computeCoherencyReal(finalNetwork,
-                                    connectivitySettings);
+    Coherency::calculateReal(finalNetwork,
+                             connectivitySettings);
 
 //    iTime = timer.elapsed();
 //    qDebug() << "Coherence::coherence timer - Actual computation:" << iTime;
@@ -154,8 +154,8 @@ QVector<MatrixXd> Coherence::computeCoherence(const QList<MatrixXd> &matDataList
     connectivitySettings.m_iNfft = iNfft;
     connectivitySettings.m_sWindowType = sWindowType;
 
-    Coherency::computeCoherency(vecCoh,
-                                connectivitySettings);
+    Coherency::calculate(vecCoh,
+                         connectivitySettings);
 
     QVector<Eigen::MatrixXd> result;
 

@@ -96,7 +96,7 @@ WeightedPhaseLagIndex::WeightedPhaseLagIndex()
 
 //*******************************************************************************************************
 
-Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const ConnectivitySettings& connectivitySettings)
+Network WeightedPhaseLagIndex::calculate(const ConnectivitySettings& connectivitySettings)
 {
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;
@@ -129,10 +129,10 @@ Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const ConnectivitySettings&
 
     //Calculate all-to-all coherence matrix over epochs
     QVector<MatrixXd> vecWPLI;
-    WeightedPhaseLagIndex::computeWPLI(vecWPLI,
-                                       connectivitySettings.m_matDataList,
-                                       connectivitySettings.m_iNfft,
-                                       connectivitySettings.m_sWindowType);
+    WeightedPhaseLagIndex::calculate(vecWPLI,
+                                     connectivitySettings.m_matDataList,
+                                     connectivitySettings.m_iNfft,
+                                     connectivitySettings.m_sWindowType);
 
 //    iTime = timer.elapsed();
 //    qDebug() << "WeightedPhaseLagIndex::weightedPhaseLagIndex timer - Actual computation:" << iTime;
@@ -165,10 +165,10 @@ Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const ConnectivitySettings&
 
 //*************************************************************************************************************
 
-void WeightedPhaseLagIndex::computeWPLI(QVector<MatrixXd>& vecWPLI,
-                                        const QList<MatrixXd> &matDataList,
-                                        int iNfft,
-                                        const QString &sWindowType)
+void WeightedPhaseLagIndex::calculate(QVector<MatrixXd>& vecWPLI,
+                                      const QList<MatrixXd> &matDataList,
+                                      int iNfft,
+                                      const QString &sWindowType)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();

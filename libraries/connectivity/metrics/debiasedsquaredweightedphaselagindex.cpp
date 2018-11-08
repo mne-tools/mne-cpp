@@ -96,7 +96,7 @@ DebiasedSquaredWeightedPhaseLagIndex::DebiasedSquaredWeightedPhaseLagIndex()
 
 //*******************************************************************************************************
 
-Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex(const ConnectivitySettings& connectivitySettings)
+Network DebiasedSquaredWeightedPhaseLagIndex::calculate(const ConnectivitySettings& connectivitySettings)
 {
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;
@@ -129,10 +129,10 @@ Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagInd
 
     //Calculate all-to-all coherence matrix over epochs
     QVector<MatrixXd> vecDebiasedSquaredWPLI;
-    DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWPLI(vecDebiasedSquaredWPLI,
-                                                                     connectivitySettings.m_matDataList,
-                                                                     connectivitySettings.m_iNfft,
-                                                                     connectivitySettings.m_sWindowType);
+    DebiasedSquaredWeightedPhaseLagIndex::calculate(vecDebiasedSquaredWPLI,
+                                                    connectivitySettings.m_matDataList,
+                                                    connectivitySettings.m_iNfft,
+                                                    connectivitySettings.m_sWindowType);
 
 //    iTime = timer.elapsed();
 //    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex timer - Actual computation:" << iTime;
@@ -165,10 +165,10 @@ Network DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagInd
 
 //*************************************************************************************************************
 
-void DebiasedSquaredWeightedPhaseLagIndex::computeDebiasedSquaredWPLI(QVector<MatrixXd>& vecDebiasedSquaredWPLI,
-                                                                      const QList<MatrixXd> &matDataList,
-                                                                      int iNfft,
-                                                                      const QString &sWindowType)
+void DebiasedSquaredWeightedPhaseLagIndex::calculate(QVector<MatrixXd>& vecDebiasedSquaredWPLI,
+                                                    const QList<MatrixXd> &matDataList,
+                                                    int iNfft,
+                                                    const QString &sWindowType)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();

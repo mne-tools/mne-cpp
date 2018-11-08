@@ -96,7 +96,7 @@ PhaseLockingValue::PhaseLockingValue()
 
 //*******************************************************************************************************
 
-Network PhaseLockingValue::phaseLockingValue(const ConnectivitySettings& connectivitySettings)
+Network PhaseLockingValue::calculate(const ConnectivitySettings& connectivitySettings)
 {
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;
@@ -128,7 +128,7 @@ Network PhaseLockingValue::phaseLockingValue(const ConnectivitySettings& connect
 //    timer.restart();
 
     //Calculate all-to-all coherence matrix over epochs
-    QVector<MatrixXd> vecPLV = PhaseLockingValue::computePLV(connectivitySettings.m_matDataList,
+    QVector<MatrixXd> vecPLV = PhaseLockingValue::calculate(connectivitySettings.m_matDataList,
                                                              connectivitySettings.m_iNfft,
                                                              connectivitySettings.m_sWindowType);
 
@@ -163,9 +163,9 @@ Network PhaseLockingValue::phaseLockingValue(const ConnectivitySettings& connect
 
 //*************************************************************************************************************
 
-QVector<MatrixXd> PhaseLockingValue::computePLV(const QList<MatrixXd> &matDataList,
-                                                int iNfft,
-                                                const QString &sWindowType)
+QVector<MatrixXd> PhaseLockingValue::calculate(const QList<MatrixXd> &matDataList,
+                                               int iNfft,
+                                               const QString &sWindowType)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
