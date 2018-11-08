@@ -100,9 +100,9 @@ void Coherency::computeCoherencyReal(Network& finalNetwork,
                                      int iNfft,
                                      const QString &sWindowType)
 {
-//        QElapsedTimer timer;
-//        qint64 iTime = 0;
-//        timer.start();
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
 
     if(matDataList.empty()) {
         qDebug() << "Coherency::computeCoherencyReal - Input data is empty";
@@ -141,31 +141,32 @@ void Coherency::computeCoherencyReal(Network& finalNetwork,
 //        reduce(finalResult, computeLambda(matDataList.at(i)));
 //    }
 
+    iTime = timer.elapsed();
+    qDebug() << "Coherency::computeCoherencyReal timer - Preparation:" << iTime;
+    timer.restart();
+
     // Parallel
-//        iTime = timer.elapsed();
-//        qDebug() << "Coherency::computeCoherencyReal timer - Preparation:" << iTime;
-//        timer.restart();
 
     QFuture<AbstractMetricResultData> result = QtConcurrent::mappedReduced(matDataList,
                                                                            computeLambda,
                                                                            reduce);
     result.waitForFinished();
 
-//        iTime = timer.elapsed();
-//        qDebug() << "Coherency::computeCoherencyReal timer - Parallel computation:" << iTime;
-//        timer.restart();
+    iTime = timer.elapsed();
+    qDebug() << "Coherency::computeCoherencyReal timer - Parallel computation:" << iTime;
+    timer.restart();
 
     AbstractMetricResultData finalResult = result.result();
 
-//        iTime = timer.elapsed();
-//        qDebug() << "Coherency::computeCoherencyReal timer - Result copy:" << iTime;
-//        timer.restart();
+    iTime = timer.elapsed();
+    qDebug() << "Coherency::computeCoherencyReal timer - Result copy:" << iTime;
+    timer.restart();
 
     finalResult.matPsdAvg = finalResult.matPsdAvg.cwiseSqrt();
 
-//        iTime = timer.elapsed();
-//        qDebug() << "Coherency::computeCoherencyReal timer - Cwise sqrt:" << iTime;
-//        timer.restart();
+    iTime = timer.elapsed();
+    qDebug() << "Coherency::computeCoherencyReal timer - Cwise sqrt:" << iTime;
+    timer.restart();
 
     // Compute CSD/(PSD_X * PSD_Y)
     QMutex mutex;
@@ -180,9 +181,9 @@ void Coherency::computeCoherencyReal(Network& finalNetwork,
                                                    computePSDCSDLambda);
     resultCSDPSD.waitForFinished();
 
-//        iTime = timer.elapsed();
-//        qDebug() << "Coherency::computeCoherencyReal timer - CSD/(PSD_X * PSD_Y):" << iTime;
-//        timer.restart();
+    iTime = timer.elapsed();
+    qDebug() << "Coherency::computeCoherencyReal timer - CSD/(PSD_X * PSD_Y):" << iTime;
+    timer.restart();
 }
 
 

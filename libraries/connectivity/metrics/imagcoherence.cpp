@@ -46,6 +46,7 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
+#include "../connectivitysettings.h"
 
 
 //*************************************************************************************************************
@@ -92,27 +93,24 @@ ImagCoherence::ImagCoherence()
 
 //*******************************************************************************************************
 
-Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList,
-                                     const MatrixX3f& matVert,
-                                     int iNfft,
-                                     const QString &sWindowType)
+Network ImagCoherence::imagCoherence(const ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("Imaginary Coherence");
 
-    if(matDataList.empty()) {
+    if(connectivitySettings.m_matDataList.empty()) {
         qDebug() << "ImagCoherence::imagcoherence - Input data is empty";
         return finalNetwork;
     }
 
     //Create nodes
-    int rows = matDataList.first().rows();
+    int rows = connectivitySettings.m_matDataList.first().rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
-        if(matVert.rows() != 0 && i < matVert.rows()) {
-            rowVert(0) = matVert.row(i)(0);
-            rowVert(1) = matVert.row(i)(1);
-            rowVert(2) = matVert.row(i)(2);
+        if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
+            rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
+            rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);
+            rowVert(2) = connectivitySettings.m_matNodePositions.row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
@@ -120,9 +118,9 @@ Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList,
 
     //Calculate all-to-all imaginary coherence matrix over epochs
     Coherency::computeCoherencyImag(finalNetwork,
-                                    matDataList,
-                                    iNfft,
-                                    sWindowType);
+                                    connectivitySettings.m_matDataList,
+                                    connectivitySettings.m_iNfft,
+                                    connectivitySettings.m_sWindowType);
 
     return finalNetwork;
 }

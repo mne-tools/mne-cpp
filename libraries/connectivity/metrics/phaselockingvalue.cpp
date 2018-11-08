@@ -46,6 +46,7 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
+#include "../connectivitysettings.h"
 
 #include <utils/spectral.h>
 
@@ -95,10 +96,7 @@ PhaseLockingValue::PhaseLockingValue()
 
 //*******************************************************************************************************
 
-Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
-                                             const MatrixX3f& matVert,
-                                             int iNfft,
-                                             const QString &sWindowType)
+Network PhaseLockingValue::phaseLockingValue(const ConnectivitySettings& connectivitySettings)
 {
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;
@@ -106,20 +104,20 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
 
     Network finalNetwork("Phase Locking Value");
 
-    if(matDataList.empty()) {
+    if(connectivitySettings.m_matDataList.empty()) {
         qDebug() << "PhaseLockingValue::phaseLockingValue - Input data is empty";
         return finalNetwork;
     }
 
     //Create nodes
-    int rows = matDataList.first().rows();
+    int rows = connectivitySettings.m_matDataList.first().rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
-        if(matVert.rows() != 0 && i < matVert.rows()) {
-            rowVert(0) = matVert.row(i)(0);
-            rowVert(1) = matVert.row(i)(1);
-            rowVert(2) = matVert.row(i)(2);
+        if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
+            rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
+            rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);
+            rowVert(2) = connectivitySettings.m_matNodePositions.row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
@@ -130,9 +128,9 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
 //    timer.restart();
 
     //Calculate all-to-all coherence matrix over epochs
-    QVector<MatrixXd> vecPLV = PhaseLockingValue::computePLV(matDataList,
-                                                             iNfft,
-                                                             sWindowType);
+    QVector<MatrixXd> vecPLV = PhaseLockingValue::computePLV(connectivitySettings.m_matDataList,
+                                                             connectivitySettings.m_iNfft,
+                                                             connectivitySettings.m_sWindowType);
 
 //    iTime = timer.elapsed();
 //    qDebug() << "PhaseLockingValue::phaseLockingValue timer - Actual computation:" << iTime;
@@ -144,7 +142,7 @@ Network PhaseLockingValue::phaseLockingValue(const QList<MatrixXd> &matDataList,
     int j;
 
     for(int i = 0; i < vecPLV.length(); ++i) {
-        for(j = i; j < matDataList.at(0).rows(); ++j) {
+        for(j = i; j < connectivitySettings.m_matDataList.at(0).rows(); ++j) {
             matWeight = vecPLV.at(i).row(j).transpose();
 
             pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));

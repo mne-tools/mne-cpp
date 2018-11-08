@@ -43,6 +43,7 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
+#include "../connectivitysettings.h"
 
 #include <utils/spectral.h>
 
@@ -92,8 +93,7 @@ CrossCorrelation::CrossCorrelation()
 
 //*************************************************************************************************************
 
-Network CrossCorrelation::crossCorrelation(const QList<MatrixXd> &matDataList,
-                                           const MatrixX3f& matVert)
+Network CrossCorrelation::crossCorrelation(const ConnectivitySettings& connectivitySettings)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
@@ -101,27 +101,27 @@ Network CrossCorrelation::crossCorrelation(const QList<MatrixXd> &matDataList,
 
     Network finalNetwork("Cross Correlation");
 
-    if(matDataList.empty()) {
+    if(connectivitySettings.m_matDataList.empty()) {
         qDebug() << "CrossCorrelation::crossCorrelation - Input data is empty";
         return finalNetwork;
     }
 
     //Create nodes
-    int rows = matDataList.first().rows();
+    int rows = connectivitySettings.m_matDataList.first().rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
-        if(matVert.rows() != 0 && i < matVert.rows()) {
-            rowVert(0) = matVert.row(i)(0);
-            rowVert(1) = matVert.row(i)(1);
-            rowVert(2) = matVert.row(i)(2);
+        if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
+            rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
+            rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);
+            rowVert(2) = connectivitySettings.m_matNodePositions.row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
     // Generate tapers
-    int iNfft = matDataList.at(0).cols();
+    int iNfft = connectivitySettings.m_matDataList.at(0).cols();
 
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iNfft, "Ones");
 
@@ -132,13 +132,13 @@ Network CrossCorrelation::crossCorrelation(const QList<MatrixXd> &matDataList,
     };
 
     // Calculate connectivity matrix over epochs and average afterwards
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList,
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.m_matDataList,
                                                               calculateLambda,
                                                               sum);
     resultMat.waitForFinished();
 
     MatrixXd matDist = resultMat.result();
-    matDist /= matDataList.size();
+    matDist /= connectivitySettings.m_matDataList.size();
 
     //Add edges to network
     MatrixXd matWeight(1,1);

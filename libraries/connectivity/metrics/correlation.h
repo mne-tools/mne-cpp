@@ -83,6 +83,7 @@ namespace CONNECTIVITYLIB {
 //=============================================================================================================
 
 class Network;
+class ConnectivitySettings;
 
 
 //=============================================================================================================
@@ -113,8 +114,7 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network correlationCoeff(const QList<Eigen::MatrixXd> &matDataList,
-                                    const Eigen::MatrixX3f& matVert);
+    static Network correlationCoeff(const ConnectivitySettings &connectivitySettings);
 
 protected:
     //=========================================================================================================
