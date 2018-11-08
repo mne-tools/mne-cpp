@@ -44,6 +44,7 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
+#include "../connectivitysettings.h"
 
 
 //*************************************************************************************************************
@@ -90,27 +91,24 @@ UnbiasedSquaredPhaseLagIndex::UnbiasedSquaredPhaseLagIndex()
 
 //*******************************************************************************************************
 
-Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const QList<MatrixXd> &matDataList,
-                                                                   const MatrixX3f& matVert,
-                                                                   int iNfft,
-                                                                   const QString &sWindowType)
+Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("Unbiased Squared Phase Lag Index");
 
-    if(matDataList.empty()) {
+    if(connectivitySettings.m_matDataList.empty()) {
         qDebug() << "UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex - Input data is empty";
         return finalNetwork;
     }
 
     //Create nodes
-    int rows = matDataList.first().rows();
+    int rows = connectivitySettings.m_matDataList.first().rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
-        if(matVert.rows() != 0 && i < matVert.rows()) {
-            rowVert(0) = matVert.row(i)(0);
-            rowVert(1) = matVert.row(i)(1);
-            rowVert(2) = matVert.row(i)(2);
+        if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
+            rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
+            rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);
+            rowVert(2) = connectivitySettings.m_matNodePositions.row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
@@ -119,9 +117,9 @@ Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const QList<M
     //Calculate all-to-all coherence matrix over epochs
     QVector<MatrixXd> vecUnbiasedSquaredPLI;
     UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(vecUnbiasedSquaredPLI,
-                                                            matDataList,
-                                                            iNfft,
-                                                            sWindowType);
+                                                            connectivitySettings.m_matDataList,
+                                                            connectivitySettings.m_iNfft,
+                                                            connectivitySettings.m_sWindowType);
 
     //Add edges to network
     QSharedPointer<NetworkEdge> pEdge;
@@ -129,7 +127,7 @@ Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const QList<M
     int j;
 
     for(int i = 0; i < vecUnbiasedSquaredPLI.length(); ++i) {
-        for(j = i; j < matDataList.at(0).rows(); ++j) {
+        for(j = i; j < connectivitySettings.m_matDataList.at(0).rows(); ++j) {
             matWeight = vecUnbiasedSquaredPLI.at(i).row(j).transpose();
 
             pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));

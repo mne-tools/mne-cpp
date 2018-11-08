@@ -46,6 +46,7 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
+#include "../connectivitysettings.h"
 
 #include <utils/spectral.h>
 
@@ -95,10 +96,7 @@ WeightedPhaseLagIndex::WeightedPhaseLagIndex()
 
 //*******************************************************************************************************
 
-Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matDataList,
-                                                     const MatrixX3f& matVert,
-                                                     int iNfft,
-                                                     const QString &sWindowType)
+Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const ConnectivitySettings& connectivitySettings)
 {
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;
@@ -106,20 +104,20 @@ Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matD
 
     Network finalNetwork("Weighted Phase Lag Index");
 
-    if(matDataList.empty()) {
+    if(connectivitySettings.m_matDataList.empty()) {
         qDebug() << "WeightedPhaseLagIndex::weightedPhaseLagIndex - Input data is empty";
         return finalNetwork;
     }
 
     //Create nodes
-    int rows = matDataList.first().rows();
+    int rows = connectivitySettings.m_matDataList.first().rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
-        if(matVert.rows() != 0 && i < matVert.rows()) {
-            rowVert(0) = matVert.row(i)(0);
-            rowVert(1) = matVert.row(i)(1);
-            rowVert(2) = matVert.row(i)(2);
+        if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
+            rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
+            rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);
+            rowVert(2) = connectivitySettings.m_matNodePositions.row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
@@ -132,9 +130,9 @@ Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matD
     //Calculate all-to-all coherence matrix over epochs
     QVector<MatrixXd> vecWPLI;
     WeightedPhaseLagIndex::computeWPLI(vecWPLI,
-                                       matDataList,
-                                       iNfft,
-                                       sWindowType);
+                                       connectivitySettings.m_matDataList,
+                                       connectivitySettings.m_iNfft,
+                                       connectivitySettings.m_sWindowType);
 
 //    iTime = timer.elapsed();
 //    qDebug() << "WeightedPhaseLagIndex::weightedPhaseLagIndex timer - Actual computation:" << iTime;
@@ -146,7 +144,7 @@ Network WeightedPhaseLagIndex::weightedPhaseLagIndex(const QList<MatrixXd> &matD
     int j;
 
     for(int i = 0; i < vecWPLI.length(); ++i) {
-        for(j = i; j < matDataList.at(0).rows(); ++j) {
+        for(j = i; j < connectivitySettings.m_matDataList.at(0).rows(); ++j) {
             matWeight = vecWPLI.at(i).row(j).transpose();
 
             pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));

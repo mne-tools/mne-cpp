@@ -43,6 +43,7 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
+#include "../connectivitysettings.h"
 
 
 //*************************************************************************************************************
@@ -90,25 +91,24 @@ Correlation::Correlation()
 
 //*************************************************************************************************************
 
-Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList,
-                                      const MatrixX3f& matVert)
+Network Correlation::correlationCoeff(const ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("Correlation");
 
-    if(matDataList.empty()) {
+    if(connectivitySettings.m_matDataList.empty()) {
         qDebug() << "Correlation::correlationCoeff - Input data is empty";
         return finalNetwork;
     }   
 
     //Create nodes
-    int rows = matDataList.first().rows();
+    int rows = connectivitySettings.m_matDataList.first().rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
-        if(matVert.rows() != 0 && i < matVert.rows()) {
-            rowVert(0) = matVert.row(i)(0);
-            rowVert(1) = matVert.row(i)(1);
-            rowVert(2) = matVert.row(i)(2);
+        if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
+            rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
+            rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);
+            rowVert(2) = connectivitySettings.m_matNodePositions.row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
@@ -118,13 +118,13 @@ Network Correlation::correlationCoeff(const QList<MatrixXd> &matDataList,
     //double dScalingStep = 1.0/matDataList.size();
     //dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
 
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(matDataList,
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.m_matDataList,
                                                               compute,
                                                               reduce);
     resultMat.waitForFinished();
 
     MatrixXd matDist = resultMat.result();
-    matDist /= matDataList.size();
+    matDist /= connectivitySettings.m_matDataList.size();
 
     //Add edges to network
     MatrixXd matWeight(1,1);

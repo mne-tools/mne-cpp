@@ -86,8 +86,7 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
     qint64 iTime = 0;
     time.start();
 
-    Connectivity tConnectivity(connectivitySettings);
-    Network finalNetwork = tConnectivity.calculateConnectivity();
+    Network finalNetwork = Connectivity::calculate(connectivitySettings);
 
     iTime = time.elapsed();
 

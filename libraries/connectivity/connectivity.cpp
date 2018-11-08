@@ -87,58 +87,34 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Connectivity::Connectivity(const ConnectivitySettings& connectivitySettings)
-: m_pConnectivitySettings(ConnectivitySettings::SPtr(new ConnectivitySettings(connectivitySettings)))
+Connectivity::Connectivity()
 {
 }
 
 
 //*************************************************************************************************************
 
-Network Connectivity::calculateConnectivity() const
+Network Connectivity::calculate(const ConnectivitySettings& connectivitySettings)
 {
     //TODO: Use multithreading to work on multiple connectivity methods at the same time
-    if(m_pConnectivitySettings->m_sConnectivityMethods.contains("COR")) {
-        return Correlation::correlationCoeff(m_pConnectivitySettings->m_matDataList,
-                                             m_pConnectivitySettings->m_matNodePositions);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("XCOR")) {
-        return CrossCorrelation::crossCorrelation(m_pConnectivitySettings->m_matDataList,
-                                                  m_pConnectivitySettings->m_matNodePositions);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("PLI")) {
-        return PhaseLagIndex::phaseLagIndex(m_pConnectivitySettings->m_matDataList,
-                                            m_pConnectivitySettings->m_matNodePositions,
-                                            m_pConnectivitySettings->m_iNfft,
-                                            m_pConnectivitySettings->m_sWindowType);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("COH")) {
-        return Coherence::coherence(m_pConnectivitySettings->m_matDataList,
-                                    m_pConnectivitySettings->m_matNodePositions,
-                                    m_pConnectivitySettings->m_iNfft,
-                                    m_pConnectivitySettings->m_sWindowType);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("IMAGCOH")) {
-        return ImagCoherence::imagCoherence(m_pConnectivitySettings->m_matDataList,
-                                            m_pConnectivitySettings->m_matNodePositions,
-                                            m_pConnectivitySettings->m_iNfft,
-                                            m_pConnectivitySettings->m_sWindowType);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("PLV")) {
-        return PhaseLockingValue::phaseLockingValue(m_pConnectivitySettings->m_matDataList,
-                                                    m_pConnectivitySettings->m_matNodePositions,
-                                                    m_pConnectivitySettings->m_iNfft,
-                                                    m_pConnectivitySettings->m_sWindowType);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("WPLI")) {
-        return WeightedPhaseLagIndex::weightedPhaseLagIndex(m_pConnectivitySettings->m_matDataList,
-                                                            m_pConnectivitySettings->m_matNodePositions,
-                                                            m_pConnectivitySettings->m_iNfft,
-                                                            m_pConnectivitySettings->m_sWindowType);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("USPLI")) {
-        return UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(m_pConnectivitySettings->m_matDataList,
-                                                                          m_pConnectivitySettings->m_matNodePositions,
-                                                                          m_pConnectivitySettings->m_iNfft,
-                                                                          m_pConnectivitySettings->m_sWindowType);
-    } else if(m_pConnectivitySettings->m_sConnectivityMethods.contains("DSWPLI")) {
-        return DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex(m_pConnectivitySettings->m_matDataList,
-                                                                                          m_pConnectivitySettings->m_matNodePositions,
-                                                                                          m_pConnectivitySettings->m_iNfft,
-                                                                                          m_pConnectivitySettings->m_sWindowType);
+    if(connectivitySettings.m_sConnectivityMethods.contains("COR")) {
+        return Correlation::correlationCoeff(connectivitySettings);
+    } else if(connectivitySettings.m_sConnectivityMethods.contains("XCOR")) {
+        return CrossCorrelation::crossCorrelation(connectivitySettings);
+    } else if(connectivitySettings.m_sConnectivityMethods.contains("PLI")) {
+        return PhaseLagIndex::phaseLagIndex(connectivitySettings);
+    } else if(connectivitySettings.m_sConnectivityMethods.contains("COH")) {
+        return Coherence::coherence(connectivitySettings);
+    } else if(connectivitySettings.m_sConnectivityMethods.contains("IMAGCOH")) {
+        return ImagCoherence::imagCoherence(connectivitySettings);
+    } else if(connectivitySettings.m_sConnectivityMethods.contains("PLV")) {
+        return PhaseLockingValue::phaseLockingValue(connectivitySettings);
+    } else if(connectivitySettings.m_sConnectivityMethods.contains("WPLI")) {
+        return WeightedPhaseLagIndex::weightedPhaseLagIndex(connectivitySettings);
+    } else if(connectivitySettings.m_sConnectivityMethods.contains("USPLI")) {
+        return UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(connectivitySettings);
+    } else if(connectivitySettings.m_sConnectivityMethods.contains("DSWPLI")) {
+        return DebiasedSquaredWeightedPhaseLagIndex::debiasedSquaredWeightedPhaseLagIndex(connectivitySettings);
     }
 
     qDebug() << "Connectivity::calculateConnectivity - Connectivity method unknown.";
