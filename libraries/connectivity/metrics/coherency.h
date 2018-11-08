@@ -87,6 +87,7 @@ namespace CONNECTIVITYLIB {
 //=============================================================================================================
 
 class Network;
+class ConnectivitySettings;
 
 
 //=============================================================================================================
@@ -112,46 +113,31 @@ public:
     /**
     * Calculates the real part of coherency of the rows of the data matrix.
     *
-    * @param[out] finalNetwork  The resulting network.
-    * @param[in] matDataList    The input data.
-    * @param[in] iNfft          FFT length.
-    * @param[in] sReturnType    The return type. Can return imag or real part of coherency. Default is real.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
+    * @param[out] finalNetwork          The resulting network.
+    * @param[in] connectivitySettings   The input data and parameters.
     */
     static void computeCoherencyReal(Network& finalNetwork,
-                                     const QList<Eigen::MatrixXd> &matDataList,
-                                     int iNfft = -1,
-                                     const QString &sWindowType="hanning");
+                                     const ConnectivitySettings &connectivitySettings);
 
     //=========================================================================================================
     /**
     * Calculates the imaginary part of coherency of the rows of the data matrix.
     *
-    * @param[out] finalNetwork  The resulting network.
-    * @param[in] matDataList    The input data.
-    * @param[in] iNfft          FFT length.
-    * @param[in] sReturnType    The return type. Can return imag or real part of coherency. Default is real.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
+    * @param[out] finalNetwork          The resulting network.
+    * @param[in] connectivitySettings   The input data and parameters.
     */
     static void computeCoherencyImag(Network& finalNetwork,
-                                     const QList<Eigen::MatrixXd> &matDataList,
-                                     int iNfft = -1,
-                                     const QString &sWindowType="hanning");
+                                     const ConnectivitySettings &connectivitySettings);
 
     //=========================================================================================================
     /**
     * Calculates the coherency of the rows of the data matrix.
     *
-    * @param[out] vecCoherency  The resulting data.
-    * @param[in] matDataList    The input data.
-    * @param[in] iNfft          FFT length.
-    * @param[in] sReturnType    The return type. Can return imag or real part of coherency. Default is real.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
+    * @param[out] finalNetwork          The resulting network.
+    * @param[in] connectivitySettings   The input data and parameters.
     */
     static void computeCoherency(QVector<QPair<int,Eigen::MatrixXcd> >& vecCoherency,
-                                 const QList<Eigen::MatrixXd> &matDataList,
-                                 int iNfft = -1,
-                                 const QString &sWindowType="hanning");
+                                 const ConnectivitySettings &connectivitySettings);
 
 private:
     //=========================================================================================================
