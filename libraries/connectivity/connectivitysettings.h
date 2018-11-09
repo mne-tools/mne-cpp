@@ -83,8 +83,8 @@ struct ConnectivityTrialData {
 };
 
 struct ConnectivityData {
-    Eigen::MatrixXd matPsdAvg;
-    QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdAvg;
+    Eigen::MatrixXd matPsdSum;
+    QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdSum;
 };
 
 
@@ -113,6 +113,12 @@ public:
     */
     explicit ConnectivitySettings();
 
+    void append(const QList<Eigen::MatrixXd>& matInputData) {
+        for(int i = 0; i < matInputData.size(); ++i) {
+            this->append(matInputData.at(i));
+        }
+    }
+
     void append(const Eigen::MatrixXd& matInputData) {
         ConnectivityTrialData tempData;
         tempData.matData = matInputData;
@@ -123,15 +129,15 @@ public:
     void removeFirst() {
         if(!m_dataList.isEmpty()) {
             // Substract PSD of first trial from overall summed up PSD
-            if(data.matPsdAvg.rows() == m_dataList.first().matPsd.rows() &&
-               data.matPsdAvg.cols() == m_dataList.first().matPsd.cols() ) {
-                data.matPsdAvg -= m_dataList.first().matPsd;
+            if(data.matPsdSum.rows() == m_dataList.first().matPsd.rows() &&
+               data.matPsdSum.cols() == m_dataList.first().matPsd.cols() ) {
+                data.matPsdSum -= m_dataList.first().matPsd;
             }
 
             // Substract CSD of first trial from overall summed up CSD
-            if(data.vecPairCsdAvg.size() == m_dataList.first().vecPairCsd.size()) {
-                for (int i = 0; i < data.vecPairCsdAvg.size(); ++i) {
-                    data.vecPairCsdAvg[i].second -= m_dataList.first().vecPairCsd.at(i).second;
+            if(data.vecPairCsdSum.size() == m_dataList.first().vecPairCsd.size()) {
+                for (int i = 0; i < data.vecPairCsdSum.size(); ++i) {
+                    data.vecPairCsdSum[i].second -= m_dataList.first().vecPairCsd.at(i).second;
                 }
             }
 
@@ -154,6 +160,7 @@ public:
     QString                     m_sWindowType;                  /**< The window type used to compute tapered spectra. */
 
     ConnectivityData            data;
+
 protected:
 
 };

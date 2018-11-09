@@ -145,17 +145,20 @@ private:
     /**
     * Computes the coherency values. This function gets called in parallel.
     *
-    * @param[in] matInputData           The input data.
-    * @param[in] iNRows                 The number of rows.
-    * @param[in] iNFreqs                The number of frequenciy bins.
-    * @param[in] iNfft                  The FFT length.
-    * @param[in] tapers                 The taper information.
+    * @param[in]    inputData           The input data.
+    * @param[out]   matPsdSum           The sum of all PSD matrices for each trial.
+    * @param[out]   vecPairCsdSum       The sum of all CSD matrices for each trial.
+    * @param[in]    mutex               The mutex used to safely access matPsdSum and vecPairCsdAvg.
+    * @param[in]    iNRows              The number of rows.
+    * @param[in]    iNFreqs             The number of frequenciy bins.
+    * @param[in]    iNfft               The FFT length.
+    * @param[in]    tapers              The taper information.
     *
     * @return            The coherency result in form of ConnectivityData.
     */
     static void compute(ConnectivityTrialData& inputData,
-                        Eigen::MatrixXd& matPsdAvg,
-                        QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdAvg,
+                        Eigen::MatrixXd& matPsdSum,
+                        QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
                         QMutex& mutex,
                         int iNRows,
                         int iNFreqs,
@@ -164,28 +167,18 @@ private:
 
     //=========================================================================================================
     /**
-    * Reduces the coherency computation to a final result. This function gets called in parallel.
-    *
-    * @param[out] finalData    The final data data.
-    * @param[in]  resultData   The resulting data from the computation step.
-    */
-    static void reduce(ConnectivityTrialData &finalData,
-                       const ConnectivityTrialData &resultData);
-
-    //=========================================================================================================
-    /**
     * Computes the PSD and CSD. This function gets called in parallel.
     */
     static void computePSDCSDReal(QMutex& mutex,
                                   Network& finalNetwork,
                                   const QPair<int,Eigen::MatrixXcd>& pairInput,
-                                  const Eigen::MatrixXd& matPsdAvg);
+                                  const Eigen::MatrixXd& matPsdSum);
     static void computePSDCSDImag(QMutex& mutex,
                                   Network& finalNetwork,
                                   const QPair<int,Eigen::MatrixXcd>& pairInput,
-                                  const Eigen::MatrixXd& matPsdAvg);
+                                  const Eigen::MatrixXd& matPsdSum);
     static void computePSDCSD(QPair<int,Eigen::MatrixXcd>& pairInput,
-                              const Eigen::MatrixXd& matPsdAvg);
+                              const Eigen::MatrixXd& matPsdSum);
 };
 
 
