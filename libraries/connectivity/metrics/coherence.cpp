@@ -140,34 +140,3 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
 
     return finalNetwork;
 }
-
-
-//*******************************************************************************************************
-
-QVector<MatrixXd> Coherence::computeCoherence(const QList<MatrixXd> &matDataList,
-                                              int iNfft,
-                                              const QString &sWindowType)
-{
-    //Calculate all-to-all coherence matrix over epochs
-    QVector<QPair<int,Eigen::MatrixXcd> > vecCoh;
-
-    ConnectivitySettings connectivitySettings;
-    ConnectivityTrialData data;
-    for(int i = 0; i < matDataList.size(); i++) {
-        data.matData = matDataList.at(i);
-        connectivitySettings.m_dataList.append(data);
-    }
-    connectivitySettings.m_iNfft = iNfft;
-    connectivitySettings.m_sWindowType = sWindowType;
-
-    Coherency::calculate(vecCoh,
-                         connectivitySettings);
-
-    QVector<Eigen::MatrixXd> result;
-
-    for(int i = 0; i < vecCoh.length(); ++i) {
-        result << vecCoh.at(i).second.cwiseAbs();
-    }
-
-    return result;
-}

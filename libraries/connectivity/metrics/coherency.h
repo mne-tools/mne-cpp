@@ -130,16 +130,6 @@ public:
     static void calculateImag(Network& finalNetwork,
                               ConnectivitySettings &connectivitySettings);
 
-    //=========================================================================================================
-    /**
-    * Calculates the coherency of the rows of the data matrix.
-    *
-    * @param[out]   finalNetwork          The resulting network.
-    * @param[in]    connectivitySettings  The input data and parameters.
-    */
-    static void calculate(QVector<QPair<int,Eigen::MatrixXcd> >& vecCoherency,
-                          ConnectivitySettings &connectivitySettings);
-
 private:
     //=========================================================================================================
     /**
@@ -177,8 +167,6 @@ private:
                                   Network& finalNetwork,
                                   const QPair<int,Eigen::MatrixXcd>& pairInput,
                                   const Eigen::MatrixXd& matPsdSum);
-    static void computePSDCSD(QPair<int,Eigen::MatrixXcd>& pairInput,
-                              const Eigen::MatrixXd& matPsdSum);
 };
 
 

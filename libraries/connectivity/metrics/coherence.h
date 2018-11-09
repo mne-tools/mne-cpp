@@ -118,20 +118,6 @@ public:
     * @return                   The connectivity information in form of a network structure.
     */
     static Network calculate(ConnectivitySettings &connectivitySettings);
-
-    //=========================================================================================================
-    /**
-    * Calculates the coherence of the rows of the data matrix.
-    *
-    * @param[in] matDataList    The input data.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The connectivity information in form of a QVector of matrices.
-    */
-    static QVector<Eigen::MatrixXd> computeCoherence(const QList<Eigen::MatrixXd> &matDataList,
-                                                     int iNfft,
-                                                     const QString &sWindowType="hanning");
 };
 
 

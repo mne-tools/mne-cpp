@@ -107,8 +107,8 @@ private:
     void compareConnectivity();
     QList<MatrixXd> readConnectivityData();
     double epsilon;
-    RowVectorXd m_ConnectivityOutput;
-    RowVectorXd m_RefConnectivityOutput;
+    double m_ConnectivityOutput;
+    double m_RefConnectivityOutput;
     ConnectivitySettings m_connectivitySettings;
 };
 
@@ -125,6 +125,14 @@ TestSpectralConnectivity::TestSpectralConnectivity()
 
 void TestSpectralConnectivity::initTestCase()
 {
+    //*********************************************************************************************************
+    // Load and Setup Testing Data
+    //*********************************************************************************************************
+
+    QList<MatrixXd> matDataList = readConnectivityData();
+    m_connectivitySettings.m_iNfft = matDataList.at(0).cols();
+    m_connectivitySettings.m_sWindowType = "hanning";
+    m_connectivitySettings.append(matDataList);
 }
 
 
@@ -133,20 +141,11 @@ void TestSpectralConnectivity::initTestCase()
 void TestSpectralConnectivity::spectralConnectivityCoherence()
 {
     //*********************************************************************************************************
-    // Load Data
-    //*********************************************************************************************************
-
-    QList<MatrixXd> matDataList = readConnectivityData();
-    m_connectivitySettings.m_iNfft = matDataList.at(0).cols();
-    m_connectivitySettings.m_sWindowType = "hanning";
-    m_connectivitySettings.append(matDataList);
-
-    //*********************************************************************************************************
     // Compute Connectivity
     //*********************************************************************************************************
 
     Network network = Coherence::calculate(m_connectivitySettings);
-    m_ConnectivityOutput = network.getFullConnectivityMatrix().row(1);
+    m_ConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -155,10 +154,7 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_coh.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
-
-    qDebug() << "network.getFullConnectivityMatrix()(0,1)" << network.getFullConnectivityMatrix()(0,1);
-    qDebug() << "refConnectivity.col(0).mean()" << refConnectivity.col(0).mean();
+    m_RefConnectivityOutput = refConnectivity.col(0).mean();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -172,21 +168,11 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
 void TestSpectralConnectivity::spectralConnectivityImagCoherence()
 {
     //*********************************************************************************************************
-    // Load Data
-    //*********************************************************************************************************
-
-    QList<MatrixXd> matDataList = readConnectivityData();
-    int iNfft = matDataList.at(0).cols();
-    QString sWindowType = "hanning";
-
-    //*********************************************************************************************************
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> vecImagCoh = ImagCoherence::calculate(matDataList,
-                                                            iNfft,
-                                                            sWindowType);
-    m_ConnectivityOutput = vecImagCoh.at(0).row(1);
+    Network network = ImagCoherence::calculate(m_connectivitySettings);
+    m_ConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -195,7 +181,7 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_imagcoh.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
+    m_RefConnectivityOutput = refConnectivity.col(0).mean();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -210,19 +196,11 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
 void TestSpectralConnectivity::spectralConnectivityPLV()
 {
     //*********************************************************************************************************
-    // Load Data
-    //*********************************************************************************************************
-
-    QList<MatrixXd> matDataList = readConnectivityData();
-    int iNfft = matDataList.at(0).cols();
-    QString sWindowType = "hanning";
-
-    //*********************************************************************************************************
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> PLV = PhaseLockingValue::calculate(matDataList, iNfft, sWindowType);
-    m_ConnectivityOutput = PLV.at(0).row(1);
+    Network network = PhaseLockingValue::calculate(m_connectivitySettings);
+    m_ConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -231,7 +209,7 @@ void TestSpectralConnectivity::spectralConnectivityPLV()
     MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_plv.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
+    m_RefConnectivityOutput = refConnectivity.col(0).mean();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -246,23 +224,11 @@ void TestSpectralConnectivity::spectralConnectivityPLV()
 void TestSpectralConnectivity::spectralConnectivityPLI()
 {
     //*********************************************************************************************************
-    // Load Data
-    //*********************************************************************************************************
-
-    QList<MatrixXd> matDataList = readConnectivityData();
-    int iNfft = matDataList.at(0).cols();
-    QString sWindowType = "hanning";
-
-    //*********************************************************************************************************
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> PLI;
-    PhaseLagIndex::calculate(PLI,
-                             matDataList,
-                             iNfft,
-                             sWindowType);
-    m_ConnectivityOutput = PLI.at(0).row(1);
+    Network network = PhaseLagIndex::calculate(m_connectivitySettings);
+    m_ConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -271,7 +237,7 @@ void TestSpectralConnectivity::spectralConnectivityPLI()
     MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_pli.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
+    m_RefConnectivityOutput = refConnectivity.col(0).mean();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -286,23 +252,11 @@ void TestSpectralConnectivity::spectralConnectivityPLI()
 void TestSpectralConnectivity::spectralConnectivityPLI2()
 {
     //*********************************************************************************************************
-    // Load Data
-    //*********************************************************************************************************
-
-    QList<MatrixXd> matDataList = readConnectivityData();
-    int iNfft = matDataList.at(0).cols();
-    QString sWindowType = "hanning";
-
-    //*********************************************************************************************************
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> PLI2;
-    UnbiasedSquaredPhaseLagIndex::calculate(PLI2,
-                                            matDataList,
-                                            iNfft,
-                                            sWindowType);
-    m_ConnectivityOutput = PLI2.at(0).row(1);
+    Network network = UnbiasedSquaredPhaseLagIndex::calculate(m_connectivitySettings);
+    m_ConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -311,7 +265,7 @@ void TestSpectralConnectivity::spectralConnectivityPLI2()
     MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_pli2.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
+    m_RefConnectivityOutput = refConnectivity.col(0).mean();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -326,23 +280,11 @@ void TestSpectralConnectivity::spectralConnectivityPLI2()
 void TestSpectralConnectivity::spectralConnectivityWPLI()
 {
     //*********************************************************************************************************
-    // Load Data
-    //*********************************************************************************************************
-
-    QList<MatrixXd> matDataList = readConnectivityData();
-    int iNfft = matDataList.at(0).cols();
-    QString sWindowType = "hanning";
-
-    //*********************************************************************************************************
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> WPLI;
-    WeightedPhaseLagIndex::calculate(WPLI,
-                                     matDataList,
-                                     iNfft,
-                                     sWindowType);
-    m_ConnectivityOutput = WPLI.at(0).row(1);
+    Network network = WeightedPhaseLagIndex::calculate(m_connectivitySettings);
+    m_ConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -351,7 +293,7 @@ void TestSpectralConnectivity::spectralConnectivityWPLI()
     MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_wpli.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
+    m_RefConnectivityOutput = refConnectivity.col(0).mean();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -366,23 +308,11 @@ void TestSpectralConnectivity::spectralConnectivityWPLI()
 void TestSpectralConnectivity::spectralConnectivityWPLI2()
 {
     //*********************************************************************************************************
-    // Load Data
-    //*********************************************************************************************************
-
-    QList<MatrixXd> matDataList = readConnectivityData();
-    int iNfft = matDataList.at(0).cols();
-    QString sWindowType = "hanning";
-
-    //*********************************************************************************************************
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> WPLI2;
-    DebiasedSquaredWeightedPhaseLagIndex::calculate(WPLI2,
-                                                    matDataList,
-                                                    iNfft,
-                                                    sWindowType);
-    m_ConnectivityOutput = WPLI2.at(0).row(1);
+    Network network = DebiasedSquaredWeightedPhaseLagIndex::calculate(m_connectivitySettings);
+    m_ConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -391,7 +321,7 @@ void TestSpectralConnectivity::spectralConnectivityWPLI2()
     MatrixXd refConnectivity;
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_wpli2.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
-    m_RefConnectivityOutput = refConnectivity.col(0).transpose();
+    m_RefConnectivityOutput = refConnectivity.col(0).mean();
 
     //*********************************************************************************************************
     // Compare Connectivity
@@ -431,24 +361,10 @@ void TestSpectralConnectivity::compareConnectivity()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare Spectral Connectivities >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     //*********************************************************************************************************
-    // Compare shape of the input data
-    //*********************************************************************************************************
-
-    QCOMPARE( m_ConnectivityOutput.rows(), m_RefConnectivityOutput.rows() );
-    QCOMPARE( m_ConnectivityOutput.cols(), m_RefConnectivityOutput.cols() );
-
-    //*********************************************************************************************************
     // Compare connectivity estimate for each frequency bin
     //*********************************************************************************************************
 
-    for (int i = 0; i < m_ConnectivityOutput.cols(); ++i)
-    {
-        if (m_RefConnectivityOutput(i) == 0.0){
-            QCOMPARE( m_ConnectivityOutput(i), m_RefConnectivityOutput(i) );
-        } else {
-            QVERIFY( (fabs(m_ConnectivityOutput(i) - m_RefConnectivityOutput(i)) / fabs(m_RefConnectivityOutput(i))) < epsilon );
-        }
-    }
+    QCOMPARE(m_ConnectivityOutput, m_RefConnectivityOutput);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Spectral Connectivities Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
