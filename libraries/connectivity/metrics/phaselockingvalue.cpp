@@ -114,6 +114,8 @@ Network PhaseLockingValue::calculate(const ConnectivitySettings& connectivitySet
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
+        rowVert = RowVectorXf::Zero(3);
+
         if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
             rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
             rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);

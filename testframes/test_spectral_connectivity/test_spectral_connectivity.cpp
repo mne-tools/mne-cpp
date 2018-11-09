@@ -40,14 +40,16 @@
 //=============================================================================================================
 
 #include <utils/ioutils.h>
-#include "connectivity/metrics/coherency.h"
-#include "connectivity/metrics/coherence.h"
-#include "connectivity/metrics/imagcoherence.h"
-#include "connectivity/metrics/phaselockingvalue.h"
-#include "connectivity/metrics/phaselagindex.h"
-#include "connectivity/metrics/unbiasedsquaredphaselagindex.h"
-#include "connectivity/metrics/weightedphaselagindex.h"
-#include "connectivity/metrics/debiasedsquaredweightedphaselagindex.h"
+#include <connectivity/metrics/coherency.h>
+#include <connectivity/metrics/coherence.h>
+#include <connectivity/metrics/imagcoherence.h>
+#include <connectivity/metrics/phaselockingvalue.h>
+#include <connectivity/metrics/phaselagindex.h>
+#include <connectivity/metrics/unbiasedsquaredphaselagindex.h>
+#include <connectivity/metrics/weightedphaselagindex.h>
+#include <connectivity/metrics/debiasedsquaredweightedphaselagindex.h>
+#include <connectivity/connectivitysettings.h>
+#include <connectivity/network/network.h>
 
 
 //*************************************************************************************************************
@@ -107,6 +109,7 @@ private:
     double epsilon;
     RowVectorXd m_ConnectivityOutput;
     RowVectorXd m_RefConnectivityOutput;
+    ConnectivitySettings m_connectivitySettings;
 };
 
 
@@ -122,7 +125,6 @@ TestSpectralConnectivity::TestSpectralConnectivity()
 
 void TestSpectralConnectivity::initTestCase()
 {
-
 }
 
 
@@ -135,17 +137,16 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     //*********************************************************************************************************
 
     QList<MatrixXd> matDataList = readConnectivityData();
-    int iNfft = matDataList.at(0).cols();
-    QString sWindowType = "hanning";
+    m_connectivitySettings.m_iNfft = matDataList.at(0).cols();
+    m_connectivitySettings.m_sWindowType = "hanning";
+    m_connectivitySettings.append(matDataList);
 
     //*********************************************************************************************************
     // Compute Connectivity
     //*********************************************************************************************************
 
-    QVector<MatrixXd> vecCoh = Coherence::computeCoherence(matDataList,
-                                                           iNfft,
-                                                           sWindowType);
-    m_ConnectivityOutput = vecCoh.at(0).row(1);
+    Network network = Coherence::calculate(m_connectivitySettings);
+    m_ConnectivityOutput = network.getFullConnectivityMatrix().row(1);
 
     //*********************************************************************************************************
     // Load MNE-PYTHON Results As Reference
@@ -155,6 +156,9 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_coh.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_RefConnectivityOutput = refConnectivity.col(0).transpose();
+
+    qDebug() << "network.getFullConnectivityMatrix()(0,1)" << network.getFullConnectivityMatrix()(0,1);
+    qDebug() << "refConnectivity.col(0).mean()" << refConnectivity.col(0).mean();
 
     //*********************************************************************************************************
     // Compare Connectivity
