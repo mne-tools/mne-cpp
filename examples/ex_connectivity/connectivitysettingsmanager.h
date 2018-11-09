@@ -106,15 +106,16 @@ public:
         m_iFreqBandHigh = 50 * dScaleFactor;
     }
 
-    ConnectivitySettings    m_settings;
-    RtConnectivity::SPtr    m_pRtConnectivity;
-    QList<Eigen::MatrixXd>  m_matDataListOriginal;
-    Network                 m_networkData;
+    ConnectivitySettings            m_settings;
+    RtConnectivity::SPtr            m_pRtConnectivity;
+    QList<Eigen::MatrixXd>          m_matDataListOriginal;
+    QList<ConnectivityTrialData>    m_dataListOriginal;
+    Network                         m_networkData;
 
-    int                     m_iFreqBandLow;
-    int                     m_iFreqBandHigh;
+    int                             m_iFreqBandLow;
+    int                             m_iFreqBandHigh;
 
-    float                   m_fSFreq;
+    float                           m_fSFreq;
 
     void onConnectivityMetricChanged(const QString& sMetric)
     {
@@ -127,11 +128,11 @@ public:
 
     void onNumberTrialsChanged(int iNumberTrials)
     {
-        if(iNumberTrials > m_matDataListOriginal.size()) {
-            iNumberTrials = m_matDataListOriginal.size();
+        if(iNumberTrials > m_dataListOriginal.size()) {
+            iNumberTrials = m_dataListOriginal.size();
         }
 
-        m_settings.m_matDataList.clear();
+        m_settings.m_dataList.clear();
         QVector<int> indexList;
 
         for(int i = 0; i < iNumberTrials; i++) {
@@ -147,8 +148,7 @@ public:
                 }
             }
 
-            m_settings.m_matDataList << m_matDataListOriginal.at(index);
-            //m_settings.m_matDataList << m_matDataListOriginal.at(i);
+            m_settings.m_dataList << m_dataListOriginal.at(index);
         }
 
         //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - indexList" << indexList;
@@ -158,12 +158,12 @@ public:
 
     void onFreqBandChanged(int iFreqLow, int iFreqHigh)
     {
-        if(m_settings.m_matDataList.isEmpty()) {
+        if(m_settings.m_dataList.isEmpty()) {
             return;
         }
 
         // By default the number of frequency bins is half the signal since we only use the half spectrum
-        double dScaleFactor = m_settings.m_matDataList.first().cols()/m_fSFreq;
+        double dScaleFactor = m_settings.m_dataList.first().matData.cols()/m_fSFreq;
 
         // Convert to frequency bins
         m_iFreqBandLow = iFreqLow * dScaleFactor;

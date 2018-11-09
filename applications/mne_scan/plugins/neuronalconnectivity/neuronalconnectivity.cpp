@@ -166,7 +166,7 @@ void NeuronalConnectivity::init()
     m_pCircularNetworkBuffer = QSharedPointer<CircularBuffer<CONNECTIVITYLIB::Network> >(new CircularBuffer<CONNECTIVITYLIB::Network>(10));
 
     //Init connectivity settings
-    m_connectivitySettings.m_sConnectivityMethods = QStringList() << "COR";
+    m_connectivitySettings.m_sConnectivityMethods = QStringList() << "COH";
     m_connectivitySettings.m_sWindowType = "Hanning";
 }
 
@@ -341,36 +341,34 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             MatrixXd data;
             QList<MatrixXd> epochDataList;
 
-            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i)
-            {
+            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 const MatrixXd& t_mat = pRTMSA->getMultiSampleArray()[i];
 
                 // Check row and colum integrity and restart if necessary
-                if(!m_connectivitySettings.m_matDataList.isEmpty()) {
-                    if(t_mat.cols() != m_connectivitySettings.m_matDataList.first().cols()) {
-                        m_connectivitySettings.m_matDataList.clear();
+                if(!m_connectivitySettings.m_dataList.isEmpty()) {
+                    if(t_mat.cols() != m_connectivitySettings.m_dataList.first().matData.cols()) {
+                        m_connectivitySettings.m_dataList.clear();
                         m_pRtConnectivity->restart();
                     }
                 }
 
                 data.resize(m_chIdx.size(), t_mat.cols());
 
-                for(qint32 j = 0; j < m_chIdx.size(); ++j)
-                {
+                for(qint32 j = 0; j < m_chIdx.size(); ++j) {
                     data.row(j) = t_mat.row(m_chIdx.at(j));
                 }
 
-                epochDataList.append(data);
+                m_connectivitySettings.append(data);
             }
 
-            m_connectivitySettings.m_matDataList << epochDataList;
-
             //Pop data from buffer
-            if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
+            if(m_connectivitySettings.m_dataList.size() > m_iNumberAverages) {
                 m_pRtConnectivity->restart();
-                int size = m_connectivitySettings.m_matDataList.size();
+                int size = m_connectivitySettings.m_dataList.size();
+
                 for(int i = 0; i < size-m_iNumberAverages; ++i) {
-                    m_connectivitySettings.m_matDataList.removeFirst();
+                    qDebug() << "NeuronalConnectivity::updateRTMSA - Delete first item in m_dataList";
+                    m_connectivitySettings.removeFirst();
                 }
             }
 
@@ -565,6 +563,8 @@ void NeuronalConnectivity::run()
                 m_currentConnectivityResult.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
                 m_currentConnectivityResult.normalize();
                 m_pRTCEOutput->data()->setValue(m_currentConnectivityResult);
+            } else {
+                qDebug()<<"NeuronalConnectivity::run - Network is empty";
             }
         }
 
@@ -575,9 +575,11 @@ void NeuronalConnectivity::run()
 
 //*************************************************************************************************************
 
-void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& connectivityResult)
+void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& connectivityResult,
+                                                            const ConnectivitySettings& connectivitySettings)
 {
     //QMutexLocker locker(&m_mutex);
+    m_connectivitySettings = connectivitySettings;
     m_pCircularNetworkBuffer->push(connectivityResult);
 }
 

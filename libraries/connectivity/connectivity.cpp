@@ -94,7 +94,7 @@ Connectivity::Connectivity()
 
 //*************************************************************************************************************
 
-Network Connectivity::calculate(const ConnectivitySettings& connectivitySettings)
+Network Connectivity::calculate(ConnectivitySettings& connectivitySettings)
 {
     //TODO: Use multithreading to work on multiple connectivity methods at the same time
     if(connectivitySettings.m_sConnectivityMethods.contains("COR")) {

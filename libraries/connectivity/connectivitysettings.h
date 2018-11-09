@@ -52,6 +52,7 @@
 
 #include <QSharedPointer>
 #include <QStringList>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -74,6 +75,17 @@
 //=============================================================================================================
 
 namespace CONNECTIVITYLIB {
+
+struct ConnectivityTrialData {
+    Eigen::MatrixXd matData;
+    Eigen::MatrixXd matPsd;
+    QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsd;
+};
+
+struct ConnectivityData {
+    Eigen::MatrixXd matPsdAvg;
+    QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdAvg;
+};
 
 
 //*************************************************************************************************************
@@ -101,14 +113,47 @@ public:
     */
     explicit ConnectivitySettings();
 
+    void append(const Eigen::MatrixXd& matInputData) {
+        ConnectivityTrialData tempData;
+        tempData.matData = matInputData;
+
+        m_dataList.append(tempData);
+    }
+
+    void removeFirst() {
+        if(!m_dataList.isEmpty()) {
+            // Substract PSD of first trial from overall summed up PSD
+            if(data.matPsdAvg.rows() == m_dataList.first().matPsd.rows() &&
+               data.matPsdAvg.cols() == m_dataList.first().matPsd.cols() ) {
+                data.matPsdAvg -= m_dataList.first().matPsd;
+            }
+
+            // Substract CSD of first trial from overall summed up CSD
+            if(data.vecPairCsdAvg.size() == m_dataList.first().vecPairCsd.size()) {
+                for (int i = 0; i < data.vecPairCsdAvg.size(); ++i) {
+                    data.vecPairCsdAvg[i].second -= m_dataList.first().vecPairCsd.at(i).second;
+                }
+            }
+
+            m_dataList.removeFirst();
+        }
+        if(!m_matDataList.isEmpty()) {
+            m_matDataList.removeFirst();
+        }
+    };
+
     QStringList                 m_sConnectivityMethods;         /**< The connectivity methods. */
 
+    QList<ConnectivityTrialData>     m_dataList;                     /**< The input data. */
+
     QList<Eigen::MatrixXd>      m_matDataList;                  /**< The input data. */
+
     Eigen::MatrixX3f            m_matNodePositions;             /**< The node position in 3D space. */
 
     int                         m_iNfft;                        /**< The FFT length used for spectral estimation. */
     QString                     m_sWindowType;                  /**< The window type used to compute tapered spectra. */
 
+    ConnectivityData            data;
 protected:
 
 };

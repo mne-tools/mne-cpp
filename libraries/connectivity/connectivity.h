@@ -109,7 +109,7 @@ public:
     *
     * @return Returns the network.
     */
-    static Network calculate(const ConnectivitySettings& connectivitySettings);
+    static Network calculate(ConnectivitySettings& connectivitySettings);
 
 protected:
 };
