@@ -119,16 +119,16 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
 
     QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
+    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COH");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "4");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.4");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.5");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
@@ -239,9 +239,9 @@ int main(int argc, char *argv[])
         // Pick relevant channels
         if(sChType.contains("EEG", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(false,true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
-        } else if(sCoilType == "grad", Qt::CaseInsensitive) {
+        } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(QString("grad"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
-        } else if (sCoilType == "mag", Qt::CaseInsensitive) {
+        } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(QString("mag"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
         }
 
@@ -270,7 +270,6 @@ int main(int argc, char *argv[])
             for(qint32 j = 0; j < iNumberRows; ++j) {
                 matData.row(j) = data.at(i)->epoch.row(picks(j));
             }
-
             matDataList << matData;
         }
     } else {
@@ -360,8 +359,13 @@ int main(int argc, char *argv[])
     QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matDataList.first().cols(), raw.info.sfreq);
 
     pConnectivitySettingsManager->m_settings.m_sConnectivityMethods << sConnectivityMethod;
-    pConnectivitySettingsManager->m_settings.m_matDataList = matDataList;
-    pConnectivitySettingsManager->m_matDataListOriginal = matDataList;
+
+    ConnectivityTrialData connectivityData;
+    for(int i = 0; i < matDataList.size(); i++) {
+        connectivityData.matData = matDataList.at(i);
+        pConnectivitySettingsManager->m_settings.m_dataList.append(connectivityData);
+        pConnectivitySettingsManager->m_dataListOriginal.append(connectivityData);
+    }
     pConnectivitySettingsManager->m_settings.m_matNodePositions = matNodePositions;
     pConnectivitySettingsManager->m_settings.m_iNfft = -1;
     pConnectivitySettingsManager->m_settings.m_sWindowType = "hanning";

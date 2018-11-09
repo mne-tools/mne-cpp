@@ -88,6 +88,7 @@ namespace CONNECTIVITYLIB {
 
 class Network;
 class ConnectivitySettings;
+class ConnectivityTrialData;
 
 
 //=============================================================================================================
@@ -113,31 +114,31 @@ public:
     /**
     * Calculates the real part of coherency of the rows of the data matrix.
     *
-    * @param[out] finalNetwork          The resulting network.
-    * @param[in] connectivitySettings   The input data and parameters.
+    * @param[out]   finalNetwork          The resulting network.
+    * @param[in]    connectivitySettings  The input data and parameters.
     */
     static void calculateReal(Network& finalNetwork,
-                                     const ConnectivitySettings &connectivitySettings);
+                              ConnectivitySettings &connectivitySettings);
 
     //=========================================================================================================
     /**
     * Calculates the imaginary part of coherency of the rows of the data matrix.
     *
-    * @param[out] finalNetwork          The resulting network.
-    * @param[in] connectivitySettings   The input data and parameters.
+    * @param[out]   finalNetwork          The resulting network.
+    * @param[in]    connectivitySettings  The input data and parameters.
     */
     static void calculateImag(Network& finalNetwork,
-                                     const ConnectivitySettings &connectivitySettings);
+                              ConnectivitySettings &connectivitySettings);
 
     //=========================================================================================================
     /**
     * Calculates the coherency of the rows of the data matrix.
     *
-    * @param[out] finalNetwork          The resulting network.
-    * @param[in] connectivitySettings   The input data and parameters.
+    * @param[out]   finalNetwork          The resulting network.
+    * @param[in]    connectivitySettings  The input data and parameters.
     */
     static void calculate(QVector<QPair<int,Eigen::MatrixXcd> >& vecCoherency,
-                                 const ConnectivitySettings &connectivitySettings);
+                          ConnectivitySettings &connectivitySettings);
 
 private:
     //=========================================================================================================
@@ -150,13 +151,16 @@ private:
     * @param[in] iNfft                  The FFT length.
     * @param[in] tapers                 The taper information.
     *
-    * @return            The coherency result in form of AbstractMetricResultData.
+    * @return            The coherency result in form of ConnectivityData.
     */
-    static AbstractMetricResultData compute(const Eigen::MatrixXd& matInputData,
-                                            int iNRows,
-                                            int iNFreqs,
-                                            int iNfft,
-                                            const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
+    static void compute(ConnectivityTrialData& inputData,
+                        Eigen::MatrixXd& matPsdAvg,
+                        QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdAvg,
+                        QMutex& mutex,
+                        int iNRows,
+                        int iNFreqs,
+                        int iNfft,
+                        const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
 
     //=========================================================================================================
     /**
@@ -165,26 +169,23 @@ private:
     * @param[out] finalData    The final data data.
     * @param[in]  resultData   The resulting data from the computation step.
     */
-    static void reduce(AbstractMetricResultData &finalData,
-                       const AbstractMetricResultData& resultData);
+    static void reduce(ConnectivityTrialData &finalData,
+                       const ConnectivityTrialData &resultData);
 
     //=========================================================================================================
     /**
     * Computes the PSD and CSD. This function gets called in parallel.
-    *
-    * @param[out] pairInput     The in/out data.
-    * @param[in]  matPsdAvg     The averaged PSD.
     */
-    static void computePSDCSD(QPair<int,Eigen::MatrixXcd>& pairInput,
-                              const Eigen::MatrixXd& matPsdAvg);
     static void computePSDCSDReal(QMutex& mutex,
                                   Network& finalNetwork,
-                                  QPair<int,Eigen::MatrixXcd>& pairInput,
+                                  const QPair<int,Eigen::MatrixXcd>& pairInput,
                                   const Eigen::MatrixXd& matPsdAvg);
     static void computePSDCSDImag(QMutex& mutex,
                                   Network& finalNetwork,
-                                  QPair<int,Eigen::MatrixXcd>& pairInput,
+                                  const QPair<int,Eigen::MatrixXcd>& pairInput,
                                   const Eigen::MatrixXd& matPsdAvg);
+    static void computePSDCSD(QPair<int,Eigen::MatrixXcd>& pairInput,
+                              const Eigen::MatrixXd& matPsdAvg);
 };
 
 

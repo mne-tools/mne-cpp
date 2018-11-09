@@ -93,7 +93,7 @@ ImagCoherence::ImagCoherence()
 
 //*******************************************************************************************************
 
-Network ImagCoherence::calculate(const ConnectivitySettings& connectivitySettings)
+Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("Imaginary Coherence");
 
@@ -133,7 +133,11 @@ QVector<MatrixXd> ImagCoherence::calculate(const QList<MatrixXd> &matDataList,
     QVector<QPair<int,Eigen::MatrixXcd> > vecCoh;
 
     ConnectivitySettings connectivitySettings;
-    connectivitySettings.m_matDataList = matDataList;
+    ConnectivityTrialData data;
+    for(int i = 0; i < matDataList.size(); i++) {
+        data.matData = matDataList.at(i);
+        connectivitySettings.m_dataList.append(data);
+    }
     connectivitySettings.m_iNfft = iNfft;
     connectivitySettings.m_sWindowType = sWindowType;
     Coherency::calculate(vecCoh,

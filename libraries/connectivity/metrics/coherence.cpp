@@ -93,7 +93,7 @@ Coherence::Coherence()
 
 //*******************************************************************************************************
 
-Network Coherence::calculate(const ConnectivitySettings& connectivitySettings)
+Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
 {
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;
@@ -101,7 +101,7 @@ Network Coherence::calculate(const ConnectivitySettings& connectivitySettings)
 
     Network finalNetwork("Coherence");
 
-    if(connectivitySettings.m_matDataList.empty()) {
+    if(connectivitySettings.m_dataList.empty()) {
         qDebug() << "Coherence::coherence - Input data is empty";
         return finalNetwork;
     }
@@ -111,7 +111,7 @@ Network Coherence::calculate(const ConnectivitySettings& connectivitySettings)
 //    timer.restart();
 
     //Create nodes
-    int rows = connectivitySettings.m_matDataList.first().rows();
+    int rows = connectivitySettings.m_dataList.first().matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
@@ -150,7 +150,11 @@ QVector<MatrixXd> Coherence::computeCoherence(const QList<MatrixXd> &matDataList
     QVector<QPair<int,Eigen::MatrixXcd> > vecCoh;
 
     ConnectivitySettings connectivitySettings;
-    connectivitySettings.m_matDataList = matDataList;
+    ConnectivityTrialData data;
+    for(int i = 0; i < matDataList.size(); i++) {
+        data.matData = matDataList.at(i);
+        connectivitySettings.m_dataList.append(data);
+    }
     connectivitySettings.m_iNfft = iNfft;
     connectivitySettings.m_sWindowType = sWindowType;
 

@@ -194,7 +194,8 @@ protected:
     *
     * @param [in] connectivityResult        The new connectivity estimate
     */
-    void onNewConnectivityResultAvailable(const CONNECTIVITYLIB::Network& connectivityResult);
+    void onNewConnectivityResultAvailable(const CONNECTIVITYLIB::Network& connectivityResult,
+                                          const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
     //=========================================================================================================
     /**

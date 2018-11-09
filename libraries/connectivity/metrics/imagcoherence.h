@@ -116,7 +116,7 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network calculate(const ConnectivitySettings &connectivitySettings);
+    static Network calculate(ConnectivitySettings &connectivitySettings);
 
     //=========================================================================================================
     /**

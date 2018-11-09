@@ -75,11 +75,6 @@
 
 namespace CONNECTIVITYLIB {
 
-struct AbstractMetricInputData {
-    Eigen::MatrixXd matInputData;
-    QPair<Eigen::MatrixXd, Eigen::VectorXd> tapers;
-};
-
 struct AbstractMetricResultData {
     Eigen::MatrixXd matPsdAvg;
     QVector<Eigen::MatrixXcd> vecCsdAvg;
