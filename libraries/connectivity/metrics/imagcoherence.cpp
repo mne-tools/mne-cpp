@@ -97,13 +97,13 @@ Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("Imaginary Coherence");
 
-    if(connectivitySettings.m_matDataList.empty()) {
+    if(connectivitySettings.m_dataList.empty()) {
         qDebug() << "ImagCoherence::imagcoherence - Input data is empty";
         return finalNetwork;
     }
 
     //Create nodes
-    int rows = connectivitySettings.m_matDataList.first().rows();
+    int rows = connectivitySettings.m_dataList.first().matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
@@ -123,34 +123,4 @@ Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
                              connectivitySettings);
 
     return finalNetwork;
-}
-
-
-//*************************************************************************************************************
-
-QVector<MatrixXd> ImagCoherence::calculate(const QList<MatrixXd> &matDataList,
-                                          int iNfft,
-                                          const QString &sWindowType)
-{
-    QVector<QPair<int,Eigen::MatrixXcd> > vecCoh;
-
-    ConnectivitySettings connectivitySettings;
-    ConnectivityTrialData data;
-    for(int i = 0; i < matDataList.size(); i++) {
-        data.matData = matDataList.at(i);
-        connectivitySettings.m_dataList.append(data);
-    }
-    connectivitySettings.m_iNfft = iNfft;
-    connectivitySettings.m_sWindowType = sWindowType;
-    Coherency::calculate(vecCoh,
-                         connectivitySettings);
-
-
-    QVector<MatrixXd> result;
-
-    for(int i = 0; i < vecCoh.length(); ++i) {
-        result << vecCoh.at(i).second.imag();
-    }
-
-    return result;
 }

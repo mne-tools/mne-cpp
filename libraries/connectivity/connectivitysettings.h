@@ -113,6 +113,23 @@ public:
     */
     explicit ConnectivitySettings();
 
+    void clear() {
+        m_dataList.clear();
+        m_matDataList.clear();
+        data.matPsdSum.resize(0,0);
+        data.vecPairCsdSum.clear();
+    }
+
+    void reset() {
+        for (int i = 0; i < m_dataList.size(); ++i) {
+            m_dataList[i].matPsd.resize(0,0);
+            m_dataList[i].vecPairCsd.clear();
+        }
+
+        data.matPsdSum.resize(0,0);
+        data.vecPairCsdSum.clear();
+    }
+
     void append(const QList<Eigen::MatrixXd>& matInputData) {
         for(int i = 0; i < matInputData.size(); ++i) {
             this->append(matInputData.at(i));

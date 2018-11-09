@@ -126,6 +126,7 @@ void Coherency::calculateReal(Network& finalNetwork,
     int iNRows = connectivitySettings.m_dataList.first().matData.rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
+    // Compute PSD/CSD for each trial
     QMutex mutex;
 
     std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
@@ -143,7 +144,6 @@ void Coherency::calculateReal(Network& finalNetwork,
     qDebug() << "Coherency::computeCoherencyReal timer - Preparation:" << iTime;
     timer.restart();
 
-    // Compute PSD/CSD for each trial
     QFuture<void> result = QtConcurrent::map(connectivitySettings.m_dataList,
                                              computeLambda);
     result.waitForFinished();
@@ -152,13 +152,7 @@ void Coherency::calculateReal(Network& finalNetwork,
     qDebug() << "Coherency::computeCoherencyReal timer - PSD/CSD computation:" << iTime;
     timer.restart();
 
-    connectivitySettings.data.matPsdSum = connectivitySettings.data.matPsdSum.cwiseSqrt();
-
-    iTime = timer.elapsed();
-    qDebug() << "Coherency::computeCoherencyReal timer - Cwise sqrt:" << iTime;
-    timer.restart();
-
-    // Compute CSD/(PSD_X * PSD_Y)
+    // Compute CSD/sqrt(PSD_X * PSD_Y)
     std::function<void(QPair<int,MatrixXcd>&)> computePSDCSDLambda = [&](QPair<int,MatrixXcd>& pairInput) {
         computePSDCSDReal(mutex,
                           finalNetwork,
@@ -171,7 +165,7 @@ void Coherency::calculateReal(Network& finalNetwork,
     resultCSDPSD.waitForFinished();
 
     iTime = timer.elapsed();
-    qDebug() << "Coherency::computeCoherencyReal timer - Network creation CSD/(PSD_X * PSD_Y):" << iTime;
+    qDebug() << "Coherency::computeCoherencyReal timer - Network creation CSD/sqrt(PSD_X * PSD_Y):" << iTime;
     timer.restart();
 }
 
@@ -208,6 +202,7 @@ void Coherency::calculateImag(Network& finalNetwork,
     int iNRows = connectivitySettings.m_dataList.first().matData.rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
+    // Compute PSD/CSD for each trial
     QMutex mutex;
 
     std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
@@ -221,7 +216,6 @@ void Coherency::calculateImag(Network& finalNetwork,
                 tapers);
     };
 
-    // Compute PSD/CSD for each trial
 //        iTime = timer.elapsed();
 //        qDebug() << "Coherency::computeCoherencyImag timer - Preparation:" << iTime;
 //        timer.restart();
@@ -234,13 +228,7 @@ void Coherency::calculateImag(Network& finalNetwork,
 //        qDebug() << "Coherency::computeCoherencyImag timer - PSD/CSD computation:" << iTime;
 //        timer.restart();
 
-    connectivitySettings.data.matPsdSum = connectivitySettings.data.matPsdSum.cwiseSqrt();
-
-//        iTime = timer.elapsed();
-//        qDebug() << "Coherency::computeCoherencyImag timer - Cwise sqrt:" << iTime;
-//        timer.restart();
-
-    // Compute CSD/(PSD_X * PSD_Y)
+    // Compute CSD/sqrt(PSD_X * PSD_Y)
     std::function<void(QPair<int,MatrixXcd>&)> computePSDCSDLambda = [&](QPair<int,MatrixXcd>& pairInput) {
         computePSDCSDImag(mutex,
                           finalNetwork,
@@ -253,90 +241,8 @@ void Coherency::calculateImag(Network& finalNetwork,
     resultCSDPSD.waitForFinished();
 
 //        iTime = timer.elapsed();
-//        qDebug() << "Coherency::computeCoherencyImag timer - Network creation CSD/(PSD_X * PSD_Y):" << iTime;
+//        qDebug() << "Coherency::computeCoherencyImag timer - Network creation CSD/sqrt(PSD_X * PSD_Y):" << iTime;
 //        timer.restart();
-}
-
-
-//*************************************************************************************************************
-
-void Coherency::calculate(QVector<QPair<int,MatrixXcd> >& vecCoherency,
-                          ConnectivitySettings &connectivitySettings)
-{
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
-
-    if(connectivitySettings.m_dataList.empty()) {
-        qDebug() << "Coherency::computeCoherency - Input data is empty";
-        return;
-    }
-
-    #ifdef EIGEN_FFTW_DEFAULT
-        fftw_make_planner_thread_safe();
-    #endif
-
-    // Check that iNfft >= signal length
-    int iSignalLength = connectivitySettings.m_dataList.first().matData.cols();
-    int iNfft = connectivitySettings.m_iNfft;
-    if (connectivitySettings.m_iNfft < iSignalLength) {
-        iNfft = iSignalLength;
-    }
-
-    // Generate tapers
-    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.m_sWindowType);
-
-    // Initialize vecPsdAvg and vecCsdAvg
-    int iNRows = connectivitySettings.m_dataList.first().matData.rows();
-    int iNFreqs = int(floor(iNfft / 2.0)) + 1;
-
-    QMutex mutex;
-
-    std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
-        compute(inputData,
-                connectivitySettings.data.matPsdSum,
-                connectivitySettings.data.vecPairCsdSum,
-                mutex,
-                iNRows,
-                iNFreqs,
-                iNfft,
-                tapers);
-    };
-
-    // Compute PSD/CSD for each trial
-//    iTime = timer.elapsed();
-//    qDebug() << "Coherency::computeCoherency timer - Preparation:" << iTime;
-//    timer.restart();
-
-    QFuture<void> result = QtConcurrent::map(connectivitySettings.m_dataList,
-                                             computeLambda);
-    result.waitForFinished();
-
-//    iTime = timer.elapsed();
-//    qDebug() << "Coherency::computeCoherency timer - PSD/CSD computation:" << iTime;
-//    timer.restart();
-
-    connectivitySettings.data.matPsdSum = connectivitySettings.data.matPsdSum.cwiseSqrt();
-
-//    iTime = timer.elapsed();
-//    qDebug() << "Coherency::computeCoherency timer - Cwise sqrt:" << iTime;
-//    timer.restart();
-
-    // Compute CSD/(PSD_X * PSD_Y)
-    std::function<void(QPair<int,MatrixXcd>&)> computePSDCSDLambda = [&](QPair<int,MatrixXcd>& pairInput) {
-        computePSDCSD(pairInput,
-                      connectivitySettings.data.matPsdSum);
-    };
-
-    QFuture<void> resultCSDPSD = QtConcurrent::map(connectivitySettings.data.vecPairCsdSum,
-                                                   computePSDCSDLambda);
-    resultCSDPSD.waitForFinished();
-
-    vecCoherency = connectivitySettings.data.vecPairCsdSum;
-
-//    iTime = timer.elapsed();
-//    qDebug() << "Coherency::computeCoherency timer - Cwise abs,produce, quotient:" << iTime;
-//    timer.restart();
 }
 
 
@@ -465,36 +371,20 @@ void Coherency::compute(ConnectivityTrialData& inputData,
 
 //*************************************************************************************************************
 
-void Coherency::computePSDCSD(QPair<int,MatrixXcd>& pairInput,
-                              const MatrixXd& matPsdSum)
-{
-    MatrixXd matPSDtmp(matPsdSum.rows(), matPsdSum.cols());
-    RowVectorXd vecPsdAvg = matPsdSum.row(pairInput.first);
-
-    for(int j = 0; j < matPSDtmp.rows(); ++j) {
-        matPSDtmp.row(j) = vecPsdAvg.cwiseProduct(matPsdSum.row(j));
-    }
-
-    pairInput.second = pairInput.second.cwiseQuotient(matPSDtmp);
-}
-
-
-//*************************************************************************************************************
-
 void Coherency::computePSDCSDReal(QMutex& mutex,
                                   Network& finalNetwork,
                                   const QPair<int,MatrixXcd>& pairInput,
                                   const MatrixXd& matPsdSum)
 {
     MatrixXd matPSDtmp(matPsdSum.rows(), matPsdSum.cols());
-    RowVectorXd vecPsdSum = matPsdSum.row(pairInput.first);
+    RowVectorXd rowPsdSum = matPsdSum.row(pairInput.first);
 
     for(int j = 0; j < matPSDtmp.rows(); ++j) {
-        matPSDtmp.row(j) = vecPsdSum.cwiseProduct(matPsdSum.row(j));
+        matPSDtmp.row(j) = rowPsdSum.cwiseProduct(matPsdSum.row(j));
     }
 
     // Average. Note that the number of trials cancel each other out.
-    MatrixXcd matCohy = pairInput.second.cwiseQuotient(matPSDtmp);
+    MatrixXcd matCohy = pairInput.second.cwiseQuotient(matPSDtmp.cwiseSqrt());
 
     QSharedPointer<NetworkEdge> pEdge;
     MatrixXd matWeight;
@@ -522,13 +412,13 @@ void Coherency::computePSDCSDImag(QMutex& mutex,
                                   const MatrixXd& matPsdSum)
 {
     MatrixXd matPSDtmp(matPsdSum.rows(), matPsdSum.cols());
-    RowVectorXd vecPsdAvg = matPsdSum.row(pairInput.first);
+    RowVectorXd rowPsdSum = matPsdSum.row(pairInput.first);
 
     for(int j = 0; j < matPSDtmp.rows(); ++j) {
-        matPSDtmp.row(j) = vecPsdAvg.cwiseProduct(matPsdSum.row(j));
+        matPSDtmp.row(j) = rowPsdSum.cwiseProduct(matPsdSum.row(j));
     }
 
-    MatrixXcd matCohy = pairInput.second.cwiseQuotient(matPSDtmp);
+    MatrixXcd matCohy = pairInput.second.cwiseQuotient(matPSDtmp.cwiseSqrt());
 
     QSharedPointer<NetworkEdge> pEdge;
     MatrixXd matWeight;
