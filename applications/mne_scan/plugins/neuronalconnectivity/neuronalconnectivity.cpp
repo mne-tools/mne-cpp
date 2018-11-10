@@ -280,20 +280,27 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;            
         }
 
-        if(!pRTSE->getValue().isEmpty()) {
-            m_iBlockSize = pRTSE->getValue().first()->data.cols();
-        }
-
         for(qint32 i = 0; i < pRTSE->getValue().size(); ++i) {
-            m_connectivitySettings.m_matDataList << pRTSE->getValue()[i]->data;
+            m_iBlockSize = pRTSE->getValue().first()->data.cols();
+
+            // Check row and colum integrity and restart if necessary
+            if(m_connectivitySettings.size() != 0) {
+                if(m_iBlockSize != m_connectivitySettings.m_dataList.first().matData.cols()) {
+                    m_connectivitySettings.clearData();
+                    m_pRtConnectivity->restart();
+                }
+            }
+
+            m_connectivitySettings.append(pRTSE->getValue()[i]->data);
         }
 
         //Pop data from buffer
-        if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
+        if(m_connectivitySettings.size() > m_iNumberAverages) {
             m_pRtConnectivity->restart();
-            int size = m_connectivitySettings.m_matDataList.size();
+            int size = m_connectivitySettings.size();
+
             for(int i = 0; i < size-m_iNumberAverages; ++i) {
-                m_connectivitySettings.m_matDataList.removeFirst();
+                m_connectivitySettings.removeFirst();
             }
         }
 
@@ -325,11 +332,7 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             m_iNumberBadChannels = m_pFiffInfo->bads.size();
         }
 
-        if(m_pFiffInfo) {            
-            if(!pRTMSA->getMultiSampleArray().isEmpty()) {
-                m_iBlockSize = pRTMSA->getMultiSampleArray()[0].cols();
-            }
-
+        if(m_pFiffInfo) {
             //Generate node vertices because the number of bad channels changed
             if(m_iNumberBadChannels != pRTMSA->info()->bads.size()) {
                 m_pFiffInfo = pRTMSA->info();
@@ -343,11 +346,12 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
 
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 const MatrixXd& t_mat = pRTMSA->getMultiSampleArray()[i];
+                m_iBlockSize = pRTMSA->getMultiSampleArray()[i].cols();
 
                 // Check row and colum integrity and restart if necessary
-                if(!m_connectivitySettings.m_dataList.isEmpty()) {
-                    if(t_mat.cols() != m_connectivitySettings.m_dataList.first().matData.cols()) {
-                        m_connectivitySettings.m_dataList.clear();
+                if(m_connectivitySettings.size() != 0) {
+                    if(m_iBlockSize != m_connectivitySettings.m_dataList.first().matData.cols()) {
+                        m_connectivitySettings.clearData();
                         m_pRtConnectivity->restart();
                     }
                 }
@@ -362,12 +366,11 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             }
 
             //Pop data from buffer
-            if(m_connectivitySettings.m_dataList.size() > m_iNumberAverages) {
+            if(m_connectivitySettings.size() > m_iNumberAverages) {
                 m_pRtConnectivity->restart();
-                int size = m_connectivitySettings.m_dataList.size();
+                int size = m_connectivitySettings.size();
 
                 for(int i = 0; i < size-m_iNumberAverages; ++i) {
-                    qDebug() << "NeuronalConnectivity::updateRTMSA - Delete first item in m_dataList";
                     m_connectivitySettings.removeFirst();
                 }
             }
@@ -429,18 +432,12 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                 if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                     const MatrixXd& t_mat = pFiffEvokedSet->evoked.at(i).data;
 
-                    //Generate node vertices because the number of bad channels changed
-                    if(m_iNumberBadChannels != pFiffEvokedSet->info.bads.size()) {
-                        m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(pFiffEvokedSet->info));
-                        generateNodeVertices();
-                        m_iNumberBadChannels = pFiffEvokedSet->evoked.at(i).info.bads.size();
-                        m_pRtConnectivity->restart();
-                    }
+                    m_iBlockSize = t_mat.cols();
 
-                    // Check column integrity and restart if necessary
-                    if(!m_connectivitySettings.m_matDataList.isEmpty()) {
-                        if(t_mat.cols() != m_connectivitySettings.m_matDataList.first().cols()) {
-                            m_connectivitySettings.m_matDataList.clear();
+                    // Check row and colum integrity and restart if necessary
+                    if(m_connectivitySettings.size() != 0) {
+                        if(m_iBlockSize != m_connectivitySettings.m_dataList.first().matData.cols()) {
+                            m_connectivitySettings.clearData();
                             m_pRtConnectivity->restart();
                         }
                     }
@@ -452,14 +449,15 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                         data.row(j) = t_mat.row(m_chIdx.at(j));
                     }
 
-                    m_connectivitySettings.m_matDataList << data;
+                    m_connectivitySettings.append(data);
 
                     //Pop data from buffer
-                    if(m_connectivitySettings.m_matDataList.size() > m_iNumberAverages) {
+                    if(m_connectivitySettings.size() > m_iNumberAverages) {
                         m_pRtConnectivity->restart();
-                        int size = m_connectivitySettings.m_matDataList.size();
+                        int size = m_connectivitySettings.size();
+
                         for(int i = 0; i < size-m_iNumberAverages; ++i) {
-                            m_connectivitySettings.m_matDataList.removeFirst();
+                            m_connectivitySettings.removeFirst();
                         }
                     }
 
@@ -528,7 +526,7 @@ void NeuronalConnectivity::generateNodeVertices()
 
     //Set node 3D positions to connectivity settings
     m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;
-    m_connectivitySettings.m_matDataList.clear();
+    m_connectivitySettings.clearData();
 }
 
 
@@ -605,7 +603,10 @@ void NeuronalConnectivity::onNumberTrialsChanged(int iNumberTrials)
 
 void NeuronalConnectivity::onWindowTypeChanged(const QString& windowType)
 {
-    m_connectivitySettings.m_sWindowType = windowType;
+    if(m_connectivitySettings.m_sWindowType != windowType) {
+        m_connectivitySettings.resetData();
+        m_connectivitySettings.m_sWindowType = windowType;
+    }
 }
 
 
@@ -614,7 +615,7 @@ void NeuronalConnectivity::onWindowTypeChanged(const QString& windowType)
 void NeuronalConnectivity::onTriggerTypeChanged(const QString& triggerType)
 {
     if(triggerType != m_sAvrType) {
-        m_connectivitySettings.m_matDataList.clear();
+        m_connectivitySettings.clearData();
         m_sAvrType = triggerType;
     }
 }

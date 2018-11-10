@@ -53,6 +53,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QMutex>
 
 
 //*************************************************************************************************************
@@ -84,6 +85,7 @@ namespace CONNECTIVITYLIB {
 
 class Network;
 class ConnectivitySettings;
+class ConnectivityTrialData;
 
 
 //=============================================================================================================
@@ -113,29 +115,24 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network calculate(const ConnectivitySettings &connectivitySettings);
+    static Network calculate(ConnectivitySettings &connectivitySettings);
 
 protected:
     //=========================================================================================================
     /**
     * Calculates the connectivity matrix for a given input data matrix based on the cross correlation coefficient.
     *
-    * @param[in] data       The input data.
-    *
-    * @return               The connectivity matrix.
+    * @param[in]    inputData           The input data.
+    * @param[out]   matDist             The sum of all edge weights.
+    * @param[in]    mutex               The mutex used to safely access matDist.
+    * @param[in]    iNfft               The FFT length.
+    * @param[in]    tapers              The taper information.
     */
-    static Eigen::MatrixXd compute(const Eigen::MatrixXd& matInputData,
-                                     int iNfft,
-                                     const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
-
-    //=========================================================================================================
-    /**
-    * Sums up (reduces) the in parallel processed connectivity matrix.
-    *
-    * @param[out] resultData    The result data.
-    * @param[in]  data          The incoming and temporary result data.
-    */
-    static void sum(Eigen::MatrixXd &resultData, const Eigen::MatrixXd &data);
+    static void compute(ConnectivityTrialData& inputData,
+                        Eigen::MatrixXd& matDist,
+                        QMutex& mutex,
+                        int iNfft,
+                        const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
 
 };
 

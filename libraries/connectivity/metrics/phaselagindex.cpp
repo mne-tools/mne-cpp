@@ -96,7 +96,7 @@ PhaseLagIndex::PhaseLagIndex()
 
 //*******************************************************************************************************
 
-Network PhaseLagIndex::calculate(const ConnectivitySettings& connectivitySettings)
+Network PhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 {
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;
@@ -104,16 +104,20 @@ Network PhaseLagIndex::calculate(const ConnectivitySettings& connectivitySetting
 
     Network finalNetwork("Phase Lag Index");
 
-    if(connectivitySettings.m_matDataList.empty()) {
-        qDebug() << "PhaseLagIndex::phaseLagIndex - Input data is empty";
+    if(connectivitySettings.m_dataList.empty()) {
+        qDebug() << "PhaseLagIndex::calculate - Input data is empty";
         return finalNetwork;
     }
 
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
+
     //Create nodes
-    int rows = connectivitySettings.m_matDataList.first().rows();
+    int iNRows = connectivitySettings.m_dataList.first().matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
-    for(int i = 0; i < rows; ++i) {
+    for(int i = 0; i < iNRows; ++i) {
         rowVert = RowVectorXf::Zero(3);
 
         if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
@@ -125,40 +129,50 @@ Network PhaseLagIndex::calculate(const ConnectivitySettings& connectivitySetting
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-//    iTime = timer.elapsed();
-//    qDebug() << "PhaseLagIndex::phaseLagIndex timer - Preparation:" << iTime;
-//    timer.restart();
-
-    //Calculate all-to-all coherence matrix over epochs
-    QVector<MatrixXd> vecPLI;
-    PhaseLagIndex::calculate(vecPLI,
-                             connectivitySettings.m_matDataList,
-                             connectivitySettings.m_iNfft,
-                             connectivitySettings.m_sWindowType);
-
-//    iTime = timer.elapsed();
-//    qDebug() << "PhaseLagIndex::phaseLagIndex timer - Actual computation:" << iTime;
-//    timer.restart();
-
-    //Add edges to network
-    QSharedPointer<NetworkEdge> pEdge;
-    MatrixXd matWeight;
-    int j;
-
-    for(int i = 0; i < vecPLI.length(); ++i) {
-        for(j = i; j < connectivitySettings.m_matDataList.at(0).rows(); ++j) {
-            matWeight = vecPLI.at(i).row(j).transpose();
-
-            pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
-
-            finalNetwork.getNodeAt(i)->append(pEdge);
-            finalNetwork.getNodeAt(j)->append(pEdge);
-            finalNetwork.append(pEdge);
-        }
+    // Check that iNfft >= signal length
+    int iSignalLength = connectivitySettings.m_dataList.at(0).matData.cols();
+    int iNfft = connectivitySettings.m_iNfft;
+    if (iNfft < iSignalLength) {
+        iNfft = iSignalLength;
     }
 
+    // Generate tapers
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.m_sWindowType);
+
+    // Initialize
+    int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+
+    QMutex mutex;
+
+    std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
+        compute(inputData,
+                connectivitySettings.data.vecPairCsdImagSignSum,
+                mutex,
+                iNRows,
+                iNFreqs,
+                iNfft,
+                tapers);
+    };
+
 //    iTime = timer.elapsed();
-//    qDebug() << "PhaseLagIndex::phaseLagIndex timer - Network creation:" << iTime;
+//    qDebug() << "PhaseLagIndex::calculate timer - Preparation:" << iTime;
+//    timer.restart();
+
+    // Compute DSWPLV in parallel for all trials
+    QFuture<void> result = QtConcurrent::map(connectivitySettings.m_dataList,
+                                             computeLambda);
+    result.waitForFinished();
+
+//    iTime = timer.elapsed();
+//    qDebug() << "PhaseLagIndex::calculate timer - Compute PLI per trial:" << iTime;
+//    timer.restart();
+
+    // Compute PLI
+    computePLI(connectivitySettings,
+               finalNetwork);
+
+//    iTime = timer.elapsed();
+//    qDebug() << "PhaseLagIndex::calculate timer - Compute PLI, Network creation:" << iTime;
 //    timer.restart();
 
     return finalNetwork;
@@ -167,139 +181,123 @@ Network PhaseLagIndex::calculate(const ConnectivitySettings& connectivitySetting
 
 //*************************************************************************************************************
 
-void PhaseLagIndex::calculate(QVector<MatrixXd>& vecPLI,
-                              const QList<MatrixXd> &matDataList,
-                              int iNfft,
-                              const QString &sWindowType)
+void PhaseLagIndex::compute(ConnectivityTrialData& inputData,
+                            QVector<QPair<int,MatrixXd> >& vecPairCsdImagSignSum,
+                            QMutex& mutex,
+                            int iNRows,
+                            int iNFreqs,
+                            int iNfft,
+                            const QPair<MatrixXd, VectorXd>& tapers)
 {
-    #ifdef EIGEN_FFTW_DEFAULT
-        fftw_make_planner_thread_safe();
-    #endif
-
-    if(matDataList.isEmpty()) {
+    if(inputData.vecPairCsdImagSign.size() == iNRows) {
+        //qDebug() << "PhaseLagIndex::compute - vecPairCsdImagSign was already computed for this trial.";
         return;
     }
 
-    // Check that iNfft >= signal length
-    int iSignalLength = matDataList.at(0).cols();
-    if (iNfft < iSignalLength) {
-        iNfft = iSignalLength;
-    }
-
-    // Generate tapers
-    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, sWindowType);
-
-    int iNRows = matDataList.at(0).rows();
-    int iNFreqs = int(floor(iNfft / 2.0)) + 1;
-
-    //    // Sequential
-    //    AbstractMetricResultData finalResult;
-
-    //    for (int i = 0; i < lData.length(); ++i) {
-    //        reduce(finalResult, compute(lData.at(i)));
-    //    }
-
-    // Parallel
-    std::function<QVector<MatrixXcd>(const MatrixXd&)> computeLambda = [&](const MatrixXd& matInputData) {
-        return compute(matInputData,
-                       iNRows,
-                       iNFreqs,
-                       iNfft,
-                       tapers);
-    };
-
-    QFuture<QVector<MatrixXcd> > result = QtConcurrent::mappedReduced(matDataList,
-                                                                      computeLambda,
-                                                                      reduce);
-    result.waitForFinished();
-
-    QVector<MatrixXcd> finalResult = result.result();
-
-    for (int i = 0; i < iNRows; ++i) {
-        vecPLI.append(finalResult.at(i).cwiseAbs() / matDataList.length());
-    }
-}
-
-
-//*************************************************************************************************************
-
-QVector<MatrixXcd> PhaseLagIndex::compute(const MatrixXd& matInputData,
-                                          int iNRows,
-                                          int iNFreqs,
-                                          int iNfft,
-                                          const QPair<MatrixXd, VectorXd>& tapers)
-{
-    // Initialize vecCsdAvg
-    QVector<MatrixXcd> vecCsdAvg;
-
-    // Subtract mean, generate tapered spectra and CSD
-    // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
-    RowVectorXd vecInputFFT, rowData;
-    RowVectorXcd vecTmpFreq;
-
-    MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
-
-    QVector<Eigen::MatrixXcd> vecTapSpectra;
+    inputData.vecPairCsdImagSign.clear();
 
     int i,j;
 
-    FFT<double> fft;
-    fft.SetFlag(fft.HalfSpectrum);
+    // Calculate tapered spectra if not available already
+    // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
+    if(inputData.vecTapSpectra.size() != iNRows) {
+        inputData.vecTapSpectra.clear();
 
-    for (i = 0; i < iNRows; ++i) {
-        // Substract mean
-        rowData.array() = matInputData.row(i).array() - matInputData.row(i).mean();
+        RowVectorXd vecInputFFT, rowData;
+        RowVectorXcd vecTmpFreq;
 
-        // FFT for freq domain returning the half spectrum and multiply taper weights
-        for(j = 0; j < tapers.first.rows(); j++) {
-            vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
-            fft.fwd(vecTmpFreq, vecInputFFT, iNfft);
-            matTapSpectrum.row(j) = vecTmpFreq * tapers.second(j);
+        MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
+
+        QVector<Eigen::MatrixXcd> vecTapSpectra;
+
+        FFT<double> fft;
+        fft.SetFlag(fft.HalfSpectrum);
+
+        for (i = 0; i < iNRows; ++i) {
+            // Substract mean
+            rowData.array() = inputData.matData.row(i).array() - inputData.matData.row(i).mean();
+
+            // Calculate tapered spectra if not available already
+            for(j = 0; j < tapers.first.rows(); j++) {
+                vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
+                // FFT for freq domain returning the half spectrum and multiply taper weights
+                fft.fwd(vecTmpFreq, vecInputFFT, iNfft);
+                matTapSpectrum.row(j) = vecTmpFreq * tapers.second(j);
+            }
+
+            inputData.vecTapSpectra.append(matTapSpectrum);
         }
-
-        vecTapSpectra.append(matTapSpectrum);
     }
 
     // Compute CSD
-    bool bNfftEven = false;
-    if (iNfft % 2 == 0){
-        bNfftEven = true;
-    }
-
-    double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
-
     MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
 
-    for (i = 0; i < iNRows; ++i) {
-        for (j = i; j < iNRows; ++j) {
-            // Compute CSD (average over tapers if necessary)
-            matCsd.row(j) = vecTapSpectra.at(i).cwiseProduct(vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
+    if(inputData.vecPairCsd.size() != iNRows) {
+        inputData.vecPairCsd.clear();
 
-            // Divide first and last element by 2 due to half spectrum
-            matCsd.row(j)(0) /= 2.0;
-            if(bNfftEven) {
-                matCsd.row(j).tail(1) /= 2.0;
-            }
+        double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
+
+        bool bNfftEven = false;
+        if (iNfft % 2 == 0){
+            bNfftEven = true;
         }
 
-        vecCsdAvg.append(matCsd.imag().cwiseSign());
+        for (i = 0; i < iNRows; ++i) {
+            for (j = i; j < iNRows; ++j) {
+                // Compute CSD (average over tapers if necessary)
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
+
+                // Divide first and last element by 2 due to half spectrum
+                matCsd.row(j)(0) /= 2.0;
+                if(bNfftEven) {
+                    matCsd.row(j).tail(1) /= 2.0;
+                }
+            }
+
+            inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,matCsd.imag().cwiseSign()));
+        }
+    } else {
+        for (i = 0; i < inputData.vecPairCsd.size(); ++i) {
+            inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,inputData.vecPairCsd.at(i).second.imag().cwiseSign()));
+        }
     }
 
-    return vecCsdAvg;
+    mutex.lock();
+
+    if(vecPairCsdImagSignSum.isEmpty()) {
+        vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
+    } else {
+        for (int j = 0; j < vecPairCsdImagSignSum.size(); ++j) {
+            vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
+        }
+    }
+
+    mutex.unlock();
 }
 
 
 //*************************************************************************************************************
 
-void PhaseLagIndex::reduce(QVector<MatrixXcd>& finalData,
-                           const QVector<MatrixXcd>& resultData)
+void PhaseLagIndex::computePLI(ConnectivitySettings &connectivitySettings,
+                               Network& finalNetwork)
 {
-    // Sum over epoch
-    if(finalData.isEmpty()) {
-        finalData = resultData;
-    } else {
-        for (int j = 0; j < finalData.size(); ++j) {
-            finalData[j] += resultData.at(j);
+    // Compute final PLI and create Network
+    MatrixXd matNom;
+    MatrixXd matWeight;
+    QSharedPointer<NetworkEdge> pEdge;
+    int j;
+
+    for (int i = 0; i < connectivitySettings.data.vecPairCsdImagSignSum.size(); ++i) {
+        matNom = connectivitySettings.data.vecPairCsdImagSignSum.at(i).second.cwiseAbs() / connectivitySettings.size();
+
+        for(j = i; j < matNom.rows(); ++j) {
+            matWeight = matNom.row(j).transpose();
+
+            pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
+
+            finalNetwork.getNodeAt(i)->append(pEdge);
+            finalNetwork.getNodeAt(j)->append(pEdge);
+            finalNetwork.append(pEdge);
         }
     }
 }

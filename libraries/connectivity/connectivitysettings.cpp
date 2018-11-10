@@ -79,6 +79,7 @@ ConnectivitySettings::ConnectivitySettings()
 : m_iNfft(-1)
 , m_sWindowType("hanning")
 {
+    clearData();
     qRegisterMetaType<CONNECTIVITYLIB::ConnectivitySettings>("CONNECTIVITYLIB::ConnectivitySettings");
 }
 

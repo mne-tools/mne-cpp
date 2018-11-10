@@ -138,13 +138,11 @@ private:
     * @param[in]    inputData           The input data.
     * @param[out]   matPsdSum           The sum of all PSD matrices for each trial.
     * @param[out]   vecPairCsdSum       The sum of all CSD matrices for each trial.
-    * @param[in]    mutex               The mutex used to safely access matPsdSum and vecPairCsdAvg.
+    * @param[in]    mutex               The mutex used to safely access matPsdSum and vecPairCsdSum.
     * @param[in]    iNRows              The number of rows.
     * @param[in]    iNFreqs             The number of frequenciy bins.
     * @param[in]    iNfft               The FFT length.
     * @param[in]    tapers              The taper information.
-    *
-    * @return            The coherency result in form of ConnectivityData.
     */
     static void compute(ConnectivityTrialData& inputData,
                         Eigen::MatrixXd& matPsdSum,
