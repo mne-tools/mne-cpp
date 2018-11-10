@@ -169,11 +169,13 @@ public:
         m_iFreqBandLow = iFreqLow * dScaleFactor;
         m_iFreqBandHigh = iFreqHigh * dScaleFactor;
 
-        onNewConnectivityResultAvailable(m_networkData);
+        onNewConnectivityResultAvailable(m_networkData, m_settings);
     }
 
-    void onNewConnectivityResultAvailable(const Network& tNetworkData)
+    void onNewConnectivityResultAvailable(const Network& tNetworkData,
+                                          const ConnectivitySettings& connectivitySettings)
     {
+        m_settings = connectivitySettings;
         m_networkData = tNetworkData;
         m_networkData.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
         m_networkData.normalize();
