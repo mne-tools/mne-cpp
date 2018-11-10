@@ -241,6 +241,13 @@ int main(int argc, char *argv[])
             picks = raw.info.pick_types(false,true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
         } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(QString("grad"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+            RowVectorXi picksTmp(picks.cols()/2);
+            int count = 0;
+            for(int i = 0; i < picks.cols(); i+=2) {
+                picksTmp(count) = picks(i);
+                count++;
+            }
+            picks = picksTmp;
         } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(QString("mag"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
         }
@@ -358,17 +365,17 @@ int main(int argc, char *argv[])
     //Do connectivity estimation and visualize results
     QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matDataList.first().cols(), raw.info.sfreq);
 
-    pConnectivitySettingsManager->m_settings.m_sConnectivityMethods << sConnectivityMethod;
+    pConnectivitySettingsManager->m_settings.setConnectivityMethods(QStringList() << sConnectivityMethod);
 
-    ConnectivityTrialData connectivityData;
+    ConnectivitySettings::IntermediateTrialData connectivityData;
     for(int i = 0; i < matDataList.size(); i++) {
         connectivityData.matData = matDataList.at(i);
-        pConnectivitySettingsManager->m_settings.m_dataList.append(connectivityData);
+        pConnectivitySettingsManager->m_settings.append(connectivityData);
         pConnectivitySettingsManager->m_dataListOriginal.append(connectivityData);
     }
-    pConnectivitySettingsManager->m_settings.m_matNodePositions = matNodePositions;
-    pConnectivitySettingsManager->m_settings.m_iNfft = -1;
-    pConnectivitySettingsManager->m_settings.m_sWindowType = "hanning";
+    pConnectivitySettingsManager->m_settings.setNodePositions(matNodePositions);
+    pConnectivitySettingsManager->m_settings.setNumberFFT(-1);
+    pConnectivitySettingsManager->m_settings.setWindowType("hanning");
 
     //Create NetworkView and add extra control widgets to output data (will be used by QuickControlView in RealTimeConnectivityEstimateWidget)
     NetworkView tNetworkView;

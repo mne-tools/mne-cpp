@@ -2,13 +2,14 @@
 /**
 * @file     imagcoherence.cpp
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -46,7 +47,6 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
-#include "../connectivitysettings.h"
 
 
 //*************************************************************************************************************
@@ -97,22 +97,22 @@ Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("Imaginary Coherence");
 
-    if(connectivitySettings.m_dataList.empty()) {
+    if(connectivitySettings.isEmpty()) {
         qDebug() << "ImagCoherence::imagcoherence - Input data is empty";
         return finalNetwork;
     }
 
     //Create nodes
-    int rows = connectivitySettings.m_dataList.first().matData.rows();
+    int rows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
         rowVert = RowVectorXf::Zero(3);
 
-        if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
-            rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
-            rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);
-            rowVert(2) = connectivitySettings.m_matNodePositions.row(i)(2);
+        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+            rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
+            rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
+            rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));

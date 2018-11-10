@@ -11,7 +11,7 @@
 #
 # @section  LICENSE
 #
-# Copyright (C) 2010, Christoph Dinh, Lorenz Esch, Florian Schlembach, Daniel Strohmeier, Lorenz Esch and Matti Hamalainen.
+# Copyright (C) 2010, Christoph Dinh, Lorenz Esch, Florian Schlembach, Daniel Strohmeier and Matti Hamalainen.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that

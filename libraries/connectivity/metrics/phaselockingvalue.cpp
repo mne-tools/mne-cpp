@@ -2,13 +2,14 @@
 /**
 * @file     phaselockingvalue.cpp
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -46,7 +47,6 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
-#include "../connectivitysettings.h"
 
 #include <utils/spectral.h>
 
@@ -98,13 +98,13 @@ PhaseLockingValue::PhaseLockingValue()
 
 Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
 
     Network finalNetwork("Phase Locking Value");
 
-    if(connectivitySettings.m_dataList.empty()) {
+    if(connectivitySettings.isEmpty()) {
         qDebug() << "PhaseLockingValue::calculate - Input data is empty";
         return finalNetwork;
     }
@@ -114,40 +114,40 @@ Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
     #endif
 
     //Create nodes
-    int iNRows = connectivitySettings.m_dataList.first().matData.rows();
+    int iNRows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < iNRows; ++i) {
         rowVert = RowVectorXf::Zero(3);
 
-        if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
-            rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
-            rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);
-            rowVert(2) = connectivitySettings.m_matNodePositions.row(i)(2);
+        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+            rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
+            rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
+            rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
     // Check that iNfft >= signal length
-    int iSignalLength = connectivitySettings.m_dataList.at(0).matData.cols();
-    int iNfft = connectivitySettings.m_iNfft;
+    int iSignalLength = connectivitySettings.at(0).matData.cols();
+    int iNfft = connectivitySettings.getNumberFFT();
     if (iNfft < iSignalLength) {
         iNfft = iSignalLength;
     }
 
     // Generate tapers
-    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.m_sWindowType);
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
 
     // Initialize
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     QMutex mutex;
 
-    std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
+    std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
         compute(inputData,
-                connectivitySettings.data.vecPairCsdSum,
-                connectivitySettings.data.vecPairCsdNormalizedSum,
+                connectivitySettings.getIntermediateSumData().vecPairCsdSum,
+                connectivitySettings.getIntermediateSumData().vecPairCsdNormalizedSum,
                 mutex,
                 iNRows,
                 iNFreqs,
@@ -155,26 +155,26 @@ Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
                 tapers);
     };
 
-    //    iTime = timer.elapsed();
-    //    qDebug() << "PhaseLockingValue::calculate timer - Preparation:" << iTime;
-    //    timer.restart();
+    iTime = timer.elapsed();
+    qDebug() << "PhaseLockingValue::calculate timer - Preparation:" << iTime;
+    timer.restart();
 
     // Compute PLV in parallel for all trials
-    QFuture<void> result = QtConcurrent::map(connectivitySettings.m_dataList,
+    QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
-//    iTime = timer.elapsed();
-//    qDebug() << "PhaseLockingValue::calculate timer - Compute PLV per trial:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qDebug() << "PhaseLockingValue::calculate timer - Compute PLV per trial:" << iTime;
+    timer.restart();
 
     // Compute PLV
     computePLV(connectivitySettings,
                finalNetwork);
 
-//    iTime = timer.elapsed();
-//    qDebug() << "PhaseLockingValue::PhaseLagIndex timer - Compute PLV, Network creation:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qDebug() << "PhaseLockingValue::PhaseLagIndex timer - Compute PLV, Network creation:" << iTime;
+    timer.restart();
 
     return finalNetwork;
 }
@@ -182,7 +182,7 @@ Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
 
 //*************************************************************************************************************
 
-void PhaseLockingValue::compute(ConnectivityTrialData& inputData,
+void PhaseLockingValue::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                                 QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
                                 QVector<QPair<int,MatrixXcd> >& vecPairCsdNormalizedSum,
                                 QMutex& mutex,
@@ -298,10 +298,10 @@ void PhaseLockingValue::computePLV(ConnectivitySettings &connectivitySettings,
     QSharedPointer<NetworkEdge> pEdge;
     int j;
 
-    for (int i = 0; i < connectivitySettings.m_dataList.first().matData.rows(); ++i) {
-        matNom = connectivitySettings.data.vecPairCsdNormalizedSum.at(i).second.cwiseAbs() / connectivitySettings.size();
+    for (int i = 0; i < connectivitySettings.at(0).matData.rows(); ++i) {
+        matNom = connectivitySettings.getIntermediateSumData().vecPairCsdNormalizedSum.at(i).second.cwiseAbs() / connectivitySettings.size();
 
-        for(j = i; j < connectivitySettings.m_dataList.at(0).matData.rows(); ++j) {
+        for(j = i; j < connectivitySettings.at(0).matData.rows(); ++j) {
             matWeight = matNom.row(j).transpose();
 
             pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));

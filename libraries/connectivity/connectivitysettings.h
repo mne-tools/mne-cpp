@@ -76,26 +76,6 @@
 
 namespace CONNECTIVITYLIB {
 
-struct ConnectivityTrialData {
-    Eigen::MatrixXd matData;
-    Eigen::MatrixXd matPsd;
-    QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsd;
-    QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdNormalized;
-    QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagSign;
-    QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagAbs;
-    QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagSqrd;
-    QVector<Eigen::MatrixXcd> vecTapSpectra;
-};
-
-struct ConnectivityData {
-    Eigen::MatrixXd matPsdSum;
-    QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdSum;
-    QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdNormalizedSum;
-    QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagSignSum;
-    QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagAbsSum;
-    QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagSqrdSum;
-};
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -110,11 +90,31 @@ struct ConnectivityData {
 * @brief This class is a container for connectivity settings.
 */
 class CONNECTIVITYSHARED_EXPORT ConnectivitySettings
-{
+{    
 
 public:
     typedef QSharedPointer<ConnectivitySettings> SPtr;            /**< Shared pointer type for ConnectivitySettings. */
     typedef QSharedPointer<const ConnectivitySettings> ConstSPtr; /**< Const shared pointer type for ConnectivitySettings. */
+
+    struct IntermediateTrialData {
+        Eigen::MatrixXd     matData;
+        Eigen::MatrixXd     matPsd;
+        QVector<Eigen::MatrixXcd>               vecTapSpectra;
+        QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsd;
+        QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsdNormalized;
+        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSign;
+        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagAbs;
+        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSqrd;
+    };
+
+    struct IntermediateSumData {
+        Eigen::MatrixXd     matPsdSum;
+        QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsdSum;
+        QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsdNormalizedSum;
+        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSignSum;
+        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagAbsSum;
+        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSqrdSum;
+    };
 
     //=========================================================================================================
     /**
@@ -122,102 +122,54 @@ public:
     */
     explicit ConnectivitySettings();
 
-    void clearData() {
-        m_dataList.clear();
-        data.matPsdSum.resize(0,0);
-        data.vecPairCsdSum.clear();
-        data.vecPairCsdNormalizedSum.clear();
-    }
+    void clearAllData();
 
-    void resetData() {
-        for (int i = 0; i < m_dataList.size(); ++i) {
-            m_dataList[i].matPsd.resize(0,0);
-            m_dataList[i].vecPairCsd.clear();
-            m_dataList[i].vecTapSpectra.clear();
-        }
+    void clearIntermediateData();
 
-        data.matPsdSum.resize(0,0);
-        data.vecPairCsdSum.clear();
-    }
+    void append(const QList<Eigen::MatrixXd>& matInputData);
 
-    void append(const QList<Eigen::MatrixXd>& matInputData) {
-        for(int i = 0; i < matInputData.size(); ++i) {
-            this->append(matInputData.at(i));
-        }
-    }
+    void append(const Eigen::MatrixXd& matInputData);
 
-    void append(const Eigen::MatrixXd& matInputData) {
-        ConnectivityTrialData tempData;
-        tempData.matData = matInputData;
+    void append(const ConnectivitySettings::IntermediateTrialData& inputData);
 
-        m_dataList.append(tempData);
-    }
+    const IntermediateTrialData& at(int i) const;
 
-    int size() const {
-        return m_dataList.size();
-    }
+    int size() const;
 
-    void removeFirst() {
-        if(!m_dataList.isEmpty()) {
-            // Substract PSD of first trial from overall summed up PSD
-            if(data.matPsdSum.rows() == m_dataList.first().matPsd.rows() &&
-               data.matPsdSum.cols() == m_dataList.first().matPsd.cols() ) {
-                data.matPsdSum -= m_dataList.first().matPsd;
-            }
+    bool isEmpty() const;
 
-            // Substract CSD of first trial from overall summed up CSD
-            if(data.vecPairCsdSum.size() == m_dataList.first().vecPairCsd.size()) {
-                for (int i = 0; i < data.vecPairCsdSum.size(); ++i) {
-                    data.vecPairCsdSum[i].second -= m_dataList.first().vecPairCsd.at(i).second;
-                }
-            }
+    void removeFirst();
 
-            // Substract normalized CSD of first trial from overall summed up normalized CSD
-            if(data.vecPairCsdNormalizedSum.size() == m_dataList.first().vecPairCsdNormalized.size()) {
-                for (int i = 0; i < data.vecPairCsdNormalizedSum.size(); ++i) {
-                    data.vecPairCsdNormalizedSum[i].second -= m_dataList.first().vecPairCsdNormalized.at(i).second;
-                }
-            }
+    void setConnectivityMethods(const QStringList& sConnectivityMethods);
 
-            // Substract sign CSD of first trial from overall summed up sign CSD
-            if(data.vecPairCsdImagSignSum.size() == m_dataList.first().vecPairCsdImagSign.size()) {
-                for (int i = 0; i < data.vecPairCsdImagSignSum.size(); ++i) {
-                    data.vecPairCsdImagSignSum[i].second -= m_dataList.first().vecPairCsdImagSign.at(i).second;
-                }
-            }
+    const QStringList& getConnectivityMethods() const;
 
-            // Substract imag abs CSD of first trial from overall summed up imag abs CSD
-            if(data.vecPairCsdImagAbsSum.size() == m_dataList.first().vecPairCsdImagAbs.size()) {
-                for (int i = 0; i < data.vecPairCsdImagAbsSum.size(); ++i) {
-                    data.vecPairCsdImagAbsSum[i].second -= m_dataList.first().vecPairCsdImagAbs.at(i).second;
-                }
-            }
+    void setNumberFFT(int iNfft);
 
-            // Substract imag sqrd CSD of first trial from overall summed up imag sqrd CSD
-            if(data.vecPairCsdImagSqrdSum.size() == m_dataList.first().vecPairCsdImagSqrd.size()) {
-                for (int i = 0; i < data.vecPairCsdImagSqrdSum.size(); ++i) {
-                    data.vecPairCsdImagSqrdSum[i].second -= m_dataList.first().vecPairCsdImagSqrd.at(i).second;
-                }
-            }
+    int getNumberFFT() const;
 
+    void setWindowType(const QString& sWindowType);
 
+    const QString& getWindowType() const;
 
-            m_dataList.removeFirst();
-        }
-    };
+    void setNodePositions(const Eigen::MatrixX3f& matNodePositions);
 
-    QStringList                 m_sConnectivityMethods;         /**< The connectivity methods. */
+    const Eigen::MatrixX3f& getNodePositions() const;
 
-    QList<ConnectivityTrialData>     m_dataList;                     /**< The input data. */
+    QList<IntermediateTrialData>& getTrialData();
 
-    Eigen::MatrixX3f            m_matNodePositions;             /**< The node position in 3D space. */
-
-    int                         m_iNfft;                        /**< The FFT length used for spectral estimation. */
-    QString                     m_sWindowType;                  /**< The window type used to compute tapered spectra. */
-
-    ConnectivityData            data;
+    IntermediateSumData& getIntermediateSumData();
 
 protected:
+    QStringList                     m_sConnectivityMethods;         /**< The connectivity methods. */
+    QString                         m_sWindowType;                  /**< The window type used to compute tapered spectra. */
+
+    int                             m_iNfft;                        /**< The FFT length used for spectral estimation. */
+
+    Eigen::MatrixX3f                m_matNodePositions;             /**< The node position in 3D space. */
+
+    IntermediateSumData             m_intermediateSumData;          /**< The intermediate sum data holds data calculated over all trials as a whole. */
+    QList<IntermediateTrialData>    m_trialData;                    /**< The trial data holds the actual and intermediate data calcualted for each trial. */
 
 };
 

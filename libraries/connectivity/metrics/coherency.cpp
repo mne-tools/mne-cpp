@@ -9,7 +9,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -47,7 +47,6 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
-#include "../connectivitysettings.h"
 
 #include <utils/spectral.h>
 
@@ -104,7 +103,7 @@ void Coherency::calculateReal(Network& finalNetwork,
     qint64 iTime = 0;
     timer.start();
 
-    if(connectivitySettings.m_dataList.empty()) {
+    if(connectivitySettings.isEmpty()) {
         qDebug() << "Coherency::computeCoherencyReal - Input data is empty";
         return;
     }
@@ -114,26 +113,26 @@ void Coherency::calculateReal(Network& finalNetwork,
     #endif
 
     // Check that iNfft >= signal length
-    int iSignalLength = connectivitySettings.m_dataList.first().matData.cols();
-    int iNfft = connectivitySettings.m_iNfft;
-    if (connectivitySettings.m_iNfft < iSignalLength) {
+    int iSignalLength = connectivitySettings.at(0).matData.cols();
+    int iNfft = connectivitySettings.getNumberFFT();
+    if (iNfft < iSignalLength) {
         iNfft = iSignalLength;
     }
 
     // Generate tapers
-    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.m_sWindowType);
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
 
     // Initialize vecPsdAvg and vecCsdAvg
-    int iNRows = connectivitySettings.m_dataList.first().matData.rows();
+    int iNRows = connectivitySettings.at(0).matData.rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     // Compute PSD/CSD for each trial
     QMutex mutex;
 
-    std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
+    std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
         compute(inputData,
-                connectivitySettings.data.matPsdSum,
-                connectivitySettings.data.vecPairCsdSum,
+                connectivitySettings.getIntermediateSumData().matPsdSum,
+                connectivitySettings.getIntermediateSumData().vecPairCsdSum,
                 mutex,
                 iNRows,
                 iNFreqs,
@@ -145,7 +144,7 @@ void Coherency::calculateReal(Network& finalNetwork,
     qDebug() << "Coherency::computeCoherencyReal timer - Preparation:" << iTime;
     timer.restart();
 
-    QFuture<void> result = QtConcurrent::map(connectivitySettings.m_dataList,
+    QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
@@ -158,10 +157,10 @@ void Coherency::calculateReal(Network& finalNetwork,
         computePSDCSDReal(mutex,
                           finalNetwork,
                           pairInput,
-                          connectivitySettings.data.matPsdSum);
+                          connectivitySettings.getIntermediateSumData().matPsdSum);
     };
 
-    QFuture<void> resultCSDPSD = QtConcurrent::map(connectivitySettings.data.vecPairCsdSum,
+    QFuture<void> resultCSDPSD = QtConcurrent::map(connectivitySettings.getIntermediateSumData().vecPairCsdSum,
                                                    computePSDCSDLambda);
     resultCSDPSD.waitForFinished();
 
@@ -180,7 +179,7 @@ void Coherency::calculateImag(Network& finalNetwork,
 //        qint64 iTime = 0;
 //        timer.start();
 
-    if(connectivitySettings.m_dataList.empty()) {
+    if(connectivitySettings.isEmpty()) {
         qDebug() << "Coherency::computeCoherencyImag - Input data is empty";
         return;
     }
@@ -190,26 +189,26 @@ void Coherency::calculateImag(Network& finalNetwork,
     #endif
 
     // Check that iNfft >= signal length
-    int iSignalLength = connectivitySettings.m_dataList.first().matData.cols();
-    int iNfft = connectivitySettings.m_iNfft;
-    if (connectivitySettings.m_iNfft < iSignalLength) {
+    int iSignalLength = connectivitySettings.at(0).matData.cols();
+    int iNfft = connectivitySettings.getNumberFFT();
+    if (iNfft < iSignalLength) {
         iNfft = iSignalLength;
     }
 
     // Generate tapers
-    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.m_sWindowType);
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
 
     // Initialize vecPsdAvg and vecCsdAvg
-    int iNRows = connectivitySettings.m_dataList.first().matData.rows();
+    int iNRows = connectivitySettings.at(0).matData.rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     // Compute PSD/CSD for each trial
     QMutex mutex;
 
-    std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
+    std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
         compute(inputData,
-                connectivitySettings.data.matPsdSum,
-                connectivitySettings.data.vecPairCsdSum,
+                connectivitySettings.getIntermediateSumData().matPsdSum,
+                connectivitySettings.getIntermediateSumData().vecPairCsdSum,
                 mutex,
                 iNRows,
                 iNFreqs,
@@ -221,7 +220,7 @@ void Coherency::calculateImag(Network& finalNetwork,
 //        qDebug() << "Coherency::computeCoherencyImag timer - Preparation:" << iTime;
 //        timer.restart();
 
-    QFuture<void> result = QtConcurrent::map(connectivitySettings.m_dataList,
+    QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
@@ -234,10 +233,10 @@ void Coherency::calculateImag(Network& finalNetwork,
         computePSDCSDImag(mutex,
                           finalNetwork,
                           pairInput,
-                          connectivitySettings.data.matPsdSum);
+                          connectivitySettings.getIntermediateSumData().matPsdSum);
     };
 
-    QFuture<void> resultCSDPSD = QtConcurrent::map(connectivitySettings.data.vecPairCsdSum,
+    QFuture<void> resultCSDPSD = QtConcurrent::map(connectivitySettings.getIntermediateSumData().vecPairCsdSum,
                                                    computePSDCSDLambda);
     resultCSDPSD.waitForFinished();
 
@@ -249,7 +248,7 @@ void Coherency::calculateImag(Network& finalNetwork,
 
 //*************************************************************************************************************
 
-void Coherency::compute(ConnectivityTrialData& inputData,
+void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         MatrixXd& matPsdSum,
                         QVector<QPair<int,MatrixXcd> >& vecPairCsdSum,
                         QMutex& mutex,
