@@ -9,7 +9,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -47,7 +47,6 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
-#include "../connectivitysettings.h"
 
 #include <utils/spectral.h>
 
@@ -105,7 +104,7 @@ Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& co
 
     Network finalNetwork("Debiased Squared Weighted Phase Lag Index");
 
-    if(connectivitySettings.m_dataList.empty()) {
+    if(connectivitySettings.isEmpty()) {
         qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::calculate - Input data is empty";
         return finalNetwork;
     }
@@ -115,42 +114,42 @@ Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& co
     #endif
 
     //Create nodes
-    int rows = connectivitySettings.m_dataList.first().matData.rows();
+    int rows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
         rowVert = RowVectorXf::Zero(3);
 
-        if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
-            rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
-            rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);
-            rowVert(2) = connectivitySettings.m_matNodePositions.row(i)(2);
+        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+            rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
+            rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
+            rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
     // Check that iNfft >= signal length
-    int iSignalLength = connectivitySettings.m_dataList.at(0).matData.cols();
-    int iNfft = connectivitySettings.m_iNfft;
+    int iSignalLength = connectivitySettings.at(0).matData.cols();
+    int iNfft = connectivitySettings.getNumberFFT();
     if (iNfft < iSignalLength) {
         iNfft = iSignalLength;
     }
 
     // Generate tapers
-    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.m_sWindowType);
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
 
     // Initialize
-    int iNRows = connectivitySettings.m_dataList.at(0).matData.rows();
+    int iNRows = connectivitySettings.at(0).matData.rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     QMutex mutex;
 
-    std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
+    std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
         return compute(inputData,
-                       connectivitySettings.data.vecPairCsdSum,
-                       connectivitySettings.data.vecPairCsdImagAbsSum,
-                       connectivitySettings.data.vecPairCsdImagSqrdSum,
+                       connectivitySettings.getIntermediateSumData().vecPairCsdSum,
+                       connectivitySettings.getIntermediateSumData().vecPairCsdImagAbsSum,
+                       connectivitySettings.getIntermediateSumData().vecPairCsdImagSqrdSum,
                        mutex,
                        iNRows,
                        iNFreqs,
@@ -163,7 +162,7 @@ Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& co
     //    timer.restart();
 
     // Compute DSWPLI in parallel for all trials
-    QFuture<void> result = QtConcurrent::map(connectivitySettings.m_dataList,
+    QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
@@ -185,7 +184,7 @@ Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& co
 
 //*************************************************************************************************************
 
-void DebiasedSquaredWeightedPhaseLagIndex::compute(ConnectivityTrialData& inputData,
+void DebiasedSquaredWeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                                                    QVector<QPair<int,MatrixXcd> >& vecPairCsdSum,
                                                    QVector<QPair<int,MatrixXd> >& vecPairCsdImagAbsSum,
                                                    QVector<QPair<int,MatrixXd> >& vecPairCsdImagSqrdSum,
@@ -325,18 +324,18 @@ void DebiasedSquaredWeightedPhaseLagIndex::computeDSWPLI(ConnectivitySettings &c
     QSharedPointer<NetworkEdge> pEdge;
     int j;
 
-    for (int i = 0; i < connectivitySettings.m_dataList.first().matData.rows(); ++i) {
+    for (int i = 0; i < connectivitySettings.at(0).matData.rows(); ++i) {
 
-        matNom = connectivitySettings.data.vecPairCsdSum.at(i).second.imag().array().square();
-        matNom -= connectivitySettings.data.vecPairCsdImagSqrdSum.at(i).second;
+        matNom = connectivitySettings.getIntermediateSumData().vecPairCsdSum.at(i).second.imag().array().square();
+        matNom -= connectivitySettings.getIntermediateSumData().vecPairCsdImagSqrdSum.at(i).second;
 
-        matDenom = connectivitySettings.data.vecPairCsdImagAbsSum.at(i).second.array().square();
-        matDenom -= connectivitySettings.data.vecPairCsdImagSqrdSum.at(i).second;
+        matDenom = connectivitySettings.getIntermediateSumData().vecPairCsdImagAbsSum.at(i).second.array().square();
+        matDenom -= connectivitySettings.getIntermediateSumData().vecPairCsdImagSqrdSum.at(i).second;
 
         matDenom = (matDenom.array() == 0.).select(INFINITY, matDenom);
         matDenom = matNom.cwiseQuotient(matDenom);
 
-        for(j = i; j < connectivitySettings.m_dataList.at(0).matData.rows(); ++j) {
+        for(j = i; j < connectivitySettings.at(0).matData.rows(); ++j) {
             matWeight = matDenom.row(j).transpose();
 
             pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));

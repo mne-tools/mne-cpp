@@ -43,7 +43,6 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
-#include "../connectivitysettings.h"
 
 #include <utils/spectral.h>
 
@@ -101,31 +100,31 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
 
     Network finalNetwork("Cross Correlation");
 
-    if(connectivitySettings.m_dataList.empty()) {
+    if(connectivitySettings.isEmpty()) {
         qDebug() << "CrossCorrelation::crossCorrelation - Input data is empty";
         return finalNetwork;
     }
 
     //Create nodes
-    int rows = connectivitySettings.m_dataList.first().matData.rows();
+    int rows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
         rowVert = RowVectorXf::Zero(3);
 
-        if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
-            rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
-            rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);
-            rowVert(2) = connectivitySettings.m_matNodePositions.row(i)(2);
+        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+            rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
+            rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
+            rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
     // Generate tapers
-    int iSignalLength = connectivitySettings.m_dataList.first().matData.cols();
-    int iNfft = connectivitySettings.m_iNfft;
-    if (connectivitySettings.m_iNfft < iSignalLength) {
+    int iSignalLength = connectivitySettings.at(0).matData.cols();
+    int iNfft = connectivitySettings.getNumberFFT();
+    if (iNfft < iSignalLength) {
         iNfft = iSignalLength;
     }
 
@@ -135,7 +134,7 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
     QMutex mutex;
     MatrixXd matDist;
 
-    std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
+    std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
         compute(inputData,
                 matDist,
                 mutex,
@@ -144,7 +143,7 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
     };
 
     // Calculate connectivity matrix over epochs and average afterwards
-    QFuture<void> resultMat = QtConcurrent::map(connectivitySettings.m_dataList,
+    QFuture<void> resultMat = QtConcurrent::map(connectivitySettings.getTrialData(),
                                                 computeLambda);
     resultMat.waitForFinished();
 
@@ -173,7 +172,7 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
 
 //*************************************************************************************************************
 
-void CrossCorrelation::compute(ConnectivityTrialData& inputData,
+void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                                MatrixXd& matDist,
                                QMutex& mutex,
                                int iNfft,

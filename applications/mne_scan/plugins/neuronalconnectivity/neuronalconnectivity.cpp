@@ -167,8 +167,8 @@ void NeuronalConnectivity::init()
 
     //Init connectivity settings
     m_sConnectivityMethods = QStringList() << "COR";
-    m_connectivitySettings.m_sConnectivityMethods = m_sConnectivityMethods;
-    m_connectivitySettings.m_sWindowType = "Hanning";
+    m_connectivitySettings.setConnectivityMethods(m_sConnectivityMethods);
+    m_connectivitySettings.setWindowType("Hanning");
 }
 
 
@@ -278,7 +278,7 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             m_matNodeVertComb << m_matNodeVertLeft, m_matNodeVertRight;
 
             //Set node 3D positions to connectivity settings
-            m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;            
+            m_connectivitySettings.setNodePositions(m_matNodeVertComb);
         }
 
         for(qint32 i = 0; i < pRTSE->getValue().size(); ++i) {
@@ -286,8 +286,8 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
 
             // Check row and colum integrity and restart if necessary
             if(m_connectivitySettings.size() != 0) {
-                if(m_iBlockSize != m_connectivitySettings.m_dataList.first().matData.cols()) {
-                    m_connectivitySettings.clearData();
+                if(m_iBlockSize != m_connectivitySettings.at(0).matData.cols()) {
+                    m_connectivitySettings.clearAllData();
                     m_pRtConnectivity->restart();
                 }
             }
@@ -343,7 +343,6 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             }
 
             MatrixXd data;
-            QList<MatrixXd> epochDataList;
 
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 const MatrixXd& t_mat = pRTMSA->getMultiSampleArray()[i];
@@ -351,8 +350,8 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
 
                 // Check row and colum integrity and restart if necessary
                 if(m_connectivitySettings.size() != 0) {
-                    if(m_iBlockSize != m_connectivitySettings.m_dataList.first().matData.cols()) {
-                        m_connectivitySettings.clearData();
+                    if(m_iBlockSize != m_connectivitySettings.at(0).matData.cols()) {
+                        m_connectivitySettings.clearAllData();
                         m_pRtConnectivity->restart();
                     }
                 }
@@ -437,8 +436,8 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
 
                     // Check row and colum integrity and restart if necessary
                     if(m_connectivitySettings.size() != 0) {
-                        if(m_iBlockSize != m_connectivitySettings.m_dataList.first().matData.cols()) {
-                            m_connectivitySettings.clearData();
+                        if(m_iBlockSize != m_connectivitySettings.at(0).matData.cols()) {
+                            m_connectivitySettings.clearAllData();
                             m_pRtConnectivity->restart();
                         }
                     }
@@ -526,8 +525,8 @@ void NeuronalConnectivity::generateNodeVertices()
     }
 
     //Set node 3D positions to connectivity settings
-    m_connectivitySettings.m_matNodePositions = m_matNodeVertComb;
-    m_connectivitySettings.clearData();
+    m_connectivitySettings.setNodePositions(m_matNodeVertComb);
+    m_connectivitySettings.clearAllData();
 }
 
 
@@ -579,7 +578,7 @@ void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& conne
 {
     //QMutexLocker locker(&m_mutex);
     m_connectivitySettings = connectivitySettings;
-    m_connectivitySettings.m_sConnectivityMethods = m_sConnectivityMethods;
+    m_connectivitySettings.setConnectivityMethods(m_sConnectivityMethods);
     m_pCircularNetworkBuffer->push(connectivityResult);
 }
 
@@ -605,9 +604,9 @@ void NeuronalConnectivity::onNumberTrialsChanged(int iNumberTrials)
 
 void NeuronalConnectivity::onWindowTypeChanged(const QString& windowType)
 {
-    if(m_connectivitySettings.m_sWindowType != windowType) {
-        m_connectivitySettings.resetData();
-        m_connectivitySettings.m_sWindowType = windowType;
+    if(m_connectivitySettings.getWindowType() != windowType) {
+        m_connectivitySettings.clearIntermediateData();
+        m_connectivitySettings.setWindowType(windowType);
     }
 }
 
@@ -617,7 +616,7 @@ void NeuronalConnectivity::onWindowTypeChanged(const QString& windowType)
 void NeuronalConnectivity::onTriggerTypeChanged(const QString& triggerType)
 {
     if(triggerType != m_sAvrType) {
-        m_connectivitySettings.clearData();
+        m_connectivitySettings.clearAllData();
         m_sAvrType = triggerType;
     }
 }

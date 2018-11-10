@@ -45,6 +45,7 @@
 #include "../connectivity_global.h"
 
 #include "abstractmetric.h"
+#include "../connectivitysettings.h"
 
 
 //*************************************************************************************************************
@@ -84,8 +85,6 @@ namespace CONNECTIVITYLIB {
 //=============================================================================================================
 
 class Network;
-class ConnectivitySettings;
-class ConnectivityTrialData;
 
 
 //=============================================================================================================
@@ -128,7 +127,7 @@ protected:
     * @param[in]    iNfft               The FFT length.
     * @param[in]    tapers              The taper information.
     */
-    static void compute(ConnectivityTrialData& inputData,
+    static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         Eigen::MatrixXd& matDist,
                         QMutex& mutex,
                         int iNfft,

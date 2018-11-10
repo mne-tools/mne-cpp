@@ -45,6 +45,7 @@
 #include "../connectivity_global.h"
 
 #include "abstractmetric.h"
+#include "../connectivitysettings.h"
 
 
 //*************************************************************************************************************
@@ -83,8 +84,6 @@ namespace CONNECTIVITYLIB {
 //=============================================================================================================
 
 class Network;
-class ConnectivitySettings;
-class ConnectivityTrialData;
 
 
 //=============================================================================================================
@@ -125,7 +124,7 @@ protected:
     *
     * @return                   The connectivity matrix.
     */
-    static Eigen::MatrixXd compute(const ConnectivityTrialData& inputData);
+    static Eigen::MatrixXd compute(const ConnectivitySettings::IntermediateTrialData& inputData);
 
     //=========================================================================================================
     /**

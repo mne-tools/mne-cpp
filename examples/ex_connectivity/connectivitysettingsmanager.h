@@ -108,8 +108,7 @@ public:
 
     ConnectivitySettings            m_settings;
     RtConnectivity::SPtr            m_pRtConnectivity;
-    QList<Eigen::MatrixXd>          m_matDataListOriginal;
-    QList<ConnectivityTrialData>    m_dataListOriginal;
+    QList<ConnectivitySettings::IntermediateTrialData>    m_dataListOriginal;
     Network                         m_networkData;
 
     int                             m_iFreqBandLow;
@@ -121,7 +120,7 @@ public:
     {
         m_pRtConnectivity->restart();
 
-        m_settings.m_sConnectivityMethods = QStringList() << sMetric;
+        m_settings.setConnectivityMethods(QStringList() << sMetric);
 
         m_pRtConnectivity->append(m_settings);
     }
@@ -132,7 +131,6 @@ public:
             iNumberTrials = m_dataListOriginal.size();
         }
 
-        m_settings.m_dataList.clear();
         QVector<int> indexList;
 
         for(int i = 0; i < iNumberTrials; i++) {
@@ -148,7 +146,17 @@ public:
                 }
             }
 
-            m_settings.m_dataList << m_dataListOriginal.at(index);
+            m_settings.append(m_dataListOriginal.at(index));
+        }
+
+        //Pop data from connectivity settings
+        if(m_settings.size() > iNumberTrials) {
+            m_pRtConnectivity->restart();
+            int size = m_settings.size();
+
+            for(int i = 0; i < size-iNumberTrials; ++i) {
+                m_settings.removeFirst();
+            }
         }
 
         //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - indexList" << indexList;
@@ -158,12 +166,12 @@ public:
 
     void onFreqBandChanged(int iFreqLow, int iFreqHigh)
     {
-        if(m_settings.m_dataList.isEmpty()) {
+        if(m_settings.isEmpty()) {
             return;
         }
 
         // By default the number of frequency bins is half the signal since we only use the half spectrum
-        double dScaleFactor = m_settings.m_dataList.first().matData.cols()/m_fSFreq;
+        double dScaleFactor = m_settings.at(0).matData.cols()/m_fSFreq;
 
         // Convert to frequency bins
         m_iFreqBandLow = iFreqLow * dScaleFactor;

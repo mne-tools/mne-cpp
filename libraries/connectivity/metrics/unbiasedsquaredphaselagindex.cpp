@@ -2,13 +2,14 @@
 /**
 * @file     unbiasedsquaredUnbiasedSquaredPhaseLagIndex.cpp
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -46,7 +47,6 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
-#include "../connectivitysettings.h"
 
 #include <utils/spectral.h>
 
@@ -104,7 +104,7 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
 
     Network finalNetwork("Unbiased Squared Phase Lag Index");
 
-    if(connectivitySettings.m_dataList.empty()) {
+    if(connectivitySettings.isEmpty()) {
         qDebug() << "UnbiasedSquaredPhaseLagIndex::calculate - Input data is empty";
         return finalNetwork;
     }
@@ -114,41 +114,41 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
     #endif
 
     //Create nodes
-    int rows = connectivitySettings.m_dataList.first().matData.rows();
+    int rows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
         rowVert = RowVectorXf::Zero(3);
 
-        if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
-            rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
-            rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);
-            rowVert(2) = connectivitySettings.m_matNodePositions.row(i)(2);
+        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+            rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
+            rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
+            rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
     // Check that iNfft >= signal length
-    int iSignalLength = connectivitySettings.m_dataList.at(0).matData.cols();
-    int iNfft = connectivitySettings.m_iNfft;
+    int iSignalLength = connectivitySettings.at(0).matData.cols();
+    int iNfft = connectivitySettings.getNumberFFT();
     if (iNfft < iSignalLength) {
         iNfft = iSignalLength;
     }
 
     // Generate tapers
-    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.m_sWindowType);
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
 
     // Initialize
-    int iNRows = connectivitySettings.m_dataList.at(0).matData.rows();
+    int iNRows = connectivitySettings.at(0).matData.rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     QMutex mutex;
 
-    std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
+    std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
         compute(inputData,
-                connectivitySettings.data.vecPairCsdSum,
-                connectivitySettings.data.vecPairCsdImagSignSum,
+                connectivitySettings.getIntermediateSumData().vecPairCsdSum,
+                connectivitySettings.getIntermediateSumData().vecPairCsdImagSignSum,
                 mutex,
                 iNRows,
                 iNFreqs,
@@ -161,7 +161,7 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
 //    timer.restart();
 
     // Compute DSWPLV in parallel for all trials
-    QFuture<void> result = QtConcurrent::map(connectivitySettings.m_dataList,
+    QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
@@ -183,7 +183,7 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
 
 //*************************************************************************************************************
 
-void UnbiasedSquaredPhaseLagIndex::compute(ConnectivityTrialData& inputData,
+void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                                            QVector<QPair<int,MatrixXcd> >& vecPairCsdSum,
                                            QVector<QPair<int,MatrixXd> >& vecPairCsdImagSignSum,
                                            QMutex& mutex,
@@ -306,8 +306,8 @@ void UnbiasedSquaredPhaseLagIndex::computeUSPLI(ConnectivitySettings &connectivi
     int j;
     double dNTrials = double(connectivitySettings.size() - 1.0);
 
-    for (int i = 0; i < connectivitySettings.data.vecPairCsdImagSignSum.size(); ++i) {
-        matNom = connectivitySettings.data.vecPairCsdImagSignSum.at(i).second.cwiseAbs() / connectivitySettings.size();
+    for (int i = 0; i < connectivitySettings.getIntermediateSumData().vecPairCsdImagSignSum.size(); ++i) {
+        matNom = connectivitySettings.getIntermediateSumData().vecPairCsdImagSignSum.at(i).second.cwiseAbs() / connectivitySettings.size();
         matNom = (connectivitySettings.size() * matNom.array().square() - 1.0) / dNTrials;
 
         for(j = i; j < matNom.rows(); ++j) {

@@ -95,8 +95,8 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
     qDebug()<<"------RtConnectivityWorker::doWork()";
-    qDebug()<<"------Method:"<<connectivitySettings.m_sConnectivityMethods.first();
-    qDebug()<<"------Data dim:"<<connectivitySettings.m_dataList.first().matData.rows() << "x" << connectivitySettings.m_dataList.first().matData.cols();
+    qDebug()<<"------Method:"<<connectivitySettings.getConnectivityMethods().first();
+    qDebug()<<"------Data dim:"<<connectivitySettings.at(0).matData.rows() << "x" << connectivitySettings.at(0).matData.cols();
     qDebug()<<"------Number trials:"<< connectivitySettings.size();
     qDebug()<<"------Total time:"<<iTime << "ms";
     qDebug()<<"----------------------------------------";

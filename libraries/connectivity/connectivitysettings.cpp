@@ -79,8 +79,224 @@ ConnectivitySettings::ConnectivitySettings()
 : m_iNfft(-1)
 , m_sWindowType("hanning")
 {
-    clearData();
     qRegisterMetaType<CONNECTIVITYLIB::ConnectivitySettings>("CONNECTIVITYLIB::ConnectivitySettings");
 }
 
 
+//*******************************************************************************************************
+
+void ConnectivitySettings::clearAllData() {
+    m_trialData.clear();
+
+    clearIntermediateData();
+}
+
+
+//*******************************************************************************************************
+
+void ConnectivitySettings::clearIntermediateData() {
+    for (int i = 0; i < m_trialData.size(); ++i) {
+        m_trialData[i].matPsd.resize(0,0);
+
+        m_trialData[i].vecPairCsd.clear();
+        m_trialData[i].vecTapSpectra.clear();
+        m_trialData[i].vecPairCsdNormalized.clear();
+        m_trialData[i].vecPairCsdImagSign.clear();
+        m_trialData[i].vecPairCsdImagAbs.clear();
+        m_trialData[i].vecPairCsdImagSqrd.clear();
+    }
+
+    m_intermediateSumData.matPsdSum.resize(0,0);
+    m_intermediateSumData.vecPairCsdSum.clear();
+    m_intermediateSumData.vecPairCsdNormalizedSum.clear();
+    m_intermediateSumData.vecPairCsdImagSignSum.clear();
+    m_intermediateSumData.vecPairCsdImagAbsSum.clear();
+    m_intermediateSumData.vecPairCsdImagSqrdSum.clear();
+}
+
+
+//*******************************************************************************************************
+
+void ConnectivitySettings::append(const QList<Eigen::MatrixXd>& matInputData)
+{
+    for(int i = 0; i < matInputData.size(); ++i) {
+        this->append(matInputData.at(i));
+    }
+}
+
+
+//*******************************************************************************************************
+
+void ConnectivitySettings::append(const Eigen::MatrixXd& matInputData)
+{
+    ConnectivitySettings::IntermediateTrialData tempData;
+    tempData.matData = matInputData;
+
+    m_trialData.append(tempData);
+}
+
+
+//*******************************************************************************************************
+
+void ConnectivitySettings::append(const ConnectivitySettings::IntermediateTrialData& inputData)
+{
+    m_trialData.append(inputData);
+}
+
+
+//*******************************************************************************************************
+
+const ConnectivitySettings::IntermediateTrialData& ConnectivitySettings::at(int i) const
+{
+    return m_trialData.at(i);
+}
+
+
+//*******************************************************************************************************
+
+int ConnectivitySettings::size() const
+{
+    return m_trialData.size();
+}
+
+
+//*******************************************************************************************************
+
+bool ConnectivitySettings::isEmpty() const
+{
+    return m_trialData.isEmpty();
+}
+
+
+//*******************************************************************************************************
+
+void ConnectivitySettings::removeFirst()
+{
+    if(!m_trialData.isEmpty()) {
+        // Substract PSD of first trial from overall summed up PSD
+        if(m_intermediateSumData.matPsdSum.rows() == m_trialData.first().matPsd.rows() &&
+           m_intermediateSumData.matPsdSum.cols() == m_trialData.first().matPsd.cols() ) {
+            m_intermediateSumData.matPsdSum -= m_trialData.first().matPsd;
+        }
+
+        // Substract CSD of first trial from overall summed up CSD
+        if(m_intermediateSumData.vecPairCsdSum.size() == m_trialData.first().vecPairCsd.size()) {
+            for (int i = 0; i < m_intermediateSumData.vecPairCsdSum.size(); ++i) {
+                m_intermediateSumData.vecPairCsdSum[i].second -= m_trialData.first().vecPairCsd.at(i).second;
+            }
+        }
+
+        // Substract normalized CSD of first trial from overall summed up normalized CSD
+        if(m_intermediateSumData.vecPairCsdNormalizedSum.size() == m_trialData.first().vecPairCsdNormalized.size()) {
+            for (int i = 0; i < m_intermediateSumData.vecPairCsdNormalizedSum.size(); ++i) {
+                m_intermediateSumData.vecPairCsdNormalizedSum[i].second -= m_trialData.first().vecPairCsdNormalized.at(i).second;
+            }
+        }
+
+        // Substract sign CSD of first trial from overall summed up sign CSD
+        if(m_intermediateSumData.vecPairCsdImagSignSum.size() == m_trialData.first().vecPairCsdImagSign.size()) {
+            for (int i = 0; i < m_intermediateSumData.vecPairCsdImagSignSum.size(); ++i) {
+                m_intermediateSumData.vecPairCsdImagSignSum[i].second -= m_trialData.first().vecPairCsdImagSign.at(i).second;
+            }
+        }
+
+        // Substract imag abs CSD of first trial from overall summed up imag abs CSD
+        if(m_intermediateSumData.vecPairCsdImagAbsSum.size() == m_trialData.first().vecPairCsdImagAbs.size()) {
+            for (int i = 0; i < m_intermediateSumData.vecPairCsdImagAbsSum.size(); ++i) {
+                m_intermediateSumData.vecPairCsdImagAbsSum[i].second -= m_trialData.first().vecPairCsdImagAbs.at(i).second;
+            }
+        }
+
+        // Substract imag sqrd CSD of first trial from overall summed up imag sqrd CSD
+        if(m_intermediateSumData.vecPairCsdImagSqrdSum.size() == m_trialData.first().vecPairCsdImagSqrd.size()) {
+            for (int i = 0; i < m_intermediateSumData.vecPairCsdImagSqrdSum.size(); ++i) {
+                m_intermediateSumData.vecPairCsdImagSqrdSum[i].second -= m_trialData.first().vecPairCsdImagSqrd.at(i).second;
+            }
+        }
+
+        m_trialData.removeFirst();
+    }
+}
+
+
+//*******************************************************************************************************
+
+void ConnectivitySettings::setConnectivityMethods(const QStringList& sConnectivityMethods)
+{
+    m_sConnectivityMethods = sConnectivityMethods;
+}
+
+
+//*******************************************************************************************************
+
+const QStringList& ConnectivitySettings::getConnectivityMethods() const
+{
+    return m_sConnectivityMethods;
+}
+
+
+//*******************************************************************************************************
+
+void ConnectivitySettings::setNumberFFT(int iNfft)
+{
+    m_iNfft = iNfft;
+}
+
+
+//*******************************************************************************************************
+
+int ConnectivitySettings::getNumberFFT() const
+{
+    return m_iNfft;
+}
+
+
+//*******************************************************************************************************
+
+void ConnectivitySettings::setWindowType(const QString& sWindowType)
+{
+    // Clear all intermediate data since this will have an effect on the frequency calculation
+    clearIntermediateData();
+
+    m_sWindowType = sWindowType;
+}
+
+
+//*******************************************************************************************************
+
+const QString& ConnectivitySettings::getWindowType() const
+{
+    return m_sWindowType;
+}
+
+
+//*******************************************************************************************************
+
+void ConnectivitySettings::setNodePositions(const Eigen::MatrixX3f& matNodePositions)
+{
+    m_matNodePositions = matNodePositions;
+}
+
+
+//*******************************************************************************************************
+
+const Eigen::MatrixX3f& ConnectivitySettings::getNodePositions() const
+{
+    return m_matNodePositions;
+}
+
+
+//*******************************************************************************************************
+
+QList<ConnectivitySettings::IntermediateTrialData>& ConnectivitySettings::getTrialData()
+{
+    return m_trialData;
+}
+
+
+//*******************************************************************************************************
+
+ConnectivitySettings::IntermediateSumData& ConnectivitySettings::getIntermediateSumData()
+{
+    return m_intermediateSumData;
+}

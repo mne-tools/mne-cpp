@@ -97,23 +97,23 @@ Connectivity::Connectivity()
 Network Connectivity::calculate(ConnectivitySettings& connectivitySettings)
 {
     //TODO: Use multithreading to work on multiple connectivity methods at the same time
-    if(connectivitySettings.m_sConnectivityMethods.contains("COR")) {
+    if(connectivitySettings.getConnectivityMethods().contains("COR")) {
         return Correlation::calculate(connectivitySettings);
-    } else if(connectivitySettings.m_sConnectivityMethods.contains("XCOR")) {
+    } else if(connectivitySettings.getConnectivityMethods().contains("XCOR")) {
         return CrossCorrelation::calculate(connectivitySettings);
-    } else if(connectivitySettings.m_sConnectivityMethods.contains("PLI")) {
+    } else if(connectivitySettings.getConnectivityMethods().contains("PLI")) {
         return PhaseLagIndex::calculate(connectivitySettings);
-    } else if(connectivitySettings.m_sConnectivityMethods.contains("COH")) {
+    } else if(connectivitySettings.getConnectivityMethods().contains("COH")) {
         return Coherence::calculate(connectivitySettings);
-    } else if(connectivitySettings.m_sConnectivityMethods.contains("IMAGCOH")) {
+    } else if(connectivitySettings.getConnectivityMethods().contains("IMAGCOH")) {
         return ImagCoherence::calculate(connectivitySettings);
-    } else if(connectivitySettings.m_sConnectivityMethods.contains("PLV")) {
+    } else if(connectivitySettings.getConnectivityMethods().contains("PLV")) {
         return PhaseLockingValue::calculate(connectivitySettings);
-    } else if(connectivitySettings.m_sConnectivityMethods.contains("WPLI")) {
+    } else if(connectivitySettings.getConnectivityMethods().contains("WPLI")) {
         return WeightedPhaseLagIndex::calculate(connectivitySettings);
-    } else if(connectivitySettings.m_sConnectivityMethods.contains("USPLI")) {
+    } else if(connectivitySettings.getConnectivityMethods().contains("USPLI")) {
         return UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings);
-    } else if(connectivitySettings.m_sConnectivityMethods.contains("DSWPLI")) {
+    } else if(connectivitySettings.getConnectivityMethods().contains("DSWPLI")) {
         return DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings);
     }
 

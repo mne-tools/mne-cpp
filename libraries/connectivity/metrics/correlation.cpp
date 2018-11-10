@@ -43,7 +43,6 @@
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
-#include "../connectivitysettings.h"
 
 
 //*************************************************************************************************************
@@ -95,22 +94,22 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("Correlation");
 
-    if(connectivitySettings.m_dataList.empty()) {
+    if(connectivitySettings.isEmpty()) {
         qDebug() << "Correlation::correlationCoeff - Input data is empty";
         return finalNetwork;
     }   
 
     //Create nodes
-    int rows = connectivitySettings.m_dataList.first().matData.rows();
+    int rows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
         rowVert = RowVectorXf::Zero(3);
 
-        if(connectivitySettings.m_matNodePositions.rows() != 0 && i < connectivitySettings.m_matNodePositions.rows()) {
-            rowVert(0) = connectivitySettings.m_matNodePositions.row(i)(0);
-            rowVert(1) = connectivitySettings.m_matNodePositions.row(i)(1);
-            rowVert(2) = connectivitySettings.m_matNodePositions.row(i)(2);
+        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+            rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
+            rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
+            rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
@@ -120,7 +119,7 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
     //double dScalingStep = 1.0/matDataList.size();
     //dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
 
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.m_dataList,
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.getTrialData(),
                                                               compute,
                                                               reduce);
     resultMat.waitForFinished();
@@ -152,7 +151,7 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
 
 //*************************************************************************************************************
 
-MatrixXd Correlation::compute(const ConnectivityTrialData& inputData)
+MatrixXd Correlation::compute(const ConnectivitySettings::IntermediateTrialData& inputData)
 {
     MatrixXd matDist = MatrixXd::Zero(inputData.matData.rows(), inputData.matData.rows());
     RowVectorXd vecRow;
