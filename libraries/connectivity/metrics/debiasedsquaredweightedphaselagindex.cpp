@@ -148,6 +148,8 @@ Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& co
     std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
         return compute(inputData,
                        connectivitySettings.data.vecPairCsdSum,
+                       connectivitySettings.data.vecPairCsdImagAbsSum,
+                       connectivitySettings.data.vecPairCsdImagSqrdSum,
                        mutex,
                        iNRows,
                        iNFreqs,
@@ -184,14 +186,18 @@ Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& co
 
 void DebiasedSquaredWeightedPhaseLagIndex::compute(ConnectivityTrialData& inputData,
                                                    QVector<QPair<int,MatrixXcd> >& vecPairCsdSum,
+                                                   QVector<QPair<int,MatrixXd> >& vecPairCsdImagAbsSum,
+                                                   QVector<QPair<int,MatrixXd> >& vecPairCsdImagSqrdSum,
                                                    QMutex& mutex,
                                                    int iNRows,
                                                    int iNFreqs,
                                                    int iNfft,
                                                    const QPair<MatrixXd, VectorXd>& tapers)
 {
-    if(inputData.vecPairCsd.size() == iNRows) {
-        //qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::compute - vecPairCsd was already computed for this trial.";
+    if(inputData.vecPairCsd.size() == iNRows &&
+       inputData.vecPairCsdImagSqrd.size() == iNRows &&
+       inputData.vecPairCsdImagAbs.size() == iNRows) {
+        //qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::compute - vecPairCsd, vecPairCsdImagSqrd and vecPairCsdImagAbs were already computed for this trial.";
         return;
     }
 
@@ -199,16 +205,11 @@ void DebiasedSquaredWeightedPhaseLagIndex::compute(ConnectivityTrialData& inputD
 
     // Calculate tapered spectra if not available already
     // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
-    if(inputData.vecTapSpectra.size() != iNRows) {
-        inputData.vecTapSpectra.clear();
-
+    if(inputData.vecTapSpectra.isEmpty()) {
         RowVectorXd vecInputFFT, rowData;
         RowVectorXcd vecTmpFreq;
 
         MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
-
-        QVector<Eigen::MatrixXcd> vecTapSpectra;
-
 
         FFT<double> fft;
         fft.SetFlag(fft.HalfSpectrum);
@@ -230,45 +231,85 @@ void DebiasedSquaredWeightedPhaseLagIndex::compute(ConnectivityTrialData& inputD
     }
 
     // Compute CSD
-    bool bNfftEven = false;
-    if (iNfft % 2 == 0){
-        bNfftEven = true;
-    }
+    if(inputData.vecPairCsd.isEmpty()) {
+        MatrixXcd matCsd(iNRows, iNFreqs);
 
-    double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
+        bool bNfftEven = false;
+        if (iNfft % 2 == 0){
+            bNfftEven = true;
+        }
 
-    MatrixXcd matCsd(iNRows, iNFreqs);
+        double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
-    for (i = 0; i < iNRows; ++i) {
-        for (j = i; j < iNRows; ++j) {
-            // Compute CSD (average over tapers if necessary)
-            matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
+        for (i = 0; i < iNRows; ++i) {
+            for (j = i; j < iNRows; ++j) {
+                // Compute CSD (average over tapers if necessary)
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
 
-            // Divide first and last element by 2 due to half spectrum
-            matCsd.row(j)(0) /= 2.0;
-            if(bNfftEven) {
-                matCsd.row(j).tail(1) /= 2.0;
+                // Divide first and last element by 2 due to half spectrum
+                matCsd.row(j)(0) /= 2.0;
+                if(bNfftEven) {
+                    matCsd.row(j).tail(1) /= 2.0;
+                }
+            }
+
+            inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
+            inputData.vecPairCsdImagSqrd.append(QPair<int,MatrixXd>(i,matCsd.imag().array().square()));
+            inputData.vecPairCsdImagAbs.append(QPair<int,MatrixXd>(i,matCsd.imag().cwiseAbs()));
+        }
+
+        mutex.lock();
+
+        if(vecPairCsdSum.isEmpty()) {
+            vecPairCsdSum = inputData.vecPairCsd;
+            vecPairCsdImagSqrdSum = inputData.vecPairCsdImagSqrd;
+            vecPairCsdImagAbsSum = inputData.vecPairCsdImagAbs;
+        } else {
+            for (int j = 0; j < vecPairCsdSum.size(); ++j) {
+                vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+                vecPairCsdImagSqrdSum[j].second += inputData.vecPairCsdImagSqrd.at(j).second;
+                vecPairCsdImagAbsSum[j].second += inputData.vecPairCsdImagAbs.at(j).second;
             }
         }
 
-        inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
-
-//        resultData.vecCsdAvgImag.append(matCsd);
-//        resultData.vecCsdAbsAvgImag.append(matCsd.cwiseAbs());
-//        resultData.vecSquaredCsdAvgImag.append(matCsd.array().square());
-    }
-
-    mutex.lock();
-
-    if(vecPairCsdSum.isEmpty()) {
-        vecPairCsdSum = inputData.vecPairCsd;
+        mutex.unlock();
     } else {
-        for (int j = 0; j < vecPairCsdSum.size(); ++j) {
-            vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+        if(inputData.vecPairCsdImagSqrd.isEmpty()) {
+            for (i = 0; i < inputData.vecPairCsd.size(); ++i) {
+                inputData.vecPairCsdImagSqrd.append(QPair<int,MatrixXd>(i,inputData.vecPairCsd.at(i).second.imag().array().square()));
+            }
+
+            mutex.lock();
+
+            if(vecPairCsdImagSqrdSum.isEmpty()) {
+                vecPairCsdImagSqrdSum = inputData.vecPairCsdImagSqrd;
+            } else {
+                for (int j = 0; j < vecPairCsdSum.size(); ++j) {
+                    vecPairCsdImagSqrdSum[j].second += inputData.vecPairCsdImagSqrd.at(j).second;
+                }
+            }
+
+            mutex.unlock();
+        }
+
+        if(inputData.vecPairCsdImagAbs.isEmpty()) {
+            for (i = 0; i < inputData.vecPairCsd.size(); ++i) {
+                inputData.vecPairCsdImagAbs.append(QPair<int,MatrixXd>(i,inputData.vecPairCsd.at(i).second.imag().cwiseAbs()));
+            }
+
+            mutex.lock();
+
+            if(vecPairCsdImagAbsSum.isEmpty()) {
+                vecPairCsdImagAbsSum = inputData.vecPairCsdImagAbs;
+            } else {
+                for (int j = 0; j < vecPairCsdSum.size(); ++j) {
+                    vecPairCsdImagAbsSum[j].second += inputData.vecPairCsdImagAbs.at(j).second;
+                }
+            }
+
+            mutex.unlock();
         }
     }
-
-    mutex.unlock();
 }
 
 
@@ -276,7 +317,7 @@ void DebiasedSquaredWeightedPhaseLagIndex::compute(ConnectivityTrialData& inputD
 
 void DebiasedSquaredWeightedPhaseLagIndex::computeDSWPLV(ConnectivitySettings &connectivitySettings,
                                                          Network& finalNetwork)
-{    
+{
     // Compute final DSWPLV and create Network
     MatrixXd matNom, matDenom;
     MatrixXd matWeight;
@@ -286,16 +327,10 @@ void DebiasedSquaredWeightedPhaseLagIndex::computeDSWPLV(ConnectivitySettings &c
     for (int i = 0; i < connectivitySettings.m_dataList.first().matData.rows(); ++i) {
 
         matNom = connectivitySettings.data.vecPairCsdSum.at(i).second.imag().array().square();
-        matNom = matNom.array() - connectivitySettings.data.vecPairCsdSum.at(i).second.imag().array().square();
+        matNom -= connectivitySettings.data.vecPairCsdImagSqrdSum.at(i).second;
 
-        matDenom = connectivitySettings.data.vecPairCsdSum.at(i).second.imag().cwiseAbs().array().square();
-        matDenom = matDenom.array() - connectivitySettings.data.vecPairCsdSum.at(i).second.imag().array().square();
-
-//        matNom = finalResult.vecCsdAvgImag.at(j).array().square();
-//        matNom -= finalResult.vecSquaredCsdAvgImag.at(j);
-
-//        matDenom = finalResult.vecCsdAbsAvgImag.at(j).array().square();
-//        matDenom -= finalResult.vecSquaredCsdAvgImag.at(j);
+        matDenom = connectivitySettings.data.vecPairCsdImagAbsSum.at(i).second.array().square();
+        matDenom -= connectivitySettings.data.vecPairCsdImagSqrdSum.at(i).second;
 
         matDenom = (matDenom.array() == 0.).select(INFINITY, matDenom);
         matDenom = matNom.cwiseQuotient(matDenom);

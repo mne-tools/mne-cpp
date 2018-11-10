@@ -82,6 +82,8 @@ struct ConnectivityTrialData {
     QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsd;
     QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdNormalized;
     QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagSign;
+    QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagAbs;
+    QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagSqrd;
     QVector<Eigen::MatrixXcd> vecTapSpectra;
 };
 
@@ -90,6 +92,8 @@ struct ConnectivityData {
     QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdSum;
     QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdNormalizedSum;
     QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagSignSum;
+    QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagAbsSum;
+    QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagSqrdSum;
 };
 
 
@@ -181,6 +185,22 @@ public:
                     data.vecPairCsdImagSignSum[i].second -= m_dataList.first().vecPairCsdImagSign.at(i).second;
                 }
             }
+
+            // Substract imag abs CSD of first trial from overall summed up imag abs CSD
+            if(data.vecPairCsdImagAbsSum.size() == m_dataList.first().vecPairCsdImagAbs.size()) {
+                for (int i = 0; i < data.vecPairCsdImagAbsSum.size(); ++i) {
+                    data.vecPairCsdImagAbsSum[i].second -= m_dataList.first().vecPairCsdImagAbs.at(i).second;
+                }
+            }
+
+            // Substract imag sqrd CSD of first trial from overall summed up imag sqrd CSD
+            if(data.vecPairCsdImagSqrdSum.size() == m_dataList.first().vecPairCsdImagSqrd.size()) {
+                for (int i = 0; i < data.vecPairCsdImagSqrdSum.size(); ++i) {
+                    data.vecPairCsdImagSqrdSum[i].second -= m_dataList.first().vecPairCsdImagSqrd.at(i).second;
+                }
+            }
+
+
 
             m_dataList.removeFirst();
         }

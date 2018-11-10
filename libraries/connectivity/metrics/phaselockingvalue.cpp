@@ -146,6 +146,7 @@ Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
 
     std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
         compute(inputData,
+                connectivitySettings.data.vecPairCsdSum,
                 connectivitySettings.data.vecPairCsdNormalizedSum,
                 mutex,
                 iNRows,
@@ -182,6 +183,7 @@ Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
 //*************************************************************************************************************
 
 void PhaseLockingValue::compute(ConnectivityTrialData& inputData,
+                                QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
                                 QVector<QPair<int,MatrixXcd> >& vecPairCsdNormalizedSum,
                                 QMutex& mutex,
                                 int iNRows,
@@ -198,15 +200,11 @@ void PhaseLockingValue::compute(ConnectivityTrialData& inputData,
 
     // Calculate tapered spectra if not available already
     // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
-    if(inputData.vecTapSpectra.size() != iNRows) {
-        inputData.vecTapSpectra.clear();
-
+    if(inputData.vecTapSpectra.isEmpty()) {
         RowVectorXd vecInputFFT, rowData;
         RowVectorXcd vecTmpFreq;
 
         MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
-
-        QVector<Eigen::MatrixXcd> vecTapSpectra;
 
         FFT<double> fft;
         fft.SetFlag(fft.HalfSpectrum);
@@ -228,10 +226,8 @@ void PhaseLockingValue::compute(ConnectivityTrialData& inputData,
     }
 
     // Compute CSD
-    MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-
-    if(inputData.vecPairCsd.size() != iNRows) {
-        inputData.vecPairCsd.clear();
+    if(inputData.vecPairCsd.isEmpty()) {
+        MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
 
         bool bNfftEven = false;
         if (iNfft % 2 == 0){
@@ -255,23 +251,39 @@ void PhaseLockingValue::compute(ConnectivityTrialData& inputData,
             inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
             inputData.vecPairCsdNormalized.append(QPair<int,MatrixXcd>(i,matCsd.cwiseQuotient(matCsd.cwiseAbs())));
         }
+
+        mutex.lock();
+
+        if(vecPairCsdSum.isEmpty()) {
+            vecPairCsdSum = inputData.vecPairCsd;
+            vecPairCsdNormalizedSum = inputData.vecPairCsdNormalized;
+        } else {
+            for (int j = 0; j < vecPairCsdSum.size(); ++j) {
+                vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+                vecPairCsdNormalizedSum[j].second += inputData.vecPairCsdNormalized.at(j).second;
+            }
+        }
+
+        mutex.unlock();
     } else {
-        for (i = 0; i < iNRows; ++i) {
-            inputData.vecPairCsdNormalized.append(QPair<int,MatrixXcd>(i,inputData.vecPairCsd.at(i).second.cwiseQuotient(inputData.vecPairCsd.at(i).second.cwiseAbs())));
+        if(inputData.vecPairCsdNormalized.isEmpty()) {
+            for (i = 0; i < iNRows; ++i) {
+                inputData.vecPairCsdNormalized.append(QPair<int,MatrixXcd>(i,inputData.vecPairCsd.at(i).second.cwiseQuotient(inputData.vecPairCsd.at(i).second.cwiseAbs())));
+            }
+
+            mutex.lock();
+
+            if(vecPairCsdNormalizedSum.isEmpty()) {
+                vecPairCsdNormalizedSum = inputData.vecPairCsdNormalized;
+            } else {
+                for (int j = 0; j < vecPairCsdNormalizedSum.size(); ++j) {
+                    vecPairCsdNormalizedSum[j].second += inputData.vecPairCsdNormalized.at(j).second;
+                }
+            }
+
+            mutex.unlock();
         }
     }
-
-    mutex.lock();
-
-    if(vecPairCsdNormalizedSum.isEmpty()) {
-        vecPairCsdNormalizedSum = inputData.vecPairCsdNormalized;
-    } else {
-        for (int j = 0; j < vecPairCsdNormalizedSum.size(); ++j) {
-            vecPairCsdNormalizedSum[j].second += inputData.vecPairCsdNormalized.at(j).second;
-        }
-    }
-
-    mutex.unlock();
 }
 
 

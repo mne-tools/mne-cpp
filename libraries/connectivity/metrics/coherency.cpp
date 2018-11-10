@@ -268,13 +268,6 @@ void Coherency::compute(ConnectivityTrialData& inputData,
         return;
     }
 
-    inputData.vecPairCsd.clear();
-    inputData.matPsd.resize(0,0);
-
-    if(inputData.vecTapSpectra.size() != iNRows) {
-        inputData.vecTapSpectra.clear();
-    }
-
     //qDebug() << "Coherency::compute - vecPairCsdSum and matPsdSum are computed for this trial.";
 
     // Substract mean, compute tapered spectra and PSD
@@ -324,35 +317,6 @@ void Coherency::compute(ConnectivityTrialData& inputData,
         }
     }
 
-//    iTime = timer.elapsed();
-//    qDebug() << QThread::currentThreadId() << "Coherency::compute timer - compute - Tapered spectra and PSD:" << iTime;
-//    timer.restart();
-
-    // Compute CSD
-    // This code was copied and modified from Utils/Spectra since we do not want to call the function due to time loss.
-    double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
-
-    MatrixXcd matCsd(iNRows, iNFreqs);
-
-    for (i = 0; i < iNRows; ++i) {
-        for (j = i; j < iNRows; ++j) {
-            // Compute CSD (average over tapers if necessary)
-            matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
-
-            // Divide first and last element by 2 due to half spectrum
-            matCsd.row(j)(0) /= 2.0;
-            if(bNfftEven) {
-                matCsd.row(j).tail(1) /= 2.0;
-            }
-        }
-
-        inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
-    }
-
-//    iTime = timer.elapsed();
-//    qDebug() << QThread::currentThreadId() << "Coherency::compute timer - compute - CSD from spectra:" << iTime;
-//    timer.restart();
-
     mutex.lock();
 
     if(matPsdSum.rows() == 0 || matPsdSum.cols() == 0) {
@@ -361,18 +325,53 @@ void Coherency::compute(ConnectivityTrialData& inputData,
         matPsdSum += inputData.matPsd;
     }
 
-    if(vecPairCsdSum.isEmpty()) {
-        vecPairCsdSum = inputData.vecPairCsd;
-    } else {
-        for (int j = 0; j < vecPairCsdSum.size(); ++j) {
-            vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
-        }
-    }
-
     mutex.unlock();
 
 //    iTime = timer.elapsed();
-//    qDebug() << QThread::currentThreadId() << "Coherency::compute timer - compute - CSD PSD summing:" << iTime;
+//    qDebug() << QThread::currentThreadId() << "Coherency::compute timer - compute - Tapered spectra and PSD (summing):" << iTime;
+//    timer.restart();
+
+    // Compute CSD
+    MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
+
+    if(inputData.vecPairCsd.isEmpty()) {
+        double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
+
+        bool bNfftEven = false;
+        if (iNfft % 2 == 0){
+            bNfftEven = true;
+        }
+
+        for (i = 0; i < iNRows; ++i) {
+            for (j = i; j < iNRows; ++j) {
+                // Compute CSD (average over tapers if necessary)
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
+
+                // Divide first and last element by 2 due to half spectrum
+                matCsd.row(j)(0) /= 2.0;
+                if(bNfftEven) {
+                    matCsd.row(j).tail(1) /= 2.0;
+                }
+            }
+
+            inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
+        }
+
+        mutex.lock();
+
+        if(vecPairCsdSum.isEmpty()) {
+            vecPairCsdSum = inputData.vecPairCsd;
+        } else {
+            for (int j = 0; j < vecPairCsdSum.size(); ++j) {
+                vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+            }
+        }
+
+        mutex.unlock();
+    }
+
+//    iTime = timer.elapsed();
+//    qDebug() << QThread::currentThreadId() << "Coherency::compute timer - compute - CSD summing:" << iTime;
 //    timer.restart();
 }
 

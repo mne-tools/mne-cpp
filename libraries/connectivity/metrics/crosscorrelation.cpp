@@ -189,9 +189,7 @@ void CrossCorrelation::compute(ConnectivityTrialData& inputData,
 
     int i, j;
 
-    if(inputData.vecTapSpectra.size() != inputData.matData.rows()) {
-        inputData.vecTapSpectra.clear();
-
+    if(inputData.vecTapSpectra.isEmpty()) {
         // This code was copied and modified from Utils/Spectra since we do not want to call the function due to time loss.
         bool bNfftEven = false;
         if (iNfft % 2 == 0){

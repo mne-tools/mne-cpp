@@ -166,7 +166,8 @@ void NeuronalConnectivity::init()
     m_pCircularNetworkBuffer = QSharedPointer<CircularBuffer<CONNECTIVITYLIB::Network> >(new CircularBuffer<CONNECTIVITYLIB::Network>(10));
 
     //Init connectivity settings
-    m_connectivitySettings.m_sConnectivityMethods = QStringList() << "COH";
+    m_sConnectivityMethods = QStringList() << "COR";
+    m_connectivitySettings.m_sConnectivityMethods = m_sConnectivityMethods;
     m_connectivitySettings.m_sWindowType = "Hanning";
 }
 
@@ -578,6 +579,7 @@ void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& conne
 {
     //QMutexLocker locker(&m_mutex);
     m_connectivitySettings = connectivitySettings;
+    m_connectivitySettings.m_sConnectivityMethods = m_sConnectivityMethods;
     m_pCircularNetworkBuffer->push(connectivityResult);
 }
 
@@ -587,7 +589,7 @@ void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& conne
 void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
 {
     m_pRtConnectivity->restart();
-    m_connectivitySettings.m_sConnectivityMethods = QStringList() << sMetric;
+    m_sConnectivityMethods = QStringList() << sMetric;
 }
 
 
