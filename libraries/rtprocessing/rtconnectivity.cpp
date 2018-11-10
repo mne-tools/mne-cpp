@@ -92,7 +92,6 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
 
     iTime = time.elapsed();
 
-    emit resultReady(finalNetwork, connectivitySettingsTemp);
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
     qDebug()<<"------RtConnectivityWorker::doWork()";
@@ -102,6 +101,8 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
     qDebug()<<"------Total time:"<<iTime << "ms";
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
+
+    emit resultReady(finalNetwork, connectivitySettingsTemp);
 }
 
 

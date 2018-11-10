@@ -148,6 +148,7 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
     std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
         compute(inputData,
                 connectivitySettings.data.vecPairCsdSum,
+                connectivitySettings.data.vecPairCsdImagAbsSum,
                 mutex,
                 iNRows,
                 iNFreqs,
@@ -159,7 +160,7 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
     //    qDebug() << "WeightedPhaseLagIndex::calculate timer - Preparation:" << iTime;
     //    timer.restart();
 
-    // Compute DSWPLV in parallel for all trials
+    // Compute WPLI in parallel for all trials
     QFuture<void> result = QtConcurrent::map(connectivitySettings.m_dataList,
                                              computeLambda);
     result.waitForFinished();
@@ -183,21 +184,21 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
 //*************************************************************************************************************
 
 void WeightedPhaseLagIndex::compute(ConnectivityTrialData& inputData,
-                            QVector<QPair<int,MatrixXcd> >& vecPairCsdSum,
-                            QMutex& mutex,
-                            int iNRows,
-                            int iNFreqs,
-                            int iNfft,
-                            const QPair<MatrixXd, VectorXd>& tapers)
+                                    QVector<QPair<int,MatrixXcd> >& vecPairCsdSum,
+                                    QVector<QPair<int,MatrixXd> >& vecPairCsdImagAbsSum,
+                                    QMutex& mutex,
+                                    int iNRows,
+                                    int iNFreqs,
+                                    int iNfft,
+                                    const QPair<MatrixXd, VectorXd>& tapers)
 {
-    if(inputData.vecPairCsd.size() == iNRows) {
-        //qDebug() << "WeightedPhaseLagIndex::compute - vecPairCsd was already computed for this trial.";
+    if(inputData.vecPairCsd.size() == iNRows &&
+       inputData.vecPairCsdImagAbs.size() == iNRows ) {
+        //qDebug() << "WeightedPhaseLagIndex::compute - vecPairCsd and vecPairCsdImagAbs were already computed for this trial.";
         return;
     }
 
     int i,j;
-
-    inputData.vecPairCsd.clear();
 
     // Calculate tapered spectra if not available already
     // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
@@ -208,8 +209,6 @@ void WeightedPhaseLagIndex::compute(ConnectivityTrialData& inputData,
         RowVectorXcd vecTmpFreq;
 
         MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
-
-        QVector<Eigen::MatrixXcd> vecTapSpectra;
 
         FFT<double> fft;
         fft.SetFlag(fft.HalfSpectrum);
@@ -236,36 +235,60 @@ void WeightedPhaseLagIndex::compute(ConnectivityTrialData& inputData,
         bNfftEven = true;
     }
 
-    double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
+    if(inputData.vecPairCsd.isEmpty()) {
+        double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
-    MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
+        MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
 
-    for (i = 0; i < iNRows; ++i) {
-        for (j = i; j < iNRows; ++j) {
-            // Compute CSD (average over tapers if necessary)
-            matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
+        for (i = 0; i < iNRows; ++i) {
+            for (j = i; j < iNRows; ++j) {
+                // Compute CSD (average over tapers if necessary)
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
 
-            // Divide first and last element by 2 due to half spectrum
-            matCsd.row(j)(0) /= 2.0;
-            if(bNfftEven) {
-                matCsd.row(j).tail(1) /= 2.0;
+                // Divide first and last element by 2 due to half spectrum
+                matCsd.row(j)(0) /= 2.0;
+                if(bNfftEven) {
+                    matCsd.row(j).tail(1) /= 2.0;
+                }
+            }
+
+            inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
+            inputData.vecPairCsdImagAbs.append(QPair<int,MatrixXd>(i,matCsd.imag().cwiseAbs()));
+        }
+
+        mutex.lock();
+
+        if(vecPairCsdSum.isEmpty()) {
+            vecPairCsdSum = inputData.vecPairCsd;
+            vecPairCsdImagAbsSum = inputData.vecPairCsdImagAbs;
+        } else {
+            for (int j = 0; j < vecPairCsdSum.size(); ++j) {
+                vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+                vecPairCsdImagAbsSum[j].second += inputData.vecPairCsdImagAbs.at(j).second;
             }
         }
 
-        inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
-    }
-
-    mutex.lock();
-
-    if(vecPairCsdSum.isEmpty()) {
-        vecPairCsdSum = inputData.vecPairCsd;
+        mutex.unlock();
     } else {
-        for (int j = 0; j < vecPairCsdSum.size(); ++j) {
-            vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+        if (inputData.vecPairCsdImagAbs.isEmpty()) {
+            inputData.vecPairCsdImagAbs.clear();
+            for (i = 0; i < inputData.vecPairCsd.size(); ++i) {
+                inputData.vecPairCsdImagAbs.append(QPair<int,MatrixXd>(i,inputData.vecPairCsd.at(i).second.imag().cwiseAbs()));
+            }
+
+            mutex.lock();
+
+            if(vecPairCsdImagAbsSum.isEmpty()) {
+                vecPairCsdImagAbsSum = inputData.vecPairCsdImagAbs;
+            } else {
+                for (int j = 0; j < vecPairCsdImagAbsSum.size(); ++j) {
+                    vecPairCsdImagAbsSum[j].second += inputData.vecPairCsdImagAbs.at(j).second;
+                }
+            }
+
+            mutex.unlock();
         }
     }
-
-    mutex.unlock();
 }
 
 
@@ -281,12 +304,10 @@ void WeightedPhaseLagIndex::computeWPLI(ConnectivitySettings &connectivitySettin
     int j;
 
     for (int i = 0; i < connectivitySettings.data.vecPairCsdSum.size(); ++i) {
-        matDenom = connectivitySettings.data.vecPairCsdSum.at(i).second.imag().cwiseAbs();
+        matDenom = connectivitySettings.data.vecPairCsdImagAbsSum.at(i).second;
         matDenom = (matDenom.array() == 0.).select(INFINITY, matDenom);
 
-        matNom = connectivitySettings.data.vecPairCsdSum.at(i).second.imag().cwiseAbs();
-
-        matNom = matNom.cwiseQuotient(matDenom);
+        matNom = connectivitySettings.data.vecPairCsdSum.at(i).second.imag().cwiseAbs().cwiseQuotient(matDenom);
 
         for(j = i; j < matNom.rows(); ++j) {
             matWeight = matNom.row(j).transpose();

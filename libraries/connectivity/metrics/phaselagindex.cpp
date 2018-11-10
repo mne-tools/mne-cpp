@@ -146,6 +146,7 @@ Network PhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 
     std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
         compute(inputData,
+                connectivitySettings.data.vecPairCsdSum,
                 connectivitySettings.data.vecPairCsdImagSignSum,
                 mutex,
                 iNRows,
@@ -182,6 +183,7 @@ Network PhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 //*************************************************************************************************************
 
 void PhaseLagIndex::compute(ConnectivityTrialData& inputData,
+                            QVector<QPair<int,MatrixXcd> >& vecPairCsdSum,
                             QVector<QPair<int,MatrixXd> >& vecPairCsdImagSignSum,
                             QMutex& mutex,
                             int iNRows,
@@ -194,21 +196,15 @@ void PhaseLagIndex::compute(ConnectivityTrialData& inputData,
         return;
     }
 
-    inputData.vecPairCsdImagSign.clear();
-
     int i,j;
 
     // Calculate tapered spectra if not available already
     // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
-    if(inputData.vecTapSpectra.size() != iNRows) {
-        inputData.vecTapSpectra.clear();
-
+    if(inputData.vecTapSpectra.isEmpty()) {
         RowVectorXd vecInputFFT, rowData;
         RowVectorXcd vecTmpFreq;
 
         MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
-
-        QVector<Eigen::MatrixXcd> vecTapSpectra;
 
         FFT<double> fft;
         fft.SetFlag(fft.HalfSpectrum);
@@ -230,10 +226,8 @@ void PhaseLagIndex::compute(ConnectivityTrialData& inputData,
     }
 
     // Compute CSD
-    MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-
-    if(inputData.vecPairCsd.size() != iNRows) {
-        inputData.vecPairCsd.clear();
+    if(inputData.vecPairCsd.isEmpty()) {
+        MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
 
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
@@ -254,25 +248,42 @@ void PhaseLagIndex::compute(ConnectivityTrialData& inputData,
                 }
             }
 
+            inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
             inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,matCsd.imag().cwiseSign()));
         }
+
+        mutex.lock();
+
+        if(vecPairCsdSum.isEmpty()) {
+            vecPairCsdSum = inputData.vecPairCsd;
+            vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
+        } else {
+            for (int j = 0; j < vecPairCsdSum.size(); ++j) {
+                vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+                vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
+            }
+        }
+
+        mutex.unlock();
     } else {
-        for (i = 0; i < inputData.vecPairCsd.size(); ++i) {
-            inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,inputData.vecPairCsd.at(i).second.imag().cwiseSign()));
+        if(inputData.vecPairCsdImagSign.isEmpty()) {
+            for (i = 0; i < inputData.vecPairCsd.size(); ++i) {
+                inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,inputData.vecPairCsd.at(i).second.imag().cwiseSign()));
+            }
+
+            mutex.lock();
+
+            if(vecPairCsdImagSignSum.isEmpty()) {
+                vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
+            } else {
+                for (int j = 0; j < vecPairCsdImagSignSum.size(); ++j) {
+                    vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
+                }
+            }
+
+            mutex.unlock();
         }
     }
-
-    mutex.lock();
-
-    if(vecPairCsdImagSignSum.isEmpty()) {
-        vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
-    } else {
-        for (int j = 0; j < vecPairCsdImagSignSum.size(); ++j) {
-            vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
-        }
-    }
-
-    mutex.unlock();
 }
 
 

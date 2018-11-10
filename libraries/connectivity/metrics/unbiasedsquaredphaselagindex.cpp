@@ -147,6 +147,7 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
 
     std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
         compute(inputData,
+                connectivitySettings.data.vecPairCsdSum,
                 connectivitySettings.data.vecPairCsdImagSignSum,
                 mutex,
                 iNRows,
@@ -183,6 +184,7 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
 //*************************************************************************************************************
 
 void UnbiasedSquaredPhaseLagIndex::compute(ConnectivityTrialData& inputData,
+                                           QVector<QPair<int,MatrixXcd> >& vecPairCsdSum,
                                            QVector<QPair<int,MatrixXd> >& vecPairCsdImagSignSum,
                                            QMutex& mutex,
                                            int iNRows,
@@ -233,9 +235,7 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivityTrialData& inputData,
     // Compute CSD
     MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
 
-    if(inputData.vecPairCsd.size() != iNRows) {
-        inputData.vecPairCsd.clear();
-
+    if(inputData.vecPairCsd.isEmpty()) {
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
         bool bNfftEven = false;
@@ -255,25 +255,42 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivityTrialData& inputData,
                 }
             }
 
+            inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
             inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,matCsd.imag().cwiseSign()));
         }
+
+        mutex.lock();
+
+        if(vecPairCsdSum.isEmpty()) {
+            vecPairCsdSum = inputData.vecPairCsd;
+            vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
+        } else {
+            for (int j = 0; j < vecPairCsdSum.size(); ++j) {
+                vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+                vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
+            }
+        }
+
+        mutex.unlock();
     } else {
-        for (i = 0; i < inputData.vecPairCsd.size(); ++i) {
-            inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,inputData.vecPairCsd.at(i).second.imag().cwiseSign()));
+        if(inputData.vecPairCsdImagSign.isEmpty()) {
+            for (i = 0; i < inputData.vecPairCsd.size(); ++i) {
+                inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,inputData.vecPairCsd.at(i).second.imag().cwiseSign()));
+            }
+
+            mutex.lock();
+
+            if(vecPairCsdImagSignSum.isEmpty()) {
+                vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
+            } else {
+                for (int j = 0; j < vecPairCsdImagSignSum.size(); ++j) {
+                    vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
+                }
+            }
+
+            mutex.unlock();
         }
     }
-
-    mutex.lock();
-
-    if(vecPairCsdImagSignSum.isEmpty()) {
-        vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
-    } else {
-        for (int j = 0; j < vecPairCsdImagSignSum.size(); ++j) {
-            vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
-        }
-    }
-
-    mutex.unlock();
 }
 
 

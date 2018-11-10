@@ -248,6 +248,7 @@ private:
     qint32              m_iBlockSize;           /**< The block size of teh last received data block. In frequency bins. */
 
     QString             m_sAvrType;             /**< The average type */
+    QStringList         m_sConnectivityMethods; /**< The connectivity metric to use */
 
     QMutex              m_mutex;
 

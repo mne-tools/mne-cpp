@@ -94,13 +94,13 @@ public:
 
 private slots:
     void initTestCase();
-    void spectralConnectivityCoherence();
-    void spectralConnectivityImagCoherence();
     void spectralConnectivityPLV();
     void spectralConnectivityPLI();
     void spectralConnectivityPLI2();
     void spectralConnectivityWPLI();
     void spectralConnectivityWPLI2();
+    void spectralConnectivityCoherence();
+    void spectralConnectivityImagCoherence();
     void cleanupTestCase();
 
 private:
@@ -359,6 +359,9 @@ void TestSpectralConnectivity::compareConnectivity()
     //*********************************************************************************************************
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare Spectral Connectivities >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
+    qDebug() << "TestSpectralConnectivity::compareConnectivity - m_ConnectivityOutput" << m_ConnectivityOutput;
+    qDebug() << "TestSpectralConnectivity::compareConnectivity - m_RefConnectivityOutput" << m_RefConnectivityOutput;
 
     //*********************************************************************************************************
     // Compare connectivity estimate for each frequency bin

@@ -125,16 +125,20 @@ protected:
     /**
     * Computes the DSWPLV values. This function gets called in parallel.
     *
-    * @param[in] inputData          The input data.
-    * @param[out]vecPairCsdSum      The sum of all CSD matrices for each trial.
-    * @param[in] mutex              The mutex used to safely access vecPairCsdSum.
-    * @param[in] iNRows             The number of rows.
-    * @param[in] iNFreqs            The number of frequenciy bins.
-    * @param[in] iNfft              The FFT length.
-    * @param[in] tapers             The taper information.
+    * @param[in] inputData              The input data.
+    * @param[out]vecPairCsdSum          The sum of all CSD matrices for each trial.
+    * @param[out]vecPairCsdImagAbsSum   The sum of all imag abs CSD matrices for each trial.
+    * @param[out]vecPairCsdImagSqrdSum  The sum of all imag aqrd CSD matrices for each trial.
+    * @param[in] mutex                  The mutex used to safely access vecPairCsdSum.
+    * @param[in] iNRows                 The number of rows.
+    * @param[in] iNFreqs                The number of frequenciy bins.
+    * @param[in] iNfft                  The FFT length.
+    * @param[in] tapers                 The taper information.
     */
     static void compute(ConnectivityTrialData& inputData,
                         QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
+                        QVector<QPair<int,Eigen::MatrixXd> >& vecPairCsdImagAbsSum,
+                        QVector<QPair<int,Eigen::MatrixXd> >& vecPairCsdImagSqrdSum,
                         QMutex& mutex,
                         int iNRows,
                         int iNFreqs,
