@@ -93,7 +93,7 @@ CrossCorrelation::CrossCorrelation()
 
 //*************************************************************************************************************
 
-Network CrossCorrelation::calculate(const ConnectivitySettings& connectivitySettings)
+Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
@@ -101,13 +101,13 @@ Network CrossCorrelation::calculate(const ConnectivitySettings& connectivitySett
 
     Network finalNetwork("Cross Correlation");
 
-    if(connectivitySettings.m_matDataList.empty()) {
+    if(connectivitySettings.m_dataList.empty()) {
         qDebug() << "CrossCorrelation::crossCorrelation - Input data is empty";
         return finalNetwork;
     }
 
     //Create nodes
-    int rows = connectivitySettings.m_matDataList.first().rows();
+    int rows = connectivitySettings.m_dataList.first().matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
@@ -131,20 +131,24 @@ Network CrossCorrelation::calculate(const ConnectivitySettings& connectivitySett
 
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iNfft, "Ones");
 
-    std::function<MatrixXd(const MatrixXd&)> computeLambda = [&](const MatrixXd& matInputData) {
-        return compute(matInputData,
-                         iNfft,
-                         tapers);
+    // Compute the cross correlation in parallel
+    QMutex mutex;
+    MatrixXd matDist;
+
+    std::function<void(ConnectivityTrialData&)> computeLambda = [&](ConnectivityTrialData& inputData) {
+        compute(inputData,
+                matDist,
+                mutex,
+                iNfft,
+                tapers);
     };
 
     // Calculate connectivity matrix over epochs and average afterwards
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.m_matDataList,
-                                                              computeLambda,
-                                                              sum);
+    QFuture<void> resultMat = QtConcurrent::map(connectivitySettings.m_dataList,
+                                                computeLambda);
     resultMat.waitForFinished();
 
-    MatrixXd matDist = resultMat.result();
-    matDist /= connectivitySettings.m_matDataList.size();
+    matDist /= connectivitySettings.size();
 
     //Add edges to network
     MatrixXd matWeight(1,1);
@@ -169,80 +173,80 @@ Network CrossCorrelation::calculate(const ConnectivitySettings& connectivitySett
 
 //*************************************************************************************************************
 
-MatrixXd CrossCorrelation::compute(const MatrixXd& matInputData,
-                                     int iNfft,
-                                     const QPair<MatrixXd, VectorXd>& tapers)
+void CrossCorrelation::compute(ConnectivityTrialData& inputData,
+                               MatrixXd& matDist,
+                               QMutex& mutex,
+                               int iNfft,
+                               const QPair<MatrixXd, VectorXd>& tapers)
 {
-    // Compute tapered spectra
-    // This code was copied and modified from Utils/Spectra since we do not want to call the function due to time loss.
-    bool bNfftEven = false;
-    if (iNfft % 2 == 0){
-        bNfftEven = true;
-    }
 
-    QVector<Eigen::MatrixXcd> vecTapSpectra;
+    // Calculate tapered spectra if not available already
+    RowVectorXd vecInputFFT, rowData;
+    RowVectorXcd vecResultFreq;
 
     FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
-    double denom = tapers.second.sum() / 2.0;
-    int iNFreqs = int(floor(iNfft / 2.0)) + 1;
-
-    RowVectorXd vecInputFFT, rowData;
-    RowVectorXcd vecResultFreq;
-
-    MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
-
     int i, j;
 
-    for (i = 0; i < matInputData.rows(); ++i) {
-        rowData = matInputData.row(i).cwiseAbs();
+    if(inputData.vecTapSpectra.size() != inputData.matData.rows()) {
+        inputData.vecTapSpectra.clear();
 
-        // FFT for freq domain returning the half spectrum and multiply taper weights
-        for(j = 0; j < tapers.first.rows(); j++) {
-            vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
-            fft.fwd(vecResultFreq, vecInputFFT, iNfft);
-            matTapSpectrum.row(j) = vecResultFreq * tapers.second(j);
+        // This code was copied and modified from Utils/Spectra since we do not want to call the function due to time loss.
+        bool bNfftEven = false;
+        if (iNfft % 2 == 0){
+            bNfftEven = true;
         }
 
-        // Average over columns
-        vecTapSpectra.append(matTapSpectrum.colwise().sum() / denom);
+        double denom = tapers.second.sum() / 2.0;
+        int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+
+        MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
+
+        for (i = 0; i < inputData.matData.rows(); ++i) {
+            rowData = inputData.matData.row(i).cwiseAbs();
+
+            // FFT for freq domain returning the half spectrum and multiply taper weights
+            for(j = 0; j < tapers.first.rows(); j++) {
+                vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
+                fft.fwd(vecResultFreq, vecInputFFT, iNfft);
+                matTapSpectrum.row(j) = vecResultFreq * tapers.second(j);
+            }
+
+            // Average over columns
+            inputData.vecTapSpectra.append(matTapSpectrum.colwise().sum() / denom);
+        }
     }
 
     // Perform multiplication and transform back to time domain to find max XCOR coefficient
-    MatrixXd matDist = MatrixXd::Zero(matInputData.rows(), matInputData.rows());
+    MatrixXd matDistTrial = MatrixXd::Zero(inputData.matData.rows(), inputData.matData.rows());
     RowVectorXd vecResultTime;
     RowVectorXcd vecRowFreq;
     int idx = 0;
 
-    for(i = 0; i < vecTapSpectra.size(); ++i) {
-        vecRowFreq = vecTapSpectra.at(i);
+    for(i = 0; i < inputData.vecTapSpectra.size(); ++i) {
+        vecRowFreq = inputData.vecTapSpectra.at(i);
 
-        for(j = i; j < vecTapSpectra.size(); ++j) {
-            vecResultFreq = vecRowFreq.array() * vecTapSpectra.at(j).conjugate().array();
+        for(j = i; j < inputData.vecTapSpectra.size(); ++j) {
+            vecResultFreq = vecRowFreq.array() * inputData.vecTapSpectra.at(j).conjugate().array();
 
             fft.inv(vecResultTime, vecResultFreq, iNfft);
 
             vecResultTime.maxCoeff(&idx);
 
-            matDist(i,j) = vecResultTime(idx);
+            matDistTrial(i,j) = vecResultTime(idx);
         }
     }
 
-    return matDist;
-}
+    // Sum up weights
+    mutex.lock();
 
-
-//*************************************************************************************************************
-
-void CrossCorrelation::sum(MatrixXd &resultData,
-                           const MatrixXd &data)
-{
-    if(resultData.rows() != data.rows() || resultData.cols() != data.cols()) {
-        resultData.resize(data.rows(), data.cols());
-        resultData.setZero();
+    if(matDist.rows() != matDistTrial.rows() || matDist.cols() != matDistTrial.cols()) {
+        matDist.resize(matDistTrial.rows(), matDistTrial.cols());
+        matDist.setZero();
     }
 
-    resultData += data;
-}
+    matDist += matDistTrial;
 
+    mutex.unlock();
+}

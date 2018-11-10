@@ -80,11 +80,16 @@ struct ConnectivityTrialData {
     Eigen::MatrixXd matData;
     Eigen::MatrixXd matPsd;
     QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsd;
+    QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdNormalized;
+    QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagSign;
+    QVector<Eigen::MatrixXcd> vecTapSpectra;
 };
 
 struct ConnectivityData {
     Eigen::MatrixXd matPsdSum;
     QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdSum;
+    QVector<QPair<int,Eigen::MatrixXcd> > vecPairCsdNormalizedSum;
+    QVector<QPair<int,Eigen::MatrixXd> > vecPairCsdImagSignSum;
 };
 
 
@@ -113,17 +118,18 @@ public:
     */
     explicit ConnectivitySettings();
 
-    void clear() {
+    void clearData() {
         m_dataList.clear();
-        m_matDataList.clear();
         data.matPsdSum.resize(0,0);
         data.vecPairCsdSum.clear();
+        data.vecPairCsdNormalizedSum.clear();
     }
 
-    void reset() {
+    void resetData() {
         for (int i = 0; i < m_dataList.size(); ++i) {
             m_dataList[i].matPsd.resize(0,0);
             m_dataList[i].vecPairCsd.clear();
+            m_dataList[i].vecTapSpectra.clear();
         }
 
         data.matPsdSum.resize(0,0);
@@ -143,6 +149,10 @@ public:
         m_dataList.append(tempData);
     }
 
+    int size() const {
+        return m_dataList.size();
+    }
+
     void removeFirst() {
         if(!m_dataList.isEmpty()) {
             // Substract PSD of first trial from overall summed up PSD
@@ -158,18 +168,27 @@ public:
                 }
             }
 
+            // Substract normalized CSD of first trial from overall summed up normalized CSD
+            if(data.vecPairCsdNormalizedSum.size() == m_dataList.first().vecPairCsdNormalized.size()) {
+                for (int i = 0; i < data.vecPairCsdNormalizedSum.size(); ++i) {
+                    data.vecPairCsdNormalizedSum[i].second -= m_dataList.first().vecPairCsdNormalized.at(i).second;
+                }
+            }
+
+            // Substract sign CSD of first trial from overall summed up sign CSD
+            if(data.vecPairCsdImagSignSum.size() == m_dataList.first().vecPairCsdImagSign.size()) {
+                for (int i = 0; i < data.vecPairCsdImagSignSum.size(); ++i) {
+                    data.vecPairCsdImagSignSum[i].second -= m_dataList.first().vecPairCsdImagSign.at(i).second;
+                }
+            }
+
             m_dataList.removeFirst();
-        }
-        if(!m_matDataList.isEmpty()) {
-            m_matDataList.removeFirst();
         }
     };
 
     QStringList                 m_sConnectivityMethods;         /**< The connectivity methods. */
 
     QList<ConnectivityTrialData>     m_dataList;                     /**< The input data. */
-
-    QList<Eigen::MatrixXd>      m_matDataList;                  /**< The input data. */
 
     Eigen::MatrixX3f            m_matNodePositions;             /**< The node position in 3D space. */
 

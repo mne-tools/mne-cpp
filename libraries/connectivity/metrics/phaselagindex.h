@@ -56,6 +56,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QMutex>
 
 
 //*************************************************************************************************************
@@ -87,6 +88,7 @@ namespace CONNECTIVITYLIB {
 
 class Network;
 class ConnectivitySettings;
+class ConnectivityTrialData;
 
 
 //=============================================================================================================
@@ -116,52 +118,38 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network calculate(const ConnectivitySettings& connectivitySettings);
-
-    //==========================================================================================================
-    /**
-    * Calculates the actual phase lag index between two data vectors.
-    *
-    * @param[out] vecPLI        The resulting data.
-    * @param[in] matDataList    The input data.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The PLI value.
-    */
-    static void calculate(QVector<Eigen::MatrixXd>& vecPLI,
-                          const QList<Eigen::MatrixXd> &matDataList,
-                          int iNfft,
-                          const QString &sWindowType);
+    static Network calculate(ConnectivitySettings& connectivitySettings);
 
 protected:
     //=========================================================================================================
     /**
     * Computes the PLI values. This function gets called in parallel.
     *
-    * @param[in] matInputData           The input data.
+    * @param[in] inputData              The input data.
+    * @param[out]vecPairCsdImagSignSum  The sum of all imag sign CSD matrices for each trial.
+    * @param[in] mutex                  The mutex used to safely access vecPairCsdSum.
     * @param[in] iNRows                 The number of rows.
     * @param[in] iNFreqs                The number of frequenciy bins.
     * @param[in] iNfft                  The FFT length.
     * @param[in] tapers                 The taper information.
-    *
-    * @return            The coherency result in form of AbstractMetricResultData.
     */
-    static QVector<Eigen::MatrixXcd> compute(const Eigen::MatrixXd& matInputData,
-                                             int iNRows,
-                                             int iNFreqs,
-                                             int iNfft,
-                                             const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
+    static void compute(ConnectivityTrialData& inputData,
+                        QVector<QPair<int,Eigen::MatrixXd> >& vecPairCsdImagSignSum,
+                        QMutex& mutex,
+                        int iNRows,
+                        int iNFreqs,
+                        int iNfft,
+                        const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
 
     //=========================================================================================================
     /**
-    * Reduces the PLI computation to a final result. This function gets called in parallel.
+    * Reduces the PLI computation to a final result.
     *
-    * @param[out] finalData    The final data.
-    * @param[in]  resultData   The resulting data from the computation step.
+    * @param[out] connectivitySettings   The input data.
+    * @param[in]  finalNetwork           The final network.
     */
-    static void reduce(QVector<Eigen::MatrixXcd>& finalData,
-                       const QVector<Eigen::MatrixXcd>& resultData);
+    static void computePLI(ConnectivitySettings &connectivitySettings,
+                          Network& finalNetwork);
 
 };
 

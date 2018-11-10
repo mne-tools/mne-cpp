@@ -84,6 +84,7 @@ namespace CONNECTIVITYLIB {
 
 class Network;
 class ConnectivitySettings;
+class ConnectivityTrialData;
 
 
 //=============================================================================================================
@@ -113,18 +114,18 @@ public:
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network calculate(const ConnectivitySettings &connectivitySettings);
+    static Network calculate(ConnectivitySettings &connectivitySettings);
 
 protected:
     //=========================================================================================================
     /**
     * Calculates the connectivity matrix for a given input data matrix based on the correlation coefficient.
     *
-    * @param[in] data       The input data.
+    * @param[in] inputData      The input data.
     *
-    * @return               The connectivity matrix.
+    * @return                   The connectivity matrix.
     */
-    static Eigen::MatrixXd compute(const Eigen::MatrixXd& data);
+    static Eigen::MatrixXd compute(const ConnectivityTrialData& inputData);
 
     //=========================================================================================================
     /**
