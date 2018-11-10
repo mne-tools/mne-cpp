@@ -2,6 +2,7 @@
 /**
 * @file     debiasedsquaredweightedphaselagindex.cpp
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April, 2018
@@ -161,21 +162,21 @@ Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& co
     //    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::calculate timer - Preparation:" << iTime;
     //    timer.restart();
 
-    // Compute DSWPLV in parallel for all trials
+    // Compute DSWPLI in parallel for all trials
     QFuture<void> result = QtConcurrent::map(connectivitySettings.m_dataList,
                                              computeLambda);
     result.waitForFinished();
 
 //    iTime = timer.elapsed();
-//    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::calculate timer - Compute DSWPLV per trial:" << iTime;
+//    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::calculate timer - Compute DSWPLI per trial:" << iTime;
 //    timer.restart();
 
-    // Compute DSWPLV
-    computeDSWPLV(connectivitySettings,
+    // Compute DSWPLI
+    computeDSWPLI(connectivitySettings,
                   finalNetwork);
 
 //    iTime = timer.elapsed();
-//    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::calculate timer - Compute DSWPLV, Network creation:" << iTime;
+//    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::calculate timer - Compute DSWPLI, Network creation:" << iTime;
 //    timer.restart();
 
     return finalNetwork;
@@ -315,10 +316,10 @@ void DebiasedSquaredWeightedPhaseLagIndex::compute(ConnectivityTrialData& inputD
 
 //*************************************************************************************************************
 
-void DebiasedSquaredWeightedPhaseLagIndex::computeDSWPLV(ConnectivitySettings &connectivitySettings,
+void DebiasedSquaredWeightedPhaseLagIndex::computeDSWPLI(ConnectivitySettings &connectivitySettings,
                                                          Network& finalNetwork)
 {
-    // Compute final DSWPLV and create Network
+    // Compute final DSWPLI and create Network
     MatrixXd matNom, matDenom;
     MatrixXd matWeight;
     QSharedPointer<NetworkEdge> pEdge;
