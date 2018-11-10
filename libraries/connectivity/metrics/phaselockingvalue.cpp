@@ -159,7 +159,7 @@ Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
     //    qDebug() << "PhaseLockingValue::calculate timer - Preparation:" << iTime;
     //    timer.restart();
 
-    // Compute DSWPLV in parallel for all trials
+    // Compute PLV in parallel for all trials
     QFuture<void> result = QtConcurrent::map(connectivitySettings.m_dataList,
                                              computeLambda);
     result.waitForFinished();

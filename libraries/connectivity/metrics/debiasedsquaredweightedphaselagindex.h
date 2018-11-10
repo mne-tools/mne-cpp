@@ -2,6 +2,7 @@
 /**
 * @file     debiasedsquaredweightedphaselagindex.h
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April, 2018
@@ -123,7 +124,7 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Computes the DSWPLV values. This function gets called in parallel.
+    * Computes the DSWPLI values. This function gets called in parallel.
     *
     * @param[in] inputData              The input data.
     * @param[out]vecPairCsdSum          The sum of all CSD matrices for each trial.
@@ -147,12 +148,12 @@ protected:
 
     //=========================================================================================================
     /**
-    * Reduces the DSWPLV computation to a final result.
+    * Reduces the DSWPLI computation to a final result.
     *
     * @param[out] connectivitySettings   The input data.
     * @param[in]  finalNetwork           The final network.
     */
-    static void computeDSWPLV(ConnectivitySettings &connectivitySettings,
+    static void computeDSWPLI(ConnectivitySettings &connectivitySettings,
                               Network& finalNetwork);
 };
 
