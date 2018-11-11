@@ -98,9 +98,9 @@ PhaseLockingValue::PhaseLockingValue()
 
 Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
 {
-    QElapsedTimer timer;
-    qint64 iTime = 0;
-    timer.start();
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
 
     Network finalNetwork("Phase Locking Value");
 
@@ -155,26 +155,26 @@ Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
                 tapers);
     };
 
-    iTime = timer.elapsed();
-    qDebug() << "PhaseLockingValue::calculate timer - Preparation:" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qDebug() << "PhaseLockingValue::calculate timer - Preparation:" << iTime;
+//    timer.restart();
 
     // Compute PLV in parallel for all trials
     QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
-    iTime = timer.elapsed();
-    qDebug() << "PhaseLockingValue::calculate timer - Compute PLV per trial:" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qDebug() << "PhaseLockingValue::calculate timer - Compute PLV per trial:" << iTime;
+//    timer.restart();
 
     // Compute PLV
     computePLV(connectivitySettings,
                finalNetwork);
 
-    iTime = timer.elapsed();
-    qDebug() << "PhaseLockingValue::PhaseLagIndex timer - Compute PLV, Network creation:" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qDebug() << "PhaseLockingValue::PhaseLagIndex timer - Compute PLV, Network creation:" << iTime;
+//    timer.restart();
 
     return finalNetwork;
 }
