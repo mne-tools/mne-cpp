@@ -131,8 +131,8 @@ void TestSpectralConnectivity::initTestCase()
     //*********************************************************************************************************
 
     QList<MatrixXd> matDataList = readConnectivityData();
-    m_connectivitySettings.m_iNfft = matDataList.at(0).cols();
-    m_connectivitySettings.m_sWindowType = "hanning";
+    m_connectivitySettings.setNumberFFT(matDataList.at(0).cols());
+    m_connectivitySettings.setWindowType("hanning");
     m_connectivitySettings.append(matDataList);
 }
 

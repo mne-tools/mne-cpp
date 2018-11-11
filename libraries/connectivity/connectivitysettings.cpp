@@ -173,6 +173,7 @@ bool ConnectivitySettings::isEmpty() const
 void ConnectivitySettings::removeFirst()
 {
     if(!m_trialData.isEmpty()) {
+        // Substract the influence by the first item on all intermediate sum data
         // Substract PSD of first trial from overall summed up PSD
         if(m_intermediateSumData.matPsdSum.rows() == m_trialData.first().matPsd.rows() &&
            m_intermediateSumData.matPsdSum.cols() == m_trialData.first().matPsd.cols() ) {
