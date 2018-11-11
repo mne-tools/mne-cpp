@@ -361,9 +361,6 @@ void TestSpectralConnectivity::compareConnectivity()
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare Spectral Connectivities >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    qDebug() << "TestSpectralConnectivity::compareConnectivity - m_ConnectivityOutput" << m_ConnectivityOutput;
-    qDebug() << "TestSpectralConnectivity::compareConnectivity - m_RefConnectivityOutput" << m_RefConnectivityOutput;
-
     //*********************************************************************************************************
     // Compare connectivity estimate
     //*********************************************************************************************************
