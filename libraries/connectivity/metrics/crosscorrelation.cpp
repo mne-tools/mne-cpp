@@ -101,7 +101,7 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
     Network finalNetwork("Cross Correlation");
 
     if(connectivitySettings.isEmpty()) {
-        qDebug() << "CrossCorrelation::crossCorrelation - Input data is empty";
+        qDebug() << "CrossCorrelation::calculate - Input data is empty";
         return finalNetwork;
     }
 
