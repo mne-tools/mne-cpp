@@ -129,7 +129,24 @@ void RealTimeConnectivityEstimateWidget::getData()
         if(!m_pRtItem) {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem";
             m_pRtItem = m_pNetworkView->addData(*(m_pRTCE->getValue().data()));
-            init();
+
+            if(m_pRTCE->getSurfSet() && m_pRTCE->getAnnotSet()) {
+                QList<FsSurfaceTreeItem*> lSurfaces = m_pNetworkView->getTreeModel()->addSurfaceSet("sample",
+                                                                                                    "MRI",
+                                                                                                    *(m_pRTCE->getSurfSet().data()),
+                                                                                                    *(m_pRTCE->getAnnotSet().data()));
+
+                for(int i = 0; i < lSurfaces.size(); i++) {
+                    lSurfaces.at(i)->setAlpha(0.3f);
+                }
+            }
+
+            if(m_pRTCE->getSensorSurface() && m_pRTCE->getFiffInfo()) {
+                m_pNetworkView->getTreeModel()->addMegSensorInfo("sample",
+                                                                 "Sensors",
+                                                                 m_pRTCE->getFiffInfo()->chs,
+                                                                 *(m_pRTCE->getSensorSurface()));
+            }
         } else {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem";
             m_pRtItem->addData(*(m_pRTCE->getValue().data()));
@@ -142,23 +159,7 @@ void RealTimeConnectivityEstimateWidget::getData()
 
 void RealTimeConnectivityEstimateWidget::init()
 {
-    if(m_pRTCE->getSurfSet() && m_pRTCE->getAnnotSet()) {
-        QList<FsSurfaceTreeItem*> lSurfaces = m_pNetworkView->getTreeModel()->addSurfaceSet("sample",
-                                                                                            "MRI",
-                                                                                            *(m_pRTCE->getSurfSet().data()),
-                                                                                            *(m_pRTCE->getAnnotSet().data()));
 
-        for(int i = 0; i < lSurfaces.size(); i++) {
-            lSurfaces.at(i)->setAlpha(0.3f);
-        }
-    }
-
-    if(m_pRTCE->getSensorSurface() && m_pRTCE->getFiffInfo()) {
-        m_pNetworkView->getTreeModel()->addMegSensorInfo("sample",
-                                                         "Sensors",
-                                                         m_pRTCE->getFiffInfo()->chs,
-                                                         *(m_pRTCE->getSensorSurface()));
-    }
 
 }
 
