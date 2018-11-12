@@ -108,7 +108,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
         }
 
         case MetaTreeItemTypes::SurfaceColorSulci: {
-            QColorDialog *pColorDialog = new QColorDialog();
+            QColorDialog *pColorDialog = new QColorDialog(parent);
             connect(pColorDialog, &QColorDialog::currentColorChanged,
                     this, &Data3DTreeDelegate::onEditorEdited);
             pColorDialog->setWindowTitle("Select Sulci Color");
@@ -128,7 +128,8 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
         }
 
         case MetaTreeItemTypes::DataThreshold: {
-            Spline* pSpline = new Spline("Set Threshold", 0);
+            Spline* pSpline = new Spline("Set Threshold", parent);
+            pSpline->setWindowFlags(Qt::Window);
             connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
 
@@ -154,7 +155,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
         }
 
         case MetaTreeItemTypes::Color: {
-            QColorDialog *pColorDialog = new QColorDialog();
+            QColorDialog *pColorDialog = new QColorDialog(parent);
             connect(pColorDialog, &QColorDialog::currentColorChanged,
                     this, &Data3DTreeDelegate::onEditorEdited);
             pColorDialog->setWindowTitle("Select Color");
@@ -261,7 +262,8 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
             MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::Data).value<MatrixXd>();
 
-            ImageSc* pPlotLA = new ImageSc(matRTData);
+            ImageSc* pPlotLA = new ImageSc(matRTData, parent);
+            pPlotLA->setWindowFlags(Qt::Window);
             pPlotLA->show();
             //return pPlotLA;
         }

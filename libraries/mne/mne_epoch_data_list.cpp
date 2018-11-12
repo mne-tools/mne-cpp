@@ -373,7 +373,9 @@ void MNEEpochDataList::checkChVariance(ArtifactRejectionData& inputData)
 
     double dMedian = temp.norm() / temp.cols();
 
+    // Remove offset
     temp = temp.array() - dMedian;
+
     temp.array().square();
 
 //    qDebug() << "MNEEpochDataList::checkChVariance - dMedian" << abs(dMedian);
@@ -395,6 +397,7 @@ void MNEEpochDataList::checkChThreshold(ArtifactRejectionData& inputData)
 {
     RowVectorXd temp = inputData.data;
 
+    // Remove offset
     temp = temp.array() - temp(0);
 
     double min = temp.minCoeff();

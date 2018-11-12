@@ -524,6 +524,9 @@ void NeuronalConnectivity::generateNodeVertices()
         bPick = false;
     }
 
+    // Set sampling frequency so that the spectrum resolution is updated
+    m_connectivitySettings.setSamplingFrequency(m_pFiffInfo->sfreq);
+
     //Set node 3D positions to connectivity settings
     m_connectivitySettings.setNodePositions(m_matNodeVertComb);
     m_connectivitySettings.clearAllData();

@@ -76,9 +76,11 @@ using namespace CONNECTIVITYLIB;
 //=============================================================================================================
 
 ConnectivitySettings::ConnectivitySettings()
-: m_iNfft(-1)
+: m_fFreqResolution(1.0f)
+, m_fSFreq(1000.0f)
 , m_sWindowType("hanning")
 {
+    m_iNfft = int(m_fSFreq/m_fFreqResolution);
     qRegisterMetaType<CONNECTIVITYLIB::ConnectivitySettings>("CONNECTIVITYLIB::ConnectivitySettings");
 }
 
@@ -238,8 +240,40 @@ const QStringList& ConnectivitySettings::getConnectivityMethods() const
 
 //*******************************************************************************************************
 
+void ConnectivitySettings::setSamplingFrequency(int iSFreq)
+{
+    if(m_fSFreq == iSFreq) {
+        return;
+    }
+
+    clearIntermediateData();
+
+    m_fSFreq = iSFreq;
+
+    if(m_fFreqResolution != 0) {
+        m_iNfft = int(m_fSFreq/m_fFreqResolution);
+    }
+}
+
+
+//*******************************************************************************************************
+
+int ConnectivitySettings::getSamplingFrequency() const
+{
+    return m_fSFreq;
+}
+
+
+//*******************************************************************************************************
+
 void ConnectivitySettings::setNumberFFT(int iNfft)
 {
+    if(m_fSFreq == 0) {
+        return;
+    }
+
+    clearIntermediateData();
+
     m_iNfft = iNfft;
 }
 

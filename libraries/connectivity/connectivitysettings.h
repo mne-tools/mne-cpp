@@ -144,6 +144,10 @@ public:
 
     const QStringList& getConnectivityMethods() const;
 
+    void setSamplingFrequency(int iSFreq);
+
+    int getSamplingFrequency() const;
+
     void setNumberFFT(int iNfft);
 
     int getNumberFFT() const;
@@ -164,7 +168,9 @@ protected:
     QStringList                     m_sConnectivityMethods;         /**< The connectivity methods. */
     QString                         m_sWindowType;                  /**< The window type used to compute tapered spectra. */
 
-    int                             m_iNfft;                        /**< The FFT length used for spectral estimation. */
+    float                           m_fSFreq;                       /**< The sampling frequency. */
+    int                             m_iNfft;                        /**< The FFT length. Gets automatically calculated if the sFreq or spectrum resolution change. */
+    float                           m_fFreqResolution;              /**< The spectrum's resolution. */
 
     Eigen::MatrixX3f                m_matNodePositions;             /**< The node position in 3D space. */
 
