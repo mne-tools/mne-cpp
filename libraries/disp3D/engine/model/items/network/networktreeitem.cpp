@@ -339,21 +339,23 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
 
             if(startPos != endPos) {
                 dWeight = pNetworkEdge->getWeight();
-                diff = endPos - startPos;
-                edgePos = endPos - diff/2;
+                if(dWeight != 0.0) {
+                    diff = endPos - startPos;
+                    edgePos = endPos - diff/2;
 
-                QMatrix4x4 tempTransform;
-                tempTransform.translate(edgePos);
-                tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
-                tempTransform.scale(1.0,diff.length(),1.0);
+                    QMatrix4x4 tempTransform;
+                    tempTransform.translate(edgePos);
+                    tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
+                    tempTransform.scale(1.0,diff.length(),1.0);
 
-                vTransformsEdges.push_back(tempTransform);
+                    vTransformsEdges.push_back(tempTransform);
 
-                // Normalize colors
-                if(dMaxWeight != 0.0f) {
-                    vColorsEdges.push_back(QColor(ColorMap::valueToJet(dWeight/dMaxWeight)));
-                } else {
-                    vColorsEdges.push_back(QColor(ColorMap::valueToJet(0.0f)));
+                    // Normalize colors
+                    if(dMaxWeight != 0.0f) {
+                        vColorsEdges.push_back(QColor(ColorMap::valueToJet(dWeight/dMaxWeight)));
+                    } else {
+                        vColorsEdges.push_back(QColor(ColorMap::valueToJet(0.0f)));
+                    }
                 }
             }
         }

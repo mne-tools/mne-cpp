@@ -124,9 +124,6 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
     // Generate tapers
     int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getNumberFFT();
-    if (iNfft < iSignalLength) {
-        iNfft = iSignalLength;
-    }
 
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iNfft, "Ones");
 

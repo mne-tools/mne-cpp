@@ -106,18 +106,25 @@ public:
         m_iFreqBandHigh = 50 * dScaleFactor;
     }
 
-    ConnectivitySettings            m_settings;
-    RtConnectivity::SPtr            m_pRtConnectivity;
+    ConnectivitySettings    m_settings;
+    RtConnectivity::SPtr    m_pRtConnectivity;
+    Network                 m_networkData;
+
+    int                     m_iFreqBandLow;
+    int                     m_iFreqBandHigh;
+
+    float                   m_fSFreq;
+
+    QVector<int>            m_indexList;
+
     QList<ConnectivitySettings::IntermediateTrialData>    m_dataListOriginal;
-    Network                         m_networkData;
-
-    int                             m_iFreqBandLow;
-    int                             m_iFreqBandHigh;
-
-    float                           m_fSFreq;
 
     void onConnectivityMetricChanged(const QString& sMetric)
     {
+        if(m_settings.getConnectivityMethods().contains(sMetric)) {
+            return;
+        }
+
         m_pRtConnectivity->restart();
 
         m_settings.setConnectivityMethods(QStringList() << sMetric);
@@ -131,17 +138,34 @@ public:
             iNumberTrials = m_dataListOriginal.size();
         }
 
-        QVector<int> indexList;
+        if(iNumberTrials == m_settings.size()) {
+            return;
+        }
 
-        for(int i = 0; i < iNumberTrials; i++) {
+        //Pop data from connectivity settings
+        int size = m_settings.size();
+
+        if(size > iNumberTrials) {
+            m_pRtConnectivity->restart();
+
+            for(int i = 0; i < size-iNumberTrials; ++i) {
+                m_settings.removeFirst();
+
+                if(!m_indexList.isEmpty()) {
+                    m_indexList.pop_front();
+                }
+            }
+        }
+
+        while(m_settings.size() < iNumberTrials) {
             bool finish = false;
             int index = 0;
 
             while(!finish) {
                 index = rand() % iNumberTrials;
 
-                if(!indexList.contains(index)) {
-                    indexList.append(index);
+                if(!m_indexList.contains(index)) {
+                    m_indexList.append(index);
                     finish = true;
                 }
             }
@@ -149,17 +173,7 @@ public:
             m_settings.append(m_dataListOriginal.at(index));
         }
 
-        //Pop data from connectivity settings
-        if(m_settings.size() > iNumberTrials) {
-            m_pRtConnectivity->restart();
-            int size = m_settings.size();
-
-            for(int i = 0; i < size-iNumberTrials; ++i) {
-                m_settings.removeFirst();
-            }
-        }
-
-        //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - indexList" << indexList;
+        //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - m_indexList" << m_indexList;
 
         m_pRtConnectivity->append(m_settings);
     }
