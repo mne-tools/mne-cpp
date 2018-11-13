@@ -590,6 +590,10 @@ void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& conne
 
 void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
 {
+    if(m_sConnectivityMethods.contains(sMetric)) {
+        return;
+    }
+
     m_pRtConnectivity->restart();
     m_sConnectivityMethods = QStringList() << sMetric;
 }

@@ -49,6 +49,7 @@
 #include <connectivity/metrics/unbiasedsquaredphaselagindex.h>
 #include <connectivity/metrics/weightedphaselagindex.h>
 #include <connectivity/metrics/debiasedsquaredweightedphaselagindex.h>
+#include <connectivity/metrics/crosscorrelation.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
 
@@ -102,6 +103,7 @@ private slots:
     void spectralConnectivityWPLI2();
     void spectralConnectivityCoherence();
     void spectralConnectivityImagCoherence();
+    void spectralConnectivityXCOR();
     void cleanupTestCase();
 
 private:
@@ -117,7 +119,7 @@ private:
 //*************************************************************************************************************
 
 TestSpectralConnectivity::TestSpectralConnectivity()
-: epsilon(0.000001)
+: epsilon(0.0000000001)
 {
 }
 
@@ -334,6 +336,35 @@ void TestSpectralConnectivity::spectralConnectivityWPLI2()
 
 //*************************************************************************************************************
 
+void TestSpectralConnectivity::spectralConnectivityXCOR()
+{
+    //*********************************************************************************************************
+    // Compute Connectivity
+    //*********************************************************************************************************
+
+    Network network = CrossCorrelation::calculate(m_connectivitySettings);
+    m_ConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
+    IOUtils::write_eigen_matrix(network.getFullConnectivityMatrix(),"ref_spectral_connectivity_xcorr.txt");
+
+    //*********************************************************************************************************
+    // Load Results As Reference
+    //*********************************************************************************************************
+
+    MatrixXd refConnectivity;
+    QString refFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_xcor.txt");
+    IOUtils::read_eigen_matrix(refConnectivity, refFileName);
+    m_RefConnectivityOutput = refConnectivity(0,1);
+
+    //*********************************************************************************************************
+    // Compare Connectivity
+    //*********************************************************************************************************
+
+    compareConnectivity();
+}
+
+
+//*************************************************************************************************************
+
 QList<MatrixXd> TestSpectralConnectivity::readConnectivityData()
 {
     MatrixXd inputTrials;
@@ -365,7 +396,7 @@ void TestSpectralConnectivity::compareConnectivity()
     // Compare connectivity estimate
     //*********************************************************************************************************
 
-    QCOMPARE(m_ConnectivityOutput, m_RefConnectivityOutput);
+    QVERIFY( (fabs(m_ConnectivityOutput - m_RefConnectivityOutput)) < epsilon );
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Spectral Connectivities Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }

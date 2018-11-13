@@ -132,6 +132,9 @@ Network PhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
     // Check that iNfft >= signal length
     int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getNumberFFT();
+    if(iNfft > iSignalLength) {
+        iNfft = iSignalLength;
+    }
 
     // Generate tapers
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
@@ -210,7 +213,7 @@ void PhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputDa
             // Substract mean
             rowData.array() = inputData.matData.row(i).array() - inputData.matData.row(i).mean();
 
-            // Calculate tapered spectra if not available already
+            // Calculate tapered spectra
             for(j = 0; j < tapers.first.rows(); j++) {
                 vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
                 // FFT for freq domain returning the half spectrum and multiply taper weights

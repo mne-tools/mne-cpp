@@ -45,6 +45,7 @@
 #include "network/network.h"
 
 #include <utils/spectral.h>
+#include <utils/ioutils.h>
 
 
 //*************************************************************************************************************
@@ -124,8 +125,11 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
     // Generate tapers
     int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getNumberFFT();
+    if(iNfft > iSignalLength) {
+        iNfft = iSignalLength;
+    }
 
-    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iNfft, "Ones");
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
 
     // Compute the cross correlation in parallel
     QMutex mutex;
@@ -175,6 +179,9 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
                                int iNfft,
                                const QPair<MatrixXd, VectorXd>& tapers)
 {
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
 
     // Calculate tapered spectra if not available already
     RowVectorXd vecInputFFT, rowData;
@@ -184,53 +191,58 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
     fft.SetFlag(fft.HalfSpectrum);
 
     int i, j;
+    int iNRows = inputData.matData.rows();
 
+    // Calculate tapered spectra if not available already
+    // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
     if(inputData.vecTapSpectra.isEmpty()) {
-        // This code was copied and modified from Utils/Spectra since we do not want to call the function due to time loss.
-        bool bNfftEven = false;
-        if (iNfft % 2 == 0){
-            bNfftEven = true;
-        }
-
-        double denom = tapers.second.sum() / 2.0;
         int iNFreqs = int(floor(iNfft / 2.0)) + 1;
-
         MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
 
-        for (i = 0; i < inputData.matData.rows(); ++i) {
-            rowData = inputData.matData.row(i).cwiseAbs();
+        for (i = 0; i < iNRows; ++i) {
+            // Substract mean
+            rowData.array() = inputData.matData.row(i).array() - inputData.matData.row(i).mean();
 
-            // FFT for freq domain returning the half spectrum and multiply taper weights
+            // Calculate tapered spectra
             for(j = 0; j < tapers.first.rows(); j++) {
                 vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
+                // FFT for freq domain returning the half spectrum and multiply taper weights
                 fft.fwd(vecResultFreq, vecInputFFT, iNfft);
                 matTapSpectrum.row(j) = vecResultFreq * tapers.second(j);
             }
 
-            // Average over columns
-            inputData.vecTapSpectra.append(matTapSpectrum.colwise().sum() / denom);
+            inputData.vecTapSpectra.append(matTapSpectrum);
         }
     }
+
+//    iTime = timer.elapsed();
+//    qDebug() << QThread::currentThreadId() << "CrossCorrelation::compute timer - Tapered spectra:" << iTime;
+//    timer.restart();
 
     // Perform multiplication and transform back to time domain to find max XCOR coefficient
-    MatrixXd matDistTrial = MatrixXd::Zero(inputData.matData.rows(), inputData.matData.rows());
-    RowVectorXd vecResultTime;
-    RowVectorXcd vecRowFreq;
+    // Note that the result in time domain is mirrored around the center of the data (compared to Matlab)
+    MatrixXd matDistTrial = MatrixXd::Zero(iNRows, iNRows);
+    RowVectorXcd vecResultXCor;
     int idx = 0;
+    double denom = tapers.second.sum();
 
     for(i = 0; i < inputData.vecTapSpectra.size(); ++i) {
-        vecRowFreq = inputData.vecTapSpectra.at(i);
+        vecResultFreq = inputData.vecTapSpectra.at(i).colwise().sum() / denom;
 
         for(j = i; j < inputData.vecTapSpectra.size(); ++j) {
-            vecResultFreq = vecRowFreq.array() * inputData.vecTapSpectra.at(j).conjugate().array();
+            vecResultXCor = vecResultFreq.cwiseProduct(inputData.vecTapSpectra.at(j).colwise().sum().conjugate() / denom);
 
-            fft.inv(vecResultTime, vecResultFreq, iNfft);
+            fft.inv(vecInputFFT, vecResultXCor, iNfft);
 
-            vecResultTime.maxCoeff(&idx);
+            vecInputFFT.maxCoeff(&idx);
 
-            matDistTrial(i,j) = vecResultTime(idx);
+            matDistTrial(i,j) = vecInputFFT(idx);
         }
     }
+
+//    iTime = timer.elapsed();
+//    qDebug() << QThread::currentThreadId() << "CrossCorrelation::compute timer - Multiplication and inv FFT:" << iTime;
+//    timer.restart();
 
     // Sum up weights
     mutex.lock();
@@ -243,4 +255,8 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
     matDist += matDistTrial;
 
     mutex.unlock();
+
+//    iTime = timer.elapsed();
+//    qDebug() << QThread::currentThreadId() << "CrossCorrelation::compute timer - Summing up matDist:" << iTime;
+//    timer.restart();
 }

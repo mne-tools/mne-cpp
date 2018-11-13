@@ -260,7 +260,12 @@ public:
     *
     * @return clustered MNE forward solution
     */
-    MNEForwardSolution cluster_forward_solution(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D = defaultD, const FiffCov &p_pNoise_cov = defaultCov, const FiffInfo &p_pInfo = defaultInfo, QString p_sMethod = "cityblock") const;
+    MNEForwardSolution cluster_forward_solution(const AnnotationSet &p_AnnotationSet,
+                                                qint32 p_iClusterSize,
+                                                MatrixXd& p_D = defaultD,
+                                                const FiffCov &p_pNoise_cov = defaultCov,
+                                                const FiffInfo &p_pInfo = defaultInfo,
+                                                QString p_sMethod = "cityblock") const;
 
     //=========================================================================================================
     /**
@@ -286,7 +291,13 @@ public:
     *
     * @return the depth prior
     */
-    static FiffCov compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp = 0.8, double limit = 10.0, const MatrixXd &patch_areas = defaultConstMatrixXd, bool limit_depth_chs = false);
+    static FiffCov compute_depth_prior(const MatrixXd &Gain,
+                                       const FiffInfo &gain_info,
+                                       bool is_fixed_ori,
+                                       double exp = 0.8,
+                                       double limit = 10.0,
+                                       const MatrixXd &patch_areas = defaultConstMatrixXd,
+                                       bool limit_depth_chs = false);
 
     //=========================================================================================================
     /**

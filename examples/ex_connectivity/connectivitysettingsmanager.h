@@ -54,13 +54,13 @@
 
 #include <QWidget>
 #include <QDebug>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
 
 
 //*************************************************************************************************************
@@ -134,6 +134,10 @@ public:
 
     void onNumberTrialsChanged(int iNumberTrials)
     {
+        QElapsedTimer timer;
+        qint64 iTime = 0;
+        timer.start();
+
         if(iNumberTrials > m_dataListOriginal.size()) {
             iNumberTrials = m_dataListOriginal.size();
         }
@@ -176,6 +180,10 @@ public:
         //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - m_indexList" << m_indexList;
 
         m_pRtConnectivity->append(m_settings);
+
+        iTime = timer.elapsed();
+        qDebug() << "Coherency::computeCoherencyImag timer - Preparation:" << iTime;
+        timer.restart();
     }
 
     void onFreqBandChanged(int iFreqLow, int iFreqHigh)

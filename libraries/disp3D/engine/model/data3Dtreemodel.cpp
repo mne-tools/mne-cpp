@@ -215,8 +215,8 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject,
 //*************************************************************************************************************
 
 QList<SourceSpaceTreeItem*> Data3DTreeModel::addSourceSpace(const QString& sSubject,
-                                                     const QString& sMeasurementSetName,
-                                                     const MNESourceSpace& sourceSpace)
+                                                            const QString& sMeasurementSetName,
+                                                            const MNESourceSpace& sourceSpace)
 {
     QList<SourceSpaceTreeItem*> pReturnItem;
 
@@ -242,8 +242,8 @@ QList<SourceSpaceTreeItem*> Data3DTreeModel::addSourceSpace(const QString& sSubj
 //*************************************************************************************************************
 
 QList<SourceSpaceTreeItem*> Data3DTreeModel::addForwardSolution(const QString& sSubject,
-                                                         const QString& sMeasurementSetName,
-                                                         const MNEForwardSolution& forwardSolution)
+                                                                const QString& sMeasurementSetName,
+                                                                const MNEForwardSolution& forwardSolution)
 {
     return this->addSourceSpace(sSubject, sMeasurementSetName, forwardSolution.src);
 }
