@@ -115,6 +115,9 @@ void Coherency::calculateReal(Network& finalNetwork,
     // Check that iNfft >= signal length
     int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getNumberFFT();
+    if(iNfft > iSignalLength) {
+        iNfft = iSignalLength;
+    }
 
     // Generate tapers
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
@@ -188,6 +191,9 @@ void Coherency::calculateImag(Network& finalNetwork,
     // Check that iNfft >= signal length
     int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getNumberFFT();
+    if(iNfft > iSignalLength) {
+        iNfft = iSignalLength;
+    }
 
     // Generate tapers
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());

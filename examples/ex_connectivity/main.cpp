@@ -65,6 +65,7 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
+#include <utils/ioutils.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
 
@@ -94,6 +95,7 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -119,9 +121,9 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
 
     QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
-    QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
+    QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "MNE");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
@@ -141,8 +143,8 @@ int main(int argc, char *argv[])
     QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "/cluster/fusion/lesch/data/MEG/jgs-20160519/assr_40_223_cut_raw.fif");
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "jgs-20160519");
     QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "/cluster/fusion/lesch/data/subjects");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/MEG/jgs-20160519/assr_40_223_raw-fwd.fif");
-    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/MEG/jgs-20160519/assr_40_223_raw-cov.fif");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/MEG/jgs-20160519/fwd_jgws-fwd.fif");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/MEG/jgs-20160519/ASSR-cov.fif");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -228,7 +230,7 @@ int main(int argc, char *argv[])
                      sRaw,
                      events);
 
-    // Read the epochs and reject bad epochs. Note, that SSPs are automatically applied
+    // Read the epochs and reject bad epochs. Note, that SSPs are automatically applied to the data.
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
                                                          events,
                                                          fTMin,
@@ -249,13 +251,14 @@ int main(int argc, char *argv[])
             picks = raw.info.pick_types(false,true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
         } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(QString("grad"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+
+            // Only pick every second gradiometer
             RowVectorXi picksTmp(picks.cols()/2);
             int count = 0;
             for(int i = 0; i < picks.cols()-1; i+=2) {
                 picksTmp(count) = picks(i);
                 count++;
             }
-            qDebug() << "Picking done";
             picks = picksTmp;
         } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(QString("mag"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
@@ -308,7 +311,7 @@ int main(int argc, char *argv[])
 
         // Cluster forward solution;
         if(bDoClust) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
+            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 200);
         } else {
             t_clusteredFwd = t_Fwd;
         }
@@ -323,7 +326,7 @@ int main(int argc, char *argv[])
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
         minimumNorm.doInverseSetup(1,false);
 
-        picks = raw.info.pick_types(QString("grad"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        picks = raw.info.pick_types(QString("all"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
         data.pick_channels(picks);
         for(int i = 0; i < data.size(); i++) {
             sourceEstimate = minimumNorm.calculateInverse(data.at(i)->epoch,

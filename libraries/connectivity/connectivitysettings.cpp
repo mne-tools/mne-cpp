@@ -48,6 +48,8 @@
 //=============================================================================================================
 
 #include <QCommandLineParser>
+#include <QElapsedTimer>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -174,6 +176,9 @@ bool ConnectivitySettings::isEmpty() const
 
 void ConnectivitySettings::removeFirst()
 {
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
     if(!m_trialData.isEmpty()) {
         // Substract the influence by the first item on all intermediate sum data
         // Substract PSD of first trial from overall summed up PSD
@@ -183,42 +188,35 @@ void ConnectivitySettings::removeFirst()
         }
 
         // Substract CSD of first trial from overall summed up CSD
-        if(m_intermediateSumData.vecPairCsdSum.size() == m_trialData.first().vecPairCsd.size()) {
+        if(m_intermediateSumData.vecPairCsdSum.size() == m_trialData.first().vecPairCsd.size() &&
+           m_intermediateSumData.vecPairCsdNormalizedSum.size() == m_trialData.first().vecPairCsdNormalized.size() &&
+           m_intermediateSumData.vecPairCsdImagSignSum.size() == m_trialData.first().vecPairCsdImagSign.size() &&
+           m_intermediateSumData.vecPairCsdImagAbsSum.size() == m_trialData.first().vecPairCsdImagAbs.size() &&
+           m_intermediateSumData.vecPairCsdImagSqrdSum.size() == m_trialData.first().vecPairCsdImagSqrd.size()) {
             for (int i = 0; i < m_intermediateSumData.vecPairCsdSum.size(); ++i) {
-                m_intermediateSumData.vecPairCsdSum[i].second -= m_trialData.first().vecPairCsd.at(i).second;
-            }
-        }
-
-        // Substract normalized CSD of first trial from overall summed up normalized CSD
-        if(m_intermediateSumData.vecPairCsdNormalizedSum.size() == m_trialData.first().vecPairCsdNormalized.size()) {
-            for (int i = 0; i < m_intermediateSumData.vecPairCsdNormalizedSum.size(); ++i) {
-                m_intermediateSumData.vecPairCsdNormalizedSum[i].second -= m_trialData.first().vecPairCsdNormalized.at(i).second;
-            }
-        }
-
-        // Substract sign CSD of first trial from overall summed up sign CSD
-        if(m_intermediateSumData.vecPairCsdImagSignSum.size() == m_trialData.first().vecPairCsdImagSign.size()) {
-            for (int i = 0; i < m_intermediateSumData.vecPairCsdImagSignSum.size(); ++i) {
-                m_intermediateSumData.vecPairCsdImagSignSum[i].second -= m_trialData.first().vecPairCsdImagSign.at(i).second;
-            }
-        }
-
-        // Substract imag abs CSD of first trial from overall summed up imag abs CSD
-        if(m_intermediateSumData.vecPairCsdImagAbsSum.size() == m_trialData.first().vecPairCsdImagAbs.size()) {
-            for (int i = 0; i < m_intermediateSumData.vecPairCsdImagAbsSum.size(); ++i) {
-                m_intermediateSumData.vecPairCsdImagAbsSum[i].second -= m_trialData.first().vecPairCsdImagAbs.at(i).second;
-            }
-        }
-
-        // Substract imag sqrd CSD of first trial from overall summed up imag sqrd CSD
-        if(m_intermediateSumData.vecPairCsdImagSqrdSum.size() == m_trialData.first().vecPairCsdImagSqrd.size()) {
-            for (int i = 0; i < m_intermediateSumData.vecPairCsdImagSqrdSum.size(); ++i) {
-                m_intermediateSumData.vecPairCsdImagSqrdSum[i].second -= m_trialData.first().vecPairCsdImagSqrd.at(i).second;
+                if(i < m_intermediateSumData.vecPairCsdSum.size()) {
+                    m_intermediateSumData.vecPairCsdSum[i].second -= m_trialData.first().vecPairCsd.at(i).second;
+                }
+                if(i < m_intermediateSumData.vecPairCsdNormalizedSum.size()) {
+                    m_intermediateSumData.vecPairCsdNormalizedSum[i].second -= m_trialData.first().vecPairCsdNormalized.at(i).second;
+                }
+                if(i < m_intermediateSumData.vecPairCsdImagSignSum.size()) {
+                    m_intermediateSumData.vecPairCsdImagSignSum[i].second -= m_trialData.first().vecPairCsdImagSign.at(i).second;
+                }
+                if(i < m_intermediateSumData.vecPairCsdImagAbsSum.size()) {
+                    m_intermediateSumData.vecPairCsdImagAbsSum[i].second -= m_trialData.first().vecPairCsdImagAbs.at(i).second;
+                }
+                if(i < m_intermediateSumData.vecPairCsdImagSqrdSum.size()) {
+                    m_intermediateSumData.vecPairCsdImagSqrdSum[i].second -= m_trialData.first().vecPairCsdImagSqrd.at(i).second;
+                }
             }
         }
 
         m_trialData.removeFirst();
     }
+    iTime = timer.elapsed();
+    qDebug() << "ConnectivitySettings::removeFirst" << iTime;
+    timer.restart();
 }
 
 
