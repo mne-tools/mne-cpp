@@ -150,31 +150,23 @@ public:
         int size = m_settings.size();
 
         if(size > iNumberTrials) {
-            m_pRtConnectivity->restart();
-
-            for(int i = 0; i < size-iNumberTrials; ++i) {
-                m_settings.removeFirst();
-
-                if(!m_indexList.isEmpty()) {
-                    m_indexList.pop_front();
-                }
-            }
+            m_settings.removeFirst(size-iNumberTrials);
         }
 
         while(m_settings.size() < iNumberTrials) {
-            bool finish = false;
-            int index = 0;
+//            bool finish = false;
+//            int index = 0;
 
-            while(!finish) {
-                index = rand() % iNumberTrials;
+//            while(!finish) {
+//                index = rand() % iNumberTrials;
 
-                if(!m_indexList.contains(index)) {
-                    m_indexList.append(index);
-                    finish = true;
-                }
-            }
+//                if(!m_indexList.contains(index)) {
+//                    m_indexList.append(index);
+//                    finish = true;
+//                }
+//            }
 
-            m_settings.append(m_dataListOriginal.at(index));
+            m_settings.append(m_dataListOriginal.at(m_settings.size()));
         }
 
         //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - m_indexList" << m_indexList;

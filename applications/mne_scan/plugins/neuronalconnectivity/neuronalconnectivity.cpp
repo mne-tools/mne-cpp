@@ -298,11 +298,7 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
         //Pop data from buffer
         if(m_connectivitySettings.size() > m_iNumberAverages) {
             m_pRtConnectivity->restart();
-            int size = m_connectivitySettings.size();
-
-            for(int i = 0; i < size-m_iNumberAverages; ++i) {
-                m_connectivitySettings.removeFirst();
-            }
+            m_connectivitySettings.removeFirst(m_connectivitySettings.size()-m_iNumberAverages);
         }
 
         m_timer.restart();
@@ -369,10 +365,7 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             if(m_connectivitySettings.size() > m_iNumberAverages) {
                 m_pRtConnectivity->restart();
                 int size = m_connectivitySettings.size();
-
-                for(int i = 0; i < size-m_iNumberAverages; ++i) {
-                    m_connectivitySettings.removeFirst();
-                }
+                m_connectivitySettings.removeFirst(m_connectivitySettings.size()-m_iNumberAverages);
             }
 
             m_timer.restart();
@@ -454,11 +447,7 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     //Pop data from buffer
                     if(m_connectivitySettings.size() > m_iNumberAverages) {
                         m_pRtConnectivity->restart();
-                        int size = m_connectivitySettings.size();
-
-                        for(int i = 0; i < size-m_iNumberAverages; ++i) {
-                            m_connectivitySettings.removeFirst();
-                        }
+                        m_connectivitySettings.removeFirst(m_connectivitySettings.size()-m_iNumberAverages);
                     }
 
                     m_timer.restart();

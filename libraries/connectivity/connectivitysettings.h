@@ -138,7 +138,7 @@ public:
 
     bool isEmpty() const;
 
-    void removeFirst();
+    void removeFirst(int iAmount = 1);
 
     void setConnectivityMethods(const QStringList& sConnectivityMethods);
 
