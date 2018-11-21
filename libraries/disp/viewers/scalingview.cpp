@@ -363,6 +363,8 @@ void ScalingView::onUpdateSpinBoxScaling(double value)
             m_qMapChScaling.insert(it.key(), it.value()->value() * scaleValue);
 //        qDebug()<<"m_pRTMSAW->m_qMapChScaling[it.key()]" << m_pRTMSAW->m_qMapChScaling[it.key()];
     }
+
+    emit scalingChanged(m_qMapChScaling);
 }
 
 

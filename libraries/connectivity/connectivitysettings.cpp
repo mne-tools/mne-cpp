@@ -176,9 +176,10 @@ bool ConnectivitySettings::isEmpty() const
 
 void ConnectivitySettings::removeFirst(int iAmount)
 {
-    QElapsedTimer timer;
-    qint64 iTime = 0;
-    timer.start();
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
+
     if(!m_trialData.isEmpty()) {
         // Substract the influence by the first item on all intermediate sum data
         // Substract PSD of first trial from overall summed up PSD
@@ -221,9 +222,10 @@ void ConnectivitySettings::removeFirst(int iAmount)
             counter--;
         }
     }
-    iTime = timer.elapsed();
-    qDebug() << "ConnectivitySettings::removeFirst" << iTime;
-    timer.restart();
+
+//    iTime = timer.elapsed();
+//    qDebug() << "ConnectivitySettings::removeFirst" << iTime;
+//    timer.restart();
 }
 
 

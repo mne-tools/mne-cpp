@@ -285,6 +285,7 @@ void TriggerDetectionView::onRealTimeTriggerColorTypeChanged(const QString &valu
 void TriggerDetectionView::onResetTriggerNumbers()
 {
     ui->m_label_numberDetectedTriggers->setText(QString("0"));
+    ui->m_comboBox_triggerColorType->clear();
 
     emit resetTriggerCounter();
 
