@@ -163,7 +163,7 @@ public:
     *
     * @return   Whether a threshold artifact was detected.
     */
-    static bool checkForArtifact(Eigen::MatrixXd& data,
+    static bool checkForArtifact(const Eigen::MatrixXd& data,
                                  const FIFFLIB::FiffInfo& pFiffInfo,
                                  double dThreshold,
                                  const QString& sCheckType = QString("threshold"),
