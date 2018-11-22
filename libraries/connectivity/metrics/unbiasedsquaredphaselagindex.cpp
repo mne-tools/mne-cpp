@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     unbiasedsquaredphaselagindex.cpp
+* @file     unbiasedsquaredUnbiasedSquaredPhaseLagIndex.cpp
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -28,6 +29,9 @@
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *
+* @note Notes:
+* - Some of this code was adapted from mne-python (https://martinos.org/mne) with permission from Alexandre Gramfort.
+*
 *
 * @brief    UnbiasedSquaredPhaseLagIndex class definition.
 *
@@ -39,11 +43,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "phaselagindex.h"
 #include "unbiasedsquaredphaselagindex.h"
 #include "network/networknode.h"
 #include "network/networkedge.h"
 #include "network/network.h"
+
+#include <utils/spectral.h>
 
 
 //*************************************************************************************************************
@@ -70,6 +75,7 @@
 
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -90,47 +96,222 @@ UnbiasedSquaredPhaseLagIndex::UnbiasedSquaredPhaseLagIndex()
 
 //*******************************************************************************************************
 
-Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const QList<MatrixXd> &matDataList,
-                                                                   const MatrixX3f& matVert,
-                                                                   int iNfft,
-                                                                   const QString &sWindowType)
+Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 {
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
+
     Network finalNetwork("Unbiased Squared Phase Lag Index");
 
-    if(matDataList.empty()) {
-        qDebug() << "UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex - Input data is empty";
+    if(connectivitySettings.isEmpty()) {
+        qDebug() << "UnbiasedSquaredPhaseLagIndex::calculate - Input data is empty";
         return finalNetwork;
     }
 
+    #ifdef EIGEN_FFTW_DEFAULT
+        fftw_make_planner_thread_safe();
+    #endif
+
     //Create nodes
-    int rows = matDataList.first().rows();
+    int rows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
-        if(matVert.rows() != 0 && i < matVert.rows()) {
-            rowVert(0) = matVert.row(i)(0);
-            rowVert(1) = matVert.row(i)(1);
-            rowVert(2) = matVert.row(i)(2);
+        rowVert = RowVectorXf::Zero(3);
+
+        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+            rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
+            rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
+            rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-    //Calculate all-to-all coherence matrix over epochs
-    QVector<MatrixXd> vecUnbiasedSquaredPLI;
-    UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(vecUnbiasedSquaredPLI,
-                                                            matDataList,
-                                                            iNfft,
-                                                            sWindowType);
+    // Check that iNfft >= signal length
+    int iSignalLength = connectivitySettings.at(0).matData.cols();
+    int iNfft = connectivitySettings.getNumberFFT();
+    if(iNfft > iSignalLength) {
+        iNfft = iSignalLength;
+    }
 
-    //Add edges to network
-    QSharedPointer<NetworkEdge> pEdge;
+    // Generate tapers
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
+
+    // Initialize
+    int iNRows = connectivitySettings.at(0).matData.rows();
+    int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+
+    QMutex mutex;
+
+    std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
+        compute(inputData,
+                connectivitySettings.getIntermediateSumData().vecPairCsdSum,
+                connectivitySettings.getIntermediateSumData().vecPairCsdImagSignSum,
+                mutex,
+                iNRows,
+                iNFreqs,
+                iNfft,
+                tapers);
+    };
+
+//    iTime = timer.elapsed();
+//    qDebug() << "UnbiasedSquaredPhaseLagIndex::calculate timer - Preparation:" << iTime;
+//    timer.restart();
+
+    // Compute DSWPLV in parallel for all trials
+    QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
+                                             computeLambda);
+    result.waitForFinished();
+
+//    iTime = timer.elapsed();
+//    qDebug() << "UnbiasedSquaredPhaseLagIndex::calculate timer - Compute USPLI per trial:" << iTime;
+//    timer.restart();
+
+    // Compute USPLI
+    computeUSPLI(connectivitySettings,
+                 finalNetwork);
+
+//    iTime = timer.elapsed();
+//    qDebug() << "UnbiasedSquaredPhaseLagIndex::calculate timer - Compute USPLI, Network creation:" << iTime;
+//    timer.restart();
+
+    return finalNetwork;
+}
+
+
+//*************************************************************************************************************
+
+void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputData,
+                                           QVector<QPair<int,MatrixXcd> >& vecPairCsdSum,
+                                           QVector<QPair<int,MatrixXd> >& vecPairCsdImagSignSum,
+                                           QMutex& mutex,
+                                           int iNRows,
+                                           int iNFreqs,
+                                           int iNfft,
+                                           const QPair<MatrixXd, VectorXd>& tapers)
+{
+    if(inputData.vecPairCsdImagSign.size() == iNRows) {
+        //qDebug() << "UnbiasedSquaredPhaseLagIndex::compute - vecPairCsdImagSign was already computed for this trial.";
+        return;
+    }
+
+    inputData.vecPairCsdImagSign.clear();
+
+    int i,j;
+
+    // Calculate tapered spectra if not available already
+    // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
+    if(inputData.vecTapSpectra.size() != iNRows) {
+        inputData.vecTapSpectra.clear();
+
+        RowVectorXd vecInputFFT, rowData;
+        RowVectorXcd vecTmpFreq;
+
+        MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
+
+        QVector<Eigen::MatrixXcd> vecTapSpectra;
+
+        FFT<double> fft;
+        fft.SetFlag(fft.HalfSpectrum);
+
+        for (i = 0; i < iNRows; ++i) {
+            // Substract mean
+            rowData.array() = inputData.matData.row(i).array() - inputData.matData.row(i).mean();
+
+            // Calculate tapered spectra if not available already
+            for(j = 0; j < tapers.first.rows(); j++) {
+                vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
+                // FFT for freq domain returning the half spectrum and multiply taper weights
+                fft.fwd(vecTmpFreq, vecInputFFT, iNfft);
+                matTapSpectrum.row(j) = vecTmpFreq * tapers.second(j);
+            }
+
+            inputData.vecTapSpectra.append(matTapSpectrum);
+        }
+    }
+
+    // Compute CSD
+    MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
+
+    if(inputData.vecPairCsd.isEmpty()) {
+        double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
+
+        bool bNfftEven = false;
+        if (iNfft % 2 == 0){
+            bNfftEven = true;
+        }
+
+        for (i = 0; i < iNRows; ++i) {
+            for (j = i; j < iNRows; ++j) {
+                // Compute CSD (average over tapers if necessary)
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
+
+                // Divide first and last element by 2 due to half spectrum
+                matCsd.row(j)(0) /= 2.0;
+                if(bNfftEven) {
+                    matCsd.row(j).tail(1) /= 2.0;
+                }
+            }
+
+            inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
+            inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,matCsd.imag().cwiseSign()));
+        }
+
+        mutex.lock();
+
+        if(vecPairCsdSum.isEmpty()) {
+            vecPairCsdSum = inputData.vecPairCsd;
+            vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
+        } else {
+            for (int j = 0; j < vecPairCsdSum.size(); ++j) {
+                vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+                vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
+            }
+        }
+
+        mutex.unlock();
+    } else {
+        if(inputData.vecPairCsdImagSign.isEmpty()) {
+            for (i = 0; i < inputData.vecPairCsd.size(); ++i) {
+                inputData.vecPairCsdImagSign.append(QPair<int,MatrixXd>(i,inputData.vecPairCsd.at(i).second.imag().cwiseSign()));
+            }
+
+            mutex.lock();
+
+            if(vecPairCsdImagSignSum.isEmpty()) {
+                vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
+            } else {
+                for (int j = 0; j < vecPairCsdImagSignSum.size(); ++j) {
+                    vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
+                }
+            }
+
+            mutex.unlock();
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void UnbiasedSquaredPhaseLagIndex::computeUSPLI(ConnectivitySettings &connectivitySettings,
+                               Network& finalNetwork)
+{
+    // Compute final DSWPLV and create Network
+    MatrixXd matNom;
     MatrixXd matWeight;
+    QSharedPointer<NetworkEdge> pEdge;
     int j;
+    double dNTrials = double(connectivitySettings.size() - 1.0);
 
-    for(int i = 0; i < vecUnbiasedSquaredPLI.length(); ++i) {
-        for(j = i; j < matDataList.at(0).rows(); ++j) {
-            matWeight = vecUnbiasedSquaredPLI.at(i).row(j).transpose();
+    for (int i = 0; i < connectivitySettings.getIntermediateSumData().vecPairCsdImagSignSum.size(); ++i) {
+        matNom = connectivitySettings.getIntermediateSumData().vecPairCsdImagSignSum.at(i).second.cwiseAbs() / connectivitySettings.size();
+        matNom = (connectivitySettings.size() * matNom.array().square() - 1.0) / dNTrials;
+
+        for(j = i; j < matNom.rows(); ++j) {
+            matWeight = matNom.row(j).transpose();
 
             pEdge = QSharedPointer<NetworkEdge>(new NetworkEdge(i, j, matWeight));
 
@@ -139,29 +320,5 @@ Network UnbiasedSquaredPhaseLagIndex::unbiasedSquaredPhaseLagIndex(const QList<M
             finalNetwork.append(pEdge);
         }
     }
-
-    return finalNetwork;
 }
 
-
-//*************************************************************************************************************
-
-void UnbiasedSquaredPhaseLagIndex::computeUnbiasedSquaredPLI(QVector<MatrixXd>& vecUnbiasedSquaredPLI,
-                                                             const QList<MatrixXd> &matDataList,
-                                                             int iNfft,
-                                                             const QString &sWindowType)
-{
-    int iNRows = matDataList.at(0).rows();
-    int iNTrials = matDataList.length();
-
-    // Compute standard PLI
-    PhaseLagIndex::computePLI(vecUnbiasedSquaredPLI,
-                              matDataList,
-                              iNfft,
-                              sWindowType);
-
-    // Compute unbiased estimator according to Vinck et al., NeuroImage 55, pp. 1548-65, 2011
-    for (int j = 0; j < iNRows; ++j) {
-        vecUnbiasedSquaredPLI.replace(j, (double(iNTrials) * vecUnbiasedSquaredPLI.at(j).array().square() - 1.0) / double(iNTrials - 1));
-    }
-}

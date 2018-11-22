@@ -2,13 +2,14 @@
 /**
 * @file     unbiasedsquaredphaselagindex.h
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -48,6 +49,7 @@
 #include "../connectivity_global.h"
 
 #include "abstractmetric.h"
+#include "../connectivitysettings.h"
 
 
 //*************************************************************************************************************
@@ -56,6 +58,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QMutex>
 
 
 //*************************************************************************************************************
@@ -90,12 +93,12 @@ class Network;
 
 //=============================================================================================================
 /**
-* This class computes the unbiased squared phase lag index connectivity metric.
+* This class computes the phase lag index connectivity metric.
 *
-* @brief This class computes the unbiased squared phase lag index connectivity metric.
+* @brief This class computes the phase lag index connectivity metric.
 */
 class CONNECTIVITYSHARED_EXPORT UnbiasedSquaredPhaseLagIndex : public AbstractMetric
-{    
+{
 
 public:
     typedef QSharedPointer<UnbiasedSquaredPhaseLagIndex> SPtr;            /**< Shared pointer type for UnbiasedSquaredPhaseLagIndex. */
@@ -109,34 +112,47 @@ public:
 
     //=========================================================================================================
     /**
-    * Calculates the phase lag index between the rows of the data matrix.
+    * Calculates the USPLI between the rows of the data matrix.
     *
-    * @param[in] matDataList    The input data.
-    * @param[in] matVert        The vertices of each network node.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
+    * @param[in] connectivitySettings   The input data and parameters.
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network unbiasedSquaredPhaseLagIndex(const QList<Eigen::MatrixXd> &matDataList,
-                                                const Eigen::MatrixX3f& matVert,
-                                                int iNfft=-1, const QString &sWindowType="hanning");
+    static Network calculate(ConnectivitySettings& connectivitySettings);
 
-    //==========================================================================================================
+protected:
+    //=========================================================================================================
     /**
-    * Calculates the actual phase lag index between two data vectors.
+    * Computes the PLI values. This function gets called in parallel.
     *
-    * @param[out] vecUnbiasedSquaredPLI     The resulting data.
-    * @param[in] matDataList                The input data.
-    * @param[in] iNfft                      The FFT length.
-    * @param[in] sWindowType                The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The PLI value.
+    * @param[in] inputData              The input data.
+    * @param[out]vecPairCsdSum          The sum of all CSD matrices for each trial.
+    * @param[out]vecPairCsdImagSignSum  The sum of all imag sign CSD matrices for each trial.
+    * @param[in] mutex                  The mutex used to safely access vecPairCsdSum.
+    * @param[in] iNRows                 The number of rows.
+    * @param[in] iNFreqs                The number of frequenciy bins.
+    * @param[in] iNfft                  The FFT length.
+    * @param[in] tapers                 The taper information.
     */
-    static void computeUnbiasedSquaredPLI(QVector<Eigen::MatrixXd>& vecUnbiasedSquaredPLI,
-                                          const QList<Eigen::MatrixXd> &matDataList,
-                                          int iNfft,
-                                          const QString &sWindowType);
+    static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
+                        QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
+                        QVector<QPair<int,Eigen::MatrixXd> >& vecPairCsdImagSignSum,
+                        QMutex& mutex,
+                        int iNRows,
+                        int iNFreqs,
+                        int iNfft,
+                        const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
+
+    //=========================================================================================================
+    /**
+    * Reduces the USPLI computation to a final result.
+    *
+    * @param[out] connectivitySettings   The input data.
+    * @param[in]  finalNetwork           The final network.
+    */
+    static void computeUSPLI(ConnectivitySettings &connectivitySettings,
+                             Network& finalNetwork);
+
 };
 
 

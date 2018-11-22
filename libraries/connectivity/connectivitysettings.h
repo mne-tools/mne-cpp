@@ -52,6 +52,7 @@
 
 #include <QSharedPointer>
 #include <QStringList>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -89,11 +90,31 @@ namespace CONNECTIVITYLIB {
 * @brief This class is a container for connectivity settings.
 */
 class CONNECTIVITYSHARED_EXPORT ConnectivitySettings
-{
+{    
 
 public:
     typedef QSharedPointer<ConnectivitySettings> SPtr;            /**< Shared pointer type for ConnectivitySettings. */
     typedef QSharedPointer<const ConnectivitySettings> ConstSPtr; /**< Const shared pointer type for ConnectivitySettings. */
+
+    struct IntermediateTrialData {
+        Eigen::MatrixXd     matData;
+        Eigen::MatrixXd     matPsd;
+        QVector<Eigen::MatrixXcd>               vecTapSpectra;
+        QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsd;
+        QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsdNormalized;
+        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSign;
+        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagAbs;
+        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSqrd;
+    };
+
+    struct IntermediateSumData {
+        Eigen::MatrixXd     matPsdSum;
+        QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsdSum;
+        QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsdNormalizedSum;
+        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSignSum;
+        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagAbsSum;
+        QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSqrdSum;
+    };
 
     //=========================================================================================================
     /**
@@ -101,15 +122,60 @@ public:
     */
     explicit ConnectivitySettings();
 
-    QStringList                 m_sConnectivityMethods;         /**< The connectivity methods. */
+    void clearAllData();
 
-    QList<Eigen::MatrixXd>      m_matDataList;                  /**< The input data. */
-    Eigen::MatrixX3f            m_matNodePositions;             /**< The node position in 3D space. */
+    void clearIntermediateData();
 
-    int                         m_iNfft;                        /**< The FFT length used for spectral estimation. */
-    QString                     m_sWindowType;                  /**< The window type used to compute tapered spectra. */
+    void append(const QList<Eigen::MatrixXd>& matInputData);
+
+    void append(const Eigen::MatrixXd& matInputData);
+
+    void append(const ConnectivitySettings::IntermediateTrialData& inputData);
+
+    const IntermediateTrialData& at(int i) const;
+
+    int size() const;
+
+    bool isEmpty() const;
+
+    void removeFirst(int iAmount = 1);
+
+    void setConnectivityMethods(const QStringList& sConnectivityMethods);
+
+    const QStringList& getConnectivityMethods() const;
+
+    void setSamplingFrequency(int iSFreq);
+
+    int getSamplingFrequency() const;
+
+    void setNumberFFT(int iNfft);
+
+    int getNumberFFT() const;
+
+    void setWindowType(const QString& sWindowType);
+
+    const QString& getWindowType() const;
+
+    void setNodePositions(const Eigen::MatrixX3f& matNodePositions);
+
+    const Eigen::MatrixX3f& getNodePositions() const;
+
+    QList<IntermediateTrialData>& getTrialData();
+
+    IntermediateSumData& getIntermediateSumData();
 
 protected:
+    QStringList                     m_sConnectivityMethods;         /**< The connectivity methods. */
+    QString                         m_sWindowType;                  /**< The window type used to compute tapered spectra. */
+
+    float                           m_fSFreq;                       /**< The sampling frequency. */
+    int                             m_iNfft;                        /**< The FFT length. Gets automatically calculated if the sFreq or spectrum resolution change. */
+    float                           m_fFreqResolution;              /**< The spectrum's resolution. */
+
+    Eigen::MatrixX3f                m_matNodePositions;             /**< The node position in 3D space. */
+
+    IntermediateSumData             m_intermediateSumData;          /**< The intermediate sum data holds data calculated over all trials as a whole. */
+    QList<IntermediateTrialData>    m_trialData;                    /**< The trial data holds the actual and intermediate data calcualted for each trial. */
 
 };
 

@@ -50,6 +50,7 @@
 
 #include <QPointer>
 #include <QtConcurrent>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -273,7 +274,7 @@ void MNEEpochDataList::pick_channels(const RowVectorXi& sel)
 
 //*************************************************************************************************************
 
-bool MNEEpochDataList::checkForArtifact(MatrixXd& data,
+bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
                                         const FiffInfo& pFiffInfo,
                                         double dThreshold,
                                         const QString& sCheckType,
@@ -327,7 +328,7 @@ bool MNEEpochDataList::checkForArtifact(MatrixXd& data,
     }
 
     if(lchData.isEmpty()) {
-        qDebug() << "MNEEpochDataList::checkForArtifact - No channels found to scan for artifacts. Returning.";
+        qDebug() << "MNEEpochDataList::checkForArtifact - No channels found to scan for artifacts. Do not reject. Returning.";
 
         return bReject;
     }
@@ -335,7 +336,7 @@ bool MNEEpochDataList::checkForArtifact(MatrixXd& data,
 //    qDebug() << "MNEEpochDataList::checkForArtifact - lchData.size()" << lchData.size();
 //    qDebug() << "MNEEpochDataList::checkForArtifact - iChType" << iChType;
 
-    if(sCheckType.contains("threshold", Qt::CaseInsensitive)) {
+    if(sCheckType.contains("threshold", Qt::CaseInsensitive) && !lchData.isEmpty()) {
         //Start the concurrent processing
         QFuture<void> future = QtConcurrent::map(lchData, checkChThreshold);
         future.waitForFinished();
@@ -347,7 +348,7 @@ bool MNEEpochDataList::checkForArtifact(MatrixXd& data,
                 break;
             }
         }
-    } else if(sCheckType.contains("variance", Qt::CaseInsensitive)) {
+    } else if(sCheckType.contains("variance", Qt::CaseInsensitive) && !lchData.isEmpty()) {
         //Start the concurrent processing
         QFuture<void> future = QtConcurrent::map(lchData, checkChVariance);
         future.waitForFinished();
@@ -373,7 +374,9 @@ void MNEEpochDataList::checkChVariance(ArtifactRejectionData& inputData)
 
     double dMedian = temp.norm() / temp.cols();
 
+    // Remove offset
     temp = temp.array() - dMedian;
+
     temp.array().square();
 
 //    qDebug() << "MNEEpochDataList::checkChVariance - dMedian" << abs(dMedian);
@@ -395,6 +398,7 @@ void MNEEpochDataList::checkChThreshold(ArtifactRejectionData& inputData)
 {
     RowVectorXd temp = inputData.data;
 
+    // Remove offset
     temp = temp.array() - temp(0);
 
     double min = temp.minCoeff();

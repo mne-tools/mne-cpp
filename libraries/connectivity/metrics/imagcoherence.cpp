@@ -2,13 +2,14 @@
 /**
 * @file     imagcoherence.cpp
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -92,61 +93,34 @@ ImagCoherence::ImagCoherence()
 
 //*******************************************************************************************************
 
-Network ImagCoherence::imagCoherence(const QList<MatrixXd> &matDataList,
-                                     const MatrixX3f& matVert,
-                                     int iNfft,
-                                     const QString &sWindowType)
+Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
 {
     Network finalNetwork("Imaginary Coherence");
 
-    if(matDataList.empty()) {
+    if(connectivitySettings.isEmpty()) {
         qDebug() << "ImagCoherence::imagcoherence - Input data is empty";
         return finalNetwork;
     }
 
     //Create nodes
-    int rows = matDataList.first().rows();
+    int rows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);
 
     for(int i = 0; i < rows; ++i) {
-        if(matVert.rows() != 0 && i < matVert.rows()) {
-            rowVert(0) = matVert.row(i)(0);
-            rowVert(1) = matVert.row(i)(1);
-            rowVert(2) = matVert.row(i)(2);
+        rowVert = RowVectorXf::Zero(3);
+
+        if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
+            rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
+            rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
+            rowVert(2) = connectivitySettings.getNodePositions().row(i)(2);
         }
 
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
     //Calculate all-to-all imaginary coherence matrix over epochs
-    Coherency::computeCoherencyImag(finalNetwork,
-                                    matDataList,
-                                    iNfft,
-                                    sWindowType);
+    Coherency::calculateImag(finalNetwork,
+                             connectivitySettings);
 
     return finalNetwork;
-}
-
-
-//*************************************************************************************************************
-
-QVector<MatrixXd> ImagCoherence::computeImagCoherence(const QList<MatrixXd> &matDataList,
-                                                      int iNfft,
-                                                      const QString &sWindowType)
-{
-    QVector<QPair<int,Eigen::MatrixXcd> > vecCoh;
-
-    Coherency::computeCoherency(vecCoh,
-                                matDataList,
-                                iNfft,
-                                sWindowType);
-
-
-    QVector<MatrixXd> result;
-
-    for(int i = 0; i < vecCoh.length(); ++i) {
-        result << vecCoh.at(i).second.imag();
-    }
-
-    return result;
 }

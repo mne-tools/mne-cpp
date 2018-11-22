@@ -2,13 +2,14 @@
 /**
 * @file     coherence.h
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -87,6 +88,7 @@ namespace CONNECTIVITYLIB {
 //=============================================================================================================
 
 class Network;
+class ConnectivitySettings;
 
 
 //=============================================================================================================
@@ -112,31 +114,11 @@ public:
     /**
     * Calculates the coherence between the rows of the data matrix.
     *
-    * @param[in] matDataList    The input data.
-    * @param[in] matVert        The vertices of each network node.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
+    * @param[in] connectivitySettings   The input data and parameters.
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network coherence(const QList<Eigen::MatrixXd> &matDataList,
-                             const Eigen::MatrixX3f& matVert,
-                             int iNfft=-1,
-                             const QString &sWindowType="hanning");
-
-    //=========================================================================================================
-    /**
-    * Calculates the coherence of the rows of the data matrix.
-    *
-    * @param[in] matDataList    The input data.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The connectivity information in form of a QVector of matrices.
-    */
-    static QVector<Eigen::MatrixXd> computeCoherence(const QList<Eigen::MatrixXd> &matDataList,
-                                                     int iNfft,
-                                                     const QString &sWindowType="hanning");
+    static Network calculate(ConnectivitySettings &connectivitySettings);
 };
 
 

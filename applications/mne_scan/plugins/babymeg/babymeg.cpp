@@ -854,7 +854,7 @@ void BabyMEG::createDigTrig(MatrixXf& data)
     QMap<int,QList<QPair<int,double> > > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.cast<double>(),
                                                                                                       m_lTriggerChannelIndices,
                                                                                                       0,
-                                                                                                      3.0,
+                                                                                                      1.0,
                                                                                                       false,
                                                                                                       "Rising",
                                                                                                       400);

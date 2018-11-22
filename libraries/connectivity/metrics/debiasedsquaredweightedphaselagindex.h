@@ -2,13 +2,14 @@
 /**
 * @file     debiasedsquaredweightedphaselagindex.h
 * @author   Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+*           Lorenz Esch <lorenz.esch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     April, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -48,6 +49,7 @@
 #include "../connectivity_global.h"
 
 #include "abstractmetric.h"
+#include "../connectivitysettings.h"
 
 
 //*************************************************************************************************************
@@ -56,6 +58,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QMutex>
 
 
 //*************************************************************************************************************
@@ -111,62 +114,46 @@ public:
     /**
     * Calculates the debiased squared weighted phase lag index between the rows of the data matrix.
     *
-    * @param[in] matDataList    The input data.
-    * @param[in] matVert        The vertices of each network node.
-    * @param[in] iNfft          The FFT length.
-    * @param[in] sWindowType    The type of the window function used to compute tapered spectra.
+    * @param[in] connectivitySettings   The input data and parameters.
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network debiasedSquaredWeightedPhaseLagIndex(const QList<Eigen::MatrixXd> &matDataList,
-                                                        const Eigen::MatrixX3f& matVert,
-                                                        int iNfft=-1,
-                                                        const QString &sWindowType="hanning");
-
-    //==========================================================================================================
-    /**
-    * Calculates the actual debiased squared weighted phase lag index between two data vectors.
-    *
-    * @param[out] vecDebiasedSquaredWPLI    The resulting data.
-    * @param[in] matDataList                The input data.
-    * @param[in] iNfft                      The FFT length.
-    * @param[in] sWindowType                The type of the window function used to compute tapered spectra.
-    *
-    * @return                   The DebiasedSquaredWPLI value.
-    */
-    static void computeDebiasedSquaredWPLI(QVector<Eigen::MatrixXd>& vecDebiasedSquaredWPLI,
-                                           const QList<Eigen::MatrixXd> &matDataList,
-                                           int iNfft,
-                                           const QString &sWindowType);
+    static Network calculate(ConnectivitySettings &connectivitySettings);
 
 protected:
     //=========================================================================================================
     /**
-    * Computes the PLV values. This function gets called in parallel.
+    * Computes the DSWPLI values. This function gets called in parallel.
     *
-    * @param[in] matInputData           The input data.
+    * @param[in] inputData              The input data.
+    * @param[out]vecPairCsdSum          The sum of all CSD matrices for each trial.
+    * @param[out]vecPairCsdImagAbsSum   The sum of all imag abs CSD matrices for each trial.
+    * @param[out]vecPairCsdImagSqrdSum  The sum of all imag aqrd CSD matrices for each trial.
+    * @param[in] mutex                  The mutex used to safely access vecPairCsdSum.
     * @param[in] iNRows                 The number of rows.
     * @param[in] iNFreqs                The number of frequenciy bins.
     * @param[in] iNfft                  The FFT length.
     * @param[in] tapers                 The taper information.
-    *
-    * @return            The coherency result in form of AbstractMetricResultData.
     */
-    static AbstractMetricResultData compute(const Eigen::MatrixXd& matInputData,
-                                            int iNRows,
-                                            int iNFreqs,
-                                            int iNfft,
-                                            const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
+    static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
+                        QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
+                        QVector<QPair<int,Eigen::MatrixXd> >& vecPairCsdImagAbsSum,
+                        QVector<QPair<int,Eigen::MatrixXd> >& vecPairCsdImagSqrdSum,
+                        QMutex& mutex,
+                        int iNRows,
+                        int iNFreqs,
+                        int iNfft,
+                        const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
 
     //=========================================================================================================
     /**
-    * Reduces the PLV computation to a final result. This function gets called in parallel.
+    * Reduces the DSWPLI computation to a final result.
     *
-    * @param[out] finalData    The final data.
-    * @param[in]  resultData   The resulting data from the computation step.
+    * @param[out] connectivitySettings   The input data.
+    * @param[in]  finalNetwork           The final network.
     */
-    static void reduce(AbstractMetricResultData& finalData,
-                       const AbstractMetricResultData& resultData);
+    static void computeDSWPLI(ConnectivitySettings &connectivitySettings,
+                              Network& finalNetwork);
 };
 
 

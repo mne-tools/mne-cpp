@@ -178,7 +178,12 @@ void MNEForwardSolution::clear()
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, const FiffCov &p_pNoise_cov, const FiffInfo &p_pInfo, QString p_sMethod) const
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const AnnotationSet &p_AnnotationSet,
+                                                                qint32 p_iClusterSize,
+                                                                MatrixXd& p_D,
+                                                                const FiffCov &p_pNoise_cov,
+                                                                const FiffInfo &p_pInfo,
+                                                                QString p_sMethod) const
 {
     printf("Cluster forward solution using %s.\n", p_sMethod.toUtf8().constData());
 
