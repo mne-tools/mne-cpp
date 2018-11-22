@@ -114,7 +114,6 @@ MNE::MNE()
 
 MNE::~MNE()
 {
-    m_future.cancel();
     m_future.waitForFinished();
 
     if(this->isRunning())
@@ -132,9 +131,6 @@ QSharedPointer<IPlugin> MNE::clone() const
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// Creating required display instances and set configurations
-//=============================================================================================================
 
 void MNE::init()
 {
@@ -276,6 +272,7 @@ void MNE::calcFiffInfo()
         }
         RowVectorXi sel = m_pFiffInfoInput->pick_channels(m_qListPickChannels);
 
+        //qDebug() << "MNE::calcFiffInfo - m_qListPickChannels.size()" << m_qListPickChannels.size();
         //qDebug() << "MNE::calcFiffInfo - m_qListPickChannels" << m_qListPickChannels;
 
         m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoInput->pick_info(sel)));
@@ -383,8 +380,10 @@ QWidget* MNE::setupWidget()
     if(!m_bFinishedClustering)
         setupWidget->setClusteringState();
 
-    connect(this, &MNE::clusteringStarted, setupWidget, &MNESetupWidget::setClusteringState);
-    connect(this, &MNE::clusteringFinished, setupWidget, &MNESetupWidget::setSetupState);
+    connect(this, &MNE::clusteringStarted,
+            setupWidget, &MNESetupWidget::setClusteringState);
+    connect(this, &MNE::clusteringFinished,
+            setupWidget, &MNESetupWidget::setSetupState);
 
     return setupWidget;
 }
@@ -402,9 +401,8 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pMatrixDataBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
         }
 
-        //Fiff Information of the evoked
+        //Fiff Information of the RTMSA
         if(!m_pFiffInfoInput) {
-            //qDebug()<<"MNE::updateRTMSA - Creating m_pFiffInfoInput";
             //m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTMSA->info().data()));
             m_pFiffInfoInput = pRTMSA->info();
             m_iNumAverages = 1;
@@ -426,8 +424,7 @@ void MNE::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
     QSharedPointer<RealTimeCov> pRTC = pMeasurement.dynamicCast<RealTimeCov>();
 
     //MEG
-    if(pRTC && m_bReceiveData)
-    {
+    if(pRTC && m_bReceiveData) {
         // Init Real-Time inverse estimator
         if(!m_pRtInvOp && m_pFiffInfo && m_pClusteredFwd) {
             m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
@@ -474,15 +471,6 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
         for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
             if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
                 m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTES->getValue()->evoked.at(i).info));
-
-                if(pRTES->getValue()->evoked.at(i).nave != m_iNumAverages) {
-                    m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
-
-                    if(m_pMinimumNorm){
-                        m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
-                    }
-                }
-
                 break;
             }
         }
@@ -493,17 +481,8 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
         for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
             if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
-                //qDebug()<<"MNE::updateRTE - average found type - " << m_sAvrType;
+                //qDebug()<<"MNE::updateRTE - average found type" << m_sAvrType;
                 m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
-
-                if(pRTES->getValue()->evoked.at(i).nave != m_iNumAverages) {
-                    m_iNumAverages = pRTES->getValue()->evoked.at(i).nave;
-
-                    if(m_pMinimumNorm){
-                        m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
-                    }
-                }
-
                 break;
             }
         }
@@ -516,7 +495,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 void MNE::updateInvOp(const MNEInverseOperator& invOp)
 {
     QMutexLocker locker(&m_qMutex);
-    //qDebug() << "MNE::updateInvOp - START";
+
     m_invOp = invOp;
 
     double snr = 3.0;
@@ -525,7 +504,8 @@ void MNE::updateInvOp(const MNEInverseOperator& invOp)
     m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
 
     //Set up the inverse according to the parameters
-    m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
+    // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
+    m_pMinimumNorm->doInverseSetup(1,false);
 }
 
 
@@ -540,8 +520,9 @@ void MNE::onMethodChanged(const QString& method)
         double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
         m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
 
-        //Set up the inverse according to the parameters
-        m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
+        // Set up the inverse according to the parameters.
+        // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
+        m_pMinimumNorm->doInverseSetup(1,false);
     }
 }
 
@@ -558,89 +539,100 @@ void MNE::onTriggerTypeChanged(const QString& triggerType)
 
 void MNE::run()
 {
-    //
-    // start receiving data
-    //
+    // Start receiving data
     m_qMutex.lock();
     m_bReceiveData = true;
     m_qMutex.unlock();
 
-    //
     // Read Fiff Info
-    //
-    while(true)
-    {
+    while(true) {
         {
             QMutexLocker locker(&m_qMutex);
             if(m_pFiffInfo)
                 break;
         }
-        calcFiffInfo();
+
+        //calcFiffInfo();
         msleep(10);// Wait for fiff Info
     }
 
-    //qDebug() << "MNE::run - m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
-    //qDebug() << "MNE::run - m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
-
-    //
-    // start processing data
-    //
-    m_bProcessData = true;
-
-    qint32 skip_count = 0;
+//    //qDebug() << "MNE::run - m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
+//    //qDebug() << "MNE::run - m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
 
 //    //
 //    // TEMP INV LOADING START
 //    //
 
+//    m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfoInput);
+
 //    QFile t_fileCov(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
 //    FiffCov noise_cov(t_fileCov);
 
 //    // regularize noise covariance
-//    noise_cov = noise_cov.regularize(*m_pFiffInfoInput.data(), 0.05, 0.05, 0.1, true);
+//    noise_cov = noise_cov.regularize(*m_pFiffInfoInput.data(),
+//                                     0.05,
+//                                     0.05,
+//                                     0.1,
+//                                     true);
 
-//    //
-//    // make an inverse operators
-//    //
-//    MNEInverseOperator inverse_operator(*m_pFiffInfoInput.data(), *m_pClusteredFwd.data(), noise_cov, 0.2f, 0.8f, false);
+//    // make an inverse operator
+//    m_invOp = MNEInverseOperator(*m_pFiffInfoInput.data(),
+//                                 *m_pClusteredFwd.data(),
+//                                 noise_cov,
+//                                 0.2f,
+//                                 0.8f);
 
-//    m_invOp = MNEInverseOperator::SPtr(&inverse_operator);
-
-//    double snr = 1.0;
+//    double snr = 3.0;
 //    double lambda2 = 1.0 / pow(snr, 2); //ToDO estimate lambda using covariance
 //    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
-//    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(inverse_operator, lambda2, method));
-//    m_pMinimumNorm->doInverseSetup(20,false);
+//    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp,
+//                                                       lambda2,
+//                                                       method));
 
 //    //
 //    // TEMP INV LOADING END
 //    //
 
+    // Init parameters
+    m_bProcessData = true;
+
+    qint32 skip_count = 0;
+    qint32 t_evokedSize;
+    MatrixXd rawSegment;
+    MatrixXd data;
+    qint32 j;
+    float tmin, tstep;
+    MNESourceEstimate sourceEstimate;
+    FiffEvoked t_fiffEvoked;
+
+    // Start processing data
     while(m_bIsRunning) {
         m_qMutex.lock();
-        qint32 t_evokedSize = m_qVecFiffEvoked.size();
+        t_evokedSize = m_qVecFiffEvoked.size();
         m_qMutex.unlock();
 
-        //Process data raw data from a RTMSA
+        //Process raw data from a RTMSA input
         if(m_pMatrixDataBuffer) {
             //qDebug()<<"MNE::run - Processing RTMSA data";
+
             if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0)) {
-                MatrixXd rawSegment = m_pMatrixDataBuffer->pop();
+                rawSegment = m_pMatrixDataBuffer->pop();
 
                 //Pick the same channels as in the inverse operator
-                MatrixXd data(m_invOp.noise_cov->names.size(), rawSegment.cols());
+                data.resize(m_invOp.noise_cov->names.size(), rawSegment.cols());
 
-                for(qint32 j = 0; j < m_invOp.noise_cov->names.size(); ++j) {
+                for(j = 0; j < m_invOp.noise_cov->names.size(); ++j) {
                     data.row(j) = rawSegment.row(m_pFiffInfoInput->ch_names.indexOf(m_invOp.noise_cov->names.at(j)));
                 }
 
-                float tmin = 0.0f;
-                float tstep = 1.0f / m_pFiffInfo->sfreq;
-
-                m_qMutex.lock();
+                tmin = 0.0f;
+                tstep = 1.0f / m_pFiffInfoInput->sfreq;
 
                 //TODO: Add picking here. See evoked part as input.
-                MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(data, tmin, tstep);
+                m_qMutex.lock();
+                sourceEstimate = m_pMinimumNorm->calculateInverse(data,
+                                                                  tmin,
+                                                                  tstep);
 
                 m_qMutex.unlock();
 
@@ -655,23 +647,22 @@ void MNE::run()
             ++skip_count;
         }
 
-        //Process data from averaging
+        //Process data from averaging input
         if(t_evokedSize > 0) {
             //qDebug() << "MNE::run - Processing RTE data - t_evokedSize" << t_evokedSize;
             if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0)) {
                 m_qMutex.lock();
-                FiffEvoked t_fiffEvoked = m_qVecFiffEvoked.takeFirst();
+                t_fiffEvoked = m_qVecFiffEvoked.takeFirst();
                 //qDebug()<<"MNE::run - t_fiffEvoked.data.rows()"<<t_fiffEvoked.data.rows();
                 m_qMutex.unlock();
 
-                float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
-                float tstep = 1/t_fiffEvoked.info.sfreq;
+                tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
+                tstep = 1/t_fiffEvoked.info.sfreq;
 
                 m_qMutex.lock();
 
-                t_fiffEvoked = t_fiffEvoked.pick_channels(m_invOp.noise_cov->names);
-
-                MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
+                sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked,
+                                                                  tstep);
 
                 m_qMutex.unlock();
 

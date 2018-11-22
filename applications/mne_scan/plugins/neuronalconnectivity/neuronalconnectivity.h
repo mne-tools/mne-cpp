@@ -194,7 +194,8 @@ protected:
     *
     * @param [in] connectivityResult        The new connectivity estimate
     */
-    void onNewConnectivityResultAvailable(const CONNECTIVITYLIB::Network& connectivityResult);
+    void onNewConnectivityResultAvailable(const CONNECTIVITYLIB::Network& connectivityResult,
+                                          const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -247,6 +248,7 @@ private:
     qint32              m_iBlockSize;           /**< The block size of teh last received data block. In frequency bins. */
 
     QString             m_sAvrType;             /**< The average type */
+    QStringList         m_sConnectivityMethods; /**< The connectivity metric to use */
 
     QMutex              m_mutex;
 
@@ -266,12 +268,14 @@ private:
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
 
-    CONNECTIVITYLIB::Network    m_connectivityEstimate;     /**< The current connectivity estimate.*/
-    Eigen::MatrixX3f            m_matNodeVertLeft;          /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f            m_matNodeVertRight;         /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f            m_matNodeVertComb;          /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    CONNECTIVITYLIB::Network    m_connectivityEstimate;         /**< The current connectivity estimate.*/
+    Eigen::MatrixX3f            m_matNodeVertLeft;              /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f            m_matNodeVertRight;             /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f            m_matNodeVertComb;              /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
 
-    QVector<int>                m_chIdx;                    /**< The channel indeces to pick from the incoming data.*/
+    QVector<int>                m_chIdx;                        /**< The channel indeces to pick from the incoming data.*/
+
+    CONNECTIVITYLIB::Network    m_currentConnectivityResult;    /**< The current connectivity result.*/
 };
 
 } // NAMESPACE

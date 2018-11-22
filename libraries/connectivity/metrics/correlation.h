@@ -45,6 +45,7 @@
 #include "../connectivity_global.h"
 
 #include "abstractmetric.h"
+#include "../connectivitysettings.h"
 
 
 //*************************************************************************************************************
@@ -108,24 +109,22 @@ public:
     /**
     * Calculates the correlation coefficient between the rows of the data matrix.
     *
-    * @param[in] matDataList    The input data.
-    * @param[in] matVert        The vertices of each network node.
+    * @param[in] connectivitySettings   The input data and parameters.
     *
     * @return                   The connectivity information in form of a network structure.
     */
-    static Network correlationCoeff(const QList<Eigen::MatrixXd> &matDataList,
-                                    const Eigen::MatrixX3f& matVert);
+    static Network calculate(ConnectivitySettings &connectivitySettings);
 
 protected:
     //=========================================================================================================
     /**
     * Calculates the connectivity matrix for a given input data matrix based on the correlation coefficient.
     *
-    * @param[in] data       The input data.
+    * @param[in] inputData      The input data.
     *
-    * @return               The connectivity matrix.
+    * @return                   The connectivity matrix.
     */
-    static Eigen::MatrixXd compute(const Eigen::MatrixXd& data);
+    static Eigen::MatrixXd compute(const ConnectivitySettings::IntermediateTrialData& inputData);
 
     //=========================================================================================================
     /**

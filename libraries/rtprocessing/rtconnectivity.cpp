@@ -82,25 +82,27 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
         return;
     }
 
+    ConnectivitySettings connectivitySettingsTemp = connectivitySettings;
+
     QElapsedTimer time;
     qint64 iTime = 0;
     time.start();
 
-    Connectivity tConnectivity(connectivitySettings);
-    Network finalNetwork = tConnectivity.calculateConnectivity();
+    Network finalNetwork = Connectivity::calculate(connectivitySettingsTemp);
 
     iTime = time.elapsed();
 
-    emit resultReady(finalNetwork);
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
     qDebug()<<"------RtConnectivityWorker::doWork()";
-    qDebug()<<"------Method:"<<connectivitySettings.m_sConnectivityMethods.first();
-    qDebug()<<"------Data dim:"<<connectivitySettings.m_matDataList.first().rows() << "x"<<connectivitySettings.m_matDataList.first().cols();
-    qDebug()<<"------Number trials:"<< connectivitySettings.m_matDataList.size();
+    qDebug()<<"------Method:"<<connectivitySettings.getConnectivityMethods().first();
+    qDebug()<<"------Data dim:"<<connectivitySettings.at(0).matData.rows() << "x" << connectivitySettings.at(0).matData.cols();
+    qDebug()<<"------Number trials:"<< connectivitySettings.size();
     qDebug()<<"------Total time:"<<iTime << "ms";
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
+
+    emit resultReady(finalNetwork, connectivitySettingsTemp);
 }
 
 
@@ -122,7 +124,7 @@ RtConnectivity::RtConnectivity(QObject *parent)
             worker, &RtConnectivityWorker::doWork);
 
     connect(worker, &RtConnectivityWorker::resultReady,
-            this, &RtConnectivity::handleResults);
+            this, &RtConnectivity::newConnectivityResultAvailable);
 
     m_workerThread.start();
 }
@@ -146,14 +148,6 @@ void RtConnectivity::append(const ConnectivitySettings& connectivitySettings)
 
 //*************************************************************************************************************
 
-void RtConnectivity::handleResults(const Network& connectivityResult)
-{
-    emit newConnectivityResultAvailable(connectivityResult);
-}
-
-
-//*************************************************************************************************************
-
 void RtConnectivity::restart()
 {
     stop();
@@ -168,7 +162,7 @@ void RtConnectivity::restart()
             worker, &RtConnectivityWorker::doWork);
 
     connect(worker, &RtConnectivityWorker::resultReady,
-            this, &RtConnectivity::handleResults);
+            this, &RtConnectivity::newConnectivityResultAvailable);
 
     m_workerThread.start();
 }

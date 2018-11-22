@@ -101,7 +101,7 @@ public:
     /**
     * Constructs a Connectivity object.
     */
-    explicit Connectivity(const ConnectivitySettings& connectivitySettings);
+    explicit Connectivity();
 
     //=========================================================================================================
     /**
@@ -109,10 +109,9 @@ public:
     *
     * @return Returns the network.
     */
-    Network calculateConnectivity() const;
+    static Network calculate(ConnectivitySettings& connectivitySettings);
 
 protected:
-    QSharedPointer<ConnectivitySettings>    m_pConnectivitySettings;           /**< The current connectivity settings. */
 };
 
 
