@@ -479,7 +479,6 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control projectors
         ProjectorsView* pProjectorsView = new ProjectorsView();
-        pProjectorsView->init(m_pFiffInfo);
         m_pQuickControlView->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
 
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
@@ -487,6 +486,8 @@ void RealTimeEvokedSetWidget::init()
 
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pButterflyView.data(), &ButterflyView::updateView);
+
+        pProjectorsView->init(m_pFiffInfo);
 
         //Activate projectors by default
         m_pEvokedSetModel->updateProjection();

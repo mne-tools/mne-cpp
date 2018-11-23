@@ -143,23 +143,23 @@ void AverageSelectionView::setAverageInformationMapOld(const QMap<double, QPair<
 
 void AverageSelectionView::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor)
 {
+    m_qMapAverageInfo = qMapAverageColor;
+
     //Check if average type already exists in the map
-    QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(qMapAverageColor);
+    QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(m_qMapAverageInfo);
 
     while (i.hasNext()) {
         i.next();
 
-        if(!m_qMapAverageInfo.contains(i.key())) {
-            if(m_qMapAverageInfoOld.contains(i.key())) {
-                //Use old color
-                QPair<QColor, QPair<QString,bool> > tempPair = i.value();
-                tempPair.first = m_qMapAverageInfoOld[i.key()].first;
+        if(m_qMapAverageInfoOld.contains(i.key())) {
+            //Use old color
+            QPair<QColor, QPair<QString,bool> > tempPair = i.value();
+            tempPair.first = m_qMapAverageInfoOld[i.key()].first;
 
-                m_qMapAverageInfo.insert(i.key(), tempPair);
-            } else {
-                //Use default color
-                m_qMapAverageInfo.insert(i.key(), i.value());
-            }
+            m_qMapAverageInfo.insert(i.key(), tempPair);
+        } else {
+            //Use default color
+            m_qMapAverageInfo.insert(i.key(), i.value());
         }
     }
 
