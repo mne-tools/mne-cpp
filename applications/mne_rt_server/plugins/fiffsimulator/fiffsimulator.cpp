@@ -88,7 +88,8 @@ const QString FiffSimulator::Commands::SIMFILE      = "simfile";
 
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
-, m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
+//, m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
+, m_sResourceDataPath(QString("C:/CloudStation/Dokumente/Karriere/TU Ilmenau/Promotion/Projekte/2015_BabyMEG/2018-11-01 Average problem/181123_142937_TestSubject_empty_outside_trg007_raw.fif"))
 , m_uiBufferSampleSize(100)//(4)
 , m_AccelerationFactor(1.0)
 , m_TrueSamplingRate(0.0)
