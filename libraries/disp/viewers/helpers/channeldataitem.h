@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     ChannelDataItem.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     January, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,104 +30,113 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse GUI application.
+* @brief    Contains the declaration of the ChannelDataItem class.
 *
 */
+
+#ifndef ChannelDataItem_H
+#define ChannelDataItem_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <stdio.h>
-#include "Windows/mainwindow.h"
-#include "Utils/info.h"
+#include "../../disp_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
+#include <QGraphicsObject>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Eigen INCLUDES
 //=============================================================================================================
 
-using namespace MNEBROWSE;
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-MainWindow* mainWindow = NULL;
-
-
-//*************************************************************************************************************
-
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+namespace DISPLIB
 {
-    Q_UNUSED(context);
 
-    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
-    QString txt = QString("[%1] ").arg(dt);
 
-    if(mainWindow) {
-        switch (type) {
-        case QtDebugMsg:
-           txt += QString("{Debug} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndMessage, _LogLvMax);
-           break;
-        case QtWarningMsg:
-           txt += QString("{Warning} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndWarning, _LogLvNormal);
-           break;
-        case QtCriticalMsg:
-           txt += QString("{Critical} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           break;
-        case QtFatalMsg:
-           txt += QString("{Fatal} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           abort();
-           break;
-        }
-    }
-}
+//*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE TYPEDEFS
+//=============================================================================================================
 
 
 //=============================================================================================================
-// MAIN
-int main(int argc, char *argv[])
+/**
+* DECLARE CLASS ChannelDataItem
+*
+* @brief The ChannelDataItem class provides a new data structure for visualizing averages in a 2D layout.
+*/
+class DISPSHARED_EXPORT ChannelDataItem : public QGraphicsObject
 {
-    qInstallMessageHandler(customMessageHandler);
-    QApplication a(argc, argv);
+    Q_OBJECT
 
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
+public:
+    //=========================================================================================================
+    /**
+    * Constructs a ChannelDataItem.
+    */
+    ChannelDataItem(int iChannelKind,
+                    int iChannelUnit,
+                    const QColor& color = Qt::black);
 
-    //show splash screen for 1 second
-    QPixmap pixmap(":/Resources/Images/splashscreen_mne_browse.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
+    //=========================================================================================================
+    /**
+    * Reimplemented virtual functions
+    */
+    QRectF boundingRect() const;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    mainWindow = new MainWindow();
-    mainWindow->show();
+    void addData(const Eigen::RowVectorXd& data);
 
-    splash.finish(mainWindow);
+    QList<Eigen::RowVectorXd>                       m_data;
 
-    a.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
+    QColor m_color;
 
-    return a.exec();
-}
+    double          m_dScaleValue;
+
+    int             m_iChannelKind;
+    int             m_iChannelUnit;
+    int             m_iIterator;
+
+    QRectF                                          m_rectBoundingRect;         /**< The bounding rect. */
+
+protected:
+    //=========================================================================================================
+    /**
+    * Create a plot path and paint the data
+    *
+    * @param [in] painter The painter used to plot in this item.
+    */
+    void paintDataPath(QPainter *painter);
+
+signals:    
+
+};
+
+} // NAMESPACE DISPLIB
+
+#endif // ChannelDataItem_H

@@ -1,16 +1,14 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+* @file     ChannelDataViewNew.h
+* @author   Lorenz Esch <lesc@mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2014
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,38 +29,37 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse GUI application.
+* @brief    Declaration of the ChannelDataViewNew Class.
 *
 */
+
+#ifndef ChannelDataViewNew_H
+#define ChannelDataViewNew_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <stdio.h>
-#include "Windows/mainwindow.h"
-#include "Utils/info.h"
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
+#include <QOpenGLWidget>
+#include <QPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Eigen INCLUDES
 //=============================================================================================================
 
-using namespace MNEBROWSE;
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -70,65 +67,81 @@ using namespace MNEBROWSE;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-MainWindow* mainWindow = NULL;
+class QGraphicsScene;
+class QGraphicsView;
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
 
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+namespace DISPLIB
 {
-    Q_UNUSED(context);
 
-    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
-    QString txt = QString("[%1] ").arg(dt);
 
-    if(mainWindow) {
-        switch (type) {
-        case QtDebugMsg:
-           txt += QString("{Debug} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndMessage, _LogLvMax);
-           break;
-        case QtWarningMsg:
-           txt += QString("{Warning} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndWarning, _LogLvNormal);
-           break;
-        case QtCriticalMsg:
-           txt += QString("{Critical} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           break;
-        case QtFatalMsg:
-           txt += QString("{Fatal} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           abort();
-           break;
-        }
-    }
-}
+//*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+class ChannelDataItem;
 
 
 //=============================================================================================================
-// MAIN
-int main(int argc, char *argv[])
-{
-    qInstallMessageHandler(customMessageHandler);
-    QApplication a(argc, argv);
+/**
+* DECLARE CLASS ChannelDataViewNew
+*
+* @brief The ChannelDataViewNew class provides a channel view display
+*/
+class DISPSHARED_EXPORT ChannelDataViewNew : public QWidget
+{    
+    Q_OBJECT
 
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
+public:
+    typedef QSharedPointer<ChannelDataViewNew> SPtr;              /**< Shared pointer type for ChannelDataViewNew. */
+    typedef QSharedPointer<const ChannelDataViewNew> ConstSPtr;   /**< Const shared pointer type for ChannelDataViewNew. */
 
-    //show splash screen for 1 second
-    QPixmap pixmap(":/Resources/Images/splashscreen_mne_browse.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
+    //=========================================================================================================
+    /**
+    * Constructs a ChannelDataViewNew which is a child of parent.
+    *
+    * @param [in] parent    The parent of widget.
+    */
+    ChannelDataViewNew(QWidget* parent = 0,
+                       Qt::WindowFlags f = Qt::Widget);
 
-    mainWindow = new MainWindow();
-    mainWindow->show();
+    //=========================================================================================================
+    /**
+    * Initilaizes the ChannelDataViewNew based on a FiffInfo.
+    *
+    * @param [in] info    The FiffInfo.
+    */
+    void init(QSharedPointer<FIFFLIB::FiffInfo> &info);
 
-    splash.finish(mainWindow);
+    //=========================================================================================================
+    /**
+    * Add data to the view.
+    *
+    * @param [in] data    The new data.
+    */
+    void addData(const QList<Eigen::MatrixXd>& data);
 
-    a.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
+protected: 
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;
+    QPointer<QGraphicsScene>            m_pGraphicsScene;
+    QPointer<QGraphicsView>             m_pQGraphicsView;
 
-    return a.exec();
-}
+    QList<QPointer<ChannelDataItem> > m_lItemList;
+
+signals:
+};
+
+} // NAMESPACE
+
+#endif // ChannelDataViewNew_H
