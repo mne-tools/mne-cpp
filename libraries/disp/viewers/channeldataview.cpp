@@ -57,6 +57,7 @@
 #include <QTableView>
 #include <QMenu>
 #include <QSvgGenerator>
+#include <QOpenGLWidget>
 
 
 //*************************************************************************************************************
@@ -75,7 +76,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
-: QWidget(parent, f)
+: QOpenGLWidget(parent, f)
 , m_iT(10)
 , m_fSamplingRate(1024)
 , m_fDefaultSectionSize(80.0f)
@@ -90,6 +91,7 @@ ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
 
     //set vertical layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
+    neLayout->setContentsMargins(0,0,0,0);
 
     neLayout->addWidget(m_pTableView);
 

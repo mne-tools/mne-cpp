@@ -53,6 +53,7 @@
 #include <QWidget>
 #include <QPointer>
 #include <QMap>
+#include <QOpenGLWidget>
 
 
 //*************************************************************************************************************
@@ -103,7 +104,7 @@ class ChannelDataDelegate;
 *
 * @brief The ChannelDataView class provides a channel view display
 */
-class DISPSHARED_EXPORT ChannelDataView : public QWidget
+class DISPSHARED_EXPORT ChannelDataView : public QOpenGLWidget
 {    
     Q_OBJECT
 
