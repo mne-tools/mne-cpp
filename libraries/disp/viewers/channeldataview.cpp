@@ -58,6 +58,8 @@
 #include <QMenu>
 #include <QSvgGenerator>
 #include <QOpenGLWidget>
+#include <QGLWidget>
+#include <QOpenGLFunctions>
 
 
 //*************************************************************************************************************
@@ -76,14 +78,30 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
-: QOpenGLWidget(parent, f)
+: QWidget(parent, f)
 , m_iT(10)
 , m_fSamplingRate(1024)
 , m_fDefaultSectionSize(80.0f)
 , m_fZoomFactor(1.0f)
 , m_bHideBadChannels(false)
 {
+    gl = new QOpenGLWidget;
+
+    QPalette pal;
+    pal.setColor(QPalette::Window, Qt::white);
+    gl->setAutoFillBackground(true);
+//    gl->setPalette(pal);
+//    gl->setAttribute(Qt::WA_OpaquePaintEvent,false);
+//    gl->setAttribute(Qt::WA_NoSystemBackground,false);
+//    gl->update();
+//    gl->setStyleSheet("");
+
+//    QSurfaceFormat fmt;
+//    fmt.setSamples(8);
+//    gl->setFormat(fmt);
+
     m_pTableView = new QTableView;
+    m_pTableView->setViewport(gl);
 
     //Install event filter for tracking mouse movements
     m_pTableView->viewport()->installEventFilter(this);
@@ -192,7 +210,17 @@ bool ChannelDataView::eventFilter(QObject *object, QEvent *event)
 void ChannelDataView::setBackgroundColor(const QColor& backgroundColor)
 {
     m_backgroundColor = backgroundColor;
-    m_pTableView->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
+//    QPalette pal;
+//    pal.setColor(QPalette::Window, backgroundColor);
+//    m_pTableView->viewport()->setPalette(pal);
+
+    gl->makeCurrent();
+    QOpenGLFunctions* pf = gl->context()->functions();
+    if(pf) {
+        pf->glClearColor(m_backgroundColor.redF(),m_backgroundColor.greenF(),m_backgroundColor.blueF(),m_backgroundColor.alphaF());
+    }
+
+//    m_pTableView->viewport()->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
 }
 
 

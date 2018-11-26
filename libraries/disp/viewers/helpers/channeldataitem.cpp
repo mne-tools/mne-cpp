@@ -129,11 +129,11 @@ void ChannelDataItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 
 void ChannelDataItem::addData(const Eigen::RowVectorXd& data)
 {
-    if(m_data.size() < 60) {
+    if(m_data.size() < 180) {
         m_data.append(data);
         m_iIterator++;
     } else {
-        if(m_iIterator < 60) {
+        if(m_iIterator < 180) {
             m_data[m_iIterator] = data;
             m_iIterator++;
         } else {
@@ -208,7 +208,7 @@ void ChannelDataItem::paintDataPath(QPainter *painter)
 
     for(int i = 0; i < m_data.size(); i++) {
         for(int k = 0; k < m_data.at(i).cols(); k++) {
-            path.lineTo(QPointF(double(counter)/3.0, dScaleY * (m_data.at(i)(k)-m_data.first()(0))));
+            path.lineTo(QPointF(double(counter)/18.0, dScaleY * (m_data.at(i)(k)-m_data.first()(0))));
             counter++;
         }
     }
