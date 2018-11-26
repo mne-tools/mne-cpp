@@ -77,7 +77,8 @@ using namespace Eigen;
 
 FiffEvokedSet::FiffEvokedSet()
 {
-
+    qRegisterMetaType<FIFFLIB::FiffEvokedSet>("FIFFLIB::FiffEvokedSet");
+    qRegisterMetaType<FIFFLIB::FiffEvokedSet::SPtr>("FIFFLIB::FiffEvokedSet::SPtr");
 }
 
 
