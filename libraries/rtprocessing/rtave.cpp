@@ -121,8 +121,6 @@ RtAve::RtAve(quint32 numAverages,
 , m_bActivateThreshold(false)
 , m_bActivateVariance(false)
 {
-    qRegisterMetaType<FIFFLIB::FiffEvokedSet::SPtr>("FIFFLIB::FiffEvokedSet::SPtr");
-
     m_pStimEvokedSet->info = *m_pFiffInfo.data();
 
     m_iNewPreStimSamples = m_iPreStimSamples;
@@ -206,7 +204,7 @@ void RtAve::setPreStim(qint32 samples, qint32 secs)
 
 void RtAve::setPostStim(qint32 samples, qint32 secs)
 {
-    Q_UNUSED(samples);
+    Q_UNUSED(secs);
 
     QMutexLocker locker(&m_qMutex);
     m_iNewPostStimSamples = samples;
