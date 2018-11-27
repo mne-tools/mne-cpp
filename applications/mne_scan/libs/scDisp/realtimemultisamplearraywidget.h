@@ -185,7 +185,6 @@ private:
     QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;        /**< ChannelSelectionView. */
     QSharedPointer<DISPLIB::FilterView>                     m_pFilterWindow;                /**< Filter window. */
     QPointer<DISPLIB::ChannelDataView>                      m_pChannelDataView;             /**< the QTableView being part of the model/view framework of Qt. */
-    QPointer<DISPLIB::ChannelDataViewNew>                      m_pChannelDataViewNew;             /**< the QTableView being part of the model/view framework of Qt. */
 
 
     QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/

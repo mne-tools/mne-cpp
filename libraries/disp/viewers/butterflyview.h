@@ -45,6 +45,7 @@
 #include "../disp_global.h"
 
 #include "modalityselectionview.h"
+#include "averageselectionview.h"
 
 
 //*************************************************************************************************************
@@ -186,7 +187,7 @@ public:
     *
     * @param [in] mapAvr     The average data information including the color per average type.
     */
-    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
+    void setAverageInformationMap(const QMap<double, AverageSelectionInfo>& mapAvr);
 
     //=========================================================================================================
     /**
@@ -247,7 +248,7 @@ private:
     QSharedPointer<EvokedSetModel>          m_pEvokedModel;                         /**< The evoked model */
     QSharedPointer<ChannelInfoModel>        m_pChannelInfoModel;                    /**< The channel info model */
 
-    QMap<double, QPair<QColor, QPair<QString,bool> > >      m_qMapAverageColor;     /**< The current average color information. */
+    QMap<double, AverageSelectionInfo>      m_qMapAverageColor;     /**< The current average color information. */
 };
 
 

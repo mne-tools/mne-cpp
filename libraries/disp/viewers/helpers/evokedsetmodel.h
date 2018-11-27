@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "../../disp_global.h"
+#include "../averageselectionview.h"
 
 #include <utils/filterTools/filterdata.h>
 #include <fiff/fiff_types.h>
@@ -420,7 +421,7 @@ private:
 
     QMap<qint32,qint32>                     m_qMapIdxRowSelection;          /**< Selection mapping.*/
     QMap<qint32,float>                      m_qMapChScaling;                /**< Channel scaling map. */
-    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInformation;             /**< Average colors and names. */
+    QMap<double, AverageSelectionInfo>      m_qMapAverageInformation;             /**< Average colors and names. */
 
     QList<Eigen::MatrixXd>                  m_matData;                      /**< List that holds the data*/
     QList<Eigen::MatrixXd>                  m_matDataFreeze;                /**< List that holds the data when freezed*/
@@ -466,7 +467,7 @@ signals:
     *
     * @param [in] qMapAverageColor     the average information map
     */
-    void newAverageTypeReceived(QMap<double, QPair<QColor, QPair<QString,bool> > > qMapAverageColor);
+    void newAverageTypeReceived(QMap<double, AverageSelectionInfo> qMapAverageColor);
 };
 
 

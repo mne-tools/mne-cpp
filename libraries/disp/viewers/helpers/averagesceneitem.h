@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "../../disp_global.h"
+#include "../averageselectionview.h"
 
 
 //*************************************************************************************************************
@@ -119,7 +120,7 @@ public:
     *
     * @param [in] mapAvr     The new color for all channels.
     */
-    void setSignalMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
+    void setSignalMap(const QMap<double, AverageSelectionInfo>& mapAvr);
 
     QString                                         m_sChannelName;             /**< The channel name.*/
     int                                             m_iChannelNumber;           /**< The channel number.*/
@@ -139,7 +140,7 @@ public:
 
     QRectF                                          m_rectBoundingRect;         /**< The bounding rect. */
 
-    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageColor;     /**< Average colors and names. */
+    QMap<double, AverageSelectionInfo>  m_qMapAverageColor;     /**< Average colors and names. */
 
 protected:
     //=========================================================================================================

@@ -81,16 +81,16 @@ AverageLayoutView::AverageLayoutView(QWidget *parent, Qt::WindowFlags f)
 {
     this->setWindowTitle("Average Layout");
 
-//    QGLFormat fmt(QGL::SampleBuffers);
-//    fmt.setSamples(4);
+    QGLFormat fmt(QGL::SampleBuffers);
+    fmt.setSamples(4);
 
-//    QGLWidget* gl = new QGLWidget(fmt);
+    QGLWidget* gl = new QGLWidget(fmt);
 
     m_pAverageLayoutView = new QGraphicsView();
-//    m_pAverageLayoutView->setViewport(gl);
+    m_pAverageLayoutView->setViewport(gl);
 
     m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView.data(), this));
-//    m_pAverageScene->setBackgroundBrush(QBrush(Qt::black));
+    m_pAverageScene->setBackgroundBrush(QBrush(Qt::black));
 
     m_pAverageLayoutView->setScene(m_pAverageScene.data());
 
@@ -201,7 +201,7 @@ void AverageLayoutView::setScaleMap(const QMap<qint32,float> &scaleMap)
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
+void AverageLayoutView::setAverageInformationMap(const QMap<double, AverageSelectionInfo> &mapAvr)
 {
     if(!m_pAverageScene) {
         qDebug() << "AverageLayoutView::setAverageInformationMap - m_pAverageScene is NULL. Returning. ";
@@ -215,7 +215,7 @@ void AverageLayoutView::setAverageInformationMap(const QMap<double, QPair<QColor
 
 //*************************************************************************************************************
 
-QMap<double, QPair<QColor, QPair<QString,bool> > > AverageLayoutView::getAverageInformationMap()
+QMap<double, AverageSelectionInfo> AverageLayoutView::getAverageInformationMap()
 {
     return m_averageInfos;
 }

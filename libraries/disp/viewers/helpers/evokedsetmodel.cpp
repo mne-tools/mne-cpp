@@ -382,22 +382,20 @@ void EvokedSetModel::updateData()
     m_bIsInit = true;
 
     //Update average information map
-    m_qMapAverageInformation.clear();
-
     for(int i = 0; i < m_pEvokedSet->evoked.size(); ++i) {
-        //Check if average type already exists in the map
+        //Check if average type already exists in the map. If not delete it.
         double avrType = m_pEvokedSet->evoked.at(i).comment.toDouble();
         if(!m_qMapAverageInformation.contains(avrType)) {
-            QPair<QColor, QPair<QString,bool> > pairFinal;
+            AverageSelectionInfo pairFinal;
             QPair<QString,bool> pairTemp;
 
-            pairTemp.first = m_pEvokedSet->evoked.at(i).comment;
-            pairTemp.second = true;
-
-            pairFinal.first = Qt::yellow;
-            pairFinal.second = pairTemp;
+            pairFinal.name = m_pEvokedSet->evoked.at(i).comment;
+            pairFinal.active = true;
+            pairFinal.color = Qt::yellow;
 
             m_qMapAverageInformation.insert(avrType, pairFinal);
+        } else {
+            m_qMapAverageInformation.remove(avrType);
         }
     }
 

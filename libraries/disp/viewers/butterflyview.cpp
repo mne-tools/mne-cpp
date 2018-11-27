@@ -234,7 +234,7 @@ void ButterflyView::takeScreenshot(const QString& fileName)
 
 //*************************************************************************************************************
 
-void ButterflyView::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
+void ButterflyView::setAverageInformationMap(const QMap<double, AverageSelectionInfo>& mapAvr)
 {
     m_qMapAverageColor = mapAvr;
 
@@ -524,7 +524,7 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 
     //Do for all average types
     for(int j = 0; j < rowVec.size(); ++j) {
-        if(m_qMapAverageColor[rowVec.at(j).first].second.second) {
+        if(m_qMapAverageColor[rowVec.at(j).first].active) {
             //Calculate downsampling factor of averaged data in respect to the items width
             int dsFactor;
             rowVec.at(j).second.cols() / this->width() < 1 ? dsFactor = 1 : dsFactor = rowVec.at(j).second.cols() / this->width();

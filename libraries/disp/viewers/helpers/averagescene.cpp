@@ -119,7 +119,7 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
 
 //*************************************************************************************************************
 
-void AverageScene::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
+void AverageScene::setAverageInformationMap(const QMap<double, AverageSelectionInfo>& mapAvr)
 {
     QList<QGraphicsItem*> items = this->items();
     QListIterator<QGraphicsItem*> i(items);
