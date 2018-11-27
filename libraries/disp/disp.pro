@@ -119,6 +119,8 @@ SOURCES += \
     viewers/connectivitysettingsview.cpp \
     viewers/minimumnormsettingsview.cpp \
     viewers/averagingsettingsview.cpp \
+    viewers/channeldataviewnew.cpp \
+    viewers/helpers/channeldataitem.cpp \
     viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
@@ -163,6 +165,8 @@ HEADERS += \
     viewers/connectivitysettingsview.h \
     viewers/minimumnormsettingsview.h \
     viewers/averagingsettingsview.h \
+    viewers/channeldataviewnew.h \
+    viewers/helpers/channeldataitem.h \
     viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \

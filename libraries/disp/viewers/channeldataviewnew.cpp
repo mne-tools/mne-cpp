@@ -1,16 +1,14 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+* @file     ChannelDataViewNew.cpp
+* @author   Lorenz Esch <lesc@mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2014
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse GUI application.
+* @brief    Definition of the ChannelDataViewNew Class.
 *
 */
 
@@ -40,9 +38,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <stdio.h>
-#include "Windows/mainwindow.h"
-#include "Utils/info.h"
+#include "ChannelDataViewNew.h"
+
+#include "helpers/channeldataitem.h"
+
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -50,11 +50,12 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
+#include <QGridLayout>
+#include <QOpenGLWidget>
+#include <QPointer>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGLWidget>
 
 
 //*************************************************************************************************************
@@ -62,73 +63,66 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEBROWSE;
+using namespace DISPLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow* mainWindow = NULL;
-
-
-//*************************************************************************************************************
-
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+ChannelDataViewNew::ChannelDataViewNew(QWidget *parent, Qt::WindowFlags f)
+: QWidget(parent, f)
 {
-    Q_UNUSED(context);
+    m_pGraphicsScene = new QGraphicsScene;
+    m_pQGraphicsView = new QGraphicsView;
+    m_pQGraphicsView->setViewport(new QGLWidget);
+    m_pQGraphicsView->setScene(m_pGraphicsScene);
 
-    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
-    QString txt = QString("[%1] ").arg(dt);
+    //set vertical layout
+    QVBoxLayout *neLayout = new QVBoxLayout(this);
+    neLayout->setContentsMargins(0,0,0,0);
 
-    if(mainWindow) {
-        switch (type) {
-        case QtDebugMsg:
-           txt += QString("{Debug} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndMessage, _LogLvMax);
-           break;
-        case QtWarningMsg:
-           txt += QString("{Warning} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndWarning, _LogLvNormal);
-           break;
-        case QtCriticalMsg:
-           txt += QString("{Critical} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           break;
-        case QtFatalMsg:
-           txt += QString("{Fatal} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           abort();
-           break;
+    neLayout->addWidget(m_pQGraphicsView);
+
+    //set layouts
+    this->setLayout(neLayout);
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataViewNew::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
+{
+    m_pFiffInfo = info;
+
+    for(int j = 0; j < m_pFiffInfo->chs.size(); j++) {
+        if(!m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(j).ch_name)) {
+            QPointer<ChannelDataItem> pItem = new ChannelDataItem(m_pFiffInfo->chs.at(j).kind,
+                                                                  m_pFiffInfo->chs.at(j).unit);
+            pItem->setPos(QPointF(0.0,j*10.0));
+            m_pGraphicsScene->addItem(pItem);
+            m_lItemList << pItem;
         }
     }
 }
 
 
-//=============================================================================================================
-// MAIN
-int main(int argc, char *argv[])
+//*************************************************************************************************************
+
+void ChannelDataViewNew::addData(const QList<Eigen::MatrixXd> &data)
 {
-    qInstallMessageHandler(customMessageHandler);
-    QApplication a(argc, argv);
+    if(data.isEmpty()) {
+        return;
+    }
 
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
+    for(int j = 0; j < m_lItemList.size(); j++) {
+        for(int i = 0; i < data.size(); i++) {
+            m_lItemList.at(j)->addData(data.at(i).row(j));
+        }
+    }
 
-    //show splash screen for 1 second
-    QPixmap pixmap(":/Resources/Images/splashscreen_mne_browse.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
-
-    mainWindow = new MainWindow();
-    mainWindow->show();
-
-    splash.finish(mainWindow);
-
-    a.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
-
-    return a.exec();
+    m_pGraphicsScene->update();
 }
+
