@@ -200,7 +200,7 @@ protected:
     QPointer<QGraphicsView>                             m_pAverageLayoutView;       /**< View for 2D average layout scene */
 
     QSharedPointer<DISPLIB::EvokedSetModel>             m_pEvokedSetModel;          /**< The data model */
-    QSharedPointer<DISPLIB::ChannelInfoModel>                m_pChannelInfoModel;             /**< Channel info model. */
+    QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Channel info model. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
 
     QMap<double, QPair<QColor, QPair<QString,bool> > >  m_averageInfos;             /**< The average information */
