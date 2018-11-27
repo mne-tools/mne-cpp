@@ -46,6 +46,7 @@
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/channelinfomodel.h>
 #include <disp/viewers/channeldataview.h>
+#include <disp/viewers/channeldataviewnew.h>
 #include <disp/viewers/scalingview.h>
 #include <disp/viewers/projectorsview.h>
 #include <disp/viewers/filtersettingsview.h>
@@ -96,6 +97,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
 , m_bInitialized(false)
 , m_iMaxFilterTapSize(0)
 , m_pChannelDataView(new ChannelDataView(this))
+, m_pChannelDataViewNew(new ChannelDataViewNew(this))
 {
     Q_UNUSED(pTime)
 
@@ -123,10 +125,12 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
 
     //Create table view and set layout
     m_pChannelDataView->hide();
+    //m_pChannelDataViewNew->hide();
 
     QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
     rtmsaLayout->setContentsMargins(0,0,0,0);
     rtmsaLayout->addWidget(m_pChannelDataView);
+    //rtmsaLayout->addWidget(m_pChannelDataViewNew);
     this->setLayout(rtmsaLayout);
 
     qRegisterMetaType<QMap<int,QList<QPair<int,double> > > >();
@@ -240,6 +244,8 @@ void RealTimeMultiSampleArrayWidget::init()
         QColor signal = settings.value(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), signalDefault).value<QColor>();
         QColor background = settings.value(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), backgroundDefault).value<QColor>();
 
+//        m_pChannelDataViewNew->init(m_pFiffInfo);
+//        m_pChannelDataViewNew->show();
         m_pChannelDataView->show();
         m_pChannelDataView->init(m_pFiffInfo);
         m_pChannelDataView->setBackgroundColor(background);
