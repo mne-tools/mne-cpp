@@ -98,13 +98,13 @@ void AverageSelectionView::init()
         delete child;
     }
 
-    //Set trigger types
+    //Create trigger type check boxes. Limit to 10.
     QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(m_qMapAverageInfo);
     int count = 0;
     m_qMapButtonAverageType.clear();
     m_qMapChkBoxAverageType.clear();
 
-    while (i.hasNext()) {
+    while (i.hasNext() && count < 10) {
         i.next();
 
         //Create average checkbox

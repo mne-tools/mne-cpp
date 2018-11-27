@@ -158,6 +158,26 @@ void RtAve::append(const MatrixXd &p_DataSegment)
 void RtAve::setAverages(qint32 numAve)
 {
     QMutexLocker locker(&m_qMutex);
+
+    if(numAve < m_iNumAverages) {
+        int iDiff = m_iNumAverages - numAve;
+
+        //Do averaging for each trigger type
+        QMutableMapIterator<double,bool> idx(m_mapFillingBackBuffer);
+        QStringList lResponsibleTriggerTypes;
+
+        while(idx.hasNext()) {
+            idx.next();
+
+            double dTriggerType = idx.key();
+
+            //Pop data from buffer
+            for(int i = 0; i < iDiff; ++i) {
+                m_mapStimAve[dTriggerType].pop_front();
+            }
+        }
+    }
+
     m_iNumAverages = numAve;
 }
 
@@ -638,11 +658,11 @@ void RtAve::generateEvoked(double dTriggerType)
 
         evoked.data = finalAverage;
 
-        if(m_mapNumberCalcAverages[dTriggerType] < m_iNumAverages) {
-            m_mapNumberCalcAverages[dTriggerType]++;
-        }
+//        if(m_mapNumberCalcAverages[dTriggerType] < m_iNumAverages) {
+//            m_mapNumberCalcAverages[dTriggerType]++;
+//        }
 
-        evoked.nave = m_mapNumberCalcAverages[dTriggerType];
+        evoked.nave = m_mapStimAve[dTriggerType].size();
     } else if(m_iAverageMode == 1) {
         MatrixXd tempMatrix = m_mapStimAve[dTriggerType].last();
 

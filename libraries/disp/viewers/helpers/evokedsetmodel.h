@@ -74,6 +74,7 @@
 
 namespace FIFFLIB {
     class FiffEvokedSet;
+    class FiffProj;
 }
 
 
@@ -360,7 +361,7 @@ public:
     /**
     * Update projections
     */
-    void updateProjection();
+    void updateProjection(const QList<FIFFLIB::FiffProj>& projs);
 
     //=========================================================================================================
     /**

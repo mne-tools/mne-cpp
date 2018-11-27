@@ -320,7 +320,7 @@ void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> &pEvokedSet, boo
         m_matSparseProjCompMult.setIdentity();
 
         //Create the initial SSP projector
-        updateProjection();
+        updateProjection(m_pEvokedSet->info.projs);
 
         //Create the initial Compensator projector
         updateCompensator(0);
@@ -382,7 +382,8 @@ void EvokedSetModel::updateData()
     m_bIsInit = true;
 
     //Update average information map
-    bool bFoundNewType = false;
+    m_qMapAverageInformation.clear();
+
     for(int i = 0; i < m_pEvokedSet->evoked.size(); ++i) {
         //Check if average type already exists in the map
         double avrType = m_pEvokedSet->evoked.at(i).comment.toDouble();
@@ -397,14 +398,10 @@ void EvokedSetModel::updateData()
             pairFinal.second = pairTemp;
 
             m_qMapAverageInformation.insert(avrType, pairFinal);
-
-            bFoundNewType = true;
         }
     }
 
-    if(bFoundNewType) {
-        emit newAverageTypeReceived(m_qMapAverageInformation);
-    }
+    emit newAverageTypeReceived(m_qMapAverageInformation);
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
@@ -649,19 +646,20 @@ void EvokedSetModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 
 //*************************************************************************************************************
 
-void EvokedSetModel::updateProjection()
+void EvokedSetModel::updateProjection(const QList<FiffProj>& projs)
 {
     // Update the SSP projector
     if(m_pEvokedSet->info.chs.size() > 0) {
+        m_pEvokedSet->info.projs = projs;
         m_bProjActivated = false;
-        for(qint32 i = 0; i < m_pEvokedSet->info.projs.size(); ++i) {
+        for(qint32 i = 0; i < projs.size(); ++i) {
             if(m_pEvokedSet->info.projs[i].active) {
                 m_bProjActivated = true;
             }
         }
 
         m_pEvokedSet->info.make_projector(m_matProj);
-        qDebug() << "updateProjection :: New projection calculated :: m_bProjActivated is "<<m_bProjActivated;
+        qDebug() << "EvokedSetModel::updateProjection - New projection calculated. m_bProjActivated is "<<m_bProjActivated;
 
         //set columns of matrix to zero depending on bad channels indexes
         RowVectorXi sel;// = RowVectorXi(0,0);

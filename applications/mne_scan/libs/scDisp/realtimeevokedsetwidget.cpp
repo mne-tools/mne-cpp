@@ -487,10 +487,8 @@ void RealTimeEvokedSetWidget::init()
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pButterflyView.data(), &ButterflyView::updateView);
 
+        // Activate projectors by default
         pProjectorsView->init(m_pFiffInfo);
-
-        //Activate projectors by default
-        m_pEvokedSetModel->updateProjection();
 
         // Quick control compensators
         CompensatorView* pCompensatorView = new CompensatorView();
