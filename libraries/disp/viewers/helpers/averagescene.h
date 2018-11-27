@@ -45,6 +45,7 @@
 #include "../../disp_global.h"
 
 #include "layoutscene.h"
+#include "../averageselectionview.h"
 
 
 //*************************************************************************************************************
@@ -124,7 +125,7 @@ public:
     *
     * @param [in] mapAvr     The average data information including the color per average type.
     */
-    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
+    void setAverageInformationMap(const QMap<double, AverageSelectionInfo>& mapAvr);
 
     //=========================================================================================================
     /**

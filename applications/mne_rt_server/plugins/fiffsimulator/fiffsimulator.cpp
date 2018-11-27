@@ -88,8 +88,8 @@ const QString FiffSimulator::Commands::SIMFILE      = "simfile";
 
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
-//, m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
-, m_sResourceDataPath(QString("/cluster/fusion/lesch/data/MEG/2018-11-01-Average-problem/181123_142937_TestSubject_empty_outside_trg007_raw.fif"))
+, m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
+//, m_sResourceDataPath(QString("/cluster/fusion/lesch/data/MEG/2018-11-01-Average-problem/181123_142937_TestSubject_empty_outside_trg007_raw.fif"))
 , m_uiBufferSampleSize(100)//(4)
 , m_AccelerationFactor(1.0)
 , m_TrueSamplingRate(0.0)
@@ -104,12 +104,11 @@ FiffSimulator::FiffSimulator()
 
 FiffSimulator::~FiffSimulator()
 {
-    qDebug() << "Destroy FiffSimulator::~FiffSimulator()";
-
-    delete m_pFiffProducer;
-
     m_bIsRunning = false;
     QThread::wait();
+
+    delete m_pFiffProducer;
+    delete m_pRawMatrixBuffer;
 }
 
 

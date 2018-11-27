@@ -109,8 +109,6 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
 , m_pRTESet(pRTESet)
 {
     Q_UNUSED(pTime)
-    //qRegisterMetaType<SCDISPLIB::AverageInfoMap>("SCDISPLIB::AverageInfoMap");
-    qRegisterMetaTypeStreamOperators<SCDISPLIB::AverageInfoMap>("SCDISPLIB::AverageInfoMap");
 
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the region selection widget (F11)"),this);
     m_pActionSelectSensors->setShortcut(tr("F11"));
@@ -254,7 +252,7 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
         //Store average colors per type
         if(m_pAverageLayoutView) {
             QVariant data;
-            SCDISPLIB::AverageInfoMap avrMap = m_pAverageLayoutView->getAverageInformationMap();
+            QMap<double, AverageSelectionInfo> avrMap = m_pAverageLayoutView->getAverageInformationMap();
             data.setValue(avrMap);
             settings.setValue(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data);
         }
@@ -557,10 +555,10 @@ void RealTimeEvokedSetWidget::init()
                 m_pButterflyView.data(), &ButterflyView::setAverageInformationMap);
 
         QVariant data;
-        QMap<double, QPair<QColor, QPair<QString,bool> > > emptyMap;
+        QMap<double, AverageSelectionInfo> emptyMap;
         data.setValue(emptyMap);
-        SCDISPLIB::AverageInfoMap map = settings.value(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data).value<SCDISPLIB::AverageInfoMap>();
-        pAverageSelectionView->setAverageInformationMapOld(map);
+        QMap<double, AverageSelectionInfo> map = settings.value(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data).value<QMap<double, AverageSelectionInfo> >();
+        pAverageSelectionView->setAverageInformationMap(map);
 
         m_pButterflyView->setModel(m_pEvokedSetModel);
         m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);

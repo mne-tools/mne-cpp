@@ -93,13 +93,12 @@ AverageSceneItem::AverageSceneItem(const QString& channelName,
     m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
 
     //Init avr map
-    QPair<QColor, QPair<QString,bool> > pairFinal;
+    AverageSelectionInfo pairFinal;
     QPair<QString,bool> pair;
 
-    pair.first = "0";
-    pair.second = true;
-    pairFinal.first = QColor(0,0,0);
-    pairFinal.second = pair;
+    pairFinal.name = "0";
+    pairFinal.active = true;
+    pairFinal.color = QColor(0,0,0);
 
     m_qMapAverageColor.insert(0,pairFinal);
 }
@@ -143,7 +142,7 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     //set posistion
     this->setPos(75*m_qpChannelPosition.x(), -75*m_qpChannelPosition.y());
 
-    painter->setRenderHint(QPainter::Antialiasing, false);
+    painter->setRenderHint(QPainter::Antialiasing, true);
 
 //    //Plot bounding rect / drawing region of this item
 //    painter->drawRect(this->boundingRect());
@@ -187,7 +186,7 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 //*************************************************************************************************************
 
-void AverageSceneItem::setSignalMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
+void AverageSceneItem::setSignalMap(const QMap<double, AverageSelectionInfo>& mapAvr)
 {
     m_qMapAverageColor = mapAvr;
 
@@ -261,7 +260,7 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
 
     //do for all currently stored evoked set data
     for(int dataIndex = 0; dataIndex < m_lAverageData.size(); ++dataIndex) {
-        if(m_qMapAverageColor[m_lAverageData.at(dataIndex).first].second.second) {
+        if(m_qMapAverageColor[m_lAverageData.at(dataIndex).first].active) {
             //plot data from averaged data m_lAverageData with the calculated downsample factor
             const double* averageData = m_lAverageData.at(dataIndex).second.first;
             int totalCols =  m_lAverageData.at(dataIndex).second.second;
@@ -285,7 +284,7 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
             pen.setColor(Qt::yellow);
 
             if(m_qMapAverageColor.contains(m_lAverageData.at(dataIndex).first)) {
-                pen.setColor(m_qMapAverageColor[m_lAverageData.at(dataIndex).first].first);
+                pen.setColor(m_qMapAverageColor[m_lAverageData.at(dataIndex).first].color);
             }
 
             pen.setWidthF(3);

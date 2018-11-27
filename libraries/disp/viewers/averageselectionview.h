@@ -71,17 +71,17 @@ class QCheckBox;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace DISPLIB
 {
+
+struct AverageSelectionInfo {
+    QColor color;
+    QString name;
+    bool active;
+};
 
 
 //*************************************************************************************************************
@@ -100,7 +100,7 @@ class DISPSHARED_EXPORT AverageSelectionView : public QWidget
 {
     Q_OBJECT
 
-public:    
+public:
     typedef QSharedPointer<AverageSelectionView> SPtr;              /**< Shared pointer type for AverageSelectionView. */
     typedef QSharedPointer<const AverageSelectionView> ConstSPtr;   /**< Const shared pointer type for AverageSelectionView. */
 
@@ -111,7 +111,7 @@ public:
     * @param [in] parent        parent of widget
     */
     AverageSelectionView(QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
+                         Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
@@ -125,15 +125,15 @@ public:
     *
     * @param [in] qMapAverageInfoOld     the old average info map.
     */
-    void setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageInfoOld);
+    void setAverageInformationMapOld(const QMap<double, AverageSelectionInfo>& qMapAverageInfoOld);
 
     //=========================================================================================================
     /**
     * Set the average map which holds the inforamtion about the currently calcuated averages.
     *
-    * @param [in] qMapAverageColor     the average map.
+    * @param [in] qMapAverageSelectionInfo     the average map.
     */
-    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor);
+    void setAverageInformationMap(const QMap<double, AverageSelectionInfo>& qMapAverageSelectionInfo);
 
     //=========================================================================================================
     /**
@@ -141,7 +141,7 @@ public:
     *
     * @return the average information map
     */
-    QMap<double, QPair<QColor, QPair<QString,bool> > > getAverageInformationMap();
+    QMap<double, AverageSelectionInfo> getAverageInformationMap();
 
 protected:
     //=========================================================================================================
@@ -150,10 +150,10 @@ protected:
     */
     void onAveragesChanged();
 
-    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInfo;              /**< Average colors and names. */
-    QMap<double, QPair<QColor, QPair<QString,bool> > >  m_qMapAverageInfoOld;           /**< Old average colors and names. */
-    QMap<QCheckBox*, double>                            m_qMapChkBoxAverageType;        /**< Check box to average type map. */
-    QMap<QPushButton*, double>                          m_qMapButtonAverageType;        /**< Push button to average type map. */
+    QMap<double, AverageSelectionInfo>      m_qMapAverageInfo;              /**< Average colors and names. */
+    QMap<double, AverageSelectionInfo>      m_qMapAverageInfoOld;           /**< Old average colors and names. */
+    QMap<QCheckBox*, double>                m_qMapChkBoxAverageType;        /**< Check box to average type map. */
+    QMap<QPushButton*, double>              m_qMapButtonAverageType;        /**< Push button to average type map. */
 
 signals:
     //=========================================================================================================
@@ -162,10 +162,15 @@ signals:
     *
     * @param[out] map     The current average map.
     */
-    void averageInformationChanged(const QMap<double, QPair<QColor, QPair<QString,bool> > >& map);
+    void averageInformationChanged(const QMap<double, AverageSelectionInfo>& map);
 
 };
 
 } // NAMESPACE
+
+#ifndef metatype_averageselectioninfo
+#define metatype_averageselectioninfo
+Q_DECLARE_METATYPE(DISPLIB::AverageSelectionInfo); /**< Provides QT META type declaration of the DISPLIBB::AverageSelectionInfo type. For signal/slot usage.*/
+#endif
 
 #endif // AVERAGESELECTIONVIEW_H
