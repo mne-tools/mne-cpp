@@ -401,7 +401,6 @@ protected:
     * Gets called when the bad channels are about to be marked as bad or good
     */
     void markChBad();
-QOpenGLWidget* gl ;
     QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt */
     QPointer<DISPLIB::ChannelDataDelegate>      m_pDelegate;                    /**< The channel data delegate */
     QPointer<DISPLIB::ChannelDataModel>         m_pModel;                       /**< The channel data model */

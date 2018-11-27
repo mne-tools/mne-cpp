@@ -175,6 +175,10 @@ void FilterData::designFilter()
 
             //This filter is designed in the frequency domain, hence the time domain impulse response need to be shortend by the users dependent number of taps
             m_dCoeffA.resize(m_iFilterOrder);
+            qDebug() << "m_iFilterOrder" << m_iFilterOrder;
+            qDebug() << "m_iFilterOrder/2" << m_iFilterOrder/2;
+            qDebug() << " filtercos.m_dCoeffA.rows()" <<  filtercos.m_dCoeffA.rows();
+            qDebug() << " filtercos.m_dCoeffA.cols()" <<  filtercos.m_dCoeffA.cols();
             m_dCoeffA.head(m_iFilterOrder/2) = filtercos.m_dCoeffA.tail(m_iFilterOrder/2);
             m_dCoeffA.tail(m_iFilterOrder/2) = filtercos.m_dCoeffA.head(m_iFilterOrder/2);
 

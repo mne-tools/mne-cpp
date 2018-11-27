@@ -93,8 +93,8 @@ void ChannelDataDelegate::initPainterPaths(const QAbstractTableModel *model)
 
     m_penMarker = QPen(colorMarker, 2, Qt::DashLine);
 
-    m_penGrid = QPen(Qt::black, 0.7, Qt::DotLine);
-    m_penTimeSpacers = QPen(Qt::black, 0.2, Qt::DotLine);
+    m_penGrid = QPen(Qt::black, 1, Qt::DashLine);
+    m_penTimeSpacers = QPen(Qt::black, 1, Qt::DashLine);
 
     m_penFreeze = QPen(Qt::darkGray, 1, Qt::SolidLine);
     m_penFreezeSelected = QPen(Qt::darkRed, 1, Qt::SolidLine);
