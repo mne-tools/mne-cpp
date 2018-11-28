@@ -99,7 +99,6 @@ void AverageSelectionView::setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> p
         return;
     }
 
-    qDebug() << "AverageSelectionView::setEvokedSet";
     m_pEvokedSet = pEvokedSet;
 
     //Delete all widgets in the averages layout

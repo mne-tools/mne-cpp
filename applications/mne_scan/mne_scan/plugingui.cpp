@@ -362,7 +362,6 @@ void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
 
 //*************************************************************************************************************
 
-
 void PluginGui::uiSetupRunningState(bool state)
 {
     if(state)
