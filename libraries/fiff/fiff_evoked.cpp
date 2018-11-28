@@ -67,6 +67,8 @@ FiffEvoked::FiffEvoked()
 , first(-1)
 , last(-1)
 , baseline(qMakePair(QVariant("None"), QVariant("None")))
+, color(Vector4i::Zero())
+, active(true)
 {
 
 }
@@ -99,6 +101,8 @@ FiffEvoked::FiffEvoked(const FiffEvoked& p_FiffEvoked)
 , data(p_FiffEvoked.data)
 , proj(p_FiffEvoked.proj)
 , baseline(p_FiffEvoked.baseline)
+, color(p_FiffEvoked.color)
+, active(p_FiffEvoked.active)
 {
 
 }
@@ -125,6 +129,8 @@ void FiffEvoked::clear()
     times = RowVectorXf();
     data = MatrixXd();
     proj = MatrixXd();
+    color = Vector4i::Zero();
+    active = true;
 }
 
 

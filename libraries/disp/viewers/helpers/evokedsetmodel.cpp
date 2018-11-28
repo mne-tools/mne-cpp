@@ -293,47 +293,65 @@ QVariant EvokedSetModel::headerData(int section, Qt::Orientation orientation, in
 
 //*************************************************************************************************************
 
-void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> &pEvokedSet, bool bReset)
+void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> pEvokedSet, bool bReset)
 {
+    m_pEvokedSet = pEvokedSet;
+
     if(bReset) {
-        beginResetModel();
-        m_pEvokedSet = pEvokedSet;
-
-        //Generate bad channel index list
-        RowVectorXi sel;// = RowVectorXi(0,0);
-        QStringList emptyExclude;
-
-        if(m_pEvokedSet->info.bads.size() > 0) {
-            sel = FiffInfoBase::pick_channels(m_pEvokedSet->info.ch_names, m_pEvokedSet->info.bads, emptyExclude);
-        }
-
-        m_vecBadIdcs = sel;
-
-        m_fSps = m_pEvokedSet->info.sfreq;
-
-        m_matSparseProjMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
-        m_matSparseCompMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
-        m_matSparseProjCompMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
-
-        m_matSparseProjMult.setIdentity();
-        m_matSparseCompMult.setIdentity();
-        m_matSparseProjCompMult.setIdentity();
-
-        //Create the initial SSP projector
-        updateProjection(m_pEvokedSet->info.projs);
-
-        //Create the initial Compensator projector
-        updateCompensator(0);
-
-        //Init list of channels which are to filtered
-        createFilterChannelList(m_pEvokedSet->info.ch_names);
-
-        endResetModel();
-
-        resetSelection();
-    } else {
-        m_pEvokedSet = pEvokedSet;
+        reset();
     }
+
+    updateData();
+
+    emit newDataReceived(m_pEvokedSet);
+}
+
+
+//*************************************************************************************************************
+
+void EvokedSetModel::reset()
+{
+    if(!m_pEvokedSet) {
+        return;
+    }
+
+    beginResetModel();
+
+    //Generate bad channel index list
+    RowVectorXi sel;// = RowVectorXi(0,0);
+    QStringList emptyExclude;
+
+    if(m_pEvokedSet->info.bads.size() > 0) {
+        sel = FiffInfoBase::pick_channels(m_pEvokedSet->info.ch_names, m_pEvokedSet->info.bads, emptyExclude);
+    }
+
+    m_vecBadIdcs = sel;
+
+    m_fSps = m_pEvokedSet->info.sfreq;
+
+    m_matSparseProjMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
+    m_matSparseCompMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
+    m_matSparseProjCompMult = SparseMatrix<double>(m_pEvokedSet->info.chs.size(),m_pEvokedSet->info.chs.size());
+
+    m_matSparseProjMult.setIdentity();
+    m_matSparseCompMult.setIdentity();
+    m_matSparseProjCompMult.setIdentity();
+
+    m_qMapAverageActivation.clear();
+    m_qMapAverageColor.clear();
+
+    //Create the initial SSP projector
+    updateProjection(m_pEvokedSet->info.projs);
+
+    //Create the initial Compensator projector
+    updateCompensator(0);
+
+    //Init list of channels which are to filtered
+    createFilterChannelList(m_pEvokedSet->info.ch_names);
+
+    endResetModel();
+
+    resetSelection();
 }
 
 
@@ -341,6 +359,10 @@ void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> &pEvokedSet, boo
 
 void EvokedSetModel::updateData()
 {
+    if(!m_pEvokedSet) {
+        return;
+    }
+
     m_matData.clear();
     m_matDataFiltered.clear();
     m_lAvrTypes.clear();
@@ -372,7 +394,7 @@ void EvokedSetModel::updateData()
 
         m_pairBaseline = m_pEvokedSet->evoked.at(i).baseline;
 
-        m_lAvrTypes.append(m_pEvokedSet->evoked.at(i).comment.toDouble());
+        m_lAvrTypes.append(m_pEvokedSet->evoked.at(i).comment);
     }
 
     if(!m_filterData.isEmpty()) {
@@ -381,37 +403,32 @@ void EvokedSetModel::updateData()
 
     m_bIsInit = true;
 
-    //Update average information map
+    // Update average selection information map
+    m_qMapAverageActivation.clear();
+    m_qMapAverageColor.clear();
+
     for(int i = 0; i < m_pEvokedSet->evoked.size(); ++i) {
-        //Check if average type already exists in the map. If not delete it.
-        double avrType = m_pEvokedSet->evoked.at(i).comment.toDouble();
-        if(!m_qMapAverageInformation.contains(avrType)) {
-            AverageSelectionInfo pairFinal;
-            QPair<QString,bool> pairTemp;
+        m_qMapAverageActivation.insert(m_pEvokedSet->evoked.at(i).comment, m_pEvokedSet->evoked.at(i).active);
 
-            pairFinal.name = m_pEvokedSet->evoked.at(i).comment;
-            pairFinal.active = true;
-            pairFinal.color = Qt::yellow;
+        QColor color(m_pEvokedSet->evoked.at(i).color[0],
+                     m_pEvokedSet->evoked.at(i).color[1],
+                     m_pEvokedSet->evoked.at(i).color[2]);
 
-            m_qMapAverageInformation.insert(avrType, pairFinal);
-        } else {
-            m_qMapAverageInformation.remove(avrType);
-        }
+        m_qMapAverageColor.insert(m_pEvokedSet->evoked.at(i).comment, color);
     }
-
-    emit newAverageTypeReceived(m_qMapAverageInformation);
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
     QModelIndex bottomRight = this->index(m_pEvokedSet->info.nchan-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
+
     emit dataChanged(topLeft, bottomRight, roles);
 }
 
 
 //*************************************************************************************************************
 
-QColor EvokedSetModel::getColor(qint32 row) const
+QColor EvokedSetModel::getColorPerRow(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
@@ -422,6 +439,23 @@ QColor EvokedSetModel::getColor(qint32 row) const
 
     return QColor(0,0,0);
 }
+
+
+//*************************************************************************************************************
+
+QMap<QString, QColor> EvokedSetModel::getColorAverage() const
+{
+    return m_qMapAverageColor;
+}
+
+
+//*************************************************************************************************************
+
+QMap<QString, bool> EvokedSetModel::getActivationAverage() const
+{
+    return m_qMapAverageActivation;
+}
+
 
 
 //*************************************************************************************************************
@@ -521,6 +555,10 @@ qint32 EvokedSetModel::getNumPreStimSamples() const
 {
     int iPreSamples = 0;
 
+    if(!m_pEvokedSet) {
+        return iPreSamples;
+    }
+
     if (!m_pEvokedSet->evoked.isEmpty()) {
         RowVectorXf times = m_pEvokedSet->evoked.first().times;
 
@@ -598,6 +636,10 @@ int EvokedSetModel::getNumAverages() const
 
 void EvokedSetModel::selectRows(const QList<qint32> &selection)
 {
+    if(!m_pEvokedSet) {
+        return;
+    }
+
     beginResetModel();
 
     m_qMapIdxRowSelection.clear();
@@ -620,6 +662,10 @@ void EvokedSetModel::selectRows(const QList<qint32> &selection)
 
 void EvokedSetModel::resetSelection()
 {
+    if(!m_pEvokedSet) {
+        return;
+    }
+
     beginResetModel();
 
     m_qMapIdxRowSelection.clear();
@@ -646,6 +692,10 @@ void EvokedSetModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 
 void EvokedSetModel::updateProjection(const QList<FiffProj>& projs)
 {
+    if(!m_pEvokedSet) {
+        return;
+    }
+
     // Update the SSP projector
     if(m_pEvokedSet->info.chs.size() > 0) {
         m_pEvokedSet->info.projs = projs;
@@ -657,7 +707,7 @@ void EvokedSetModel::updateProjection(const QList<FiffProj>& projs)
         }
 
         m_pEvokedSet->info.make_projector(m_matProj);
-        qDebug() << "EvokedSetModel::updateProjection - New projection calculated. m_bProjActivated is "<<m_bProjActivated;
+        //qDebug() << "EvokedSetModel::updateProjection - New projection calculated. m_bProjActivated is "<<m_bProjActivated;
 
         //set columns of matrix to zero depending on bad channels indexes
         RowVectorXi sel;// = RowVectorXi(0,0);
@@ -712,6 +762,10 @@ void EvokedSetModel::updateProjection(const QList<FiffProj>& projs)
 
 void EvokedSetModel::updateCompensator(int to)
 {
+    if(!m_pEvokedSet) {
+        return;
+    }
+
     // Update the compensator
     if(m_pEvokedSet->info.chs.size() > 0)
     {
@@ -805,6 +859,10 @@ void EvokedSetModel::filterChanged(QList<FilterData> filterData)
 
 void EvokedSetModel::setFilterChannelType(QString channelType)
 {
+    if(!m_pEvokedSet) {
+        return;
+    }
+
     m_sFilterChannelType = channelType;
     m_filterChannelList = m_visibleChannelList;
 
@@ -853,6 +911,10 @@ void EvokedSetModel::setChannelColors(QList<QColor> channelColors)
 
 void EvokedSetModel::createFilterChannelList(QStringList channelNames)
 {
+    if(!m_pEvokedSet) {
+        return;
+    }
+
     m_filterChannelList.clear();
     m_visibleChannelList = channelNames;
 

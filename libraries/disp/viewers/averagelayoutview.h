@@ -168,19 +168,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Set the average map information
-    *
-    * @param [in] mapAvr     The average data information including the color per average type.
+    * Triggers an update for the color per average map information.
     */
-    void setAverageInformationMap(const QMap<double, AverageSelectionInfo>& mapAvr);
+    void updateColorAverage();
 
     //=========================================================================================================
     /**
-    * Returns the average map information
-    *
-    * @return     The current average data information including the color per average type.
+    * Triggers an update for the activation per average map information.
     */
-    QMap<double, AverageSelectionInfo> getAverageInformationMap();
+    void updateActivationAverage();
 
     //=========================================================================================================
     /**
@@ -203,9 +199,6 @@ protected:
     QSharedPointer<DISPLIB::EvokedSetModel>                     m_pEvokedSetModel;          /**< The data model */
     QSharedPointer<DISPLIB::ChannelInfoModel>                   m_pChannelInfoModel;        /**< Channel info model. */
     QSharedPointer<FIFFLIB::FiffInfo>                           m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
-
-    QMap<double, AverageSelectionInfo>                          m_averageInfos;             /**< The average information */
-
 };
 
 } // NAMESPACE

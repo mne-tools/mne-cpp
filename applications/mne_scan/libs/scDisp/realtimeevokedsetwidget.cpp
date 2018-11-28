@@ -249,13 +249,13 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
             settings.setValue(QString("RTESW/%1/selectedView").arg(t_sRTESName), m_pToolBox->currentIndex());
         }
 
-        //Store average colors per type
-        if(m_pAverageLayoutView) {
-            QVariant data;
-            QMap<double, AverageSelectionInfo> avrMap = m_pAverageLayoutView->getAverageInformationMap();
-            data.setValue(avrMap);
-            settings.setValue(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data);
-        }
+//        //Store average colors per type
+//        if(m_pAverageLayoutView) {
+//            QVariant data;
+//            QMap<double, AverageSelectionInfo> avrMap = m_pAverageLayoutView->getAverageInformationMap();
+//            data.setValue(avrMap);
+//            settings.setValue(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data);
+//        }
 
         //Store signal and background colors
         if(m_pQuickControlView) {
@@ -279,7 +279,6 @@ void RealTimeEvokedSetWidget::getData()
 {
     if(!m_bInitialized) {
         if(m_pRTESet->isInitialized()) {
-            m_qListChInfo = m_pRTESet->chInfo();
             m_pFiffInfo = m_pRTESet->info();
 
             if(!m_pRTESet->getValue()->evoked.isEmpty()) {
@@ -287,8 +286,6 @@ void RealTimeEvokedSetWidget::getData()
             }
 
             init();
-
-            m_pEvokedSetModel->updateData();
         }
     }
 
@@ -306,13 +303,6 @@ void RealTimeEvokedSetWidget::getData()
         FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
         pEvokedSet->info = *(m_pFiffInfo.data());
         m_pEvokedSetModel->setEvokedSet(pEvokedSet);
-
-        m_pEvokedSetModel->updateData();
-
-        // Update number of trials in GUI
-        if(m_pAveragingSettingsView) {
-            m_pAveragingSettingsView->setDetectedEpochs(pEvokedSet);
-        }
     }
 }
 
@@ -337,6 +327,13 @@ void RealTimeEvokedSetWidget::init()
         //Init data model
         m_pEvokedSetModel = EvokedSetModel::SPtr::create(this);
         m_pEvokedSetModel->setChannelColors(m_pRTESet->chColor());
+
+        if(m_pAveragingSettingsView) {
+            connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::resetAverage,
+                    m_pEvokedSetModel.data(), &EvokedSetModel::reset);
+            connect(m_pEvokedSetModel.data(), &EvokedSetModel::newDataReceived,
+                    m_pAveragingSettingsView.data(), &AveragingSettingsView::setDetectedEpochs);
+        }
 
         FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
         pEvokedSet->info = *m_pFiffInfo.data();
@@ -433,13 +430,13 @@ void RealTimeEvokedSetWidget::init()
 
         //Set stored filter settings from last session
         m_pFilterView->setFilterParameters(settings.value(QString("RTESW/%1/filterHP").arg(t_sRTESName), 5.0).toDouble(),
-                                                settings.value(QString("RTESW/%1/filterLP").arg(t_sRTESName), 40.0).toDouble(),
-                                                settings.value(QString("RTESW/%1/filterOrder").arg(t_sRTESName), 128).toInt(),
-                                                settings.value(QString("RTESW/%1/filterType").arg(t_sRTESName), 2).toInt(),
-                                                settings.value(QString("RTESW/%1/filterDesignMethod").arg(t_sRTESName), 0).toInt(),
-                                                settings.value(QString("RTESW/%1/filterTransition").arg(t_sRTESName), 5.0).toDouble(),
-                                                settings.value(QString("RTESW/%1/filterUserDesignActive").arg(t_sRTESName), false).toBool(),
-                                                settings.value(QString("RTESW/%1/filterChannelType").arg(t_sRTESName), "MEG").toString());
+                                           settings.value(QString("RTESW/%1/filterLP").arg(t_sRTESName), 40.0).toDouble(),
+                                           settings.value(QString("RTESW/%1/filterOrder").arg(t_sRTESName), 128).toInt(),
+                                           settings.value(QString("RTESW/%1/filterType").arg(t_sRTESName), 2).toInt(),
+                                           settings.value(QString("RTESW/%1/filterDesignMethod").arg(t_sRTESName), 0).toInt(),
+                                           settings.value(QString("RTESW/%1/filterTransition").arg(t_sRTESName), 5.0).toDouble(),
+                                           settings.value(QString("RTESW/%1/filterUserDesignActive").arg(t_sRTESName), false).toBool(),
+                                           settings.value(QString("RTESW/%1/filterChannelType").arg(t_sRTESName), "MEG").toString());
 
         //Init channel selection manager
         m_pChannelInfoModel = QSharedPointer<ChannelInfoModel>(new ChannelInfoModel(m_pFiffInfo, this));
@@ -529,7 +526,7 @@ void RealTimeEvokedSetWidget::init()
         pChannelDataSettingsView->setSignalBackgroundColors(QColor(),
                                                             settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
 
-        // Quick control channel data settings
+        // Quick modality selection
         ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView();
         pModalitySelectionView->init(m_pFiffInfo);
         pModalitySelectionView->setModalities(qListModalities);
@@ -538,28 +535,22 @@ void RealTimeEvokedSetWidget::init()
         connect(pModalitySelectionView, &ModalitySelectionView::modalitiesChanged,
                 m_pButterflyView.data(), &ButterflyView::setModalities);
 
-
-
+        // Quick control average selection
         AverageSelectionView* pAverageSelectionView = new AverageSelectionView();
-        pAverageSelectionView->init();
         m_pQuickControlView->addGroupBoxWithTabs(pAverageSelectionView, "Averaging", "Selection");
 
-        //Handle averages
-        connect(this->m_pEvokedSetModel.data(), &EvokedSetModel::newAverageTypeReceived,
-                pAverageSelectionView, &AverageSelectionView::setAverageInformationMap);
+        connect(pAverageSelectionView, &AverageSelectionView::averageActivationChanged,
+                m_pButterflyView.data(), &ButterflyView::updateActivationAverage);
 
-        connect(pAverageSelectionView, &AverageSelectionView::averageInformationChanged,
-                m_pAverageLayoutView.data(), &AverageLayoutView::setAverageInformationMap);
+        connect(pAverageSelectionView, &AverageSelectionView::averageActivationChanged,
+                m_pAverageLayoutView.data(), &AverageLayoutView::updateActivationAverage);
+        connect(pAverageSelectionView, &AverageSelectionView::averageColorchanged,
+                m_pAverageLayoutView.data(), &AverageLayoutView::updateColorAverage);
 
-        connect(pAverageSelectionView, &AverageSelectionView::averageInformationChanged,
-                m_pButterflyView.data(), &ButterflyView::setAverageInformationMap);
+        connect(m_pEvokedSetModel.data(), &EvokedSetModel::newDataReceived,
+                pAverageSelectionView, &AverageSelectionView::setEvokedSet);
 
-        QVariant data;
-        QMap<double, AverageSelectionInfo> emptyMap;
-        data.setValue(emptyMap);
-        QMap<double, AverageSelectionInfo> map = settings.value(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data).value<QMap<double, AverageSelectionInfo> >();
-        pAverageSelectionView->setAverageInformationMap(map);
-
+        // View settings
         m_pButterflyView->setModel(m_pEvokedSetModel);
         m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
         m_pButterflyView->setModalities(qListModalities);

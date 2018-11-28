@@ -76,7 +76,8 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageLayoutView::AverageLayoutView(QWidget *parent, Qt::WindowFlags f)
+AverageLayoutView::AverageLayoutView(QWidget *parent,
+                                     Qt::WindowFlags f)
 : QWidget(parent, f)
 {
     this->setWindowTitle("Average Layout");
@@ -195,29 +196,34 @@ void AverageLayoutView::setScaleMap(const QMap<qint32,float> &scaleMap)
     }
 
     m_pAverageScene->setScaleMap(scaleMap);
+
     updateData();
 }
 
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setAverageInformationMap(const QMap<double, AverageSelectionInfo> &mapAvr)
+void AverageLayoutView::updateColorAverage()
 {
-    if(!m_pAverageScene) {
-        qDebug() << "AverageLayoutView::setAverageInformationMap - m_pAverageScene is NULL. Returning. ";
+    if(!m_pAverageScene || !m_pEvokedSetModel) {
+        qDebug() << "AverageLayoutView::updateColorAverage - m_pAverageScene, m_pEvokedSetModel are NULL. Returning. ";
         return;
     }
 
-    m_averageInfos = mapAvr;
-    m_pAverageScene->setAverageInformationMap(mapAvr);
+    m_pAverageScene->setColorPerAverage(m_pEvokedSetModel->getColorAverage());
 }
 
 
 //*************************************************************************************************************
 
-QMap<double, AverageSelectionInfo> AverageLayoutView::getAverageInformationMap()
+void AverageLayoutView::updateActivationAverage()
 {
-    return m_averageInfos;
+    if(!m_pAverageScene || !m_pEvokedSetModel) {
+        qDebug() << "AverageLayoutView::updateActivationAverage - m_pAverageScene, m_pEvokedSetModel are NULL. Returning. ";
+        return;
+    }
+
+    m_pAverageScene->setActivationPerAverage(m_pEvokedSetModel->getActivationAverage());
 }
 
 
@@ -232,7 +238,9 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
 
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
     m_pAverageScene->repaintItems(selectedChannelItems);
-    setAverageInformationMap(m_averageInfos);
+
+    updateActivationAverage();
+    updateColorAverage();
     updateData();
 }
 
@@ -250,13 +258,13 @@ void AverageLayoutView::updateData()
     QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
 
     //Set new data for all averageSceneItems
-    for(int i = 0; i<currentAverageSceneItems.size(); i++) {
+    for(int i = 0; i < currentAverageSceneItems.size(); i++) {
         AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
 
         averageSceneItemTemp->m_lAverageData.clear();
 
         //Get only the necessary data from the average model (use column 2)
-        QList<QPair<double, DISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<double, DISPLIB::RowVectorPair> > >();
+        QList<QPair<QString, DISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<QString, DISPLIB::RowVectorPair> > >();
 
         //Get the averageScenItem specific data row
         int channelNumber = m_pChannelInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
