@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <QPainter>
+#include <QDebug>
 #include <QStaticText>
 
 
@@ -88,19 +89,7 @@ AverageSceneItem::AverageSceneItem(const QString& channelName,
 , m_iMaxHeigth(150)
 , m_iTotalNumberChannels(0)
 {
-    m_lAverageColors.append(color);
-
     m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
-
-    //Init avr map
-    AverageSelectionInfo pairFinal;
-    QPair<QString,bool> pair;
-
-    pairFinal.name = "0";
-    pairFinal.active = true;
-    pairFinal.color = QColor(0,0,0);
-
-    m_qMapAverageColor.insert(0,pairFinal);
 }
 
 
@@ -162,8 +151,8 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->save();
     QPen pen;
     pen.setColor(Qt::yellow);
-    if(!m_lAverageColors.isEmpty()) {
-        pen.setColor(m_lAverageColors.first());
+    if(!m_qMapAverageColor.isEmpty()) {
+        pen.setColor(m_qMapAverageColor.first());
     }
     pen.setWidthF(5);
 
@@ -181,16 +170,6 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 //    painter->setPen(pen);
 //    painter->drawRect(this->boundingRect());
 //    painter->restore();
-}
-
-
-//*************************************************************************************************************
-
-void AverageSceneItem::setSignalMap(const QMap<double, AverageSelectionInfo>& mapAvr)
-{
-    m_qMapAverageColor = mapAvr;
-
-    update();
 }
 
 
@@ -260,7 +239,9 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
 
     //do for all currently stored evoked set data
     for(int dataIndex = 0; dataIndex < m_lAverageData.size(); ++dataIndex) {
-        if(m_qMapAverageColor[m_lAverageData.at(dataIndex).first].active) {
+        QString sAvrComment = m_lAverageData.at(dataIndex).first;
+
+        if(m_qMapAverageActivation[sAvrComment]) {
             //plot data from averaged data m_lAverageData with the calculated downsample factor
             const double* averageData = m_lAverageData.at(dataIndex).second.first;
             int totalCols =  m_lAverageData.at(dataIndex).second.second;
@@ -283,8 +264,8 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
             pen.setStyle(Qt::SolidLine);
             pen.setColor(Qt::yellow);
 
-            if(m_qMapAverageColor.contains(m_lAverageData.at(dataIndex).first)) {
-                pen.setColor(m_qMapAverageColor[m_lAverageData.at(dataIndex).first].color);
+            if(m_qMapAverageColor.contains(sAvrComment)) {
+                pen.setColor(m_qMapAverageColor[sAvrComment]);
             }
 
             pen.setWidthF(3);

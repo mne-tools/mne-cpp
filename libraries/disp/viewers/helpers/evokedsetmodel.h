@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "../../disp_global.h"
-#include "../averageselectionview.h"
 
 #include <utils/filterTools/filterdata.h>
 #include <fiff/fiff_types.h>
@@ -105,8 +104,8 @@ namespace EvokedSetModelRoles {
 
 typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> MatrixXdR;
 typedef QPair<const double*,qint32> RowVectorPair;
-typedef QPair<double, Eigen::RowVectorXd> AvrTypeRowVector;
-typedef QPair<double, DISPLIB::RowVectorPair> AvrTypeRowVectorPair;
+typedef QPair<QString, Eigen::RowVectorXd> AvrTypeRowVector;
+typedef QPair<QString, DISPLIB::RowVectorPair> AvrTypeRowVectorPair;
 
 
 //=============================================================================================================
@@ -208,14 +207,16 @@ public:
                                 Qt::Orientation orientation,
                                 int role = Qt::DisplayRole) const;
 
+    void reset();
+
     //=========================================================================================================
     /**
     * Sets corresponding evoked set
     *
     * @param [in] pEvokedSet      The evoked set
-    * @param [in] bRese           Whether to reset the model
+    * @param [in] bReset          Whether to reset the model
     */
-    void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> &pEvokedSet,
+    void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet,
                       bool bReset = false);
 
     //=========================================================================================================
@@ -232,7 +233,11 @@ public:
     *
     * @return color of given channel number
     */
-    QColor getColor(qint32 row) const;
+    QColor getColorPerRow(qint32 row) const;
+
+    QMap<QString, QColor> getColorAverage() const;
+
+    QMap<QString, bool> getActivationAverage() const;
 
     //=========================================================================================================
     /**
@@ -421,13 +426,14 @@ private:
 
     QMap<qint32,qint32>                     m_qMapIdxRowSelection;          /**< Selection mapping.*/
     QMap<qint32,float>                      m_qMapChScaling;                /**< Channel scaling map. */
-    QMap<double, AverageSelectionInfo>      m_qMapAverageInformation;             /**< Average colors and names. */
+    QMap<QString, QColor>                   m_qMapAverageColor;             /**< Average colors. */
+    QMap<QString, bool>                     m_qMapAverageActivation;        /**< Average activation status. */
 
     QList<Eigen::MatrixXd>                  m_matData;                      /**< List that holds the data*/
     QList<Eigen::MatrixXd>                  m_matDataFreeze;                /**< List that holds the data when freezed*/
     QList<Eigen::MatrixXd>                  m_matDataFiltered;              /**< The filtered data */
     QList<Eigen::MatrixXd>                  m_matDataFilteredFreeze;        /**< The raw filtered data in freeze mode */
-    QList<double>                           m_lAvrTypes;                    /**< The average types */
+    QStringList                             m_lAvrTypes;                    /**< The average types */
     QList<QColor>                           m_qListChColors;                /**< Channel color for butterfly plot.*/
 
     Eigen::MatrixXd                         m_matProj;                      /**< SSP projector */
@@ -467,7 +473,7 @@ signals:
     *
     * @param [in] qMapAverageColor     the average information map
     */
-    void newAverageTypeReceived(QMap<double, AverageSelectionInfo> qMapAverageColor);
+    void newDataReceived(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 };
 
 

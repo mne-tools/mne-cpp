@@ -114,14 +114,6 @@ public:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    //=========================================================================================================
-    /**
-    * Set the average information for each average type
-    *
-    * @param [in] mapAvr     The new color for all channels.
-    */
-    void setSignalMap(const QMap<double, AverageSelectionInfo>& mapAvr);
-
     QString                                         m_sChannelName;             /**< The channel name.*/
     int                                             m_iChannelNumber;           /**< The channel number.*/
     int                                             m_iChannelKind;             /**< The channel kind.*/
@@ -132,15 +124,15 @@ public:
     int                                             m_iMaxHeigth;               /**< The max heigth. */
 
     QPointF                                         m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
-    QList<QColor>                                   m_lAverageColors;           /**< The current average color.*/
-    QList<QPair<double, RowVectorPair> >            m_lAverageData;             /**< The channels average data which is to be plotted.*/
+    QList<QPair<QString, RowVectorPair> >           m_lAverageData;             /**< The channels average data which is to be plotted.*/
 
     QPair<int,int>                                  m_firstLastSample;          /**< The first and last sample.*/
+
     QMap<qint32,float>                              m_scaleMap;                 /**< Map with all channel types and their current scaling value.*/
+    QMap<QString, bool>                             m_qMapAverageActivation;    /**< The average activation information.*/
+    QMap<QString, QColor>                           m_qMapAverageColor;         /**< The average color information.*/
 
     QRectF                                          m_rectBoundingRect;         /**< The bounding rect. */
-
-    QMap<double, AverageSelectionInfo>  m_qMapAverageColor;     /**< Average colors and names. */
 
 protected:
     //=========================================================================================================

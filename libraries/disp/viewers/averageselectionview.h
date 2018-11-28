@@ -68,6 +68,10 @@
 class QPushButton;
 class QCheckBox;
 
+namespace FIFFLIB {
+    class FiffEvokedSet;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -76,12 +80,6 @@ class QCheckBox;
 
 namespace DISPLIB
 {
-
-struct AverageSelectionInfo {
-    QColor color;
-    QString name;
-    bool active;
-};
 
 
 //*************************************************************************************************************
@@ -94,7 +92,7 @@ struct AverageSelectionInfo {
 /**
 * DECLARE CLASS AverageSelectionView
 *
-* @brief The AverageSelectionView class provides a view to select different averages
+* @brief The AverageSelectionView class provides a view to activate and choose colors for different averages
 */
 class DISPSHARED_EXPORT AverageSelectionView : public QWidget
 {
@@ -115,33 +113,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Init the view
-    */
-    void init();
-
-    //=========================================================================================================
-    /**
-    * Set the old average map which holds the inforamtion about the calcuated averages.
+    * Sets corresponding evoked set
     *
-    * @param [in] qMapAverageInfoOld     the old average info map.
+    * @param [in] pEvokedSet      The evoked set
     */
-    void setAverageInformationMapOld(const QMap<double, AverageSelectionInfo>& qMapAverageInfoOld);
-
-    //=========================================================================================================
-    /**
-    * Set the average map which holds the inforamtion about the currently calcuated averages.
-    *
-    * @param [in] qMapAverageSelectionInfo     the average map.
-    */
-    void setAverageInformationMap(const QMap<double, AverageSelectionInfo>& qMapAverageSelectionInfo);
-
-    //=========================================================================================================
-    /**
-    * Create list of channels which are to be filtered based on channel names
-    *
-    * @return the average information map
-    */
-    QMap<double, AverageSelectionInfo> getAverageInformationMap();
+    void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
 protected:
     //=========================================================================================================
@@ -150,27 +126,16 @@ protected:
     */
     void onAveragesChanged();
 
-    QMap<double, AverageSelectionInfo>      m_qMapAverageInfo;              /**< Average colors and names. */
-    QMap<double, AverageSelectionInfo>      m_qMapAverageInfoOld;           /**< Old average colors and names. */
-    QMap<QCheckBox*, double>                m_qMapChkBoxAverageType;        /**< Check box to average type map. */
-    QMap<QPushButton*, double>              m_qMapButtonAverageType;        /**< Push button to average type map. */
+    int m_iMaxNumAverages;
+
+    QSharedPointer<FIFFLIB::FiffEvokedSet>          m_pEvokedSet;                   /**< The pointer to the evoked data set. */
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user wants to make a screenshot.
-    *
-    * @param[out] map     The current average map.
-    */
-    void averageInformationChanged(const QMap<double, AverageSelectionInfo>& map);
+    void averageActivationChanged();
 
+    void averageColorchanged();
 };
 
 } // NAMESPACE
-
-#ifndef metatype_averageselectioninfo
-#define metatype_averageselectioninfo
-Q_DECLARE_METATYPE(DISPLIB::AverageSelectionInfo); /**< Provides QT META type declaration of the DISPLIBB::AverageSelectionInfo type. For signal/slot usage.*/
-#endif
 
 #endif // AVERAGESELECTIONVIEW_H

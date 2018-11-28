@@ -40,6 +40,8 @@
 
 #include "averageselectionview.h"
 
+#include <fiff/fiff_evoked_set.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -60,6 +62,8 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
+#include<Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,6 +71,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -75,8 +80,9 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 AverageSelectionView::AverageSelectionView(QWidget *parent,
-                         Qt::WindowFlags f)
+                                           Qt::WindowFlags f)
 : QWidget(parent, f)
+, m_iMaxNumAverages(10)
 {
     this->setWindowTitle("Average Selection");
     this->setMinimumWidth(330);
@@ -86,180 +92,53 @@ AverageSelectionView::AverageSelectionView(QWidget *parent,
 
 //*************************************************************************************************************
 
-void AverageSelectionView::init()
+void AverageSelectionView::setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet)
 {
-//    //Delete all widgets in the averages layout
-//    QGridLayout* topLayout = static_cast<QGridLayout*>(this->layout());
 
-//    if(!topLayout) {
-//       topLayout = new QGridLayout();
-//    }
-
-//    QLayoutItem *child;
-//    bool bKeepItem = false;
-
-//    while ((child = topLayout->takeAt(0)) != 0) {
-//        if(child->widget()->objectName() == QString(sAvrType)) {
-//            bKeepItem = true;
-//            break;
-//        }
-//    }
-
-
-
-//    QMapIterator<double, AverageSelectionInfo> i(m_qMapAverageInfo);
-//    int count = 0;
-
-//    while (i.hasNext() && count < 10) {
-//        i.next();
-
-//        QString sAvrType = i.value().second.first;
-
-
-//        while ((child = topLayout->takeAt(0)) != 0) {
-//            if(child->widget()->objectName() == QString(sAvrType)) {
-//                bKeepItem = true;
-//                break;
-//            }
-//        }
-
-//        if(!bKeepItem) {
-//            delete child->widget();
-//            delete child;
-//        }
-//    }
-
-
-
-
-
-
-
-//    //Create trigger type check boxes. Limit to 10.
-//    QMapIterator<double, AverageSelectionInfo> i(m_qMapAverageInfo);
-//    int count = 0;
-//    m_qMapButtonAverageType.clear();
-//    m_qMapChkBoxAverageType.clear();
-
-//    while (i.hasNext() && count < 10) {
-//        i.next();
-
-//        //Create average checkbox
-//        QCheckBox* pCheckBox = new QCheckBox(i.value().second.first);
-//        pCheckBox->setChecked(i.value().second.second);
-//        topLayout->addWidget(pCheckBox, count, 0);
-//        connect(pCheckBox, &QCheckBox::clicked,
-//                this, &AverageSelectionView::onAveragesChanged);
-//        m_qMapChkBoxAverageType.insert(pCheckBox, i.value().second.first.toDouble());
-
-//        //Create average color pushbutton
-//        QPushButton* pButton = new QPushButton();
-//        pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(i.value().first.red()).arg(i.value().first.green()).arg(i.value().first.blue()));
-//        topLayout->addWidget(pButton, count, 1);
-//        connect(pButton, &QPushButton::clicked,
-//                this, &AverageSelectionView::onAveragesChanged);
-//        m_qMapButtonAverageType.insert(pButton, i.value().second.first.toDouble());
-
-//        ++count;
-//    }
-
-//    //Find Filter tab and add current layout
-//    this->setLayout(topLayout);
-}
-
-
-//*************************************************************************************************************
-
-void AverageSelectionView::setAverageInformationMapOld(const QMap<double, AverageSelectionInfo>& qMapAverageInfoOld)
-{
-    m_qMapAverageInfoOld = qMapAverageInfoOld;
-}
-
-
-//*************************************************************************************************************
-
-void AverageSelectionView::setAverageInformationMap(const QMap<double, AverageSelectionInfo> &qMapAverageSelectionInfo)
-{
-    //m_qMapAverageInfo = qMapAverageSelectionInfo;
-    //Delete all widgets in the averages layout
-    QGridLayout* topLayout = static_cast<QGridLayout*>(this->layout());
-
-    if(!topLayout) {
-       topLayout = new QGridLayout();
-       this->setLayout(topLayout);
+    if(!pEvokedSet) {
+        return;
     }
 
-    //Check if average type already exists in the map
-    QMapIterator<double, AverageSelectionInfo> i(qMapAverageSelectionInfo);
+    qDebug() << "AverageSelectionView::setEvokedSet";
+    m_pEvokedSet = pEvokedSet;
 
-    while (i.hasNext()) {
-        i.next();
-
-        if(!m_qMapAverageInfo.contains(i.key())) {
-            m_qMapAverageInfo.insert(i.key(), i.value());
-
-            int row = topLayout->count();
-
-            // Create checkbox
-            QPointer<QCheckBox> pCheckBox = new QCheckBox(i.value().name);
-            pCheckBox->setObjectName(i.value().name);
-            pCheckBox->setChecked(i.value().active);
-            topLayout->addWidget(pCheckBox, row, 0);
-            connect(pCheckBox.data(), &QCheckBox::clicked,
-                    this, &AverageSelectionView::onAveragesChanged);
-            m_qMapChkBoxAverageType.insert(pCheckBox, i.value().name.toDouble());
-
-            // Create pushbutton
-            QPointer<QPushButton> pButton = new QPushButton();
-            pButton->setObjectName(i.value().name);
-            pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(i.value().color.red()).arg(i.value().color.green()).arg(i.value().color.blue()));
-            topLayout->addWidget(pButton, row, 1);
-            connect(pButton.data(), &QPushButton::clicked,
-                    this, &AverageSelectionView::onAveragesChanged);
-            m_qMapButtonAverageType.insert(pButton, i.value().name.toDouble());
-        }
-
-//        if(m_qMapAverageInfoOld.contains(i.key())) {
-//            //Use old color
-//            AverageSelectionInfo tempPair = i.value();
-//            tempPair.first = m_qMapAverageInfoOld[i.key()].first;
-
-//            m_qMapAverageInfo.insert(i.key(), tempPair);
-//        } else {
-//            //Use default color
-//            m_qMapAverageInfo.insert(i.key(), i.value());
-//        }
+    //Delete all widgets in the averages layout
+    QGridLayout* topLayout = static_cast<QGridLayout*>(this->layout());
+    if(!topLayout) {
+       topLayout = new QGridLayout();
     }
 
     QLayoutItem *child;
-    bool bKeepItem = false;
-    int count = topLayout->count();
-
-    for(int i = 0; i < count; ++i) {
-        if(!m_qMapAverageInfo.contains(topLayout->itemAt(i)->widget()->objectName())) {
-            topLayout->
-        }
+    while ((child = topLayout->takeAt(0)) != 0) {
+        delete child->widget();
+        delete child;
     }
 
-    while ((child = topLayout->itemAt(0)) != 0) {
-        if(child->widget()->objectName() == QString(sAvrType)) {
-            bKeepItem = true;
+    // Create new GUI elements
+    for(int i = 0; i < pEvokedSet->evoked.size(); ++i) {
+        if(i >= m_iMaxNumAverages) {
             break;
         }
+
+        //Create average active checkbox
+        QPointer<QCheckBox> pCheckBox = new QCheckBox(pEvokedSet->evoked.at(i).comment);
+        pCheckBox->setChecked(pEvokedSet->evoked.at(i).active);
+        pCheckBox->setObjectName(pEvokedSet->evoked.at(i).comment);
+        topLayout->addWidget(pCheckBox, i, 0);
+        connect(pCheckBox, &QCheckBox::clicked,
+                this, &AverageSelectionView::onAveragesChanged);
+
+        //Create average color pushbutton
+        Vector4i color = pEvokedSet->evoked.at(i).color;
+        QPointer<QPushButton> pButton = new QPushButton();
+        pButton->setObjectName(pEvokedSet->evoked.at(i).comment);
+        pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color[0]).arg(color[1]).arg(color[2]));
+        topLayout->addWidget(pButton, i, 1);
+        connect(pButton, &QPushButton::clicked,
+                this, &AverageSelectionView::onAveragesChanged);
     }
 
-    //Recreate average group
-    //init();
-
-    emit averageInformationChanged(m_qMapAverageInfo);
-}
-
-
-//*************************************************************************************************************
-
-QMap<double, AverageSelectionInfo> AverageSelectionView::getAverageInformationMap()
-{
-    return m_qMapAverageInfo;
+    this->setLayout(topLayout);
 }
 
 
@@ -269,7 +148,9 @@ void AverageSelectionView::onAveragesChanged()
 {
     //Change color for average
     if(QPointer<QPushButton> button = qobject_cast<QPushButton*>(sender())) {
-        QColor color = QColorDialog::getColor(m_qMapAverageInfo[m_qMapButtonAverageType[button]].color, this, "Set average color");
+        QString sObjectName = button->objectName();
+
+        QColor color = QColorDialog::getColor(button->palette().color(QPalette::Background), this, "Set average color");
 
         if(button) {
             QPalette palette(QPalette::Button,color);
@@ -278,17 +159,27 @@ void AverageSelectionView::onAveragesChanged()
 
             //Set color of button new new scene color
             button->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
-
-            m_qMapAverageInfo[m_qMapButtonAverageType[button]].color = color;
-
-            emit averageInformationChanged(m_qMapAverageInfo);
         }
+
+        for(int i = 0; i < m_pEvokedSet->evoked.size(); ++i) {
+            if(sObjectName == m_pEvokedSet->evoked.at(i).comment) {
+                m_pEvokedSet->evoked[i].color = Vector4i(color.red(), color.green(), color.blue(), color.alpha());
+            }
+        }
+
+        emit averageColorchanged();
     }
 
     //Change color for average
     if(QPointer<QCheckBox> checkBox = qobject_cast<QCheckBox*>(sender())) {
-        m_qMapAverageInfo[m_qMapChkBoxAverageType[checkBox]].active = checkBox->isChecked();
+        QString sObjectName = checkBox->objectName();
 
-        emit averageInformationChanged(m_qMapAverageInfo);
+        for(int i = 0; i < m_pEvokedSet->evoked.size(); ++i) {
+            if(sObjectName == m_pEvokedSet->evoked.at(i).comment) {
+                m_pEvokedSet->evoked[i].active = checkBox->isChecked();
+            }
+        }
+
+        emit averageActivationChanged();
     }
 }

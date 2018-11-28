@@ -45,7 +45,6 @@
 #include "../disp_global.h"
 
 #include "modalityselectionview.h"
-#include "averageselectionview.h"
 
 
 //*************************************************************************************************************
@@ -183,11 +182,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Set the average map information
-    *
-    * @param [in] mapAvr     The average data information including the color per average type.
+    * Triggers an update for the activation per average map information.
     */
-    void setAverageInformationMap(const QMap<double, AverageSelectionInfo>& mapAvr);
+    void updateActivationAverage();
 
     //=========================================================================================================
     /**
@@ -243,12 +240,12 @@ private:
 
     QList<int>  m_lSelectedChannels;            /**< The currently selected channels */
 
-    QList<DISPLIB::Modality>                m_qListModalities;                      /**< The list of currently selected modalities */
+    QList<DISPLIB::Modality>                m_qListModalities;              /**< The list of currently selected modalities */
 
-    QSharedPointer<EvokedSetModel>          m_pEvokedModel;                         /**< The evoked model */
-    QSharedPointer<ChannelInfoModel>        m_pChannelInfoModel;                    /**< The channel info model */
+    QSharedPointer<EvokedSetModel>          m_pEvokedSetModel;                 /**< The evoked model */
+    QSharedPointer<ChannelInfoModel>        m_pChannelInfoModel;            /**< The channel info model */
+    QMap<QString, bool>                     m_qMapAverageActivation;        /**< Average activation status. */
 
-    QMap<double, AverageSelectionInfo>      m_qMapAverageColor;     /**< The current average color information. */
 };
 
 
