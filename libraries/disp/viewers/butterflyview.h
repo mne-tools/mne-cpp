@@ -184,7 +184,7 @@ public:
     /**
     * Triggers an update for the activation per average map information.
     */
-    void setAverageActivation(const QMap<QString, bool>& qMapAverageActivation);
+    void setAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
     //=========================================================================================================
     /**
@@ -242,9 +242,9 @@ private:
 
     QList<DISPLIB::Modality>                m_qListModalities;              /**< The list of currently selected modalities */
 
-    QSharedPointer<EvokedSetModel>          m_pEvokedSetModel;                 /**< The evoked model */
+    QSharedPointer<EvokedSetModel>          m_pEvokedSetModel;              /**< The evoked model */
     QSharedPointer<ChannelInfoModel>        m_pChannelInfoModel;            /**< The channel info model */
-    QMap<QString, bool>                     m_qMapAverageActivation;        /**< Average activation status. */
+    QSharedPointer<QMap<QString, bool> >    m_qMapAverageActivation;        /**< Average activation status. */
 
 };
 
