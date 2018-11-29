@@ -170,13 +170,13 @@ public:
     /**
     * Triggers an update for the color per average map information.
     */
-    void setAverageColor(const QMap<QString, QColor>& qMapAverageColor);
+    void setAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
     //=========================================================================================================
     /**
     * Triggers an update for the activation per average map information.
     */
-    void setAverageActivation(const QMap<QString, bool>& qMapAverageActivation);
+    void setAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
     //=========================================================================================================
     /**
@@ -195,8 +195,8 @@ public:
 protected:
     QSharedPointer<AverageScene>                                m_pAverageScene;            /**< The pointer to the average scene. */
     QPointer<QGraphicsView>                                     m_pAverageLayoutView;       /**< View for 2D average layout scene */
-    QMap<QString, QColor>                                       m_qMapAverageColor;         /**< Average colors. */
-    QMap<QString, bool>                                         m_qMapAverageActivation;    /**< Average activation status. */
+    QSharedPointer<QMap<QString, QColor> >                      m_qMapAverageColor;         /**< Average colors. */
+    QSharedPointer<QMap<QString, bool> >                        m_qMapAverageActivation;    /**< Average activation status. */
 
     QSharedPointer<DISPLIB::EvokedSetModel>                     m_pEvokedSetModel;          /**< The data model */
     QSharedPointer<DISPLIB::ChannelInfoModel>                   m_pChannelInfoModel;        /**< Channel info model. */

@@ -84,6 +84,10 @@ EvokedSetModel::EvokedSetModel(QObject *parent)
 , m_bCompActivated(false)
 , m_bIsInit(false)
 , m_iMaxFilterLength(100)
+, m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
+, m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
+, m_qMapAverageColorOld(QSharedPointer<QMap<QString, QColor> >::create())
+, m_qMapAverageActivationOld(QSharedPointer<QMap<QString, bool> >::create())
 {
 }
 
@@ -337,8 +341,10 @@ void EvokedSetModel::reset()
     m_matSparseCompMult.setIdentity();
     m_matSparseProjCompMult.setIdentity();
 
-    m_qMapAverageActivation.clear();
-    m_qMapAverageColor.clear();
+    m_qMapAverageActivation->clear();
+    m_qMapAverageColor->clear();
+    m_qMapAverageActivationOld->clear();
+    m_qMapAverageColorOld->clear();
 
     //Create the initial SSP projector
     updateProjection(m_pEvokedSet->info.projs);
@@ -404,26 +410,40 @@ void EvokedSetModel::updateData()
     m_bIsInit = true;
 
     // Update average selection information map
-    qDebug() << "EvokedSetModel::updateData - m_pEvokedSet->evoked.size()" << m_pEvokedSet->evoked.size();
-
     QStringList slCurrentAvrComments;
-    int iSizeAvrActivation = m_qMapAverageActivation.size();
-    int iSizeAvrColor = m_qMapAverageColor.size();
+    int iSizeAvrActivation = m_qMapAverageActivation->size();
+    int iSizeAvrColor = m_qMapAverageColor->size();
 
     for(int i = 0; i < m_pEvokedSet->evoked.size(); ++i) {
         slCurrentAvrComments << m_pEvokedSet->evoked.at(i).comment;
 
-        if(!m_qMapAverageActivation.contains(m_pEvokedSet->evoked.at(i).comment)) {
-            m_qMapAverageActivation.insert(m_pEvokedSet->evoked.at(i).comment, true);
+        if(!m_qMapAverageActivation->contains(m_pEvokedSet->evoked.at(i).comment)) {
+            if(m_qMapAverageActivationOld->contains(m_pEvokedSet->evoked.at(i).comment)) {
+                m_qMapAverageActivation->insert(m_pEvokedSet->evoked.at(i).comment, m_qMapAverageActivation->value(m_pEvokedSet->evoked.at(i).comment));
+            } else {
+                m_qMapAverageActivation->insert(m_pEvokedSet->evoked.at(i).comment, true);
+            }
         }
 
-        if(!m_qMapAverageColor.contains(m_pEvokedSet->evoked.at(i).comment)) {
-            m_qMapAverageColor.insert(m_pEvokedSet->evoked.at(i).comment, Qt::yellow);
+        if(!m_qMapAverageColor->contains(m_pEvokedSet->evoked.at(i).comment)) {
+            if(m_qMapAverageColorOld->contains(m_pEvokedSet->evoked.at(i).comment)) {
+                m_qMapAverageColor->insert(m_pEvokedSet->evoked.at(i).comment, m_qMapAverageColor->value(m_pEvokedSet->evoked.at(i).comment));
+            } else {
+                m_qMapAverageColor->insert(m_pEvokedSet->evoked.at(i).comment, Qt::yellow);
+            }
+        }
+
+        if(!m_qMapAverageActivationOld->contains(m_pEvokedSet->evoked.at(i).comment)) {
+            m_qMapAverageActivationOld->insert(m_pEvokedSet->evoked.at(i).comment, true);
+        }
+
+        if(!m_qMapAverageColorOld->contains(m_pEvokedSet->evoked.at(i).comment)) {
+            m_qMapAverageColorOld->insert(m_pEvokedSet->evoked.at(i).comment, Qt::yellow);
         }
     }
 
     // Delete average color and activation if they are no longer present in the evoked set
-    QMutableMapIterator<QString, bool> itrActivation(m_qMapAverageActivation);
+    QMutableMapIterator<QString, bool> itrActivation(*m_qMapAverageActivation);
     while(itrActivation.hasNext()) {
         itrActivation.next();
         if(!slCurrentAvrComments.contains(itrActivation.key())) {
@@ -431,7 +451,7 @@ void EvokedSetModel::updateData()
         }
     }
 
-    QMutableMapIterator<QString, QColor> itrColor(m_qMapAverageColor);
+    QMutableMapIterator<QString, QColor> itrColor(*m_qMapAverageColor);
     while(itrColor.hasNext()) {
         itrColor.next();
         if(!slCurrentAvrComments.contains(itrColor.key())) {
@@ -440,12 +460,12 @@ void EvokedSetModel::updateData()
     }
 
     // Only emit new colors and activations if evoked types were added or deleted
-    if(iSizeAvrColor != m_qMapAverageColor.size()) {
-        emit newAverageColor(m_qMapAverageColor);
+    if(iSizeAvrColor != m_qMapAverageColor->size()) {
+        emit newAverageColorMap(m_qMapAverageColor);
     }
 
-    if(iSizeAvrActivation != m_qMapAverageActivation.size()) {
-        emit newAverageActivation(m_qMapAverageActivation);
+    if(iSizeAvrActivation != m_qMapAverageActivation->size()) {
+        emit newAverageActivationMap(m_qMapAverageActivation);
     }
 
     //Update data content
@@ -474,7 +494,7 @@ QColor EvokedSetModel::getColorPerRow(qint32 row) const
 
 //*************************************************************************************************************
 
-QMap<QString, QColor> EvokedSetModel::getAverageColor() const
+QSharedPointer<QMap<QString, QColor> > EvokedSetModel::getAverageColor() const
 {
     return m_qMapAverageColor;
 }
@@ -482,7 +502,7 @@ QMap<QString, QColor> EvokedSetModel::getAverageColor() const
 
 //*************************************************************************************************************
 
-QMap<QString, bool> EvokedSetModel::getAverageActivation() const
+QSharedPointer<QMap<QString, bool> > EvokedSetModel::getAverageActivation() const
 {
     return m_qMapAverageActivation;
 }
@@ -490,17 +510,19 @@ QMap<QString, bool> EvokedSetModel::getAverageActivation() const
 
 //*************************************************************************************************************
 
-void EvokedSetModel::setAverageColor(const QMap<QString, QColor>& qMapAverageColor)
+void EvokedSetModel::setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
 {
     m_qMapAverageColor = qMapAverageColor;
+    m_qMapAverageColorOld = qMapAverageColor;
 }
 
 
 //*************************************************************************************************************
 
-void EvokedSetModel::setAverageActivation(const QMap<QString, bool>& qMapAverageActivation)
+void EvokedSetModel::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
 {
     m_qMapAverageActivation = qMapAverageActivation;
+    m_qMapAverageActivationOld = qMapAverageActivation;
 }
 
 

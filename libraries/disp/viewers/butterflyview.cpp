@@ -84,6 +84,7 @@ ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
 , m_fMaxEEG(0.0)
 , m_fMaxEOG(0.0)
 , m_fMaxMISC(0.0)
+, m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 {
 }
 
@@ -113,7 +114,7 @@ void ButterflyView::dataUpdate(const QModelIndex& topLeft, const QModelIndex& bo
         m_bIsInit = true;
     }
 
-    setAverageActivation(m_qMapAverageActivation);
+    setAverageActivationMap(m_qMapAverageActivation);
 
     update();
 }
@@ -235,7 +236,7 @@ void ButterflyView::takeScreenshot(const QString& fileName)
 
 //*************************************************************************************************************
 
-void ButterflyView::setAverageActivation(const QMap<QString, bool>& qMapAverageActivation)
+void ButterflyView::setAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
 {
     m_qMapAverageActivation = qMapAverageActivation;
     update();
@@ -526,7 +527,7 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
     for(int j = 0; j < rowVec.size(); ++j) {
         QString sAvrComment = rowVec.at(j).first;
 
-        if(m_qMapAverageActivation[sAvrComment]) {
+        if(m_qMapAverageActivation->value(sAvrComment)) {
             //Calculate downsampling factor of averaged data in respect to the items width
             int dsFactor;
             rowVec.at(j).second.cols() / this->width() < 1 ? dsFactor = 1 : dsFactor = rowVec.at(j).second.cols() / this->width();

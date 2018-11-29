@@ -125,7 +125,7 @@ public:
     *
     * @param [in] qMapActivationPerAverage     The average activation information.
     */
-    void setActivationPerAverage(const QMap<QString, bool>& qMapActivationPerAverage);
+    void setActivationPerAverage(const QSharedPointer<QMap<QString, bool> > qMapActivationPerAverage);
 
     //=========================================================================================================
     /**
@@ -133,7 +133,7 @@ public:
     *
     * @param [in] qMapAverageColor     The average color information.
     */
-    void setColorPerAverage(const QMap<QString, QColor>& qMapAverageColor);
+    void setColorPerAverage(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
     //=========================================================================================================
     /**

@@ -104,8 +104,8 @@ public:
     AverageSelectionView(QWidget *parent = 0,
                          Qt::WindowFlags f = Qt::Widget);
 
-    void setAverageColor(const QMap<QString, QColor>& qMapAverageColor);
-    void setAverageActivation(const QMap<QString, bool>& qMapAverageActivation);
+    void setAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+    void setAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
 protected:
     //=========================================================================================================
@@ -124,12 +124,12 @@ protected:
 
     int m_iMaxNumAverages;
 
-    QMap<QString, QColor>                   m_qMapAverageColor;             /**< Average colors. */
-    QMap<QString, bool>                     m_qMapAverageActivation;        /**< Average activation status. */
+    QSharedPointer<QMap<QString, QColor> >    m_qMapAverageColor;             /**< Average colors. */
+    QSharedPointer<QMap<QString, bool> >      m_qMapAverageActivation;        /**< Average activation status. */
 
 signals:    
-    void newAverageColor(const QMap<QString, QColor>& qMapAverageColor);
-    void newAverageActivation(const QMap<QString, bool>& qMapAverageActivation);
+    void newAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+    void newAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 };
 
 } // NAMESPACE

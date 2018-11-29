@@ -235,13 +235,13 @@ public:
     */
     QColor getColorPerRow(qint32 row) const;
 
-    QMap<QString, QColor> getAverageColor() const;
+    QSharedPointer<QMap<QString, QColor> > getAverageColor() const;
 
-    QMap<QString, bool> getAverageActivation() const;
+    QSharedPointer<QMap<QString, bool> > getAverageActivation() const;
 
-    void setAverageColor(const QMap<QString, QColor>& qMapAverageColor);
+    void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
-    void setAverageActivation(const QMap<QString, bool>& qMapAverageActivation);
+    void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
     //=========================================================================================================
     /**
@@ -430,8 +430,10 @@ private:
 
     QMap<qint32,qint32>                     m_qMapIdxRowSelection;          /**< Selection mapping.*/
     QMap<qint32,float>                      m_qMapChScaling;                /**< Channel scaling map. */
-    QMap<QString, QColor>                   m_qMapAverageColor;             /**< Average colors. */
-    QMap<QString, bool>                     m_qMapAverageActivation;        /**< Average activation status. */
+    QSharedPointer<QMap<QString, QColor> >  m_qMapAverageColor;             /**< Average colors. */
+    QSharedPointer<QMap<QString, bool> >    m_qMapAverageActivation;        /**< Average activation status. */
+    QSharedPointer<QMap<QString, QColor> >  m_qMapAverageColorOld;          /**< Average colors. */
+    QSharedPointer<QMap<QString, bool> >    m_qMapAverageActivationOld;     /**< Average activation status. */
 
     QList<Eigen::MatrixXd>                  m_matData;                      /**< List that holds the data*/
     QList<Eigen::MatrixXd>                  m_matDataFreeze;                /**< List that holds the data when freezed*/
@@ -479,8 +481,8 @@ signals:
     */
     void newDataReceived(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
-    void newAverageColor(const QMap<QString, QColor>& qMapAverageColor);
-    void newAverageActivation(const QMap<QString, bool>& qMapAverageActivation);
+    void newAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+    void newAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 };
 
 
