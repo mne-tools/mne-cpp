@@ -65,13 +65,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QPushButton;
-class QCheckBox;
-
-namespace FIFFLIB {
-    class FiffEvokedSet;
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -111,15 +104,18 @@ public:
     AverageSelectionView(QWidget *parent = 0,
                          Qt::WindowFlags f = Qt::Widget);
 
+    void setAverageColor(const QMap<QString, QColor>& qMapAverageColor);
+    void setAverageActivation(const QMap<QString, bool>& qMapAverageActivation);
+
+protected:
     //=========================================================================================================
     /**
     * Sets corresponding evoked set
     *
     * @param [in] pEvokedSet      The evoked set
     */
-    void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
+    void update();
 
-protected:
     //=========================================================================================================
     /**
     * Call this slot whenever the averages changed.
@@ -128,12 +124,12 @@ protected:
 
     int m_iMaxNumAverages;
 
-    QSharedPointer<FIFFLIB::FiffEvokedSet>          m_pEvokedSet;                   /**< The pointer to the evoked data set. */
+    QMap<QString, QColor>                   m_qMapAverageColor;             /**< Average colors. */
+    QMap<QString, bool>                     m_qMapAverageActivation;        /**< Average activation status. */
 
-signals:
-    void averageActivationChanged();
-
-    void averageColorchanged();
+signals:    
+    void newAverageColor(const QMap<QString, QColor>& qMapAverageColor);
+    void newAverageActivation(const QMap<QString, bool>& qMapAverageActivation);
 };
 
 } // NAMESPACE

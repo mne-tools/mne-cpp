@@ -203,27 +203,29 @@ void AverageLayoutView::setScaleMap(const QMap<qint32,float> &scaleMap)
 
 //*************************************************************************************************************
 
-void AverageLayoutView::updateColorAverage()
+void AverageLayoutView::setAverageColor(const QMap<QString, QColor>& qMapAverageColor)
 {
-    if(!m_pAverageScene || !m_pEvokedSetModel) {
-        qDebug() << "AverageLayoutView::updateColorAverage - m_pAverageScene, m_pEvokedSetModel are NULL. Returning. ";
+    if(!m_pAverageScene) {
+        qDebug() << "AverageLayoutView::setColorAverage - m_pAverageScene is NULL. Returning. ";
         return;
     }
 
-    m_pAverageScene->setColorPerAverage(m_pEvokedSetModel->getColorAverage());
+    m_qMapAverageColor = qMapAverageColor;
+    m_pAverageScene->setColorPerAverage(m_qMapAverageColor);
 }
 
 
 //*************************************************************************************************************
 
-void AverageLayoutView::updateActivationAverage()
+void AverageLayoutView::setAverageActivation(const QMap<QString, bool>& qMapAverageActivation)
 {
-    if(!m_pAverageScene || !m_pEvokedSetModel) {
-        qDebug() << "AverageLayoutView::updateActivationAverage - m_pAverageScene, m_pEvokedSetModel are NULL. Returning. ";
+    if(!m_pAverageScene) {
+        qDebug() << "AverageLayoutView::setColorAverage - m_pAverageScene is NULL. Returning. ";
         return;
     }
 
-    m_pAverageScene->setActivationPerAverage(m_pEvokedSetModel->getActivationAverage());
+    m_qMapAverageActivation = qMapAverageActivation;
+    m_pAverageScene->setActivationPerAverage(qMapAverageActivation);
 }
 
 
@@ -239,8 +241,8 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
     m_pAverageScene->repaintItems(selectedChannelItems);
 
-    updateActivationAverage();
-    updateColorAverage();
+    setAverageColor(m_qMapAverageColor);
+    setAverageActivation(m_qMapAverageActivation);
     updateData();
 }
 

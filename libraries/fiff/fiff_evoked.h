@@ -237,8 +237,6 @@ public:
     MatrixXd                    data;               /**< 2D array of shape [n_channels x n_times]; Evoked response. */
     MatrixXd                    proj;               /**< SSP projection */
     QPair<QVariant,QVariant>    baseline;           /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
-    Vector4i                    color;              /**< The color as RGBA used when plotting. */
-    bool                        active;             /**< The active flag when plotting. */
 };
 
 //*************************************************************************************************************

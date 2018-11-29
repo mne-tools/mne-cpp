@@ -349,12 +349,7 @@ void RtAve::run()
 
 void RtAve::doAveraging(const MatrixXd& rawSegment)
 {
-    //qDebug()<<"";
-    //qDebug()<<"";
-    //qDebug()<<"";
-
     //Detect trigger
-
     //QElapsedTimer time;
     //time.start();
 
@@ -391,19 +386,14 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
 
         double dTriggerType = idx.key();
 
-        //qDebug()<<"1 dTriggerType"<<dTriggerType;
-
+        //Fill front / pre stim buffer
         if(lDetectedTriggers.isEmpty()) {
-            //qDebug()<<"6";
-            //Fill front / pre stim buffer
             fillFrontBuffer(rawSegment, -1.0);
         }
 
         //Fill back buffer and decide when to do the data packing of the different buffers
         if(m_mapFillingBackBuffer[dTriggerType]) {
-            //qDebug()<<"2";
             if(m_mapMatDataPostIdx[dTriggerType] == m_iPostStimSamples) {
-                //qDebug()<<"3";
                 m_mapFillingBackBuffer[dTriggerType] = 0;
 
                 //Merge the different buffers
@@ -425,27 +415,21 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
                 //qDebug()<<"RtAve::run() - dTriggerType:" << dTriggerType;
                 //qDebug()<<"RtAve::run() - m_mapStimAve[dTriggerType].size():" << m_mapStimAve[dTriggerType].size();
             } else {
-                //qDebug()<<"4";
                 fillBackBuffer(rawSegment, dTriggerType);
             }
         } else {
             if(lDetectedTriggers.isEmpty()) {
-                //qDebug()<<"6";
                 //Fill front / pre stim buffer
                 fillFrontBuffer(rawSegment, dTriggerType);
             } else {
                 for(int i = 0; i < lDetectedTriggers.size(); ++i) {
                     if(dTriggerType == lDetectedTriggers.at(i).second) {
-                        //qDebug()<<"8";
                         int iTriggerPos = lDetectedTriggers.at(i).first;
 
                         //If number of averages is equals zero do not perform averages
                         if(m_iNumAverages == 0) {
                             iTriggerPos = rawSegment.cols()-1;
                         }
-
-                        //qDebug()<<"8.1";
-
                         //Do front buffer stuff
                         MatrixXd tempMat;
 
@@ -457,8 +441,6 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
                             fillFrontBuffer(tempMat, dTriggerType);
                         }
 
-                        //qDebug()<<"8.2";
-
                         //Do back buffer stuff
                         if(rawSegment.cols() - iTriggerPos >= m_mapDataPost[dTriggerType].cols()) {
                             m_mapDataPost[dTriggerType] = rawSegment.block(0,iTriggerPos,m_mapDataPost[dTriggerType].rows(),m_mapDataPost[dTriggerType].cols());
@@ -467,8 +449,6 @@ void RtAve::doAveraging(const MatrixXd& rawSegment)
                             m_mapDataPost[dTriggerType].block(0,0,m_mapDataPost[dTriggerType].rows(),rawSegment.cols() - iTriggerPos) = rawSegment.block(0,iTriggerPos,rawSegment.rows(),rawSegment.cols() - iTriggerPos);
                             m_mapMatDataPostIdx[dTriggerType] = rawSegment.cols() - iTriggerPos;
                         }
-
-                        //qDebug()<<"8.3";
 
                         m_mapFillingBackBuffer[dTriggerType] = true;
 
@@ -688,10 +668,7 @@ void RtAve::generateEvoked(double dTriggerType)
 
 void RtAve::reset()
 {
-//    qDebug()<<"RtAve::reset()";
     QMutexLocker locker(&m_qMutex);
-
-    //qDebug()<<"RtAve::reset() - 1";
 
     //Reset
     m_iPreStimSamples = m_iNewPreStimSamples;
@@ -699,20 +676,10 @@ void RtAve::reset()
     m_iTriggerChIndex = m_iNewTriggerIndex;
     m_iAverageMode = m_iNewAverageMode;
 
-    //qDebug()<<"RtAve::reset() - 2";
-
     //Clear all evoked data information
     m_pStimEvokedSet->evoked.clear();
 
-   // qDebug()<<"RtAve::reset() - 3";
-
     //Clear all maps
-//    m_mapDataPre.clear();
-//    m_mapDataPost.clear();
-//    m_mapFillingBackBuffer.clear();
-//    m_mapStimAve.clear();
-//    m_mapNumberCalcAverages.clear();
-
     m_qMapDetectedTrigger.clear();
     m_mapStimAve.clear();
     m_mapDataPre.clear();
@@ -720,8 +687,6 @@ void RtAve::reset()
     m_mapMatDataPostIdx.clear();
     m_mapFillingBackBuffer.clear();
     m_mapNumberCalcAverages.clear();
-
- //   qDebug()<<"RtAve::reset() - 4";
 
 //    QMutableMapIterator<double,Eigen::MatrixXd> i0(m_mapDataPre);
 //    while (i0.hasNext()) {

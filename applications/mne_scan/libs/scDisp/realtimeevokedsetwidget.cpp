@@ -249,13 +249,17 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
             settings.setValue(QString("RTESW/%1/selectedView").arg(t_sRTESName), m_pToolBox->currentIndex());
         }
 
-//        //Store average colors per type
-//        if(m_pAverageLayoutView) {
-//            QVariant data;
-//            QMap<double, AverageSelectionInfo> avrMap = m_pAverageLayoutView->getAverageInformationMap();
-//            data.setValue(avrMap);
-//            settings.setValue(QString("RTESW/%1/averageInfoMap").arg(t_sRTESName), data);
-//        }
+        //Store average colors per type
+        if(m_pEvokedSetModel) {
+            QVariant data;
+            QMap<QString, QColor> qMapAverageColor = m_pEvokedSetModel->getAverageColor();
+            data.setValue(qMapAverageColor);
+            settings.setValue(QString("RTESW/%1/averageColorMap").arg(t_sRTESName), data);
+
+            QMap<QString, bool> qMapAverageActivation = m_pEvokedSetModel->getAverageActivation();
+            data.setValue(qMapAverageActivation);
+            settings.setValue(QString("RTESW/%1/averageActivationMap").arg(t_sRTESName), data);
+        }
 
         //Store signal and background colors
         if(m_pQuickControlView) {
@@ -328,9 +332,15 @@ void RealTimeEvokedSetWidget::init()
         m_pEvokedSetModel = EvokedSetModel::SPtr::create(this);
         m_pEvokedSetModel->setChannelColors(m_pRTESet->chColor());
 
+        QVariant data;
+        QMap<QString, QColor> qMapAverageColor;
+        data.setValue(qMapAverageColor);
+        m_pEvokedSetModel->setAverageActivation(settings.value(QString("RTESW/%1/averageActivationMap").arg(t_sRTESName), data).value<QMap<QString, bool> >());
+        QMap<QString, bool> qMapAverageActivation;
+        data.setValue(qMapAverageActivation);
+        m_pEvokedSetModel->setAverageColor(settings.value(QString("RTESW/%1/averageColorMap").arg(t_sRTESName), data).value<QMap<QString, QColor> >());
+
         if(m_pAveragingSettingsView) {
-            connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::resetAverage,
-                    m_pEvokedSetModel.data(), &EvokedSetModel::reset);
             connect(m_pEvokedSetModel.data(), &EvokedSetModel::newDataReceived,
                     m_pAveragingSettingsView.data(), &AveragingSettingsView::setDetectedEpochs);
         }
@@ -539,23 +549,28 @@ void RealTimeEvokedSetWidget::init()
         AverageSelectionView* pAverageSelectionView = new AverageSelectionView();
         m_pQuickControlView->addGroupBoxWithTabs(pAverageSelectionView, "Averaging", "Selection");
 
-        connect(pAverageSelectionView, &AverageSelectionView::averageActivationChanged,
-                m_pButterflyView.data(), &ButterflyView::updateActivationAverage);
+        connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageActivation,
+                pAverageSelectionView, &AverageSelectionView::setAverageActivation);
+        connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageColor,
+                pAverageSelectionView, &AverageSelectionView::setAverageColor);
 
-        connect(pAverageSelectionView, &AverageSelectionView::averageActivationChanged,
-                m_pAverageLayoutView.data(), &AverageLayoutView::updateActivationAverage);
-        connect(pAverageSelectionView, &AverageSelectionView::averageColorchanged,
-                m_pAverageLayoutView.data(), &AverageLayoutView::updateColorAverage);
+        connect(pAverageSelectionView, &AverageSelectionView::newAverageActivation,
+                m_pButterflyView.data(), &ButterflyView::setAverageActivation);
 
-        connect(m_pEvokedSetModel.data(), &EvokedSetModel::newDataReceived,
-                pAverageSelectionView, &AverageSelectionView::setEvokedSet);
+        connect(pAverageSelectionView, &AverageSelectionView::newAverageActivation,
+                m_pAverageLayoutView.data(), &AverageLayoutView::setAverageActivation);
+        connect(pAverageSelectionView, &AverageSelectionView::newAverageColor,
+                m_pAverageLayoutView.data(), &AverageLayoutView::setAverageColor);
 
         // View settings
         m_pButterflyView->setModel(m_pEvokedSetModel);
+        m_pButterflyView->setAverageActivation(m_pEvokedSetModel->getAverageActivation());
         m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
         m_pButterflyView->setModalities(qListModalities);
 
         m_pAverageLayoutView->setFiffInfo(m_pFiffInfo);
+        m_pAverageLayoutView->setAverageActivation(m_pEvokedSetModel->getAverageActivation());
+        m_pAverageLayoutView->setAverageColor(m_pEvokedSetModel->getAverageColor());
         m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
         m_pAverageLayoutView->setEvokedSetModel(m_pEvokedSetModel);
         m_pAverageLayoutView->setScaleMap(m_pEvokedSetModel->getScaling());

@@ -113,7 +113,7 @@ void ButterflyView::dataUpdate(const QModelIndex& topLeft, const QModelIndex& bo
         m_bIsInit = true;
     }
 
-    updateActivationAverage();
+    setAverageActivation(m_qMapAverageActivation);
 
     update();
 }
@@ -235,15 +235,9 @@ void ButterflyView::takeScreenshot(const QString& fileName)
 
 //*************************************************************************************************************
 
-void ButterflyView::updateActivationAverage()
+void ButterflyView::setAverageActivation(const QMap<QString, bool>& qMapAverageActivation)
 {
-    if(!m_pEvokedSetModel) {
-        qDebug() << "ButterflyView::updateActivationAverage - m_pEvokedSetModel is NULL. Returning. ";
-        return;
-    }
-
-    m_qMapAverageActivation = m_pEvokedSetModel->getActivationAverage();
-
+    m_qMapAverageActivation = qMapAverageActivation;
     update();
 }
 
