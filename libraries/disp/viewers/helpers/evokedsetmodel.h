@@ -235,9 +235,13 @@ public:
     */
     QColor getColorPerRow(qint32 row) const;
 
-    QMap<QString, QColor> getColorAverage() const;
+    QMap<QString, QColor> getAverageColor() const;
 
-    QMap<QString, bool> getActivationAverage() const;
+    QMap<QString, bool> getAverageActivation() const;
+
+    void setAverageColor(const QMap<QString, QColor>& qMapAverageColor);
+
+    void setAverageActivation(const QMap<QString, bool>& qMapAverageActivation);
 
     //=========================================================================================================
     /**
@@ -474,6 +478,9 @@ signals:
     * @param [in] qMapAverageColor     the average information map
     */
     void newDataReceived(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
+
+    void newAverageColor(const QMap<QString, QColor>& qMapAverageColor);
+    void newAverageActivation(const QMap<QString, bool>& qMapAverageActivation);
 };
 
 

@@ -184,7 +184,7 @@ public:
     /**
     * Triggers an update for the activation per average map information.
     */
-    void updateActivationAverage();
+    void setAverageActivation(const QMap<QString, bool>& qMapAverageActivation);
 
     //=========================================================================================================
     /**
