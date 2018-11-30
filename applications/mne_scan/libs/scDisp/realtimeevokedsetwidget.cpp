@@ -562,15 +562,15 @@ void RealTimeEvokedSetWidget::init()
                 m_pButterflyView, &ButterflyView::setAverageColorMap);
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageActivationMap,
                 m_pButterflyView, &ButterflyView::setAverageActivationMap);
+        connect(pAverageSelectionView, &AverageSelectionView::newAverageActivationMap,
+                m_pButterflyView.data(), &ButterflyView::setAverageActivationMap);
+        connect(pAverageSelectionView, &AverageSelectionView::newAverageColorMap,
+                m_pButterflyView.data(), &ButterflyView::setAverageColorMap);
 
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageColorMap,
                 m_pAverageLayoutView, &AverageLayoutView::setAverageColorMap);
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageActivationMap,
                 m_pAverageLayoutView, &AverageLayoutView::setAverageActivationMap);
-
-        connect(pAverageSelectionView, &AverageSelectionView::newAverageActivationMap,
-                m_pButterflyView.data(), &ButterflyView::setAverageActivationMap);
-
         connect(pAverageSelectionView, &AverageSelectionView::newAverageActivationMap,
                 m_pAverageLayoutView.data(), &AverageLayoutView::setAverageActivationMap);
         connect(pAverageSelectionView, &AverageSelectionView::newAverageColorMap,

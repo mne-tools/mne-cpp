@@ -437,14 +437,6 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
 
                 painter.save();
 
-                if(m_pEvokedSetModel->isFreezed()) {
-                    QColor freezeColor = m_pEvokedSetModel->getColorPerRow(r);
-                    freezeColor.setAlphaF(0.5);
-                    painter.setPen(QPen(freezeColor, 1));
-                } else {
-                    painter.setPen(QPen(m_pEvokedSetModel->getColorPerRow(r), 1));
-                }
-
                 createPlotPath(r, painter);
 
                 painter.restore();
@@ -536,6 +528,15 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
     //Do for all average types
     for(int j = 0; j < rowVec.size(); ++j) {
         QString sAvrComment = rowVec.at(j).first;
+
+        // Select color for each average
+        if(m_pEvokedSetModel->isFreezed()) {
+            QColor freezeColor = m_qMapAverageColor->value(sAvrComment);
+            freezeColor.setAlphaF(0.5);
+            painter.setPen(QPen(freezeColor, 1));
+        } else {
+            painter.setPen(QPen(m_qMapAverageColor->value(sAvrComment)));
+        }
 
         if(m_qMapAverageActivation->value(sAvrComment)) {
             //Calculate downsampling factor of averaged data in respect to the items width
