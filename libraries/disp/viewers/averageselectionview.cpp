@@ -94,7 +94,23 @@ AverageSelectionView::AverageSelectionView(QWidget *parent,
 
 //*************************************************************************************************************
 
-void AverageSelectionView::setAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
+QSharedPointer<QMap<QString, QColor> > AverageSelectionView::getAverageColor() const
+{
+    return m_qMapAverageColor;
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<QMap<QString, bool> > AverageSelectionView::getAverageActivation() const
+{
+    return m_qMapAverageActivation;
+}
+
+
+//*************************************************************************************************************
+
+void AverageSelectionView::setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
 {
     m_qMapAverageColor = qMapAverageColor;
     update();
@@ -103,7 +119,7 @@ void AverageSelectionView::setAverageColorMap(const QSharedPointer<QMap<QString,
 
 //*************************************************************************************************************
 
-void AverageSelectionView::setAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
+void AverageSelectionView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
 {
     m_qMapAverageActivation = qMapAverageActivation;
     update();

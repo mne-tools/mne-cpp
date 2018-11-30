@@ -45,7 +45,6 @@
 #include "../../disp_global.h"
 
 #include "layoutscene.h"
-#include "../averageselectionview.h"
 
 
 //*************************************************************************************************************

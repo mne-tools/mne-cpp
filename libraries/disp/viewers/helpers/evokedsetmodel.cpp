@@ -306,8 +306,6 @@ void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> pEvokedSet)
     }
 
     updateData();
-
-    emit newDataReceived(m_pEvokedSet);
 }
 
 

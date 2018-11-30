@@ -205,10 +205,26 @@ void AverageLayoutView::setScaleMap(const QMap<qint32,float> &scaleMap)
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
+QSharedPointer<QMap<QString, QColor> > AverageLayoutView::getAverageColor() const
+{
+    return m_qMapAverageColor;
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<QMap<QString, bool> > AverageLayoutView::getAverageActivation() const
+{
+    return m_qMapAverageActivation;
+}
+
+
+//*************************************************************************************************************
+
+void AverageLayoutView::setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
 {
     if(!m_pAverageScene) {
-        qDebug() << "AverageLayoutView::setAverageColorMap - m_pAverageScene is NULL. Returning. ";
+        qDebug() << "AverageLayoutView::setAverageColor - m_pAverageScene is NULL. Returning. ";
         return;
     }
 
@@ -219,10 +235,10 @@ void AverageLayoutView::setAverageColorMap(const QSharedPointer<QMap<QString, QC
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
+void AverageLayoutView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
 {
     if(!m_pAverageScene) {
-        qDebug() << "AverageLayoutView::setAverageActivationMap - m_pAverageScene is NULL. Returning. ";
+        qDebug() << "AverageLayoutView::setAverageActivation - m_pAverageScene is NULL. Returning. ";
         return;
     }
 
@@ -243,8 +259,8 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
     m_pAverageScene->repaintItems(selectedChannelItems);
 
-    setAverageColorMap(m_qMapAverageColor);
-    setAverageActivationMap(m_qMapAverageActivation);
+    setAverageColor(m_qMapAverageColor);
+    setAverageActivation(m_qMapAverageActivation);
     updateData();
 }
 
