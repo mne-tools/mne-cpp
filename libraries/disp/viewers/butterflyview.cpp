@@ -53,6 +53,7 @@
 #include <QPainter>
 #include <QDebug>
 #include <QSvgGenerator>
+#include <QSurfaceFormat>
 
 
 //*************************************************************************************************************
@@ -81,6 +82,10 @@ ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 {
+    // Activate anti aliasing
+    QSurfaceFormat fmt;
+    fmt.setSamples(4);
+    this->setFormat(fmt);
 }
 
 
@@ -272,7 +277,7 @@ void ButterflyView::paintGL()
     painter.drawRect(QRect(0,0,this->width()-1,this->height()-1));
     painter.restore();
 
-    painter.setRenderHint(QPainter::Antialiasing, false);
+    painter.setRenderHint(QPainter::Antialiasing, true);
 
     if(m_bIsInit && m_pEvokedSetModel)
     {
