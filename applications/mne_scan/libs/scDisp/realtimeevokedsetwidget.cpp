@@ -187,15 +187,6 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
         QSettings settings;
 
-        //Store modalities
-        if(m_pButterflyView) {
-            QList<Modality> qListModalities = m_pButterflyView->getModalities();
-            for(qint32 i = 0; i < qListModalities.size(); ++i) {
-                settings.setValue(QString("RTESW/%1/%2/active").arg(t_sRTESName).arg(qListModalities[i].m_sName), qListModalities[i].m_bActive);
-                settings.setValue(QString("RTESW/%1/%2/norm").arg(t_sRTESName).arg(qListModalities[i].m_sName), qListModalities[i].m_fNorm);
-            }
-        }
-
         //Store filter
         if(m_pFilterView) {
             FilterData filter = m_pFilterView->getUserDesignedFilter();
@@ -210,24 +201,29 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
             settings.setValue(QString("RTESW/%1/filterChannelType").arg(t_sRTESName), m_pFilterView->getChannelType());
         }
 
-        //Store scaling
-        if(m_pEvokedSetModel) {
-            QMap<qint32, float> qMapChScaling = m_pEvokedSetModel->getScaling();
+        //Store scaling and modalities
+        if(m_pScalingView && m_pModalitySelectionView) {
+            QMap<qint32, float> qMapChScaling = m_pScalingView->getScaleMap();
+            QMap<QString, bool> qMapModalities = m_pModalitySelectionView->getModalityMap();
 
             if(qMapChScaling.contains(FIFF_UNIT_T)) {
                 settings.setValue(QString("RTESW/%1/scaleMAG").arg(t_sRTESName), qMapChScaling[FIFF_UNIT_T]);
+                settings.setValue(QString("RTESW/%1/modalityMAG").arg(t_sRTESName), qMapModalities["MAG"]);
             }
 
             if(qMapChScaling.contains(FIFF_UNIT_T_M)) {
                 settings.setValue(QString("RTESW/%1/scaleGRAD").arg(t_sRTESName), qMapChScaling[FIFF_UNIT_T_M]);
+                settings.setValue(QString("RTESW/%1/modalityGRAD").arg(t_sRTESName), qMapModalities["GRAD"]);
             }
 
             if(qMapChScaling.contains(FIFFV_EEG_CH)) {
                 settings.setValue(QString("RTESW/%1/scaleEEG").arg(t_sRTESName), qMapChScaling[FIFFV_EEG_CH]);
+                settings.setValue(QString("RTESW/%1/modalityEEG").arg(t_sRTESName), qMapModalities["EEG"]);
             }
 
             if(qMapChScaling.contains(FIFFV_EOG_CH)) {
                 settings.setValue(QString("RTESW/%1/scaleEOG").arg(t_sRTESName), qMapChScaling[FIFFV_EOG_CH]);
+                settings.setValue(QString("RTESW/%1/modalityEOG").arg(t_sRTESName), qMapModalities["EOG"]);
             }
 
             if(qMapChScaling.contains(FIFFV_STIM_CH)) {
@@ -236,8 +232,9 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
             if(qMapChScaling.contains(FIFFV_MISC_CH)) {
                 settings.setValue(QString("RTESW/%1/scaleMISC").arg(t_sRTESName), qMapChScaling[FIFFV_MISC_CH]);
+                settings.setValue(QString("RTESW/%1/modalityMISC").arg(t_sRTESName), qMapModalities["MISC"]);
             }
-        }
+        }        
 
         //Store selected layout file
         if(m_pChannelSelectionView) {
@@ -362,79 +359,47 @@ void RealTimeEvokedSetWidget::init()
         m_pEvokedSetModel->setAverageActivation(pqMapAverageActivation);
 
         // Init modalities and scaling
-        bool sel, hasMag = false, hasGrad = false, hasEEG = false, hasEog = false, hasStim = false, hasMisc = false;
-        float val = 1e-11f;
         QMap<qint32, float> qMapChScaling;
-        QList<Modality> qListModalities;
+        QMap<QString, bool> qMapModalities;
 
         for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
             if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH) {
-                if(!hasMag && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T) {
+                if(!qMapChScaling.contains(FIFF_UNIT_T) && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T) {
                     //Modality
-                    sel = settings.value(QString("RTESW/%1/MAG/active").arg(t_sRTESName), true).toBool();
-                    val = settings.value(QString("RTESW/%1/MAG/norm").arg(t_sRTESName), 1e-11f).toFloat();
-                    qListModalities.append(Modality("MAG",sel,val));
+                    qMapModalities.insert("MAG",settings.value(QString("RTESW/%1/modalityMAG").arg(t_sRTESName), true).toBool());
 
                     //Scaling
-                    val = settings.value(QString("RTESW/%1/scaleMAG").arg(t_sRTESName), 1e-11f).toFloat();
-                    qMapChScaling.insert(FIFF_UNIT_T, val);
-
-                    hasMag = true;
-                } else if(!hasGrad && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M) {
+                    qMapChScaling.insert(FIFF_UNIT_T, settings.value(QString("RTESW/%1/scaleMAG").arg(t_sRTESName), 1e-11f).toFloat());
+                } else if(!qMapChScaling.contains(FIFF_UNIT_T_M) && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M) {
                     //Modality
-                    sel = settings.value(QString("RTESW/%1/GRAD/active").arg(t_sRTESName), true).toBool();
-                    val = settings.value(QString("RTESW/%1/GRAD/norm").arg(t_sRTESName), 1e-10f).toFloat();
-                    qListModalities.append(Modality("GRAD",sel,val));
+                    qMapModalities.insert("GRAD",settings.value(QString("RTESW/%1/modalityGRAD").arg(t_sRTESName), true).toBool());
 
                     //Scaling
-                    val = settings.value(QString("RTESW/%1/scaleGRAD").arg(t_sRTESName), 1e-10f).toFloat();
-                    qMapChScaling.insert(FIFF_UNIT_T_M, val);
-
-                    hasGrad = true;
+                    qMapChScaling.insert(FIFF_UNIT_T_M, settings.value(QString("RTESW/%1/scaleGRAD").arg(t_sRTESName), 1e-10f).toFloat());
                 }
-            } else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH) {
+            } else if(!qMapChScaling.contains(FIFFV_EEG_CH) && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH) {
                 //Modality
-                sel = settings.value(QString("RTESW/%1/EEG/active").arg(t_sRTESName), true).toBool();
-                val = settings.value(QString("RTESW/%1/EEG/norm").arg(t_sRTESName), 1e-4f).toFloat();
-                qListModalities.append(Modality("EEG",sel,val));
+                qMapModalities.insert("EEG",settings.value(QString("RTESW/%1/modalityEEG").arg(t_sRTESName), true).toBool());
 
                 //Scaling
-                val = settings.value(QString("RTESW/%1/scaleEEG").arg(t_sRTESName), 1e-4f).toFloat();
-                qMapChScaling.insert(FIFFV_EEG_CH, val);
-
-                hasEEG = true;
-            } else if(!hasEog && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH) {
+                qMapChScaling.insert(FIFFV_EEG_CH, settings.value(QString("RTESW/%1/scaleEEG").arg(t_sRTESName), 1e-4f).toFloat());
+            } else if(!qMapChScaling.contains(FIFFV_EOG_CH) && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH) {
                 //Modality
-                sel = settings.value(QString("RTESW/%1/EOG/active").arg(t_sRTESName), true).toBool();
-                val = settings.value(QString("RTESW/%1/EOG/norm").arg(t_sRTESName), 1e-3f).toFloat();
-                qListModalities.append(Modality("EOG",sel,val));
+                qMapModalities.insert("EOG",settings.value(QString("RTESW/%1/modalityEOG").arg(t_sRTESName), true).toBool());
 
                 //Scaling
-                val = settings.value(QString("RTESW/%1/scaleEOG").arg(t_sRTESName), 1e-3f).toFloat();
-                qMapChScaling.insert(FIFFV_EOG_CH, val);
-
-                hasEog = true;
-            } else if(!hasStim && m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
+                qMapChScaling.insert(FIFFV_EOG_CH, settings.value(QString("RTESW/%1/scaleEOG").arg(t_sRTESName), 1e-3f).toFloat());
+            } else if(!qMapChScaling.contains(FIFFV_STIM_CH) && m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
                 //Scaling only we do not need it as a modality
-                val = settings.value(QString("RTESW/%1/scaleSTIM").arg(t_sRTESName), 1e-3f).toFloat();
-                qMapChScaling.insert(FIFFV_STIM_CH, val);
-
-                hasStim = true;
-            } else if(!hasMisc && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH) {
+                qMapChScaling.insert(FIFFV_STIM_CH,  settings.value(QString("RTESW/%1/scaleSTIM").arg(t_sRTESName), 1e-3f).toFloat());
+            } else if(!qMapChScaling.contains(FIFFV_MISC_CH) && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH) {
                 //Modality
-                sel = settings.value(QString("RTESW/%1/MISC/active").arg(t_sRTESName), true).toBool();
-                val = settings.value(QString("RTESW/%1/MISC/norm").arg(t_sRTESName), 1e-3f).toFloat();
-                qListModalities.append(Modality("MISC",sel,val));
+                qMapModalities.insert("MISC",settings.value(QString("RTESW/%1/modalityMISC").arg(t_sRTESName), true).toBool());
 
                 //Scaling
-                val = settings.value(QString("RTESW/%1/scaleMISC").arg(t_sRTESName), 1e-3f).toFloat();
-                qMapChScaling.insert(FIFFV_MISC_CH, val);
-
-                hasMisc = true;
+                qMapChScaling.insert(FIFFV_MISC_CH, settings.value(QString("RTESW/%1/scaleMISC").arg(t_sRTESName), 1e-3f).toFloat());
             }
         }
-
-        m_pEvokedSetModel->setScaling(qMapChScaling);
 
         //Init filter window
         m_pFilterView = FilterView::SPtr::create(this, Qt::Window);
@@ -485,17 +450,14 @@ void RealTimeEvokedSetWidget::init()
         m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESName), "babymeg-mag-inner-layer.lout").toString());
 
         // Quick control scaling
-        ScalingView* pScalingView = new ScalingView();
-        pScalingView->init(qMapChScaling);
-        m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
+        m_pScalingView = new ScalingView;
+        m_pScalingView->init(qMapChScaling);
+        m_pQuickControlView->addGroupBox(m_pScalingView, "Scaling");
 
-        connect(pScalingView, &ScalingView::scalingChanged,
-                m_pEvokedSetModel.data(), &EvokedSetModel::setScaling);
+        connect(m_pScalingView.data(), &ScalingView::scalingChanged,
+                m_pButterflyView.data(), &ButterflyView::setScaleMap);
 
-        connect(pScalingView, &ScalingView::scalingChanged,
-                m_pButterflyView.data(), &ButterflyView::updateView);
-
-        connect(pScalingView, &ScalingView::scalingChanged,
+        connect(m_pScalingView.data(), &ScalingView::scalingChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
 
         // Quick control projectors
@@ -553,13 +515,12 @@ void RealTimeEvokedSetWidget::init()
                                                             settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
 
         // Quick modality selection
-        ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView();
-        pModalitySelectionView->init(m_pFiffInfo);
-        pModalitySelectionView->setModalities(qListModalities);
-        m_pQuickControlView->addGroupBoxWithTabs(pModalitySelectionView, "Other", "Modalities");
+        m_pModalitySelectionView = new ModalitySelectionView();
+        m_pModalitySelectionView->setModalityMap(qMapModalities);
+        m_pQuickControlView->addGroupBoxWithTabs(m_pModalitySelectionView, "Other", "Modalities");
 
-        connect(pModalitySelectionView, &ModalitySelectionView::modalitiesChanged,
-                m_pButterflyView.data(), &ButterflyView::setModalities);
+        connect(m_pModalitySelectionView.data(), &ModalitySelectionView::modalitiesChanged,
+                m_pButterflyView.data(), &ButterflyView::setModalityMap);
 
         // Quick control average selection
         AverageSelectionView* pAverageSelectionView = new AverageSelectionView();
@@ -595,21 +556,19 @@ void RealTimeEvokedSetWidget::init()
         m_pButterflyView->setAverageActivation(pqMapAverageActivation);
         m_pButterflyView->setAverageColor(pqMapAverageColor);
         m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
-        m_pButterflyView->setModalities(qListModalities);
+        m_pButterflyView->setScaleMap(qMapChScaling);
+        m_pButterflyView->setModalityMap(qMapModalities);
+        m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
 
-        m_pAverageLayoutView->setFiffInfo(m_pFiffInfo);
-        m_pAverageLayoutView->setEvokedSetModel(m_pEvokedSetModel);
+        // Call this function before the layout calls below so that the scene items are drawn first
+        m_pChannelSelectionView->updateDataView();
+
+        m_pAverageLayoutView->setModel(m_pEvokedSetModel);
         m_pAverageLayoutView->setAverageActivation(pqMapAverageActivation);
         m_pAverageLayoutView->setAverageColor(pqMapAverageColor);
         m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
         m_pAverageLayoutView->setScaleMap(qMapChScaling);
-
         m_pAverageLayoutView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
-        m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
-
-        m_pChannelSelectionView->updateDataView();
-        m_pButterflyView->update();
-        m_pAverageLayoutView->update();
 
         //Initialized
         m_bInitialized = true;

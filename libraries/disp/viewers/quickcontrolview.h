@@ -121,10 +121,19 @@ public:
 
     //=========================================================================================================
     /**
+    * Add a new group box to this Widget.
+    * This function will store the shared pointer to a member list and deparent this list as soon as this class is destroyed.
+    * This way the memory management stays with the QSharedPointer.
+    *
+    * @param [in] pWidget           The widgets which will be put into the new group box.
+    */
+    void addWidget(QSharedPointer<QWidget> pWidget);
+
+    //=========================================================================================================
+    /**
     * Add a new group box to this Widget. Takes ownership of the passed widget.
     *
     * @param [in] pWidget           The widgets which will be put into the new group box.
-    * @param [in] sGroupBoxName     The name of the new group box.
     */
     void addWidget(QWidget* pWidget);
 
@@ -222,7 +231,7 @@ private:
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
     Ui::QuickControlViewWidget*                         ui;                             /**< The generated UI file. */
 
-    QList<QSharedPointer<QWidget> >                     m_lControlWidgets;              /**< The quick control view widgets. Note that these are managed elsewhere. */
+    QList<QSharedPointer<QWidget> >                     m_lControlWidgets;              /**< The quick control view widgets. Please note that these are managed elsewhere. */
 
 signals:
 

@@ -86,6 +86,14 @@ ScalingView::ScalingView(QWidget *parent,
 
 //*************************************************************************************************************
 
+QMap<qint32,float> ScalingView::getScaleMap() const
+{
+    return m_qMapChScaling;
+}
+
+
+//*************************************************************************************************************
+
 void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
 {
     m_qMapChScaling = qMapChScaling;

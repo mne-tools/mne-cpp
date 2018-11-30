@@ -111,14 +111,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the fiff info.
-    *
-    * @param [in] pFiffInfo     The new FiffInfo.
-    */
-    void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &pFiffInfo);
-
-    //=========================================================================================================
-    /**
     * Sets the channel info model.
     *
     * @param [in] pChannelInfoModel     The new channel info model.
@@ -131,7 +123,7 @@ public:
     *
     * @param [in] pEvokedSetModel     The new evoked set model.
     */
-    void setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel);
+    void setModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel);
 
     //=========================================================================================================
     /**
@@ -219,7 +211,6 @@ protected:
 
     QSharedPointer<DISPLIB::EvokedSetModel>                     m_pEvokedSetModel;          /**< The data model */
     QSharedPointer<DISPLIB::ChannelInfoModel>                   m_pChannelInfoModel;        /**< Channel info model. */
-    QSharedPointer<FIFFLIB::FiffInfo>                           m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
 };
 
 } // NAMESPACE

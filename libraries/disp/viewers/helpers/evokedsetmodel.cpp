@@ -641,14 +641,6 @@ bool EvokedSetModel::isFreezed() const
 
 //*************************************************************************************************************
 
-const QMap< qint32,float >& EvokedSetModel::getScaling() const
-{
-    return m_qMapChScaling;
-}
-
-
-//*************************************************************************************************************
-
 int EvokedSetModel::getNumberOfTimeSpacers() const
 {
     //std::cout<<floor((m_matData.cols()/m_fSps)*10)<<std::endl;
@@ -721,16 +713,6 @@ void EvokedSetModel::resetSelection()
         m_qMapIdxRowSelection.insert(i,i);
     }
 
-    endResetModel();
-}
-
-
-//*************************************************************************************************************
-
-void EvokedSetModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
-{
-    beginResetModel();
-    m_qMapChScaling = p_qMapChScaling;
     endResetModel();
 }
 

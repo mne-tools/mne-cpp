@@ -295,14 +295,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns current scaling
-    *
-    * @return the current scaling
-    */
-    const QMap<qint32, float>& getScaling() const;
-
-    //=========================================================================================================
-    /**
     * Returns the current number for the time spacers
     *
     * @return the current number for the time spacers
@@ -373,14 +365,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Set scaling channel scaling
-    *
-    * @param[in] p_qMapChScaling    Map of scaling factors
-    */
-    void setScaling(const QMap< qint32,float >& p_qMapChScaling);
-
-    //=========================================================================================================
-    /**
     * Update projections
     */
     void updateProjection(const QList<FIFFLIB::FiffProj>& projs);
@@ -433,7 +417,6 @@ private:
     QSharedPointer<FIFFLIB::FiffEvokedSet>  m_pEvokedSet;                   /**< The evoked set measurement. */
 
     QMap<qint32,qint32>                     m_qMapIdxRowSelection;          /**< Selection mapping.*/
-    QMap<qint32,float>                      m_qMapChScaling;                /**< Channel scaling map. */
     QSharedPointer<QMap<QString, QColor> >  m_qMapAverageColor;             /**< Average colors. */
     QSharedPointer<QMap<QString, bool> >    m_qMapAverageActivation;        /**< Average activation status. */
     QSharedPointer<QMap<QString, QColor> >  m_qMapAverageColorOld;          /**< Average colors. */
