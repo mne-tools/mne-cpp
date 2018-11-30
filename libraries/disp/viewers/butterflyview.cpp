@@ -115,7 +115,7 @@ void ButterflyView::dataUpdate(const QModelIndex& topLeft, const QModelIndex& bo
         m_bIsInit = true;
     }
 
-    setAverageActivationMap(m_qMapAverageActivation);
+    setAverageActivation(m_qMapAverageActivation);
 
     update();
 }
@@ -237,7 +237,23 @@ void ButterflyView::takeScreenshot(const QString& fileName)
 
 //*************************************************************************************************************
 
-void ButterflyView::setAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
+QSharedPointer<QMap<QString, QColor> > ButterflyView::getAverageColor() const
+{
+    return m_qMapAverageColor;
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<QMap<QString, bool> > ButterflyView::getAverageActivation() const
+{
+    return m_qMapAverageActivation;
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyView::setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
 {
     m_qMapAverageColor = qMapAverageColor;
     update();
@@ -246,7 +262,7 @@ void ButterflyView::setAverageColorMap(const QSharedPointer<QMap<QString, QColor
 
 //*************************************************************************************************************
 
-void ButterflyView::setAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
+void ButterflyView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
 {
     m_qMapAverageActivation = qMapAverageActivation;
     update();

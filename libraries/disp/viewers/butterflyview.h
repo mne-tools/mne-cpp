@@ -182,15 +182,35 @@ public:
 
     //=========================================================================================================
     /**
-    * Triggers an update for the color per average map information.
+    * Get the current average colors
+    *
+    * @return Pointer to the current average colors.
     */
-    void setAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+    QSharedPointer<QMap<QString, QColor> > getAverageColor() const;
 
     //=========================================================================================================
     /**
-    * Triggers an update for the activation per average map information.
+    * Get the current average activations
+    *
+    * @return Pointer to the current average activations.
     */
-    void setAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
+    QSharedPointer<QMap<QString, bool> > getAverageActivation() const;
+
+    //=========================================================================================================
+    /**
+    * Set the average colors
+    *
+    * @param [in] qMapAverageColor      Pointer to the new average colors
+    */
+    void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+
+    //=========================================================================================================
+    /**
+    * Set the average activations
+    *
+    * @param [in] qMapAverageActivation      Pointer to the new average activations
+    */
+    void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
     //=========================================================================================================
     /**
