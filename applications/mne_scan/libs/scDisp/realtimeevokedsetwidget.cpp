@@ -251,14 +251,21 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
         //Store average colors per type
         if(m_pEvokedSetModel) {
-            QVariant data;
-            QSharedPointer<QMap<QString, QColor> > qMapAverageColor = m_pEvokedSetModel->getAverageColor();
-            data.setValue(*qMapAverageColor);
-            settings.setValue(QString("RTESW/%1/averageColorMap").arg(t_sRTESName), data);
+            settings.beginGroup(QString("RTESW/%1/averageColorMap").arg(t_sRTESName));
+            QMap<QString, QColor>::const_iterator iColor = m_pEvokedSetModel->getAverageColor()->constBegin();
+            while (iColor != m_pEvokedSetModel->getAverageColor()->constEnd()) {
+                 settings.setValue(iColor.key(), iColor.value());
+                 ++iColor;
+            }
+            settings.endGroup();
 
-            QSharedPointer<QMap<QString, bool> > qMapAverageActivation = m_pEvokedSetModel->getAverageActivation();
-            data.setValue(*qMapAverageActivation);
-            settings.setValue(QString("RTESW/%1/averageActivationMap").arg(t_sRTESName), data);
+            settings.beginGroup(QString("RTESW/%1/averageActivationMap").arg(t_sRTESName));
+            QMap<QString, bool>::const_iterator iActivation = m_pEvokedSetModel->getAverageActivation()->constBegin();
+            while (iActivation != m_pEvokedSetModel->getAverageActivation()->constEnd()) {
+                 settings.setValue(iActivation.key(), iActivation.value());
+                 ++iActivation;
+            }
+            settings.endGroup();
         }
 
         //Store signal and background colors
@@ -285,15 +292,9 @@ void RealTimeEvokedSetWidget::getData()
         if(m_pRTESet->isInitialized()) {
             m_pFiffInfo = m_pRTESet->info();
 
-            if(!m_pRTESet->getValue()->evoked.isEmpty()) {
-                m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
-            }
-
             init();
         }
-    }
-
-    if(m_bInitialized) {
+    } else {
         //Check if block size has changed, if yes update the filter
         if(!m_pRTESet->getValue()->evoked.isEmpty()) {
             if(m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {
@@ -319,41 +320,49 @@ void RealTimeEvokedSetWidget::init()
         QSettings settings;
         QString t_sRTESName = m_pRTESet->getName();
 
-        //Remove temporary label and show actual average display
+        // Remove temporary label and show actual average display
         m_pRTESetLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
         m_pToolBox->show();
         m_pActionSelectSensors->setVisible(true);
 
-        //Choose current view toolbox index - butterfly or 2D layout
+        // Choose current view toolbox index - butterfly or 2D layout
         m_pToolBox->setCurrentIndex(settings.value(QString("RTESW/%1/selectedView").arg(t_sRTESName), 0).toInt());
 
-        //Init data model
+        // Init data model
         m_pEvokedSetModel = EvokedSetModel::SPtr::create(this);
-        m_pEvokedSetModel->setChannelColors(m_pRTESet->chColor());
-
-        QVariant data;
-
-        QMap<QString, QColor> qMapAverageColor;
-        data.setValue(qMapAverageColor);
-        qMapAverageColor = settings.value(QString("RTESW/%1/averageColorMap").arg(t_sRTESName), data).value<QMap<QString, QColor> >();
-        m_pEvokedSetModel->setAverageColor(QSharedPointer<QMap<QString, QColor> >::create(qMapAverageColor));
-
-        QMap<QString, bool> qMapAverageActivation;
-        data.setValue(qMapAverageActivation);
-        qMapAverageActivation = settings.value(QString("RTESW/%1/averageActivationMap").arg(t_sRTESName), data).value<QMap<QString, bool> >();
-        m_pEvokedSetModel->setAverageActivation(QSharedPointer<QMap<QString, bool> >::create(qMapAverageActivation));
 
         if(m_pAveragingSettingsView) {
             connect(m_pEvokedSetModel.data(), &EvokedSetModel::newDataReceived,
                     m_pAveragingSettingsView.data(), &AveragingSettingsView::setDetectedEpochs);
         }
 
+        // Set the inital data
         FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
         pEvokedSet->info = *m_pFiffInfo.data();
-        m_pEvokedSetModel->setEvokedSet(pEvokedSet, true);
+        m_pEvokedSetModel->setEvokedSet(pEvokedSet);
 
-        //Init modalities and scaling
+        QMap<QString, QColor> qMapAverageColor;
+        settings.beginGroup(QString("RTESW/%1/averageColorMap").arg(t_sRTESName));
+        QStringList keys = settings.childKeys();
+        foreach (QString key, keys) {
+             qMapAverageColor[key] = settings.value(key).value<QColor>();
+        }
+        settings.endGroup();
+        QSharedPointer<QMap<QString, QColor> > pqMapAverageColor = QSharedPointer<QMap<QString, QColor> >::create(qMapAverageColor);
+        m_pEvokedSetModel->setAverageColor(pqMapAverageColor);
+
+        QMap<QString, bool> qMapAverageActivation;
+        settings.beginGroup(QString("RTESW/%1/averageActivationMap").arg(t_sRTESName));
+        keys = settings.childKeys();
+        foreach (QString key, keys) {
+             qMapAverageActivation[key] = settings.value(key).toBool();
+        }
+        settings.endGroup();
+        QSharedPointer<QMap<QString, bool> > pqMapAverageActivation = QSharedPointer<QMap<QString, bool> >::create(qMapAverageActivation);
+        m_pEvokedSetModel->setAverageActivation(pqMapAverageActivation);
+
+        // Init modalities and scaling
         bool sel, hasMag = false, hasGrad = false, hasEEG = false, hasEog = false, hasStim = false, hasMisc = false;
         float val = 1e-11f;
         QMap<qint32, float> qMapChScaling;
@@ -438,9 +447,13 @@ void RealTimeEvokedSetWidget::init()
                 m_pEvokedSetModel.data(), &EvokedSetModel::filterChanged);
 
         m_pFilterView->init(m_pFiffInfo->sfreq);
-        m_pFilterView->setWindowSize(m_iMaxFilterTapSize);
-        m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
-        m_pFilterView->setSamplingRate(m_pFiffInfo->sfreq);
+
+        if(!m_pRTESet->getValue()->evoked.isEmpty()) {
+            m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
+
+            m_pFilterView->setWindowSize(m_iMaxFilterTapSize);
+            m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
+        }
 
         //Set stored filter settings from last session
         m_pFilterView->setFilterParameters(settings.value(QString("RTESW/%1/filterHP").arg(t_sRTESName), 5.0).toDouble(),
@@ -474,7 +487,7 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control scaling
         ScalingView* pScalingView = new ScalingView();
-        pScalingView->init(m_pEvokedSetModel->getScaling());
+        pScalingView->init(qMapChScaling);
         m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
 
         connect(pScalingView, &ScalingView::scalingChanged,
@@ -551,6 +564,8 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control average selection
         AverageSelectionView* pAverageSelectionView = new AverageSelectionView();
+        pAverageSelectionView->setAverageColorMap(pqMapAverageColor);
+        pAverageSelectionView->setAverageActivationMap(pqMapAverageActivation);
         m_pQuickControlView->addGroupBoxWithTabs(pAverageSelectionView, "Averaging", "Selection");
 
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageActivationMap,
@@ -578,16 +593,17 @@ void RealTimeEvokedSetWidget::init()
 
         // View settings
         m_pButterflyView->setModel(m_pEvokedSetModel);
-        m_pButterflyView->setAverageActivationMap(m_pEvokedSetModel->getAverageActivation());
+        m_pButterflyView->setAverageActivationMap(pqMapAverageActivation);
+        m_pButterflyView->setAverageColorMap(pqMapAverageColor);
         m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
         m_pButterflyView->setModalities(qListModalities);
 
         m_pAverageLayoutView->setFiffInfo(m_pFiffInfo);
-        m_pAverageLayoutView->setAverageActivationMap(m_pEvokedSetModel->getAverageActivation());
-        m_pAverageLayoutView->setAverageColorMap(m_pEvokedSetModel->getAverageColor());
-        m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
         m_pAverageLayoutView->setEvokedSetModel(m_pEvokedSetModel);
-        m_pAverageLayoutView->setScaleMap(m_pEvokedSetModel->getScaling());
+        m_pAverageLayoutView->setAverageActivationMap(pqMapAverageActivation);
+        m_pAverageLayoutView->setAverageColorMap(pqMapAverageColor);
+        m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
+        m_pAverageLayoutView->setScaleMap(qMapChScaling);
 
         m_pAverageLayoutView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
         m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
