@@ -107,7 +107,7 @@ void AverageSceneItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_UNUSED(event)
     m_iFontTextSize = 150;
-    emit sceneUpdateRequested();
+    update();
 }
 
 
@@ -117,7 +117,7 @@ void AverageSceneItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_UNUSED(event)
     m_iFontTextSize = 15;
-    emit sceneUpdateRequested();
+    update();
 }
 
 
