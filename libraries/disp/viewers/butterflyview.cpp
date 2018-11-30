@@ -69,10 +69,9 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
-: QWidget(parent, f)
+: QOpenGLWidget(parent, f)
 , m_pEvokedSetModel(NULL)
 , m_bIsInit(false)
-, m_iNumChannels(-1)
 , m_bShowMAG(true)
 , m_bShowGRAD(true)
 , m_bShowEEG(true)
@@ -100,9 +99,7 @@ void ButterflyView::setModel(QSharedPointer<EvokedSetModel> model)
 
 void ButterflyView::dataUpdate()
 {
-    if(!m_bIsInit && m_pEvokedSetModel->isInit())
-    {
-        m_iNumChannels = m_pEvokedSetModel->rowCount();
+    if(!m_bIsInit && m_pEvokedSetModel->isInit()) {
         m_bIsInit = true;
     }
 
@@ -266,7 +263,7 @@ void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels
 
 //*************************************************************************************************************
 
-void ButterflyView::paintEvent(QPaintEvent* paintEvent)
+void ButterflyView::paintGL()
 {
     QPainter painter(this);
 
@@ -375,7 +372,7 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
         painter.translate(0,this->height()/2);
 
         //Actual average data
-        for(qint32 r = 0; r < m_iNumChannels; ++r) {
+        for(qint32 r = 0; r < m_pEvokedSetModel->rowCount(); ++r) {
             if(m_lSelectedChannels.contains(r)) {
                 qint32 kind = m_pEvokedSetModel->getKind(r);
 
@@ -429,7 +426,7 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
         }
     }
 
-    return QWidget::paintEvent(paintEvent);
+    return QOpenGLWidget::paintGL();
 }
 
 
