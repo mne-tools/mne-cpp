@@ -109,9 +109,6 @@ void AverageScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelIte
                                                                       selectionSceneItemTemp->m_iChannelUnit,
                                                                       m_colGlobalItemSignalColor);
 
-        connect(averageSceneItemTemp, &AverageSceneItem::sceneUpdateRequested,
-                    this, &AverageScene::updateScene);
-
         this->addItem(averageSceneItemTemp);
     }
 }
