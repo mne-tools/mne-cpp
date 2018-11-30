@@ -297,12 +297,12 @@ QVariant EvokedSetModel::headerData(int section, Qt::Orientation orientation, in
 
 //*************************************************************************************************************
 
-void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> pEvokedSet, bool bReset)
+void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> pEvokedSet)
 {
     m_pEvokedSet = pEvokedSet;
 
-    if(bReset) {
-        reset();
+    if(!m_bIsInit) {
+        init();
     }
 
     updateData();
@@ -313,7 +313,7 @@ void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> pEvokedSet, bool
 
 //*************************************************************************************************************
 
-void EvokedSetModel::reset()
+void EvokedSetModel::init()
 {
     if(!m_pEvokedSet) {
         return;
@@ -358,6 +358,8 @@ void EvokedSetModel::reset()
     endResetModel();
 
     resetSelection();
+
+    m_bIsInit = true;
 }
 
 
@@ -406,8 +408,6 @@ void EvokedSetModel::updateData()
     if(!m_filterData.isEmpty()) {
         filterChannelsConcurrently();
     }
-
-    m_bIsInit = true;
 
     // Update average selection information map. Use old colors if existing.
     QStringList slCurrentAvrComments;
@@ -472,21 +472,6 @@ void EvokedSetModel::updateData()
     QVector<int> roles; roles << Qt::DisplayRole;
 
     emit dataChanged(topLeft, bottomRight, roles);
-}
-
-
-//*************************************************************************************************************
-
-QColor EvokedSetModel::getColorPerRow(qint32 row) const
-{
-    if(row < m_qMapIdxRowSelection.size()) {
-        qint32 chRow = m_qMapIdxRowSelection[row];
-        if(chRow < m_qListChColors.size()) {
-            return m_qListChColors[chRow];
-        }
-    }
-
-    return QColor(0,0,0);
 }
 
 
@@ -960,14 +945,6 @@ void EvokedSetModel::setFilterChannelType(QString channelType)
 
     //Filter all visible data channels at once
     //filterChannelsConcurrently();
-}
-
-
-//*************************************************************************************************************
-
-void EvokedSetModel::setChannelColors(QList<QColor> channelColors)
-{
-    m_qListChColors = channelColors;
 }
 
 

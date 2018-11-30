@@ -207,33 +207,21 @@ public:
                                 Qt::Orientation orientation,
                                 int role = Qt::DisplayRole) const;
 
-    void reset();
+    void init();
 
     //=========================================================================================================
     /**
     * Sets corresponding evoked set
     *
     * @param [in] pEvokedSet      The evoked set
-    * @param [in] bReset          Whether to reset the model
     */
-    void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet,
-                      bool bReset = false);
+    void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
     //=========================================================================================================
     /**
     * Update stored data
     */
     void updateData();
-
-    //=========================================================================================================
-    /**
-    * Returns the color of a given channel number
-    *
-    * @param[in] row    row number which correspodns to a given channel
-    *
-    * @return color of given channel number
-    */
-    QColor getColorPerRow(qint32 row) const;
 
     QSharedPointer<QMap<QString, QColor> > getAverageColor() const;
 
@@ -405,14 +393,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the channel colors
-    *
-    * @param[in] channelColors    the channel colors
-    */
-    void setChannelColors(QList<QColor> channelColors);
-
-    //=========================================================================================================
-    /**
     * Create list of channels which are to be filtered based on channel names
     *
     * @param[in] channelNames    the channel names which are to be filtered
@@ -440,7 +420,6 @@ private:
     QList<Eigen::MatrixXd>                  m_matDataFiltered;              /**< The filtered data */
     QList<Eigen::MatrixXd>                  m_matDataFilteredFreeze;        /**< The raw filtered data in freeze mode */
     QStringList                             m_lAvrTypes;                    /**< The average types */
-    QList<QColor>                           m_qListChColors;                /**< Channel color for butterfly plot.*/
 
     Eigen::MatrixXd                         m_matProj;                      /**< SSP projector */
     Eigen::MatrixXd                         m_matComp;                      /**< Compensator */
