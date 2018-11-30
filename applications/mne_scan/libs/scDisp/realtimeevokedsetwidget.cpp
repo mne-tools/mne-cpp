@@ -336,7 +336,7 @@ void RealTimeEvokedSetWidget::init()
 
         QMap<QString, QColor> qMapAverageColor;
         data.setValue(qMapAverageColor);
-        qMapAverageColor = settings.value(QString("RTESW/%1/averageActivationMap").arg(t_sRTESName), data).value<QMap<QString, QColor> >();
+        qMapAverageColor = settings.value(QString("RTESW/%1/averageColorMap").arg(t_sRTESName), data).value<QMap<QString, QColor> >();
         m_pEvokedSetModel->setAverageColor(QSharedPointer<QMap<QString, QColor> >::create(qMapAverageColor));
 
         QMap<QString, bool> qMapAverageActivation;
@@ -557,6 +557,16 @@ void RealTimeEvokedSetWidget::init()
                 pAverageSelectionView, &AverageSelectionView::setAverageActivationMap);
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageColorMap,
                 pAverageSelectionView, &AverageSelectionView::setAverageColorMap);
+
+        connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageColorMap,
+                m_pButterflyView, &ButterflyView::setAverageColorMap);
+        connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageActivationMap,
+                m_pButterflyView, &ButterflyView::setAverageActivationMap);
+
+        connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageColorMap,
+                m_pAverageLayoutView, &AverageLayoutView::setAverageColorMap);
+        connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageActivationMap,
+                m_pAverageLayoutView, &AverageLayoutView::setAverageActivationMap);
 
         connect(pAverageSelectionView, &AverageSelectionView::newAverageActivationMap,
                 m_pButterflyView.data(), &ButterflyView::setAverageActivationMap);

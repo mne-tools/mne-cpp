@@ -150,10 +150,7 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     QStaticText staticElectrodeName = QStaticText(m_sChannelName);
     painter->save();
     QPen pen;
-    pen.setColor(Qt::yellow);
-    if(!m_qMapAverageColor.isEmpty()) {
-        pen.setColor(m_qMapAverageColor.first());
-    }
+    pen.setColor(Qt::red);
     pen.setWidthF(5);
 
     QFont f = painter->font();

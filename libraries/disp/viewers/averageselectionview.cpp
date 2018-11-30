@@ -115,6 +115,7 @@ void AverageSelectionView::setAverageActivationMap(const QSharedPointer<QMap<QSt
 void AverageSelectionView::update()
 {
     if(m_qMapAverageColor->size() != m_qMapAverageActivation->size()) {
+        qDebug() << "AverageSelectionView::update - m_qMapAverageColor and m_qMapAverageActivation do not match in size. Returning.";
         return;
     }
 
