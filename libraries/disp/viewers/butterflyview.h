@@ -50,7 +50,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QOpenGLWidget>
 #include <QMap>
 
 
@@ -89,7 +89,7 @@ class ChannelInfoModel;
 *
 * @brief The ButterflyView class provides a butterfly view.
 */
-class DISPSHARED_EXPORT ButterflyView : public QWidget
+class DISPSHARED_EXPORT ButterflyView : public QOpenGLWidget
 {
     Q_OBJECT
 
@@ -236,7 +236,7 @@ protected:
     *
     * @param [in] event pointer to PaintEvent -> not used.
     */
-    virtual void paintEvent(QPaintEvent* paintEvent );
+    virtual void paintGL();
 
     //=========================================================================================================
     /**
@@ -252,8 +252,6 @@ protected:
     bool        m_bShowEOG;                     /**< Show EEG channels */
     bool        m_bShowMISC;                    /**< Show Miscellaneous channels */
     bool        m_bIsInit;                      /**< Whether this class has been initialized */
-
-    qint32      m_iNumChannels;                 /**< Number of channels */
 
     QColor      m_colCurrentBackgroundColor;    /**< The current background color */
 
