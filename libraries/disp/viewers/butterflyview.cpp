@@ -79,11 +79,6 @@ ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
 , m_bShowEOG(true)
 , m_bShowMISC(true)
 , m_colCurrentBackgroundColor(Qt::white)
-, m_fMaxMAG(0.0)
-, m_fMaxGRAD(0.0)
-, m_fMaxEEG(0.0)
-, m_fMaxEOG(0.0)
-, m_fMaxMISC(0.0)
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 {
@@ -103,12 +98,8 @@ void ButterflyView::setModel(QSharedPointer<EvokedSetModel> model)
 
 //*************************************************************************************************************
 
-void ButterflyView::dataUpdate(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+void ButterflyView::dataUpdate()
 {
-    Q_UNUSED(topLeft);
-    Q_UNUSED(bottomRight);
-    Q_UNUSED(roles);
-
     if(!m_bIsInit && m_pEvokedSetModel->isInit())
     {
         m_iNumChannels = m_pEvokedSetModel->rowCount();
@@ -123,51 +114,29 @@ void ButterflyView::dataUpdate(const QModelIndex& topLeft, const QModelIndex& bo
 
 //*************************************************************************************************************
 
-QList<Modality> ButterflyView::getModalities()
+QMap<QString, bool> ButterflyView::getModalityMap()
 {
-    return m_qListModalities;
+    return m_modalityMap;
 }
 
 
 //*************************************************************************************************************
 
-void ButterflyView::setModalities(const QList<Modality>& p_qListModalities)
+void ButterflyView::setModalityMap(const QMap<QString, bool> &modalityMap)
 {
-    m_qListModalities = p_qListModalities;
+    m_modalityMap = modalityMap;
 
-    for(qint32 i = 0; i < m_qListModalities.size(); ++i)
-    {
-        if(m_qListModalities[i].m_sName == ("GRAD"))
-        {
-            m_bShowGRAD = m_qListModalities[i].m_bActive;
-            m_fMaxGRAD = m_qListModalities[i].m_fNorm;
-        }
+    qDebug() << "ButterflyView::setModalityMap m_modalityMap - " << m_modalityMap;
 
-        if(m_qListModalities[i].m_sName == ("MAG"))
-        {
-            m_bShowMAG = m_qListModalities[i].m_bActive;
-            m_fMaxMAG = m_qListModalities[i].m_fNorm;
-        }
-        if(m_qListModalities[i].m_sName == ("EEG"))
-        {
-            m_bShowEEG = m_qListModalities[i].m_bActive;
-            m_fMaxEEG = m_qListModalities[i].m_fNorm;
+    update();
+}
 
-        }
-        if(m_qListModalities[i].m_sName == ("EOG"))
-        {
-            m_bShowEOG = m_qListModalities[i].m_bActive;
-            m_fMaxEOG = m_qListModalities[i].m_fNorm;
 
-        }
-        if(m_qListModalities[i].m_sName == ("MISC"))
-        {
-            m_bShowMISC = m_qListModalities[i].m_bActive;
-            m_fMaxMISC = m_qListModalities[i].m_fNorm;
+//*************************************************************************************************************
 
-        }
-    }
-
+void ButterflyView::setScaleMap(const QMap<qint32,float> &scaleMap)
+{
+    m_scaleMap = scaleMap;
     update();
 }
 
@@ -308,7 +277,7 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
 
     painter.setRenderHint(QPainter::Antialiasing, false);
 
-    if(m_bIsInit)
+    if(m_bIsInit && m_pEvokedSetModel)
     {
         //Draw baseline correction area
         if(m_pEvokedSetModel->getBaselineInfo().first.toString() != "None" &&
@@ -415,14 +384,14 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
                     case FIFFV_MEG_CH: {
                         qint32 unit = m_pEvokedSetModel->getUnit(r);
                         if(unit == FIFF_UNIT_T_M) {
-                            if(m_bShowGRAD)
+                            if(m_modalityMap["GRAD"])
                                 break;
                             else
                                 continue;
                         }
                         else if(unit == FIFF_UNIT_T)
                         {
-                            if(m_bShowMAG)
+                            if(m_modalityMap["MAG"])
                                 break;
                             else
                                 continue;
@@ -430,19 +399,19 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
                         continue;
                     }
                     case FIFFV_EEG_CH: {
-                        if(m_bShowEEG)
+                        if(m_modalityMap["EEG"])
                             break;
                         else
                             continue;
                     }
                     case FIFFV_EOG_CH: {
-                        if(m_bShowEOG)
+                        if(m_modalityMap["EOG"])
                             break;
                         else
                             continue;
                     }
                     case FIFFV_MISC_CH: {
-                        if(m_bShowMISC)
+                        if(m_modalityMap["MISC"])
                             break;
                         else
                             continue;
@@ -477,8 +446,8 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
             qint32 unit = m_pEvokedSetModel->getUnit(row);
             if(unit == FIFF_UNIT_T_M) { //gradiometers
                 fMaxValue = 1e-10f;
-                if(m_pEvokedSetModel->getScaling().contains(FIFF_UNIT_T_M))
-                    fMaxValue = m_pEvokedSetModel->getScaling()[FIFF_UNIT_T_M];
+                if(m_scaleMap.contains(FIFF_UNIT_T_M))
+                    fMaxValue = m_scaleMap[FIFF_UNIT_T_M];
             }
             else if(unit == FIFF_UNIT_T) //magnitometers
             {
@@ -487,40 +456,40 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 //                else
                 fMaxValue = 1e-11f;
 
-                if(m_pEvokedSetModel->getScaling().contains(FIFF_UNIT_T))
-                    fMaxValue = m_pEvokedSetModel->getScaling()[FIFF_UNIT_T];
+                if(m_scaleMap.contains(FIFF_UNIT_T))
+                    fMaxValue = m_scaleMap[FIFF_UNIT_T];
             }
             break;
         }
 
         case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
             fMaxValue = 1e-11f;
-            if(m_pEvokedSetModel->getScaling().contains(FIFF_UNIT_T))
-                fMaxValue = m_pEvokedSetModel->getScaling()[FIFF_UNIT_T];
+            if(m_scaleMap.contains(FIFF_UNIT_T))
+                fMaxValue = m_scaleMap[FIFF_UNIT_T];
             break;
         }
         case FIFFV_EEG_CH: {
             fMaxValue = 1e-4f;
-            if(m_pEvokedSetModel->getScaling().contains(FIFFV_EEG_CH))
-                fMaxValue = m_pEvokedSetModel->getScaling()[FIFFV_EEG_CH];
+            if(m_scaleMap.contains(FIFFV_EEG_CH))
+                fMaxValue = m_scaleMap[FIFFV_EEG_CH];
             break;
         }
         case FIFFV_EOG_CH: {
             fMaxValue = 1e-3f;
-            if(m_pEvokedSetModel->getScaling().contains(FIFFV_EOG_CH))
-                fMaxValue = m_pEvokedSetModel->getScaling()[FIFFV_EOG_CH];
+            if(m_scaleMap.contains(FIFFV_EOG_CH))
+                fMaxValue = m_scaleMap[FIFFV_EOG_CH];
             break;
         }
         case FIFFV_STIM_CH: {
             fMaxValue = 5;
-            if(m_pEvokedSetModel->getScaling().contains(FIFFV_STIM_CH))
-                fMaxValue = m_pEvokedSetModel->getScaling()[FIFFV_STIM_CH];
+            if(m_scaleMap.contains(FIFFV_STIM_CH))
+                fMaxValue = m_scaleMap[FIFFV_STIM_CH];
             break;
         }
         case FIFFV_MISC_CH: {
             fMaxValue = 1e-3f;
-            if(m_pEvokedSetModel->getScaling().contains(FIFFV_MISC_CH))
-                fMaxValue = m_pEvokedSetModel->getScaling()[FIFFV_MISC_CH];
+            if(m_scaleMap.contains(FIFFV_MISC_CH))
+                fMaxValue = m_scaleMap[FIFFV_MISC_CH];
             break;
         }
     }

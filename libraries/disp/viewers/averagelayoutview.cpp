@@ -106,14 +106,6 @@ AverageLayoutView::AverageLayoutView(QWidget *parent,
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &pFiffInfo)
-{
-    m_pFiffInfo = pFiffInfo;
-}
-
-
-//*************************************************************************************************************
-
 void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
 {
     m_pChannelInfoModel = pChannelInfoModel;
@@ -122,7 +114,7 @@ void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pC
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel)
+void AverageLayoutView::setModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel)
 {    
     connect(pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
             this, &AverageLayoutView::updateData);
@@ -269,8 +261,8 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
 
 void AverageLayoutView::updateData()
 {
-    if(!m_pAverageScene || !m_pEvokedSetModel || !m_pChannelInfoModel || !m_pFiffInfo) {
-        qDebug() << "AverageLayoutView::updateData - m_pAverageScene, m_pEvokedSetModel, m_pChannelInfoModel or m_pFiffInfo are NULL. Returning. ";
+    if(!m_pAverageScene || !m_pEvokedSetModel || !m_pChannelInfoModel) {
+        qDebug() << "AverageLayoutView::updateData - m_pAverageScene, m_pEvokedSetModel or m_pChannelInfoModel are NULL. Returning. ";
         return;
     }
 
@@ -291,8 +283,9 @@ void AverageLayoutView::updateData()
 
         if(channelNumber != -1) {
             //qDebug() << "Change data for" << channelNumber << "" << averageSceneItemTemp->m_sChannelName;
-            averageSceneItemTemp->m_iChannelKind = m_pFiffInfo->chs.at(channelNumber).kind;
-            averageSceneItemTemp->m_iChannelUnit = m_pFiffInfo->chs.at(channelNumber).unit;
+
+            averageSceneItemTemp->m_iChannelKind = m_pChannelInfoModel->data(m_pChannelInfoModel->index(channelNumber, 4), ChannelInfoModelRoles::GetChKind).toInt();
+            averageSceneItemTemp->m_iChannelUnit = m_pChannelInfoModel->data(m_pChannelInfoModel->index(channelNumber, 6), ChannelInfoModelRoles::GetChUnit).toInt();
             averageSceneItemTemp->m_firstLastSample.first = (-1)*m_pEvokedSetModel->getNumPreStimSamples();
 
             if(!averageData.isEmpty()) {
@@ -300,7 +293,7 @@ void AverageLayoutView::updateData()
             }
 
             averageSceneItemTemp->m_iChannelNumber = channelNumber;
-            averageSceneItemTemp->m_iTotalNumberChannels = m_pFiffInfo->ch_names.size();
+            averageSceneItemTemp->m_iTotalNumberChannels = m_pEvokedSetModel->rowCount();
             averageSceneItemTemp->m_lAverageData = averageData;
         }
     }
