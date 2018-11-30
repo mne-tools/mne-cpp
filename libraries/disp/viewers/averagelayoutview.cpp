@@ -59,7 +59,7 @@
 #include <QSvgGenerator>
 #include <QDebug>
 #include <QGraphicsItem>
-#include <QGLWidget>
+#include <QOpenGLWidget>
 
 
 //*************************************************************************************************************
@@ -78,19 +78,25 @@ using namespace FIFFLIB;
 
 AverageLayoutView::AverageLayoutView(QWidget *parent,
                                      Qt::WindowFlags f)
-: QWidget(parent, f)
+: QOpenGLWidget(parent, f)
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 {
     this->setWindowTitle("Average Layout");
 
-    QGLFormat fmt(QGL::SampleBuffers);
+    // Activate anti aliasing
+    QSurfaceFormat fmt;
     fmt.setSamples(4);
+    this->setFormat(fmt);
 
-    QGLWidget* gl = new QGLWidget(fmt);
+//    QSurfaceFormat fmt;
+//    fmt.setSamples(4);
+
+//    QOpenGLWidget* gl = new QOpenGLWidget();
+//    gl->setFormat(fmt);
 
     m_pAverageLayoutView = new QGraphicsView();
-    m_pAverageLayoutView->setViewport(gl);
+    //m_pAverageLayoutView->setViewport(gl);
 
     m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView.data(), this));
     m_pAverageScene->setBackgroundBrush(QBrush(Qt::black));
@@ -115,7 +121,7 @@ void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pC
 //*************************************************************************************************************
 
 void AverageLayoutView::setModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel)
-{    
+{
     connect(pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
             this, &AverageLayoutView::updateData);
 
