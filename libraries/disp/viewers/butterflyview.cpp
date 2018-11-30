@@ -85,6 +85,7 @@ ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
 , m_fMaxEOG(0.0)
 , m_fMaxMISC(0.0)
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
+, m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 {
 }
 
@@ -231,6 +232,15 @@ void ButterflyView::takeScreenshot(const QString& fileName)
         this->render(&painter);
         image.save(fileName);
     }
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyView::setAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
+{
+    m_qMapAverageColor = qMapAverageColor;
+    update();
 }
 
 

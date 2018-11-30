@@ -409,7 +409,7 @@ void EvokedSetModel::updateData()
 
     m_bIsInit = true;
 
-    // Update average selection information map
+    // Update average selection information map. Use old colors if existing.
     QStringList slCurrentAvrComments;
     int iSizeAvrActivation = m_qMapAverageActivation->size();
     int iSizeAvrColor = m_qMapAverageColor->size();
@@ -419,26 +419,20 @@ void EvokedSetModel::updateData()
 
         if(!m_qMapAverageActivation->contains(m_pEvokedSet->evoked.at(i).comment)) {
             if(m_qMapAverageActivationOld->contains(m_pEvokedSet->evoked.at(i).comment)) {
-                m_qMapAverageActivation->insert(m_pEvokedSet->evoked.at(i).comment, m_qMapAverageActivation->value(m_pEvokedSet->evoked.at(i).comment));
+                qDebug() << "EvokedSetModel::updateData m_qMapAverageActivationOld exists for" << m_pEvokedSet->evoked.at(i).comment << m_qMapAverageActivationOld->value(m_pEvokedSet->evoked.at(i).comment);
+                m_qMapAverageActivation->insert(m_pEvokedSet->evoked.at(i).comment, m_qMapAverageActivationOld->value(m_pEvokedSet->evoked.at(i).comment));
             } else {
+                qDebug() << "EvokedSetModel::updateData m_qMapAverageActivationOld does not exists for" << m_pEvokedSet->evoked.at(i).comment;
                 m_qMapAverageActivation->insert(m_pEvokedSet->evoked.at(i).comment, true);
             }
         }
 
         if(!m_qMapAverageColor->contains(m_pEvokedSet->evoked.at(i).comment)) {
             if(m_qMapAverageColorOld->contains(m_pEvokedSet->evoked.at(i).comment)) {
-                m_qMapAverageColor->insert(m_pEvokedSet->evoked.at(i).comment, m_qMapAverageColor->value(m_pEvokedSet->evoked.at(i).comment));
+                m_qMapAverageColor->insert(m_pEvokedSet->evoked.at(i).comment, m_qMapAverageColorOld->value(m_pEvokedSet->evoked.at(i).comment));
             } else {
                 m_qMapAverageColor->insert(m_pEvokedSet->evoked.at(i).comment, Qt::yellow);
             }
-        }
-
-        if(!m_qMapAverageActivationOld->contains(m_pEvokedSet->evoked.at(i).comment)) {
-            m_qMapAverageActivationOld->insert(m_pEvokedSet->evoked.at(i).comment, true);
-        }
-
-        if(!m_qMapAverageColorOld->contains(m_pEvokedSet->evoked.at(i).comment)) {
-            m_qMapAverageColorOld->insert(m_pEvokedSet->evoked.at(i).comment, Qt::yellow);
         }
     }
 
@@ -447,6 +441,8 @@ void EvokedSetModel::updateData()
     while(itrActivation.hasNext()) {
         itrActivation.next();
         if(!slCurrentAvrComments.contains(itrActivation.key())) {
+            qDebug() << "EvokedSetModel::updateData Adding to m_qMapAverageActivationOld" << itrActivation.key();
+            m_qMapAverageActivationOld->insert(itrActivation.key(),itrActivation.value());
             itrActivation.remove();
         }
     }
@@ -455,6 +451,8 @@ void EvokedSetModel::updateData()
     while(itrColor.hasNext()) {
         itrColor.next();
         if(!slCurrentAvrComments.contains(itrColor.key())) {
+            qDebug() << "EvokedSetModel::updateData Adding to m_qMapAverageColorOld" << itrColor.key();
+            m_qMapAverageColorOld->insert(itrColor.key(),itrColor.value());
             itrColor.remove();
         }
     }
@@ -513,7 +511,6 @@ QSharedPointer<QMap<QString, bool> > EvokedSetModel::getAverageActivation() cons
 void EvokedSetModel::setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
 {
     m_qMapAverageColor = qMapAverageColor;
-    m_qMapAverageColorOld = qMapAverageColor;
 }
 
 
@@ -522,7 +519,6 @@ void EvokedSetModel::setAverageColor(const QSharedPointer<QMap<QString, QColor> 
 void EvokedSetModel::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
 {
     m_qMapAverageActivation = qMapAverageActivation;
-    m_qMapAverageActivationOld = qMapAverageActivation;
 }
 
 

@@ -182,6 +182,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Triggers an update for the color per average map information.
+    */
+    void setAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+
+    //=========================================================================================================
+    /**
     * Triggers an update for the activation per average map information.
     */
     void setAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
@@ -244,7 +250,9 @@ private:
 
     QSharedPointer<EvokedSetModel>          m_pEvokedSetModel;              /**< The evoked model */
     QSharedPointer<ChannelInfoModel>        m_pChannelInfoModel;            /**< The channel info model */
+
     QSharedPointer<QMap<QString, bool> >    m_qMapAverageActivation;        /**< Average activation status. */
+    QSharedPointer<QMap<QString, QColor> >  m_qMapAverageColor;             /**< Average colors. */
 
 };
 
