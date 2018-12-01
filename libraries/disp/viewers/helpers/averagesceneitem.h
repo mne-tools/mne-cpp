@@ -151,6 +151,11 @@ protected:
     void paintStimLine(QPainter *painter);
 
 signals:
+    //=========================================================================================================
+    /**
+    * Signal to request a scene update.
+    */
+    void sceneUpdateRequested();
 };
 
 } // NAMESPACE DISPLIB

@@ -59,7 +59,6 @@
 #include <QSvgGenerator>
 #include <QDebug>
 #include <QGraphicsItem>
-#include <QOpenGLWidget>
 
 
 //*************************************************************************************************************
@@ -89,14 +88,9 @@ AverageLayoutView::AverageLayoutView(QWidget *parent,
     fmt.setSamples(4);
     this->setFormat(fmt);
 
-//    QSurfaceFormat fmt;
-//    fmt.setSamples(4);
-
-//    QOpenGLWidget* gl = new QOpenGLWidget();
-//    gl->setFormat(fmt);
-
     m_pAverageLayoutView = new QGraphicsView();
-    //m_pAverageLayoutView->setViewport(gl);
+    m_pAverageLayoutView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_pAverageLayoutView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView.data(), this));
     m_pAverageScene->setBackgroundBrush(QBrush(Qt::black));
@@ -105,6 +99,7 @@ AverageLayoutView::AverageLayoutView(QWidget *parent,
 
     //set layouts
     QVBoxLayout *neLayout = new QVBoxLayout(this);
+    neLayout->setContentsMargins(0,0,0,0);
     neLayout->addWidget(m_pAverageLayoutView);
     this->setLayout(neLayout);
 }
