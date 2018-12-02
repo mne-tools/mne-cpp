@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     RtAve class declaration.
+* @brief     RtAveWorker class declaration.
 *
 */
 
@@ -47,8 +47,6 @@
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_info.h>
 
-#include <utils/generics/circularmatrixbuffer.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -56,8 +54,8 @@
 //=============================================================================================================
 
 #include <QThread>
-#include <QMutex>
 #include <QSharedPointer>
+#include <QObject>
 
 
 //*************************************************************************************************************
@@ -91,52 +89,42 @@ namespace RTPROCESSINGLIB
 
 //=============================================================================================================
 /**
-* Real-time averaging and returns evoked data
+* Real-time averaging worker
 *
-* @brief Real-time averaging helper
+* @brief Real-time averaging worker
 */
-class RTPROCESINGSHARED_EXPORT RtAve : public QThread
+class RTPROCESINGSHARED_EXPORT RtAveWorker : public QObject
 {
     Q_OBJECT
-public:
-    typedef QSharedPointer<RtAve> SPtr;             /**< Shared pointer type for RtAve. */
-    typedef QSharedPointer<const RtAve> ConstSPtr;  /**< Const shared pointer type for RtAve. */
 
+public:
     //=========================================================================================================
     /**
-    * Creates the real-time covariance estimation object.
+    * Creates the real-time averaging object.
     *
     * @param[in] numAverages            Number of evkos to average
-    * @param[in] p_iPreStimSamples      Number of samples averaged before the stimulus
-    * @param[in] p_iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus)
-    * @param[in] p_iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs
-    * @param[in] p_iBaselineToSSecs     End of baseline area which was/is used for correction in msecs
-    * @param[in] p_iTriggerIndex        Row in dex of channel which is to be scanned for triggers
-    * @param[in] p_pFiffInfo            Associated Fiff Information
-    * @param[in] parent     Parent QObject (optional)
+    * @param[in] iPreStimSamples      Number of samples averaged before the stimulus
+    * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus)
+    * @param[in] iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs
+    * @param[in] iBaselineToSSecs     End of baseline area which was/is used for correction in msecs
+    * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers
+    * @param[in] pFiffInfo            Associated Fiff Information
     */
-    explicit RtAve(quint32 numAverages,
-                   quint32 p_iPreStimSamples,
-                   quint32 p_iPostStimSamples,
-                   quint32 p_iBaselineFromSecs,
-                   quint32 p_iBaselineToSecs,
-                   quint32 p_iTriggerIndex,
-                   FIFFLIB::FiffInfo::SPtr p_pFiffInfo,
-                   QObject *parent = 0);
+    RtAveWorker(quint32 numAverages,
+                quint32 iPreStimSamples,
+                quint32 iPostStimSamples,
+                quint32 iBaselineFromSecs,
+                quint32 iBaselineToSecs,
+                quint32 iTriggerIndex,
+                FIFFLIB::FiffInfo::SPtr pFiffInfo);
 
     //=========================================================================================================
     /**
-    * Destroys the Real-time covariance estimation object.
-    */
-    ~RtAve();
-
-    //=========================================================================================================
-    /**
-    * Slot to receive incoming data.
+    * Perform one single HPI fit.
     *
-    * @param[in] p_DataSegment  Data to estimate the covariance from -> ToDo Replace this by shared data pointer
+    * @param[in] t_mat           Data to estimate the HPI positions from
     */
-    void append(const Eigen::MatrixXd &p_DataSegment);
+    void doWork(const Eigen::MatrixXd& matData);
 
     //=========================================================================================================
     /**
@@ -144,7 +132,7 @@ public:
     *
     * @param[in] numAve     new number of averages
     */
-    void setAverages(qint32 numAve);
+    void setAverageNumber(qint32 numAve);
 
     //=========================================================================================================
     /**
@@ -161,7 +149,8 @@ public:
     * @param[in] samples    new number of pre stimulus samples
     * @param[in] secs    new number of pre stimulus seconds
     */
-    void setPreStim(qint32 samples, qint32 secs);
+    void setPreStim(qint32 samples,
+                    qint32 secs);
 
     //=========================================================================================================
     /**
@@ -170,7 +159,8 @@ public:
     * @param[in] samples    new number of post stimulus samples
     * @param[in] secs    new number of pre stimulus seconds
     */
-    void setPostStim(qint32 samples, qint32 secs);
+    void setPostStim(qint32 samples,
+                     qint32 secs);
 
     //=========================================================================================================
     /**
@@ -189,7 +179,10 @@ public:
     * @param[in] bActivateVariance      Whether to activate variance artifact reduction or not
     * @param[in] dValueVariance         The artifact variance value
     */
-    void setArtifactReduction(bool bActivateThreshold, double dValueThreshold, bool bActivateVariance, double dValueVariance);
+    void setArtifactReduction(bool bActivateThreshold,
+                              double dValueThreshold,
+                              bool bActivateVariance,
+                              double dValueVariance);
 
     //=========================================================================================================
     /**
@@ -206,7 +199,8 @@ public:
     * @param[in] fromSamp    from of baseline area in samples
     * @param[in] fromMSec    from of baseline area in mSeconds
     */
-    void setBaselineFrom(int fromSamp, int fromMSec);
+    void setBaselineFrom(int fromSamp,
+                         int fromMSec);
 
     //=========================================================================================================
     /**
@@ -215,29 +209,8 @@ public:
     * @param[in] toSamp    to of baseline area in samples
     * @param[in] toMSec    to of baseline area in mSeconds
     */
-    void setBaselineTo(int toSamp, int toMSec);
-
-    //=========================================================================================================
-    /**
-    * Starts the RtAve by starting the producer's thread.
-    */
-    virtual bool start();
-
-    //=========================================================================================================
-    /**
-    * Stops the RtAve by stopping the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
-    virtual bool stop();
-
-    //=========================================================================================================
-    /**
-    * Returns true if is running, otherwise false.
-    *
-    * @return true if is running, false otherwise
-    */
-    inline bool isRunning();
+    void setBaselineTo(int toSamp,
+                       int toMSec);
 
     //=========================================================================================================
     /**
@@ -246,15 +219,6 @@ public:
     void reset();
 
 protected:
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
-
-private:
     //=========================================================================================================
     /**
     * do the actual averaging here.
@@ -287,17 +251,9 @@ private:
 
     //=========================================================================================================
     /**
-    * Check if data buffer has been initialized
-    */
-    inline bool isDataBufferInit();
-
-    //=========================================================================================================
-    /**
     * Check if control values have been changed
     */
     inline bool controlValuesChanged();
-
-    QMutex                                          m_qMutex;                   /**< Provides access serialization between threads*/
 
     qint32                                          m_iNumAverages;             /**< Number of averages */
 
@@ -325,7 +281,7 @@ private:
     QPair<QVariant,QVariant>                        m_pairBaselineSamp;         /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Holds the fiff measurement information. */
-    FIFFLIB::FiffEvokedSet::SPtr                    m_pStimEvokedSet;           /**< Holds the evoked information. */
+    FIFFLIB::FiffEvokedSet                          m_stimEvokedSet;            /**< Holds the evoked information. */
 
     QMap<int,QList<int> >                           m_qMapDetectedTrigger;      /**< Detected trigger for each trigger channel. */
     QMap<double,QList<Eigen::MatrixXd> >            m_mapStimAve;               /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
@@ -333,60 +289,235 @@ private:
     QMap<double,Eigen::MatrixXd>                    m_mapDataPost;              /**< The matrix holding the post stim data. */
     QMap<double,qint32>                             m_mapMatDataPostIdx;        /**< Current index inside of the matrix m_matDataPost */
     QMap<double,bool>                               m_mapFillingBackBuffer;     /**< Whether the back buffer is currently getting filled. */
-    QMap<double,qint32>                             m_mapNumberCalcAverages;    /**< The number of currently calculated averages for each trigger type. */
-
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pRawMatrixBuffer;         /**< The Circular Raw Matrix Buffer. */
 
 signals:
     //=========================================================================================================
     /**
     * Signal which is emitted when new evoked stimulus data are available.
     *
-    * @param[in] p_pEvokedStimSet          The evoked stimulus data set.
-    * @param[in] lResponsibleTriggerTypes  List of all trigger types which lead to the recent emit of a new evoked set.
+    * @param[in] evokedStimSet              The evoked stimulus data set.
+    * @param[in] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
     */
-    void evokedStim(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedStimSet, const QStringList& lResponsibleTriggerTypes);
+    void resultReady(const FIFFLIB::FiffEvokedSet& evokedStimSet,
+                     const QStringList& lResponsibleTriggerTypes);
 };
+
+
+//=============================================================================================================
+/**
+* Real-time averaging
+*
+* @brief Real-time averaging
+*/
+class RTPROCESINGSHARED_EXPORT RtAve : public QObject
+{
+    Q_OBJECT
+
+public:
+    typedef QSharedPointer<RtAve> SPtr;             /**< Shared pointer type for RtAve. */
+    typedef QSharedPointer<const RtAve> ConstSPtr;  /**< Const shared pointer type for RtAve. */
+
+    //=========================================================================================================
+    /**
+    * Creates the real-time averaging object.
+    *
+    * @param[in] numAverages            Number of evkos to average
+    * @param[in] iPreStimSamples      Number of samples averaged before the stimulus
+    * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus)
+    * @param[in] iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs
+    * @param[in] iBaselineToSSecs     End of baseline area which was/is used for correction in msecs
+    * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers
+    * @param[in] pFiffInfo            Associated Fiff Information
+    * @param[in] parent     Parent QObject (optional)
+    */
+    explicit RtAve(quint32 numAverages,
+                   quint32 iPreStimSamples,
+                   quint32 iPostStimSamples,
+                   quint32 iBaselineFromSecs,
+                   quint32 iBaselineToSecs,
+                   quint32 iTriggerIndex,
+                   FIFFLIB::FiffInfo::SPtr pFiffInfo,
+                   QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the real-time averaging object.
+    */
+    ~RtAve();
+
+    //=========================================================================================================
+    /**
+    * Slot to receive incoming data.
+    *
+    * @param[in] data  Data to calculate the average from
+    */
+    void append(const Eigen::MatrixXd &data);
+
+    //=========================================================================================================
+    /**
+    * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+    *
+    * @param[in] numAverages            Number of evkos to average
+    * @param[in] iPreStimSamples      Number of samples averaged before the stimulus
+    * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus)
+    * @param[in] iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs
+    * @param[in] iBaselineToSSecs     End of baseline area which was/is used for correction in msecs
+    * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers
+    * @param[in] pFiffInfo            Associated Fiff Information
+    */
+    void restart(quint32 numAverages,
+                 quint32 iPreStimSamples,
+                 quint32 iPostStimSamples,
+                 quint32 iBaselineFromSecs,
+                 quint32 iBaselineToSecs,
+                 quint32 iTriggerIndex,
+                 FIFFLIB::FiffInfo::SPtr pFiffInfo);
+
+    //=========================================================================================================
+    /**
+    * Stops the thread by interrupting its computation queue, quitting and waiting.
+    */
+    void stop();
+
+    //=========================================================================================================
+    /**
+    * Sets the number of averages
+    *
+    * @param[in] numAve     new number of averages
+    */
+    void setAverageNumber(qint32 numAve);
+
+    //=========================================================================================================
+    /**
+    * Sets the average mode
+    *
+    * @param[in] mode     average mode (0-running or 1-cumulative)
+    */
+    void setAverageMode(qint32 mode);
+
+    //=========================================================================================================
+    /**
+    * Sets the number of pre stimulus samples
+    *
+    * @param[in] samples    new number of pre stimulus samples
+    * @param[in] secs    new number of pre stimulus seconds
+    */
+    void setPreStim(qint32 samples,
+                    qint32 secs);
+
+    //=========================================================================================================
+    /**
+    * Sets the number of post stimulus samples
+    *
+    * @param[in] samples    new number of post stimulus samples
+    * @param[in] secs    new number of pre stimulus seconds
+    */
+    void setPostStim(qint32 samples,
+                     qint32 secs);
+
+    //=========================================================================================================
+    /**
+    * Sets the index of the trigger channel which is to be scanned fo triggers
+    *
+    * @param[in] idx    trigger channel index
+    */
+    void setTriggerChIndx(qint32 idx);
+
+    //=========================================================================================================
+    /**
+    * Sets the artifact reduction
+    *
+    * @param[in] bActivateThreshold     Whether to activate threshold artifact reduction or not
+    * @param[in] dValueThreshold        The artifact threshold value
+    * @param[in] bActivateVariance      Whether to activate variance artifact reduction or not
+    * @param[in] dValueVariance         The artifact variance value
+    */
+    void setArtifactReduction(bool bActivateThreshold,
+                              double dValueThreshold,
+                              bool bActivateVariance,
+                              double dValueVariance);
+
+    //=========================================================================================================
+    /**
+    * Sets the baseline correction on or off
+    *
+    * @param[in] activate    activate baseline correction
+    */
+    void setBaselineActive(bool activate);
+
+    //=========================================================================================================
+    /**
+    * Sets the from mSeconds of the baseline area
+    *
+    * @param[in] fromSamp    from of baseline area in samples
+    * @param[in] fromMSec    from of baseline area in mSeconds
+    */
+    void setBaselineFrom(int fromSamp,
+                         int fromMSec);
+
+    //=========================================================================================================
+    /**
+    * Sets the to mSeconds of the baseline area
+    *
+    * @param[in] toSamp    to of baseline area in samples
+    * @param[in] toMSec    to of baseline area in mSeconds
+    */
+    void setBaselineTo(int toSamp,
+                       int toMSec);
+
+    //=========================================================================================================
+    /**
+    * Reset the data processing in the real-time worker
+    */
+    void reset();
+
+protected:
+    //=========================================================================================================
+    /**
+    * Handles the results.
+    */
+    void handleResults(const FIFFLIB::FiffEvokedSet& evokedStimSet,
+                       const QStringList& lResponsibleTriggerTypes);
+
+    QThread             m_workerThread;         /**< The worker thread. */
+
+signals:
+    void evokedStim(const FIFFLIB::FiffEvokedSet& evokedStimSet,
+                    const QStringList& lResponsibleTriggerTypes);
+    void operate(const Eigen::MatrixXd& matData);
+    void averageNumberChanged(qint32 numAve);
+    void averageModeChanged(qint32 mode);
+    void averagePreStimChanged(qint32 samples,
+                               qint32 secs);
+    void averagePostStimChanged(qint32 samples,
+                                qint32 secs);
+    void averageTriggerChIdxChanged(qint32 idx);
+    void averageArtifactReductionChanged(bool bActivateThreshold,
+                                         double dValueThreshold,
+                                         bool bActivateVariance,
+                                         double dValueVariance);
+    void averageBaselineActiveChanged(bool activate);
+    void averageBaselineFromChanged(int fromSamp,
+                                    int fromMSec);
+    void averageBaselineToChanged(int toSamp,
+                                  int toMSec);
+    void averageResetRequested();
+};
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RtAve::isRunning()
+inline bool RtAveWorker::controlValuesChanged()
 {
-    return m_bIsRunning;
-}
-
-
-//*************************************************************************************************************
-
-inline bool RtAve::isDataBufferInit()
-{
-    QMutexLocker locker(&m_qMutex);
-
-    bool result = false;
-
-    if(m_pRawMatrixBuffer) {
-        result = true;
-    }
-
-    return result;
-}
-
-
-//*************************************************************************************************************
-
-inline bool RtAve::controlValuesChanged()
-{
-    QMutexLocker locker(&m_qMutex);
-
     bool result = false;
 
     if(m_iNewPreStimSamples != m_iPreStimSamples
-            || m_iNewPostStimSamples != m_iPostStimSamples
-            || m_iNewTriggerIndex != m_iTriggerChIndex
-            || m_iNewAverageMode != m_iAverageMode) {
+       || m_iNewPostStimSamples != m_iPostStimSamples
+       || m_iNewTriggerIndex != m_iTriggerChIndex
+       || m_iNewAverageMode != m_iAverageMode) {
         result = true;
     }
 
@@ -394,10 +525,5 @@ inline bool RtAve::controlValuesChanged()
 }
 
 } // NAMESPACE
-
-#ifndef metatype_fiffevokedsptr
-#define metatype_fiffevokedsptr
-Q_DECLARE_METATYPE(FIFFLIB::FiffEvoked::SPtr); /**< Provides QT META type declaration of the FIFFLIB::FiffEvoked type. For signal/slot usage.*/
-#endif
 
 #endif // RTAVE_H
