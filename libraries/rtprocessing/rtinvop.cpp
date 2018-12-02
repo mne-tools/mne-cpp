@@ -80,6 +80,10 @@ using namespace MNELIB;
 
 void RtInvOpWorker::doWork(const RtInvOpInput &inputData)
 {
+    if(this->thread()->isInterruptionRequested()) {
+        return;
+    }
+
     // Restrict forward solution as necessary for MEG
     MNEForwardSolution forwardMeg = inputData.pFwd->pick_types(true, false);
 
@@ -105,10 +109,6 @@ RtInvOp::RtInvOp(FiffInfo::SPtr &p_pFiffInfo,
 , m_pFiffInfo(p_pFiffInfo)
 , m_pFwd(p_pFwd)
 {
-    if(this->thread()->isInterruptionRequested()) {
-        return;
-    }
-
     RtInvOpWorker *worker = new RtInvOpWorker;
     worker->moveToThread(&m_workerThread);
 
