@@ -116,7 +116,7 @@ public:
     *
     * @param [in] pChannelInfoModel     The new channel info model.
     */
-    void setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
+    void setModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
 
     //=========================================================================================================
     /**
@@ -213,7 +213,7 @@ protected:
 
     QSharedPointer<QMap<QString, QColor> >                      m_qMapAverageColor;         /**< Average colors. */
     QSharedPointer<QMap<QString, bool> >                        m_qMapAverageActivation;    /**< Average activation status. */
-
+    QMap<qint32,float>                                          m_scaleMap;                 /**< The current scaling map. */
 };
 
 } // NAMESPACE

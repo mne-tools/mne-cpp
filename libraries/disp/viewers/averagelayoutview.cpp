@@ -83,10 +83,10 @@ AverageLayoutView::AverageLayoutView(QWidget *parent,
 {
     this->setWindowTitle("Average Layout");
 
-    // Activate anti aliasing
-    QSurfaceFormat fmt;
-    fmt.setSamples(4);
-    this->setFormat(fmt);
+//    // Activate anti aliasing
+//    QSurfaceFormat fmt;
+//    fmt.setSamples(4);
+//    this->setFormat(fmt);
 
     m_pAverageLayoutView = new QGraphicsView();
     m_pAverageLayoutView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -107,7 +107,7 @@ AverageLayoutView::AverageLayoutView(QWidget *parent,
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
+void AverageLayoutView::setModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
 {
     m_pChannelInfoModel = pChannelInfoModel;
 }
@@ -254,6 +254,7 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
 
     setAverageColor(m_qMapAverageColor);
     setAverageActivation(m_qMapAverageActivation);
+    setScaleMap(m_scaleMap);
     updateData();
 }
 

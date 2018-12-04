@@ -152,7 +152,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Perform a view update.
+    * Perform a view update from outside of this class.
     */
     void updateView();
 
@@ -218,7 +218,7 @@ public:
     *
     * @param [in] pChannelInfoModel     The new channel info model.
     */
-    void setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
+    void setModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
 
     //=========================================================================================================
     /**

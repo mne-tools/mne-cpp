@@ -70,7 +70,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
-: QOpenGLWidget(parent, f)
+: QOpenGLWidget(parent)
 , m_pEvokedSetModel(NULL)
 , m_bIsInit(false)
 , m_bShowMAG(true)
@@ -82,10 +82,10 @@ ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 {
-    // Activate anti aliasing
-    QSurfaceFormat fmt;
-    fmt.setSamples(4);
-    this->setFormat(fmt);
+//    // Activate anti aliasing
+//    QSurfaceFormat fmt;
+//    fmt.setSamples(4);
+//    this->setFormat(fmt);
 }
 
 
@@ -127,9 +127,6 @@ QMap<QString, bool> ButterflyView::getModalityMap()
 void ButterflyView::setModalityMap(const QMap<QString, bool> &modalityMap)
 {
     m_modalityMap = modalityMap;
-
-    qDebug() << "ButterflyView::setModalityMap m_modalityMap - " << m_modalityMap;
-
     update();
 }
 
@@ -138,7 +135,7 @@ void ButterflyView::setModalityMap(const QMap<QString, bool> &modalityMap)
 
 void ButterflyView::setScaleMap(const QMap<qint32,float> &scaleMap)
 {
-    m_scaleMap = scaleMap;
+    m_scaleMap = scaleMap;    
     update();
 }
 
@@ -148,7 +145,6 @@ void ButterflyView::setScaleMap(const QMap<qint32,float> &scaleMap)
 void ButterflyView::setSelectedChannels(const QList<int> &selectedChannels)
 {
     m_lSelectedChannels = selectedChannels;
-
     update();
 }
 
@@ -166,7 +162,6 @@ void ButterflyView::updateView()
 void ButterflyView::setBackgroundColor(const QColor& backgroundColor)
 {
     m_colCurrentBackgroundColor = backgroundColor;
-
     update();
 }
 
@@ -183,8 +178,7 @@ const QColor& ButterflyView::getBackgroundColor()
 
 void ButterflyView::takeScreenshot(const QString& fileName)
 {
-    if(fileName.contains(".svg", Qt::CaseInsensitive))
-    {
+    if(fileName.contains(".svg", Qt::CaseInsensitive)) {
         // Generate screenshot
         QSvgGenerator svgGen;
         svgGen.setFileName(fileName);
@@ -194,8 +188,7 @@ void ButterflyView::takeScreenshot(const QString& fileName)
         this->render(&svgGen);
     }
 
-    if(fileName.contains(".png", Qt::CaseInsensitive))
-    {
+    if(fileName.contains(".png", Qt::CaseInsensitive)) {
         QImage image(this->size(), QImage::Format_ARGB32);
         image.fill(Qt::transparent);
 
@@ -242,7 +235,7 @@ void ButterflyView::setAverageActivation(const QSharedPointer<QMap<QString, bool
 
 //*************************************************************************************************************
 
-void ButterflyView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
+void ButterflyView::setModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
 {
     m_pChannelInfoModel = pChannelInfoModel;
 }
