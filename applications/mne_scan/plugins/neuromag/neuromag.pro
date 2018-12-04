@@ -58,6 +58,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}Communicationd \
             -lscMeasd \
             -lscDispd \
@@ -71,6 +72,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
+            -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}Communication \
             -lscMeas \
             -lscDisp \
@@ -84,7 +86,6 @@ SOURCES += \
         neuromagproducer.cpp \
         FormFiles/neuromagsetupwidget.cpp \
         FormFiles/neuromagaboutwidget.cpp \
-        FormFiles/neuromagprojectdialog.cpp \
 
 HEADERS += \
         neuromag_global.h \
@@ -92,12 +93,10 @@ HEADERS += \
         neuromagproducer.h \
         FormFiles/neuromagsetupwidget.h \
         FormFiles/neuromagaboutwidget.h \
-        FormFiles/neuromagprojectdialog.h \
 
 FORMS += \
     FormFiles/neuromagsetup.ui \
     FormFiles/neuromagabout.ui \
-    FormFiles/neuromagprojectdialog.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/mne_scan/plugins/neuromag/header.fif \

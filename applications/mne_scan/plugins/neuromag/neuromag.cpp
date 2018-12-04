@@ -43,10 +43,14 @@
 #include "neuromagproducer.h"
 
 #include "FormFiles/neuromagsetupwidget.h"
-#include "FormFiles/neuromagprojectdialog.h"
 
-#include <utils/ioutils.h>
 #include <fiff/fiff_dir_node.h>
+#include <fiff/fiff_stream.h>
+#include <scMeas/realtimemultisamplearray.h>
+#include <disp/viewers/projectsettingsview.h>
+#include <fiff/fiff_info.h>
+#include <utils/ioutils.h>
+#include <communication/rtClient/rtcmdclient.h>
 
 
 //*************************************************************************************************************
@@ -54,12 +58,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QtPlugin>
-#include <QtCore/QTextStream>
-#include <QtCore/QFile>
-
-#include <QList>
-#include <QDebug>
+#include <QDir>
+#include <QSettings>
+#include <QMessageBox>
 
 
 //*************************************************************************************************************
@@ -73,6 +74,7 @@ using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace SCMEASLIB;
 using namespace FIFFLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -95,17 +97,17 @@ Neuromag::Neuromag()
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
     m_pActionSetupProject->setStatusTip(tr("Setup Project"));
-    connect(m_pActionSetupProject, &QAction::triggered,
+    connect(m_pActionSetupProject.data(), &QAction::triggered,
             this, &Neuromag::showProjectDialog);
     addPluginAction(m_pActionSetupProject);
 
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
-    connect(m_pActionRecordFile, &QAction::triggered,
+    connect(m_pActionRecordFile.data(), &QAction::triggered,
             this, &Neuromag::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
 
-    //Init timers
+    //Init recording timers
     m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
     m_pRecordTimer->setSingleShot(true);
     connect(m_pRecordTimer.data(), &QTimer::timeout,
@@ -143,31 +145,48 @@ QSharedPointer<SCSHAREDLIB::IPlugin> Neuromag::clone() const
 
 void Neuromag::init()
 {
-    //NeuromagData Path
-    m_sNeuromagDataPath = QDir::homePath() + "/NeuromagData";
-    if(!QDir(m_sNeuromagDataPath).exists())
-        QDir().mkdir(m_sNeuromagDataPath);
+    //Neuromag data Path
+    QString sNeuromagDataPath = QDir::homePath() + "/BabyMEGData";
+    if(!QDir(sNeuromagDataPath).exists()) {
+        QDir().mkdir(sNeuromagDataPath);
+    }
+
     //Test Project
-    if(!QDir(m_sNeuromagDataPath+"/TestProject").exists())
-        QDir().mkdir(m_sNeuromagDataPath+"/TestProject");
     QSettings settings;
-    m_sCurrentProject = settings.value(QString("Plugin/%1/currentProject").arg(getName()), "TestProject").toString();
+    QString sCurrentProject = settings.value(QString("Plugin/%1/currentProject").arg(getName()), "TestProject").toString();
+    if(!QDir(sNeuromagDataPath+"/"+sCurrentProject).exists()) {
+        QDir().mkdir(sNeuromagDataPath+"/"+sCurrentProject);
+    }
+
     //Test Subject
-    if(!QDir(m_sNeuromagDataPath+"/TestProject/TestSubject").exists())
-        QDir().mkdir(m_sNeuromagDataPath+"/TestProject/TestSubject");
-    m_sCurrentSubject = settings.value(QString("Plugin/%1/currentSubject").arg(getName()), "TestSubject").toString();
+    QString sCurrentSubject = settings.value(QString("Plugin/%1/currentSubject").arg(getName()), "TestSubject").toString();
+    if(!QDir(sNeuromagDataPath+"/"+sCurrentProject+"/"+sCurrentSubject).exists()) {
+        QDir().mkdir(sNeuromagDataPath+"/"+sCurrentProject+"/"+sCurrentSubject);
+    }
+
+    m_pProjectSettingsView = QSharedPointer<ProjectSettingsView>::create(sNeuromagDataPath,
+                                                                         sCurrentProject,
+                                                                         sCurrentSubject,
+                                                                         "");
+
+    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::timerChanged,
+            this, &Neuromag::setRecordingTimerChanged);
+
+    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::recordingTimerStateChanged,
+            this, &Neuromag::setRecordingTimerStateChanged);
+
+    m_pProjectSettingsView->setWindowFlags(Qt::WindowStaysOnTopHint);
+    m_pProjectSettingsView->hide();
 
     // Start NeuromagProducer
     m_pNeuromagProducer->start();
 
     //init channels when fiff info is available
-    connect(this, &Neuromag::fiffInfoAvailable, this, &Neuromag::initConnector);
+    connect(this, &Neuromag::fiffInfoAvailable,
+            this, &Neuromag::initConnector);
 
     //Try to connect the cmd client on start up using localhost connection
     this->connectCmdClient();
-
-    //Init projection dialog
-    m_pNeuromagProjectDialog = QSharedPointer<NeuromagProjectDialog>(new NeuromagProjectDialog(this));
 }
 
 
@@ -181,47 +200,11 @@ void Neuromag::unload()
 
 //*************************************************************************************************************
 
-QString Neuromag::getFilePath(bool currentTime) const
-{
-    QString sFilePath = m_sNeuromagDataPath + "/" + m_sCurrentProject + "/" + m_sCurrentSubject;
-
-    QString sTimeStamp;
-
-    if(currentTime)
-        sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
-    else
-        sTimeStamp = "<YYMMDD_HMS>";
-
-    if(m_sCurrentParadigm.isEmpty())
-        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_raw.fif");
-    else
-        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_" + m_sCurrentParadigm + "_raw.fif");
-
-    return sFilePath;
-}
-
-
-//*************************************************************************************************************
-
-QString Neuromag::getDataPath() const
-{
-    return m_sNeuromagDataPath;
-}
-
-
-//*************************************************************************************************************
-
 void Neuromag::showProjectDialog()
 {
-    m_pNeuromagProjectDialog->setWindowFlags(Qt::WindowStaysOnTopHint);
-
-    connect(m_pNeuromagProjectDialog.data(), &NeuromagProjectDialog::timerChanged,
-            this, &Neuromag::setRecordingTimerChanged);
-
-    connect(m_pNeuromagProjectDialog.data(), &NeuromagProjectDialog::recordingTimerStateChanged,
-            this, &Neuromag::setRecordingTimerStateChanged);
-
-    m_pNeuromagProjectDialog->show();
+    if(!m_pProjectSettingsView) {
+        m_pProjectSettingsView->show();
+    }
 }
 
 
@@ -229,14 +212,12 @@ void Neuromag::showProjectDialog()
 
 void Neuromag::splitRecordingFile()
 {
-    qDebug() << "Split recording file";
+    qDebug() << "Neuromag::splitRecordingFile - Splitting recording file";
     ++m_iSplitCount;
     QString nextFileName = m_sRecordFile.remove("_raw.fif");
     nextFileName += QString("-%1_raw.fif").arg(m_iSplitCount);
 
-    /*
-    * Write the link to the next file
-    */
+    // Write the link to the next file
     qint32 data;
     m_pOutfid->start_block(FIFFB_REF);
     data = FIFFV_ROLE_NEXT_FILE;
@@ -263,8 +244,7 @@ void Neuromag::splitRecordingFile()
 void Neuromag::toggleRecordingFile()
 {
     //Setup writing to file
-    if(m_bWriteToFile)
-    {
+    if(m_bWriteToFile) {
         m_mutex.lock();
         m_pOutfid->finish_writing_raw();
         m_mutex.unlock();
@@ -278,13 +258,10 @@ void Neuromag::toggleRecordingFile()
         m_pBlinkingRecordButtonTimer->stop();
 
         m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
-    }
-    else
-    {
+    } else {
         m_iSplitCount = 0;
 
-        if(!m_pFiffInfo)
-        {
+        if(!m_pFiffInfo) {
             QMessageBox msgBox;
             msgBox.setText("FiffInfo missing!");
             msgBox.exec();
@@ -292,10 +269,12 @@ void Neuromag::toggleRecordingFile()
         }
 
         //Initiate the stream for writing to the fif file
-        m_sRecordFile = getFilePath(true);
+        if(m_pProjectSettingsView) {
+            m_sRecordFile = m_pProjectSettingsView->getCurrentFileName();
+        }
+
         m_qFileOut.setFileName(m_sRecordFile);
-        if(m_qFileOut.exists())
-        {
+        if(m_qFileOut.exists()) {
             QMessageBox msgBox;
             msgBox.setText("The file you want to write already exists.");
             msgBox.setInformativeText("Do you want to overwrite this file?");
@@ -341,8 +320,9 @@ void Neuromag::toggleRecordingFile()
         m_recordingStartedTime.restart();
         m_pUpdateTimeInfoTimer->start(1000);
 
-        if(m_bUseRecordTimer)
+        if(m_bUseRecordTimer) {
             m_pRecordTimer->start(m_iRecordingMSeconds);
+        }
     }
 }
 
@@ -352,8 +332,9 @@ void Neuromag::toggleRecordingFile()
 void Neuromag::setRecordingTimerChanged(int timeMSecs)
 {
     //If the recording time is changed during the recording, change the timer
-    if(m_bWriteToFile)
+    if(m_bWriteToFile) {
         m_pRecordTimer->setInterval(timeMSecs-m_recordingStartedTime.elapsed());
+    }
 
     m_iRecordingMSeconds = timeMSecs;
 }
@@ -371,7 +352,7 @@ void Neuromag::setRecordingTimerStateChanged(bool state)
 
 void Neuromag::onRecordingRemainingTimeChange()
 {
-    m_pNeuromagProjectDialog->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
+    m_pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
 }
 
 
@@ -547,11 +528,11 @@ void Neuromag::requestInfo()
 bool Neuromag::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning())
+    if(this->isRunning()) {
         QThread::wait();
+    }
 
-    if(m_bCmdClientIsConnected && m_pFiffInfo)
-    {
+    if(m_bCmdClientIsConnected && m_pFiffInfo) {
         // Initialize real time measurements
         init();
 
@@ -578,8 +559,7 @@ bool Neuromag::start()
         (*m_pRtCmdClient)["start"].send();
 
         return true;
-    }
-    else {
+    } else {
         if(!m_pFiffInfo) {
             qWarning()<<"Neuromag::start - FiffInfo is empty (NULL).";
         }
@@ -595,14 +575,14 @@ bool Neuromag::start()
 
 bool Neuromag::stop()
 {
-    if(m_pNeuromagProducer->isRunning())
+    if(m_pNeuromagProducer->isRunning()) {
         m_pNeuromagProducer->stop();
+    }
 
     //Wait until this thread (TMSI) is stopped
     m_bIsRunning = false;
 
-    if(this->isRunning())
-    {
+    if(this->isRunning())  {
         //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
         m_pRawMatrixBuffer_In->releaseFromPop();
 
@@ -655,13 +635,13 @@ bool Neuromag::readProjectors()
 
     printf("Opening header data %s...\n",t_sFileName.toUtf8().constData());
 
-    if(!t_pStream->open())
+    if(!t_pStream->open()) {
         return false;
+    }
 
     QList<FiffProj> q_ListProj = t_pStream->read_proj(t_pStream->dirtree());
 
-    if (q_ListProj.size() == 0)
-    {
+    if (q_ListProj.size() == 0) {
         printf("Could not find projectors\n");
         return false;
     }
@@ -671,8 +651,9 @@ bool Neuromag::readProjectors()
     //
     //   Activate the projection items
     //
-    for (qint32 k = 0; k < m_pFiffInfo->projs.size(); ++k)
+    for (qint32 k = 0; k < m_pFiffInfo->projs.size(); ++k) {
         m_pFiffInfo->projs[k].active = true;
+    }
 
     //garbage collecting
     t_pStream->close();
@@ -689,38 +670,30 @@ void Neuromag::run()
 
     qint32 size = 0;
 
-    while(m_bIsRunning)
-    {
-        if(m_pRawMatrixBuffer_In)
-        {
+    while(m_bIsRunning) {
+        if(m_pRawMatrixBuffer_In) {
             //pop matrix
             matValue = m_pRawMatrixBuffer_In->pop();
 
             //Write raw data to fif file
-            if(m_bWriteToFile)
-            {
+            if(m_bWriteToFile) {
                 size += matValue.rows()*matValue.cols() * 4;
 
-                if(size > MAX_DATA_LEN)
-                {
+                if(size > MAX_DATA_LEN) {
                     size = 0;
                     this->splitRecordingFile();
                 }
 
                 m_mutex.lock();
-                if(m_pOutfid)
-                {
+                if(m_pOutfid) {
                     m_pOutfid->write_raw_buffer(matValue.cast<double>());
                 }
                 m_mutex.unlock();
-            }
-            else
-            {
+            } else {
                 size = 0;
             }
 
-            if(m_pRTMSA_Neuromag)
-            {
+            if(m_pRTMSA_Neuromag) {
                 m_pRTMSA_Neuromag->data()->setValue(matValue.cast<double>());
             }
         }
@@ -732,13 +705,10 @@ void Neuromag::run()
 
 void Neuromag::changeRecordingButton()
 {
-    if(m_iBlinkStatus == 0)
-    {
+    if(m_iBlinkStatus == 0) {
         m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
         m_iBlinkStatus = 1;
-    }
-    else
-    {
+    } else {
         m_pActionRecordFile->setIcon(QIcon(":/images/record_active.png"));
         m_iBlinkStatus = 0;
     }

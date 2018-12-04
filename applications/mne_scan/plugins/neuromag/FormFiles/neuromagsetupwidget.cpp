@@ -43,6 +43,9 @@
 
 #include "../neuromag.h"
 
+#include <communication/rtClient/rtcmdclient.h>
+#include <fiff/fiff_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -77,21 +80,27 @@ NeuromagSetupWidget::NeuromagSetupWidget(Neuromag* p_pNeuromag, QWidget* parent)
     //rt server connection
     this->ui.m_qLineEdit_Ip->setText(m_pNeuromag->m_sNeuromagIP);
 
-    connect(ui.m_qPushButton_Connect, &QPushButton::released, this, &NeuromagSetupWidget::pressedConnect);
+    connect(ui.m_qPushButton_Connect, &QPushButton::released,
+            this, &NeuromagSetupWidget::pressedConnect);
 
-    connect(m_pNeuromag, &Neuromag::cmdConnectionChanged, this, &NeuromagSetupWidget::cmdConnectionChanged);
+    connect(m_pNeuromag, &Neuromag::cmdConnectionChanged,
+            this, &NeuromagSetupWidget::cmdConnectionChanged);
 
     //rt server fiffInfo received
-    connect(m_pNeuromag, &Neuromag::fiffInfoAvailable, this, &NeuromagSetupWidget::fiffInfoReceived);
+    connect(m_pNeuromag, &Neuromag::fiffInfoAvailable,
+            this, &NeuromagSetupWidget::fiffInfoReceived);
 
     //Buffer
-    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::textChanged, this, &NeuromagSetupWidget::bufferSizeEdited);
+    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::textChanged,
+            this, &NeuromagSetupWidget::bufferSizeEdited);
 
     //CLI
-    connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &NeuromagSetupWidget::pressedSendCLI);
+    connect(ui.m_qPushButton_SendCLI, &QPushButton::released,
+            this, &NeuromagSetupWidget::pressedSendCLI);
 
     //About
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &NeuromagSetupWidget::showAboutDialog);
+    connect(ui.m_qPushButton_About, &QPushButton::released,
+            this, &NeuromagSetupWidget::showAboutDialog);
 
 //    //SQUID Control
 //    connect(ui.m_qPushButton_SQUIDControl, &QPushButton::released, this, &NeuromagSetupWidget::SQUIDControlDialog);
