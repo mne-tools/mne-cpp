@@ -43,14 +43,13 @@
 
 
 #include <scMeas/measurementtypes.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-#include <scMeas/newnumeric.h>
+#include <scMeas/realtimemultisamplearray.h>
+#include <scMeas/numeric.h>
 
 #include <scShared/Management/pluginconnectorconnection.h>
 #include <scShared/Management/pluginoutputdata.h>
 #include <scShared/Management/plugininputdata.h>
 #include <scShared/Interfaces/IPlugin.h>
-
 
 #include <Eigen/Core>
 
@@ -132,7 +131,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
 
 
-//void debugTest(QSharedPointer<NewRealTimeMultiSampleArray> testData)
+//void debugTest(QSharedPointer<RealTimeMultiSampleArray> testData)
 //{
 //    qDebug() << "Here in debug Test Callback new";
 

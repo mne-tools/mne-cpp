@@ -46,9 +46,10 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
 
-#include "FormFiles/neuronalconnectivityyourwidget.h"
+#include <connectivity/connectivitysettings.h>
+#include <connectivity/network/network.h>
 
 
 //*************************************************************************************************************
@@ -56,9 +57,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QtCore/QtPlugin>
-#include <QDebug>
+#include <QMutex>
+#include <QElapsedTimer>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -78,9 +79,19 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
+namespace DISPLIB {
+    class ConnectivitySettingsView;
+}
+
+namespace RTPROCESSINGLIB {
+    class RtConnectivity;
+}
+
 namespace SCMEASLIB {
     class RealTimeSourceEstimate;
+    class RealTimeMultiSampleArray;
     class RealTimeConnectivityEstimate;
+    class RealTimeEvokedSet;
 }
 
 
@@ -95,8 +106,10 @@ namespace NEURONALCONNECTIVITYPLUGIN
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// NEURONALCONNECTIVITYPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
+
+class NeuronalConnectivityYourWidget;
 
 
 //=============================================================================================================
@@ -108,7 +121,7 @@ namespace NEURONALCONNECTIVITYPLUGIN
 class NEURONALCONNECTIVITYSHARED_EXPORT NeuronalConnectivity : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "neuronalconnectivity.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "neuronalconnectivity.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
@@ -142,42 +155,127 @@ public:
     /**
     * Udates the pugin with new (incoming) data.
     *
-    * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
+    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
     */
-    void updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateSource(SCMEASLIB::Measurement::SPtr pMeasurement);
+
+    //=========================================================================================================
+    /**
+    * Updates the real time multi sample array data
+    *
+    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
+    */
+    void updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement);
+
+    //=========================================================================================================
+    /**
+    * Slot to update the fiff evoked
+    *
+    * @param[in] pMeasurement   The evoked to be appended
+    */
+    void updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 protected:
+    //=========================================================================================================
+    /**
+    * Generate the node positions based on the current incoming data. Also take into account selected bad channels.
+    */
+    void generateNodeVertices();
+
     //=========================================================================================================
     /**
     * IAlgorithm function
     */
     virtual void run();
 
-    void showYourWidget();
-
-private:
-    bool                                                                            m_bIsRunning;                   /**< Flag whether thread is running.*/
-    qint32                                                                          m_iDownSample;                  /**< Sampling rate */
-
-    QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
-    QSharedPointer<NeuronalConnectivityYourWidget>                                  m_pYourWidget;                  /**< flag whether thread is running.*/
-    QAction*                                                                        m_pActionShowYourWidget;        /**< flag whether thread is running.*/
-
-    QSharedPointer<IOBUFFER::CircularMatrixBuffer<double> >                         m_pNeuronalConnectivityBuffer;  /**< Holds incoming data.*/
-
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr           m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
-
-    Eigen::MatrixX3f        m_matNodeVertLeft;          /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f        m_matNodeVertRight;         /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f        m_matNodeVertComb;          /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-
-signals:
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
+    * Slot called when a new real-time connectivity estimate is available.
+    *
+    * @param [in] connectivityResult        The new connectivity estimate
     */
-    void fiffInfoAvailable();
+    void onNewConnectivityResultAvailable(const CONNECTIVITYLIB::Network& connectivityResult,
+                                          const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the metric changed.
+    *
+    * @param [in] sMetric        The new metric
+    */
+    void onMetricChanged(const QString &sMetric);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the number of trials changed.
+    *
+    * @param [in] iNumberTrials        The new number of trials.
+    */
+    void onNumberTrialsChanged(int iNumberTrials);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the window type changed.
+    *
+    * @param [in] windowType        The new window type
+    */
+    void onWindowTypeChanged(const QString& windowType);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the trigger type changed.
+    *
+    * @param [in] triggerType        The new trigger type.
+    */
+    void onTriggerTypeChanged(const QString& triggerType);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the frequency band changed.
+    *
+    * @param [in] iFreqLow        The new lower frequency band.
+    * @param [in] iFreqHigh       The new higher frequency band.
+    */
+    void onFrequencyBandChanged(int iFreqLow, int iFreqHigh);
+
+private:
+    bool                m_bIsRunning;           /**< Flag whether thread is running.*/
+    qint32              m_iDownSample;          /**< Sampling rate. */
+    qint32              m_iNumberAverages;      /**< The number of averages used to calculate the connectivity estimate. Use this only for resting state data when the averaging plugin is not connected.*/
+    qint32              m_iNumberBadChannels;   /**< The current number of bad channels. USed to test if new bad channels were selected. */
+    qint32              m_iFreqBandLow;         /**< The lower frequency band to average the connectivy weights from. */
+    qint32              m_iFreqBandHigh;        /**< The higher frequency band to average the connectivy weights to. In frequency bins. */
+    qint32              m_iBlockSize;           /**< The block size of teh last received data block. In frequency bins. */
+
+    QString             m_sAvrType;             /**< The average type */
+    QStringList         m_sConnectivityMethods; /**< The connectivity metric to use */
+
+    QMutex              m_mutex;
+
+    QElapsedTimer       m_timer;
+
+    CONNECTIVITYLIB::ConnectivitySettings                                           m_connectivitySettings;         /**< The connectivity settings.*/
+
+    QSharedPointer<IOBUFFER::CircularBuffer<CONNECTIVITYLIB::Network> >             m_pCircularNetworkBuffer;       /**< The circular buffer holding the connectivity estimates.*/
+    QSharedPointer<RTPROCESSINGLIB::RtConnectivity>                                 m_pRtConnectivity;              /**< The real-time connectivity estimation object.*/
+    QSharedPointer<FIFFLIB::FiffInfo>                                               m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QSharedPointer<DISPLIB::ConnectivitySettingsView>                               m_pConnectivitySettingsView;    /**< The connectivity settings widget which will be added to the Quick Control view. The QuickControlView will not take ownership. Ownership will be managed by the QSharedPointer.*/
+    QAction*                                                                        m_pActionShowYourWidget;        /**< flag whether thread is running.*/
+
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr           m_pRTSEInput;                   /**< The RealTimeSourceEstimate input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr         m_pRTMSAInput;                  /**< The RealTimeMultiSampleArray input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>::SPtr                m_pRTEVSInput;                  /**< The RealTimeEvoked input.*/
+
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr    m_pRTCEOutput;                  /**< The RealTimeSourceEstimate output.*/
+
+    CONNECTIVITYLIB::Network    m_connectivityEstimate;         /**< The current connectivity estimate.*/
+    Eigen::MatrixX3f            m_matNodeVertLeft;              /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f            m_matNodeVertRight;             /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f            m_matNodeVertComb;              /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+
+    QVector<int>                m_chIdx;                        /**< The channel indeces to pick from the incoming data.*/
+
+    CONNECTIVITYLIB::Network    m_currentConnectivityResult;    /**< The current connectivity result.*/
 };
 
 } // NAMESPACE

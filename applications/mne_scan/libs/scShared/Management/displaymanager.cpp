@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the DisplayManager Class.
+* @brief    Definition of the DisplayManager Class.
 *
 */
 
@@ -40,40 +40,21 @@
 
 #include "displaymanager.h"
 
-
 #include <scDisp/realtimesamplearraywidget.h>
 #include <scDisp/realtimemultisamplearraywidget.h>
 #include <scDisp/realtimesourceestimatewidget.h>
 #include <scDisp/realtimeconnectivityestimatewidget.h>
-#include <scDisp/realtimeevokedwidget.h>
 #include <scDisp/realtimeevokedsetwidget.h>
 #include <scDisp/realtimecovwidget.h>
-#include <scDisp/frequencyspectrumwidget.h>
+#include <scDisp/realtimespectrumwidget.h>
 
-#include <scMeas/newrealtimesamplearray.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimesamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
-#include <scMeas/realtimeevoked.h>
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimecov.h>
-#include <scMeas/frequencyspectrum.h>
-
-
-//#include <scDisp/measurementwidget.h>
-//#include <scDisp/numericwidget.h>
-//#include <scDisp/realtimemultisamplearraywidget.h>
-//#include <scDisp/realtimemultisamplearray_new_widget.h>
-//#include <scDisp/realtimesourceestimatewidget.h>
-//#include <scDisp/progressbarwidget.h>
-//#include <scDisp/textwidget.h>
-
-//#include <scMeas/Measurement/text.h>
-//#include <scMeas/Measurement/realtimesourceestimate.h>
-//#include <scMeas/Measurement/realtimemultisamplearray_new.h>
-//#include <scMeas/Measurement/realtimemultisamplearray.h>
-//#include <scMeas/Measurement/progressbar.h>
-//#include <scMeas/Measurement/numeric.h>
+#include <scMeas/realtimespectrum.h>
 
 
 //*************************************************************************************************************
@@ -83,8 +64,8 @@
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-
 #include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -128,9 +109,9 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
     foreach (QSharedPointer< PluginOutputConnector > pPluginOutputConnector, outputConnectorList)
     {
-        if(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >())
+        if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSampleArray> >())
         {
-            QSharedPointer<NewRealTimeSampleArray>* pRealTimeSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data();
+            QSharedPointer<RealTimeSampleArray>* pRealTimeSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSampleArray> >()->data();
             RealTimeSampleArrayWidget* rtsaWidget = new RealTimeSampleArrayWidget(*pRealTimeSampleArray, pT, newDisp);
 
             qListActions.append(rtsaWidget->getDisplayActions());
@@ -142,10 +123,10 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtsaWidget);
             rtsaWidget->init();
         }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >())
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >())
         {
-            QSharedPointer<NewRealTimeMultiSampleArray>* pNewRealTimeMultiSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >()->data();
-            RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(*pNewRealTimeMultiSampleArray, pT, newDisp);
+            QSharedPointer<RealTimeMultiSampleArray>* pRealTimeMultiSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >()->data();
+            RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(*pRealTimeMultiSampleArray, pT, newDisp);
 
             qListActions.append(rtmsaWidget->getDisplayActions());
             qListWidgets.append(rtmsaWidget->getDisplayWidgets());
@@ -184,21 +165,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtseWidget);
             rtseWidget->init();
         }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >())
-        {
-            QSharedPointer<RealTimeEvoked>* pRealTimeEvoked = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >()->data();
-
-            RealTimeEvokedWidget* rteWidget = new RealTimeEvokedWidget(*pRealTimeEvoked, pT, newDisp);
-
-            qListActions.append(rteWidget->getDisplayActions());
-            qListWidgets.append(rteWidget->getDisplayWidgets());
-
-            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rteWidget, &RealTimeEvokedWidget::update, Qt::BlockingQueuedConnection);
-
-            vboxLayout->addWidget(rteWidget);
-            rteWidget->init();
-        }
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >())
         {
             QSharedPointer<RealTimeEvokedSet>* pRealTimeEvokedSet = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >()->data();
@@ -229,17 +195,17 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtcWidget);
             rtcWidget->init();
         }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<FrequencySpectrum> >())
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >())
         {
-            QSharedPointer<FrequencySpectrum>* pFrequencySpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<FrequencySpectrum> >()->data();
+            QSharedPointer<RealTimeSpectrum>* pRealTimeSpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >()->data();
 
-            FrequencySpectrumWidget* fsWidget = new FrequencySpectrumWidget(*pFrequencySpectrum, pT, newDisp);
+            RealTimeSpectrumWidget* fsWidget = new RealTimeSpectrumWidget(*pRealTimeSpectrum, pT, newDisp);
 
             qListActions.append(fsWidget->getDisplayActions());
             qListWidgets.append(fsWidget->getDisplayWidgets());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    fsWidget, &FrequencySpectrumWidget::update, Qt::BlockingQueuedConnection);
+                    fsWidget, &RealTimeSpectrumWidget::update, Qt::BlockingQueuedConnection);
 
             vboxLayout->addWidget(fsWidget);
             fsWidget->init();

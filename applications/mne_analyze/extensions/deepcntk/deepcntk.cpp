@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the DeepCNTK class.
+* @brief    Definition of the DeepCNTK class.
 *
 */
 
@@ -45,7 +45,7 @@
 #include <deep/deep.h>
 #include <deep/deepmodelcreator.h>
 
-#include <dispCharts/lineplot.h>
+#include <disp/lineplot.h>
 #include <disp/deepmodelviewer/deepviewer.h>
 #include <disp/deepmodelviewer/controls.h>
 
@@ -82,7 +82,6 @@ using namespace ANSHAREDLIB;
 using namespace Eigen;
 using namespace DEEPLIB;
 using namespace DISPLIB;
-using namespace DISPCHARTSLIB;
 //using namespace QtCharts;
 using namespace CNTK;
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RtSss class.
+* @brief    Definition of the RtSss class.
 *
 */
 
@@ -115,12 +115,12 @@ void RtSss::init()
         m_pRtSssBuffer = CircularMatrixBuffer<double>::SPtr();
 
     // Input
-    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "RtSssIn", "RtSss input data");
+    m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "RtSssIn", "RtSss input data");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &RtSss::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
-    m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtSssOut", "RtSss output data");
+    m_pRTMSAOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "RtSssOut", "RtSss output data");
     m_outputConnectors.append(m_pRTMSAOutput);
 
 
@@ -264,11 +264,11 @@ void RtSss::setLout(int val)
 
 //*************************************************************************************************************
 
-void RtSss::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void RtSss::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
 //    qDebug()  << "*********** Update ************";
 
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA && m_bReceiveData)
     {

@@ -41,7 +41,10 @@ QT += network concurrent
 QT -= gui
 
 CONFIG   += console
-CONFIG   -= app_bundle
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
 
 TARGET = mne_rt_server
 
@@ -51,20 +54,14 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}RtCommandd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Communicationd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Fs \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}RtCommand \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Communication
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
@@ -90,41 +87,63 @@ HEADERS += \
     commandthread.h \
     mne_rt_commands.h
 
+RESOURCE_FILES += \
+    $${ROOT_DIR}/resources/mne_rt_server_plugins/plugin.cfg \
+    $${ROOT_DIR}/resources/mne_rt_server_plugins/README \
+
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-# Deploy Qt Dependencies
+# Deploy dependencies
 win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .exe
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
     # === Unix ===
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 macx {
-    #ToDo Mac
-    #macdeployqt is done in an separate deploy script
-#    isEmpty(TARGET_EXT) {
-#        TARGET_CUSTOM_EXT = .app
-#    } else {
-#        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-#    }
-#
-#    DEPLOY_COMMAND = macdeployqt
-#
-#    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-#
-#    QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+    rcplugins.path = Contents/MacOS/resources/
+    rcplugins.files = $${ROOT_DIR}/resources/mne_rt_server_plugins
+    QMAKE_BUNDLE_DATA += rcplugins
+
+    plugins.path = Contents/MacOS/
+    plugins.files = $${ROOT_DIR}/bin/mne_rt_server_plugins
+    QMAKE_BUNDLE_DATA += plugins
+
+    QMAKE_RPATHDIR += @executable_path/../Frameworks
+    EXTRA_ARGS =
+
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
+
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}
+

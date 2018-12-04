@@ -45,8 +45,7 @@
 #include "averaging_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
-#include <rtProcessing/rtave.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
@@ -62,8 +61,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-//#define DEBUG_AVERAGING
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -71,7 +68,7 @@
 //=============================================================================================================
 
 namespace SCMEASLIB{
-    class NewRealTimeMultiSampleArray;
+    class RealTimeMultiSampleArray;
     class RealTimeEvokedSet;
 }
 
@@ -79,13 +76,17 @@ namespace RTPROCESSINGLIB{
     class RtAve;
 }
 
+namespace DISPLIB{
+    class AveragingSettingsView;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE AveragingPlugin
+// DEFINE NAMESPACE AVERAGINGPLUGIN
 //=============================================================================================================
 
-namespace AveragingPlugin
+namespace AVERAGINGPLUGIN
 {
 
 
@@ -93,8 +94,6 @@ namespace AveragingPlugin
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class AveragingSettingsWidget;
 
 
 //=============================================================================================================
@@ -106,7 +105,7 @@ class AveragingSettingsWidget;
 class AVERAGINGSHARED_EXPORT Averaging : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "averaging.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "averaging.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
@@ -136,7 +135,7 @@ public:
     virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -150,7 +149,7 @@ public:
     *
     * @param[in] numAve     new number of averages
     */
-    void changeNumAverages(qint32 numAve);
+    void onChangeNumAverages(qint32 numAve);
 
     //=========================================================================================================
     /**
@@ -158,7 +157,7 @@ public:
     *
     * @param[in] mode     average mode (0-running or 1-cumulative)
     */
-    void changeAverageMode(qint32 mode);
+    void onChangeAverageMode(qint32 mode);
 
     //=========================================================================================================
     /**
@@ -166,7 +165,7 @@ public:
     *
     * @param[in] index     the new stim channel index
     */
-    void changeStimChannel(qint32 index);
+    void onChangeStimChannel(qint32 index);
 
     //=========================================================================================================
     /**
@@ -174,7 +173,7 @@ public:
     *
     * @param[in] mseconds     the new pres stim in seconds
     */
-    void changePreStim(qint32 mseconds);
+    void onChangePreStim(qint32 mseconds);
 
     //=========================================================================================================
     /**
@@ -182,7 +181,7 @@ public:
     *
     * @param[in] mseconds     the new post stim in seconds
     */
-    void changePostStim(qint32 mseconds);
+    void onChangePostStim(qint32 mseconds);
 
     //=========================================================================================================
     /**
@@ -191,7 +190,7 @@ public:
     * @param[in] thresholdFirst     the new first component of the the rejection threshold value
     * @param[in] thresholdSecond    the new second component (e-...) of the the rejection threshold value
     */
-    void changeArtifactThreshold(double thresholdFirst, int thresholdSecond);
+    void onChangeArtifactThreshold(double thresholdFirst, int thresholdSecond);
 
     //=========================================================================================================
     /**
@@ -199,7 +198,7 @@ public:
     *
     * @param[in] state     the new state
     */
-    void changeArtifactThresholdReductionActive(bool state);
+    void onChangeArtifactThresholdReductionActive(bool state);
 
     //=========================================================================================================
     /**
@@ -207,7 +206,7 @@ public:
     *
     * @param[in] dVariance     the new value (dVariance times calculated variance is to be rejected)
     */
-    void changeArtifactVariance(double dVariance);
+    void onChangeArtifactVariance(double dVariance);
 
     //=========================================================================================================
     /**
@@ -215,7 +214,7 @@ public:
     *
     * @param[in] state     the new state
     */
-    void changeArtifactVarianceReductionActive(bool state);
+    void onChangeArtifactVarianceReductionActive(bool state);
 
     //=========================================================================================================
     /**
@@ -223,7 +222,7 @@ public:
     *
     * @param[in] fromMSeconds     the new baseline from value in seconds
     */
-    void changeBaselineFrom(qint32 fromMSeconds);
+    void onChangeBaselineFrom(qint32 fromMSeconds);
 
     //=========================================================================================================
     /**
@@ -231,7 +230,7 @@ public:
     *
     * @param[in] fromMSeconds     the new baseline to value in seconds
     */
-    void changeBaselineTo(qint32 toMSeconds);
+    void onChangeBaselineTo(qint32 toMSeconds);
 
     //=========================================================================================================
     /**
@@ -239,21 +238,17 @@ public:
     *
     * @param[in] state     the new state
     */
-    void changeBaselineActive(bool state);
+    void onChangeBaselineActive(bool state);
 
     //=========================================================================================================
     /**
     * Append new FiffEvokedSet to the buffer
     *
-    * @param[in] p_pEvokedSet     the new FiffEvokedSet
+    * @param[in] p_pEvokedSet               the new FiffEvokedSet
+    * @param[in] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
     */
-    void appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet);
-
-    //=========================================================================================================
-    /**
-    * Show the averaging widget
-    */
-    void showAveragingWidget();
+    void appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet,
+                      const QStringList &lResponsibleTriggerTypes);
 
     //=========================================================================================================
     /**
@@ -261,24 +256,18 @@ public:
     *
     * @param[in] state     the new state
     */
-    void resetAverage(bool state);
+    void onResetAverage(bool state);
 
 protected:
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
-
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr  m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr           m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;                 /**< Holds incoming data.*/
 
-    QSharedPointer<AveragingSettingsWidget>         m_pAveragingWidget;                 /**< Holds averaging settings widget.*/
+    QSharedPointer<DISPLIB::AveragingSettingsView>  m_pAveragingSettingsView;           /**< Holds averaging settings widget.*/
 
     QVector<FIFFLIB::FiffEvokedSet::SPtr>           m_qVecEvokedData;                   /**< Evoked data set. */
 
@@ -287,7 +276,7 @@ private:
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                        /**< Fiff measurement info.*/
     QList<qint32>                                   m_qListStimChs;                     /**< Stimulus channels.*/
 
-    RTPROCESSINGLIB::RtAve::SPtr                    m_pRtAve;                           /**< Real-time average. */
+    QSharedPointer<RTPROCESSINGLIB::RtAve>          m_pRtAve;                           /**< Real-time average. */
 
     bool                                            m_bIsRunning;                       /**< If this thread is running. */
     bool                                            m_bProcessData;                     /**< If data should be received for processing. */
@@ -304,30 +293,16 @@ private:
     qint32                                          m_iBaselineToSeconds;               /**< The end value for baseline correction in seconds. */
     qint32                                          m_iBaselineToSamples;               /**< The end value for baseline correction in samples. */
     qint32                                          m_iStimChanIdx;                     /**< The channel index in the stim channel list. */
+    qint32                                          m_iStimChan;                        /**< The channel index in the total channel list. */
     qint32                                          m_iAverageMode;                     /**< The average mode (0-running or 1-cumulative). */
     qint32                                          m_iNumAverages;                     /**< The number of averages. */
-    qint32                                          m_iStimChan;                        /**< The channel index in the total channel list. */
     qint32                                          m_iArtifactThresholdSecond;         /**< The second (e-..) component of the rejection threshold value. */
     double                                          m_dArtifactVariance;                /**< The rejection variance value. */
     double                                          m_dArtifactThresholdFirst;          /**< The first component of the rejection threshold value. */
 
-    QAction*                                        m_pActionShowAdjustment;            /**< The action triggering the averaging settings window. */
-
-#ifdef DEBUG_AVERAGING
-    //
-    // TEST
-    //
-    qint32 m_iTestStimCh;
-    qint32 m_iTestCount;
-    qint32 m_iTestCount2;
-#endif
+    QStringList                                     m_lResponsibleTriggerTypes;         /**< List of all trigger types which lead to the recent emit of a new evoked set. */
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available
-    */
-    void fiffInfoAvailable();
 };
 
 } // NAMESPACE

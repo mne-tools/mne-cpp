@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RtSssAlgo class.
+* @brief    Definition of the RtSssAlgo class.
 *
 */
 
@@ -473,7 +473,7 @@ void RtSssAlgoTest::getSSSBasis(VectorXd X, VectorXd Y, VectorXd Z, int LIn, int
 //  % check input parameters
 //  % -- R ~= 0 & THETA ~= 0
     for(int i=0; i<X.rows(); i++)
-        if ( (abs(X(i)) < 1e-30) && (abs(Y(i)) < 1e-30) )
+        if ( (std::fabs(X(i)) < 1e-30) && (std::fabs(Y(i)) < 1e-30) )
         {
             std::cout << "Zero THETA detected!****  ";
             std::cout << "X, Y: " << X(i) << ",  " << Y(i) << endl;

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ECGSimulator class.
+* @brief    Definition of the ECGSimulator class.
 *
 */
 
@@ -80,7 +80,7 @@ ECGSimulator::ECGSimulator()
 , m_pInBuffer_II(new dBuffer(1024))
 , m_pInBuffer_III(new dBuffer(1024))
 , m_pECGProducer(new ECGProducer(this, m_pInBuffer_I, m_pInBuffer_II, m_pInBuffer_III))
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/ECGSimulator/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/ECGSimulator/")
 , m_pECGChannel_ECG_I(new ECGSimChannel(m_qStringResourcePath+"data/", QString("ECG_I_256_s30661.txt")))
 , m_pECGChannel_ECG_II(new ECGSimChannel(m_qStringResourcePath+"data/", QString("ECG_II_256_s30661.txt")))
 , m_pECGChannel_ECG_III(new ECGSimChannel(m_qStringResourcePath+"data/", QString("ECG_III_256_s30661.txt")))
@@ -117,19 +117,19 @@ void ECGSimulator::init()
 {
     if(m_pECGChannel_ECG_I->isEnabled())
     {
-        m_pRTSA_ECG_I_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG I", "ECG I output data");
+        m_pRTSA_ECG_I_new = PluginOutputData<RealTimeSampleArray>::create(this, "ECG I", "ECG I output data");
         m_outputConnectors.append(m_pRTSA_ECG_I_new);
     }
 
     if(m_pECGChannel_ECG_II->isEnabled())
     {
-        m_pRTSA_ECG_II_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG II", "ECG II output data");
+        m_pRTSA_ECG_II_new = PluginOutputData<RealTimeSampleArray>::create(this, "ECG II", "ECG II output data");
         m_outputConnectors.append(m_pRTSA_ECG_II_new);
     }
 
     if(m_pECGChannel_ECG_III->isEnabled())
     {
-        m_pRTSA_ECG_III_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG III", "ECG III output data");
+        m_pRTSA_ECG_III_new = PluginOutputData<RealTimeSampleArray>::create(this, "ECG III", "ECG III output data");
         m_outputConnectors.append(m_pRTSA_ECG_III_new);
     }
 }

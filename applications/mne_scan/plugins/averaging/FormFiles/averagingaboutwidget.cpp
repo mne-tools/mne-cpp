@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the AveragingAboutWidget class.
+* @brief    Definition of the AveragingAboutWidget class.
 *
 */
 
@@ -46,7 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace AveragingPlugin;
+using namespace AVERAGINGPLUGIN;
 
 
 //*************************************************************************************************************

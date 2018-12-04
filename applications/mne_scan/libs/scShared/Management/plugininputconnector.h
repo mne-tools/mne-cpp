@@ -44,7 +44,7 @@
 
 #include "pluginconnector.h"
 
-#include <scMeas/newmeasurement.h>
+#include <scMeas/measurement.h>
 
 
 //*************************************************************************************************************
@@ -110,10 +110,10 @@ public:
 
 
 signals:
-    void notify(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void notify(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 public slots:
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 
 

@@ -43,23 +43,14 @@
 //=============================================================================================================
 
 #include "mne_global.h"
+
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
-#include <fs/annotationset.h>
-#include <fs/surfaceset.h>
-#include <fiff/fiff_info.h>
 #include <fiff/fiff_evoked.h>
-#include <mne/mne_forwardsolution.h>
-#include <mne/mne_sourceestimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
-#include <rtProcessing/rtinvop.h>
 
-#include <scMeas/realtimesourceestimate.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-#include <scMeas/realtimecov.h>
-#include <scMeas/realtimeevokedset.h>
+#include <mne/mne_inverse_operator.h>
 
 
 //*************************************************************************************************************
@@ -67,32 +58,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QFile>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEPlugin
-//=============================================================================================================
-
-namespace MNEPlugin
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FSLIB;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVERSELIB;
-using namespace RTPROCESSINGLIB;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace IOBUFFER;
+#include <QFuture>
+#include <QPointer>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -100,29 +68,78 @@ using namespace IOBUFFER;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace DISPLIB {
+    class MinimumNormSettingsView;
+}
+
+namespace MNELIB {
+    class MNEForwardSolution;
+    class MNEInverseOperator;
+}
+
+namespace FIFFLIB {
+    class FiffInfo;
+    class FiffInfoBase;
+}
+
+namespace INVERSELIB {
+    class MinimumNorm;
+}
+
+namespace RTPROCESSINGLIB {
+    class RtInvOp;
+}
+
+namespace FSLIB {
+    class AnnotationSet;
+    class SurfaceSet;
+}
+
+namespace SCMEASLIB {
+    class RealTimeEvokedSet;
+    class RealTimeMultiSampleArray;
+    class RealTimeCov;
+    class RealTimeSourceEstimate;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEPLUGIN
+//=============================================================================================================
+
+namespace MNEPLUGIN
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNEPLUGIN FORWARD DECLARATIONS
+//=============================================================================================================
+
 
 //=============================================================================================================
 /**
 * DECLARE CLASS MNE
 *
-* @brief The MNE class provides a dummy algorithm structure.
+* @brief The MNE class provides a plugin for estimating distributed source localization in real-time.
 */
-class MNESHARED_EXPORT MNE : public IAlgorithm
+class MNESHARED_EXPORT MNE : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "mne.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "mne.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
     friend class MNESetupWidget;
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a MNE.
     */
     MNE();
+
     //=========================================================================================================
     /**
     * Destroys the MNE.
@@ -131,49 +148,46 @@ public:
 
     //=========================================================================================================
     /**
-    * Clone the plugin
+    * IAlgorithm functions
     */
-    virtual QSharedPointer<IPlugin> clone() const;
-
-    //=========================================================================================================
-    /**
-    * Initialise the MNE.
-    */
-    void init();
-
-    //=========================================================================================================
-    /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
+    virtual void init();
     virtual void unload();
-
-    void calcFiffInfo();
-
-    void doClustering();
-
-    void finishedClustering();
-
     virtual bool start();
     virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
+    virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
     virtual QString getName() const;
-
     virtual QWidget* setupWidget();
 
     //=========================================================================================================
     /**
-    * Slot to update the real time multi sample array data
-    *
+    * Slot called when the fiff info is to be calculated.
     */
-    void updateRTMSA(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void calcFiffInfo();
+
+    //=========================================================================================================
+    /**
+    * Slot called to do the clustering.
+    */
+    void doClustering();
+
+    //=========================================================================================================
+    /**
+    * Slot called when the clustering is finished.
+    */
+    void finishedClustering();
+
+    //=========================================================================================================
+    /**
+    * Slot to update the real time multi sample array data
+    */
+    void updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
     * Slot to update the fiff covariance
-    *
     */
-    void updateRTC(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -181,80 +195,89 @@ public:
     *
     * @param[in] pMeasurement   The evoked to be appended
     */
-    void updateRTE(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
     * Slot to update the inverse operator
     *
-    * @param[in] p_pInvOp    The inverse operator to update
+    * @param[in] invOp    The inverse operator to update
     */
-    void updateInvOp(MNEInverseOperator::SPtr p_pInvOp);
+    void updateInvOp(const MNELIB::MNEInverseOperator& invOp);
+
+protected:
+    //=========================================================================================================
+    /**
+    * Slot called when the method changed.
+    *
+    * @param [in] method        The new method.
+    */
+    void onMethodChanged(const QString &method);
+
+    //=========================================================================================================
+    /**
+    * Slot called when the trigger type changed.
+    *
+    * @param [in] triggerType        The new trigger type.
+    */
+    void onTriggerTypeChanged(const QString& triggerType);
+
+    virtual void run();
+
+    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >      m_pRTMSAInput;              /**< The RealTimeMultiSampleArray input.*/
+    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet> >             m_pRTESInput;               /**< The RealTimeEvoked input.*/
+    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeCov> >                   m_pRTCInput;                /**< The RealTimeCov input.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSourceEstimate> >       m_pRTSEOutput;              /**< The RealTimeSourceEstimate output.*/
+    QSharedPointer<IOBUFFER::CircularMatrixBuffer<double> >                                 m_pMatrixDataBuffer;        /**< Holds incoming RealTimeMultiSampleArray data.*/
+    QSharedPointer<INVERSELIB::MinimumNorm>                                                 m_pMinimumNorm;             /**< Minimum Norm Estimation. */
+    QSharedPointer<RTPROCESSINGLIB::RtInvOp>                                                m_pRtInvOp;                 /**< Real-time inverse operator. */
+    QSharedPointer<MNELIB::MNEForwardSolution>                                              m_pFwd;                     /**< Forward solution. */
+    QSharedPointer<MNELIB::MNEForwardSolution>                                              m_pClusteredFwd;            /**< Clustered forward solution. */
+    QSharedPointer<FSLIB::AnnotationSet>                                                    m_pAnnotationSet;           /**< Annotation set. */
+    QSharedPointer<FSLIB::SurfaceSet>                                                       m_pSurfaceSet;              /**< Surface set. */
+    QSharedPointer<FIFFLIB::FiffInfoBase>                                                   m_pFiffInfoForward;         /**< Fiff information of the forward solution. */
+    QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;                /**< Fiff information. */
+    QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfoInput;           /**< Fiff information of the evoked. */
+
+    QSharedPointer<DISPLIB::MinimumNormSettingsView>                                        m_pMinimumNormSettingsView; /**< The minimum norm settings widget which will be added to the Quick Control view. The QuickControlView will not take ownership. Ownership will be managed by the QSharedPointer.*/
+
+    QMutex                          m_qMutex;                   /**< The mutex ensuring thread safety. */
+    QFuture<void>                   m_future;                   /**< The future monitoring the clustering. */
+
+    QVector<FIFFLIB::FiffEvoked>    m_qVecFiffEvoked;           /**< The list of stored averages. */
+
+    qint32                          m_iNumAverages;             /**< The number of trials/averages to store. */
+    qint32                          m_iDownSample;              /**< Down sample factor. */
+
+    bool                            m_bIsRunning;               /**< If source lab is running. */
+    bool                            m_bReceiveData;             /**< If thread is ready to receive data. */
+    bool                            m_bProcessData;             /**< If data should be received for processing. */
+    bool                            m_bFinishedClustering;      /**< If clustered forward solution is available. */
+
+    QFile                           m_qFileFwdSolution;         /**< File to forward solution. */
+
+    QString                         m_sAtlasDir;                /**< File to Atlas. */
+    QString                         m_sSurfaceDir;              /**< File to Surface. */
+    QString                         m_sAvrType;                 /**< The average type */
+    QString                         m_sMethod;                  /**< The method: "MNE" | "dSPM" | "sLORETA". */
+
+    QStringList                     m_qListCovChNames;          /**< Covariance channel names. */
+    QStringList                     m_qListPickChannels;        /**< Channels to pick. */
+
+    MNELIB::MNEInverseOperator      m_invOp;                    /**< The inverse operator. */
 
 signals:
     //=========================================================================================================
     /**
-    * Signal when clsutering is started
+    * Signal when clustering is started
     */
     void clusteringStarted();
 
     //=========================================================================================================
     /**
-    * Signal when clsutering has finished
+    * Signal when clustering has finished
     */
     void clusteringFinished();
-
-protected:
-    virtual void run();
-
-private:
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr      m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
-    PluginInputData<RealTimeEvokedSet>::SPtr                m_pRTESInput;            /**< The RealTimeEvoked input.*/
-    PluginInputData<RealTimeCov>::SPtr                      m_pRTCInput;            /**< The RealTimeCov input.*/
-
-    PluginOutputData<RealTimeSourceEstimate>::SPtr          m_pRTSEOutput;          /**< The RealTimeSourceEstimate output.*/
-
-    CircularMatrixBuffer<double>::SPtr                      m_pMatrixDataBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
-
-    QMutex m_qMutex;
-
-    QVector<FiffEvoked> m_qVecFiffEvoked;
-    qint32 m_iNumAverages;
-
-    QVector<FiffCov>        m_qVecFiffCov;
-
-    bool m_bIsRunning;      /**< If source lab is running */
-    bool m_bReceiveData;    /**< If thread is ready to receive data */
-    bool m_bProcessData;    /**< If data should be received for processing */
-
-    //MNE stuff
-    QFile                       m_qFileFwdSolution; /**< File to forward solution. */
-    MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
-    MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
-
-    bool m_bFinishedClustering;                     /**< If clustered forward solution is available. */
-
-    QString                     m_sAtlasDir;        /**< File to Atlas. */
-    AnnotationSet::SPtr         m_pAnnotationSet;   /**< Annotation set. */
-    QString                     m_sSurfaceDir;      /**< File to Surface. */
-    SurfaceSet::SPtr            m_pSurfaceSet;      /**< Surface set. */
-
-    FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
-    FiffInfo::SPtr              m_pFiffInfoInput;   /**< Fiff information of the evoked. */
-    QStringList                 m_qListCovChNames;  /**< Covariance channel names. */
-    FiffInfoBase::SPtr          m_pFiffInfoForward; /**< Fiff information of the forward solution. */
-
-    QStringList                 m_qListPickChannels;        /**< Channels to pick */
-
-    RtInvOp::SPtr               m_pRtInvOp;         /**< Real-time inverse operator. */
-    MNEInverseOperator::SPtr    m_pInvOp;           /**< The inverse operator. */
-
-    MinimumNorm::SPtr           m_pMinimumNorm;     /**< Minimum Norm Estimation. */
-    qint32                      m_iDownSample;      /**< Sampling rate */
-
-    QString                     m_sAvrType;         /**< The average type */
-
-//    RealTimeSourceEstimate::SPtr m_pRTSE_MNE; /**< Source Estimate output channel. */
 };
 
 } // NAMESPACE

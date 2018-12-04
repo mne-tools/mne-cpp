@@ -40,8 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
+#include <disp3D/viewers/abstractview.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <fs/surfaceset.h>
@@ -90,7 +89,7 @@ int main(int argc, char *argv[])
 
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
-    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
 
     parser.addOption(hemiOption);
     parser.addOption(subjectOption);
@@ -106,10 +105,9 @@ int main(int argc, char *argv[])
     // pial
     //
     SurfaceSet tSurfSetPial (subject, hemi, "pial", subjectPath);
-    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
 
-    View3D::SPtr t_BrainView = View3D::SPtr(new View3D());
-    t_BrainView->setModel(p3DDataModel);
+    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
+    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
 
     p3DDataModel->addSurfaceSet(subject, "pial", tSurfSetPial);
 
@@ -131,13 +129,7 @@ int main(int argc, char *argv[])
     SurfaceSet tSurfSetWhite (subject, hemi, "white", subjectPath);
     p3DDataModel->addSurfaceSet(subject, "white", tSurfSetWhite);
 
-    t_BrainView->show();
-
-    //3D control
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->setWindowFlags(Qt::WindowStaysOnTopHint);
-    control3DWidget->init(p3DDataModel, t_BrainView);
-    control3DWidget->show();
+    p3DAbstractView->show();
 
     return a.exec();
 }

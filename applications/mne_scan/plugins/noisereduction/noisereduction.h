@@ -47,15 +47,15 @@
 #include <utils/filterTools/sphara.h>
 #include <utils/ioutils.h>
 
-#include "disp/filterwindow.h"
+#include <disp/viewers/filterview.h>
 
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <rtProcessing/rtfilter.h>
+#include <rtprocessing/rtfilter.h>
 
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 #include "FormFiles/noisereductionsetupwidget.h"
 #include "FormFiles/noisereductionoptionswidget.h"
@@ -149,9 +149,9 @@ public:
     /**
     * Udates the pugin with new (incoming) data.
     *
-    * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
+    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
     */
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 public slots:
     //=========================================================================================================
@@ -208,7 +208,7 @@ protected slots:
     *
     * @param[in] filterData    list of the currently active filter
     */
-    void filterChanged(QList<FilterData> filterData);
+    void filterChanged(QList<UTILSLIB::FilterData> filterData);
 
     //=========================================================================================================
     /**
@@ -273,7 +273,7 @@ private:
     QString                         m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
 
     QPushButton*                    m_pShowFilterOptions;                       /**< Holds the show filter options button. */
-    QList<FilterData>               m_filterData;                               /**< List of currently active filters. */
+    QList<UTILSLIB::FilterData>     m_filterData;                               /**< List of currently active filters. */
 
     Eigen::VectorXi                 m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
     Eigen::VectorXi                 m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
@@ -302,13 +302,13 @@ private:
     NoiseReductionOptionsWidget::SPtr               m_pOptionsWidget;           /**< The noise reduction option widget object.*/
     QAction*                                        m_pActionShowOptionsWidget; /**< The noise reduction option widget action.*/
 
-    DISPLIB::FilterWindow::SPtr                     m_pFilterWindow;            /**< Filter window. */
-    RTPROCESSINGLIB::RtFilter::SPtr                       m_pRtFilter;                /**< Real time filter object. */
+    DISPLIB::FilterView::SPtr                       m_pFilterView;              /**< Filter view. */
+    RTPROCESSINGLIB::RtFilter::SPtr                     m_pRtFilter;                /**< Real time filter object. */
 
-    SCMEASLIB::NewRealTimeMultiSampleArray::SPtr     m_pRTMSA;                   /**< the real time multi sample array object. */
+    SCMEASLIB::RealTimeMultiSampleArray::SPtr    m_pRTMSA;                   /**< the real time multi sample array object. */
 
-    PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The NewRealTimeMultiSampleArray of the NoiseReduction input.*/
-    PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The NewRealTimeMultiSampleArray of the NoiseReduction output.*/
+    PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
+    PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/
 
 signals:
     //=========================================================================================================

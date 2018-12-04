@@ -42,9 +42,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <generics/circularbuffer_old.h>
+#include <utils/generics/circularbuffer_old.h>
 
-#include <rtClient/rtdataclient.h>
+#include <communication/rtClient/rtdataclient.h>
 
 
 //*************************************************************************************************************
@@ -151,7 +151,7 @@ private:
     FiffSimulator*  m_pFiffSimulator;   /**< Holds a pointer to corresponding MneRtClient.*/
     bool            m_bIsRunning;       /**< Whether MneRtClientProducer is running.*/
 
-    QSharedPointer<RTCLIENTLIB::RtDataClient> m_pRtDataClient;   /**< The data client.*/
+    QSharedPointer<COMMUNICATIONLIB::RtDataClient> m_pRtDataClient;   /**< The data client.*/
     bool m_bDataClientIsConnected;                  /**< If the data client is connected.*/
 
     qint32 m_iDataClientId;

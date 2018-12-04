@@ -96,7 +96,7 @@ namespace AverageModelRoles
                   GetProjections = Qt::UserRole + 1008};
 }
 
-namespace ChInfoModelRoles
+namespace ChannelInfoModelRoles
 {
     enum ItemRole{GetOrigChName = Qt::UserRole + 1009,
                   GetMappedLayoutChName = Qt::UserRole + 1010,

@@ -4,11 +4,11 @@
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2016
+* @date     July, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -43,16 +43,10 @@
 //=============================================================================================================
 
 #include "scdisp_global.h"
-#include "newmeasurementwidget.h"
-#include "helpers/realtimeevokedsetmodel.h"
-#include "helpers/realtimebutterflyplot.h"
-#include "disp/selectionmanagerwindow.h"
-#include "disp/helpers/chinfomodel.h"
-#include "helpers/quickcontrolwidget.h"
-#include "disp/helpers/averagescene.h"
-#include "disp/helpers/averagesceneitem.h"
-#include "disp/filterwindow.h"
-#include <scMeas/realtimeevokedset.h>
+
+#include "measurementwidget.h"
+
+#include <disp/viewers/butterflyview.h>
 
 
 //*************************************************************************************************************
@@ -61,19 +55,40 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QList>
-#include <QAction>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QToolBox>
+#include <QPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace SCMEASLIB {
+    class RealTimeEvokedSet;
+    class RealTimeSampleArrayChInfo;
+}
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+namespace DISPLIB{
+    class AveragingSettingsView;
+}
+
+namespace DISPLIB {
+    class EvokedSetModel;
+    class ButterflyView;
+    class ChannelSelectionView;
+    class ChannelInfoModel;
+    class FilterView;
+    class AverageLayoutView;
+    class QuickControlView;
+}
+
+class QVBoxLayout;
+class QLabel;
+class QToolBox;
 
 
 //*************************************************************************************************************
@@ -84,48 +99,28 @@
 namespace SCDISPLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// SCDISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-struct Modality;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE TYPEDEFS
+//=============================================================================================================
 
 typedef QMap<double, QPair<QColor, QPair<QString,bool> > > AverageInfoMap;
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCMEASLIB;
-using namespace DISPLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// ENUMERATIONS
-//=============================================================================================================
-
-////=============================================================================================================
-///**
-//* Tool enumeration.
-//*/
-//enum Tool
-//{
-//    Freeze     = 0,       /**< Freezing tool. */
-//    Annotation = 1        /**< Annotation tool. */
-//};
-
-
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeMultiSampleArrayNewWidget
+* DECLARE CLASS RealTimeEvokedSetWidget
 *
-* @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
+* @brief The RealTimeEvokedSetWidget class provides a real-time display for multiple averages.
 */
-class SCDISPSHARED_EXPORT RealTimeEvokedSetWidget : public NewMeasurementWidget
+class SCDISPSHARED_EXPORT RealTimeEvokedSetWidget : public MeasurementWidget
 {
     Q_OBJECT
 
@@ -141,7 +136,9 @@ public:
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSet> pRTESet, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    RealTimeEvokedSetWidget(QSharedPointer<SCMEASLIB::RealTimeEvokedSet> pRTESet,
+                            QSharedPointer<QTime> &pTime,
+                            QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -155,7 +152,7 @@ public:
     *
     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
     */
-    virtual void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -169,14 +166,6 @@ public:
     */
     virtual void init();
 
-    //=========================================================================================================
-    /**
-    * call this whenever the external channel selection manager changes
-    *
-    * * @param [in] selectedChannelItems list of selected graphic items
-    */
-    void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
-
 private slots:
     //=========================================================================================================
     /**
@@ -186,51 +175,15 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Only shows the channels defined in the QStringList selectedChannels
-    *
-    * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
-    */
-    void showSelectedChannelsOnly(QStringList selectedChannels);
-
-    //=========================================================================================================
-    /**
-    * Broadcast channel scaling
-    *
-    * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
-    */
-    void broadcastScaling(QMap<qint32, float> scaleMap);
-
-    //=========================================================================================================
-    /**
-    * Broadcast settings to attached widgets
-    */
-    void broadcastSettings(QList<Modality> modalityList);
-
-    //=========================================================================================================
-    /**
     * Shows quick control widget
     */
     void showQuickControlWidget();
 
     //=========================================================================================================
     /**
-    * call this function whenever a selection was made in teh evoked data set list
-    */
-    void onSelectionChanged();
-
-    //=========================================================================================================
-    /**
     * Shows the filter widget
     */
     void showFilterWidget(bool state = true);
-
-    //=========================================================================================================
-    /**
-    * Broadcast the background color changes made in the QuickControl widget
-    *
-    * @param [in] backgroundColor  The new background color.
-    */
-    void onTableViewBackgroundColorChanged(const QColor& backgroundColor);
 
     //=========================================================================================================
     /**
@@ -243,45 +196,37 @@ private slots:
 private:
     //=========================================================================================================
     /**
-    * Reimplemented mouseWheelEvent
-    */
-    virtual void wheelEvent(QWheelEvent * event);    
-
-    //=========================================================================================================
-    /**
     * Reimplemented eventFilter
     */
     bool virtual eventFilter(QObject *object, QEvent *event);
 
-    RealTimeEvokedSetModel::SPtr        m_pRTESetModel;             /**< RTE data model */
-    RealTimeButterflyPlot::SPtr         m_pButterflyPlot;           /**< Butterfly plot */
-    AverageScene::SPtr                  m_pAverageScene;            /**< The pointer to the average scene. */
-    RealTimeEvokedSet::SPtr             m_pRTESet;                  /**< The real-time evoked measurement. */
-    QuickControlWidget::SPtr            m_pQuickControlWidget;      /**< Quick control widget. */
-    SelectionManagerWindow::SPtr        m_pSelectionManagerWindow;  /**< SelectionManagerWindow. */
-    ChInfoModel::SPtr                   m_pChInfoModel;             /**< Channel info model. */
-    FilterWindow::SPtr                  m_pFilterWindow;            /**< Filter window. */
+    QSharedPointer<DISPLIB::EvokedSetModel>             m_pEvokedSetModel;          /**< RTE data model */
+    QSharedPointer<SCMEASLIB::RealTimeEvokedSet>        m_pRTESet;                  /**< The real-time evoked measurement. */
+    QSharedPointer<DISPLIB::QuickControlView>           m_pQuickControlView;        /**< Quick control widget. */
+    QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< ChannelSelectionView. */
+    QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Channel info model. */
+    QSharedPointer<DISPLIB::FilterView>                 m_pFilterView;              /**< Filter view. */
+    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
+    QPointer<DISPLIB::AverageLayoutView>                m_pAverageLayoutView;       /**< 2D layout view for plotting averages*/
+    QPointer<DISPLIB::ButterflyView>                    m_pButterflyView;           /**< Butterfly plot */
+
+    QSharedPointer<DISPLIB::AveragingSettingsView>      m_pAveragingSettingsView;   /**< Holds averaging settings widget.*/
+
+    QList<SCMEASLIB::RealTimeSampleArrayChInfo>         m_qListChInfo;              /**< Channel info list. ToDo: check if this is obsolete later on.*/
+    QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
 
     bool                                m_bInitialized;             /**< Is Initialized */
     bool                                m_bHideBadChannels;         /**< hide bad channels flag. */
     qint32                              m_iMaxFilterTapSize;        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 
-    FiffInfo::SPtr                      m_pFiffInfo;                /**< FiffInfo, which is used insteadd of ListChInfo*/
+    QPointer<QAction>                   m_pActionSelectSensors;     /**< show roi select widget */
+    QPointer<QAction>                   m_pActionQuickControl;      /**< Show quick control widget. */
 
-    QAction*                            m_pActionSelectSensors;     /**< show roi select widget */
-    QAction*                            m_pActionQuickControl;      /**< Show quick control widget. */
-
-    QVBoxLayout*                        m_pRTESetLayout;            /**< RTE Widget layout */
-    QLabel*                             m_pLabelInit;               /**< Initialization Label */
-    QToolBox*                           m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
-    QGraphicsView*                      m_pAverageLayoutView;       /**< View for 2D average layout scene */
-
-    QList<Modality>                     m_qListModalities;
-    QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
-    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;              /**< Channel info list. ToDo: check if this is obsolete later on*/
-    QMap<qint32,float>                  m_qMapChScaling;            /**< Channel scaling values. */
+    QPointer<QVBoxLayout>               m_pRTESetLayout;            /**< RTE Widget layout */
+    QPointer<QLabel>                    m_pLabelInit;               /**< Initialization Label */
+    QPointer<QToolBox>                  m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
 };
 
 } // NAMESPACE SCDISPLIB
 
-#endif // RealTimeEvokedSetWidget_H
+#endif // REALTIMEEVOKEDSETWIDGET_H

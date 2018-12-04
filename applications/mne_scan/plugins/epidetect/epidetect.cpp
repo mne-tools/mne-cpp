@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the Epidetect class.
+* @brief    Definition of the Epidetect class.
 *
 */
 
@@ -106,13 +106,13 @@ QSharedPointer<IPlugin> Epidetect::clone() const
 void Epidetect::init()
 {
     // Input
-    m_pEpidetectInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "EpidetectIn", "Epidetect input data");
+    m_pEpidetectInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "EpidetectIn", "Epidetect input data");
     connect(m_pEpidetectInput.data(), &PluginInputConnector::notify, this, &Epidetect::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pEpidetectInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in  plugin
-    m_pEpidetectOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "EpidetectOut", "Epidetect output data");
+    m_pEpidetectOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "EpidetectOut", "Epidetect output data");
     m_outputConnectors.append(m_pEpidetectOutput);
 
     //Delete Buffer - will be initailzed with first incoming data
@@ -192,9 +192,9 @@ QWidget* Epidetect::setupWidget()
 
 //*************************************************************************************************************
 
-void Epidetect::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void Epidetect::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
         //Check if buffer initialized
@@ -226,7 +226,7 @@ void Epidetect::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 //*************************************************************************************************************
 
 
-QPair<Eigen::MatrixXd, QList<int>> Epidetect::prepareData(Eigen::MatrixXd mat)
+QPair<Eigen::MatrixXd, QList<int> > Epidetect::prepareData(Eigen::MatrixXd mat)
 {
     MatrixXd trimmedMatrix;
     QList<int> stimLocations;
@@ -257,7 +257,7 @@ QPair<Eigen::MatrixXd, QList<int>> Epidetect::prepareData(Eigen::MatrixXd mat)
     qSort(stimLocations);
 
     trimmedMatrix.conservativeResize(j,trimmedMatrix.cols());
-    QPair<MatrixXd, QList<int>> out;
+    QPair<MatrixXd, QList<int> > out;
     out.first = trimmedMatrix;
     out.second = stimLocations;
 
@@ -292,7 +292,7 @@ void Epidetect::run()
     while(m_bIsRunning)
     {
         QElapsedTimer timer;
-        QPair<MatrixXd,QList<int>> data;
+        QPair<MatrixXd,QList<int> > data;
 
         m_dMuGes = 0;
 
@@ -344,7 +344,7 @@ void Epidetect::run()
         VectorXd newP2PVal = calculator.getP2P();
         VectorXd newKurtosisVal = calculator.getKurtosis();
 
-        if (counter = m_iFuzzyEnStep*m_iListLength-1)
+        if (counter == m_iFuzzyEnStep*m_iListLength-1)
         {
             FuzzyEnHistoryValues.col(0) = fuzzyEnHistory.rowwise().minCoeff();
             FuzzyEnHistoryValues.col(1) = fuzzyEnHistory.rowwise().mean();

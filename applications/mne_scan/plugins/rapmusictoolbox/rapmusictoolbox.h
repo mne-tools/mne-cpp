@@ -45,7 +45,7 @@
 #include "rapmusictoolbox_global.h"
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
 #include <fs/annotationset.h>
 #include <fs/surfaceset.h>
@@ -56,7 +56,7 @@
 #include <inverse/rapMusic/pwlrapmusic.h>
 
 #include <scMeas/realtimesourceestimate.h>
-#include <scMeas/realtimeevoked.h>
+#include <scMeas/realtimeevokedset.h>
 
 
 //*************************************************************************************************************
@@ -106,7 +106,7 @@ using namespace INVERSELIB;
 class RAPMUSICTOOLBOXSHARED_EXPORT RapMusicToolbox : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "rapmusictoolbox.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "rapmusictoolbox.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
@@ -163,7 +163,7 @@ public:
     *
     * @param[in] pMeasurement   The evoked to be appended
     */
-    void updateRTE(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 signals:
     //=========================================================================================================
@@ -182,13 +182,13 @@ protected:
     virtual void run();
 
 private:
-    PluginInputData<RealTimeEvoked>::SPtr   m_pRTEInput;    /**< The RealTimeEvoked input.*/
+    PluginInputData<RealTimeEvokedSet>::SPtr   m_pRTEInput;    /**< The RealTimeEvoked input.*/
 
     PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
 
     QMutex m_qMutex;
 
-    QVector<FiffEvoked> m_qVecFiffEvoked;
+    QVector<FiffEvokedSet> m_qVecFiffEvoked;
     qint32 m_iNumAverages;
 
     bool m_bIsRunning;      /**< If source lab is running */

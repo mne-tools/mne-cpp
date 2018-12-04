@@ -29,11 +29,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RealTimeSampleArrayWidget Class.
+* @brief    Definition of the RealTimeSampleArrayWidget Class.
 *
 */
 
-//ToDo Paint to render area
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -41,17 +40,10 @@
 //=============================================================================================================
 
 #include "realtimesamplearraywidget.h"
-//#include "annotationwindow.h"
 
-#include <scMeas/newrealtimesamplearray.h>
 #include "iostream"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
+#include <scMeas/realtimesamplearray.h>
 #include <math.h>
 
 
@@ -64,7 +56,6 @@
 #include <QPainter>
 #include <QTimer>
 #include <QTime>
-
 #include <QDebug>
 
 
@@ -82,8 +73,8 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(QSharedPointer<NewRealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent)
-: NewMeasurementWidget(parent)
+RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(QSharedPointer<RealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent)
+: MeasurementWidget(parent)
 , m_pRTSA(pRTSA)
 , m_bMeasurement(false)
 , m_bPosition(true)
@@ -128,7 +119,7 @@ RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(QSharedPointer<NewRealTimeS
 
 RealTimeSampleArrayWidget::~RealTimeSampleArrayWidget()
 {
-//    qDebug() << "NewRealTimeSampleArrayWidget deleted";
+//    qDebug() << "RealTimeSampleArrayWidget deleted";
     // Clear sampling rate vector
     RealTimeSampleArrayWidget::s_listSamplingRates.clear();
 }
@@ -167,7 +158,7 @@ void RealTimeSampleArrayWidget::actualize()
         dMax = value > dMax ? value : dMax;
 
 //    // Set new sample widths
-//    foreach(NewRealTimeSampleArrayWidget* pRTSAW, DisplayManager::getRTSAWidgets().values())
+//    foreach(RealTimeSampleArrayWidget* pRTSAW, DisplayManager::getRTSAWidgets().values())
 //        pRTSAW->m_dSampleWidth = dMax/pRTSAW->m_pRTSA->getSamplingRate();
 }
 
@@ -202,7 +193,7 @@ void RealTimeSampleArrayWidget::minValueChanged(double minValue)
 
 //*************************************************************************************************************
 
-void RealTimeSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+void RealTimeSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     if(m_pRTSA->getSampleArray().size() > 0)
     {
@@ -240,7 +231,7 @@ void RealTimeSampleArrayWidget::update(SCMEASLIB::NewMeasurement::SPtr)
         }
     }
     else
-        qWarning() << "NewRealTimeSampleArrayWidget::update; getArraySize():" << m_pRTSA->getArraySize() << "getSampleArray():" << m_pRTSA->getSampleArray().size();
+        qWarning() << "RealTimeSampleArrayWidget::update; getArraySize():" << m_pRTSA->getArraySize() << "getSampleArray():" << m_pRTSA->getSampleArray().size();
 }
 
 
@@ -371,7 +362,7 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
         int iStartY = m_qPointMouseStartPosition.y();
 
         // Compute pixel difference
-        int iPixelDifferenceY = abs(iStartY - iEndY);
+        int iPixelDifferenceY = std::abs(iStartY - iEndY);
 
         double scale = (m_dMaxValue_init-m_dMinValue_init)/usHeight;
 
@@ -458,8 +449,8 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
 
 
         // Compute pixel difference
-        double iPixelDifferenceX = abs(iStartX - iEndX);
-        double iPixelDifferenceY = abs(iStartY - iEndY);
+        double iPixelDifferenceX = static_cast<double>(std::abs(iStartX - iEndX));
+        double iPixelDifferenceY = static_cast<double>(std::abs(iStartY - iEndY));
 
         if(iPixelDifferenceX < 5 && iPixelDifferenceY < 5)
             return;

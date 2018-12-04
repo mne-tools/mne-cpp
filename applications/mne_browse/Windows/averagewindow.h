@@ -43,13 +43,14 @@
 //=============================================================================================================
 
 #include "ui_averagewindow.h"
-#include "utils/layoutloader.h"             //MNE-CPP utils
-#include "disp/helpers/averagescene.h"
-#include "disp/helpers/selectionsceneitem.h"
 #include "../Utils/butterflyscene.h"
 #include "../Utils/types.h"
 #include "../Models/averagemodel.h"
 #include "../Delegates/averagedelegate.h"
+
+#include <utils/layoutloader.h>
+#include <disp/viewers/helpers/averagescene.h>
+#include <disp/viewers/helpers/selectionsceneitem.h>
 
 
 //*************************************************************************************************************

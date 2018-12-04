@@ -49,7 +49,7 @@
 #include <fiff/fiff_stream.h>
 
 #include <scShared/Interfaces/ISensor.h>
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
@@ -79,11 +79,11 @@
 //=============================================================================================================
 
 namespace SCMEASLIB {
-    class NewRealTimeMultiSampleArray;
+    class RealTimeMultiSampleArray;
 }
 
-namespace SCDISPLIB {
-    class HPIWidget;
+namespace DISP3DLIB {
+    class HpiView;
 }
 
 #define MAX_DATA_LEN    2000000000L
@@ -399,7 +399,7 @@ protected:
     */
     void onRecordingRemainingTimeChange();
 
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<IOBUFFER::RawMatrixBuffer>                                   m_pRawMatrixBuffer; /**< Holds incoming raw data. */
 
@@ -408,7 +408,7 @@ protected:
     QSharedPointer<BabyMEGInfo>             pInfo;                          /**< Set up the babyMEG info. */
     QSharedPointer<BabyMEGProjectDialog>    m_pBabyMEGProjectDialog;        /**< Window to setup the recording tiem and fiel name. */
     QSharedPointer<BabyMEGSQUIDControlDgl>  SQUIDCtrlDlg;                   /**< Nonmodal dialog for squid control. */
-    QSharedPointer<SCDISPLIB::HPIWidget>    m_pHPIWidget;                   /**< HPI widget. */
+    QSharedPointer<DISP3DLIB::HpiView>      m_pHPIWidget;                   /**< HPI widget. */
 
     QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
     QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */

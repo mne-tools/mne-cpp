@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RTServerSetupWidget class.
+* @brief    Definition of the RTServerSetupWidget class.
 *
 */
 
@@ -44,7 +44,7 @@
 #include "../fiffsimulator.h"
 
 #include <fiff/fiff_info.h>
-#include <rtClient/rtcmdclient.h>
+#include <communication/rtClient/rtcmdclient.h>
 
 
 //*************************************************************************************************************
@@ -88,7 +88,7 @@ FiffSimulatorSetupWidget::FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulat
     connect(m_pFiffSimulator, &FiffSimulator::fiffInfoAvailable, this, &FiffSimulatorSetupWidget::fiffInfoReceived);
 
     //Buffer
-    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::editingFinished, this, &FiffSimulatorSetupWidget::bufferSizeEdited);
+    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::textChanged, this, &FiffSimulatorSetupWidget::bufferSizeEdited);
 
     //CLI
     connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &FiffSimulatorSetupWidget::pressedSendCLI);

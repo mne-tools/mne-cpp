@@ -67,7 +67,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 , m_bUseUnitGain(false)
 , m_bUseUnitOffset(false)
 , m_bWriteDriverDebugToFile(false)
-, m_sOutputFilePath("/mne_scan_plugins/resources/tmsi")
+, m_sOutputFilePath("/resources/mne_scan/plugins/tmsi")
 , m_bUseCommonAverage(false)
 , m_bMeasureImpedances(false)
 {
@@ -161,7 +161,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
 
     //Open file to write to
     if(m_bWriteDriverDebugToFile)
-        m_outputFileStream.open("mne_scan_plugins/resources/tmsi/TMSi_Driver_Debug.txt", ios::trunc); //ios::trunc deletes old file data
+        m_outputFileStream.open("resources/mne_scan/plugins/tmsi/TMSi_Driver_Debug.txt", ios::trunc); //ios::trunc deletes old file data
 
     //Check if device handler already exists and a connection was established before
 //    if(m_HandleMaster != NULL)

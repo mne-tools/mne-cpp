@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the NoiseReduction class.
+* @brief    Definition of the NoiseReduction class.
 *
 */
 
@@ -72,8 +72,8 @@ NoiseReduction::NoiseReduction()
 , m_bProjActivated(false)
 , m_bCompActivated(false)
 , m_sCurrentSystem("VectorView")
-, m_pRTMSA(NewRealTimeMultiSampleArray::SPtr(new NewRealTimeMultiSampleArray()))
-, m_pFilterWindow(Q_NULLPTR)
+, m_pRTMSA(RealTimeMultiSampleArray::SPtr(new RealTimeMultiSampleArray()))
+, m_pFilterView(Q_NULLPTR)
 {
     if(m_sCurrentSystem == "BabyMEG") {
         m_iNBaseFctsFirst = 270;
@@ -117,8 +117,8 @@ NoiseReduction::~NoiseReduction()
         QSettings settings;
 
         //Store filter
-        if(m_pFilterWindow != 0) {
-            FilterData filter = m_pFilterWindow->getUserDesignedFilter();
+        if(m_pFilterView != 0) {
+            FilterData filter = m_pFilterView->getUserDesignedFilter();
 
             settings.setValue(QString("RTNRW/%1/filterHP").arg(t_sRTMSAName), filter.m_dHighpassFreq);
             settings.setValue(QString("RTNRW/%1/filterLP").arg(t_sRTMSAName), filter.m_dLowpassFreq);
@@ -126,8 +126,8 @@ NoiseReduction::~NoiseReduction()
             settings.setValue(QString("RTNRW/%1/filterType").arg(t_sRTMSAName), (int)filter.m_Type);
             settings.setValue(QString("RTNRW/%1/filterDesignMethod").arg(t_sRTMSAName), (int)filter.m_designMethod);
             settings.setValue(QString("RTNRW/%1/filterTransition").arg(t_sRTMSAName), filter.m_dParksWidth*(filter.m_sFreq/2));
-            settings.setValue(QString("RTNRW/%1/filterUserDesignActive").arg(t_sRTMSAName), m_pFilterWindow->userDesignedFiltersIsActive());
-            settings.setValue(QString("RTNRW/%1/filterChannelType").arg(t_sRTMSAName), m_pFilterWindow->getChannelType());
+            settings.setValue(QString("RTNRW/%1/filterUserDesignActive").arg(t_sRTMSAName), m_pFilterView->userDesignedFiltersIsActive());
+            settings.setValue(QString("RTNRW/%1/filterChannelType").arg(t_sRTMSAName), m_pFilterView->getChannelType());
         }
     }
 }
@@ -147,13 +147,13 @@ QSharedPointer<IPlugin> NoiseReduction::clone() const
 void NoiseReduction::init()
 {
     // Input
-    m_pNoiseReductionInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "NoiseReductionIn", "NoiseReduction input data");
+    m_pNoiseReductionInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "NoiseReductionIn", "NoiseReduction input data");
     connect(m_pNoiseReductionInput.data(), &PluginInputConnector::notify,
             this, &NoiseReduction::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pNoiseReductionInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
-    m_pNoiseReductionOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "NoiseReductionOut", "NoiseReduction output data");
+    m_pNoiseReductionOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "NoiseReductionOut", "NoiseReduction output data");
     m_outputConnectors.append(m_pNoiseReductionOutput);
 
     QStringList slFlags;
@@ -226,7 +226,7 @@ IPlugin::PluginType NoiseReduction::getType() const
 
 QString NoiseReduction::getName() const
 {
-    return "NoiseReduction";
+    return "Noise Reduction";
 }
 
 
@@ -241,11 +241,11 @@ QWidget* NoiseReduction::setupWidget()
 
 //*************************************************************************************************************
 
-void NoiseReduction::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    //QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    //QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
-    m_pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    m_pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(m_pRTMSA) {
         //Check if buffer initialized
@@ -513,13 +513,13 @@ void NoiseReduction::showOptionsWidget()
 void NoiseReduction::initSphara()
 {
     //Load SPHARA matrix
-    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
-    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
 
-    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
-    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
-    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/Current_SPHARA_EEG.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt"));
 
     //Generate indices used to create the SPHARA operators for VectorView
     m_vecIndicesFirstVV.resize(0);
@@ -570,30 +570,30 @@ void NoiseReduction::initSphara()
 
 void NoiseReduction::initFilter()
 {
-    m_pFilterWindow = FilterWindow::SPtr(new FilterWindow(m_pOptionsWidget.data(), Qt::Window/*0, Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint*/));
-    //m_pFilterWindow->setWindowFlags(Qt::WindowStaysOnTopHint);
+    m_pFilterView = FilterView::SPtr(new FilterView(m_pOptionsWidget.data(), Qt::Window/*0, Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint*/));
+    //m_pFilterView->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-    m_pFilterWindow->setFiffInfo(m_pFiffInfo);
-    m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
-    m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
+    m_pFilterView->init(m_pFiffInfo->sfreq);
+    m_pFilterView->setWindowSize(m_iMaxFilterTapSize);
+    m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
 
-    connect(m_pFilterWindow.data(), static_cast<void (FilterWindow::*)(QString)>(&FilterWindow::applyFilter),
+    connect(m_pFilterView.data(), static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
             this, static_cast<void (NoiseReduction::*)(QString)>(&NoiseReduction::setFilterChannelType));
 
-    connect(m_pFilterWindow.data(), &FilterWindow::filterChanged,
+    connect(m_pFilterView.data(), &FilterView::filterChanged,
             this, &NoiseReduction::filterChanged);
 
-    connect(m_pFilterWindow.data(), &FilterWindow::filterActivated,
+    connect(m_pFilterView.data(), &FilterView::filterActivated,
             this, &NoiseReduction::filterActivated);
 
     //Handle Filtering
-    connect(m_pFilterWindow.data(), &FilterWindow::activationCheckBoxListChanged,
+    connect(m_pFilterView.data(), &FilterView::activationCheckBoxListChanged,
             m_pOptionsWidget.data(), &NoiseReductionOptionsWidget::filterGroupChanged);
 
     connect(m_pOptionsWidget.data(), &NoiseReductionOptionsWidget::showFilterOptions,
             this, &NoiseReduction::showFilterWidget);
 
-    m_pOptionsWidget->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
+    m_pOptionsWidget->filterGroupChanged(m_pFilterView->getActivationCheckBoxList());
 
     m_pRtFilter = RtFilter::SPtr(new RtFilter());
 
@@ -602,7 +602,7 @@ void NoiseReduction::initFilter()
     //Set stored filter settings from last session
     QString t_sRTMSAName = m_pRTMSA->getName();
     QSettings settings;
-    m_pFilterWindow->setFilterParameters(settings.value(QString("RTNRW/%1/filterHP").arg(t_sRTMSAName), 5.0).toDouble(),
+    m_pFilterView->setFilterParameters(settings.value(QString("RTNRW/%1/filterHP").arg(t_sRTMSAName), 5.0).toDouble(),
                                             settings.value(QString("RTNRW/%1/filterLP").arg(t_sRTMSAName), 40.0).toDouble(),
                                             settings.value(QString("RTNRW/%1/filterOrder").arg(t_sRTMSAName), 128).toInt(),
                                             settings.value(QString("RTNRW/%1/filterType").arg(t_sRTMSAName), 2).toInt(),
@@ -618,14 +618,14 @@ void NoiseReduction::initFilter()
 void NoiseReduction::showFilterWidget(bool state)
 {
     if(state) {
-        if(m_pFilterWindow->isActiveWindow()) {
-            m_pFilterWindow->hide();
+        if(m_pFilterView->isActiveWindow()) {
+            m_pFilterView->hide();
         } else {
-            m_pFilterWindow->activateWindow();
-            m_pFilterWindow->show();
+            m_pFilterView->activateWindow();
+            m_pFilterView->show();
         }
     } else {
-        m_pFilterWindow->hide();
+        m_pFilterView->hide();
     }
 }
 
@@ -655,8 +655,8 @@ void NoiseReduction::createSpharaOperator()
     }
 
     //Write final operator matrices to file
-//    IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/matSpharaMultFirst.txt"));
-//    IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/noisereduction/SPHARA/matSpharaMultSecond.txt"));
+//    IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultFirst.txt"));
+//    IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultSecond.txt"));
 
     //
     // Make operators sparse

@@ -46,9 +46,9 @@
 #include "reference_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-#include <utils/eegref.h>
+#include <utils/generics/circularmatrixbuffer.h>
+#include <scMeas/realtimemultisamplearray.h>
+#include <eegref.h>
 
 #include "FormFiles/referencesetupwidget.h"
 #include "FormFiles/referencetoolbarwidget.h"
@@ -66,11 +66,12 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE ReferencePlugin
+// DEFINE NAMESPACE REFERENCEPLUGIN
 //=============================================================================================================
 
 namespace REFERENCEPLUGIN
 {
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,7 +89,7 @@ class ReferenceToolbarWidget;
 class REFERENCESHARED_EXPORT Reference : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "reference.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "reference.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
@@ -122,9 +123,9 @@ public:
     /**
     * Udates the pugin with new (incoming) data.
     *
-    * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
+    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
     */
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
@@ -149,8 +150,8 @@ private:
 
     QSharedPointer<IOBUFFER::_double_CircularMatrixBuffer>  m_pRefBuffer;                   /**< Holds incoming data.*/
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pRefInput;      /**< The NewRealTimeMultiSampleArray of the Reference input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pRefOutput;     /**< The NewRealTimeMultiSampleArray of the Reference output.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pRefInput;      /**< The RealTimeMultiSampleArray of the Reference input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pRefOutput;     /**< The RealTimeMultiSampleArray of the Reference output.*/
 
 signals:
     //=========================================================================================================

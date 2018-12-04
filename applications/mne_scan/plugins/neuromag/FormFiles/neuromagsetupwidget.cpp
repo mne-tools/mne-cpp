@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RTServerSetupWidget class.
+* @brief    Definition of the RTServerSetupWidget class.
 *
 */
 
@@ -85,7 +85,7 @@ NeuromagSetupWidget::NeuromagSetupWidget(Neuromag* p_pNeuromag, QWidget* parent)
     connect(m_pNeuromag, &Neuromag::fiffInfoAvailable, this, &NeuromagSetupWidget::fiffInfoReceived);
 
     //Buffer
-    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::editingFinished, this, &NeuromagSetupWidget::bufferSizeEdited);
+    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::textChanged, this, &NeuromagSetupWidget::bufferSizeEdited);
 
     //CLI
     connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &NeuromagSetupWidget::pressedSendCLI);

@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "scmeas_global.h"
-#include "newmeasurement.h"
+#include "measurement.h"
 #include "realtimesamplearraychinfo.h"
 
 #include <fiff/fiff_evoked_set.h>
@@ -95,7 +95,7 @@ namespace SCMEASLIB
 *
 * @brief The RealTimeEvokedSet class provides a data stream which holds FiffEvokedSet data.
 */
-class SCMEASSHARED_EXPORT RealTimeEvokedSet : public NewMeasurement
+class SCMEASSHARED_EXPORT RealTimeEvokedSet : public Measurement
 {
     Q_OBJECT
 public:
@@ -182,10 +182,13 @@ public:
     /**
     * New devoked to distribute
     *
-    * @param [in] v             the evoked set which should be distributed.
-    * @param [in] p_fiffinfo    the evoked fiff info as shared pointer.
+    * @param [in] v                         the evoked set which should be distributed.
+    * @param [in] p_fiffinfo                the evoked fiff info as shared pointer.
+    * @param [in] lResponsibleTriggerTypes  List of all trigger types which lead to the recent emit of a new evoked set.
     */
-    virtual void setValue(FiffEvokedSet &v, FiffInfo::SPtr p_fiffinfo);
+    virtual void setValue(const FiffEvokedSet &v,
+                          const FiffInfo::SPtr& p_fiffinfo,
+                          const QStringList& lResponsibleTriggerTypes);
 
     //=========================================================================================================
     /**
@@ -195,6 +198,14 @@ public:
     * @return the last attached value.
     */
     virtual FiffEvokedSet::SPtr& getValue();
+
+    //=========================================================================================================
+    /**
+    * Returns the trigger types which lead to the emit of this evoked set.
+    *
+    * @return the trigger types which lead to the emit of this evoked set.
+    */
+    const QStringList& getResponsibleTriggerTypes();
 
     //=========================================================================================================
     /**
@@ -233,6 +244,8 @@ private:
 
     FIFFLIB::FiffEvokedSet::SPtr        m_pFiffEvokedSet;   /**< Evoked data set*/
 
+    QStringList                         m_lResponsibleTriggerTypes; /**< List of all trigger types which lead to the recent emit of a new evoked set. */
+
     FIFFLIB::FiffInfo::SPtr             m_pFiffInfo;        /**< Fiff info */
 
     QString                             m_sXMLLayoutFile;   /**< Layout file name. */
@@ -241,7 +254,7 @@ private:
 
     QList<QColor>                       m_qListChColors;    /**< Channel color for butterfly plot.*/
 
-    QList<RealTimeSampleArrayChInfo>    m_qListChInfo; /**< Channel info list.*/
+    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;      /**< Channel info list.*/
 
     bool                                m_bInitialized;     /**< If values are stored.*/
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffSimulator class.
+* @brief    Definition of the FiffSimulator class.
 *
 */
 
@@ -45,8 +45,8 @@
 
 #include <utils/ioutils.h>
 #include <fiff/fiff_info.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-#include <scDisp/hpiwidget.h>
+#include <scMeas/realtimemultisamplearray.h>
+#include <disp3D/viewers/hpiview.h>
 
 
 //*************************************************************************************************************
@@ -73,8 +73,8 @@ using namespace UTILSLIB;
 using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace SCMEASLIB;
-using namespace RTCLIENTLIB;
-using namespace SCDISPLIB;
+using namespace COMMUNICATIONLIB;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************
@@ -135,7 +135,7 @@ QSharedPointer<IPlugin> FiffSimulator::clone() const
 
 void FiffSimulator::init()
 {
-    m_pRTMSA_FiffSimulator = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "FiffSimulator", "Fiff Simulator Output");
+    m_pRTMSA_FiffSimulator = PluginOutputData<RealTimeMultiSampleArray>::create(this, "FiffSimulator", "Fiff Simulator Output");
     m_pRTMSA_FiffSimulator->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSA_FiffSimulator);
 
@@ -143,7 +143,8 @@ void FiffSimulator::init()
     m_pFiffSimulatorProducer->start();
 
     //init channels when fiff info is available
-    connect(this, &FiffSimulator::fiffInfoAvailable, this, &FiffSimulator::initConnector);
+    connect(this, &FiffSimulator::fiffInfoAvailable,
+            this, &FiffSimulator::initConnector);
 
     //Try to connect the cmd client on start up using localhost connection
     this->connectCmdClient();
@@ -289,7 +290,7 @@ void FiffSimulator::initConnector()
         m_pRTMSA_FiffSimulator->data()->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSA_FiffSimulator->data()->setMultiArraySize(1);
         m_pRTMSA_FiffSimulator->data()->setVisibility(true);
-        m_pRTMSA_FiffSimulator->data()->setXMLLayoutFile("./mne_scan_plugins/resources/FiffSimulator/VectorViewSimLayout.xml");
+        m_pRTMSA_FiffSimulator->data()->setXMLLayoutFile(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/FiffSimulator/VectorViewSimLayout.xml");
     }
 }
 
@@ -440,8 +441,8 @@ void FiffSimulator::showHPIDialog()
         return;
     } else {
         if (!m_pHPIWidget) {
-            m_pHPIWidget = QSharedPointer<HPIWidget>(new HPIWidget(m_pFiffInfo));
-            connect(m_pHPIWidget.data(), &HPIWidget::continousHPIToggled,
+            m_pHPIWidget = QSharedPointer<HpiView>(new HpiView(m_pFiffInfo));
+            connect(m_pHPIWidget.data(), &HpiView::continousHPIToggled,
                     this, &FiffSimulator::onContinousHPIToggled);
         }
 

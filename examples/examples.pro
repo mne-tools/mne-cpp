@@ -4,13 +4,15 @@
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 #           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+#           Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2010
 #
 # @section  LICENSE
 #
-# Copyright (C) 2010, Christoph Dinh, Lorenz Esch, Florian Schlembach and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2010, Christoph Dinh, Lorenz Esch, Florian Schlembach, Daniel Strohmeier and Matti Hamalainen.
+# All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -71,7 +73,10 @@ SUBDIRS += \
             ex_inverse_rap_music \
             ex_read_fwd_disp_3D \
             ex_roi_clustered_inverse_pwl_rap_music \
-            ex_st_clustered_inverse_pwl_rap_music
+            ex_st_clustered_inverse_pwl_rap_music \
+            ex_interpolation \
+            ex_spectral \
+            ex_tf_plot
 
         !isEmpty( CNTK_INCLUDE_DIR ) {
             SUBDIRS += \

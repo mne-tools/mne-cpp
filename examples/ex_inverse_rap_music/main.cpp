@@ -52,10 +52,10 @@
 
 #include <inverse/rapMusic/rapmusic.h>
 
+#include <disp3D/viewers/abstractview.h>
 #include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -69,6 +69,7 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -106,9 +107,9 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Compute Inverse Rap Music Example");
     parser.addHelpOption();
-    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", "./MNE-sample-data/subjects");
+    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
     QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"RapMusic.stc");
     QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
@@ -176,7 +177,7 @@ int main(int argc, char *argv[])
 
     int iWinSize = 200;
     if(doMovie) {
-        t_rapMusic.setStcAttr(iWinSize, 0.6);
+        t_rapMusic.setStcAttr(iWinSize, 0.6f);
     }
 
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
@@ -205,28 +206,27 @@ int main(int argc, char *argv[])
         return 1;
 
     //Visualize the results
-    View3D::SPtr testWindow = View3D::SPtr(new View3D());
-    Data3DTreeModel::SPtr p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
-
-    testWindow->setModel(p3DDataModel);
+    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
+    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
 
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, t_surfSet, t_annotationSet);
 
     //Add rt source loc data and init some visualization values
-    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
+                                                                      evoked.comment,
+                                                                      sourceEstimate,
+                                                                      t_clusteredFwd,
+                                                                      t_surfSet,
+                                                                      t_annotationSet)) {
         pRTDataItem->setLoopState(true);
         pRTDataItem->setTimeInterval(17);
         pRTDataItem->setNumberAverages(1);
-        pRTDataItem->setStreamingActive(true);
-        pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
+        pRTDataItem->setStreamingState(true);
+        pRTDataItem->setThresholds(QVector3D(0.01f,0.5f,1.0f));
         pRTDataItem->setVisualizationType("Annotation based");
-        pRTDataItem->setColortable("Hot");
+        pRTDataItem->setColormapType("Hot");
     }
-    testWindow->show();
-
-    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
-    control3DWidget->init(p3DDataModel, testWindow);
-    control3DWidget->show();
+    p3DAbstractView->show();
 
     if(!t_sFileNameStc.isEmpty())
     {

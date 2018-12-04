@@ -4,11 +4,11 @@
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,11 +29,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RealTimeSourceEstimateWidget Class.
+* @brief    Definition of the RealTimeSourceEstimateWidget Class.
 *
 */
-
-//ToDo Paint to render area
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -44,20 +42,8 @@
 
 #include <scMeas/realtimesourceestimate.h>
 
-#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
-
-#include <mne/mne_forwardsolution.h>
-#include <mne/mne_inverse_operator.h>
-
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
-
-#include <inverse/minimumNorm/minimumnorm.h>
-
-#include <math.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
+#include <disp3D/viewers/sourceestimateview.h>
 
 
 //*************************************************************************************************************
@@ -65,13 +51,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSlider>
-#include <QAction>
-#include <QLabel>
 #include <QGridLayout>
-#include <QSettings>
-#include <QDebug>
-#include <QStringList>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -89,9 +70,7 @@
 
 using namespace SCDISPLIB;
 using namespace DISP3DLIB;
-using namespace MNELIB;
 using namespace SCMEASLIB;
-using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -100,32 +79,17 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent)
-: NewMeasurementWidget(parent)
+: MeasurementWidget(parent)
 , m_pRTSE(pRTSE)
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)
+, m_pSourceEstimateView(SourceEstimateView::SPtr::create())
 {
-    m_pAction3DControl = new QAction(QIcon(":/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
-    m_pAction3DControl->setShortcut(tr("F9"));
-    m_pAction3DControl->setToolTip(tr("Shows the 3D control widget (F9)"));
-    connect(m_pAction3DControl, &QAction::triggered,
-            this, &RealTimeSourceEstimateWidget::show3DControlWidget);
-    addDisplayAction(m_pAction3DControl);
-    m_pAction3DControl->setVisible(true);
-
-    m_p3DView = View3D::SPtr(new View3D());
-    m_pData3DModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
-
-    m_p3DView->setModel(m_pData3DModel);
-
-    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this,
-                                                                 QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light",
-                                                                 Qt::Window));
-    m_pControl3DView->init(m_pData3DModel, m_p3DView);
-
     QGridLayout *mainLayoutView = new QGridLayout;
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
-    mainLayoutView->addWidget(pWidgetContainer);
+    mainLayoutView->addWidget(m_pSourceEstimateView.data(),0,0);
+
+    QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTSE->getControlWidgets();
+    m_pSourceEstimateView->setQuickControlWidgets(lControlWidgets);
 
     this->setLayout(mainLayoutView);
 
@@ -137,18 +101,15 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 
 RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
 {
-    //
     // Store Settings
-    //
-    if(!m_pRTSE->getName().isEmpty())
-    {
+    if(!m_pRTSE->getName().isEmpty()) {
     }
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimateWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+void RealTimeSourceEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     getData();
 }
@@ -158,43 +119,37 @@ void RealTimeSourceEstimateWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 
 void RealTimeSourceEstimateWidget::getData()
 {
-    if(m_bInitialized)
-    {
-        //
-        // Add rt brain data
-        //
-        if(!m_pRtItem) {
-            qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-            m_pRtItem = m_pData3DModel->addSourceData("Subject", "Data", *m_pRTSE->getValue(), *m_pRTSE->getFwdSolution());
+    if(m_bInitialized) {
+        QList<MNESourceEstimate::SPtr> lMNEData = m_pRTSE->getValue();
 
-            m_pRtItem->setLoopState(false);
-            m_pRtItem->setTimeInterval(17);
-            m_pRtItem->setNormalization(QVector3D(0.0,5,10));
-            m_pRtItem->setColortable("Hot");
-            m_pRtItem->setVisualizationType("Annotation based");
-            //m_pRtItem->onTimeIntervalChanged(m_pRTSE->getValue()->tstep*1000000);
-            m_pRtItem->setNumberAverages(1);
-            m_pRtItem->setStreamingActive(true);
-        } else {
-            qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
+        // Add source estimate data
+        if(!lMNEData.isEmpty()) {
+            if(!m_pRtItem && m_pRTSE->getAnnotSet() && m_pRTSE->getSurfSet() && m_pRTSE->getFwdSolution()) {
+                //qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
+                m_pRtItem = m_pSourceEstimateView->addData("Subject", "Data",
+                                                          *lMNEData.first(),
+                                                          *m_pRTSE->getFwdSolution(),
+                                                          *m_pRTSE->getSurfSet(),
+                                                          *m_pRTSE->getAnnotSet());
 
-            if(m_pRtItem) {
-                m_pRtItem->addData(*m_pRTSE->getValue());
+                m_pRtItem->setLoopState(false);
+                m_pRtItem->setTimeInterval(17);
+                m_pRtItem->setThresholds(QVector3D(0.0,5,10));
+                m_pRtItem->setColormapType("Hot");
+                m_pRtItem->setVisualizationType("Annotation based");
+                m_pRtItem->setNumberAverages(1);
+                m_pRtItem->setStreamingState(true);
+                m_pRtItem->setSFreq(m_pRTSE->getFiffInfo()->sfreq);
+            } else {
+                //qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
+
+                if(m_pRtItem) {
+                    m_pRtItem->addData(*lMNEData.first());
+                }
             }
         }
-    }
-    else
-    {
-        if(m_pRTSE->getAnnotSet() && m_pRTSE->getSurfSet())
-        {
-            m_pRTSE->m_bStcSend = false;
-            init();
-
-            //
-            // Add brain data
-            //
-            m_pData3DModel->addSurfaceSet("Subject", "MRI", *m_pRTSE->getSurfSet(), *m_pRTSE->getAnnotSet());
-        }
+    } else {
+        init();
     }
 }
 
@@ -204,24 +159,4 @@ void RealTimeSourceEstimateWidget::getData()
 void RealTimeSourceEstimateWidget::init()
 {
     m_bInitialized = true;
-    m_pRTSE->m_bStcSend = true;
 }
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimateWidget::show3DControlWidget()
-{
-    if(m_pControl3DView->isActiveWindow())
-        m_pControl3DView->hide();
-    else {
-        m_pControl3DView->activateWindow();
-        m_pControl3DView->show();
-    }
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================

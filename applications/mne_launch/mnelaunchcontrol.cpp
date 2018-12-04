@@ -95,14 +95,23 @@ void MNELaunchControl::invokeAnalyze()
 void MNELaunchControl::invokeApplication(const QString &application, const QStringList &arguments)
 {
     QFile file(QCoreApplication::applicationDirPath()+ "/" + application);
-#if defined(_WIN32) || defined(_WIN32_WCE)
-    file.setFileName(file.fileName() + ".exe");
-#endif
+    #if defined(Q_OS_WIN)
+        file.setFileName(file.fileName() + ".exe");
+    #elif defined(Q_OS_MACOS)
+        //On MacOS we use .app bundle structures. MNE Launch executable path is: mne_launch.app/Contents/MacOS/
+        file.setFileName(QCoreApplication::applicationDirPath() + "/../../../" + application + ".app");
+    #endif
 
     if(file.exists()) {
         try {
             QPointer<QProcess> process( new QProcess );
-            process->start(file.fileName(), arguments);
+
+            #if defined(Q_OS_MACOS)
+                process->start("open", {file.fileName()});
+            #else
+                process->start(file.fileName(), arguments);
+            #endif
+
             m_ListProcesses.append(process);
         } catch (int e) {
             qWarning() << "Not able to start" << file.fileName() << ". Error:" << e;
