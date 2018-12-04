@@ -70,7 +70,6 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <QQuaternion>
 
 
 //*************************************************************************************************************
@@ -84,6 +83,10 @@ namespace SCMEASLIB {
 
 namespace DISP3DLIB {
     class HpiView;
+}
+
+namespace DISPLIB {
+    class ProjectSettingsView;
 }
 
 #define MAX_DATA_LEN    2000000000L
@@ -104,11 +107,9 @@ namespace BABYMEGPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BabyMEGProjectDialog;
 class BabyMEGClient;
 class BabyMEGInfo;
 class BabyMEGSetupWidget;
-class BabyMEGProjectDialog;
 class BabyMEGSQUIDControlDgl;
 
 
@@ -126,7 +127,6 @@ class BABYMEGSHARED_EXPORT BabyMEG : public SCSHAREDLIB::ISensor
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
     friend class BabyMEGSetupWidget;
-    friend class BabyMEGProjectDialog;
     friend class BabyMEGSQUIDControlDgl;
 
 public:
@@ -325,6 +325,38 @@ protected:
 
     //=========================================================================================================
     /**
+    * Set the data path.
+    *
+    * @param[in] sDataPath   The new data path.
+    */
+    void setDataPath(const QString& sDataPath);
+
+    //=========================================================================================================
+    /**
+    * Set the project.
+    *
+    * @param[in] sCurrentProject   The new project.
+    */
+    void setProject(const QString& sCurrentProject);
+
+    //=========================================================================================================
+    /**
+    * Set the subject.
+    *
+    * @param[in] sCurrentSubject   The new subject.
+    */
+    void setSubject(const QString& sCurrentSubject);
+
+    //=========================================================================================================
+    /**
+    * Set the paradigm.
+    *
+    * @param[in] sCurrentParadigm   The new paradigm.
+    */
+    void setParadigm(const QString& sCurrentParadigm);
+
+    //=========================================================================================================
+    /**
     * Shows the project dialog/window.
     */
     void showProjectDialog();
@@ -403,12 +435,12 @@ protected:
 
     QSharedPointer<IOBUFFER::RawMatrixBuffer>                                   m_pRawMatrixBuffer; /**< Holds incoming raw data. */
 
-    QSharedPointer<BabyMEGClient>           m_pMyClient;                    /**< TCP/IP communication between Qt and Labview. */
-    QSharedPointer<BabyMEGClient>           m_pMyClientComm;                /**< TCP/IP communication between Qt and Labview - communication. */
-    QSharedPointer<BabyMEGInfo>             pInfo;                          /**< Set up the babyMEG info. */
-    QSharedPointer<BabyMEGProjectDialog>    m_pBabyMEGProjectDialog;        /**< Window to setup the recording tiem and fiel name. */
-    QSharedPointer<BabyMEGSQUIDControlDgl>  SQUIDCtrlDlg;                   /**< Nonmodal dialog for squid control. */
-    QSharedPointer<DISP3DLIB::HpiView>      m_pHPIWidget;                   /**< HPI widget. */
+    QSharedPointer<BabyMEGClient>                   m_pMyClient;                    /**< TCP/IP communication between Qt and Labview. */
+    QSharedPointer<BabyMEGClient>                   m_pMyClientComm;                /**< TCP/IP communication between Qt and Labview - communication. */
+    QSharedPointer<BabyMEGInfo>                     m_pInfo;                        /**< Set up the babyMEG info. */
+    QSharedPointer<DISPLIB::ProjectSettingsView>    m_pProjectSettingsView;         /**< Window to setup the recording tiem and fiel name. */
+    QSharedPointer<BabyMEGSQUIDControlDgl>          m_pSQUIDCtrlDlg;                /**< Nonmodal dialog for squid control. */
+    QSharedPointer<DISP3DLIB::HpiView>              m_pHPIWidget;                   /**< HPI widget. */
 
     QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
     QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */

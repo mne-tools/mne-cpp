@@ -43,7 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "disp_global.h"
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
@@ -99,7 +99,7 @@ public:
     explicit ProjectSettingsView(const QString& sDataPath = "/TestData",
                                  const QString& sCurrentProject = "TestProject",
                                  const QString& sCurrentSubject = "TestSubject",
-                                 const QString& sCurrentParadigm = "",
+                                 const QString& sCurrentParadigm = "UnknownParadigm",
                                  QWidget *parent = 0);
     ~ProjectSettingsView();
 

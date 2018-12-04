@@ -42,7 +42,6 @@
 
 #include "babymeg.h"
 #include "FormFiles/babymegsetupwidget.h"
-#include "FormFiles/babymegprojectdialog.h"
 #include "FormFiles/babymegsquidcontroldgl.h"
 #include "babymegclient.h"
 #include "babymeginfo.h"
@@ -53,6 +52,7 @@
 #include <utils/detecttrigger.h>
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_dig_point_set.h>
+#include <disp/viewers/projectsettingsview.h>
 #include <communication/rtClient/rtcmdclient.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <disp3D/viewers/hpiview.h>
@@ -92,6 +92,7 @@ using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace SCMEASLIB;
 using namespace DISP3DLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -219,21 +220,21 @@ void BabyMEG::init()
     m_sCurrentSubject = settings.value(QString("Plugin/%1/currentSubject").arg(getName()), "TestSubject").toString();
 
     //BabyMEG Inits
-    pInfo = QSharedPointer<BabyMEGInfo>(new BabyMEGInfo());
-    connect(pInfo.data(), &BabyMEGInfo::fiffInfoAvailable,
+    m_pInfo = QSharedPointer<BabyMEGInfo>(new BabyMEGInfo());
+    connect(m_pInfo.data(), &BabyMEGInfo::fiffInfoAvailable,
             this, &BabyMEG::setFiffInfo);
-    connect(pInfo.data(), &BabyMEGInfo::SendDataPackage,
+    connect(m_pInfo.data(), &BabyMEGInfo::SendDataPackage,
             this, &BabyMEG::setFiffData);
-    connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage,
+    connect(m_pInfo.data(), &BabyMEGInfo::SendCMDPackage,
             this, &BabyMEG::setCMDData);
-    connect(pInfo.data(), &BabyMEGInfo::GainInfoUpdate,
+    connect(m_pInfo.data(), &BabyMEGInfo::GainInfoUpdate,
             this, &BabyMEG::setFiffGainInfo);
 
     m_pMyClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
-    m_pMyClient->SetInfo(pInfo);
+    m_pMyClient->SetInfo(m_pInfo);
     m_pMyClient->start();
     m_pMyClientComm = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6341,this));
-    m_pMyClientComm->SetInfo(pInfo);
+    m_pMyClientComm->SetInfo(m_pInfo);
     m_pMyClientComm->start();
 
     m_pMyClientComm->SendCommandToBabyMEGShortConnection("INFO");
@@ -243,9 +244,6 @@ void BabyMEG::init()
     //init channels when fiff info is available
     connect(this, &BabyMEG::fiffInfoAvailable,
             this, &BabyMEG::initConnector);
-
-    //Init projection dialog
-    m_pBabyMEGProjectDialog = QSharedPointer<BabyMEGProjectDialog>(new BabyMEGProjectDialog(this));
 }
 
 
@@ -474,7 +472,7 @@ void BabyMEG::setFiffInfo(const FiffInfo& p_FiffInfo)
         qDebug() << "Not able to read bad channels";
     }
 
-    m_iBufferSize = pInfo->dataLength;
+    m_iBufferSize = m_pInfo->dataLength;
 
     //
     //   Add the calibration factors
@@ -714,17 +712,66 @@ void BabyMEG::setRecordingTimerStateChanged(bool state)
 
 //*************************************************************************************************************
 
+void BabyMEG::setDataPath(const QString& sDataPath)
+{
+    m_sBabyMEGDataPath = sDataPath;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::setProject(const QString& sCurrentProject)
+{
+    m_sCurrentProject = sCurrentProject;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::setSubject(const QString& sCurrentSubject)
+{
+    m_sCurrentSubject = sCurrentSubject;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::setParadigm(const QString& sCurrentParadigm)
+{
+    m_sCurrentParadigm = sCurrentParadigm;
+}
+
+
+//*************************************************************************************************************
+
 void BabyMEG::showProjectDialog()
 {
-    m_pBabyMEGProjectDialog->setWindowFlags(Qt::WindowStaysOnTopHint);
+    // Start Squid control widget
+    if(!m_pProjectSettingsView) {
+        m_pProjectSettingsView = QSharedPointer<ProjectSettingsView>::create(m_sBabyMEGDataPath,
+                                                                             m_sCurrentProject,
+                                                                             m_sCurrentSubject,
+                                                                             m_sCurrentParadigm);
+    }
 
-    connect(m_pBabyMEGProjectDialog.data(), &BabyMEGProjectDialog::timerChanged,
+    m_pProjectSettingsView->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::timerChanged,
             this, &BabyMEG::setRecordingTimerChanged);
 
-    connect(m_pBabyMEGProjectDialog.data(), &BabyMEGProjectDialog::recordingTimerStateChanged,
+    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::recordingTimerStateChanged,
             this, &BabyMEG::setRecordingTimerStateChanged);
 
-    m_pBabyMEGProjectDialog->show();
+    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::newParadigm,
+            this, &BabyMEG::setParadigm);
+
+    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::newProject,
+            this, &BabyMEG::setProject);
+
+    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::newSubject,
+            this, &BabyMEG::setSubject);
+
+    m_pProjectSettingsView->show();
 }
 
 
@@ -733,14 +780,14 @@ void BabyMEG::showProjectDialog()
 void BabyMEG::showSqdCtrlDialog()
 {
     // Start Squid control widget
-    if(SQUIDCtrlDlg == NULL) {
-        SQUIDCtrlDlg = QSharedPointer<BabyMEGSQUIDControlDgl>(new BabyMEGSQUIDControlDgl(this));
+    if(!m_pSQUIDCtrlDlg) {
+        m_pSQUIDCtrlDlg = QSharedPointer<BabyMEGSQUIDControlDgl>(new BabyMEGSQUIDControlDgl(this));
     }
 
-    if(!SQUIDCtrlDlg->isVisible()) {
-        SQUIDCtrlDlg->show();
-        SQUIDCtrlDlg->raise();
-        SQUIDCtrlDlg->Init();
+    if(!m_pSQUIDCtrlDlg->isVisible()) {
+        m_pSQUIDCtrlDlg->show();
+        m_pSQUIDCtrlDlg->raise();
+        m_pSQUIDCtrlDlg->Init();
     }
 }
 
@@ -1033,7 +1080,7 @@ void BabyMEG::changeRecordingButton()
 
 void BabyMEG::onRecordingRemainingTimeChange()
 {
-    m_pBabyMEGProjectDialog->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
+    m_pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
 }
 
 
