@@ -162,7 +162,7 @@ void AverageSelectionView::update()
         pCheckBox->setChecked(m_qMapAverageActivation->value(itr.key()));
         pCheckBox->setObjectName(itr.key());
         topLayout->addWidget(pCheckBox, count, 0);
-        connect(pCheckBox, &QCheckBox::clicked,
+        connect(pCheckBox.data(), &QCheckBox::clicked,
                 this, &AverageSelectionView::onAveragesChanged);
 
         //Create average color pushbutton
@@ -171,7 +171,7 @@ void AverageSelectionView::update()
         pButton->setObjectName(itr.key());
         pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
         topLayout->addWidget(pButton, count, 1);
-        connect(pButton, &QPushButton::clicked,
+        connect(pButton.data(), &QPushButton::clicked,
                 this, &AverageSelectionView::onAveragesChanged);
 
         count++;

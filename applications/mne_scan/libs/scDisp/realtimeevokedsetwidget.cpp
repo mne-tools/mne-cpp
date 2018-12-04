@@ -534,18 +534,18 @@ void RealTimeEvokedSetWidget::init()
                 pAverageSelectionView, &AverageSelectionView::setAverageColor);
 
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageColorMap,
-                m_pButterflyView, &ButterflyView::setAverageColor);
+                m_pButterflyView.data(), &ButterflyView::setAverageColor);
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageActivationMap,
-                m_pButterflyView, &ButterflyView::setAverageActivation);
+                m_pButterflyView.data(), &ButterflyView::setAverageActivation);
         connect(pAverageSelectionView, &AverageSelectionView::newAverageActivationMap,
                 m_pButterflyView.data(), &ButterflyView::setAverageActivation);
         connect(pAverageSelectionView, &AverageSelectionView::newAverageColorMap,
                 m_pButterflyView.data(), &ButterflyView::setAverageColor);
 
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageColorMap,
-                m_pAverageLayoutView, &AverageLayoutView::setAverageColor);
+                m_pAverageLayoutView.data(), &AverageLayoutView::setAverageColor);
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageActivationMap,
-                m_pAverageLayoutView, &AverageLayoutView::setAverageActivation);
+                m_pAverageLayoutView.data(), &AverageLayoutView::setAverageActivation);
         connect(pAverageSelectionView, &AverageSelectionView::newAverageActivationMap,
                 m_pAverageLayoutView.data(), &AverageLayoutView::setAverageActivation);
         connect(pAverageSelectionView, &AverageSelectionView::newAverageColorMap,
