@@ -173,6 +173,14 @@ void ProjectSettingsView::setRecordingElapsedTime(int mSecsElapsed)
 
 //*************************************************************************************************************
 
+QString ProjectSettingsView::getCurrentFileName()
+{
+    return m_sFileName;
+}
+
+
+//*************************************************************************************************************
+
 void ProjectSettingsView::deleteSubject()
 {
     QMessageBox msgBox;
@@ -386,9 +394,26 @@ void ProjectSettingsView::selectNewSubject(const QString &sNewSubject)
 
 //*************************************************************************************************************
 
-void ProjectSettingsView::updateFileName()
+void ProjectSettingsView::updateFileName(bool currentTime)
 {
-    ui->m_qLineEditFileName->setText(m_sDataPath);
+    QString sFilePath = m_sDataPath + "/" + m_sCurrentProject + "/" + m_sCurrentSubject;
+
+    QString sTimeStamp;
+
+    if(currentTime) {
+        sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
+    } else {
+        sTimeStamp = "<YYMMDD_HMS>";
+    }
+
+    if(m_sCurrentParadigm.isEmpty())
+        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_raw.fif");
+    else
+        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_" + m_sCurrentParadigm + "_raw.fif");
+
+    m_sFileName = sFilePath;
+
+    ui->m_qLineEditFileName->setText(m_sFileName);
 }
 
 

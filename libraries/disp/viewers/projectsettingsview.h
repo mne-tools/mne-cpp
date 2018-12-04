@@ -104,6 +104,7 @@ public:
     ~ProjectSettingsView();
 
     void setRecordingElapsedTime(int mSecsElapsed);
+    QString getCurrentFileName();
 
 private:
     void addProject();
@@ -120,7 +121,7 @@ private:
     void selectNewProject(const QString &sNewProject);
     void selectNewSubject(const QString &sNewSubject);
 
-    void updateFileName();
+    void updateFileName(bool currentTime = true);
 
     void onTimeChanged();
     void onRecordingTimerStateChanged(bool state);
@@ -134,6 +135,7 @@ private:
     QString             m_sCurrentProject;
     QString             m_sCurrentSubject;
     QString             m_sCurrentParadigm;
+    QString             m_sFileName;
 
     int                 m_iRecordingTime;       /**< recording time in ms.*/
 

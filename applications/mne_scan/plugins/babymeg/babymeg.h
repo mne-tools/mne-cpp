@@ -214,24 +214,6 @@ protected:
 
     //=========================================================================================================
     /**
-    * Returns the babyMEG file path which is to be written to.
-    *
-    * @param[in] currentTime    insert current time stamp.
-    *
-    * @return the storage filepath
-    */
-    QString getFilePath(bool currentTime = false) const;
-
-    //=========================================================================================================
-    /**
-    * Returns the path where the subjects folders are stored.
-    *
-    * @return the data path
-    */
-    QString getDataPath() const;
-
-    //=========================================================================================================
-    /**
     * Sets the Fiff Info.
     *
     * @param[in] p_FiffInfo    the Fiff Info.
@@ -324,35 +306,11 @@ protected:
 
     //=========================================================================================================
     /**
-    * Set the data path.
+    * Set the final file name including its full path.
     *
-    * @param[in] sDataPath   The new data path.
+    * @param[in] sFileName   The new file name.
     */
-    void setDataPath(const QString& sDataPath);
-
-    //=========================================================================================================
-    /**
-    * Set the project.
-    *
-    * @param[in] sCurrentProject   The new project.
-    */
-    void setProject(const QString& sCurrentProject);
-
-    //=========================================================================================================
-    /**
-    * Set the subject.
-    *
-    * @param[in] sCurrentSubject   The new subject.
-    */
-    void setSubject(const QString& sCurrentSubject);
-
-    //=========================================================================================================
-    /**
-    * Set the paradigm.
-    *
-    * @param[in] sCurrentParadigm   The new paradigm.
-    */
-    void setParadigm(const QString& sCurrentParadigm);
+    void setFileName(const QString& sFileName);
 
     //=========================================================================================================
     /**
@@ -459,10 +417,6 @@ protected:
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
     bool                                    m_bIsRunning;                   /**< If thread is running flag.*/
     bool                                    m_bDoContinousHPI;              /**< Whether to do continous HPI.*/
-    QString                                 m_sBabyMEGDataPath;             /**< The data storage path.*/
-    QString                                 m_sCurrentProject;              /**< The current project which is part of the filename to be recorded.*/
-    QString                                 m_sCurrentSubject;              /**< The current subject which is part of the filename to be recorded.*/
-    QString                                 m_sCurrentParadigm;             /**< The current paradigm which is part of the filename to be recorded.*/
     QString                                 m_sRecordFile;                  /**< Current record file. */
     QString                                 m_sFiffProjections;             /**< Fiff projection information */
     QString                                 m_sFiffCompensators;            /**< Fiff compensator information */

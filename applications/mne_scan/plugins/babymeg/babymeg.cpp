@@ -93,7 +93,6 @@ BabyMEG::BabyMEG()
 : m_iBlinkStatus(0)
 , m_iBufferSize(-1)
 , m_bWriteToFile(false)
-, m_sCurrentParadigm("")
 , m_bIsRunning(false)
 , m_bUseRecordTimer(false)
 , m_pRawMatrixBuffer(0)
@@ -195,24 +194,37 @@ QSharedPointer<IPlugin> BabyMEG::clone() const
 void BabyMEG::init()
 {
     //BabyMEGData Path
-    m_sBabyMEGDataPath = QDir::homePath() + "/BabyMEGData";
-    if(!QDir(m_sBabyMEGDataPath).exists()) {
-        QDir().mkdir(m_sBabyMEGDataPath);
+    QString sBabyMEGDataPath = QDir::homePath() + "/BabyMEGData";
+    if(!QDir(sBabyMEGDataPath).exists()) {
+        QDir().mkdir(sBabyMEGDataPath);
     }
 
     //Test Project
-    if(!QDir(m_sBabyMEGDataPath+"/TestProject").exists()) {
-        QDir().mkdir(m_sBabyMEGDataPath+"/TestProject");
-    }
-
     QSettings settings;
-    m_sCurrentProject = settings.value(QString("Plugin/%1/currentProject").arg(getName()), "TestProject").toString();
+    QString sCurrentProject = settings.value(QString("Plugin/%1/currentProject").arg(getName()), "TestProject").toString();
+    if(!QDir(sBabyMEGDataPath+"/"+sCurrentProject).exists()) {
+        QDir().mkdir(sBabyMEGDataPath+"/"+sCurrentProject);
+    }
 
     //Test Subject
-    if(!QDir(m_sBabyMEGDataPath+"/TestProject/TestSubject").exists()) {
-        QDir().mkdir(m_sBabyMEGDataPath+"/TestProject/TestSubject");
+    QString sCurrentSubject = settings.value(QString("Plugin/%1/currentSubject").arg(getName()), "TestSubject").toString();
+    if(!QDir(sBabyMEGDataPath+"/"+sCurrentProject+"/"+sCurrentSubject).exists()) {
+        QDir().mkdir(sBabyMEGDataPath+"/"+sCurrentProject+"/"+sCurrentSubject);
     }
-    m_sCurrentSubject = settings.value(QString("Plugin/%1/currentSubject").arg(getName()), "TestSubject").toString();
+
+    m_pProjectSettingsView = QSharedPointer<ProjectSettingsView>::create(sBabyMEGDataPath,
+                                                                         sCurrentProject,
+                                                                         sCurrentSubject,
+                                                                         "");
+
+    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::timerChanged,
+            this, &BabyMEG::setRecordingTimerChanged);
+
+    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::recordingTimerStateChanged,
+            this, &BabyMEG::setRecordingTimerStateChanged);
+
+    m_pProjectSettingsView->setWindowFlags(Qt::WindowStaysOnTopHint);
+    m_pProjectSettingsView->hide();
 
     //BabyMEG Inits
     m_pInfo = QSharedPointer<BabyMEGInfo>(new BabyMEGInfo());
@@ -326,8 +338,6 @@ QWidget* BabyMEG::setupWidget()
 
     BabyMEGSetupWidget* widget = new BabyMEGSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
-    //init dialog
-
     return widget;
 }
 
@@ -412,37 +422,6 @@ void BabyMEG::initConnector()
         m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG007"));
         m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG008"));
     }
-}
-
-
-//*************************************************************************************************************
-
-QString BabyMEG::getFilePath(bool currentTime) const
-{
-    QString sFilePath = m_sBabyMEGDataPath + "/" + m_sCurrentProject + "/" + m_sCurrentSubject;
-
-    QString sTimeStamp;
-
-    if(currentTime) {
-        sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
-    } else {
-        sTimeStamp = "<YYMMDD_HMS>";
-    }
-
-    if(m_sCurrentParadigm.isEmpty())
-        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_raw.fif");
-    else
-        sFilePath.append("/"+ sTimeStamp + "_" + m_sCurrentSubject + "_" + m_sCurrentParadigm + "_raw.fif");
-
-    return sFilePath;
-}
-
-
-//*************************************************************************************************************
-
-QString BabyMEG::getDataPath() const
-{
-    return m_sBabyMEGDataPath;
 }
 
 
@@ -707,33 +686,9 @@ void BabyMEG::setRecordingTimerStateChanged(bool state)
 
 //*************************************************************************************************************
 
-void BabyMEG::setDataPath(const QString& sDataPath)
+void BabyMEG::setFileName(const QString& sFileName)
 {
-    m_sBabyMEGDataPath = sDataPath;
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::setProject(const QString& sCurrentProject)
-{
-    m_sCurrentProject = sCurrentProject;
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::setSubject(const QString& sCurrentSubject)
-{
-    m_sCurrentSubject = sCurrentSubject;
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEG::setParadigm(const QString& sCurrentParadigm)
-{
-    m_sCurrentParadigm = sCurrentParadigm;
+    m_sRecordFile = sFileName;
 }
 
 
@@ -741,32 +696,9 @@ void BabyMEG::setParadigm(const QString& sCurrentParadigm)
 
 void BabyMEG::showProjectDialog()
 {
-    // Start Squid control widget
     if(!m_pProjectSettingsView) {
-        m_pProjectSettingsView = QSharedPointer<ProjectSettingsView>::create(m_sBabyMEGDataPath,
-                                                                             m_sCurrentProject,
-                                                                             m_sCurrentSubject,
-                                                                             m_sCurrentParadigm);
+        m_pProjectSettingsView->show();
     }
-
-    m_pProjectSettingsView->setWindowFlags(Qt::WindowStaysOnTopHint);
-
-    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::timerChanged,
-            this, &BabyMEG::setRecordingTimerChanged);
-
-    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::recordingTimerStateChanged,
-            this, &BabyMEG::setRecordingTimerStateChanged);
-
-    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::newParadigm,
-            this, &BabyMEG::setParadigm);
-
-    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::newProject,
-            this, &BabyMEG::setProject);
-
-    connect(m_pProjectSettingsView.data(), &ProjectSettingsView::newSubject,
-            this, &BabyMEG::setSubject);
-
-    m_pProjectSettingsView->show();
 }
 
 
@@ -848,7 +780,10 @@ void BabyMEG::toggleRecordingFile()
         }
 
         //Initiate the stream for writing to the fif file
-        m_sRecordFile = getFilePath(true);
+        if(m_pProjectSettingsView) {
+            m_sRecordFile = m_pProjectSettingsView->getCurrentFileName();
+        }
+
         m_qFileOut.setFileName(m_sRecordFile);
         if(m_qFileOut.exists()) {
             QMessageBox msgBox;
