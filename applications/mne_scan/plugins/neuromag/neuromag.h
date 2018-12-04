@@ -46,11 +46,11 @@
 #include "neuromag_global.h"
 
 #include <scShared/Interfaces/ISensor.h>
-#include <generics/circularbuffer_old.h>
-#include <generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <utils/generics/circularbuffer_old.h>
+#include <utils/generics/circularmatrixbuffer.h>
+#include <scMeas/realtimemultisamplearray.h>
 
-#include <rtClient/rtcmdclient.h>
+#include <communication/rtClient/rtcmdclient.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_stream.h>
@@ -216,6 +216,8 @@ public:
 
     virtual QWidget* setupWidget();
 
+    bool readProjectors();
+
     //=========================================================================================================
     /**
     * Change connector
@@ -269,12 +271,12 @@ private:
 //    float           m_fSamplingRate;                /**< The sampling rate.*/
 //    int             m_iDownsamplingFactor;          /**< The down sampling factor.*/
 
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_Neuromag;          /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSA_Neuromag;          /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QMutex                                  m_mutex;
     QString                                 m_sNeuromagClientAlias;         /**< The rt server client alias.*/
 
-    QSharedPointer<RTCLIENTLIB::RtCmdClient>m_pRtCmdClient;                 /**< The command client.*/
+    QSharedPointer<COMMUNICATIONLIB::RtCmdClient>m_pRtCmdClient;                 /**< The command client.*/
     bool                                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
 
     QString                                 m_sNeuromagIP;                  /**< The IP Adress of mne_rt_server.*/
