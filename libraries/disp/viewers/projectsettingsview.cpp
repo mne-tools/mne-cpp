@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
-* @file     babymegprojectdialog.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     projectsettingsview.cpp
+* @author   Lorenz Esch <lorenzesch@hotmail.com>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -9,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BabyMEGProjectDialog class definition.
+* @brief    Definition of the ProjectSettingsView Class.
 *
 */
 
@@ -39,21 +40,21 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "babymegprojectdialog.h"
-#include "ui_babymegprojectdialog.h"
-#include "../babymeg.h"
+#include "projectsettingsview.h"
+
+#include "ui_projectsettingsview.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QFileDialog>
-#include <QString>
 #include <QDir>
 #include <QDebug>
-#include <QSettings>
 #include <QInputDialog>
+#include <QMessageBox>
+#include <QTime>
 
 
 //*************************************************************************************************************
@@ -67,7 +68,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BABYMEGPLUGIN;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -75,10 +76,17 @@ using namespace BABYMEGPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
-: m_pBabyMEG(p_pBabyMEG)
-, QDialog(parent)
-, ui(new Ui::BabyMEGProjectDialog)
+ProjectSettingsView::ProjectSettingsView(const QString& sDataPath,
+                                         const QString& sCurrentProject,
+                                         const QString& sCurrentSubject,
+                                         const QString& sCurrentParadigm,
+                                         QWidget *parent)
+: QDialog(parent)
+, m_sDataPath(sDataPath)
+, m_sCurrentProject(sCurrentProject)
+, m_sCurrentSubject(sCurrentSubject)
+, m_sCurrentParadigm(sCurrentParadigm)
+, ui(new Ui::ProjectSettingsViewWidget)
 , m_iRecordingTime(5*60*1000)
 {
     ui->setupUi(this);
@@ -87,37 +95,37 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
     scanForSubjects();
 
     connect(ui->m_qComboBox_ProjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
-                this,&BabyMEGProjectDialog::selectNewProject);
+                this,&ProjectSettingsView::selectNewProject);
 
     connect(ui->m_qComboBox_SubjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
-                this,&BabyMEGProjectDialog::selectNewSubject);
+                this,&ProjectSettingsView::selectNewSubject);
 
     connect(ui->m_qLineEditParadigm,&QLineEdit::textChanged,
-                this,&BabyMEGProjectDialog::paradigmChanged);
+                this,&ProjectSettingsView::paradigmChanged);
 
     connect(ui->m_qPushButtonNewProject,&QPushButton::clicked,
-                this,&BabyMEGProjectDialog::addProject);
+                this,&ProjectSettingsView::addProject);
 
     connect(ui->m_qPushButtonNewSubject,&QPushButton::clicked,
-                this,&BabyMEGProjectDialog::addSubject);
+                this,&ProjectSettingsView::addSubject);
 
     connect(ui->m_qPushButtonDeleteProject,&QPushButton::clicked,
-                this,&BabyMEGProjectDialog::deleteProject);
+                this,&ProjectSettingsView::deleteProject);
 
     connect(ui->m_qPushButtonDeleteSubject,&QPushButton::clicked,
-                this,&BabyMEGProjectDialog::deleteSubject);
+                this,&ProjectSettingsView::deleteSubject);
 
     connect(ui->m_spinBox_hours, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                this,&BabyMEGProjectDialog::onTimeChanged);
+                this,&ProjectSettingsView::onTimeChanged);
 
     connect(ui->m_spinBox_min, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                this,&BabyMEGProjectDialog::onTimeChanged);
+                this,&ProjectSettingsView::onTimeChanged);
 
     connect(ui->m_spinBox_sec, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                this,&BabyMEGProjectDialog::onTimeChanged);
+                this,&ProjectSettingsView::onTimeChanged);
 
     connect(ui->m_checkBox_useRecordingTimer,&QCheckBox::toggled,
-                this,&BabyMEGProjectDialog::onRecordingTimerStateChanged);
+                this,&ProjectSettingsView::onRecordingTimerStateChanged);
 
     ui->m_qLineEditFileName->setReadOnly(true);
 
@@ -139,7 +147,7 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
 
 //*************************************************************************************************************
 
-BabyMEGProjectDialog::~BabyMEGProjectDialog()
+ProjectSettingsView::~ProjectSettingsView()
 {
     delete ui;
 }
@@ -147,7 +155,7 @@ BabyMEGProjectDialog::~BabyMEGProjectDialog()
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::setRecordingElapsedTime(int mSecsElapsed)
+void ProjectSettingsView::setRecordingElapsedTime(int mSecsElapsed)
 {
     QTime remainingTime(0,0,0,0);
 
@@ -165,7 +173,7 @@ void BabyMEGProjectDialog::setRecordingElapsedTime(int mSecsElapsed)
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::deleteSubject()
+void ProjectSettingsView::deleteSubject()
 {
     QMessageBox msgBox;
     msgBox.setText(QString("Deleting subject data '%1'.").arg(ui->m_qComboBox_SubjectSelection->currentText()));
@@ -192,7 +200,7 @@ void BabyMEGProjectDialog::deleteSubject()
         if(ret == QMessageBox::No)
             return;
 
-        QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_ProjectSelection->currentText() + "/" + ui->m_qComboBox_SubjectSelection->currentText();
+        QString dirName = m_sDataPath + "/" + ui->m_qComboBox_ProjectSelection->currentText() + "/" + ui->m_qComboBox_SubjectSelection->currentText();
 
         QDir dir(dirName);
 
@@ -208,7 +216,7 @@ void BabyMEGProjectDialog::deleteSubject()
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::deleteProject()
+void ProjectSettingsView::deleteProject()
 {
     QMessageBox msgBox;
     msgBox.setText(QString("Deleting project data '%1'.").arg(ui->m_qComboBox_ProjectSelection->currentText()));
@@ -235,7 +243,7 @@ void BabyMEGProjectDialog::deleteProject()
         if(ret == QMessageBox::No)
             return;
 
-        QString dirName = m_pBabyMEG->getDataPath() + "/" + ui->m_qComboBox_ProjectSelection->currentText();
+        QString dirName = m_sDataPath + "/" + ui->m_qComboBox_ProjectSelection->currentText();
 
         QDir dir(dirName);
 
@@ -251,7 +259,7 @@ void BabyMEGProjectDialog::deleteProject()
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::addProject()
+void ProjectSettingsView::addProject()
 {
     bool ok;
     QString sProject = QInputDialog::getText(this, tr("Add new Project"),
@@ -259,10 +267,11 @@ void BabyMEGProjectDialog::addProject()
                                               tr("NewProject"), &ok);
     if (ok && !sProject.isEmpty())
     {
-        if(!QDir(m_pBabyMEG->m_sBabyMEGDataPath+"/" + sProject).exists())
-            QDir().mkdir(m_pBabyMEG->m_sBabyMEGDataPath+"/"+sProject);
+        if(!QDir(m_sDataPath+"/" + sProject).exists())
+            QDir().mkdir(m_sDataPath+"/"+sProject);
 
-        m_pBabyMEG->m_sCurrentProject = sProject;
+        m_sCurrentProject = sProject;
+        emit newProject(m_sCurrentProject);
 
         scanForProjects();
     }
@@ -271,7 +280,7 @@ void BabyMEGProjectDialog::addProject()
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::addSubject()
+void ProjectSettingsView::addSubject()
 {
     bool ok;
     QString sSubject = QInputDialog::getText(this, tr("Add new Subject"),
@@ -280,10 +289,12 @@ void BabyMEGProjectDialog::addSubject()
 
     if (ok && !sSubject.isEmpty())
     {
-        if(!QDir(m_pBabyMEG->m_sBabyMEGDataPath + "/" + m_pBabyMEG->m_sCurrentProject + "/" + sSubject).exists())
-            QDir().mkdir(m_pBabyMEG->m_sBabyMEGDataPath + "/" + m_pBabyMEG->m_sCurrentProject + "/" + sSubject);
+        if(!QDir(m_sDataPath + "/" + m_sCurrentProject + "/" + sSubject).exists())
+            QDir().mkdir(m_sDataPath + "/" + m_sCurrentProject + "/" + sSubject);
 
-        m_pBabyMEG->m_sCurrentSubject = sSubject;
+        m_sCurrentSubject = sSubject;
+
+        emit newSubject(m_sCurrentSubject);
 
         scanForSubjects();
     }
@@ -292,22 +303,23 @@ void BabyMEGProjectDialog::addSubject()
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::paradigmChanged(const QString &newParadigm)
+void ProjectSettingsView::paradigmChanged(const QString &sNewParadigm)
 {
-    m_pBabyMEG->m_sCurrentParadigm = newParadigm;
+    m_sCurrentParadigm = sNewParadigm;
+    emit newParadigm(m_sCurrentParadigm);
     updateFileName();
 }
 
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::scanForProjects()
+void ProjectSettingsView::scanForProjects()
 {
     //clear
     ui->m_qComboBox_ProjectSelection->clear();
     m_sListProjects.clear();
 
-    QDir t_qDirData(m_pBabyMEG->m_sBabyMEGDataPath);
+    QDir t_qDirData(m_sDataPath);
 
     QFileInfoList t_qFileInfoList = t_qDirData.entryInfoList();
     QFileInfoList::const_iterator it;
@@ -316,19 +328,19 @@ void BabyMEGProjectDialog::scanForProjects()
             m_sListProjects.append(it->fileName());
 
     ui->m_qComboBox_ProjectSelection->insertItems(0,m_sListProjects);
-    ui->m_qComboBox_ProjectSelection->setCurrentIndex(ui->m_qComboBox_ProjectSelection->findText(m_pBabyMEG->m_sCurrentProject));
+    ui->m_qComboBox_ProjectSelection->setCurrentIndex(ui->m_qComboBox_ProjectSelection->findText(m_sCurrentProject));
 }
 
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::scanForSubjects()
+void ProjectSettingsView::scanForSubjects()
 {
     //clear
     ui->m_qComboBox_SubjectSelection->clear();
     m_sListSubjects.clear();
 
-    QDir t_qDirProject(m_pBabyMEG->m_sBabyMEGDataPath+"/"+m_pBabyMEG->m_sCurrentProject);
+    QDir t_qDirProject(m_sDataPath+"/"+m_sCurrentProject);
 
     QFileInfoList t_qFileInfoList = t_qDirProject.entryInfoList();
     QFileInfoList::const_iterator it;
@@ -338,7 +350,7 @@ void BabyMEGProjectDialog::scanForSubjects()
 
     ui->m_qComboBox_SubjectSelection->insertItems(0,m_sListSubjects);
 
-    qint32 idx = ui->m_qComboBox_SubjectSelection->findText(m_pBabyMEG->m_sCurrentSubject);
+    qint32 idx = ui->m_qComboBox_SubjectSelection->findText(m_sCurrentSubject);
     if(idx >= 0)
         ui->m_qComboBox_SubjectSelection->setCurrentIndex(idx);
     else
@@ -351,9 +363,10 @@ void BabyMEGProjectDialog::scanForSubjects()
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::selectNewProject(const QString &newProject)
+void ProjectSettingsView::selectNewProject(const QString &sNewProject)
 {
-    m_pBabyMEG->m_sCurrentProject = newProject;
+    m_sCurrentProject = sNewProject;
+    emit newProject(m_sCurrentProject);
 
     scanForSubjects();
     updateFileName();
@@ -362,9 +375,10 @@ void BabyMEGProjectDialog::selectNewProject(const QString &newProject)
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::selectNewSubject(const QString &newSubject)
+void ProjectSettingsView::selectNewSubject(const QString &sNewSubject)
 {
-    m_pBabyMEG->m_sCurrentSubject = newSubject;
+    m_sCurrentSubject = sNewSubject;
+    emit newSubject(m_sCurrentSubject);
 
     updateFileName();
 }
@@ -372,15 +386,15 @@ void BabyMEGProjectDialog::selectNewSubject(const QString &newSubject)
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::updateFileName()
+void ProjectSettingsView::updateFileName()
 {
-    ui->m_qLineEditFileName->setText(m_pBabyMEG->getFilePath());
+    ui->m_qLineEditFileName->setText(m_sDataPath);
 }
 
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::onTimeChanged()
+void ProjectSettingsView::onTimeChanged()
 {
     m_iRecordingTime = (ui->m_spinBox_hours->value()*60*60)+(ui->m_spinBox_min->value()*60)+(ui->m_spinBox_sec->value());
 
@@ -398,7 +412,7 @@ void BabyMEGProjectDialog::onTimeChanged()
 
 //*************************************************************************************************************
 
-void BabyMEGProjectDialog::onRecordingTimerStateChanged(bool state)
+void ProjectSettingsView::onRecordingTimerStateChanged(bool state)
 {
     emit recordingTimerStateChanged(state);
 }
