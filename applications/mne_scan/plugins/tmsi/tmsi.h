@@ -49,7 +49,7 @@
 #include "tmsi_global.h"
 
 #include <scShared/Interfaces/ISensor.h>
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 #include <scMeas/newrealtimemultisamplearray.h>
 
 #include <utils/layoutloader.h>

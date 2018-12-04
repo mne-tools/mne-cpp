@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the Neuromag class.
+* @brief    Definition of the Neuromag class.
 *
 */
 
@@ -84,12 +84,12 @@ Neuromag::Neuromag()
 : m_sNeuromagClientAlias("mne_scan")
 , m_pRtCmdClient(NULL)
 , m_bCmdClientIsConnected(false)
-, m_sNeuromagIP("141.35.69.116")//("127.0.0.1")
+, m_sNeuromagIP("172.21.16.88")//("127.0.0.1")
 , m_pNeuromagProducer(new NeuromagProducer(this))
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(0)
 , m_bIsRunning(false)
-, m_sFiffHeader(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/resources/neuromag/header.fif")
+, m_sFiffHeader(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/neuromag/header.fif")
 , m_iActiveConnectorId(0)
 , m_bWriteToFile(false)
 {
@@ -384,14 +384,14 @@ void Neuromag::initConnector()
 {
     if(m_pFiffInfo)
     {
-        m_pRTMSA_Neuromag = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtClient", "MNE Rt Client");
+        m_pRTMSA_Neuromag = PluginOutputData<RealTimeMultiSampleArray>::create(this, "Realtime", "MNE Rt Client");
 
         m_pRTMSA_Neuromag->data()->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSA_Neuromag->data()->setMultiArraySize(1);
 
         m_pRTMSA_Neuromag->data()->setVisibility(true);
 
-        m_pRTMSA_Neuromag->data()->setXMLLayoutFile("./mne_scan_plugins/resources/Neuromag/VectorViewLayout.xml");
+        m_pRTMSA_Neuromag->data()->setXMLLayoutFile("./resources/mne_scan/plugins/Neuromag/VectorViewLayout.xml");
 
         m_outputConnectors.append(m_pRTMSA_Neuromag);
     }
@@ -477,8 +477,9 @@ void Neuromag::connectCmdClient()
             if(!m_pFiffInfo)
                 requestInfo();
 
-            if(m_pFiffInfo)
-                readHeader();
+            // This will read projectors from an external file and replace the one received from mne_rt_server
+            //if(m_pFiffInfo)
+            //    readProjectors();
 
             //
             // Read Connectors
@@ -578,8 +579,15 @@ bool Neuromag::start()
 
         return true;
     }
-    else
+    else {
+        if(!m_pFiffInfo) {
+            qWarning()<<"Neuromag::start - FiffInfo is empty (NULL).";
+        }
+        if(!m_bCmdClientIsConnected) {
+            qWarning()<<"Neuromag::start - m_bCmdClientIsConnected is false.";
+        }
         return false;
+    }
 }
 
 
@@ -635,7 +643,7 @@ QWidget* Neuromag::setupWidget()
 
 //*************************************************************************************************************
 
-bool Neuromag::readHeader()
+bool Neuromag::readProjectors()
 {
     QFile t_headerFiffFile(m_sFiffHeader);
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimemultisamplearray_new_widget.h
+* @file     realtimesourceestimatewidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -44,10 +44,7 @@
 
 #include "scdisp_global.h"
 
-#include "newmeasurementwidget.h"
-
-#include "fs/annotationset.h"
-#include "fs/surfaceset.h"
+#include "measurementwidget.h"
 
 
 //*************************************************************************************************************
@@ -69,13 +66,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QTime;
-
 namespace DISP3DLIB {
     class MneEstimateTreeItem;
-    class View3D;
-    class Control3DWidget;
-    class Data3DTreeModel;
+    class SourceEstimateView;
 }
 
 namespace SCMEASLIB {
@@ -94,34 +87,18 @@ namespace SCDISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// SCDISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// ENUMERATIONS
-//=============================================================================================================
-
-////=============================================================================================================
-///**
-//* Tool enumeration.
-//*/
-//enum Tool
-//{
-//    Freeze     = 0,       /**< Freezing tool. */
-//    Annotation = 1        /**< Annotation tool. */
-//};
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeMultiSampleArrayNewWidget
+* DECLARE CLASS RealTimeSourceEstimateWidget
 *
-* @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
+* @brief The RealTimeSourceEstimateWidget class provides a real-time 3D source estimate display.
 */
 
-class SCDISPSHARED_EXPORT RealTimeSourceEstimateWidget : public NewMeasurementWidget
+class SCDISPSHARED_EXPORT RealTimeSourceEstimateWidget : public MeasurementWidget
 {
     Q_OBJECT
 
@@ -156,7 +133,7 @@ public:
     *
     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
     */
-    virtual void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -164,31 +141,12 @@ public:
     */
     virtual void init();
 
-protected slots:
-    //=========================================================================================================
-    /**
-    * Shows the 3D control widget
-    */
-    void show3DControlWidget();
-
 private:
-    QSharedPointer<SCMEASLIB::RealTimeSourceEstimate>   m_pRTSE;            /**< The real-time source estimate measurement. */
+    QSharedPointer<SCMEASLIB::RealTimeSourceEstimate>   m_pRTSE;                /**< The real-time source estimate measurement. */
+    QSharedPointer<DISP3DLIB::SourceEstimateView>       m_pSourceEstimateView;  /**< The 3D source estimate view. */
+    QPointer<DISP3DLIB::MneEstimateTreeItem>            m_pRtItem;              /**< The Disp3D real time items. */
 
-    bool                                                m_bInitialized;     /**< Whether init was processed successfully. */
-
-    FSLIB::AnnotationSet                                m_annotationSet;    /**< The current annotation set. */
-    FSLIB::SurfaceSet                                   m_surfSet;          /**< The current surface set. */
-
-    QSharedPointer<DISP3DLIB::View3D>                   m_p3DView;          /**< The Disp3D view. */
-    QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;   /**< The Disp3D control. */
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>          m_pData3DModel;     /**< The Disp3D model. */
-
-    DISP3DLIB::MneEstimateTreeItem*                     m_pRtItem;          /**< The Disp3D real time items. */
-
-    QAction*                                            m_pAction3DControl; /**< Show 3D View control widget */
-
-signals:
-    void startInit();
+    bool                                                m_bInitialized;         /**< Whether init was processed successfully. */
 };
 
 } // NAMESPACE

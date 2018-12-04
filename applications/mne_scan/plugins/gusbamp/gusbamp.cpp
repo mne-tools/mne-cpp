@@ -71,7 +71,7 @@ using namespace std;
 
 GUSBAmp::GUSBAmp()
 : m_pRTMSA_GUSBAmp(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/gusbamp/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/gusbamp/")
 , m_pRawMatrixBuffer_In(0)
 , m_pGUSBAmpProducer(new GUSBAmpProducer(this))
 , m_iNumberOfChannels(0)
@@ -165,11 +165,8 @@ void GUSBAmp::setUpFiffInfo()
             //Set channel type
             fChInfo.kind = FIFFV_EEG_CH;
 
-            //Set coil type
-            fChInfo.coil_type = FIFFV_COIL_EEG;
-
             //Set logno
-            fChInfo.logno = i;
+            fChInfo.logNo = i;
 
             //Set coord frame
             fChInfo.coord_frame = FIFFV_COORD_HEAD;

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the Averaging class.
+* @brief    Definition of the Averaging class.
 *
 */
 
@@ -40,19 +40,13 @@
 
 #include "averaging.h"
 #include "FormFiles/averagingsetupwidget.h"
-#include "FormFiles/averagingsettingswidget.h"
 
-#include <iostream>
-#include <time.h>
+#include <disp/viewers/averagingsettingsview.h>
 
 #include <scMeas/realtimeevokedset.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
+#include <rtprocessing/rtave.h>
 
 
 //*************************************************************************************************************
@@ -60,26 +54,18 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QtPlugin>
-#include <QMutexLocker>
-#include <QSettings>
-
-#include <QDebug>
-
-#include <QtWidgets>
-#include <QSpinBox>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace AveragingPlugin;
+using namespace AVERAGINGPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
 using namespace FIFFLIB;
+using namespace DISPLIB;
 using namespace RTPROCESSINGLIB;
 
 
@@ -89,22 +75,16 @@ using namespace RTPROCESSINGLIB;
 //=============================================================================================================
 
 Averaging::Averaging()
-: m_pAveragingInput(NULL)
-//, m_pAveragingOutput(NULL)
-, m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
-, m_bIsRunning(false)
+: m_bIsRunning(false)
 , m_bProcessData(false)
 , m_iPreStimSeconds(100)
 , m_iPostStimSeconds(400)
-, m_dArtifactThresholdFirst(250)
-, m_iArtifactThresholdSecond(-5)
+, m_dArtifactThresholdFirst(150)
+, m_iArtifactThresholdSecond(-6)
 , m_iBaselineFromSeconds(0)
 , m_iBaselineToSeconds(0)
 , m_iNumAverages(10)
-, m_iStimChan(0)
 , m_iAverageMode(0)
-, m_pAveragingWidget(AveragingSettingsWidget::SPtr())
-, m_pActionShowAdjustment(Q_NULLPTR)
 , m_bDoBaselineCorrection(false)
 , m_bDoArtifactThresholdReduction(false)
 , m_bDoArtifactVarianceReduction(false)
@@ -114,18 +94,8 @@ Averaging::Averaging()
 , m_iBaselineFromSamples(0)
 , m_iBaselineToSamples(0)
 , m_iStimChanIdx(0)
-#ifdef DEBUG_AVERAGING
-, m_iTestCount(0)
-, m_iTestCount2(0)
-#endif
+, m_iStimChan(0)
 {
-    m_pActionShowAdjustment = new QAction(QIcon(":/images/averagingadjustments.png"), tr("Averaging Adjustments"),this);
-//    m_pActionSetupProject->setShortcut(tr("F12"));
-    m_pActionShowAdjustment->setStatusTip(tr("Averaging Adjustments"));
-    connect(m_pActionShowAdjustment, &QAction::triggered, this, &Averaging::showAveragingWidget);
-    addPluginAction(m_pActionShowAdjustment);
-
-    m_pActionShowAdjustment->setVisible(false);
 }
 
 
@@ -151,9 +121,7 @@ QSharedPointer<IPlugin> Averaging::clone() const
 
 void Averaging::unload()
 {
-    //
     // Store Settings
-    //
     QSettings settings;
     settings.setValue(QString("Plugin/%1/preStimSeconds").arg(this->getName()), m_iPreStimSeconds);
     settings.setValue(QString("Plugin/%1/postStimSeconds").arg(this->getName()), m_iPostStimSeconds);
@@ -161,8 +129,8 @@ void Averaging::unload()
     settings.setValue(QString("Plugin/%1/baselineToSamples").arg(this->getName()), m_iBaselineToSamples);
 
     settings.setValue(QString("Plugin/%1/numAverages").arg(this->getName()), m_iNumAverages);
-    settings.setValue(QString("Plugin/%1/stimChannel").arg(this->getName()), m_iStimChan);
     settings.setValue(QString("Plugin/%1/stimChannelIdx").arg(this->getName()), m_iStimChanIdx);
+    settings.setValue(QString("Plugin/%1/stimChannel").arg(this->getName()), m_iStimChan);
     settings.setValue(QString("Plugin/%1/averageMode").arg(this->getName()), m_iAverageMode);
 
     settings.setValue(QString("Plugin/%1/doArtifactThresholdReduction").arg(this->getName()), m_bDoArtifactThresholdReduction);
@@ -177,17 +145,6 @@ void Averaging::unload()
     settings.setValue(QString("Plugin/%1/baselineFromSamples").arg(this->getName()), m_iBaselineFromSamples);
 
     settings.setValue(QString("Plugin/%1/doBaselineCorrection").arg(this->getName()), m_bDoBaselineCorrection);
-}
-
-
-//*************************************************************************************************************
-
-void Averaging::initConnector()
-{
-//    if(m_pFiffInfo)
-//    {
-
-//    }
 }
 
 
@@ -261,9 +218,9 @@ QWidget* Averaging::setupWidget()
 
 //*************************************************************************************************************
 
-void Averaging::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
         //Check if buffer initialized
@@ -274,47 +231,11 @@ void Averaging::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
-            emit fiffInfoAvailable();
-
-#ifdef DEBUG_AVERAGING
-            for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
-            {
-                if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
-                {
-                    m_iTestStimCh = i;
-                    break;
-                }
-            }
-#endif
         }
 
-
-        if(m_bProcessData)
-        {
-            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i)
-            {
+        if(m_bProcessData) {
+            for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 MatrixXd t_mat = pRTMSA->getMultiSampleArray()[i];
-
-#ifdef DEBUG_AVERAGING
-                qsrand(time(NULL)+m_iTestCount);
-
-                t_mat = MatrixXd::Zero(t_mat.rows(), t_mat.cols());
-
-                if(m_iTestCount%10 == 0)//GEN test stim
-                {
-                    qint32 samp = (qrand() % (t_mat.cols()/8))+1; //exclude buggy 0
-                    if(m_iTestCount2 % 5 == 0) // create zero every 5 generations
-                        samp = 0;
-                    RowVectorXd stim = RowVectorXd::Ones(8)*5;
-                    t_mat.block(m_iTestStimCh,samp,1,8) = stim;
-
-                    t_mat.block(0,samp+1,m_iTestStimCh, t_mat.cols()-(samp+1)) = MatrixXd::Ones(m_iTestStimCh, t_mat.cols()-(samp+1));
-
-                    //qDebug() << "Pos:" << samp;
-                    ++m_iTestCount2;
-                }
-                ++m_iTestCount;
-#endif
                 m_pAveragingBuffer->push(&t_mat);
             }
         }
@@ -326,9 +247,7 @@ void Averaging::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void Averaging::init()
 {
-    //
     // Load Settings
-    //
     QSettings settings;
     m_iPreStimSeconds = settings.value(QString("Plugin/%1/preStimSeconds").arg(this->getName()), 100).toInt();
     m_iPostStimSeconds = settings.value(QString("Plugin/%1/postStimSeconds").arg(this->getName()), 400).toInt();
@@ -342,19 +261,19 @@ void Averaging::init()
 
     m_bDoArtifactThresholdReduction = settings.value(QString("Plugin/%1/doArtifactThresholdReduction").arg(this->getName()), false).toBool();
     m_bDoArtifactVarianceReduction = settings.value(QString("Plugin/%1/doArtifactVarianceReduction").arg(this->getName()), false).toBool();
-    m_dArtifactThresholdFirst = settings.value(QString("Plugin/%1/artifactThresholdFirst").arg(this->getName()), 300).toDouble();
-    m_iArtifactThresholdSecond = settings.value(QString("Plugin/%1/artifactThresholdSecond").arg(this->getName()), -6).toInt();
+    m_dArtifactThresholdFirst = settings.value(QString("Plugin/%1/artifactThresholdFirst").arg(this->getName()), m_dArtifactThresholdFirst).toDouble();
+    m_iArtifactThresholdSecond = settings.value(QString("Plugin/%1/artifactThresholdSecond").arg(this->getName()), m_iArtifactThresholdSecond).toInt();
     m_dArtifactVariance = settings.value(QString("Plugin/%1/artifactVariance").arg(this->getName()), 3).toInt();
 
     m_iNumAverages = settings.value(QString("Plugin/%1/numAverages").arg(this->getName()), 10).toInt();
-    m_iStimChan = settings.value(QString("Plugin/%1/stimChannel").arg(this->getName()), 0).toInt();
     m_iStimChanIdx = settings.value(QString("Plugin/%1/stimChannelIdX").arg(this->getName()), 0).toInt();
     m_iAverageMode = settings.value(QString("Plugin/%1/averageMode").arg(this->getName()), 0).toInt();
+    m_iStimChan = settings.value(QString("Plugin/%1/stimChannel").arg(this->getName()), 0).toInt();
 
     m_bDoBaselineCorrection = settings.value(QString("Plugin/%1/doBaselineCorrection").arg(this->getName()), false).toBool();
 
     // Input
-    m_pAveragingInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
+    m_pAveragingInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
     connect(m_pAveragingInput.data(), &PluginInputConnector::notify, this, &Averaging::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pAveragingInput);
 
@@ -363,61 +282,106 @@ void Averaging::init()
     m_pAveragingOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pAveragingOutput);
 
-    //init channels when fiff info is available
-    connect(this, &Averaging::fiffInfoAvailable, this, &Averaging::initConnector);
+    //Add control widgets to output data (will be used by QuickControlView by the measurements display)
+    m_pAveragingSettingsView = AveragingSettingsView::SPtr::create(Q_NULLPTR,
+                                                                   m_pFiffInfo,
+                                                                   m_qListStimChs,
+                                                                   m_iStimChan,
+                                                                   m_iNumAverages,
+                                                                   m_iAverageMode,
+                                                                   m_iPreStimSeconds,
+                                                                   m_iPostStimSeconds,
+                                                                   m_bDoArtifactThresholdReduction,
+                                                                   m_bDoArtifactVarianceReduction,
+                                                                   m_dArtifactThresholdFirst,
+                                                                   m_iArtifactThresholdSecond,
+                                                                   m_dArtifactVariance,
+                                                                   m_bDoBaselineCorrection,
+                                                                   m_iBaselineFromSeconds,
+                                                                   m_iBaselineToSeconds);
 
-    //Delete Buffer - will be initialized with first incoming data
-    if(!m_pAveragingBuffer.isNull())
-        m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr();
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeNumAverages,
+            this, &Averaging::onChangeNumAverages);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeArtifactThreshold,
+            this, &Averaging::onChangeArtifactThreshold);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeArtifactVariance,
+            this, &Averaging::onChangeArtifactVariance);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeBaselineFrom,
+            this, &Averaging::onChangeBaselineFrom);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeBaselineTo,
+            this, &Averaging::onChangeBaselineTo);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changePostStim,
+            this, &Averaging::onChangePostStim);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changePreStim,
+            this, &Averaging::onChangePreStim);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeStimChannel,
+            this, &Averaging::onChangeStimChannel);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeArtifactThresholdReductionActive,
+            this, &Averaging::onChangeArtifactThresholdReductionActive);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeArtifactVarianceReductionActive,
+            this, &Averaging::onChangeArtifactVarianceReductionActive);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeArtifactVariance,
+            this, &Averaging::onChangeArtifactVariance);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeBaselineActive,
+            this, &Averaging::onChangeBaselineActive);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::resetAverage,
+            this, &Averaging::onResetAverage);
+    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeAverageMode,
+            this, &Averaging::onChangeAverageMode);
+
+    m_pAveragingOutput->data()->addControlWidget(m_pAveragingSettingsView);
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::changeNumAverages(qint32 numAve)
+void Averaging::onChangeNumAverages(qint32 numAve)
 {
     QMutexLocker locker(&m_qMutex);
     m_iNumAverages = numAve;
-    if(m_pRtAve)
+    if(m_pRtAve) {
         m_pRtAve->setAverages(numAve);
+    }
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::changeAverageMode(qint32 mode)
+void Averaging::onChangeAverageMode(qint32 mode)
 {
     QMutexLocker locker(&m_qMutex);
     m_iAverageMode = mode;
-    if(m_pRtAve)
+    if(m_pRtAve) {
         m_pRtAve->setAverageMode(mode);
+    }
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::changeStimChannel(qint32 index)
+void Averaging::onChangeStimChannel(qint32 index)
 {
-    Q_UNUSED(index)
     QMutexLocker locker(&m_qMutex);
-    m_iStimChan = m_pAveragingWidget->getStimChannelIdx();
+
     m_iStimChanIdx = m_qListStimChs.at(index);
+    m_iStimChan = m_pAveragingSettingsView->getStimChannelIdx();
 
     if(m_pRtAve) {
         m_pRtAve->setTriggerChIndx(m_iStimChanIdx);
     }
 
-//    qDebug() << "Averaging::changeStimChannel(qint32 index)" << m_pAveragingWidget->m_pComboBoxChSelection->currentData().toInt();
+//    qDebug() << "Averaging::changeStimChannel(qint32 index)" << m_pAveragingSettingsView->m_pComboBoxChSelection->currentData().toInt();
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::changePreStim(qint32 mseconds)
+void Averaging::onChangePreStim(qint32 mseconds)
 {
     QMutexLocker locker(&m_qMutex);
-    if(mseconds<10)
+    if(mseconds<10) {
         mseconds=10;
+    }
 
     m_iPreStimSeconds = mseconds;
     m_iPreStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
@@ -436,11 +400,12 @@ void Averaging::changePreStim(qint32 mseconds)
 
 //*************************************************************************************************************
 
-void Averaging::changePostStim(qint32 mseconds)
+void Averaging::onChangePostStim(qint32 mseconds)
 {
     QMutexLocker locker(&m_qMutex);
-    if(mseconds<10)
+    if(mseconds<10) {
         mseconds=10;
+    }
 
     m_iPostStimSeconds = mseconds;
     m_iPostStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
@@ -455,7 +420,7 @@ void Averaging::changePostStim(qint32 mseconds)
 
 //*************************************************************************************************************
 
-void Averaging::changeArtifactThreshold(double thresholdFirst, int thresholdSecond)
+void Averaging::onChangeArtifactThreshold(double thresholdFirst, int thresholdSecond)
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -470,7 +435,7 @@ void Averaging::changeArtifactThreshold(double thresholdFirst, int thresholdSeco
 
 //*************************************************************************************************************
 
-void Averaging::changeArtifactThresholdReductionActive(bool state)
+void Averaging::onChangeArtifactThresholdReductionActive(bool state)
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -484,35 +449,41 @@ void Averaging::changeArtifactThresholdReductionActive(bool state)
 
 //*************************************************************************************************************
 
-void Averaging::changeArtifactVariance(double dVariance)
+void Averaging::onChangeArtifactVariance(double dVariance)
 {
     QMutexLocker locker(&m_qMutex);
 
     m_dArtifactVariance = dVariance;
 
     if(m_pRtAve) {
-        m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction, m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond), m_bDoArtifactVarianceReduction, m_dArtifactVariance);
+        m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction,
+                                       m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond),
+                                       m_bDoArtifactVarianceReduction,
+                                       m_dArtifactVariance);
     }
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::changeArtifactVarianceReductionActive(bool state)
+void Averaging::onChangeArtifactVarianceReductionActive(bool state)
 {
     QMutexLocker locker(&m_qMutex);
 
     m_bDoArtifactVarianceReduction = state;
 
     if(m_pRtAve) {
-        m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction, m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond), m_bDoArtifactVarianceReduction, m_dArtifactVariance);
+        m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction,
+                                       m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond),
+                                       m_bDoArtifactVarianceReduction,
+                                       m_dArtifactVariance);
     }
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::changeBaselineFrom(qint32 fromMSeconds)
+void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
 {
     QMutexLocker locker(&m_qMutex);
     m_iBaselineFromSeconds = fromMSeconds;
@@ -528,7 +499,7 @@ void Averaging::changeBaselineFrom(qint32 fromMSeconds)
 
 //*************************************************************************************************************
 
-void Averaging::changeBaselineTo(qint32 toMSeconds)
+void Averaging::onChangeBaselineTo(qint32 toMSeconds)
 {
     QMutexLocker locker(&m_qMutex);
     m_iBaselineToSeconds = toMSeconds;
@@ -544,7 +515,7 @@ void Averaging::changeBaselineTo(qint32 toMSeconds)
 
 //*************************************************************************************************************
 
-void Averaging::changeBaselineActive(bool state)
+void Averaging::onChangeBaselineActive(bool state)
 {
     QMutexLocker locker(&m_qMutex);
     m_bDoBaselineCorrection = state;
@@ -557,48 +528,19 @@ void Averaging::changeBaselineActive(bool state)
 
 //*************************************************************************************************************
 
-void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet)
+void Averaging::appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet,
+                             const QStringList& lResponsibleTriggerTypes)
 {
-//    qDebug() << "";
-//    qDebug() << "Averaging::appendEvoked - p_pEvokedSet INFO:";
-//    qDebug() << "p_pEvokedSet->evoked.size():" << p_pEvokedSet->evoked.size();
-//    qDebug() << "";
-
-//    for(int i = 0; i < p_pEvokedSet->evoked.size(); ++i) {
-//        qDebug() << p_pEvokedSet->evoked.at(i).comment <<"rows x cols:" << p_pEvokedSet->evoked.at(i).data.rows() << "x" << p_pEvokedSet->evoked.at(i).data.cols() << "-" << p_pEvokedSet->evoked.at(i).nave << "averages";
-//        //std::cout << p_pEvokedSet->evoked.at(i).data.block(0,0,10,10);
-//    }
-
-    // << p_pEvoked->comment;
-//    qDebug() << p_pEvoked->comment;
-//    QString t_sStimulusChannel = m_pFiffInfo->chs[m_qListStimChs[m_iStimChan]].ch_name;
-
-//    if(p_pEvoked->comment == t_sStimulusChannel)
-//    {
-//        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
-        m_qMutex.lock();
-        m_qVecEvokedData.push_back(p_pEvokedSet);
-        m_qMutex.unlock();
-//        qDebug() << "append after" << m_qVecEvokedData.size();
-//    }
+    m_qMutex.lock();
+    m_qVecEvokedData.push_back(p_pEvokedSet);
+    m_lResponsibleTriggerTypes = lResponsibleTriggerTypes;
+    m_qMutex.unlock();
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::showAveragingWidget()
-{
-    QMutexLocker locker(&m_qMutex);
-    if(!m_pAveragingWidget)
-        m_pAveragingWidget = AveragingSettingsWidget::SPtr(new AveragingSettingsWidget(this));
-
-    m_pAveragingWidget->show();
-}
-
-
-//*************************************************************************************************************
-
-void Averaging::resetAverage(bool state)
+void Averaging::onResetAverage(bool state)
 {
     Q_UNUSED(state)
     QMutexLocker locker(&m_qMutex);
@@ -613,33 +555,42 @@ void Averaging::resetAverage(bool state)
 
 void Averaging::run()
 {
-    qDebug() << "START void Averaging::run()";
-    //
+    //qDebug() << "START void Averaging::run()";
     // Read Fiff Info
-    //
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
     m_iPreStimSamples = ((float)m_iPreStimSeconds/1000)*m_pFiffInfo->sfreq;
     m_iPostStimSamples = ((float)m_iPostStimSeconds/1000)*m_pFiffInfo->sfreq;
 
-    m_pActionShowAdjustment->setVisible(true);
-
-    for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i)
-    {
-        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
-        {
-            qDebug() << "Stim" << i << "Name" << m_pFiffInfo->chs[i].ch_name;
+    // Init the stim channels
+    for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i) {
+        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
+            //qDebug() << "Stim" << i << "Name" << m_pFiffInfo->chs[i].ch_name;
             m_qListStimChs.append(i);
         }
     }
 
+    m_pAveragingSettingsView->setStimChannels(m_pFiffInfo,
+                                        m_qListStimChs,
+                                        m_iStimChan);
+
+    // If initital stim channel index does not match current data choose the first one
+    if(!m_qListStimChs.contains(m_iStimChanIdx) &&
+       !m_qListStimChs.isEmpty()) {
+        m_iStimChanIdx = m_qListStimChs.first();
+    }
+
     m_bProcessData = true;
 
-    //
     // Init Real-Time average
-    //
-    m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages, m_iPreStimSamples, m_iPostStimSamples, m_iBaselineFromSeconds, m_iBaselineToSeconds, m_qListStimChs.at(m_iStimChan), m_pFiffInfo));
+    m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages,
+                                     m_iPreStimSamples,
+                                     m_iPostStimSamples,
+                                     m_iBaselineFromSeconds,
+                                     m_iBaselineToSeconds,
+                                     m_qListStimChs.at(m_iStimChan),
+                                     m_pFiffInfo));
     m_pRtAve->setBaselineFrom(m_iBaselineFromSamples, m_iBaselineFromSeconds);
     m_pRtAve->setBaselineTo(m_iBaselineToSamples, m_iBaselineToSeconds);
     m_pRtAve->setBaselineActive(m_bDoBaselineCorrection);
@@ -651,8 +602,7 @@ void Averaging::run()
 
     m_pRtAve->start();
 
-    while(true)
-    {
+    while(true) {
         {
             QMutexLocker locker(&m_qMutex);
             if(!m_bIsRunning)
@@ -665,22 +615,19 @@ void Averaging::run()
             doProcessing = m_bProcessData;
         }
 
-        if(doProcessing)
-        {
-            /* Dispatch the inputs */
+        if(doProcessing) {
+            // Dispatch the inputs
             MatrixXd rawSegment = m_pAveragingBuffer->pop();
 
             m_pRtAve->append(rawSegment);
 
             m_qMutex.lock();
-            if(m_qVecEvokedData.size() > 0)
-            {
+            if(m_qVecEvokedData.size() > 0) {
                 FiffEvokedSet t_fiffEvokedSet = *m_qVecEvokedData[0].data();
 
-#ifdef DEBUG_AVERAGING
-                std::cout << "EVK:" << t_fiffEvoked.data.row(0) << std::endl;
-#endif
-                m_pAveragingOutput->data()->setValue(t_fiffEvokedSet, m_pFiffInfo);
+                m_pAveragingOutput->data()->setValue(t_fiffEvokedSet,
+                                                     m_pFiffInfo,
+                                                     m_lResponsibleTriggerTypes);
 
                 m_qVecEvokedData.pop_front();
 
@@ -689,8 +636,6 @@ void Averaging::run()
 
         }
     }
-
-    m_pActionShowAdjustment->setVisible(false);
 
     m_pRtAve->stop();
 }

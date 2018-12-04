@@ -42,23 +42,23 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
 #include "bci_global.h"
 
-#include <mne_x/Interfaces/IAlgorithm.h>
-
-#include <generics/circularmatrixbuffer.h>
-
-#include <xMeas/newrealtimesamplearray.h>
-#include <xMeas/newrealtimemultisamplearray.h>
-#include <xMeas/realtimesourceestimate.h>
+#include <utils/generics/circularmatrixbuffer.h>
+#include <scShared/Interfaces/IAlgorithm.h>
+#include <scMeas/newrealtimesamplearray.h>
+#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimesourceestimate.h>
 
 #include <utils/filterTools/filterdata.h>
 
 #include <fstream>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// QT STL INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
@@ -67,12 +67,13 @@
 #include "FormFiles/bcisetupwidget.h"
 #include "FormFiles/bcifeaturewindow.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE BCIPLUGIN
 //=============================================================================================================
 
-namespace BCIPlugin
+namespace BCIPLUGIN
 {
 
 //*************************************************************************************************************
@@ -82,17 +83,6 @@ namespace BCIPlugin
 
 typedef QList< QList<double> > MyQList;
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNEX;
-using namespace XMEASLIB;
-using namespace IOBuffer;
-using namespace UTILSLIB;
-using namespace std;
-
 
 //=============================================================================================================
 /**
@@ -100,12 +90,12 @@ using namespace std;
 *
 * @brief The BCI class provides an EEG BCI.
 */
-class BCISHARED_EXPORT BCI : public IAlgorithm
+class BCISHARED_EXPORT BCI : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "bci.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "bci.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
+    Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
     friend class BCISetupWidget;
     friend class BCIFeatureWindow;
@@ -164,7 +154,7 @@ protected:
     *
     * @param [in] pMeasurement measurement object.
     */
-    void updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateSensor(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -172,7 +162,7 @@ protected:
     *
     * @param [in] pMeasurement measurement object.
     */
-    void updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -271,23 +261,23 @@ signals:
     void paintFeatures(MyQList features, bool bTrigerActivated);
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputOne;        /**< The first RealTimeSampleArray of the BCI output.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputTwo;        /**< The second RealTimeSampleArray of the BCI output.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputThree;      /**< The third RealTimeSampleArray of the BCI output.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputFour;       /**< The fourth RealTimeSampleArray of the BCI output.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputFive;       /**< The fifth RealTimeSampleArray of the BCI output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeSampleArray>::SPtr      m_pBCIOutputOne;        /**< The first RealTimeSampleArray of the BCI output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeSampleArray>::SPtr      m_pBCIOutputTwo;        /**< The second RealTimeSampleArray of the BCI output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeSampleArray>::SPtr      m_pBCIOutputThree;      /**< The third RealTimeSampleArray of the BCI output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeSampleArray>::SPtr      m_pBCIOutputFour;       /**< The fourth RealTimeSampleArray of the BCI output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeSampleArray>::SPtr      m_pBCIOutputFive;       /**< The fifth RealTimeSampleArray of the BCI output.*/
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
-    PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
 
-    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
-    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;    /**< Holds incoming source level data.*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;    /**< Holds incoming source level data.*/
 
-    QSharedPointer<FilterData>                          m_filterOperator;       /**< Holds filter with specified properties by the user.*/
+    QSharedPointer<UTILSLIB::FilterData>                          m_filterOperator;       /**< Holds filter with specified properties by the user.*/
 
     QSharedPointer<BCIFeatureWindow>                    m_BCIFeatureWindow;     /**< Holds pointer to BCIFeatureWindow for visualization purposes.*/
 
-    ofstream                m_outStreamDebug;                   /**< Outputstream to generate debug file.*/
+    std::ofstream                m_outStreamDebug;                   /**< Outputstream to generate debug file.*/
 
     bool                    m_bIsRunning;                       /**< Whether BCI is running.*/
     QString                 m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
@@ -296,7 +286,7 @@ private:
     QMutex                  m_qMutex;                           /**< QMutex to guarantee thread safety.*/
 
     // Sensor level
-    FiffInfo::SPtr          m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
+    SCMEASLIB::FiffInfo::SPtr          m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
     bool                    m_bFiffInfoInitialised_Sensor;      /**< Sensor level: Fiff information initialised. */
     bool                    m_bFillSensorWindowFirstTime;       /**< Sensor level: Flag if the working matrix m_mSlidingWindowSensor is being filled for the first time. */
     MatrixXd                m_matSlidingWindowSensor;           /**< Sensor level: Working (sliding) matrix, used to store data for feature calculation on sensor level. */

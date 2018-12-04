@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of FormulaEditor class.
+* @brief    Definition of FormulaEditor class.
 */
 
 //*************************************************************************************************************
@@ -206,19 +206,19 @@ void AtomPaintWindow::paint_signal(QList<qreal> valueList, QSize windowSize)
             i++;
         }
 
-        if(maxPos > fabs(maxNeg)) absMin = maxNeg;      // find absolute minimum of (maxPos, maxNeg)
+        if(maxPos > std::fabs(maxNeg)) absMin = maxNeg;      // find absolute minimum of (maxPos, maxNeg)
         else     absMin = maxPos;
 
         if(absMin != 0)                                 // absMin must not be zero
         {
             while(true)                                 // shift factor for decimal places?
             {
-                if(fabs(absMin) < 1)                    // if absMin > 1 , no shift of decimal places nescesary
+                if(std::fabs(absMin) < 1)                    // if absMin > 1 , no shift of decimal places nescesary
                 {
                     absMin = absMin * 10;
                     drawFactor++;                       // shiftfactor counter
                 }
-                if(fabs(absMin) >= 1) break;
+                if(std::fabs(absMin) >= 1) break;
             }
         }
 
@@ -848,7 +848,7 @@ double Formulaeditor::term(int& nPosition, QString& strCharacter)
       char_n(nPosition, strCharacter);
       vz = sign_factor(nPosition, strCharacter);
 
-      if ((t <= 0 && fabs(vz) <= 1) || (t <= 0 && vz != qint32(vz))) errorText = QString("Extraction of square root of negative numbers is not possible using dense matrix algebra.");
+      if ((t <= 0 && std::fabs(vz) <= 1) || (t <= 0 && vz != qint32(vz))) errorText = QString("Extraction of square root of negative numbers is not possible using dense matrix algebra.");
       else    t = pow(t,vz);
   }
   return t;
@@ -951,7 +951,7 @@ double Formulaeditor::factor(qint32& nPosition, QString& strCharacter)
                     f = factor(nPosition, strCharacter);
                     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     if (strFunktionUpper == "ABS")
-                        f = fabs(f);
+                        f = std::fabs(f);
                     else if (strFunktionUpper == "SQRT")
                         if (f >= 0)
                             f = sqrt(f);
@@ -1001,14 +1001,14 @@ double Formulaeditor::factor(qint32& nPosition, QString& strCharacter)
                     }
                     else if (strFunktionUpper == "ARCSIN")
                     {
-                        if (fabs(f) < 1)
+                        if (std::fabs(f) < 1.0)
                             f = asin(f);
                         else
                             wError = -1;
                     }
                     else if (strFunktionUpper == "ARCCOS")
                     {
-                        if (fabs(f) <= 1)
+                        if (std::fabs(f) <= 1.0)
                             f = acos(f);
                         else
                             wError = -1;
@@ -1023,14 +1023,14 @@ double Formulaeditor::factor(qint32& nPosition, QString& strCharacter)
                         f = ArSinh(f);                   
                     else if (strFunktionUpper == "ARCOSH")
                     {
-                        if (fabs(f) >= 1)
+                        if (std::fabs(f) >= 1.0)
                             f = ArCosh(f);
                         else
                             wError = -1;
                     }
                     else if (strFunktionUpper == "ARTANH")
                     {
-                        if (fabs(f) <= 1)
+                        if (std::fabs(f) <= 1.0)
                             f = ArTanh(f);
                         else
                             wError = -1;

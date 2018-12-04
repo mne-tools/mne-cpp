@@ -45,11 +45,11 @@
 #include "rtsss_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <generics/circularbuffer.h>
-#include <generics/circularmatrixbuffer.h>
+#include <utils/generics/circularbuffer.h>
+#include <utils/generics/circularmatrixbuffer.h>
 
-#include <scMeas/newrealtimesamplearray.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimesamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
@@ -145,7 +145,7 @@ public:
 
     virtual QWidget* setupWidget();
 
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     void setLinRR(int);
     void setLoutRR(int);
@@ -156,13 +156,13 @@ protected:
     virtual void run();
 
 private:
-//    PluginInputData<NewRealTimeSampleArray>::SPtr   m_pDummyInput;      /**< The RealTimeSampleArray of the DummyToolbox input.*/
-//    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pDummyOutput;    /**< The RealTimeSampleArray of the DummyToolbox output.*/
-    PluginInputData<NewRealTimeSampleArray>::SPtr   m_pRTSAInput;      /**< The RealTimeSampleArray of the RtSss input.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pRTSAOutput;    /**< The RealTimeSampleArray of the RtSss output.*/
+//    PluginInputData<RealTimeSampleArray>::SPtr   m_pDummyInput;      /**< The RealTimeSampleArray of the DummyToolbox input.*/
+//    PluginOutputData<RealTimeSampleArray>::SPtr  m_pDummyOutput;    /**< The RealTimeSampleArray of the DummyToolbox output.*/
+    PluginInputData<RealTimeSampleArray>::SPtr   m_pRTSAInput;      /**< The RealTimeSampleArray of the RtSss input.*/
+    PluginOutputData<RealTimeSampleArray>::SPtr  m_pRTSAOutput;    /**< The RealTimeSampleArray of the RtSss output.*/
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr      m_pRTMSAOutput;  /**< The RealTimeMultiSampleArray output.*/
+    PluginInputData<RealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
+    PluginOutputData<RealTimeMultiSampleArray>::SPtr      m_pRTMSAOutput;  /**< The RealTimeMultiSampleArray output.*/
 
 
     bool m_bIsRunning;      /**< If source lab is running */

@@ -45,29 +45,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="m_qGridLayout_main">
-     <item row="0" column="0">
-      <widget class="QGroupBox" name="m_qGroupBox_yourGroupBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>100</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Your group box</string>
-       </property>
-       <property name="flat">
-        <bool>false</bool>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Properties"/>
-      </widget>
-     </item>
      <item row="0" column="1" rowspan="2" colspan="2">
       <widget class="QGroupBox" name="m_qGroupBox_Information">
        <property name="title">

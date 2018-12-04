@@ -45,8 +45,8 @@
 #include "fiffsimulator_global.h"
 
 #include <scShared/Interfaces/ISensor.h>
-#include <generics/circularmatrixbuffer.h>
-#include <rtClient/rtcmdclient.h>
+#include <utils/generics/circularmatrixbuffer.h>
+#include <communication/rtClient/rtcmdclient.h>
 
 
 //*************************************************************************************************************
@@ -65,15 +65,15 @@
 //=============================================================================================================
 
 namespace SCMEASLIB {
-    class NewRealTimeMultiSampleArray;
+    class RealTimeMultiSampleArray;
 }
 
 namespace FIFFLIB {
     class FiffInfo;
 }
 
-namespace SCDISPLIB {
-    class HPIWidget;
+namespace DISP3DLIB {
+    class HpiView;
 }
 
 
@@ -103,7 +103,7 @@ class FiffSimulatorProducer;
 class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public SCSHAREDLIB::ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fiffsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fiffsimulator.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
@@ -227,13 +227,13 @@ protected:
     */
     void onContinousHPIToggled(bool bDoContinousHPI);
 
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<FiffSimulatorProducer>       m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
     QSharedPointer<IOBUFFER::RawMatrixBuffer>   m_pRawMatrixBuffer_In;      /**< Holds incoming raw data. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                /**< Fiff measurement info.*/
-    QSharedPointer<RTCLIENTLIB::RtCmdClient>    m_pRtCmdClient;             /**< The command client.*/
-    QSharedPointer<SCDISPLIB::HPIWidget>        m_pHPIWidget;               /**< HPI widget. */
+    QSharedPointer<COMMUNICATIONLIB::RtCmdClient>    m_pRtCmdClient;             /**< The command client.*/
+    QSharedPointer<DISP3DLIB::HpiView>          m_pHPIWidget;               /**< HPI widget. */
 
     QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
 

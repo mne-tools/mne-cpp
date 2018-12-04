@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneFiffExp Class.
+* @brief    Definition of the MneFiffExp Class.
 *
 */
 

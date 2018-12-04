@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the MneShowFiffSettings class.
+* @brief    Definition of the MneShowFiffSettings class.
 *
 */
 
@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "mne_show_fiff_settings.h"
+#include <stdio.h>
 
 
 //*************************************************************************************************************

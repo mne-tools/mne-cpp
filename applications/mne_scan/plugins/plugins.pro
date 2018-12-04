@@ -38,7 +38,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
+contains(MNECPP_CONFIG, buildBasicMneScanVersion) {
     message(Building basic MNE Scan version!)
     #Sensors
     SUBDIRS += \
@@ -58,6 +58,8 @@ contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
         # gusbamp \
         # eegosports \
         # brainamp \
+        # tmsi \
+        natus \
 
     #Algorithms
     SUBDIRS += \
@@ -68,39 +70,12 @@ contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
         averaging \
         covariance \
         noise \
-        #bci \
+        # bci \
         rtsss \
         rthpi \
         noisereduction \
         ssvepbci \
         neuronalconnectivity \
         reference
-
-    win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
-        contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE Scan FOR a 64bit system
-            exists(C:/Windows/System32/TMSiSDK.dll) {
-                message(Compiling MNE-X FOR a 64bit system: TMSI plugin configured! TMSi Driver found!)
-                SUBDIRS += tmsi
-            }
-        }
-        else {
-            exists(C:/Windows/SysWOW64/TMSiSDK32bit.dll) { #Compiling MNE Scan FOR a 32bit system ON a 64bit system
-                message(Compiling MNE-X FOR a 32bit system ON a 64bit system: TMSI plugin configured! TMSi Driver found!)
-                SUBDIRS += tmsi
-            }
-            else {
-                exists(C:/Windows/System32/TMSiSDK.dll) { #Compiling MNE Scan FOR a 32bit system ON a 32bit system
-                    message(Compiling MNE-X FOR a 32bit system ON a 32bit system: TMSI plugin configured! TMSi Driver found!)
-                    SUBDIRS += tmsi
-                }
-                else {
-                    message(TMSI plugin not configured! TMSi Driver not found!)
-                }
-            }
-        }
-    }
-    else {
-        message(TMSI plugin was not configured due to wrong OS (win32 needed)!)
-    }
 }
 

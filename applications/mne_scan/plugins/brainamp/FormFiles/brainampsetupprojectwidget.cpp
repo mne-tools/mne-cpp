@@ -235,8 +235,8 @@ void BrainAMPSetupProjectWidget::onCardinalComboBoxChanged()
 
 void BrainAMPSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath)
 {
-    QList<QVector<double> > elcLocation3D;
-    QList<QVector<double> > elcLocation2D;
+    QList<QVector<float> > elcLocation3D;
+    QList<QVector<float> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 
@@ -298,7 +298,7 @@ void BrainAMPSetupProjectWidget::changeOutputFile()
     QString path = QFileDialog::getSaveFileName(
                 this,
                 "Save to fif file",
-                "mne_scan_plugins/resources/brainamp/EEG_data_001_raw.fif",
+                "resources/mne_scan/plugins/brainamp/EEG_data_001_raw.fif",
                  tr("Fif files (*.fif)"));
 
     if(path==NULL){
@@ -316,7 +316,7 @@ void BrainAMPSetupProjectWidget::changeCap()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change EEG cap layout",
-                                                "mne_x_plugins/resources/tmsi/loc_files",
+                                                "resources/mne_scan/plugins/tmsi/loc_files",
                                                  tr("Electrode location files (*.elc)"));
 
     if(path==NULL){
@@ -334,7 +334,7 @@ void BrainAMPSetupProjectWidget::changeCardinalFile()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change cardinal file",
-                                                "mne_x_plugins/resources/tmsi/loc_files",
+                                                "resources/mne_scan/plugins/tmsi/loc_files",
                                                  tr("Electrode location files (*.elc)"));
 
     if(path==NULL)

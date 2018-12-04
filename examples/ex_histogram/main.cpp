@@ -49,8 +49,8 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <utils/mnemath.h>
-#include <dispCharts/bar.h>
-#include <dispCharts/spline.h>
+#include <disp/plots/bar.h>
+#include <disp/plots/spline.h>
 
 //includes for source localization data
 #include <fs/label.h>
@@ -59,8 +59,6 @@
 #include <fiff/fiff_evoked.h>
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
 
 
 //*************************************************************************************************************
@@ -88,10 +86,9 @@
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace std;
-using namespace DISPCHARTSLIB;
+using namespace DISPLIB;
 using namespace FSLIB;
 using namespace INVERSELIB;
-using namespace DISP3DLIB;
 using namespace UTILSLIB;
 
 
@@ -128,9 +125,9 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Histogram Example");
     parser.addHelpOption();
-    QCommandLineOption sampleFwdFileOption("fwd", "Path to forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption sampleCovFileOption("cov", "Path to covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QCommandLineOption sampleEvokedFileOption("ave", "Path to evoked <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption sampleFwdFileOption("fwd", "Path to forward solution <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption sampleCovFileOption("cov", "Path to covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption sampleEvokedFileOption("ave", "Path to evoked <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
     QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0");//3.0;//0.1;//3.0;
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
@@ -173,7 +170,7 @@ int main(int argc, char *argv[])
     if(t_Fwd.isEmpty())
         return 1;
 
-    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
 
     FiffCov noise_cov(t_fileCov);
 
@@ -231,16 +228,14 @@ int main(int argc, char *argv[])
     std::cout << "resultFrequency = " << resultFrequency << std::endl;
     qDebug()<<"HistCounts timer:"<<myTimerHistCounts.elapsed();
 
-    int precision = 2;             //format for the amount digits of coefficient shown in the Bar Histogram (does not affect Spline)
-
     //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other
     Spline* displayObj = new Spline("MNE-CPP Histogram Example (Spline)");
     //Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
 
     QTime myTimerHistogram;
     myTimerHistogram.start();
-    displayObj->setData(resultClassLimit, resultFrequency, precision);
-    QVector3D thresholdLines1(2.1e-10, 5.0e-8, 6.0e-7);
+    displayObj->setData(resultClassLimit, resultFrequency);
+    QVector3D thresholdLines1(2.1e-10f, 5.0e-8f, 6.0e-7f);
     displayObj->setThreshold(thresholdLines1);
 
     qDebug()<<"Histogram timer:"<<myTimerHistogram.elapsed();

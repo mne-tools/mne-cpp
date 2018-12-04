@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Install Qt 5.8
-sudo apt-get install -qq qt58base qt583d qt58svg qt58serialport qt58charts-no-lgpl
+# Install Qt 5.10.1
+sudo apt-get install -qq qt510base qt5103d qt510svg qt510serialport qt510charts-no-lgpl
 
 # Setup Qt environment
-source /opt/qt58/bin/qt58-env.sh
+source /opt/qt510/bin/qt510-env.sh

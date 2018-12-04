@@ -45,8 +45,8 @@
 #include "epidetect_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <utils/generics/circularmatrixbuffer.h>
+#include <scMeas/realtimemultisamplearray.h>
 #include "FormFiles/epidetectsetupwidget.h"
 #include "FormFiles/epidetectwidget.h"
 #include "calcmetric.h"
@@ -91,7 +91,7 @@ using namespace SCSHAREDLIB;
 class EPIDETECTSHARED_EXPORT Epidetect : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "epidetect.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "epidetect.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
@@ -125,9 +125,9 @@ public:
     /**
     * Udates the pugin with new (incoming) data.
     *
-    * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
+    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
     */
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
@@ -146,7 +146,7 @@ private:
     * @param[in] mat unprocessed data-set
     * @param[out] QPair containing the data-set without all unwanted channels and a QList containing the channel indices.
     */
-    QPair<Eigen::MatrixXd, QList<int>> prepareData(Eigen::MatrixXd mat);
+    QPair<Eigen::MatrixXd, QList<int> > prepareData(Eigen::MatrixXd mat);
 
     //=========================================================================================================
     /**
@@ -163,8 +163,8 @@ private:
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr                       m_pEpidetectBuffer;  /**< Holds incoming data.*/
 
-    PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pEpidetectInput;   /**< The NewRealTimeMultiSampleArray of the Epidetect input.*/
-    PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pEpidetectOutput;  /**< The NewRealTimeMultiSampleArray of the Epidetect output.*/
+    PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pEpidetectInput;   /**< The RealTimeMultiSampleArray of the Epidetect input.*/
+    PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pEpidetectOutput;  /**< The RealTimeMultiSampleArray of the Epidetect output.*/
 
     Eigen::VectorXd                                                    m_dvecEpiHistory;    /**< Contains seizure-detection history.*/
     Eigen::VectorXd                                                    m_dvecMuP2P;         /**< Contains membership-values for peak-to-peak magnitude.*/

@@ -58,9 +58,9 @@ using namespace MNEBROWSE;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
-//, m_qEvokedFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
+//, m_qFileRaw(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+//, m_qEventFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+//, m_qEvokedFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -115,11 +115,11 @@ void MainWindow::setupWindowWidgets()
     m_pChInfoWindow->hide();
 
     //Create selection manager window - QTDesigner used - see / FormFiles
-    m_pSelectionManagerWindowDock = new QDockWidget(this);
-    addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindowDock);
-    m_pSelectionManagerWindow = new SelectionManagerWindow(m_pSelectionManagerWindowDock, m_pChInfoWindow->getDataModel(), Qt::Widget);
-    m_pSelectionManagerWindowDock->setWidget(m_pSelectionManagerWindow);
-    m_pSelectionManagerWindowDock->hide();
+    m_pChannelSelectionViewDock = new QDockWidget(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pChannelSelectionViewDock);
+    m_pChannelSelectionView = new ChannelSelectionView(m_pChannelSelectionViewDock, m_pChInfoWindow->getDataModel(), Qt::Widget);
+    m_pChannelSelectionViewDock->setWidget(m_pChannelSelectionView);
+    m_pChannelSelectionViewDock->hide();
 
     //Create average manager window - QTDesigner used - see / FormFiles
     m_pAverageWindow = new AverageWindow(this, m_qEvokedFile);
@@ -164,32 +164,32 @@ void MainWindow::setupWindowWidgets()
             m_pAverageWindow, &AverageWindow::scaleAveragedData);
 
     //Hide non selected channels in the data view
-    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::showSelectedChannelsOnly,
+    connect(m_pChannelSelectionView, &ChannelSelectionView::showSelectedChannelsOnly,
             m_pDataWindow, &DataWindow::showSelectedChannelsOnly);
 
     //Connect selection manager with average manager
-    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::selectionChanged,
+    connect(m_pChannelSelectionView, &ChannelSelectionView::selectionChanged,
             m_pAverageWindow, &AverageWindow::channelSelectionManagerChanged);
 
     //Connect channel info window with raw data model, layout manager, average manager and the data window
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::fiffInfoChanged);
+            m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::fiffInfoChanged);
 
     connect(m_pDataWindow->getDataModel(), &RawModel::assignedOperatorsChanged,
-            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::assignedOperatorsChanged);
+            m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::assignedOperatorsChanged);
 
-    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::loadedLayoutMap,
-            m_pChInfoWindow->getDataModel().data(), &ChInfoModel::layoutChanged);
+    connect(m_pChannelSelectionView, &ChannelSelectionView::loadedLayoutMap,
+            m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::layoutChanged);
 
-    connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
-            m_pSelectionManagerWindow, &SelectionManagerWindow::setCurrentlyMappedFiffChannels);
+    connect(m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::channelsMappedToLayout,
+            m_pChannelSelectionView, &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
-    connect(m_pChInfoWindow->getDataModel().data(), &ChInfoModel::channelsMappedToLayout,
+    connect(m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::channelsMappedToLayout,
             m_pAverageWindow, &AverageWindow::setMappedChannelNames);
 
     //Connect selection manager with a new file loaded signal
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-            m_pSelectionManagerWindow, &SelectionManagerWindow::newFiffFileLoaded);
+            m_pChannelSelectionView, &ChannelSelectionView::newFiffFileLoaded);
 
     //Connect filter window with new file loaded signal
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
@@ -209,9 +209,9 @@ void MainWindow::setupWindowWidgets()
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pChInfoWindow->getDataModel()->fiffInfoChanged(m_pDataWindow->getDataModel()->m_pFiffInfo);
-        m_pChInfoWindow->getDataModel()->layoutChanged(m_pSelectionManagerWindow->getLayoutMap());
-        m_pSelectionManagerWindow->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
-        m_pSelectionManagerWindow->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pChInfoWindow->getDataModel()->layoutChanged(m_pChannelSelectionView->getLayoutMap());
+        m_pChannelSelectionView->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
+        m_pChannelSelectionView->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pFilterWindow->newFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pNoiseReductionWindow->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
     }
@@ -289,7 +289,7 @@ void MainWindow::createToolBar()
     QAction* showSelectionManager = new QAction(QIcon(":/Resources/Images/showSelectionManager.png"),tr("Toggle selection manager"), this);
     showSelectionManager->setStatusTip(tr("Toggle the selection manager"));
     connect(showSelectionManager, &QAction::triggered, this, [=](){
-        showWindow(m_pSelectionManagerWindowDock);
+        showWindow(m_pChannelSelectionViewDock);
     });
     toolBar->addAction(showSelectionManager);
 
@@ -364,7 +364,7 @@ void MainWindow::connectMenus()
         showWindow(m_pInformationWindow);
     });
     connect(ui->m_channelSelectionManagerAction, &QAction::triggered, this, [=](){
-        showWindow(m_pSelectionManagerWindowDock);
+        showWindow(m_pChannelSelectionViewDock);
     });
     connect(ui->m_averageWindowAction, &QAction::triggered, this, [=](){
         showWindow(m_pAverageWindow);
@@ -472,7 +472,7 @@ void MainWindow::openFile()
 {
     QString filename = QFileDialog::getOpenFileName(this,
                                                     QString("Open fiff data file"),
-                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif data files (*.fif)"));
 
     if(filename.isEmpty())
@@ -555,7 +555,7 @@ void MainWindow::writeFile()
 {
     QString filename = QFileDialog::getSaveFileName(this,
                                                     QString("Write fiff data file"),
-                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif data files (*.fif)"));
 
     if(filename.isEmpty()) {
@@ -613,7 +613,7 @@ void MainWindow::loadEvents()
 {
     QString filename = QFileDialog::getOpenFileName(this,
                                                     QString("Open fiff event data file"),
-                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
 
     if(filename.isEmpty())
@@ -647,7 +647,7 @@ void MainWindow::saveEvents()
 {
     QString filename = QFileDialog::getSaveFileName(this,
                                                     QString("Save fiff event data file"),
-                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
                                                     tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
     if(filename.isEmpty())
     {
@@ -671,7 +671,7 @@ void MainWindow::saveEvents()
 
 void MainWindow::loadEvoked()
 {
-    QString filename = QFileDialog::getOpenFileName(this,QString("Open evoked fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif evoked data files (*-ave.fif);;fif data files (*.fif)"));
+    QString filename = QFileDialog::getOpenFileName(this,QString("Open evoked fiff data file"),QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),tr("fif evoked data files (*-ave.fif);;fif data files (*.fif)"));
 
     if(filename.isEmpty())
     {

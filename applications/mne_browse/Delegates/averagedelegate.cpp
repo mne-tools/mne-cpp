@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of AverageDelegate of mne_browse
+* @brief    Definition of AverageDelegate of mne_browse
 *
 */
 

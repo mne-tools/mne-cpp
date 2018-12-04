@@ -89,7 +89,7 @@ using namespace Eigen;
 
 EEGoSports::EEGoSports()
 : m_pRMTSA_EEGoSports(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/eegosports/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/eegosports/")
 , m_pEEGoSportsProducer(new EEGoSportsProducer(this))
 , m_dLPAShift(0.01)
 , m_dRPAShift(0.01)
@@ -523,7 +523,7 @@ bool EEGoSports::start()
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_EEGoSports->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_EEGoSports->data()->setMultiArraySize(10);
+    m_pRMTSA_EEGoSports->data()->setMultiArraySize(1);
     m_pRMTSA_EEGoSports->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer

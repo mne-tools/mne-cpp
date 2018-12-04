@@ -45,19 +45,12 @@
 #include "covariance_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-#include <scMeas/realtimecov.h>
-#include <rtProcessing/rtcov.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// Eigen INCLUDES
 //=============================================================================================================
-
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_cov.h>
 
 
 //*************************************************************************************************************
@@ -65,34 +58,41 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
 #include <QVector>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE CovariancePlugin
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace CovariancePlugin
+namespace FIFFLIB {
+    class FiffCov;
+    class FiffInfo;
+}
+
+namespace RTPROCESSINGLIB {
+    class RtCov;
+}
+
+namespace SCMEASLIB {
+    class RealTimeMultiSampleArray;
+    class RealTimeCov;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE COVARIANCEPLUGIN
+//=============================================================================================================
+
+namespace COVARIANCEPLUGIN
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace IOBUFFER;
-using namespace RTPROCESSINGLIB;
-using namespace FIFFLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
+// COVARIANCEPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 class CovarianceSettingsWidget;
@@ -104,10 +104,10 @@ class CovarianceSettingsWidget;
 *
 * @brief The Covariance class provides a Covariance algorithm structure.
 */
-class COVARIANCESHARED_EXPORT Covariance : public IAlgorithm
+class COVARIANCESHARED_EXPORT Covariance : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "covariance.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "covariance.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
@@ -142,56 +142,49 @@ public:
     /**
     * Clone the plugin
     */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     virtual bool start();
     virtual bool stop();
 
-    virtual IPlugin::PluginType getType() const;
+    virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
     virtual QWidget* setupWidget();
 
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
-    void appendCovariance(FiffCov::SPtr p_pCovariance);
+    void appendCovariance(const FIFFLIB::FiffCov &p_pCovariance);
 
     void showCovarianceWidget();
 
     void changeSamples(qint32 samples);
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available
-    */
-    void fiffInfoAvailable();
-
 protected:
     virtual void run();
 
 private:
-    QMutex mutex;
+    QMutex      mutex;
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pCovarianceInput;     /**< The NewRealTimeMultiSampleArray of the Covariance input.*/
-    PluginOutputData<RealTimeCov>::SPtr                 m_pCovarianceOutput;    /**< The RealTimeCov of the Covariance output.*/
+    bool        m_bIsRunning;                       /**< If thread is running */
+    bool        m_bProcessData;                     /**< If data should be received for processing */
 
-    FiffInfo::SPtr  m_pFiffInfo;                                /**< Fiff measurement info.*/
+    qint32      m_iEstimationSamples;
 
-    CircularMatrixBuffer<double>::SPtr   m_pCovarianceBuffer;   /**< Holds incoming data.*/
+    QVector<FIFFLIB::FiffCov>   m_qVecCovData;      /**< Covariance data set */
 
-    RtCov::SPtr m_pRtCov;                       /**< Real-time covariance. */
+    QAction*                    m_pActionShowAdjustment;
 
-    QVector<FiffCov::SPtr>   m_qVecCovData;     /**< Covariance data set */
+    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;        /**< Fiff measurement info.*/
+    QSharedPointer<RTPROCESSINGLIB::RtCov>        m_pRtCov;           /**< Real-time covariance. */
 
-    bool m_bIsRunning;                          /**< If source lab is running */
-    bool m_bProcessData;                        /**< If data should be received for processing */
+    QSharedPointer<CovarianceSettingsWidget>        m_pCovarianceWidget;
 
-    qint32 m_iEstimationSamples;
+    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >  m_pCovarianceInput;     /**< The RealTimeMultiSampleArray of the Covariance input.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeCov> >              m_pCovarianceOutput;    /**< The RealTimeCov of the Covariance output.*/
 
-    QSharedPointer<CovarianceSettingsWidget> m_pCovarianceWidget;
+signals:
 
-    QAction* m_pActionShowAdjustment;
 };
 
 } // NAMESPACE

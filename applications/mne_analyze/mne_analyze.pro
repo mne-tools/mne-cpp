@@ -39,7 +39,10 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     libs \
+    extensions \
     mne_analyze \
-    extensions
 
-CONFIG += ordered
+# Specify dependencies because of packaging on MacOS
+libs.depends =
+extensions.depends = libs
+mne_analyze.depends = libs extensions

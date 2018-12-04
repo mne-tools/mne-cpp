@@ -68,7 +68,7 @@ using namespace TMSIPlugin;
 
 TMSI::TMSI()
 : m_pRMTSA_TMSI(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/tmsi/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/tmsi/")
 , m_pRawMatrixBuffer_In(0)
 , m_pTMSIProducer(new TMSIProducer(this))
 {
@@ -148,7 +148,7 @@ void TMSI::init()
     QDate date;
     m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
 
-    m_sElcFilePath = QString("./resources/3DLayouts/standard_waveguard128_duke.elc");
+    m_sElcFilePath = QString("./resources/general/3DLayouts/standard_waveguard128_duke.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
@@ -711,7 +711,7 @@ void TMSI::run()
                 //    QVector<float> impulseResponse(numberCoeff);
                 //    filterObject->createDynamicFilter(QString('LP'), numberCoeff, (float)0.3, impulseResponse);
 
-                //    ofstream outputFileStream("mne_scan_plugins/resources/tmsi/filterToolsTest.txt", ios::out);
+                //    ofstream outputFileStream("resources/mne_scan/plugins/tmsi/filterToolsTest.txt", ios::out);
 
                 //    outputFileStream << "impulseResponse:\n";
                 //    for(int i=0; i<impulseResponse.size(); i++)

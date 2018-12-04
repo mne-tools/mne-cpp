@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BCI class.
+* @brief    Definition of the BCI class.
 *
 */
 
@@ -74,7 +74,7 @@ using namespace std;
 //=============================================================================================================
 
 SsvepBci::SsvepBci()
-: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_scan_plugins/resources/ssvepbci/")
+: m_qStringResourcePath(qApp->applicationDirPath()+"resources/mne_scan/plugins/ssvepBCI/")
 , m_bProcessData(false)
 , m_dAlpha(0.25)
 , m_iNumberOfHarmonics(2)
@@ -142,32 +142,32 @@ void SsvepBci::init()
     connect(m_pRTSEInput.data(), &PluginInputConnector::notify, this, &SsvepBci::updateSource, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTSEInput);
 
-    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "BCIInSensor", "SourceLab sensor input data");
+    m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "BCIInSensor", "SourceLab sensor input data");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &SsvepBci::updateSensor, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
 //    // Output streams
-//    m_pBCIOutputOne = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data One");
+//    m_pBCIOutputOne = PluginOutputData<RealTimeSampleArray>::create(this, "ControlSignal", "BCI output data One");
 //    m_pBCIOutputOne->data()->setArraySize(1);
 //    m_pBCIOutputOne->data()->setName("Boundary");
 //    m_outputConnectors.append(m_pBCIOutputOne);
 
-//    m_pBCIOutputTwo = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Two");
+//    m_pBCIOutputTwo = PluginOutputData<RealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Two");
 //    m_pBCIOutputTwo->data()->setArraySize(1);
 //    m_pBCIOutputTwo->data()->setName("Left electrode var");
 //    m_outputConnectors.append(m_pBCIOutputTwo);
 
-//    m_pBCIOutputThree = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Three");
+//    m_pBCIOutputThree = PluginOutputData<RealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Three");
 //    m_pBCIOutputThree->data()->setArraySize(1);
 //    m_pBCIOutputThree->data()->setName("Right electrode var");
 //    m_outputConnectors.append(m_pBCIOutputThree);
 
-//    m_pBCIOutputFour = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Four");
+//    m_pBCIOutputFour = PluginOutputData<RealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Four");
 //    m_pBCIOutputFour->data()->setArraySize(1);
 //    m_pBCIOutputFour->data()->setName("Left electrode");
 //    m_outputConnectors.append(m_pBCIOutputFour);
 
-//    m_pBCIOutputFive = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Five");
+//    m_pBCIOutputFive = PluginOutputData<RealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Five");
 //    m_pBCIOutputFive->data()->setArraySize(1);
 //    m_pBCIOutputFive->data()->setName("Right electrode");
 //    m_outputConnectors.append(m_pBCIOutputFive);
@@ -281,10 +281,10 @@ QWidget* SsvepBci::setupWidget()
 
 //*************************************************************************************************************
 
-void SsvepBci::updateSensor(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void SsvepBci::updateSensor(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     // initialize the sample array which will be filled with raw data
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
     if(pRTMSA){
         //Check if buffer initialized
         m_qMutex.lock();
@@ -332,7 +332,7 @@ void SsvepBci::updateSensor(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void SsvepBci::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void SsvepBci::updateSource(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
 
     QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
@@ -340,15 +340,17 @@ void SsvepBci::updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
     {
         //Check if buffer initialized
         if(!m_pBCIBuffer_Source){
-            m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64,  pRTSE->getValue()->data.rows(), pRTSE->getValue()->data.cols()));
+            m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64,
+                                                                                                      pRTSE->getValue().first()->data.rows(),
+                                                                                                      pRTSE->getValue().first()->data.cols()));
         }
 
         if(m_bProcessData)
         {
-            MatrixXd t_mat(pRTSE->getValue()->data.rows(), pRTSE->getValue()->data.cols());
+            MatrixXd t_mat(pRTSE->getValue().first()->data.rows(), pRTSE->getValue().first()->data.cols());
 
-            for(unsigned char i = 0; i < pRTSE->getValue()->data.cols(); ++i)
-                t_mat.col(i) = pRTSE->getValue()->data.col(i);
+            for(unsigned char i = 0; i < pRTSE->getValue().first()->data.cols(); ++i)
+                t_mat.col(i) = pRTSE->getValue().first()->data.col(i);
 
             m_pBCIBuffer_Source->push(&t_mat);
         }

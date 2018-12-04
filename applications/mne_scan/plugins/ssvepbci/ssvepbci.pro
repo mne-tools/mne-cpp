@@ -51,8 +51,7 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fsd \
@@ -61,8 +60,7 @@ CONFIG(debug, debug|release) {
             -lscSharedd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Fs \
@@ -101,6 +99,17 @@ FORMS += \
         FormFiles/ssvepbciaboutwidget.ui \
         FormFiles/ssvepbciconfigurationwidget.ui \
 
+RESOURCE_FILES +=\
+    $${ROOT_DIR}/resources/mne_scan/plugins/ssvepBCI/AccuracyResults.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ssvepBCI/BCIDebugFile.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ssvepBCI/beep.wav \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ssvepBCI/Pinning_Scheme_Duke_128.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ssvepBCI/Pinning_Scheme_Duke_Dry_64.txt \
+
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
@@ -126,3 +135,23 @@ RESOURCES += \
         ssvepbci.qrc
 
 DISTFILES +=
+
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the Music class.
+* @brief    Definition of the Music class.
 *
 */
 
@@ -58,7 +58,7 @@
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/model/items/sourceactivity/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -174,10 +174,10 @@ QWidget *Music::getView()
 
 void Music::calculate()
 {
-    QString fwdFileOption("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QString evokedFileOption("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QString fwdFileOption(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QString evokedFileOption(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QString subjectOption("sample");
-    QString subjectDirectoryOption("./MNE-sample-data/subjects");
+    QString subjectDirectoryOption(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
 
     QString t_sFileNameStc("");//"RapMusic.stc");
     QString annotOption("aparc.a2009s");
@@ -226,7 +226,7 @@ void Music::calculate()
 
     int iWinSize = 200;
     if(doMovie) {
-        t_rapMusic.setStcAttr(iWinSize, 0.6);
+        t_rapMusic.setStcAttr(iWinSize, 0.6f);
     }
 
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
@@ -267,7 +267,7 @@ void Music::calculate()
 //        pRTDataItem->setLoopState(true);
 //        pRTDataItem->setTimeInterval(17);
 //        pRTDataItem->setNumberAverages(1);
-//        pRTDataItem->setStreamingActive(true);
+//        pRTDataItem->setStreamingState(true);
 //        pRTDataItem->setNormalization(QVector3D(0.01,0.5,1.0));
 //        pRTDataItem->setVisualizationType("Annotation based");
 //        pRTDataItem->setColortable("Hot");

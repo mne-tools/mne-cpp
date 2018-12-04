@@ -50,13 +50,13 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lscMeasd \
             -lscDispd \
             -lscSharedd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lscMeas \
             -lscDisp \
             -lscShared
@@ -83,6 +83,17 @@ FORMS += \
         FormFiles/ecgsetup.ui \
         FormFiles/ecgabout.ui
 
+RESOURCE_FILES +=\
+    $${ROOT_DIR}/resources/mne_scan/plugins/ECGSimulator/readme.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ECGSimulator/data/ECG_I_256_s30661.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ECGSimulator/data/ECG_II_256_s30661.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ECGSimulator/data/ECG_III_256_s30661.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/ECGSimulator/data/ecgdata.txt \
+
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
@@ -99,3 +110,23 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
+
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}
