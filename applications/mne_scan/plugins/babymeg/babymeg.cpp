@@ -46,8 +46,6 @@
 #include "babymegclient.h"
 #include "babymeginfo.h"
 
-#include <iostream>
-
 #include <utils/ioutils.h>
 #include <utils/detecttrigger.h>
 #include <fiff/fiff_types.h>
@@ -62,15 +60,6 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QtCore/QtPlugin>
-#include <QtCore/QTextStream>
-#include <QtCore/QFile>
-
-#include <QList>
-#include <QDebug>
-#include <QDir>
-#include <QDateTime>
 
 #include <QQuaternion>
 
@@ -207,16 +196,22 @@ void BabyMEG::init()
 {
     //BabyMEGData Path
     m_sBabyMEGDataPath = QDir::homePath() + "/BabyMEGData";
-    if(!QDir(m_sBabyMEGDataPath).exists())
+    if(!QDir(m_sBabyMEGDataPath).exists()) {
         QDir().mkdir(m_sBabyMEGDataPath);
+    }
+
     //Test Project
-    if(!QDir(m_sBabyMEGDataPath+"/TestProject").exists())
+    if(!QDir(m_sBabyMEGDataPath+"/TestProject").exists()) {
         QDir().mkdir(m_sBabyMEGDataPath+"/TestProject");
+    }
+
     QSettings settings;
     m_sCurrentProject = settings.value(QString("Plugin/%1/currentProject").arg(getName()), "TestProject").toString();
+
     //Test Subject
-    if(!QDir(m_sBabyMEGDataPath+"/TestProject/TestSubject").exists())
+    if(!QDir(m_sBabyMEGDataPath+"/TestProject/TestSubject").exists()) {
         QDir().mkdir(m_sBabyMEGDataPath+"/TestProject/TestSubject");
+    }
     m_sCurrentSubject = settings.value(QString("Plugin/%1/currentSubject").arg(getName()), "TestSubject").toString();
 
     //BabyMEG Inits
@@ -500,18 +495,18 @@ void BabyMEG::setFiffInfo(const FiffInfo& p_FiffInfo)
 
 //*************************************************************************************************************
 
-void BabyMEG::setFiffData(QByteArray DATA)
+void BabyMEG::setFiffData(QByteArray data)
 {
     //get the first byte -- the data format
-    int dformat = DATA.left(1).toInt();
+    int dformat = data.left(1).toInt();
 
-    DATA.remove(0,1);
+    data.remove(0,1);
     qint32 rows = m_pFiffInfo->nchan;
-    qint32 cols = (DATA.size()/dformat)/rows;
+    qint32 cols = (data.size()/dformat)/rows;
 
     qDebug() << "[BabyMEG] Matrix " << rows << "x" << cols << " [Data bytes:" << dformat << "]";
 
-    MatrixXf rawData(Map<MatrixXf>( (float*)DATA.data(),rows, cols ));
+    MatrixXf rawData(Map<MatrixXf>( (float*)data.data(),rows, cols ));
 
     for(qint32 i = 0; i < rows*cols; ++i)
         IOUtils::swap_floatp(rawData.data()+i);
@@ -525,7 +520,7 @@ void BabyMEG::setFiffData(QByteArray DATA)
         m_pRawMatrixBuffer->push(&rawData);
     }
 
-    emit DataToSquidCtrlGUI(rawData);
+    emit dataToSquidCtrlGUI(rawData);
 }
 
 
@@ -535,7 +530,7 @@ void BabyMEG::setCMDData(QByteArray DATA)
 {
     qDebug()<<"------"<<DATA;
 //    m_commandManager["FLL"].reply(DATA);
-    emit SendCMDDataToSQUIDControl(DATA);
+    emit sendCMDDataToSQUIDControl(DATA);
     qDebug()<<"Data has been received.";
 }
 

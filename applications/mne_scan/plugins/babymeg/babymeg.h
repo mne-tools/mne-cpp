@@ -57,10 +57,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QVector>
-#include <QTimer>
-#include <QMutex>
+#include <QMessageBox>
+#include <QScrollBar>
+#include <QTime>
 
 
 //*************************************************************************************************************
@@ -503,7 +502,7 @@ signals:
     *
     * @param[in] tmp    data to squid control
     */
-    void DataToSquidCtrlGUI(Eigen::MatrixXf tmp);
+    void dataToSquidCtrlGUI(Eigen::MatrixXf tmp);
 
     //=========================================================================================================
     /**
@@ -511,7 +510,7 @@ signals:
     *
     * @param[in] DATA    data to squid control
     */
-    void SendCMDDataToSQUIDControl(QByteArray DATA);
+    void sendCMDDataToSQUIDControl(QByteArray DATA);
 };
 
 } // NAMESPACE
