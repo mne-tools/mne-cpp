@@ -210,10 +210,6 @@ void ChannelDataView::setBackgroundColor(const QColor& backgroundColor)
 {
     m_backgroundColor = backgroundColor;
 
-    if(m_pDelegate) {
-        m_pDelegate->setBackgroundColor(backgroundColor);
-    }
-
 //    QPalette pal;
 //    pal.setColor(QPalette::Window, backgroundColor);
 //    m_pTableView->viewport()->setPalette(pal);
