@@ -42,7 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/circularbuffer_old.h>
 
 
 //*************************************************************************************************************
@@ -76,7 +75,6 @@ namespace NEUROMAGPLUGIN
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace IOBUFFER;
 using namespace COMMUNICATIONLIB;
 
 
@@ -157,7 +155,7 @@ private:
 
     QMutex m_mutex;
 
-    Neuromag* m_pNeuromag;    /**< Holds a pointer to corresponding Neuromag.*/
+    Neuromag*   m_pNeuromag;    /**< Holds a pointer to corresponding Neuromag.*/
     bool        m_bIsRunning;       /**< Whether NeuromagProducer is running.*/
 
     QSharedPointer<RtDataClient> m_pRtDataClient;   /**< The data client.*/
