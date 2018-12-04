@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>644</height>
+    <height>491</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -35,65 +35,7 @@
    <item>
     <layout class="QVBoxLayout" name="m_verticalLayout_base">
      <item>
-      <widget class="QPushButton" name="m_pushButton_minimize">
-       <property name="text">
-        <string>Minimize</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <layout class="QGridLayout" name="m_gridLayout_main">
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="m_groupBox_windowOptions">
-         <property name="title">
-          <string>Window options</string>
-         </property>
-         <layout class="QFormLayout" name="formLayout_2">
-          <item row="1" column="0">
-           <widget class="QLabel" name="m_label_opacity">
-            <property name="text">
-             <string>Window opacity:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QSlider" name="m_horizontalSlider_opacity">
-            <property name="minimum">
-             <number>25</number>
-            </property>
-            <property name="maximum">
-             <number>100</number>
-            </property>
-            <property name="pageStep">
-             <number>1</number>
-            </property>
-            <property name="value">
-             <number>90</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QCheckBox" name="m_checkBox_alwaysOnTop">
-            <property name="text">
-             <string>Always on top</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
        <item row="0" column="0">
         <widget class="QTreeView" name="m_treeView_loadedData">
          <property name="sizePolicy">
@@ -122,7 +64,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="1" column="0">
         <widget class="QGroupBox" name="m_groupBox_viewOptions">
          <property name="title">
           <string>View options</string>
@@ -163,10 +105,17 @@
             </property>
            </widget>
           </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="QPushButton" name="m_pushButton_takeScreenshot">
+            <property name="text">
+             <string>Take screenshot</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="2" column="0">
         <widget class="QGroupBox" name="m_groupBox_lightOptions">
          <property name="title">
           <string>Light options</string>

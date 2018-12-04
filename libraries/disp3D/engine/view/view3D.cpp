@@ -56,12 +56,16 @@
 
 #include <QPropertyAnimation>
 #include <QKeyEvent>
+#include <QDate>
+#include <QTime>
+#include <QDir>
 
 #include <Qt3DCore/QTransform>
 #include <Qt3DCore/QAspectEngine>
 #include <Qt3DRender/QCamera>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DRender/QPointLight>
+#include <Qt3DRender/QRenderCapture>
 #include <Qt3DExtras/QCylinderGeometry>
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DRender/QRenderSettings>
@@ -89,16 +93,20 @@ View3D::View3D()
 , m_p3DObjectsEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pLightEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pCamera(this->camera())
+, m_pCapture(new Qt3DRender::QRenderCapture)
 {
+    //Root entity
+    this->setRootEntity(m_pRootEntity);
+
+    //FrameGraph
     m_pFrameGraph = new CustomFrameGraph();
-    init();
-}
+    m_pFrameGraph->setParent(m_pCapture);
+    m_pFrameGraph->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 1.0));
+    this->setActiveFrameGraph(m_pCapture);
 
+    //Only render new frames when needed
+    this->renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::OnDemand);
 
-//*************************************************************************************************************
-
-void View3D::init()
-{
     initLight();
 
     m_pCamera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
@@ -106,21 +114,13 @@ void View3D::init()
     m_pCamera->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
     m_pCamera->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
     m_pCamera->tiltAboutViewCenter(180);
+    m_pFrameGraph->setCamera(m_pCamera);
 
     OrbitalCameraController *pCamController = new OrbitalCameraController(m_pRootEntity);
     pCamController->setCamera(m_pCamera);
 
-    //FrameGraph
-    m_pFrameGraph->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 0.5));
-    m_pFrameGraph->setCamera(m_pCamera);
-
     createCoordSystem(m_pRootEntity);
     toggleCoordAxis(false);
-
-    this->setRootEntity(m_pRootEntity);
-    this->setActiveFrameGraph(m_pFrameGraph);
-    //Only render new frames when needed
-    this->renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::OnDemand);
 }
 
 
@@ -182,47 +182,6 @@ void View3D::setSceneColor(const QColor& colSceneColor)
 
 //*************************************************************************************************************
 
-void View3D::startModelRotationRecursive(QObject* pObject)
-{
-    //TODO this won't work with QEntities
-    if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(pObject)) {
-        QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
-        anim->setDuration(30000);
-        anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
-        anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
-        anim->setLoopCount(-1);
-        anim->start();
-        m_lPropertyAnimations << anim;
-    }
-
-    for(int i = 0; i < pObject->children().size(); ++i) {
-        startModelRotationRecursive(pObject->children().at(i));
-    }
-}
-
-
-//*************************************************************************************************************
-
-void View3D::startStopModelRotation(bool checked)
-{
-    if(checked) {
-        //Start animation
-        m_lPropertyAnimations.clear();
-
-        for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
-            startModelRotationRecursive(m_p3DObjectsEntity->children().at(i));
-        }
-    }
-    else {
-        for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
-            m_lPropertyAnimations.at(i)->stop();
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
 void View3D::toggleCoordAxis(bool checked)
 {
     m_pCoordSysEntity->setEnabled(checked);
@@ -259,6 +218,48 @@ void View3D::setLightIntensity(double value)
     for(int i = 0; i < m_lLightSources.size(); ++i) {
         m_lLightSources.at(i)->setIntensity(value);
     }
+}
+
+
+//*************************************************************************************************************
+
+void View3D::takeScreenshot()
+{
+    if(!m_pCapture) {
+        return;
+    }
+
+    m_pReply = m_pCapture->requestCapture();
+
+    QObject::connect(m_pReply.data(), &Qt3DRender::QRenderCaptureReply::completed,
+                     this, &View3D::saveScreenshot);
+}
+
+
+//*************************************************************************************************************
+
+void View3D::saveScreenshot()
+{
+    if(!m_pReply) {
+        return;
+    }
+
+    // Create file name
+    QString sDate = QDate::currentDate().toString("yyyy_MM_dd");
+    QString sTime = QTime::currentTime().toString("hh_mm_ss");
+
+    if(!QDir("./Screenshots").exists()) {
+        QDir().mkdir("./Screenshots");
+    }
+
+    QString fileName = QString("./Screenshots/%1-%2-View3D.bmp").arg(sDate).arg(sTime);
+    QImage image = m_pReply->image();
+
+    bool flag = image.save(fileName);
+    qDebug() << "image.rect()" << image.rect();
+    qDebug() << "flag" << flag;
+
+    delete m_pReply;
 }
 
 
@@ -327,3 +328,41 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
 
 
 //*************************************************************************************************************
+
+void View3D::startModelRotationRecursive(QObject* pObject)
+{
+    //TODO this won't work with QEntities
+    if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(pObject)) {
+        QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
+        anim->setDuration(30000);
+        anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
+        anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
+        anim->setLoopCount(-1);
+        anim->start();
+        m_lPropertyAnimations << anim;
+    }
+
+    for(int i = 0; i < pObject->children().size(); ++i) {
+        startModelRotationRecursive(pObject->children().at(i));
+    }
+}
+
+
+//*************************************************************************************************************
+
+void View3D::startStopModelRotation(bool checked)
+{
+    if(checked) {
+        //Start animation
+        m_lPropertyAnimations.clear();
+
+        for(int i = 0; i < m_p3DObjectsEntity->children().size(); ++i) {
+            startModelRotationRecursive(m_p3DObjectsEntity->children().at(i));
+        }
+    }
+    else {
+        for(int i = 0; i < m_lPropertyAnimations.size(); ++i) {
+            m_lPropertyAnimations.at(i)->stop();
+        }
+    }
+}
