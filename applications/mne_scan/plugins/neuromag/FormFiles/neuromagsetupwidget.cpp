@@ -102,9 +102,6 @@ NeuromagSetupWidget::NeuromagSetupWidget(Neuromag* p_pNeuromag, QWidget* parent)
     connect(ui.m_qPushButton_About, &QPushButton::released,
             this, &NeuromagSetupWidget::showAboutDialog);
 
-//    //SQUID Control
-//    connect(ui.m_qPushButton_SQUIDControl, &QPushButton::released, this, &NeuromagSetupWidget::SQUIDControlDialog);
-
     this->init();
 }
 
