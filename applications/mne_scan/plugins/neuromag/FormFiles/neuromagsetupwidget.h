@@ -130,13 +130,6 @@ private:
     */
     void showAboutDialog();
 
-//    //=========================================================================================================
-//    /**
-//    * Shows the SQUID Control Dialog
-//    *
-//    */
-//    void SQUIDControlDialog();
-
     Neuromag*                       m_pNeuromag;    /**< a pointer to corresponding mne rt client.*/
 
     Ui::NeuromagSetupWidgetClass    ui;             /**< the user interface for the NeuromagSetupWidget.*/
