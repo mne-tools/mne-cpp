@@ -555,7 +555,7 @@ void RealTimeEvokedSetWidget::init()
         m_pButterflyView->setModel(m_pEvokedSetModel);
         m_pButterflyView->setAverageActivation(pqMapAverageActivation);
         m_pButterflyView->setAverageColor(pqMapAverageColor);
-        m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
+        m_pButterflyView->setModel(m_pChannelInfoModel);
         m_pButterflyView->setScaleMap(qMapChScaling);
         m_pButterflyView->setModalityMap(qMapModalities);
         m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
@@ -566,7 +566,7 @@ void RealTimeEvokedSetWidget::init()
         m_pAverageLayoutView->setModel(m_pEvokedSetModel);
         m_pAverageLayoutView->setAverageActivation(pqMapAverageActivation);
         m_pAverageLayoutView->setAverageColor(pqMapAverageColor);
-        m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
+        m_pAverageLayoutView->setModel(m_pChannelInfoModel);
         m_pAverageLayoutView->setScaleMap(qMapChScaling);
         m_pAverageLayoutView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
 

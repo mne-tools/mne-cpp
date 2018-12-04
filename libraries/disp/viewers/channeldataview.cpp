@@ -58,7 +58,6 @@
 #include <QMenu>
 #include <QSvgGenerator>
 #include <QOpenGLWidget>
-#include <QGLWidget>
 
 
 //*************************************************************************************************************
@@ -85,10 +84,7 @@ ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
 , m_bHideBadChannels(false)
 {
     // TODO: Try to use QOpenGLWidget instead
-//    QOpenGLWidget* gl = new QOpenGLWidget();
-//    QSurfaceFormat fmt;
-//    fmt.setSamples(8);
-//    gl->setFormat(fmt);
+    QOpenGLWidget* gl = new QOpenGLWidget(0, Qt::Widget);
 
 //    QPalette pal;
 //    pal.setColor(QPalette::Window, Qt::white);
@@ -99,26 +95,25 @@ ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
 //    gl->update();
 //    gl->setStyleSheet("");
 
-    QGLFormat fmt(QGL::SampleBuffers);
-    fmt.setSamples(4);
+//    QGLFormat fmt(QGL::SampleBuffers);
+//    fmt.setSamples(4);
 
-    QGLWidget* gl = new QGLWidget(fmt);
+//    QGLWidget* gl = new QGLWidget(fmt);
 
     m_pTableView = new QTableView;
     m_pTableView->setViewport(gl);
+    m_pTableView->setWindowFlag(Qt::CustomizeWindowHint, true);
 
     //Install event filter for tracking mouse movements
     m_pTableView->viewport()->installEventFilter(this);
     m_pTableView->setMouseTracking(true);
 
-    //set vertical layout
+    //Set layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
-    neLayout->setContentsMargins(0,0,0,0);
-
+    //neLayout->setContentsMargins(0,0,0,0);
     neLayout->addWidget(m_pTableView);
 
-    //set layouts
-    this->setLayout(neLayout);
+    //this->setLayout(neLayout);
 }
 
 
@@ -214,9 +209,14 @@ bool ChannelDataView::eventFilter(QObject *object, QEvent *event)
 void ChannelDataView::setBackgroundColor(const QColor& backgroundColor)
 {
     m_backgroundColor = backgroundColor;
-    QPalette pal;
-    pal.setColor(QPalette::Window, backgroundColor);
-    m_pTableView->viewport()->setPalette(pal);
+
+    if(m_pDelegate) {
+        m_pDelegate->setBackgroundColor(backgroundColor);
+    }
+
+//    QPalette pal;
+//    pal.setColor(QPalette::Window, backgroundColor);
+//    m_pTableView->viewport()->setPalette(pal);
 
     // QGLWidegt and QOpenGLWidegt do not properly work with QStyleSheet
 //    m_pTableView->viewport()->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
