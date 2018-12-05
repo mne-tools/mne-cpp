@@ -52,7 +52,6 @@
 #include <QWidget>
 #include <QPointer>
 #include <QMap>
-#include <QOpenGLWidget>
 
 
 //*************************************************************************************************************
@@ -93,7 +92,7 @@ class ChannelInfoModel;
 *
 * @brief The AverageLayoutView class provides a widget for a 2D average layout
 */
-class DISPSHARED_EXPORT AverageLayoutView : public QOpenGLWidget
+class DISPSHARED_EXPORT AverageLayoutView : public QWidget
 {
     Q_OBJECT
 

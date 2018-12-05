@@ -59,6 +59,7 @@
 #include <QSvgGenerator>
 #include <QDebug>
 #include <QGraphicsItem>
+#include <QOpenGLWidget>
 
 
 //*************************************************************************************************************
@@ -77,18 +78,14 @@ using namespace FIFFLIB;
 
 AverageLayoutView::AverageLayoutView(QWidget *parent,
                                      Qt::WindowFlags f)
-: QOpenGLWidget(parent, f)
+: QWidget(parent, f)
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 {
     this->setWindowTitle("Average Layout");
 
-//    // Activate anti aliasing
-//    QSurfaceFormat fmt;
-//    fmt.setSamples(4);
-//    this->setFormat(fmt);
-
     m_pAverageLayoutView = new QGraphicsView();
+    m_pAverageLayoutView->setViewport(new QOpenGLWidget);
     m_pAverageLayoutView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_pAverageLayoutView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
