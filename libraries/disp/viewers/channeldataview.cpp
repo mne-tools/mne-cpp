@@ -57,7 +57,7 @@
 #include <QTableView>
 #include <QMenu>
 #include <QSvgGenerator>
-#include <QOpenGLWidget>
+#include <QGLWidget>
 
 
 //*************************************************************************************************************
@@ -83,39 +83,22 @@ ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
 , m_fZoomFactor(1.0f)
 , m_bHideBadChannels(false)
 {
-    // TODO: Try to use QOpenGLWidget instead
-    QOpenGLWidget* gl = new QOpenGLWidget(0, Qt::Widget);
-
-//    QPalette pal;
-//    pal.setColor(QPalette::Window, Qt::white);
-//    gl->setAutoFillBackground(true);
-//    gl->setPalette(pal);
-//    gl->setAttribute(Qt::WA_OpaquePaintEvent,false);
-//    gl->setAttribute(Qt::WA_NoSystemBackground,false);
-//    gl->update();
-//    gl->setStyleSheet("");
-
-//    QGLFormat fmt(QGL::SampleBuffers);
-//    fmt.setSamples(4);
-
-//    QGLWidget* gl = new QGLWidget(fmt);
-
+    // Use QGLWidget for rendering the table view.
+    // Unfortunatley, QOpenGLWidget is not able to change the background color, which is a must for this ChanalDataViewer.
     m_pTableView = new QTableView;
-    qDebug() << "m_pTableView->viewport()->size() before" << m_pTableView->viewport()->size();
-    m_pTableView->setViewport(gl);
-    qDebug() << "m_pTableView->viewport()->size() after" << m_pTableView->viewport()->size();
-    m_pTableView->setWindowFlag(Qt::CustomizeWindowHint, true);
+    QGLFormat currentFormat = QGLFormat(QGL::SampleBuffers);
+    currentFormat.setSamples(10);
+    QGLWidget* pGLWidget = new QGLWidget(currentFormat);
+    m_pTableView->setViewport(pGLWidget);
 
-    //Install event filter for tracking mouse movements
+    // Install event filter for tracking mouse movements
     m_pTableView->viewport()->installEventFilter(this);
     m_pTableView->setMouseTracking(true);
 
-    //Set layout
+    // Set layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
-    //neLayout->setContentsMargins(0,0,0,0);
     neLayout->addWidget(m_pTableView);
-
-    //this->setLayout(neLayout);
+    this->setLayout(neLayout);
 }
 
 
@@ -212,12 +195,10 @@ void ChannelDataView::setBackgroundColor(const QColor& backgroundColor)
 {
     m_backgroundColor = backgroundColor;
 
-//    QPalette pal;
-//    pal.setColor(QPalette::Window, backgroundColor);
-//    m_pTableView->viewport()->setPalette(pal);
-
-    // QGLWidegt and QOpenGLWidegt do not properly work with QStyleSheet
-//    m_pTableView->viewport()->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
+    QPalette pal;
+    pal.setColor(QPalette::Window, m_backgroundColor);
+    m_pTableView->viewport()->setPalette(pal);
+    m_pTableView->viewport()->setBackgroundRole(QPalette::Window);
 }
 
 
@@ -278,7 +259,7 @@ void ChannelDataView::hideBadChannels()
             m_pTableView->hideRow(m_qListBadChannels.at(i));
         } else {
             m_pTableView->showRow(m_qListBadChannels.at(i));
-            }
+        }
     }
 
     //Update the visible channel list which are to be filtered

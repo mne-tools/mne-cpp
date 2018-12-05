@@ -265,6 +265,7 @@ void createPaths(const QModelIndex &index,
 void ChannelDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     float t_fPlotHeight = option.rect.height();
+    painter->setRenderHint(QPainter::Antialiasing, true);
 
     switch(index.column()) {
         case 0: { //chnames
@@ -308,7 +309,6 @@ void ChannelDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
             {
                 QPainterPath path(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
 
-                painter->setRenderHint(QPainter::Antialiasing, true);
 
                 //Plot marker
 //                createMarkerPath(option, path);
