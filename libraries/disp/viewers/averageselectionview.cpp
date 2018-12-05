@@ -167,7 +167,7 @@ void AverageSelectionView::update()
 
         //Create average color pushbutton
         QColor color = itr.value();
-        QPointer<QPushButton> pButton = new QPushButton();
+        QPointer<QPushButton> pButton = new QPushButton("Click to change");
         pButton->setObjectName(itr.key());
         pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
         topLayout->addWidget(pButton, count, 1);

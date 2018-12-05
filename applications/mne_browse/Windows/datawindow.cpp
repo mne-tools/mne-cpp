@@ -204,14 +204,14 @@ void DataWindow::initMVCSettings()
     //-----------------------------------
     //------ Init data window view ------
     //-----------------------------------
-    //Set MVC model
-    ui->m_tableView_rawTableView->setModel(m_pRawModel);
-
     //Use GPU rendering
     QGLFormat currentFormat = QGLFormat(QGL::SampleBuffers);
-    currentFormat.setSamples(6);
+    currentFormat.setSamples(10);
     QGLWidget* pGLWidget = new QGLWidget(currentFormat);
     ui->m_tableView_rawTableView->setViewport(pGLWidget);
+
+    //Set MVC model
+    ui->m_tableView_rawTableView->setModel(m_pRawModel);
 
     //Set MVC delegate
     m_pRawDelegate = new RawDelegate(this);
