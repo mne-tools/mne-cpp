@@ -128,7 +128,5 @@ int main(int argc, char *argv[])
 
     splash.finish(mainWindow);
 
-    a.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
-
     return a.exec();
 }
