@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Raw File Setup</string>
+   <string>Project Settings</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>

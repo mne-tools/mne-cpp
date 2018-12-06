@@ -406,7 +406,7 @@ void DacqServer::run()
                                 a = 1.0;
                         }
                         for (qint32 ns = 0; ns < m_pNeuromag->m_uiBufferSampleSize; ns++)
-                            (*t_pMatrix)(ch,ns) = a * m_pNeuromag->m_info.chs[ch].cal * m_pNeuromag->m_info.chs[ch].range * data32[nchan*ns+ch];
+                            (*t_pMatrix)(ch,ns) = a * /*m_pNeuromag->m_info.chs[ch].cal * m_pNeuromag->m_info.chs[ch].range **/ data32[nchan*ns+ch];
                     }
 
                     m_pNeuromag->m_pRawMatrixBuffer->push(t_pMatrix);

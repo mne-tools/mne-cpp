@@ -246,6 +246,14 @@ protected:
 
     //=========================================================================================================
     /**
+    * Calibrate matrix.
+    *
+    * @param[out] data  the data matrix
+    */
+    Eigen::MatrixXd calibrate(const Eigen::MatrixXf& data);
+
+    //=========================================================================================================
+    /**
     * change recording button.
     */
     void changeRecordingButton();

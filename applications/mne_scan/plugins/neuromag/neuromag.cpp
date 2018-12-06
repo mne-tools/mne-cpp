@@ -146,7 +146,7 @@ QSharedPointer<SCSHAREDLIB::IPlugin> Neuromag::clone() const
 void Neuromag::init()
 {
     //Neuromag data Path
-    QString sNeuromagDataPath = QDir::homePath() + "/BabyMEGData";
+    QString sNeuromagDataPath = QDir::homePath() + "/NeuromagData";
     if(!QDir(sNeuromagDataPath).exists()) {
         QDir().mkdir(sNeuromagDataPath);
     }
@@ -168,6 +168,7 @@ void Neuromag::init()
                                                                          sCurrentProject,
                                                                          sCurrentSubject,
                                                                          "");
+    m_sRecordFile = m_pProjectSettingsView->getCurrentFileName();
 
     connect(m_pProjectSettingsView.data(), &ProjectSettingsView::timerChanged,
             this, &Neuromag::setRecordingTimerChanged);
@@ -202,7 +203,7 @@ void Neuromag::unload()
 
 void Neuromag::showProjectDialog()
 {
-    if(!m_pProjectSettingsView) {
+    if(m_pProjectSettingsView) {
         m_pProjectSettingsView->show();
     }
 }
@@ -284,31 +285,17 @@ void Neuromag::toggleRecordingFile()
                 return;
         }
 
-        //Add the calibration factors
-        m_cals = RowVectorXd(m_pFiffInfo->nchan);
-        m_cals.setZero();
-        for (qint32 k = 0; k < m_pFiffInfo->nchan; ++k) {
-            m_cals[k] = m_pFiffInfo->chs[k].range*m_pFiffInfo->chs[k].cal;
-        }
-
         //Set all projectors to zero before writing to file because we always write the raw data
         for(int i = 0; i<m_pFiffInfo->projs.size(); i++) {
             m_pFiffInfo->projs[i].active = false;
         }
 
-        //Initialize the data and calibration vector
-        typedef Eigen::Triplet<double> T;
-        std::vector<T> tripletList;
-        tripletList.reserve(m_pFiffInfo->nchan);
-        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
-            tripletList.push_back(T(i, i, this->m_cals[i]));
-        }
-
-        m_sparseMatCals = SparseMatrix<double>(m_pFiffInfo->nchan, m_pFiffInfo->nchan);
-        m_sparseMatCals.setFromTriplets(tripletList.begin(), tripletList.end());
-
         m_mutex.lock();
-        m_pOutfid = FiffStream::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals, defaultMatrixXi, true);
+        m_pOutfid = FiffStream::start_writing_raw(m_qFileOut,
+                                                  *m_pFiffInfo,
+                                                  m_cals,
+                                                  defaultMatrixXi,
+                                                  true);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
         m_mutex.unlock();
@@ -375,6 +362,24 @@ void Neuromag::initConnector()
         m_pRTMSA_Neuromag->data()->setXMLLayoutFile("./resources/mne_scan/plugins/Neuromag/VectorViewLayout.xml");
 
         m_outputConnectors.append(m_pRTMSA_Neuromag);
+
+        //Add the calibration factors
+        m_cals = RowVectorXd(m_pFiffInfo->nchan);
+        m_cals.setZero();
+        for (qint32 k = 0; k < m_pFiffInfo->nchan; ++k) {
+            m_cals[k] = m_pFiffInfo->chs[k].range*m_pFiffInfo->chs[k].cal;
+        }
+
+        //Initialize the data and calibration vector
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(m_pFiffInfo->nchan);
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
+            tripletList.push_back(T(i, i, this->m_cals[i]));
+        }
+
+        m_sparseMatCals = SparseMatrix<double>(m_pFiffInfo->nchan, m_pFiffInfo->nchan);
+        m_sparseMatCals.setFromTriplets(tripletList.begin(), tripletList.end());
     }
 }
 
@@ -694,10 +699,25 @@ void Neuromag::run()
             }
 
             if(m_pRTMSA_Neuromag) {
-                m_pRTMSA_Neuromag->data()->setValue(matValue.cast<double>());
+                m_pRTMSA_Neuromag->data()->setValue(this->calibrate(matValue));
             }
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+MatrixXd Neuromag::calibrate(const MatrixXf& data)
+{
+    MatrixXd one;
+    if(m_pFiffInfo && m_sparseMatCals.cols() == m_pFiffInfo->nchan) {
+        one = m_sparseMatCals*data.cast<double>();
+    } else {
+        one = data.cast<double>();
+    }
+
+    return one;
 }
 
 

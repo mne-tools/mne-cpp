@@ -175,6 +175,9 @@ void ProjectSettingsView::setRecordingElapsedTime(int mSecsElapsed)
 
 QString ProjectSettingsView::getCurrentFileName()
 {
+    //Update file name before returning to include the current time since the last update was called
+    updateFileName();
+
     return m_sFileName;
 }
 
