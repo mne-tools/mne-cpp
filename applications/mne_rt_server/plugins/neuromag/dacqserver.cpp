@@ -146,10 +146,10 @@ bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
 //                        qDebug() << "FIFF_PROJ_ITEM_TIME";
 //                        break;
                     case FIFF_PROJ_ITEM_NVEC:
-                        nvec == *(t_pTag->toInt());
+                        nvec = *(t_pTag->toInt());
                         break;        
                     case FIFF_MNE_PROJ_ITEM_ACTIVE:
-                        active == *(t_pTag->toInt());
+                        active = *(t_pTag->toInt());
                         break;
                     case FIFF_PROJ_ITEM_VECTORS:
                         data = t_pTag->toFloatMatrix().cast<double>();
