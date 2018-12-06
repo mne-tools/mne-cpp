@@ -224,7 +224,6 @@ void BabyMEG::init()
     connect(m_pProjectSettingsView.data(), &ProjectSettingsView::recordingTimerStateChanged,
             this, &BabyMEG::setRecordingTimerStateChanged);
 
-    m_pProjectSettingsView->setWindowFlags(Qt::WindowStaysOnTopHint);
     m_pProjectSettingsView->hide();
 
     //BabyMEG Inits
@@ -777,9 +776,22 @@ void BabyMEG::toggleRecordingFile()
         if(!m_pFiffInfo) {
             QMessageBox msgBox;
             msgBox.setText("FiffInfo missing!");
+            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
             msgBox.exec();
             return;
         }
+
+        if(m_pFiffInfo->dev_head_t.trans.isIdentity()) {
+            QMessageBox msgBox;
+            msgBox.setText("It seems that no HPI fitting was performed. This is your last chance!");
+            msgBox.setInformativeText(" Do you want to continue without HPI fitting?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+            int ret = msgBox.exec();
+            if(ret == QMessageBox::No)
+                return;
+        }
+
 
         //Initiate the stream for writing to the fif file
         if(m_pProjectSettingsView) {
@@ -792,6 +804,7 @@ void BabyMEG::toggleRecordingFile()
             msgBox.setText("The file you want to write already exists.");
             msgBox.setInformativeText("Do you want to overwrite this file?");
             msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
             int ret = msgBox.exec();
             if(ret == QMessageBox::No) {
                 return;
