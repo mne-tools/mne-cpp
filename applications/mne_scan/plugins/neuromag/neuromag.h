@@ -335,6 +335,7 @@ protected:
 
     QPointer<QAction>                       m_pActionSetupProject;          /**< shows setup project dialog */
     QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action */
+    QPointer<QAction>                       m_pActionComputeHPI;            /**< The Action to show the HPI view */
 
 signals:
     //=========================================================================================================
