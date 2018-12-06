@@ -216,6 +216,7 @@ void BabyMEG::init()
                                                                          sCurrentProject,
                                                                          sCurrentSubject,
                                                                          "");
+    m_sRecordFile = m_pProjectSettingsView->getCurrentFileName();
 
     connect(m_pProjectSettingsView.data(), &ProjectSettingsView::timerChanged,
             this, &BabyMEG::setRecordingTimerChanged);
