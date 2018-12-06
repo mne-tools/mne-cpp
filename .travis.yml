@@ -24,7 +24,7 @@ matrix:
       compiler: gcc
       env: BUILD=linux_release
     - os: osx
-      osx_image: xcode8
+      osx_image: xcode8.3
       compiler: clang
       env: BUILD=osx_release
     - os: linux
