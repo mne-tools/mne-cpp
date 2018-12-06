@@ -93,8 +93,8 @@ void ChannelDataDelegate::initPainterPaths(const QAbstractTableModel *model)
 
     m_penMarker = QPen(colorMarker, 2, Qt::DashLine);
 
-    m_penGrid = QPen(Qt::black, 0.7, Qt::DotLine);
-    m_penTimeSpacers = QPen(Qt::black, 0.2, Qt::DotLine);
+    m_penGrid = QPen(Qt::black, 1, Qt::DashLine);
+    m_penTimeSpacers = QPen(Qt::black, 1, Qt::DashLine);
 
     m_penFreeze = QPen(Qt::darkGray, 1, Qt::SolidLine);
     m_penFreezeSelected = QPen(Qt::darkRed, 1, Qt::SolidLine);
@@ -265,6 +265,7 @@ void createPaths(const QModelIndex &index,
 void ChannelDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     float t_fPlotHeight = option.rect.height();
+    painter->setRenderHint(QPainter::Antialiasing, true);
 
     switch(index.column()) {
         case 0: { //chnames
@@ -308,7 +309,6 @@ void ChannelDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
             {
                 QPainterPath path(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
 
-                painter->setRenderHint(QPainter::Antialiasing, true);
 
                 //Plot marker
 //                createMarkerPath(option, path);

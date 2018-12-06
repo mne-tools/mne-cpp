@@ -41,6 +41,8 @@
 
 #include "datawindow.h"
 
+#include <QGLWidget>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -202,6 +204,12 @@ void DataWindow::initMVCSettings()
     //-----------------------------------
     //------ Init data window view ------
     //-----------------------------------
+    //Use GPU rendering
+    QGLFormat currentFormat = QGLFormat(QGL::SampleBuffers);
+    currentFormat.setSamples(10);
+    QGLWidget* pGLWidget = new QGLWidget(currentFormat);
+    ui->m_tableView_rawTableView->setViewport(pGLWidget);
+
     //Set MVC model
     ui->m_tableView_rawTableView->setModel(m_pRawModel);
 

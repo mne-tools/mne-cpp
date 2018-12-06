@@ -86,6 +86,14 @@ ScalingView::ScalingView(QWidget *parent,
 
 //*************************************************************************************************************
 
+QMap<qint32,float> ScalingView::getScaleMap() const
+{
+    return m_qMapChScaling;
+}
+
+
+//*************************************************************************************************************
+
 void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
 {
     m_qMapChScaling = qMapChScaling;
@@ -101,11 +109,11 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setMinimum(0.1);
+        t_pDoubleSpinBoxScale->setMinimum(0.001);
         t_pDoubleSpinBoxScale->setMaximum(50000);
         t_pDoubleSpinBoxScale->setMaximumWidth(500);
-        t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(1);
+        t_pDoubleSpinBoxScale->setSingleStep(0.01);
+        t_pDoubleSpinBoxScale->setDecimals(3);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
         t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFF_UNIT_T)/(1e-12));
         m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T,t_pDoubleSpinBoxScale);

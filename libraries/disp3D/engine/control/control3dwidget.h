@@ -140,14 +140,6 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Minimizes th ewidget and all its contents.
-    *
-    * @param[in] state         Whether the widget is to be maximized or minimized
-    */
-    void onMinimizeWidget(bool state);
-
-    //=========================================================================================================
-    /**
     * Slot called when opacity slider was changed.
     *
     * @param [in] value         opacity value.
@@ -282,6 +274,12 @@ signals:
     * @param[in] value      The newly picked intensity.
     */
     void lightIntensityChanged(double value);
+
+    //=========================================================================================================
+    /**
+    * Use this signal whenever the take screenshot button was clicked by the user.
+    */
+    void takeScreenshotChanged();
 };
 
 } // NAMESPACE DISP3DLIB

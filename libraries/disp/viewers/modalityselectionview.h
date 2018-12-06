@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -65,10 +66,6 @@
 //=============================================================================================================
 
 class QCheckBox;
-
-namespace FIFFLIB {
-    class FiffInfo;
-}
 
 
 //*************************************************************************************************************
@@ -90,22 +87,6 @@ namespace DISPLIB
 //=============================================================================================================
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STRUCTS
-//=============================================================================================================
-
-struct Modality {
-    QString m_sName;
-    bool m_bActive;
-    float m_fNorm;
-
-    Modality(QString name, bool active, double norm)
-    : m_sName(name), m_bActive(active), m_fNorm(norm)
-    {}
-};
 
 
 //=============================================================================================================
@@ -133,27 +114,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Init the view.
+    * Set the modality checkboxes.
     *
-    * @param [in] pFiffInfo    The fiff info.
+    * @param [in] modalityMap    The modality map.
     */
-    void init(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    void setModalityMap(const QMap<QString, bool>& modalityMap);
 
     //=========================================================================================================
     /**
-    * Init the view.
+    * Get the activation of the already created modality check boxes.
     *
-    * @param [in] modalityList    The modality info.
+    * @return The current modality map.
     */
-    void init(const QList<DISPLIB::Modality>& modalityList);
-
-    //=========================================================================================================
-    /**
-    * Set the activation of the already created modality check boxes.
-    *
-    * @param [in] modalityList    The modality info.
-    */
-    void setModalities(const QList<Modality> &lModalities);
+    QMap<QString, bool> getModalityMap();
 
 protected:
     //=========================================================================================================
@@ -162,17 +135,15 @@ protected:
     */
     void onUpdateModalityCheckbox(qint32 state);
 
-    QList<Modality>                     m_qListModalities;              /**< List of different modalities. */
+    QMap<QString, bool>                 m_modalityMap;                  /**< Map of different modalities. */
     QList<QCheckBox*>                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
-
-    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                    /**< Connected fiff info. */
 
 signals:
     //=========================================================================================================
     /**
     * Emit this signal whenever the user changed the modality.
     */
-    void modalitiesChanged(const QList<Modality>& modalityList);
+    void modalitiesChanged(const QMap<QString, bool>& modalityMap);
 
 };
 

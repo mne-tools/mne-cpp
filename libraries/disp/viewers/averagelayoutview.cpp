@@ -59,6 +59,7 @@
 #include <QSvgGenerator>
 #include <QDebug>
 #include <QGraphicsItem>
+#include <QOpenGLWidget>
 
 
 //*************************************************************************************************************
@@ -75,36 +76,35 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageLayoutView::AverageLayoutView(QWidget *parent, Qt::WindowFlags f)
+AverageLayoutView::AverageLayoutView(QWidget *parent,
+                                     Qt::WindowFlags f)
 : QWidget(parent, f)
+, m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
+, m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 {
     this->setWindowTitle("Average Layout");
 
-    m_pAverageLayoutView = new QGraphicsView(this);
+    m_pAverageLayoutView = new QGraphicsView();
+    m_pAverageLayoutView->setViewport(new QOpenGLWidget);
+    m_pAverageLayoutView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_pAverageLayoutView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     m_pAverageScene = AverageScene::SPtr(new AverageScene(m_pAverageLayoutView.data(), this));
+    m_pAverageScene->setBackgroundBrush(QBrush(Qt::black));
 
     m_pAverageLayoutView->setScene(m_pAverageScene.data());
-    QBrush brush(Qt::black);
-    m_pAverageScene->setBackgroundBrush(brush);
 
     //set layouts
     QVBoxLayout *neLayout = new QVBoxLayout(this);
-    neLayout->addWidget(m_pAverageLayoutView.data());
+    neLayout->setContentsMargins(0,0,0,0);
+    neLayout->addWidget(m_pAverageLayoutView);
     this->setLayout(neLayout);
 }
 
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &pFiffInfo)
-{
-    m_pFiffInfo = pFiffInfo;
-}
-
-
-//*************************************************************************************************************
-
-void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
+void AverageLayoutView::setModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
 {
     m_pChannelInfoModel = pChannelInfoModel;
 }
@@ -112,8 +112,8 @@ void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pC
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel)
-{    
+void AverageLayoutView::setModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel)
+{
     connect(pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
             this, &AverageLayoutView::updateData);
 
@@ -125,6 +125,11 @@ void AverageLayoutView::setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvoke
 
 void AverageLayoutView::setBackgroundColor(const QColor& backgroundColor)
 {
+    if(!m_pAverageScene) {
+        qDebug() << "AverageLayoutView::setBackgroundColor - m_pAverageScene is NULL. Returning. ";
+        return;
+    }
+
     QBrush backgroundBrush = m_pAverageScene->backgroundBrush();
     backgroundBrush.setColor(backgroundColor);
     m_pAverageScene->setBackgroundBrush(backgroundBrush);
@@ -135,6 +140,11 @@ void AverageLayoutView::setBackgroundColor(const QColor& backgroundColor)
 
 QColor AverageLayoutView::getBackgroundColor()
 {
+    if(!m_pAverageScene) {
+        qDebug() << "AverageLayoutView::getBackgroundColor - m_pAverageScene is NULL. Returning. ";
+        return QColor();
+    }
+
     return m_pAverageScene->backgroundBrush().color();
 }
 
@@ -143,6 +153,11 @@ QColor AverageLayoutView::getBackgroundColor()
 
 void AverageLayoutView::takeScreenshot(const QString& fileName)
 {
+    if(!m_pAverageScene) {
+        qDebug() << "AverageLayoutView::takeScreenshot - m_pAverageScene is NULL. Returning. ";
+        return;
+    }
+
     if(fileName.contains(".svg", Qt::CaseInsensitive))
     {
         // Generate screenshot
@@ -157,7 +172,7 @@ void AverageLayoutView::takeScreenshot(const QString& fileName)
 
     if(fileName.contains(".png", Qt::CaseInsensitive))
     {
-        QPixmap pixMap = QPixmap::grabWidget(m_pAverageLayoutView.data());
+        QPixmap pixMap = QPixmap::grabWidget(m_pAverageLayoutView);
         pixMap.save(fileName);
     }
 }
@@ -167,25 +182,58 @@ void AverageLayoutView::takeScreenshot(const QString& fileName)
 
 void AverageLayoutView::setScaleMap(const QMap<qint32,float> &scaleMap)
 {
+    if(!m_pAverageScene) {
+        qDebug() << "AverageLayoutView::setScaleMap - m_pAverageScene is NULL. Returning. ";
+        return;
+    }
+
     m_pAverageScene->setScaleMap(scaleMap);
+
     updateData();
 }
 
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
+QSharedPointer<QMap<QString, QColor> > AverageLayoutView::getAverageColor() const
 {
-    m_averageInfos = mapAvr;
-    m_pAverageScene->setAverageInformationMap(mapAvr);
+    return m_qMapAverageColor;
 }
 
 
 //*************************************************************************************************************
 
-QMap<double, QPair<QColor, QPair<QString,bool> > > AverageLayoutView::getAverageInformationMap()
+QSharedPointer<QMap<QString, bool> > AverageLayoutView::getAverageActivation() const
 {
-    return m_averageInfos;
+    return m_qMapAverageActivation;
+}
+
+
+//*************************************************************************************************************
+
+void AverageLayoutView::setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
+{
+    if(!m_pAverageScene) {
+        qDebug() << "AverageLayoutView::setAverageColor - m_pAverageScene is NULL. Returning. ";
+        return;
+    }
+
+    m_qMapAverageColor = qMapAverageColor;
+    m_pAverageScene->setColorPerAverage(m_qMapAverageColor);
+}
+
+
+//*************************************************************************************************************
+
+void AverageLayoutView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
+{
+    if(!m_pAverageScene) {
+        qDebug() << "AverageLayoutView::setAverageActivation - m_pAverageScene is NULL. Returning. ";
+        return;
+    }
+
+    m_qMapAverageActivation = qMapAverageActivation;
+    m_pAverageScene->setActivationPerAverage(qMapAverageActivation);
 }
 
 
@@ -193,9 +241,17 @@ QMap<double, QPair<QColor, QPair<QString,bool> > > AverageLayoutView::getAverage
 
 void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem*> &selectedChannelItems)
 {
+    if(!m_pAverageScene) {
+        qDebug() << "AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ";
+        return;
+    }
+
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
     m_pAverageScene->repaintItems(selectedChannelItems);
-    setAverageInformationMap(m_averageInfos);
+
+    setAverageColor(m_qMapAverageColor);
+    setAverageActivation(m_qMapAverageActivation);
+    setScaleMap(m_scaleMap);
     updateData();
 }
 
@@ -204,8 +260,8 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
 
 void AverageLayoutView::updateData()
 {
-    if(!m_pEvokedSetModel || !m_pChannelInfoModel || !m_pFiffInfo) {
-        qDebug() << "AverageLayoutView::updateData - m_pEvokedSetModel, m_pChannelInfoModel or m_pFiffInfo are NULL. Returning. ";
+    if(!m_pAverageScene || !m_pEvokedSetModel || !m_pChannelInfoModel) {
+        qDebug() << "AverageLayoutView::updateData - m_pAverageScene, m_pEvokedSetModel or m_pChannelInfoModel are NULL. Returning. ";
         return;
     }
 
@@ -213,21 +269,22 @@ void AverageLayoutView::updateData()
     QList<QGraphicsItem *> currentAverageSceneItems = m_pAverageScene->items();
 
     //Set new data for all averageSceneItems
-    for(int i = 0; i<currentAverageSceneItems.size(); i++) {
+    for(int i = 0; i < currentAverageSceneItems.size(); i++) {
         AverageSceneItem* averageSceneItemTemp = static_cast<AverageSceneItem*>(currentAverageSceneItems.at(i));
 
         averageSceneItemTemp->m_lAverageData.clear();
 
         //Get only the necessary data from the average model (use column 2)
-        QList<QPair<double, DISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<double, DISPLIB::RowVectorPair> > >();
+        QList<QPair<QString, DISPLIB::RowVectorPair> > averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<QString, DISPLIB::RowVectorPair> > >();
 
         //Get the averageScenItem specific data row
         int channelNumber = m_pChannelInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
 
         if(channelNumber != -1) {
             //qDebug() << "Change data for" << channelNumber << "" << averageSceneItemTemp->m_sChannelName;
-            averageSceneItemTemp->m_iChannelKind = m_pFiffInfo->chs.at(channelNumber).kind;
-            averageSceneItemTemp->m_iChannelUnit = m_pFiffInfo->chs.at(channelNumber).unit;
+
+            averageSceneItemTemp->m_iChannelKind = m_pChannelInfoModel->data(m_pChannelInfoModel->index(channelNumber, 4), ChannelInfoModelRoles::GetChKind).toInt();
+            averageSceneItemTemp->m_iChannelUnit = m_pChannelInfoModel->data(m_pChannelInfoModel->index(channelNumber, 6), ChannelInfoModelRoles::GetChUnit).toInt();
             averageSceneItemTemp->m_firstLastSample.first = (-1)*m_pEvokedSetModel->getNumPreStimSamples();
 
             if(!averageData.isEmpty()) {
@@ -235,7 +292,7 @@ void AverageLayoutView::updateData()
             }
 
             averageSceneItemTemp->m_iChannelNumber = channelNumber;
-            averageSceneItemTemp->m_iTotalNumberChannels = m_pFiffInfo->ch_names.size();
+            averageSceneItemTemp->m_iTotalNumberChannels = m_pEvokedSetModel->rowCount();
             averageSceneItemTemp->m_lAverageData = averageData;
         }
     }

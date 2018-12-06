@@ -244,10 +244,10 @@ public:
     /**
     * Append new FiffEvokedSet to the buffer
     *
-    * @param[in] p_pEvokedSet               the new FiffEvokedSet
+    * @param[in] evokedSet                  The new FiffEvokedSet
     * @param[in] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
     */
-    void appendEvoked(FIFFLIB::FiffEvokedSet::SPtr p_pEvokedSet,
+    void appendEvoked(const FIFFLIB::FiffEvokedSet& evokedSet,
                       const QStringList &lResponsibleTriggerTypes);
 
     //=========================================================================================================
@@ -265,11 +265,11 @@ private:
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr           m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;                 /**< Holds incoming data.*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;
 
     QSharedPointer<DISPLIB::AveragingSettingsView>  m_pAveragingSettingsView;           /**< Holds averaging settings widget.*/
 
-    QVector<FIFFLIB::FiffEvokedSet::SPtr>           m_qVecEvokedData;                   /**< Evoked data set. */
+    QVector<FIFFLIB::FiffEvokedSet>                 m_qVecEvokedData;                   /**< Evoked data set. */
 
     QMutex                                          m_qMutex;                           /**< Provides access serialization between threads. */
 

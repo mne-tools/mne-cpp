@@ -53,6 +53,7 @@
 #include <QPainter>
 #include <QDebug>
 #include <QSvgGenerator>
+#include <QSurfaceFormat>
 
 
 //*************************************************************************************************************
@@ -69,22 +70,22 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
-: QWidget(parent, f)
-, m_pEvokedModel(NULL)
+: QOpenGLWidget(parent)
+, m_pEvokedSetModel(NULL)
 , m_bIsInit(false)
-, m_iNumChannels(-1)
 , m_bShowMAG(true)
 , m_bShowGRAD(true)
 , m_bShowEEG(true)
 , m_bShowEOG(true)
 , m_bShowMISC(true)
 , m_colCurrentBackgroundColor(Qt::white)
-, m_fMaxMAG(0.0)
-, m_fMaxGRAD(0.0)
-, m_fMaxEEG(0.0)
-, m_fMaxEOG(0.0)
-, m_fMaxMISC(0.0)
+, m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
+, m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 {
+//    // Activate anti aliasing
+//    QSurfaceFormat fmt;
+//    fmt.setSamples(4);
+//    this->setFormat(fmt);
 }
 
 
@@ -92,26 +93,22 @@ ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
 
 void ButterflyView::setModel(QSharedPointer<EvokedSetModel> model)
 {
-    m_pEvokedModel = model;
+    m_pEvokedSetModel = model;
 
-    connect(m_pEvokedModel.data(), &EvokedSetModel::dataChanged,
+    connect(m_pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
             this, &ButterflyView::dataUpdate);
 }
 
 
 //*************************************************************************************************************
 
-void ButterflyView::dataUpdate(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+void ButterflyView::dataUpdate()
 {
-    Q_UNUSED(topLeft);
-    Q_UNUSED(bottomRight);
-    Q_UNUSED(roles);
-
-    if(!m_bIsInit && m_pEvokedModel->isInit())
-    {
-        m_iNumChannels = m_pEvokedModel->rowCount();
+    if(!m_bIsInit && m_pEvokedSetModel->isInit()) {
         m_bIsInit = true;
     }
+
+    setAverageActivation(m_qMapAverageActivation);
 
     update();
 }
@@ -119,51 +116,26 @@ void ButterflyView::dataUpdate(const QModelIndex& topLeft, const QModelIndex& bo
 
 //*************************************************************************************************************
 
-QList<Modality> ButterflyView::getModalities()
+QMap<QString, bool> ButterflyView::getModalityMap()
 {
-    return m_qListModalities;
+    return m_modalityMap;
 }
 
 
 //*************************************************************************************************************
 
-void ButterflyView::setModalities(const QList<Modality>& p_qListModalities)
+void ButterflyView::setModalityMap(const QMap<QString, bool> &modalityMap)
 {
-    m_qListModalities = p_qListModalities;
+    m_modalityMap = modalityMap;
+    update();
+}
 
-    for(qint32 i = 0; i < m_qListModalities.size(); ++i)
-    {
-        if(m_qListModalities[i].m_sName == ("GRAD"))
-        {
-            m_bShowGRAD = m_qListModalities[i].m_bActive;
-            m_fMaxGRAD = m_qListModalities[i].m_fNorm;
-        }
 
-        if(m_qListModalities[i].m_sName == ("MAG"))
-        {
-            m_bShowMAG = m_qListModalities[i].m_bActive;
-            m_fMaxMAG = m_qListModalities[i].m_fNorm;
-        }
-        if(m_qListModalities[i].m_sName == ("EEG"))
-        {
-            m_bShowEEG = m_qListModalities[i].m_bActive;
-            m_fMaxEEG = m_qListModalities[i].m_fNorm;
+//*************************************************************************************************************
 
-        }
-        if(m_qListModalities[i].m_sName == ("EOG"))
-        {
-            m_bShowEOG = m_qListModalities[i].m_bActive;
-            m_fMaxEOG = m_qListModalities[i].m_fNorm;
-
-        }
-        if(m_qListModalities[i].m_sName == ("MISC"))
-        {
-            m_bShowMISC = m_qListModalities[i].m_bActive;
-            m_fMaxMISC = m_qListModalities[i].m_fNorm;
-
-        }
-    }
-
+void ButterflyView::setScaleMap(const QMap<qint32,float> &scaleMap)
+{
+    m_scaleMap = scaleMap;    
     update();
 }
 
@@ -173,7 +145,6 @@ void ButterflyView::setModalities(const QList<Modality>& p_qListModalities)
 void ButterflyView::setSelectedChannels(const QList<int> &selectedChannels)
 {
     m_lSelectedChannels = selectedChannels;
-
     update();
 }
 
@@ -191,7 +162,6 @@ void ButterflyView::updateView()
 void ButterflyView::setBackgroundColor(const QColor& backgroundColor)
 {
     m_colCurrentBackgroundColor = backgroundColor;
-
     update();
 }
 
@@ -204,13 +174,11 @@ const QColor& ButterflyView::getBackgroundColor()
 }
 
 
-
 //*************************************************************************************************************
 
 void ButterflyView::takeScreenshot(const QString& fileName)
 {
-    if(fileName.contains(".svg", Qt::CaseInsensitive))
-    {
+    if(fileName.contains(".svg", Qt::CaseInsensitive)) {
         // Generate screenshot
         QSvgGenerator svgGen;
         svgGen.setFileName(fileName);
@@ -220,8 +188,7 @@ void ButterflyView::takeScreenshot(const QString& fileName)
         this->render(&svgGen);
     }
 
-    if(fileName.contains(".png", Qt::CaseInsensitive))
-    {
+    if(fileName.contains(".png", Qt::CaseInsensitive)) {
         QImage image(this->size(), QImage::Format_ARGB32);
         image.fill(Qt::transparent);
 
@@ -234,17 +201,41 @@ void ButterflyView::takeScreenshot(const QString& fileName)
 
 //*************************************************************************************************************
 
-void ButterflyView::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
+QSharedPointer<QMap<QString, QColor> > ButterflyView::getAverageColor() const
 {
-    m_qMapAverageColor = mapAvr;
+    return m_qMapAverageColor;
+}
 
+
+//*************************************************************************************************************
+
+QSharedPointer<QMap<QString, bool> > ButterflyView::getAverageActivation() const
+{
+    return m_qMapAverageActivation;
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyView::setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
+{
+    m_qMapAverageColor = qMapAverageColor;
     update();
 }
 
 
 //*************************************************************************************************************
 
-void ButterflyView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
+void ButterflyView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
+{
+    m_qMapAverageActivation = qMapAverageActivation;
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void ButterflyView::setModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
 {
     m_pChannelInfoModel = pChannelInfoModel;
 }
@@ -270,7 +261,7 @@ void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels
 
 //*************************************************************************************************************
 
-void ButterflyView::paintEvent(QPaintEvent* paintEvent)
+void ButterflyView::paintGL()
 {
     QPainter painter(this);
 
@@ -279,26 +270,26 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
     painter.drawRect(QRect(0,0,this->width()-1,this->height()-1));
     painter.restore();
 
-    painter.setRenderHint(QPainter::Antialiasing, false);
+    painter.setRenderHint(QPainter::Antialiasing, true);
 
-    if(m_bIsInit)
+    if(m_bIsInit && m_pEvokedSetModel)
     {
         //Draw baseline correction area
-        if(m_pEvokedModel->getBaselineInfo().first.toString() != "None" &&
-                m_pEvokedModel->getBaselineInfo().second.toString() != "None") {
-            float from = m_pEvokedModel->getBaselineInfo().first.toFloat();
-            float to = m_pEvokedModel->getBaselineInfo().second.toFloat();
+        if(m_pEvokedSetModel->getBaselineInfo().first.toString() != "None" &&
+                m_pEvokedSetModel->getBaselineInfo().second.toString() != "None") {
+            float from = m_pEvokedSetModel->getBaselineInfo().first.toFloat();
+            float to = m_pEvokedSetModel->getBaselineInfo().second.toFloat();
 
             painter.save();
             painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
             painter.setBrush(Qt::red);
             painter.setOpacity(0.1);
 
-            float fDx = (float)(this->width()) / ((float)m_pEvokedModel->getNumSamples());
+            float fDx = (float)(this->width()) / ((float)m_pEvokedSetModel->getNumSamples());
 
-            float fromSamp = ((from)*m_pEvokedModel->getSamplingFrequency())+m_pEvokedModel->getNumPreStimSamples();
+            float fromSamp = ((from)*m_pEvokedSetModel->getSamplingFrequency())+m_pEvokedSetModel->getNumPreStimSamples();
             float posX = fDx*(fromSamp);
-            float toSamp = ((to)*m_pEvokedModel->getSamplingFrequency())+m_pEvokedModel->getNumPreStimSamples();
+            float toSamp = ((to)*m_pEvokedSetModel->getSamplingFrequency())+m_pEvokedSetModel->getNumPreStimSamples();
             float width = fDx*(toSamp-fromSamp);
 
             QRect rect(posX,0,width,this->height());
@@ -309,12 +300,12 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
         }
 
         //Stimulus bar
-        if(m_pEvokedModel->getNumSamples() > 0) {
+        if(m_pEvokedSetModel->getNumSamples() > 0) {
             painter.save();
             painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
 
-            float fDx = (float)(this->width()) / ((float)m_pEvokedModel->getNumSamples());
-            float posX = fDx * ((float)m_pEvokedModel->getNumPreStimSamples());
+            float fDx = (float)(this->width()) / ((float)m_pEvokedSetModel->getNumSamples());
+            float posX = fDx * ((float)m_pEvokedSetModel->getNumPreStimSamples());
             painter.drawLine(posX, 1, posX, this->height());
 
             painter.drawText(QPointF(posX+5,this->rect().bottomRight().y()-5), QString("0ms / Stimulus"));
@@ -323,7 +314,7 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
         }
 
         //Vertical time spacers
-        if(m_pEvokedModel->getNumberOfTimeSpacers() > 0)
+        if(m_pEvokedSetModel->getNumberOfTimeSpacers() > 0)
         {
             painter.save();
             QColor colorTimeSpacer = Qt::black;
@@ -334,14 +325,14 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
             float yEnd = this->rect().bottomRight().y();
 
             float fDx = 1;
-            if(m_pEvokedModel->getNumSamples() != 0) {
-                fDx = (float)(this->width()) / ((float)m_pEvokedModel->getNumSamples());
+            if(m_pEvokedSetModel->getNumSamples() != 0) {
+                fDx = (float)(this->width()) / ((float)m_pEvokedSetModel->getNumSamples());
             }
 
-            float sampleCounter = m_pEvokedModel->getNumPreStimSamples();
+            float sampleCounter = m_pEvokedSetModel->getNumPreStimSamples();
             int counter = 1;
             float timeDistanceMSec = 50.0;
-            float timeDistanceSamples = (timeDistanceMSec/1000.0)*m_pEvokedModel->getSamplingFrequency(); //time distance corresponding to sampling frequency
+            float timeDistanceSamples = (timeDistanceMSec/1000.0)*m_pEvokedSetModel->getSamplingFrequency(); //time distance corresponding to sampling frequency
 
             //spacers before stim
             while(sampleCounter-timeDistanceSamples>0) {
@@ -354,8 +345,8 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
 
             //spacers after stim
             counter = 1;
-            sampleCounter = m_pEvokedModel->getNumPreStimSamples();
-            while(sampleCounter+timeDistanceSamples<m_pEvokedModel->getNumSamples()) {
+            sampleCounter = m_pEvokedSetModel->getNumPreStimSamples();
+            while(sampleCounter+timeDistanceSamples<m_pEvokedSetModel->getNumSamples()) {
                 sampleCounter+=timeDistanceSamples;
                 float x = fDx*sampleCounter;
                 painter.drawLine(x, yStart, x, yEnd);
@@ -367,7 +358,7 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
         }
 
         //Zero line
-        if(m_pEvokedModel->getNumSamples() > 0) {
+        if(m_pEvokedSetModel->getNumSamples() > 0) {
             painter.save();
             painter.setPen(QPen(Qt::black, 1, Qt::DashLine));
 
@@ -379,23 +370,23 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
         painter.translate(0,this->height()/2);
 
         //Actual average data
-        for(qint32 r = 0; r < m_iNumChannels; ++r) {
+        for(qint32 r = 0; r < m_pEvokedSetModel->rowCount(); ++r) {
             if(m_lSelectedChannels.contains(r)) {
-                qint32 kind = m_pEvokedModel->getKind(r);
+                qint32 kind = m_pEvokedSetModel->getKind(r);
 
                 //Display only selected kinds
                 switch(kind) {
                     case FIFFV_MEG_CH: {
-                        qint32 unit = m_pEvokedModel->getUnit(r);
+                        qint32 unit = m_pEvokedSetModel->getUnit(r);
                         if(unit == FIFF_UNIT_T_M) {
-                            if(m_bShowGRAD)
+                            if(m_modalityMap["GRAD"])
                                 break;
                             else
                                 continue;
                         }
                         else if(unit == FIFF_UNIT_T)
                         {
-                            if(m_bShowMAG)
+                            if(m_modalityMap["MAG"])
                                 break;
                             else
                                 continue;
@@ -403,19 +394,19 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
                         continue;
                     }
                     case FIFFV_EEG_CH: {
-                        if(m_bShowEEG)
+                        if(m_modalityMap["EEG"])
                             break;
                         else
                             continue;
                     }
                     case FIFFV_EOG_CH: {
-                        if(m_bShowEOG)
+                        if(m_modalityMap["EOG"])
                             break;
                         else
                             continue;
                     }
                     case FIFFV_MISC_CH: {
-                        if(m_bShowMISC)
+                        if(m_modalityMap["MISC"])
                             break;
                         else
                             continue;
@@ -426,14 +417,6 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
 
                 painter.save();
 
-                if(m_pEvokedModel->isFreezed()) {
-                    QColor freezeColor = m_pEvokedModel->getColor(r);
-                    freezeColor.setAlphaF(0.5);
-                    painter.setPen(QPen(freezeColor, 1));
-                } else {
-                    painter.setPen(QPen(m_pEvokedModel->getColor(r), 1));
-                }
-
                 createPlotPath(r, painter);
 
                 painter.restore();
@@ -441,7 +424,7 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
         }
     }
 
-    return QWidget::paintEvent(paintEvent);
+    return QOpenGLWidget::paintGL();
 }
 
 
@@ -450,58 +433,58 @@ void ButterflyView::paintEvent(QPaintEvent* paintEvent)
 void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
-    qint32 kind = m_pEvokedModel->getKind(row);
+    qint32 kind = m_pEvokedSetModel->getKind(row);
     float fMaxValue = 1e-9f;
 
     switch(kind) {
         case FIFFV_MEG_CH: {
-            qint32 unit = m_pEvokedModel->getUnit(row);
+            qint32 unit = m_pEvokedSetModel->getUnit(row);
             if(unit == FIFF_UNIT_T_M) { //gradiometers
                 fMaxValue = 1e-10f;
-                if(m_pEvokedModel->getScaling().contains(FIFF_UNIT_T_M))
-                    fMaxValue = m_pEvokedModel->getScaling()[FIFF_UNIT_T_M];
+                if(m_scaleMap.contains(FIFF_UNIT_T_M))
+                    fMaxValue = m_scaleMap[FIFF_UNIT_T_M];
             }
             else if(unit == FIFF_UNIT_T) //magnitometers
             {
-//                if(m_pEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
+//                if(m_pEvokedSetModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
 //                    fMaxValue = 1e-11f;
 //                else
                 fMaxValue = 1e-11f;
 
-                if(m_pEvokedModel->getScaling().contains(FIFF_UNIT_T))
-                    fMaxValue = m_pEvokedModel->getScaling()[FIFF_UNIT_T];
+                if(m_scaleMap.contains(FIFF_UNIT_T))
+                    fMaxValue = m_scaleMap[FIFF_UNIT_T];
             }
             break;
         }
 
         case FIFFV_REF_MEG_CH: {  /*11/04/14 Added by Limin: MEG reference channel */
             fMaxValue = 1e-11f;
-            if(m_pEvokedModel->getScaling().contains(FIFF_UNIT_T))
-                fMaxValue = m_pEvokedModel->getScaling()[FIFF_UNIT_T];
+            if(m_scaleMap.contains(FIFF_UNIT_T))
+                fMaxValue = m_scaleMap[FIFF_UNIT_T];
             break;
         }
         case FIFFV_EEG_CH: {
             fMaxValue = 1e-4f;
-            if(m_pEvokedModel->getScaling().contains(FIFFV_EEG_CH))
-                fMaxValue = m_pEvokedModel->getScaling()[FIFFV_EEG_CH];
+            if(m_scaleMap.contains(FIFFV_EEG_CH))
+                fMaxValue = m_scaleMap[FIFFV_EEG_CH];
             break;
         }
         case FIFFV_EOG_CH: {
             fMaxValue = 1e-3f;
-            if(m_pEvokedModel->getScaling().contains(FIFFV_EOG_CH))
-                fMaxValue = m_pEvokedModel->getScaling()[FIFFV_EOG_CH];
+            if(m_scaleMap.contains(FIFFV_EOG_CH))
+                fMaxValue = m_scaleMap[FIFFV_EOG_CH];
             break;
         }
         case FIFFV_STIM_CH: {
             fMaxValue = 5;
-            if(m_pEvokedModel->getScaling().contains(FIFFV_STIM_CH))
-                fMaxValue = m_pEvokedModel->getScaling()[FIFFV_STIM_CH];
+            if(m_scaleMap.contains(FIFFV_STIM_CH))
+                fMaxValue = m_scaleMap[FIFFV_STIM_CH];
             break;
         }
         case FIFFV_MISC_CH: {
             fMaxValue = 1e-3f;
-            if(m_pEvokedModel->getScaling().contains(FIFFV_MISC_CH))
-                fMaxValue = m_pEvokedModel->getScaling()[FIFFV_MISC_CH];
+            if(m_scaleMap.contains(FIFFV_MISC_CH))
+                fMaxValue = m_scaleMap[FIFFV_MISC_CH];
             break;
         }
     }
@@ -511,20 +494,31 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 
     //restrictions for paint performance
     float fWinMaxVal = ((float)this->height()-2)/2.0f;
-    qint32 iDownSampling = (m_pEvokedModel->getNumSamples() * 4 / (this->width()-2));
+    qint32 iDownSampling = (m_pEvokedSetModel->getNumSamples() * 4 / (this->width()-2));
     if(iDownSampling < 1) {
         iDownSampling = 1;
     }
 
     QPointF qSamplePosition;
 
-    float fDx = (float)(this->width()-2) / ((float)m_pEvokedModel->getNumSamples()-1.0f);//((float)option.rect.width()) / m_pEvokedModel->getMaxSamples();
+    float fDx = (float)(this->width()-2) / ((float)m_pEvokedSetModel->getNumSamples()-1.0f);//((float)option.rect.width()) / m_pEvokedSetModel->getMaxSamples();
 
-    QList<DISPLIB::AvrTypeRowVector> rowVec = m_pEvokedModel->data(row,1).value<QList<DISPLIB::AvrTypeRowVector> >();
+    QList<DISPLIB::AvrTypeRowVector> rowVec = m_pEvokedSetModel->data(row,1).value<QList<DISPLIB::AvrTypeRowVector> >();
 
     //Do for all average types
     for(int j = 0; j < rowVec.size(); ++j) {
-        if(m_qMapAverageColor[rowVec.at(j).first].second.second) {
+        QString sAvrComment = rowVec.at(j).first;
+
+        // Select color for each average
+        if(m_pEvokedSetModel->isFreezed()) {
+            QColor freezeColor = m_qMapAverageColor->value(sAvrComment);
+            freezeColor.setAlphaF(0.5);
+            painter.setPen(QPen(freezeColor, 1));
+        } else {
+            painter.setPen(QPen(m_qMapAverageColor->value(sAvrComment)));
+        }
+
+        if(m_qMapAverageActivation->value(sAvrComment)) {
             //Calculate downsampling factor of averaged data in respect to the items width
             int dsFactor;
             rowVec.at(j).second.cols() / this->width() < 1 ? dsFactor = 1 : dsFactor = rowVec.at(j).second.cols() / this->width();
@@ -539,7 +533,7 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
             if(rowVec.at(j).second.cols() > 0)
             {
                 float val = rowVec.at(j).second[0];
-                fValue = (val/*-rowVec.at(j)[m_pEvokedModel->getNumPreStimSamples()-1]*/)*fScaleY;//ToDo -> -2 PreStim is one too short
+                fValue = (val/*-rowVec.at(j)[m_pEvokedSetModel->getNumPreStimSamples()-1]*/)*fScaleY;//ToDo -> -2 PreStim is one too short
 
                 float newY = y_base+fValue;
 
@@ -552,7 +546,7 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
             //create lines from one to the next sample
             qint32 i;
             for(i = 1; i < rowVec.at(j).second.cols() && path.elementCount() <= this->width(); i += dsFactor) {
-                float val = /*rowVec.at(j)[m_pEvokedModel->getNumPreStimSamples()-1] - */rowVec.at(j).second[i]; //remove first sample data[0] as offset
+                float val = /*rowVec.at(j)[m_pEvokedSetModel->getNumPreStimSamples()-1] - */rowVec.at(j).second[i]; //remove first sample data[0] as offset
                 fValue = val*fScaleY;
 
                 //Cut plotting if out of widget area
@@ -568,7 +562,7 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
             }
 
         //    //create lines from one to the next sample for last path
-        //    qint32 sample_offset = m_pEvokedModel->numVLines() + 1;
+        //    qint32 sample_offset = m_pEvokedSetModel->numVLines() + 1;
         //    qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
         //    lastPath.moveTo(qSamplePosition);
 
