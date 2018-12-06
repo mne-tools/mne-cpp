@@ -105,7 +105,7 @@ struct RtCovInput {
 *
 * @brief Real-time covariance worker.
 */
-class RtCovWorker : public QObject
+class RTPROCESINGSHARED_EXPORT RtCovWorker : public QObject
 {
     Q_OBJECT
 

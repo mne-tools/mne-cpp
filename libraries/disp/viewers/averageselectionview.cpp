@@ -40,6 +40,8 @@
 
 #include "averageselectionview.h"
 
+#include <fiff/fiff_evoked_set.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,12 +53,16 @@
 #include <QColorDialog>
 #include <QPalette>
 #include <QPushButton>
+#include <QDebug>
+#include <QPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
+
+#include<Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -65,6 +71,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -73,8 +80,11 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 AverageSelectionView::AverageSelectionView(QWidget *parent,
-                         Qt::WindowFlags f)
+                                           Qt::WindowFlags f)
 : QWidget(parent, f)
+, m_iMaxNumAverages(10)
+, m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
+, m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 {
     this->setWindowTitle("Average Selection");
     this->setMinimumWidth(330);
@@ -84,8 +94,47 @@ AverageSelectionView::AverageSelectionView(QWidget *parent,
 
 //*************************************************************************************************************
 
-void AverageSelectionView::init()
+QSharedPointer<QMap<QString, QColor> > AverageSelectionView::getAverageColor() const
 {
+    return m_qMapAverageColor;
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<QMap<QString, bool> > AverageSelectionView::getAverageActivation() const
+{
+    return m_qMapAverageActivation;
+}
+
+
+//*************************************************************************************************************
+
+void AverageSelectionView::setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
+{
+    m_qMapAverageColor = qMapAverageColor;
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void AverageSelectionView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
+{
+    m_qMapAverageActivation = qMapAverageActivation;
+    update();
+}
+
+
+//*************************************************************************************************************
+
+void AverageSelectionView::update()
+{
+    if(m_qMapAverageColor->size() != m_qMapAverageActivation->size()) {
+        qDebug() << "AverageSelectionView::update - m_qMapAverageColor and m_qMapAverageActivation do not match in size. Returning.";
+        return;
+    }
+
     //Delete all widgets in the averages layout
     QGridLayout* topLayout = static_cast<QGridLayout*>(this->layout());
     if(!topLayout) {
@@ -98,83 +147,37 @@ void AverageSelectionView::init()
         delete child;
     }
 
-    //Set trigger types
-    QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(m_qMapAverageInfo);
+    // Create new GUI elements
+    QMapIterator<QString, QColor> itr(*m_qMapAverageColor);
     int count = 0;
-    m_qMapButtonAverageType.clear();
-    m_qMapChkBoxAverageType.clear();
+    while(itr.hasNext()) {
+        if(count >= m_iMaxNumAverages) {
+            break;
+        }
 
-    while (i.hasNext()) {
-        i.next();
+        itr.next();
 
-        //Create average checkbox
-        QCheckBox* pCheckBox = new QCheckBox(i.value().second.first);
-        pCheckBox->setChecked(i.value().second.second);
+        //Create average active checkbox
+        QPointer<QCheckBox> pCheckBox = new QCheckBox(itr.key());
+        pCheckBox->setChecked(m_qMapAverageActivation->value(itr.key()));
+        pCheckBox->setObjectName(itr.key());
         topLayout->addWidget(pCheckBox, count, 0);
-        connect(pCheckBox, &QCheckBox::clicked,
+        connect(pCheckBox.data(), &QCheckBox::clicked,
                 this, &AverageSelectionView::onAveragesChanged);
-        m_qMapChkBoxAverageType.insert(pCheckBox, i.value().second.first.toDouble());
 
         //Create average color pushbutton
-        QPushButton* pButton = new QPushButton();
-        pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(i.value().first.red()).arg(i.value().first.green()).arg(i.value().first.blue()));
+        QColor color = itr.value();
+        QPointer<QPushButton> pButton = new QPushButton("Click to change");
+        pButton->setObjectName(itr.key());
+        pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
         topLayout->addWidget(pButton, count, 1);
-        connect(pButton, &QPushButton::clicked,
+        connect(pButton.data(), &QPushButton::clicked,
                 this, &AverageSelectionView::onAveragesChanged);
-        m_qMapButtonAverageType.insert(pButton, i.value().second.first.toDouble());
 
-        ++count;
+        count++;
     }
 
-    //Find Filter tab and add current layout
     this->setLayout(topLayout);
-}
-
-
-//*************************************************************************************************************
-
-void AverageSelectionView::setAverageInformationMapOld(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageInfoOld)
-{
-    m_qMapAverageInfoOld = qMapAverageInfoOld;
-}
-
-
-//*************************************************************************************************************
-
-void AverageSelectionView::setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& qMapAverageColor)
-{
-    //Check if average type already exists in the map
-    QMapIterator<double, QPair<QColor, QPair<QString,bool> > > i(qMapAverageColor);
-
-    while (i.hasNext()) {
-        i.next();
-
-        if(!m_qMapAverageInfo.contains(i.key())) {
-            if(m_qMapAverageInfoOld.contains(i.key())) {
-                //Use old color
-                QPair<QColor, QPair<QString,bool> > tempPair = i.value();
-                tempPair.first = m_qMapAverageInfoOld[i.key()].first;
-
-                m_qMapAverageInfo.insert(i.key(), tempPair);
-            } else {
-                //Use default color
-                m_qMapAverageInfo.insert(i.key(), i.value());
-            }
-        }
-    }
-
-    //Recreate average group
-    init();
-
-    emit averageInformationChanged(m_qMapAverageInfo);
-}
-
-
-//*************************************************************************************************************
-
-QMap<double, QPair<QColor, QPair<QString,bool> > > AverageSelectionView::getAverageInformationMap()
-{
-    return m_qMapAverageInfo;
 }
 
 
@@ -183,29 +186,31 @@ QMap<double, QPair<QColor, QPair<QString,bool> > > AverageSelectionView::getAver
 void AverageSelectionView::onAveragesChanged()
 {
     //Change color for average
-    if(QPushButton* button = qobject_cast<QPushButton*>(sender()))
-    {
-        QColor color = QColorDialog::getColor(m_qMapAverageInfo[m_qMapButtonAverageType[button]].first, this, "Set average color");
+    if(QPointer<QPushButton> button = qobject_cast<QPushButton*>(sender())) {
+        QString sObjectName = button->objectName();
 
-        //Change color of pushbutton
-        QPalette* palette1 = new QPalette();
-        palette1->setColor(QPalette::Button,color);
-        button->setPalette(*palette1);
-        button->update();
+        QColor color = QColorDialog::getColor(m_qMapAverageColor->value(sObjectName), this, "Set average color");
 
-        //Set color of button new new scene color
-        button->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
+        if(button) {
+            QPalette palette(QPalette::Button,color);
+            button->setPalette(palette);
+            button->update();
 
-        m_qMapAverageInfo[m_qMapButtonAverageType[button]].first = color;
+            //Set color of button new new scene color
+            button->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
+        }
 
-        emit averageInformationChanged(m_qMapAverageInfo);
+        m_qMapAverageColor->insert(sObjectName, color);
+
+        emit newAverageColorMap(m_qMapAverageColor);
     }
 
     //Change color for average
-    if(QCheckBox* checkBox = qobject_cast<QCheckBox*>(sender()))
-    {
-        m_qMapAverageInfo[m_qMapChkBoxAverageType[checkBox]].second.second = checkBox->isChecked();
+    if(QPointer<QCheckBox> checkBox = qobject_cast<QCheckBox*>(sender())) {
+        QString sObjectName = checkBox->objectName();
 
-        emit averageInformationChanged(m_qMapAverageInfo);
+        m_qMapAverageActivation->insert(sObjectName, checkBox->isChecked());
+
+        emit newAverageActivationMap(m_qMapAverageActivation);
     }
 }

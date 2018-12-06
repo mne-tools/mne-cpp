@@ -637,7 +637,6 @@ QStringList ChannelInfoModel::getBadChannelList()
 
 void ChannelInfoModel::mapLayoutToChannels()
 {
-    //TODO: Move this to layout loader in MNE-CPP Utils?
     //Map channels to layout
     QList<FiffChInfo> channelList = m_pFiffInfo->chs;
     for(int i = 0; i<channelList.size(); i++) {

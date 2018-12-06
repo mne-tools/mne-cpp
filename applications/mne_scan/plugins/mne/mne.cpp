@@ -466,21 +466,21 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
         return;
     }
 
+    FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
+
     //Fiff Information of the evoked
-    if(!m_pFiffInfoInput && pRTES->getValue()->evoked.size() > 0) {
-        for(int i = 0; i < pRTES->getValue()->evoked.size(); ++i) {
-            if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
-                m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pRTES->getValue()->evoked.at(i).info));
+    if(!m_pFiffInfoInput && pFiffEvokedSet->evoked.size() > 0) {
+        for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+            if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
+                m_pFiffInfoInput = QSharedPointer<FiffInfo>(new FiffInfo(pFiffEvokedSet->evoked.at(i).info));
                 break;
             }
         }
     }
 
     if(m_bProcessData) {
-        FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
-
         for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
-            if(pRTES->getValue()->evoked.at(i).comment == m_sAvrType) {
+            if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                 //qDebug()<<"MNE::updateRTE - average found type" << m_sAvrType;
                 m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
                 break;
@@ -552,7 +552,7 @@ void MNE::run()
                 break;
         }
 
-        //calcFiffInfo();
+        calcFiffInfo();
         msleep(10);// Wait for fiff Info
     }
 

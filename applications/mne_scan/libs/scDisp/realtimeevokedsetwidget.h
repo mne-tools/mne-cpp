@@ -84,6 +84,8 @@ namespace DISPLIB {
     class FilterView;
     class AverageLayoutView;
     class QuickControlView;
+    class ScalingView;
+    class ModalitySelectionView;
 }
 
 class QVBoxLayout;
@@ -104,14 +106,6 @@ namespace SCDISPLIB
 //=============================================================================================================
 // SCDISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE TYPEDEFS
-//=============================================================================================================
-
-typedef QMap<double, QPair<QColor, QPair<QString,bool> > > AverageInfoMap;
 
 
 //=============================================================================================================
@@ -207,12 +201,12 @@ private:
     QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Channel info model. */
     QSharedPointer<DISPLIB::FilterView>                 m_pFilterView;              /**< Filter view. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
+    QSharedPointer<DISPLIB::AveragingSettingsView>      m_pAveragingSettingsView;   /**< Holds averaging settings widget.*/
     QPointer<DISPLIB::AverageLayoutView>                m_pAverageLayoutView;       /**< 2D layout view for plotting averages*/
     QPointer<DISPLIB::ButterflyView>                    m_pButterflyView;           /**< Butterfly plot */
+    QPointer<DISPLIB::ScalingView>                      m_pScalingView;             /**< Holds averaging scaling widget.*/
+    QPointer<DISPLIB::ModalitySelectionView>            m_pModalitySelectionView;   /**< Holds modality selection widget.*/
 
-    QSharedPointer<DISPLIB::AveragingSettingsView>      m_pAveragingSettingsView;   /**< Holds averaging settings widget.*/
-
-    QList<SCMEASLIB::RealTimeSampleArrayChInfo>         m_qListChInfo;              /**< Channel info list. ToDo: check if this is obsolete later on.*/
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
 
     bool                                m_bInitialized;             /**< Is Initialized */

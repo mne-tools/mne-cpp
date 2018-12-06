@@ -39,7 +39,6 @@ TEMPLATE = lib
 
 QT  += core widgets svg concurrent
 
-# Deep Model Viewer
 qtHaveModule(printsupport): QT += printsupport
 qtHaveModule(opengl): QT += opengl
 qtHaveModule(charts): QT += charts

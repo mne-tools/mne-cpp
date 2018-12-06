@@ -77,7 +77,8 @@ using namespace Eigen;
 
 FiffEvokedSet::FiffEvokedSet()
 {
-
+    qRegisterMetaType<FIFFLIB::FiffEvokedSet>("FIFFLIB::FiffEvokedSet");
+    qRegisterMetaType<FIFFLIB::FiffEvokedSet::SPtr>("FIFFLIB::FiffEvokedSet::SPtr");
 }
 
 
@@ -85,6 +86,9 @@ FiffEvokedSet::FiffEvokedSet()
 
 FiffEvokedSet::FiffEvokedSet(QIODevice& p_IODevice)
 {
+    qRegisterMetaType<FIFFLIB::FiffEvokedSet>("FIFFLIB::FiffEvokedSet");
+    qRegisterMetaType<FIFFLIB::FiffEvokedSet::SPtr>("FIFFLIB::FiffEvokedSet::SPtr");
+
     if(!FiffEvokedSet::read(p_IODevice, *this))
     {
         printf("\tFiff evoked data set not found.\n");//ToDo Throw here
@@ -99,7 +103,6 @@ FiffEvokedSet::FiffEvokedSet(const FiffEvokedSet& p_FiffEvokedSet)
 : info(p_FiffEvokedSet.info)
 , evoked(p_FiffEvokedSet.evoked)
 {
-
 }
 
 

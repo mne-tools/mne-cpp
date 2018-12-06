@@ -44,15 +44,13 @@
 
 #include "../disp_global.h"
 
-#include "modalityselectionview.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QOpenGLWidget>
 #include <QMap>
 
 
@@ -91,7 +89,7 @@ class ChannelInfoModel;
 *
 * @brief The ButterflyView class provides a butterfly view.
 */
-class DISPSHARED_EXPORT ButterflyView : public QWidget
+class DISPSHARED_EXPORT ButterflyView : public QOpenGLWidget
 {
     Q_OBJECT
 
@@ -117,30 +115,32 @@ public:
     //=========================================================================================================
     /**
     * Perform a data update.
-    *
-    * @param [in] topLeft       The new top left index.
-    * @param [in] bottomRight   The new bottom right index.
-    * @param [in] roles         The new roles.
     */
-    void dataUpdate(const QModelIndex& topLeft,
-                    const QModelIndex& bottomRight,
-                    const QVector<int>& roles = QVector<int>());
+    void dataUpdate();
 
     //=========================================================================================================
     /**
-    * Returns the modality list.
+    * Get the activation of the already created modality check boxes.
     *
-    * @return A list with all currently selected modalities.
+    * @return The current modality map.
     */
-    QList<Modality> getModalities();
+    QMap<QString, bool> getModalityMap();
 
     //=========================================================================================================
     /**
-    * Set the modalities.
+    * Set the modality checkboxes.
     *
-    * @param [in] p_qListModalities     The new modalities.
+    * @param [in] modalityMap    The modality map.
     */
-    void setModalities(const QList<Modality>& p_qListModalities);
+    void setModalityMap(const QMap<QString, bool>& modalityMap);
+
+    //=========================================================================================================
+    /**
+    * Sets the scale map to scaleMap.
+    *
+    * @param [in] scaleMap map with all channel types and their current scaling value.
+    */
+    void setScaleMap(const QMap<qint32, float> &scaleMap);
 
     //=========================================================================================================
     /**
@@ -152,7 +152,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Perform a view update.
+    * Perform a view update from outside of this class.
     */
     void updateView();
 
@@ -182,11 +182,35 @@ public:
 
     //=========================================================================================================
     /**
-    * Set the average map information
+    * Get the current average colors
     *
-    * @param [in] mapAvr     The average data information including the color per average type.
+    * @return Pointer to the current average colors.
     */
-    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
+    QSharedPointer<QMap<QString, QColor> > getAverageColor() const;
+
+    //=========================================================================================================
+    /**
+    * Get the current average activations
+    *
+    * @return Pointer to the current average activations.
+    */
+    QSharedPointer<QMap<QString, bool> > getAverageActivation() const;
+
+    //=========================================================================================================
+    /**
+    * Set the average colors
+    *
+    * @param [in] qMapAverageColor      Pointer to the new average colors
+    */
+    void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
+
+    //=========================================================================================================
+    /**
+    * Set the average activations
+    *
+    * @param [in] qMapAverageActivation      Pointer to the new average activations
+    */
+    void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
     //=========================================================================================================
     /**
@@ -194,7 +218,7 @@ public:
     *
     * @param [in] pChannelInfoModel     The new channel info model.
     */
-    void setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
+    void setModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
 
     //=========================================================================================================
     /**
@@ -212,9 +236,8 @@ protected:
     *
     * @param [in] event pointer to PaintEvent -> not used.
     */
-    virtual void paintEvent(QPaintEvent* paintEvent );
+    virtual void paintGL();
 
-private:
     //=========================================================================================================
     /**
     * createPlotPath creates the QPointer path for the data plot.
@@ -230,24 +253,18 @@ private:
     bool        m_bShowMISC;                    /**< Show Miscellaneous channels */
     bool        m_bIsInit;                      /**< Whether this class has been initialized */
 
-    float       m_fMaxMAG;                      /**< Scale for Magnetometers channels */
-    float       m_fMaxGRAD;                     /**< Scale for Gradiometers channels */
-    float       m_fMaxEEG;                      /**< Scale for EEG channels */
-    float       m_fMaxEOG;                      /**< Scale for EEG channels */
-    float       m_fMaxMISC;                     /**< Scale for Miscellaneous channels */
-
-    qint32      m_iNumChannels;                 /**< Number of channels */
-
     QColor      m_colCurrentBackgroundColor;    /**< The current background color */
 
     QList<int>  m_lSelectedChannels;            /**< The currently selected channels */
 
-    QList<DISPLIB::Modality>                m_qListModalities;                      /**< The list of currently selected modalities */
+    QMap<QString, bool>                     m_modalityMap;                  /**< Map of different modalities. */
+    QMap<qint32,float>                      m_scaleMap;                     /**< Map with all channel types and their current scaling value.*/
 
-    QSharedPointer<EvokedSetModel>          m_pEvokedModel;                         /**< The evoked model */
-    QSharedPointer<ChannelInfoModel>        m_pChannelInfoModel;                    /**< The channel info model */
+    QSharedPointer<EvokedSetModel>          m_pEvokedSetModel;              /**< The evoked model */
+    QSharedPointer<ChannelInfoModel>        m_pChannelInfoModel;            /**< The channel info model */
 
-    QMap<double, QPair<QColor, QPair<QString,bool> > >      m_qMapAverageColor;     /**< The current average color information. */
+    QSharedPointer<QMap<QString, bool> >    m_qMapAverageActivation;        /**< Average activation status. */
+    QSharedPointer<QMap<QString, QColor> >  m_qMapAverageColor;             /**< Average colors. */
 };
 
 
@@ -257,7 +274,5 @@ private:
 //=============================================================================================================
 
 } // NAMESPACE
-
-Q_DECLARE_METATYPE(QList<DISPLIB::Modality>);
 
 #endif // BUTTERFLYVIEW_H

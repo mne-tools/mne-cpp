@@ -45,8 +45,6 @@
 #include "scdisp_global.h"
 #include "measurementwidget.h"
 
-#include <disp/viewers/modalityselectionview.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -54,6 +52,7 @@
 //=============================================================================================================
 
 #include <QPointer>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -158,7 +157,7 @@ protected:
     /**
     * Show modality view.
     */
-    void onNewModalitySelection(const QList<DISPLIB::Modality>& modalityList);
+    void onNewModalitySelection(const QMap<QString, bool>& modalityMap);
 
     QSharedPointer<DISPLIB::ModalitySelectionView>   m_pModalitySelectionWidget;     /**< Modality selection widget */
 
@@ -171,7 +170,7 @@ protected:
     bool                                    m_bInitialized;                 /**< Is Initialized */
 
     QStringList                             m_qListChNames;                 /**< Channel names */
-    QList<DISPLIB::Modality>                m_qListPickTypes;               /**< Channel Types to pick */
+    QMap<QString, bool>                     m_modalityMap;                  /**< Map of different modalities. */
 
     Eigen::MatrixXd                         m_matSelector;                  /**< Selction matrix */
     Eigen::MatrixXd                         m_matSelectorT;                 /**< Transposed selction matrix */

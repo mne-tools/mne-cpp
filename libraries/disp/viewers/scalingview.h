@@ -115,6 +115,15 @@ public:
 
     //=========================================================================================================
     /**
+    * Get the current scaling map
+    *
+    * @return The current scaling map.
+    */
+
+    QMap<qint32,float> getScaleMap() const;
+
+    //=========================================================================================================
+    /**
     * Init the view
     */
     void init(const QMap<qint32, float> &qMapChScaling);
