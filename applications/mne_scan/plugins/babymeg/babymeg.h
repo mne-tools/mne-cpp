@@ -60,6 +60,7 @@
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QTime>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -429,11 +430,11 @@ protected:
     Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
     Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
 
-    QAction*                m_pActionSetupProject;          /**< shows setup project dialog */
-    QAction*                m_pActionRecordFile;            /**< start recording action */
-    QAction*                m_pActionSqdCtrl;               /**< show squid control */
-    QAction*                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
-    QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
+    QPointer<QAction>                       m_pActionSetupProject;          /**< shows setup project dialog */
+    QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action */
+    QPointer<QAction>                       m_pActionSqdCtrl;               /**< show squid control */
+    QPointer<QAction>                       m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
+    QPointer<QAction>                       m_pActionComputeHPI;            /**< The Action to show the HPI view */
 
 signals:
     //=========================================================================================================

@@ -109,6 +109,13 @@ Neuromag::Neuromag()
             this, &Neuromag::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
 
+    //Init HPI
+    m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
+    m_pActionComputeHPI->setStatusTip(tr("Compute HPI"));
+    connect(m_pActionComputeHPI.data(), &QAction::triggered,
+            this, &Neuromag::showHPIDialog);
+    addPluginAction(m_pActionComputeHPI);
+
     //Init recording timers
     m_pRecordTimer = QSharedPointer<QTimer>(new QTimer(this));
     m_pRecordTimer->setSingleShot(true);
@@ -744,7 +751,6 @@ void Neuromag::showHPIDialog()
         msgBox.exec();
         return;
     } else {
-        qDebug()<<" Start to load Polhemus File";
         if (!m_pHPIWidget) {
             m_pHPIWidget = QSharedPointer<HpiView>(new HpiView(m_pFiffInfo));
         }

@@ -106,13 +106,13 @@ BabyMEG::BabyMEG()
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionSetupProject->setStatusTip(tr("Setup Project"));
-    connect(m_pActionSetupProject, &QAction::triggered,
+    connect(m_pActionSetupProject.data(), &QAction::triggered,
             this, &BabyMEG::showProjectDialog);
     addPluginAction(m_pActionSetupProject);    
 
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
-    connect(m_pActionRecordFile, &QAction::triggered,
+    connect(m_pActionRecordFile.data(), &QAction::triggered,
             this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
     //m_pActionRecordFile->setEnabled(false);
@@ -120,20 +120,20 @@ BabyMEG::BabyMEG()
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionSqdCtrl->setStatusTip(tr("Squid Control"));
-    connect(m_pActionSqdCtrl, &QAction::triggered,
+    connect(m_pActionSqdCtrl.data(), &QAction::triggered,
             this, &BabyMEG::showSqdCtrlDialog);
     addPluginAction(m_pActionSqdCtrl);
 
     m_pActionUpdateFiffInfo = new QAction(QIcon(":/images/latestFiffInfo.png"), tr("Update Fiff Info"),this);
     m_pActionUpdateFiffInfo->setStatusTip(tr("Update Fiff Info"));
-    connect(m_pActionUpdateFiffInfo, &QAction::triggered,
+    connect(m_pActionUpdateFiffInfo.data(), &QAction::triggered,
             this, &BabyMEG::updateFiffInfo);
     addPluginAction(m_pActionUpdateFiffInfo);
 
     //Init HPI
     m_pActionComputeHPI = new QAction(QIcon(":/images/latestFiffInfoHPI.png"), tr("Compute HPI"),this);
     m_pActionComputeHPI->setStatusTip(tr("Compute HPI"));
-    connect(m_pActionComputeHPI, &QAction::triggered,
+    connect(m_pActionComputeHPI.data(), &QAction::triggered,
             this, &BabyMEG::showHPIDialog);
     addPluginAction(m_pActionComputeHPI);
 
@@ -587,7 +587,6 @@ void BabyMEG::showHPIDialog()
         msgBox.exec();
         return;
     } else {
-        qDebug()<<" Start to load Polhemus File";
         if (!m_pHPIWidget) {
             m_pHPIWidget = QSharedPointer<HpiView>(new HpiView(m_pFiffInfo));
             connect(m_pHPIWidget.data(), &HpiView::continousHPIToggled,
