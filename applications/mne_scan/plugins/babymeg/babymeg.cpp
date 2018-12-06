@@ -744,7 +744,9 @@ void BabyMEG::splitRecordingFile()
 
     //start next file
     m_qFileOut.setFileName(nextFileName);
-    m_pOutfid = FiffStream::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals, defaultMatrixXi, false);
+    m_pOutfid = FiffStream::start_writing_raw(m_qFileOut,
+                                              *m_pFiffInfo,
+                                              RowVectorXd());
     fiff_int_t first = 0;
     m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
 }
@@ -803,7 +805,9 @@ void BabyMEG::toggleRecordingFile()
 
         //Start/Prepare writing process. Actual writing is done in run() method.
         m_mutex.lock();
-        m_pOutfid = FiffStream::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals, defaultMatrixXi, false);
+        m_pOutfid = FiffStream::start_writing_raw(m_qFileOut,
+                                                  *m_pFiffInfo,
+                                                  RowVectorXd());
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
         m_mutex.unlock();
