@@ -51,6 +51,7 @@
 #include <fiff/fiff_info.h>
 #include <utils/ioutils.h>
 #include <communication/rtClient/rtcmdclient.h>
+#include <disp3D/viewers/hpiview.h>
 
 
 //*************************************************************************************************************
@@ -75,6 +76,7 @@ using namespace IOBUFFER;
 using namespace SCMEASLIB;
 using namespace FIFFLIB;
 using namespace DISPLIB;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************
@@ -129,6 +131,15 @@ Neuromag::~Neuromag()
 {
     if(m_pNeuromagProducer->isRunning() || this->isRunning())
         stop();
+}
+
+
+//*************************************************************************************************************
+
+void Neuromag::clear()
+{
+    m_pFiffInfo.reset();
+    m_iBufferSize = -1;
 }
 
 
@@ -337,55 +348,6 @@ void Neuromag::setRecordingTimerStateChanged(bool state)
 
 //*************************************************************************************************************
 
-void Neuromag::onRecordingRemainingTimeChange()
-{
-    m_pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Create measurement instances and config them
-//=============================================================================================================
-
-void Neuromag::initConnector()
-{
-    if(m_pFiffInfo)
-    {
-        m_pRTMSA_Neuromag = PluginOutputData<RealTimeMultiSampleArray>::create(this, "Realtime", "MNE Rt Client");
-
-        m_pRTMSA_Neuromag->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSA_Neuromag->data()->setMultiArraySize(1);
-
-        m_pRTMSA_Neuromag->data()->setVisibility(true);
-
-        m_pRTMSA_Neuromag->data()->setXMLLayoutFile("./resources/mne_scan/plugins/Neuromag/VectorViewLayout.xml");
-
-        m_outputConnectors.append(m_pRTMSA_Neuromag);
-
-        //Add the calibration factors
-        m_cals = RowVectorXd(m_pFiffInfo->nchan);
-        m_cals.setZero();
-        for (qint32 k = 0; k < m_pFiffInfo->nchan; ++k) {
-            m_cals[k] = m_pFiffInfo->chs[k].range*m_pFiffInfo->chs[k].cal;
-        }
-
-        //Initialize the data and calibration vector
-        typedef Eigen::Triplet<double> T;
-        std::vector<T> tripletList;
-        tripletList.reserve(m_pFiffInfo->nchan);
-        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
-            tripletList.push_back(T(i, i, this->m_cals[i]));
-        }
-
-        m_sparseMatCals = SparseMatrix<double>(m_pFiffInfo->nchan, m_pFiffInfo->nchan);
-        m_sparseMatCals.setFromTriplets(tripletList.begin(), tripletList.end());
-    }
-}
-
-
-//*************************************************************************************************************
-
 void Neuromag::changeConnector(qint32 p_iNewConnectorId)
 {
     if(p_iNewConnectorId != m_iActiveConnectorId)
@@ -417,114 +379,6 @@ void Neuromag::changeConnector(qint32 p_iNewConnectorId)
 
         emit cmdConnectionChanged(m_bCmdClientIsConnected);
     }
-}
-
-
-//*************************************************************************************************************
-
-void Neuromag::clear()
-{
-    m_pFiffInfo.reset();
-    m_iBufferSize = -1;
-}
-
-
-//*************************************************************************************************************
-
-void Neuromag::connectCmdClient()
-{
-    if(m_pRtCmdClient.isNull())
-        m_pRtCmdClient = QSharedPointer<RtCmdClient>(new RtCmdClient);
-    else if(m_bCmdClientIsConnected)
-        this->disconnectCmdClient();
-
-    m_pRtCmdClient->connectToHost(m_sNeuromagIP);
-    m_pRtCmdClient->waitForConnected(1000);
-
-    if(m_pRtCmdClient->state() == QTcpSocket::ConnectedState)
-    {
-        m_mutex.lock();
-
-        if(!m_bCmdClientIsConnected)
-        {
-            //
-            // request available commands
-            //
-            m_pRtCmdClient->requestCommands();
-
-            //
-            // set cmd client is connected
-            //
-            m_bCmdClientIsConnected = true;
-
-            //
-            // Read Info
-            //
-            if(!m_pFiffInfo)
-                requestInfo();
-
-            // This will read projectors from an external file and replace the one received from mne_rt_server
-            //if(m_pFiffInfo)
-            //    readProjectors();
-
-            //
-            // Read Connectors
-            //
-            if(m_qMapConnectors.size() == 0)
-                m_iActiveConnectorId = m_pRtCmdClient->requestConnectors(m_qMapConnectors);
-
-            QMap<qint32, QString>::const_iterator it;
-            for(it = m_qMapConnectors.begin(); it != m_qMapConnectors.end(); ++it)
-                if(it.value().compare("Neuromag Connector") == 0 && m_iActiveConnectorId != it.key())
-                    changeConnector(it.key());
-
-            //
-            // Read Buffer Size
-            //
-            m_iBufferSize = m_pRtCmdClient->requestBufsize();
-
-            emit cmdConnectionChanged(m_bCmdClientIsConnected);
-        }
-        m_mutex.unlock();
-    }
-}
-
-
-//*************************************************************************************************************
-
-void Neuromag::disconnectCmdClient()
-{
-    if(m_bCmdClientIsConnected)
-    {
-        m_pRtCmdClient->disconnectFromHost();
-        m_pRtCmdClient->waitForDisconnected();
-        m_mutex.lock();
-        m_bCmdClientIsConnected = false;
-        m_mutex.unlock();
-        emit cmdConnectionChanged(m_bCmdClientIsConnected);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void Neuromag::requestInfo()
-{
-    while(!(m_pNeuromagProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected))
-        qWarning() << "NeuromagProducer is not running! Retry...";
-
-    if(m_pNeuromagProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)
-    {
-        // read meas info
-        (*m_pRtCmdClient)["measinfo"].pValues()[0].setValue(m_pNeuromagProducer->m_iDataClientId);
-        (*m_pRtCmdClient)["measinfo"].send();
-
-        m_pNeuromagProducer->m_mutex.lock();
-        m_pNeuromagProducer->m_bFlagInfoRequest = true;
-        m_pNeuromagProducer->m_mutex.unlock();
-    }
-    else
-        qWarning() << "NeuromagProducer is not connected!";
 }
 
 
@@ -669,6 +523,105 @@ bool Neuromag::readProjectors()
 
 //*************************************************************************************************************
 
+void Neuromag::connectCmdClient()
+{
+    if(m_pRtCmdClient.isNull())
+        m_pRtCmdClient = QSharedPointer<RtCmdClient>(new RtCmdClient);
+    else if(m_bCmdClientIsConnected)
+        this->disconnectCmdClient();
+
+    m_pRtCmdClient->connectToHost(m_sNeuromagIP);
+    m_pRtCmdClient->waitForConnected(1000);
+
+    if(m_pRtCmdClient->state() == QTcpSocket::ConnectedState)
+    {
+        m_mutex.lock();
+
+        if(!m_bCmdClientIsConnected)
+        {
+            //
+            // request available commands
+            //
+            m_pRtCmdClient->requestCommands();
+
+            //
+            // set cmd client is connected
+            //
+            m_bCmdClientIsConnected = true;
+
+            //
+            // Read Info
+            //
+            if(!m_pFiffInfo)
+                requestInfo();
+
+            // This will read projectors from an external file and replace the one received from mne_rt_server
+            //if(m_pFiffInfo)
+            //    readProjectors();
+
+            //
+            // Read Connectors
+            //
+            if(m_qMapConnectors.size() == 0)
+                m_iActiveConnectorId = m_pRtCmdClient->requestConnectors(m_qMapConnectors);
+
+            QMap<qint32, QString>::const_iterator it;
+            for(it = m_qMapConnectors.begin(); it != m_qMapConnectors.end(); ++it)
+                if(it.value().compare("Neuromag Connector") == 0 && m_iActiveConnectorId != it.key())
+                    changeConnector(it.key());
+
+            //
+            // Read Buffer Size
+            //
+            m_iBufferSize = m_pRtCmdClient->requestBufsize();
+
+            emit cmdConnectionChanged(m_bCmdClientIsConnected);
+        }
+        m_mutex.unlock();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Neuromag::disconnectCmdClient()
+{
+    if(m_bCmdClientIsConnected)
+    {
+        m_pRtCmdClient->disconnectFromHost();
+        m_pRtCmdClient->waitForDisconnected();
+        m_mutex.lock();
+        m_bCmdClientIsConnected = false;
+        m_mutex.unlock();
+        emit cmdConnectionChanged(m_bCmdClientIsConnected);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Neuromag::requestInfo()
+{
+    while(!(m_pNeuromagProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected))
+        qWarning() << "NeuromagProducer is not running! Retry...";
+
+    if(m_pNeuromagProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)
+    {
+        // read meas info
+        (*m_pRtCmdClient)["measinfo"].pValues()[0].setValue(m_pNeuromagProducer->m_iDataClientId);
+        (*m_pRtCmdClient)["measinfo"].send();
+
+        m_pNeuromagProducer->m_mutex.lock();
+        m_pNeuromagProducer->m_bFlagInfoRequest = true;
+        m_pNeuromagProducer->m_mutex.unlock();
+    }
+    else
+        qWarning() << "NeuromagProducer is not connected!";
+}
+
+
+//*************************************************************************************************************
+
 void Neuromag::run()
 {
     MatrixXf matValue;
@@ -731,5 +684,84 @@ void Neuromag::changeRecordingButton()
     } else {
         m_pActionRecordFile->setIcon(QIcon(":/images/record_active.png"));
         m_iBlinkStatus = 0;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Neuromag::onRecordingRemainingTimeChange()
+{
+    m_pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
+}
+
+
+//*************************************************************************************************************
+
+void Neuromag::initConnector()
+{
+    if(m_pFiffInfo)
+    {
+        m_pRTMSA_Neuromag = PluginOutputData<RealTimeMultiSampleArray>::create(this, "Realtime", "MNE Rt Client");
+
+        m_pRTMSA_Neuromag->data()->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSA_Neuromag->data()->setMultiArraySize(1);
+
+        m_pRTMSA_Neuromag->data()->setVisibility(true);
+
+        m_pRTMSA_Neuromag->data()->setXMLLayoutFile("./resources/mne_scan/plugins/Neuromag/VectorViewLayout.xml");
+
+        m_outputConnectors.append(m_pRTMSA_Neuromag);
+
+        //Add the calibration factors
+        m_cals = RowVectorXd(m_pFiffInfo->nchan);
+        m_cals.setZero();
+        for (qint32 k = 0; k < m_pFiffInfo->nchan; ++k) {
+            m_cals[k] = m_pFiffInfo->chs[k].range*m_pFiffInfo->chs[k].cal;
+        }
+
+        //Initialize the data and calibration vector
+        typedef Eigen::Triplet<double> T;
+        std::vector<T> tripletList;
+        tripletList.reserve(m_pFiffInfo->nchan);
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
+            tripletList.push_back(T(i, i, this->m_cals[i]));
+        }
+
+        m_sparseMatCals = SparseMatrix<double>(m_pFiffInfo->nchan, m_pFiffInfo->nchan);
+        m_sparseMatCals.setFromTriplets(tripletList.begin(), tripletList.end());
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Neuromag::showHPIDialog()
+{
+    if(!m_pFiffInfo) {
+        QMessageBox msgBox;
+        msgBox.setText("FiffInfo missing!");
+        msgBox.exec();
+        return;
+    } else {
+        qDebug()<<" Start to load Polhemus File";
+        if (!m_pHPIWidget) {
+            m_pHPIWidget = QSharedPointer<HpiView>(new HpiView(m_pFiffInfo));
+        }
+
+        if (!m_pHPIWidget->isVisible()) {
+            m_pHPIWidget->show();
+            m_pHPIWidget->raise();
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void Neuromag::updateHPI(const MatrixXf& matData)
+{
+    if(m_pFiffInfo && m_pHPIWidget) {
+        m_pHPIWidget->setData(this->calibrate(matData));
     }
 }

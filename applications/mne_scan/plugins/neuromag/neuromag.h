@@ -99,6 +99,10 @@ namespace SCMEASLIB {
     class RealTimeMultiSampleArray;
 }
 
+namespace DISP3DLIB {
+    class HpiView;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -264,14 +268,25 @@ protected:
     */
     void onRecordingRemainingTimeChange();
 
-private:
     //=========================================================================================================
     /**
     * Initialises the output connector.
     */
     void initConnector();
 
-    bool readHeader();
+    //=========================================================================================================
+    /**
+    * Set HPI fiff information.
+    */
+    void showHPIDialog();
+
+    //=========================================================================================================
+    /**
+    * Sends the current data block to the HPI dialog.
+    *
+    * @param [in] matData   The new data block.
+    */
+    void updateHPI(const Eigen::MatrixXf &matData);
 
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA_Neuromag;          /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
@@ -284,6 +299,7 @@ private:
     QSharedPointer<DISPLIB::ProjectSettingsView>        m_pProjectSettingsView;         /**< Window to setup the recording tiem and fiel name. */
     QSharedPointer<FIFFLIB::FiffStream>                 m_pOutfid;                      /**< FiffStream to write to.*/
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QSharedPointer<DISP3DLIB::HpiView>                  m_pHPIWidget;                   /**< HPI widget. */
 
     QMutex                                  m_mutex;
 
