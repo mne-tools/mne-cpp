@@ -2,6 +2,8 @@
 
 # Install Qt
 brew install qt
+brew linkapps qt
+brew link --force qt
 
 # Install dylibbundler
 brew install dylibbundler
