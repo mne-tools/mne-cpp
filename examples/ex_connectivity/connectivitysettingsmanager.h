@@ -201,6 +201,9 @@ public:
         m_networkData = tNetworkData;
         m_networkData.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
         m_networkData.normalize();
+        VisualizationInfo info = m_networkData.getVisualizationInfo();
+        info.sMethod = "Color";
+        m_networkData.setVisualizationInfo(info);
 
         if(!m_networkData.isEmpty()) {
             emit newConnectivityResultAvailable(m_networkData);

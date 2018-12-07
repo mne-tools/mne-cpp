@@ -83,6 +83,12 @@ namespace CONNECTIVITYLIB {
 class NetworkEdge;
 class NetworkNode;
 
+struct VisualizationInfo {
+    QString sMethod = "Map";                                    /**< The color method: Map (uses sColormap parameter) or Color (uses colNodes and colEdges).*/
+    QString sColormap = "Jet";                                  /**< The colormap.*/
+    Eigen::Vector4i colNodes = Eigen::Vector4i(255, 0, 0, 1);   /**< The node color.*/
+    Eigen::Vector4i colEdges = Eigen::Vector4i(255, 0, 0, 1);   /**< The edge color.*/
+};
 
 //=============================================================================================================
 /**
@@ -295,7 +301,7 @@ public:
     *
     * @return The current upper/lower bin to average from/to.
     */
-    const QPair<int,int>& getFrequencyBins();
+    const QPair<int,int>& getFrequencyBins() const;
 
     //=========================================================================================================
     /**
@@ -321,7 +327,27 @@ public:
     */
     bool isEmpty() const;
 
+    //=========================================================================================================
+    /**
+    * Normalize the network.
+    */
     void normalize();
+
+    //=========================================================================================================
+    /**
+    * Get the current visualization info.
+    *
+    * @return The current visualization info.
+    */
+    VisualizationInfo getVisualizationInfo() const;
+
+    //=========================================================================================================
+    /**
+    * Set the current visualization info.
+    *
+    * @param[in] visualizationInfo        The new visualization info.
+    */
+    void setVisualizationInfo(const VisualizationInfo& visualizationInfo);
 
 protected:
     QList<QSharedPointer<NetworkEdge> >     m_lFullEdges;               /**< List with all edges of the network.*/
@@ -338,6 +364,8 @@ protected:
     QPair<int,int>                          m_minMaxFrequencyBins;      /**< The minimum and maximum frequency bins to average from/to.*/
 
     double                                  m_dThreshold;               /**< The current threshold value.*/
+
+    VisualizationInfo                       m_visualizationInfo;        /**< The current visualization info used to plot the network later on.*/
 };
 
 
@@ -352,6 +380,11 @@ protected:
 #ifndef metatype_networks
 #define metatype_networks
 Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network);
+#endif
+
+#ifndef metatype_networkssptr
+#define metatype_networkssptr
+Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network::SPtr);
 #endif
 
 #endif // NETWORK_H
