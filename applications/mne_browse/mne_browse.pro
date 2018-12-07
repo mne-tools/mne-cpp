@@ -40,7 +40,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += gui network core widgets concurrent svg
+QT += gui network core widgets concurrent svg opengl
 
 TARGET = mne_browse
 

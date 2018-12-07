@@ -114,7 +114,8 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC,
     //set layouts
     this->setLayout(m_pRtcLayout);
 
-    m_qListPickTypes << Modality("EEG", true, 0.0) << Modality("MEG", true, 0.0);
+    m_modalityMap.insert("EEG", true);
+    m_modalityMap.insert("MEG", true);
 
     getData();
 
@@ -168,7 +169,7 @@ void RealTimeCovWidget::init()
 
         m_pImageSc->setTitle(m_pRTC->getName());
 
-        onNewModalitySelection(m_qListPickTypes);
+        onNewModalitySelection(m_modalityMap);
 
         m_bInitialized = true;
     }
@@ -186,7 +187,7 @@ void RealTimeCovWidget::showModalitySelectionWidget()
         connect(m_pModalitySelectionWidget.data(), &ModalitySelectionView::modalitiesChanged,
                 this, &RealTimeCovWidget::onNewModalitySelection);
 
-        m_pModalitySelectionWidget->init(m_qListPickTypes);
+        m_pModalitySelectionWidget->setModalityMap(m_modalityMap);
     }
 
     m_pModalitySelectionWidget->show();
@@ -195,13 +196,15 @@ void RealTimeCovWidget::showModalitySelectionWidget()
 
 //*************************************************************************************************************
 
-void RealTimeCovWidget::onNewModalitySelection(const QList<Modality>& modalityList)
+void RealTimeCovWidget::onNewModalitySelection(const QMap<QString, bool> &modalityMap)
 {
     if(m_pRTC) {
         QList<qint32> qListSelChannel;
         for(qint32 i = 0; i < m_qListChNames.size(); ++i) {
-            foreach (const Modality &type, modalityList) {
-                if (m_qListChNames[i].contains(type.m_sName) && type.m_bActive) {
+            QMapIterator<QString, bool> itr(modalityMap);
+            while (itr.hasNext()) {
+                itr.next();
+                if (m_qListChNames[i].contains(itr.key()) && itr.value()) {
                     qListSelChannel.append(i);
                 }
             }

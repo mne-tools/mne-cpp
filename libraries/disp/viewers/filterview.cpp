@@ -117,7 +117,7 @@ FilterView::~FilterView()
 
 void FilterView::init(double dSFreq)
 {
-    m_dSFreq = dSFreq;
+    setSamplingRate(dSFreq);
 
     filterParametersChanged();
 

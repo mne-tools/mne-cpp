@@ -97,7 +97,7 @@ struct RtInvOpInput {
 *
 * @brief Real-time inverse operator worker.
 */
-class RtInvOpWorker : public QObject
+class RTPROCESINGSHARED_EXPORT RtInvOpWorker : public QObject
 {
     Q_OBJECT
 

@@ -189,5 +189,9 @@ int main(int argc, char *argv[])
 
 //    qInstallMessageHandler(customMessageHandler);
 
+    QSurfaceFormat fmt;
+    fmt.setSamples(10);
+    QSurfaceFormat::setDefaultFormat(fmt);
+
     return app.exec();
 }

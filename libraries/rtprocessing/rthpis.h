@@ -109,7 +109,7 @@ struct FittingResult {
 *
 * @brief Real-time HPI worker.
 */
-class RtHPISWorker : public QObject
+class RTPROCESINGSHARED_EXPORT RtHPISWorker : public QObject
 {
     Q_OBJECT
 
@@ -118,13 +118,13 @@ public:
     /**
     * Perform one single HPI fit.
     *
-    * @param[in] t_mat           Data to estimate the HPI positions from
-    * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
-    * @param[in] vFreqs          The frequencies for each coil.
-    * @param[in] p_pFiffInfo     Associated Fiff Information.
+    * @param[in] matData            Data to estimate the HPI positions from
+    * @param[in] matProjectors      The projectors to apply. Bad channels are still included.
+    * @param[in] vFreqs             The frequencies for each coil.
+    * @param[in] pFiffInfo          Associated Fiff Information.
     */
     void doWork(const Eigen::MatrixXd& matData,
-                const Eigen::MatrixXd& m_matProjectors,
+                const Eigen::MatrixXd& matProjectors,
                 const QVector<int>& vFreqs,
                 QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
@@ -153,7 +153,8 @@ public:
     * @param[in] p_pFiffInfo        Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtHPIS(QSharedPointer<FIFFLIB::FiffInfo> p_pFiffInfo, QObject *parent = 0);
+    explicit RtHPIS(QSharedPointer<FIFFLIB::FiffInfo> p_pFiffInfo,
+                    QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -200,7 +201,7 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Handles the result
+    * Handles the results.
     */
     void handleResults(const FittingResult &fitResult);
 

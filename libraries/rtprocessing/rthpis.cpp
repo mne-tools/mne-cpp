@@ -80,9 +80,9 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 void RtHPISWorker::doWork(const Eigen::MatrixXd& matData,
-            const Eigen::MatrixXd& m_matProjectors,
-            const QVector<int>& vFreqs,
-            QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
+                          const Eigen::MatrixXd& matProjectors,
+                          const QVector<int>& vFreqs,
+                          QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
 {
     if(this->thread()->isInterruptionRequested()) {
         return;
@@ -94,7 +94,7 @@ void RtHPISWorker::doWork(const Eigen::MatrixXd& matData,
     fitResult.devHeadTrans.to = 4;
 
     HPIFit::fitHPI(matData,
-                    m_matProjectors,
+                    matProjectors,
                     fitResult.devHeadTrans,
                     vFreqs,
                     fitResult.errorDistances,
