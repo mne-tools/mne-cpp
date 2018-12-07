@@ -103,7 +103,7 @@ namespace DISP3DLIB {
 
 //=============================================================================================================
 /**
-* This class holds a custom framegraph that can be used for computations with OpenGL compute shadern.
+* This class holds a custom framegraph that can be used for computations with OpenGL compute shader.
 *
 * @brief Custom framegaph class.
 */

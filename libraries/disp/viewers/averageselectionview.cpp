@@ -174,7 +174,7 @@ void AverageSelectionView::update()
         connect(pButton.data(), &QPushButton::clicked,
                 this, &AverageSelectionView::onAveragesChanged);
 
-        count++;
+        ++count;
     }
 
     this->setLayout(topLayout);
