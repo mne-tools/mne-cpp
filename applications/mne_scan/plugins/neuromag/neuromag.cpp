@@ -252,9 +252,10 @@ void Neuromag::splitRecordingFile()
 
     //start next file
     m_qFileOut.setFileName(nextFileName);
+    RowVectorXd cals;
     m_pOutfid = FiffStream::start_writing_raw(m_qFileOut,
                                               *m_pFiffInfo,
-                                              RowVectorXd());
+                                              cals);
     fiff_int_t first = 0;
     m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
 }
@@ -324,9 +325,10 @@ void Neuromag::toggleRecordingFile()
         }
 
         m_mutex.lock();
+        RowVectorXd cals;
         m_pOutfid = FiffStream::start_writing_raw(m_qFileOut,
                                                   *m_pFiffInfo,
-                                                  RowVectorXd());
+                                                  cals);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
         m_mutex.unlock();
