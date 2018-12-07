@@ -41,6 +41,7 @@ QT += core gui
 QT += widgets
 
 CONFIG   += console
+CONFIG   -= app_bundle
 
 TARGET = ex_disp
 
