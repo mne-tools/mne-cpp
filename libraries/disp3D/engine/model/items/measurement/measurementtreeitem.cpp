@@ -349,29 +349,34 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData,
                                               Qt3DCore::QEntity* p3DEntityParent)
 {
     if(!tNetworkData.getNodes().isEmpty()) {
-        //Add source estimation data as child
-        if(this->findChildren(Data3DTreeModelItemTypes::NetworkItem).size() == 0) {
-            //If rt data item does not exists yet, create it here!
-            if(!m_pNetworkTreeItem) {
-                m_pNetworkTreeItem = new NetworkTreeItem(p3DEntityParent);
-            }
+        NetworkTreeItem* pReturnItem = Q_NULLPTR;
 
-            m_pNetworkTreeItem->setText(tNetworkData.getConnectivityMethod());
+        QPair<int,int> bins = tNetworkData.getFrequencyBins();
+        QString sItemName = QString("%1_%2_%3").arg(tNetworkData.getConnectivityMethod()).arg(QString::number(bins.first)).arg(QString::number(bins.second));
+
+        //Add network estimation data as child
+        QList<QStandardItem*> lItems = this->findChildren(sItemName);
+
+        if(lItems.isEmpty()) {
+            pReturnItem = new NetworkTreeItem(p3DEntityParent);
+
+            pReturnItem->setText(sItemName);
 
             QList<QStandardItem*> list;
-            list << m_pNetworkTreeItem;
-            list << new QStandardItem(m_pNetworkTreeItem->toolTip());
+            list << pReturnItem;
+            list << new QStandardItem(pReturnItem->toolTip());
             this->appendRow(list);
 
-            m_pNetworkTreeItem->addData(tNetworkData);
+            pReturnItem->addData(tNetworkData);
         } else {
-            if(m_pNetworkTreeItem) {
-                m_pNetworkTreeItem->setText(tNetworkData.getConnectivityMethod());
-                m_pNetworkTreeItem->addData(tNetworkData);
+            if(lItems.first()) {
+                if(pReturnItem = dynamic_cast<NetworkTreeItem*>(lItems.first())) {
+                    pReturnItem->addData(tNetworkData);
+                }
             }
         }
 
-        return m_pNetworkTreeItem;
+        return pReturnItem;
     } else {
         qDebug() << "MeasurementTreeItem::addData - network data is empty";
     }
