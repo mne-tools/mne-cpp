@@ -30,14 +30,13 @@ defineReplace(macDeployArgs) {
     mne_library_dir = $$4
     extra_args = $$5
 
-    target_custom_ext = $${target_ext}
-    isEmpty($${target_custom_ext}) {
-        target_custom_ext = .app
+    isEmpty(target_ext) {
+        target_ext = .app
     }
 
     deploy_cmd = macdeployqt
 
-    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_custom_ext}))
+    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_ext}))
 
     deploy_libs_to_copy = -libpath=$${mne_library_dir}
     !isEmpty(extra_args) {
@@ -54,16 +53,15 @@ defineReplace(winDeployLibArgs) {
     mne_library_dir = $$4
     extra_args = $$5
 
-    target_custom_ext = $${target_ext}
-    isEmpty($${target_custom_ext}) {
-        target_custom_ext = .dll
+    isEmpty(target_ext) {
+        target_ext = .dll
     }
 
-    file = $$shell_quote($$shell_path($${mne_library_dir}/$${target}$${target_custom_ext}))
+    file = $$shell_quote($$shell_path($${mne_library_dir}/$${target}$${target_ext}))
     final_deploy_command += $${QMAKE_COPY} $${file} $$shell_quote($${mne_binary_dir}) $$escape_expand(\\n\\t)
 
     # Deploy qt dependecies for the library
-    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_custom_ext}))
+    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_ext}))
     deploy_cmd = windeployqt
 
     final_deploy_command += $$deploy_cmd $$deploy_target $$extra_args $$escape_expand(\\n\\t)
@@ -78,12 +76,11 @@ defineReplace(winDeployAppArgs) {
     extra_args = $$5
 
     # Deploy qt dependecies for the application
-    target_custom_ext = $${target_ext}
-    isEmpty($${target_custom_ext}) {
-        target_custom_ext = .exe
+    isEmpty(target_ext) {
+        target_ext = .exe
     }
 
-    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_custom_ext}))
+    deploy_target = $$shell_quote($$shell_path($${mne_binary_dir}/$${target}$${target_ext}))
     deploy_cmd = windeployqt
 
     final_deploy_command += $$deploy_cmd $$deploy_target $$extra_args $$escape_expand(\\n\\t)
@@ -219,5 +216,5 @@ isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
 
 
 # FFTW dir
-FFTW_DIR_LIBS = $$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/lib)
-FFTW_DIR_INCLUDE = $$shell_path(/cluster/fusion/lesch/Programs/fftw-3.3.8/include)
+FFTW_DIR_LIBS = $$shell_path(C:\fftw-3.3.5-dll64)
+FFTW_DIR_INCLUDE = $$shell_path(C:\fftw-3.3.5-dll64)

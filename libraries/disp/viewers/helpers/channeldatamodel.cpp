@@ -560,7 +560,7 @@ void ChannelDataModel::addData(const QList<MatrixXd> &data)
         if(m_bTriggerDetectionActive) {
             int iOldDetectedTriggers = m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].size();
 
-            QList<QPair<int,double> > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksMax(data.at(b), m_iCurrentTriggerChIndex, m_iCurrentSample-nCol, m_dTriggerThreshold, true);
+            QList<QPair<int,double> > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksMax(data.at(b), m_iCurrentTriggerChIndex, m_iCurrentSample-nCol, m_dTriggerThreshold, true, 500);
             //QList<QPair<int,double> > qMapDetectedTrigger = DetectTrigger::detectTriggerFlanksGrad(data.at(b), m_iCurrentTriggerChIndex, m_iCurrentSample-nCol, m_dTriggerThreshold, false, "Rising");
 
             //Append results to already found triggers

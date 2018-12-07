@@ -164,7 +164,7 @@ void ProjectorsView::onEnableDisableAllProj(bool status)
         m_pEnableDisableProjectors->setChecked(status);
     }
 
-    emit projSelectionChanged();
+    emit projSelectionChanged(m_pFiffInfo->projs);
 }
 
 
@@ -187,5 +187,5 @@ void ProjectorsView::onCheckProjStatusChanged(bool status)
         m_pEnableDisableProjectors->setChecked(bAllActivated);
     }
 
-    emit projSelectionChanged();
+    emit projSelectionChanged(m_pFiffInfo->projs);
 }

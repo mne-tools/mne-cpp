@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <QPainter>
+#include <QDebug>
 #include <QStaticText>
 
 
@@ -88,20 +89,7 @@ AverageSceneItem::AverageSceneItem(const QString& channelName,
 , m_iMaxHeigth(150)
 , m_iTotalNumberChannels(0)
 {
-    m_lAverageColors.append(color);
-
     m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
-
-    //Init avr map
-    QPair<QColor, QPair<QString,bool> > pairFinal;
-    QPair<QString,bool> pair;
-
-    pair.first = "0";
-    pair.second = true;
-    pairFinal.first = QColor(0,0,0);
-    pairFinal.second = pair;
-
-    m_qMapAverageColor.insert(0,pairFinal);
 }
 
 
@@ -143,7 +131,7 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     //set posistion
     this->setPos(75*m_qpChannelPosition.x(), -75*m_qpChannelPosition.y());
 
-    painter->setRenderHint(QPainter::Antialiasing, false);
+    painter->setRenderHint(QPainter::Antialiasing, true);
 
 //    //Plot bounding rect / drawing region of this item
 //    painter->drawRect(this->boundingRect());
@@ -162,10 +150,7 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     QStaticText staticElectrodeName = QStaticText(m_sChannelName);
     painter->save();
     QPen pen;
-    pen.setColor(Qt::yellow);
-    if(!m_lAverageColors.isEmpty()) {
-        pen.setColor(m_lAverageColors.first());
-    }
+    pen.setColor(Qt::red);
     pen.setWidthF(5);
 
     QFont f = painter->font();
@@ -182,16 +167,6 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 //    painter->setPen(pen);
 //    painter->drawRect(this->boundingRect());
 //    painter->restore();
-}
-
-
-//*************************************************************************************************************
-
-void AverageSceneItem::setSignalMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr)
-{
-    m_qMapAverageColor = mapAvr;
-
-    update();
 }
 
 
@@ -261,7 +236,9 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
 
     //do for all currently stored evoked set data
     for(int dataIndex = 0; dataIndex < m_lAverageData.size(); ++dataIndex) {
-        if(m_qMapAverageColor[m_lAverageData.at(dataIndex).first].second.second) {
+        QString sAvrComment = m_lAverageData.at(dataIndex).first;
+
+        if(m_qMapAverageActivation[sAvrComment]) {
             //plot data from averaged data m_lAverageData with the calculated downsample factor
             const double* averageData = m_lAverageData.at(dataIndex).second.first;
             int totalCols =  m_lAverageData.at(dataIndex).second.second;
@@ -278,14 +255,14 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
             }
 
             //Create path
-            //float offset = (*(averageData+(abs(m_firstLastSample.first)*m_iTotalNumberChannels)+m_iChannelNumber)); //choose offset to be the signal value at time instance 0
+            float offset = (*(averageData+(0*m_iTotalNumberChannels)+m_iChannelNumber)); //choose offset to be the signal value at first sample
             QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
             QPen pen;
             pen.setStyle(Qt::SolidLine);
             pen.setColor(Qt::yellow);
 
-            if(m_qMapAverageColor.contains(m_lAverageData.at(dataIndex).first)) {
-                pen.setColor(m_qMapAverageColor[m_lAverageData.at(dataIndex).first].first);
+            if(m_qMapAverageColor.contains(sAvrComment)) {
+                pen.setColor(m_qMapAverageColor[sAvrComment]);
             }
 
             pen.setWidthF(3);
@@ -293,7 +270,7 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
 
             for(int i = 0; i < totalCols && path.elementCount() <= boundingRect.width(); i += dsFactor) {
                 //evoked matrix is stored in column major
-                double val = ((*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber))/*-offset*/) * dScaleY;
+                double val = ((*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber))-offset) * dScaleY;
 
                 //Cut plotting if three times bigger than m_iMaxHeigth
                 if(std::fabs(val) > 6*m_iMaxHeigth) {

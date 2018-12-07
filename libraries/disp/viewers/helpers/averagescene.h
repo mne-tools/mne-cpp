@@ -120,11 +120,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Set the average map information
+    * Set the activation per average map information
     *
-    * @param [in] mapAvr     The average data information including the color per average type.
+    * @param [in] qMapActivationPerAverage     The average activation information.
     */
-    void setAverageInformationMap(const QMap<double, QPair<QColor, QPair<QString,bool> > >& mapAvr);
+    void setActivationPerAverage(const QSharedPointer<QMap<QString, bool> > qMapActivationPerAverage);
+
+    //=========================================================================================================
+    /**
+    * Set the color per average map information
+    *
+    * @param [in] qMapAverageColor     The average color information.
+    */
+    void setColorPerAverage(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
     //=========================================================================================================
     /**

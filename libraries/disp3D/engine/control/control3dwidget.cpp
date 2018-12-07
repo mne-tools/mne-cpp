@@ -90,26 +90,10 @@ Control3DWidget::Control3DWidget(QWidget* parent,
     ui->setupUi(this);
 
     //Parse flags
-    if(slFlags.contains("Minimize")) {
-        ui->m_pushButton_minimize->show();
-        connect(ui->m_pushButton_minimize, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-             this, &Control3DWidget::onMinimizeWidget);
-    } else {
-        ui->m_pushButton_minimize->hide();
-    }
-
     if(slFlags.contains("Data")) {
         ui->m_treeView_loadedData->show();
     } else {
         ui->m_treeView_loadedData->hide();
-    }
-
-    if(slFlags.contains("Window")) {
-        ui->m_groupBox_windowOptions->show();
-        connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
-                this, &Control3DWidget::onOpacityChange);
-    } else {
-        ui->m_groupBox_windowOptions->hide();
     }
 
     if(slFlags.contains("View")) {
@@ -117,8 +101,6 @@ Control3DWidget::Control3DWidget(QWidget* parent,
 
         connect(ui->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &Control3DWidget::onSceneColorPicker);
-        connect(ui->m_checkBox_alwaysOnTop, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-                this, &Control3DWidget::onAlwaysOnTop);
         connect(ui->m_checkBox_showFullScreen, &QCheckBox::clicked,
                 this, &Control3DWidget::onShowFullScreen);
 
@@ -127,6 +109,9 @@ Control3DWidget::Control3DWidget(QWidget* parent,
 
         connect(ui->m_checkBox_coordAxis, &QCheckBox::clicked,
                 this, &Control3DWidget::onCoordAxisClicked);
+
+        connect(ui->m_pushButton_takeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+                this, &Control3DWidget::takeScreenshotChanged);
     } else {
         ui->m_groupBox_viewOptions->hide();
     }
@@ -148,10 +133,6 @@ Control3DWidget::Control3DWidget(QWidget* parent,
     ui->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(255, 255, 255);"));
 
     this->adjustSize();
-    this->setWindowOpacity(1/(100.0/90.0));
-
-    //Rename minimize button
-    ui->m_pushButton_minimize->setText(QString("Minimize - %1").arg(this->windowTitle()));
 
     //Init tree view properties
     Data3DTreeDelegate* pData3DTreeDelegate = new Data3DTreeDelegate(this);
@@ -163,9 +144,6 @@ Control3DWidget::Control3DWidget(QWidget* parent,
     ui->m_treeView_loadedData->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->m_treeView_loadedData, &QWidget::customContextMenuRequested,
             this, &Control3DWidget::onCustomContextMenuRequested);
-
-    //Set on top as default
-    onAlwaysOnTop(ui->m_checkBox_alwaysOnTop->isChecked());
 }
 
 
@@ -204,6 +182,9 @@ void Control3DWidget::init(QSharedPointer<Data3DTreeModel> pData3DTreeModel,
     connect(this, &Control3DWidget::lightIntensityChanged,
             pView3D.data(), &View3D::setLightIntensity);
 
+    connect(this, &Control3DWidget::takeScreenshotChanged,
+            pView3D.data(), &View3D::takeScreenshot);
+
     //Set description hidden as default
     ui->m_treeView_loadedData->setColumnHidden(1, true);
 }
@@ -230,30 +211,6 @@ void Control3DWidget::onTreeViewDescriptionHide()
     } else {
         ui->m_treeView_loadedData->setColumnHidden(1, true);
     }
-}
-
-
-//*************************************************************************************************************
-
-void Control3DWidget::onMinimizeWidget(bool state)
-{
-    if(!state) {
-        ui->m_treeView_loadedData->hide();
-        ui->m_groupBox_viewOptions->hide();
-        ui->m_groupBox_lightOptions->hide();
-        ui->m_groupBox_windowOptions->hide();
-        ui->m_pushButton_minimize->setText(QString("Maximize - %1").arg(this->windowTitle()));        
-        this->resize(width(), ui->m_pushButton_minimize->height());
-    }
-    else {
-        ui->m_treeView_loadedData->show();
-        ui->m_groupBox_lightOptions->show();
-        ui->m_groupBox_viewOptions->show();
-        ui->m_groupBox_windowOptions->show();
-        ui->m_pushButton_minimize->setText(QString("Minimize - %1").arg(this->windowTitle()));
-    }
-
-    this->adjustSize();
 }
 
 

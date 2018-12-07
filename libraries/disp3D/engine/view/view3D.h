@@ -64,6 +64,8 @@ class QPropertyAnimation;
 
 namespace Qt3DRender {
     class QPointLight;
+    class QRenderCapture;
+    class QRenderCaptureReply;
 }
 
 
@@ -157,13 +159,17 @@ public:
     */
     void setLightIntensity(double value);
 
-protected:
-
     //=========================================================================================================
     /**
-    * Init the 3D view
+    * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
+    *
+    * @param [in] fileName     The file name and path where to store the screenshot.
     */
-    void init();
+    void takeScreenshot();
+
+protected:
+
+    void saveScreenshot();
 
     //=========================================================================================================
     /**
@@ -194,13 +200,15 @@ protected:
     void startModelRotationRecursive(QObject* pObject);
 
 
-    QPointer<Qt3DCore::QEntity>         m_pRootEntity;                  /**< The root/most top level entity buffer. */
-    QPointer<Qt3DCore::QEntity>         m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
-    QPointer<Qt3DCore::QEntity>         m_pLightEntity;                 /**< The root/most top level entity buffer. */
-    QSharedPointer<Qt3DCore::QEntity>   m_pCoordSysEntity;              /**< The entity representing the x/y/z coord system. */
+    QPointer<Qt3DCore::QEntity>                 m_pRootEntity;                  /**< The root/most top level entity buffer. */
+    QPointer<Qt3DCore::QEntity>                 m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
+    QPointer<Qt3DCore::QEntity>                 m_pLightEntity;                 /**< The root/most top level entity buffer. */
+    QSharedPointer<Qt3DCore::QEntity>           m_pCoordSysEntity;              /**< The entity representing the x/y/z coord system. */
 
-    QPointer<CustomFrameGraph>          m_pFrameGraph;                  /**< The frameGraph entity. */
-    QPointer<Qt3DRender::QCamera>       m_pCamera;                      /**< The camera entity. */
+    QPointer<CustomFrameGraph>                  m_pFrameGraph;                  /**< The frameGraph entity. */
+    QPointer<Qt3DRender::QCamera>               m_pCamera;                      /**< The camera entity. */
+    QPointer<Qt3DRender::QRenderCapture>        m_pCapture;                     /**< The capture object to save screenshots. */
+    QPointer<Qt3DRender::QRenderCaptureReply>   m_pReply;                       /**< The capture reply object to save screenshots. */
 
     QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;         /**< The animations for each 3D object. */
     QList<QPointer<Qt3DRender::QPointLight> >  m_lLightSources;          /**< The light sources. */

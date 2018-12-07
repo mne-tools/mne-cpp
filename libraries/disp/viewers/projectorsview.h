@@ -69,6 +69,7 @@ class QCheckBox;
 
 namespace FIFFLIB {
     class FiffInfo;
+    class FiffProj;
 }
 
 
@@ -147,7 +148,7 @@ signals:
     /**
     * Emit this signal whenever the user changes the projections.
     */
-    void projSelectionChanged();
+    void projSelectionChanged(const QList<FIFFLIB::FiffProj>& projs);
 
 };
 

@@ -202,4 +202,15 @@ public:
 
 } // NAMESPACE
 
+
+#ifndef metatype_fiffevokedset
+#define metatype_fiffevokedset
+Q_DECLARE_METATYPE(FIFFLIB::FiffEvoked); /**< Provides QT META type declaration of the FIFFLIB::FiffEvoked type. For signal/slot usage.*/
+#endif
+
+#ifndef metatype_fiffevokedsetsptr
+#define metatype_fiffevokedsetsptr
+Q_DECLARE_METATYPE(FIFFLIB::FiffEvoked::SPtr); /**< Provides QT META type declaration of the FIFFLIB::FiffEvoked type. For signal/slot usage.*/
+#endif
+
 #endif // FIFF_EVOKED_SET_H
