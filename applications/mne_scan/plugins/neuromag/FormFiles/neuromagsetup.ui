@@ -26,7 +26,80 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QGridLayout" name="m_qGridLayout_main">
-         <item row="4" column="0">
+         <item row="0" column="2" colspan="2">
+          <widget class="QLabel" name="m_qLabelNeuromagImage">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="../neuromag.qrc">:/images/neuromag.png</pixmap>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1" rowspan="2" colspan="3">
+          <widget class="QGroupBox" name="m_qGroupBox_Channels">
+           <property name="title">
+            <string>Fiff Channel</string>
+           </property>
+           <layout class="QGridLayout" name="m_qGridLayout_Channel">
+            <item row="0" column="0">
+             <widget class="QColumnView" name="m_qColumnView_Channels"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="5" column="3">
+          <widget class="QPushButton" name="m_qPushButton_About">
+           <property name="text">
+            <string>About</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1" colspan="2">
+          <spacer name="m_qHorizontalSpacer_About">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="1" rowspan="2" colspan="3">
+          <widget class="QGroupBox" name="m_qGroupBox_Information">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Information</string>
+           </property>
+           <layout class="QGridLayout" name="m_qGridLayout_Information">
+            <item row="0" column="0">
+             <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <spacer name="m_qHorizontalSpacerTitle">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="0">
           <widget class="QGroupBox" name="m_qGroupBox_MneRtClientProperties">
            <property name="title">
             <string>Neuromag Preferences</string>
@@ -75,7 +148,7 @@
            </layout>
           </widget>
          </item>
-         <item row="5" column="0">
+         <item row="2" column="0">
           <widget class="QGroupBox" name="m_qGroupBox_PluginProperties">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -124,153 +197,6 @@
             </item>
            </layout>
           </widget>
-         </item>
-         <item row="1" column="0" rowspan="3">
-          <widget class="QGroupBox" name="m_qGroupBox_Acquisition">
-           <property name="title">
-            <string>Acquisition</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout">
-            <item row="6" column="2">
-             <widget class="QPushButton" name="m_qPushButton_FiffRecordFile">
-              <property name="text">
-               <string>...</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0" colspan="3">
-             <widget class="Line" name="line_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="m_qLabel_SubjectDescription">
-              <property name="text">
-               <string>Subject:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QComboBox" name="m_qComboBox_SubjectSelection"/>
-            </item>
-            <item row="3" column="2">
-             <widget class="QPushButton" name="m_qPushButton_NewSubject">
-              <property name="text">
-               <string>New Subject</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2">
-             <widget class="QPushButton" name="m_qPushButton_NewProject">
-              <property name="text">
-               <string>New Project</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>File:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="1">
-             <widget class="QLineEdit" name="m_qLineEdit_FiffRecordFile"/>
-            </item>
-            <item row="2" column="1">
-             <widget class="QComboBox" name="m_qComboBox_ProjectSelection"/>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="m_qLabel_ProjectDescription">
-              <property name="text">
-               <string>Project</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QCheckBox" name="m_qCheckBox_RecordData">
-              <property name="text">
-               <string>Record Data</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="0" column="2" colspan="2">
-          <widget class="QLabel" name="m_qLabelNeuromagImage">
-           <property name="text">
-            <string/>
-           </property>
-           <property name="pixmap">
-            <pixmap resource="../neuromag.qrc">:/images/neuromag.png</pixmap>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1" rowspan="2" colspan="3">
-          <widget class="QGroupBox" name="m_qGroupBox_Channels">
-           <property name="title">
-            <string>Fiff Channel</string>
-           </property>
-           <layout class="QGridLayout" name="m_qGridLayout_Channel">
-            <item row="0" column="0">
-             <widget class="QColumnView" name="m_qColumnView_Channels"/>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="6" column="3">
-          <widget class="QPushButton" name="m_qPushButton_About">
-           <property name="text">
-            <string>About</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1" colspan="2">
-          <spacer name="m_qHorizontalSpacer_About">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="1" column="1" rowspan="3" colspan="3">
-          <widget class="QGroupBox" name="m_qGroupBox_Information">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="title">
-            <string>Information</string>
-           </property>
-           <layout class="QGridLayout" name="m_qGridLayout_Information">
-            <item row="0" column="0">
-             <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <spacer name="m_qHorizontalSpacerTitle">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
          </item>
         </layout>
        </item>
