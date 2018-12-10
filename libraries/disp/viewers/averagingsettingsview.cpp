@@ -65,7 +65,6 @@ AveragingSettingsView::AveragingSettingsView(QWidget *parent,
                                              const QList<qint32>& qListStimChs,
                                              int iStimChan,
                                              int iNumAverages,
-                                             int iAverageMode,
                                              int iPreStimSeconds,
                                              int iPostStimSeconds,
                                              bool bDoArtifactThresholdReduction,
@@ -99,10 +98,6 @@ AveragingSettingsView::AveragingSettingsView(QWidget *parent,
     ui->m_pSpinBoxNumAverages->setValue(iNumAverages);
     connect(ui->m_pSpinBoxNumAverages, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsView::onChangeNumAverages);
-
-    ui->m_comboBox_runningAvr->setCurrentIndex(iAverageMode);
-    connect(ui->m_comboBox_runningAvr, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &AveragingSettingsView::onChangeAverageMode);
 
     //Pre Post stimulus
     ui->m_pSpinBoxPreStimSamples->setValue(iPreStimSeconds);
@@ -162,9 +157,6 @@ AveragingSettingsView::AveragingSettingsView(QWidget *parent,
     ui->m_pcheckBox_varianceReduction->hide();
     ui->m_label_varianceValue->hide();
     ui->m_spinBox_variance->hide();
-
-    // Init average mode
-    onChangeAverageMode();
 
     ui->m_groupBox_detectedTrials->hide();
 }
@@ -297,20 +289,4 @@ void AveragingSettingsView::onChangeArtifactThreshold()
 void AveragingSettingsView::onChangeNumAverages()
 {
     emit changeNumAverages(ui->m_pSpinBoxNumAverages->value());
-}
-
-
-//*************************************************************************************************************
-
-void AveragingSettingsView::onChangeAverageMode()
-{
-    if(ui->m_comboBox_runningAvr->currentText() == "Cumulative") {
-        ui->m_label_numberAverages->hide();
-        ui->m_pSpinBoxNumAverages->hide();
-    } else if (ui->m_comboBox_runningAvr->currentText() == "Running"){
-        ui->m_label_numberAverages->show();
-        ui->m_pSpinBoxNumAverages->show();
-    }
-
-    emit changeAverageMode(ui->m_comboBox_runningAvr->currentIndex());
 }

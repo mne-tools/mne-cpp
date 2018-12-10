@@ -102,7 +102,6 @@ public:
                                    const QList<qint32>& qListStimChs,
                                    int iStimChan,
                                    int iNumAverages,
-                                   int iAverageMode,
                                    int iPreStimSeconds,
                                    int iPostStimSeconds,
                                    bool bDoArtifactThresholdReduction,
@@ -129,7 +128,6 @@ protected:
     void onChangeBaselineTo();
     void onChangeArtifactThreshold();
     void onChangeNumAverages();
-    void onChangeAverageMode();
 
     Ui::AverageSettingsViewWidget* ui;		/**< Holds the user interface for the AverageSettingsViewWidget.*/
 
