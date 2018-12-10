@@ -287,7 +287,6 @@ void Averaging::init()
                                                                    m_qListStimChs,
                                                                    m_iStimChan,
                                                                    m_iNumAverages,
-                                                                   m_iAverageMode,
                                                                    m_iPreStimSeconds,
                                                                    m_iPostStimSeconds,
                                                                    m_bDoArtifactThresholdReduction,
@@ -325,8 +324,6 @@ void Averaging::init()
             this, &Averaging::onChangeBaselineActive);
     connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::resetAverage,
             this, &Averaging::onResetAverage);
-    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeAverageMode,
-            this, &Averaging::onChangeAverageMode);
 
     m_pAveragingOutput->data()->addControlWidget(m_pAveragingSettingsView);
 }
@@ -340,18 +337,6 @@ void Averaging::onChangeNumAverages(qint32 numAve)
     m_iNumAverages = numAve;
     if(m_pRtAve) {
         m_pRtAve->setAverageNumber(numAve);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void Averaging::onChangeAverageMode(qint32 mode)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_iAverageMode = mode;
-    if(m_pRtAve) {
-        m_pRtAve->setAverageMode(mode);
     }
 }
 
@@ -585,7 +570,6 @@ void Averaging::run()
     m_pRtAve->setBaselineFrom(m_iBaselineFromSamples, m_iBaselineFromSeconds);
     m_pRtAve->setBaselineTo(m_iBaselineToSamples, m_iBaselineToSeconds);
     m_pRtAve->setBaselineActive(m_bDoBaselineCorrection);
-    m_pRtAve->setAverageMode(m_iAverageMode);
     m_pRtAve->setArtifactReduction(m_bDoArtifactThresholdReduction,
                                    m_dArtifactThresholdFirst * pow(10, m_iArtifactThresholdSecond),
                                    m_bDoArtifactVarianceReduction,

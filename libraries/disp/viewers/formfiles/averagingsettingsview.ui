@@ -174,51 +174,30 @@
        <widget class="QComboBox" name="m_pComboBoxChSelection"/>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="m_label_averageMethod">
-        <property name="text">
-         <string>Average mode:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="m_comboBox_runningAvr">
-        <item>
-         <property name="text">
-          <string>Running</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Cumulative</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="2" column="0">
        <widget class="QLabel" name="m_label_numberAverages">
         <property name="text">
          <string>Number of trials:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="1" column="1">
        <widget class="QSpinBox" name="m_pSpinBoxNumAverages">
         <property name="minimum">
-         <number>0</number>
+         <number>1</number>
         </property>
         <property name="maximum">
          <number>1000</number>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>Pre-stimulus in ms:</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="2" column="1">
        <widget class="QSpinBox" name="m_pSpinBoxPreStimSamples">
         <property name="prefix">
          <string>-</string>
@@ -234,14 +213,14 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>Post-stimulus in ms:</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
+      <item row="3" column="1">
        <widget class="QSpinBox" name="m_pSpinBoxPostStimSamples">
         <property name="minimum">
          <number>10</number>
@@ -257,11 +236,9 @@
      </layout>
      <zorder>label</zorder>
      <zorder>m_pComboBoxChSelection</zorder>
-     <zorder>m_label_averageMethod</zorder>
      <zorder>m_label_numberAverages</zorder>
      <zorder>label_3</zorder>
      <zorder>label_4</zorder>
-     <zorder>m_comboBox_runningAvr</zorder>
      <zorder>m_pSpinBoxNumAverages</zorder>
      <zorder>m_pSpinBoxPreStimSamples</zorder>
      <zorder>m_pSpinBoxPostStimSamples</zorder>

@@ -153,14 +153,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Change the average mode
-    *
-    * @param[in] mode     average mode (0-running or 1-cumulative)
-    */
-    void onChangeAverageMode(qint32 mode);
-
-    //=========================================================================================================
-    /**
     * Change the stim channel
     *
     * @param[in] index     the new stim channel index

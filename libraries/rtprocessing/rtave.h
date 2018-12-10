@@ -136,14 +136,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the average mode
-    *
-    * @param[in] mode     average mode (0-running or 1-cumulative)
-    */
-    void setAverageMode(qint32 mode);
-
-    //=========================================================================================================
-    /**
     * Sets the number of pre stimulus samples
     *
     * @param[in] samples    new number of pre stimulus samples
@@ -263,18 +255,17 @@ protected:
     qint32                                          m_iPostStimSamples;         /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
     qint32                                          m_iNewPostStimSamples;      /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
 
-    qint32                                          m_iAverageMode;             /**< The averaging mode 0-running 1-cumulative. */
-    qint32                                          m_iNewAverageMode;          /**< The new averaging mode 0-running 1-cumulative. */
-
     qint32                                          m_iTriggerChIndex;          /**< Current row index of the data matrix which is to be scanned for triggers */
     qint32                                          m_iNewTriggerIndex;         /**< Old row index of the data matrix which is to be scanned for triggers */
 
     float                                           m_fTriggerThreshold;        /**< Threshold to detect trigger */
 
+    int                                             m_dValueVariance;           /**< Variance value to detect artifacts */
+
+    double                                          m_dValueThreshold;          /**< Threshold to detect artifacts */
+
     bool                                            m_bActivateThreshold;       /**< Whether to do threshold artifact reduction or not. */
     bool                                            m_bActivateVariance;        /**< Whether to do variance artifact reduction or not. */
-    bool                                            m_bIsRunning;               /**< Holds if real-time Covariance estimation is running.*/
-    bool                                            m_bAutoAspect;              /**< Auto aspect detection on or off. */
     bool                                            m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
 
     QPair<QVariant,QVariant>                        m_pairBaselineSec;          /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
@@ -283,10 +274,9 @@ protected:
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Holds the fiff measurement information. */
     FIFFLIB::FiffEvokedSet                          m_stimEvokedSet;            /**< Holds the evoked information. */
 
-    QMap<int,QList<int> >                           m_qMapDetectedTrigger;      /**< Detected trigger for each trigger channel. */
     QMap<double,QList<Eigen::MatrixXd> >            m_mapStimAve;               /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
-    QMap<double,Eigen::MatrixXd>                    m_mapDataPre;               /**< The matrix holding the pre stim data. */
-    QMap<double,Eigen::MatrixXd>                    m_mapDataPost;              /**< The matrix holding the post stim data. */
+    QMap<double,Eigen::MatrixXd>                    m_mapDataPre;               /**< The matrix holding the summed up, but unaveraged, pre stim data. */
+    QMap<double,Eigen::MatrixXd>                    m_mapDataPost;              /**< The matrix holding the summed up, but unaveraged, post stim data. */
     QMap<double,qint32>                             m_mapMatDataPostIdx;        /**< Current index inside of the matrix m_matDataPost */
     QMap<double,bool>                               m_mapFillingBackBuffer;     /**< Whether the back buffer is currently getting filled. */
 
@@ -389,14 +379,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the average mode
-    *
-    * @param[in] mode     average mode (0-running or 1-cumulative)
-    */
-    void setAverageMode(qint32 mode);
-
-    //=========================================================================================================
-    /**
     * Sets the number of pre stimulus samples
     *
     * @param[in] samples    new number of pre stimulus samples
@@ -486,7 +468,6 @@ signals:
                     const QStringList& lResponsibleTriggerTypes);
     void operate(const Eigen::MatrixXd& matData);
     void averageNumberChanged(qint32 numAve);
-    void averageModeChanged(qint32 mode);
     void averagePreStimChanged(qint32 samples,
                                qint32 secs);
     void averagePostStimChanged(qint32 samples,
@@ -516,8 +497,7 @@ inline bool RtAveWorker::controlValuesChanged()
 
     if(m_iNewPreStimSamples != m_iPreStimSamples
        || m_iNewPostStimSamples != m_iPostStimSamples
-       || m_iNewTriggerIndex != m_iTriggerChIndex
-       || m_iNewAverageMode != m_iAverageMode) {
+       || m_iNewTriggerIndex != m_iTriggerChIndex) {
         result = true;
     }
 
