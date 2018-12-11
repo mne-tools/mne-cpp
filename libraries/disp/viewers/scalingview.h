@@ -110,8 +110,15 @@ public:
     *
     * @param [in] parent        parent of widget
     */
-    ScalingView(QWidget *parent = 0,
+    ScalingView(const QString& sSettingsPath = "",
+                QWidget *parent = 0,
                 Qt::WindowFlags f = Qt::Widget);
+
+    //=========================================================================================================
+    /**
+    * Destroys the ScalingView.
+    */
+    ~ScalingView();
 
     //=========================================================================================================
     /**
@@ -119,16 +126,19 @@ public:
     *
     * @return The current scaling map.
     */
-
     QMap<qint32,float> getScaleMap() const;
 
     //=========================================================================================================
     /**
-    * Init the view
+    * Set the current scaling map. This also recreates the GUI.
     */
-    void init(const QMap<qint32, float> &qMapChScaling);
+    void setScaleMap(const QMap<qint32, float> &qMapChScaling);
 
 protected:
+    void redrawGUI();
+    void saveSettings(const QString& settingsPath);
+    void loadSettings(const QString& settingsPath);
+
     //=========================================================================================================
     /**
     * Slot called when scaling spin boxes change
@@ -144,6 +154,8 @@ protected:
     QMap<qint32, float>                 m_qMapChScaling;                /**< Channel scaling values. */
     QMap<qint32, QDoubleSpinBox*>       m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
     QMap<qint32, QSlider*>              m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
+
+    QString                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
 signals:
     //=========================================================================================================

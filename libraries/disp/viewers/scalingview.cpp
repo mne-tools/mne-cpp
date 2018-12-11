@@ -52,6 +52,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QSlider>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -74,13 +75,26 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ScalingView::ScalingView(QWidget *parent,
+ScalingView::ScalingView(const QString& sSettingsPath,
+                         QWidget *parent,
                          Qt::WindowFlags f)
 : QWidget(parent, f)
+, m_sSettingsPath(sSettingsPath)
 {
     this->setWindowTitle("Scaling");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
+
+    loadSettings(m_sSettingsPath);
+    redrawGUI();
+}
+
+
+//*************************************************************************************************************
+
+ScalingView::~ScalingView()
+{
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -94,10 +108,18 @@ QMap<qint32,float> ScalingView::getScaleMap() const
 
 //*************************************************************************************************************
 
-void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
+void ScalingView::setScaleMap(const QMap<qint32,float>& qMapChScaling)
 {
     m_qMapChScaling = qMapChScaling;
 
+    redrawGUI();
+}
+
+
+//*************************************************************************************************************
+
+void ScalingView::redrawGUI()
+{
     QGridLayout* t_pGridLayout = new QGridLayout;
 
     qint32 i = 0;
@@ -307,6 +329,72 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
     }
 
     this->setLayout(t_pGridLayout);
+}
+
+
+//*************************************************************************************************************
+
+void ScalingView::saveSettings(const QString& settingsPath)
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    if(m_qMapChScaling.contains(FIFF_UNIT_T)) {
+        settings.setValue(settingsPath + QString("/scaleMAG"), m_qMapChScaling[FIFF_UNIT_T]);
+    }
+
+    if(m_qMapChScaling.contains(FIFF_UNIT_T_M)) {
+        settings.setValue(settingsPath + QString("/scaleGRAD"), m_qMapChScaling[FIFF_UNIT_T_M]);
+    }
+
+    if(m_qMapChScaling.contains(FIFFV_EEG_CH)) {
+        settings.setValue(settingsPath + QString("/scaleEEG"), m_qMapChScaling[FIFFV_EEG_CH]);
+    }
+
+    if(m_qMapChScaling.contains(FIFFV_EOG_CH)) {
+        settings.setValue(settingsPath + QString("/scaleEOG"), m_qMapChScaling[FIFFV_EOG_CH]);
+    }
+
+    if(m_qMapChScaling.contains(FIFFV_STIM_CH)) {
+        settings.setValue(settingsPath + QString("/scaleSTIM"), m_qMapChScaling[FIFFV_STIM_CH]);
+    }
+
+    if(m_qMapChScaling.contains(FIFFV_MISC_CH)) {
+        settings.setValue(settingsPath + QString("/scaleMISC"), m_qMapChScaling[FIFFV_MISC_CH]);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ScalingView::loadSettings(const QString& settingsPath)
+{
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    float val = settings.value(settingsPath + QString("/scaleMAG"), 1e-11f).toFloat();
+    m_qMapChScaling.insert(FIFF_UNIT_T, val);
+
+    val = settings.value(settingsPath + QString("/scaleGRAD"), 1e-10f).toFloat();
+    m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
+
+    val = settings.value(settingsPath + QString("/scaleEEG"), 1e-4f).toFloat();
+    m_qMapChScaling.insert(FIFFV_EEG_CH, val);
+
+    val = settings.value(settingsPath + QString("/scaleEOG"), 1e-3f).toFloat();
+    m_qMapChScaling.insert(FIFFV_EOG_CH, val);
+
+    val = settings.value(settingsPath + QString("/scaleSTIM"), 1e-3f).toFloat();
+    m_qMapChScaling.insert(FIFFV_STIM_CH, val);
+
+    val = settings.value(settingsPath + QString("/scaleMISC"), 1e-3f).toFloat();
+    m_qMapChScaling.insert(FIFFV_MISC_CH, val);
 }
 
 

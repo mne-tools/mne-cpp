@@ -145,27 +145,6 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
         //Store view
         if(m_pChannelDataView) {
-            //Scaling
-            QMap<qint32, float> qMapChScaling = m_pChannelDataView->getScalingMap();
-
-            if(qMapChScaling.contains(FIFF_UNIT_T))
-                settings.setValue(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), qMapChScaling[FIFF_UNIT_T]);
-
-            if(qMapChScaling.contains(FIFF_UNIT_T_M))
-                settings.setValue(QString("t_sRTMSAWName/%1/scaleGRAD").arg(t_sRTMSAWName), qMapChScaling[FIFF_UNIT_T_M]);
-
-            if(qMapChScaling.contains(FIFFV_EEG_CH))
-                settings.setValue(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), qMapChScaling[FIFFV_EEG_CH]);
-
-            if(qMapChScaling.contains(FIFFV_EOG_CH))
-                settings.setValue(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), qMapChScaling[FIFFV_EOG_CH]);
-
-            if(qMapChScaling.contains(FIFFV_STIM_CH))
-                settings.setValue(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), qMapChScaling[FIFFV_STIM_CH]);
-
-            if(qMapChScaling.contains(FIFFV_MISC_CH))
-                settings.setValue(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), qMapChScaling[FIFFV_MISC_CH]);
-
             //Zoom and window size
             settings.setValue(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), m_pChannelDataView->getZoom());
             settings.setValue(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), m_pChannelDataView->getWindowSize());
@@ -249,49 +228,6 @@ void RealTimeMultiSampleArrayWidget::init()
             this->onHideBadChannels();
         }
 
-        //Init scaling
-        bool hasMag = false, hasGrad = false, hasEEG = false, hasEog = false, hasStim = false, hasMisc = false;
-        float val = 1e-11f;
-        QMap<qint32, float> qMapChScaling;
-
-        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
-            if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH) {
-                if(!hasMag && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T) {
-                    val = settings.value(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), 1e-11f).toFloat();
-                    qMapChScaling.insert(FIFF_UNIT_T, val);
-
-                    hasMag = true;
-                } else if(!hasGrad && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M) {
-                    val = settings.value(QString("RTMSAW/%1/scaleGRAD").arg(t_sRTMSAWName), 1e-10f).toFloat();
-                    qMapChScaling.insert(FIFF_UNIT_T_M, val);
-
-                    hasGrad = true;
-                }
-            } else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH) {
-                val = settings.value(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), 1e-4f).toFloat();
-                qMapChScaling.insert(FIFFV_EEG_CH, val);
-
-                hasEEG = true;
-            } else if(!hasEog && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH) {
-                val = settings.value(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), 1e-3f).toFloat();
-                qMapChScaling.insert(FIFFV_EOG_CH, val);
-
-                hasEog = true;
-            } else if(!hasStim && m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
-                val = settings.value(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), 1e-3f).toFloat();
-                qMapChScaling.insert(FIFFV_STIM_CH, val);
-
-                hasStim = true;
-            } else if(!hasMisc && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH) {
-                val = settings.value(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), 1e-3f).toFloat();
-                qMapChScaling.insert(FIFFV_MISC_CH, val);
-
-                hasMisc = true;
-            }
-        }
-
-        m_pChannelDataView->setScalingMap(qMapChScaling);
-
         //Init filter window
         m_pFilterWindow = FilterView::SPtr::create(this, Qt::Window);
 
@@ -356,12 +292,13 @@ void RealTimeMultiSampleArrayWidget::init()
 
         // Quick control scaling
         if(slFlags.contains("scaling")) {
-            ScalingView* pScalingView = new ScalingView();
-            pScalingView->init(qMapChScaling);
+            ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(t_sRTMSAWName));
             m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
 
             connect(pScalingView, &ScalingView::scalingChanged,
                     m_pChannelDataView.data(), &ChannelDataView::setScalingMap);
+
+            m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
         }
 
         // Quick control projectors

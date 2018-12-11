@@ -140,10 +140,10 @@ public:
     */
     void setNumberDetectedTriggersAndTypes(int totalNumberDetections, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 
+protected:
     void saveSettings(const QString& settingsPath);
     void loadSettings(const QString& settingsPath);
 
-protected:
     //=========================================================================================================
     /**
     * Slot called when trigger info changed
