@@ -729,6 +729,7 @@ void ChannelDataModel::updateProjection()
         }
 
         this->m_pFiffInfo->make_projector(m_matProj);
+
         qDebug() << "ChannelDataModel::updateProjection - New projection calculated.";
 
         //set columns of matrix to zero depending on bad channels indexes
