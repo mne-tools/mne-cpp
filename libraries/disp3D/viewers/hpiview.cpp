@@ -475,7 +475,9 @@ void HpiView::onBtnLoadPolhemusFile()
     QString fileName_HPI = QFileDialog::getOpenFileName(this,
             tr("Open digitizer file"), "", tr("Fiff file (*.fif)"));
 
-    ui->m_lineEdit_filePath->setText(fileName_HPI);
+    if(!fileName_HPI.isEmpty()) {
+        ui->m_lineEdit_filePath->setText(fileName_HPI);
+    }
 
     //Load Polhemus file
     if (!fileName_HPI.isEmpty()) {

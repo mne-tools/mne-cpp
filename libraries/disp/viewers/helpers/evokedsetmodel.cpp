@@ -103,8 +103,8 @@ EvokedSetModel::~EvokedSetModel()
 //virtual functions
 int EvokedSetModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    if(!m_qMapIdxRowSelection.empty()) {
-        return m_qMapIdxRowSelection.size();
+    if(m_pEvokedSet) {
+        return m_pEvokedSet->info.nchan;
     }
 
     return 0;

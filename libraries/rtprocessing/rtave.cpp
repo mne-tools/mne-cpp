@@ -293,27 +293,14 @@ void RtAveWorker::doAveraging(const MatrixXd& rawSegment)
 
         //Fill back buffer and decide when to do the data packing of the different buffers
         if(m_mapFillingBackBuffer[dTriggerType]) {
-            if(m_mapMatDataPostIdx[dTriggerType] == m_iPostStimSamples) {
-                //Merge the different buffers
-                mergeData(dTriggerType);
-
-                //Calculate the final average/evoked data
-                generateEvoked(dTriggerType);
-
-                //List of all trigger types which lead to the recent emit of a new evoked set. */
-                if(!lResponsibleTriggerTypes.contains(QString::number(dTriggerType))) {
-                    lResponsibleTriggerTypes << QString::number(dTriggerType);
-                }
-
-                emit resultReady(m_stimEvokedSet,
-                                 lResponsibleTriggerTypes);
-
-                m_mapFillingBackBuffer[dTriggerType] = false;
-
-//                qDebug()<<"RtAveWorker::run() - dTriggerType:" << dTriggerType;
-//                qDebug()<<"RtAveWorker::run() - m_mapStimAve[dTriggerType].size():" << m_mapStimAve[dTriggerType].size();
-            } else {
+            if(m_mapMatDataPostIdx[dTriggerType] != m_iPostStimSamples) {
                 fillBackBuffer(rawSegment, dTriggerType);
+            }
+
+            if(m_mapMatDataPostIdx[dTriggerType] == m_iPostStimSamples) {
+                m_mapMatDataPostIdx[dTriggerType] = 0;
+                m_mapFillingBackBuffer[dTriggerType] = false;
+                emitEvoked(dTriggerType, lResponsibleTriggerTypes);
             }
         } else {
             if(lDetectedTriggers.isEmpty()) {
@@ -328,23 +315,39 @@ void RtAveWorker::doAveraging(const MatrixXd& rawSegment)
                         MatrixXd tempMat;
 
                         if(iTriggerPos >= m_iPreStimSamples) {
-                            tempMat = rawSegment.block(0,iTriggerPos - m_iPreStimSamples,rawSegment.rows(),m_iPreStimSamples);
-                            fillFrontBuffer(tempMat, dTriggerType);
+                            tempMat = rawSegment.block(0,
+                                                       iTriggerPos - m_iPreStimSamples,
+                                                       rawSegment.rows(),
+                                                       m_iPreStimSamples);
                         } else {
-                            tempMat = rawSegment.block(0,0,rawSegment.rows(),iTriggerPos);
-                            fillFrontBuffer(tempMat, dTriggerType);
+                            tempMat = rawSegment.block(0,
+                                                       0,
+                                                       rawSegment.rows(),
+                                                       iTriggerPos);
                         }
+
+                        fillFrontBuffer(tempMat, dTriggerType);
 
                         //Do back buffer stuff
                         if(rawSegment.cols() - iTriggerPos >= m_mapDataPost[dTriggerType].cols()) {
-                            m_mapDataPost[dTriggerType] = rawSegment.block(0,iTriggerPos,m_mapDataPost[dTriggerType].rows(),m_mapDataPost[dTriggerType].cols());
-                            m_mapMatDataPostIdx[dTriggerType] = m_iPostStimSamples;
+                            m_mapDataPost[dTriggerType] = rawSegment.block(0,
+                                                                           iTriggerPos,
+                                                                           m_mapDataPost[dTriggerType].rows(),
+                                                                           m_mapDataPost[dTriggerType].cols());
+                            emitEvoked(dTriggerType, lResponsibleTriggerTypes);
+                            m_mapMatDataPostIdx[dTriggerType] = 0;
+                            m_mapFillingBackBuffer[dTriggerType] = false;
                         } else {
-                            m_mapDataPost[dTriggerType].block(0,0,m_mapDataPost[dTriggerType].rows(),rawSegment.cols() - iTriggerPos) = rawSegment.block(0,iTriggerPos,rawSegment.rows(),rawSegment.cols() - iTriggerPos);
+                            m_mapDataPost[dTriggerType].block(0,
+                                                              0,
+                                                              m_mapDataPost[dTriggerType].rows(),
+                                                              rawSegment.cols() - iTriggerPos) = rawSegment.block(0,
+                                                                                                                  iTriggerPos,
+                                                                                                                  rawSegment.rows(),
+                                                                                                                  rawSegment.cols() - iTriggerPos);
                             m_mapMatDataPostIdx[dTriggerType] = rawSegment.cols() - iTriggerPos;
+                            m_mapFillingBackBuffer[dTriggerType] = true;
                         }
-
-                        m_mapFillingBackBuffer[dTriggerType] = true;
 
                         //qDebug()<<"Trigger type "<<dTriggerType<<" found at "<<iTriggerPos;
                     }
@@ -354,6 +357,28 @@ void RtAveWorker::doAveraging(const MatrixXd& rawSegment)
     }
 
     //qDebug()<<"RtAveWorker::doAveraging() - time for procesing"<<time.elapsed();
+}
+
+
+//*************************************************************************************************************
+
+void RtAveWorker::emitEvoked(double dTriggerType, QStringList& lResponsibleTriggerTypes)
+{
+    //Merge the different buffers
+    mergeData(dTriggerType);
+
+    //Calculate the final average/evoked data
+    generateEvoked(dTriggerType);
+
+    //List of all trigger types which lead to the recent emit of a new evoked set. */
+    if(!lResponsibleTriggerTypes.contains(QString::number(dTriggerType))) {
+        lResponsibleTriggerTypes << QString::number(dTriggerType);
+    }
+
+    emit resultReady(m_stimEvokedSet, lResponsibleTriggerTypes);
+
+//    qDebug()<<"RtAveWorker::emitEvoked() - dTriggerType:" << dTriggerType;
+//    qDebug()<<"RtAveWorker::emitEvoked() - m_mapStimAve[dTriggerType].size():" << m_mapStimAve[dTriggerType].size();
 }
 
 
@@ -388,7 +413,7 @@ void RtAveWorker::fillFrontBuffer(const MatrixXd &data, double dTriggerType)
     }
 
     if(m_mapDataPre[dTriggerType].cols() <= data.cols()) {
-        if(m_iPreStimSamples > 0 && data.cols() > m_iPreStimSamples) {
+        if(m_iPreStimSamples > 0 && data.cols() >= m_iPreStimSamples) {
             m_mapDataPre[dTriggerType] = data.block(0,
                                                     data.cols() - m_iPreStimSamples,
                                                     data.rows(),
@@ -506,9 +531,7 @@ void RtAveWorker::generateEvoked(double dTriggerType)
         finalAverage += m_mapStimAve[dTriggerType].at(i);
     }
 
-    if(m_mapStimAve[dTriggerType].isEmpty()) {
-        finalAverage = finalAverage/1;
-    } else {
+    if(!m_mapStimAve[dTriggerType].isEmpty()) {
         finalAverage = finalAverage/m_mapStimAve[dTriggerType].size();
     }
 
