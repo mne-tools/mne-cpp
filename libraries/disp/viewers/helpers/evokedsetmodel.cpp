@@ -516,6 +516,21 @@ fiff_int_t EvokedSetModel::getKind(qint32 row) const
 
 //*************************************************************************************************************
 
+bool EvokedSetModel::getIsChannelBad(qint32 row) const
+{
+    bool bIsBad = false;
+
+    if(row < m_qMapIdxRowSelection.size()) {
+        qint32 chRow = m_qMapIdxRowSelection[row];
+        bIsBad = m_pEvokedSet->info.bads.contains(m_pEvokedSet->info.chs[chRow].ch_name);
+    }
+
+    return bIsBad;
+}
+
+
+//*************************************************************************************************************
+
 fiff_int_t EvokedSetModel::getUnit(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {

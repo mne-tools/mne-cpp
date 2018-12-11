@@ -267,6 +267,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns true or fals whether the provided channel is bad.
+    *
+    * @param[in] row    row number which correspodns to a given channel
+    *
+    * @return Returns true or fals whether the provided channel is bad
+    */
+    bool getIsChannelBad(qint32 row) const;
+
+    //=========================================================================================================
+    /**
     * Returns the unit of a given channel number
     *
     * @param[in] row    row number which correspodns to a given channel
