@@ -246,7 +246,7 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pChannelDataView->setSignalColor(signal);
 
         if(settings.value(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), false).toBool()) {
-            m_pChannelDataView->hideBadChannels();
+            this->onHideBadChannels();
         }
 
         //Init scaling
