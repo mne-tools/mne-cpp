@@ -599,5 +599,14 @@ void ChannelDataView::markChBad()
 
     m_pModel->updateProjection();
 
+    //Hide non selected channels/rows in the data views
+    for(int i = 0; i<m_qListBadChannels.size(); i++) {
+        if(m_bHideBadChannels) {
+            m_pTableView->hideRow(m_qListBadChannels.at(i));
+        } else {
+            m_pTableView->showRow(m_qListBadChannels.at(i));
+        }
+    }
+
     emit channelMarkingChanged();
 }
