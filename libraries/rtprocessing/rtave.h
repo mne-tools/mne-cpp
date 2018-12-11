@@ -223,6 +223,8 @@ protected:
     */
     void fillFrontBuffer(const Eigen::MatrixXd& data, double dTriggerType);
 
+    void emitEvoked(double dTriggerType, QStringList& lResponsibleTriggerTypes);
+
     //=========================================================================================================
     /**
     * Prepends incoming data to back/post stim buffer.
@@ -275,8 +277,8 @@ protected:
     FIFFLIB::FiffEvokedSet                          m_stimEvokedSet;            /**< Holds the evoked information. */
 
     QMap<double,QList<Eigen::MatrixXd> >            m_mapStimAve;               /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
-    QMap<double,Eigen::MatrixXd>                    m_mapDataPre;               /**< The matrix holding the summed up, but unaveraged, pre stim data. */
-    QMap<double,Eigen::MatrixXd>                    m_mapDataPost;              /**< The matrix holding the summed up, but unaveraged, post stim data. */
+    QMap<double,Eigen::MatrixXd>                    m_mapDataPre;               /**< The matrix holding pre stim data. */
+    QMap<double,Eigen::MatrixXd>                    m_mapDataPost;              /**< The matrix holding post stim data. */
     QMap<double,qint32>                             m_mapMatDataPostIdx;        /**< Current index inside of the matrix m_matDataPost */
     QMap<double,bool>                               m_mapFillingBackBuffer;     /**< Whether the back buffer is currently getting filled. */
 
