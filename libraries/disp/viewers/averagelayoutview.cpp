@@ -294,6 +294,7 @@ void AverageLayoutView::updateData()
             averageSceneItemTemp->m_iChannelNumber = channelNumber;
             averageSceneItemTemp->m_iTotalNumberChannels = m_pEvokedSetModel->rowCount();
             averageSceneItemTemp->m_lAverageData = averageData;
+            averageSceneItemTemp->m_bIsBad = m_pEvokedSetModel->getIsChannelBad(channelNumber);
         }
     }
 

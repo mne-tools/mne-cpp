@@ -87,6 +87,7 @@ AverageSceneItem::AverageSceneItem(const QString& channelName,
 , m_iFontTextSize(15)
 , m_iMaxWidth(1000)
 , m_iMaxHeigth(150)
+, m_bIsBad(false)
 , m_iTotalNumberChannels(0)
 {
     m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
@@ -132,6 +133,10 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     this->setPos(75*m_qpChannelPosition.x(), -75*m_qpChannelPosition.y());
 
     painter->setRenderHint(QPainter::Antialiasing, true);
+
+    if(m_bIsBad) {
+        painter->setOpacity(0.20);
+    }
 
 //    //Plot bounding rect / drawing region of this item
 //    painter->drawRect(this->boundingRect());
