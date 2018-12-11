@@ -55,10 +55,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MneRtClientPlugin
+// DEFINE NAMESPACE NEUROMAGPLUGIN
 //=============================================================================================================
 
-namespace MneRtClientPlugin
+namespace NEUROMAGPLUGIN
 {
 
 
@@ -104,21 +104,15 @@ public:
     */
     void init();
 
-//slots
-    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
-
-    void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
+    void bufferSizeEdited();            /**< Buffer size edited and set new buffer size.*/
 
     void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
 
-    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
+    void pressedConnect();              /**< Triggers a connection trial to rt_server.*/
 
-    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
+    void pressedSendCLI();              /**< Triggers a send request of a cli command.*/
 
-    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
-
-    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
-
+    void fiffInfoReceived();            /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
 
 private:
     //=========================================================================================================
@@ -136,18 +130,11 @@ private:
     */
     void showAboutDialog();
 
-//    //=========================================================================================================
-//    /**
-//    * Shows the SQUID Control Dialog
-//    *
-//    */
-//    void SQUIDControlDialog();
+    Neuromag*                       m_pNeuromag;    /**< a pointer to corresponding mne rt client.*/
 
-    Neuromag*   m_pNeuromag;      /**< a pointer to corresponding mne rt client.*/
+    Ui::NeuromagSetupWidgetClass    ui;             /**< the user interface for the NeuromagSetupWidget.*/
 
-    Ui::NeuromagSetupWidgetClass ui; /**< the user interface for the NeuromagSetupWidget.*/
-
-    bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
+    bool                            m_bIsInit;      /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
 };
 
 } // NAMESPACE

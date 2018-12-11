@@ -43,6 +43,9 @@
 
 #include "../neuromag.h"
 
+#include <communication/rtClient/rtcmdclient.h>
+#include <fiff/fiff_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -59,7 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MneRtClientPlugin;
+using namespace NEUROMAGPLUGIN;
 
 
 //*************************************************************************************************************
@@ -74,33 +77,30 @@ NeuromagSetupWidget::NeuromagSetupWidget(Neuromag* p_pNeuromag, QWidget* parent)
 {
     ui.setupUi(this);
 
-    //Record data checkbox
-    connect(ui.m_qCheckBox_RecordData, &QCheckBox::stateChanged, this, &NeuromagSetupWidget::checkedRecordDataChanged);
-
-    //Fiff record file
-    connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &NeuromagSetupWidget::pressedFiffRecordFile);
-
     //rt server connection
     this->ui.m_qLineEdit_Ip->setText(m_pNeuromag->m_sNeuromagIP);
 
-    connect(ui.m_qPushButton_Connect, &QPushButton::released, this, &NeuromagSetupWidget::pressedConnect);
+    connect(ui.m_qPushButton_Connect, &QPushButton::released,
+            this, &NeuromagSetupWidget::pressedConnect);
 
-    connect(m_pNeuromag, &Neuromag::cmdConnectionChanged, this, &NeuromagSetupWidget::cmdConnectionChanged);
+    connect(m_pNeuromag, &Neuromag::cmdConnectionChanged,
+            this, &NeuromagSetupWidget::cmdConnectionChanged);
 
     //rt server fiffInfo received
-    connect(m_pNeuromag, &Neuromag::fiffInfoAvailable, this, &NeuromagSetupWidget::fiffInfoReceived);
+    connect(m_pNeuromag, &Neuromag::fiffInfoAvailable,
+            this, &NeuromagSetupWidget::fiffInfoReceived);
 
     //Buffer
-    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::textChanged, this, &NeuromagSetupWidget::bufferSizeEdited);
+    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::textChanged,
+            this, &NeuromagSetupWidget::bufferSizeEdited);
 
     //CLI
-    connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &NeuromagSetupWidget::pressedSendCLI);
+    connect(ui.m_qPushButton_SendCLI, &QPushButton::released,
+            this, &NeuromagSetupWidget::pressedSendCLI);
 
     //About
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &NeuromagSetupWidget::showAboutDialog);
-
-//    //SQUID Control
-//    connect(ui.m_qPushButton_SQUIDControl, &QPushButton::released, this, &NeuromagSetupWidget::SQUIDControlDialog);
+    connect(ui.m_qPushButton_About, &QPushButton::released,
+            this, &NeuromagSetupWidget::showAboutDialog);
 
     this->init();
 }
@@ -118,7 +118,6 @@ NeuromagSetupWidget::~NeuromagSetupWidget()
 
 void NeuromagSetupWidget::init()
 {
-    checkedRecordDataChanged();
     cmdConnectionChanged(m_pNeuromag->m_bCmdClientIsConnected);
 }
 
@@ -134,37 +133,6 @@ void NeuromagSetupWidget::bufferSizeEdited()
         m_pNeuromag->m_iBufferSize = t_iBufferSize;
     else
         ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pNeuromag->m_iBufferSize));
-}
-
-
-//*************************************************************************************************************
-
-void NeuromagSetupWidget::checkedRecordDataChanged()
-{
-    if(ui.m_qCheckBox_RecordData->checkState() == Qt::Checked)
-    {
-        ui.m_qComboBox_SubjectSelection->setEnabled(true);
-        ui.m_qPushButton_NewSubject->setEnabled(true);
-        ui.m_qLineEdit_FiffRecordFile->setEnabled(true);
-        ui.m_qPushButton_FiffRecordFile->setEnabled(true);
-    }
-    else
-    {
-        ui.m_qComboBox_SubjectSelection->setEnabled(false);
-        ui.m_qPushButton_NewSubject->setEnabled(false);
-        ui.m_qLineEdit_FiffRecordFile->setEnabled(false);
-        ui.m_qPushButton_FiffRecordFile->setEnabled(false);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void NeuromagSetupWidget::pressedFiffRecordFile()
-{
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Fiff Record File"), "", tr("Fiff Record File (*.fif)"));
-
-    ui.m_qLineEdit_FiffRecordFile->setText(fileName);
 }
 
 

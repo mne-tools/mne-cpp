@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
     //
     RowVectorXd cals;
 
-    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut,raw.info, cals, picks, true);
+   FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut,raw.info, cals, picks);
     //
     //   Set up the reading parameters
     //
