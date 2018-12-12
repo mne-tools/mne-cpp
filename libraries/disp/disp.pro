@@ -123,8 +123,6 @@ SOURCES += \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
     viewers/helpers/averagesceneitem.cpp \
-    viewers/helpers/filterdatadelegate.cpp \
-    viewers/helpers/filterdatamodel.cpp \
     viewers/helpers/filterplotscene.cpp \
     viewers/helpers/selectionscene.cpp \
     viewers/helpers/selectionsceneitem.cpp \
@@ -168,8 +166,6 @@ HEADERS += \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \
     viewers/helpers/averagesceneitem.h \
-    viewers/helpers/filterdatadelegate.h \
-    viewers/helpers/filterdatamodel.h \
     viewers/helpers/filterplotscene.h \
     viewers/helpers/selectionscene.h \
     viewers/helpers/selectionsceneitem.h \

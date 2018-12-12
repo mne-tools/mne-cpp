@@ -172,7 +172,7 @@ void TriggerDetectionView::setNumberDetectedTriggersAndTypes(int numberDetection
 
 void TriggerDetectionView::saveSettings(const QString& settingsPath)
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if(settingsPath.isEmpty()) {
         return;
     }
 
@@ -197,7 +197,7 @@ void TriggerDetectionView::saveSettings(const QString& settingsPath)
 
 void TriggerDetectionView::loadSettings(const QString& settingsPath)
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if(settingsPath.isEmpty()) {
         return;
     }
 

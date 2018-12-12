@@ -46,7 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace NoiseReductionPlugin;
+using namespace NOISEREDUCTIONPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace UTILSLIB;
@@ -106,29 +106,6 @@ NoiseReduction::~NoiseReduction()
 {
     if(this->isRunning()) {
         stop();
-    }
-
-    //
-    // Store Settings
-    //
-    if(!m_pRTMSA->getName().isEmpty()) {
-        QString t_sRTMSAName = m_pRTMSA->getName();
-
-        QSettings settings;
-
-        //Store filter
-        if(m_pFilterView != 0) {
-            FilterData filter = m_pFilterView->getUserDesignedFilter();
-
-            settings.setValue(QString("RTNRW/%1/filterHP").arg(t_sRTMSAName), filter.m_dHighpassFreq);
-            settings.setValue(QString("RTNRW/%1/filterLP").arg(t_sRTMSAName), filter.m_dLowpassFreq);
-            settings.setValue(QString("RTNRW/%1/filterOrder").arg(t_sRTMSAName), filter.m_iFilterOrder);
-            settings.setValue(QString("RTNRW/%1/filterType").arg(t_sRTMSAName), (int)filter.m_Type);
-            settings.setValue(QString("RTNRW/%1/filterDesignMethod").arg(t_sRTMSAName), (int)filter.m_designMethod);
-            settings.setValue(QString("RTNRW/%1/filterTransition").arg(t_sRTMSAName), filter.m_dParksWidth*(filter.m_sFreq/2));
-            settings.setValue(QString("RTNRW/%1/filterUserDesignActive").arg(t_sRTMSAName), m_pFilterView->userDesignedFiltersIsActive());
-            settings.setValue(QString("RTNRW/%1/filterChannelType").arg(t_sRTMSAName), m_pFilterView->getChannelType());
-        }
     }
 }
 
@@ -479,15 +456,13 @@ void NoiseReduction::setFilterChannelType(QString sType)
 
 //*************************************************************************************************************
 
-void NoiseReduction::filterChanged(QList<FilterData> filterData)
+void NoiseReduction::filterChanged(const FilterData& filterData)
 {
     m_filterData = filterData;
 
     m_iMaxFilterLength = 1;
-    for(int i = 0; i < filterData.size(); ++i) {
-        if(m_iMaxFilterLength<filterData.at(i).m_iFilterOrder) {
-            m_iMaxFilterLength = filterData.at(i).m_iFilterOrder;
-        }
+    if(m_iMaxFilterLength < m_filterData.m_iFilterOrder) {
+        m_iMaxFilterLength = m_filterData.m_iFilterOrder;
     }
 }
 
@@ -570,46 +545,46 @@ void NoiseReduction::initSphara()
 
 void NoiseReduction::initFilter()
 {
-    m_pFilterView = FilterView::SPtr(new FilterView(m_pOptionsWidget.data(), Qt::Window/*0, Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint*/));
-    //m_pFilterView->setWindowFlags(Qt::WindowStaysOnTopHint);
+    QString t_sRTMSAName = m_pRTMSA->getName();
+    m_pFilterView = FilterView::SPtr(new FilterView(QString("RTNRW/%1").arg(t_sRTMSAName),
+                                                    m_pOptionsWidget.data(),
+                                                    Qt::Window));
+
+//    connect(m_pFilterView.data(), static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
+//            this, static_cast<void (NoiseReduction::*)(QString)>(&NoiseReduction::setFilterChannelType));
+
+    connect(m_pFilterView.data(), &FilterView::filterChanged,
+            this, &NoiseReduction::filterChanged);
+
+//    connect(m_pFilterView.data(), &FilterView::filterActivated,
+//            this, &NoiseReduction::filterActivated);
 
     m_pFilterView->init(m_pFiffInfo->sfreq);
     m_pFilterView->setWindowSize(m_iMaxFilterTapSize);
     m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
 
-    connect(m_pFilterView.data(), static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
-            this, static_cast<void (NoiseReduction::*)(QString)>(&NoiseReduction::setFilterChannelType));
-
-    connect(m_pFilterView.data(), &FilterView::filterChanged,
-            this, &NoiseReduction::filterChanged);
-
-    connect(m_pFilterView.data(), &FilterView::filterActivated,
-            this, &NoiseReduction::filterActivated);
-
     //Handle Filtering
-    connect(m_pFilterView.data(), &FilterView::activationCheckBoxListChanged,
-            m_pOptionsWidget.data(), &NoiseReductionOptionsWidget::filterGroupChanged);
+//    connect(m_pFilterView.data(), &FilterView::activationCheckBoxListChanged,
+//            m_pOptionsWidget.data(), &NoiseReductionOptionsWidget::filterGroupChanged);
 
     connect(m_pOptionsWidget.data(), &NoiseReductionOptionsWidget::showFilterOptions,
             this, &NoiseReduction::showFilterWidget);
 
-    m_pOptionsWidget->filterGroupChanged(m_pFilterView->getActivationCheckBoxList());
+    //m_pOptionsWidget->filterGroupChanged(m_pFilterView->getActivationCheckBox());
 
     m_pRtFilter = RtFilter::SPtr(new RtFilter());
 
     this->setFilterChannelType("MEG");
 
     //Set stored filter settings from last session
-    QString t_sRTMSAName = m_pRTMSA->getName();
     QSettings settings;
     m_pFilterView->setFilterParameters(settings.value(QString("RTNRW/%1/filterHP").arg(t_sRTMSAName), 5.0).toDouble(),
-                                            settings.value(QString("RTNRW/%1/filterLP").arg(t_sRTMSAName), 40.0).toDouble(),
-                                            settings.value(QString("RTNRW/%1/filterOrder").arg(t_sRTMSAName), 128).toInt(),
-                                            settings.value(QString("RTNRW/%1/filterType").arg(t_sRTMSAName), 2).toInt(),
-                                            settings.value(QString("RTNRW/%1/filterDesignMethod").arg(t_sRTMSAName), 0).toInt(),
-                                            settings.value(QString("RTNRW/%1/filterTransition").arg(t_sRTMSAName), 5.0).toDouble(),
-                                            settings.value(QString("RTNRW/%1/filterUserDesignActive").arg(t_sRTMSAName), false).toBool(),
-                                            settings.value(QString("RTNRW/%1/filterChannelType").arg(t_sRTMSAName), "MEG").toString());
+                                       settings.value(QString("RTNRW/%1/filterLP").arg(t_sRTMSAName), 40.0).toDouble(),
+                                       settings.value(QString("RTNRW/%1/filterOrder").arg(t_sRTMSAName), 128).toInt(),
+                                       settings.value(QString("RTNRW/%1/filterType").arg(t_sRTMSAName), 2).toInt(),
+                                       settings.value(QString("RTNRW/%1/filterDesignMethod").arg(t_sRTMSAName), 0).toInt(),
+                                       settings.value(QString("RTNRW/%1/filterTransition").arg(t_sRTMSAName), 5.0).toDouble(),
+                                       settings.value(QString("RTNRW/%1/filterChannelType").arg(t_sRTMSAName), "MEG").toString());
 }
 
 
@@ -757,7 +732,7 @@ void NoiseReduction::run()
 
         //Do temporal filtering here
         if(m_bFilterActivated) {
-            t_mat = m_pRtFilter->filterChannelsConcurrently(t_mat, m_iMaxFilterLength, m_lFilterChannelList, m_filterData);
+            t_mat = m_pRtFilter->filterChannelsConcurrently(t_mat, m_iMaxFilterLength, m_lFilterChannelList, QList<FilterData>() << m_filterData);
         }
 
 //        qDebug()<<"t_mat dim:"<<t_mat.rows()<<"x"<<t_mat.cols();

@@ -57,10 +57,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE NoiseReductionPlugin
+// DEFINE NAMESPACE NOISEREDUCTIONPLUGIN
 //=============================================================================================================
 
-namespace NoiseReductionPlugin
+namespace NOISEREDUCTIONPLUGIN
 {
 
 
@@ -91,7 +91,7 @@ public:
     /**
     * Constructs a DummyToolbox.
     */
-    explicit NoiseReductionOptionsWidget(NoiseReductionPlugin::NoiseReduction* toolbox, QWidget* parent = 0);
+    explicit NoiseReductionOptionsWidget(NOISEREDUCTIONPLUGIN::NoiseReduction* toolbox, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -178,7 +178,7 @@ protected:
 private:
     Ui::NoiseReductionOptionsWidgetClass*   ui;                             /**< The UI class specified in the designer. */
 
-    NoiseReductionPlugin::NoiseReduction*   m_pNoiseReductionToolbox;
+    NOISEREDUCTIONPLUGIN::NoiseReduction*   m_pNoiseReductionToolbox;
 
     FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;                    /**< Connected fiff info. */
 

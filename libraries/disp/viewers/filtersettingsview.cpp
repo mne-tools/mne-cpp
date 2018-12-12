@@ -40,6 +40,8 @@
 
 #include "filtersettingsview.h"
 
+#include "filterview.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -49,6 +51,7 @@
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QPushButton>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -69,39 +72,19 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FilterSettingsView::FilterSettingsView(QWidget *parent,
-                         Qt::WindowFlags f)
+FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
+                                       QWidget *parent,
+                                       Qt::WindowFlags f)
 : QWidget(parent, f)
-, m_pShowFilterOptions(Q_NULLPTR)
+, m_sSettingsPath(sSettingsPath)
 {
-    this->setWindowTitle("Compensators");
+    this->setWindowTitle("Filter Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
-}
 
-
-//*************************************************************************************************************
-
-void FilterSettingsView::filterGroupChanged(QList<QCheckBox*> list)
-{
-    m_qFilterListCheckBox.clear();
-
-    for(int u = 0; u < list.size(); ++u) {
-        QCheckBox* tempCheckBox = new QCheckBox(list[u]->text());
-        tempCheckBox->setChecked(list[u]->isChecked());
-
-        connect(tempCheckBox, &QCheckBox::toggled,
-                list[u], &QCheckBox::setChecked);
-
-        if(tempCheckBox->text() == "Activate user designed filter")
-            connect(tempCheckBox, &QCheckBox::toggled,
-                    this, &FilterSettingsView::onUserFilterToggled);
-
-        connect(list[u], &QCheckBox::toggled,
-                tempCheckBox, &QCheckBox::setChecked);
-
-        m_qFilterListCheckBox.append(tempCheckBox);
-    }
+    m_pFilterView = FilterView::SPtr::create(m_sSettingsPath,
+                                             this,
+                                             Qt::Window);
 
     //Delete all widgets in the filter layout
     QGridLayout* topLayout = static_cast<QGridLayout*>(this->layout());
@@ -109,57 +92,89 @@ void FilterSettingsView::filterGroupChanged(QList<QCheckBox*> list)
        topLayout = new QGridLayout();
     }
 
-    QLayoutItem *child;
-    while ((child = topLayout->takeAt(0)) != 0) {
-        delete child->widget();
-        delete child;
-    }
-
     //Add filters
-    int u = 0;
+    m_pCheckBox = new QCheckBox("Activate filter");
 
-    for(u; u < m_qFilterListCheckBox.size(); ++u) {
-        topLayout->addWidget(m_qFilterListCheckBox[u], u, 0);
-    }
+    connect(m_pCheckBox.data(), &QCheckBox::toggled,
+            this, &FilterSettingsView::filterActivationChanged);
+
+    topLayout->addWidget(m_pCheckBox, 0, 0);
 
     //Add push button for filter options
-    m_pShowFilterOptions = new QPushButton();
-//        m_pShowFilterOptions->setText("Open Filter options");
-    m_pShowFilterOptions->setText("Filter options");
-    m_pShowFilterOptions->setCheckable(false);
-    connect(m_pShowFilterOptions, &QPushButton::clicked,
-            this, &FilterSettingsView::onShowFilterOptions);
+    QPushButton* pShowFilterOptions = new QPushButton();
+    pShowFilterOptions->setText("Filter options");
+    pShowFilterOptions->setCheckable(false);
+    connect(pShowFilterOptions, &QPushButton::clicked,
+            this, &FilterSettingsView::onShowFilterView);
 
-    topLayout->addWidget(m_pShowFilterOptions, u+1, 0);
+    topLayout->addWidget(pShowFilterOptions, 1, 0);
 
     //Find Filter tab and add current layout
     this->setLayout(topLayout);
+
+    loadSettings(m_sSettingsPath);
+}
+
+//*************************************************************************************************************
+
+FilterSettingsView::~FilterSettingsView()
+{
+    saveSettings(m_sSettingsPath);
 }
 
 
 //*************************************************************************************************************
 
-void FilterSettingsView::onUserFilterToggled(bool state)
+QSharedPointer<FilterView> FilterSettingsView::getFilterView()
 {
-    Q_UNUSED(state);
-    //qDebug()<<"onUserFilterToggled";
-    //emit updateConnectedView();
+    return m_pFilterView;
 }
 
 
 //*************************************************************************************************************
 
-void FilterSettingsView::onShowFilterOptions(bool state)
+bool FilterSettingsView::getFilterActive()
 {
-//    if(state)
-//        m_pShowFilterOptions->setText("Close filter options");
-//    else
-//        m_pShowFilterOptions->setText("Open filter options");
+    return m_pCheckBox->isChecked();
+}
 
-//    m_pShowFilterOptions->setChecked(state);
 
-//    emit showFilterOptions(state);
+//*************************************************************************************************************
 
-    Q_UNUSED(state);
-    emit showFilterOptions(true);
+void FilterSettingsView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    settings.setValue(settingsPath + QString("/filterActivated"), m_pCheckBox->isChecked());
+}
+
+
+//*************************************************************************************************************
+
+void FilterSettingsView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    m_pCheckBox->setChecked(settings.value(settingsPath + QString("/filterActivated"), false).toBool());
+}
+
+
+//*************************************************************************************************************
+
+void FilterSettingsView::onShowFilterView()
+{
+    if(m_pFilterView->isActiveWindow()) {
+        m_pFilterView->hide();
+    } else {
+        m_pFilterView->activateWindow();
+        m_pFilterView->show();
+    }
 }

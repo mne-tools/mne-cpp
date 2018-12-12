@@ -388,17 +388,17 @@ void ChannelDataView::updateSpharaOptions(const QString& sSytemType, int nBaseFc
 
 //*************************************************************************************************************
 
-void ChannelDataView::filterChanged(QList<FilterData> filterData)
+void ChannelDataView::setFilter(const FilterData& filterData)
 {
-    m_pModel->filterChanged(filterData);
+    m_pModel->filterChanged(QList<FilterData>() << filterData);
 }
 
 
 //*************************************************************************************************************
 
-void ChannelDataView::filterActivated(bool state)
+void ChannelDataView::setFilterActive(bool state)
 {
-    m_pModel->filterActivated(state);
+    m_pModel->setFilterActive(state);
 }
 
 

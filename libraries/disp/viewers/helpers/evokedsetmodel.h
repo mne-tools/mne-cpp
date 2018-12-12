@@ -225,6 +225,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Set filter activation
+    *
+    * @param[in] state    filter on/off flag
+    */
+    void setFilterActive(bool state);
+
+    //=========================================================================================================
+    /**
     * Get the current average colors
     *
     * @return Pointer to the current average colors.
@@ -395,11 +403,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Filter parameters changed
+    * Set filter
     *
     * @param[in] filterData    list of the currently active filter
     */
-    void filterChanged(QList<UTILSLIB::FilterData> filterData);
+    void setFilter(const UTILSLIB::FilterData &filterData);
 
     //=========================================================================================================
     /**
@@ -452,6 +460,7 @@ private:
     bool                                    m_bIsFreezed;                   /**< Display is freezed */
     bool                                    m_bProjActivated;               /**< Doo projections flag */
     bool                                    m_bCompActivated;               /**< Compensator activated */
+    bool                                    m_bPerformFiltering;            /**< Flag whether to activate/deactivate filtering. */
     float                                   m_fSps;                         /**< Sampling rate */
     qint32                                  m_iMaxFilterLength;             /**< Max order of the current filters */
 
