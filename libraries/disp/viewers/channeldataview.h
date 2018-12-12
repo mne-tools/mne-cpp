@@ -304,9 +304,9 @@ public:
     /**
     * Filter parameters changed
     *
-    * @param[in] filterData    list of the currently active filter
+    * @param[in] filterData   the currently active filter
     */
-    void filterChanged(QList<UTILSLIB::FilterData> filterData);
+    void setFilter(const UTILSLIB::FilterData &filterData);
 
     //=========================================================================================================
     /**
@@ -314,7 +314,7 @@ public:
     *
     * @param[in] state    filter on/off flag
     */
-    void filterActivated(bool state);
+    void setFilterActive(bool state);
 
     //=========================================================================================================
     /**

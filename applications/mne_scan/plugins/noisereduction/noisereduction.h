@@ -83,10 +83,20 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE NoiseReductionPlugin
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace NoiseReductionPlugin
+namespace UTILSLIB{
+    class FilterData;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE NOISEREDUCTIONPLUGIN
+//=============================================================================================================
+
+namespace NOISEREDUCTIONPLUGIN
 {
 
 
@@ -100,7 +110,7 @@ using namespace SCSHAREDLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// NOISEREDUCTIONPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -206,9 +216,9 @@ protected slots:
     /**
     * Filter parameters changed
     *
-    * @param[in] filterData    list of the currently active filter
+    * @param[in] filterData    currently active filter
     */
-    void filterChanged(QList<UTILSLIB::FilterData> filterData);
+    void filterChanged(const UTILSLIB::FilterData& filterData);
 
     //=========================================================================================================
     /**
@@ -273,7 +283,7 @@ private:
     QString                         m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
 
     QPushButton*                    m_pShowFilterOptions;                       /**< Holds the show filter options button. */
-    QList<UTILSLIB::FilterData>     m_filterData;                               /**< List of currently active filters. */
+    UTILSLIB::FilterData            m_filterData;                               /**< The currently active filter. */
 
     Eigen::VectorXi                 m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
     Eigen::VectorXi                 m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/

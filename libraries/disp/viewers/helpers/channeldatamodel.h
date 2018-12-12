@@ -347,11 +347,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Filter avtivated
+    * Set filter activation
     *
     * @param[in] state    filter on/off flag
     */
-    void filterActivated(bool state);
+    void setFilterActive(bool state);
 
     //=========================================================================================================
     /**
@@ -541,6 +541,7 @@ private:
     bool                                m_bSpharaActivated;                         /**< Sphara activated */
     bool                                m_bIsFreezed;                               /**< Display is freezed */
     bool                                m_bDrawFilterFront;                         /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
+    bool                                m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
     bool                                m_bTriggerDetectionActive;                  /**< Trigger detection activation state */
     float                               m_fSps;                                     /**< Sampling rate */
     double                              m_dTriggerThreshold;                        /**< Trigger detection threshold */

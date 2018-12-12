@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace NoiseReductionPlugin;
+using namespace NOISEREDUCTIONPLUGIN;
 using namespace FIFFLIB;
 
 

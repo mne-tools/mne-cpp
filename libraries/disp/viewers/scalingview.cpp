@@ -336,7 +336,7 @@ void ScalingView::redrawGUI()
 
 void ScalingView::saveSettings(const QString& settingsPath)
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if(settingsPath.isEmpty()) {
         return;
     }
 
@@ -372,7 +372,7 @@ void ScalingView::saveSettings(const QString& settingsPath)
 
 void ScalingView::loadSettings(const QString& settingsPath)
 {
-    if(m_sSettingsPath.isEmpty()) {
+    if(settingsPath.isEmpty()) {
         return;
     }
 

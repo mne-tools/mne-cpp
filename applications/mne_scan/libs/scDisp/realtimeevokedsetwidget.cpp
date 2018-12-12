@@ -187,20 +187,6 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
         QSettings settings;
 
-        //Store filter
-        if(m_pFilterView) {
-            FilterData filter = m_pFilterView->getUserDesignedFilter();
-
-            settings.setValue(QString("RTESW/%1/filterHP").arg(t_sRTESName), filter.m_dHighpassFreq);
-            settings.setValue(QString("RTESW/%1/filterLP").arg(t_sRTESName), filter.m_dLowpassFreq);
-            settings.setValue(QString("RTESW/%1/filterOrder").arg(t_sRTESName), filter.m_iFilterOrder);
-            settings.setValue(QString("RTESW/%1/filterType").arg(t_sRTESName), (int)filter.m_Type);
-            settings.setValue(QString("RTESW/%1/filterDesignMethod").arg(t_sRTESName), (int)filter.m_designMethod);
-            settings.setValue(QString("RTESW/%1/filterTransition").arg(t_sRTESName), filter.m_dParksWidth*(filter.m_sFreq/2));
-            settings.setValue(QString("RTESW/%1/filterUserDesignActive").arg(t_sRTESName), m_pFilterView->userDesignedFiltersIsActive());
-            settings.setValue(QString("RTESW/%1/filterChannelType").arg(t_sRTESName), m_pFilterView->getChannelType());
-        }
-
 //        //Store modalities
 //        if(m_pModalitySelectionView) {
 //            QMap<QString, bool> qMapModalities = m_pModalitySelectionView->getModalityMap();
@@ -290,8 +276,8 @@ void RealTimeEvokedSetWidget::getData()
             if(m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {
                 m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
 
-                m_pFilterView->setWindowSize(m_iMaxFilterTapSize);
-                m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
+//                m_pFilterView->setWindowSize(m_iMaxFilterTapSize);
+//                m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
             }
         }
 
@@ -374,35 +360,7 @@ void RealTimeEvokedSetWidget::init()
                 //Modality
                 qMapModalities.insert("MISC",settings.value(QString("RTESW/%1/modalityMISC").arg(t_sRTESName), true).toBool());
             }
-        }
-
-        //Init filter window
-        m_pFilterView = FilterView::SPtr::create(this, Qt::Window);
-
-        connect(m_pFilterView.data(), static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
-                m_pEvokedSetModel.data(),static_cast<void (EvokedSetModel::*)(QString)>(&EvokedSetModel::setFilterChannelType));
-
-        connect(m_pFilterView.data(), &FilterView::filterChanged,
-                m_pEvokedSetModel.data(), &EvokedSetModel::filterChanged);
-
-        m_pFilterView->init(m_pFiffInfo->sfreq);
-
-        if(!m_pRTESet->getValue()->evoked.isEmpty()) {
-            m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
-
-            m_pFilterView->setWindowSize(m_iMaxFilterTapSize);
-            m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
-        }
-
-        //Set stored filter settings from last session
-        m_pFilterView->setFilterParameters(settings.value(QString("RTESW/%1/filterHP").arg(t_sRTESName), 5.0).toDouble(),
-                                           settings.value(QString("RTESW/%1/filterLP").arg(t_sRTESName), 40.0).toDouble(),
-                                           settings.value(QString("RTESW/%1/filterOrder").arg(t_sRTESName), 128).toInt(),
-                                           settings.value(QString("RTESW/%1/filterType").arg(t_sRTESName), 2).toInt(),
-                                           settings.value(QString("RTESW/%1/filterDesignMethod").arg(t_sRTESName), 0).toInt(),
-                                           settings.value(QString("RTESW/%1/filterTransition").arg(t_sRTESName), 5.0).toDouble(),
-                                           settings.value(QString("RTESW/%1/filterUserDesignActive").arg(t_sRTESName), false).toBool(),
-                                           settings.value(QString("RTESW/%1/filterChannelType").arg(t_sRTESName), "MEG").toString());
+        }       
 
         //Init channel selection manager
         m_pChannelInfoModel = QSharedPointer<ChannelInfoModel>(new ChannelInfoModel(m_pFiffInfo, this));
@@ -459,16 +417,28 @@ void RealTimeEvokedSetWidget::init()
                 m_pButterflyView.data(), &ButterflyView::updateView);
 
         // Quick control filter settings
-        FilterSettingsView* pFilterSettingsView = new FilterSettingsView();
+        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTESW/%1").arg(t_sRTESName));
         m_pQuickControlView->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter");
 
-        connect(m_pFilterView.data(), &FilterView::activationCheckBoxListChanged,
-                pFilterSettingsView, &FilterSettingsView::filterGroupChanged);
+        connect(pFilterSettingsView->getFilterView().data(), &FilterView::filterChannelTypeChanged,
+                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterChannelType);
 
-        connect(pFilterSettingsView, &FilterSettingsView::showFilterOptions,
-                this, &RealTimeEvokedSetWidget::showFilterWidget);
+        connect(pFilterSettingsView->getFilterView().data(), &FilterView::filterChanged,
+                m_pEvokedSetModel.data(), &EvokedSetModel::setFilter);
 
-        pFilterSettingsView->filterGroupChanged(m_pFilterView->getActivationCheckBoxList());
+        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
+                m_pEvokedSetModel.data(), &EvokedSetModel::setFilterActive);
+
+        m_pEvokedSetModel->setFilterActive(pFilterSettingsView->getFilterActive());
+
+        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
+
+        if(!m_pRTESet->getValue()->evoked.isEmpty()) {
+            m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
+
+            pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
+            pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
+        }
 
         // Quick control channel data settings
         ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView();
@@ -567,23 +537,6 @@ void RealTimeEvokedSetWidget::showSensorSelectionWidget()
 void RealTimeEvokedSetWidget::showQuickControlWidget()
 {
     m_pQuickControlView->show();
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedSetWidget::showFilterWidget(bool state)
-{
-    if(state) {
-        if(m_pFilterView->isActiveWindow())
-            m_pFilterView->hide();
-        else {
-            m_pFilterView->activateWindow();
-            m_pFilterView->show();
-        }
-    } else {
-        m_pFilterView->hide();
-    }
 }
 
 
