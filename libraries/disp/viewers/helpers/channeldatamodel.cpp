@@ -714,12 +714,14 @@ void ChannelDataModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::updateProjection()
+void ChannelDataModel::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
 {
     //  Update the SSP projector
     if(m_pFiffInfo) {
         //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
         m_bProjActivated = false;
+        m_pFiffInfo->projs = projs;
+
         for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
             if(this->m_pFiffInfo->projs[i].active) {
                 m_bProjActivated = true;

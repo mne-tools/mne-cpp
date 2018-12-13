@@ -304,9 +304,9 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
             this->setFilterChannelType(m_pFilterSettingsView->getFilterView()->getChannelType());
 
-            m_pProjectorsView->init(m_pFiffInfo);
+            m_pProjectorsView->setProjectors(m_pFiffInfo->projs);
 
-            m_pCompensatorView->init(m_pFiffInfo);
+            m_pCompensatorView->setCompensators(m_pFiffInfo->comps);
         }
 
         MatrixXd t_mat;

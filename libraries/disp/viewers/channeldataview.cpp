@@ -356,9 +356,9 @@ void ChannelDataView::takeScreenshot(const QString& fileName)
 
 //*************************************************************************************************************
 
-void ChannelDataView::updateProjection()
+void ChannelDataView::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
 {
-    m_pModel->updateProjection();
+    m_pModel->updateProjection(projs);
 }
 
 
@@ -597,7 +597,7 @@ void ChannelDataView::markChBad()
         }
     }
 
-    m_pModel->updateProjection();
+    m_pModel->updateProjection(m_pFiffInfo->projs);
 
     //Hide non selected channels/rows in the data views
     for(int i = 0; i<m_qListBadChannels.size(); i++) {

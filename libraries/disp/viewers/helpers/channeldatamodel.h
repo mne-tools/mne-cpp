@@ -45,6 +45,7 @@
 #include "../../disp_global.h"
 
 #include <fiff/fiff_types.h>
+#include <fiff/fiff_proj.h>
 #include <utils/filterTools/filterdata.h>
 
 
@@ -308,8 +309,10 @@ public:
     //=========================================================================================================
     /**
     * Update the SSP projection
+    *
+    * @param [in] projs    The new projectors.
     */
-    void updateProjection();
+    void updateProjection(const QList<FIFFLIB::FiffProj>& projs);
 
     //=========================================================================================================
     /**

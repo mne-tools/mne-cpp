@@ -66,10 +66,9 @@
 //=============================================================================================================
 
 class QCheckBox;
-class QSignalMapper;
 
 namespace FIFFLIB {
-    class FiffInfo;
+    class FiffCtfComp;
 }
 
 
@@ -114,29 +113,78 @@ public:
     *
     * @param [in] parent        parent of widget
     */
-    CompensatorView(QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
+    CompensatorView(const QString& sSettingsPath = "",
+                    QWidget *parent = 0,
+                    Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Update the selection.
-    *
-    * @param [in] state    The state (unused).
+    * Destroys the CompensatorView.
     */
-    void init(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    ~CompensatorView();
 
-protected:
+    //=========================================================================================================
+    /**
+    * Get the current compensators
+    *
+    * @return The current compensators.
+    */
+    QList<FIFFLIB::FiffCtfComp> getCompensators() const;
+
+    //=========================================================================================================
+    /**
+    * Get the last value of comp.to
+    *
+    * @return The last value of comp.to.
+    */
+    int getLastTo() const;
+
+    //=========================================================================================================
+    /**
+    * Set the current compensators
+    *
+    * @param [in] comps    The new compensators.
+    */
+    void setCompensators(const QList<FIFFLIB::FiffCtfComp>& comps);
+
+protected:    
+    //=========================================================================================================
+    /**
+    * Redraw the selection.
+    */
+    void redrawGUI();
+
+    //=========================================================================================================
+    /**
+    * Saves all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to store the settings to.
+    */
+    void saveSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+    * Loads and inits all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to load the settings from.
+    */
+    void loadSettings(const QString& settingsPath);
+
     //=========================================================================================================
     /**
     * Slot called when the compensator check state changes
     */
-    void onCheckCompStatusChanged(const QString & compName);
-
-    QSignalMapper*                                      m_pCompSignalMapper;            /**< The signal mapper. */
+    void onCheckCompStatusChanged();
 
     QList<QCheckBox*>                                   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
+    QList<FIFFLIB::FiffCtfComp>                         m_pComps;                       /**< The current compensators. */
+
+    QString                                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+
+    int                                                 m_iLastTo;
+
+    QMap<int,bool>                                      m_mapCompActive;
 
 signals:
     //=========================================================================================================
