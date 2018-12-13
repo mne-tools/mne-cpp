@@ -157,9 +157,10 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     m_pRTESetLayout->addWidget(m_pToolBox);
 
     // Init quick control view
-    m_pQuickControlView = QSharedPointer<QuickControlView>::create("RT Averaging", Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint, this);
-    QSettings settings;
-    m_pQuickControlView->setOpacityValue(settings.value(QString("RTESW/%1/viewOpacity").arg(m_pRTESet->getName()), 100).toInt());
+    m_pQuickControlView = QSharedPointer<QuickControlView>::create(QString("RTESW/%1/viewOpacity").arg(m_pRTESet->getName()),
+                                                                   "RT Averaging",
+                                                                   Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
+                                                                   this);
     m_pActionQuickControl->setVisible(true);
 
     QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTESet->getControlWidgets();
@@ -316,7 +317,7 @@ void RealTimeEvokedSetWidget::init()
         QSharedPointer<QMap<QString, bool> > pqMapAverageActivation = QSharedPointer<QMap<QString, bool> >::create(qMapAverageActivation);
         m_pEvokedSetModel->setAverageActivation(pqMapAverageActivation); 
 
-        //Init channel selection manager
+        //Init channel info and selection view
         m_pChannelInfoModel = ChannelInfoModel::SPtr::create(m_pFiffInfo,
                                                              this);
 
@@ -325,7 +326,6 @@ void RealTimeEvokedSetWidget::init()
                                                                                m_pChannelInfoModel,
                                                                                Qt::Window);
 
-        //Connect channel info model
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
                 m_pChannelInfoModel.data(), &ChannelInfoModel::layoutChanged);
 

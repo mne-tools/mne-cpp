@@ -128,11 +128,10 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
     // Quick control selection
     QSettings settings;
 
-    m_pQuickControlView = QuickControlView::SPtr::create("RT Display",
+    m_pQuickControlView = QuickControlView::SPtr::create(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
+                                                         "RT Display",
                                                          Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
                                                          this);
-    m_pQuickControlView->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(m_pRTMSA->getName()), 95).toInt());
-
     QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTMSA->getControlWidgets();
 
     for(int i = 0; i < lControlWidgets.size(); ++i) {
@@ -171,16 +170,10 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
 
 RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 {
-    // Store Settings
-    if(!m_pRTMSA->getName().isEmpty()) {
-        QString sRTMSAWName = m_pRTMSA->getName();
+    QSettings settings;
 
-        QSettings settings;
-
-        //Store QuickControlView
-        if(m_pQuickControlView) {
-            settings.setValue(QString("RTMSAW/%1/viewOpacity").arg(sRTMSAWName), m_pQuickControlView->getOpacityValue());
-        }
+    if(m_pChannelDataView && m_pRTMSA) {
+        settings.setValue(QString("RTMSAW/%1/showHideBad").arg(m_pRTMSA->getName()), m_pChannelDataView->getBadChannelHideStatus());
     }
 }
 
@@ -213,15 +206,8 @@ void RealTimeMultiSampleArrayWidget::init()
         QString sRTMSAWName = m_pRTMSA->getName();
 
         // Init channel view
-        QColor signalDefault = Qt::darkBlue;
-        QColor backgroundDefault = Qt::white;
-        QColor signal = settings.value(QString("RTMSAW/%1/signalColor").arg(sRTMSAWName), signalDefault).value<QColor>();
-        QColor background = settings.value(QString("RTMSAW/%1/backgroundColor").arg(sRTMSAWName), backgroundDefault).value<QColor>();
-
         m_pChannelDataView->show();
         m_pChannelDataView->init(m_pFiffInfo);
-        m_pChannelDataView->setBackgroundColor(background);
-        m_pChannelDataView->setSignalColor(signal);
 
         if(settings.value(QString("RTMSAW/%1/showHideBad").arg(sRTMSAWName), false).toBool()) {
             this->onHideBadChannels();
