@@ -140,7 +140,7 @@ public:
     *
     * @param fiffInfo fiff info variabel.
     */
-    void fiffInfoChanged(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo);
+    void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**

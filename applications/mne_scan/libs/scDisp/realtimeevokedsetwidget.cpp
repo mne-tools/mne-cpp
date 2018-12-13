@@ -343,7 +343,7 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::selectionChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::channelSelectionManagerChanged);
 
-        m_pChannelInfoModel->fiffInfoChanged(m_pFiffInfo);
+        m_pChannelInfoModel->setFiffInfo(m_pFiffInfo);
 
         // Quick control scaling        
         ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName),

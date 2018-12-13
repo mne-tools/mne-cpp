@@ -223,6 +223,12 @@ void View3D::setLightIntensity(double value)
 
 void View3D::takeScreenshot()
 {
+    if(m_pScreenCaptureReply) {
+        if(!m_pScreenCaptureReply->isComplete()) {
+            return;
+        }
+    }
+
     m_pScreenCaptureReply = m_pFrameGraph->requestRenderCaptureReply();
 
     if(!m_pScreenCaptureReply) {

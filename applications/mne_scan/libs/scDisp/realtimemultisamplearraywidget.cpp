@@ -246,7 +246,8 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pChannelSelectionView = ChannelSelectionView::SPtr::create(QString("RTMSAW/%1").arg(sRTMSAWName),
                                                                      this,
-                                                                     m_pChannelInfoModel, Qt::Window);
+                                                                     m_pChannelInfoModel,
+                                                                     Qt::Window);
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
                 m_pChannelDataView.data(), &ChannelDataView::showSelectedChannelsOnly);
@@ -263,7 +264,7 @@ void RealTimeMultiSampleArrayWidget::init()
         connect(m_pChannelInfoModel.data(), &ChannelInfoModel::channelsMappedToLayout,
                 m_pChannelSelectionView.data(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
-        m_pChannelInfoModel->fiffInfoChanged(m_pFiffInfo);
+        m_pChannelInfoModel->setFiffInfo(m_pFiffInfo);
 
         //Init quick control widget
         QStringList slFlags = m_pRTMSA->getDisplayFlags();
