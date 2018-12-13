@@ -162,12 +162,29 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     m_pQuickControlView->setOpacityValue(settings.value(QString("RTESW/%1/viewOpacity").arg(m_pRTESet->getName()), 100).toInt());
     m_pActionQuickControl->setVisible(true);
 
-    // Quick control average selection
     QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTESet->getControlWidgets();
-    if(!lControlWidgets.isEmpty()) {
-        if(lControlWidgets.first()) {
-            m_pAveragingSettingsView = qSharedPointerDynamicCast<DISPLIB::AveragingSettingsView>(lControlWidgets.first());
-            m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.first(), "Averaging", "Settings");
+
+    for(int i = 0; i < lControlWidgets.size(); ++i) {
+        QString sObjectName = lControlWidgets.at(i)->objectName();
+
+        if(sObjectName.contains("widget_", Qt::CaseInsensitive)) {
+            m_pQuickControlView->addWidget(lControlWidgets.at(i));
+        }
+
+        if(sObjectName.contains("group_", Qt::CaseInsensitive)) {
+            if(sObjectName.contains("group_tab_", Qt::CaseInsensitive)) {
+                sObjectName.remove("group_tab_");
+                QStringList sList = sObjectName.split("_");
+                qDebug() << "RealTimeMultiSampleArrayWidget sList" << sList;
+                if(sList.size() >= 2) {
+                   m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), sList.at(0), sList.at(1));
+                } else {
+                    m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), "", sObjectName);
+                }
+            } else {
+                sObjectName.remove("group_");
+                m_pQuickControlView->addGroupBox(lControlWidgets.at(i), sObjectName);
+            }
         }
     }
 

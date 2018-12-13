@@ -297,6 +297,7 @@ void Averaging::init()
                                                                    m_bDoBaselineCorrection,
                                                                    m_iBaselineFromSeconds,
                                                                    m_iBaselineToSeconds);
+    m_pAveragingSettingsView->setObjectName("group_tab_Averaging_Settings");
 
     connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeNumAverages,
             this, &Averaging::onChangeNumAverages);
