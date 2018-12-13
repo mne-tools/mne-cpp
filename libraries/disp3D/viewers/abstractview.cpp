@@ -152,7 +152,11 @@ void AbstractView::setQuickControlWidgets(const QList<QSharedPointer<QWidget> >&
 
 void AbstractView::createGUI()
 {
-    m_pQuickControlView = new QuickControlView("Network View", Qt::Widget, this, false);
+    m_pQuickControlView = new QuickControlView("3DView",
+                                               "3D View",
+                                               Qt::Widget,
+                                               this,
+                                               false);
     m_pQuickControlView->setVisiblityHideOpacityClose(false);
 
     //Create widget GUI
