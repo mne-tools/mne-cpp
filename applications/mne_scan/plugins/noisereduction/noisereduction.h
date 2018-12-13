@@ -44,33 +44,17 @@
 
 #include "noisereduction_global.h"
 
-#include <utils/filterTools/sphara.h>
-#include <utils/ioutils.h>
-
-#include <disp/viewers/filterview.h>
+#include <utils/generics/circularmatrixbuffer.h>
+#include <utils/filterTools/filterdata.h>
+#include <fiff/fiff_proj.h>
 
 #include <scShared/Interfaces/IAlgorithm.h>
-
-#include <rtprocessing/rtfilter.h>
-
-#include <utils/generics/circularmatrixbuffer.h>
-
-#include <scMeas/realtimemultisamplearray.h>
-
-#include "FormFiles/noisereductionsetupwidget.h"
-#include "FormFiles/noisereductionoptionswidget.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QtWidgets>
-#include <QtCore/QtPlugin>
-#include <QDebug>
-#include <QSettings>
-#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -88,6 +72,25 @@
 
 namespace UTILSLIB{
     class FilterData;
+}
+
+namespace DISPLIB{
+    class ProjectorsView;
+    class CompensatorView;
+    class FilterSettingsView;
+    class SpharaSettingsView;
+}
+
+namespace FIFFLIB{
+    class FiffInfo;
+}
+
+namespace RTPROCESSINGLIB{
+    class RtFilter;
+}
+
+namespace SCMEASLIB{
+    class RealTimeMultiSampleArray;
 }
 
 
@@ -118,7 +121,7 @@ using namespace SCSHAREDLIB;
 /**
 * DECLARE CLASS NoiseReduction
 *
-* @brief The NoiseReduction class provides a noisereduction algorithm structure.
+* @brief The NoiseReduction class provides a tools to reduce noise of an incoming data stream. It then forwards the processed data to subsequent plugins.
 */
 class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public IAlgorithm
 {
@@ -126,8 +129,6 @@ class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public IAlgorithm
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "noisereduction.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
-
-    friend class NoiseReductionOptionsWidget;
 
 public:
     //=========================================================================================================
@@ -163,38 +164,32 @@ public:
     */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
-public slots:
-    //=========================================================================================================
-    /**
-    * Set the acquisition system type (BabyMEG, VecotrView, EEG).
-    *
-    * @param[in] sSystem    The type of the acquisition system.
-    */
-    void setAcquisitionSystem(const QString &sSystem);
-
     //=========================================================================================================
     /**
     * Set the active flag for SPHARA processing.
     *
     * @param[in] state    The new activity flag.
     */
-    void setSpharaMode(bool state);
+    void setSpharaActive(bool state);
 
     //=========================================================================================================
     /**
-    * Set the number of base functions to keep for SPHARA processing.
+    * Set the number of base functions and acquisition system for SPHARA processing.
     *
-    * @param[in] nBaseFctsGrad    The number of grad/mag base functions to keep.
-    * @param[in] nBaseFctsMag     The number of grad/mag base functions to keep.
+    * @param[in] sSytemType         The acquisition system.
+    * @param[in] nBaseFctsGrad      The number of grad/mag base functions to keep.
+    * @param[in] nBaseFctsMag       The number of grad/mag base functions to keep.
     */
-    void setSpharaNBaseFcts(int nBaseFctsGrad, int nBaseFctsMag);
+    void setSpharaOptions(const QString& sSytemType,
+                          int nBaseFctsFirst,
+                          int nBaseFctsSecond);
 
-protected slots:
+protected:
     //=========================================================================================================
     /**
     * Update the SSP projection
     */
-    void updateProjection();
+    void updateProjection(const QList<FIFFLIB::FiffProj>& projs);
 
     //=========================================================================================================
     /**
@@ -218,7 +213,7 @@ protected slots:
     *
     * @param[in] filterData    currently active filter
     */
-    void filterChanged(const UTILSLIB::FilterData& filterData);
+    void setFilter(const UTILSLIB::FilterData& filterData);
 
     //=========================================================================================================
     /**
@@ -226,32 +221,13 @@ protected slots:
     *
     * @param[in] state    filter on/off flag
     */
-    void filterActivated(bool state);
-
-protected:
-    //=========================================================================================================
-    /**
-    * Toggle visibilty the visibility of the options toolbar widget.
-    */
-    void showOptionsWidget();
+    void setFilterActive(bool state);
 
     //=========================================================================================================
     /**
     * Init the SPHARA method.
     */
     void initSphara();
-
-    //=========================================================================================================
-    /**
-    * Init the temporal filtering.
-    */
-    void initFilter();
-
-    //=========================================================================================================
-    /**
-    * Shows the filter widget
-    */
-    void showFilterWidget(bool state = true);
 
     //=========================================================================================================
     /**
@@ -282,7 +258,6 @@ private:
     QString                         m_sCurrentSystem;                           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
     QString                         m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
 
-    QPushButton*                    m_pShowFilterOptions;                       /**< Holds the show filter options button. */
     UTILSLIB::FilterData            m_filterData;                               /**< The currently active filter. */
 
     Eigen::VectorXi                 m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
@@ -305,28 +280,23 @@ private:
 
     QVector<int>                    m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
 
-    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffInfo>                               m_pFiffInfo;                /**< Fiff measurement info.*/
 
-    IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pNoiseReductionBuffer;    /**< Holds incoming data.*/
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr                    m_pNoiseReductionBuffer;    /**< Holds incoming data.*/
 
-    NoiseReductionOptionsWidget::SPtr               m_pOptionsWidget;           /**< The noise reduction option widget object.*/
-    QAction*                                        m_pActionShowOptionsWidget; /**< The noise reduction option widget action.*/
+    QSharedPointer<RTPROCESSINGLIB::RtFilter>                       m_pRtFilter;                /**< Real time filter object. */
 
-    DISPLIB::FilterView::SPtr                       m_pFilterView;              /**< Filter view. */
-    RTPROCESSINGLIB::RtFilter::SPtr                     m_pRtFilter;                /**< Real time filter object. */
+    QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray>             m_pRTMSA;                   /**< the real time multi sample array object. */
 
-    SCMEASLIB::RealTimeMultiSampleArray::SPtr    m_pRTMSA;                   /**< the real time multi sample array object. */
+    QSharedPointer<DISPLIB::ProjectorsView>                         m_pProjectorsView;
+    QSharedPointer<DISPLIB::CompensatorView>                        m_pCompensatorView;
+    QSharedPointer<DISPLIB::FilterSettingsView>                     m_pFilterSettingsView;
+    QSharedPointer<DISPLIB::SpharaSettingsView>                     m_pSpharaSettingsView;
 
     PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
     PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available
-    */
-    void fiffInfoAvailable();
-
 };
 
 } // NAMESPACE
