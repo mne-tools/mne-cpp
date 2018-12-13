@@ -64,7 +64,6 @@ class QPropertyAnimation;
 
 namespace Qt3DRender {
     class QPointLight;
-    class QRenderCapture;
     class QRenderCaptureReply;
 }
 
@@ -207,8 +206,7 @@ protected:
 
     QPointer<CustomFrameGraph>                  m_pFrameGraph;                  /**< The frameGraph entity. */
     QPointer<Qt3DRender::QCamera>               m_pCamera;                      /**< The camera entity. */
-    QPointer<Qt3DRender::QRenderCapture>        m_pCapture;                     /**< The capture object to save screenshots. */
-    QPointer<Qt3DRender::QRenderCaptureReply>   m_pReply;                       /**< The capture reply object to save screenshots. */
+    QPointer<Qt3DRender::QRenderCaptureReply>   m_pScreenCaptureReply;          /**< The capture reply object to save screenshots. */
 
     QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;         /**< The animations for each 3D object. */
     QList<QPointer<Qt3DRender::QPointLight> >  m_lLightSources;          /**< The light sources. */

@@ -84,6 +84,8 @@ namespace Qt3DRender {
         class QBlendEquationArguments;
         class QBlendEquation;
         class QCullFace;
+        class QRenderCapture;
+        class QRenderCaptureReply;
 }
 
 
@@ -155,6 +157,14 @@ public:
      */
     void setClearColor(const QColor &tColor);
 
+    //=========================================================================================================
+    /**
+     * Used to request render capture. Only one render capture result is produced per requestCapture call.
+     * The function returns a QRenderCaptureReply object, which receives the captured image when it is done.
+     * The user is responsible for deallocating the returned object.
+     */
+    Qt3DRender::QRenderCaptureReply* requestRenderCaptureReply();
+
 protected:
 
 private:
@@ -208,6 +218,8 @@ private:
     QPointer<Qt3DRender::QBlendEquationArguments>   m_pBlendArguments;      /**< Blend equation arguments render state. */
 
     QPointer<Qt3DRender::QNoDepthMask>              m_pNoDepthMask;         /**< Render state for disableling writing to depth buffer. */
+
+    QPointer<Qt3DRender::QRenderCapture>            m_pCapture;             /**< Used to take a screenshot of the render result. */
 
     bool                                            m_bUseOpenGl4_3;        /**< OpenGL version 4.3 status flag. */
 };
