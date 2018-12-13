@@ -357,7 +357,7 @@ void RealTimeEvokedSetWidget::init()
                 m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
 
         // Quick control projectors
-        ProjectorsView* pProjectorsView = new ProjectorsView();
+        ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTESW/%1").arg(t_sRTESName));
         m_pQuickControlView->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
 
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
@@ -366,11 +366,10 @@ void RealTimeEvokedSetWidget::init()
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pButterflyView.data(), &ButterflyView::updateView);
 
-        pProjectorsView->init(m_pFiffInfo);
+        m_pEvokedSetModel->updateProjection(pProjectorsView->getProjectors());
 
         // Quick control compensators
-        CompensatorView* pCompensatorView = new CompensatorView();
-        pCompensatorView->init(m_pFiffInfo);
+        CompensatorView* pCompensatorView = new CompensatorView(QString("RTESW/%1").arg(t_sRTESName));
         m_pQuickControlView->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
 
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
@@ -378,6 +377,8 @@ void RealTimeEvokedSetWidget::init()
 
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
                 m_pButterflyView.data(), &ButterflyView::updateView);
+
+        m_pEvokedSetModel->updateCompensator(pCompensatorView->getLastTo());
 
         // Quick control filter settings
         FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTESW/%1").arg(t_sRTESName));

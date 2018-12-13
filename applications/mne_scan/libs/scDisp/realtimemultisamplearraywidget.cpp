@@ -285,24 +285,26 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
         }
 
-        // Quick control projectors and compensators
+        // Quick control projectors
         if(slFlags.contains("projections")) {
-            ProjectorsView* pProjectorsView = new ProjectorsView();
-            pProjectorsView->init(m_pFiffInfo);
+            ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTMSAW/%1").arg(sRTMSAWName));
             m_pQuickControlView->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
 
             connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                     m_pChannelDataView.data(), &ChannelDataView::updateProjection);
 
-            //Activate projectors by default
-            m_pChannelDataView->updateProjection();
+            pProjectorsView->setProjectors(m_pFiffInfo->projs);
+        }
 
-            CompensatorView* pCompensatorView = new CompensatorView();
-            pCompensatorView->init(m_pFiffInfo);
+        // Quick control compensators
+        if(slFlags.contains("compensators")) {
+            CompensatorView* pCompensatorView = new CompensatorView(QString("RTMSAW/%1").arg(sRTMSAWName));
             m_pQuickControlView->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
 
             connect(pCompensatorView, &CompensatorView::compSelectionChanged,
                     m_pChannelDataView.data(), &ChannelDataView::updateCompensator);
+
+            pCompensatorView->setCompensators(m_pFiffInfo->comps);
         }
 
         // Quick control filter
