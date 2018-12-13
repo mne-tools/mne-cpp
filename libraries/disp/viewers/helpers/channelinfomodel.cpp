@@ -552,7 +552,7 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
 
 //*************************************************************************************************************
 
-void ChannelInfoModel::fiffInfoChanged(FiffInfo::SPtr& pFiffInfo)
+void ChannelInfoModel::setFiffInfo(FiffInfo::SPtr& pFiffInfo)
 {
     beginResetModel();
 
