@@ -204,34 +204,6 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
         QSettings settings;
 
-//        //Store modalities
-//        if(m_pModalitySelectionView) {
-//            QMap<QString, bool> qMapModalities = m_pModalitySelectionView->getModalityMap();
-
-//            if(qMapChScaling.contains(FIFF_UNIT_T)) {
-//                settings.setValue(QString("RTESW/%1/modalityMAG").arg(t_sRTESName), qMapModalities["MAG"]);
-//            }
-
-//            if(qMapChScaling.contains(FIFF_UNIT_T_M)) {
-//                settings.setValue(QString("RTESW/%1/modalityGRAD").arg(t_sRTESName), qMapModalities["GRAD"]);
-//            }
-
-//            if(qMapChScaling.contains(FIFFV_EEG_CH)) {
-//                settings.setValue(QString("RTESW/%1/modalityEEG").arg(t_sRTESName), qMapModalities["EEG"]);
-//            }
-
-//            if(qMapChScaling.contains(FIFFV_EOG_CH)) {
-//                settings.setValue(QString("RTESW/%1/modalityEOG").arg(t_sRTESName), qMapModalities["EOG"]);
-//            }
-
-//            if(qMapChScaling.contains(FIFFV_STIM_CH)) {
-//            }
-
-//            if(qMapChScaling.contains(FIFFV_MISC_CH)) {
-//                settings.setValue(QString("RTESW/%1/modalityMISC").arg(t_sRTESName), qMapModalities["MISC"]);
-//            }
-//        }
-
         //Store selected layout file
         if(m_pChannelSelectionView) {
             settings.setValue(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESName), m_pChannelSelectionView->getCurrentLayoutFile());
@@ -352,32 +324,7 @@ void RealTimeEvokedSetWidget::init()
         }
         settings.endGroup();
         QSharedPointer<QMap<QString, bool> > pqMapAverageActivation = QSharedPointer<QMap<QString, bool> >::create(qMapAverageActivation);
-        m_pEvokedSetModel->setAverageActivation(pqMapAverageActivation);
-
-        // Init modalities and scaling
-        QMap<QString, bool> qMapModalities;
-
-        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
-            if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH) {
-                if(m_pFiffInfo->chs[i].unit == FIFF_UNIT_T) {
-                    //Modality
-                    qMapModalities.insert("MAG",settings.value(QString("RTESW/%1/modalityMAG").arg(t_sRTESName), true).toBool());
-                } else if(m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M) {
-                    //Modality
-                    qMapModalities.insert("GRAD",settings.value(QString("RTESW/%1/modalityGRAD").arg(t_sRTESName), true).toBool());
-                }
-            } else if(m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH) {
-                //Modality
-                qMapModalities.insert("EEG",settings.value(QString("RTESW/%1/modalityEEG").arg(t_sRTESName), true).toBool());
-            } else if(m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH) {
-                //Modality
-                qMapModalities.insert("EOG",settings.value(QString("RTESW/%1/modalityEOG").arg(t_sRTESName), true).toBool());
-            } else if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
-            } else if(m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH) {
-                //Modality
-                qMapModalities.insert("MISC",settings.value(QString("RTESW/%1/modalityMISC").arg(t_sRTESName), true).toBool());
-            }
-        }       
+        m_pEvokedSetModel->setAverageActivation(pqMapAverageActivation); 
 
         //Init channel selection manager
         m_pChannelInfoModel = QSharedPointer<ChannelInfoModel>(new ChannelInfoModel(m_pFiffInfo, this));
@@ -400,13 +347,14 @@ void RealTimeEvokedSetWidget::init()
         m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESName), "babymeg-mag-inner-layer.lout").toString());
 
         // Quick control scaling        
-        QPointer<DISPLIB::ScalingView> pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName));
+        ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName),
+                                                    m_pFiffInfo->chs);
         m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
 
-        connect(pScalingView.data(), &ScalingView::scalingChanged,
+        connect(pScalingView, &ScalingView::scalingChanged,
                 m_pButterflyView.data(), &ButterflyView::setScaleMap);
 
-        connect(pScalingView.data(), &ScalingView::scalingChanged,
+        connect(pScalingView, &ScalingView::scalingChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
 
         // Quick control projectors
@@ -419,7 +367,6 @@ void RealTimeEvokedSetWidget::init()
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pButterflyView.data(), &ButterflyView::updateView);
 
-        // Activate projectors by default
         pProjectorsView->init(m_pFiffInfo);
 
         // Quick control compensators
@@ -475,12 +422,12 @@ void RealTimeEvokedSetWidget::init()
         pChannelDataSettingsView->setSignalBackgroundColors(QColor(),
                                                             settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
 
-        // Quick modality selection
-        m_pModalitySelectionView = new ModalitySelectionView();
-        m_pModalitySelectionView->setModalityMap(qMapModalities);
-        m_pQuickControlView->addGroupBoxWithTabs(m_pModalitySelectionView, "Other", "Modalities");
+        // Quick control modality selection
+        ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView(QString("RTESW/%1").arg(t_sRTESName),
+                                                                                  m_pFiffInfo->chs);
+        m_pQuickControlView->addGroupBoxWithTabs(pModalitySelectionView, "Other", "Modalities");
 
-        connect(m_pModalitySelectionView.data(), &ModalitySelectionView::modalitiesChanged,
+        connect(pModalitySelectionView, &ModalitySelectionView::modalitiesChanged,
                 m_pButterflyView.data(), &ButterflyView::setModalityMap);
 
         // Quick control average selection
@@ -518,7 +465,7 @@ void RealTimeEvokedSetWidget::init()
         m_pButterflyView->setAverageColor(pqMapAverageColor);
         m_pButterflyView->setModel(m_pChannelInfoModel);
         m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
-        m_pButterflyView->setModalityMap(qMapModalities);
+        m_pButterflyView->setModalityMap(pModalitySelectionView->getModalityMap());
         m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
 
         // Call this function before the layout calls below so that the scene items are drawn first

@@ -106,6 +106,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the fiff info
+    *
+    * @param [in] pFiffInfo     the new fiff info.
+    */
+    void setFiffInfo(QSharedPointer<FiffInfo> pFiffInfo);
+
+    //=========================================================================================================
+    /**
+    * Get the fiff info
+    *
+    * @return     the current fiff info.
+    */
+    QSharedPointer<FiffInfo> getFiffInfo();
+
+    //=========================================================================================================
+    /**
     * New covariance to distribute
     *
     * @param [in] v     the covariance which should be distributed.
@@ -133,6 +149,7 @@ private:
     mutable QMutex  m_qMutex;       /**< Mutex to ensure thread safety */
 
     FiffCov::SPtr   m_pFiffCov;     /**< Covariance data set */
+    FiffInfo::SPtr  m_pFiffInfo;    /**< The Fiff Info. */
 
     bool            m_bInitialized; /**< If values are stored.*/
 };
