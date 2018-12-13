@@ -76,7 +76,7 @@ MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi&
     MatrixXd matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
 
     if(matBaseFct.size() == 0) {
-        qWarning()<<"Sphara::makeSpharaProjector - Basis function matrix was empty. Retruning identity matrix instead.";
+        qWarning()<<"Sphara::makeSpharaProjector - Basis function matrix was empty. Returning identity matrix instead.";
         return matSpharaOperator;
     }
 
