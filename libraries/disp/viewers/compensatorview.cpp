@@ -52,6 +52,7 @@
 #include <QGridLayout>
 #include <QSignalMapper>
 #include <QSettings>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -112,7 +113,7 @@ void CompensatorView::setCompensators(const QList<FIFFLIB::FiffCtfComp>& comps)
 {
     m_pComps = comps;
 
-    for(int i; i < m_pComps.size(); ++i) {
+    for(int i = 0; i < m_pComps.size(); ++i) {
         if(!m_mapCompActive.contains(m_pComps.at(i).kind)) {
             m_mapCompActive.insert(m_pComps.at(i).kind, false);
         }
@@ -143,9 +144,7 @@ void CompensatorView::redrawGUI()
     // Compensation Selection
     QGridLayout *topLayout = new QGridLayout;
 
-    qint32 i=0;
-
-    for(i; i < m_pComps.size(); ++i) {
+    for(int i = 0; i < m_pComps.size(); ++i) {
         QString numStr;
         QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pComps[i].kind));
 
@@ -154,7 +153,7 @@ void CompensatorView::redrawGUI()
         connect(checkBox, &QCheckBox::toggled,
                 this, &CompensatorView::onCheckCompStatusChanged);
 
-        checkBox->setChecked(m_mapCompActive[m_pComps[i].kind]);
+        checkBox->setChecked(m_mapCompActive[m_pComps.at(i).kind]);
 
         topLayout->addWidget(checkBox, i, 0);
     }
@@ -218,8 +217,10 @@ void CompensatorView::onCheckCompStatusChanged()
         for(int i = 0; i < m_qListCompCheckBox.size(); ++i) {
             if(m_qListCompCheckBox[i]->text() != compName) {
                 m_qListCompCheckBox[i]->setChecked(false);
+                m_mapCompActive[compName.toInt()] = false;
             } else {
                 currentState = m_qListCompCheckBox[i]->isChecked();
+                m_mapCompActive[compName.toInt()] = currentState;
             }
         }
 
