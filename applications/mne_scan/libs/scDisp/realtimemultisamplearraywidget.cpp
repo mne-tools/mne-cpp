@@ -124,6 +124,39 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
     //Create table view and set layout
     m_pChannelDataView->hide();
 
+    // Quick control selection
+    QSettings settings;
+
+    m_pQuickControlView = QuickControlView::SPtr::create("RT Display", Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint, this);
+    m_pQuickControlView->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(m_pRTMSA->getName()), 95).toInt());
+
+    QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTMSA->getControlWidgets();
+
+    for(int i = 0; i < lControlWidgets.size(); ++i) {
+        QString sObjectName = lControlWidgets.at(i)->objectName();
+        qDebug() << "RealTimeMultiSampleArrayWidget" << sObjectName;
+
+        if(sObjectName.contains("widget_", Qt::CaseInsensitive)) {
+            m_pQuickControlView->addWidget(lControlWidgets.at(i));
+        }
+
+        if(sObjectName.contains("group_", Qt::CaseInsensitive)) {
+            if(sObjectName.contains("group_tab_", Qt::CaseInsensitive)) {
+                sObjectName.remove("group_tab_");
+                QStringList sList = sObjectName.split("_");
+                qDebug() << "RealTimeMultiSampleArrayWidget sList" << sList;
+                if(sList.size() >= 2) {
+                   m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), sList.at(0), sList.at(1));
+                } else {
+                    m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), "", sObjectName);
+                }
+            } else {
+                sObjectName.remove("group_");
+                m_pQuickControlView->addGroupBox(lControlWidgets.at(i), sObjectName);
+            }
+        }
+    }
+
     QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
     rtmsaLayout->setContentsMargins(0,0,0,0);
     rtmsaLayout->addWidget(m_pChannelDataView);
@@ -246,9 +279,6 @@ void RealTimeMultiSampleArrayWidget::init()
             slFlags.clear();
             slFlags << "projections" << "view" << "scaling";
         #endif
-
-        m_pQuickControlView = QuickControlView::SPtr::create("RT Display", Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint, this);
-        m_pQuickControlView->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
 
         // Quick control scaling
         if(slFlags.contains("scaling")) {
