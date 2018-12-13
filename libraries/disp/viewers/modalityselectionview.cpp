@@ -49,6 +49,7 @@
 #include <QGridLayout>
 #include <QCheckBox>
 #include <QLabel>
+#include <QSettings>
 #include <QMapIterator>
 
 
@@ -71,13 +72,49 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ModalitySelectionView::ModalitySelectionView(QWidget *parent,
+ModalitySelectionView::ModalitySelectionView(const QString &sSettingsPath,
+                                             const QList<FIFFLIB::FiffChInfo>& lChannelList,
+                                             QWidget *parent,
                                              Qt::WindowFlags f)
 : QWidget(parent, f)
+, m_sSettingsPath(sSettingsPath)
 {
     this->setWindowTitle("Modality Selection");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
+
+    // Specify which channel types are needed
+    for(int i = 0; i < lChannelList.size(); ++i) {
+        if(lChannelList.at(i).unit == FIFF_UNIT_T && !m_lChannelTypeList.contains("MAG")) {
+            m_lChannelTypeList << "MAG";
+        }
+        if(lChannelList.at(i).unit == FIFF_UNIT_T_M && !m_lChannelTypeList.contains("GRAD")) {
+            m_lChannelTypeList << "GRAD";
+        }
+        if(lChannelList.at(i).kind == FIFFV_EEG_CH && !m_lChannelTypeList.contains("EEG")) {
+            m_lChannelTypeList << "EEG";
+        }
+        if(lChannelList.at(i).kind == FIFFV_EOG_CH && !m_lChannelTypeList.contains("EOG")) {
+            m_lChannelTypeList << "EOG";
+        }
+        if(lChannelList.at(i).kind == FIFFV_STIM_CH && !m_lChannelTypeList.contains("STIM")) {
+            m_lChannelTypeList << "STIM";
+        }
+        if(lChannelList.at(i).kind == FIFFV_MISC_CH && !m_lChannelTypeList.contains("MISC")) {
+            m_lChannelTypeList << "MISC";
+        }
+    }
+
+    loadSettings(m_sSettingsPath);
+    redrawGUI();
+}
+
+
+//*************************************************************************************************************
+
+ModalitySelectionView::~ModalitySelectionView()
+{
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -93,6 +130,16 @@ QMap<QString, bool> ModalitySelectionView::getModalityMap()
 
 void ModalitySelectionView::setModalityMap(const QMap<QString, bool> &modalityMap)
 {
+    m_modalityMap = modalityMap;
+
+    redrawGUI();
+}
+
+
+//*************************************************************************************************************
+
+void ModalitySelectionView::redrawGUI()
+{
     m_qListModalityCheckBox.clear();
 
     //Delete all widgets in the averages layout
@@ -107,25 +154,86 @@ void ModalitySelectionView::setModalityMap(const QMap<QString, bool> &modalityMa
         delete child;
     }
 
-    m_modalityMap = modalityMap;
-
-    QMapIterator<QString, bool> i(modalityMap);
+    QMapIterator<QString, bool> i(m_modalityMap);
 
     int count = 0;
     while (i.hasNext()) {
         i.next();
 
-        QCheckBox* t_pCheckBoxModality = new QCheckBox(i.key());
-        t_pCheckBoxModality->setChecked(i.value());
-        m_qListModalityCheckBox << t_pCheckBoxModality;
-        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
-                this, &ModalitySelectionView::onUpdateModalityCheckbox);
-        topLayout->addWidget(t_pCheckBoxModality,count,0);
-        count++;
+        if(m_lChannelTypeList.contains(i.key(), Qt::CaseInsensitive)) {
+            QCheckBox* t_pCheckBoxModality = new QCheckBox(i.key());
+            t_pCheckBoxModality->setChecked(i.value());
+            m_qListModalityCheckBox << t_pCheckBoxModality;
+            connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
+                    this, &ModalitySelectionView::onUpdateModalityCheckbox);
+            topLayout->addWidget(t_pCheckBoxModality,count,0);
+            count++;
+        }
     }
 
     //Find Modalities tab and add current layout
     this->setLayout(topLayout);
+}
+
+
+//*************************************************************************************************************
+
+void ModalitySelectionView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    if(m_modalityMap.contains("MAG")) {
+        settings.setValue(settingsPath + QString("/modalityMAG"), m_modalityMap["MAG"]);
+    }
+    if(m_modalityMap.contains("GRAD")) {
+        settings.setValue(settingsPath + QString("/modalityGRAD"), m_modalityMap["GRAD"]);
+    }
+    if(m_modalityMap.contains("EEG")) {
+        settings.setValue(settingsPath + QString("/modalityEEG"), m_modalityMap["EEG"]);
+    }
+    if(m_modalityMap.contains("EOG")) {
+        settings.setValue(settingsPath + QString("/modalityEOG"), m_modalityMap["EOG"]);
+    }
+    if(m_modalityMap.contains("STIM")) {
+        settings.setValue(settingsPath + QString("/modalitySTIM"), m_modalityMap["STIM"]);
+    }
+    if(m_modalityMap.contains("MISC")) {
+        settings.setValue(settingsPath + QString("/modalityMISC"), m_modalityMap["MISC"]);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ModalitySelectionView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    bool flag = settings.value(settingsPath + QString("/modalityMAG"), true).toBool();
+    m_modalityMap.insert("MAG", flag);
+
+    flag = settings.value(settingsPath + QString("/modalityGRAD"), true).toBool();
+    m_modalityMap.insert("GRAD", flag);
+
+    flag = settings.value(settingsPath + QString("/modalityEEG"), true).toBool();
+    m_modalityMap.insert("EEG", flag);
+
+    flag = settings.value(settingsPath + QString("/modalityEOG"), true).toBool();
+    m_modalityMap.insert("EOG", flag);
+
+    flag = settings.value(settingsPath + QString("/modalitySTIM"), true).toBool();
+    m_modalityMap.insert("STIM", flag);
+
+    flag = settings.value(settingsPath + QString("/modalityMISC"), true).toBool();
+    m_modalityMap.insert("MISC", flag);
 }
 
 

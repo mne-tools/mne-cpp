@@ -44,6 +44,8 @@
 
 #include "../disp_global.h"
 
+#include <fiff/fiff_ch_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -109,8 +111,16 @@ public:
     *
     * @param [in] parent        parent of widget
     */
-    ModalitySelectionView(QWidget *parent = 0,
+    ModalitySelectionView(const QString& sSettingsPath = "",
+                          const QList<FIFFLIB::FiffChInfo> &lChannelList = QList<FIFFLIB::FiffChInfo>(),
+                          QWidget *parent = 0,
                           Qt::WindowFlags f = Qt::Widget);
+
+    //=========================================================================================================
+    /**
+    * Destroys the ModalitySelectionView.
+    */
+    ~ModalitySelectionView();
 
     //=========================================================================================================
     /**
@@ -131,12 +141,38 @@ public:
 protected:
     //=========================================================================================================
     /**
+    * Redraw the GUI.
+    */
+    void redrawGUI();
+
+    //=========================================================================================================
+    /**
+    * Saves all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to store the settings to.
+    */
+    void saveSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+    * Loads and inits all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to load the settings from.
+    */
+    void loadSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
     * Slot called when modality check boxes were changed
     */
     void onUpdateModalityCheckbox(qint32 state);
 
     QMap<QString, bool>                 m_modalityMap;                  /**< Map of different modalities. */
     QList<QCheckBox*>                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */
+
+    QStringList                         m_lChannelTypeList;             /**< Channel type list. */
+
+    QString                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
 signals:
     //=========================================================================================================

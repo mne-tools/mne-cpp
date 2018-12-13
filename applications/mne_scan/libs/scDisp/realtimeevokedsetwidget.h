@@ -196,7 +196,6 @@ private:
     QSharedPointer<DISPLIB::AveragingSettingsView>      m_pAveragingSettingsView;   /**< Holds averaging settings widget.*/
     QPointer<DISPLIB::AverageLayoutView>                m_pAverageLayoutView;       /**< 2D layout view for plotting averages*/
     QPointer<DISPLIB::ButterflyView>                    m_pButterflyView;           /**< Butterfly plot */
-    QPointer<DISPLIB::ModalitySelectionView>            m_pModalitySelectionView;   /**< Holds modality selection widget.*/
 
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
 

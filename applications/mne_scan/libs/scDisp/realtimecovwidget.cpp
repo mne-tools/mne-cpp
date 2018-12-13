@@ -118,7 +118,6 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC,
     m_modalityMap.insert("MEG", true);
 
     getData();
-
 }
 
 
@@ -182,7 +181,10 @@ void RealTimeCovWidget::showModalitySelectionWidget()
 {
     if(!m_pModalitySelectionWidget)
     {
-        m_pModalitySelectionWidget = QSharedPointer<ModalitySelectionView>(new ModalitySelectionView(this, Qt::Window));
+        m_pModalitySelectionWidget = ModalitySelectionView::SPtr::create(QString("Plugin/%1").arg(m_pRTC->getName()),
+                                                                         m_pRTC->getFiffInfo()->chs,
+                                                                         this,
+                                                                         Qt::Window);
 
         connect(m_pModalitySelectionWidget.data(), &ModalitySelectionView::modalitiesChanged,
                 this, &RealTimeCovWidget::onNewModalitySelection);
