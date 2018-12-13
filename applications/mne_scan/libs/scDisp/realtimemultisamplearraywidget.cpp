@@ -194,11 +194,6 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
         if(m_pQuickControlView) {
             settings.setValue(QString("RTMSAW/%1/viewOpacity").arg(sRTMSAWName), m_pQuickControlView->getOpacityValue());
         }
-
-        //Store selected layout file
-        if(m_pChannelSelectionView) {
-            settings.setValue(QString("RTMSAW/%1/selectedLayoutFile").arg(sRTMSAWName), m_pChannelSelectionView->getCurrentLayoutFile());
-        }
     }
 }
 
@@ -246,9 +241,12 @@ void RealTimeMultiSampleArrayWidget::init()
         }
 
         //Init channel selection manager
-        m_pChannelInfoModel = ChannelInfoModel::SPtr::create(m_pFiffInfo, this);
+        m_pChannelInfoModel = ChannelInfoModel::SPtr::create(m_pFiffInfo,
+                                                             this);
 
-        m_pChannelSelectionView = ChannelSelectionView::SPtr::create(this, m_pChannelInfoModel, Qt::Window);
+        m_pChannelSelectionView = ChannelSelectionView::SPtr::create(QString("RTMSAW/%1").arg(sRTMSAWName),
+                                                                     this,
+                                                                     m_pChannelInfoModel, Qt::Window);
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
                 m_pChannelDataView.data(), &ChannelDataView::showSelectedChannelsOnly);
@@ -266,9 +264,6 @@ void RealTimeMultiSampleArrayWidget::init()
                 m_pChannelSelectionView.data(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
         m_pChannelInfoModel->fiffInfoChanged(m_pFiffInfo);
-
-        m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(sRTMSAWName),
-                                                                       "babymeg-mag-inner-layer.lout").toString());
 
         //Init quick control widget
         QStringList slFlags = m_pRTMSA->getDisplayFlags();

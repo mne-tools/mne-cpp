@@ -117,7 +117,8 @@ public:
     * @param [in] parent pointer to parent widget; If parent is 0, the new ChannelSelectionView becomes a window. If parent is another widget, ChannelSelectionView becomes a child window inside parent. ChannelSelectionView is deleted when its parent is deleted.
     * @param [in] pChannelInfoModel pointer to the channel info model.
     */
-    ChannelSelectionView(QWidget *parent = 0,
+    ChannelSelectionView(const QString& sSettingsPath = "",
+                         QWidget *parent = 0,
                          QSharedPointer<ChannelInfoModel> pChannelInfoModel = QSharedPointer<ChannelInfoModel>(0),
                          Qt::WindowType f = Qt::Widget);
 
@@ -213,6 +214,22 @@ public:
     void updateDataView();
 
 private:
+    //=========================================================================================================
+    /**
+    * Saves all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to store the settings to.
+    */
+    void saveSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+    * Loads and inits all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to load the settings from.
+    */
+    void loadSettings(const QString& settingsPath);
+
     //=========================================================================================================
     /**
     * Initialises all tabel widgets in the selection window.
@@ -347,6 +364,8 @@ private:
     SelectionScene*                     m_pSelectionScene;                  /**< Pointer to the selection scene class. */
 
     QStringList                         m_currentlyLoadedFiffChannels;      /**< List of currently loaded fiff data channels.*/
+
+    QString                             m_sSettingsPath;                    /**< The settings path to store the GUI settings to. */
 
 signals:
     //=========================================================================================================

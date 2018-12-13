@@ -117,7 +117,10 @@ void MainWindow::setupWindowWidgets()
     //Create selection manager window - QTDesigner used - see / FormFiles
     m_pChannelSelectionViewDock = new QDockWidget(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pChannelSelectionViewDock);
-    m_pChannelSelectionView = new ChannelSelectionView(m_pChannelSelectionViewDock, m_pChInfoWindow->getDataModel(), Qt::Widget);
+    m_pChannelSelectionView = new ChannelSelectionView(QString("MNEBrowse"),
+                                                       m_pChannelSelectionViewDock,
+                                                       m_pChInfoWindow->getDataModel(),
+                                                       Qt::Widget);
     m_pChannelSelectionViewDock->setWidget(m_pChannelSelectionView);
     m_pChannelSelectionViewDock->hide();
 

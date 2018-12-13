@@ -204,11 +204,6 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
         QSettings settings;
 
-        //Store selected layout file
-        if(m_pChannelSelectionView) {
-            settings.setValue(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESName), m_pChannelSelectionView->getCurrentLayoutFile());
-        }
-
         //Store current view toolbox index - butterfly or 2D layout
         if(m_pToolBox) {
             settings.setValue(QString("RTESW/%1/selectedView").arg(t_sRTESName), m_pToolBox->currentIndex());
@@ -327,8 +322,13 @@ void RealTimeEvokedSetWidget::init()
         m_pEvokedSetModel->setAverageActivation(pqMapAverageActivation); 
 
         //Init channel selection manager
-        m_pChannelInfoModel = QSharedPointer<ChannelInfoModel>(new ChannelInfoModel(m_pFiffInfo, this));
-        m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>::create(this, m_pChannelInfoModel, Qt::Window);
+        m_pChannelInfoModel = ChannelInfoModel::SPtr::create(m_pFiffInfo,
+                                                             this);
+
+        m_pChannelSelectionView = QSharedPointer<ChannelSelectionView>::create(QString("RTESW/%1").arg(t_sRTESName),
+                                                                               this,
+                                                                               m_pChannelInfoModel,
+                                                                               Qt::Window);
 
         //Connect channel info model
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
@@ -344,7 +344,6 @@ void RealTimeEvokedSetWidget::init()
                 m_pAverageLayoutView.data(), &AverageLayoutView::channelSelectionManagerChanged);
 
         m_pChannelInfoModel->fiffInfoChanged(m_pFiffInfo);
-        m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTESW/%1/selectedLayoutFile").arg(t_sRTESName), "babymeg-mag-inner-layer.lout").toString());
 
         // Quick control scaling        
         ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName),
