@@ -227,11 +227,6 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
             }
             settings.endGroup();
         }
-
-        //Store signal and background colors
-        if(m_pQuickControlView) {
-            settings.setValue(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), m_pButterflyView->getBackgroundColor());
-        }
     }
 }
 
@@ -405,8 +400,8 @@ void RealTimeEvokedSetWidget::init()
         }
 
         // Quick control channel data settings
-        ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView();
-        pChannelDataSettingsView->init(QStringList() << "screenshot" << "backgroundColor");
+        ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView(QString("RTESW/%1").arg(t_sRTESName));
+        pChannelDataSettingsView->setWidgetList(QStringList() << "screenshot" << "backgroundColor");
         m_pQuickControlView->addGroupBoxWithTabs(pChannelDataSettingsView, "Other", "View");
 
         connect(pChannelDataSettingsView, &ChannelDataSettingsView::backgroundColorChanged,
@@ -418,9 +413,8 @@ void RealTimeEvokedSetWidget::init()
         connect(pChannelDataSettingsView, &ChannelDataSettingsView::makeScreenshot,
                 this, &RealTimeEvokedSetWidget::onMakeScreenshot);
 
-        QColor backgroundDefault = Qt::black;
-        pChannelDataSettingsView->setSignalBackgroundColors(QColor(),
-                                                            settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
+        m_pAverageLayoutView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
+        m_pButterflyView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
 
         // Quick control modality selection
         ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView(QString("RTESW/%1").arg(t_sRTESName),
@@ -466,7 +460,6 @@ void RealTimeEvokedSetWidget::init()
         m_pButterflyView->setModel(m_pChannelInfoModel);
         m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
         m_pButterflyView->setModalityMap(pModalitySelectionView->getModalityMap());
-        m_pButterflyView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
 
         // Call this function before the layout calls below so that the scene items are drawn first
         m_pChannelSelectionView->updateDataView();
@@ -476,7 +469,6 @@ void RealTimeEvokedSetWidget::init()
         m_pAverageLayoutView->setAverageColor(pqMapAverageColor);
         m_pAverageLayoutView->setModel(m_pChannelInfoModel);
         m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
-        m_pAverageLayoutView->setBackgroundColor(settings.value(QString("RTESW/%1/backgroundColor").arg(t_sRTESName), backgroundDefault).value<QColor>());
 
         //Initialized
         m_bInitialized = true;

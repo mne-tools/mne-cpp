@@ -95,7 +95,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
 , m_pRTMSA(pRTMSA)
 , m_bInitialized(false)
 , m_iMaxFilterTapSize(0)
-, m_pChannelDataView(new ChannelDataView(this))
 {
     Q_UNUSED(pTime)
 
@@ -122,12 +121,16 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
     m_pActionQuickControl->setVisible(true);
 
     //Create table view and set layout
+    m_pChannelDataView = new ChannelDataView(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
+                                             this);
     m_pChannelDataView->hide();
 
     // Quick control selection
     QSettings settings;
 
-    m_pQuickControlView = QuickControlView::SPtr::create("RT Display", Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint, this);
+    m_pQuickControlView = QuickControlView::SPtr::create("RT Display",
+                                                         Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
+                                                         this);
     m_pQuickControlView->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(m_pRTMSA->getName()), 95).toInt());
 
     QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTMSA->getControlWidgets();
@@ -173,22 +176,6 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
         QString sRTMSAWName = m_pRTMSA->getName();
 
         QSettings settings;
-
-        //Store view
-        if(m_pChannelDataView) {
-            //Zoom and window size
-            settings.setValue(QString("RTMSAW/%1/viewZoomFactor").arg(sRTMSAWName), m_pChannelDataView->getZoom());
-            settings.setValue(QString("RTMSAW/%1/viewWindowSize").arg(sRTMSAWName), m_pChannelDataView->getWindowSize());
-
-            //Store show/hide bad channel flag
-            settings.setValue(QString("RTMSAW/%1/showHideBad").arg(sRTMSAWName), m_pChannelDataView->getBadChannelHideStatus());
-
-            settings.setValue(QString("RTMSAW/%1/signalColor").arg(sRTMSAWName), m_pChannelDataView->getSignalColor());
-
-            settings.setValue(QString("RTMSAW/%1/backgroundColor").arg(sRTMSAWName), m_pChannelDataView->getBackgroundColor());
-
-            settings.setValue(QString("RTMSAW/%1/distanceTimeSpacer").arg(sRTMSAWName), m_pChannelDataView->getDistanceTimeSpacer());
-        }
 
         //Store QuickControlView
         if(m_pQuickControlView) {
@@ -343,8 +330,8 @@ void RealTimeMultiSampleArrayWidget::init()
 
         // Quick control channel data settings
         if(slFlags.contains("view")) {
-            ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView();
-            pChannelDataSettingsView->init();
+            ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView(QString("RTMSAW/%1").arg(sRTMSAWName));
+            pChannelDataSettingsView->setWidgetList();
             m_pQuickControlView->addGroupBoxWithTabs(pChannelDataSettingsView, "Other", "View");
 
             connect(pChannelDataSettingsView, &ChannelDataSettingsView::signalColorChanged,
@@ -365,10 +352,11 @@ void RealTimeMultiSampleArrayWidget::init()
             connect(pChannelDataSettingsView, &ChannelDataSettingsView::makeScreenshot,
                     this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
 
-            pChannelDataSettingsView->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(sRTMSAWName), 1.0).toFloat(),
-                                                        settings.value(QString("RTMSAW/%1/viewWindowSize").arg(sRTMSAWName), 10).toInt());
-            pChannelDataSettingsView->setDistanceTimeSpacer(settings.value(QString("RTMSAW/%1/distanceTimeSpacer").arg(sRTMSAWName), 100).toInt());
-            pChannelDataSettingsView->setSignalBackgroundColors(signal, background);
+            m_pChannelDataView->setZoom(pChannelDataSettingsView->getZoom());
+            m_pChannelDataView->setWindowSize(pChannelDataSettingsView->getWindowSize());
+            m_pChannelDataView->setDistanceTimeSpacer(pChannelDataSettingsView->getDistanceTimeSpacer());
+            m_pChannelDataView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
+            m_pChannelDataView->setSignalColor(pChannelDataSettingsView->getSignalColor());
         }
 
         // Quick control trigger detection settings
