@@ -148,7 +148,7 @@ void NoiseReduction::init()
     m_pNoiseReductionOutput->data()->setDisplayFlags(slFlags);
 
     // Quick control projectors
-    m_pProjectorsView = ProjectorsView::SPtr::create();
+    m_pProjectorsView = ProjectorsView::SPtr::create(QString("Plugin/%1/").arg(this->getName()));
     m_pProjectorsView->setObjectName("group_tab_Noise_SSP");
     m_pNoiseReductionOutput->data()->addControlWidget(m_pProjectorsView);
 
@@ -156,7 +156,7 @@ void NoiseReduction::init()
             this, &NoiseReduction::updateProjection);
 
     // Quick control compensators
-    m_pCompensatorView = CompensatorView::SPtr::create();
+    m_pCompensatorView = CompensatorView::SPtr::create(QString("Plugin/%1/").arg(this->getName()));
     m_pCompensatorView->setObjectName("group_tab_Noise_Comp");
     m_pNoiseReductionOutput->data()->addControlWidget(m_pCompensatorView);
 
@@ -305,7 +305,6 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             this->setFilterChannelType(m_pFilterSettingsView->getFilterView()->getChannelType());
 
             m_pProjectorsView->setProjectors(m_pFiffInfo->projs);
-
             m_pCompensatorView->setCompensators(m_pFiffInfo->comps);
         }
 

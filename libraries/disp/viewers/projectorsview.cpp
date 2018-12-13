@@ -52,7 +52,6 @@
 #include <QGridLayout>
 #include <QFrame>
 #include <QSettings>
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -113,8 +112,6 @@ void ProjectorsView::setProjectors(const QList<FIFFLIB::FiffProj>& projs)
 {
     m_pProjs = projs;
 
-    qDebug() << "ProjectorsView::setProjectors" << m_mapProjActive;
-
     for(int i = 0; i < m_pProjs.size(); ++i) {
         if(!m_mapProjActive.contains(m_pProjs.at(i).desc)) {
             m_mapProjActive.insert(m_pProjs.at(i).desc, m_pProjs.at(i).active);
@@ -173,11 +170,9 @@ void ProjectorsView::redrawGUI()
     connect(m_pEnableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
         this, &ProjectorsView::onEnableDisableAllProj);
 
-    //Find SSP tab and add current layout
     this->setLayout(topLayout);
 
-    //Set default activation to true
-    onEnableDisableAllProj(true);
+    onCheckProjStatusChanged();
 }
 
 
@@ -235,6 +230,8 @@ void ProjectorsView::onEnableDisableAllProj(bool status)
     //Set all projection activation states to status
     for(int i = 0; i < m_pProjs.size(); ++i) {
         m_pProjs[i].active = status;
+        m_mapProjActive[m_pProjs.at(i).desc] = status;
+
     }
 
     if(m_pEnableDisableProjectors) {
@@ -257,6 +254,7 @@ void ProjectorsView::onCheckProjStatusChanged()
         }
 
         m_pProjs[i].active = m_qListProjCheckBox.at(i)->isChecked();
+        m_mapProjActive[m_pProjs.at(i).desc] = m_qListProjCheckBox.at(i)->isChecked();
     }
 
     if(m_pEnableDisableProjectors) {
