@@ -134,7 +134,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
 
     for(int i = 0; i < lControlWidgets.size(); ++i) {
         QString sObjectName = lControlWidgets.at(i)->objectName();
-        qDebug() << "RealTimeMultiSampleArrayWidget" << sObjectName;
 
         if(sObjectName.contains("widget_", Qt::CaseInsensitive)) {
             m_pQuickControlView->addWidget(lControlWidgets.at(i));
@@ -144,7 +143,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
             if(sObjectName.contains("group_tab_", Qt::CaseInsensitive)) {
                 sObjectName.remove("group_tab_");
                 QStringList sList = sObjectName.split("_");
-                qDebug() << "RealTimeMultiSampleArrayWidget sList" << sList;
                 if(sList.size() >= 2) {
                    m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), sList.at(0), sList.at(1));
                 } else {
