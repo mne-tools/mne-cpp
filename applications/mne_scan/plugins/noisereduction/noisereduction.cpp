@@ -188,7 +188,7 @@ void NoiseReduction::init()
             this, &NoiseReduction::setSpharaActive);
 
     connect(m_pSpharaSettingsView.data(), &SpharaSettingsView::spharaOptionsChanged,
-            this, &NoiseReduction::createSpharaOperator);
+            this, &NoiseReduction::setSpharaOptions);
 
     if(!m_pNoiseReductionBuffer.isNull()) {
         m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr();
@@ -508,13 +508,13 @@ void NoiseReduction::setFilterActive(bool state)
 void NoiseReduction::initSphara()
 {
     //Load SPHARA matrix
-    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
-    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
 
-    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
-    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
-    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt"));
 
     //Generate indices used to create the SPHARA operators for VectorView
     m_vecIndicesFirstVV.resize(0);
@@ -537,7 +537,7 @@ void NoiseReduction::initSphara()
     //Generate indices used to create the SPHARA operators for babyMEG
     m_vecIndicesFirstBabyMEG.resize(0);
     for(int r = 0; r < m_pFiffInfo->chs.size(); ++r) {
-        //Find INNER LAYER
+        //Find inner layer
         if(m_pFiffInfo->chs.at(r).chpos.coil_type == 7002) {
             m_vecIndicesFirstBabyMEG.conservativeResize(m_vecIndicesFirstBabyMEG.rows()+1);
             m_vecIndicesFirstBabyMEG(m_vecIndicesFirstBabyMEG.rows()-1) = r;
