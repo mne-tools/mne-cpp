@@ -326,6 +326,7 @@ void RealTimeMultiSampleArrayWidget::init()
                     m_pChannelDataView.data(), &ChannelDataView::setFilterActive);
 
             m_pChannelDataView->setFilterActive(pFilterSettingsView->getFilterActive());
+            m_pChannelDataView->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
             pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
             pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
             pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);

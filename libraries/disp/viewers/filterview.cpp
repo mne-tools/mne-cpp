@@ -99,7 +99,6 @@ FilterView::FilterView(const QString& sSettingsPath,
     initSpinBoxes();
     initButtons();
     initComboBoxes();
-//    initFilters();
     initFilterPlot();
 
     loadSettings(m_sSettingsPath);

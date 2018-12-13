@@ -302,6 +302,8 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
             m_pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
 
+            this->setFilterChannelType(m_pFilterSettingsView->getFilterView()->getChannelType());
+
             m_pProjectorsView->init(m_pFiffInfo);
 
             m_pCompensatorView->init(m_pFiffInfo);
