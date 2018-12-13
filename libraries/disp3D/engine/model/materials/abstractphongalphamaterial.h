@@ -42,6 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../../../disp3D_global.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -93,7 +95,7 @@ namespace DISP3DLIB {
 * @brief This abstract class is used as a base class for all materials that are using the phong alpha lightining model in their shaders.
 */
 
-class AbstractPhongAlphaMaterial : public Qt3DRender::QMaterial
+class DISP3DSHARED_EXPORT AbstractPhongAlphaMaterial : public Qt3DRender::QMaterial
 {
     Q_OBJECT
 
