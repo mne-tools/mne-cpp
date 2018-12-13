@@ -58,6 +58,7 @@
 #include <QMenu>
 #include <QSvgGenerator>
 #include <QGLWidget>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -75,13 +76,16 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
+ChannelDataView::ChannelDataView(const QString& sSettingsPath,
+                                 QWidget *parent,
+                                 Qt::WindowFlags f)
 : QWidget(parent, f)
 , m_iT(10)
 , m_fSamplingRate(1024)
 , m_fDefaultSectionSize(80.0f)
 , m_fZoomFactor(1.0f)
 , m_bHideBadChannels(false)
+, m_sSettingsPath(sSettingsPath)
 {
     // Use QGLWidget for rendering the table view.
     // Unfortunatley, QOpenGLWidget is not able to change the background color, which is a must for this ChanalDataViewer.
@@ -99,6 +103,16 @@ ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
     QVBoxLayout *neLayout = new QVBoxLayout(this);
     neLayout->addWidget(m_pTableView);
     this->setLayout(neLayout);
+
+    loadSettings(m_sSettingsPath);
+}
+
+
+//*************************************************************************************************************
+
+ChannelDataView::~ChannelDataView()
+{
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -443,6 +457,30 @@ int ChannelDataView::getDistanceTimeSpacer()
 void ChannelDataView::resetTriggerCounter()
 {
     m_pModel->resetTriggerCounter();
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
 }
 
 

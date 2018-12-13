@@ -1089,7 +1089,11 @@ void ChannelDataModel::triggerInfoChanged(const QMap<double, QColor>& colorMap, 
 
 void ChannelDataModel::distanceTimeSpacerChanged(int value)
 {
-    m_iDistanceTimerSpacer = value;
+    if(value <= 0) {
+        m_iDistanceTimerSpacer = 1000;
+    } else {
+        m_iDistanceTimerSpacer = value;
+    }
 }
 
 
@@ -1111,12 +1115,10 @@ void ChannelDataModel::markChBad(QModelIndexList chlist, bool status)
         if(status) {
             if(!m_pFiffInfo->bads.contains(chInfolist[chlist[i].row()].ch_name))
                 m_pFiffInfo->bads.append(chInfolist[chlist[i].row()].ch_name);
-            qDebug() << "RawModel:" << chInfolist[chlist[i].row()].ch_name << "marked as bad.";
         } else {
             if(m_pFiffInfo->bads.contains(chInfolist[chlist[i].row()].ch_name)) {
                 int index = m_pFiffInfo->bads.indexOf(chInfolist[chlist[i].row()].ch_name);
                 m_pFiffInfo->bads.removeAt(index);
-                qDebug() << "RawModel:" << chInfolist[chlist[i].row()].ch_name << "marked as good.";
             }
         }
 

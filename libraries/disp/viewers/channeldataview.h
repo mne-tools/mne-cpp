@@ -119,8 +119,15 @@ public:
     *
     * @param [in] parent    The parent of widget.
     */
-    ChannelDataView(QWidget* parent = 0,
+    ChannelDataView(const QString& sSettingsPath = "",
+                    QWidget* parent = 0,
                     Qt::WindowFlags f = Qt::Widget);
+
+    //=========================================================================================================
+    /**
+    * Destroys the ChannelDataView.
+    */
+    ~ChannelDataView();
 
     //=========================================================================================================
     /**
@@ -367,6 +374,22 @@ public:
 protected:
     //=========================================================================================================
     /**
+    * Saves all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to store the settings to.
+    */
+    void saveSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+    * Loads and inits all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to load the settings from.
+    */
+    void loadSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
     * Show channel context menu
     *
     * @param [in] pos   Position to popup the conext menu.
@@ -421,6 +444,8 @@ protected:
     QStringList                                 m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
     QColor                                      m_backgroundColor;              /**< Current background color. */
     int                                         m_iDistanceTimeSpacer;          /**< Current distance between time spacer. */
+
+    QString                                     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
 signals:    
     //=========================================================================================================
