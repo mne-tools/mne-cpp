@@ -62,6 +62,7 @@
 #include <QFileDialog>
 #include <QListWidgetItem>
 #include <QGraphicsItem>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -85,12 +86,14 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelSelectionView::ChannelSelectionView(QWidget *parent,
+ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
+                                           QWidget *parent,
                                            ChannelInfoModel::SPtr pChannelInfoModel,
                                            Qt::WindowType f)
 : QWidget(parent, f)
 , ui(new Ui::ChannelSelectionViewWidget)
 , m_pChannelInfoModel(pChannelInfoModel)
+, m_sSettingsPath(sSettingsPath)
 {
     ui->setupUi(this);
 
@@ -100,6 +103,8 @@ ChannelSelectionView::ChannelSelectionView(QWidget *parent,
     initComboBoxes();
     initButtons();
     initCheckBoxes();
+
+    loadSettings(m_sSettingsPath);
 }
 
 
@@ -107,6 +112,8 @@ ChannelSelectionView::ChannelSelectionView(QWidget *parent,
 
 ChannelSelectionView::~ChannelSelectionView()
 {
+    saveSettings(m_sSettingsPath);
+
     delete ui;
 }
 
@@ -414,6 +421,34 @@ void ChannelSelectionView::updateDataView()
 
         emit selectionChanged(visibleItemList);
     }
+}
+
+
+//*************************************************************************************************************
+
+void ChannelSelectionView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    settings.setValue(settingsPath + QString("/selectedLayoutFile"), getCurrentLayoutFile());
+}
+
+
+//*************************************************************************************************************
+
+void ChannelSelectionView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    setCurrentLayoutFile(settings.value(settingsPath + QString("/selectedLayoutFile"), "babymeg-mag-inner-layer.lout").toString());
 }
 
 
