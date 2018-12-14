@@ -93,7 +93,6 @@ SOURCES += \
     FormFiles/babymegaboutwidget.cpp \
     FormFiles/babymegsquidcontroldgl.cpp \
     FormFiles/globalobj.cpp \
-    FormFiles/babymegprojectdialog.cpp \
     FormFiles/plotter.cpp \
 
 HEADERS += \
@@ -105,14 +104,12 @@ HEADERS += \
     FormFiles/babymegaboutwidget.h \
     FormFiles/babymegsquidcontroldgl.h \
     FormFiles/globalobj.h \
-    FormFiles/babymegprojectdialog.h \
     FormFiles/plotter.h \
 
 FORMS += \
     FormFiles/babymegsetup.ui \
     FormFiles/babymegabout.ui \
     FormFiles/babymegsquidcontroldgl.ui \
-    FormFiles/babymegprojectdialog.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/mne_scan/plugins/babymeg/both.bad \

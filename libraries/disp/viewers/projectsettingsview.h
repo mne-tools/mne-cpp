@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
-* @file     babymegprojectdialog.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     projectsettingsview.h
+* @author   Lorenz Esch <lorenzesch@hotmail.com>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -9,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,19 +31,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    BabyMEGProjectDialog class declaration.
+* @brief    Declaration of the ProjectSettingsView Class.
 *
 */
 
-#ifndef BABYMEGPROJECTDIALOG_H
-#define BABYMEGPROJECTDIALOG_H
+#ifndef PROJECTSETTINGSVIEW_H
+#define PROJECTSETTINGSVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "babymeg_global.h"
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
@@ -51,7 +52,6 @@
 //=============================================================================================================
 
 #include <QDialog>
-#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -66,42 +66,45 @@
 //=============================================================================================================
 
 namespace Ui {
-    class BabyMEGProjectDialog;
+    class ProjectSettingsViewWidget;
 }
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BABYMEGPLUGIN
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace BABYMEGPLUGIN
+namespace DISPLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-class BabyMEG;
 
 
 //=============================================================================================================
 /**
-* The BabyMEGProjectDialog class provides a dialog to setup the project.
+* The ProjectSettingsView class provides a viewer to setup and manage the file name before the acquisition starts.
 *
-* @brief The BabyMEGProjectDialog class provides a dialog to setup the project.
+* @brief The ProjectSettingsView class provides a viewer to setup and manage the file name before the acquisition starts.
 */
-class BABYMEGSHARED_EXPORT BabyMEGProjectDialog : public QDialog
+class DISPSHARED_EXPORT ProjectSettingsView : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
-    ~BabyMEGProjectDialog();
+    explicit ProjectSettingsView(const QString& sDataPath = "/TestData",
+                                 const QString& sCurrentProject = "TestProject",
+                                 const QString& sCurrentSubject = "TestSubject",
+                                 const QString& sCurrentParadigm = "UnknownParadigm",
+                                 QWidget *parent = 0);
+    ~ProjectSettingsView();
 
     void setRecordingElapsedTime(int mSecsElapsed);
+    QString getCurrentFileName();
 
 private:
     void addProject();
@@ -110,33 +113,40 @@ private:
     void deleteProject();
     void deleteSubject();
 
-    void paradigmChanged(const QString &newParadigm);
+    void paradigmChanged(const QString &sNewParadigm);
 
     void scanForProjects();
     void scanForSubjects();
 
-    void selectNewProject(const QString &newProject);
-    void selectNewSubject(const QString &newSubject);
+    void selectNewProject(const QString &sNewProject);
+    void selectNewSubject(const QString &sNewSubject);
 
-    void updateFileName();
+    void updateFileName(bool currentTime = true);
 
     void onTimeChanged();
     void onRecordingTimerStateChanged(bool state);
 
-    BabyMEG*                    m_pBabyMEG;
+    Ui::ProjectSettingsViewWidget*   ui;
 
-    Ui::BabyMEGProjectDialog*   ui;
+    QStringList         m_sListProjects;
+    QStringList         m_sListSubjects;
 
-    QStringList                 m_sListProjects;
-    QStringList                 m_sListSubjects;
+    QString             m_sDataPath;
+    QString             m_sCurrentProject;
+    QString             m_sCurrentSubject;
+    QString             m_sCurrentParadigm;
+    QString             m_sFileName;
 
-    int                         m_iRecordingTime;       /**< recording time in ms.*/
+    int                 m_iRecordingTime;       /**< recording time in ms.*/
 
 signals:
     void timerChanged(int secs);
     void recordingTimerStateChanged(bool state);
+    void newProject(const QString& sCurrentProject);
+    void newSubject(const QString& sCurrentSubject);
+    void newParadigm(const QString& sCurrentParadigm);
 };
 
 } // NAMESPACE
 
-#endif // BABYMEGPROJECTDIALOG_H
+#endif // PROJECTSETTINGSVIEW_H
