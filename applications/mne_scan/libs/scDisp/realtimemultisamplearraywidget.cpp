@@ -126,8 +126,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
     m_pChannelDataView->hide();
 
     // Quick control selection
-    QSettings settings;
-
     m_pQuickControlView = QuickControlView::SPtr::create(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
                                                          "RT Display",
                                                          Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,

@@ -240,6 +240,7 @@ void QuickControlView::setVisiblityHideOpacityClose(bool bVisibility)
     ui->m_label_opacity->setVisible(bVisibility);
 }
 
+
 //*************************************************************************************************************
 
 void QuickControlView::saveSettings(const QString& settingsPath)
@@ -264,7 +265,7 @@ void QuickControlView::loadSettings(const QString& settingsPath)
 
     QSettings settings;
 
-    onOpacityChange(settings.value(settingsPath + QString("/viewOpacity"), 100).toInt());
+    setOpacityValue(settings.value(settingsPath + QString("/viewOpacity"), 100).toInt());
 }
 
 
@@ -272,7 +273,11 @@ void QuickControlView::loadSettings(const QString& settingsPath)
 
 void QuickControlView::onOpacityChange(qint32 value)
 {
-    this->setWindowOpacity(1/(100.0/value));
+    if(value <= 0) {
+        this->setWindowOpacity(1);
+    } else {
+        this->setWindowOpacity(1/(100.0/value));
+    }
 }
 
 
