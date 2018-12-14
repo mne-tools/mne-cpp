@@ -156,8 +156,15 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
         }
     }
 
-    if (nproj == 0)
+    if (nproj == 0) {
+        printf("FiffProj::make_projector - No projectors nproj=0\n");
         return 0;
+    }
+
+    if (nvec <= 0) {
+        printf("FiffProj::make_projector - No rows in projector matrices found nvec<=0\n");
+        return 0;
+    }
 
     //
     //   Pick the appropriate entries

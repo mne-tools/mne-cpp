@@ -59,6 +59,9 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Communicationd \
+            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd \
             -lscMeasd \
             -lscDispd \
             -lscSharedd
@@ -72,6 +75,9 @@ else {
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}Communication \
+            -lMNE$${MNE_LIB_VERSION}RtProcessing \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}Disp3D \
             -lscMeas \
             -lscDisp \
             -lscShared
@@ -80,23 +86,21 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
-        directrecord.cpp \
-    neuromag.cpp \
-    neuromagproducer.cpp \
-    FormFiles/neuromagsetupwidget.cpp \
-    FormFiles/neuromagaboutwidget.cpp
+        neuromag.cpp \
+        neuromagproducer.cpp \
+        FormFiles/neuromagsetupwidget.cpp \
+        FormFiles/neuromagaboutwidget.cpp \
 
 HEADERS += \
-        directrecord.h \
-    neuromag_global.h \
-    neuromag.h \
-    neuromagproducer.h \
-    FormFiles/neuromagsetupwidget.h \
-    FormFiles/neuromagaboutwidget.h
+        neuromag_global.h \
+        neuromag.h \
+        neuromagproducer.h \
+        FormFiles/neuromagsetupwidget.h \
+        FormFiles/neuromagaboutwidget.h \
 
 FORMS += \
     FormFiles/neuromagsetup.ui \
-    FormFiles/neuromagabout.ui
+    FormFiles/neuromagabout.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/mne_scan/plugins/neuromag/header.fif \
