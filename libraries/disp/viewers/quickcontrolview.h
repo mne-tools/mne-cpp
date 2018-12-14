@@ -189,7 +189,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the values of the opacity slider
+    * Sets the values of the opacity slider. Choose value between 0.0 and 1.0.
     *
     * @param [in] opactiy       the new opacity value
     */
@@ -197,9 +197,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Get current opacity value.
+    * Get current opacity value. Value between 0.0 and 1.0.
     *
-    * @return thecurrent set opacity value of this window.
+    * @return the current set opacity value of this window.
     */
     int getOpacityValue();
 
