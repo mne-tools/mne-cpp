@@ -2,13 +2,14 @@
 /**
 * @file     neuromag.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     October, 2016
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2016, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the Neuromag class.
+* @brief    Declaration of the Neuromag class.
 *
 */
 
@@ -45,25 +46,7 @@
 #include "neuromag_global.h"
 
 #include <scShared/Interfaces/ISensor.h>
-#include <utils/generics/circularbuffer_old.h>
 #include <utils/generics/circularmatrixbuffer.h>
-#include <scMeas/realtimemultisamplearray.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_info.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <communication/rtClient/rtcmdclient.h>
 
 
 //*************************************************************************************************************
@@ -71,30 +54,27 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QVector>
+#include <QFile>
 #include <QTimer>
+#include <QTime>
+#include <QPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MneRtClientPlugin
+// EIGEN INCLUDES
 //=============================================================================================================
 
-namespace MneRtClientPlugin
-{
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINES
 //=============================================================================================================
 
-using namespace SCSHAREDLIB;
-using namespace IOBUFFER;
-using namespace COMMUNICATIONLIB;
-using namespace FIFFLIB;
-using namespace SCMEASLIB;
+#define MAX_DATA_LEN    2000000000L
+#define MAX_POS         2000000000L
 
 
 //*************************************************************************************************************
@@ -102,17 +82,52 @@ using namespace SCMEASLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace DISPLIB {
+    class ProjectSettingsView;
+}
+
+namespace FIFFLIB {
+    class FiffStream;
+    class FiffInfo;
+}
+
+namespace COMMUNICATIONLIB {
+    class RtCmdClient;
+}
+
+namespace SCMEASLIB {
+    class RealTimeMultiSampleArray;
+}
+
+namespace DISP3DLIB {
+    class HpiView;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE NEUROMAGPLUGIN
+//=============================================================================================================
+
+namespace NEUROMAGPLUGIN
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// NEUROMAGPLUGIN FORWARD DECLARATIONS
+//=============================================================================================================
+
 class NeuromagProducer;
-//class ECGChannel;
 
 
 //=============================================================================================================
 /**
 * DECLARE CLASS Neuromag
 *
-* @brief The Neuromag class provides a RT server connection.
+* @brief The Neuromag class provides a connector to the mne_rt_server Neuromag plugin.
 */
-class NEUROMAGSHARED_EXPORT Neuromag : public ISensor
+class NEUROMAGSHARED_EXPORT Neuromag : public SCSHAREDLIB::ISensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "neuromag.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -146,7 +161,7 @@ public:
     /**
     * Clone the plugin
     */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     //=========================================================================================================
     /**
@@ -158,7 +173,41 @@ public:
     /**
     * Is called when plugin is detached of the stage. Can be used to safe settings.
     */
-    virtual void unload();
+    virtual void unload();    
+
+    //=========================================================================================================
+    /**
+    * Shows the project dialog/window.
+    */
+    void showProjectDialog();
+
+    //=========================================================================================================
+    /**
+    * Determines current file. And starts a new one.
+    */
+    void splitRecordingFile();
+
+    //=========================================================================================================
+    /**
+    * Starts or stops a file recording depending on the current recording state.
+    */
+    void toggleRecordingFile();
+
+    //=========================================================================================================
+    /**
+    * Set the recording time in seconds.
+    *
+    * @param[in] time   the new recording time.
+    */
+    void setRecordingTimerChanged(int timeMSecs);
+
+    //=========================================================================================================
+    /**
+    * Set the recording time active flag.
+    *
+    * @param[in] state   whether the recording should be used or not.
+    */
+    void setRecordingTimerStateChanged(bool state);
 
     virtual bool start();
     virtual bool stop();
@@ -168,7 +217,8 @@ public:
 
     virtual QWidget* setupWidget();
 
-//slots:
+    bool readProjectors();
+
     //=========================================================================================================
     /**
     * Change connector
@@ -195,6 +245,98 @@ public:
     */
     void requestInfo();
 
+protected:
+    virtual void run();
+
+    //=========================================================================================================
+    /**
+    * Calibrate matrix.
+    *
+    * @param[out] data  the data matrix
+    */
+    Eigen::MatrixXd calibrate(const Eigen::MatrixXf& data);
+
+    //=========================================================================================================
+    /**
+    * change recording button.
+    */
+    void changeRecordingButton();
+
+    //=========================================================================================================
+    /**
+    * This function sends the current remaining recording time to the project window.
+    */
+    void onRecordingRemainingTimeChange();
+
+    //=========================================================================================================
+    /**
+    * Initialises the output connector.
+    */
+    void initConnector();
+
+    //=========================================================================================================
+    /**
+    * Set HPI fiff information.
+    */
+    void showHPIDialog();
+
+    //=========================================================================================================
+    /**
+    * Sends the current data block to the HPI dialog.
+    *
+    * @param [in] matData   The new data block.
+    */
+    void updateHPI(const Eigen::MatrixXf &matData);
+
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA_Neuromag;          /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+
+    QSharedPointer<COMMUNICATIONLIB::RtCmdClient>       m_pRtCmdClient;                 /**< The command client.*/
+    QSharedPointer<NeuromagProducer>                    m_pNeuromagProducer;            /**< Holds the NeuromagnProducer.*/
+    QSharedPointer<IOBUFFER::RawMatrixBuffer>           m_pRawMatrixBuffer_In;          /**< Holds incoming raw data. */
+    QSharedPointer<QTimer>                              m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
+    QSharedPointer<QTimer>                              m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */
+    QSharedPointer<QTimer>                              m_pRecordTimer;                 /**< timer to control recording time. */
+    QSharedPointer<DISPLIB::ProjectSettingsView>        m_pProjectSettingsView;         /**< Window to setup the recording tiem and fiel name. */
+    QSharedPointer<FIFFLIB::FiffStream>                 m_pOutfid;                      /**< FiffStream to write to.*/
+    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QSharedPointer<DISP3DLIB::HpiView>                  m_pHPIWidget;                   /**< HPI widget. */
+
+    QMutex                                  m_mutex;
+
+    QString                                 m_sNeuromagClientAlias;         /**< The rt server client alias.*/
+    QString                                 m_sNeuromagIP;                  /**< The IP Adress of mne_rt_server.*/
+    QString                                 m_sFiffHeader;                  /**< Fiff header information */
+    QString                                 m_sNeuromagDataPath;            /**< The data storage path.*/
+    QString                                 m_sCurrentProject;              /**< The current project which is part of the filename to be recorded.*/
+    QString                                 m_sCurrentSubject;              /**< The current subject which is part of the filename to be recorded.*/
+    QString                                 m_sCurrentParadigm;             /**< The current paradigm which is part of the filename to be recorded.*/
+    QString                                 m_sRecordFile;                  /**< Current record file. */
+
+    bool                                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
+    bool                                    m_bIsRunning;                   /**< Whether FiffSimulator is running.*/
+    bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
+
+    qint16                                  m_iBlinkStatus;                 /**< The blink status of the recording button.*/
+    qint32                                  m_iSplitCount;                  /**< File split count */
+    qint32                                  m_iBufferSize;                  /**< The raw data buffer size.*/
+    qint32                                  m_iActiveConnectorId;           /**< The active connector.*/
+    int                                     m_iRecordingMSeconds;           /**< Recording length in mseconds.*/
+
+    QMap<qint32, QString>                   m_qMapConnectors;               /**< Connector map.*/
+
+    QTimer                                  m_cmdConnectionTimer;           /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
+    QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
+
+    QFile                                   m_qFileOut;                     /**< QFile for writing to fif file.*/
+
+    Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
+    Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
+
+    QPointer<QAction>                       m_pActionSetupProject;          /**< shows setup project dialog */
+    QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action */
+    QPointer<QAction>                       m_pActionComputeHPI;            /**< The Action to show the HPI view */
+
 signals:
     //=========================================================================================================
     /**
@@ -209,47 +351,6 @@ signals:
     * Emitted when fiffInfo is available
     */
     void fiffInfoAvailable();
-
-protected:
-    virtual void run();
-
-private:
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
-
-    bool readProjectors();
-
-    QMutex rtServerMutex;
-
-    QString m_sNeuromagClientAlias;     /**< The rt server client alias.*/
-
-//    float           m_fSamplingRate;                /**< The sampling rate.*/
-//    int             m_iDownsamplingFactor;          /**< The down sampling factor.*/
-
-    PluginOutputData<RealTimeMultiSampleArray>::SPtr m_pRTMSA_Neuromag;   /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
-
-    QSharedPointer<RtCmdClient> m_pRtCmdClient; /**< The command client.*/
-    bool m_bCmdClientIsConnected;               /**< If the command client is connected.*/
-
-    QString     m_sNeuromagIP;               /**< The IP Adress of mne_rt_server.*/
-    QString     m_sFiffHeader;  /**< Fiff header information */
-
-    QSharedPointer<NeuromagProducer> m_pNeuromagProducer;     /**< Holds the NeuromagnProducer.*/
-
-    QMap<qint32, QString> m_qMapConnectors;                 /**< Connector map.*/
-    qint32 m_iActiveConnectorId;                            /**< The active connector.*/
-
-    FiffInfo::SPtr m_pFiffInfo;                             /**< Fiff measurement info.*/
-    qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
-
-    QTimer m_cmdConnectionTimer;                            /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
-
-    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer_In;  /**< Holds incoming raw data. */
-
-    bool                            m_bIsRunning;           /**< Whether FiffSimulator is running.*/
 
 };
 

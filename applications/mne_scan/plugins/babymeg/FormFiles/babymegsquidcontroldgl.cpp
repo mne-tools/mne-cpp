@@ -77,8 +77,8 @@ BabyMEGSQUIDControlDgl::BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *pare
 , m_pBabyMEG(p_pBabyMEG)
 {
     connect(this,&BabyMEGSQUIDControlDgl::SendCMDToMEGSource,p_pBabyMEG,&BabyMEG::comFLL);
-    connect(m_pBabyMEG,&BabyMEG::DataToSquidCtrlGUI,this,&BabyMEGSQUIDControlDgl::TuneGraphDispProc);
-    connect(m_pBabyMEG,&BabyMEG::SendCMDDataToSQUIDControl,this,&BabyMEGSQUIDControlDgl::RcvCMDData);
+    connect(m_pBabyMEG,&BabyMEG::dataToSquidCtrlGUI,this,&BabyMEGSQUIDControlDgl::TuneGraphDispProc);
+    connect(m_pBabyMEG,&BabyMEG::sendCMDDataToSQUIDControl,this,&BabyMEGSQUIDControlDgl::RcvCMDData);
 
     ui->setupUi(this);
 

@@ -148,6 +148,6 @@ void BabyMEGSetupWidget::showAboutDialog()
 
 void BabyMEGSetupWidget::showSqdCtrlDialog()
 {
-//    BabyMEGSQUIDControlDgl SQUIDCtrlDlg(m_pBabyMEG,this);
-//    SQUIDCtrlDlg.exec();
+//    BabyMEGSQUIDControlDgl m_pSQUIDCtrlDlg(m_pBabyMEG,this);
+//    m_pSQUIDCtrlDlg.exec();
 }
