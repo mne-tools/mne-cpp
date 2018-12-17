@@ -98,7 +98,7 @@ SOURCES += \
     plots/graph.cpp \
     plots/tfplot.cpp \
     plots/helpers/colormap.cpp \
-    viewers/filterview.cpp \
+    viewers/filterdesignview.cpp \
     viewers/averagelayoutview.cpp \
     viewers/spectrumview.cpp \
     viewers/modalityselectionview.cpp \
@@ -142,7 +142,7 @@ HEADERS += \
     plots/graph.h \
     plots/tfplot.h \
     plots/helpers/colormap.h \
-    viewers/filterview.h \
+    viewers/filterdesignview.h \
     viewers/averagelayoutview.h \
     viewers/spectrumview.h \
     viewers/modalityselectionview.h \
@@ -214,7 +214,7 @@ qtHaveModule(charts) {
 }
 
 FORMS += \
-    viewers/formfiles/filterview.ui \
+    viewers/formfiles/filterdesignview.ui \
     viewers/formfiles/channelselectionview.ui \
     viewers/formfiles/spharasettingsview.ui \
     viewers/formfiles/channeldatasettingsview.ui \

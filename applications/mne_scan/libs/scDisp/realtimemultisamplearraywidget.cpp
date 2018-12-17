@@ -42,7 +42,7 @@
 #include "realtimemultisamplearraywidget.h"
 
 #include <disp/viewers/quickcontrolview.h>
-#include <disp/viewers/filterview.h>
+#include <disp/viewers/filterdesignview.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/channelinfomodel.h>
 #include <disp/viewers/channeldataview.h>
@@ -263,10 +263,10 @@ void RealTimeMultiSampleArrayWidget::init()
             FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTMSAW/%1").arg(sRTMSAWName));
             m_pQuickControlView->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter");
 
-            connect(pFilterSettingsView->getFilterView().data(), &FilterView::filterChannelTypeChanged,
+            connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
                     m_pChannelDataView.data(), &ChannelDataView::setFilterChannelType);
 
-            connect(pFilterSettingsView->getFilterView().data(), &FilterView::filterChanged,
+            connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
                     m_pChannelDataView.data(), &ChannelDataView::setFilter);
 
             connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,

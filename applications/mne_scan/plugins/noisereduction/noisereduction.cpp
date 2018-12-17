@@ -43,7 +43,7 @@
 #include <disp/viewers/scalingview.h>
 #include <disp/viewers/projectorsview.h>
 #include <disp/viewers/filtersettingsview.h>
-#include <disp/viewers/filterview.h>
+#include <disp/viewers/filterdesignview.h>
 #include <disp/viewers/compensatorview.h>
 #include <disp/viewers/spharasettingsview.h>
 #include <utils/filterTools/sphara.h>
@@ -168,10 +168,10 @@ void NoiseReduction::init()
     m_pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
     m_pNoiseReductionOutput->data()->addControlWidget(m_pFilterSettingsView);
 
-    connect(m_pFilterSettingsView->getFilterView().data(), &FilterView::filterChannelTypeChanged,
+    connect(m_pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
             this, &NoiseReduction::setFilterChannelType);
 
-    connect(m_pFilterSettingsView->getFilterView().data(), &FilterView::filterChanged,
+    connect(m_pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
             this, &NoiseReduction::setFilter);
 
     connect(m_pFilterSettingsView.data(), &FilterSettingsView::filterActivationChanged,

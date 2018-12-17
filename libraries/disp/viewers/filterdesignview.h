@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterView class.
+* @brief    Contains the declaration of the FilterDesignView class.
 *
 */
 
-#ifndef FILTERVIEW_H
-#define FILTERVIEW_H
+#ifndef FILTERDESIGNVIEW_H
+#define FILTERDESIGNVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,34 +92,34 @@ class FilterPlotScene;
 
 
 /**
-* DECLARE CLASS FilterView
+* DECLARE CLASS FilterDesignView
 *
-* @brief The FilterView class provides the a manager for temporal filtering.
+* @brief The FilterDesignView class provides the a manager for temporal filtering.
 */
-class DISPSHARED_EXPORT FilterView : public QWidget
+class DISPSHARED_EXPORT FilterDesignView : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<FilterView> SPtr;              /**< Shared pointer type for FilterView. */
-    typedef QSharedPointer<const FilterView> ConstSPtr;   /**< Const shared pointer type for FilterView. */
+    typedef QSharedPointer<FilterDesignView> SPtr;              /**< Shared pointer type for FilterDesignView. */
+    typedef QSharedPointer<const FilterDesignView> ConstSPtr;   /**< Const shared pointer type for FilterDesignView. */
 
     //=========================================================================================================
     /**
-    * Constructs a FilterView dialog which is a child of parent.
+    * Constructs a FilterDesignView dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterView becomes a window. If parent is another widget, FilterView becomes a child window inside parent. FilterView is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterDesignView becomes a window. If parent is another widget, FilterDesignView becomes a child window inside parent. FilterDesignView is deleted when its parent is deleted.
     */
-    FilterView(const QString& sSettingsPath,
+    FilterDesignView(const QString& sSettingsPath,
                QWidget *parent = 0,
                Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterView.
-    * All FilterView's children are deleted first. The application exits if FilterView is the main widget.
+    * Destroys the FilterDesignView.
+    * All FilterDesignView's children are deleted first. The application exits if FilterDesignView is the main widget.
     */
-    ~FilterView();
+    ~FilterDesignView();
 
     //=========================================================================================================
     /**
@@ -328,4 +328,4 @@ signals:
 
 } // NAMESPACE DISPLIB
 
-#endif // FILTERVIEW_H
+#endif // FILTERDESIGNVIEW_H

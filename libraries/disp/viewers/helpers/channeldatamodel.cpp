@@ -1346,7 +1346,4 @@ void ChannelDataModel::clearModel()
     m_matOverlap.setZero();
 
     endResetModel();
-
-    qDebug("ChannelDataModel cleared.");
-
 }

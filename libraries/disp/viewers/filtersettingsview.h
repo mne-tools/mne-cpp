@@ -94,7 +94,7 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FilterView;
+class FilterDesignView;
 
 
 //=============================================================================================================
@@ -127,7 +127,7 @@ public:
     */
     ~FilterSettingsView();
 
-    QSharedPointer<FilterView> getFilterView();
+    QSharedPointer<FilterDesignView> getFilterView();
 
     bool getFilterActive();
 
@@ -156,7 +156,7 @@ protected:
 
     QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
-    QSharedPointer<FilterView>              m_pFilterView;                  /**< The filter view. */
+    QSharedPointer<FilterDesignView>              m_pFilterView;                  /**< The filter view. */
 
     QPointer<QCheckBox>                     m_pCheckBox;                    /**< The filter activation check box. */
 

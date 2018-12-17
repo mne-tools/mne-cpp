@@ -40,7 +40,7 @@
 
 #include "filtersettingsview.h"
 
-#include "filterview.h"
+#include "filterdesignview.h"
 
 
 //*************************************************************************************************************
@@ -82,7 +82,7 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
 
-    m_pFilterView = FilterView::SPtr::create(m_sSettingsPath,
+    m_pFilterView = FilterDesignView::SPtr::create(m_sSettingsPath,
                                              this,
                                              Qt::Window);
 
@@ -125,7 +125,7 @@ FilterSettingsView::~FilterSettingsView()
 
 //*************************************************************************************************************
 
-QSharedPointer<FilterView> FilterSettingsView::getFilterView()
+QSharedPointer<FilterDesignView> FilterSettingsView::getFilterView()
 {
     return m_pFilterView;
 }

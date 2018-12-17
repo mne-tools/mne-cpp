@@ -43,7 +43,7 @@
 #include <disp/viewers/quickcontrolview.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/channelinfomodel.h>
-#include <disp/viewers/filterview.h>
+#include <disp/viewers/filterdesignview.h>
 #include <disp/viewers/filtersettingsview.h>
 #include <disp/viewers/helpers/evokedsetmodel.h>
 #include <disp/viewers/butterflyview.h>
@@ -315,10 +315,10 @@ void RealTimeEvokedSetWidget::init()
         FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTESW/%1").arg(t_sRTESName));
         m_pQuickControlView->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter");
 
-        connect(pFilterSettingsView->getFilterView().data(), &FilterView::filterChannelTypeChanged,
+        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::setFilterChannelType);
 
-        connect(pFilterSettingsView->getFilterView().data(), &FilterView::filterChanged,
+        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::setFilter);
 
         connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
