@@ -102,6 +102,7 @@ ChannelDataView::ChannelDataView(const QString& sSettingsPath,
     // Set layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
     neLayout->addWidget(m_pTableView);
+    neLayout->setContentsMargins(0,0,0,0);
     this->setLayout(neLayout);
 
     loadSettings(m_sSettingsPath);

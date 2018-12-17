@@ -44,6 +44,8 @@
 
 #include <connectivity/network/network.h>
 
+#include <disp/viewers/quickcontrolview.h>
+
 #include <disp3D/viewers/networkview.h>
 #include <disp3D/engine/model/items/network/networktreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
@@ -88,12 +90,23 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
 , m_pRtItem(Q_NULLPTR)
 , m_pNetworkView(new NetworkView())
 {
+    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget (F9)"),this);
+    m_pActionQuickControl->setShortcut(tr("F9"));
+    m_pActionQuickControl->setStatusTip(tr("Show quick control widget (F9)"));
+    connect(m_pActionQuickControl.data(), &QAction::triggered,
+            this, &RealTimeConnectivityEstimateWidget::showQuickControlView);
+    addDisplayAction(m_pActionQuickControl);
+    m_pActionQuickControl->setVisible(true);
+
     QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTCE->getControlWidgets();
     m_pNetworkView->setQuickControlWidgets(lControlWidgets);
 
+    m_pQuickControlView = m_pNetworkView->getQuickControl();
+    m_pQuickControlView->setWindowFlags(Qt::Window);
+
     QGridLayout *mainLayoutView = new QGridLayout();
     mainLayoutView->addWidget(m_pNetworkView.data());
-
+    mainLayoutView->setContentsMargins(0,0,0,0);
     this->setLayout(mainLayoutView);
 }
 
@@ -159,7 +172,15 @@ void RealTimeConnectivityEstimateWidget::getData()
 
 void RealTimeConnectivityEstimateWidget::init()
 {
-
-
+    m_bInitialized = true;
 }
 
+
+//*************************************************************************************************************
+
+void RealTimeConnectivityEstimateWidget::showQuickControlView()
+{
+    if(m_pQuickControlView) {
+        m_pQuickControlView->show();
+    }
+}

@@ -179,6 +179,7 @@ void QuickControlView::addGroupBoxWithTabs(QSharedPointer<QWidget> pWidget,
 
 }
 
+
 //*************************************************************************************************************
 
 void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,

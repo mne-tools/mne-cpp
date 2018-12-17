@@ -56,9 +56,10 @@
 #include <inverse/rapMusic/rapmusic.h>
 
 #include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
+
+#include <disp/viewers/control3dview.h>
 
 #include <utils/mnemath.h>
 
@@ -274,7 +275,7 @@ void Music::calculate()
 //    }
 //    testWindow->show();
 
-//    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+//    Control3DView::SPtr control3DWidget = Control3DView::SPtr(new Control3DView());
 //    control3DWidget->init(p3DDataModel, testWindow);
 //    control3DWidget->show();
 

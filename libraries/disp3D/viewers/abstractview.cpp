@@ -42,12 +42,13 @@
 
 #include "../engine/view/view3D.h"
 #include "../engine/model/data3Dtreemodel.h"
-#include "../engine/control/control3dwidget.h"
+#include "../engine/model/data3Dtreedelegate.h"
 
 #include <inverse/dipoleFit/dipole_fit_settings.h>
 #include <inverse/dipoleFit/ecd_set.h>
 #include <mne/mne_bem.h>
 #include <disp/viewers/quickcontrolview.h>
+#include <disp/viewers/control3dview.h>
 
 
 //*************************************************************************************************************
@@ -66,8 +67,6 @@
 
 using namespace DISP3DLIB;
 using namespace DISPLIB;
-using namespace INVERSELIB;
-using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -85,11 +84,35 @@ AbstractView::AbstractView(QWidget* parent,
     m_p3DView->setFlag(Qt::FramelessWindowHint, true);
     m_p3DView->setModel(m_pData3DModel);
 
+    // Init 3D control view
     QStringList slControlFlags;
     slControlFlags << "Data" << "View" << "Light";
-    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this, slControlFlags));
+    m_pControl3DView = Control3DView::SPtr(new Control3DView(this, slControlFlags));
 
-    m_pControl3DView->init(m_pData3DModel, m_p3DView);
+    Data3DTreeDelegate* pData3DTreeDelegate = new Data3DTreeDelegate(this);
+    m_pControl3DView->setDelegate(pData3DTreeDelegate);
+    m_pControl3DView->setModel(m_pData3DModel.data());
+
+    connect(m_pControl3DView.data(), &Control3DView::sceneColorChanged,
+            m_p3DView.data(), &View3D::setSceneColor);
+
+    connect(m_pControl3DView.data(), &Control3DView::rotationChanged,
+            m_p3DView.data(), &View3D::startStopModelRotation);
+
+    connect(m_pControl3DView.data(), &Control3DView::showCoordAxis,
+            m_p3DView.data(), &View3D::toggleCoordAxis);
+
+    connect(m_pControl3DView.data(), &Control3DView::showFullScreen,
+            m_p3DView.data(), &View3D::showFullScreen);
+
+    connect(m_pControl3DView.data(), &Control3DView::lightColorChanged,
+            m_p3DView.data(), &View3D::setLightColor);
+
+    connect(m_pControl3DView.data(), &Control3DView::lightIntensityChanged,
+            m_p3DView.data(), &View3D::setLightIntensity);
+
+    connect(m_pControl3DView.data(), &Control3DView::takeScreenshotChanged,
+            m_p3DView.data(), &View3D::takeScreenshot);
 
     createGUI();
 }
@@ -112,7 +135,7 @@ QSharedPointer<DISP3DLIB::View3D> AbstractView::getView()
 
 //*************************************************************************************************************
 
-QSharedPointer<DISP3DLIB::Control3DWidget> AbstractView::getControlView()
+QSharedPointer<DISPLIB::Control3DView> AbstractView::getControlView()
 {
     return m_pControl3DView;
 }

@@ -42,7 +42,6 @@
 #include "ui_hpiview.h"
 
 #include "../engine/view/view3D.h"
-#include "../engine/control/control3dwidget.h"
 #include "../engine/model/data3Dtreemodel.h"
 #include "../engine/model/items/bem/bemtreeitem.h"
 #include "../engine/model/items/bem/bemsurfacetreeitem.h"
@@ -51,6 +50,7 @@
 #include "../engine/model/3dhelpers/renderable3Dentity.h"
 
 #include <fiff/fiff_dig_point_set.h>
+#include <fiff/c/fiff_digitizer_data.h>
 
 #include <inverse/hpiFit/hpifit.h>
 
@@ -61,7 +61,7 @@
 #include <mne/c/mne_surface_or_volume.h>
 #include <mne/mne_bem.h>
 
-#include <fiff/c/fiff_digitizer_data.h>
+#include <disp/viewers/control3dview.h>
 
 
 //*************************************************************************************************************
@@ -89,6 +89,7 @@
 
 using namespace FIFFLIB;
 using namespace DISP3DLIB;
+using namespace DISPLIB;
 using namespace MNELIB;
 using namespace RTPROCESSINGLIB;
 using namespace INVERSELIB;
@@ -156,8 +157,30 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
 
     QStringList slFlag = QStringList() << "Data";
 
-    Control3DWidget* control3DWidget = new Control3DWidget(this, slFlag);
-    control3DWidget->init(m_pData3DModel, m_pView3D);
+    Control3DView* control3DWidget = new Control3DView(this, slFlag);
+    control3DWidget->setModel(m_pData3DModel.data());
+
+    connect(control3DWidget, &Control3DView::sceneColorChanged,
+            m_pView3D.data(), &View3D::setSceneColor);
+
+    connect(control3DWidget, &Control3DView::rotationChanged,
+            m_pView3D.data(), &View3D::startStopModelRotation);
+
+    connect(control3DWidget, &Control3DView::showCoordAxis,
+            m_pView3D.data(), &View3D::toggleCoordAxis);
+
+    connect(control3DWidget, &Control3DView::showFullScreen,
+            m_pView3D.data(), &View3D::showFullScreen);
+
+    connect(control3DWidget, &Control3DView::lightColorChanged,
+            m_pView3D.data(), &View3D::setLightColor);
+
+    connect(control3DWidget, &Control3DView::lightIntensityChanged,
+            m_pView3D.data(), &View3D::setLightIntensity);
+
+    connect(control3DWidget, &Control3DView::takeScreenshotChanged,
+            m_pView3D.data(), &View3D::takeScreenshot);
+
     control3DWidget->onTreeViewDescriptionHide();
 
     QGridLayout* gridLayout = new QGridLayout();
