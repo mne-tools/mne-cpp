@@ -251,7 +251,8 @@ void QuickControlView::saveSettings(const QString& settingsPath)
 
     QSettings settings;
 
-    settings.setValue(settingsPath + QString("/viewOpacity"), getOpacityValue());
+    settings.setValue(settingsPath + QString("/QuickControlViewOpacity"), getOpacityValue());
+    settings.setValue(settingsPath + QString("/QuickControlViewPos"), this->pos());
 }
 
 
@@ -265,7 +266,8 @@ void QuickControlView::loadSettings(const QString& settingsPath)
 
     QSettings settings;
 
-    setOpacityValue(settings.value(settingsPath + QString("/viewOpacity"), 100).toInt());
+    setOpacityValue(settings.value(settingsPath + QString("/QuickControlViewOpacity"), 100).toInt());
+    move(settings.value(settingsPath + QString("/QuickControlViewPos"), QPoint(100,100)).toPoint());
 }
 
 

@@ -435,6 +435,7 @@ void ChannelSelectionView::saveSettings(const QString& settingsPath)
     QSettings settings;
 
     settings.setValue(settingsPath + QString("/selectedLayoutFile"), getCurrentLayoutFile());
+    settings.setValue(settingsPath + QString("/ChannelSelectionViewPos"), this->pos());
 }
 
 
@@ -449,6 +450,7 @@ void ChannelSelectionView::loadSettings(const QString& settingsPath)
     QSettings settings;
 
     setCurrentLayoutFile(settings.value(settingsPath + QString("/selectedLayoutFile"), "babymeg-mag-inner-layer.lout").toString());
+    move(settings.value(settingsPath + QString("/ChannelSelectionViewPos"), QPoint(100,100)).toPoint());
 }
 
 
