@@ -271,6 +271,7 @@ void FilterDesignView::saveSettings(const QString& settingsPath)
     settings.setValue(settingsPath + QString("/filterDesignMethod"), m_filterData.m_designMethod);
     settings.setValue(settingsPath + QString("/filterTransition"), m_filterData.m_dParksWidth*(m_filterData.m_sFreq/2));
     settings.setValue(settingsPath + QString("/filterChannelType"), getChannelType());
+    settings.setValue(settingsPath + QString("/FilterDesignViewPos"), this->pos());
 }
 
 
@@ -292,6 +293,7 @@ void FilterDesignView::loadSettings(const QString& settingsPath)
                         settings.value(settingsPath + QString("/filterDesignMethod"), 0).toInt(),
                         settings.value(settingsPath + QString("/filterTransition"), 5.0).toDouble(),
                         settings.value(settingsPath + QString("/filterChannelType"), "MEG").toString());
+    move(settings.value(settingsPath + QString("/FilterDesignViewPos"), QPoint(100,100)).toPoint());
 }
 
 

@@ -191,8 +191,8 @@ void AbstractView::createGUI()
 
     QGridLayout* pMainLayoutView = new QGridLayout();
     pMainLayoutView->addWidget(pWidgetContainer,0,0);
-    pMainLayoutView->addWidget(m_pQuickControlView.data(),0,1);
-
+    pMainLayoutView->addWidget(m_pQuickControlView.data(),0,1);    
+    pMainLayoutView->setContentsMargins(0,0,0,0);
 
     this->setLayout(pMainLayoutView);
 }

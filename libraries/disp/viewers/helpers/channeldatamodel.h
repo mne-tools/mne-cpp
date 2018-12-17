@@ -647,14 +647,12 @@ inline qint32 ChannelDataModel::getMaxSamples() const
 
 inline qint32 ChannelDataModel::getCurrentSampleIndex() const
 {
-    if(m_bIsFreezed)
+    if(m_bIsFreezed) {
         return m_iCurrentSampleFreeze;
+    }
 
-    if(!m_filterData.isEmpty()/* || !m_bDrawFilterFront*/) {
-//        if(!m_bDrawFilterFront)
-//            return m_iCurrentSample+m_iMaxFilterLength/2;
-//        else
-            return m_iCurrentSample-m_iMaxFilterLength/2;
+    if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+        return m_iCurrentSample-m_iMaxFilterLength/2;
     }
 
     return m_iCurrentSample;
