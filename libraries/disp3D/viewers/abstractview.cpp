@@ -42,7 +42,7 @@
 
 #include "../engine/view/view3D.h"
 #include "../engine/model/data3Dtreemodel.h"
-#include "../engine/model/data3Dtreedelegate.h"
+#include "../engine/delegate/data3Dtreedelegate.h"
 
 #include <inverse/dipoleFit/dipole_fit_settings.h>
 #include <inverse/dipoleFit/ecd_set.h>
