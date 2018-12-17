@@ -297,7 +297,7 @@ void RealTimeEvokedSetWidget::init()
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pButterflyView.data(), &ButterflyView::updateView);
 
-        m_pEvokedSetModel->updateProjection(pProjectorsView->getProjectors());
+        pProjectorsView->setProjectors(m_pFiffInfo->projs);
 
         // Quick control compensators
         CompensatorView* pCompensatorView = new CompensatorView(QString("RTESW/%1").arg(t_sRTESName));
@@ -309,7 +309,7 @@ void RealTimeEvokedSetWidget::init()
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
                 m_pButterflyView.data(), &ButterflyView::updateView);
 
-        m_pEvokedSetModel->updateCompensator(pCompensatorView->getLastTo());
+        pCompensatorView->setCompensators(m_pFiffInfo->comps);
 
         // Quick control filter settings
         FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTESW/%1").arg(t_sRTESName));

@@ -156,7 +156,7 @@ void ScalingView::redrawGUI()
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
         t_pDoubleSpinBoxScale->setMinimum(0.001);
         t_pDoubleSpinBoxScale->setMaximum(50000);
-        t_pDoubleSpinBoxScale->setMaximumWidth(500);
+        t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(0.01);
         t_pDoubleSpinBoxScale->setDecimals(3);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
@@ -168,7 +168,7 @@ void ScalingView::redrawGUI()
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
         t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(5000);
+        t_pHorizontalSlider->setMaximum(500);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T)/(1e-12)*10);
@@ -202,9 +202,9 @@ void ScalingView::redrawGUI()
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
         t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(5000);
-        t_pHorizontalSlider->setSingleStep(10);
-        t_pHorizontalSlider->setPageStep(10);
+        t_pHorizontalSlider->setMaximum(2000);
+        t_pHorizontalSlider->setSingleStep(1);
+        t_pHorizontalSlider->setPageStep(1);
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T_M)/(1e-15*100));
         m_qMapScalingSlider.insert(FIFF_UNIT_T_M,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
@@ -236,7 +236,7 @@ void ScalingView::redrawGUI()
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
         t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(25000);
+        t_pHorizontalSlider->setMaximum(1000);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EEG_CH)/(1e-06)*10);
@@ -270,7 +270,7 @@ void ScalingView::redrawGUI()
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
         t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(25000);
+        t_pHorizontalSlider->setMaximum(1000);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EOG_CH)/(1e-06)*10);
