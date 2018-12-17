@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FilterViewWidget</class>
- <widget class="QWidget" name="FilterViewWidget">
+ <class>FilterDesignViewWidget</class>
+ <widget class="QWidget" name="FilterDesignViewWidget">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>
