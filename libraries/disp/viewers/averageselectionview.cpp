@@ -54,6 +54,7 @@
 #include <QPalette>
 #include <QPushButton>
 #include <QDebug>
+#include <QSettings>
 #include <QPointer>
 
 
@@ -79,16 +80,29 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AverageSelectionView::AverageSelectionView(QWidget *parent,
+AverageSelectionView::AverageSelectionView(const QString& sSettingsPath,
+                                           QWidget *parent,
                                            Qt::WindowFlags f)
 : QWidget(parent, f)
 , m_iMaxNumAverages(10)
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
+, m_sSettingsPath(sSettingsPath)
 {
     this->setWindowTitle("Average Selection");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
+
+    loadSettings(m_sSettingsPath);
+    redrawGUI();
+}
+
+
+//*************************************************************************************************************
+
+AverageSelectionView::~AverageSelectionView()
+{
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -113,7 +127,7 @@ QSharedPointer<QMap<QString, bool> > AverageSelectionView::getAverageActivation(
 void AverageSelectionView::setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor)
 {
     m_qMapAverageColor = qMapAverageColor;
-    update();
+    redrawGUI();
 }
 
 
@@ -122,13 +136,67 @@ void AverageSelectionView::setAverageColor(const QSharedPointer<QMap<QString, QC
 void AverageSelectionView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
 {
     m_qMapAverageActivation = qMapAverageActivation;
-    update();
+    redrawGUI();
 }
 
 
 //*************************************************************************************************************
 
-void AverageSelectionView::update()
+void AverageSelectionView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    settings.beginGroup(settingsPath + QString("/averageColorMap"));
+    QMap<QString, QColor>::const_iterator iColor = m_qMapAverageColor->constBegin();
+    while (iColor != m_qMapAverageColor->constEnd()) {
+         settings.setValue(iColor.key(), iColor.value());
+         ++iColor;
+    }
+    settings.endGroup();
+
+    settings.beginGroup(settingsPath + QString("/averageActivationMap"));
+    QMap<QString, bool>::const_iterator iActivation = m_qMapAverageActivation->constBegin();
+    while (iActivation != m_qMapAverageActivation->constEnd()) {
+         settings.setValue(iActivation.key(), iActivation.value());
+         ++iActivation;
+    }
+    settings.endGroup();
+}
+
+
+//*************************************************************************************************************
+
+void AverageSelectionView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    settings.beginGroup(settingsPath + QString("/averageColorMap"));
+    QStringList keys = settings.childKeys();
+    foreach (QString key, keys) {
+         m_qMapAverageColor->insert(key, settings.value(key).value<QColor>());
+    }
+    settings.endGroup();
+
+    settings.beginGroup(settingsPath + QString("/averageActivationMap"));
+    keys = settings.childKeys();
+    foreach (QString key, keys) {
+         m_qMapAverageActivation->insert(key, settings.value(key).toBool());
+    }
+    settings.endGroup();
+}
+
+
+//*************************************************************************************************************
+
+void AverageSelectionView::redrawGUI()
 {
     if(m_qMapAverageColor->size() != m_qMapAverageActivation->size()) {
         qDebug() << "AverageSelectionView::update - m_qMapAverageColor and m_qMapAverageActivation do not match in size. Returning.";
@@ -163,7 +231,7 @@ void AverageSelectionView::update()
         pCheckBox->setObjectName(itr.key());
         topLayout->addWidget(pCheckBox, count, 0);
         connect(pCheckBox.data(), &QCheckBox::clicked,
-                this, &AverageSelectionView::onAveragesChanged);
+                this, &AverageSelectionView::onAverageSelectionColorChanged);
 
         //Create average color pushbutton
         QColor color = itr.value();
@@ -172,7 +240,7 @@ void AverageSelectionView::update()
         pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
         topLayout->addWidget(pButton, count, 1);
         connect(pButton.data(), &QPushButton::clicked,
-                this, &AverageSelectionView::onAveragesChanged);
+                this, &AverageSelectionView::onAverageSelectionColorChanged);
 
         ++count;
     }
@@ -183,7 +251,7 @@ void AverageSelectionView::update()
 
 //*************************************************************************************************************
 
-void AverageSelectionView::onAveragesChanged()
+void AverageSelectionView::onAverageSelectionColorChanged()
 {
     //Change color for average
     if(QPointer<QPushButton> button = qobject_cast<QPushButton*>(sender())) {
