@@ -130,30 +130,9 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
                                                          "RT Display",
                                                          Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
                                                          this);
-    QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTMSA->getControlWidgets();
 
-    for(int i = 0; i < lControlWidgets.size(); ++i) {
-        QString sObjectName = lControlWidgets.at(i)->objectName();
-
-        if(sObjectName.contains("widget_", Qt::CaseInsensitive)) {
-            m_pQuickControlView->addWidget(lControlWidgets.at(i));
-        }
-
-        if(sObjectName.contains("group_", Qt::CaseInsensitive)) {
-            if(sObjectName.contains("group_tab_", Qt::CaseInsensitive)) {
-                sObjectName.remove("group_tab_");
-                QStringList sList = sObjectName.split("_");
-                if(sList.size() >= 2) {
-                   m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), sList.at(0), sList.at(1));
-                } else {
-                    m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), "", sObjectName);
-                }
-            } else {
-                sObjectName.remove("group_");
-                m_pQuickControlView->addGroupBox(lControlWidgets.at(i), sObjectName);
-            }
-        }
-    }
+    this->addControlWidgets(m_pQuickControlView,
+                            m_pRTMSA->getControlWidgets());
 
     QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
     rtmsaLayout->setContentsMargins(0,0,0,0);

@@ -101,8 +101,15 @@ public:
     *
     * @param [in] parent        parent of widget
     */
-    AverageSelectionView(QWidget *parent = 0,
+    AverageSelectionView(const QString &sSettingsPath="",
+                         QWidget *parent = 0,
                          Qt::WindowFlags f = Qt::Widget);
+
+    //=========================================================================================================
+    /**
+    * Destroys the AverageSelectionView.
+    */
+    ~AverageSelectionView();
 
     //=========================================================================================================
     /**
@@ -139,22 +146,38 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Sets corresponding evoked set
+    * Saves all important settings of this view via QSettings.
     *
-    * @param [in] pEvokedSet      The evoked set
+    * @param[in] settingsPath        the path to store the settings to.
     */
-    void update();
+    void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Call this slot whenever the averages changed.
+    * Loads and inits all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to load the settings from.
     */
-    void onAveragesChanged();
+    void loadSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+    * Redraw the GUI.
+    */
+    void redrawGUI();
+
+    //=========================================================================================================
+    /**
+    * Call this slot whenever the average selection or color changed.
+    */
+    void onAverageSelectionColorChanged();
 
     int m_iMaxNumAverages;
 
-    QSharedPointer<QMap<QString, QColor> >    m_qMapAverageColor;             /**< Average colors. */
-    QSharedPointer<QMap<QString, bool> >      m_qMapAverageActivation;        /**< Average activation status. */
+    QSharedPointer<QMap<QString, QColor> >      m_qMapAverageColor;             /**< Average colors. */
+    QSharedPointer<QMap<QString, bool> >        m_qMapAverageActivation;        /**< Average activation status. */
+
+    QString                                     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
 signals:    
     //=========================================================================================================

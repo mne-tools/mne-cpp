@@ -163,31 +163,8 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
                                                                    this);
     m_pActionQuickControl->setVisible(true);
 
-    QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTESet->getControlWidgets();
-
-    for(int i = 0; i < lControlWidgets.size(); ++i) {
-        QString sObjectName = lControlWidgets.at(i)->objectName();
-
-        if(sObjectName.contains("widget_", Qt::CaseInsensitive)) {
-            m_pQuickControlView->addWidget(lControlWidgets.at(i));
-        }
-
-        if(sObjectName.contains("group_", Qt::CaseInsensitive)) {
-            if(sObjectName.contains("group_tab_", Qt::CaseInsensitive)) {
-                sObjectName.remove("group_tab_");
-                QStringList sList = sObjectName.split("_");
-                qDebug() << "RealTimeMultiSampleArrayWidget sList" << sList;
-                if(sList.size() >= 2) {
-                   m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), sList.at(0), sList.at(1));
-                } else {
-                    m_pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), "", sObjectName);
-                }
-            } else {
-                sObjectName.remove("group_");
-                m_pQuickControlView->addGroupBox(lControlWidgets.at(i), sObjectName);
-            }
-        }
-    }
+    this->addControlWidgets(m_pQuickControlView,
+                            m_pRTESet->getControlWidgets());
 
     //set layouts
     this->setLayout(m_pRTESetLayout);
@@ -208,25 +185,6 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
         //Store current view toolbox index - butterfly or 2D layout
         if(m_pToolBox) {
             settings.setValue(QString("RTESW/%1/selectedView").arg(t_sRTESName), m_pToolBox->currentIndex());
-        }
-
-        //Store average colors per type
-        if(m_pEvokedSetModel) {
-            settings.beginGroup(QString("RTESW/%1/averageColorMap").arg(t_sRTESName));
-            QMap<QString, QColor>::const_iterator iColor = m_pEvokedSetModel->getAverageColor()->constBegin();
-            while (iColor != m_pEvokedSetModel->getAverageColor()->constEnd()) {
-                 settings.setValue(iColor.key(), iColor.value());
-                 ++iColor;
-            }
-            settings.endGroup();
-
-            settings.beginGroup(QString("RTESW/%1/averageActivationMap").arg(t_sRTESName));
-            QMap<QString, bool>::const_iterator iActivation = m_pEvokedSetModel->getAverageActivation()->constBegin();
-            while (iActivation != m_pEvokedSetModel->getAverageActivation()->constEnd()) {
-                 settings.setValue(iActivation.key(), iActivation.value());
-                 ++iActivation;
-            }
-            settings.endGroup();
         }
     }
 }
@@ -289,33 +247,11 @@ void RealTimeEvokedSetWidget::init()
         // Choose current view toolbox index - butterfly or 2D layout
         m_pToolBox->setCurrentIndex(settings.value(QString("RTESW/%1/selectedView").arg(t_sRTESName), 0).toInt());
 
-        // Init data model
+        // Init data model and set first data
         m_pEvokedSetModel = EvokedSetModel::SPtr::create(this);
-
-        // Set the inital data
         FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
         pEvokedSet->info = *m_pFiffInfo.data();
         m_pEvokedSetModel->setEvokedSet(pEvokedSet);
-
-        QMap<QString, QColor> qMapAverageColor;
-        settings.beginGroup(QString("RTESW/%1/averageColorMap").arg(t_sRTESName));
-        QStringList keys = settings.childKeys();
-        foreach (QString key, keys) {
-             qMapAverageColor[key] = settings.value(key).value<QColor>();
-        }
-        settings.endGroup();
-        QSharedPointer<QMap<QString, QColor> > pqMapAverageColor = QSharedPointer<QMap<QString, QColor> >::create(qMapAverageColor);
-        m_pEvokedSetModel->setAverageColor(pqMapAverageColor);
-
-        QMap<QString, bool> qMapAverageActivation;
-        settings.beginGroup(QString("RTESW/%1/averageActivationMap").arg(t_sRTESName));
-        keys = settings.childKeys();
-        foreach (QString key, keys) {
-             qMapAverageActivation[key] = settings.value(key).toBool();
-        }
-        settings.endGroup();
-        QSharedPointer<QMap<QString, bool> > pqMapAverageActivation = QSharedPointer<QMap<QString, bool> >::create(qMapAverageActivation);
-        m_pEvokedSetModel->setAverageActivation(pqMapAverageActivation); 
 
         //Init channel info and selection view
         m_pChannelInfoModel = ChannelInfoModel::SPtr::create(m_pFiffInfo,
@@ -425,9 +361,7 @@ void RealTimeEvokedSetWidget::init()
                 m_pButterflyView.data(), &ButterflyView::setModalityMap);
 
         // Quick control average selection
-        AverageSelectionView* pAverageSelectionView = new AverageSelectionView();
-        pAverageSelectionView->setAverageColor(pqMapAverageColor);
-        pAverageSelectionView->setAverageActivation(pqMapAverageActivation);
+        AverageSelectionView* pAverageSelectionView = new AverageSelectionView(QString("RTESW/%1").arg(t_sRTESName));
         m_pQuickControlView->addGroupBoxWithTabs(pAverageSelectionView, "Averaging", "Selection");
 
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageActivationMap,
@@ -453,10 +387,13 @@ void RealTimeEvokedSetWidget::init()
         connect(pAverageSelectionView, &AverageSelectionView::newAverageColorMap,
                 m_pAverageLayoutView.data(), &AverageLayoutView::setAverageColor);
 
+        m_pEvokedSetModel->setAverageActivation(pAverageSelectionView->getAverageActivation());
+        m_pEvokedSetModel->setAverageColor(pAverageSelectionView->getAverageColor());
+
         // View settings
         m_pButterflyView->setModel(m_pEvokedSetModel);
-        m_pButterflyView->setAverageActivation(pqMapAverageActivation);
-        m_pButterflyView->setAverageColor(pqMapAverageColor);
+        m_pButterflyView->setAverageActivation(pAverageSelectionView->getAverageActivation());
+        m_pButterflyView->setAverageColor(pAverageSelectionView->getAverageColor());
         m_pButterflyView->setModel(m_pChannelInfoModel);
         m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
         m_pButterflyView->setModalityMap(pModalitySelectionView->getModalityMap());
@@ -465,8 +402,8 @@ void RealTimeEvokedSetWidget::init()
         m_pChannelSelectionView->updateDataView();
 
         m_pAverageLayoutView->setModel(m_pEvokedSetModel);
-        m_pAverageLayoutView->setAverageActivation(pqMapAverageActivation);
-        m_pAverageLayoutView->setAverageColor(pqMapAverageColor);
+        m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
+        m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
         m_pAverageLayoutView->setModel(m_pChannelInfoModel);
         m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
 
