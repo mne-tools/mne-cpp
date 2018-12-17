@@ -918,7 +918,7 @@ void ChannelDataModel::updateSpharaOptions(const QString& sSytemType, int nBaseF
 
 //*************************************************************************************************************
 
-void ChannelDataModel::filterChanged(QList<FilterData> filterData)
+void ChannelDataModel::setFilter(QList<FilterData> filterData)
 {
     m_filterData = filterData;
 

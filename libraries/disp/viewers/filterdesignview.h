@@ -70,7 +70,7 @@
 class QCheckBox;
 
 namespace Ui {
-    class FilterViewWidget;
+    class FilterDesignViewWidget;
 }
 
 
@@ -296,7 +296,7 @@ protected:
     */
     void onBtnLoadFilter();
 
-    Ui::FilterViewWidget*               ui;                         /**< Pointer to the qt designer generated ui class.*/
+    Ui::FilterDesignViewWidget*               ui;                         /**< Pointer to the qt designer generated ui class.*/
 
     QSharedPointer<FilterPlotScene>     m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 

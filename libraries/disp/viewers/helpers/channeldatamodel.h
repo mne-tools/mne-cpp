@@ -342,11 +342,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Filter parameters changed
+    * Set new filter parameters
     *
-    * @param[in] filterData    list of the currently active filter
+    * @param[in] filterData    list of the new filter
     */
-    void filterChanged(QList<UTILSLIB::FilterData> filterData);
+    void setFilter(QList<UTILSLIB::FilterData> filterData);
 
     //=========================================================================================================
     /**
