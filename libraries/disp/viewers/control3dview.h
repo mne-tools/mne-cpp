@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     cntrol3dwidget.h
+* @file     control3dview.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,19 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Control3DWidget class declaration
+* @brief    Control3DView class declaration
 *
 */
 
-#ifndef DISP3DLIB_CONTROL3DWIDGET_H
-#define DISP3DLIB_CONTROL3DWIDGET_H
+#ifndef DISPLIB_CONTROL3DVIEW_H
+#define DISPLIB_CONTROL3DVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../../disp3D_global.h"
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
@@ -64,26 +64,26 @@
 //=============================================================================================================
 
 namespace Ui {
-    class Control3DWidget;
+    class Control3DViewWidget;
 }
+
+class QItemDelegate;
+class QStandardItemModel;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace DISPLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DISP3DLIB FORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-class View3D;
-class Data3DTreeModel;
 
 
 //=============================================================================================================
@@ -92,13 +92,13 @@ class Data3DTreeModel;
 *
 * @brief User GUI control for the View3D.
 */
-class DISP3DSHARED_EXPORT Control3DWidget : public QWidget
+class DISPSHARED_EXPORT Control3DView : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<Control3DWidget> SPtr;              /**< Shared pointer type for Control3DWidget. */
-    typedef QSharedPointer<const Control3DWidget> ConstSPtr;   /**< Const shared pointer type for Control3DWidget. */
+    typedef QSharedPointer<Control3DView> SPtr;              /**< Shared pointer type for Control3DView. */
+    typedef QSharedPointer<const Control3DView> ConstSPtr;   /**< Const shared pointer type for Control3DView. */
 
     //=========================================================================================================
     /**
@@ -108,13 +108,17 @@ public:
     * @param [in] slFlags    The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view, filter, triggerdetection, modalities, scaling, sphara.
     * @param [in] type
     */
-    explicit Control3DWidget(QWidget* parent = 0, const QStringList& slFlags = QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light", Qt::WindowType type = Qt::Widget);
+    explicit Control3DView(QWidget* parent = 0,
+                           const QStringList& slFlags = QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light",
+                           Qt::WindowType type = Qt::Widget);
 
     //=========================================================================================================
     /**
     * Default destructor.
     */
-    ~Control3DWidget();
+    ~Control3DView();
+
+    void setDelegate(QItemDelegate* pItemDelegate);
 
     //=========================================================================================================
     /**
@@ -123,7 +127,7 @@ public:
     * @param[in] pData3DTreeModel   The 3D data tree model.
     * @param[in] pView3D            The view3D to bec connected to this widget.
     */
-    void init(QSharedPointer<DISP3DLIB::Data3DTreeModel> pData3DTreeModel, QSharedPointer<View3D> pView3D);
+    void setModel(QStandardItemModel* pDataTreeModel);
 
     //=========================================================================================================
     /**
@@ -221,10 +225,10 @@ protected:
     */
     void onLightIntensityChanged(double value);
 
-    Ui::Control3DWidget*    ui;                         /**< The pointer to the QtDesigner ui class. */
+    Ui::Control3DViewWidget*    ui;                         /**< The pointer to the QtDesigner ui class. */
 
-    QColor                  m_colCurrentSceneColor;     /**< Current color of the scene in all View3D's. */
-    QColor                  m_colCurrentLightColor;     /**< Current color of the lights in all View3D's. */
+    QColor                      m_colCurrentSceneColor;     /**< Current color of the scene in all View3D's. */
+    QColor                      m_colCurrentLightColor;     /**< Current color of the lights in all View3D's. */
 
 signals:
     //=========================================================================================================
@@ -282,6 +286,6 @@ signals:
     void takeScreenshotChanged();
 };
 
-} // NAMESPACE DISP3DLIB
+} // NAMESPACE DISPLIB
 
-#endif // DISP3DLIB_CONTROL3DWIDGET_H
+#endif // DISPLIB_CONTROL3DVIEW_H

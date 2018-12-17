@@ -53,6 +53,7 @@
 //=============================================================================================================
 
 #include <QPointer>
+#include <QAction>
 
 
 //*************************************************************************************************************
@@ -141,10 +142,19 @@ public:
     */
     virtual void init();
 
-private:
+protected:
+    //=========================================================================================================
+    /**
+    * Shows quick control view
+    */
+    void showQuickControlView();
+
     QSharedPointer<SCMEASLIB::RealTimeSourceEstimate>   m_pRTSE;                /**< The real-time source estimate measurement. */
     QSharedPointer<DISP3DLIB::SourceEstimateView>       m_pSourceEstimateView;  /**< The 3D source estimate view. */
+
     QPointer<DISP3DLIB::MneEstimateTreeItem>            m_pRtItem;              /**< The Disp3D real time items. */
+    QPointer<DISPLIB::QuickControlView>                 m_pQuickControlView;    /**< Quick control widget. */
+    QPointer<QAction>                                   m_pActionQuickControl;  /**< Show quick control widget. */
 
     bool                                                m_bInitialized;         /**< Whether init was processed successfully. */
 };

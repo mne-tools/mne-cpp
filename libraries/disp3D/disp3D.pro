@@ -119,7 +119,6 @@ SOURCES += \
     engine/model/materials/pervertextessphongalphamaterial.cpp \
     engine/model/materials/shownormalsmaterial.cpp \
     engine/model/materials/networkmaterial.cpp \
-    engine/control/control3dwidget.cpp \
     viewers/ecdview.cpp \
     viewers/abstractview.cpp \
     viewers/networkview.cpp \
@@ -175,7 +174,6 @@ HEADERS += \
     engine/model/materials/pervertextessphongalphamaterial.h \
     engine/model/materials/shownormalsmaterial.h \
     engine/model/materials/networkmaterial.h \
-    engine/control/control3dwidget.h \
     viewers/ecdview.h \
     viewers/abstractview.h \
     viewers/networkview.h \
@@ -193,7 +191,6 @@ HEADERS += \
     engine/view/orbitalcameracontroller.h
 
 FORMS += \
-    engine/control/formfiles/control3dwidget.ui \
     viewers/formfiles/hpiview.ui \
 
 RESOURCES += $$PWD/disp3d.qrc \

@@ -119,6 +119,7 @@ SOURCES += \
     viewers/minimumnormsettingsview.cpp \
     viewers/averagingsettingsview.cpp \
     viewers/projectsettingsview.cpp \
+    viewers/control3dview.cpp \
     viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
@@ -162,6 +163,7 @@ HEADERS += \
     viewers/minimumnormsettingsview.h \
     viewers/averagingsettingsview.h \
     viewers/projectsettingsview.h \
+    viewers/control3dview.h \
     viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \
@@ -222,6 +224,7 @@ FORMS += \
     viewers/formfiles/minimumnormsettingsview.ui \
     viewers/formfiles/averagingsettingsview.ui \
     viewers/formfiles/projectsettingsview.ui \
+    viewers/formfiles/control3dview.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \

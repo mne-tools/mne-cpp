@@ -42,6 +42,8 @@
 
 #include <scMeas/realtimesourceestimate.h>
 
+#include <disp/viewers/quickcontrolview.h>
+
 #include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 #include <disp3D/viewers/sourceestimateview.h>
 
@@ -70,6 +72,7 @@
 
 using namespace SCDISPLIB;
 using namespace DISP3DLIB;
+using namespace DISPLIB;
 using namespace SCMEASLIB;
 
 
@@ -85,12 +88,24 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 , m_pRtItem(Q_NULLPTR)
 , m_pSourceEstimateView(SourceEstimateView::SPtr::create())
 {
+    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget (F9)"),this);
+    m_pActionQuickControl->setShortcut(tr("F9"));
+    m_pActionQuickControl->setStatusTip(tr("Show quick control widget (F9)"));
+    connect(m_pActionQuickControl.data(), &QAction::triggered,
+            this, &RealTimeSourceEstimateWidget::showQuickControlView);
+    addDisplayAction(m_pActionQuickControl);
+    m_pActionQuickControl->setVisible(true);
+
     QGridLayout *mainLayoutView = new QGridLayout;
     mainLayoutView->addWidget(m_pSourceEstimateView.data(),0,0);
 
     QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTSE->getControlWidgets();
     m_pSourceEstimateView->setQuickControlWidgets(lControlWidgets);
 
+    m_pQuickControlView = m_pSourceEstimateView->getQuickControl();
+    m_pQuickControlView->setWindowFlags(Qt::Window);
+
+    mainLayoutView->setContentsMargins(0,0,0,0);
     this->setLayout(mainLayoutView);
 
     getData();
@@ -159,4 +174,14 @@ void RealTimeSourceEstimateWidget::getData()
 void RealTimeSourceEstimateWidget::init()
 {
     m_bInitialized = true;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeSourceEstimateWidget::showQuickControlView()
+{
+    if(m_pQuickControlView) {
+        m_pQuickControlView->show();
+    }
 }
