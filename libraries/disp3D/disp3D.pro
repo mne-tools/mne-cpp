@@ -83,8 +83,8 @@ else {
 
 SOURCES += \
     engine/view/view3D.cpp \
+    engine/delegate/data3Dtreedelegate.cpp \
     engine/model/data3Dtreemodel.cpp \
-    engine/model/data3Dtreedelegate.cpp \
     engine/model/items/subject/subjecttreeitem.cpp \
     engine/model/items/measurement/measurementtreeitem.cpp \
     engine/model/items/freesurfer/fssurfacetreeitem.cpp \
@@ -136,8 +136,8 @@ SOURCES += \
 
 HEADERS += \
     engine/view/view3D.h \
+    engine/delegate/data3Dtreedelegate.h \
     engine/model/data3Dtreemodel.h \
-    engine/model/data3Dtreedelegate.h \
     engine/model/items/subject/subjecttreeitem.h \
     engine/model/items/measurement/measurementtreeitem.h \
     engine/model/items/freesurfer/fssurfacetreeitem.h \
