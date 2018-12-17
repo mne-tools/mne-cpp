@@ -405,7 +405,7 @@ void ChannelDataView::updateSpharaOptions(const QString& sSytemType, int nBaseFc
 
 void ChannelDataView::setFilter(const FilterData& filterData)
 {
-    m_pModel->filterChanged(QList<FilterData>() << filterData);
+    m_pModel->setFilter(QList<FilterData>() << filterData);
 }
 
 

@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "filterdesignview.h"
-#include "ui_filterview.h"
+#include "ui_filterdesignview.h"
 
 #include "helpers/filterplotscene.h"
 
@@ -88,7 +88,7 @@ FilterDesignView::FilterDesignView(const QString& sSettingsPath,
                        QWidget *parent,
                        Qt::WindowFlags f)
 : QWidget(parent, f)
-, ui(new Ui::FilterViewWidget)
+, ui(new Ui::FilterDesignViewWidget)
 , m_iWindowSize(4016)
 , m_iFilterTaps(512)
 , m_dSFreq(600)
