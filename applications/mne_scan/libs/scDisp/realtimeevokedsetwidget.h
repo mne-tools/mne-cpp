@@ -72,10 +72,6 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
-namespace DISPLIB{
-    class AveragingSettingsView;
-}
-
 namespace DISPLIB {
     class EvokedSetModel;
     class ButterflyView;
@@ -83,8 +79,6 @@ namespace DISPLIB {
     class ChannelInfoModel;
     class AverageLayoutView;
     class QuickControlView;
-    class ScalingView;
-    class ModalitySelectionView;
 }
 
 class QVBoxLayout;
@@ -193,7 +187,6 @@ private:
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< ChannelSelectionView. */
     QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Channel info model. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
-    QSharedPointer<DISPLIB::AveragingSettingsView>      m_pAveragingSettingsView;   /**< Holds averaging settings widget.*/
     QPointer<DISPLIB::AverageLayoutView>                m_pAverageLayoutView;       /**< 2D layout view for plotting averages*/
     QPointer<DISPLIB::ButterflyView>                    m_pButterflyView;           /**< Butterfly plot */
 
@@ -209,6 +202,9 @@ private:
     QPointer<QVBoxLayout>               m_pRTESetLayout;            /**< RTE Widget layout */
     QPointer<QLabel>                    m_pLabelInit;               /**< Initialization Label */
     QPointer<QToolBox>                  m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
+
+signals:
+    void windowSizeChanged(int iWindowSize);
 };
 
 } // NAMESPACE SCDISPLIB

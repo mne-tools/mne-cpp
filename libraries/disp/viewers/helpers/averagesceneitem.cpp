@@ -260,7 +260,8 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
             }
 
             //Create path
-            float offset = (*(averageData+(0*m_iTotalNumberChannels)+m_iChannelNumber)); //choose offset to be the signal value at first sample
+            //float offset = (*(averageData+(0*m_iTotalNumberChannels)+m_iChannelNumber)); //choose offset to be the signal value at first sample
+            float offset = 0;
             QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
             QPen pen;
             pen.setStyle(Qt::SolidLine);
@@ -277,14 +278,14 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
                 //evoked matrix is stored in column major
                 double val = ((*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber))-offset) * dScaleY;
 
-                //Cut plotting if three times bigger than m_iMaxHeigth
-                if(std::fabs(val) > 6*m_iMaxHeigth) {
-                    qSamplePosition.setY(-(val/val) * m_iMaxHeigth); //(val/val) used to retrieve sign of val
-                    qSamplePosition.setX(path.currentPosition().x()+1);
-                } else {
+//                //Cut plotting if six times bigger than m_iMaxHeigth
+//                if(std::fabs(val) > 6*m_iMaxHeigth) {
+//                    qSamplePosition.setY(-(val/val) * m_iMaxHeigth); //(val/val) used to retrieve sign of val
+//                    qSamplePosition.setX(path.currentPosition().x()+1);
+//                } else {
                     qSamplePosition.setY(-val);
                     qSamplePosition.setX(path.currentPosition().x()+1);
-                }
+//                }
 
                 path.lineTo(qSamplePosition);
             }
