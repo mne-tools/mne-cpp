@@ -103,7 +103,7 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
     m_pSourceEstimateView->setQuickControlWidgets(lControlWidgets);
 
     m_pQuickControlView = m_pSourceEstimateView->getQuickControl();
-    m_pQuickControlView->setWindowFlags(Qt::Window);
+    m_pQuickControlView->setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
 
     mainLayoutView->setContentsMargins(0,0,0,0);
     this->setLayout(mainLayoutView);
@@ -182,6 +182,7 @@ void RealTimeSourceEstimateWidget::init()
 void RealTimeSourceEstimateWidget::showQuickControlView()
 {
     if(m_pQuickControlView) {
+        m_pQuickControlView->raise();
         m_pQuickControlView->show();
     }
 }

@@ -102,7 +102,7 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
     m_pNetworkView->setQuickControlWidgets(lControlWidgets);
 
     m_pQuickControlView = m_pNetworkView->getQuickControl();
-    m_pQuickControlView->setWindowFlags(Qt::Window);
+    m_pQuickControlView->setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
 
     QGridLayout *mainLayoutView = new QGridLayout();
     mainLayoutView->addWidget(m_pNetworkView.data());
@@ -181,6 +181,7 @@ void RealTimeConnectivityEstimateWidget::init()
 void RealTimeConnectivityEstimateWidget::showQuickControlView()
 {
     if(m_pQuickControlView) {
+        m_pQuickControlView->raise();
         m_pQuickControlView->show();
     }
 }
