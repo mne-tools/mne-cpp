@@ -214,18 +214,13 @@ void RealTimeEvokedSetWidget::getData()
             if(m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {
                 m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
 
-//                m_pFilterView->setWindowSize(m_iMaxFilterTapSize);
-//                m_pFilterView->setMaxFilterTaps(m_iMaxFilterTapSize);
+                emit windowSizeChanged(m_iMaxFilterTapSize);
             }
         }
 
         FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
         pEvokedSet->info = *(m_pFiffInfo.data());
         m_pEvokedSetModel->setEvokedSet(pEvokedSet);
-
-        if(m_pAveragingSettingsView) {
-            m_pAveragingSettingsView->setDetectedEpochs(pEvokedSet);
-        }
     }
 }
 
@@ -320,6 +315,12 @@ void RealTimeEvokedSetWidget::init()
 
         connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::setFilter);
+
+        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
+                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setWindowSize);
+
+        connect(this, &RealTimeEvokedSetWidget::windowSizeChanged,
+                pFilterSettingsView->getFilterView().data(), &FilterDesignView::setMaxFilterTaps);
 
         connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::setFilterActive);
