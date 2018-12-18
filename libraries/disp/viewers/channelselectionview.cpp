@@ -105,6 +105,8 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
     initCheckBoxes();
 
     loadSettings(m_sSettingsPath);
+
+    setCurrentlyMappedFiffChannels(m_pChannelInfoModel->getMappedChannelsList());
 }
 
 
@@ -365,8 +367,9 @@ void ChannelSelectionView::updateBadChannels()
             digIndex = m_pChannelInfoModel->index(i,1);
             QString origChName = m_pChannelInfoModel->data(digIndex,ChannelInfoModelRoles::GetOrigChName).toString();
 
-            if(badChannelList.contains(origChName))
+            if(badChannelList.contains(origChName)) {
                 badChannelMappedNames << mappedChName;
+            }
         }
     }
 
@@ -740,6 +743,7 @@ void ChannelSelectionView::onComboBoxLayoutChanged()
 {
     QString selectionName(ui->m_comboBox_layoutFile->currentText());
     loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/2DLayouts/"));
+    updateBadChannels();
 }
 
 

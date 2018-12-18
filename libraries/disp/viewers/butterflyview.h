@@ -110,7 +110,7 @@ public:
     *
     * @param [in] model     The new evoked set model.
     */
-    void setModel(QSharedPointer<EvokedSetModel> model);
+    void setEvokedSetModel(QSharedPointer<EvokedSetModel> model);
 
     //=========================================================================================================
     /**
@@ -218,7 +218,7 @@ public:
     *
     * @param [in] pChannelInfoModel     The new channel info model.
     */
-    void setModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
+    void setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
 
     //=========================================================================================================
     /**

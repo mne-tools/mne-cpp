@@ -199,22 +199,19 @@ void RealTimeMultiSampleArrayWidget::init()
                                                                      m_pChannelInfoModel,
                                                                      Qt::Window);
 
-        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
-                m_pChannelDataView.data(), &ChannelDataView::showSelectedChannelsOnly);
-
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
                 m_pChannelInfoModel.data(), &ChannelInfoModel::layoutChanged);
-
-        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
-                m_pChannelSelectionView.data(), &ChannelSelectionView::updateBadChannels);
-
-        connect(m_pChannelDataView.data(), &ChannelDataView::channelMarkingChanged,
-                m_pChannelSelectionView.data(), &ChannelSelectionView::updateBadChannels);
 
         connect(m_pChannelInfoModel.data(), &ChannelInfoModel::channelsMappedToLayout,
                 m_pChannelSelectionView.data(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
-        m_pChannelInfoModel->setFiffInfo(m_pFiffInfo);
+        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
+                m_pChannelDataView.data(), &ChannelDataView::showSelectedChannelsOnly);
+
+        connect(m_pChannelDataView.data(), &ChannelDataView::channelMarkingChanged,
+                m_pChannelSelectionView.data(), &ChannelSelectionView::updateBadChannels);
+
+        m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
         //Init quick control widget
         QStringList slFlags = m_pRTMSA->getDisplayFlags();

@@ -269,7 +269,7 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::selectionChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::channelSelectionManagerChanged);
 
-        m_pChannelInfoModel->setFiffInfo(m_pFiffInfo);
+        m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
         // Quick control scaling        
         ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName),
@@ -392,20 +392,20 @@ void RealTimeEvokedSetWidget::init()
         m_pEvokedSetModel->setAverageColor(pAverageSelectionView->getAverageColor());
 
         // View settings
-        m_pButterflyView->setModel(m_pEvokedSetModel);
+        m_pButterflyView->setEvokedSetModel(m_pEvokedSetModel);
         m_pButterflyView->setAverageActivation(pAverageSelectionView->getAverageActivation());
         m_pButterflyView->setAverageColor(pAverageSelectionView->getAverageColor());
-        m_pButterflyView->setModel(m_pChannelInfoModel);
+        m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
         m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
         m_pButterflyView->setModalityMap(pModalitySelectionView->getModalityMap());
 
         // Call this function before the layout calls below so that the scene items are drawn first
         m_pChannelSelectionView->updateDataView();
 
-        m_pAverageLayoutView->setModel(m_pEvokedSetModel);
+        m_pAverageLayoutView->setEvokedSetModel(m_pEvokedSetModel);
         m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
         m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
-        m_pAverageLayoutView->setModel(m_pChannelInfoModel);
+        m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
         m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
 
         //Initialized
@@ -430,6 +430,7 @@ void RealTimeEvokedSetWidget::showSensorSelectionWidget()
 
 void RealTimeEvokedSetWidget::showQuickControlWidget()
 {
+    m_pQuickControlView->raise();
     m_pQuickControlView->show();
 }
 

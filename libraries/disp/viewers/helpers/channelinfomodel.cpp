@@ -79,6 +79,7 @@ ChannelInfoModel::ChannelInfoModel(FiffInfo::SPtr& pFiffInfo, QObject *parent)
 : QAbstractTableModel(parent)
 , m_pFiffInfo(pFiffInfo)
 {
+    setFiffInfo(m_pFiffInfo);
 }
 
 
