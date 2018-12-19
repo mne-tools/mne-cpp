@@ -163,6 +163,14 @@ private:
 
     //=========================================================================================================
     /**
+    * Call this function whenever the surface color was changed.
+    *
+    * @param[in] color        The new surface color.
+    */
+    virtual void onColorChanged(const QVariant& color);
+
+    //=========================================================================================================
+    /**
     * Call this function whenever you want to calculate the indices/tris for a network.
     *
     * @param[in] tNetworkData     The network data.
