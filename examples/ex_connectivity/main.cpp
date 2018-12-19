@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
 
     QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
@@ -318,7 +318,7 @@ int main(int argc, char *argv[])
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
         minimumNorm.doInverseSetup(1,false);
 
-        picks = raw.info.pick_types(QString("all"),false,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        picks = raw.info.pick_types(QString("all"),true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
         data.pick_channels(picks);
         for(int i = 0; i < data.size(); i++) {
             sourceEstimate = minimumNorm.calculateInverse(data.at(i)->epoch,

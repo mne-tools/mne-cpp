@@ -215,6 +215,26 @@ void AbstractMeshTreeItem::setMaterial(Qt3DRender::QMaterial* pMaterial)
 
 //*************************************************************************************************************
 
+void AbstractMeshTreeItem::setVertices(const MatrixX3f& tMatVert,
+                                       const MatrixX3f& tMatNorm,
+                                       const MatrixXi& tMatTris,
+                                       const MatrixX3f& tMatColors,
+                                       Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
+{
+    if(m_pCustomMesh) {
+        m_pCustomMesh->setMeshData(tMatVert,
+                                   tMatNorm,
+                                   tMatTris,
+                                   tMatColors,
+                                   primitiveType);
+
+        this->setData(QVariant(tMatVert.rows()), Data3DTreeModelItemRoles::NumberVertices);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void AbstractMeshTreeItem::onSurfaceTessInnerChanged(const QVariant& fTessInner)
 {
     this->setMaterialParameter(fTessInner.toFloat(), "innerTess");
