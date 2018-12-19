@@ -149,6 +149,9 @@ void RealTimeConnectivityEstimateWidget::getData()
             }
         } else {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem";
+            QPair<int,int> bins = m_pRTCE->getValue()->getFrequencyBins();
+            QString sItemName = QString("%1_%2_%3").arg(m_pRTCE->getValue()->getConnectivityMethod()).arg(QString::number(bins.first)).arg(QString::number(bins.second));
+            m_pRtItem->setText(sItemName);
             m_pRtItem->addData(*(m_pRTCE->getValue().data()));
         }
     }

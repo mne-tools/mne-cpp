@@ -86,6 +86,8 @@ NetworkView::~NetworkView()
 NetworkTreeItem* NetworkView::addData(const Network& tNetworkData)
 {
     //Add network data
-    return m_pData3DModel->addConnectivityData("sample", "Connectivity", tNetworkData);
+    return m_pData3DModel->addConnectivityData("sample",
+                                               QString("Connectivity"),
+                                               tNetworkData);
 }
 

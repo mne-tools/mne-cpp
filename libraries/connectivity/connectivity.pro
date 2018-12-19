@@ -38,8 +38,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT -= gui
 QT += concurrent
+QT -= gui
 
 DEFINES += CONNECTIVITY_LIBRARY
 

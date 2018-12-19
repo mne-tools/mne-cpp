@@ -106,6 +106,18 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns a Jet RGB to a given double value [0,1] and a colormap specified by sMap.
+    * If no matching colormap was found return Jet.
+    *
+    * @param[in] v      the double which has to be part of the intervall [0,1]
+    * @param[in] sMap   the colormap to choose
+    *
+    * @return the corresponding RGB value
+    */
+    static inline QRgb valueToColor(double v, const QString& sMap);
+
+    //=========================================================================================================
+    /**
     * Returns a Jet RGB to a given double value [0,1]
     *
     * @param[in] v      the double which has to be part of the intervall [0,1]
@@ -353,6 +365,35 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline QRgb ColorMap::valueToColor(double v, const QString& sMap)
+{
+    if(sMap == "Hot") {
+        return valueToHot(v);
+    }
+
+    if(sMap == "HotNegative1") {
+        return valueToHotNegative1(v);
+    }
+
+    if(sMap == "HotNegative2") {
+        return valueToHotNegative2(v);
+    }
+
+    if(sMap == "Bone") {
+        return valueToBone(v);
+    }
+
+    if(sMap == "RedBlue") {
+        return valueToRedBlue(v);
+    }
+
+    // If no matching colormap was found return Jet
+    return valueToJet(v);
+}
+
+
+//*************************************************************************************************************
 
 inline QRgb ColorMap::valueToJet(double v)
 {
