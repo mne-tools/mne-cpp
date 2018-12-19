@@ -92,6 +92,7 @@ Network::Network(const QString& sConnectivityMethod,
 , m_dThreshold(dThreshold)
 {
     qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
+    qRegisterMetaType<CONNECTIVITYLIB::Network::SPtr>("CONNECTIVITYLIB::Network::SPtr");
 }
 
 
@@ -399,7 +400,7 @@ void Network::setFrequencyBins(int iLowerBin, int iUpperBin)
 
 //*************************************************************************************************************
 
-const QPair<int,int>& Network::getFrequencyBins()
+const QPair<int,int>& Network::getFrequencyBins() const
 {
     return m_minMaxFrequencyBins;
 }
@@ -465,4 +466,20 @@ void Network::normalize()
 
     m_minMaxThresholdedWeights.first = m_minMaxThresholdedWeights.first/m_minMaxThresholdedWeights.second;
     m_minMaxThresholdedWeights.second = 1.0;
+}
+
+
+//*************************************************************************************************************
+
+VisualizationInfo Network::getVisualizationInfo() const
+{
+    return m_visualizationInfo;
+}
+
+
+//*************************************************************************************************************
+
+void Network::setVisualizationInfo(const VisualizationInfo& visualizationInfo)
+{
+    m_visualizationInfo = visualizationInfo;
 }
