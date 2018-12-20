@@ -88,7 +88,7 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
 , m_pRTCE(pRTCE)
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)
-, m_pNetworkView(new NetworkView())
+, m_pAbstractView(new AbstractView())
 {
     m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget (F9)"),this);
     m_pActionQuickControl->setShortcut(tr("F9"));
@@ -99,13 +99,15 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
     m_pActionQuickControl->setVisible(true);
 
     QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTCE->getControlWidgets();
-    m_pNetworkView->setQuickControlWidgets(lControlWidgets);
+    m_pAbstractView->setQuickControlWidgets(lControlWidgets);
 
-    m_pQuickControlView = m_pNetworkView->getQuickControl();
+    m_pQuickControlView = m_pAbstractView->getQuickControl();
     m_pQuickControlView->setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
+    m_pQuickControlView->setDraggable(true);
+    m_pQuickControlView->setVisiblityHideOpacityClose(true);
 
     QGridLayout *mainLayoutView = new QGridLayout();
-    mainLayoutView->addWidget(m_pNetworkView.data());
+    mainLayoutView->addWidget(m_pAbstractView.data());
     mainLayoutView->setContentsMargins(0,0,0,0);
     this->setLayout(mainLayoutView);
 }
@@ -141,12 +143,12 @@ void RealTimeConnectivityEstimateWidget::getData()
         // Add rt brain data
         if(!m_pRtItem) {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem";
-            m_pRtItem = m_pNetworkView->addData("sample",
-                                                "Connectivity",
-                                                *(m_pRTCE->getValue().data()));
+            m_pRtItem = m_pAbstractView->getTreeModel()->addConnectivityData("sample",
+                                                                            "Connectivity",
+                                                                            *(m_pRTCE->getValue().data()));
 
             if(m_pRTCE->getSurfSet() && m_pRTCE->getAnnotSet()) {
-                QList<FsSurfaceTreeItem*> lSurfaces = m_pNetworkView->getTreeModel()->addSurfaceSet("sample",
+                QList<FsSurfaceTreeItem*> lSurfaces = m_pAbstractView->getTreeModel()->addSurfaceSet("sample",
                                                                                                     "MRI",
                                                                                                     *(m_pRTCE->getSurfSet().data()),
                                                                                                     *(m_pRTCE->getAnnotSet().data()));
@@ -157,7 +159,7 @@ void RealTimeConnectivityEstimateWidget::getData()
             }
 
             if(m_pRTCE->getSensorSurface() && m_pRTCE->getFiffInfo()) {
-                m_pNetworkView->getTreeModel()->addMegSensorInfo("sample",
+                m_pAbstractView->getTreeModel()->addMegSensorInfo("sample",
                                                                  "Sensors",
                                                                  m_pRTCE->getFiffInfo()->chs,
                                                                  *(m_pRTCE->getSensorSurface()));

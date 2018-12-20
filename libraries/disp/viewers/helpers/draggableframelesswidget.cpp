@@ -90,6 +90,14 @@ DraggableFramelessWidget::~DraggableFramelessWidget()
 
 //*************************************************************************************************************
 
+void DraggableFramelessWidget::setDraggable(bool bFlag)
+{
+        m_bDraggable = bFlag;
+}
+
+
+//*************************************************************************************************************
+
 void DraggableFramelessWidget::mousePressEvent(QMouseEvent *event)
 {
     if(!m_bDraggable) {

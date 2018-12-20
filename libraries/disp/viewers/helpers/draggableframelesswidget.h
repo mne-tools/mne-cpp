@@ -113,6 +113,14 @@ public:
     */
     ~DraggableFramelessWidget();
 
+    //=========================================================================================================
+    /**
+    * Set the draggable flag of this widget.
+    *
+    * @param [in] bFlag  the flag to set.
+    */
+    void setDraggable(bool bFlag);
+
 protected:
     //=========================================================================================================
     /**
