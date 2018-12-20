@@ -44,14 +44,13 @@
 
 #include <disp3D/viewers/networkview.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D/engine/model/items/network/networktreeitem.h>
+#include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
-
-#include <disp3D/engine/model/items/network/networktreeitem.h>
-#include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
-#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -380,27 +379,21 @@ int main(int argc, char *argv[])
     pConnectivitySettingsManager->m_settings.setSamplingFrequency(raw.info.sfreq);
     pConnectivitySettingsManager->m_settings.setWindowType("hanning");
 
-    //Create NetworkView and add extra control widgets to output data (will be used by QuickControlView in RealTimeConnectivityEstimateWidget)
+    //Create NetworkView
     NetworkView tNetworkView;
-
-    ConnectivitySettingsView::SPtr pConnectivitySettingsView = ConnectivitySettingsView::SPtr::create();
-
-    QList<QSharedPointer<QWidget> > lWidgets;
-    lWidgets << pConnectivitySettingsView;
-    tNetworkView.setQuickControlWidgets(lWidgets);
     tNetworkView.show();
 
-    QObject::connect(pConnectivitySettingsView.data(), &ConnectivitySettingsView::connectivityMetricChanged,
+    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::connectivityMetricChanged,
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onConnectivityMetricChanged);
 
-    QObject::connect(pConnectivitySettingsView.data(), &ConnectivitySettingsView::numberTrialsChanged,
+    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::numberTrialsChanged,
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onNumberTrialsChanged);
 
-    QObject::connect(pConnectivitySettingsView.data(), &ConnectivitySettingsView::freqBandChanged,
+    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::freqBandChanged,
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onFreqBandChanged);
 
     QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
-                     &tNetworkView, &NetworkView::addData);
+                     &tNetworkView, QOverload<const QString&, const QString&, const Network&>::of(&NetworkView::addData));
 
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
@@ -429,7 +422,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    pConnectivitySettingsView->setNumberTrials(1);
+    tNetworkView.getConnectivitySettingsView()->setNumberTrials(1);
     pConnectivitySettingsManager->onNumberTrialsChanged(1);
 
     return a.exec();

@@ -100,7 +100,7 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
 //    qint64 iTime = 0;
 //    timer.start();
 
-    Network finalNetwork("Coherence");
+    Network finalNetwork("COH");
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "Coherence::coherence - Input data is empty";

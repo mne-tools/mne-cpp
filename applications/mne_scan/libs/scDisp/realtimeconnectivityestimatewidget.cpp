@@ -128,7 +128,9 @@ void RealTimeConnectivityEstimateWidget::getData()
         // Add rt brain data
         if(!m_pRtItem) {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem";
-            m_pRtItem = m_pNetworkView->addData(*(m_pRTCE->getValue().data()));
+            m_pRtItem = m_pNetworkView->addData("sample",
+                                                "Connectivity",
+                                                *(m_pRTCE->getValue().data()));
 
             if(m_pRTCE->getSurfSet() && m_pRTCE->getAnnotSet()) {
                 QList<FsSurfaceTreeItem*> lSurfaces = m_pNetworkView->getTreeModel()->addSurfaceSet("sample",

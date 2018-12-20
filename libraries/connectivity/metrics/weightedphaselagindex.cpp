@@ -102,7 +102,7 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
 //    qint64 iTime = 0;
 //    timer.start();
 
-    Network finalNetwork("Phase Lag Index");
+    Network finalNetwork("PLI");
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "WeightedPhaseLagIndex::calculate - Input data is empty";

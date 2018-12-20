@@ -111,6 +111,14 @@ public:
     */
     static Network calculate(ConnectivitySettings& connectivitySettings);
 
+    //=========================================================================================================
+    /**
+    * Computes the network based on the current settings.
+    *
+    * @return Returns the list with calculated networks for each provided method.
+    */
+    static QList<Network> calculateMultiMethods(ConnectivitySettings& connectivitySettings);
+
 protected:
 };
 

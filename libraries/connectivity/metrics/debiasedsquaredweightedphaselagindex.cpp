@@ -102,7 +102,7 @@ Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& co
 //    qint64 iTime = 0;
 //    timer.start();
 
-    Network finalNetwork("Debiased Squared Weighted Phase Lag Index");
+    Network finalNetwork("DSWPLI");
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::calculate - Input data is empty";
