@@ -44,7 +44,7 @@ QT += widgets 3dextras
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = ex_connnectivity_comparison
+TARGET = ex_connectivity_comparison
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
