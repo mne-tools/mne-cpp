@@ -695,7 +695,7 @@ void BabyMEG::setFileName(const QString& sFileName)
 
 void BabyMEG::showProjectDialog()
 {
-    if(!m_pProjectSettingsView) {
+    if(m_pProjectSettingsView) {
         m_pProjectSettingsView->show();
     }
 }

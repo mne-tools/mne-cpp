@@ -105,7 +105,15 @@ FilterData::FilterData()
 
 //*************************************************************************************************************
 
-FilterData::FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength, DesignMethod designMethod)
+FilterData::FilterData(QString unique_name,
+                       FilterType type,
+                       int order,
+                       double centerfreq,
+                       double bandwidth,
+                       double parkswidth,
+                       double sFreq,
+                       qint32 fftlength,
+                       DesignMethod designMethod)
 : m_Type(type)
 , m_iFilterOrder(order)
 , m_iFFTlength(fftlength)
@@ -126,7 +134,11 @@ void FilterData::designFilter()
 {
     switch(m_designMethod) {
         case Tschebyscheff: {
-            ParksMcClellan filter(m_iFilterOrder, m_dCenterFreq, m_dBandwidth, m_dParksWidth, (ParksMcClellan::TPassType)m_Type);
+            ParksMcClellan filter(m_iFilterOrder,
+                                  m_dCenterFreq,
+                                  m_dBandwidth,
+                                  m_dParksWidth,
+                                  (ParksMcClellan::TPassType)m_Type);
             m_dCoeffA = filter.FirCoeff;
 
             //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
@@ -140,35 +152,35 @@ void FilterData::designFilter()
 
             switch(m_Type) {
                 case LPF:
-                    filtercos = CosineFilter (m_iFFTlength,
-                                            (m_dCenterFreq)*(m_sFreq/2),
-                                            m_dParksWidth*(m_sFreq/2),
-                                            (m_dCenterFreq)*(m_sFreq/2),
-                                            m_dParksWidth*(m_sFreq/2),
-                                            m_sFreq,
-                                            (CosineFilter::TPassType)m_Type);
+                    filtercos = CosineFilter(m_iFFTlength,
+                                             (m_dCenterFreq)*(m_sFreq/2),
+                                             m_dParksWidth*(m_sFreq/2),
+                                             (m_dCenterFreq)*(m_sFreq/2),
+                                             m_dParksWidth*(m_sFreq/2),
+                                             m_sFreq,
+                                             (CosineFilter::TPassType)m_Type);
 
                     break;
 
                 case HPF:
-                    filtercos = CosineFilter (m_iFFTlength,
-                                            (m_dCenterFreq)*(m_sFreq/2),
-                                            m_dParksWidth*(m_sFreq/2),
-                                            (m_dCenterFreq)*(m_sFreq/2),
-                                            m_dParksWidth*(m_sFreq/2),
-                                            m_sFreq,
-                                            (CosineFilter::TPassType)m_Type);
+                    filtercos = CosineFilter(m_iFFTlength,
+                                             (m_dCenterFreq)*(m_sFreq/2),
+                                             m_dParksWidth*(m_sFreq/2),
+                                             (m_dCenterFreq)*(m_sFreq/2),
+                                             m_dParksWidth*(m_sFreq/2),
+                                             m_sFreq,
+                                             (CosineFilter::TPassType)m_Type);
 
                     break;
 
                 case BPF:
-                    filtercos = CosineFilter (m_iFFTlength,
-                                            (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2),
-                                            m_dParksWidth*(m_sFreq/2),
-                                            (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2),
-                                            m_dParksWidth*(m_sFreq/2),
-                                            m_sFreq,
-                                            (CosineFilter::TPassType)m_Type);
+                    filtercos = CosineFilter(m_iFFTlength,
+                                             (m_dCenterFreq + m_dBandwidth/2)*(m_sFreq/2),
+                                             m_dParksWidth*(m_sFreq/2),
+                                             (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2),
+                                             m_dParksWidth*(m_sFreq/2),
+                                             m_sFreq,
+                                             (CosineFilter::TPassType)m_Type);
 
                     break;
             }

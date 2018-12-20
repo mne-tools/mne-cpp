@@ -51,6 +51,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <Qt3DRender/QGeometryRenderer>
 #include <QPointer>
 
 
@@ -125,6 +126,22 @@ public:
     virtual void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     virtual void setMaterial(Qt3DRender::QMaterial *pMaterial);
+
+    //=========================================================================================================
+    /**
+    * Set the needed information to create the mesh and then creates a new mesh.
+    *
+    * @param[in] tMatVert       Vertices in form of a matrix.
+    * @param[in] tMatNorm       Normals in form of a matrix.
+    * @param[in] tMatTris       Tris/Faces in form of a matrix.
+    * @param[in] tMatColors     The color info of all the vertices.
+    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
+    */
+    void setVertices(const Eigen::MatrixX3f& tMatVert,
+                     const Eigen::MatrixX3f& tMatNorm,
+                     const Eigen::MatrixXi& tMatTris,
+                     const Eigen::MatrixX3f& tMatColors,
+                     Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
 
     //=========================================================================================================
     /**

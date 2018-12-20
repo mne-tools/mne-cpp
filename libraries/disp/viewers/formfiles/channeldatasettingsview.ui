@@ -107,7 +107,7 @@
      <item row="2" column="0">
       <widget class="QLabel" name="label_timeSpacers">
        <property name="text">
-        <string>Time spacer every</string>
+        <string>Time spacer every (ms):</string>
        </property>
       </widget>
      </item>
@@ -121,26 +121,26 @@
      <item row="2" column="1">
       <widget class="QComboBox" name="m_comboBox_distaceTimeSpacer">
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
        <item>
         <property name="text">
-         <string>100ms</string>
+         <string>100</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>200ms</string>
+         <string>200</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>500ms</string>
+         <string>500</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>1000ms</string>
+         <string>1000</string>
         </property>
        </item>
       </widget>

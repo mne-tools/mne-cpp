@@ -40,7 +40,7 @@
 
 #include "compensatorview.h"
 
-#include <fiff/fiff_info.h>
+#include <fiff/fiff_ctf_comp.h>
 
 
 //*************************************************************************************************************
@@ -51,6 +51,8 @@
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QSignalMapper>
+#include <QSettings>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -73,76 +75,161 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CompensatorView::CompensatorView(QWidget *parent,
-                         Qt::WindowFlags f)
+CompensatorView::CompensatorView(const QString& sSettingsPath,
+                                 QWidget *parent,
+                                 Qt::WindowFlags f)
 : QWidget(parent, f)
-, m_pCompSignalMapper(new QSignalMapper(this))
+, m_sSettingsPath(sSettingsPath)
+, m_iLastTo(0)
 {
     this->setWindowTitle("Compensators");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
+
+    loadSettings(m_sSettingsPath);
+    redrawGUI();
 }
 
 
 //*************************************************************************************************************
 
-void CompensatorView::init(const FiffInfo::SPtr pFiffInfo)
+CompensatorView::~CompensatorView()
 {
-    if(pFiffInfo) {
-        m_pFiffInfo = pFiffInfo;
+    saveSettings(m_sSettingsPath);
+}
 
-        m_qListCompCheckBox.clear();
 
-        // Compensation Selection
-        QGridLayout *topLayout = new QGridLayout;
+//*************************************************************************************************************
 
-        qint32 i=0;
+QList<FIFFLIB::FiffCtfComp> CompensatorView::getCompensators() const
+{
+    return m_pComps;
+}
 
-        for(i; i < m_pFiffInfo->comps.size(); ++i)
-        {
-            QString numStr;
-            QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pFiffInfo->comps[i].kind));
 
-            m_qListCompCheckBox.append(checkBox);
+//*************************************************************************************************************
 
-            connect(checkBox, SIGNAL(clicked()),
-                        m_pCompSignalMapper, SLOT(map()));
+void CompensatorView::setCompensators(const QList<FIFFLIB::FiffCtfComp>& comps)
+{
+    m_pComps = comps;
 
-            m_pCompSignalMapper->setMapping(checkBox, numStr);
-
-            topLayout->addWidget(checkBox, i, 0);
-
+    for(int i = 0; i < m_pComps.size(); ++i) {
+        if(!m_mapCompActive.contains(m_pComps.at(i).kind)) {
+            m_mapCompActive.insert(m_pComps.at(i).kind, false);
         }
+    }
 
-        connect(m_pCompSignalMapper, SIGNAL(mapped(const QString &)),
-                    this, SIGNAL(compClicked(const QString &)));
+    redrawGUI();
+}
 
-        connect(this, &CompensatorView::compClicked,
+
+//*************************************************************************************************************
+
+int CompensatorView::getLastTo() const
+{
+    return m_iLastTo;
+}
+
+
+//*************************************************************************************************************
+
+void CompensatorView::redrawGUI()
+{
+    if(m_pComps.isEmpty()) {
+        return;
+    }
+
+    m_qListCompCheckBox.clear();
+
+    // Compensation Selection
+    QGridLayout *topLayout = new QGridLayout;
+
+    for(int i = 0; i < m_pComps.size(); ++i) {
+        QString numStr;
+        QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pComps[i].kind));
+
+        m_qListCompCheckBox.append(checkBox);
+
+        connect(checkBox, &QCheckBox::toggled,
                 this, &CompensatorView::onCheckCompStatusChanged);
 
-        //Find Comp tab and add current layout
-        this->setLayout(topLayout);
+        checkBox->setChecked(m_mapCompActive[m_pComps.at(i).kind]);
+
+        topLayout->addWidget(checkBox, i, 0);
     }
+
+    //Find Comp tab and add current layout
+    this->setLayout(topLayout);
 }
 
 
 //*************************************************************************************************************
 
-void CompensatorView::onCheckCompStatusChanged(const QString & compName)
+void CompensatorView::saveSettings(const QString& settingsPath)
 {
-    bool currentState = false;
+    if(settingsPath.isEmpty()) {
+        return;
+    }
 
-    for(int i = 0; i < m_qListCompCheckBox.size(); ++i) {
-        if(m_qListCompCheckBox[i]->text() != compName) {
-            m_qListCompCheckBox[i]->setChecked(false);
-        } else {
-            currentState = m_qListCompCheckBox[i]->isChecked();
+    QSettings settings;
+
+    settings.beginGroup(settingsPath + QString("/compensatorActive"));
+
+    QMap<int,bool>::const_iterator iComp = m_mapCompActive.constBegin();
+    while (iComp != m_mapCompActive.constEnd()) {
+         settings.setValue(QString::number(iComp.key()), iComp.value());
+         ++iComp;
+    }
+
+    settings.endGroup();
+}
+
+
+//*************************************************************************************************************
+
+void CompensatorView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    settings.beginGroup(settingsPath + QString("/compensatorActive"));
+
+    QStringList keys = settings.childKeys();
+    foreach (QString key, keys) {
+        m_mapCompActive[key.toInt()] = settings.value(key).toBool();
+    }
+
+    settings.endGroup();
+}
+
+
+//*************************************************************************************************************
+
+void CompensatorView::onCheckCompStatusChanged()
+{    
+   if(QCheckBox* pCheckBox = qobject_cast<QCheckBox*>(sender())) {
+        bool currentState = false;
+        QString compName = pCheckBox->text();
+
+        for(int i = 0; i < m_qListCompCheckBox.size(); ++i) {
+            if(m_qListCompCheckBox[i]->text() != compName) {
+                m_qListCompCheckBox[i]->setChecked(false);
+                m_mapCompActive[compName.toInt()] = false;
+            } else {
+                currentState = m_qListCompCheckBox[i]->isChecked();
+                m_mapCompActive[compName.toInt()] = currentState;
+            }
         }
-    }
 
-    if(currentState) {
-        emit compSelectionChanged(compName.toInt());
-    } else { //If none selected
-        emit compSelectionChanged(0);
-    }
+        if(currentState) {
+            emit compSelectionChanged(compName.toInt());
+            m_iLastTo = compName.toInt();
+        } else { //If none selected
+            emit compSelectionChanged(0);
+            m_iLastTo = 0;
+        }
+   }
 }

@@ -79,6 +79,7 @@ ChannelInfoModel::ChannelInfoModel(FiffInfo::SPtr& pFiffInfo, QObject *parent)
 : QAbstractTableModel(parent)
 , m_pFiffInfo(pFiffInfo)
 {
+    setFiffInfo(m_pFiffInfo);
 }
 
 
@@ -552,7 +553,7 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
 
 //*************************************************************************************************************
 
-void ChannelInfoModel::fiffInfoChanged(FiffInfo::SPtr& pFiffInfo)
+void ChannelInfoModel::setFiffInfo(FiffInfo::SPtr& pFiffInfo)
 {
     beginResetModel();
 

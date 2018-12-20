@@ -49,6 +49,7 @@
 //=============================================================================================================
 
 #include <QColorDialog>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -70,22 +71,34 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelDataSettingsView::ChannelDataSettingsView(QWidget *parent,
-                         Qt::WindowFlags f)
+ChannelDataSettingsView::ChannelDataSettingsView(const QString &sSettingsPath,
+                                                 QWidget *parent,
+                                                 Qt::WindowFlags f)
 : QWidget(parent, f)
 , ui(new Ui::ChannelDataSettingsViewWidget)
+, m_sSettingsPath(sSettingsPath)
 {
     ui->setupUi(this);
 
     this->setWindowTitle("Channel Data View Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
+
+    loadSettings(m_sSettingsPath);
 }
 
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::init(const QStringList& lVisibleWidgets)
+ChannelDataSettingsView::~ChannelDataSettingsView()
+{
+    saveSettings(m_sSettingsPath);
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataSettingsView::setWidgetList(const QStringList& lVisibleWidgets)
 {
     if(lVisibleWidgets.contains("numberChannels", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Number of visible channels
@@ -147,21 +160,29 @@ void ChannelDataSettingsView::init(const QStringList& lVisibleWidgets)
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::setViewParameters(double zoomFactor, int windowSize)
+void ChannelDataSettingsView::setWindowSize(int windowSize)
 {
-    ui->m_doubleSpinBox_numberVisibleChannels->setValue(zoomFactor);
     ui->m_spinBox_windowSize->setValue(windowSize);
 
-    zoomChanged(zoomFactor);
     timeWindowChanged(windowSize);
 }
 
 
 //*************************************************************************************************************
 
-QString ChannelDataSettingsView::getDistanceTimeSpacer()
+void ChannelDataSettingsView::setZoom(double zoomFactor)
 {
-    return ui->m_comboBox_distaceTimeSpacer->currentText();
+    ui->m_doubleSpinBox_numberVisibleChannels->setValue(zoomFactor);
+
+    zoomChanged(zoomFactor);
+}
+
+
+//*************************************************************************************************************
+
+int ChannelDataSettingsView::getDistanceTimeSpacer()
+{
+    return ui->m_comboBox_distaceTimeSpacer->currentText().toInt();
 }
 
 
@@ -175,12 +196,20 @@ void ChannelDataSettingsView::setDistanceTimeSpacer(int value)
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::setSignalBackgroundColors(const QColor& signalColor, const QColor& backgroundColor)
+void ChannelDataSettingsView::setBackgroundColor(const QColor& backgroundColor)
 {
     ui->m_pushButton_backgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
-    ui->m_pushButton_signalColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(signalColor.red()).arg(signalColor.green()).arg(signalColor.blue()));
 
     m_colCurrentBackgroundColor = backgroundColor;
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataSettingsView::setSignalColor(const QColor& signalColor)
+{
+    ui->m_pushButton_signalColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(signalColor.red()).arg(signalColor.green()).arg(signalColor.blue()));
+
     m_colCurrentSignalColor = signalColor;
 }
 
@@ -198,6 +227,59 @@ const QColor& ChannelDataSettingsView::getSignalColor()
 const QColor& ChannelDataSettingsView::getBackgroundColor()
 {
     return m_colCurrentBackgroundColor;
+}
+
+
+//*************************************************************************************************************
+
+double ChannelDataSettingsView::getZoom()
+{
+    return ui->m_doubleSpinBox_numberVisibleChannels->value();
+}
+
+
+//*************************************************************************************************************
+
+int ChannelDataSettingsView::getWindowSize()
+{
+    return ui->m_spinBox_windowSize->value();
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataSettingsView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    settings.setValue(settingsPath + QString("/viewZoomFactor"), getZoom());
+    settings.setValue(settingsPath + QString("/viewWindowSize"), getWindowSize());
+    settings.setValue(settingsPath + QString("/signalColor"), getSignalColor());
+    settings.setValue(settingsPath + QString("/backgroundColor"), getBackgroundColor());
+    settings.setValue(settingsPath + QString("/distanceTimeSpacer"), getDistanceTimeSpacer());
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataSettingsView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+    setZoom(settings.value(settingsPath + QString("/viewZoomFactor"), 0.3).toDouble());
+    setWindowSize(settings.value(settingsPath + QString("/viewWindowSize"), 10).toInt());
+    QColor color = Qt::blue;
+    setSignalColor(settings.value(settingsPath + QString("/signalColor"), color).value<QColor>());
+    color = Qt::black;
+    setBackgroundColor(settings.value(settingsPath + QString("/backgroundColor"), color).value<QColor>());
+    setDistanceTimeSpacer(settings.value(settingsPath + QString("/distanceTimeSpacer"), 1000).toInt());
 }
 
 

@@ -153,19 +153,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Change the average mode
-    *
-    * @param[in] mode     average mode (0-running or 1-cumulative)
-    */
-    void onChangeAverageMode(qint32 mode);
-
-    //=========================================================================================================
-    /**
     * Change the stim channel
     *
-    * @param[in] index     the new stim channel index
+    * @param[in] sStimCh     the new stim channel name
     */
-    void onChangeStimChannel(qint32 index);
+    void onChangeStimChannel(const QString &sStimCh);
 
     //=========================================================================================================
     /**
@@ -187,26 +179,13 @@ public:
     /**
     * Change the threshold value for trial rejection
     *
-    * @param[in] thresholdFirst     the new first component of the the rejection threshold value
-    * @param[in] thresholdSecond    the new second component (e-...) of the the rejection threshold value
+    * @param[in] bDoArtifactReduction       whether to perform artifact reduction
+    * @param[in] thresholdFirst             the new first component of the the rejection threshold value
+    * @param[in] thresholdSecond            the new second component (e-...) of the the rejection threshold value
     */
-    void onChangeArtifactThreshold(double thresholdFirst, int thresholdSecond);
-
-    //=========================================================================================================
-    /**
-    * Change the state of the artifact rejection based on thresholding
-    *
-    * @param[in] state     the new state
-    */
-    void onChangeArtifactThresholdReductionActive(bool state);
-
-    //=========================================================================================================
-    /**
-    * Change the variance value for trial rejection
-    *
-    * @param[in] dVariance     the new value (dVariance times calculated variance is to be rejected)
-    */
-    void onChangeArtifactVariance(double dVariance);
+    void onChangeArtifactThreshold(bool bDoArtifactThresholdReduction,
+                                   double thresholdFirst,
+                                   int thresholdSecond);
 
     //=========================================================================================================
     /**
@@ -274,33 +253,15 @@ private:
     QMutex                                          m_qMutex;                           /**< Provides access serialization between threads. */
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                        /**< Fiff measurement info.*/
-    QList<qint32>                                   m_qListStimChs;                     /**< Stimulus channels.*/
 
-    QSharedPointer<RTPROCESSINGLIB::RtAve>          m_pRtAve;                           /**< Real-time average. */
+    QSharedPointer<RTPROCESSINGLIB::RtAve>          m_pRtAve;                           /**< Real-time average object. */
 
     bool                                            m_bIsRunning;                       /**< If this thread is running. */
     bool                                            m_bProcessData;                     /**< If data should be received for processing. */
-    bool                                            m_bDoArtifactThresholdReduction;    /**< If trial rejection is to be done based on threshold. */
-    bool                                            m_bDoArtifactVarianceReduction;     /**< If trial rejection is to be done based on variance. */
-    bool                                            m_bDoBaselineCorrection;            /**< If baseline correction is to be performed. */
-
-    qint32                                          m_iPreStimSamples;                  /**< The number of pre stimulus samples. */
-    qint32                                          m_iPostStimSamples;                 /**< The number of post stimulus samples. */
-    qint32                                          m_iPreStimSeconds;                  /**< The number of pre stimulus samples in seconds. */
-    qint32                                          m_iPostStimSeconds;                 /**< The number of post stimulus samples in seconds. */
-    qint32                                          m_iBaselineFromSeconds;             /**< The start value for baseline correction in seconds. */
-    qint32                                          m_iBaselineFromSamples;             /**< The start value for baseline correction in samples. */
-    qint32                                          m_iBaselineToSeconds;               /**< The end value for baseline correction in seconds. */
-    qint32                                          m_iBaselineToSamples;               /**< The end value for baseline correction in samples. */
-    qint32                                          m_iStimChanIdx;                     /**< The channel index in the stim channel list. */
-    qint32                                          m_iStimChan;                        /**< The channel index in the total channel list. */
-    qint32                                          m_iAverageMode;                     /**< The average mode (0-running or 1-cumulative). */
-    qint32                                          m_iNumAverages;                     /**< The number of averages. */
-    qint32                                          m_iArtifactThresholdSecond;         /**< The second (e-..) component of the rejection threshold value. */
-    double                                          m_dArtifactVariance;                /**< The rejection variance value. */
-    double                                          m_dArtifactThresholdFirst;          /**< The first component of the rejection threshold value. */
 
     QStringList                                     m_lResponsibleTriggerTypes;         /**< List of all trigger types which lead to the recent emit of a new evoked set. */
+
+    QMap<QString,int>                               m_mapStimChsIndexNames;             /**< The currently available stim channels and their corresponding index in the data. */
 
 signals:
 };

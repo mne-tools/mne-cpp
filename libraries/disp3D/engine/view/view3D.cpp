@@ -65,7 +65,7 @@
 #include <Qt3DRender/QCamera>
 #include <Qt3DExtras/QPhongMaterial>
 #include <Qt3DRender/QPointLight>
-#include <Qt3DRender/QRenderCapture>
+#include <Qt3DRender/QRenderCaptureReply>
 #include <Qt3DExtras/QCylinderGeometry>
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DRender/QRenderSettings>
@@ -93,16 +93,14 @@ View3D::View3D()
 , m_p3DObjectsEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pLightEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pCamera(this->camera())
-, m_pCapture(new Qt3DRender::QRenderCapture)
 {
     //Root entity
     this->setRootEntity(m_pRootEntity);
 
     //FrameGraph
     m_pFrameGraph = new CustomFrameGraph();
-    m_pFrameGraph->setParent(m_pCapture);
     m_pFrameGraph->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 1.0));
-    this->setActiveFrameGraph(m_pCapture);
+    this->setActiveFrameGraph(m_pFrameGraph);
 
     //Only render new frames when needed
     this->renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::OnDemand);
@@ -225,13 +223,19 @@ void View3D::setLightIntensity(double value)
 
 void View3D::takeScreenshot()
 {
-    if(!m_pCapture) {
+    if(m_pScreenCaptureReply) {
+        if(!m_pScreenCaptureReply->isComplete()) {
+            return;
+        }
+    }
+
+    m_pScreenCaptureReply = m_pFrameGraph->requestRenderCaptureReply();
+
+    if(!m_pScreenCaptureReply) {
         return;
     }
 
-    m_pReply = m_pCapture->requestCapture();
-
-    QObject::connect(m_pReply.data(), &Qt3DRender::QRenderCaptureReply::completed,
+    QObject::connect(m_pScreenCaptureReply.data(), &Qt3DRender::QRenderCaptureReply::completed,
                      this, &View3D::saveScreenshot);
 }
 
@@ -240,7 +244,7 @@ void View3D::takeScreenshot()
 
 void View3D::saveScreenshot()
 {
-    if(!m_pReply) {
+    if(!m_pScreenCaptureReply) {
         return;
     }
 
@@ -253,13 +257,13 @@ void View3D::saveScreenshot()
     }
 
     QString fileName = QString("./Screenshots/%1-%2-View3D.bmp").arg(sDate).arg(sTime);
-    QImage image = m_pReply->image();
+    QImage image = m_pScreenCaptureReply->image();
 
     bool flag = image.save(fileName);
     qDebug() << "image.rect()" << image.rect();
     qDebug() << "flag" << flag;
 
-    delete m_pReply;
+    delete m_pScreenCaptureReply;
 }
 
 

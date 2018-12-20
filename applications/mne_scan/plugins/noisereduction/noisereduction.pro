@@ -84,19 +84,16 @@ SOURCES += \
         noisereduction.cpp \
         FormFiles/noisereductionsetupwidget.cpp \
         FormFiles/noisereductionaboutwidget.cpp \
-        FormFiles/noisereductionoptionswidget.cpp
 
 HEADERS += \
         noisereduction.h\
         noisereduction_global.h \
         FormFiles/noisereductionsetupwidget.h \
         FormFiles/noisereductionaboutwidget.h \
-        FormFiles/noisereductionoptionswidget.h
 
 FORMS += \
         FormFiles/noisereductionsetup.ui \
         FormFiles/noisereductionabout.ui \
-        FormFiles/noisereductionoptionswidget.ui
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt \

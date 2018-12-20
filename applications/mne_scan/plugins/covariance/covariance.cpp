@@ -232,6 +232,8 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         {
             m_pFiffInfo = pRTMSA->info();
 
+            m_pCovarianceOutput->data()->setFiffInfo(m_pFiffInfo);
+
             //Set m_iEstimationSamples so that we alwyas wait for 5 secs
             m_iEstimationSamples = m_pFiffInfo->sfreq * 5;
             m_pRtCov = RtCov::SPtr(new RtCov(m_iEstimationSamples, m_pFiffInfo));

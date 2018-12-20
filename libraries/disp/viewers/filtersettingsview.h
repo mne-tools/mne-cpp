@@ -52,6 +52,7 @@
 
 #include <QWidget>
 #include <QMap>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -74,6 +75,10 @@ class QCheckBox;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace UTILSLIB {
+    class FilterData;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,6 +93,8 @@ namespace DISPLIB
 //=============================================================================================================
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
+
+class FilterDesignView;
 
 
 //=============================================================================================================
@@ -110,42 +117,51 @@ public:
     *
     * @param [in] parent        parent of widget
     */
-    FilterSettingsView(QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
+    FilterSettingsView(const QString& sSettingsPath = "",
+                       QWidget *parent = 0,
+                       Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Call this whenever the current filters have changed.
-    *
-    * @param [in] list    list of QCheckBoxes which are to be added to the filter group
+    * Destroys the FilterSettingsView.
     */
-    void filterGroupChanged(QList<QCheckBox*> list);
+    ~FilterSettingsView();
+
+    QSharedPointer<FilterDesignView> getFilterView();
+
+    bool getFilterActive();
 
 protected:
     //=========================================================================================================
     /**
-    * Slot called when the user designed filter was toggled
+    * Saves all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to store the settings to.
     */
-    void onUserFilterToggled(bool state);
+    void saveSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+    * Loads and inits all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to load the settings from.
+    */
+    void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
     * Show the filter option screen to the user.
-    *
-    * @param [in] state toggle state.
     */
-    void onShowFilterOptions(bool state);
+    void onShowFilterView();
 
-    QList<QCheckBox*>                                   m_qFilterListCheckBox;          /**< List of filter CheckBox. */
-    QPushButton*                                        m_pShowFilterOptions;           /**< Holds the show filter options button. */
+    QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+
+    QSharedPointer<FilterDesignView>              m_pFilterView;                  /**< The filter view. */
+
+    QPointer<QCheckBox>                     m_pCheckBox;                    /**< The filter activation check box. */
 
 signals:
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever the user is supposed to see the filter option window.
-    */
-    void showFilterOptions(bool state);
-
+    void filterActivationChanged(bool activated);
 };
 
 } // NAMESPACE
