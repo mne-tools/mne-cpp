@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Control3DWidget</class>
- <widget class="QWidget" name="Control3DWidget">
+ <class>Control3DViewWidget</class>
+ <widget class="QWidget" name="Control3DViewWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>491</height>
+    <height>520</height>
    </rect>
   </property>
   <property name="sizePolicy">

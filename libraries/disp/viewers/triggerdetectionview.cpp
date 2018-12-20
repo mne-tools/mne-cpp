@@ -172,6 +172,10 @@ void TriggerDetectionView::setNumberDetectedTriggersAndTypes(int numberDetection
 
 void TriggerDetectionView::saveSettings(const QString& settingsPath)
 {
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
     QSettings settings;
 
     settings.setValue(settingsPath + QString("/triggerDetectionActivated"), ui->m_checkBox_activateTriggerDetection->isChecked());
@@ -193,6 +197,10 @@ void TriggerDetectionView::saveSettings(const QString& settingsPath)
 
 void TriggerDetectionView::loadSettings(const QString& settingsPath)
 {
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
     QSettings settings;
 
     ui->m_checkBox_activateTriggerDetection->setChecked(settings.value(settingsPath + QString("/triggerDetectionActivated"), false).toBool());

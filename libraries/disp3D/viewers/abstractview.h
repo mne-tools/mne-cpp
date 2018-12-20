@@ -61,6 +61,7 @@
 
 namespace DISPLIB {
     class QuickControlView;
+    class Control3DView;
 }
 
 
@@ -79,7 +80,6 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 class View3D;
-class Control3DWidget;
 class Data3DTreeModel;
 
 
@@ -124,7 +124,7 @@ public:
     *
     * @return The currently set Control3D.
     */
-    QSharedPointer<DISP3DLIB::Control3DWidget> getControlView();
+    QSharedPointer<DISPLIB::Control3DView> getControlView();
 
     //=========================================================================================================
     /**
@@ -158,9 +158,9 @@ protected:
     void createGUI();
 
     QSharedPointer<DISP3DLIB::View3D>                   m_p3DView;              /**< The Disp3D view. */
-    QSharedPointer<DISP3DLIB::Control3DWidget>          m_pControl3DView;       /**< The Disp3D control. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>          m_pData3DModel;         /**< The Disp3D model. */
 
+    QSharedPointer<DISPLIB::Control3DView>              m_pControl3DView;       /**< The Disp3D control. */
     QPointer<DISPLIB::QuickControlView>                 m_pQuickControlView;    /**< The quick control view. */
 };
 

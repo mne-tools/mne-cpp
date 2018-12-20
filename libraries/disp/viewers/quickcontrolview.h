@@ -108,7 +108,8 @@ public:
     * @param [in] parent        The parent of widget.
     * @param [in] bDraggable    Flag specifying whether this widget is draggable.
     */
-    QuickControlView(const QString& name = "",
+    QuickControlView(const QString& sSettingsPath = "",
+                     const QString& name = "",
                      Qt::WindowFlags flags = Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
                      QWidget *parent = Q_NULLPTR,
                      bool bDraggable = true);
@@ -188,7 +189,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the values of the opacity slider
+    * Sets the values of the opacity slider. Choose value between 0.0 and 1.0.
     *
     * @param [in] opactiy       the new opacity value
     */
@@ -196,9 +197,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Get current opacity value.
+    * Get current opacity value. Value between 0.0 and 1.0.
     *
-    * @return thecurrent set opacity value of this window.
+    * @return the current set opacity value of this window.
     */
     int getOpacityValue();
 
@@ -211,6 +212,22 @@ public:
     void setVisiblityHideOpacityClose(bool bVisibility);
 
 protected:
+    //=========================================================================================================
+    /**
+    * Saves all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to store the settings to.
+    */
+    void saveSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+    * Loads and inits all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to load the settings from.
+    */
+    void loadSettings(const QString& settingsPath);
+
     //=========================================================================================================
     /**
     * Slot called when opacity slider was changed
@@ -228,6 +245,7 @@ protected:
     void onToggleHideAll(bool state);
 
 private:       
+    QString                                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
     Ui::QuickControlViewWidget*                         ui;                             /**< The generated UI file. */
 

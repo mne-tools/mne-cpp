@@ -79,10 +79,6 @@ namespace SCMEASLIB {
     class RealTimeConnectivityEstimate;
 }
 
-namespace DISPLIB {
-    class QuickControlView;
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -158,7 +154,7 @@ protected:
     void showQuickControlView();
 
     QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate>     m_pRTCE;                /**< The real-time source estimate measurement. */
-    QSharedPointer<DISPLIB::QuickControlView>                   m_pQuickControlView;    /**< quick control widget. */
+    QPointer<DISPLIB::QuickControlView>                         m_pQuickControlView;    /**< Quick control widget. */
 
     bool                                                        m_bInitialized;         /**< Whether init was processed successfully. */
 

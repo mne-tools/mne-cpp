@@ -62,6 +62,7 @@
 #include <QFileDialog>
 #include <QListWidgetItem>
 #include <QGraphicsItem>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -85,12 +86,14 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelSelectionView::ChannelSelectionView(QWidget *parent,
+ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
+                                           QWidget *parent,
                                            ChannelInfoModel::SPtr pChannelInfoModel,
                                            Qt::WindowType f)
 : QWidget(parent, f)
 , ui(new Ui::ChannelSelectionViewWidget)
 , m_pChannelInfoModel(pChannelInfoModel)
+, m_sSettingsPath(sSettingsPath)
 {
     ui->setupUi(this);
 
@@ -100,6 +103,10 @@ ChannelSelectionView::ChannelSelectionView(QWidget *parent,
     initComboBoxes();
     initButtons();
     initCheckBoxes();
+
+    loadSettings(m_sSettingsPath);
+
+    setCurrentlyMappedFiffChannels(m_pChannelInfoModel->getMappedChannelsList());
 }
 
 
@@ -107,6 +114,8 @@ ChannelSelectionView::ChannelSelectionView(QWidget *parent,
 
 ChannelSelectionView::~ChannelSelectionView()
 {
+    saveSettings(m_sSettingsPath);
+
     delete ui;
 }
 
@@ -358,8 +367,9 @@ void ChannelSelectionView::updateBadChannels()
             digIndex = m_pChannelInfoModel->index(i,1);
             QString origChName = m_pChannelInfoModel->data(digIndex,ChannelInfoModelRoles::GetOrigChName).toString();
 
-            if(badChannelList.contains(origChName))
+            if(badChannelList.contains(origChName)) {
                 badChannelMappedNames << mappedChName;
+            }
         }
     }
 
@@ -414,6 +424,36 @@ void ChannelSelectionView::updateDataView()
 
         emit selectionChanged(visibleItemList);
     }
+}
+
+
+//*************************************************************************************************************
+
+void ChannelSelectionView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    settings.setValue(settingsPath + QString("/selectedLayoutFile"), getCurrentLayoutFile());
+    settings.setValue(settingsPath + QString("/ChannelSelectionViewPos"), this->pos());
+}
+
+
+//*************************************************************************************************************
+
+void ChannelSelectionView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    setCurrentLayoutFile(settings.value(settingsPath + QString("/selectedLayoutFile"), "babymeg-mag-inner-layer.lout").toString());
+    move(settings.value(settingsPath + QString("/ChannelSelectionViewPos"), QPoint(100,100)).toPoint());
 }
 
 
@@ -703,6 +743,7 @@ void ChannelSelectionView::onComboBoxLayoutChanged()
 {
     QString selectionName(ui->m_comboBox_layoutFile->currentText());
     loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/2DLayouts/"));
+    updateBadChannels();
 }
 
 

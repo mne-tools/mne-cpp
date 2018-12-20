@@ -225,6 +225,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Set filter activation
+    *
+    * @param[in] state    filter on/off flag
+    */
+    void setFilterActive(bool state);
+
+    //=========================================================================================================
+    /**
     * Get the current average colors
     *
     * @return Pointer to the current average colors.
@@ -264,6 +272,16 @@ public:
     * @return kind of given channel number
     */
     FIFFLIB::fiff_int_t getKind(qint32 row) const;
+
+    //=========================================================================================================
+    /**
+    * Returns true or fals whether the provided channel is bad.
+    *
+    * @param[in] row    row number which correspodns to a given channel
+    *
+    * @return Returns true or fals whether the provided channel is bad
+    */
+    bool getIsChannelBad(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -385,11 +403,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Filter parameters changed
+    * Set filter
     *
     * @param[in] filterData    list of the currently active filter
     */
-    void filterChanged(QList<UTILSLIB::FilterData> filterData);
+    void setFilter(const UTILSLIB::FilterData &filterData);
 
     //=========================================================================================================
     /**
@@ -442,6 +460,7 @@ private:
     bool                                    m_bIsFreezed;                   /**< Display is freezed */
     bool                                    m_bProjActivated;               /**< Doo projections flag */
     bool                                    m_bCompActivated;               /**< Compensator activated */
+    bool                                    m_bPerformFiltering;            /**< Flag whether to activate/deactivate filtering. */
     float                                   m_fSps;                         /**< Sampling rate */
     qint32                                  m_iMaxFilterLength;             /**< Max order of the current filters */
 

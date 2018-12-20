@@ -52,6 +52,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QSlider>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -74,13 +75,49 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ScalingView::ScalingView(QWidget *parent,
+ScalingView::ScalingView(const QString& sSettingsPath,
+                         const QList<FIFFLIB::FiffChInfo>& lChannelList,
+                         QWidget *parent,
                          Qt::WindowFlags f)
 : QWidget(parent, f)
+, m_sSettingsPath(sSettingsPath)
 {
     this->setWindowTitle("Scaling");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
+
+    // Specify which channel types are needed
+    for(int i = 0; i < lChannelList.size(); ++i) {
+        if(lChannelList.at(i).unit == FIFF_UNIT_T && !m_lChannelTypeList.contains("MAG")) {
+            m_lChannelTypeList << "MAG";
+        }
+        if(lChannelList.at(i).unit == FIFF_UNIT_T_M && !m_lChannelTypeList.contains("GRAD")) {
+            m_lChannelTypeList << "GRAD";
+        }
+        if(lChannelList.at(i).kind == FIFFV_EEG_CH && !m_lChannelTypeList.contains("EEG")) {
+            m_lChannelTypeList << "EEG";
+        }
+        if(lChannelList.at(i).kind == FIFFV_EOG_CH && !m_lChannelTypeList.contains("EOG")) {
+            m_lChannelTypeList << "EOG";
+        }
+        if(lChannelList.at(i).kind == FIFFV_STIM_CH && !m_lChannelTypeList.contains("STIM")) {
+            m_lChannelTypeList << "STIM";
+        }
+        if(lChannelList.at(i).kind == FIFFV_MISC_CH && !m_lChannelTypeList.contains("MISC")) {
+            m_lChannelTypeList << "MISC";
+        }
+    }
+
+    loadSettings(m_sSettingsPath);
+    redrawGUI();
+}
+
+
+//*************************************************************************************************************
+
+ScalingView::~ScalingView()
+{
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -94,16 +131,24 @@ QMap<qint32,float> ScalingView::getScaleMap() const
 
 //*************************************************************************************************************
 
-void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
+void ScalingView::setScaleMap(const QMap<qint32,float>& qMapChScaling)
 {
     m_qMapChScaling = qMapChScaling;
 
+    redrawGUI();
+}
+
+
+//*************************************************************************************************************
+
+void ScalingView::redrawGUI()
+{
     QGridLayout* t_pGridLayout = new QGridLayout;
 
     qint32 i = 0;
 
     //MAG
-    if(m_qMapChScaling.contains(FIFF_UNIT_T))
+    if(m_qMapChScaling.contains(FIFF_UNIT_T) && m_lChannelTypeList.contains("MAG"))
     {
         QLabel* t_pLabelModality = new QLabel("MAG (pT)");
         t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
@@ -111,7 +156,7 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
         QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
         t_pDoubleSpinBoxScale->setMinimum(0.001);
         t_pDoubleSpinBoxScale->setMaximum(50000);
-        t_pDoubleSpinBoxScale->setMaximumWidth(500);
+        t_pDoubleSpinBoxScale->setMaximumWidth(100);
         t_pDoubleSpinBoxScale->setSingleStep(0.01);
         t_pDoubleSpinBoxScale->setDecimals(3);
         t_pDoubleSpinBoxScale->setPrefix("+/- ");
@@ -123,7 +168,7 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
         t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(5000);
+        t_pHorizontalSlider->setMaximum(500);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T)/(1e-12)*10);
@@ -136,7 +181,7 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
     }
 
     //GRAD
-    if(m_qMapChScaling.contains(FIFF_UNIT_T_M))
+    if(m_qMapChScaling.contains(FIFF_UNIT_T_M) && m_lChannelTypeList.contains("GRAD"))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("GRAD (fT/cm)");
@@ -157,9 +202,9 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
         t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(5000);
-        t_pHorizontalSlider->setSingleStep(10);
-        t_pHorizontalSlider->setPageStep(10);
+        t_pHorizontalSlider->setMaximum(2000);
+        t_pHorizontalSlider->setSingleStep(1);
+        t_pHorizontalSlider->setPageStep(1);
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T_M)/(1e-15*100));
         m_qMapScalingSlider.insert(FIFF_UNIT_T_M,t_pHorizontalSlider);
         connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
@@ -170,7 +215,7 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
     }
 
     //EEG
-    if(m_qMapChScaling.contains(FIFFV_EEG_CH))
+    if(m_qMapChScaling.contains(FIFFV_EEG_CH) && m_lChannelTypeList.contains("EEG"))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("EEG (uV)");
@@ -191,7 +236,7 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
         t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(25000);
+        t_pHorizontalSlider->setMaximum(1000);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EEG_CH)/(1e-06)*10);
@@ -204,7 +249,7 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
     }
 
     //EOG
-    if(m_qMapChScaling.contains(FIFFV_EOG_CH))
+    if(m_qMapChScaling.contains(FIFFV_EOG_CH) && m_lChannelTypeList.contains("EOG"))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("EOG (uV)");
@@ -225,7 +270,7 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
 
         QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
         t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(25000);
+        t_pHorizontalSlider->setMaximum(1000);
         t_pHorizontalSlider->setSingleStep(1);
         t_pHorizontalSlider->setPageStep(1);
         t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EOG_CH)/(1e-06)*10);
@@ -238,7 +283,7 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
     }
 
     //STIM
-    if(m_qMapChScaling.contains(FIFFV_STIM_CH))
+    if(m_qMapChScaling.contains(FIFFV_STIM_CH) && m_lChannelTypeList.contains("STIM"))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("STIM");
@@ -273,7 +318,7 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
     }
 
     //MISC
-    if(m_qMapChScaling.contains(FIFFV_MISC_CH))
+    if(m_qMapChScaling.contains(FIFFV_MISC_CH) && m_lChannelTypeList.contains("MISC"))
     {
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText("MISC");
@@ -307,6 +352,72 @@ void ScalingView::init(const QMap<qint32,float>& qMapChScaling)
     }
 
     this->setLayout(t_pGridLayout);
+}
+
+
+//*************************************************************************************************************
+
+void ScalingView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    if(m_qMapChScaling.contains(FIFF_UNIT_T)) {
+        settings.setValue(settingsPath + QString("/scaleMAG"), m_qMapChScaling[FIFF_UNIT_T]);
+    }
+
+    if(m_qMapChScaling.contains(FIFF_UNIT_T_M)) {
+        settings.setValue(settingsPath + QString("/scaleGRAD"), m_qMapChScaling[FIFF_UNIT_T_M]);
+    }
+
+    if(m_qMapChScaling.contains(FIFFV_EEG_CH)) {
+        settings.setValue(settingsPath + QString("/scaleEEG"), m_qMapChScaling[FIFFV_EEG_CH]);
+    }
+
+    if(m_qMapChScaling.contains(FIFFV_EOG_CH)) {
+        settings.setValue(settingsPath + QString("/scaleEOG"), m_qMapChScaling[FIFFV_EOG_CH]);
+    }
+
+    if(m_qMapChScaling.contains(FIFFV_STIM_CH)) {
+        settings.setValue(settingsPath + QString("/scaleSTIM"), m_qMapChScaling[FIFFV_STIM_CH]);
+    }
+
+    if(m_qMapChScaling.contains(FIFFV_MISC_CH)) {
+        settings.setValue(settingsPath + QString("/scaleMISC"), m_qMapChScaling[FIFFV_MISC_CH]);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void ScalingView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    float val = settings.value(settingsPath + QString("/scaleMAG"), 1e-11f).toFloat();
+    m_qMapChScaling.insert(FIFF_UNIT_T, val);
+
+    val = settings.value(settingsPath + QString("/scaleGRAD"), 1e-10f).toFloat();
+    m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
+
+    val = settings.value(settingsPath + QString("/scaleEEG"), 1e-4f).toFloat();
+    m_qMapChScaling.insert(FIFFV_EEG_CH, val);
+
+    val = settings.value(settingsPath + QString("/scaleEOG"), 1e-3f).toFloat();
+    m_qMapChScaling.insert(FIFFV_EOG_CH, val);
+
+    val = settings.value(settingsPath + QString("/scaleSTIM"), 1e-3f).toFloat();
+    m_qMapChScaling.insert(FIFFV_STIM_CH, val);
+
+    val = settings.value(settingsPath + QString("/scaleMISC"), 1e-3f).toFloat();
+    m_qMapChScaling.insert(FIFFV_MISC_CH, val);
 }
 
 

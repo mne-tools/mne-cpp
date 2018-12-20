@@ -88,6 +88,7 @@ ChannelDataModel::ChannelDataModel(QObject *parent)
 , m_bSpharaActivated(false)
 , m_bProjActivated(false)
 , m_bCompActivated(false)
+, m_bPerformFiltering(false)
 , m_fSps(1024.0f)
 , m_iT(10)
 , m_iDownsampling(10)
@@ -157,27 +158,25 @@ QVariant ChannelDataModel::data(const QModelIndex &index, int role) const
                 case Qt::DisplayRole: {
                     if(m_bIsFreezed) {
                         // data freeze
-                        if(m_filterData.isEmpty()) {
-                            rowVectorPair.first = m_matDataRawFreeze.data() + row*m_matDataRawFreeze.cols();
-                            rowVectorPair.second  = m_matDataRawFreeze.cols();
-                            v.setValue(rowVectorPair);
-                        }
-                        else {
+                        if(!m_filterData.isEmpty() && m_bPerformFiltering) {
                             rowVectorPair.first = m_matDataFilteredFreeze.data() + row*m_matDataFilteredFreeze.cols();
                             rowVectorPair.second  = m_matDataFilteredFreeze.cols();
+                            v.setValue(rowVectorPair);
+                        } else {
+                            rowVectorPair.first = m_matDataRawFreeze.data() + row*m_matDataRawFreeze.cols();
+                            rowVectorPair.second  = m_matDataRawFreeze.cols();
                             v.setValue(rowVectorPair);
                         }
                     }
                     else {
                         // data stream
-                        if(m_filterData.isEmpty()) {
-                            rowVectorPair.first = m_matDataRaw.data() + row*m_matDataRaw.cols();
-                            rowVectorPair.second  = m_matDataRaw.cols();
-                            v.setValue(rowVectorPair);
-                        }
-                        else {
+                        if(!m_filterData.isEmpty() && m_bPerformFiltering) {
                             rowVectorPair.first = m_matDataFiltered.data() + row*m_matDataFiltered.cols();
                             rowVectorPair.second  = m_matDataFiltered.cols();
+                            v.setValue(rowVectorPair);
+                        } else {
+                            rowVectorPair.first = m_matDataRaw.data() + row*m_matDataRaw.cols();
+                            rowVectorPair.second  = m_matDataRaw.cols();
                             v.setValue(rowVectorPair);
                         }
                     }
@@ -422,11 +421,11 @@ void ChannelDataModel::setSamplingInfo(float sps, int T, bool bSetZero)
 
 MatrixXd ChannelDataModel::getLastBlock()
 {
-    if(m_filterData.isEmpty()) {
-        return m_matDataRaw.block(0, m_iCurrentSample-m_iCurrentBlockSize, m_matDataRaw.rows(), m_iCurrentBlockSize);
+    if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+        return m_matDataFiltered.block(0, m_iCurrentSample-m_iCurrentBlockSize, m_matDataFiltered.rows(), m_iCurrentBlockSize);
     }
 
-    return m_matDataFiltered.block(0, m_iCurrentSample-m_iCurrentBlockSize, m_matDataFiltered.rows(), m_iCurrentBlockSize);
+    return m_matDataRaw.block(0, m_iCurrentSample-m_iCurrentBlockSize, m_matDataRaw.rows(), m_iCurrentBlockSize);
 }
 
 
@@ -528,7 +527,7 @@ void ChannelDataModel::addData(const QList<MatrixXd> &data)
         }
 
         //Filter if neccessary else set filtered data matrix to zero
-        if(!m_filterData.isEmpty()) {
+        if(!m_filterData.isEmpty() && m_bPerformFiltering) {
             filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol), m_iCurrentSample);
 
             //Perform SPHARA on filtered data after actual filtering - SPHARA should be applied on the best possible data
@@ -715,12 +714,14 @@ void ChannelDataModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::updateProjection()
+void ChannelDataModel::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
 {
     //  Update the SSP projector
     if(m_pFiffInfo) {
         //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
         m_bProjActivated = false;
+        m_pFiffInfo->projs = projs;
+
         for(qint32 i = 0; i < this->m_pFiffInfo->projs.size(); ++i) {
             if(this->m_pFiffInfo->projs[i].active) {
                 m_bProjActivated = true;
@@ -917,7 +918,7 @@ void ChannelDataModel::updateSpharaOptions(const QString& sSytemType, int nBaseF
 
 //*************************************************************************************************************
 
-void ChannelDataModel::filterChanged(QList<FilterData> filterData)
+void ChannelDataModel::setFilter(QList<FilterData> filterData)
 {
     m_filterData = filterData;
 
@@ -940,13 +941,9 @@ void ChannelDataModel::filterChanged(QList<FilterData> filterData)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::filterActivated(bool state)
+void ChannelDataModel::setFilterActive(bool state)
 {
-    //Filter all visible data channels at once
-    if(state) {
- //       m_bDrawFilterFront = false;
-        //filterChannelsConcurrently();
-    }
+    m_bPerformFiltering = state;
 }
 
 
@@ -1092,7 +1089,11 @@ void ChannelDataModel::triggerInfoChanged(const QMap<double, QColor>& colorMap, 
 
 void ChannelDataModel::distanceTimeSpacerChanged(int value)
 {
-    m_iDistanceTimerSpacer = value;
+    if(value <= 0) {
+        m_iDistanceTimerSpacer = 1000;
+    } else {
+        m_iDistanceTimerSpacer = value;
+    }
 }
 
 
@@ -1114,12 +1115,10 @@ void ChannelDataModel::markChBad(QModelIndexList chlist, bool status)
         if(status) {
             if(!m_pFiffInfo->bads.contains(chInfolist[chlist[i].row()].ch_name))
                 m_pFiffInfo->bads.append(chInfolist[chlist[i].row()].ch_name);
-            qDebug() << "RawModel:" << chInfolist[chlist[i].row()].ch_name << "marked as bad.";
         } else {
             if(m_pFiffInfo->bads.contains(chInfolist[chlist[i].row()].ch_name)) {
                 int index = m_pFiffInfo->bads.indexOf(chInfolist[chlist[i].row()].ch_name);
                 m_pFiffInfo->bads.removeAt(index);
-                qDebug() << "RawModel:" << chInfolist[chlist[i].row()].ch_name << "marked as good.";
             }
         }
 
@@ -1149,7 +1148,7 @@ void ChannelDataModel::filterChannelsConcurrently()
 {
     //std::cout<<"START ChannelDataModel::filterChannelsConcurrently"<<std::endl;
 
-    if(m_filterData.isEmpty()) {
+    if(m_filterData.isEmpty() || !m_bPerformFiltering) {
         return;
     }
 
@@ -1347,7 +1346,4 @@ void ChannelDataModel::clearModel()
     m_matOverlap.setZero();
 
     endResetModel();
-
-    qDebug("ChannelDataModel cleared.");
-
 }

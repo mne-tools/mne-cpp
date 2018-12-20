@@ -45,6 +45,7 @@
 #include "../../disp_global.h"
 
 #include <fiff/fiff_types.h>
+#include <fiff/fiff_proj.h>
 #include <utils/filterTools/filterdata.h>
 
 
@@ -308,8 +309,10 @@ public:
     //=========================================================================================================
     /**
     * Update the SSP projection
+    *
+    * @param [in] projs    The new projectors.
     */
-    void updateProjection();
+    void updateProjection(const QList<FIFFLIB::FiffProj>& projs);
 
     //=========================================================================================================
     /**
@@ -339,19 +342,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Filter parameters changed
+    * Set new filter parameters
     *
-    * @param[in] filterData    list of the currently active filter
+    * @param[in] filterData    list of the new filter
     */
-    void filterChanged(QList<UTILSLIB::FilterData> filterData);
+    void setFilter(QList<UTILSLIB::FilterData> filterData);
 
     //=========================================================================================================
     /**
-    * Filter avtivated
+    * Set filter activation
     *
     * @param[in] state    filter on/off flag
     */
-    void filterActivated(bool state);
+    void setFilterActive(bool state);
 
     //=========================================================================================================
     /**
@@ -541,6 +544,7 @@ private:
     bool                                m_bSpharaActivated;                         /**< Sphara activated */
     bool                                m_bIsFreezed;                               /**< Display is freezed */
     bool                                m_bDrawFilterFront;                         /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
+    bool                                m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
     bool                                m_bTriggerDetectionActive;                  /**< Trigger detection activation state */
     float                               m_fSps;                                     /**< Sampling rate */
     double                              m_dTriggerThreshold;                        /**< Trigger detection threshold */
@@ -643,14 +647,12 @@ inline qint32 ChannelDataModel::getMaxSamples() const
 
 inline qint32 ChannelDataModel::getCurrentSampleIndex() const
 {
-    if(m_bIsFreezed)
+    if(m_bIsFreezed) {
         return m_iCurrentSampleFreeze;
+    }
 
-    if(!m_filterData.isEmpty()/* || !m_bDrawFilterFront*/) {
-//        if(!m_bDrawFilterFront)
-//            return m_iCurrentSample+m_iMaxFilterLength/2;
-//        else
-            return m_iCurrentSample-m_iMaxFilterLength/2;
+    if(!m_filterData.isEmpty() && m_bPerformFiltering) {
+        return m_iCurrentSample-m_iMaxFilterLength/2;
     }
 
     return m_iCurrentSample;

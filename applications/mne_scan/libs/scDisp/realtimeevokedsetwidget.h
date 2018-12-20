@@ -72,20 +72,13 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
-namespace DISPLIB{
-    class AveragingSettingsView;
-}
-
 namespace DISPLIB {
     class EvokedSetModel;
     class ButterflyView;
     class ChannelSelectionView;
     class ChannelInfoModel;
-    class FilterView;
     class AverageLayoutView;
     class QuickControlView;
-    class ScalingView;
-    class ModalitySelectionView;
 }
 
 class QVBoxLayout;
@@ -175,12 +168,6 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Shows the filter widget
-    */
-    void showFilterWidget(bool state = true);
-
-    //=========================================================================================================
-    /**
     * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
     *
     * @param[out] imageType     The current iamge type: png, svg.
@@ -199,13 +186,9 @@ private:
     QSharedPointer<DISPLIB::QuickControlView>           m_pQuickControlView;        /**< Quick control widget. */
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< ChannelSelectionView. */
     QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Channel info model. */
-    QSharedPointer<DISPLIB::FilterView>                 m_pFilterView;              /**< Filter view. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
-    QSharedPointer<DISPLIB::AveragingSettingsView>      m_pAveragingSettingsView;   /**< Holds averaging settings widget.*/
     QPointer<DISPLIB::AverageLayoutView>                m_pAverageLayoutView;       /**< 2D layout view for plotting averages*/
     QPointer<DISPLIB::ButterflyView>                    m_pButterflyView;           /**< Butterfly plot */
-    QPointer<DISPLIB::ScalingView>                      m_pScalingView;             /**< Holds averaging scaling widget.*/
-    QPointer<DISPLIB::ModalitySelectionView>            m_pModalitySelectionView;   /**< Holds modality selection widget.*/
 
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
 
@@ -219,6 +202,9 @@ private:
     QPointer<QVBoxLayout>               m_pRTESetLayout;            /**< RTE Widget layout */
     QPointer<QLabel>                    m_pLabelInit;               /**< Initialization Label */
     QPointer<QToolBox>                  m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
+
+signals:
+    void windowSizeChanged(int iWindowSize);
 };
 
 } // NAMESPACE SCDISPLIB
