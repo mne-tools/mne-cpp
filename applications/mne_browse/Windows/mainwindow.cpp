@@ -117,7 +117,10 @@ void MainWindow::setupWindowWidgets()
     //Create selection manager window - QTDesigner used - see / FormFiles
     m_pChannelSelectionViewDock = new QDockWidget(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pChannelSelectionViewDock);
-    m_pChannelSelectionView = new ChannelSelectionView(m_pChannelSelectionViewDock, m_pChInfoWindow->getDataModel(), Qt::Widget);
+    m_pChannelSelectionView = new ChannelSelectionView(QString("MNEBrowse"),
+                                                       m_pChannelSelectionViewDock,
+                                                       m_pChInfoWindow->getDataModel(),
+                                                       Qt::Widget);
     m_pChannelSelectionViewDock->setWidget(m_pChannelSelectionView);
     m_pChannelSelectionViewDock->hide();
 
@@ -173,7 +176,7 @@ void MainWindow::setupWindowWidgets()
 
     //Connect channel info window with raw data model, layout manager, average manager and the data window
     connect(m_pDataWindow->getDataModel(), &RawModel::fileLoaded,
-            m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::fiffInfoChanged);
+            m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::setFiffInfo);
 
     connect(m_pDataWindow->getDataModel(), &RawModel::assignedOperatorsChanged,
             m_pChInfoWindow->getDataModel().data(), &ChannelInfoModel::assignedOperatorsChanged);
@@ -208,7 +211,7 @@ void MainWindow::setupWindowWidgets()
     //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels - TODO: dirty move get rid of this here
     if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
-        m_pChInfoWindow->getDataModel()->fiffInfoChanged(m_pDataWindow->getDataModel()->m_pFiffInfo);
+        m_pChInfoWindow->getDataModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
         m_pChInfoWindow->getDataModel()->layoutChanged(m_pChannelSelectionView->getLayoutMap());
         m_pChannelSelectionView->setCurrentlyMappedFiffChannels(m_pChInfoWindow->getDataModel()->getMappedChannelsList());
         m_pChannelSelectionView->newFiffFileLoaded(m_pDataWindow->getDataModel()->m_pFiffInfo);

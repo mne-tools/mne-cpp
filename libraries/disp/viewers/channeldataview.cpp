@@ -58,6 +58,7 @@
 #include <QMenu>
 #include <QSvgGenerator>
 #include <QGLWidget>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -75,13 +76,16 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
+ChannelDataView::ChannelDataView(const QString& sSettingsPath,
+                                 QWidget *parent,
+                                 Qt::WindowFlags f)
 : QWidget(parent, f)
 , m_iT(10)
 , m_fSamplingRate(1024)
 , m_fDefaultSectionSize(80.0f)
 , m_fZoomFactor(1.0f)
 , m_bHideBadChannels(false)
+, m_sSettingsPath(sSettingsPath)
 {
     // Use QGLWidget for rendering the table view.
     // Unfortunatley, QOpenGLWidget is not able to change the background color, which is a must for this ChanalDataViewer.
@@ -98,7 +102,18 @@ ChannelDataView::ChannelDataView(QWidget *parent, Qt::WindowFlags f)
     // Set layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
     neLayout->addWidget(m_pTableView);
+    neLayout->setContentsMargins(0,0,0,0);
     this->setLayout(neLayout);
+
+    loadSettings(m_sSettingsPath);
+}
+
+
+//*************************************************************************************************************
+
+ChannelDataView::~ChannelDataView()
+{
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -356,9 +371,9 @@ void ChannelDataView::takeScreenshot(const QString& fileName)
 
 //*************************************************************************************************************
 
-void ChannelDataView::updateProjection()
+void ChannelDataView::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
 {
-    m_pModel->updateProjection();
+    m_pModel->updateProjection(projs);
 }
 
 
@@ -388,17 +403,17 @@ void ChannelDataView::updateSpharaOptions(const QString& sSytemType, int nBaseFc
 
 //*************************************************************************************************************
 
-void ChannelDataView::filterChanged(QList<FilterData> filterData)
+void ChannelDataView::setFilter(const FilterData& filterData)
 {
-    m_pModel->filterChanged(filterData);
+    m_pModel->setFilter(QList<FilterData>() << filterData);
 }
 
 
 //*************************************************************************************************************
 
-void ChannelDataView::filterActivated(bool state)
+void ChannelDataView::setFilterActive(bool state)
 {
-    m_pModel->filterActivated(state);
+    m_pModel->setFilterActive(state);
 }
 
 
@@ -443,6 +458,30 @@ int ChannelDataView::getDistanceTimeSpacer()
 void ChannelDataView::resetTriggerCounter()
 {
     m_pModel->resetTriggerCounter();
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
 }
 
 
@@ -597,7 +636,16 @@ void ChannelDataView::markChBad()
         }
     }
 
-    m_pModel->updateProjection();
+    m_pModel->updateProjection(m_pFiffInfo->projs);
+
+    //Hide non selected channels/rows in the data views
+    for(int i = 0; i<m_qListBadChannels.size(); i++) {
+        if(m_bHideBadChannels) {
+            m_pTableView->hideRow(m_qListBadChannels.at(i));
+        } else {
+            m_pTableView->showRow(m_qListBadChannels.at(i));
+        }
+    }
 
     emit channelMarkingChanged();
 }

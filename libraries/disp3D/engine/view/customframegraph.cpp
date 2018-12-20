@@ -64,6 +64,7 @@
 #include <Qt3DRender/QBlendEquation>
 #include <Qt3DRender/QBlendEquationArguments>
 #include <Qt3DRender/QCullFace>
+#include <Qt3DRender/QRenderCapture>
 #include <QGLFormat>
 
 
@@ -174,6 +175,14 @@ void CustomFrameGraph::setClearColor(const QColor &tColor)
 
 //*************************************************************************************************************
 
+QRenderCaptureReply* CustomFrameGraph::requestRenderCaptureReply()
+{
+    return m_pCapture->requestCapture();
+}
+
+
+//*************************************************************************************************************
+
 void CustomFrameGraph::init()
 {
     //Build the frame graph
@@ -210,6 +219,7 @@ void CustomFrameGraph::init()
     //Transparent sorted forward render branch
     m_pForwardSortedFilter = new QTechniqueFilter(m_pTransparentState);
     m_pSortPolicy = new QSortPolicy(m_pForwardSortedFilter);
+    m_pCapture = new QRenderCapture(m_pSortPolicy);
 
     //Init frame graph nodes
     this->setNormalizedRect(QRectF(0.0f, 0.0f, 1.0f, 1.0f));

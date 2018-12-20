@@ -64,7 +64,8 @@ using namespace SCMEASLIB;
 
 RealTimeCov::RealTimeCov(QObject *parent)
 : Measurement(QMetaType::type("RealTimeCov::SPtr"), parent)
-, m_pFiffCov(new FiffCov)
+, m_pFiffCov(FiffCov::SPtr::create())
+, m_pFiffInfo(FiffInfo::SPtr::create())
 , m_bInitialized(false)
 {
 
@@ -85,6 +86,22 @@ FiffCov::SPtr& RealTimeCov::getValue()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffCov;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeCov::setFiffInfo(QSharedPointer<FiffInfo> pFiffInfo)
+{
+    m_pFiffInfo = pFiffInfo;
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<FiffInfo> RealTimeCov::getFiffInfo()
+{
+    return m_pFiffInfo;
 }
 
 

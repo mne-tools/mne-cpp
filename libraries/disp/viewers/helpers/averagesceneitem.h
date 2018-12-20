@@ -122,6 +122,8 @@ public:
     int                                             m_iMaxWidth;                /**< The max width. */
     int                                             m_iMaxHeigth;               /**< The max heigth. */
 
+    bool                                            m_bIsBad;                   /**< Whether this channel is bad. */
+
     QPointF                                         m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
     QList<QPair<QString, RowVectorPair> >           m_lAverageData;             /**< The channels average data which is to be plotted.*/
 

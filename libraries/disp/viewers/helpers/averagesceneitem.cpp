@@ -87,6 +87,7 @@ AverageSceneItem::AverageSceneItem(const QString& channelName,
 , m_iFontTextSize(15)
 , m_iMaxWidth(1000)
 , m_iMaxHeigth(150)
+, m_bIsBad(false)
 , m_iTotalNumberChannels(0)
 {
     m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
@@ -132,6 +133,10 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     this->setPos(75*m_qpChannelPosition.x(), -75*m_qpChannelPosition.y());
 
     painter->setRenderHint(QPainter::Antialiasing, true);
+
+    if(m_bIsBad) {
+        painter->setOpacity(0.20);
+    }
 
 //    //Plot bounding rect / drawing region of this item
 //    painter->drawRect(this->boundingRect());
@@ -255,7 +260,8 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
             }
 
             //Create path
-            float offset = (*(averageData+(0*m_iTotalNumberChannels)+m_iChannelNumber)); //choose offset to be the signal value at first sample
+            //float offset = (*(averageData+(0*m_iTotalNumberChannels)+m_iChannelNumber)); //choose offset to be the signal value at first sample
+            float offset = 0;
             QPainterPath path = QPainterPath(QPointF(boundingRect.x(), boundingRect.y() + boundingRect.height()/2));
             QPen pen;
             pen.setStyle(Qt::SolidLine);
@@ -272,8 +278,8 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
                 //evoked matrix is stored in column major
                 double val = ((*(averageData+(i*m_iTotalNumberChannels)+m_iChannelNumber))-offset) * dScaleY;
 
-                //Cut plotting if three times bigger than m_iMaxHeigth
-                if(std::fabs(val) > 6*m_iMaxHeigth) {
+                //Cut plotting if six times bigger than m_iMaxHeigth
+                if(std::fabs(val) > 6*m_iMaxHeigth && m_bIsBad) {
                     qSamplePosition.setY(-(val/val) * m_iMaxHeigth); //(val/val) used to retrieve sign of val
                     qSamplePosition.setX(path.currentPosition().x()+1);
                 } else {
