@@ -103,7 +103,7 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
     Network finalNetwork("COH");
 
     if(connectivitySettings.isEmpty()) {
-        qDebug() << "Coherence::coherence - Input data is empty";
+        qDebug() << "Coherence::calculate - Input data is empty";
         return finalNetwork;
     }
 

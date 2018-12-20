@@ -95,7 +95,7 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
     Network finalNetwork("COR");
 
     if(connectivitySettings.isEmpty()) {
-        qDebug() << "Correlation::correlationCoeff - Input data is empty";
+        qDebug() << "Correlation::calculate - Input data is empty";
         return finalNetwork;
     }   
 
