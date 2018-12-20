@@ -95,7 +95,7 @@ ImagCoherence::ImagCoherence()
 
 Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
 {
-    Network finalNetwork("Imaginary Coherence");
+    Network finalNetwork("IMAGCOH");
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "ImagCoherence::imagcoherence - Input data is empty";

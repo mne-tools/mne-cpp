@@ -203,12 +203,16 @@ public:
         m_networkData.normalize();
 
         if(!m_networkData.isEmpty()) {
-            emit newConnectivityResultAvailable(m_networkData);
+            emit newConnectivityResultAvailable("sample",
+                                                "Connectivity",
+                                                m_networkData);
         }
     }
 
 signals:
-    void newConnectivityResultAvailable(const Network& tNetworkData);
+    void newConnectivityResultAvailable(const QString& sSubject,
+                                        const QString& sMeasurement,
+                                        const Network& tNetworkData);
 
 };
 

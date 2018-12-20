@@ -54,7 +54,7 @@ SUBDIRS += \
     ex_read_evoked \
     ex_read_fwd \
     ex_read_raw \
-    ex_read_write_raw
+    ex_read_write_raw \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
@@ -64,6 +64,7 @@ SUBDIRS += \
             ex_clustered_inverse_pwl_rap_music_raw \
             ex_clustered_inverse_rap_music_raw \
             ex_connectivity \
+            ex_connnectivity_comparison \
             ex_disp \
             ex_disp_3D \
             ex_fs_surface \
@@ -76,7 +77,7 @@ SUBDIRS += \
             ex_st_clustered_inverse_pwl_rap_music \
             ex_interpolation \
             ex_spectral \
-            ex_tf_plot
+            ex_tf_plot \
 
         !isEmpty( CNTK_INCLUDE_DIR ) {
             SUBDIRS += \

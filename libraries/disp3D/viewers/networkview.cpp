@@ -45,6 +45,8 @@
 
 #include <connectivity/network/network.h>
 
+#include <disp/viewers/connectivitysettingsview.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,7 +72,11 @@ using namespace CONNECTIVITYLIB;
 NetworkView::NetworkView(QWidget* parent,
                          Qt::WindowFlags f)
 : AbstractView(parent, f)
+, m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create())
 {
+    QList<QSharedPointer<QWidget> > lWidgets;
+    lWidgets << m_pConnectivitySettingsView;
+    this->setQuickControlWidgets(lWidgets);
 }
 
 
@@ -83,11 +89,33 @@ NetworkView::~NetworkView()
 
 //*************************************************************************************************************
 
-NetworkTreeItem* NetworkView::addData(const Network& tNetworkData)
+QList<NetworkTreeItem*> NetworkView::addData(const QString& sSubject,
+                                             const QString& sMeasurementSetName,
+                                             const QList<Network>& tNetworkData)
 {
     //Add network data
-    return m_pData3DModel->addConnectivityData("sample",
-                                               QString("Connectivity"),
+    return m_pData3DModel->addConnectivityData(sSubject,
+                                               sMeasurementSetName,
                                                tNetworkData);
 }
 
+
+//*************************************************************************************************************
+
+NetworkTreeItem* NetworkView::addData(const QString& sSubject,
+                                      const QString& sMeasurementSetName,
+                                      const Network& tNetworkData)
+{
+    //Add network data
+    return m_pData3DModel->addConnectivityData(sSubject,
+                                               sMeasurementSetName,
+                                               tNetworkData);
+}
+
+
+//*************************************************************************************************************
+
+ConnectivitySettingsView::SPtr NetworkView::getConnectivitySettingsView()
+{
+    return m_pConnectivitySettingsView;
+}

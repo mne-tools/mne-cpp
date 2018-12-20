@@ -102,7 +102,7 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
 //    qint64 iTime = 0;
 //    timer.start();
 
-    Network finalNetwork("Unbiased Squared Phase Lag Index");
+    Network finalNetwork("USPLI");
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "UnbiasedSquaredPhaseLagIndex::calculate - Input data is empty";

@@ -330,6 +330,24 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject,
 
 //*************************************************************************************************************
 
+QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& sSubject,
+                                                             const QString& sMeasurementSetName,
+                                                             const QList<Network>& networkData)
+{
+    QList<NetworkTreeItem*> returnList;
+
+    for(int i = 0; i < networkData.size(); ++i) {
+        returnList.append(addConnectivityData(sSubject,
+                                              sMeasurementSetName,
+                                              networkData.at(i)));
+    }
+
+    return returnList;
+}
+
+
+//*************************************************************************************************************
+
 NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject,
                                                       const QString& sMeasurementSetName,
                                                       const Network& networkData)

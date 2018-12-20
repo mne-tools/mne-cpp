@@ -98,7 +98,7 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
         fftw_make_planner_thread_safe();
     #endif
 
-    Network finalNetwork("Cross Correlation");
+    Network finalNetwork("XCOR");
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "CrossCorrelation::calculate - Input data is empty";

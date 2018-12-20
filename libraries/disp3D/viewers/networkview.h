@@ -62,6 +62,10 @@ namespace CONNECTIVITYLIB {
     class Network;
 }
 
+namespace DISPLIB {
+    class ConnectivitySettingsView;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -108,13 +112,39 @@ public:
     */
     ~NetworkView();
 
+
     //=========================================================================================================
     /**
-    * Add data to the view
+    * Adds a list of connectivity estimation data.
+    *
+    * @param[in] sSubject               The name of the subject.
+    * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+    * @param[in] networkData            The list of connectivity data.
+    *
+    * @return                           Returns a lsit with pointers to the added tree items.
     */
-    NetworkTreeItem* addData(const CONNECTIVITYLIB::Network& tNetworkData);
+    QList<NetworkTreeItem*> addData(const QString& sSubject,
+                                    const QString& sMeasurementSetName,
+                                    const QList<CONNECTIVITYLIB::Network> &tNetworkData);
+
+    //=========================================================================================================
+    /**
+    * Adds connectivity estimation data.
+    *
+    * @param[in] sSubject               The name of the subject.
+    * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+    * @param[in] networkData            The connectivity data.
+    *
+    * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+    */
+    NetworkTreeItem* addData(const QString& sSubject,
+                             const QString& sMeasurementSetName,
+                             const CONNECTIVITYLIB::Network& tNetworkData);
+
+    QSharedPointer<DISPLIB::ConnectivitySettingsView> getConnectivitySettingsView();
 
 protected:
+    QSharedPointer<DISPLIB::ConnectivitySettingsView>       m_pConnectivitySettingsView;    /** The connectivity settings view. */
 
 };
 
