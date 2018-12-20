@@ -92,7 +92,10 @@ FilterPlotScene::FilterPlotScene(QGraphicsView *view, QObject *parent)
 
 //*************************************************************************************************************
 
-void FilterPlotScene::updateFilter(const FilterData& operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh)
+void FilterPlotScene::updateFilter(const FilterData& operatorFilter,
+                                   int samplingFreq,
+                                   int cutOffLow,
+                                   int cutOffHigh)
 {
     if(operatorFilter.m_dCoeffA.cols() == 0)
         return;

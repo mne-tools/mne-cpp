@@ -68,7 +68,6 @@
 class QCheckBox;
 
 namespace FIFFLIB {
-    class FiffInfo;
     class FiffProj;
 }
 
@@ -114,18 +113,55 @@ public:
     *
     * @param [in] parent        parent of widget
     */
-    ProjectorsView(QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
+    ProjectorsView(const QString& sSettingsPath = "",
+                   QWidget *parent = 0,
+                   Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Init the view.
-    *
-    * @param [in] pFiffInfo    The fiff info.
+    * Destroys the ProjectorsView.
     */
-    void init(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    ~ProjectorsView();
+
+    //=========================================================================================================
+    /**
+    * Get the current projectors
+    *
+    * @return The current projectors.
+    */
+    QList<FIFFLIB::FiffProj> getProjectors() const;
+
+    //=========================================================================================================
+    /**
+    * Set the current projectors
+    *
+    * @param [in] projs    The new projectors.
+    */
+    void setProjectors(const QList<FIFFLIB::FiffProj>& projs);
 
 protected:
+    //=========================================================================================================
+    /**
+    * Redraw the view.
+    */
+    void redrawGUI();
+
+    //=========================================================================================================
+    /**
+    * Saves all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to store the settings to.
+    */
+    void saveSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+    * Loads and inits all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to load the settings from.
+    */
+    void loadSettings(const QString& settingsPath);
+
     //=========================================================================================================
     /**
     * Slot called when user enables/disables all projectors
@@ -136,12 +172,16 @@ protected:
     /**
     * Slot called when the projector check state changes
     */
-    void onCheckProjStatusChanged(bool state);
+    void onCheckProjStatusChanged();
 
     QList<QCheckBox*>                                   m_qListProjCheckBox;            /**< List of projection CheckBox. */
     QCheckBox*                                          m_pEnableDisableProjectors;     /**< Holds the enable disable all check box. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Connected fiff info. */
+    QList<FIFFLIB::FiffProj>                            m_pProjs;                       /**< The current projectors. */
+
+    QString                                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+
+    QMap<QString,bool>                                  m_mapProjActive;
 
 signals:
     //=========================================================================================================

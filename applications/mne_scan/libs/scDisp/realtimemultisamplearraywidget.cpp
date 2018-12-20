@@ -42,7 +42,7 @@
 #include "realtimemultisamplearraywidget.h"
 
 #include <disp/viewers/quickcontrolview.h>
-#include <disp/viewers/filterview.h>
+#include <disp/viewers/filterdesignview.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/channelinfomodel.h>
 #include <disp/viewers/channeldataview.h>
@@ -95,7 +95,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
 , m_pRTMSA(pRTMSA)
 , m_bInitialized(false)
 , m_iMaxFilterTapSize(0)
-, m_pChannelDataView(new ChannelDataView(this))
 {
     Q_UNUSED(pTime)
 
@@ -122,7 +121,18 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
     m_pActionQuickControl->setVisible(true);
 
     //Create table view and set layout
+    m_pChannelDataView = new ChannelDataView(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
+                                             this);
     m_pChannelDataView->hide();
+
+    // Quick control selection
+    m_pQuickControlView = QuickControlView::SPtr::create(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
+                                                         "RT Display",
+                                                         Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
+                                                         this);
+
+    this->addControlWidgets(m_pQuickControlView,
+                            m_pRTMSA->getControlWidgets());
 
     QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
     rtmsaLayout->setContentsMargins(0,0,0,0);
@@ -137,72 +147,10 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
 
 RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 {
-    // Store Settings
-    if(!m_pRTMSA->getName().isEmpty()) {
-        QString t_sRTMSAWName = m_pRTMSA->getName();
+    QSettings settings;
 
-        QSettings settings;
-
-        //Store view
-        if(m_pChannelDataView) {
-            //Scaling
-            QMap<qint32, float> qMapChScaling = m_pChannelDataView->getScalingMap();
-
-            if(qMapChScaling.contains(FIFF_UNIT_T))
-                settings.setValue(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), qMapChScaling[FIFF_UNIT_T]);
-
-            if(qMapChScaling.contains(FIFF_UNIT_T_M))
-                settings.setValue(QString("t_sRTMSAWName/%1/scaleGRAD").arg(t_sRTMSAWName), qMapChScaling[FIFF_UNIT_T_M]);
-
-            if(qMapChScaling.contains(FIFFV_EEG_CH))
-                settings.setValue(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), qMapChScaling[FIFFV_EEG_CH]);
-
-            if(qMapChScaling.contains(FIFFV_EOG_CH))
-                settings.setValue(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), qMapChScaling[FIFFV_EOG_CH]);
-
-            if(qMapChScaling.contains(FIFFV_STIM_CH))
-                settings.setValue(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), qMapChScaling[FIFFV_STIM_CH]);
-
-            if(qMapChScaling.contains(FIFFV_MISC_CH))
-                settings.setValue(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), qMapChScaling[FIFFV_MISC_CH]);
-
-            //Zoom and window size
-            settings.setValue(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), m_pChannelDataView->getZoom());
-            settings.setValue(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), m_pChannelDataView->getWindowSize());
-
-            //Store show/hide bad channel flag
-            settings.setValue(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), m_pChannelDataView->getBadChannelHideStatus());
-
-            settings.setValue(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), m_pChannelDataView->getSignalColor());
-
-            settings.setValue(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), m_pChannelDataView->getBackgroundColor());
-
-            settings.setValue(QString("RTMSAW/%1/distanceTimeSpacer").arg(t_sRTMSAWName), m_pChannelDataView->getDistanceTimeSpacer());
-        }
-
-        //Store filter
-        if(m_pFilterWindow) {
-            FilterData filter = m_pFilterWindow->getUserDesignedFilter();
-
-            settings.setValue(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), filter.m_dHighpassFreq);
-            settings.setValue(QString("RTMSAW/%1/filterLP").arg(t_sRTMSAWName), filter.m_dLowpassFreq);
-            settings.setValue(QString("RTMSAW/%1/filterOrder").arg(t_sRTMSAWName), filter.m_iFilterOrder);
-            settings.setValue(QString("RTMSAW/%1/filterType").arg(t_sRTMSAWName), (int)filter.m_Type);
-            settings.setValue(QString("RTMSAW/%1/filterDesignMethod").arg(t_sRTMSAWName), (int)filter.m_designMethod);
-            settings.setValue(QString("RTMSAW/%1/filterTransition").arg(t_sRTMSAWName), filter.m_dParksWidth*(filter.m_sFreq/2));
-            settings.setValue(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), m_pFilterWindow->userDesignedFiltersIsActive());
-            settings.setValue(QString("RTMSAW/%1/filterChannelType").arg(t_sRTMSAWName), m_pFilterWindow->getChannelType());
-        }
-
-        //Store QuickControlView
-        if(m_pQuickControlView) {
-            settings.setValue(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), m_pQuickControlView->getOpacityValue());
-        }
-
-        //Store selected layout file
-        if(m_pChannelSelectionView) {
-            settings.setValue(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName), m_pChannelSelectionView->getCurrentLayoutFile());
-        }
+    if(m_pChannelDataView && m_pRTMSA) {
+        settings.setValue(QString("RTMSAW/%1/showHideBad").arg(m_pRTMSA->getName()), m_pChannelDataView->getBadChannelHideStatus());
     }
 }
 
@@ -232,116 +180,38 @@ void RealTimeMultiSampleArrayWidget::init()
 {
     if(m_pFiffInfo) {
         QSettings settings;
-        QString t_sRTMSAWName = m_pRTMSA->getName();
+        QString sRTMSAWName = m_pRTMSA->getName();
 
         // Init channel view
-        QColor signalDefault = Qt::darkBlue;
-        QColor backgroundDefault = Qt::white;
-        QColor signal = settings.value(QString("RTMSAW/%1/signalColor").arg(t_sRTMSAWName), signalDefault).value<QColor>();
-        QColor background = settings.value(QString("RTMSAW/%1/backgroundColor").arg(t_sRTMSAWName), backgroundDefault).value<QColor>();
-
         m_pChannelDataView->show();
         m_pChannelDataView->init(m_pFiffInfo);
-        m_pChannelDataView->setBackgroundColor(background);
-        m_pChannelDataView->setSignalColor(signal);
 
-        if(settings.value(QString("RTMSAW/%1/showHideBad").arg(t_sRTMSAWName), false).toBool()) {
-            m_pChannelDataView->hideBadChannels();
+        if(settings.value(QString("RTMSAW/%1/showHideBad").arg(sRTMSAWName), false).toBool()) {
+            this->onHideBadChannels();
         }
-
-        //Init scaling
-        bool hasMag = false, hasGrad = false, hasEEG = false, hasEog = false, hasStim = false, hasMisc = false;
-        float val = 1e-11f;
-        QMap<qint32, float> qMapChScaling;
-
-        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i) {
-            if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH) {
-                if(!hasMag && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T) {
-                    val = settings.value(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), 1e-11f).toFloat();
-                    qMapChScaling.insert(FIFF_UNIT_T, val);
-
-                    hasMag = true;
-                } else if(!hasGrad && m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M) {
-                    val = settings.value(QString("RTMSAW/%1/scaleGRAD").arg(t_sRTMSAWName), 1e-10f).toFloat();
-                    qMapChScaling.insert(FIFF_UNIT_T_M, val);
-
-                    hasGrad = true;
-                }
-            } else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH) {
-                val = settings.value(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), 1e-4f).toFloat();
-                qMapChScaling.insert(FIFFV_EEG_CH, val);
-
-                hasEEG = true;
-            } else if(!hasEog && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH) {
-                val = settings.value(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), 1e-3f).toFloat();
-                qMapChScaling.insert(FIFFV_EOG_CH, val);
-
-                hasEog = true;
-            } else if(!hasStim && m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
-                val = settings.value(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), 1e-3f).toFloat();
-                qMapChScaling.insert(FIFFV_STIM_CH, val);
-
-                hasStim = true;
-            } else if(!hasMisc && m_pFiffInfo->chs[i].kind == FIFFV_MISC_CH) {
-                val = settings.value(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), 1e-3f).toFloat();
-                qMapChScaling.insert(FIFFV_MISC_CH, val);
-
-                hasMisc = true;
-            }
-        }
-
-        m_pChannelDataView->setScalingMap(qMapChScaling);
-
-        //Init filter window
-        m_pFilterWindow = FilterView::SPtr::create(this, Qt::Window);
-
-        m_pFilterWindow->init(m_pFiffInfo->sfreq);
-        m_pFilterWindow->setWindowSize(m_iMaxFilterTapSize);
-        m_pFilterWindow->setMaxFilterTaps(m_iMaxFilterTapSize);
-
-        connect(m_pFilterWindow.data(),static_cast<void (FilterView::*)(QString)>(&FilterView::applyFilter),
-                m_pChannelDataView.data(),static_cast<void (ChannelDataView::*)(const QString &)>(&ChannelDataView::setFilterChannelType));
-
-        connect(m_pFilterWindow.data(), &FilterView::filterChanged,
-                m_pChannelDataView.data(), &ChannelDataView::filterChanged);
-
-        connect(m_pFilterWindow.data(), &FilterView::filterActivated,
-                m_pChannelDataView.data(), &ChannelDataView::filterActivated);
-
-        //Set stored filter settings from last session
-        m_pFilterWindow->setFilterParameters(settings.value(QString("RTMSAW/%1/filterHP").arg(t_sRTMSAWName), 5.0).toDouble(),
-                                                settings.value(QString("RTMSAW/%1/filterLP").arg(t_sRTMSAWName), 40.0).toDouble(),
-                                                settings.value(QString("RTMSAW/%1/filterOrder").arg(t_sRTMSAWName), 128).toInt(),
-                                                settings.value(QString("RTMSAW/%1/filterType").arg(t_sRTMSAWName), 2).toInt(),
-                                                settings.value(QString("RTMSAW/%1/filterDesignMethod").arg(t_sRTMSAWName), 0).toInt(),
-                                                settings.value(QString("RTMSAW/%1/filterTransition").arg(t_sRTMSAWName), 5.0).toDouble(),
-                                                settings.value(QString("RTMSAW/%1/filterUserDesignActive").arg(t_sRTMSAWName), false).toBool(),
-                                                settings.value(QString("RTMSAW/%1/filterChannelType").arg(t_sRTMSAWName), "MEG").toString());
 
         //Init channel selection manager
-        m_pChannelInfoModel = ChannelInfoModel::SPtr::create(m_pFiffInfo, this);
+        m_pChannelInfoModel = ChannelInfoModel::SPtr::create(m_pFiffInfo,
+                                                             this);
 
-        m_pChannelSelectionView = ChannelSelectionView::SPtr::create(this, m_pChannelInfoModel, Qt::Window);
-
-        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
-                m_pChannelDataView.data(), &ChannelDataView::showSelectedChannelsOnly);
+        m_pChannelSelectionView = ChannelSelectionView::SPtr::create(QString("RTMSAW/%1").arg(sRTMSAWName),
+                                                                     this,
+                                                                     m_pChannelInfoModel,
+                                                                     Qt::Window);
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
                 m_pChannelInfoModel.data(), &ChannelInfoModel::layoutChanged);
 
-        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::loadedLayoutMap,
-                m_pChannelSelectionView.data(), &ChannelSelectionView::updateBadChannels);
+        connect(m_pChannelInfoModel.data(), &ChannelInfoModel::channelsMappedToLayout,
+                m_pChannelSelectionView.data(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
+
+        connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
+                m_pChannelDataView.data(), &ChannelDataView::showSelectedChannelsOnly);
 
         connect(m_pChannelDataView.data(), &ChannelDataView::channelMarkingChanged,
                 m_pChannelSelectionView.data(), &ChannelSelectionView::updateBadChannels);
 
-        connect(m_pChannelInfoModel.data(), &ChannelInfoModel::channelsMappedToLayout,
-                m_pChannelSelectionView.data(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
-
-        m_pChannelInfoModel->fiffInfoChanged(m_pFiffInfo);
-
-        m_pChannelSelectionView->setCurrentLayoutFile(settings.value(QString("RTMSAW/%1/selectedLayoutFile").arg(t_sRTMSAWName),
-                                                                       "babymeg-mag-inner-layer.lout").toString());
+        m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
         //Init quick control widget
         QStringList slFlags = m_pRTMSA->getDisplayFlags();
@@ -351,52 +221,59 @@ void RealTimeMultiSampleArrayWidget::init()
             slFlags << "projections" << "view" << "scaling";
         #endif
 
-        m_pQuickControlView = QuickControlView::SPtr::create("RT Display", Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint, this);
-        m_pQuickControlView->setOpacityValue(settings.value(QString("RTMSAW/%1/viewOpacity").arg(t_sRTMSAWName), 95).toInt());
-
         // Quick control scaling
         if(slFlags.contains("scaling")) {
-            ScalingView* pScalingView = new ScalingView();
-            pScalingView->init(qMapChScaling);
+            ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName),
+                                                        m_pFiffInfo->chs);
             m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
 
             connect(pScalingView, &ScalingView::scalingChanged,
                     m_pChannelDataView.data(), &ChannelDataView::setScalingMap);
+
+            m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
         }
 
         // Quick control projectors
         if(slFlags.contains("projections")) {
-            ProjectorsView* pProjectorsView = new ProjectorsView();
-            pProjectorsView->init(m_pFiffInfo);
+            ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTMSAW/%1").arg(sRTMSAWName));
             m_pQuickControlView->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
 
             connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                     m_pChannelDataView.data(), &ChannelDataView::updateProjection);
 
-            //Activate projectors by default
-            m_pChannelDataView->updateProjection();
+            pProjectorsView->setProjectors(m_pFiffInfo->projs);
         }
 
         // Quick control compensators
-        if(slFlags.contains("filter")) {
-            CompensatorView* pCompensatorView = new CompensatorView();
-            pCompensatorView->init(m_pFiffInfo);
+        if(slFlags.contains("compensators")) {
+            CompensatorView* pCompensatorView = new CompensatorView(QString("RTMSAW/%1").arg(sRTMSAWName));
             m_pQuickControlView->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
 
             connect(pCompensatorView, &CompensatorView::compSelectionChanged,
                     m_pChannelDataView.data(), &ChannelDataView::updateCompensator);
 
-            // Quick control filter settings
-            FilterSettingsView* pFilterSettingsView = new FilterSettingsView();
+            pCompensatorView->setCompensators(m_pFiffInfo->comps);
+        }
+
+        // Quick control filter
+        if(slFlags.contains("filter")) {
+            FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTMSAW/%1").arg(sRTMSAWName));
             m_pQuickControlView->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter");
 
-            connect(m_pFilterWindow.data(), &FilterView::activationCheckBoxListChanged,
-                    pFilterSettingsView, &FilterSettingsView::filterGroupChanged);
+            connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::setFilterChannelType);
 
-            connect(pFilterSettingsView, &FilterSettingsView::showFilterOptions,
-                    this, &RealTimeMultiSampleArrayWidget::showFilterWidget);
+            connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::setFilter);
 
-            pFilterSettingsView->filterGroupChanged(m_pFilterWindow->getActivationCheckBoxList());
+            connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
+                    m_pChannelDataView.data(), &ChannelDataView::setFilterActive);
+
+            m_pChannelDataView->setFilterActive(pFilterSettingsView->getFilterActive());
+            m_pChannelDataView->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
+            pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
+            pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
+            pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
         }
 
         // Quick control SPHARA settings
@@ -413,8 +290,8 @@ void RealTimeMultiSampleArrayWidget::init()
 
         // Quick control channel data settings
         if(slFlags.contains("view")) {
-            ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView();
-            pChannelDataSettingsView->init();
+            ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView(QString("RTMSAW/%1").arg(sRTMSAWName));
+            pChannelDataSettingsView->setWidgetList();
             m_pQuickControlView->addGroupBoxWithTabs(pChannelDataSettingsView, "Other", "View");
 
             connect(pChannelDataSettingsView, &ChannelDataSettingsView::signalColorChanged,
@@ -435,15 +312,16 @@ void RealTimeMultiSampleArrayWidget::init()
             connect(pChannelDataSettingsView, &ChannelDataSettingsView::makeScreenshot,
                     this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
 
-            pChannelDataSettingsView->setViewParameters(settings.value(QString("RTMSAW/%1/viewZoomFactor").arg(t_sRTMSAWName), 1.0).toFloat(),
-                                                        settings.value(QString("RTMSAW/%1/viewWindowSize").arg(t_sRTMSAWName), 10).toInt());
-            pChannelDataSettingsView->setDistanceTimeSpacer(settings.value(QString("RTMSAW/%1/distanceTimeSpacer").arg(t_sRTMSAWName), 100).toInt());
-            pChannelDataSettingsView->setSignalBackgroundColors(signal, background);
+            m_pChannelDataView->setZoom(pChannelDataSettingsView->getZoom());
+            m_pChannelDataView->setWindowSize(pChannelDataSettingsView->getWindowSize());
+            m_pChannelDataView->setDistanceTimeSpacer(pChannelDataSettingsView->getDistanceTimeSpacer());
+            m_pChannelDataView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
+            m_pChannelDataView->setSignalColor(pChannelDataSettingsView->getSignalColor());
         }
 
         // Quick control trigger detection settings
         if(slFlags.contains("triggerdetection")) {
-            TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView(QString("RTMSAW/%1").arg(t_sRTMSAWName));
+            TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView(QString("RTMSAW/%1").arg(sRTMSAWName));
             m_pQuickControlView->addGroupBoxWithTabs(pTriggerDetectionView, "Other", "Triggers");
 
             connect(pTriggerDetectionView, &TriggerDetectionView::triggerInfoChanged,
@@ -460,25 +338,6 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //Initialized
         m_bInitialized = true;
-    }
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeMultiSampleArrayWidget::showFilterWidget(bool state)
-{
-    if(m_pFilterWindow) {
-        if(state) {
-            if(m_pFilterWindow->isActiveWindow()) {
-                m_pFilterWindow->hide();
-            } else {
-                m_pFilterWindow->activateWindow();
-                m_pFilterWindow->show();
-            }
-        } else {
-            m_pFilterWindow->hide();
-        }
     }
 }
 

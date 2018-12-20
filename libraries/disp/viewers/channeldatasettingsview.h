@@ -111,8 +111,15 @@ public:
     *
     * @param [in] parent        parent of widget
     */
-    ChannelDataSettingsView(QWidget *parent = 0,
-                Qt::WindowFlags f = Qt::Widget);
+    ChannelDataSettingsView(const QString& sSettingsPath = "",
+                            QWidget *parent = 0,
+                            Qt::WindowFlags f = Qt::Widget);
+
+    //=========================================================================================================
+    /**
+    * Destroys the ChannelDataSettingsView.
+    */
+    ~ChannelDataSettingsView();
 
     //=========================================================================================================
     /**
@@ -121,24 +128,31 @@ public:
     * @param [in] lVisibleWidgets       The widgets to be visible: numberChannels, windowSize, distanceSpacers,
     *                                   backgroundcolor, signalColor, screenshot
     */
-    void init(const QStringList &lVisibleWidgets = QStringList());
+    void setWidgetList(const QStringList &lVisibleWidgets = QStringList());
 
     //=========================================================================================================
     /**
-    * Sets the values of the zoomFactor and windowSize spin boxes
+    * Sets the values of the windowSize spin box
     *
-    * @param [in] zoomFactor    new zoomFactor value
     * @param [in] windowSize    new window size value
     */
-    void setViewParameters(double zoomFactor, int windowSize);
+    void setWindowSize(int windowSize);
 
     //=========================================================================================================
     /**
-    * Get current distance time spacer combo box.
+    * Sets the values of the zoomFactor spin box
     *
-    * @return the current distance time spacer combo box.
+    * @param [in] zoomFactor    new zoomFactor value
     */
-    QString getDistanceTimeSpacer();
+    void setZoom(double zoomFactor);
+
+    //=========================================================================================================
+    /**
+    * Get current distance time spacer.
+    *
+    * @return the current distance time spacer.
+    */
+    int getDistanceTimeSpacer();
 
     //=========================================================================================================
     /**
@@ -150,12 +164,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Set current signal and background colors.
+    * Set current  background color.
     *
-    * @param [in] signalColor       The new signal color.
     * @param [in] backgroundColor   The new background color.
     */
-    void setSignalBackgroundColors(const QColor& signalColor, const QColor& backgroundColor);
+    void setBackgroundColor(const QColor& backgroundColor);
+
+    //=========================================================================================================
+    /**
+    * Set current signal color.
+    *
+    * @param [in] signalColor       The new signal color.
+    */
+    void setSignalColor(const QColor& signalColor);
 
     //=========================================================================================================
     /**
@@ -173,7 +194,39 @@ public:
     */
     const QColor& getBackgroundColor();
 
+    //=========================================================================================================
+    /**
+    * Returns the current zoom.
+    *
+    * @return The current zoom.
+    */
+    double getZoom();
+
+    //=========================================================================================================
+    /**
+    * Returns the current window size.
+    *
+    * @return The current window size.
+    */
+    int getWindowSize();
+
 protected:
+    //=========================================================================================================
+    /**
+    * Saves all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to store the settings to.
+    */
+    void saveSettings(const QString& settingsPath);
+
+    //=========================================================================================================
+    /**
+    * Loads and inits all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to load the settings from.
+    */
+    void loadSettings(const QString& settingsPath);
+
     //=========================================================================================================
     /**
     * Slot called when time window size changes
@@ -208,8 +261,9 @@ protected:
 
     Ui::ChannelDataSettingsViewWidget* ui;
 
-    QColor  m_colCurrentSignalColor;        /**< Current color of the signal. */
-    QColor  m_colCurrentBackgroundColor;    /**< Current color of the background. */
+    QColor      m_colCurrentSignalColor;        /**< Current color of the signal. */
+    QColor      m_colCurrentBackgroundColor;    /**< Current color of the background. */
+    QString     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
 signals:
     //=========================================================================================================

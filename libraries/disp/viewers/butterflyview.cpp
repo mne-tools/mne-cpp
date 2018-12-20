@@ -91,7 +91,7 @@ ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
 
 //*************************************************************************************************************
 
-void ButterflyView::setModel(QSharedPointer<EvokedSetModel> model)
+void ButterflyView::setEvokedSetModel(QSharedPointer<EvokedSetModel> model)
 {
     m_pEvokedSetModel = model;
 
@@ -235,7 +235,7 @@ void ButterflyView::setAverageActivation(const QSharedPointer<QMap<QString, bool
 
 //*************************************************************************************************************
 
-void ButterflyView::setModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
+void ButterflyView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
 {
     m_pChannelInfoModel = pChannelInfoModel;
 }
@@ -435,6 +435,11 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = m_pEvokedSetModel->getKind(row);
     float fMaxValue = 1e-9f;
+    bool bIsBad = m_pEvokedSetModel->getIsChannelBad(row);
+
+    if(bIsBad) {
+        painter.setOpacity(0.20);
+    }
 
     switch(kind) {
         case FIFFV_MEG_CH: {

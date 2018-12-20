@@ -50,6 +50,7 @@
 
 #include <QGroupBox>
 #include <QTabWidget>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -65,13 +66,15 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QuickControlView::QuickControlView(const QString& name,
+QuickControlView::QuickControlView(const QString &sSettingsPath,
+                                   const QString& name,
                                    Qt::WindowFlags flags,
                                    QWidget *parent,
                                    bool bDraggable)
 : DraggableFramelessWidget(parent, flags, false, bDraggable)
 , ui(new Ui::QuickControlViewWidget)
 , m_sName(name)
+, m_sSettingsPath(sSettingsPath)
 {
     ui->setupUi(this);
 
@@ -87,6 +90,8 @@ QuickControlView::QuickControlView(const QString& name,
             this, &QuickControlView::hide);
 
     this->adjustSize();
+
+    loadSettings(m_sSettingsPath);
 }
 
 
@@ -100,6 +105,8 @@ QuickControlView::~QuickControlView()
             m_lControlWidgets.at(i)->setParent(0);
         }
     }
+
+    saveSettings(m_sSettingsPath);
 
     delete ui;
 }
@@ -172,6 +179,7 @@ void QuickControlView::addGroupBoxWithTabs(QSharedPointer<QWidget> pWidget,
 
 }
 
+
 //*************************************************************************************************************
 
 void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,
@@ -207,14 +215,6 @@ void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,
 
 //*************************************************************************************************************
 
-void QuickControlView::onOpacityChange(qint32 value)
-{
-    this->setWindowOpacity(1/(100.0/value));
-}
-
-
-//*************************************************************************************************************
-
 void QuickControlView::setOpacityValue(int opactiy)
 {
     ui->m_horizontalSlider_opacity->setValue(opactiy);
@@ -239,6 +239,48 @@ void QuickControlView::setVisiblityHideOpacityClose(bool bVisibility)
     ui->m_pushButton_hideAll->setVisible(bVisibility);
     ui->m_horizontalSlider_opacity->setVisible(bVisibility);
     ui->m_label_opacity->setVisible(bVisibility);
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    settings.setValue(settingsPath + QString("/QuickControlViewOpacity"), getOpacityValue());
+    settings.setValue(settingsPath + QString("/QuickControlViewPos"), this->pos());
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    setOpacityValue(settings.value(settingsPath + QString("/QuickControlViewOpacity"), 100).toInt());
+    move(settings.value(settingsPath + QString("/QuickControlViewPos"), QPoint(100,100)).toPoint());
+}
+
+
+//*************************************************************************************************************
+
+void QuickControlView::onOpacityChange(qint32 value)
+{
+    if(value <= 0) {
+        this->setWindowOpacity(1);
+    } else {
+        this->setWindowOpacity(1/(100.0/value));
+    }
 }
 
 

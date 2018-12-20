@@ -41,7 +41,7 @@
 //=============================================================================================================
 
 #include "data3Dtreedelegate.h"
-#include "data3Dtreemodel.h"
+#include "../model/data3Dtreemodel.h"
 
 #include <disp/plots/imagesc.h>
 #include <disp/plots/spline.h>

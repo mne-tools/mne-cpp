@@ -56,15 +56,26 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace DISPLIB {
+    class QuickControlView;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE SCDISPLIB
 //=============================================================================================================
 
 namespace SCDISPLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// SCDISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 //*************************************************************************************************************
@@ -157,6 +168,16 @@ protected:
     */
     inline void addDisplayWidget(QWidget* pWidget);
 
+    //=========================================================================================================
+    /**
+    * Adds control widgets to a QuickControlView based on their set objects names
+    *
+    * @param [in] pQuickControlView  The quick control view to add the control widgets to
+    * @param [in] lControlWidgets  The control widgets
+    */
+    void addControlWidgets(QSharedPointer<DISPLIB::QuickControlView> pQuickControlView,
+                           const QList<QSharedPointer<QWidget> >& lControlWidgets);
+
 private:
     QList< QAction* >   m_qListDisplayActions;      /**< List of display actions */
     QList< QWidget* >   m_qListDisplayWidgets;       /**< List of display widgets to attach to the toolbar */
@@ -196,6 +217,7 @@ inline void MeasurementWidget::addDisplayWidget(QWidget* pWidget)
 {
     m_qListDisplayWidgets.append(pWidget);
 }
+
 
 } //NAMESPACE
 

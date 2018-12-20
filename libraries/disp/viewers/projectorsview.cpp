@@ -40,7 +40,7 @@
 
 #include "projectorsview.h"
 
-#include <fiff/fiff_info.h>
+#include <fiff/fiff_proj.h>
 
 
 //*************************************************************************************************************
@@ -51,6 +51,7 @@
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QFrame>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -73,78 +74,147 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ProjectorsView::ProjectorsView(QWidget *parent,
-                         Qt::WindowFlags f)
+ProjectorsView::ProjectorsView(const QString& sSettingsPath,
+                               QWidget *parent,
+                               Qt::WindowFlags f)
 : QWidget(parent, f)
 , m_pEnableDisableProjectors(Q_NULLPTR)
+, m_sSettingsPath(sSettingsPath)
 {
     this->setWindowTitle("Projectors");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
+
+    loadSettings(m_sSettingsPath);
+    redrawGUI();
 }
 
 
 //*************************************************************************************************************
 
-void ProjectorsView::init(const FiffInfo::SPtr pFiffInfo)
+ProjectorsView::~ProjectorsView()
 {
-    if(pFiffInfo) {
-        m_pFiffInfo = pFiffInfo;
+    saveSettings(m_sSettingsPath);
+}
 
-        //If no projectors are defined return here
-        if(pFiffInfo->projs.empty()) {
-            return;
+
+//*************************************************************************************************************
+
+QList<FIFFLIB::FiffProj> ProjectorsView::getProjectors() const
+{
+    return m_pProjs;
+}
+
+
+//*************************************************************************************************************
+
+void ProjectorsView::setProjectors(const QList<FIFFLIB::FiffProj>& projs)
+{
+    m_pProjs = projs;
+
+    for(int i = 0; i < m_pProjs.size(); ++i) {
+        if(!m_mapProjActive.contains(m_pProjs.at(i).desc)) {
+            m_mapProjActive.insert(m_pProjs.at(i).desc, m_pProjs.at(i).active);
+        } else {
+            m_pProjs[i].active = m_mapProjActive[m_pProjs.at(i).desc];
         }
-
-        m_qListProjCheckBox.clear();
-        // Projection Selection
-        QGridLayout *topLayout = new QGridLayout;
-
-        bool bAllActivated = true;
-
-        qint32 i=0;
-
-        for(i; i < pFiffInfo->projs.size(); ++i)
-        {
-            QCheckBox* checkBox = new QCheckBox(pFiffInfo->projs[i].desc);
-            checkBox->setChecked(pFiffInfo->projs[i].active);
-
-            if(pFiffInfo->projs[i].active == false)
-                bAllActivated = false;
-
-            m_qListProjCheckBox.append(checkBox);
-
-            connect(checkBox, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-                    this, &ProjectorsView::onCheckProjStatusChanged);
-
-            topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
-
-//            if(i>m_pFiffInfo->projs.size()/2)
-//                topLayout->addWidget(checkBox, i-rowCount, 1); //+2 because we already added two widgets before the first projector check box
-//            else {
-//                topLayout->addWidget(checkBox, i, 0); //+2 because we already added two widgets before the first projector check box
-//                rowCount++;
-//            }
-        }
-
-        QFrame* line = new QFrame();
-        line->setFrameShape(QFrame::HLine);
-        line->setFrameShadow(QFrame::Sunken);
-
-        topLayout->addWidget(line, i+1, 0);
-
-        m_pEnableDisableProjectors = new QCheckBox("Enable all");
-        m_pEnableDisableProjectors->setChecked(bAllActivated);
-        topLayout->addWidget(m_pEnableDisableProjectors, i+2, 0);
-        connect(m_pEnableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &ProjectorsView::onEnableDisableAllProj);
-
-        //Find SSP tab and add current layout
-        this->setLayout(topLayout);
-
-        //Set default activation to true
-        onEnableDisableAllProj(true);
     }
+
+    redrawGUI();
+}
+
+
+//*************************************************************************************************************
+
+void ProjectorsView::redrawGUI()
+{
+    if(m_pProjs.isEmpty()) {
+        return;
+    }
+
+    m_qListProjCheckBox.clear();
+
+    // Projection Selection
+    QGridLayout *topLayout = new QGridLayout;
+
+    bool bAllActivated = true;
+
+    qint32 i = 0;
+
+    for(i; i < m_pProjs.size(); ++i) {
+        QCheckBox* checkBox = new QCheckBox(m_pProjs.at(i).desc);
+
+        if(m_pProjs.at(i).active == false) {
+            bAllActivated = false;
+        }
+
+        m_qListProjCheckBox.append(checkBox);
+
+        connect(checkBox, &QCheckBox::toggled,
+                this, &ProjectorsView::onCheckProjStatusChanged);
+
+        checkBox->setChecked(m_pProjs.at(i).active);
+
+        topLayout->addWidget(checkBox, i, 0);
+    }
+
+    QFrame* line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+
+    topLayout->addWidget(line, i+1, 0);
+
+    m_pEnableDisableProjectors = new QCheckBox("Enable all");
+    m_pEnableDisableProjectors->setChecked(bAllActivated);
+    topLayout->addWidget(m_pEnableDisableProjectors, i+2, 0);
+    connect(m_pEnableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+        this, &ProjectorsView::onEnableDisableAllProj);
+
+    this->setLayout(topLayout);
+
+    onCheckProjStatusChanged();
+}
+
+
+//*************************************************************************************************************
+
+void ProjectorsView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    settings.beginGroup(settingsPath + QString("/projectorsActive"));
+
+    QMap<QString,bool>::const_iterator iProj = m_mapProjActive.constBegin();
+    while (iProj != m_mapProjActive.constEnd()) {
+         settings.setValue(iProj.key(), iProj.value());
+         ++iProj;
+    }
+
+    settings.endGroup();
+}
+
+
+//*************************************************************************************************************
+
+void ProjectorsView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+
+    settings.beginGroup(settingsPath + QString("/projectorsActive"));
+
+    QStringList keys = settings.childKeys();
+    foreach (QString key, keys) {
+        m_mapProjActive[key] = settings.value(key).toBool();
+    }
+    settings.endGroup();
 }
 
 
@@ -153,39 +223,43 @@ void ProjectorsView::init(const FiffInfo::SPtr pFiffInfo)
 void ProjectorsView::onEnableDisableAllProj(bool status)
 {
     //Set all checkboxes to status
-    for(int i=0; i<m_qListProjCheckBox.size(); i++)
+    for(int i = 0; i<m_qListProjCheckBox.size(); i++) {
         m_qListProjCheckBox.at(i)->setChecked(status);
+    }
 
     //Set all projection activation states to status
-    for(int i=0; i < m_pFiffInfo->projs.size(); ++i)
-        m_pFiffInfo->projs[i].active = status;
+    for(int i = 0; i < m_pProjs.size(); ++i) {
+        m_pProjs[i].active = status;
+        m_mapProjActive[m_pProjs.at(i).desc] = status;
+
+    }
 
     if(m_pEnableDisableProjectors) {
         m_pEnableDisableProjectors->setChecked(status);
     }
 
-    emit projSelectionChanged(m_pFiffInfo->projs);
+    emit projSelectionChanged(m_pProjs);
 }
 
 
 //*************************************************************************************************************
 
-void ProjectorsView::onCheckProjStatusChanged(bool status)
+void ProjectorsView::onCheckProjStatusChanged()
 {
-    Q_UNUSED(status)
-
     bool bAllActivated = true;
 
     for(qint32 i = 0; i < m_qListProjCheckBox.size(); ++i) {
-        if(m_qListProjCheckBox[i]->isChecked() == false)
+        if(m_qListProjCheckBox.at(i)->isChecked() == false) {
             bAllActivated = false;
+        }
 
-        this->m_pFiffInfo->projs[i].active = m_qListProjCheckBox[i]->isChecked();
+        m_pProjs[i].active = m_qListProjCheckBox.at(i)->isChecked();
+        m_mapProjActive[m_pProjs.at(i).desc] = m_qListProjCheckBox.at(i)->isChecked();
     }
 
     if(m_pEnableDisableProjectors) {
         m_pEnableDisableProjectors->setChecked(bAllActivated);
     }
 
-    emit projSelectionChanged(m_pFiffInfo->projs);
+    emit projSelectionChanged(m_pProjs);
 }

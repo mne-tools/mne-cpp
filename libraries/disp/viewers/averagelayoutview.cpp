@@ -104,7 +104,7 @@ AverageLayoutView::AverageLayoutView(QWidget *parent,
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
+void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
 {
     m_pChannelInfoModel = pChannelInfoModel;
 }
@@ -112,7 +112,7 @@ void AverageLayoutView::setModel(QSharedPointer<ChannelInfoModel> &pChannelInfoM
 
 //*************************************************************************************************************
 
-void AverageLayoutView::setModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel)
+void AverageLayoutView::setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel)
 {
     connect(pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
             this, &AverageLayoutView::updateData);
@@ -294,6 +294,7 @@ void AverageLayoutView::updateData()
             averageSceneItemTemp->m_iChannelNumber = channelNumber;
             averageSceneItemTemp->m_iTotalNumberChannels = m_pEvokedSetModel->rowCount();
             averageSceneItemTemp->m_lAverageData = averageData;
+            averageSceneItemTemp->m_bIsBad = m_pEvokedSetModel->getIsChannelBad(channelNumber);
         }
     }
 
