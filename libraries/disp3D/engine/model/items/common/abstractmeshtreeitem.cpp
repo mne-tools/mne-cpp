@@ -228,7 +228,9 @@ void AbstractMeshTreeItem::setVertices(const MatrixX3f& tMatVert,
                                    tMatColors,
                                    primitiveType);
 
-        this->setData(QVariant(tMatVert.rows()), Data3DTreeModelItemRoles::NumberVertices);
+        int iNumVerts = tMatVert.rows();
+
+        this->setData(QVariant(iNumVerts), Data3DTreeModelItemRoles::NumberVertices);
     }
 }
 
