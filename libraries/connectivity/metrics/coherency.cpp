@@ -364,7 +364,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         if(vecPairCsdSum.isEmpty()) {
             vecPairCsdSum = inputData.vecPairCsd;
         } else {
-            for (int j = 0; j < vecPairCsdSum.size(); ++j) {
+            for (j = 0; j < vecPairCsdSum.size(); ++j) {
                 vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
             }
         }

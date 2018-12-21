@@ -182,9 +182,10 @@ QList<Network> Connectivity::calculateMultiMethods(ConnectivitySettings& connect
     if(lMethods.contains("COH")) {
         ConnectivitySettings temp = tempfirst;
         timer.restart();
-        future = QtConcurrent::run(Coherence::calculate, temp);
-        future.waitForFinished();
-        results.append(future.result());
+//        future = QtConcurrent::run(Coherence::calculate, temp);
+//        future.waitForFinished();
+//        results.append(future.result());
+        results.append(Coherence::calculate(connectivitySettings));
         qDebug() << "Connectivity::calculateMultiMethods - Calculated COH in "<< timer.elapsed() << "msecs.";
     }
 

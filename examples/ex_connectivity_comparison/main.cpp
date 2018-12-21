@@ -361,7 +361,7 @@ int main(int argc, char *argv[])
 
     // Compute the connectivity estimates for the methods to be compared
     ConnectivitySettings conSettings;
-    conSettings.setConnectivityMethods(QStringList() << "COR" << "XCOR" << "PLI" << "COH" << "IMAGCOH" << "PLV" << "WPLI" << "USPLI" << "DSWPLI");
+    conSettings.setConnectivityMethods(QStringList() << "COH"); //"COR" << "XCOR" << "PLI" << "COH" << "IMAGCOH" << "PLV" << "WPLI" << "USPLI" << "DSWPLI");
     conSettings.append(matDataList);
     conSettings.setNodePositions(matNodePositions);
     conSettings.setSamplingFrequency(raw.info.sfreq);
@@ -386,7 +386,7 @@ int main(int argc, char *argv[])
     mColor.insert("DSWPLI",Vector4i(255, 0, 255, 1));
 
     for(int j = 0; j < lNetworks.size(); ++j) {
-        lNetworks[j].setFrequencyBins(iFreqBandLow, iFreqBandHigh);
+//        lNetworks[j].setFrequencyBins(iFreqBandLow, iFreqBandHigh);
         lNetworks[j].normalize();
         VisualizationInfo visInfo = lNetworks.at(j).getVisualizationInfo();
         visInfo.sMethod = "Color";
