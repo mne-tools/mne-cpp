@@ -233,8 +233,6 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
     }
 
     // Compute CSD
-    MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-
     if(inputData.vecPairCsd.isEmpty()) {
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
@@ -242,6 +240,8 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
         if (iNfft % 2 == 0){
             bNfftEven = true;
         }
+
+        MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
 
         for (i = 0; i < iNRows; ++i) {
             for (j = i; j < iNRows; ++j) {

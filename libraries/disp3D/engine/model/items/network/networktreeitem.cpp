@@ -132,9 +132,9 @@ void NetworkTreeItem::initItem()
     list << new QStandardItem(pItemNetworkMatrix->toolTip());
     this->appendRow(list);
 
-    //Set material
-    NetworkMaterial* pNetworkMaterial = new NetworkMaterial();
-    this->setMaterial(pNetworkMaterial);
+//    //Set material
+//    NetworkMaterial* pNetworkMaterial = new NetworkMaterial();
+//    this->setMaterial(pNetworkMaterial);
 }
 
 
@@ -268,7 +268,7 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
         //Add material
         GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(false);
         pMaterial->setAmbient(ColorMap::valueToJet(0.0));
-        //pMaterial->setAlpha(1.0f);
+        pMaterial->setAlpha(1.0);
         m_pNodesEntity->addComponent(pMaterial);
     }
 
@@ -349,7 +349,7 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
         //Add material
         GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(false);
         pMaterial->setAmbient(ColorMap::valueToJet(0.0));
-        //pMaterial->setAlpha(1.0f);
+        pMaterial->setAlpha(1.0f);
         m_pEdgeEntity->addComponent(pMaterial);
     }
 
