@@ -472,6 +472,10 @@ bool Neuromag::stop()
         m_pRTMSA_Neuromag->data()->clear();
     }
 
+    if(m_pHPIWidget) {
+        m_pHPIWidget->hide();
+    }
+
     return true;
 }
 
