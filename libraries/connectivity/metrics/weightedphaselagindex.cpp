@@ -230,13 +230,13 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
     }
 
     // Compute CSD
-    bool bNfftEven = false;
-    if (iNfft % 2 == 0){
-        bNfftEven = true;
-    }
-
     if(inputData.vecPairCsd.isEmpty()) {
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
+
+        bool bNfftEven = false;
+        if (iNfft % 2 == 0){
+            bNfftEven = true;
+        }
 
         MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
 

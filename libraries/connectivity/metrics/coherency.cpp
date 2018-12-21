@@ -334,7 +334,9 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
     // Compute CSD
     MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
 
-    if(inputData.vecPairCsd.isEmpty()) {
+    if(inputData.vecPairCsd.size() != iNRows) {
+        inputData.vecPairCsd.clear();
+
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
         bool bNfftEven = false;

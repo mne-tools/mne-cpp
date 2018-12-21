@@ -195,11 +195,11 @@ private:
 
     QPointer<MetaTreeItem>                          m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
 
-    QPointer<QEntity>                               m_pNodesEntity;
-    QSharedPointer<Qt3DExtras::QSphereGeometry>     m_pNodesGeometry;               /**< The network geomtries for incoming edges. */
-    QPointer<GeometryMultiplier>                    m_pNodes;                       /**< The geometry multiplier for incoming edges. */
+    QPointer<QEntity>                               m_pNodesEntity;                 /**< The network node entity. */
+    QSharedPointer<Qt3DExtras::QSphereGeometry>     m_pNodesGeometry;               /**< The network node geometry. */
+    QPointer<GeometryMultiplier>                    m_pNodes;                       /**< The network nodes. */
 
-    QPointer<QEntity>                               m_pEdgeEntity;
+    QPointer<QEntity>                               m_pEdgeEntity;                  /**< The network edge entity. */
     QSharedPointer<Qt3DExtras::QCylinderGeometry>   m_pEdgesGeometry;               /**< The network geomtries for edges. */
     QPointer<GeometryMultiplier>                    m_pEdges;                       /**< The geometry multiplier for edges. */
 

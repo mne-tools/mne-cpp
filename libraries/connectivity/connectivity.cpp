@@ -133,73 +133,84 @@ QList<Network> Connectivity::calculateMultiMethods(ConnectivitySettings& connect
     QList<Network> results;
     QElapsedTimer timer;
 
-    if(lMethods.contains("COR")) {
-        timer.restart();
-        future = QtConcurrent::run(Correlation::calculate, connectivitySettings);
-        future.waitForFinished();
-        results.append(future.result());
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated COR in "<< timer.elapsed() << "msecs.";
-    }
-
-    if(lMethods.contains("XCOR")) {
-        timer.restart();
-        future = QtConcurrent::run(CrossCorrelation::calculate, connectivitySettings);
-        future.waitForFinished();
-        results.append(future.result());
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated XCOR in "<< timer.elapsed() << "msecs.";
-    }
-
-    if(lMethods.contains("PLI")) {
-        timer.restart();
-        future = QtConcurrent::run(PhaseLagIndex::calculate, connectivitySettings);
-        future.waitForFinished();
-        results.append(future.result());
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated PLI in "<< timer.elapsed() << "msecs.";
-    }
-
-    if(lMethods.contains("COH")) {
-        timer.restart();
-        future = QtConcurrent::run(Coherence::calculate, connectivitySettings);
-        future.waitForFinished();
-        results.append(future.result());
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated COH in "<< timer.elapsed() << "msecs.";
-    }
-
-    if(lMethods.contains("IMAGCOH")) {
-        timer.restart();
-        future = QtConcurrent::run(ImagCoherence::calculate, connectivitySettings);
-        future.waitForFinished();
-        results.append(future.result());
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated IMAGCOH in "<< timer.elapsed() << "msecs.";
-    }
-
-    if(lMethods.contains("PLV")) {
-        timer.restart();
-        future = QtConcurrent::run(PhaseLockingValue::calculate, connectivitySettings);
-        future.waitForFinished();
-        results.append(future.result());
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated PLV in "<< timer.elapsed() << "msecs.";
-    }
-
     if(lMethods.contains("WPLI")) {
+        ConnectivitySettings temp = connectivitySettings;
         timer.restart();
-        future = QtConcurrent::run(WeightedPhaseLagIndex::calculate, connectivitySettings);
+        future = QtConcurrent::run(WeightedPhaseLagIndex::calculate, temp);
         future.waitForFinished();
         results.append(future.result());
         qDebug() << "Connectivity::calculateMultiMethods - Calculated WPLI in "<< timer.elapsed() << "msecs.";
     }
 
     if(lMethods.contains("USPLI")) {
+        ConnectivitySettings temp = connectivitySettings;
         timer.restart();
-        future = QtConcurrent::run(UnbiasedSquaredPhaseLagIndex::calculate, connectivitySettings);
+        future = QtConcurrent::run(UnbiasedSquaredPhaseLagIndex::calculate, temp);
         future.waitForFinished();
         results.append(future.result());
         qDebug() << "Connectivity::calculateMultiMethods - Calculated USPLI in "<< timer.elapsed() << "msecs.";
     }
 
-    if(lMethods.contains("DSWPLI")) {
+    if(lMethods.contains("COR")) {
+        ConnectivitySettings temp = connectivitySettings;
         timer.restart();
-        future = QtConcurrent::run(DebiasedSquaredWeightedPhaseLagIndex::calculate, connectivitySettings);
+        future = QtConcurrent::run(Correlation::calculate, temp);
+        future.waitForFinished();
+        results.append(future.result());
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated COR in "<< timer.elapsed() << "msecs.";
+    }
+
+    if(lMethods.contains("XCOR")) {
+        ConnectivitySettings temp = connectivitySettings;
+        timer.restart();
+        future = QtConcurrent::run(CrossCorrelation::calculate, temp);
+        future.waitForFinished();
+        results.append(future.result());
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated XCOR in "<< timer.elapsed() << "msecs.";
+    }
+
+    if(lMethods.contains("PLI")) {
+        ConnectivitySettings temp = connectivitySettings;
+        timer.restart();
+        future = QtConcurrent::run(PhaseLagIndex::calculate, temp);
+        future.waitForFinished();
+        results.append(future.result());
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated PLI in "<< timer.elapsed() << "msecs.";
+    }
+
+    if(lMethods.contains("COH")) {
+        ConnectivitySettings temp = connectivitySettings;
+        timer.restart();
+        future = QtConcurrent::run(Coherence::calculate, temp);
+        future.waitForFinished();
+        results.append(future.result());
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated COH in "<< timer.elapsed() << "msecs.";
+    }
+
+    if(lMethods.contains("IMAGCOH")) {
+        ConnectivitySettings temp = connectivitySettings;
+        timer.restart();
+        future = QtConcurrent::run(ImagCoherence::calculate, temp);
+        future.waitForFinished();
+        results.append(future.result());
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated IMAGCOH in "<< timer.elapsed() << "msecs.";
+    }
+
+    if(lMethods.contains("PLV")) {
+        ConnectivitySettings temp = connectivitySettings;
+        timer.restart();
+        future = QtConcurrent::run(PhaseLockingValue::calculate, temp);
+        future.waitForFinished();
+        results.append(future.result());
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated PLV in "<< timer.elapsed() << "msecs.";
+    }
+
+
+
+    if(lMethods.contains("DSWPLI")) {
+        ConnectivitySettings temp = connectivitySettings;
+        timer.restart();
+        future = QtConcurrent::run(DebiasedSquaredWeightedPhaseLagIndex::calculate, temp);
         future.waitForFinished();
         results.append(future.result());
         qDebug() << "Connectivity::calculateMultiMethods - Calculated DSWPLI in "<< timer.elapsed() << "msecs.";
