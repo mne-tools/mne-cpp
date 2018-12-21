@@ -161,7 +161,6 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
                                                                    "RT Averaging",
                                                                    Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
                                                                    this);
-    m_pActionQuickControl->setVisible(true);
 
     this->addControlWidgets(m_pQuickControlView,
                             m_pRTESet->getControlWidgets());
@@ -178,13 +177,11 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
     // Store Settings
     if(!m_pRTESet->getName().isEmpty())
     {
-        QString t_sRTESName = m_pRTESet->getName();
-
         QSettings settings;
 
         //Store current view toolbox index - butterfly or 2D layout
         if(m_pToolBox) {
-            settings.setValue(QString("RTESW/%1/selectedView").arg(t_sRTESName), m_pToolBox->currentIndex());
+            settings.setValue(QString("RTESW/%1/selectedView").arg(m_pRTESet->getName()), m_pToolBox->currentIndex());
         }
     }
 }
@@ -230,6 +227,8 @@ void RealTimeEvokedSetWidget::getData()
 void RealTimeEvokedSetWidget::init()
 {
     if(m_pFiffInfo) {
+        m_pActionQuickControl->setVisible(true);
+
         QSettings settings;
         QString t_sRTESName = m_pRTESet->getName();
 
@@ -247,6 +246,7 @@ void RealTimeEvokedSetWidget::init()
         FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
         pEvokedSet->info = *m_pFiffInfo.data();
         m_pEvokedSetModel->setEvokedSet(pEvokedSet);
+        m_pButterflyView->setEvokedSetModel(m_pEvokedSetModel);
 
         //Init channel info and selection view
         m_pChannelInfoModel = ChannelInfoModel::SPtr::create(m_pFiffInfo,
@@ -269,6 +269,11 @@ void RealTimeEvokedSetWidget::init()
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::selectionChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::channelSelectionManagerChanged);
 
+        // Init the views. This needs to be done in the following order because we need to draw the items in the m_pChannelSelectionView first, hence we need to init it first.
+        m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
+        m_pChannelSelectionView->updateDataView();
+        m_pAverageLayoutView->setEvokedSetModel(m_pEvokedSetModel);
+        m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
         m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
         // Quick control scaling        
@@ -281,6 +286,9 @@ void RealTimeEvokedSetWidget::init()
 
         connect(pScalingView, &ScalingView::scalingChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::setScaleMap);
+
+        m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
+        m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
 
         // Quick control projectors
         ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTESW/%1").arg(t_sRTESName));
@@ -361,6 +369,8 @@ void RealTimeEvokedSetWidget::init()
         connect(pModalitySelectionView, &ModalitySelectionView::modalitiesChanged,
                 m_pButterflyView.data(), &ButterflyView::setModalityMap);
 
+        m_pButterflyView->setModalityMap(pModalitySelectionView->getModalityMap());
+
         // Quick control average selection
         AverageSelectionView* pAverageSelectionView = new AverageSelectionView(QString("RTESW/%1").arg(t_sRTESName));
         m_pQuickControlView->addGroupBoxWithTabs(pAverageSelectionView, "Averaging", "Selection");
@@ -390,23 +400,10 @@ void RealTimeEvokedSetWidget::init()
 
         m_pEvokedSetModel->setAverageActivation(pAverageSelectionView->getAverageActivation());
         m_pEvokedSetModel->setAverageColor(pAverageSelectionView->getAverageColor());
-
-        // View settings
-        m_pButterflyView->setEvokedSetModel(m_pEvokedSetModel);
         m_pButterflyView->setAverageActivation(pAverageSelectionView->getAverageActivation());
         m_pButterflyView->setAverageColor(pAverageSelectionView->getAverageColor());
-        m_pButterflyView->setChannelInfoModel(m_pChannelInfoModel);
-        m_pButterflyView->setScaleMap(pScalingView->getScaleMap());
-        m_pButterflyView->setModalityMap(pModalitySelectionView->getModalityMap());
-
-        // Call this function before the layout calls below so that the scene items are drawn first
-        m_pChannelSelectionView->updateDataView();
-
-        m_pAverageLayoutView->setEvokedSetModel(m_pEvokedSetModel);
         m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
         m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
-        m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
-        m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
 
         //Initialized
         m_bInitialized = true;
