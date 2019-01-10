@@ -142,7 +142,7 @@ QList<Network> Connectivity::calculateMultiMethods(ConnectivitySettings& connect
 
     if(lMethods.contains("USPLI")) {
         timer.restart();
-        results.append(CrossCorrelation::calculate(connectivitySettings));
+        results.append(UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings));
         qDebug() << "Connectivity::calculateMultiMethods - Calculated USPLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
     }
 
