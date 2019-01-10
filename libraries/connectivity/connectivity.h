@@ -113,7 +113,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Computes the network based on the current settings.
+    * Computes the network based on the current settings. This functions automatically clears the intermediate data after it is finished.
     *
     * @return Returns the list with calculated networks for each provided method.
     */

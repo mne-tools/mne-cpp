@@ -361,7 +361,7 @@ int main(int argc, char *argv[])
 
     // Compute the connectivity estimates for the methods to be compared
     ConnectivitySettings conSettings;
-    conSettings.setConnectivityMethods(QStringList() << "COH"); //"COR" << "XCOR" << "PLI" << "COH" << "IMAGCOH" << "PLV" << "WPLI" << "USPLI" << "DSWPLI");
+    conSettings.setConnectivityMethods(QStringList() << "COH" << "COR" << "XCOR" << "PLI" << "COH" << "IMAGCOH" << "PLV" << "WPLI" << "USPLI" << "DSWPLI");
     conSettings.append(matDataList);
     conSettings.setNodePositions(matNodePositions);
     conSettings.setSamplingFrequency(raw.info.sfreq);
@@ -375,18 +375,18 @@ int main(int argc, char *argv[])
     int iFreqBandHigh = 13 * dScaleFactor;
 
     QMap<QString,Vector4i> mColor;
-    mColor.insert("COR",Vector4i(0, 0, 0, 1));
-    mColor.insert("XCOR",Vector4i(255, 200, 0, 1));
+    mColor.insert("COR",Vector4i(90, 26, 100, 1));
+    mColor.insert("XCOR",Vector4i(255, 20, 80, 1));
     mColor.insert("PLI",Vector4i(255, 255, 0, 1));
-    mColor.insert("COH",Vector4i(255, 100, 0, 1));
-    mColor.insert("IMAGCOH",Vector4i(0, 255, 200, 1));
+    mColor.insert("COH",Vector4i(2, 89, 100, 1));
+    mColor.insert("IMAGCOH",Vector4i(50, 255, 48, 1));
     mColor.insert("PLV",Vector4i(0, 255, 255, 1));
     mColor.insert("WPLI",Vector4i(255, 0, 100, 1));
     mColor.insert("USPLI",Vector4i(255, 0, 200, 1));
     mColor.insert("DSWPLI",Vector4i(255, 0, 255, 1));
 
     for(int j = 0; j < lNetworks.size(); ++j) {
-//        lNetworks[j].setFrequencyBins(iFreqBandLow, iFreqBandHigh);
+        lNetworks[j].setFrequencyBins(iFreqBandLow, iFreqBandHigh);
         lNetworks[j].normalize();
         VisualizationInfo visInfo = lNetworks.at(j).getVisualizationInfo();
         visInfo.sMethod = "Color";
