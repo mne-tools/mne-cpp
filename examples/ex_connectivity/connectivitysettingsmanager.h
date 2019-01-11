@@ -102,8 +102,8 @@ public:
         double dScaleFactor = iBlockSize/m_fSFreq;
 
         // Convert to frequency bins
-        m_iFreqBandLow = 1 * dScaleFactor;
-        m_iFreqBandHigh = 50 * dScaleFactor;
+        m_iFreqBandLow = 7 * dScaleFactor;
+        m_iFreqBandHigh = 13 * dScaleFactor;
     }
 
     ConnectivitySettings    m_settings;
