@@ -394,16 +394,14 @@ int main(int argc, char *argv[])
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onFreqBandChanged);
 
     QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
-                     &tNetworkView, QOverload<const QString&, const QString&, const Network&>::of(&NetworkView::addData));
-
-    QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
-                     [&](const QString& a, const QString& b, const Network& c) {NetworkTreeItem* pNetworkTreeItems = tNetworkView.addData(a,b,c);
-                                                                                pNetworkTreeItems->setThresholds(QVector3D(0.8,0.9,1.0)); }
+                     [&](const QString& a, const QString& b, const Network& c) {if(NetworkTreeItem* pNetworkTreeItem = tNetworkView.addData(a,b,c)) {
+                                                                                    pNetworkTreeItem->setThresholds(QVector3D(0.8,0.9,1.0));
+                                                                                }}
     );
 
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
-        QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+        QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resoces/general/sensorSurfaces/306m_rt.fif");
         MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
         tNetworkView.getTreeModel()->addMegSensorInfo("Sensors",
                                                       "VectorView",
