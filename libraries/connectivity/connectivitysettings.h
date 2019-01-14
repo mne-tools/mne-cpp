@@ -139,6 +139,7 @@ public:
     bool isEmpty() const;
 
     void removeFirst(int iAmount = 1);
+    void removeLast(int iAmount = 1);
 
     void setConnectivityMethods(const QStringList& sConnectivityMethods);
 

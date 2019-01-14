@@ -231,6 +231,63 @@ void ConnectivitySettings::removeFirst(int iAmount)
 
 //*******************************************************************************************************
 
+void ConnectivitySettings::removeLast(int iAmount)
+{
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
+
+    if(!m_trialData.isEmpty()) {
+        // Substract the influence by the last item on all intermediate sum data
+        // Substract PSD of last trial from overall summed up PSD
+        if(m_intermediateSumData.matPsdSum.rows() == m_trialData.last().matPsd.rows() &&
+           m_intermediateSumData.matPsdSum.cols() == m_trialData.last().matPsd.cols() ) {
+            m_intermediateSumData.matPsdSum -= m_trialData.last().matPsd;
+        }
+
+        // Substract influence of trials from overall summed up intermediate data
+        int counter = iAmount;
+
+        for (int i = 0; i < m_trialData.last().matData.rows(); ++i) {
+            counter = iAmount;
+
+            while(counter > 0){
+                if(i < m_intermediateSumData.vecPairCsdSum.size() && (m_intermediateSumData.vecPairCsdSum.size() == m_trialData.last().vecPairCsd.size())) {
+                    m_intermediateSumData.vecPairCsdSum[i].second -= m_trialData.last().vecPairCsd.at(i).second;
+                }
+                if(i < m_intermediateSumData.vecPairCsdNormalizedSum.size() && (m_intermediateSumData.vecPairCsdNormalizedSum.size() == m_trialData.last().vecPairCsdNormalized.size())) {
+                    m_intermediateSumData.vecPairCsdNormalizedSum[i].second -= m_trialData.last().vecPairCsdNormalized.at(i).second;
+                }
+                if(i < m_intermediateSumData.vecPairCsdImagSignSum.size() && (m_intermediateSumData.vecPairCsdImagSignSum.size() == m_trialData.last().vecPairCsdImagSign.size())) {
+                    m_intermediateSumData.vecPairCsdImagSignSum[i].second -= m_trialData.last().vecPairCsdImagSign.at(i).second;
+                }
+                if(i < m_intermediateSumData.vecPairCsdImagAbsSum.size() && (m_intermediateSumData.vecPairCsdImagAbsSum.size() == m_trialData.last().vecPairCsdImagAbs.size())) {
+                    m_intermediateSumData.vecPairCsdImagAbsSum[i].second -= m_trialData.last().vecPairCsdImagAbs.at(i).second;
+                }
+                if(i < m_intermediateSumData.vecPairCsdImagSqrdSum.size() && (m_intermediateSumData.vecPairCsdImagSqrdSum.size() == m_trialData.last().vecPairCsdImagSqrd.size())) {
+                    m_intermediateSumData.vecPairCsdImagSqrdSum[i].second -= m_trialData.last().vecPairCsdImagSqrd.at(i).second;
+                }
+
+                counter--;
+            }
+        }
+
+        // Remove the actual data from the trial list
+        counter = iAmount;
+        while(counter > 0 && !m_trialData.isEmpty()){
+            m_trialData.removeLast();
+            counter--;
+        }
+    }
+
+//    iTime = timer.elapsed();
+//    qDebug() << "ConnectivitySettings::removeLast" << iTime;
+//    timer.restart();
+}
+
+
+//*******************************************************************************************************
+
 void ConnectivitySettings::setConnectivityMethods(const QStringList& sConnectivityMethods)
 {
     m_sConnectivityMethods = sConnectivityMethods;

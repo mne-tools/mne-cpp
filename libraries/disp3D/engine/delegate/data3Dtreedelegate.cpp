@@ -338,7 +338,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
             break;
         }
 
-        case MetaTreeItemTypes::DataThreshold: {              
+        case MetaTreeItemTypes::DataThreshold: {
             if(Spline* pSpline = static_cast<Spline*>(editor)) {
                 //Find the parent and retreive real-time data to calcualte the histogram
                 if(AbstractTreeItem* pParentItem = static_cast<AbstractTreeItem*>(pAbstractItem->QStandardItem::parent())) {
