@@ -138,10 +138,12 @@ public:
 //        qint64 iTime = 0;
 //        timer.start();
 
+        //The maximum number of trials will always be the number of orginal trials stored
         if(iNumberTrials > m_dataListOriginal.size()) {
             iNumberTrials = m_dataListOriginal.size();
         }
 
+        //If the number of trials did not change compared to last time return
         if(iNumberTrials == m_settings.size()) {
             return;
         }
@@ -150,7 +152,7 @@ public:
         int size = m_settings.size();
 
         if(size > iNumberTrials) {
-            m_settings.removeFirst(size-iNumberTrials);
+            m_settings.removeLast(size-iNumberTrials);
         }
 
         while(m_settings.size() < iNumberTrials) {
@@ -166,7 +168,7 @@ public:
 //                }
 //            }
 
-            m_settings.append(m_dataListOriginal.at(m_settings.size()));
+            m_settings.append(m_dataListOriginal.at(m_settings.size()-1));
         }
 
         //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - m_indexList" << m_indexList;
