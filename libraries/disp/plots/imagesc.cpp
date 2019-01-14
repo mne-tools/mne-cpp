@@ -128,6 +128,9 @@ void ImageSc::init()
     //Parent init
     Graph::init();
 
+    m_iBorderTopBottom = 20;
+    m_iBorderLeftRight = 60;
+
     //Colormap
     pColorMapper = ColorMap::valueToJet;
 
@@ -138,7 +141,6 @@ void ImageSc::init()
     m_iColorbarWidth = 12;
     m_iColorbarSteps = 7;//>= 2!!
     m_iColorbarGradSteps = 200;
-
 }
 
 
