@@ -28,27 +28,31 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Implements mne_show_fiff application of MNE-C
+# @brief    build and distribution settings for mne_plugin_creator
 #
 #--------------------------------------------------------------------------------------------------------------
+include(../../mne-cpp.pri)
+
 QT -= gui
 
+VERSION = $${MNE_CPP_VERSION}
+
+# Target (executable) name
+TARGET = mne_plugin_creator
+contains(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+# Configuration options
 CONFIG += c++11 console
 CONFIG -= app_bundle
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
 
-# The following define makes your compiler emit warnings if you use
-# any feature of Qt which as been marked deprecated (the exact warnings
-# depend on your compiler). Please consult the documentation of the
-# deprecated API in order to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS
-
-# You can also make your code fail to compile if you use deprecated APIs.
-# In order to do so, uncomment the following line.
-# You can also select to disable deprecated APIs only up to a certain version of Qt.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
+# Files
 SOURCES += \
-        main.cpp \
+    main.cpp \
     pluginparams.cpp \
     templatefile.cpp \
     mnescanplugincreator.cpp \
@@ -56,11 +60,6 @@ SOURCES += \
     mnescaninputparser.cpp \
     iinputparser.cpp \
     appinputparser.cpp
-
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
     pluginparams.h \
@@ -71,5 +70,61 @@ HEADERS += \
     iinputparser.h \
     appinputparser.h
 
+RESOURCE_FILES += \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/README.md \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/options.png \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/template.json \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/template.pro \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/template_global.h \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/headertemplate.h \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/sourcetemplate.cpp \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/widgettemplate.h \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/widgettemplate.cpp \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/widgettemplate.ui \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/aboutwidgettemplate.h \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/aboutwidgettemplate.cpp \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/aboutwidgettemplate.ui \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/setupwidgettemplate.h \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/setupwidgettemplate.cpp \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/mne_scan/setupwidgettemplate.ui \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/testframes/template.pro \
+    $${ROOT_DIR}/resources/mne_plugin_creator/templates/testframes/template.cpp \
+
+
 OTHER_FILES += \
     README.md
+
+# Deployment
+unix: QMAKE_CXXFLAGS += -isystem
+
+win32 {
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+}
+
+macx {
+    QMAKE_RPATHDIR += @executable_path/../Frameworks
+
+    # Copy Resource folder to app bundle
+    explain.path = Contents/MacOS/resources/general/explanations
+    explain.files = $${ROOT_DIR}/resources/general/explanations/fiff_explanations.txt
+    QMAKE_BUNDLE_DATA += explain
+    EXTRA_ARGS =
+
+    # Entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
+}
+
+unix:!macx {
+    QMAKE_RPATHDIR += $ORIGIN/../lib
+}
+
+# Copy resources to install location
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
+message(COPYING RESOURCES: $${COPY_CMD})
+
