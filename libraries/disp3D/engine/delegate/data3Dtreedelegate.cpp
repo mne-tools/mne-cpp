@@ -93,7 +93,7 @@ Data3DTreeDelegate::Data3DTreeDelegate(QObject* parent)
 QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option , const QModelIndex& index) const
 {
     // Only create the editors here. Do not set any data from the model yet. This is done in setEditorData().
-    //Connect to Data3DTreeDelegate::onEditorEdited if you want to have immediate feedback (default by QItemDelegate is on EditorFinished).
+    //Connect to Data3DTreeDelegate::onEditorEdited if you want to have immediate feedback (default by QItemDelegate is onEditorFinished).
     const Data3DTreeModel* pData3DTreeModel = static_cast<const Data3DTreeModel*>(index.model());
     const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pData3DTreeModel->itemFromIndex(index));
 
@@ -264,6 +264,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::Data).value<MatrixXd>();
 
             ImageSc* pPlotLA = new ImageSc(matRTData, parent);
+            pPlotLA->resize(400,300);
             pPlotLA->setWindowFlags(Qt::Window);
             pPlotLA->show();
             //return pPlotLA;
@@ -375,6 +376,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
                 }
 
                 pSpline->resize(600,400);
+                pSpline->show();
             }
 
             break;
