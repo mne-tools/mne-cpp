@@ -110,7 +110,7 @@ public:
     */
     explicit EcdDataTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
                              int iType = Data3DTreeModelItemTypes::ECDDataItem,
-                             const QString& text = "Dipole fit data");
+                             const QString& text = "ECD");
 
     //=========================================================================================================
     /**
