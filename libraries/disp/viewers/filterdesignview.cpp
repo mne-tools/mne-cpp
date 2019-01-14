@@ -61,6 +61,8 @@
 #include <QSvgGenerator>
 #include <QCheckBox>
 #include <QSettings>
+#include <QApplication>
+#include <QDesktopWidget>
 
 
 //*************************************************************************************************************
@@ -293,7 +295,15 @@ void FilterDesignView::loadSettings(const QString& settingsPath)
                         settings.value(settingsPath + QString("/filterDesignMethod"), 0).toInt(),
                         settings.value(settingsPath + QString("/filterTransition"), 5.0).toDouble(),
                         settings.value(settingsPath + QString("/filterChannelType"), "MEG").toString());
-    move(settings.value(settingsPath + QString("/FilterDesignViewPos"), QPoint(100,100)).toPoint());
+
+    QPoint pos = settings.value(settingsPath + QString("/FilterDesignViewPos"), QPoint(100,100)).toPoint();
+
+    QRect screenRect = QApplication::desktop()->screenGeometry();
+    if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
+        move(QPoint(100,100));
+    } else {
+        move(pos);
+    }
 }
 
 
