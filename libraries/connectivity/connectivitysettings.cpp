@@ -180,47 +180,42 @@ void ConnectivitySettings::removeFirst(int iAmount)
 //    qint64 iTime = 0;
 //    timer.start();
 
-    if(!m_trialData.isEmpty()) {
-        // Substract the influence by the first item on all intermediate sum data
-        // Substract PSD of first trial from overall summed up PSD
+    if(m_trialData.isEmpty()) {
+        qDebug() << "ConnectivitySettings::removeFirst - No elements to delete. Returning.";
+        return;
+    }
+
+    if(m_trialData.size() < iAmount) {
+        qDebug() << "ConnectivitySettings::removeFirst - Not enough elements stored in list in order to delete them. Returning.";
+        return;
+    }
+
+    // Substract influence of trials from overall summed up intermediate data and remove from data list
+    for (int j = 0; j < iAmount; ++j) {
+        for (int i = 0; i < m_trialData.first().matData.rows(); ++i) {
+            if(i < m_intermediateSumData.vecPairCsdSum.size() && (m_intermediateSumData.vecPairCsdSum.size() == m_trialData.first().vecPairCsd.size())) {
+                m_intermediateSumData.vecPairCsdSum[i].second -= m_trialData.first().vecPairCsd.at(i).second;
+            }
+            if(i < m_intermediateSumData.vecPairCsdNormalizedSum.size() && (m_intermediateSumData.vecPairCsdNormalizedSum.size() == m_trialData.first().vecPairCsdNormalized.size())) {
+                m_intermediateSumData.vecPairCsdNormalizedSum[i].second -= m_trialData.first().vecPairCsdNormalized.at(i).second;
+            }
+            if(i < m_intermediateSumData.vecPairCsdImagSignSum.size() && (m_intermediateSumData.vecPairCsdImagSignSum.size() == m_trialData.first().vecPairCsdImagSign.size())) {
+                m_intermediateSumData.vecPairCsdImagSignSum[i].second -= m_trialData.first().vecPairCsdImagSign.at(i).second;
+            }
+            if(i < m_intermediateSumData.vecPairCsdImagAbsSum.size() && (m_intermediateSumData.vecPairCsdImagAbsSum.size() == m_trialData.first().vecPairCsdImagAbs.size())) {
+                m_intermediateSumData.vecPairCsdImagAbsSum[i].second -= m_trialData.first().vecPairCsdImagAbs.at(i).second;
+            }
+            if(i < m_intermediateSumData.vecPairCsdImagSqrdSum.size() && (m_intermediateSumData.vecPairCsdImagSqrdSum.size() == m_trialData.first().vecPairCsdImagSqrd.size())) {
+                m_intermediateSumData.vecPairCsdImagSqrdSum[i].second -= m_trialData.first().vecPairCsdImagSqrd.at(i).second;
+            }
+        }
+
         if(m_intermediateSumData.matPsdSum.rows() == m_trialData.first().matPsd.rows() &&
            m_intermediateSumData.matPsdSum.cols() == m_trialData.first().matPsd.cols() ) {
             m_intermediateSumData.matPsdSum -= m_trialData.first().matPsd;
         }
 
-        // Substract influence of trials from overall summed up intermediate data
-        int counter = iAmount;
-
-        for (int i = 0; i < m_trialData.first().matData.rows(); ++i) {
-            counter = iAmount;
-
-            while(counter > 0){
-                if(i < m_intermediateSumData.vecPairCsdSum.size() && (m_intermediateSumData.vecPairCsdSum.size() == m_trialData.first().vecPairCsd.size())) {
-                    m_intermediateSumData.vecPairCsdSum[i].second -= m_trialData.first().vecPairCsd.at(i).second;
-                }
-                if(i < m_intermediateSumData.vecPairCsdNormalizedSum.size() && (m_intermediateSumData.vecPairCsdNormalizedSum.size() == m_trialData.first().vecPairCsdNormalized.size())) {
-                    m_intermediateSumData.vecPairCsdNormalizedSum[i].second -= m_trialData.first().vecPairCsdNormalized.at(i).second;
-                }
-                if(i < m_intermediateSumData.vecPairCsdImagSignSum.size() && (m_intermediateSumData.vecPairCsdImagSignSum.size() == m_trialData.first().vecPairCsdImagSign.size())) {
-                    m_intermediateSumData.vecPairCsdImagSignSum[i].second -= m_trialData.first().vecPairCsdImagSign.at(i).second;
-                }
-                if(i < m_intermediateSumData.vecPairCsdImagAbsSum.size() && (m_intermediateSumData.vecPairCsdImagAbsSum.size() == m_trialData.first().vecPairCsdImagAbs.size())) {
-                    m_intermediateSumData.vecPairCsdImagAbsSum[i].second -= m_trialData.first().vecPairCsdImagAbs.at(i).second;
-                }
-                if(i < m_intermediateSumData.vecPairCsdImagSqrdSum.size() && (m_intermediateSumData.vecPairCsdImagSqrdSum.size() == m_trialData.first().vecPairCsdImagSqrd.size())) {
-                    m_intermediateSumData.vecPairCsdImagSqrdSum[i].second -= m_trialData.first().vecPairCsdImagSqrd.at(i).second;
-                }
-
-                counter--;
-            }
-        }
-
-        // Remove the actual data from the trial list
-        counter = iAmount;
-        while(counter > 0 && !m_trialData.isEmpty()){
-            m_trialData.removeFirst();
-            counter--;
-        }
+        m_trialData.removeFirst();
     }
 
 //    iTime = timer.elapsed();
@@ -237,48 +232,44 @@ void ConnectivitySettings::removeLast(int iAmount)
 //    qint64 iTime = 0;
 //    timer.start();
 
-    if(!m_trialData.isEmpty()) {
-        // Substract the influence by the last item on all intermediate sum data
-        // Substract PSD of last trial from overall summed up PSD
+    if(m_trialData.isEmpty()) {
+        qDebug() << "ConnectivitySettings::removeLast - No elements to delete. Returning.";
+        return;
+    }
+
+    if(m_trialData.size() < iAmount) {
+        qDebug() << "ConnectivitySettings::removeLast - Not enough elements stored in list in order to delete them. Returning.";
+        return;
+    }
+
+    // Substract influence of trials from overall summed up intermediate data and remove from data list
+    for (int j = 0; j < iAmount; ++j) {
+        for (int i = 0; i < m_trialData.last().matData.rows(); ++i) {
+            if(i < m_intermediateSumData.vecPairCsdSum.size() && (m_intermediateSumData.vecPairCsdSum.size() == m_trialData.last().vecPairCsd.size())) {
+                m_intermediateSumData.vecPairCsdSum[i].second -= m_trialData.last().vecPairCsd.at(i).second;
+            }
+            if(i < m_intermediateSumData.vecPairCsdNormalizedSum.size() && (m_intermediateSumData.vecPairCsdNormalizedSum.size() == m_trialData.last().vecPairCsdNormalized.size())) {
+                m_intermediateSumData.vecPairCsdNormalizedSum[i].second -= m_trialData.last().vecPairCsdNormalized.at(i).second;
+            }
+            if(i < m_intermediateSumData.vecPairCsdImagSignSum.size() && (m_intermediateSumData.vecPairCsdImagSignSum.size() == m_trialData.last().vecPairCsdImagSign.size())) {
+                m_intermediateSumData.vecPairCsdImagSignSum[i].second -= m_trialData.last().vecPairCsdImagSign.at(i).second;
+            }
+            if(i < m_intermediateSumData.vecPairCsdImagAbsSum.size() && (m_intermediateSumData.vecPairCsdImagAbsSum.size() == m_trialData.last().vecPairCsdImagAbs.size())) {
+                m_intermediateSumData.vecPairCsdImagAbsSum[i].second -= m_trialData.last().vecPairCsdImagAbs.at(i).second;
+            }
+            if(i < m_intermediateSumData.vecPairCsdImagSqrdSum.size() && (m_intermediateSumData.vecPairCsdImagSqrdSum.size() == m_trialData.last().vecPairCsdImagSqrd.size())) {
+                m_intermediateSumData.vecPairCsdImagSqrdSum[i].second -= m_trialData.last().vecPairCsdImagSqrd.at(i).second;
+            }
+        }
+
         if(m_intermediateSumData.matPsdSum.rows() == m_trialData.last().matPsd.rows() &&
            m_intermediateSumData.matPsdSum.cols() == m_trialData.last().matPsd.cols() ) {
             m_intermediateSumData.matPsdSum -= m_trialData.last().matPsd;
         }
 
-        // Substract influence of trials from overall summed up intermediate data
-        int counter = iAmount;
-
-        for (int i = 0; i < m_trialData.last().matData.rows(); ++i) {
-            counter = iAmount;
-
-            while(counter > 0){
-                if(i < m_intermediateSumData.vecPairCsdSum.size() && (m_intermediateSumData.vecPairCsdSum.size() == m_trialData.last().vecPairCsd.size())) {
-                    m_intermediateSumData.vecPairCsdSum[i].second -= m_trialData.last().vecPairCsd.at(i).second;
-                }
-                if(i < m_intermediateSumData.vecPairCsdNormalizedSum.size() && (m_intermediateSumData.vecPairCsdNormalizedSum.size() == m_trialData.last().vecPairCsdNormalized.size())) {
-                    m_intermediateSumData.vecPairCsdNormalizedSum[i].second -= m_trialData.last().vecPairCsdNormalized.at(i).second;
-                }
-                if(i < m_intermediateSumData.vecPairCsdImagSignSum.size() && (m_intermediateSumData.vecPairCsdImagSignSum.size() == m_trialData.last().vecPairCsdImagSign.size())) {
-                    m_intermediateSumData.vecPairCsdImagSignSum[i].second -= m_trialData.last().vecPairCsdImagSign.at(i).second;
-                }
-                if(i < m_intermediateSumData.vecPairCsdImagAbsSum.size() && (m_intermediateSumData.vecPairCsdImagAbsSum.size() == m_trialData.last().vecPairCsdImagAbs.size())) {
-                    m_intermediateSumData.vecPairCsdImagAbsSum[i].second -= m_trialData.last().vecPairCsdImagAbs.at(i).second;
-                }
-                if(i < m_intermediateSumData.vecPairCsdImagSqrdSum.size() && (m_intermediateSumData.vecPairCsdImagSqrdSum.size() == m_trialData.last().vecPairCsdImagSqrd.size())) {
-                    m_intermediateSumData.vecPairCsdImagSqrdSum[i].second -= m_trialData.last().vecPairCsdImagSqrd.at(i).second;
-                }
-
-                counter--;
-            }
-        }
-
-        // Remove the actual data from the trial list
-        counter = iAmount;
-        while(counter > 0 && !m_trialData.isEmpty()){
-            m_trialData.removeLast();
-            counter--;
-        }
+        m_trialData.removeLast();
     }
+
 
 //    iTime = timer.elapsed();
 //    qDebug() << "ConnectivitySettings::removeLast" << iTime;
