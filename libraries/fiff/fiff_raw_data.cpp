@@ -130,7 +130,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     bool projAvailable = true;
 
     if (this->proj.size() == 0) {
-        qDebug() << "FiffRawData::read_raw_segment - No projectors set";
+        qDebug() << "FiffRawData::read_raw_segment - No projectors setup. Consider calling MNE::setup_compensators.";
         projAvailable = false;
     }
 
@@ -464,7 +464,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     bool projAvailable = true;
 
     if (this->proj.size() == 0) {
-        qDebug() << "FiffRawData::read_raw_segment - No projectors set";
+        qDebug() << "FiffRawData::read_raw_segment - No projectors setup. Consider calling MNE::setup_compensators.";
         projAvailable = false;
     }
 
