@@ -362,8 +362,8 @@ void RealTimeEvokedSetWidget::init()
         m_pButterflyView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
 
         // Quick control modality selection
-        ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView(QString("RTESW/%1").arg(t_sRTESName),
-                                                                                  m_pFiffInfo->chs);
+        ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView(m_pFiffInfo->chs,
+                                                                                  QString("RTESW/%1").arg(t_sRTESName));
         m_pQuickControlView->addGroupBoxWithTabs(pModalitySelectionView, "Other", "Modalities");
 
         connect(pModalitySelectionView, &ModalitySelectionView::modalitiesChanged,
