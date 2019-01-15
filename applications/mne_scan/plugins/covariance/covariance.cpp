@@ -284,6 +284,8 @@ void Covariance::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    m_pCovarianceOutput->data()->setFiffInfo(m_pFiffInfo);
+
 //    m_pActionShowAdjustment->setVisible(true);
 
     // Start processing data

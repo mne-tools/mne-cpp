@@ -72,8 +72,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ModalitySelectionView::ModalitySelectionView(const QString &sSettingsPath,
-                                             const QList<FIFFLIB::FiffChInfo>& lChannelList,
+ModalitySelectionView::ModalitySelectionView(const QList<FIFFLIB::FiffChInfo>& lChannelList,
+                                             const QString &sSettingsPath,
                                              QWidget *parent,
                                              Qt::WindowFlags f)
 : QWidget(parent, f)
