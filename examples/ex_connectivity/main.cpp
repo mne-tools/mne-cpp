@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
-    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "0.0");
+    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
     QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.5");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
@@ -200,9 +200,6 @@ int main(int argc, char *argv[])
     SurfaceSet tSurfSetInflated (sSubj, 2, "inflated", sSubjDir);
     AnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
 
-    QFile t_fileCov(sCov);
-    FiffCov noise_cov(t_fileCov);
-
     bool keep_comp = false;
     fiff_int_t dest_comp = 0;
 
@@ -211,7 +208,7 @@ int main(int argc, char *argv[])
     FiffRawData raw(t_fileRaw);
 
     // Select bad channels
-    raw.info.bads << "MEG2412" << "MEG2413";
+    //raw.info.bads << "MEG2412" << "MEG2413";
 
     MNE::setup_compensators(raw,
                             dest_comp,
@@ -231,10 +228,13 @@ int main(int argc, char *argv[])
                                                          150*pow(10.0,-06),
                                                          "eog");
     data.dropRejected();
+    data.applyBaselineCorrection(qMakePair(QVariant(fTMin), QVariant("0.0")));
 
+    // Average epochs. Do not use SSPs.
     FiffEvoked evoked = data.average(raw.info,
                                      0,
                                      data.first()->epoch.cols()-1);
+
     MNESourceEstimate sourceEstimateEvoked;
 
     if(!bDoSourceLoc) {
@@ -295,6 +295,8 @@ int main(int argc, char *argv[])
         QString method(sSourceLocMethod);
 
         // regularize noise covariance
+        QFile t_fileCov(sCov);
+        FiffCov noise_cov(t_fileCov);
         noise_cov = noise_cov.regularize(raw.info,
                                          0.05,
                                          0.05,
@@ -331,6 +333,14 @@ int main(int argc, char *argv[])
 
             matDataList << sourceEstimate.data;
         }
+
+        QFile fOut("ex_connectivity_evoked_chnames.txt");
+        if (fOut.open(QFile::WriteOnly | QFile::Text)) {
+            QTextStream s(&fOut);
+            for (int i = 0; i < evoked.info.ch_names.size(); ++i)
+                s << evoked.info.ch_names.at(i) << '\n';
+        }
+        fOut.close();
 
         MinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
         sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked);
@@ -372,7 +382,12 @@ int main(int argc, char *argv[])
 
     ConnectivitySettings::IntermediateTrialData connectivityData;
     for(int i = 0; i < matDataList.size(); i++) {
-        connectivityData.matData = matDataList.at(i);
+        // Only calculate conenctivity for post stim
+        int samplesToCutOut = abs(fTMin*raw.info.sfreq);
+        connectivityData.matData = matDataList.at(i).block(0,
+                                                           samplesToCutOut,
+                                                           matDataList.at(i).rows(),
+                                                           matDataList.at(i).cols()-samplesToCutOut);
         pConnectivitySettingsManager->m_settings.append(connectivityData);
         pConnectivitySettingsManager->m_dataListOriginal.append(connectivityData);
     }
@@ -395,13 +410,13 @@ int main(int argc, char *argv[])
 
     QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
                      [&](const QString& a, const QString& b, const Network& c) {if(NetworkTreeItem* pNetworkTreeItem = tNetworkView.addData(a,b,c)) {
-                                                                                    pNetworkTreeItem->setThresholds(QVector3D(0.8,0.9,1.0));
+                                                                                    pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
                                                                                 }}
     );
 
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
-        QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resoces/general/sensorSurfaces/306m_rt.fif");
+        QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
         MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
         tNetworkView.getTreeModel()->addMegSensorInfo("Sensors",
                                                       "VectorView",

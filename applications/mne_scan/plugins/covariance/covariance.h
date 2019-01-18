@@ -171,12 +171,12 @@ private:
 
     qint32      m_iEstimationSamples;
 
-    QVector<FIFFLIB::FiffCov>   m_qVecCovData;      /**< Covariance data set */
+    QVector<FIFFLIB::FiffCov>                       m_qVecCovData;                  /**< Covariance data set */
 
-    QAction*                    m_pActionShowAdjustment;
+    QAction*                                        m_pActionShowAdjustment;
 
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;        /**< Fiff measurement info.*/
-    QSharedPointer<RTPROCESSINGLIB::RtCov>        m_pRtCov;           /**< Real-time covariance. */
+    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QSharedPointer<RTPROCESSINGLIB::RtCov>          m_pRtCov;                       /**< Real-time covariance. */
 
     QSharedPointer<CovarianceSettingsWidget>        m_pCovarianceWidget;
 

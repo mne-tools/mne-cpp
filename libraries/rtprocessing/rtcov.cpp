@@ -91,7 +91,7 @@ void RtCovWorker::doWork(const RtCovInput &inputData)
     QStringList exclude;
     for(int i = 0; i<inputData.fiffInfo.chs.size(); i++) {
         if(inputData.fiffInfo.chs.at(i).kind != FIFFV_MEG_CH &&
-                inputData.fiffInfo.chs.at(i).kind != FIFFV_EEG_CH) {
+           inputData.fiffInfo.chs.at(i).kind != FIFFV_EEG_CH) {
             exclude << inputData.fiffInfo.chs.at(i).ch_name;
         }
     }
@@ -115,16 +115,16 @@ void RtCovWorker::doWork(const RtCovInput &inputData)
         // regularize noise covariance
         computedCov = computedCov.regularize(inputData.fiffInfo, 0.05, 0.05, 0.1, doProj, exclude);
 
-        //            qint32 samples = rawSegment.cols();
-        //            VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
+//            qint32 samples = rawSegment.cols();
+//            VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
 
-        //            MatrixXf noise_covariance = rawSegment * rawSegment.transpose();// noise_covariance == raw_covariance
-        //            noise_covariance.array() -= samples * (mu * mu.transpose()).array();
-        //            noise_covariance.array() /= (samples - 1);
+//            MatrixXf noise_covariance = rawSegment * rawSegment.transpose();// noise_covariance == raw_covariance
+//            noise_covariance.array() -= samples * (mu * mu.transpose()).array();
+//            noise_covariance.array() /= (samples - 1);
 
-        //            std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
+//            std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
 
-        //            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
+//            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
         emit resultReady(computedCov);
     } else {
         qDebug() << "RtCovWorker::doWork - Number of samples equals zero. Regularization not possible. Returning without result.";

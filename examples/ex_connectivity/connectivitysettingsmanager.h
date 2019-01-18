@@ -143,11 +143,6 @@ public:
             iNumberTrials = m_dataListOriginal.size();
         }
 
-        //If the number of trials did not change compared to last time return
-        if(iNumberTrials == m_settings.size()) {
-            return;
-        }
-
         //Pop data from connectivity settings
         int size = m_settings.size();
 
