@@ -103,8 +103,7 @@ MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, 
     //
     qint32 nave = p_fiffEvoked.nave;
 
-    if(!m_inverseOperator.check_ch_names(p_fiffEvoked.info))
-    {
+    if(!m_inverseOperator.check_ch_names(p_fiffEvoked.info)) {
         qWarning("Channel name check failed.");
         return MNESourceEstimate();
     }
@@ -119,7 +118,7 @@ MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, 
     printf("Picked %d channels from the data\n",t_fiffEvoked.info.nchan);
 
     //Results
-    float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
+    float tmin = p_fiffEvoked.times[0];
     float tstep = 1/t_fiffEvoked.info.sfreq;
 
     return calculateInverse(t_fiffEvoked.data, tmin, tstep);

@@ -203,12 +203,15 @@
          <string>-</string>
         </property>
         <property name="minimum">
-         <number>10</number>
+         <number>0</number>
         </property>
         <property name="maximum">
          <number>10000</number>
         </property>
         <property name="singleStep">
+         <number>10</number>
+        </property>
+        <property name="value">
          <number>10</number>
         </property>
        </widget>
@@ -230,6 +233,9 @@
         </property>
         <property name="singleStep">
          <number>10</number>
+        </property>
+        <property name="value">
+         <number>100</number>
         </property>
        </widget>
       </item>

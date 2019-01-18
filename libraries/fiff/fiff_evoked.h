@@ -220,7 +220,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Inputs a new data set and recalculates the average. This function also iterates the nave parameter by one.
+    * Applies baseline correction to the evoked data.
     *
     * @param[in] p_baseline     time definition of the baseline in seconds [from, to]
     */

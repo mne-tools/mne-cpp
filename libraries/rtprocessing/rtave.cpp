@@ -217,10 +217,10 @@ void RtAveWorker::setBaselineActive(bool activate)
         for(int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
             m_stimEvokedSet.evoked[i].baseline = qMakePair(QVariant("None"), QVariant("None"));
         }
-    }
-
-    for(int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
-        m_stimEvokedSet.evoked[i].baseline = m_pairBaselineSec;
+    } else {
+        for(int i = 0; i < m_stimEvokedSet.evoked.size(); ++i) {
+            m_stimEvokedSet.evoked[i].baseline = m_pairBaselineSec;
+        }
     }
 }
 
@@ -510,15 +510,12 @@ void RtAveWorker::generateEvoked(double dTriggerType)
 
     //If the evoked is not yet present add it here
     if(iEvokedIdx == -1) {
-        float T = 1.0/m_pFiffInfo->sfreq;
-
         evoked.baseline = m_pairBaselineSec;
         evoked.times.resize(m_iPreStimSamples + m_iPostStimSamples);
-        evoked.times[0] = -T*m_iPreStimSamples;
-        for(int i = 1; i < evoked.times.size(); ++i) {
-            evoked.times[i] = evoked.times[i-1] + T;
-        }
-        evoked.times[m_iPreStimSamples] = 0.0f;
+        evoked.times = RowVectorXf::LinSpaced(m_iPreStimSamples + m_iPostStimSamples,
+                                              -1*m_iPreStimSamples/m_pFiffInfo->sfreq,
+                                              m_iPostStimSamples/m_pFiffInfo->sfreq);
+        evoked.times[m_iPreStimSamples] = 0.0;
         evoked.first = 0;
         evoked.last = m_iPreStimSamples + m_iPostStimSamples;
         evoked.comment = QString::number(dTriggerType);

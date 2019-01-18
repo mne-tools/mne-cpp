@@ -292,7 +292,19 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
                 }
             }
 
-            m_connectivitySettings.append(pRTSE->getValue()[i]->data);
+            // Find out how many samples were used for pre stimulus
+            int iZeroIdx = 0;
+            for(int j = 0; j < pRTSE->getValue()[i]->times.cols(); ++j) {
+                if(pRTSE->getValue()[i]->times(j) >= 0) {
+                    iZeroIdx = j;
+                    break;
+                }
+            }
+
+            m_connectivitySettings.append(pRTSE->getValue()[i]->data.block(0,
+                                                                           iZeroIdx,
+                                                                           pRTSE->getValue()[i]->data.rows(),
+                                                                           pRTSE->getValue()[i]->data.cols()-iZeroIdx));
         }
 
         //Pop data from buffer
