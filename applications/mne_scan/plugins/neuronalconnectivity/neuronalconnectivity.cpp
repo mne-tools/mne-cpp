@@ -282,16 +282,6 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
         }
 
         for(qint32 i = 0; i < pRTSE->getValue().size(); ++i) {
-            m_iBlockSize = pRTSE->getValue().first()->data.cols();
-
-            // Check row and colum integrity and restart if necessary
-            if(m_connectivitySettings.size() != 0) {
-                if(m_iBlockSize != m_connectivitySettings.at(0).matData.cols()) {
-                    m_connectivitySettings.clearAllData();
-                    m_pRtConnectivity->restart();
-                }
-            }
-
             // Find out how many samples were used for pre stimulus
             int iZeroIdx = 0;
             for(int j = 0; j < pRTSE->getValue()[i]->times.cols(); ++j) {
@@ -301,10 +291,22 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
                 }
             }
 
-            m_connectivitySettings.append(pRTSE->getValue()[i]->data.block(0,
-                                                                           iZeroIdx,
-                                                                           pRTSE->getValue()[i]->data.rows(),
-                                                                           pRTSE->getValue()[i]->data.cols()-iZeroIdx));
+            m_iBlockSize = pRTSE->getValue().first()->data.cols() - iZeroIdx;
+
+            // Check row and colum integrity and restart if necessary
+            if(m_connectivitySettings.size() != 0) {
+                if(m_iBlockSize != m_connectivitySettings.at(0).matData.cols()) {
+                    m_connectivitySettings.clearAllData();
+                    m_pRtConnectivity->restart();
+                }
+            }
+
+            if(m_connectivitySettings.size() <= 25) {
+                m_connectivitySettings.append(pRTSE->getValue()[i]->data.block(0,
+                                                                               iZeroIdx,
+                                                                               pRTSE->getValue()[i]->data.rows(),
+                                                                               pRTSE->getValue()[i]->data.cols() - iZeroIdx));
+            }
         }
 
         //Pop data from buffer
