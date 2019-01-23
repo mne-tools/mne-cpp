@@ -160,28 +160,28 @@
      <item row="4" column="1">
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="0">
-        <widget class="QSpinBox" name="m_spinBox_freqLow">
-         <property name="suffix">
-          <string>Hz</string>
+        <widget class="QDoubleSpinBox" name="m_spinBox_freqLow">
+         <property name="decimals">
+          <number>1</number>
          </property>
          <property name="maximum">
-          <number>5000</number>
+          <double>10000.000000000000000</double>
          </property>
          <property name="value">
-          <number>7</number>
+          <double>7.000000000000000</double>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QSpinBox" name="m_spinBox_freqHigh">
-         <property name="suffix">
-          <string>Hz</string>
+        <widget class="QDoubleSpinBox" name="m_spinBox_freqHigh">
+         <property name="decimals">
+          <number>1</number>
          </property>
          <property name="maximum">
-          <number>5000</number>
+          <double>10000.000000000000000</double>
          </property>
          <property name="value">
-          <number>13</number>
+          <double>13.000000000000000</double>
          </property>
         </widget>
        </item>

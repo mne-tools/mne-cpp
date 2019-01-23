@@ -109,6 +109,9 @@ Network PhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
         return finalNetwork;
     }
 
+    finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
+    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
+
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
     #endif

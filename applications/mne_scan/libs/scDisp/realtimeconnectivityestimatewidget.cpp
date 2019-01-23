@@ -147,7 +147,7 @@ void RealTimeConnectivityEstimateWidget::getData()
                                                                             "Connectivity",
                                                                             *(m_pRTCE->getValue().data()));
 
-            m_pRtItem->setThresholds(QVector3D(0.9,0.95,1.0));
+            m_pRtItem->setThresholds(QVector3D(0.9f,0.95f,1.0f));
 
             if(m_pRTCE->getSurfSet() && m_pRTCE->getAnnotSet()) {
                 QList<FsSurfaceTreeItem*> lSurfaces = m_pAbstractView->getTreeModel()->addSurfaceSet("sample",

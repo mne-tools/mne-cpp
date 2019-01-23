@@ -99,6 +99,9 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
         return finalNetwork;
     }   
 
+    finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
+    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
+
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();
     RowVectorXf rowVert = RowVectorXf::Zero(3);

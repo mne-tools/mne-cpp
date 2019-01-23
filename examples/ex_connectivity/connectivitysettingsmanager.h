@@ -98,12 +98,9 @@ public:
         QObject::connect(m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
                          this, &ConnectivitySettingsManager::onNewConnectivityResultAvailable);
 
-        // By default the number of frequency bins is half the signal since we only use the half spectrum
-        double dScaleFactor = iBlockSize/m_fSFreq;
-
-        // Convert to frequency bins
-        m_iFreqBandLow = 7 * dScaleFactor;
-        m_iFreqBandHigh = 13 * dScaleFactor;
+        // Default frequency range
+        m_fFreqBandLow = 7.0f;
+        m_fFreqBandHigh = 13.0f;
 
         m_settings.setSamplingFrequency(sFreq);
     }
@@ -112,8 +109,8 @@ public:
     RtConnectivity::SPtr    m_pRtConnectivity;
     Network                 m_networkData;
 
-    int                     m_iFreqBandLow;
-    int                     m_iFreqBandHigh;
+    float                   m_fFreqBandLow;
+    float                   m_fFreqBandHigh;
 
     float                   m_fSFreq;
 
@@ -177,18 +174,15 @@ public:
 //        timer.restart();
     }
 
-    void onFreqBandChanged(int iFreqLow, int iFreqHigh)
+    void onFreqBandChanged(float fFreqLow, float fFreqHigh)
     {
         if(m_settings.isEmpty()) {
             return;
         }
 
-        // By default the number of frequency bins is half the signal since we only use the half spectrum
-        double dScaleFactor = m_settings.at(0).matData.cols()/m_fSFreq;
-
         // Convert to frequency bins
-        m_iFreqBandLow = iFreqLow * dScaleFactor;
-        m_iFreqBandHigh = iFreqHigh * dScaleFactor;
+        m_fFreqBandLow = fFreqLow;
+        m_fFreqBandHigh = fFreqHigh;
 
         onNewConnectivityResultAvailable(m_networkData, m_settings);
     }
@@ -198,7 +192,7 @@ public:
     {
         m_settings = connectivitySettings;
         m_networkData = tNetworkData;
-        m_networkData.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
+        m_networkData.setFrequencyBins(m_fFreqBandLow, m_fFreqBandHigh);
         m_networkData.normalize();
 
         if(!m_networkData.isEmpty()) {

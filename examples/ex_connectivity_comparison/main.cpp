@@ -366,7 +366,7 @@ int main(int argc, char *argv[])
     conSettings.setConnectivityMethods(QStringList() << "COH" << "COR" << "XCOR" << "PLI" << "IMAGCOH" << "PLV" << "WPLI" << "USPLI" << "DSWPLI");
 
     for(int i = 0; i < matDataList.size(); i++) {
-        // Only calculate conenctivity for post stim
+        // Only calculate connectivity for post stim
         int samplesToCutOut = abs(fTMin*raw.info.sfreq);
         conSettings.append(matDataList.at(i).block(0,
                                                   samplesToCutOut,
@@ -380,11 +380,6 @@ int main(int argc, char *argv[])
 
     QList<Network> lNetworks = Connectivity::calculateMultiMethods(conSettings);
 
-    // By default the number of frequency bins is half the signal since we only use the half spectrum
-    double dScaleFactor = conSettings.at(0).matData.cols()/raw.info.sfreq;
-    int iFreqBandLow = 7 * dScaleFactor;
-    int iFreqBandHigh = 13 * dScaleFactor;
-
     QMap<QString,Vector4i> mColor;
     mColor.insert("COR",Vector4i(90, 26, 100, 1));
     mColor.insert("XCOR",Vector4i(255, 20, 80, 1));
@@ -397,7 +392,7 @@ int main(int argc, char *argv[])
     mColor.insert("DSWPLI",Vector4i(25, 10, 255, 1));
 
     for(int j = 0; j < lNetworks.size(); ++j) {
-        lNetworks[j].setFrequencyBins(iFreqBandLow, iFreqBandHigh);
+        lNetworks[j].setFrequencyBins(7.0f, 13.0f);
         lNetworks[j].normalize();
         VisualizationInfo visInfo = lNetworks.at(j).getVisualizationInfo();
         visInfo.sMethod = "Color";
