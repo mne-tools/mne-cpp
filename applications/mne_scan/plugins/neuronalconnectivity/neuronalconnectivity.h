@@ -233,18 +233,18 @@ protected:
     /**
     * Slot called when the frequency band changed.
     *
-    * @param [in] iFreqLow        The new lower frequency band.
-    * @param [in] iFreqHigh       The new higher frequency band.
+    * @param [in] fFreqLow        The new lower frequency band.
+    * @param [in] fFreqHigh       The new higher frequency band.
     */
-    void onFrequencyBandChanged(int iFreqLow, int iFreqHigh);
+    void onFrequencyBandChanged(float fFreqLow, float fFreqHigh);
 
 private:
     bool                m_bIsRunning;           /**< Flag whether thread is running.*/
     qint32              m_iDownSample;          /**< Sampling rate. */
     qint32              m_iNumberAverages;      /**< The number of averages used to calculate the connectivity estimate. Use this only for resting state data when the averaging plugin is not connected.*/
     qint32              m_iNumberBadChannels;   /**< The current number of bad channels. USed to test if new bad channels were selected. */
-    qint32              m_iFreqBandLow;         /**< The lower frequency band to average the connectivy weights from. */
-    qint32              m_iFreqBandHigh;        /**< The higher frequency band to average the connectivy weights to. In frequency bins. */
+    float               m_fFreqBandLow;         /**< The lower frequency band to average the connectivity weights from. */
+    float               m_fFreqBandHigh;        /**< The higher frequency band to average the connectivity weights to. */
     qint32              m_iBlockSize;           /**< The block size of teh last received data block. In frequency bins. */
 
     QString             m_sAvrType;             /**< The average type */

@@ -290,18 +290,18 @@ public:
     /**
     * Sets the frequency bins to average from/to.
     *
-    * @param[in] iLowerBin        The new lower bin to average from.
-    * @param[in] iUpperBin        The new upper bin to average to.
+    * @param[in] fLowerFreq        The new lower frequency edge to average from.
+    * @param[in] fUpperFreq        The new upper frequency edge to average to.
     */
-    void setFrequencyBins(int iLowerBin, int iUpperBin);
+    void setFrequencyBins(float fLowerFreq, float fUpperFreq);
 
     //=========================================================================================================
     /**
-    * Returns the current frequency bins to average from/to.
+    * Returns the current frequency edge to average from/to.
     *
-    * @return The current upper/lower bin to average from/to.
+    * @return The current upper/lower frequency edge to average from/to.
     */
-    const QPair<int,int>& getFrequencyBins() const;
+    const QPair<float,float>& getFrequencyBins() const;
 
     //=========================================================================================================
     /**
@@ -349,6 +349,38 @@ public:
     */
     void setVisualizationInfo(const VisualizationInfo& visualizationInfo);
 
+    //=========================================================================================================
+    /**
+    * Get the currently set sampling frequency.
+    *
+    * @return The currently set sampling frequency.
+    */
+    float getSamplingFrequency() const;
+
+    //=========================================================================================================
+    /**
+    * Set the new sampling frequency.
+    *
+    * @param[in] sFreq        The new sampling frequency.
+    */
+    void setSamplingFrequency(float fSFreq);
+
+    //=========================================================================================================
+    /**
+    * Get the currently set number of samples.
+    *
+    * @return The currently set number of samples.
+    */
+    int getNumberSamples() const;
+
+    //=========================================================================================================
+    /**
+    * Set the new number of samples.
+    *
+    * @param[in] iNumberSamples        The new number of samples.
+    */
+    void setNumberSamples(int iNumberSamples);
+
 protected:
     QList<QSharedPointer<NetworkEdge> >     m_lFullEdges;               /**< List with all edges of the network.*/
     QList<QSharedPointer<NetworkEdge> >     m_lThresholdedEdges;        /**< List with all the active (thresholded) edges of the network.*/
@@ -361,9 +393,11 @@ protected:
 
     QPair<double,double>                    m_minMaxFullWeights;        /**< The minimum and maximum weight strength of the entire network.*/
     QPair<double,double>                    m_minMaxThresholdedWeights; /**< The minimum and maximum weight strength of the active edges.*/
-    QPair<int,int>                          m_minMaxFrequencyBins;      /**< The minimum and maximum frequency bins to average from/to.*/
+    QPair<float,float>                      m_minMaxFrequency;          /**< The minimum and maximum frequency bins to average from/to.*/
 
-    double                                  m_dThreshold;               /**< The current threshold value.*/
+    double                                  m_dThreshold;               /**< The current value which was used to threshold the edge weigths.*/
+    float                                   m_fSFreq;                   /**< The sampling frequency used to collect the data which this network is based on.*/
+    int                                     m_iNumberSamples;           /**< The number of colelcted data samples, e.g., in time to generate this network  data with.*/
 
     VisualizationInfo                       m_visualizationInfo;        /**< The current visualization info used to plot the network later on.*/
 };
