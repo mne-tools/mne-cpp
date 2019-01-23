@@ -663,14 +663,6 @@ void MNE::run()
                 t_fiffEvoked = m_qVecFiffEvoked.takeFirst();
                 //qDebug()<<"MNE::run - t_fiffEvoked.data.rows()"<<t_fiffEvoked.data.rows();
 
-                QFile fOut("mne_evoked_chnames.txt");
-                if (fOut.open(QFile::WriteOnly | QFile::Text)) {
-                    QTextStream s(&fOut);
-                    for (int i = 0; i < t_fiffEvoked.info.ch_names.size(); ++i)
-                        s << t_fiffEvoked.info.ch_names.at(i) << '\n';
-                }
-                fOut.close();
-
                 sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked);
 
                 m_qMutex.unlock();

@@ -121,12 +121,12 @@ int main(int argc, char *argv[])
     QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
+    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
-    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "0.0");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.5");
+    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.4");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
@@ -205,8 +205,9 @@ int main(int argc, char *argv[])
     FiffRawData raw(t_fileRaw);
 
     // Select bad channels
-    raw.info.bads << "MEG2412" << "MEG2413";
+    //raw.info.bads << "MEG2412" << "MEG2413";
 
+    // Setup compensators and projectors so they get applied while reading
     MNE::setup_compensators(raw,
                             dest_comp,
                             keep_comp);
@@ -225,6 +226,7 @@ int main(int argc, char *argv[])
                                                          150*pow(10.0,-06),
                                                          "eog");
     data.dropRejected();
+    data.applyBaselineCorrection(qMakePair(QVariant(fTMin), QVariant("0.0")));
 
     FiffEvoked evoked = data.average(raw.info,
                                      0,
@@ -362,7 +364,16 @@ int main(int argc, char *argv[])
     // Compute the connectivity estimates for the methods to be compared
     ConnectivitySettings conSettings;
     conSettings.setConnectivityMethods(QStringList() << "COH" << "COR" << "XCOR" << "PLI" << "IMAGCOH" << "PLV" << "WPLI" << "USPLI" << "DSWPLI");
-    conSettings.append(matDataList);
+
+    for(int i = 0; i < matDataList.size(); i++) {
+        // Only calculate conenctivity for post stim
+        int samplesToCutOut = abs(fTMin*raw.info.sfreq);
+        conSettings.append(matDataList.at(i).block(0,
+                                                  samplesToCutOut,
+                                                  matDataList.at(i).rows(),
+                                                  matDataList.at(i).cols()-samplesToCutOut));
+    }
+
     conSettings.setNodePositions(matNodePositions);
     conSettings.setSamplingFrequency(raw.info.sfreq);
     conSettings.setWindowType("hanning");
@@ -403,7 +414,7 @@ int main(int argc, char *argv[])
                                                                      lNetworks);
 
     for(int j = 0; j < lNetworkTreeItems.size(); ++j) {
-        lNetworkTreeItems.at(j)->setThresholds(QVector3D(0.8,0.9,1.0));
+        lNetworkTreeItems.at(j)->setThresholds(QVector3D(0.9,0.95,1.0));
     }
 
     //Read and show sensor helmets

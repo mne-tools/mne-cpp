@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
-    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
+    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
@@ -210,6 +210,7 @@ int main(int argc, char *argv[])
     // Select bad channels
     //raw.info.bads << "MEG2412" << "MEG2413";
 
+    // Setup compensators and projectors so they get applied while reading
     MNE::setup_compensators(raw,
                             dest_comp,
                             keep_comp);
@@ -334,14 +335,6 @@ int main(int argc, char *argv[])
             matDataList << sourceEstimate.data;
         }
 
-        QFile fOut("ex_connectivity_evoked_chnames.txt");
-        if (fOut.open(QFile::WriteOnly | QFile::Text)) {
-            QTextStream s(&fOut);
-            for (int i = 0; i < evoked.info.ch_names.size(); ++i)
-                s << evoked.info.ch_names.at(i) << '\n';
-        }
-        fOut.close();
-
         MinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
         sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked);
 
@@ -376,14 +369,14 @@ int main(int argc, char *argv[])
     }
 
     //Do connectivity estimation and visualize results
-    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matDataList.first().cols(), raw.info.sfreq);
+    int samplesToCutOut = abs(fTMin * raw.info.sfreq);
+    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matDataList.first().cols()-samplesToCutOut, raw.info.sfreq);
 
     pConnectivitySettingsManager->m_settings.setConnectivityMethods(QStringList() << sConnectivityMethod);
 
     ConnectivitySettings::IntermediateTrialData connectivityData;
     for(int i = 0; i < matDataList.size(); i++) {
-        // Only calculate conenctivity for post stim
-        int samplesToCutOut = abs(fTMin*raw.info.sfreq);
+        // Only calculate connectivity for post stim
         connectivityData.matData = matDataList.at(i).block(0,
                                                            samplesToCutOut,
                                                            matDataList.at(i).rows(),

@@ -305,7 +305,7 @@ void ConnectivitySettings::setSamplingFrequency(int iSFreq)
 
     m_fSFreq = iSFreq;
 
-    if(m_fFreqResolution != 0) {
+    if(m_fFreqResolution != 0.0f) {
         m_iNfft = int(m_fSFreq/m_fFreqResolution);
     }
 }
