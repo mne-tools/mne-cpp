@@ -141,9 +141,9 @@ public:
     /**
     * Applies baseline correction to the evoked data.
     *
-    * @param[in] p_baseline     time definition of the baseline in seconds [from, to]
+    * @param[in] baseline     time definition of the baseline in seconds [from, to]
     */
-    void applyBaselineCorrection(QPair<QVariant,QVariant>& p_baseline);
+    void applyBaselineCorrection(QPair<QVariant,QVariant>& baseline);
 
     //=========================================================================================================
     /**

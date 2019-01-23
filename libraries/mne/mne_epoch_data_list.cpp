@@ -241,14 +241,12 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
 
 //*************************************************************************************************************
 
-void MNEEpochDataList::applyBaselineCorrection(QPair<QVariant, QVariant>& p_baseline)
+void MNEEpochDataList::applyBaselineCorrection(QPair<QVariant, QVariant>& baseline)
 {
     // Run baseline correction
     QMutableListIterator<MNEEpochData::SPtr> i(*this);
     while (i.hasNext()) {
-        i.next();
-        RowVectorXf times = RowVectorXf::LinSpaced(i.value()->epoch.cols(), i.value()->tmin, i.value()->tmax);
-        i.value()->epoch = MNEMath::rescale(i.value()->epoch, times, p_baseline, QString("mean"));
+        i.next()->applyBaselineCorrection(baseline);
     }
 }
 
