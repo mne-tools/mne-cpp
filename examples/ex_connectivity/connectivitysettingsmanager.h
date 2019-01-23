@@ -104,6 +104,8 @@ public:
         // Convert to frequency bins
         m_iFreqBandLow = 7 * dScaleFactor;
         m_iFreqBandHigh = 13 * dScaleFactor;
+
+        m_settings.setSamplingFrequency(sFreq);
     }
 
     ConnectivitySettings    m_settings;
