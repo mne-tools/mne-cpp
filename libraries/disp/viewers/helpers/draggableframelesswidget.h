@@ -136,6 +136,12 @@ protected:
 
     //=========================================================================================================
     /**
+    * Reimplmented mouseReleaseEvent.
+    */
+    void mouseReleaseEvent(QMouseEvent *event);
+
+    //=========================================================================================================
+    /**
     * Reimplmented mouseMoveEvent.
     */
     void resizeEvent(QResizeEvent *event);
@@ -154,6 +160,7 @@ private:
     QPoint      m_dragPosition;     /**< The drag position of the window. */
     bool        m_bRoundEdges;      /**< Flag specifying whether to round the edges. */
     bool        m_bDraggable;       /**< Flag specifying whether this widget is draggable. */
+    bool        m_bMousePressed;       /**< Flag specifying whether this widget is draggable. */
 };
 
 } // NAMESPACE DISPLIB
