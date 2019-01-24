@@ -89,6 +89,7 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)
 , m_pAbstractView(new AbstractView())
+, m_iNumberBadChannels(0)
 {
     m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget (F9)"),this);
     m_pActionQuickControl->setShortcut(tr("F9"));
@@ -162,10 +163,11 @@ void RealTimeConnectivityEstimateWidget::getData()
 
             if(m_pRTCE->getSensorSurface() && m_pRTCE->getFiffInfo()) {
                 m_pAbstractView->getTreeModel()->addMegSensorInfo("sample",
-                                                                 "Sensors",
-                                                                 m_pRTCE->getFiffInfo()->chs,
-                                                                 *(m_pRTCE->getSensorSurface()),
-                                                                 m_pRTCE->getFiffInfo()->bads);
+                                                                  "Sensors",
+                                                                  m_pRTCE->getFiffInfo()->chs,
+                                                                  *(m_pRTCE->getSensorSurface()),
+                                                                  m_pRTCE->getFiffInfo()->bads);
+                m_iNumberBadChannels = m_pRTCE->getFiffInfo()->bads.size();
             }
         } else {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem";
@@ -173,6 +175,16 @@ void RealTimeConnectivityEstimateWidget::getData()
             QString sItemName = QString("%1_%2_%3").arg(m_pRTCE->getValue()->getConnectivityMethod()).arg(QString::number(bins.first)).arg(QString::number(bins.second));
             m_pRtItem->setText(sItemName);
             m_pRtItem->addData(*(m_pRTCE->getValue().data()));
+
+
+            if(m_iNumberBadChannels != m_pRTCE->getFiffInfo()->bads.size()) {
+                m_pAbstractView->getTreeModel()->addMegSensorInfo("sample",
+                                                                  "Sensors",
+                                                                  m_pRTCE->getFiffInfo()->chs,
+                                                                  *(m_pRTCE->getSensorSurface()),
+                                                                  m_pRTCE->getFiffInfo()->bads);
+                m_iNumberBadChannels = m_pRTCE->getFiffInfo()->bads.size();
+            }
         }
     }
 }
