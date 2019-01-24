@@ -99,22 +99,32 @@ void SensorPositionTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString& sDataType)
+void SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                                     const QString& sDataType,
+                                     const QStringList& bads)
 {
-    plotSensors(lChInfo, sDataType);
+    plotSensors(lChInfo, sDataType, bads);
 }
 
 
 //*************************************************************************************************************
 
-void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString& sDataType)
+void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                                         const QString& sDataType,
+                                         const QStringList& bads)
 {
     //Create digitizer
-
     GeometryMultiplier *pMesh;
 
-    if(sDataType == "MEG")
-    {
+    //Add material
+    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
+
+    QColor colDefault(100,100,100);
+    pMaterial->setAmbient(colDefault);
+    pMaterial->setAlpha(1.0f);
+    this->addComponent(pMaterial);
+
+    if(sDataType == "MEG") {
         QSharedPointer<Qt3DExtras::QCuboidGeometry> pSensorRect = QSharedPointer<Qt3DExtras::QCuboidGeometry>::create();
         pSensorRect->setXExtent(0.01f);
         pSensorRect->setYExtent(0.01f);
@@ -125,6 +135,7 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
         //Create transform matrix for each cuboid instance
         QVector<QMatrix4x4> vTransforms;
         vTransforms.reserve(lChInfo.size());
+        QVector<QColor> vColorsNodes;
         QVector3D tempPos;
 
         for(int i = 0; i < lChInfo.size(); ++i) {
@@ -146,13 +157,18 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
             if(!vTransforms.contains(tempTransform)) {
                 vTransforms.push_back(tempTransform);
             }
+
+            if(bads.contains(lChInfo.at(i).ch_name)) {
+                vColorsNodes.push_back(QColor(255,0,0));
+            } else {
+                vColorsNodes.push_back(QColor(100,100,100));
+            }
         }
 
         //Set instance Transform
         pMesh->setTransforms(vTransforms);
-    }
-    else if (sDataType == "EEG")
-    {
+        pMesh->setColors(vColorsNodes);
+    } else if (sDataType == "EEG") {
         QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphere = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
         pSourceSphere->setRadius(0.001f);
 
@@ -161,6 +177,7 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
         //Create transform matrix for each cuboid instance
         QVector<QMatrix4x4> vTransforms;
         vTransforms.reserve(lChInfo.size());
+        QVector<QColor> vColorsNodes;
         QVector3D tempPos;
 
         for(int i = 0; i < lChInfo.size(); ++i) {
@@ -173,22 +190,20 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
             tempTransform.translate(tempPos);
 
             vTransforms.push_back(tempTransform);
+
+            if(bads.contains(lChInfo.at(i).ch_name)) {
+                vColorsNodes.push_back(Qt::red);
+            } else {
+                vColorsNodes.push_back(Qt::gray);
+            }
         }
 
         //Set instance Transform
         pMesh->setTransforms(vTransforms);
+        pMesh->setColors(vColorsNodes);
     }
 
     this->addComponent(pMesh);
-
-    //Add material
-    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
-
-    QColor colDefault(100,100,100);
-    pMaterial->setAmbient(colDefault);
-    pMaterial->setAlpha(1.0f);
-    this->addComponent(pMaterial);
-
 
     //Update colors in color item
     QList<QStandardItem*> items = this->findChildren(MetaTreeItemTypes::Color);
@@ -196,7 +211,7 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
     for(int i = 0; i < items.size(); ++i) {
         if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
             QVariant data;
-            data.setValue(colDefault);
+            data.setValue(Qt::gray);
             item->setData(data, MetaTreeItemRoles::Color);
             item->setData(data, Qt::DecorationRole);
         }

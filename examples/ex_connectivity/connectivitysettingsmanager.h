@@ -90,10 +90,9 @@ class ConnectivitySettingsManager : public QObject
 
 public:
 
-    ConnectivitySettingsManager(int iBlockSize, float sFreq = 1000.0f, QObject *parent = 0)
+    ConnectivitySettingsManager(int iBlockSize, QObject *parent = 0)
     : QObject(parent)
     , m_pRtConnectivity(RtConnectivity::SPtr::create())
-    , m_fSFreq(sFreq)
     {
         QObject::connect(m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
                          this, &ConnectivitySettingsManager::onNewConnectivityResultAvailable);
@@ -101,8 +100,6 @@ public:
         // Default frequency range
         m_fFreqBandLow = 7.0f;
         m_fFreqBandHigh = 13.0f;
-
-        m_settings.setSamplingFrequency(sFreq);
     }
 
     ConnectivitySettings    m_settings;
@@ -111,8 +108,6 @@ public:
 
     float                   m_fFreqBandLow;
     float                   m_fFreqBandHigh;
-
-    float                   m_fSFreq;
 
     QVector<int>            m_indexList;
 

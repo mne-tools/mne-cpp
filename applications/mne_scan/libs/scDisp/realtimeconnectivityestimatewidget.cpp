@@ -144,16 +144,16 @@ void RealTimeConnectivityEstimateWidget::getData()
         if(!m_pRtItem) {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem";
             m_pRtItem = m_pAbstractView->getTreeModel()->addConnectivityData("sample",
-                                                                            "Connectivity",
-                                                                            *(m_pRTCE->getValue().data()));
+                                                                             "Connectivity",
+                                                                             *(m_pRTCE->getValue().data()));
 
             m_pRtItem->setThresholds(QVector3D(0.9f,0.95f,1.0f));
 
             if(m_pRTCE->getSurfSet() && m_pRTCE->getAnnotSet()) {
                 QList<FsSurfaceTreeItem*> lSurfaces = m_pAbstractView->getTreeModel()->addSurfaceSet("sample",
-                                                                                                    "MRI",
-                                                                                                    *(m_pRTCE->getSurfSet().data()),
-                                                                                                    *(m_pRTCE->getAnnotSet().data()));
+                                                                                                     "MRI",
+                                                                                                     *(m_pRTCE->getSurfSet().data()),
+                                                                                                     *(m_pRTCE->getAnnotSet().data()));
 
                 for(int i = 0; i < lSurfaces.size(); i++) {
                     lSurfaces.at(i)->setAlpha(0.3f);
@@ -164,7 +164,8 @@ void RealTimeConnectivityEstimateWidget::getData()
                 m_pAbstractView->getTreeModel()->addMegSensorInfo("sample",
                                                                  "Sensors",
                                                                  m_pRTCE->getFiffInfo()->chs,
-                                                                 *(m_pRTCE->getSensorSurface()));
+                                                                 *(m_pRTCE->getSensorSurface()),
+                                                                 m_pRTCE->getFiffInfo()->bads);
             }
         } else {
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem";

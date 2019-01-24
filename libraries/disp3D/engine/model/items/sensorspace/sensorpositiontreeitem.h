@@ -119,8 +119,11 @@ public:
     *
     * @param[in] lChInfo            The channel information used to plot the MEG channels.
     * @param[in] sDataType          The data type: EEG, MEG.
+    * @param[in] bads               The bad channel list.
     */
-    void addData(const QList<FIFFLIB::FiffChInfo> &lChInfo, const QString &sDataType);
+    void addData(const QList<FIFFLIB::FiffChInfo> &lChInfo,
+                 const QString& sDataType,
+                 const QStringList& bads = QStringList());
 
 protected:
     //=========================================================================================================
@@ -129,8 +132,11 @@ protected:
     *
     * @param[in] lChInfo            The channel information used to plot the MEG channels.
     * @param[in] sDataType          The data type: EEG, MEG.
+    * @param[in] bads               The bad channel list.
     */
-    void plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString &sDataType);
+    void plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                     const QString& sDataType,
+                     const QStringList& bads = QStringList());
 
     //=========================================================================================================
     /**
