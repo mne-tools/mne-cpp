@@ -158,6 +158,8 @@ protected:
 
     bool                                                        m_bInitialized;         /**< Whether init was processed successfully. */
 
+    int                                                         m_iNumberBadChannels;   /**< The last received number of bad channels. */
+
     FSLIB::AnnotationSet                                        m_annotationSet;        /**< The current annotation set. */
     FSLIB::SurfaceSet                                           m_surfSet;              /**< The current surface set. */
 
