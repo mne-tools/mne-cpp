@@ -177,13 +177,15 @@ void RealTimeConnectivityEstimateWidget::getData()
             m_pRtItem->addData(*(m_pRTCE->getValue().data()));
 
 
-            if(m_iNumberBadChannels != m_pRTCE->getFiffInfo()->bads.size()) {
-                m_pAbstractView->getTreeModel()->addMegSensorInfo("sample",
-                                                                  "Sensors",
-                                                                  m_pRTCE->getFiffInfo()->chs,
-                                                                  *(m_pRTCE->getSensorSurface()),
-                                                                  m_pRTCE->getFiffInfo()->bads);
-                m_iNumberBadChannels = m_pRTCE->getFiffInfo()->bads.size();
+            if(m_pRTCE->getSensorSurface() && m_pRTCE->getFiffInfo()) {
+                if(m_iNumberBadChannels != m_pRTCE->getFiffInfo()->bads.size()) {
+                    m_pAbstractView->getTreeModel()->addMegSensorInfo("sample",
+                                                                      "Sensors",
+                                                                      m_pRTCE->getFiffInfo()->chs,
+                                                                      *(m_pRTCE->getSensorSurface()),
+                                                                      m_pRTCE->getFiffInfo()->bads);
+                    m_iNumberBadChannels = m_pRTCE->getFiffInfo()->bads.size();
+                }
             }
         }
     }
