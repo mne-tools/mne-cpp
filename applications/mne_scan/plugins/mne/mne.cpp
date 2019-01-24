@@ -594,6 +594,7 @@ void MNE::run()
     m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp,
                                                        lambda2,
                                                        method));
+    m_pMinimumNorm->doInverseSetup(1,false);
 
     m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfoInput);
 

@@ -41,6 +41,10 @@
 
 #include "connectivitysettings.h"
 
+#include <mne/mne_forwardsolution.h>
+#include <fs/surfaceset.h>
+#include <fiff/fiff_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,6 +68,9 @@
 //=============================================================================================================
 
 using namespace CONNECTIVITYLIB;
+using namespace MNELIB;
+using namespace Eigen;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -101,7 +108,6 @@ void ConnectivitySettings::clearAllData() {
 void ConnectivitySettings::clearIntermediateData() {
     for (int i = 0; i < m_trialData.size(); ++i) {
         m_trialData[i].matPsd.resize(0,0);
-
         m_trialData[i].vecPairCsd.clear();
         m_trialData[i].vecTapSpectra.clear();
         m_trialData[i].vecPairCsdNormalized.clear();
@@ -121,7 +127,7 @@ void ConnectivitySettings::clearIntermediateData() {
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::append(const QList<Eigen::MatrixXd>& matInputData)
+void ConnectivitySettings::append(const QList<MatrixXd>& matInputData)
 {
     for(int i = 0; i < matInputData.size(); ++i) {
         this->append(matInputData.at(i));
@@ -131,7 +137,7 @@ void ConnectivitySettings::append(const QList<Eigen::MatrixXd>& matInputData)
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::append(const Eigen::MatrixXd& matInputData)
+void ConnectivitySettings::append(const MatrixXd& matInputData)
 {
     ConnectivitySettings::IntermediateTrialData tempData;
     tempData.matData = matInputData;
@@ -362,7 +368,61 @@ const QString& ConnectivitySettings::getWindowType() const
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::setNodePositions(const Eigen::MatrixX3f& matNodePositions)
+void ConnectivitySettings::setNodePositions(const FiffInfo& fiffInfo,
+                                            const RowVectorXi& picks)
+{
+    m_matNodePositions.resize(picks.cols(),3);
+
+    qint32 kind;
+    for(int i = 0; i < picks.cols(); ++i) {
+        kind = fiffInfo.chs.at(i).kind;
+        if(kind == FIFFV_EEG_CH ||
+           kind == FIFFV_MEG_CH) {
+            m_matNodePositions(i,0) = fiffInfo.chs.at(picks(i)).chpos.r0(0);
+            m_matNodePositions(i,1) = fiffInfo.chs.at(picks(i)).chpos.r0(1);
+            m_matNodePositions(i,2) = fiffInfo.chs.at(picks(i)).chpos.r0(2);
+        }
+    }
+}
+
+
+//*******************************************************************************************************
+
+void ConnectivitySettings::setNodePositions(const MNEForwardSolution& forwardSolution, const SurfaceSet& surfSet)
+{
+    //Generate node vertices
+    MatrixX3f matNodeVertLeft, matNodeVertRight;
+
+    if(forwardSolution.isClustered()) {
+        matNodeVertLeft.resize(forwardSolution.src[0].cluster_info.centroidVertno.size(),3);
+        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
+            matNodeVertLeft.row(j) = surfSet[0].rr().row(forwardSolution.src[0].cluster_info.centroidVertno.at(j)) - surfSet[0].offset().transpose();
+        }
+
+        matNodeVertRight.resize(forwardSolution.src[1].cluster_info.centroidVertno.size(),3);
+        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
+            matNodeVertRight.row(j) = surfSet[1].rr().row(forwardSolution.src[1].cluster_info.centroidVertno.at(j)) - surfSet[1].offset().transpose();
+        }
+    } else {
+        matNodeVertLeft.resize(forwardSolution.src[0].vertno.rows(),3);
+        for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
+            matNodeVertLeft.row(j) = surfSet[0].rr().row(forwardSolution.src[0].vertno(j)) - surfSet[0].offset().transpose();
+        }
+
+        matNodeVertRight.resize(forwardSolution.src[1].vertno.rows(),3);
+        for(int j = 0; j < matNodeVertRight.rows(); ++j) {
+            matNodeVertRight.row(j) = surfSet[1].rr().row(forwardSolution.src[1].vertno(j)) - surfSet[1].offset().transpose();
+        }
+    }
+
+    m_matNodePositions.resize(matNodeVertLeft.rows()+matNodeVertRight.rows(),3);
+    m_matNodePositions << matNodeVertLeft, matNodeVertRight;
+}
+
+
+//*******************************************************************************************************
+
+void ConnectivitySettings::setNodePositions(const MatrixX3f& matNodePositions)
 {
     m_matNodePositions = matNodePositions;
 }
@@ -370,7 +430,7 @@ void ConnectivitySettings::setNodePositions(const Eigen::MatrixX3f& matNodePosit
 
 //*******************************************************************************************************
 
-const Eigen::MatrixX3f& ConnectivitySettings::getNodePositions() const
+const MatrixX3f& ConnectivitySettings::getNodePositions() const
 {
     return m_matNodePositions;
 }

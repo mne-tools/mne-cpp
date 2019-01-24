@@ -361,7 +361,7 @@ void NoiseReduction::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
         }
 
         MatrixXd matProj;
-        this->m_pFiffInfo->make_projector(matProj);
+        FiffProj::make_projector(projs, m_pFiffInfo->ch_names, matProj, m_pFiffInfo->bads);
 
         //set columns of matrix to zero depending on bad channels indexes
         for(qint32 j = 0; j < m_pFiffInfo->bads.size(); ++j) {

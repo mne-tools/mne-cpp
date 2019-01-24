@@ -252,35 +252,8 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             m_pRTCEOutput->data()->setFwdSolution(pRTSE->getFwdSolution());
             m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
 
-            //Generate node vertices
-            if(pRTSE->getFwdSolution()->isClustered()) {
-                m_matNodeVertLeft.resize(pRTSE->getFwdSolution()->src[0].cluster_info.centroidVertno.size(),3);
-
-                for(int j = 0; j < m_matNodeVertLeft.rows(); ++j) {
-                    m_matNodeVertLeft.row(j) = pRTSE->getSurfSet()->data()[0].rr().row(pRTSE->getFwdSolution()->src[0].cluster_info.centroidVertno.at(j)) - pRTSE->getSurfSet()->data()[0].offset().transpose();
-                }
-
-                m_matNodeVertRight.resize(pRTSE->getFwdSolution()->src[1].cluster_info.centroidVertno.size(),3);
-                for(int j = 0; j < m_matNodeVertRight.rows(); ++j) {
-                    m_matNodeVertRight.row(j) = pRTSE->getSurfSet()->data()[1].rr().row(pRTSE->getFwdSolution()->src[1].cluster_info.centroidVertno.at(j)) - pRTSE->getSurfSet()->data()[1].offset().transpose();
-                }
-            } else {
-                m_matNodeVertLeft.resize(pRTSE->getFwdSolution()->src[0].vertno.rows(),3);
-                for(int j = 0; j < m_matNodeVertLeft.rows(); ++j) {
-                    m_matNodeVertLeft.row(j) = pRTSE->getSurfSet()->data()[0].rr().row(pRTSE->getFwdSolution()->src[0].vertno(j)) - pRTSE->getSurfSet()->data()[0].offset().transpose();
-                }
-
-                m_matNodeVertRight.resize(pRTSE->getFwdSolution()->src[1].vertno.rows(),3);
-                for(int j = 0; j < m_matNodeVertRight.rows(); ++j) {
-                    m_matNodeVertRight.row(j) = pRTSE->getSurfSet()->data()[1].rr().row(pRTSE->getFwdSolution()->src[1].vertno(j)) - pRTSE->getSurfSet()->data()[1].offset().transpose();
-                }
-            }
-
-            m_matNodeVertComb.resize(m_matNodeVertLeft.rows() + m_matNodeVertRight.rows(),3);
-            m_matNodeVertComb << m_matNodeVertLeft, m_matNodeVertRight;
-
-            //Set node 3D positions to connectivity settings
-            m_connectivitySettings.setNodePositions(m_matNodeVertComb);
+            // Generate network nodes
+            m_connectivitySettings.setNodePositions(*pRTSE->getFwdSolution(), *pRTSE->getSurfSet());
         }
 
         for(qint32 i = 0; i < pRTSE->getValue().size(); ++i) {
@@ -368,10 +341,10 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
                     }
                 }
 
-                data.resize(m_chIdx.size(), t_mat.cols());
+                data.resize(m_vecPicks.cols(), t_mat.cols());
 
-                for(qint32 j = 0; j < m_chIdx.size(); ++j) {
-                    data.row(j) = t_mat.row(m_chIdx.at(j));
+                for(qint32 j = 0; j < m_vecPicks.cols(); ++j) {
+                    data.row(j) = t_mat.row(m_vecPicks[j]);
                 }
 
                 m_connectivitySettings.append(data);
@@ -454,10 +427,10 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     }
 
                     MatrixXd data;
-                    data.resize(m_chIdx.size(), t_mat.cols());
+                    data.resize(m_vecPicks.cols(), t_mat.cols());
 
-                    for(qint32 j = 0; j < m_chIdx.size(); ++j) {
-                        data.row(j) = t_mat.row(m_chIdx.at(j));
+                    for(qint32 j = 0; j < m_vecPicks.cols(); ++j) {
+                        data.row(j) = t_mat.row(m_vecPicks[j]);
                     }
 
                     m_connectivitySettings.append(data);
@@ -483,60 +456,98 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void NeuronalConnectivity::generateNodeVertices()
 {
-    //Generate node vertices
-    bool bPick = false;
-    qint32 unit, kind;
-    int counter = 0;
-    QString sChType = "grad";
-    m_chIdx.clear();
-    m_matNodeVertComb = MatrixX3f();
+    if(!m_pFiffInfo) {
+        qDebug() << "NeuronalConnectivity::generateNodeVertices - FiffInfo is Null. Returning.";
+        return;
+    }
 
-    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
-        unit = m_pFiffInfo->chs.at(i).unit;
-        kind = m_pFiffInfo->chs.at(i).kind;
+    QString sCoilType = "grad";
+    QString sChType = "mag";
 
-        if(unit == FIFF_UNIT_T_M &&
-            kind == FIFFV_MEG_CH &&
-            sChType == "grad") {
-            bPick = true;
+    QStringList exclude;
+    exclude << m_pFiffInfo->bads << m_pFiffInfo->ch_names.filter("EOG");
 
-            //Skip second gradiometer in triplet
-            ++i;
-        } else if(unit == FIFF_UNIT_T &&
-                  kind == FIFFV_MEG_CH &&
-                    sChType == "mag") {
-            bPick = true;
-        } else if (unit == FIFF_UNIT_V &&
-                   kind == FIFFV_EEG_CH &&
-                    sChType == "eeg") {
-            bPick = true;
-        }
+    if(sChType.contains("EEG", Qt::CaseInsensitive)) {
+        m_vecPicks = m_pFiffInfo->pick_types(false,true,false,QStringList(),exclude);
+    } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
+        // Only pick every second gradiometer. If it is a bad channel try the second one in the triplet. Works only for Neuromag data
+        RowVectorXi picksTmp = m_pFiffInfo->pick_types(QString("grad"),false,false);
+        m_vecPicks.resize(0);
 
-        if(bPick && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            //Get the positions
-            m_matNodeVertComb.conservativeResize(m_matNodeVertComb.rows()+1, 3);
-            m_matNodeVertComb(counter,0) = m_pFiffInfo->chs.at(i).chpos.r0(0);
-            m_matNodeVertComb(counter,1) = m_pFiffInfo->chs.at(i).chpos.r0(1);
-            m_matNodeVertComb(counter,2) = m_pFiffInfo->chs.at(i).chpos.r0(2);
-
-            if(sChType == "grad") {
-                m_chIdx << i-1;
-            } else {
-                m_chIdx << i;
+        for(int i = 0; i < picksTmp.cols()-1; i+=2) {
+            if(!m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(picksTmp(i)))) {
+                m_vecPicks.conservativeResize(m_vecPicks.cols()+1);
+                m_vecPicks(m_vecPicks.cols()-1) = picksTmp(i);
+            } else if(!m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(picksTmp(i+1)))) {
+                m_vecPicks.conservativeResize(m_vecPicks.cols()+1);
+                m_vecPicks(m_vecPicks.cols()-1) = picksTmp(i+1);
             }
-
-            counter++;
         }
-
-        bPick = false;
+    } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
+        m_vecPicks = m_pFiffInfo->pick_types(QString("mag"),false,false,QStringList(),exclude);
     }
 
     // Set sampling frequency so that the spectrum resolution is updated
     m_connectivitySettings.setSamplingFrequency(m_pFiffInfo->sfreq);
 
     //Set node 3D positions to connectivity settings
-    m_connectivitySettings.setNodePositions(m_matNodeVertComb);
+    m_connectivitySettings.setNodePositions(*m_pFiffInfo, m_vecPicks);
     m_connectivitySettings.clearAllData();
+
+//    //Generate node vertices
+//    bool bPick = false;
+//    qint32 unit, kind;
+//    int counter = 0;
+//    QString sChType = "grad";
+//    m_chIdx.clear();
+//    m_matNodeVertComb = MatrixX3f();
+
+//    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
+//        unit = m_pFiffInfo->chs.at(i).unit;
+//        kind = m_pFiffInfo->chs.at(i).kind;
+
+//        if(unit == FIFF_UNIT_T_M &&
+//            kind == FIFFV_MEG_CH &&
+//            sChType == "grad") {
+//            bPick = true;
+
+//            //Skip second gradiometer in triplet
+//            ++i;
+//        } else if(unit == FIFF_UNIT_T &&
+//                  kind == FIFFV_MEG_CH &&
+//                    sChType == "mag") {
+//            bPick = true;
+//        } else if (unit == FIFF_UNIT_V &&
+//                   kind == FIFFV_EEG_CH &&
+//                    sChType == "eeg") {
+//            bPick = true;
+//        }
+
+//        if(bPick && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+//            //Get the positions
+//            m_matNodeVertComb.conservativeResize(m_matNodeVertComb.rows()+1, 3);
+//            m_matNodeVertComb(counter,0) = m_pFiffInfo->chs.at(i).chpos.r0(0);
+//            m_matNodeVertComb(counter,1) = m_pFiffInfo->chs.at(i).chpos.r0(1);
+//            m_matNodeVertComb(counter,2) = m_pFiffInfo->chs.at(i).chpos.r0(2);
+
+//            if(sChType == "grad") {
+//                m_chIdx << i-1;
+//            } else {
+//                m_chIdx << i;
+//            }
+
+//            counter++;
+//        }
+
+//        bPick = false;
+//    }
+
+//    // Set sampling frequency so that the spectrum resolution is updated
+//    m_connectivitySettings.setSamplingFrequency(m_pFiffInfo->sfreq);
+
+//    //Set node 3D positions to connectivity settings
+//    m_connectivitySettings.setNodePositions(m_matNodeVertComb);
+//    m_connectivitySettings.clearAllData();
 }
 
 
