@@ -93,7 +93,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 : m_bIsRunning(false)
 , m_iDownSample(1)
 , m_iNumberAverages(10)
-, m_sAvrType("3")
+, m_sAvrType("2")
 , m_fFreqBandLow(7.0f)
 , m_fFreqBandHigh(13.0f)
 , m_iBlockSize(1)
@@ -493,61 +493,6 @@ void NeuronalConnectivity::generateNodeVertices()
     //Set node 3D positions to connectivity settings
     m_connectivitySettings.setNodePositions(*m_pFiffInfo, m_vecPicks);
     m_connectivitySettings.clearAllData();
-
-//    //Generate node vertices
-//    bool bPick = false;
-//    qint32 unit, kind;
-//    int counter = 0;
-//    QString sChType = "grad";
-//    m_chIdx.clear();
-//    m_matNodeVertComb = MatrixX3f();
-
-//    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
-//        unit = m_pFiffInfo->chs.at(i).unit;
-//        kind = m_pFiffInfo->chs.at(i).kind;
-
-//        if(unit == FIFF_UNIT_T_M &&
-//            kind == FIFFV_MEG_CH &&
-//            sChType == "grad") {
-//            bPick = true;
-
-//            //Skip second gradiometer in triplet
-//            ++i;
-//        } else if(unit == FIFF_UNIT_T &&
-//                  kind == FIFFV_MEG_CH &&
-//                    sChType == "mag") {
-//            bPick = true;
-//        } else if (unit == FIFF_UNIT_V &&
-//                   kind == FIFFV_EEG_CH &&
-//                    sChType == "eeg") {
-//            bPick = true;
-//        }
-
-//        if(bPick && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-//            //Get the positions
-//            m_matNodeVertComb.conservativeResize(m_matNodeVertComb.rows()+1, 3);
-//            m_matNodeVertComb(counter,0) = m_pFiffInfo->chs.at(i).chpos.r0(0);
-//            m_matNodeVertComb(counter,1) = m_pFiffInfo->chs.at(i).chpos.r0(1);
-//            m_matNodeVertComb(counter,2) = m_pFiffInfo->chs.at(i).chpos.r0(2);
-
-//            if(sChType == "grad") {
-//                m_chIdx << i-1;
-//            } else {
-//                m_chIdx << i;
-//            }
-
-//            counter++;
-//        }
-
-//        bPick = false;
-//    }
-
-//    // Set sampling frequency so that the spectrum resolution is updated
-//    m_connectivitySettings.setSamplingFrequency(m_pFiffInfo->sfreq);
-
-//    //Set node 3D positions to connectivity settings
-//    m_connectivitySettings.setNodePositions(m_matNodeVertComb);
-//    m_connectivitySettings.clearAllData();
 }
 
 
@@ -612,8 +557,11 @@ void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
         return;
     }
 
-    m_pRtConnectivity->restart();
     m_sConnectivityMethods = QStringList() << sMetric;
+    if(m_pRtConnectivity) {
+        m_pRtConnectivity->restart();
+        m_pRtConnectivity->append(m_connectivitySettings);
+    }
 }
 
 
