@@ -283,7 +283,7 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
         }
 
         //Pop data from buffer
-        if(m_connectivitySettings.size() > m_iNumberAverages) {
+        if(m_connectivitySettings.size() >= m_iNumberAverages) {
             m_pRtConnectivity->restart();
             m_connectivitySettings.removeFirst(m_connectivitySettings.size()-m_iNumberAverages);
         }
