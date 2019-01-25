@@ -177,7 +177,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
         }
     }
 
-    qDebug() << "MNEEpochDataList::readEpochs - Read a total of"<< data.size() <<"epochs and marked"<< dropCount <<"for rejection";
+    qDebug() << "MNEEpochDataList::readEpochs - Read a total of"<< data.size() <<"epochs of type" << event << "and marked"<< dropCount <<"for rejection";
 
     return data;
 }
