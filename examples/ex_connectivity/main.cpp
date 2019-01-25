@@ -81,6 +81,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QObject>
+#include <QVariant>
 
 
 //*************************************************************************************************************
@@ -231,7 +232,8 @@ int main(int argc, char *argv[])
                                                          150*pow(10.0,-06),
                                                          "eog");
     data.dropRejected();
-    data.applyBaselineCorrection(qMakePair(QVariant(fTMin), QVariant("0.0")));
+    QPair<QVariant, QVariant> pair(QVariant(fTMin), QVariant("0.0"));
+    data.applyBaselineCorrection(pair);
 
     // Average epochs. Do not use SSPs.
     FiffEvoked evoked = data.average(raw.info,
