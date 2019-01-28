@@ -98,12 +98,15 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
         fftw_make_planner_thread_safe();
     #endif
 
-    Network finalNetwork("Cross Correlation");
+    Network finalNetwork("XCOR");
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "CrossCorrelation::calculate - Input data is empty";
         return finalNetwork;
     }
+
+    finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
+    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();

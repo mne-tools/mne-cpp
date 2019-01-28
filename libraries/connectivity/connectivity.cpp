@@ -1,4 +1,4 @@
-//=============================================================================================================
+﻿//=============================================================================================================
 /**
 * @file     connectivity.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
@@ -60,6 +60,8 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QFutureSynchronizer>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -94,30 +96,67 @@ Connectivity::Connectivity()
 
 //*************************************************************************************************************
 
-Network Connectivity::calculate(ConnectivitySettings& connectivitySettings)
+QList<Network> Connectivity::calculate(ConnectivitySettings& connectivitySettings)
 {
-    //TODO: Use multithreading to work on multiple connectivity methods at the same time
-    if(connectivitySettings.getConnectivityMethods().contains("COR")) {
-        return Correlation::calculate(connectivitySettings);
-    } else if(connectivitySettings.getConnectivityMethods().contains("XCOR")) {
-        return CrossCorrelation::calculate(connectivitySettings);
-    } else if(connectivitySettings.getConnectivityMethods().contains("PLI")) {
-        return PhaseLagIndex::calculate(connectivitySettings);
-    } else if(connectivitySettings.getConnectivityMethods().contains("COH")) {
-        return Coherence::calculate(connectivitySettings);
-    } else if(connectivitySettings.getConnectivityMethods().contains("IMAGCOH")) {
-        return ImagCoherence::calculate(connectivitySettings);
-    } else if(connectivitySettings.getConnectivityMethods().contains("PLV")) {
-        return PhaseLockingValue::calculate(connectivitySettings);
-    } else if(connectivitySettings.getConnectivityMethods().contains("WPLI")) {
-        return WeightedPhaseLagIndex::calculate(connectivitySettings);
-    } else if(connectivitySettings.getConnectivityMethods().contains("USPLI")) {
-        return UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings);
-    } else if(connectivitySettings.getConnectivityMethods().contains("DSWPLI")) {
-        return DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings);
+    QStringList lMethods = connectivitySettings.getConnectivityMethods();
+    QList<Network> results;
+    QElapsedTimer timer;
+
+    int iNTrials = connectivitySettings.getTrialData().size();
+
+    if(lMethods.contains("WPLI")) {
+        timer.restart();
+        results.append(WeightedPhaseLagIndex::calculate(connectivitySettings));
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated WPLI for" << iNTrials << "trials in"<< timer.elapsed() << "msecs.";
     }
 
-    qDebug() << "Connectivity::calculateConnectivity - Connectivity method unknown.";
+    if(lMethods.contains("USPLI")) {
+        timer.restart();
+        results.append(UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings));
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated USPLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+    }
 
-    return Network();
+    if(lMethods.contains("COR")) {
+        timer.restart();
+        results.append(Correlation::calculate(connectivitySettings));
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated COR for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+    }
+
+    if(lMethods.contains("XCOR")) {
+        timer.restart();
+        results.append(CrossCorrelation::calculate(connectivitySettings));
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated XCOR for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+    }
+
+    if(lMethods.contains("PLI")) {
+        timer.restart();
+        results.append(PhaseLagIndex::calculate(connectivitySettings));
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated PLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+    }
+
+    if(lMethods.contains("COH")) {
+        timer.restart();
+        results.append(Coherence::calculate(connectivitySettings));
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated COH for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+    }
+
+    if(lMethods.contains("IMAGCOH")) {
+        timer.restart();
+        results.append(ImagCoherence::calculate(connectivitySettings));
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated IMAGCOH for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+    }
+
+    if(lMethods.contains("PLV")) {
+        timer.restart();
+        results.append(PhaseLockingValue::calculate(connectivitySettings));
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated PLV for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+    }
+
+    if(lMethods.contains("DSWPLI")) {
+        timer.restart();
+        results.append(DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings));
+        qDebug() << "Connectivity::calculateMultiMethods - Calculated DSWPLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+    }
+
+    return results;
 }

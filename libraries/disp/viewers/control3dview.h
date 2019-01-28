@@ -105,11 +105,11 @@ public:
     * Default constructor.
     *
     * @param[in] parent      The parent of the QObject.
-    * @param [in] slFlags    The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: projections, compensators, view, filter, triggerdetection, modalities, scaling, sphara.
+    * @param [in] slFlags    The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: "Data", "View", "Light".
     * @param [in] type
     */
     explicit Control3DView(QWidget* parent = 0,
-                           const QStringList& slFlags = QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light",
+                           const QStringList& slFlags = QStringList() << "Data" << "View" << "Light",
                            Qt::WindowType type = Qt::Widget);
 
     //=========================================================================================================
@@ -118,6 +118,20 @@ public:
     */
     ~Control3DView();
 
+    //=========================================================================================================
+    /**
+    * Set the flags specifying which part of the GUI should be shown.
+    *
+    * @param[in] slFlags   flags.
+    */
+    void setFlags(const QStringList& slFlags);
+
+    //=========================================================================================================
+    /**
+    * Set the delegate for the tree view.
+    *
+    * @param[in] pItemDelegate   The delegate.
+    */
     void setDelegate(QItemDelegate* pItemDelegate);
 
     //=========================================================================================================

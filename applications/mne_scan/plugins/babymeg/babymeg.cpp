@@ -309,6 +309,10 @@ bool BabyMEG::stop()
     //Clear Buffers
     m_pRawMatrixBuffer->clear();
 
+    if(m_pHPIWidget) {
+        m_pHPIWidget->hide();
+    }
+
     return true;
 }
 

@@ -104,6 +104,8 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 
     m_pQuickControlView = m_pSourceEstimateView->getQuickControl();
     m_pQuickControlView->setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
+    m_pQuickControlView->setDraggable(true);
+    m_pQuickControlView->setVisiblityHideOpacityClose(true);
 
     mainLayoutView->setContentsMargins(0,0,0,0);
     this->setLayout(mainLayoutView);

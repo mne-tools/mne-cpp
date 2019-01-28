@@ -116,6 +116,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Applies baseline correction to the evoked data.
+    *
+    * @param[in] baseline     time definition of the baseline in seconds [from, to]
+    */
+    void applyBaselineCorrection(QPair<QVariant,QVariant>& baseline);
+
+        //=========================================================================================================
+    /**
     * Reduces the data to the selected rows.
     *
     * @param[in] sel     The selected rows to keep.

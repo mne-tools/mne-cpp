@@ -92,12 +92,15 @@ Correlation::Correlation()
 
 Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
 {
-    Network finalNetwork("Correlation");
+    Network finalNetwork("COR");
 
     if(connectivitySettings.isEmpty()) {
-        qDebug() << "Correlation::correlationCoeff - Input data is empty";
+        qDebug() << "Correlation::calculate - Input data is empty";
         return finalNetwork;
     }   
+
+    finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
+    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();
@@ -119,12 +122,19 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
     //double dScalingStep = 1.0/matDataList.size();
     //dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
 
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.getTrialData(),
-                                                              compute,
-                                                              reduce);
-    resultMat.waitForFinished();
+//    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.getTrialData(),
+//                                                              compute,
+//                                                              reduce);
+//    resultMat.waitForFinished();
 
-    MatrixXd matDist = resultMat.result();
+//    MatrixXd matDist = resultMat.result();
+
+    MatrixXd matDist;
+
+    for(int i = 0; i < connectivitySettings.getTrialData().size(); ++i) {
+        reduce(matDist, compute(connectivitySettings.getTrialData().at(i)));
+    }
+
     matDist /= connectivitySettings.size();
 
     //Add edges to network
@@ -161,7 +171,7 @@ MatrixXd Correlation::compute(const ConnectivitySettings::IntermediateTrialData&
         vecRow = inputData.matData.row(i);
 
         for(j = i; j < inputData.matData.rows(); ++j) {
-            matDist(i,j) += vecRow.dot(inputData.matData.row(j))/vecRow.cols();
+            matDist(i,j) += (vecRow.dot(inputData.matData.row(j))/vecRow.cols());
         }
     }
 

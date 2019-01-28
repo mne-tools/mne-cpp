@@ -68,6 +68,18 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace MNELIB {
+    class MNEForwardSolution;
+}
+
+namespace FSLIB {
+    class SurfaceSet;
+}
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -140,6 +152,8 @@ public:
 
     void removeFirst(int iAmount = 1);
 
+    void removeLast(int iAmount = 1);
+
     void setConnectivityMethods(const QStringList& sConnectivityMethods);
 
     const QStringList& getConnectivityMethods() const;
@@ -155,6 +169,12 @@ public:
     void setWindowType(const QString& sWindowType);
 
     const QString& getWindowType() const;
+
+    void setNodePositions(const FIFFLIB::FiffInfo& fiffInfo,
+                          const Eigen::RowVectorXi& picks);
+
+    void setNodePositions(const MNELIB::MNEForwardSolution& forwardSolution,
+                          const FSLIB::SurfaceSet& surfSet);
 
     void setNodePositions(const Eigen::MatrixX3f& matNodePositions);
 

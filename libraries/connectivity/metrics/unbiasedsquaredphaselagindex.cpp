@@ -102,12 +102,15 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
 //    qint64 iTime = 0;
 //    timer.start();
 
-    Network finalNetwork("Unbiased Squared Phase Lag Index");
+    Network finalNetwork("USPLI");
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "UnbiasedSquaredPhaseLagIndex::calculate - Input data is empty";
         return finalNetwork;
     }
+
+    finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
+    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
@@ -233,8 +236,6 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
     }
 
     // Compute CSD
-    MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-
     if(inputData.vecPairCsd.isEmpty()) {
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
@@ -242,6 +243,8 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
         if (iNfft % 2 == 0){
             bNfftEven = true;
         }
+
+        MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
 
         for (i = 0; i < iNRows; ++i) {
             for (j = i; j < iNRows; ++j) {

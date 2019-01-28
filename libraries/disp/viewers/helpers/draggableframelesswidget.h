@@ -113,6 +113,14 @@ public:
     */
     ~DraggableFramelessWidget();
 
+    //=========================================================================================================
+    /**
+    * Set the draggable flag of this widget.
+    *
+    * @param [in] bFlag  the flag to set.
+    */
+    void setDraggable(bool bFlag);
+
 protected:
     //=========================================================================================================
     /**
@@ -125,6 +133,12 @@ protected:
     * Reimplmented mouseMoveEvent.
     */
     void mousePressEvent(QMouseEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Reimplmented mouseReleaseEvent.
+    */
+    void mouseReleaseEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
@@ -146,6 +160,7 @@ private:
     QPoint      m_dragPosition;     /**< The drag position of the window. */
     bool        m_bRoundEdges;      /**< Flag specifying whether to round the edges. */
     bool        m_bDraggable;       /**< Flag specifying whether this widget is draggable. */
+    bool        m_bMousePressed;       /**< Flag specifying whether this widget is draggable. */
 };
 
 } // NAMESPACE DISPLIB

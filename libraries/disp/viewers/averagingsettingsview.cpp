@@ -216,7 +216,6 @@ int AveragingSettingsView::getStimChannelIdx()
 void AveragingSettingsView::redrawGUI()
 {
     if(!m_mapStimChsIndexNames.isEmpty()) {
-
         ui->m_pComboBoxChSelection->clear();
 
         QMapIterator<QString, int> i(m_mapStimChsIndexNames);
@@ -236,12 +235,12 @@ void AveragingSettingsView::redrawGUI()
             this, &AveragingSettingsView::onChangeNumAverages);
 
     //Pre Post stimulus
-    ui->m_pSpinBoxPreStimSamples->setValue(m_iPreStimSeconds);
-    connect(ui->m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    ui->m_pSpinBoxPreStimMSeconds->setValue(m_iPreStimSeconds);
+    connect(ui->m_pSpinBoxPreStimMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsView::onChangePreStim);
 
-    ui->m_pSpinBoxPostStimSamples->setValue(m_iPostStimSeconds);
-    connect(ui->m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    ui->m_pSpinBoxPostStimMSeconds->setValue(m_iPostStimSeconds);
+    connect(ui->m_pSpinBoxPostStimMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsView::onChangePostStim);
 
     //Artifact rejection
@@ -270,16 +269,16 @@ void AveragingSettingsView::redrawGUI()
     connect(ui->m_pcheckBoxBaselineCorrection, &QCheckBox::clicked,
             this, &AveragingSettingsView::changeBaselineActive);
 
-    ui->m_pSpinBoxBaselineFrom->setMinimum(ui->m_pSpinBoxPreStimSamples->value()*-1);
-    ui->m_pSpinBoxBaselineFrom->setMaximum(ui->m_pSpinBoxPostStimSamples->value());
-    ui->m_pSpinBoxBaselineFrom->setValue(m_iBaselineFromSeconds);
-    connect(ui->m_pSpinBoxBaselineFrom, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    ui->m_pSpinBoxBaselineFromMSeconds->setMinimum(ui->m_pSpinBoxPreStimMSeconds->value()*-1);
+    ui->m_pSpinBoxBaselineFromMSeconds->setMaximum(ui->m_pSpinBoxPostStimMSeconds->value());
+    ui->m_pSpinBoxBaselineFromMSeconds->setValue(m_iBaselineFromSeconds);
+    connect(ui->m_pSpinBoxBaselineFromMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsView::onChangeBaselineFrom);
 
-    ui->m_pSpinBoxBaselineTo->setMinimum(ui->m_pSpinBoxPreStimSamples->value()*-1);
-    ui->m_pSpinBoxBaselineTo->setMaximum(ui->m_pSpinBoxPostStimSamples->value());
-    ui->m_pSpinBoxBaselineTo->setValue(m_iBaselineToSeconds);
-    connect(ui->m_pSpinBoxBaselineTo, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    ui->m_pSpinBoxBaselineToMSeconds->setMinimum(ui->m_pSpinBoxPreStimMSeconds->value()*-1);
+    ui->m_pSpinBoxBaselineToMSeconds->setMaximum(ui->m_pSpinBoxPostStimMSeconds->value());
+    ui->m_pSpinBoxBaselineToMSeconds->setValue(m_iBaselineToSeconds);
+    connect(ui->m_pSpinBoxBaselineToMSeconds, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &AveragingSettingsView::onChangeBaselineTo);
 
     connect(ui->m_pushButton_reset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -356,9 +355,9 @@ void AveragingSettingsView::saveSettings(const QString& settingsPath)
     settings.setValue(settingsPath + QString("/artifactThresholdFirst"), m_dArtifactThresholdFirst);
     settings.setValue(settingsPath + QString("/artifactThresholdSecond"), m_iArtifactThresholdSecond);
     settings.setValue(settingsPath + QString("/artifactVariance"), m_dArtifactVariance);
-    settings.setValue(settingsPath + QString("Plugin/%1/baselineFromSeconds"), m_iBaselineFromSeconds);
-    settings.setValue(settingsPath + QString("Plugin/%1/baselineToSeconds"), m_iBaselineToSeconds);
-    settings.setValue(settingsPath + QString("Plugin/%1/doBaselineCorrection"), m_bDoBaselineCorrection);
+    settings.setValue(settingsPath + QString("/baselineFromSeconds"), m_iBaselineFromSeconds);
+    settings.setValue(settingsPath + QString("/baselineToSeconds"), m_iBaselineToSeconds);
+    settings.setValue(settingsPath + QString("/doBaselineCorrection"), m_bDoBaselineCorrection);
 }
 
 
@@ -377,6 +376,15 @@ void AveragingSettingsView::loadSettings(const QString& settingsPath)
     m_iPostStimSeconds = settings.value(settingsPath + QString("/postStimSeconds"), 400).toInt();
     m_iBaselineFromSeconds = settings.value(settingsPath + QString("/baselineFromSeconds"), 0).toInt();
     m_iBaselineToSeconds = settings.value(settingsPath + QString("/baselineToSeconds"), 0).toInt();
+
+    if(m_iBaselineFromSeconds < -1 * m_iPreStimSeconds || m_iBaselineFromSeconds > m_iPostStimSeconds) {
+        m_iBaselineFromSeconds = -1 * m_iPreStimSeconds;
+    }
+
+    if(m_iBaselineToSeconds > m_iPostStimSeconds  || m_iBaselineToSeconds < m_iPreStimSeconds) {
+        m_iBaselineToSeconds = 0;
+    }
+
     m_bDoArtifactThresholdReduction = settings.value(settingsPath + QString("/doArtifactThresholdReduction"), false).toBool();
     m_bDoArtifactVarianceReduction = settings.value(settingsPath + QString("/doArtifactVarianceReduction"), false).toBool();
     m_dArtifactThresholdFirst = settings.value(settingsPath + QString("/artifactThresholdFirst"), m_dArtifactThresholdFirst).toDouble();
@@ -392,9 +400,9 @@ void AveragingSettingsView::loadSettings(const QString& settingsPath)
 
 void AveragingSettingsView::onChangePreStim()
 {
-    qint32 mSeconds = ui->m_pSpinBoxPreStimSamples->value();
-    ui->m_pSpinBoxBaselineTo->setMinimum(ui->m_pSpinBoxPreStimSamples->value()*-1);
-    ui->m_pSpinBoxBaselineFrom->setMinimum(ui->m_pSpinBoxPreStimSamples->value()*-1);
+    qint32 mSeconds = ui->m_pSpinBoxPreStimMSeconds->value();
+    ui->m_pSpinBoxBaselineToMSeconds->setMinimum(ui->m_pSpinBoxPreStimMSeconds->value()*-1);
+    ui->m_pSpinBoxBaselineFromMSeconds->setMinimum(ui->m_pSpinBoxPreStimMSeconds->value()*-1);
 
     m_iPreStimSeconds = mSeconds;
 
@@ -406,9 +414,9 @@ void AveragingSettingsView::onChangePreStim()
 
 void AveragingSettingsView::onChangePostStim()
 {
-    qint32 mSeconds = ui->m_pSpinBoxPostStimSamples->value();
-    ui->m_pSpinBoxBaselineTo->setMaximum(ui->m_pSpinBoxPostStimSamples->value());
-    ui->m_pSpinBoxBaselineFrom->setMaximum(ui->m_pSpinBoxPostStimSamples->value());
+    qint32 mSeconds = ui->m_pSpinBoxPostStimMSeconds->value();
+    ui->m_pSpinBoxBaselineToMSeconds->setMaximum(ui->m_pSpinBoxPostStimMSeconds->value());
+    ui->m_pSpinBoxBaselineFromMSeconds->setMaximum(ui->m_pSpinBoxPostStimMSeconds->value());
 
     m_iPostStimSeconds = mSeconds;
 
@@ -420,8 +428,10 @@ void AveragingSettingsView::onChangePostStim()
 
 void AveragingSettingsView::onChangeBaselineFrom()
 {
-    qint32 mSeconds = ui->m_pSpinBoxBaselineFrom->value();
-    ui->m_pSpinBoxBaselineTo->setMinimum(mSeconds);
+    qint32 mSeconds = ui->m_pSpinBoxBaselineFromMSeconds->value();
+    ui->m_pSpinBoxBaselineToMSeconds->setMinimum(mSeconds);
+
+    m_iBaselineFromSeconds = mSeconds;
 
     emit changeBaselineFrom(mSeconds);
 }
@@ -431,8 +441,10 @@ void AveragingSettingsView::onChangeBaselineFrom()
 
 void AveragingSettingsView::onChangeBaselineTo()
 {
-    qint32 mSeconds = ui->m_pSpinBoxBaselineTo->value();
-    ui->m_pSpinBoxBaselineFrom->setMaximum(mSeconds);
+    qint32 mSeconds = ui->m_pSpinBoxBaselineToMSeconds->value();
+    ui->m_pSpinBoxBaselineFromMSeconds->setMaximum(mSeconds);
+
+    m_iBaselineToSeconds = mSeconds;
 
     emit changeBaselineTo(mSeconds);
 }
@@ -442,6 +454,10 @@ void AveragingSettingsView::onChangeBaselineTo()
 
 void AveragingSettingsView::onChangeArtifactThreshold()
 {
+    m_bDoArtifactThresholdReduction = ui->m_pcheckBox_artifactReduction->isChecked();
+    m_dArtifactThresholdFirst = ui->m_pSpinBox_artifactThresholdFirst->value();
+    m_iArtifactThresholdSecond = ui->m_pSpinBox_artifactThresholdSecond->value();
+
     emit changeArtifactThreshold(ui->m_pcheckBox_artifactReduction->isChecked(),
                                  ui->m_pSpinBox_artifactThresholdFirst->value(),
                                  ui->m_pSpinBox_artifactThresholdSecond->value());
@@ -452,6 +468,9 @@ void AveragingSettingsView::onChangeArtifactThreshold()
 
 void AveragingSettingsView::onChangeArtifactVariance()
 {
+    m_bDoArtifactVarianceReduction = ui->m_pcheckBox_varianceReduction->isChecked();
+    m_dArtifactVariance = ui->m_spinBox_variance->value();
+
     emit changeArtifactVariance(ui->m_pcheckBox_varianceReduction->isChecked(),
                                 ui->m_spinBox_variance->value());
 }
@@ -461,5 +480,7 @@ void AveragingSettingsView::onChangeArtifactVariance()
 
 void AveragingSettingsView::onChangeNumAverages()
 {
+    m_iNumAverages = ui->m_pSpinBoxNumAverages->value();
+
     emit changeNumAverages(ui->m_pSpinBoxNumAverages->value());
 }

@@ -51,6 +51,8 @@
 #include <QGroupBox>
 #include <QTabWidget>
 #include <QSettings>
+#include <QApplication>
+#include <QDesktopWidget>
 
 
 //*************************************************************************************************************
@@ -268,7 +270,15 @@ void QuickControlView::loadSettings(const QString& settingsPath)
     QSettings settings;
 
     setOpacityValue(settings.value(settingsPath + QString("/QuickControlViewOpacity"), 100).toInt());
-    move(settings.value(settingsPath + QString("/QuickControlViewPos"), QPoint(100,100)).toPoint());
+
+    QPoint pos = settings.value(settingsPath + QString("/QuickControlViewPos"), QPoint(100,100)).toPoint();
+
+    QRect screenRect = QApplication::desktop()->screenGeometry();
+    if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
+        move(QPoint(100,100));
+    } else {
+        move(pos);
+    }
 }
 
 

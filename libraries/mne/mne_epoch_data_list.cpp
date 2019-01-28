@@ -151,8 +151,8 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
             }
 
             epoch->event = event;
-            epoch->tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
-            epoch->tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
+            epoch->tmin = tmin;
+            epoch->tmax = tmax;
 
             epoch->bReject = checkForArtifact(epoch->epoch,
                                               raw.info,
@@ -177,7 +177,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
         }
     }
 
-    qDebug() << "Read total of"<< data.size() <<"epochs and dropped"<< dropCount <<"of them";
+    qDebug() << "MNEEpochDataList::readEpochs - Read a total of"<< data.size() <<"epochs of type" << event << "and marked"<< dropCount <<"for rejection";
 
     return data;
 }
@@ -224,12 +224,7 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
     p_evoked.first = first;
     p_evoked.last = last;
 
-    RowVectorXf times = RowVectorXf(last-first+1);
-    for (qint32 k = 0; k < times.size(); ++k) {
-        times[k] = ((float)(first+k)) / info.sfreq;
-    }
-
-    p_evoked.times = times;
+    p_evoked.times = RowVectorXf::LinSpaced(this->first()->epoch.cols(), this->first()->tmin, this->first()->tmax);
 
     p_evoked.comment = QString::number(this->at(0)->event);
 
@@ -238,13 +233,21 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
         printf("\tSSP projectors applied to the evoked data\n");
     }
 
-    QPair<QVariant,QVariant> pairBaselineSec;
-    pairBaselineSec.first = this->first()->tmin;
-    pairBaselineSec.second = this->first()->tmax;
-
-    p_evoked.data = MNEMath::rescale(matAverage, times, pairBaselineSec, QString("mean"));
+    p_evoked.data = matAverage;
 
     return p_evoked;
+}
+
+
+//*************************************************************************************************************
+
+void MNEEpochDataList::applyBaselineCorrection(QPair<QVariant, QVariant>& baseline)
+{
+    // Run baseline correction
+    QMutableListIterator<MNEEpochData::SPtr> i(*this);
+    while (i.hasNext()) {
+        i.next()->applyBaselineCorrection(baseline);
+    }
 }
 
 

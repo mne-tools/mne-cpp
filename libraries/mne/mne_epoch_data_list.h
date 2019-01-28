@@ -123,7 +123,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Averages epoch list.
+    * Averages epoch list. Note that no baseline correction performed.
     *
     * @param[in] info     measurement info
     * @param[in] first    First time sample
@@ -136,6 +136,14 @@ public:
                                 FIFFLIB::fiff_int_t last,
                                 Eigen::VectorXi sel = FIFFLIB::defaultVectorXi,
                                 bool proj = false);
+
+    //=========================================================================================================
+    /**
+    * Applies baseline correction to the evoked data.
+    *
+    * @param[in] baseline     time definition of the baseline in seconds [from, to]
+    */
+    void applyBaselineCorrection(QPair<QVariant,QVariant>& baseline);
 
     //=========================================================================================================
     /**

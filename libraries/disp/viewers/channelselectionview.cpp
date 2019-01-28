@@ -63,6 +63,8 @@
 #include <QListWidgetItem>
 #include <QGraphicsItem>
 #include <QSettings>
+#include <QApplication>
+#include <QDesktopWidget>
 
 
 //*************************************************************************************************************
@@ -453,7 +455,15 @@ void ChannelSelectionView::loadSettings(const QString& settingsPath)
     QSettings settings;
 
     setCurrentLayoutFile(settings.value(settingsPath + QString("/selectedLayoutFile"), "babymeg-mag-inner-layer.lout").toString());
-    move(settings.value(settingsPath + QString("/ChannelSelectionViewPos"), QPoint(100,100)).toPoint());
+
+    QPoint pos = settings.value(settingsPath + QString("/ChannelSelectionViewPos"), QPoint(100,100)).toPoint();
+
+    QRect screenRect = QApplication::desktop()->screenGeometry();
+    if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
+        move(QPoint(100,100));
+    } else {
+        move(pos);
+    }
 }
 
 

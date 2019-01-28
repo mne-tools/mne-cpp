@@ -2151,7 +2151,7 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
         //    Scan numbers may have been messed up
         //
         chs[k].scanNo = k+1;//+1 because
-        cals[k] = chs[k].cal;
+        cals[k] = chs[k].range * chs[k].cal; //See description FiffRawData.cals
         t_pStream->write_ch_info(chs[k]);
     }
     //

@@ -90,10 +90,10 @@ ConnectivitySettingsView::ConnectivitySettingsView(QWidget *parent,
     connect(ui->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &ConnectivitySettingsView::onTriggerTypeChanged);
 
-    connect(ui->m_spinBox_freqLow, &QSpinBox::editingFinished,
+    connect(ui->m_spinBox_freqLow, &QDoubleSpinBox::editingFinished,
             this, &ConnectivitySettingsView::onFrequencyBandChanged);
 
-    connect(ui->m_spinBox_freqHigh, &QSpinBox::editingFinished,
+    connect(ui->m_spinBox_freqHigh, &QDoubleSpinBox::editingFinished,
             this, &ConnectivitySettingsView::onFrequencyBandChanged);
 
 //    connect(ui->m_spinBox_freqLow, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),

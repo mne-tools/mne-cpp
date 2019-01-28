@@ -222,6 +222,10 @@ bool FiffSimulator::stop()
         m_pRTMSA_FiffSimulator->data()->clear();
     }
 
+    if(m_pHPIWidget) {
+        m_pHPIWidget->hide();
+    }
+
     return true;
 }
 

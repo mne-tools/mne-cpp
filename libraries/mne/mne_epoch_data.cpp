@@ -40,6 +40,8 @@
 
 #include "mne_epoch_data.h"
 
+#include <utils/mnemath.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -48,6 +50,7 @@
 
 using namespace MNELIB;
 using namespace Eigen;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -82,6 +85,16 @@ MNEEpochData::MNEEpochData(const MNEEpochData &p_MNEEpochData)
 MNEEpochData::~MNEEpochData()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void MNEEpochData::applyBaselineCorrection(QPair<QVariant, QVariant>& baseline)
+{
+    // Run baseline correction
+    RowVectorXf times = RowVectorXf::LinSpaced(this->epoch.cols(), this->tmin, this->tmax);
+    this->epoch = MNEMath::rescale(this->epoch, times, baseline, QString("mean"));
 }
 
 

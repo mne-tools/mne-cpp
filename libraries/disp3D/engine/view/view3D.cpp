@@ -257,11 +257,7 @@ void View3D::saveScreenshot()
     }
 
     QString fileName = QString("./Screenshots/%1-%2-View3D.bmp").arg(sDate).arg(sTime);
-    QImage image = m_pScreenCaptureReply->image();
-
-    bool flag = image.save(fileName);
-    qDebug() << "image.rect()" << image.rect();
-    qDebug() << "flag" << flag;
+    m_pScreenCaptureReply->saveImage(fileName);
 
     delete m_pScreenCaptureReply;
 }

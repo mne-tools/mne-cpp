@@ -90,30 +90,24 @@ class ConnectivitySettingsManager : public QObject
 
 public:
 
-    ConnectivitySettingsManager(int iBlockSize, float sFreq = 1000.0f, QObject *parent = 0)
+    ConnectivitySettingsManager(int iBlockSize, QObject *parent = 0)
     : QObject(parent)
     , m_pRtConnectivity(RtConnectivity::SPtr::create())
-    , m_fSFreq(sFreq)
     {
         QObject::connect(m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
                          this, &ConnectivitySettingsManager::onNewConnectivityResultAvailable);
 
-        // By default the number of frequency bins is half the signal since we only use the half spectrum
-        double dScaleFactor = iBlockSize/m_fSFreq;
-
-        // Convert to frequency bins
-        m_iFreqBandLow = 1 * dScaleFactor;
-        m_iFreqBandHigh = 50 * dScaleFactor;
+        // Default frequency range
+        m_fFreqBandLow = 7.0f;
+        m_fFreqBandHigh = 13.0f;
     }
 
     ConnectivitySettings    m_settings;
     RtConnectivity::SPtr    m_pRtConnectivity;
-    Network                 m_networkData;
+    QList<Network>          m_networkData;
 
-    int                     m_iFreqBandLow;
-    int                     m_iFreqBandHigh;
-
-    float                   m_fSFreq;
+    float                   m_fFreqBandLow;
+    float                   m_fFreqBandHigh;
 
     QVector<int>            m_indexList;
 
@@ -134,23 +128,20 @@ public:
 
     void onNumberTrialsChanged(int iNumberTrials)
     {
-        QElapsedTimer timer;
-        qint64 iTime = 0;
-        timer.start();
+//        QElapsedTimer timer;
+//        qint64 iTime = 0;
+//        timer.start();
 
+        //The maximum number of trials will always be the number of orginal trials stored
         if(iNumberTrials > m_dataListOriginal.size()) {
             iNumberTrials = m_dataListOriginal.size();
-        }
-
-        if(iNumberTrials == m_settings.size()) {
-            return;
         }
 
         //Pop data from connectivity settings
         int size = m_settings.size();
 
         if(size > iNumberTrials) {
-            m_settings.removeFirst(size-iNumberTrials);
+            m_settings.removeLast(size-iNumberTrials);
         }
 
         while(m_settings.size() < iNumberTrials) {
@@ -166,49 +157,55 @@ public:
 //                }
 //            }
 
-            m_settings.append(m_dataListOriginal.at(m_settings.size()));
+            m_settings.append(m_dataListOriginal.at(m_settings.size()-1));
         }
 
         //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - m_indexList" << m_indexList;
 
         m_pRtConnectivity->append(m_settings);
 
-        iTime = timer.elapsed();
-        qDebug() << "Coherency::computeCoherencyImag timer - Preparation:" << iTime;
-        timer.restart();
+//        iTime = timer.elapsed();
+//        qDebug() << "Coherency::computeCoherencyImag timer - Preparation:" << iTime;
+//        timer.restart();
     }
 
-    void onFreqBandChanged(int iFreqLow, int iFreqHigh)
+    void onFreqBandChanged(float fFreqLow, float fFreqHigh)
     {
         if(m_settings.isEmpty()) {
             return;
         }
 
-        // By default the number of frequency bins is half the signal since we only use the half spectrum
-        double dScaleFactor = m_settings.at(0).matData.cols()/m_fSFreq;
-
         // Convert to frequency bins
-        m_iFreqBandLow = iFreqLow * dScaleFactor;
-        m_iFreqBandHigh = iFreqHigh * dScaleFactor;
+        m_fFreqBandLow = fFreqLow;
+        m_fFreqBandHigh = fFreqHigh;
 
         onNewConnectivityResultAvailable(m_networkData, m_settings);
     }
 
-    void onNewConnectivityResultAvailable(const Network& tNetworkData,
+    void onNewConnectivityResultAvailable(const QList<Network>& connectivityResults,
                                           const ConnectivitySettings& connectivitySettings)
     {
         m_settings = connectivitySettings;
-        m_networkData = tNetworkData;
-        m_networkData.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
-        m_networkData.normalize();
+        m_networkData = connectivityResults;
+
+        for(int i = 0; i < connectivityResults.size(); ++i) {
+            m_networkData[i].setFrequencyBins(m_fFreqBandLow, m_fFreqBandHigh);
+            m_networkData[i].normalize();
+        }
 
         if(!m_networkData.isEmpty()) {
-            emit newConnectivityResultAvailable(m_networkData);
+            for(int i = 0; i < m_networkData.size(); ++i) {
+                emit newConnectivityResultAvailable("sample",
+                                                    "Connectivity",
+                                                    m_networkData.at(i));
+            }
         }
     }
 
 signals:
-    void newConnectivityResultAvailable(const Network& tNetworkData);
+    void newConnectivityResultAvailable(const QString& sSubject,
+                                        const QString& sMeasurement,
+                                        const Network& tNetworkData);
 
 };
 
