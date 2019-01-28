@@ -416,9 +416,19 @@ protected:
 Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network);
 #endif
 
+#ifndef metatype_networkslist
+#define metatype_networkslist
+Q_DECLARE_METATYPE(QList<CONNECTIVITYLIB::Network>);
+#endif
+
 #ifndef metatype_networkssptr
 #define metatype_networkssptr
 Q_DECLARE_METATYPE(CONNECTIVITYLIB::Network::SPtr);
+#endif
+
+#ifndef metatype_networkssptrlist
+#define metatype_networkssptrlist
+Q_DECLARE_METATYPE(QList<CONNECTIVITYLIB::Network::SPtr>);
 #endif
 
 #endif // NETWORK_H

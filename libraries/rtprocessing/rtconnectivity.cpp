@@ -88,7 +88,7 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
     qint64 iTime = 0;
     time.start();
 
-    Network finalNetwork = Connectivity::calculate(connectivitySettingsTemp);
+    QList<Network> finalNetworks = Connectivity::calculate(connectivitySettingsTemp);
 
     iTime = time.elapsed();
 
@@ -102,7 +102,7 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
     qDebug()<<"----------------------------------------";
     qDebug()<<"----------------------------------------";
 
-    emit resultReady(finalNetwork, connectivitySettingsTemp);
+    emit resultReady(finalNetworks, connectivitySettingsTemp);
 }
 
 

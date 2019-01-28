@@ -104,7 +104,7 @@ public:
 
     ConnectivitySettings    m_settings;
     RtConnectivity::SPtr    m_pRtConnectivity;
-    Network                 m_networkData;
+    QList<Network>          m_networkData;
 
     float                   m_fFreqBandLow;
     float                   m_fFreqBandHigh;
@@ -182,18 +182,23 @@ public:
         onNewConnectivityResultAvailable(m_networkData, m_settings);
     }
 
-    void onNewConnectivityResultAvailable(const Network& tNetworkData,
+    void onNewConnectivityResultAvailable(const QList<Network>& connectivityResults,
                                           const ConnectivitySettings& connectivitySettings)
     {
         m_settings = connectivitySettings;
-        m_networkData = tNetworkData;
-        m_networkData.setFrequencyBins(m_fFreqBandLow, m_fFreqBandHigh);
-        m_networkData.normalize();
+        m_networkData = connectivityResults;
+
+        for(int i = 0; i < connectivityResults.size(); ++i) {
+            m_networkData[i].setFrequencyBins(m_fFreqBandLow, m_fFreqBandHigh);
+            m_networkData[i].normalize();
+        }
 
         if(!m_networkData.isEmpty()) {
-            emit newConnectivityResultAvailable("sample",
-                                                "Connectivity",
-                                                m_networkData);
+            for(int i = 0; i < m_networkData.size(); ++i) {
+                emit newConnectivityResultAvailable("sample",
+                                                    "Connectivity",
+                                                    m_networkData.at(i));
+            }
         }
     }
 
