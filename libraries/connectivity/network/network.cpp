@@ -95,6 +95,8 @@ Network::Network(const QString& sConnectivityMethod,
 {
     qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
     qRegisterMetaType<CONNECTIVITYLIB::Network::SPtr>("CONNECTIVITYLIB::Network::SPtr");
+    qRegisterMetaType<QList<CONNECTIVITYLIB::Network> >("QList<CONNECTIVITYLIB::Network>");
+    qRegisterMetaType<QList<CONNECTIVITYLIB::Network::SPtr> >("QList<CONNECTIVITYLIB::Network::SPtr>");
 }
 
 

@@ -103,13 +103,13 @@ public:
     */
     explicit Connectivity();
 
-    //=========================================================================================================
-    /**
-    * Computes the network based on the current settings.
-    *
-    * @return Returns the network.
-    */
-    static Network calculate(ConnectivitySettings& connectivitySettings);
+//    //=========================================================================================================
+//    /**
+//    * Computes the network based on the current settings.
+//    *
+//    * @return Returns the network.
+//    */
+//    static Network calculate(ConnectivitySettings& connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -117,7 +117,7 @@ public:
     *
     * @return Returns the list with calculated networks for each provided method.
     */
-    static QList<Network> calculateMultiMethods(ConnectivitySettings& connectivitySettings);
+    static QList<Network> calculate(ConnectivitySettings& connectivitySettings);
 
 protected:
 };

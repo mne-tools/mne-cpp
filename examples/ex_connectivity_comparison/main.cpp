@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
 
     QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
@@ -346,7 +346,7 @@ int main(int argc, char *argv[])
     conSettings.setSamplingFrequency(raw.info.sfreq);
     conSettings.setWindowType("hanning");
 
-    QList<Network> lNetworks = Connectivity::calculateMultiMethods(conSettings);
+    QList<Network> lNetworks = Connectivity::calculate(conSettings);
 
     QMap<QString,Vector4i> mColor;
     mColor.insert("COR",Vector4i(90, 26, 100, 1));

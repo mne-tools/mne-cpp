@@ -539,13 +539,16 @@ void NeuronalConnectivity::run()
 
 //*************************************************************************************************************
 
-void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& connectivityResult,
+void NeuronalConnectivity::onNewConnectivityResultAvailable(const QList<Network>& connectivityResults,
                                                             const ConnectivitySettings& connectivitySettings)
 {
     //QMutexLocker locker(&m_mutex);
     m_connectivitySettings = connectivitySettings;
     m_connectivitySettings.setConnectivityMethods(m_sConnectivityMethods);
-    m_pCircularNetworkBuffer->push(connectivityResult);
+
+    for(int i = 0; i < connectivityResults.size(); ++i) {
+        m_pCircularNetworkBuffer->push(connectivityResults.at(i));
+    }
 }
 
 
