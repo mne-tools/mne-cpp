@@ -498,7 +498,7 @@ void MNE::updateInvOp(const MNEInverseOperator& invOp)
 
     m_invOp = invOp;
 
-    double snr = 1.0;
+    double snr = 3.0;
     double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
 
     m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
@@ -516,7 +516,7 @@ void MNE::onMethodChanged(const QString& method)
     m_sMethod = method;
 
     if(m_pMinimumNorm) {
-        double snr = 1.0;
+        double snr = 3.0;
         double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
         m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp, lambda2, m_sMethod));
 
@@ -590,7 +590,7 @@ void MNE::run()
 //                                 0.2f,
 //                                 0.8f);
 
-//    double snr = 1.0;
+//    double snr = 3.0;
 //    double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
 //    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 //    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp,
