@@ -99,6 +99,7 @@ void SensorSetTreeItem::initItem()
 void SensorSetTreeItem::addData(const MNEBem &tSensor,
                                 const QList<FiffChInfo>& lChInfo,
                                 const QString& sDataType,
+                                const QStringList& bads,
                                 Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate sensor surfaces as childs
@@ -130,7 +131,7 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor,
     //Add sensor locations as child items
     if(!lChInfoGrad.isEmpty() && sDataType == "MEG") {
         SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "Grad");
-        pSensorPosItem->addData(lChInfoGrad, "MEG");
+        pSensorPosItem->addData(lChInfoGrad, "MEG", bads);
 
         QList<QStandardItem*> list;
         list << pSensorPosItem;
@@ -140,7 +141,7 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor,
 
     if(!lChInfoMag.isEmpty() && sDataType == "MEG") {
         SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "Mag");
-        pSensorPosItem->addData(lChInfoMag, "MEG");
+        pSensorPosItem->addData(lChInfoMag, "MEG", bads);
 
         QList<QStandardItem*> list;
         list << pSensorPosItem;
@@ -150,7 +151,7 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor,
 
     if(!lChInfoEEG.isEmpty() && sDataType == "EEG") {
         SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "EEG");
-        pSensorPosItem->addData(lChInfoEEG, "EEG");
+        pSensorPosItem->addData(lChInfoEEG, "EEG", bads);
 
         QList<QStandardItem*> list;
         list << pSensorPosItem;

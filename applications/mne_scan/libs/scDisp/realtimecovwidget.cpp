@@ -45,6 +45,8 @@
 #include <disp/viewers/modalityselectionview.h>
 #include <disp/plots/imagesc.h>
 
+#include <fiff/fiff_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -75,6 +77,7 @@
 using namespace SCDISPLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -115,7 +118,8 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC,
     this->setLayout(m_pRtcLayout);
 
     m_modalityMap.insert("EEG", true);
-    m_modalityMap.insert("MEG", true);
+    m_modalityMap.insert("MAG", true);
+    m_modalityMap.insert("GRAD", true);
 
     getData();
 }
@@ -146,8 +150,14 @@ void RealTimeCovWidget::getData()
             init();
         }
     } else {
-        if(m_matSelectorT.cols() == m_pRTC->getValue()->data.rows() && m_pImageSc) {
-            MatrixXd data = (m_matSelectorT * m_pRTC->getValue()->data) * m_matSelector;
+        if(m_pImageSc) {
+            MatrixXd data(m_qListSelChannel.size(), m_qListSelChannel.size());
+
+            for(int i = 0; i < m_qListSelChannel.size(); i++) {
+                for(int j = 0; j < m_qListSelChannel.size(); j++) {
+                    data(i,j) = m_pRTC->getValue()->data(m_qListSelChannel.at(i),m_qListSelChannel.at(j));
+                }
+            }
 
             m_pImageSc->updateData(data);
         }
@@ -161,7 +171,7 @@ void RealTimeCovWidget::init()
 {
     if(m_pRTC->getValue()->names.size() > 0)
     {
-        m_qListChNames = m_pRTC->getValue()->names;
+        m_pFiffInfo = m_pRTC->getFiffInfo();
 
         m_pRtcLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
@@ -181,8 +191,8 @@ void RealTimeCovWidget::showModalitySelectionWidget()
 {
     if(!m_pModalitySelectionWidget)
     {
-        m_pModalitySelectionWidget = ModalitySelectionView::SPtr::create(QString("Plugin/%1").arg(m_pRTC->getName()),
-                                                                         m_pRTC->getFiffInfo()->chs,
+        m_pModalitySelectionWidget = ModalitySelectionView::SPtr::create(m_pRTC->getFiffInfo()->chs,
+                                                                         QString("Plugin/%1").arg(m_pRTC->getName()),
                                                                          this,
                                                                          Qt::Window);
 
@@ -200,24 +210,27 @@ void RealTimeCovWidget::showModalitySelectionWidget()
 
 void RealTimeCovWidget::onNewModalitySelection(const QMap<QString, bool> &modalityMap)
 {
-    if(m_pRTC) {
-        QList<qint32> qListSelChannel;
-        for(qint32 i = 0; i < m_qListChNames.size(); ++i) {
-            QMapIterator<QString, bool> itr(modalityMap);
-            while (itr.hasNext()) {
-                itr.next();
-                if (m_qListChNames[i].contains(itr.key()) && itr.value()) {
-                    qListSelChannel.append(i);
-                }
+    if(m_pRTC && m_pFiffInfo) {
+        QStringList chNames = m_pRTC->getValue()->names;
+        m_qListSelChannel.clear();
+
+        for(qint32 i = 0; i < chNames.size(); ++i) {
+            int unit = m_pFiffInfo->chs.at(m_pFiffInfo->ch_names.indexOf(chNames.at(i))).unit;
+
+            if(unit == FIFF_UNIT_T && modalityMap["MAG"]) {
+                m_qListSelChannel.append(i);
+            }
+
+            if(unit == FIFF_UNIT_T_M && modalityMap["GRAD"]) {
+                m_qListSelChannel.append(i);
+            }
+
+            if(unit == FIFF_UNIT_V && (modalityMap["EEG"] ||
+                                      modalityMap["EOG"] ||
+                                      modalityMap["STIM"] ||
+                                      modalityMap["MISC"])) {
+                m_qListSelChannel.append(i);
             }
         }
-
-        m_matSelector = MatrixXd::Zero(m_pRTC->getValue()->data.cols(), qListSelChannel.size());
-
-        for(qint32 i = 0; i  < qListSelChannel.size(); ++i) {
-            m_matSelector(qListSelChannel[i],i) = 1;
-        }
-
-        m_matSelectorT = m_matSelector.transpose();
     }
 }

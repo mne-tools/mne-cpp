@@ -93,9 +93,9 @@ NeuronalConnectivity::NeuronalConnectivity()
 : m_bIsRunning(false)
 , m_iDownSample(1)
 , m_iNumberAverages(10)
-, m_sAvrType("4")
-, m_iFreqBandLow(1)
-, m_iFreqBandHigh(50)
+, m_sAvrType("1")
+, m_fFreqBandLow(7.0f)
+, m_fFreqBandHigh(13.0f)
 , m_iBlockSize(1)
 , m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create())
 {
@@ -244,45 +244,29 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTSE->getFiffInfo();
 
+            m_connectivitySettings.setSamplingFrequency(m_pFiffInfo->sfreq);
+
             //Init output - Unocmment this if you also uncommented the m_pRTCEOutput in the constructor above
             m_pRTCEOutput->data()->setAnnotSet(pRTSE->getAnnotSet());
             m_pRTCEOutput->data()->setSurfSet(pRTSE->getSurfSet());
             m_pRTCEOutput->data()->setFwdSolution(pRTSE->getFwdSolution());
             m_pRTCEOutput->data()->setFiffInfo(m_pFiffInfo);
 
-            //Generate node vertices
-            if(pRTSE->getFwdSolution()->isClustered()) {
-                m_matNodeVertLeft.resize(pRTSE->getFwdSolution()->src[0].cluster_info.centroidVertno.size(),3);
-
-                for(int j = 0; j < m_matNodeVertLeft.rows(); ++j) {
-                    m_matNodeVertLeft.row(j) = pRTSE->getSurfSet()->data()[0].rr().row(pRTSE->getFwdSolution()->src[0].cluster_info.centroidVertno.at(j)) - pRTSE->getSurfSet()->data()[0].offset().transpose();
-                }
-
-                m_matNodeVertRight.resize(pRTSE->getFwdSolution()->src[1].cluster_info.centroidVertno.size(),3);
-                for(int j = 0; j < m_matNodeVertRight.rows(); ++j) {
-                    m_matNodeVertRight.row(j) = pRTSE->getSurfSet()->data()[1].rr().row(pRTSE->getFwdSolution()->src[1].cluster_info.centroidVertno.at(j)) - pRTSE->getSurfSet()->data()[1].offset().transpose();
-                }
-            } else {
-                m_matNodeVertLeft.resize(pRTSE->getFwdSolution()->src[0].vertno.rows(),3);
-                for(int j = 0; j < m_matNodeVertLeft.rows(); ++j) {
-                    m_matNodeVertLeft.row(j) = pRTSE->getSurfSet()->data()[0].rr().row(pRTSE->getFwdSolution()->src[0].vertno(j)) - pRTSE->getSurfSet()->data()[0].offset().transpose();
-                }
-
-                m_matNodeVertRight.resize(pRTSE->getFwdSolution()->src[1].vertno.rows(),3);
-                for(int j = 0; j < m_matNodeVertRight.rows(); ++j) {
-                    m_matNodeVertRight.row(j) = pRTSE->getSurfSet()->data()[1].rr().row(pRTSE->getFwdSolution()->src[1].vertno(j)) - pRTSE->getSurfSet()->data()[1].offset().transpose();
-                }
-            }
-
-            m_matNodeVertComb.resize(m_matNodeVertLeft.rows() + m_matNodeVertRight.rows(),3);
-            m_matNodeVertComb << m_matNodeVertLeft, m_matNodeVertRight;
-
-            //Set node 3D positions to connectivity settings
-            m_connectivitySettings.setNodePositions(m_matNodeVertComb);
+            // Generate network nodes
+            m_connectivitySettings.setNodePositions(*pRTSE->getFwdSolution(), *pRTSE->getSurfSet());
         }
 
         for(qint32 i = 0; i < pRTSE->getValue().size(); ++i) {
-            m_iBlockSize = pRTSE->getValue().first()->data.cols();
+            // Find out how many samples were used for pre stimulus
+            int iZeroIdx = 0;
+            for(int j = 0; j < pRTSE->getValue()[i]->times.cols(); ++j) {
+                if(pRTSE->getValue()[i]->times(j) >= 0) {
+                    iZeroIdx = j;
+                    break;
+                }
+            }
+
+            m_iBlockSize = pRTSE->getValue().first()->data.cols() - iZeroIdx;
 
             // Check row and colum integrity and restart if necessary
             if(m_connectivitySettings.size() != 0) {
@@ -292,11 +276,14 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
                 }
             }
 
-            m_connectivitySettings.append(pRTSE->getValue()[i]->data);
+            m_connectivitySettings.append(pRTSE->getValue()[i]->data.block(0,
+                                                                           iZeroIdx,
+                                                                           pRTSE->getValue()[i]->data.rows(),
+                                                                           pRTSE->getValue()[i]->data.cols() - iZeroIdx));
         }
 
         //Pop data from buffer
-        if(m_connectivitySettings.size() > m_iNumberAverages) {
+        if(m_connectivitySettings.size() >= m_iNumberAverages) {
             m_pRtConnectivity->restart();
             m_connectivitySettings.removeFirst(m_connectivitySettings.size()-m_iNumberAverages);
         }
@@ -317,6 +304,8 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
+
+            m_connectivitySettings.setSamplingFrequency(m_pFiffInfo->sfreq);
 
             //Set 3D sensor surface for visualization
             QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
@@ -352,10 +341,10 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
                     }
                 }
 
-                data.resize(m_chIdx.size(), t_mat.cols());
+                data.resize(m_vecPicks.cols(), t_mat.cols());
 
-                for(qint32 j = 0; j < m_chIdx.size(); ++j) {
-                    data.row(j) = t_mat.row(m_chIdx.at(j));
+                for(qint32 j = 0; j < m_vecPicks.cols(); ++j) {
+                    data.row(j) = t_mat.row(m_vecPicks[j]);
                 }
 
                 m_connectivitySettings.append(data);
@@ -401,6 +390,8 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                 if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(pFiffEvokedSet->info));
 
+                    m_connectivitySettings.setSamplingFrequency(m_pFiffInfo->sfreq);
+
                     //Set 3D sensor surface for visualization
                     QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
                     MNEBem::SPtr pSensorSurfaceVV = MNEBem::SPtr::create(t_filesensorSurfaceVV);
@@ -436,10 +427,10 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     }
 
                     MatrixXd data;
-                    data.resize(m_chIdx.size(), t_mat.cols());
+                    data.resize(m_vecPicks.cols(), t_mat.cols());
 
-                    for(qint32 j = 0; j < m_chIdx.size(); ++j) {
-                        data.row(j) = t_mat.row(m_chIdx.at(j));
+                    for(qint32 j = 0; j < m_vecPicks.cols(); ++j) {
+                        data.row(j) = t_mat.row(m_vecPicks[j]);
                     }
 
                     m_connectivitySettings.append(data);
@@ -465,59 +456,42 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void NeuronalConnectivity::generateNodeVertices()
 {
-    //Generate node vertices
-    bool bPick = false;
-    qint32 unit, kind;
-    int counter = 0;
-    QString sChType = "grad";
-    m_chIdx.clear();
-    m_matNodeVertComb = MatrixX3f();
+    if(!m_pFiffInfo) {
+        qDebug() << "NeuronalConnectivity::generateNodeVertices - FiffInfo is Null. Returning.";
+        return;
+    }
 
-    for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
-        unit = m_pFiffInfo->chs.at(i).unit;
-        kind = m_pFiffInfo->chs.at(i).kind;
+    QString sCoilType = "grad";
+    QString sChType = "mag";
 
-        if(unit == FIFF_UNIT_T_M &&
-            kind == FIFFV_MEG_CH &&
-            sChType == "grad") {
-            bPick = true;
+    QStringList exclude;
+    exclude << m_pFiffInfo->bads << m_pFiffInfo->ch_names.filter("EOG");
 
-            //Skip second gradiometer in triplet
-            ++i;
-        } else if(unit == FIFF_UNIT_T &&
-                  kind == FIFFV_MEG_CH &&
-                    sChType == "mag") {
-            bPick = true;
-        } else if (unit == FIFF_UNIT_V &&
-                   kind == FIFFV_EEG_CH &&
-                    sChType == "eeg") {
-            bPick = true;
-        }
+    if(sChType.contains("EEG", Qt::CaseInsensitive)) {
+        m_vecPicks = m_pFiffInfo->pick_types(false,true,false,QStringList(),exclude);
+    } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
+        // Only pick every second gradiometer. If it is a bad channel try the second one in the triplet. Works only for Neuromag data
+        RowVectorXi picksTmp = m_pFiffInfo->pick_types(QString("grad"),false,false);
+        m_vecPicks.resize(0);
 
-        if(bPick && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            //Get the positions
-            m_matNodeVertComb.conservativeResize(m_matNodeVertComb.rows()+1, 3);
-            m_matNodeVertComb(counter,0) = m_pFiffInfo->chs.at(i).chpos.r0(0);
-            m_matNodeVertComb(counter,1) = m_pFiffInfo->chs.at(i).chpos.r0(1);
-            m_matNodeVertComb(counter,2) = m_pFiffInfo->chs.at(i).chpos.r0(2);
-
-            if(sChType == "grad") {
-                m_chIdx << i-1;
-            } else {
-                m_chIdx << i;
+        for(int i = 0; i < picksTmp.cols()-1; i+=2) {
+            if(!m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(picksTmp(i)))) {
+                m_vecPicks.conservativeResize(m_vecPicks.cols()+1);
+                m_vecPicks(m_vecPicks.cols()-1) = picksTmp(i);
+            } else if(!m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(picksTmp(i+1)))) {
+                m_vecPicks.conservativeResize(m_vecPicks.cols()+1);
+                m_vecPicks(m_vecPicks.cols()-1) = picksTmp(i+1);
             }
-
-            counter++;
         }
-
-        bPick = false;
+    } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
+        m_vecPicks = m_pFiffInfo->pick_types(QString("mag"),false,false,QStringList(),exclude);
     }
 
     // Set sampling frequency so that the spectrum resolution is updated
     m_connectivitySettings.setSamplingFrequency(m_pFiffInfo->sfreq);
 
     //Set node 3D positions to connectivity settings
-    m_connectivitySettings.setNodePositions(m_matNodeVertComb);
+    m_connectivitySettings.setNodePositions(*m_pFiffInfo, m_vecPicks);
     m_connectivitySettings.clearAllData();
 }
 
@@ -550,7 +524,7 @@ void NeuronalConnectivity::run()
             //Send the data to the connected plugins and the online display
             if(!m_currentConnectivityResult.isEmpty()) {
                 //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
-                m_currentConnectivityResult.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
+                m_currentConnectivityResult.setFrequencyBins(m_fFreqBandLow, m_fFreqBandHigh);
                 m_currentConnectivityResult.normalize();
                 m_pRTCEOutput->data()->setValue(m_currentConnectivityResult);
             } else {
@@ -565,13 +539,16 @@ void NeuronalConnectivity::run()
 
 //*************************************************************************************************************
 
-void NeuronalConnectivity::onNewConnectivityResultAvailable(const Network& connectivityResult,
+void NeuronalConnectivity::onNewConnectivityResultAvailable(const QList<Network>& connectivityResults,
                                                             const ConnectivitySettings& connectivitySettings)
 {
     //QMutexLocker locker(&m_mutex);
     m_connectivitySettings = connectivitySettings;
     m_connectivitySettings.setConnectivityMethods(m_sConnectivityMethods);
-    m_pCircularNetworkBuffer->push(connectivityResult);
+
+    for(int i = 0; i < connectivityResults.size(); ++i) {
+        m_pCircularNetworkBuffer->push(connectivityResults.at(i));
+    }
 }
 
 
@@ -583,8 +560,11 @@ void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
         return;
     }
 
-    m_pRtConnectivity->restart();
     m_sConnectivityMethods = QStringList() << sMetric;
+    if(m_pRtConnectivity) {
+        m_pRtConnectivity->restart();
+        m_pRtConnectivity->append(m_connectivitySettings);
+    }
 }
 
 
@@ -620,22 +600,19 @@ void NeuronalConnectivity::onTriggerTypeChanged(const QString& triggerType)
 
 //*************************************************************************************************************
 
-void NeuronalConnectivity::onFrequencyBandChanged(int iFreqLow, int iFreqHigh)
+void NeuronalConnectivity::onFrequencyBandChanged(float fFreqLow, float fFreqHigh)
 {
-    // By default the number of frequency bins is half the signal since we only use the half spectrum
-    double dScaleFactor = m_iBlockSize/m_pFiffInfo->sfreq;
-
     // Convert to frequency bins
-    m_iFreqBandLow = iFreqLow * dScaleFactor;
-    m_iFreqBandHigh = iFreqHigh * dScaleFactor;
+    m_fFreqBandLow = fFreqLow;
+    m_fFreqBandHigh = fFreqHigh;
 
     //QMutexLocker locker(&m_mutex);
     if(!m_currentConnectivityResult.isEmpty()) {
-        m_currentConnectivityResult.setFrequencyBins(m_iFreqBandLow, m_iFreqBandHigh);
+        m_currentConnectivityResult.setFrequencyBins(m_fFreqBandLow, m_fFreqBandHigh);
         m_currentConnectivityResult.normalize();
         m_pCircularNetworkBuffer->push(m_currentConnectivityResult);
     }
 
-    //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_iFreqBandLow" << m_iFreqBandLow;
-    //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_iFreqBandHigh" << m_iFreqBandHigh;
+    //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_fFreqBandLow" << m_fFreqBandLow;
+    //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_fFreqBandHigh" << m_fFreqBandHigh;
 }

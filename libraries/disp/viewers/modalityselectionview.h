@@ -111,8 +111,8 @@ public:
     *
     * @param [in] parent        parent of widget
     */
-    ModalitySelectionView(const QString& sSettingsPath = "",
-                          const QList<FIFFLIB::FiffChInfo> &lChannelList = QList<FIFFLIB::FiffChInfo>(),
+    ModalitySelectionView(const QList<FIFFLIB::FiffChInfo> &lChannelList,
+                          const QString& sSettingsPath = "",
                           QWidget *parent = 0,
                           Qt::WindowFlags f = Qt::Widget);
 

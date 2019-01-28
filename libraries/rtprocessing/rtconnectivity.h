@@ -111,7 +111,7 @@ public:
     void doWork(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
 signals:
-    void resultReady(const CONNECTIVITYLIB::Network& connectivityResult, const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+    void resultReady(const  QList<CONNECTIVITYLIB::Network>& connectivityResults, const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 };
 
 //=============================================================================================================
@@ -166,7 +166,7 @@ protected:
     QThread             m_workerThread;         /**< The worker thread. */
 
 signals:
-    void newConnectivityResultAvailable(const CONNECTIVITYLIB::Network& connectivityResult, const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
+    void newConnectivityResultAvailable(const QList<CONNECTIVITYLIB::Network>& connectivityResults, const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
     void operate(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 };

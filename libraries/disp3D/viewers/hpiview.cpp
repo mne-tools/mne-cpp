@@ -302,8 +302,10 @@ void HpiView::updateProjections()
     if(m_bUseComp) {
         // Setup Comps
         FiffCtfComp newComp;
-        m_pFiffInfo->make_compensator(0, 101, newComp);//Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
-        matComp = newComp.data->data;
+        //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+        if(m_pFiffInfo->make_compensator(0, 101, newComp)) {
+            matComp = newComp.data->data;
+        }
     }
 
     m_matCompProjectors = m_matProjectors * matComp;

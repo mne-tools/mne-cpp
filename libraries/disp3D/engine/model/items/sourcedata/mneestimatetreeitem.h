@@ -1,4 +1,4 @@
-//=============================================================================================================
+ //=============================================================================================================
 /**
 * @file     mneestimatetreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
@@ -123,7 +123,7 @@ public:
     * @param[in] bUseGPU    Whether to use the GPU to visualize the data.
     */
     explicit MneEstimateTreeItem(int iType = Data3DTreeModelItemTypes::MNEEstimateItem,
-                                 const QString& text = "MNE data",
+                                 const QString& text = "MNE",
                                  bool bUseGPU = false);
 
     //=========================================================================================================

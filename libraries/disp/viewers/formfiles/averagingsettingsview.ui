@@ -131,7 +131,16 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QSpinBox" name="m_pSpinBoxBaselineFrom">
+       <widget class="QSpinBox" name="m_pSpinBoxBaselineFromMSeconds">
+        <property name="prefix">
+         <string/>
+        </property>
+        <property name="minimum">
+         <number>-10000</number>
+        </property>
+        <property name="maximum">
+         <number>10000</number>
+        </property>
         <property name="singleStep">
          <number>10</number>
         </property>
@@ -145,7 +154,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QSpinBox" name="m_pSpinBoxBaselineTo">
+       <widget class="QSpinBox" name="m_pSpinBoxBaselineToMSeconds">
         <property name="singleStep">
          <number>10</number>
         </property>
@@ -198,17 +207,20 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QSpinBox" name="m_pSpinBoxPreStimSamples">
+       <widget class="QSpinBox" name="m_pSpinBoxPreStimMSeconds">
         <property name="prefix">
          <string>-</string>
         </property>
         <property name="minimum">
-         <number>10</number>
+         <number>0</number>
         </property>
         <property name="maximum">
          <number>10000</number>
         </property>
         <property name="singleStep">
+         <number>10</number>
+        </property>
+        <property name="value">
          <number>10</number>
         </property>
        </widget>
@@ -221,7 +233,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QSpinBox" name="m_pSpinBoxPostStimSamples">
+       <widget class="QSpinBox" name="m_pSpinBoxPostStimMSeconds">
         <property name="minimum">
          <number>10</number>
         </property>
@@ -230,6 +242,9 @@
         </property>
         <property name="singleStep">
          <number>10</number>
+        </property>
+        <property name="value">
+         <number>100</number>
         </property>
        </widget>
       </item>
@@ -240,8 +255,8 @@
      <zorder>label_3</zorder>
      <zorder>label_4</zorder>
      <zorder>m_pSpinBoxNumAverages</zorder>
-     <zorder>m_pSpinBoxPreStimSamples</zorder>
-     <zorder>m_pSpinBoxPostStimSamples</zorder>
+     <zorder>m_pSpinBoxPreStimMSeconds</zorder>
+     <zorder>m_pSpinBoxPostStimMSeconds</zorder>
     </widget>
    </item>
    <item row="4" column="0">

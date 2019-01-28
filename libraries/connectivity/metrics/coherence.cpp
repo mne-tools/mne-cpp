@@ -100,12 +100,14 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
 //    qint64 iTime = 0;
 //    timer.start();
 
-    Network finalNetwork("Coherence");
-
+    Network finalNetwork("COH");
     if(connectivitySettings.isEmpty()) {
-        qDebug() << "Coherence::coherence - Input data is empty";
+        qDebug() << "Coherence::calculate - Input data is empty";
         return finalNetwork;
     }
+
+    finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
+    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
 //    iTime = timer.elapsed();
 //    qDebug() << "Coherence::coherence timer - Empty network creation:" << iTime;

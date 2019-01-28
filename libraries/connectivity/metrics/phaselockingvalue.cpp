@@ -102,12 +102,15 @@ Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
 //    qint64 iTime = 0;
 //    timer.start();
 
-    Network finalNetwork("Phase Locking Value");
+    Network finalNetwork("PLV");
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "PhaseLockingValue::calculate - Input data is empty";
         return finalNetwork;
     }
+
+    finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
+    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();

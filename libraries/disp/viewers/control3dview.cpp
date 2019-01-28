@@ -80,8 +80,8 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 Control3DView::Control3DView(QWidget* parent,
-                                 const QStringList& slFlags,
-                                 Qt::WindowType type)
+                             const QStringList& slFlags,
+                             Qt::WindowType type)
 : QWidget(parent, type)
 , ui(new Ui::Control3DViewWidget)
 , m_colCurrentSceneColor(QColor(0,0,0))
@@ -89,6 +89,25 @@ Control3DView::Control3DView(QWidget* parent,
 {
     ui->setupUi(this);
 
+    setFlags(slFlags);
+
+    //Init's
+    ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
+    ui->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(255, 255, 255);"));
+
+    this->adjustSize();
+
+    //set context menu
+    ui->m_treeView_loadedData->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->m_treeView_loadedData, &QWidget::customContextMenuRequested,
+            this, &Control3DView::onCustomContextMenuRequested);
+}
+
+
+//*************************************************************************************************************
+
+void Control3DView::setFlags(const QStringList& slFlags)
+{
     //Parse flags
     if(slFlags.contains("Data")) {
         ui->m_treeView_loadedData->show();
@@ -126,18 +145,6 @@ Control3DView::Control3DView(QWidget* parent,
     } else {
         ui->m_groupBox_lightOptions->hide();
     }
-
-
-    //Init's
-    ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(0, 0, 0);"));
-    ui->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(255, 255, 255);"));
-
-    this->adjustSize();
-
-    //set context menu
-    ui->m_treeView_loadedData->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->m_treeView_loadedData, &QWidget::customContextMenuRequested,
-            this, &Control3DView::onCustomContextMenuRequested);
 }
 
 

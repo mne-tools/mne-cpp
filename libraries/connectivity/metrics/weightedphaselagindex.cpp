@@ -102,12 +102,15 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
 //    qint64 iTime = 0;
 //    timer.start();
 
-    Network finalNetwork("Phase Lag Index");
+    Network finalNetwork("WPLI");
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "WeightedPhaseLagIndex::calculate - Input data is empty";
         return finalNetwork;
     }
+
+    finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
+    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
@@ -230,13 +233,13 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
     }
 
     // Compute CSD
-    bool bNfftEven = false;
-    if (iNfft % 2 == 0){
-        bNfftEven = true;
-    }
-
     if(inputData.vecPairCsd.isEmpty()) {
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
+
+        bool bNfftEven = false;
+        if (iNfft % 2 == 0){
+            bNfftEven = true;
+        }
 
         MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
 

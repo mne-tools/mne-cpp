@@ -76,6 +76,7 @@ DraggableFramelessWidget::DraggableFramelessWidget(QWidget *parent,
 : QWidget(parent, flags)
 , m_bRoundEdges(bRoundEdges)
 , m_bDraggable(bDraggable)
+, m_bMousePressed(false)
 {
     this->adjustSize();
 }
@@ -90,6 +91,14 @@ DraggableFramelessWidget::~DraggableFramelessWidget()
 
 //*************************************************************************************************************
 
+void DraggableFramelessWidget::setDraggable(bool bFlag)
+{
+        m_bDraggable = bFlag;
+}
+
+
+//*************************************************************************************************************
+
 void DraggableFramelessWidget::mousePressEvent(QMouseEvent *event)
 {
     if(!m_bDraggable) {
@@ -99,6 +108,7 @@ void DraggableFramelessWidget::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         m_dragPosition = event->globalPos() - frameGeometry().topLeft();
         event->accept();
+        m_bMousePressed = true;
     }
 }
 
@@ -111,9 +121,19 @@ void DraggableFramelessWidget::mouseMoveEvent(QMouseEvent *event)
         return QWidget::mouseMoveEvent(event);
     }
 
-    if (event->buttons() & Qt::LeftButton) {
+    if (event->buttons() && Qt::LeftButton && m_bMousePressed) {
         move(event->globalPos() - m_dragPosition);
         event->accept();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DraggableFramelessWidget::mouseReleaseEvent(QMouseEvent *event )
+{
+    if(event->button() == Qt::LeftButton) {
+        m_bMousePressed = false;
     }
 }
 

@@ -1,8 +1,7 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Lorenz Esch Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @author   Lorenz Esch <lorenzesch@hotmail.com>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2016
@@ -30,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of using the MNE-CPP Connectivity library
+* @brief     Example to compare connectivity methods
 *
 */
 
@@ -40,17 +39,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivitysettingsmanager.h"
-
 #include <disp3D/viewers/networkview.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/model/items/network/networktreeitem.h>
-#include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
-#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
+
+#include <disp3D/engine/model/items/network/networktreeitem.h>
+#include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -67,7 +65,6 @@
 #include <utils/ioutils.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
-#include <disp3D/engine/model/items/network/networktreeitem.h>
 
 
 //*************************************************************************************************************
@@ -81,7 +78,6 @@
 #include <QDebug>
 #include <QFile>
 #include <QObject>
-#include <QVariant>
 
 
 //*************************************************************************************************************
@@ -118,14 +114,13 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("Connectivity Example");
+    parser.setApplicationDescription("Connectivity Comparison Example");
     parser.addHelpOption();
 
     QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
     QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
@@ -146,7 +141,6 @@ int main(int argc, char *argv[])
     parser.addOption(sourceLocOption);
     parser.addOption(clustOption);
     parser.addOption(covFileOption);
-    parser.addOption(connectMethodOption);
     parser.addOption(sourceLocMethodOption);
     parser.addOption(snrOption);
     parser.addOption(evokedIndexOption);
@@ -160,7 +154,6 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     // Init from arguments
-    QString sConnectivityMethod = parser.value(connectMethodOption);
     QString sAnnotType = parser.value(annotOption);
     QString sSubj = parser.value(subjectOption);
     QString sSubjDir = parser.value(subjectPathOption);
@@ -200,15 +193,17 @@ int main(int argc, char *argv[])
     SurfaceSet tSurfSetInflated (sSubj, 2, "inflated", sSubjDir);
     AnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
 
+    QFile t_fileCov(sCov);
+    FiffCov noise_cov(t_fileCov);
+
     bool keep_comp = false;
     fiff_int_t dest_comp = 0;
 
+    ConnectivitySettings conSettings;
+
     // Create sensor level data
     QFile t_fileRaw(sRaw);
-    FiffRawData raw(t_fileRaw);    
-
-    int samplesToCutOut = abs(fTMin * raw.info.sfreq);
-    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager;
+    FiffRawData raw(t_fileRaw);
 
     // Select bad channels
     //raw.info.bads << "MEG2412" << "MEG2413";
@@ -235,11 +230,9 @@ int main(int argc, char *argv[])
     QPair<QVariant, QVariant> pair(QVariant(fTMin), QVariant("0.0"));
     data.applyBaselineCorrection(pair);
 
-    // Average epochs. Do not use SSPs.
     FiffEvoked evoked = data.average(raw.info,
                                      0,
                                      data.first()->epoch.cols()-1);
-
     MNESourceEstimate sourceEstimateEvoked;
 
     if(!bDoSourceLoc) {
@@ -267,6 +260,9 @@ int main(int argc, char *argv[])
             picks = raw.info.pick_types(QString("mag"),false,false,QStringList(),exclude);
         }
 
+        // Generate network nodes
+        conSettings.setNodePositions(raw.info, picks);
+
         // Transform to a more generic data matrix list, pick only channels of interest and remove EOG channel
         MatrixXd matData;
         int iNumberRows = picks.cols(); //picks.cols() 32
@@ -278,11 +274,7 @@ int main(int argc, char *argv[])
                 matData.row(j) = data.at(i)->epoch.row(picks(j));
             }
             matDataList << matData;
-        }        
-
-        // Generate network nodes
-        pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matDataList.first().cols()-samplesToCutOut);
-        pConnectivitySettingsManager->m_settings.setNodePositions(raw.info, picks);
+        }
     } else {
         //Create source level data
         QFile t_fileFwd(sFwd);
@@ -295,8 +287,6 @@ int main(int argc, char *argv[])
         QString method(sSourceLocMethod);
 
         // regularize noise covariance
-        QFile t_fileCov(sCov);
-        FiffCov noise_cov(t_fileCov);
         noise_cov = noise_cov.regularize(raw.info,
                                          0.05,
                                          0.05,
@@ -338,44 +328,57 @@ int main(int argc, char *argv[])
         sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked);
 
         // Generate network nodes
-        pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matDataList.first().cols()-samplesToCutOut);
-        pConnectivitySettingsManager->m_settings.setNodePositions(t_clusteredFwd, tSurfSetInflated);
+        conSettings.setNodePositions(t_clusteredFwd, tSurfSetInflated);
     }
 
-    //Do connectivity estimation and visualize results
-    pConnectivitySettingsManager->m_settings.setConnectivityMethods(QStringList() << sConnectivityMethod);
-    pConnectivitySettingsManager->m_settings.setSamplingFrequency(raw.info.sfreq);
-    pConnectivitySettingsManager->m_settings.setWindowType("hanning");
+    // Compute the connectivity estimates for the methods to be compared
+    conSettings.setConnectivityMethods(QStringList() << "COH" << "COR" << "XCOR" << "PLI" << "IMAGCOH" << "PLV" << "WPLI" << "USPLI" << "DSWPLI");
 
-    ConnectivitySettings::IntermediateTrialData connectivityData;
     for(int i = 0; i < matDataList.size(); i++) {
         // Only calculate connectivity for post stim
-        connectivityData.matData = matDataList.at(i).block(0,
-                                                           samplesToCutOut,
-                                                           matDataList.at(i).rows(),
-                                                           matDataList.at(i).cols()-samplesToCutOut);
-        pConnectivitySettingsManager->m_settings.append(connectivityData);
-        pConnectivitySettingsManager->m_dataListOriginal.append(connectivityData);
+        int samplesToCutOut = abs(fTMin*raw.info.sfreq);
+        conSettings.append(matDataList.at(i).block(0,
+                                                  samplesToCutOut,
+                                                  matDataList.at(i).rows(),
+                                                  matDataList.at(i).cols()-samplesToCutOut));
+    }
+
+    conSettings.setSamplingFrequency(raw.info.sfreq);
+    conSettings.setWindowType("hanning");
+
+    QList<Network> lNetworks = Connectivity::calculate(conSettings);
+
+    QMap<QString,Vector4i> mColor;
+    mColor.insert("COR",Vector4i(90, 26, 100, 1));
+    mColor.insert("XCOR",Vector4i(255, 20, 80, 1));
+    mColor.insert("PLI",Vector4i(255, 255, 0, 1));
+    mColor.insert("COH",Vector4i(2, 89, 100, 1));
+    mColor.insert("IMAGCOH",Vector4i(50, 255, 48, 1));
+    mColor.insert("PLV",Vector4i(0, 255, 255, 1));
+    mColor.insert("WPLI",Vector4i(255, 0, 100, 1));
+    mColor.insert("USPLI",Vector4i(255, 89, 200, 1));
+    mColor.insert("DSWPLI",Vector4i(25, 10, 255, 1));
+
+    for(int j = 0; j < lNetworks.size(); ++j) {
+        lNetworks[j].setFrequencyBins(7.0f, 13.0f);
+        lNetworks[j].normalize();
+        VisualizationInfo visInfo = lNetworks.at(j).getVisualizationInfo();
+        visInfo.sMethod = "Color";
+        visInfo.colNodes = mColor[lNetworks[j].getConnectivityMethod()];
+        visInfo.colEdges = mColor[lNetworks[j].getConnectivityMethod()];
+        lNetworks[j].setVisualizationInfo(visInfo);
     }
 
     //Create NetworkView
     NetworkView tNetworkView;
     tNetworkView.show();
+    QList<NetworkTreeItem*> lNetworkTreeItems = tNetworkView.addData("sample",
+                                                                     evoked.comment,
+                                                                     lNetworks);
 
-    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::connectivityMetricChanged,
-                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onConnectivityMetricChanged);
-
-    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::numberTrialsChanged,
-                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onNumberTrialsChanged);
-
-    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::freqBandChanged,
-                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onFreqBandChanged);
-
-    QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
-                     [&](const QString& a, const QString& b, const Network& c) {if(NetworkTreeItem* pNetworkTreeItem = tNetworkView.addData(a,b,c)) {
-                                                                                    pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
-                                                                                }}
-    );
+    for(int j = 0; j < lNetworkTreeItems.size(); ++j) {
+        lNetworkTreeItems.at(j)->setThresholds(QVector3D(0.9,0.95,1.0));
+    }
 
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
@@ -401,12 +404,9 @@ int main(int argc, char *argv[])
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Interpolation based");
             pRTDataItem->setColormapType("Jet");
-            pRTDataItem->setAlpha(0.5f);
+            pRTDataItem->setAlpha(0.25f);
         }
     }
-
-    tNetworkView.getConnectivitySettingsView()->setNumberTrials(1);
-    pConnectivitySettingsManager->onNumberTrialsChanged(1);
 
     return a.exec();
 }

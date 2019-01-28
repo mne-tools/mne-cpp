@@ -256,6 +256,20 @@ public:
 
     //=========================================================================================================
     /**
+    * Adds a list of connectivity estimation data.
+    *
+    * @param[in] sSubject               The name of the subject.
+    * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+    * @param[in] networkData            The list of connectivity data.
+    *
+    * @return                           Returns a lsit with pointers to the added tree items.
+    */
+    QList<NetworkTreeItem*> addConnectivityData(const QString& sSubject,
+                                                const QString& sMeasurementSetName,
+                                                const QList<CONNECTIVITYLIB::Network>& networkData);
+
+    //=========================================================================================================
+    /**
     * Adds connectivity estimation data.
     *
     * @param[in] sSubject               The name of the subject.
@@ -291,13 +305,15 @@ public:
     * @param[in] sSensorSetName     The name of the sensor set to which the data is to be added. If it does not exist yet, it will be created.
     * @param[in] sensor             The sensor surface information in form of a BEM model. Sensor surfaces are internally represented as MNEBem models.
     * @param[in] lChInfo            The channel information used to plot the MEG channels.
+    * @param[in] bads               The bad channel list.
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     SensorSetTreeItem* addMegSensorInfo(const QString& sSubject,
                                         const QString& sSensorSetName,
                                         const QList<FIFFLIB::FiffChInfo>& lChInfo,
-                                        const MNELIB::MNEBem& sensor = MNELIB::MNEBem());
+                                        const MNELIB::MNEBem& sensor = MNELIB::MNEBem(),
+                                        const QStringList &bads = QStringList());
 
     //=========================================================================================================
     /**
@@ -306,12 +322,14 @@ public:
     * @param[in] sSubject           The name of the subject.
     * @param[in] sSensorSetName     The name of the sensor set to which the data is to be added. If it does not exist yet, it will be created.
     * @param[in] lChInfo            The channel information used to plot the EEG channels.
+    * @param[in] bads               The bad channel list.
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
     SensorSetTreeItem* addEegSensorInfo(const QString& sSubject,
-                                           const QString& sSensorSetName,
-                                           const QList<FIFFLIB::FiffChInfo>& lChInfo);
+                                        const QString& sSensorSetName,
+                                        const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                                        const QStringList &bads = QStringList());
 
     //=========================================================================================================
     /**

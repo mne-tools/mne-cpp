@@ -107,9 +107,9 @@ public:
     /**
     * Computes the network based on the current settings.
     *
-    * @return Returns the network.
+    * @return Returns the list with calculated networks for each provided method.
     */
-    static Network calculate(ConnectivitySettings& connectivitySettings);
+    static QList<Network> calculate(ConnectivitySettings& connectivitySettings);
 
 protected:
 };

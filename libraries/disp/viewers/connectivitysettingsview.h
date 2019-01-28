@@ -211,10 +211,10 @@ signals:
     /**
     * Emit signal whenever the frequency band changed.
     *
-    * @param [in] iFreqLow        The new lower frequency band.
-    * @param [in] iFreqHigh       The new higher frequency band.
+    * @param [in] fFreqLow        The new lower frequency band.
+    * @param [in] fFreqHigh       The new higher frequency band.
     */
-    void freqBandChanged(int iFreqLow, int iFreqHigh);
+    void freqBandChanged(float fFreqLow, float fFreqHigh);
 
 };
 

@@ -104,7 +104,7 @@ void Coherency::calculateReal(Network& finalNetwork,
 //    timer.start();
 
     if(connectivitySettings.isEmpty()) {
-        qDebug() << "Coherency::computeCoherencyReal - Input data is empty";
+        qDebug() << "Coherency::calculateReal - Input data is empty";
         return;
     }
 
@@ -180,7 +180,7 @@ void Coherency::calculateImag(Network& finalNetwork,
 //        timer.start();
 
     if(connectivitySettings.isEmpty()) {
-        qDebug() << "Coherency::computeCoherencyImag - Input data is empty";
+        qDebug() << "Coherency::calculateImag - Input data is empty";
         return;
     }
 
@@ -334,7 +334,9 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
     // Compute CSD
     MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
 
-    if(inputData.vecPairCsd.isEmpty()) {
+    if(inputData.vecPairCsd.size() != iNRows) {
+        inputData.vecPairCsd.clear();
+
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
         bool bNfftEven = false;
@@ -362,7 +364,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         if(vecPairCsdSum.isEmpty()) {
             vecPairCsdSum = inputData.vecPairCsd;
         } else {
-            for (int j = 0; j < vecPairCsdSum.size(); ++j) {
+            for (j = 0; j < vecPairCsdSum.size(); ++j) {
                 vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
             }
         }
