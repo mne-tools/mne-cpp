@@ -103,17 +103,9 @@ public:
     */
     explicit Connectivity();
 
-//    //=========================================================================================================
-//    /**
-//    * Computes the network based on the current settings.
-//    *
-//    * @return Returns the network.
-//    */
-//    static Network calculate(ConnectivitySettings& connectivitySettings);
-
     //=========================================================================================================
     /**
-    * Computes the network based on the current settings. This functions automatically clears the intermediate data after it is finished.
+    * Computes the network based on the current settings.
     *
     * @return Returns the list with calculated networks for each provided method.
     */

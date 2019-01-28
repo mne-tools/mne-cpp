@@ -94,36 +94,6 @@ Connectivity::Connectivity()
 }
 
 
-////*************************************************************************************************************
-
-//Network Connectivity::calculate(ConnectivitySettings& connectivitySettings)
-//{
-//    if(connectivitySettings.getConnectivityMethods().contains("COR")) {
-//        return Correlation::calculate(connectivitySettings);
-//    } else if(connectivitySettings.getConnectivityMethods().contains("XCOR")) {
-//        return CrossCorrelation::calculate(connectivitySettings);
-//    } else if(connectivitySettings.getConnectivityMethods().contains("PLI")) {
-//        return PhaseLagIndex::calculate(connectivitySettings);
-//    } else if(connectivitySettings.getConnectivityMethods().contains("COH")) {
-//        return Coherence::calculate(connectivitySettings);
-//    } else if(connectivitySettings.getConnectivityMethods().contains("IMAGCOH")) {
-//        return ImagCoherence::calculate(connectivitySettings);
-//    } else if(connectivitySettings.getConnectivityMethods().contains("PLV")) {
-//        return PhaseLockingValue::calculate(connectivitySettings);
-//    } else if(connectivitySettings.getConnectivityMethods().contains("WPLI")) {
-//        return WeightedPhaseLagIndex::calculate(connectivitySettings);
-//    } else if(connectivitySettings.getConnectivityMethods().contains("USPLI")) {
-//        return UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings);
-//    } else if(connectivitySettings.getConnectivityMethods().contains("DSWPLI")) {
-//        return DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings);
-//    }
-
-//    qDebug() << "Connectivity::calculateConnectivity - Connectivity method unknown.";
-
-//    return Network();
-//}
-
-
 //*************************************************************************************************************
 
 QList<Network> Connectivity::calculate(ConnectivitySettings& connectivitySettings)
@@ -187,9 +157,6 @@ QList<Network> Connectivity::calculate(ConnectivitySettings& connectivitySetting
         results.append(DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings));
         qDebug() << "Connectivity::calculateMultiMethods - Calculated DSWPLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
     }
-
-//    // Clear intermediate data
-//    connectivitySettings.clearIntermediateData();
 
     return results;
 }
