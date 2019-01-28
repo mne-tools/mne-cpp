@@ -125,9 +125,9 @@ int main(int argc, char *argv[])
 
     // Set up the reading parameters
     fiff_int_t from = raw.first_samp;
-    //fiff_int_t to = raw.last_samp;
-    fiff_int_t to = raw.first_samp + raw.info.sfreq * 6;
-    float quantum_sec = 1.0f;//read and write in 10 sec junks
+    fiff_int_t to = raw.last_samp;
+    //fiff_int_t to = raw.first_samp + raw.info.sfreq * 6;
+    float quantum_sec = 10.0f;//read and write in 10 sec junks
     fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);
 
     // To read the whole file at once set quantum = to - from + 1;
