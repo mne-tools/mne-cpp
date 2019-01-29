@@ -478,9 +478,6 @@ void NeuronalConnectivity::generateNodeVertices()
             if(!m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(picksTmp(i)))) {
                 m_vecPicks.conservativeResize(m_vecPicks.cols()+1);
                 m_vecPicks(m_vecPicks.cols()-1) = picksTmp(i);
-            } else if(!m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(picksTmp(i+1)))) {
-                m_vecPicks.conservativeResize(m_vecPicks.cols()+1);
-                m_vecPicks(m_vecPicks.cols()-1) = picksTmp(i+1);
             }
         }
     } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
