@@ -2151,8 +2151,8 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
         //    Scan numbers may have been messed up
         //
         chs[k].scanNo = k+1;
-        //chs[k].range = 1.0; // We cannot always reset to 1.0. E.g. BabyMEG uses its own ranges.
-        cals[k] = chs[k].range * chs[k].cal; // We have to include ranges here because we do not set them to 1.0 anymore. They are set to 1.0 as default in FiffChInfo class.
+        chs[k].range = 1.0; // Reset to 1.0 because we always write floats.
+        cals[k] = chs[k].cal;
         t_pStream->write_ch_info(chs[k]);
     }
     //
