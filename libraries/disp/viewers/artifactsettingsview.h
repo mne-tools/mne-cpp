@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     averagingsettingsview.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     artifactsettingsview.h
+* @author   Lorenz Esch <lorenzesch@hotmail.com>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2015
+* @date     January, 2018
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Christoph Dinh, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the AveragingSettingsView class.
+* @brief    Declaration of the ArtifactSettingsView class.
 *
 */
 
-#ifndef AVERAGINGSETTINGSVIEW_H
-#define AVERAGINGSETTINGSVIEW_H
+#ifndef ARTIFACTSETTINGSVIEW_H
+#define ARTIFACTSETTINGSVIEW_H
 
 
 //*************************************************************************************************************
@@ -63,6 +62,11 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class QCheckBox;
+class QDoubleSpinBox;
+class QSpinBox;
+class QGridLayout;
+
 namespace Ui {
     class AverageSettingsViewWidget;
 }
@@ -89,47 +93,35 @@ namespace DISPLIB
 
 
 /**
-* DECLARE CLASS AveragingSettingsView
+* DECLARE CLASS ArtifactSettingsView
 *
-* @brief The AveragingSettingsView class provides a averaging settings view.
+* @brief The ArtifactSettingsView class provides an artifact rejection settings view.
 */
-class DISPSHARED_EXPORT AveragingSettingsView : public QWidget
+class DISPSHARED_EXPORT ArtifactSettingsView : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<AveragingSettingsView> SPtr;         /**< Shared pointer type for AveragingAdjustmentWidget. */
-    typedef QSharedPointer<AveragingSettingsView> ConstSPtr;    /**< Const shared pointer type for AveragingAdjustmentWidget. */
+    typedef QSharedPointer<ArtifactSettingsView> SPtr;         /**< Shared pointer type for AveragingAdjustmentWidget. */
+    typedef QSharedPointer<ArtifactSettingsView> ConstSPtr;    /**< Const shared pointer type for AveragingAdjustmentWidget. */
 
-    explicit AveragingSettingsView(const QString& sSettingsPath = "",
-                                   const QMap<QString, int>& mapStimChsIndexNames = QMap<QString, int>(),
-                                   QWidget *parent = Q_NULLPTR);
+    explicit ArtifactSettingsView(const QString& sSettingsPath = "",
+                                 const QList<FIFFLIB::FiffChInfo>& fiffChInfoList = QList<FIFFLIB::FiffChInfo>(),
+                                 QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Destroys the AveragingSettingsView.
+    * Destroys the ArtifactSettingsView.
     */
-    ~AveragingSettingsView();
+    ~ArtifactSettingsView();
 
-    void setStimChannels(const QMap<QString, int> &mapStimChsIndexNames);
+    void setChInfo(const QList<FIFFLIB::FiffChInfo>& fiffChInfoList);
 
-    QString getCurrentStimCh();
+    QMap<QString,double> getThresholdMap();
 
-    bool getDoBaselineCorrection();
+    void setThresholdMap(const QMap<QString,double>& mapThresholds);
 
-    int getNumAverages();
-
-    int getBaselineFromSeconds();
-
-    int getBaselineToSeconds();
-
-    int getStimChannelIdx();
-
-    int getPreStimSeconds();
-
-    int getPostStimSeconds();
-
-    void setDetectedEpochs(const FIFFLIB::FiffEvokedSet& evokedSet);
+    bool getDoArtifactThresholdRejection();
 
 protected:
     //=========================================================================================================
@@ -154,39 +146,28 @@ protected:
     */
     void loadSettings(const QString& settingsPath);
 
-    void onChangePreStim();
-    void onChangePostStim();
-    void onChangeBaselineFrom();
-    void onChangeBaselineTo();
-    void onChangeNumAverages();
+    void onChangeArtifactThreshold();
 
-    Ui::AverageSettingsViewWidget* ui;              /**< Holds the user interface for the AverageSettingsViewWidget.*/
+    QString                         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
-    QString             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
-    QString             m_sCurrentStimChan;
+    QMap<QString,QDoubleSpinBox*>   m_mapChThresholdsDoubleSpinBoxes;
+    QMap<QString,QSpinBox*>         m_mapChThresholdsSpinBoxes;
 
-    QMap<QString,int>   m_mapStimChsIndexNames;
+    QMap<QString,double>            m_mapThresholdsFirst;
+    QMap<QString,int>               m_mapThresholdsSecond;
+    QMap<QString,double>            m_mapThresholds;
 
-    int                 m_iNumAverages;
-    int                 m_iPreStimSeconds;
-    int                 m_iPostStimSeconds;
-    int                 m_iBaselineFromSeconds;
-    int                 m_iBaselineToSeconds;
-    bool                m_bDoBaselineCorrection;
+    QList<FIFFLIB::FiffChInfo>      m_fiffChInfoList;
+
+    bool                            m_bDoArtifactThresholdReduction;
+
+    QPointer<QCheckBox>             m_pArtifactRejectionCheckBox;
 
 signals:
-    void changePreStim(qint32 value);
-    void changePostStim(qint32 value);
-    void changeBaselineFrom(qint32 value);
-    void changeBaselineTo(qint32 value);
-    void changeNumAverages(qint32 value);
-    void changeStimChannel(const QString& sStimName);
-    void changeBaselineActive(bool state);
-    void resetAverage(bool state);
-    void changeAverageMode(qint32 index);
+    void changeArtifactThreshold(const QMap<QString,double>& mapThresholds);
 
 };
 
 } // NAMESPACE
 
-#endif // AVERAGINGSETTINGSVIEW_H
+#endif // ARTIFACTSETTINGSVIEW_H

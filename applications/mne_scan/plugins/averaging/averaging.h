@@ -78,6 +78,7 @@ namespace RTPROCESSINGLIB{
 
 namespace DISPLIB{
     class AveragingSettingsView;
+    class ArtifactSettingsView;
 }
 
 
@@ -243,6 +244,7 @@ private:
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;
 
     QSharedPointer<DISPLIB::AveragingSettingsView>  m_pAveragingSettingsView;           /**< Holds averaging settings widget.*/
+    QSharedPointer<DISPLIB::ArtifactSettingsView>   m_pArtifactSettingsView;            /**< Holds artifact settings widget.*/
 
     QVector<FIFFLIB::FiffEvokedSet>                 m_qVecEvokedData;                   /**< Evoked data set. */
 

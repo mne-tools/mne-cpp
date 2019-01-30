@@ -42,6 +42,7 @@
 #include "FormFiles/averagingsetupwidget.h"
 
 #include <disp/viewers/averagingsettingsview.h>
+#include <disp/viewers/artifactsettingsview.h>
 
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
@@ -195,8 +196,11 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
 
             if(m_pAveragingSettingsView) {
-                m_pAveragingSettingsView->setChInfo(m_pFiffInfo->chs);
                 m_pAveragingSettingsView->setStimChannels(m_mapStimChsIndexNames);
+            }
+
+            if(m_pArtifactSettingsView) {
+                m_pArtifactSettingsView->setChInfo(m_pFiffInfo->chs);
             }
         }
 
@@ -233,8 +237,6 @@ void Averaging::init()
 
     connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeNumAverages,
             this, &Averaging::onChangeNumAverages);
-    connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeArtifactThreshold,
-            this, &Averaging::onChangeArtifactThreshold);
     connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeBaselineFrom,
             this, &Averaging::onChangeBaselineFrom);
     connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::changeBaselineTo,
@@ -251,6 +253,14 @@ void Averaging::init()
             this, &Averaging::onResetAverage);
 
     m_pAveragingOutput->data()->addControlWidget(m_pAveragingSettingsView);
+
+    m_pArtifactSettingsView = ArtifactSettingsView::SPtr::create(QString("Plugin/%1").arg(this->getName()));
+    m_pArtifactSettingsView->setObjectName("group_tab_Averaging_Artifact");
+
+    connect(m_pArtifactSettingsView.data(), &ArtifactSettingsView::changeArtifactThreshold,
+            this, &Averaging::onChangeArtifactThreshold);
+
+    m_pAveragingOutput->data()->addControlWidget(m_pArtifactSettingsView);
 }
 
 
@@ -425,7 +435,7 @@ void Averaging::run()
     m_pRtAve->setBaselineFrom(iBaselineFromSamples, m_pAveragingSettingsView->getBaselineFromSeconds());
     m_pRtAve->setBaselineTo(iBaselineToSamples, m_pAveragingSettingsView->getBaselineToSeconds());
     m_pRtAve->setBaselineActive(m_pAveragingSettingsView->getDoBaselineCorrection());
-    m_pRtAve->setArtifactReduction(m_pAveragingSettingsView->getThresholdMap());
+    m_pRtAve->setArtifactReduction(m_pArtifactSettingsView->getThresholdMap());
 
     connect(m_pRtAve.data(), &RtAve::evokedStim,
             this, &Averaging::appendEvoked);
