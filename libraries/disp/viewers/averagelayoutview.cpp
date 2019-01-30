@@ -85,7 +85,12 @@ AverageLayoutView::AverageLayoutView(QWidget *parent,
     this->setWindowTitle("Average Layout");
 
     m_pAverageLayoutView = new QGraphicsView();
+
+#if defined(USE_OPENGL)
     m_pAverageLayoutView->setViewport(new QOpenGLWidget);
+    qDebug() << "USING OPEN GL ++++++++++++++++++++++++++++++++++++++++++++++++++++";
+#endif
+
     m_pAverageLayoutView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_pAverageLayoutView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
