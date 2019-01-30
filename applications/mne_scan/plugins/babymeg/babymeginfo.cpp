@@ -294,7 +294,6 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         t_ch.scanNo = i;
         t_ch.logNo = i+1;
         t_ch.cal = lm_ch_calicoef.at(i).toDouble();
-        t_ch.unit_mul = 1.0;//lm_ch_scales.at(i).toFloat();
         t_ch.range =1.0f/lm_ch_gain.at(i).toFloat();//1; // set gain
 
         //qDebug()<<i<<":="<<t_ch.ch_name<<","<<t_ch.range<<","<<t_ch.cal;
