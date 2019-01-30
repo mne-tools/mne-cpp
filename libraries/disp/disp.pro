@@ -45,6 +45,10 @@ qtHaveModule(charts): QT += charts
 
 DEFINES += DISP_LIBRARY
 
+contains(MNECPP_CONFIG, dispOpenGL) {
+    DEFINES += USE_OPENGL
+}
+
 TARGET = Disp
 TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {

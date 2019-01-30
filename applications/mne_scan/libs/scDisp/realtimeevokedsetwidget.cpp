@@ -124,7 +124,7 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     connect(m_pActionQuickControl.data(), &QAction::triggered,
             this, &RealTimeEvokedSetWidget::showQuickControlWidget);
     addDisplayAction(m_pActionQuickControl);
-    m_pActionQuickControl->setVisible(false);
+    m_pActionQuickControl->setVisible(true);
 
     //Create GUI
     m_pRTESetLayout = new QVBoxLayout(this);

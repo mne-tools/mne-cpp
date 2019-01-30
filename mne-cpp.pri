@@ -114,7 +114,7 @@ MNE_LIB_VERSION = 1
 
 QMAKE_TARGET_PRODUCT = mne-cpp
 QMAKE_TARGET_DESCRIPTION = MNE Qt 5 based C++ library.
-QMAKE_TARGET_COPYRIGHT = Copyright (C) 2018 Authors of mne-cpp. All rights reserved.
+QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reserved.
 
 
 ########################################### PROJECT CONFIGURATION #############################################
@@ -128,9 +128,10 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2018 Authors of mne-cpp. All rights reser
 ## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=static
 ## To build MNE-CPP Deep library based CNTK: qmake MNECPP_CONFIG+=buildDeep
 ## To build MNE-CPP with FFTW support in Eigen (make sure to specify FFTW_DIRs below): qmake MNECPP_CONFIG+=useFFTW
+## To build MNE-CPP Disp library with OpenGL support (default is with OpenGL support): qmake MNECPP_CONFIG+=dispOpenGL
 
 # Default flags
-MNECPP_CONFIG +=
+MNECPP_CONFIG += dispOpenGL
 
 #Build minimalVersion for qt versions < 5.10.0
 !minQtVersion(5, 10, 0) {
@@ -215,7 +216,6 @@ isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
     MNE_INSTALL_INCLUDE_DIR = $$shell_path($${PWD}/include)
 }
 
-
 # FFTW dir
-FFTW_DIR_LIBS = $$shell_path(C:\fftw-3.3.5-dll64)
-FFTW_DIR_INCLUDE = $$shell_path(C:\fftw-3.3.5-dll64)
+FFTW_DIR_LIBS = $$shell_path(K:\fftw-3.3.5-dll64)
+FFTW_DIR_INCLUDE = $$shell_path(K:\fftw-3.3.5-dll64)

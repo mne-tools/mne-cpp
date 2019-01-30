@@ -520,13 +520,15 @@ public:
     * @param[in] info           The measurement info block of the source file
     * @param[out] cals          A copy of the calibration values
     * @param[in] sel            Which channels will be included in the output file (optional)
+    * @param[in] bResetRange    Flag whether to reset the range to 1.0. Default is true.
     *
     * @return the started fiff file
     */
     static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice,
                                               const FiffInfo& info,
                                               RowVectorXd& cals,
-                                              MatrixXi sel = defaultMatrixXi);
+                                              MatrixXi sel = defaultMatrixXi,
+                                              bool bResetRange = true);
 
     //=========================================================================================================
     /**
