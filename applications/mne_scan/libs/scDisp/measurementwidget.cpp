@@ -75,7 +75,7 @@ MeasurementWidget::~MeasurementWidget()
 //*************************************************************************************************************
 
 void MeasurementWidget::addControlWidgets(QSharedPointer<DISPLIB::QuickControlView> pQuickControlView,
-                                                 const QList<QSharedPointer<QWidget> >& lControlWidgets)
+                                          const QList<QSharedPointer<QWidget> >& lControlWidgets)
 {
     if(!pQuickControlView) {
         return;
@@ -93,7 +93,7 @@ void MeasurementWidget::addControlWidgets(QSharedPointer<DISPLIB::QuickControlVi
                 sObjectName.remove("group_tab_");
                 QStringList sList = sObjectName.split("_");
                 if(sList.size() >= 2) {
-                   pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), sList.at(0), sList.at(1));
+                    pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), sList.at(0), sList.at(1));
                 } else {
                     pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), "", sObjectName);
                 }

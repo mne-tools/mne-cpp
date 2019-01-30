@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>296</width>
-    <height>407</height>
+    <height>358</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -107,7 +107,7 @@
      <zorder>m_pSpinBoxPostStimMSeconds</zorder>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="1" column="0">
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
       <string>Baseline correction</string>
@@ -169,24 +169,17 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="2" column="0">
     <widget class="QGroupBox" name="m_groupBox_detectedTrials">
      <property name="title">
       <string>Detected Trials</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="3" column="0">
     <widget class="QPushButton" name="m_pushButton_reset">
      <property name="text">
       <string>RESET</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="m_groupBox_artifactRejection">
-     <property name="title">
-      <string>Artifact rejection via thresholding</string>
      </property>
     </widget>
    </item>
