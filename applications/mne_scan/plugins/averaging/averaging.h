@@ -179,13 +179,9 @@ public:
     /**
     * Change the threshold value for trial rejection
     *
-    * @param[in] bDoArtifactReduction       whether to perform artifact reduction
-    * @param[in] thresholdFirst             the new first component of the the rejection threshold value
-    * @param[in] thresholdSecond            the new second component (e-...) of the the rejection threshold value
+    * @param[in] mapThresholds       The new map including the current thresholds for the channels
     */
-    void onChangeArtifactThreshold(bool bDoArtifactThresholdReduction,
-                                   double thresholdFirst,
-                                   int thresholdSecond);
+    void onChangeArtifactThreshold(const QMap<QString, double> &mapThresholds);
 
     //=========================================================================================================
     /**

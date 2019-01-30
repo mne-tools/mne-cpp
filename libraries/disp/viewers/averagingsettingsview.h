@@ -45,12 +45,15 @@
 
 #include "../disp_global.h"
 
+#include <fiff/fiff_ch_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QPointer>
 #include <QWidget>
 #include <QMap>
 
@@ -60,12 +63,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class QCheckBox;
+class QDoubleSpinBox;
+class QSpinBox;
+
 namespace Ui {
     class AverageSettingsViewWidget;
 }
 
 namespace FIFFLIB {
     class FiffEvokedSet;
+    class FiffChInfo;
 }
 
 
@@ -98,7 +106,8 @@ public:
     typedef QSharedPointer<AveragingSettingsView> ConstSPtr;    /**< Const shared pointer type for AveragingAdjustmentWidget. */
 
     explicit AveragingSettingsView(const QString& sSettingsPath = "",
-                                   const QMap<QString, int> &mapStimChsIndexNames = QMap<QString, int>(),
+                                   const QList<FIFFLIB::FiffChInfo>& fiffChInfoList = QList<FIFFLIB::FiffChInfo>(),
+                                   const QMap<QString, int>& mapStimChsIndexNames = QMap<QString, int>(),
                                    QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
@@ -109,11 +118,13 @@ public:
 
     void setStimChannels(const QMap<QString, int> &mapStimChsIndexNames);
 
+    void setChInfo(const QList<FIFFLIB::FiffChInfo>& fiffChInfoList);
+
     QString getCurrentStimCh();
 
-    double getThresholdFirst();
+    QMap<QString,double> getThresholdMap();
 
-    int getThresholdSecond();
+    void setThresholdMap(const QMap<QString,double>& mapThresholds);
 
     bool getDoArtifactThresholdRejection();
 
@@ -161,37 +172,39 @@ protected:
     void onChangeBaselineFrom();
     void onChangeBaselineTo();
     void onChangeArtifactThreshold();
-    void onChangeArtifactVariance();
     void onChangeNumAverages();
 
-    Ui::AverageSettingsViewWidget* ui;		/**< Holds the user interface for the AverageSettingsViewWidget.*/
+    Ui::AverageSettingsViewWidget* ui;              /**< Holds the user interface for the AverageSettingsViewWidget.*/
 
     QString             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
     QString             m_sCurrentStimChan;
 
-    QMap<QString,int>   m_mapStimChsIndexNames;
+    QMap<QString,int>               m_mapStimChsIndexNames;
+    QMap<QString,QDoubleSpinBox*>   m_mapChThresholdsDoubleSpinBoxes;
+    QMap<QString,QSpinBox*>         m_mapChThresholdsSpinBoxes;
+
+    QMap<QString,double>            m_mapThresholdsFirst;
+    QMap<QString,int>               m_mapThresholdsSecond;
+    QMap<QString,double>            m_mapThresholds;
+
+    QList<FIFFLIB::FiffChInfo>      m_fiffChInfoList;
 
     int                 m_iNumAverages;
     int                 m_iPreStimSeconds;
     int                 m_iPostStimSeconds;
     int                 m_iBaselineFromSeconds;
     int                 m_iBaselineToSeconds;
-    int                 m_iArtifactThresholdSecond;
-
     bool                m_bDoArtifactThresholdReduction;
-    bool                m_bDoArtifactVarianceReduction;
     bool                m_bDoBaselineCorrection;
 
-    double              m_dArtifactThresholdFirst;
-    double              m_dArtifactVariance;
+    QPointer<QCheckBox> m_pArtifactRejectionCheckBox;
 
 signals:
     void changePreStim(qint32 value);
     void changePostStim(qint32 value);
     void changeBaselineFrom(qint32 value);
     void changeBaselineTo(qint32 value);
-    void changeArtifactThreshold(bool bActivate, qint32 first, qint32 second);
-    void changeArtifactVariance(bool bActivate, qint32 first);
+    void changeArtifactThreshold(const QMap<QString,double>& mapThresholds);
     void changeNumAverages(qint32 value);
     void changeStimChannel(const QString& sStimName);
     void changeBaselineActive(bool state);

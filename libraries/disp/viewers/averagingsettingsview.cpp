@@ -74,13 +74,17 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
+                                             const QList<FiffChInfo>& fiffChInfoList,
                                              const QMap<QString, int> &mapStimChsIndexNames,
                                              QWidget *parent)
 : QWidget(parent)
 , ui(new Ui::AverageSettingsViewWidget)
 , m_sSettingsPath(sSettingsPath)
 , m_mapStimChsIndexNames(mapStimChsIndexNames)
+, m_fiffChInfoList(fiffChInfoList)
 {
+    qRegisterMetaType<QMap<QString,double> >("QMap<QString,double>");
+
     ui->setupUi(this);
 
     this->setWindowTitle("Averaging Settings");
@@ -125,6 +129,86 @@ void AveragingSettingsView::setStimChannels(const QMap<QString,int>& mapStimChsI
 
 //*************************************************************************************************************
 
+void AveragingSettingsView::setChInfo(const QList<FIFFLIB::FiffChInfo>& fiffChInfoList)
+{
+    m_fiffChInfoList = fiffChInfoList;
+
+    //Artifact rejection
+    if(!m_fiffChInfoList.isEmpty()) {
+        QStringList channelTypes;
+        int kind, unit;
+
+        for(int i = 0; i < m_fiffChInfoList.size(); ++i) {
+            kind = m_fiffChInfoList.at(i).kind;
+            unit = m_fiffChInfoList.at(i).unit;
+
+            if(kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T_M && !channelTypes.contains("GRAD Tm")) {
+                channelTypes << "GRAD Tm";
+            }
+            if(kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T && !channelTypes.contains("MAG T")) {
+                channelTypes << "MAG T";
+            }
+            if(kind == FIFFV_EEG_CH && !channelTypes.contains("EEG V")) {
+                channelTypes << "EEG V";
+            }
+            if(kind == FIFFV_EOG_CH && !channelTypes.contains("EOG V")) {
+                channelTypes << "EOG V";
+            }
+            if(kind == FIFFV_EMG_CH && !channelTypes.contains("EMG V")) {
+                channelTypes << "EMG V";
+            }
+            if(kind == FIFFV_ECG_CH && !channelTypes.contains("ECG V")) {
+                channelTypes << "ECG V";
+            }
+        }
+
+        if(!channelTypes.isEmpty()) {
+            ui->m_groupBox_artifactRejection->show();
+            QGridLayout* pLayout = new QGridLayout();
+            m_pArtifactRejectionCheckBox = new QCheckBox("Activate");
+            pLayout->addWidget(m_pArtifactRejectionCheckBox,0,0,1,2);
+            m_pArtifactRejectionCheckBox->setChecked(m_bDoArtifactThresholdReduction);
+            connect(m_pArtifactRejectionCheckBox.data(), &QCheckBox::clicked,
+                    this, &AveragingSettingsView::onChangeArtifactThreshold);
+
+            for(int i = 0; i < channelTypes.size(); ++i) {
+                QLabel* pLabel = new QLabel(channelTypes.at(i));
+                pLayout->addWidget(pLabel,i+1,0);
+
+                QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox();
+                pDoubleSpinBox->setPrefix("+/-");
+                pDoubleSpinBox->setMinimum(0.0);
+                pDoubleSpinBox->setMaximum(100000.0);
+                pDoubleSpinBox->setValue(m_mapThresholdsFirst[channelTypes.at(i)]);
+                pLayout->addWidget(pDoubleSpinBox,i+1,1);
+                connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                            this, &AveragingSettingsView::onChangeArtifactThreshold);
+                m_mapChThresholdsDoubleSpinBoxes[channelTypes.at(i)] = pDoubleSpinBox;
+
+                QSpinBox* pSpinBox = new QSpinBox();
+                pSpinBox->setPrefix("e");
+                pSpinBox->setMaximum(0);
+                pSpinBox->setMinimum(-10000);
+                pSpinBox->setValue(m_mapThresholdsSecond[channelTypes.at(i)]);
+                pLayout->addWidget(pSpinBox,i+1,2);
+                connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                            this, &AveragingSettingsView::onChangeArtifactThreshold);
+                m_mapChThresholdsSpinBoxes[channelTypes.at(i)] = pSpinBox;
+            }
+
+            if(QLayout* layout = ui->m_groupBox_artifactRejection->layout()) {
+                delete layout;
+            }
+            ui->m_groupBox_artifactRejection->setLayout(pLayout);
+        } else {
+            ui->m_groupBox_artifactRejection->hide();
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
 QString AveragingSettingsView::getCurrentStimCh()
 {
     return m_sCurrentStimChan;
@@ -133,17 +217,17 @@ QString AveragingSettingsView::getCurrentStimCh()
 
 //*************************************************************************************************************
 
-double AveragingSettingsView::getThresholdFirst()
+QMap<QString,double> AveragingSettingsView::getThresholdMap()
 {
-    return m_dArtifactThresholdFirst;
+    return m_mapThresholds;
 }
 
 
 //*************************************************************************************************************
 
-int AveragingSettingsView::getThresholdSecond()
+void AveragingSettingsView::setThresholdMap(const QMap<QString,double>& mapThresholds)
 {
-    return m_iArtifactThresholdSecond;
+    m_mapThresholds = mapThresholds;
 }
 
 
@@ -151,7 +235,11 @@ int AveragingSettingsView::getThresholdSecond()
 
 bool AveragingSettingsView::getDoArtifactThresholdRejection()
 {
-    return m_bDoArtifactThresholdReduction;
+    if (m_pArtifactRejectionCheckBox) {
+        return m_pArtifactRejectionCheckBox->isChecked();
+    }
+
+    return false;
 }
 
 
@@ -244,25 +332,76 @@ void AveragingSettingsView::redrawGUI()
             this, &AveragingSettingsView::onChangePostStim);
 
     //Artifact rejection
-    ui->m_pcheckBox_artifactReduction->setChecked(m_bDoArtifactThresholdReduction);
-    connect(ui->m_pcheckBox_artifactReduction, &QCheckBox::clicked,
-            this, &AveragingSettingsView::onChangeArtifactThreshold);
+    if(!m_fiffChInfoList.isEmpty()) {
+        QStringList channelTypes;
+        int kind, unit;
 
-    ui->m_pcheckBox_varianceReduction->setChecked(m_bDoArtifactVarianceReduction);
-    connect(ui->m_pcheckBox_varianceReduction, &QCheckBox::clicked,
-            this, &AveragingSettingsView::onChangeArtifactVariance);
+        for(int i = 0; i < m_fiffChInfoList.size(); ++i) {
+            kind = m_fiffChInfoList.at(i).kind;
+            unit = m_fiffChInfoList.at(i).unit;
 
-    ui->m_pSpinBox_artifactThresholdFirst->setValue(m_dArtifactThresholdFirst);
-    connect(ui->m_pSpinBox_artifactThresholdFirst, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &AveragingSettingsView::onChangeArtifactThreshold);
+            if(kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T_M && !channelTypes.contains("grad")) {
+                channelTypes << "grad";
+            }
+            if(kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T && !channelTypes.contains("mag")) {
+                channelTypes << "mag";
+            }
+            if(kind == FIFFV_EEG_CH && !channelTypes.contains("eeg")) {
+                channelTypes << "eeg";
+            }
+            if(kind == FIFFV_EOG_CH && !channelTypes.contains("eog")) {
+                channelTypes << "eog";
+            }
+            if(kind == FIFFV_EMG_CH && !channelTypes.contains("emg")) {
+                channelTypes << "emg";
+            }
+            if(kind == FIFFV_ECG_CH && !channelTypes.contains("ecg")) {
+                channelTypes << "ecg";
+            }
+        }
 
-    ui->m_pSpinBox_artifactThresholdSecond->setValue(m_iArtifactThresholdSecond);
-    connect(ui->m_pSpinBox_artifactThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &AveragingSettingsView::onChangeArtifactThreshold);
+        if(!channelTypes.isEmpty()) {
+            ui->m_groupBox_artifactRejection->show();
+            QGridLayout* pLayout = new QGridLayout();
+            m_pArtifactRejectionCheckBox = new QCheckBox("Activate artifact rejection");
+            pLayout->addWidget(m_pArtifactRejectionCheckBox,0,0,1,2);
+            m_pArtifactRejectionCheckBox->setChecked(m_bDoArtifactThresholdReduction);
+            connect(m_pArtifactRejectionCheckBox.data(), &QCheckBox::clicked,
+                    this, &AveragingSettingsView::onChangeArtifactThreshold);
 
-    ui->m_spinBox_variance->setValue(m_dArtifactVariance);
-    connect(ui->m_spinBox_variance, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &AveragingSettingsView::onChangeArtifactVariance);
+            for(int i = 0; i < channelTypes.size(); ++i) {
+                QLabel* pLabel = new QLabel(channelTypes.at(i));
+                pLayout->addWidget(pLabel,i+1,0);
+
+                QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox();
+                pDoubleSpinBox->setPrefix("+/-");
+                pDoubleSpinBox->setMinimum(0.0);
+                pDoubleSpinBox->setMaximum(100000.0);
+                pDoubleSpinBox->setValue(m_mapThresholdsFirst[channelTypes.at(i)]);
+                pLayout->addWidget(pDoubleSpinBox,i+1,1);
+                connect(pDoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                            this, &AveragingSettingsView::onChangeArtifactThreshold);
+                m_mapChThresholdsDoubleSpinBoxes[channelTypes.at(i)] = pDoubleSpinBox;
+
+                QSpinBox* pSpinBox = new QSpinBox();
+                pSpinBox->setPrefix("e");
+                pSpinBox->setMaximum(0);
+                pSpinBox->setMinimum(-10000);
+                pSpinBox->setValue(m_mapThresholdsSecond[channelTypes.at(i)]);
+                pLayout->addWidget(pSpinBox,i+1,2);
+                connect(pSpinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                            this, &AveragingSettingsView::onChangeArtifactThreshold);
+                m_mapChThresholdsSpinBoxes[channelTypes.at(i)] = pSpinBox;
+            }
+
+            if(QLayout* layout = ui->m_groupBox_artifactRejection->layout()) {
+                delete layout;
+            }
+            ui->m_groupBox_artifactRejection->setLayout(pLayout);
+        } else {
+            ui->m_groupBox_artifactRejection->hide();
+        }
+    }
 
     //Baseline Correction
     ui->m_pcheckBoxBaselineCorrection->setChecked(m_bDoBaselineCorrection);
@@ -285,13 +424,6 @@ void AveragingSettingsView::redrawGUI()
             this, &AveragingSettingsView::resetAverage);
 
     setWindowFlags(Qt::WindowStaysOnTopHint);
-
-    // Disable and hide variance rejection
-    ui->m_pcheckBox_varianceReduction->setChecked(false);
-    ui->m_line_adrtifactRejection->hide();
-    ui->m_pcheckBox_varianceReduction->hide();
-    ui->m_label_varianceValue->hide();
-    ui->m_spinBox_variance->hide();
 
     ui->m_groupBox_detectedTrials->hide();
 }
@@ -351,10 +483,23 @@ void AveragingSettingsView::saveSettings(const QString& settingsPath)
     settings.setValue(settingsPath + QString("/numAverages"), m_iNumAverages);
     settings.setValue(settingsPath + QString("/currentStimChannel"), m_sCurrentStimChan);
     settings.setValue(settingsPath + QString("/doArtifactThresholdReduction"), m_bDoArtifactThresholdReduction);
-    settings.setValue(settingsPath + QString("/doArtifactVarianceReduction"), m_bDoArtifactVarianceReduction);
-    settings.setValue(settingsPath + QString("/artifactThresholdFirst"), m_dArtifactThresholdFirst);
-    settings.setValue(settingsPath + QString("/artifactThresholdSecond"), m_iArtifactThresholdSecond);
-    settings.setValue(settingsPath + QString("/artifactVariance"), m_dArtifactVariance);
+
+    settings.beginGroup(settingsPath + QString("/artifactThresholdsFirst"));
+    QMap<QString, double>::const_iterator itrFirst = m_mapThresholdsFirst.constBegin();
+    while (itrFirst != m_mapThresholdsFirst.constEnd()) {
+         settings.setValue(itrFirst.key(), itrFirst.value());
+         ++itrFirst;
+    }
+    settings.endGroup();
+
+    settings.beginGroup(settingsPath + QString("/artifactThresholdsSecond"));
+    QMap<QString, int>::const_iterator itrSecond = m_mapThresholdsSecond.constBegin();
+    while (itrSecond != m_mapThresholdsSecond.constEnd()) {
+         settings.setValue(itrSecond.key(), itrSecond.value());
+         ++itrSecond;
+    }
+    settings.endGroup();
+
     settings.setValue(settingsPath + QString("/baselineFromSeconds"), m_iBaselineFromSeconds);
     settings.setValue(settingsPath + QString("/baselineToSeconds"), m_iBaselineToSeconds);
     settings.setValue(settingsPath + QString("/doBaselineCorrection"), m_bDoBaselineCorrection);
@@ -386,10 +531,27 @@ void AveragingSettingsView::loadSettings(const QString& settingsPath)
     }
 
     m_bDoArtifactThresholdReduction = settings.value(settingsPath + QString("/doArtifactThresholdReduction"), false).toBool();
-    m_bDoArtifactVarianceReduction = settings.value(settingsPath + QString("/doArtifactVarianceReduction"), false).toBool();
-    m_dArtifactThresholdFirst = settings.value(settingsPath + QString("/artifactThresholdFirst"), m_dArtifactThresholdFirst).toDouble();
-    m_iArtifactThresholdSecond = settings.value(settingsPath + QString("/artifactThresholdSecond"), m_iArtifactThresholdSecond).toInt();
-    m_dArtifactVariance = settings.value(settingsPath + QString("/artifactVariance"), 3).toInt();
+
+    if(m_bDoArtifactThresholdReduction) {
+        m_mapThresholds["Active"] = 1.0;
+    } else {
+        m_mapThresholds["Active"] = 0.0;
+    }
+
+    settings.beginGroup(settingsPath + QString("/artifactThresholdsFirst"));
+    QStringList keys = settings.childKeys();
+    foreach (QString key, keys) {
+         m_mapThresholdsFirst.insert(key, settings.value(key, 1.0).toDouble());
+    }
+    settings.endGroup();
+
+    settings.beginGroup(settingsPath + QString("/artifactThresholdsSecond"));
+    keys = settings.childKeys();
+    foreach (QString key, keys) {
+         m_mapThresholdsSecond.insert(key, settings.value(key, -1).toInt());
+    }
+    settings.endGroup();
+
     m_iNumAverages = settings.value(settingsPath + QString("/numAverages"), 10).toInt();
     m_sCurrentStimChan = settings.value(settingsPath + QString("/currentStimChannel"), "STI014").toString();
     m_bDoBaselineCorrection = settings.value(settingsPath + QString("/doBaselineCorrection"), false).toBool();
@@ -454,25 +616,50 @@ void AveragingSettingsView::onChangeBaselineTo()
 
 void AveragingSettingsView::onChangeArtifactThreshold()
 {
-    m_bDoArtifactThresholdReduction = ui->m_pcheckBox_artifactReduction->isChecked();
-    m_dArtifactThresholdFirst = ui->m_pSpinBox_artifactThresholdFirst->value();
-    m_iArtifactThresholdSecond = ui->m_pSpinBox_artifactThresholdSecond->value();
+    m_mapThresholds.clear();
+    m_mapThresholdsFirst.clear();
+    m_mapThresholdsSecond.clear();
 
-    emit changeArtifactThreshold(ui->m_pcheckBox_artifactReduction->isChecked(),
-                                 ui->m_pSpinBox_artifactThresholdFirst->value(),
-                                 ui->m_pSpinBox_artifactThresholdSecond->value());
-}
+    if(m_pArtifactRejectionCheckBox) {
+        if(m_pArtifactRejectionCheckBox->isChecked()) {
+            m_mapThresholds["Active"] = 1.0;
+            m_bDoArtifactThresholdReduction = true;
+        } else {
+            m_mapThresholds["Active"] = 0.0;
+            m_bDoArtifactThresholdReduction = false;
+        }
+    }
 
+    QMapIterator<QString, QDoubleSpinBox*> i(m_mapChThresholdsDoubleSpinBoxes);
 
-//*************************************************************************************************************
+    while (i.hasNext()) {
+        i.next();
+        if(i.value()) {
+            m_mapThresholdsFirst[i.key()] = i.value()->value();
+            m_mapThresholdsSecond[i.key()] = m_mapChThresholdsSpinBoxes[i.key()]->value();
 
-void AveragingSettingsView::onChangeArtifactVariance()
-{
-    m_bDoArtifactVarianceReduction = ui->m_pcheckBox_varianceReduction->isChecked();
-    m_dArtifactVariance = ui->m_spinBox_variance->value();
+            if(i.key().contains("GRAD")) {
+                m_mapThresholds["GRAD"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
+            }
+            if(i.key().contains("MAG")) {
+                m_mapThresholds["MAG"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
+            }
+            if(i.key().contains("EEG")) {
+                m_mapThresholds["EEG"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
+            }
+            if(i.key().contains("ECG")) {
+                m_mapThresholds["ECG"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
+            }
+            if(i.key().contains("EOG")) {
+                m_mapThresholds["EOG"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
+            }
+            if(i.key().contains("EMG")) {
+                m_mapThresholds["EMG"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
+            }
+        }
+    }
 
-    emit changeArtifactVariance(ui->m_pcheckBox_varianceReduction->isChecked(),
-                                ui->m_spinBox_variance->value());
+    emit changeArtifactThreshold(m_mapThresholds);
 }
 
 

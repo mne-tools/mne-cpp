@@ -193,6 +193,11 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                     m_mapStimChsIndexNames.insert(m_pFiffInfo->chs[i].ch_name,i);
                 }
             }
+
+            if(m_pAveragingSettingsView) {
+                m_pAveragingSettingsView->setChInfo(m_pFiffInfo->chs);
+                m_pAveragingSettingsView->setStimChannels(m_mapStimChsIndexNames);
+            }
         }
 
         // Append new data
@@ -306,17 +311,12 @@ void Averaging::onChangePostStim(qint32 mseconds)
 
 //*************************************************************************************************************
 
-void Averaging::onChangeArtifactThreshold(bool bDoArtifactThresholdReduction,
-                                          double thresholdFirst,
-                                          int thresholdSecond)
+void Averaging::onChangeArtifactThreshold(const QMap<QString,double>& mapThresholds)
 {
     QMutexLocker locker(&m_qMutex);
 
     if(m_pRtAve) {
-        m_pRtAve->setArtifactReduction(bDoArtifactThresholdReduction,
-                                       thresholdFirst * pow(10, thresholdSecond),
-                                       false,
-                                       3);
+        m_pRtAve->setArtifactReduction(mapThresholds);
     }
 }
 
@@ -397,8 +397,6 @@ void Averaging::run()
         msleep(10);
     }
 
-    m_pAveragingSettingsView->setStimChannels(m_mapStimChsIndexNames);
-
     if(m_mapStimChsIndexNames.isEmpty()) {
         qDebug() << "Averaging::run() - No stim channels were found. Averaging plugin was not started.";
         return;
@@ -427,10 +425,7 @@ void Averaging::run()
     m_pRtAve->setBaselineFrom(iBaselineFromSamples, m_pAveragingSettingsView->getBaselineFromSeconds());
     m_pRtAve->setBaselineTo(iBaselineToSamples, m_pAveragingSettingsView->getBaselineToSeconds());
     m_pRtAve->setBaselineActive(m_pAveragingSettingsView->getDoBaselineCorrection());
-    m_pRtAve->setArtifactReduction(m_pAveragingSettingsView->getDoArtifactThresholdRejection(),
-                                   m_pAveragingSettingsView->getThresholdFirst() * pow(10, m_pAveragingSettingsView->getThresholdSecond()),
-                                   false,
-                                   3);
+    m_pRtAve->setArtifactReduction(m_pAveragingSettingsView->getThresholdMap());
 
     connect(m_pRtAve.data(), &RtAve::evokedStim,
             this, &Averaging::appendEvoked);
