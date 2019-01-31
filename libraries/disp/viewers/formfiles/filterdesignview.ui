@@ -228,13 +228,13 @@
               <item row="5" column="1">
                <widget class="QSpinBox" name="m_spinBox_filterTaps">
                 <property name="minimum">
-                 <number>2</number>
+                 <number>16</number>
                 </property>
                 <property name="maximum">
-                 <number>256</number>
+                 <number>512</number>
                 </property>
                 <property name="singleStep">
-                 <number>2</number>
+                 <number>1</number>
                 </property>
                 <property name="value">
                  <number>128</number>

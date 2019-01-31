@@ -42,6 +42,10 @@ TEMPLATE = app
 
 QT += gui network core widgets concurrent svg opengl
 
+contains(MNECPP_CONFIG, dispOpenGL) {
+    DEFINES += USE_OPENGL
+}
+
 TARGET = mne_browse
 
 CONFIG(debug, debug|release) {

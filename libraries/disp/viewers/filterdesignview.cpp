@@ -123,8 +123,6 @@ void FilterDesignView::init(double dSFreq)
 {
     setSamplingRate(dSFreq);
 
-    filterParametersChanged();
-
     //Update min max of spin boxes to nyquist
     double samplingFrequency = m_dSFreq;
     double nyquistFrequency = samplingFrequency/2;
@@ -139,6 +137,8 @@ void FilterDesignView::init(double dSFreq)
     if(ui->m_doubleSpinBox_lowpass->value()>m_dSFreq/2) {
         ui->m_doubleSpinBox_lowpass->setValue(m_dSFreq/2);
     }
+
+    filterParametersChanged();
 
     updateFilterPlot();
 }
@@ -155,8 +155,7 @@ void FilterDesignView::setWindowSize(int iWindowSize)
         m_iWindowSize--;
     }
 
-
-    ui->m_spinBox_filterTaps->setValue(m_iWindowSize);
+    //ui->m_spinBox_filterTaps->setValue(m_iWindowSize);
 }
 
 
@@ -164,6 +163,7 @@ void FilterDesignView::setWindowSize(int iWindowSize)
 
 void FilterDesignView::setMaxFilterTaps(int iMaxNumberFilterTaps)
 {
+    qDebug() << "FilterDesignView::setMaxFilterTaps - iMaxNumberFilterTaps +++++++++++++++++++++++++++" << iMaxNumberFilterTaps;
     if(iMaxNumberFilterTaps%2 != 0) {
         iMaxNumberFilterTaps--;
     }
@@ -193,24 +193,27 @@ void FilterDesignView::setSamplingRate(double dSamplingRate)
     if(ui->m_doubleSpinBox_lowpass->value()>m_dSFreq/2) {
         ui->m_doubleSpinBox_lowpass->setValue(m_dSFreq/2);
     }
-
-    filterParametersChanged();
 }
 
 
 //*************************************************************************************************************
 
 void FilterDesignView::setFilterParameters(double hp,
-                                     double lp,
-                                     int order,
-                                     int type,
-                                     int designMethod,
-                                     double transition,
-                                     const QString &sChannelType)
+                                           double lp,
+                                           int order,
+                                           int type,
+                                           int designMethod,
+                                           double transition,
+                                           const QString &sChannelType)
 {
+
+    qDebug() << "FilterDesignView::setFilterParameters - order +++++++++++++++++++++++++++" << order;
+
     ui->m_doubleSpinBox_highpass->setValue(lp);
     ui->m_doubleSpinBox_lowpass->setValue(hp);
     ui->m_spinBox_filterTaps->setValue(order);
+
+    qDebug() << "FilterDesignView::setFilterParameters - ui->m_spinBox_filterTaps->value() +++++++++++++++++++++++++++" << ui->m_spinBox_filterTaps->value();
 
     if(type == 0) {
         ui->m_comboBox_filterType->setCurrentText("Lowpass");
@@ -581,8 +584,6 @@ void FilterDesignView::filterParametersChanged()
 
     //update filter plot
     updateFilterPlot();
-
-    saveSettings(m_sSettingsPath);
 }
 
 
@@ -591,8 +592,6 @@ void FilterDesignView::filterParametersChanged()
 void FilterDesignView::onSpinBoxFilterChannelType(const QString& channelType)
 {
     emit filterChannelTypeChanged(channelType);
-
-    saveSettings(m_sSettingsPath);
 }
 
 

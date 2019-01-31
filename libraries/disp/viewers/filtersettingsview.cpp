@@ -83,8 +83,8 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
     this->setMaximumWidth(330);
 
     m_pFilterView = FilterDesignView::SPtr::create(m_sSettingsPath,
-                                             this,
-                                             Qt::Window);
+                                                   this,
+                                                   Qt::Window);
 
     //Delete all widgets in the filter layout
     QGridLayout* topLayout = static_cast<QGridLayout*>(this->layout());
