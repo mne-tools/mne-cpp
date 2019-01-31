@@ -291,8 +291,6 @@ void QuickControlView::onOpacityChange(qint32 value)
     } else {
         this->setWindowOpacity(1/(100.0/value));
     }
-
-    saveSettings(m_sSettingsPath);
 }
 
 
