@@ -232,4 +232,6 @@ void CompensatorView::onCheckCompStatusChanged()
             m_iLastTo = 0;
         }
    }
+
+   saveSettings(m_sSettingsPath);
 }

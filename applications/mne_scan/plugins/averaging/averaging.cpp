@@ -103,7 +103,7 @@ QSharedPointer<IPlugin> Averaging::clone() const
 //*************************************************************************************************************
 
 void Averaging::unload()
-{    
+{
 }
 
 
@@ -412,7 +412,7 @@ void Averaging::run()
         return;
     }
 
-    int iCurrentStimChIdx = m_mapStimChsIndexNames[m_pAveragingSettingsView->getCurrentStimCh()];
+    int iCurrentStimChIdx = m_mapStimChsIndexNames.value(m_pAveragingSettingsView->getCurrentStimCh());
 
     if(!m_mapStimChsIndexNames.contains(m_pAveragingSettingsView->getCurrentStimCh())) {
         qDebug() << "Averaging::run() - Current stim channel is not present in data. Setting to first found stim channel instead.";

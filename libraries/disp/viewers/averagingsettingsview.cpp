@@ -118,7 +118,7 @@ void AveragingSettingsView::setStimChannels(const QMap<QString,int>& mapStimChsI
         ui->m_pComboBoxChSelection->setCurrentText(m_sCurrentStimChan);
 
         connect(ui->m_pComboBoxChSelection, &QComboBox::currentTextChanged,
-                this, &AveragingSettingsView::changeStimChannel);
+                this, &AveragingSettingsView::onChangeStimChannel);
     }
 }
 
@@ -345,6 +345,8 @@ void AveragingSettingsView::onChangePreStim()
     m_iPreStimSeconds = mSeconds;
 
     emit changePreStim(mSeconds);
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -359,6 +361,8 @@ void AveragingSettingsView::onChangePostStim()
     m_iPostStimSeconds = mSeconds;
 
     emit changePostStim(mSeconds);
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -372,6 +376,8 @@ void AveragingSettingsView::onChangeBaselineFrom()
     m_iBaselineFromSeconds = mSeconds;
 
     emit changeBaselineFrom(mSeconds);
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -385,6 +391,8 @@ void AveragingSettingsView::onChangeBaselineTo()
     m_iBaselineToSeconds = mSeconds;
 
     emit changeBaselineTo(mSeconds);
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -395,4 +403,18 @@ void AveragingSettingsView::onChangeNumAverages()
     m_iNumAverages = ui->m_pSpinBoxNumAverages->value();
 
     emit changeNumAverages(ui->m_pSpinBoxNumAverages->value());
+
+    saveSettings(m_sSettingsPath);
+}
+
+
+//*************************************************************************************************************
+
+void AveragingSettingsView::onChangeStimChannel()
+{
+    m_sCurrentStimChan = ui->m_pComboBoxChSelection->currentText();
+
+    emit changeStimChannel(m_sCurrentStimChan);
+
+    saveSettings(m_sSettingsPath);
 }

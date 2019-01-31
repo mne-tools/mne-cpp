@@ -154,6 +154,12 @@ protected:
     */
     void onShowFilterView();
 
+    //=========================================================================================================
+    /**
+    * Whenever the filter activation changed
+    */
+    void onFilterActivationChanged();
+
     QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
     QSharedPointer<FilterDesignView>              m_pFilterView;                  /**< The filter view. */

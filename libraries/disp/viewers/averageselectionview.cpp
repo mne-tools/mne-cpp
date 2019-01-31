@@ -281,4 +281,6 @@ void AverageSelectionView::onAverageSelectionColorChanged()
 
         emit newAverageActivationMap(m_qMapAverageActivation);
     }
+
+    saveSettings(m_sSettingsPath);
 }
