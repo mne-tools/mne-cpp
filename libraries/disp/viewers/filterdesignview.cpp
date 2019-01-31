@@ -163,7 +163,6 @@ void FilterDesignView::setWindowSize(int iWindowSize)
 
 void FilterDesignView::setMaxFilterTaps(int iMaxNumberFilterTaps)
 {
-    qDebug() << "FilterDesignView::setMaxFilterTaps - iMaxNumberFilterTaps +++++++++++++++++++++++++++" << iMaxNumberFilterTaps;
     if(iMaxNumberFilterTaps%2 != 0) {
         iMaxNumberFilterTaps--;
     }
@@ -206,14 +205,9 @@ void FilterDesignView::setFilterParameters(double hp,
                                            double transition,
                                            const QString &sChannelType)
 {
-
-    qDebug() << "FilterDesignView::setFilterParameters - order +++++++++++++++++++++++++++" << order;
-
     ui->m_doubleSpinBox_highpass->setValue(lp);
     ui->m_doubleSpinBox_lowpass->setValue(hp);
     ui->m_spinBox_filterTaps->setValue(order);
-
-    qDebug() << "FilterDesignView::setFilterParameters - ui->m_spinBox_filterTaps->value() +++++++++++++++++++++++++++" << ui->m_spinBox_filterTaps->value();
 
     if(type == 0) {
         ui->m_comboBox_filterType->setCurrentText("Lowpass");

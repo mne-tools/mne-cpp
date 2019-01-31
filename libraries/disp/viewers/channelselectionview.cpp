@@ -167,7 +167,6 @@ void ChannelSelectionView::initComboBoxes()
         << "Vectorview-all.lout"
         << "Vectorview-mag.lout"
         << "standard_waveguard64_duke.lout"
-
 //     << "CTF-275.lout"
 //     << "magnesWH3600.lout"
     );
@@ -754,8 +753,6 @@ void ChannelSelectionView::onComboBoxLayoutChanged()
     QString selectionName(ui->m_comboBox_layoutFile->currentText());
     loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/2DLayouts/"));
     updateBadChannels();
-
-    saveSettings(m_sSettingsPath);
 }
 
 
