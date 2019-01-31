@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
 
     //Store application info to use QSettings
     QCoreApplication::setOrganizationName("MNE-CPP");
-    QCoreApplication::setOrganizationDomain("www.tu-ilmenau.de/mne-cpp");
+    QCoreApplication::setOrganizationDomain("www.mne-cpp.org");
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
 
     SCMEASLIB::MeasurementTypes::registerTypes();

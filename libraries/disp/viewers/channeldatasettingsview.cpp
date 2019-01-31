@@ -50,6 +50,7 @@
 
 #include <QColorDialog>
 #include <QSettings>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -191,8 +192,6 @@ int ChannelDataSettingsView::getDistanceTimeSpacer()
 void ChannelDataSettingsView::setDistanceTimeSpacer(int value)
 {
     ui->m_comboBox_distaceTimeSpacer->setCurrentText(QString::number(value));
-
-    saveSettings(m_sSettingsPath);
 }
 
 
@@ -203,8 +202,6 @@ void ChannelDataSettingsView::setBackgroundColor(const QColor& backgroundColor)
     ui->m_pushButton_backgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
 
     m_colCurrentBackgroundColor = backgroundColor;
-
-    saveSettings(m_sSettingsPath);
 }
 
 
@@ -215,8 +212,6 @@ void ChannelDataSettingsView::setSignalColor(const QColor& signalColor)
     ui->m_pushButton_signalColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(signalColor.red()).arg(signalColor.green()).arg(signalColor.blue()));
 
     m_colCurrentSignalColor = signalColor;
-
-    saveSettings(m_sSettingsPath);
 }
 
 
@@ -283,7 +278,7 @@ void ChannelDataSettingsView::loadSettings(const QString& settingsPath)
     setWindowSize(settings.value(settingsPath + QString("/viewWindowSize"), 10).toInt());
     QColor color = Qt::blue;
     setSignalColor(settings.value(settingsPath + QString("/signalColor"), color).value<QColor>());
-    color = Qt::black;
+    color = Qt::white;
     setBackgroundColor(settings.value(settingsPath + QString("/backgroundColor"), color).value<QColor>());
     setDistanceTimeSpacer(settings.value(settingsPath + QString("/distanceTimeSpacer"), 1000).toInt());
 }

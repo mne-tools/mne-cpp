@@ -520,7 +520,7 @@ public:
     * @param[in] info           The measurement info block of the source file
     * @param[out] cals          A copy of the calibration values
     * @param[in] sel            Which channels will be included in the output file (optional)
-    * @param[in] bResetRange    Flag whether to reset the range to 1.0. Default is true.
+    * @param[in] bResetRange    Flag whether to reset the channel range to 1.0. Default is true.
     *
     * @return the started fiff file
     */
