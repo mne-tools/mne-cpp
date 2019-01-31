@@ -581,6 +581,8 @@ void FilterDesignView::filterParametersChanged()
 
     //update filter plot
     updateFilterPlot();
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -589,6 +591,8 @@ void FilterDesignView::filterParametersChanged()
 void FilterDesignView::onSpinBoxFilterChannelType(const QString& channelType)
 {
     emit filterChannelTypeChanged(channelType);
+
+    saveSettings(m_sSettingsPath);
 }
 
 

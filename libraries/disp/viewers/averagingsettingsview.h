@@ -158,7 +158,8 @@ protected:
     void onChangePostStim();
     void onChangeBaselineFrom();
     void onChangeBaselineTo();
-    void onChangeNumAverages();
+    void onChangeNumAverages();    
+    void onChangeStimChannel();
 
     Ui::AverageSettingsViewWidget* ui;              /**< Holds the user interface for the AverageSettingsViewWidget.*/
 

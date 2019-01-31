@@ -440,7 +440,7 @@ void ChannelSelectionView::saveSettings(const QString& settingsPath)
     QSettings settings;
 
     settings.setValue(settingsPath + QString("/selectedLayoutFile"), getCurrentLayoutFile());
-    settings.setValue(settingsPath + QString("/ChannelSelectionViewPos"), this->pos());
+    settings.setValue(settingsPath + QString("/channelSelectionViewPos"), this->pos());
 }
 
 
@@ -456,7 +456,7 @@ void ChannelSelectionView::loadSettings(const QString& settingsPath)
 
     setCurrentLayoutFile(settings.value(settingsPath + QString("/selectedLayoutFile"), "babymeg-mag-inner-layer.lout").toString());
 
-    QPoint pos = settings.value(settingsPath + QString("/ChannelSelectionViewPos"), QPoint(100,100)).toPoint();
+    QPoint pos = settings.value(settingsPath + QString("/channelSelectionViewPos"), QPoint(100,100)).toPoint();
 
     QRect screenRect = QApplication::desktop()->screenGeometry();
     if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
@@ -754,6 +754,8 @@ void ChannelSelectionView::onComboBoxLayoutChanged()
     QString selectionName(ui->m_comboBox_layoutFile->currentText());
     loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/2DLayouts/"));
     updateBadChannels();
+
+    saveSettings(m_sSettingsPath);
 }
 
 

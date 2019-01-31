@@ -348,4 +348,6 @@ void ArtifactSettingsView::onChangeArtifactThreshold()
     }
 
     emit changeArtifactThreshold(m_mapThresholds);
+
+    saveSettings(m_sSettingsPath);
 }

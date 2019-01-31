@@ -88,7 +88,6 @@ AverageLayoutView::AverageLayoutView(QWidget *parent,
 
 #if defined(USE_OPENGL)
     m_pAverageLayoutView->setViewport(new QOpenGLWidget);
-    qDebug() << "USING OPEN GL ++++++++++++++++++++++++++++++++++++++++++++++++++++";
 #endif
 
     m_pAverageLayoutView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

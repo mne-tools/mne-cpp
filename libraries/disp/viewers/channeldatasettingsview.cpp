@@ -191,6 +191,8 @@ int ChannelDataSettingsView::getDistanceTimeSpacer()
 void ChannelDataSettingsView::setDistanceTimeSpacer(int value)
 {
     ui->m_comboBox_distaceTimeSpacer->setCurrentText(QString::number(value));
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -201,6 +203,8 @@ void ChannelDataSettingsView::setBackgroundColor(const QColor& backgroundColor)
     ui->m_pushButton_backgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
 
     m_colCurrentBackgroundColor = backgroundColor;
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -211,6 +215,8 @@ void ChannelDataSettingsView::setSignalColor(const QColor& signalColor)
     ui->m_pushButton_signalColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(signalColor.red()).arg(signalColor.green()).arg(signalColor.blue()));
 
     m_colCurrentSignalColor = signalColor;
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -306,6 +312,8 @@ void ChannelDataSettingsView::onDistanceTimeSpacerChanged(qint32 value)
     }
 
     //emit updateConnectedView();
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -341,6 +349,8 @@ void ChannelDataSettingsView::onViewColorButtonClicked()
 
         emit backgroundColorChanged(m_colCurrentBackgroundColor);
     }
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -349,6 +359,8 @@ void ChannelDataSettingsView::onViewColorButtonClicked()
 void ChannelDataSettingsView::onTimeWindowChanged(int value)
 {
     emit timeWindowChanged(value);
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -357,6 +369,8 @@ void ChannelDataSettingsView::onTimeWindowChanged(int value)
 void ChannelDataSettingsView::onZoomChanged(double value)
 {
     emit zoomChanged(value);
+
+    saveSettings(m_sSettingsPath);
 }
 
 
