@@ -484,6 +484,8 @@ void ScalingView::onUpdateSpinBoxScaling(double value)
     }
 
     emit scalingChanged(m_qMapChScaling);
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -548,4 +550,6 @@ void ScalingView::onUpdateSliderScaling(int value)
     }
 
     emit scalingChanged(m_qMapChScaling);
+
+    saveSettings(m_sSettingsPath);
 }

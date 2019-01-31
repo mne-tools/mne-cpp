@@ -45,12 +45,15 @@
 
 #include "../disp_global.h"
 
+#include <fiff/fiff_ch_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QPointer>
 #include <QWidget>
 #include <QMap>
 
@@ -66,6 +69,7 @@ namespace Ui {
 
 namespace FIFFLIB {
     class FiffEvokedSet;
+    class FiffChInfo;
 }
 
 
@@ -98,7 +102,7 @@ public:
     typedef QSharedPointer<AveragingSettingsView> ConstSPtr;    /**< Const shared pointer type for AveragingAdjustmentWidget. */
 
     explicit AveragingSettingsView(const QString& sSettingsPath = "",
-                                   const QMap<QString, int> &mapStimChsIndexNames = QMap<QString, int>(),
+                                   const QMap<QString, int>& mapStimChsIndexNames = QMap<QString, int>(),
                                    QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
@@ -110,12 +114,6 @@ public:
     void setStimChannels(const QMap<QString, int> &mapStimChsIndexNames);
 
     QString getCurrentStimCh();
-
-    double getThresholdFirst();
-
-    int getThresholdSecond();
-
-    bool getDoArtifactThresholdRejection();
 
     bool getDoBaselineCorrection();
 
@@ -160,11 +158,10 @@ protected:
     void onChangePostStim();
     void onChangeBaselineFrom();
     void onChangeBaselineTo();
-    void onChangeArtifactThreshold();
-    void onChangeArtifactVariance();
-    void onChangeNumAverages();
+    void onChangeNumAverages();    
+    void onChangeStimChannel();
 
-    Ui::AverageSettingsViewWidget* ui;		/**< Holds the user interface for the AverageSettingsViewWidget.*/
+    Ui::AverageSettingsViewWidget* ui;              /**< Holds the user interface for the AverageSettingsViewWidget.*/
 
     QString             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
     QString             m_sCurrentStimChan;
@@ -176,22 +173,13 @@ protected:
     int                 m_iPostStimSeconds;
     int                 m_iBaselineFromSeconds;
     int                 m_iBaselineToSeconds;
-    int                 m_iArtifactThresholdSecond;
-
-    bool                m_bDoArtifactThresholdReduction;
-    bool                m_bDoArtifactVarianceReduction;
     bool                m_bDoBaselineCorrection;
-
-    double              m_dArtifactThresholdFirst;
-    double              m_dArtifactVariance;
 
 signals:
     void changePreStim(qint32 value);
     void changePostStim(qint32 value);
     void changeBaselineFrom(qint32 value);
     void changeBaselineTo(qint32 value);
-    void changeArtifactThreshold(bool bActivate, qint32 first, qint32 second);
-    void changeArtifactVariance(bool bActivate, qint32 first);
     void changeNumAverages(qint32 value);
     void changeStimChannel(const QString& sStimName);
     void changeBaselineActive(bool state);

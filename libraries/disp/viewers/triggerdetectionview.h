@@ -165,33 +165,15 @@ protected:
 
     //=========================================================================================================
     /**
-    * Slot called when trigger detection check box was toggled
-    */
-    void onRealTimeTriggerActiveChanged(int state);
-
-    //=========================================================================================================
-    /**
     * Slot called when trigger detection color button was clicked
     */
     void onRealTimeTriggerColorChanged(bool state);
 
     //=========================================================================================================
     /**
-    * Slot called when trigger detection threshold was changed
-    */
-    void onRealTimeTriggerThresholdChanged(double value);
-
-    //=========================================================================================================
-    /**
     * Slot called when trigger type changed
     */
     void onRealTimeTriggerColorTypeChanged(const QString& value);
-
-    //=========================================================================================================
-    /**
-    * Slot called when trigger channel selection changed
-    */
-    void onRealTimeTriggerCurrentChChanged(const QString &value);
 
     //=========================================================================================================
     /**

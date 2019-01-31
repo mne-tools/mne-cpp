@@ -78,6 +78,7 @@ namespace RTPROCESSINGLIB{
 
 namespace DISPLIB{
     class AveragingSettingsView;
+    class ArtifactSettingsView;
 }
 
 
@@ -179,13 +180,9 @@ public:
     /**
     * Change the threshold value for trial rejection
     *
-    * @param[in] bDoArtifactReduction       whether to perform artifact reduction
-    * @param[in] thresholdFirst             the new first component of the the rejection threshold value
-    * @param[in] thresholdSecond            the new second component (e-...) of the the rejection threshold value
+    * @param[in] mapThresholds       The new map including the current thresholds for the channels
     */
-    void onChangeArtifactThreshold(bool bDoArtifactThresholdReduction,
-                                   double thresholdFirst,
-                                   int thresholdSecond);
+    void onChangeArtifactThreshold(const QMap<QString, double> &mapThresholds);
 
     //=========================================================================================================
     /**
@@ -247,6 +244,7 @@ private:
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;
 
     QSharedPointer<DISPLIB::AveragingSettingsView>  m_pAveragingSettingsView;           /**< Holds averaging settings widget.*/
+    QSharedPointer<DISPLIB::ArtifactSettingsView>   m_pArtifactSettingsView;            /**< Holds artifact settings widget.*/
 
     QVector<FIFFLIB::FiffEvokedSet>                 m_qVecEvokedData;                   /**< Evoked data set. */
 
