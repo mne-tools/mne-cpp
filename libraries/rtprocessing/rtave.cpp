@@ -95,14 +95,13 @@ RtAveWorker::RtAveWorker(quint32 numAverages,
 , m_pFiffInfo(pFiffInfo)
 , m_fTriggerThreshold(0.5)
 , m_iTriggerChIndex(-1)
-, m_dValueVariance(0.5)
-, m_dValueThreshold(300e-6)
 , m_iNewTriggerIndex(iTriggerIndex)
 , m_bDoBaselineCorrection(false)
 , m_pairBaselineSec(qMakePair(QVariant(QString::number(iBaselineFromSecs)),QVariant(QString::number(iBaselineToSecs))))
 , m_bActivateThreshold(false)
-, m_bActivateVariance(false)
 {
+    m_mapThresholds["EOG"] = 300e-6;
+
     m_stimEvokedSet.info = *m_pFiffInfo.data();
 
     m_iNewPreStimSamples = m_iPreStimSamples;
@@ -197,13 +196,15 @@ void RtAveWorker::setTriggerChIndx(qint32 idx)
 
 //*************************************************************************************************************
 
-void RtAveWorker::setArtifactReduction(bool bActivateThreshold, double dValueThreshold, bool bActivateVariance, double dValueVariance)
+void RtAveWorker::setArtifactReduction(const QMap<QString, double> &mapThresholds)
 {
-    m_dValueVariance = dValueVariance;
-    m_dValueThreshold = dValueThreshold;
+    if(mapThresholds["Active"] == 0.0) {
+        m_bActivateThreshold = false;
+    } else {
+        m_bActivateThreshold = true;
+    }
 
-    m_bActivateThreshold = bActivateThreshold;
-    m_bActivateVariance = bActivateVariance;
+    m_mapThresholds = mapThresholds;
 }
 
 
@@ -454,23 +455,27 @@ void RtAveWorker::mergeData(double dTriggerType)
     mergedData << m_mapDataPre[dTriggerType], m_mapDataPost[dTriggerType];
 
     //Perform artifact threshold
-    bool bArtifactedDetected = false;
+    bool bArtifactDetected = false;
 
     if(m_bActivateThreshold) {
-        bArtifactedDetected = MNEEpochDataList::checkForArtifact(mergedData,
-                                                                 *m_pFiffInfo,
-                                                                 m_dValueThreshold,
-                                                                 "threshold");
+        QMapIterator<QString,double> i(m_mapThresholds);
+
+        qDebug() << "Doing artifact reduction for" << m_mapThresholds;
+
+        while (i.hasNext()) {
+            i.next();
+            bArtifactDetected = MNEEpochDataList::checkForArtifact(mergedData,
+                                                                   *m_pFiffInfo,
+                                                                   i.value(),
+                                                                   "threshold",
+                                                                   i.key());
+            if(bArtifactDetected) {
+                break;
+            }
+        }
     }
 
-    if(m_bActivateVariance) {
-        bArtifactedDetected = MNEEpochDataList::checkForArtifact(mergedData,
-                                                                 *m_pFiffInfo,
-                                                                 m_dValueVariance,
-                                                                 "variance");
-    }
-
-    if(bArtifactedDetected == false) {
+    if(!bArtifactDetected) {
         //Add cut data to average buffer
         m_mapStimAve[dTriggerType].append(mergedData);
 
@@ -761,15 +766,9 @@ void RtAve::setTriggerChIndx(qint32 idx)
 
 //*************************************************************************************************************
 
-void RtAve::setArtifactReduction(bool bActivateThreshold,
-                                 double dValueThreshold,
-                                 bool bActivateVariance,
-                                 double dValueVariance)
+void RtAve::setArtifactReduction(const QMap<QString,double>& mapThresholds)
 {
-    emit averageArtifactReductionChanged(bActivateThreshold,
-                                         dValueThreshold,
-                                         bActivateVariance,
-                                         dValueVariance);
+    emit averageArtifactReductionChanged(mapThresholds);
 }
 
 

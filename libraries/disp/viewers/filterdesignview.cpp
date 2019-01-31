@@ -123,8 +123,6 @@ void FilterDesignView::init(double dSFreq)
 {
     setSamplingRate(dSFreq);
 
-    filterParametersChanged();
-
     //Update min max of spin boxes to nyquist
     double samplingFrequency = m_dSFreq;
     double nyquistFrequency = samplingFrequency/2;
@@ -139,6 +137,8 @@ void FilterDesignView::init(double dSFreq)
     if(ui->m_doubleSpinBox_lowpass->value()>m_dSFreq/2) {
         ui->m_doubleSpinBox_lowpass->setValue(m_dSFreq/2);
     }
+
+    filterParametersChanged();
 
     updateFilterPlot();
 }
@@ -155,8 +155,7 @@ void FilterDesignView::setWindowSize(int iWindowSize)
         m_iWindowSize--;
     }
 
-
-    ui->m_spinBox_filterTaps->setValue(m_iWindowSize);
+    //ui->m_spinBox_filterTaps->setValue(m_iWindowSize);
 }
 
 
@@ -193,20 +192,18 @@ void FilterDesignView::setSamplingRate(double dSamplingRate)
     if(ui->m_doubleSpinBox_lowpass->value()>m_dSFreq/2) {
         ui->m_doubleSpinBox_lowpass->setValue(m_dSFreq/2);
     }
-
-    filterParametersChanged();
 }
 
 
 //*************************************************************************************************************
 
 void FilterDesignView::setFilterParameters(double hp,
-                                     double lp,
-                                     int order,
-                                     int type,
-                                     int designMethod,
-                                     double transition,
-                                     const QString &sChannelType)
+                                           double lp,
+                                           int order,
+                                           int type,
+                                           int designMethod,
+                                           double transition,
+                                           const QString &sChannelType)
 {
     ui->m_doubleSpinBox_highpass->setValue(lp);
     ui->m_doubleSpinBox_lowpass->setValue(hp);

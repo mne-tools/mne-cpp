@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
         if(sChType.contains("EEG", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(false,true,false,QStringList(),exclude);
         } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
-            // Only pick every second gradiometer. If it is a bad channel try the second one in the triplet. Works only for Neuromag data
+            // Only pick every second gradiometer which are not marked as bad.
             RowVectorXi picksTmp = raw.info.pick_types(QString("grad"),false,false);
             picks.resize(0);
 
@@ -258,9 +258,6 @@ int main(int argc, char *argv[])
                 if(!raw.info.bads.contains(raw.info.ch_names.at(picksTmp(i)))) {
                     picks.conservativeResize(picks.cols()+1);
                     picks(picks.cols()-1) = picksTmp(i);
-                } else if(!raw.info.bads.contains(raw.info.ch_names.at(picksTmp(i+1)))) {
-                    picks.conservativeResize(picks.cols()+1);
-                    picks(picks.cols()-1) = picksTmp(i+1);
                 }
             }
         } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
