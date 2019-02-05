@@ -515,6 +515,8 @@ void MNE::onMethodChanged(const QString& method)
 {
     m_sMethod = method;
 
+    QMutexLocker locker(&m_qMutex);
+
     if(m_pMinimumNorm) {
         double snr = 3.0;
         double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
@@ -627,6 +629,7 @@ void MNE::run()
                 rawSegment = m_pMatrixDataBuffer->pop();
 
                 //Pick the same channels as in the inverse operator
+                m_qMutex.lock();
                 data.resize(m_invOp.noise_cov->names.size(), rawSegment.cols());
 
                 for(j = 0; j < m_invOp.noise_cov->names.size(); ++j) {
@@ -637,7 +640,6 @@ void MNE::run()
                 tstep = 1.0f / m_pFiffInfoInput->sfreq;
 
                 //TODO: Add picking here. See evoked part as input.
-                m_qMutex.lock();
                 sourceEstimate = m_pMinimumNorm->calculateInverse(data,
                                                                   tmin,
                                                                   tstep);
@@ -648,9 +650,7 @@ void MNE::run()
                     m_pRTSEOutput->data()->setValue(sourceEstimate);
                 }
             } else {
-                m_qMutex.lock();
                 m_pMatrixDataBuffer->pop();
-                m_qMutex.unlock();
             }
 
             ++skip_count;
