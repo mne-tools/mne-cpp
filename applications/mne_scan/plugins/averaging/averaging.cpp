@@ -227,7 +227,7 @@ void Averaging::init()
 
     // Output
     m_pAveragingOutput = PluginOutputData<RealTimeEvokedSet>::create(this, "AveragingOut", "Averaging Output Data");
-    m_pAveragingOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+    m_pAveragingOutput->data()->setName(QString("Plugin/%1").arg(this->getName()));//Provide name to auto store widget settings
     m_outputConnectors.append(m_pAveragingOutput);
 
     //Add control widgets to output data (will be used by QuickControlView by the measurements display)

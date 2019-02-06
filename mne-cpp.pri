@@ -131,7 +131,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To build MNE-CPP Disp library and MNE Browse with OpenGL support (default is with OpenGL support): qmake MNECPP_CONFIG+=dispOpenGL
 
 # Default flags
-MNECPP_CONFIG += dispOpenGL
+MNECPP_CONFIG += dispOpenGL useFFTW
 
 #Build minimalVersion for qt versions < 5.10.0
 !minQtVersion(5, 10, 0) {
@@ -217,5 +217,5 @@ isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
 }
 
 # FFTW dir
-FFTW_DIR_LIBS = $$shell_path(K:\fftw-3.3.5-dll64)
-FFTW_DIR_INCLUDE = $$shell_path(K:\fftw-3.3.5-dll64)
+FFTW_DIR_LIBS = $$shell_path(C:\fftw-3.3.5-dll64)
+FFTW_DIR_INCLUDE = $$shell_path(C:\fftw-3.3.5-dll64)

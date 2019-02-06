@@ -288,12 +288,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the frequency bins to average from/to.
+    * Sets the frequency range to average from/to.
     *
     * @param[in] fLowerFreq        The new lower frequency edge to average from.
     * @param[in] fUpperFreq        The new upper frequency edge to average to.
     */
-    void setFrequencyBins(float fLowerFreq, float fUpperFreq);
+    void setFrequencyRange(float fLowerFreq, float fUpperFreq);
 
     //=========================================================================================================
     /**
@@ -301,7 +301,7 @@ public:
     *
     * @return The current upper/lower frequency edge to average from/to.
     */
-    const QPair<float,float>& getFrequencyBins() const;
+    const QPair<float,float>& getFrequencyRange() const;
 
     //=========================================================================================================
     /**
