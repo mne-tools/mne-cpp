@@ -60,6 +60,7 @@ contains(MNECPP_CONFIG, buildBasicMneScanVersion) {
         # brainamp \
         # tmsi \
         natus \
+        lsladapter \
 
     #Algorithms
     SUBDIRS += \
