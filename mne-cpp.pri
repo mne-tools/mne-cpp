@@ -131,7 +131,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To build MNE-CPP Disp library and MNE Browse with OpenGL support (default is with OpenGL support): qmake MNECPP_CONFIG+=dispOpenGL
 
 # Default flags
-MNECPP_CONFIG += dispOpenGL useFFTW
+MNECPP_CONFIG += dispOpenGL
 
 #Build minimalVersion for qt versions < 5.10.0
 !minQtVersion(5, 10, 0) {
