@@ -155,7 +155,7 @@ bool LSLAdapter::stop()
 
 QWidget* LSLAdapter::setupWidget()
 {
-    // apparently the widget may get deletly during runtime,
+    // apparently the widget may get deleted during runtime,
     // so we have to return a new one everytime this method is called
     LSLAdapterSetup* temp = new LSLAdapterSetup();
     connect(temp, &LSLAdapterSetup::startStream, this, &LSLAdapter::onStartStream);
@@ -186,22 +186,22 @@ void LSLAdapter::run()
 
 void LSLAdapter::onStartStream(const QListWidgetItem* pItem)
 {
-        // start producer, catch a few basic faulty conditions first
-        if (m_pProducerThread.isRunning())
-        {
-            qDebug() << "[LSLAdapter::onStartStream] Producer thread still / already running";
-            return;
-        }
-        if (m_mAvailableStreams.contains(pItem) == false) {
-            qDebug() << "[LSLAdapter::onStartStream] There seems to be an inconsistency between the UI and the network...";
-            return;
-        }
-        // extract stream that corresponds to chosen item and pass it to the producer
-        lsl::stream_info stream = m_mAvailableStreams.value(pItem);
-        m_pProducer->reset();
-        m_pProducer->setStreamInfo(stream);
-        // start background thread
-        m_pProducerThread.start();
+    // start producer, catch a few basic faulty conditions first
+    if (m_pProducerThread.isRunning())
+    {
+        qDebug() << "[LSLAdapter::onStartStream] Producer thread still / already running";
+        return;
+    }
+    if (m_mAvailableStreams.contains(pItem) == false) {
+        qDebug() << "[LSLAdapter::onStartStream] There seems to be an inconsistency between the UI and the network...";
+        return;
+    }
+    // extract stream that corresponds to chosen item and pass it to the producer
+    lsl::stream_info stream = m_mAvailableStreams.value(pItem);
+    m_pProducer->reset();
+    m_pProducer->setStreamInfo(stream);
+    // start background thread
+    m_pProducerThread.start();
 }
 
 
