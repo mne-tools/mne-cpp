@@ -351,8 +351,8 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData,
     if(!tNetworkData.getNodes().isEmpty()) {
         NetworkTreeItem* pReturnItem = Q_NULLPTR;
 
-        QPair<int,int> bins = tNetworkData.getFrequencyBins();
-        QString sItemName = QString("%1_%2_%3").arg(tNetworkData.getConnectivityMethod()).arg(QString::number(bins.first)).arg(QString::number(bins.second));
+        QPair<float,float> freqs = tNetworkData.getFrequencyRange();
+        QString sItemName = QString("%1_%2_%3").arg(tNetworkData.getConnectivityMethod()).arg(QString::number(freqs.first)).arg(QString::number(freqs.second));
 
         //Add network estimation data as child
         QList<QStandardItem*> lItems = this->findChildren(sItemName);

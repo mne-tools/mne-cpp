@@ -357,7 +357,7 @@ int main(int argc, char *argv[])
     mColor.insert("DSWPLI",Vector4i(25, 10, 255, 1));
 
     for(int j = 0; j < lNetworks.size(); ++j) {
-        lNetworks[j].setFrequencyBins(7.0f, 13.0f);
+        lNetworks[j].setFrequencyRange(7.0f, 13.0f);
         lNetworks[j].normalize();
         VisualizationInfo visInfo = lNetworks.at(j).getVisualizationInfo();
         visInfo.sMethod = "Color";
