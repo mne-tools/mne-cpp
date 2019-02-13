@@ -44,7 +44,7 @@ DEFINES += LSLADAPTER_LIBRARY
 QT += core widgets
 QT += network
 
-TARGET = lsl
+TARGET = lsladapter
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
