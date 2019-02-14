@@ -90,7 +90,11 @@ class ChannelInfoModel;
 * @brief The ButterflyView class provides a butterfly view.
 */
 #if defined(USE_OPENGL)
-    class DISPSHARED_EXPORT ButterflyView : public QOpenGLWidget
+    #if !defined(ON_MAC)
+        class DISPSHARED_EXPORT ButterflyView : public QOpenGLWidget
+    #else
+        class DISPSHARED_EXPORT ButterflyView : public QWidget
+    #endif
 #else
     class DISPSHARED_EXPORT ButterflyView : public QWidget
 #endif
@@ -241,7 +245,11 @@ protected:
     * @param [in] event pointer to PaintEvent -> not used.
     */
 #if defined(USE_OPENGL)
-    virtual void paintGL();
+    #if !defined(ON_MAC)
+        virtual void paintGL();
+    #else
+        virtual void paintEvent(QPaintEvent *event);
+    #endif
 #else
     virtual void paintEvent(QPaintEvent *event);
 #endif

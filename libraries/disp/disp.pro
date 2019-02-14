@@ -49,6 +49,11 @@ contains(MNECPP_CONFIG, dispOpenGL) {
     DEFINES += USE_OPENGL
 }
 
+macx {
+    # On MacOS
+    DEFINES += ON_MAC
+}
+
 TARGET = Disp
 TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
