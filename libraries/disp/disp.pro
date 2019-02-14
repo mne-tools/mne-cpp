@@ -40,18 +40,13 @@ TEMPLATE = lib
 QT  += core widgets svg concurrent
 
 qtHaveModule(printsupport): QT += printsupport
-qtHaveModule(opengl): QT += opengl
 qtHaveModule(charts): QT += charts
 
 DEFINES += DISP_LIBRARY
 
 contains(MNECPP_CONFIG, dispOpenGL) {
+    qtHaveModule(opengl): QT += opengl
     DEFINES += USE_OPENGL
-}
-
-macx {
-    # On MacOS
-    DEFINES += ON_MAC
 }
 
 TARGET = Disp

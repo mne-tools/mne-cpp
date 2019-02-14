@@ -358,6 +358,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the background color
+    *
+    * @param[in] color    The background color
+    */
+    void setBackgroundColor(const QColor& color);
+
+    //=========================================================================================================
+    /**
     * Sets the type of channel which are to be filtered
     *
     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
@@ -606,6 +614,8 @@ private:
     QStringList                         m_filterChannelList;                        /**< List of channels which are to be filtered.*/
     QStringList                         m_visibleChannelList;                       /**< List of currently visible channels in the view.*/
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;                      /**< Selection mapping.*/
+
+    QColor                              m_colBackground;                            /**< The background color.*/
 
 signals:
     //=========================================================================================================
