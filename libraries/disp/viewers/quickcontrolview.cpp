@@ -84,10 +84,7 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
     connect(ui->m_horizontalSlider_opacity, &QSlider::valueChanged,
             this, &QuickControlView::onOpacityChange);
 
-    //Init and connect hide all group (minimize) button
-    connect(ui->m_pushButton_hideAll, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &QuickControlView::onToggleHideAll);
-
+    //Init and connect close button
     connect(ui->m_pushButton_close, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             this, &QuickControlView::hide);
 
@@ -238,7 +235,6 @@ int QuickControlView::getOpacityValue()
 void QuickControlView::setVisiblityHideOpacityClose(bool bVisibility)
 {
     ui->m_pushButton_close->setVisible(bVisibility);
-    ui->m_pushButton_hideAll->setVisible(bVisibility);
     ui->m_horizontalSlider_opacity->setVisible(bVisibility);
     ui->m_label_opacity->setVisible(bVisibility);
 }
@@ -292,14 +288,3 @@ void QuickControlView::onOpacityChange(qint32 value)
         this->setWindowOpacity(1/(100.0/value));
     }
 }
-
-
-//*************************************************************************************************************
-
-void QuickControlView::onToggleHideAll(bool state)
-{
-    ui->m_widget_groupBoxes->setVisible(state);
-    ui->m_widget_opacity->setVisible(state);
-    this->adjustSize();
-}
-
