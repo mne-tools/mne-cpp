@@ -42,8 +42,6 @@
 #include "lsladapterproducer.h"
 #include "FormFiles/lsladaptersetup.h"
 
-#include <sstream>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,6 +49,7 @@
 //=============================================================================================================
 
 #include <QListWidgetItem>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -76,7 +75,8 @@ using namespace SCMEASLIB;
 
 LSLAdapter::LSLAdapter()
     : ISensor()
-    , m_mAvailableStreams()
+    , m_updateStreamsFutureWatcher()
+    , m_vAvailableStreams()
     , m_pProducerThread()
     , m_pProducer(new LSLAdapterProducer())
 {
@@ -94,6 +94,12 @@ LSLAdapter::LSLAdapter()
             &QThread::finished,
             this,
             &LSLAdapter::onProducerThreadFinished);
+
+    // connect finished signal for background lsl stream scanning
+    connect(&m_updateStreamsFutureWatcher,
+            &QFutureWatcher<QVector<lsl::stream_info>>::finished,
+            this,
+            &LSLAdapter::onLSLStreamScanReady);
 }
 
 
@@ -160,15 +166,18 @@ QWidget* LSLAdapter::setupWidget()
     LSLAdapterSetup* temp = new LSLAdapterSetup();
     connect(temp, &LSLAdapterSetup::startStream, this, &LSLAdapter::onStartStream);
     connect(temp, &LSLAdapterSetup::stopStream, this, &LSLAdapter::onStopStream);
+    connect(temp, &LSLAdapterSetup::refreshAvailableStreams, this, &LSLAdapter::onRefreshAvailableStreams);
+    connect(this, &LSLAdapter::updatedAvailableLSLStreams, temp, &LSLAdapterSetup::onLSLScanResults);
 
-    // we have to refill the structure that links UI items to stream infos:
-    m_mAvailableStreams.clear();
-    for (const auto & streamInfo : getAvailableLSLStreams()) {
-        std::stringstream buildString;
-        buildString << streamInfo.name() << ", " << streamInfo.type() << ", " << streamInfo.hostname();
-        QListWidgetItem* pAdded = temp->addStream(QString(buildString.str().c_str()));
-        m_mAvailableStreams.insert(pAdded, streamInfo);
+    // check if we have some information about previously available lsl streams:
+    if(m_vAvailableStreams.isEmpty() == false) {
+        // let the widget display potentially outdated info, until the background thread for stream scanning will return
+        temp->onLSLScanResults(m_vAvailableStreams);
     }
+
+    // lsl stream scanning is time consuming, run in background:
+    QFuture<QVector<lsl::stream_info>> future = QtConcurrent::run(scanAvailableLSLStreams);
+    m_updateStreamsFutureWatcher.setFuture(future);
 
     return temp;
 }
@@ -184,7 +193,19 @@ void LSLAdapter::run()
 
 //*************************************************************************************************************
 
-void LSLAdapter::onStartStream(const QListWidgetItem* pItem)
+void LSLAdapter::onRefreshAvailableStreams()
+{
+    // lsl stream scanning is time consuming, run in background:
+    if (m_updateStreamsFutureWatcher.isRunning() == false) {
+        QFuture<QVector<lsl::stream_info>> future = QtConcurrent::run(scanAvailableLSLStreams);
+        m_updateStreamsFutureWatcher.setFuture(future);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void LSLAdapter::onStartStream(const lsl::stream_info& stream)
 {
     // start producer, catch a few basic faulty conditions first
     if (m_pProducerThread.isRunning())
@@ -192,12 +213,7 @@ void LSLAdapter::onStartStream(const QListWidgetItem* pItem)
         qDebug() << "[LSLAdapter::onStartStream] Producer thread still / already running";
         return;
     }
-    if (m_mAvailableStreams.contains(pItem) == false) {
-        qDebug() << "[LSLAdapter::onStartStream] There seems to be an inconsistency between the UI and the network...";
-        return;
-    }
-    // extract stream that corresponds to chosen item and pass it to the producer
-    lsl::stream_info stream = m_mAvailableStreams.value(pItem);
+    // pass stream info to producer
     m_pProducer->reset();
     m_pProducer->setStreamInfo(stream);
     // start background thread
@@ -215,8 +231,8 @@ void LSLAdapter::onStopStream()
     m_pProducer->stop();
 }
 
-//*************************************************************************************************************
 
+//*************************************************************************************************************
 
 void LSLAdapter::onProducerThreadFinished()
 {
@@ -227,8 +243,21 @@ void LSLAdapter::onProducerThreadFinished()
 
 //*************************************************************************************************************
 
-QVector<lsl::stream_info> LSLAdapter::getAvailableLSLStreams()
+void LSLAdapter::onLSLStreamScanReady()
+{
+    // save available streams
+    m_vAvailableStreams = m_updateStreamsFutureWatcher.result();
+
+    // tell UI
+    emit updatedAvailableLSLStreams(m_vAvailableStreams);
+}
+
+
+//*************************************************************************************************************
+
+QVector<lsl::stream_info> LSLAdapter::scanAvailableLSLStreams()
 {
     // no filtering implemented so far, simply get all streams
-    return QVector<lsl::stream_info>::fromStdVector(lsl::resolve_streams());
+    QVector<lsl::stream_info> temp = QVector<lsl::stream_info>::fromStdVector(lsl::resolve_streams());
+    return temp;
 }

@@ -56,6 +56,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <QFutureWatcher>
 
 
 //*************************************************************************************************************
@@ -141,10 +142,16 @@ public slots:
 
     //=========================================================================================================
     /**
+    * This is called by the UI, whenever the user wants to manually refresh the list of available LSL streams.
+    */
+    void onRefreshAvailableStreams();
+
+    //=========================================================================================================
+    /**
     * This is called by the UI via a connect. It retrieves the LSL stream that corresponds to the passed
     * QListWidgetItem and starts the background thread.
     */
-    void onStartStream(const QListWidgetItem* pItem);
+    void onStartStream(const lsl::stream_info& stream);
 
     //=========================================================================================================
     /**
@@ -169,16 +176,33 @@ protected:
     */
     virtual void run();
 
+signals:
+
+    //=========================================================================================================
+    /**
+    * This is emitted in order to tell the UI that the list of available LSL streams has been updated.
+    */
+    void updatedAvailableLSLStreams(QVector<lsl::stream_info>& vStreamInfos);
+
+private slots:
+
+    //=========================================================================================================
+    /**
+    * This is called by the QFutureWatcher, indicating that the background scanning is complete.
+    */
+    void onLSLStreamScanReady();
+
 private:
 
     //=========================================================================================================
     /**
     * Helper function for getting a list of LSL streams that fulfill the current filtering settings.
     */
-    QVector<lsl::stream_info> getAvailableLSLStreams();
+    static QVector<lsl::stream_info> scanAvailableLSLStreams();
 
 
-    QMap<const QListWidgetItem*, lsl::stream_info>  m_mAvailableStreams;
+    QFutureWatcher<QVector<lsl::stream_info> >      m_updateStreamsFutureWatcher;
+    QVector<lsl::stream_info>                       m_vAvailableStreams;
     QThread                                         m_pProducerThread;
     LSLAdapterProducer*                             m_pProducer;
 

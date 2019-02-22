@@ -44,6 +44,8 @@
 
 #include "../ui_lsladaptersetup.h"
 
+#include <lsl_cpp.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -94,26 +96,33 @@ public:
     */
     ~LSLAdapterSetup() = default;
 
-
-    //=========================================================================================================
-    /**
-    * This is called by the LSLAdapter in order to add a stream description to the list in the UI
-    */
-    QListWidgetItem* addStream(const QString& sStreamDesc);
-
 signals:
 
     //=========================================================================================================
     /**
     * This tells the LSL Adapter that the user wants to connect to a certain stream.
     */
-    void startStream(QListWidgetItem* pItem);
+    void startStream(const lsl::stream_info& stream);
 
     //=========================================================================================================
     /**
     * This tells the LSL Adapter that the user wants to stop streaming, i.e. wants to disconnect from the stream.
     */
     void stopStream();
+
+    //=========================================================================================================
+    /**
+    * This tells the LSL Adapter that the user wants to refresh the displayed list of available LSL streams.
+    */
+    void refreshAvailableStreams();
+
+public slots:
+
+    //=========================================================================================================
+    /**
+    * This is called by the LSL Adapter, when it has finished scanning for available LSL streams.
+    */
+    void onLSLScanResults(QVector<lsl::stream_info> &vStreamInfos);
 
 private slots:
 
@@ -123,9 +132,13 @@ private slots:
 
     void on_stopStreaming_released();
 
+    void on_refreshAvailableStreams_released();
+
 private:
 
-    Ui::LSLSetupWidget      ui;
+    QMap<QListWidgetItem*, lsl::stream_info>    m_mItemToStreamInfo;
+
+    Ui::LSLSetupWidget                          ui;
 };
 
 } // NAMESPACE

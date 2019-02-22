@@ -123,10 +123,11 @@ void LSLAdapterProducer::readStream()
 
 //*************************************************************************************************************
 
-void LSLAdapterProducer::setStreamInfo(const lsl::stream_info &stream)
+void LSLAdapterProducer::setStreamInfo(const lsl::stream_info& stream)
 {
     m_StreamInfo = stream;
     m_bHasStreamInfo = true;
+    // @TODO parse fiff info from lsl stream info
 }
 
 

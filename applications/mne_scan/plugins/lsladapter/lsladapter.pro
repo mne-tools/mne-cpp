@@ -41,8 +41,7 @@ CONFIG += plugin
 
 DEFINES += LSLADAPTER_LIBRARY
 
-QT += core widgets
-QT += network
+QT += core widgets network concurrent
 
 TARGET = lsladapter
 CONFIG(debug, debug|release) {

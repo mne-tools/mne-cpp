@@ -31,6 +31,13 @@
     <widget class="QListWidget" name="listLSLStreams"/>
    </item>
    <item>
+    <widget class="QPushButton" name="refreshAvailableStreams">
+     <property name="text">
+      <string>Refresh available streams</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="connectToStream">
      <property name="text">
       <string>Connect to highlighted stream</string>
