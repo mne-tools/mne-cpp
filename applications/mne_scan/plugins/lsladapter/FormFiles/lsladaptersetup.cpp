@@ -41,6 +41,8 @@
 #include "lsladaptersetup.h"
 #include "../lsladapter.h"
 
+#include <sstream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -65,7 +67,9 @@ using namespace LSLADAPTERPLUGIN;
 //=============================================================================================================
 
 LSLAdapterSetup::LSLAdapterSetup(QWidget* parent)
-: QWidget(parent)
+    : QWidget(parent)
+    , m_mItemToStreamInfo()
+    , ui()
 {
     ui.setupUi(this);
 }
@@ -73,12 +77,23 @@ LSLAdapterSetup::LSLAdapterSetup(QWidget* parent)
 
 //*************************************************************************************************************
 
-QListWidgetItem* LSLAdapterSetup::addStream(const QString & sStreamDesc)
+void LSLAdapterSetup::onLSLScanResults(QVector<lsl::stream_info>& vStreamInfos)
 {
-    QListWidgetItem* pItem = new QListWidgetItem;
-    pItem->setText(sStreamDesc);
-    ui.listLSLStreams->addItem(pItem);
-    return pItem;
+    // clear UI list
+    ui.listLSLStreams->clear();
+
+    // clear mapping and create items
+    m_mItemToStreamInfo.clear();
+    for (lsl::stream_info streamInfo : vStreamInfos) {
+        std::stringstream buildString;
+        buildString << streamInfo.name() << ", " << streamInfo.type() << ", " << streamInfo.hostname();
+        QListWidgetItem* pItem = new QListWidgetItem;
+        pItem->setText(QString(buildString.str().c_str()));
+        ui.listLSLStreams->addItem(pItem);
+
+        // add to mapping
+        m_mItemToStreamInfo.insert(pItem, streamInfo);
+    }
 }
 
 
@@ -91,13 +106,26 @@ void LSLAdapterSetup::on_connectToStream_released()
         return;
     }
     QListWidgetItem* currentItem = ui.listLSLStreams->currentItem();
-    emit startStream(currentItem);
+
+    // get corresponding stream info by looking it up in the mapping
+    lsl::stream_info stream = m_mItemToStreamInfo.value(currentItem);
+    emit startStream(stream);
 }
 
 
 //*************************************************************************************************************
 
-void LSLADAPTERPLUGIN::LSLAdapterSetup::on_stopStreaming_released()
+void LSLAdapterSetup::on_stopStreaming_released()
 {
+    // simply pass on to LSL Adapter
     emit stopStream();
+}
+
+
+//*************************************************************************************************************
+
+void LSLAdapterSetup::on_refreshAvailableStreams_released()
+{
+    // simply pass on to LSL Adapter
+    emit refreshAvailableStreams();
 }
