@@ -116,27 +116,34 @@ signals:
     */
     void refreshAvailableStreams();
 
+    //=========================================================================================================
+    /**
+    * This tells the LSL Adapter that the user has changed the stream selection.
+    */
+    void streamSelectionChanged(const lsl::stream_info& stream);
+
 public slots:
 
     //=========================================================================================================
     /**
     * This is called by the LSL Adapter, when it has finished scanning for available LSL streams.
     */
-    void onLSLScanResults(QVector<lsl::stream_info> &vStreamInfos);
+    void onLSLScanResults(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
 
 private slots:
 
     // auto-generated slots:
 
-    void on_connectToStream_released();
-
-    void on_stopStreaming_released();
-
     void on_refreshAvailableStreams_released();
+
+    void on_listLSLStreams_itemDoubleClicked(QListWidgetItem *pItem);
 
 private:
 
+    void updateTextFields();
+
     QMap<QListWidgetItem*, lsl::stream_info>    m_mItemToStreamInfo;
+    QListWidgetItem*                            m_pCurrentSelectedStream;
 
     Ui::LSLSetupWidget                          ui;
 };

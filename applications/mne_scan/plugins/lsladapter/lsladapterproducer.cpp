@@ -69,6 +69,8 @@ using namespace LSLADAPTERPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+Q_DECLARE_METATYPE(Eigen::MatrixXd);
+
 LSLAdapterProducer::LSLAdapterProducer(QObject *parent)
     : QObject(parent)
     , m_StreamInfo()
@@ -76,6 +78,7 @@ LSLAdapterProducer::LSLAdapterProducer(QObject *parent)
     , m_bIsRunning(false)
     , m_bHasStreamInfo(false)
 {
+    qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
 
 }
 
@@ -101,15 +104,32 @@ void LSLAdapterProducer::readStream()
     // start to stream, build a stream inlet
     m_bIsRunning = true;
     m_StreamInlet = new lsl::stream_inlet(m_StreamInfo);
+    m_StreamInlet->open_stream();
 
+    int numChannels = m_StreamInfo.channel_count();
+
+    QThread::msleep(100);
     while (m_bIsRunning) {
 
         // DUMMY CODE START ===============
-        std::vector<float> sample;
-        m_StreamInlet->pull_sample(sample);
-        for (const auto& f : sample) {
-            qDebug() << f;
+        std::vector<std::vector<float>> chunk = m_StreamInlet->pull_chunk<float>();
+        if(chunk.size() == 0)
+            continue;
+
+        qDebug() << "p " << chunk.size() << " | " <<  chunk[0].size();
+
+        Eigen::MatrixXf matData;
+        matData.resize(numChannels, chunk.size());
+
+        for(int s = 0; s < chunk.size(); ++s) {
+            for(int c = 0; c < numChannels; ++c) {
+                matData(c, s) = chunk[s][c];  // @TODO dimension switch ?
+            }
         }
+
+        Eigen::MatrixXd matEmit = matData.cast<double>();
+        emit newDataAvailable(matEmit);
+        QThread::msleep(100);
         // DUMMY CODE END =================
 
     }
@@ -127,7 +147,6 @@ void LSLAdapterProducer::setStreamInfo(const lsl::stream_info& stream)
 {
     m_StreamInfo = stream;
     m_bHasStreamInfo = true;
-    // @TODO parse fiff info from lsl stream info
 }
 
 

@@ -42,6 +42,9 @@
 #include "lsladapterproducer.h"
 #include "FormFiles/lsladaptersetup.h"
 
+#include <fiff/fiff.h>
+#include <scMeas/realtimemultisamplearray.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,6 +69,7 @@
 using namespace LSLADAPTERPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -77,8 +81,17 @@ LSLAdapter::LSLAdapter()
     : ISensor()
     , m_updateStreamsFutureWatcher()
     , m_vAvailableStreams()
+    , m_currentStream()
+    , m_bHasValidStream(false)
     , m_pProducerThread()
     , m_pProducer(new LSLAdapterProducer())
+    , m_pListReceivedSamples(QSharedPointer<QList<Eigen::MatrixXd> >::create())
+    , m_bIsRunning(false)
+    , m_fSamplingFrequency(-1.0f)
+    , m_iNumberChannels(-1)
+    , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
+    , m_mutex()
+    , m_pRTMSA(PluginOutputData<RealTimeMultiSampleArray>::create(this, "LSL Adapter", "LSL stream data"))
 {
     // move producer to thread and connect a few feedback functions
     m_pProducer->moveToThread(&m_pProducerThread);
@@ -94,6 +107,11 @@ LSLAdapter::LSLAdapter()
             &QThread::finished,
             this,
             &LSLAdapter::onProducerThreadFinished);
+    // connect data streaming:
+    connect(m_pProducer,
+            &LSLAdapterProducer::newDataAvailable,
+            this,
+            &LSLAdapter::onNewDataAvailable);
 
     // connect finished signal for background lsl stream scanning
     connect(&m_updateStreamsFutureWatcher,
@@ -125,6 +143,13 @@ QSharedPointer<IPlugin> LSLAdapter::clone() const
 
 void LSLAdapter::init()
 {
+    m_pRTMSA->data()->setName(this->getName());
+    m_outputConnectors.append(m_pRTMSA);
+
+    // start scan for available LSL streams
+    QFuture<QVector<lsl::stream_info>> future = QtConcurrent::run(scanAvailableLSLStreams);
+    m_updateStreamsFutureWatcher.setFuture(future);
+
     // load filtering settings etc.
 }
 
@@ -141,8 +166,36 @@ void LSLAdapter::unload()
 
 bool LSLAdapter::start()
 {
-    // starting is UI-controlled
-    return true;
+    // check if the thread is already or still running.
+    // this can happen if the start button is pressed immediately after the stop button was pressed.
+    // in this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning()) {
+        this->wait();
+    }
+
+    if(m_bHasValidStream) {
+        m_bIsRunning = true;
+
+        prepareFiffInfo(m_currentStream);
+
+        // set the channel size of the RTMSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
+        m_pRTMSA->data()->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSA->data()->setMultiArraySize(1);
+        m_pRTMSA->data()->setVisibility(true);
+
+        // start this thread
+        QThread::start();
+
+        // start producer
+        m_pProducer->setStreamInfo(m_currentStream);
+        m_pProducerThread.start();
+
+        return true;
+    }
+    else {
+        qDebug() << "[LSLAdapter::start] No valid stream !";
+        return false;
+    }
 }
 
 
@@ -150,9 +203,15 @@ bool LSLAdapter::start()
 
 bool LSLAdapter::stop()
 {
+    // stop this thread and wait for it
+    m_bIsRunning = false;
+    this->wait();
+    // clear data in RTMSA
+    m_pRTMSA->data()->clear();
     // stop the producer and wait for it
     m_pProducer->stop();
     m_pProducerThread.wait();
+
     return true;
 }
 
@@ -164,15 +223,14 @@ QWidget* LSLAdapter::setupWidget()
     // apparently the widget may get deleted during runtime,
     // so we have to return a new one everytime this method is called
     LSLAdapterSetup* temp = new LSLAdapterSetup();
-    connect(temp, &LSLAdapterSetup::startStream, this, &LSLAdapter::onStartStream);
-    connect(temp, &LSLAdapterSetup::stopStream, this, &LSLAdapter::onStopStream);
     connect(temp, &LSLAdapterSetup::refreshAvailableStreams, this, &LSLAdapter::onRefreshAvailableStreams);
+    connect(temp, &LSLAdapterSetup::streamSelectionChanged, this, &LSLAdapter::onStreamSelectionChanged);
     connect(this, &LSLAdapter::updatedAvailableLSLStreams, temp, &LSLAdapterSetup::onLSLScanResults);
 
     // check if we have some information about previously available lsl streams:
-    if(m_vAvailableStreams.isEmpty() == false) {
+    if(m_vAvailableStreams.isEmpty() == false && m_bHasValidStream) {
         // let the widget display potentially outdated info, until the background thread for stream scanning will return
-        temp->onLSLScanResults(m_vAvailableStreams);
+        temp->onLSLScanResults(m_vAvailableStreams, m_currentStream);
     }
 
     // lsl stream scanning is time consuming, run in background:
@@ -187,7 +245,22 @@ QWidget* LSLAdapter::setupWidget()
 
 void LSLAdapter::run()
 {
-    // nothing so far
+    while(m_bIsRunning)
+    {
+        qDebug() << "a";
+        m_mutex.lock();
+        if(m_pListReceivedSamples->isEmpty() == false)
+        {
+            MatrixXd matData = m_pListReceivedSamples->takeFirst();
+            qDebug() << m_pListReceivedSamples->size();
+            qDebug() << matData.cols() << " | " << matData.rows();
+            m_pRTMSA->data()->setValue(matData);
+        }
+        m_mutex.unlock();
+        qDebug() << "b";
+        QThread::msleep(20);
+    }
+    qDebug() << "c";
 }
 
 
@@ -195,40 +268,11 @@ void LSLAdapter::run()
 
 void LSLAdapter::onRefreshAvailableStreams()
 {
-    // lsl stream scanning is time consuming, run in background:
+    // lsl stream scanning is time-consuming, run in background:
     if (m_updateStreamsFutureWatcher.isRunning() == false) {
         QFuture<QVector<lsl::stream_info>> future = QtConcurrent::run(scanAvailableLSLStreams);
         m_updateStreamsFutureWatcher.setFuture(future);
     }
-}
-
-
-//*************************************************************************************************************
-
-void LSLAdapter::onStartStream(const lsl::stream_info& stream)
-{
-    // start producer, catch a few basic faulty conditions first
-    if (m_pProducerThread.isRunning())
-    {
-        qDebug() << "[LSLAdapter::onStartStream] Producer thread still / already running";
-        return;
-    }
-    // pass stream info to producer
-    m_pProducer->reset();
-    m_pProducer->setStreamInfo(stream);
-    // start background thread
-    m_pProducerThread.start();
-}
-
-
-//*************************************************************************************************************
-
-void LSLAdapter::onStopStream()
-{
-    if (m_pProducerThread.isRunning() == false) {
-        qDebug() << "LSLAdapter::onStopStream] Stream should already be stopped...";
-    }
-    m_pProducer->stop();
 }
 
 
@@ -248,8 +292,28 @@ void LSLAdapter::onLSLStreamScanReady()
     // save available streams
     m_vAvailableStreams = m_updateStreamsFutureWatcher.result();
 
+    // check whether any streams are available
+    if(m_vAvailableStreams.size() == 0) {
+        m_bHasValidStream = false;
+        m_currentStream = lsl::stream_info();
+        return;
+    }
+    // check whether we had a valid stream, and if its still amongst the available ones
+    if(m_bHasValidStream) {
+        if(contains(m_vAvailableStreams, m_currentStream) == false) {
+            qDebug() << "[LSLAdapter] Old stream no longer available, switching to first available stream";
+            m_currentStream = m_vAvailableStreams[0];
+            m_bHasValidStream = true;
+        }
+        // else-case: no need to change anything
+    } else {
+        // simply take first stream
+        m_currentStream = m_vAvailableStreams[0];
+        m_bHasValidStream = true;
+    }
+
     // tell UI
-    emit updatedAvailableLSLStreams(m_vAvailableStreams);
+    emit updatedAvailableLSLStreams(m_vAvailableStreams, m_currentStream);
 }
 
 
@@ -260,4 +324,131 @@ QVector<lsl::stream_info> LSLAdapter::scanAvailableLSLStreams()
     // no filtering implemented so far, simply get all streams
     QVector<lsl::stream_info> temp = QVector<lsl::stream_info>::fromStdVector(lsl::resolve_streams());
     return temp;
+}
+
+
+//*************************************************************************************************************
+
+
+void LSLAdapter::onStreamSelectionChanged(const lsl::stream_info& newStream)
+{
+    m_bHasValidStream = true;
+    m_currentStream = newStream;
+}
+
+
+//*************************************************************************************************************
+
+void LSLAdapter::onNewDataAvailable(const Eigen::MatrixXd& matData)
+{
+    qDebug() << "onNewA";
+    m_mutex.lock();
+    qDebug() << "onNewB";
+    if(m_bIsRunning) {
+        m_pListReceivedSamples->append(matData);
+        qDebug() << m_pListReceivedSamples->size() << "llöl";
+    }
+    m_mutex.unlock();
+    qDebug() << "onNewC";
+}
+
+
+//*************************************************************************************************************
+
+void LSLAdapter::prepareFiffInfo(const lsl::stream_info &stream)
+{
+    // parse fiff info from lsl stream info
+    QString type = QString::fromStdString(stream.type()).toUpper();
+    if(type == "EEG") {
+        // copy basic info into intended member fields
+        m_iNumberChannels = stream.channel_count();
+        m_fSamplingFrequency = static_cast<float>(stream.nominal_srate());
+
+        // clear old fiff info data
+        m_pFiffInfo->clear();
+        // set number of channels, sampling frequency and high/-lowpass
+        m_pFiffInfo->nchan = m_iNumberChannels;
+        m_pFiffInfo->sfreq = m_fSamplingFrequency;
+        m_pFiffInfo->highpass = 0.001f;
+        m_pFiffInfo->lowpass = m_fSamplingFrequency / 2;
+
+        // set up the channel info
+        QStringList QSLChNames;
+        m_pFiffInfo->chs.clear();
+
+        for(int i = 0; i < m_pFiffInfo->nchan; ++i) {
+            // create information for each channel
+            QString sChType;
+            FiffChInfo fChInfo;
+
+            // set channel name
+            sChType = QString("EEG ");
+            if(i < 10) {
+                sChType.append("00");
+            }
+
+            if(i >= 10 && i < 100) {
+                sChType.append("0");
+            }
+
+            fChInfo.ch_name = sChType.append(sChType.number(i));
+
+            // set channel type
+            fChInfo.kind = FIFFV_EEG_CH;
+
+            // set logno
+            fChInfo.logNo = i;
+
+            // set coord frame
+            fChInfo.coord_frame = FIFFV_COORD_HEAD;
+
+            // set unit
+            fChInfo.unit = FIFF_UNIT_V;
+            fChInfo.unit_mul = 0;
+
+            // set EEG electrode location - Convert from mm to m
+            fChInfo.eeg_loc(0,0) = 0;
+            fChInfo.eeg_loc(1,0) = 0;
+            fChInfo.eeg_loc(2,0) = 0;
+
+            // set EEG electrode direction - Convert from mm to m
+            fChInfo.eeg_loc(0,1) = 0;
+            fChInfo.eeg_loc(1,1) = 0;
+            fChInfo.eeg_loc(2,1) = 0;
+
+            // also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
+            fChInfo.chpos.r0(0) = 0;
+            fChInfo.chpos.r0(1) = 0;
+            fChInfo.chpos.r0(2) = 0;
+
+            fChInfo.chpos.ex(0) = 1;
+            fChInfo.chpos.ex(1) = 0;
+            fChInfo.chpos.ex(2) = 0;
+
+            fChInfo.chpos.ey(0) = 0;
+            fChInfo.chpos.ey(1) = 1;
+            fChInfo.chpos.ey(2) = 0;
+
+            fChInfo.chpos.ez(0) = 0;
+            fChInfo.chpos.ez(1) = 0;
+            fChInfo.chpos.ez(2) = 1;
+
+            QSLChNames << sChType;
+
+            m_pFiffInfo->chs.append(fChInfo);
+        }
+
+        // set channel names in fiff_info_base
+        m_pFiffInfo->ch_names = QSLChNames;
+
+        // set head projection
+        m_pFiffInfo->dev_head_t.from = FIFFV_COORD_DEVICE;
+        m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
+        m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
+        m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
+    }
+    else {
+        qDebug() << "[LSLAdapterProducer::setStreamInfo] Type " << type << " not implemented !";
+        return;
+    }
 }
