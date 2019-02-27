@@ -69,6 +69,7 @@ using namespace LSLADAPTERPLUGIN;
 LSLAdapterSetup::LSLAdapterSetup(QWidget* parent)
     : QWidget(parent)
     , m_mItemToStreamInfo()
+    , m_pCurrentSelectedStream(Q_NULLPTR)
     , ui()
 {
     ui.setupUi(this);
@@ -77,7 +78,8 @@ LSLAdapterSetup::LSLAdapterSetup(QWidget* parent)
 
 //*************************************************************************************************************
 
-void LSLAdapterSetup::onLSLScanResults(QVector<lsl::stream_info>& vStreamInfos)
+void LSLAdapterSetup::onLSLScanResults(const QVector<lsl::stream_info>& vStreamInfos,
+                                       const lsl::stream_info& currentStream)
 {
     // clear UI list
     ui.listLSLStreams->clear();
@@ -88,37 +90,22 @@ void LSLAdapterSetup::onLSLScanResults(QVector<lsl::stream_info>& vStreamInfos)
         std::stringstream buildString;
         buildString << streamInfo.name() << ", " << streamInfo.type() << ", " << streamInfo.hostname();
         QListWidgetItem* pItem = new QListWidgetItem;
+        // select the current stream
+        if(currentStream.uid() == streamInfo.uid()) {
+            pItem->setSelected(true);
+            m_pCurrentSelectedStream = pItem;
+        } else {
+            pItem->setSelected(false);
+        }
         pItem->setText(QString(buildString.str().c_str()));
+
         ui.listLSLStreams->addItem(pItem);
 
         // add to mapping
         m_mItemToStreamInfo.insert(pItem, streamInfo);
     }
-}
 
-
-//*************************************************************************************************************
-
-void LSLAdapterSetup::on_connectToStream_released()
-{
-    if (ui.listLSLStreams->count() == 0) {
-        qDebug() << "[LSLAdapterSetup] No streams in list !";
-        return;
-    }
-    QListWidgetItem* currentItem = ui.listLSLStreams->currentItem();
-
-    // get corresponding stream info by looking it up in the mapping
-    lsl::stream_info stream = m_mItemToStreamInfo.value(currentItem);
-    emit startStream(stream);
-}
-
-
-//*************************************************************************************************************
-
-void LSLAdapterSetup::on_stopStreaming_released()
-{
-    // simply pass on to LSL Adapter
-    emit stopStream();
+    updateTextFields();
 }
 
 
@@ -128,4 +115,31 @@ void LSLAdapterSetup::on_refreshAvailableStreams_released()
 {
     // simply pass on to LSL Adapter
     emit refreshAvailableStreams();
+}
+
+void LSLAdapterSetup::on_listLSLStreams_itemDoubleClicked(QListWidgetItem *pItem)
+{
+    m_pCurrentSelectedStream = pItem;
+
+    updateTextFields();
+
+    // tell adapter:
+    if(m_pCurrentSelectedStream && m_mItemToStreamInfo.contains(m_pCurrentSelectedStream)) {
+        emit streamSelectionChanged(m_mItemToStreamInfo.value(m_pCurrentSelectedStream));
+    }
+    else {
+        // this should not happen
+        qDebug() << "[LSLAdapterSetup] CRITICAL: Major inconsistency in UI!";
+    }
+}
+
+void LSLAdapterSetup::updateTextFields()
+{
+    // current stream label:
+    if(m_pCurrentSelectedStream) {
+        ui.currentStreamDescription->setText(m_pCurrentSelectedStream->text());
+    } else {
+        ui.currentStreamDescription->setText(QString("None"));
+    }
+    ui.currentStreamDescription->setStyleSheet("font: bold");
 }

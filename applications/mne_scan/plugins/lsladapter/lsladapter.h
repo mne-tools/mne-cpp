@@ -57,12 +57,15 @@
 #include <QObject>
 #include <QThread>
 #include <QFutureWatcher>
+#include <QMutex>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -71,6 +74,14 @@
 //=============================================================================================================
 
 class QListWidgetItem;
+
+namespace SCMEASLIB {
+    class RealTimeMultiSampleArray;
+}
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
 
 
 //*************************************************************************************************************
@@ -92,7 +103,7 @@ class LSLAdapterProducer;
 
 //=============================================================================================================
 /**
-* The LSL class deals with the lsl library (labstreaminglayer)
+* The LSL class deals with the LSL library (labstreaminglayer)
 */
 class LSLADAPTERSHARED_EXPORT LSLAdapter : public SCSHAREDLIB::ISensor
 {
@@ -148,23 +159,15 @@ public slots:
 
     //=========================================================================================================
     /**
-    * This is called by the UI via a connect. It retrieves the LSL stream that corresponds to the passed
-    * QListWidgetItem and starts the background thread.
+    * This is called by the UI, whenever the user wants to changed the stream to connect to.
     */
-    void onStartStream(const lsl::stream_info& stream);
+    void onStreamSelectionChanged(const lsl::stream_info& newStream);
 
     //=========================================================================================================
     /**
-    * This is called by the UI via a connect. It stops the background thread / disconnects from the LSL stream.
+    * This gets called by the producer, whenever it has a new block of data ready
     */
-    void onStopStream();
-
-    //=========================================================================================================
-    /**
-    * This is called by the background thread via a connect. It allows us to perform additional cleanup after
-    * the thread has finished.
-    */
-    void onProducerThreadFinished();
+    void onNewDataAvailable(const Eigen::MatrixXd& matData);
 
 protected:
 
@@ -180,11 +183,20 @@ signals:
 
     //=========================================================================================================
     /**
-    * This is emitted in order to tell the UI that the list of available LSL streams has been updated.
+    * @brief * This is emitted in order to tell the UI that the list of available LSL streams has been updated.
+    * @param vStreamInfos Vector of available LSL streams
+    * @param currentStream The LSL stream that the Adapter would currently connect to (upon start)
     */
-    void updatedAvailableLSLStreams(QVector<lsl::stream_info>& vStreamInfos);
+    void updatedAvailableLSLStreams(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
 
 private slots:
+
+    //=========================================================================================================
+    /**
+    * This is called by the background thread via a connect. It allows us to perform additional cleanup after
+    * the thread has finished.
+    */
+    void onProducerThreadFinished();
 
     //=========================================================================================================
     /**
@@ -200,12 +212,32 @@ private:
     */
     static QVector<lsl::stream_info> scanAvailableLSLStreams();
 
+    //=========================================================================================================
+    /**
+    * Helper function that fills the FiffInfo member based on an LSL stream info.
+    */
+    void prepareFiffInfo(const lsl::stream_info& stream);
 
+    // LSL stream management
     QFutureWatcher<QVector<lsl::stream_info> >      m_updateStreamsFutureWatcher;
     QVector<lsl::stream_info>                       m_vAvailableStreams;
+    lsl::stream_info                                m_currentStream;
+    bool                                            m_bHasValidStream;
+
+    // producer management
     QThread                                         m_pProducerThread;
     LSLAdapterProducer*                             m_pProducer;
+    QSharedPointer<QList<Eigen::MatrixXd> >         m_pListReceivedSamples;
 
+    // own thread management
+    bool                                            m_bIsRunning;
+
+    // fiff info / data output
+    float                                           m_fSamplingFrequency;
+    int                                             m_iNumberChannels;
+    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
+    QMutex                                          m_mutex;
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA;
 };
 
 //*************************************************************************************************************
@@ -224,6 +256,19 @@ inline SCSHAREDLIB::IPlugin::PluginType LSLAdapter::getType() const
 inline QString LSLAdapter::getName() const
 {
     return "LSL Adapter";
+}
+
+
+//************************************************************************************************************
+/**
+* @brief Apparently LSL does not have an '==' operator where one side is const, so this function compares the UIDs instead.
+*/
+inline bool contains(const QVector<lsl::stream_info>& v, const lsl::stream_info& s)
+{
+    bool result = false;
+    for(const auto& s2 : v)
+        result = result | (s2.uid() == s.uid());
+    return result;
 }
 
 } // NAMESPACE

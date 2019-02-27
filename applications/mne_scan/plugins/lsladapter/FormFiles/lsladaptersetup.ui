@@ -38,16 +38,30 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="connectToStream">
-     <property name="text">
-      <string>Connect to highlighted stream</string>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="stopStreaming">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Stop streaming / disconnect</string>
+      <string>Stream to connect to:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="currentStreamDescription">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;None&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
