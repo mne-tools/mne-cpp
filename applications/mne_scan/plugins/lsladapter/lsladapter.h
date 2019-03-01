@@ -65,8 +65,6 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -139,7 +137,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the LSL adapter by stopping its background thread
+    * Stops the LSL adapter by stopping its producer
     */
     virtual bool stop();
 
@@ -163,16 +161,11 @@ public slots:
     */
     void onStreamSelectionChanged(const lsl::stream_info& newStream);
 
-    //=========================================================================================================
-    /**
-    * This gets called by the producer, whenever it has a new block of data ready
-    */
-    void onNewDataAvailable(const Eigen::MatrixXd& matData);
-
 protected:
 
     //=========================================================================================================
     /**
+    * The LSLAdapter has an empty run method, as all of the work is done in the producer.
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
     * Returning from this method will end the execution of the thread.
     * Pure virtual method inherited by QThread.
@@ -183,20 +176,13 @@ signals:
 
     //=========================================================================================================
     /**
-    * @brief * This is emitted in order to tell the UI that the list of available LSL streams has been updated.
+    * @brief This is emitted in order to tell the UI that the list of available LSL streams has been updated.
     * @param vStreamInfos Vector of available LSL streams
     * @param currentStream The LSL stream that the Adapter would currently connect to (upon start)
     */
     void updatedAvailableLSLStreams(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
 
 private slots:
-
-    //=========================================================================================================
-    /**
-    * This is called by the background thread via a connect. It allows us to perform additional cleanup after
-    * the thread has finished.
-    */
-    void onProducerThreadFinished();
 
     //=========================================================================================================
     /**
@@ -218,6 +204,13 @@ private:
     */
     void prepareFiffInfo(const lsl::stream_info& stream);
 
+    // fiff info / data output
+    float                                           m_fSamplingFrequency;
+    int                                             m_iNumberChannels;
+    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
+    QMutex                                          m_mutex;
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA;
+
     // LSL stream management
     QFutureWatcher<QVector<lsl::stream_info> >      m_updateStreamsFutureWatcher;
     QVector<lsl::stream_info>                       m_vAvailableStreams;
@@ -227,17 +220,6 @@ private:
     // producer management
     QThread                                         m_pProducerThread;
     LSLAdapterProducer*                             m_pProducer;
-    QSharedPointer<QList<Eigen::MatrixXd> >         m_pListReceivedSamples;
-
-    // own thread management
-    bool                                            m_bIsRunning;
-
-    // fiff info / data output
-    float                                           m_fSamplingFrequency;
-    int                                             m_iNumberChannels;
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
-    QMutex                                          m_mutex;
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA;
 };
 
 //*************************************************************************************************************
