@@ -44,6 +44,11 @@
 
 #include "lsladapter_global.h"
 
+#include <vector>
+
+#include <scMeas/realtimemultisamplearray.h>
+#include <scShared/Management/pluginoutputdata.h>
+
 #include <lsl_cpp.h>
 
 
@@ -53,6 +58,7 @@
 //=============================================================================================================
 
 #include <QObject>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -98,35 +104,44 @@ public:
     //=========================================================================================================
     /**
     * Constructs a LSLAdapterProducer which is a child of parent.
-    *
-    * @param [in] parent pointer to potential parent widget.
     */
-    LSLAdapterProducer(QObject *parent = Q_NULLPTR);
+    LSLAdapterProducer(QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > pRTMSA,
+                       int iOutputBlockSize = 100,
+                       QObject *parent = Q_NULLPTR);
 
+    //=========================================================================================================
     /**
     * Destructor
     */
     ~LSLAdapterProducer();
 
+    //=========================================================================================================
     /**
     * Call this to provide the stream info for the producer.
     */
     void setStreamInfo(const lsl::stream_info& stream);
 
+    //=========================================================================================================
     /**
     * Stops the streaming.
     */
     void stop();
 
+    //=========================================================================================================
     /**
     * Resets the producer.
     */
     void reset();
 
+    //=========================================================================================================
+    /**
+    * Whether or not the producer is running.
+    */
     inline bool isRunning() const;
 
 public slots:
 
+    //=========================================================================================================
     /**
     * The background thread of the LSLAdapter will run this function.
     */
@@ -140,21 +155,20 @@ signals:
     */
     void finished();
 
-    //=========================================================================================================
-    /**
-    * Emit this signal whenever a new data matrix is available.
-    *
-    * @param [in] matData The newly parsed data.
-    */
-    void newDataAvailable(const Eigen::MatrixXd& matData);
-
 private:
 
-    lsl::stream_info    m_StreamInfo;
-    lsl::stream_inlet*  m_StreamInlet;
+    // LSL stuff
+    lsl::stream_info            m_StreamInfo;
+    lsl::stream_inlet*          m_StreamInlet;
+    bool                        m_bHasStreamInfo;
 
-    volatile bool       m_bIsRunning;
-    bool                m_bHasStreamInfo;
+    // synchronization with main thread
+    volatile bool               m_bIsRunning;
+
+    // buffering and output parameters
+    int                         m_iOutputBlockSize;
+    QVector<std::vector<float>> m_vBufferedSamples; // @TODO maybe refactor buffering as list of chunks instead of singular samples (?)
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA;
 };
 
 //*************************************************************************************************************

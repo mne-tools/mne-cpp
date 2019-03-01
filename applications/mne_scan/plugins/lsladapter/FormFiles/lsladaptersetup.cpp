@@ -83,7 +83,8 @@ void LSLAdapterSetup::onLSLScanResults(const QVector<lsl::stream_info>& vStreamI
 {
     // clear UI list
     ui.listLSLStreams->clear();
-
+    // mark m_pCurentSelectedStream as invalid (it will be deleted by the subsequent call to clear on the map).
+    m_pCurrentSelectedStream = Q_NULLPTR;
     // clear mapping and create items
     m_mItemToStreamInfo.clear();
     for (lsl::stream_info streamInfo : vStreamInfos) {
@@ -117,6 +118,9 @@ void LSLAdapterSetup::on_refreshAvailableStreams_released()
     emit refreshAvailableStreams();
 }
 
+
+//*************************************************************************************************************
+
 void LSLAdapterSetup::on_listLSLStreams_itemDoubleClicked(QListWidgetItem *pItem)
 {
     m_pCurrentSelectedStream = pItem;
@@ -132,6 +136,9 @@ void LSLAdapterSetup::on_listLSLStreams_itemDoubleClicked(QListWidgetItem *pItem
         qDebug() << "[LSLAdapterSetup] CRITICAL: Major inconsistency in UI!";
     }
 }
+
+
+//*************************************************************************************************************
 
 void LSLAdapterSetup::updateTextFields()
 {

@@ -100,18 +100,6 @@ signals:
 
     //=========================================================================================================
     /**
-    * This tells the LSL Adapter that the user wants to connect to a certain stream.
-    */
-    void startStream(const lsl::stream_info& stream);
-
-    //=========================================================================================================
-    /**
-    * This tells the LSL Adapter that the user wants to stop streaming, i.e. wants to disconnect from the stream.
-    */
-    void stopStream();
-
-    //=========================================================================================================
-    /**
     * This tells the LSL Adapter that the user wants to refresh the displayed list of available LSL streams.
     */
     void refreshAvailableStreams();
@@ -126,7 +114,7 @@ public slots:
 
     //=========================================================================================================
     /**
-    * This is called by the LSL Adapter, when it has finished scanning for available LSL streams.
+    * This is called by the LSL Adapter, when it has finished scanning and filtering available LSL streams.
     */
     void onLSLScanResults(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
 
@@ -140,6 +128,10 @@ private slots:
 
 private:
 
+    //=========================================================================================================
+    /**
+    * Helper method to update textfields.
+    */
     void updateTextFields();
 
     QMap<QListWidgetItem*, lsl::stream_info>    m_mItemToStreamInfo;

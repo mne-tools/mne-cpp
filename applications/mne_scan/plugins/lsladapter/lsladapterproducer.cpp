@@ -62,6 +62,8 @@
 //=============================================================================================================
 
 using namespace LSLADAPTERPLUGIN;
+using namespace SCSHAREDLIB;
+using namespace SCMEASLIB;
 
 
 //*************************************************************************************************************
@@ -69,16 +71,18 @@ using namespace LSLADAPTERPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Q_DECLARE_METATYPE(Eigen::MatrixXd);
-
-LSLAdapterProducer::LSLAdapterProducer(QObject *parent)
+LSLAdapterProducer::LSLAdapterProducer(QSharedPointer<PluginOutputData<RealTimeMultiSampleArray> > pRTMSA,
+                                       int iOutputBlockSize,
+                                       QObject *parent)
     : QObject(parent)
     , m_StreamInfo()
     , m_StreamInlet(Q_NULLPTR)
-    , m_bIsRunning(false)
     , m_bHasStreamInfo(false)
+    , m_bIsRunning(false)
+    , m_iOutputBlockSize(iOutputBlockSize)
+    , m_vBufferedSamples()
+    , m_pRTMSA(pRTMSA)
 {
-    qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
 
 }
 
@@ -106,36 +110,43 @@ void LSLAdapterProducer::readStream()
     m_StreamInlet = new lsl::stream_inlet(m_StreamInfo);
     m_StreamInlet->open_stream();
 
-    int numChannels = m_StreamInfo.channel_count();
+    int iNumChannels = m_StreamInfo.channel_count();
 
-    QThread::msleep(100);
-    while (m_bIsRunning) {
-
-        // DUMMY CODE START ===============
-        std::vector<std::vector<float>> chunk = m_StreamInlet->pull_chunk<float>();
-        if(chunk.size() == 0)
+    while(m_bIsRunning) {
+        if(m_StreamInlet->samples_available() == false) {
+            // save a bit of CPU, then check again
+            QThread::msleep(5);
             continue;
+        }
+        std::vector<std::vector<float>> chunk = m_StreamInlet->pull_chunk<float>();
 
-        qDebug() << "p " << chunk.size() << " | " <<  chunk[0].size();
-
-        Eigen::MatrixXf matData;
-        matData.resize(numChannels, chunk.size());
-
-        for(int s = 0; s < chunk.size(); ++s) {
-            for(int c = 0; c < numChannels; ++c) {
-                matData(c, s) = chunk[s][c];  // @TODO dimension switch ?
-            }
+        // copy samples into buffer
+        for(const auto& vSample : chunk) {
+            m_vBufferedSamples.append(vSample);
         }
 
-        Eigen::MatrixXd matEmit = matData.cast<double>();
-        emit newDataAvailable(matEmit);
-        QThread::msleep(100);
-        // DUMMY CODE END =================
+        // check if we can output another block
+        if(m_vBufferedSamples.size() >= m_iOutputBlockSize) {
+            Eigen::MatrixXd matData(iNumChannels, m_iOutputBlockSize);
 
+            // copy samples
+            for(int sampleIdx = 0; sampleIdx < m_iOutputBlockSize; ++sampleIdx) {
+                for(int channelIdx = 0; channelIdx < iNumChannels; ++channelIdx) {
+                    matData(channelIdx, sampleIdx) = static_cast<double>(m_vBufferedSamples[sampleIdx][static_cast<unsigned>(channelIdx)]);
+                }
+            }
+
+            // remove copied samples from list
+            m_vBufferedSamples.remove(0, m_iOutputBlockSize);
+
+            // publish new block
+            m_pRTMSA->data()->setValue(matData);
+        }
     }
 
-    // cleanup
-    m_StreamInlet->close_stream();
+    // cleanup, have to use delete, only calling close_stream results in an warning "Stream transmission broke off"
+    // @TODO check if this behaviour results from exterior threading issues.
+    delete m_StreamInlet;
 
     emit finished();
 }
@@ -165,6 +176,8 @@ void LSLAdapterProducer::reset()
     // reset flags
     m_bIsRunning = false;
     m_bHasStreamInfo = false;
+    // clear buffer
+    m_vBufferedSamples.clear();
     // reset lsl members
     m_StreamInfo = lsl::stream_info();
     delete m_StreamInlet;
