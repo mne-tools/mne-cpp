@@ -48,9 +48,18 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${MNE_LIBRARY_DIR} \
-        -LC:/LSL/lib/ \
-        -lliblsl64
+LIBS += -L$${MNE_LIBRARY_DIR}
+
+win32 {
+    LIBS += -LC:/LSL/lib/ \
+            -lliblsl64
+}
+
+unix:!macx {
+    LIBS += -L/usr/local/LSL/lib \
+            -llsl64
+}
+
 
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
@@ -96,7 +105,16 @@ FORMS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
-INCLUDEPATH += C:/LSL/include/
+
+
+win32 {
+    INCLUDEPATH += C:/LSL/include/
+}
+
+unix:!macx {
+    INCLUDEPATH += /usr/local/LSL/include
+}
+
 
 OTHER_FILES += lsladapter.json
 
