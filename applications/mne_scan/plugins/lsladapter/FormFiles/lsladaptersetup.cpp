@@ -66,13 +66,15 @@ using namespace LSLADAPTERPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LSLAdapterSetup::LSLAdapterSetup(QWidget* parent)
+LSLAdapterSetup::LSLAdapterSetup(int initialBlockSize, QWidget* parent)
     : QWidget(parent)
     , m_mItemToStreamInfo()
     , m_pCurrentSelectedStream(Q_NULLPTR)
     , ui()
 {
     ui.setupUi(this);
+    // copy start value for block size into UI:
+    ui.blockSizeEdit->setText(QString::number(initialBlockSize));
 }
 
 
@@ -149,4 +151,20 @@ void LSLAdapterSetup::updateTextFields()
         ui.currentStreamDescription->setText(QString("None"));
     }
     ui.currentStreamDescription->setStyleSheet("font: bold");
+}
+
+
+
+//*************************************************************************************************************
+
+void LSLADAPTERPLUGIN::LSLAdapterSetup::on_blockSizeEdit_editingFinished()
+{
+    QString sInput = ui.blockSizeEdit->text();
+    int iBlockSize = sInput.toInt();
+    if(iBlockSize <= 1) {
+        qDebug() << "[LSLAdapterSetup: blockSizeEdit: Not a valid block size: " << sInput;
+    }
+    else {
+        emit blockSizeChanged(iBlockSize);
+    }
 }
