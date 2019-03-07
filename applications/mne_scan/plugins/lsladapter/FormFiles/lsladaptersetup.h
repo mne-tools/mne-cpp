@@ -88,7 +88,7 @@ public:
     *
     * @param [in] parent pointer to potential parent widget
     */
-    LSLAdapterSetup(QWidget *parent = Q_NULLPTR);
+    LSLAdapterSetup(int initialBlockSize, QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -110,6 +110,12 @@ signals:
     */
     void streamSelectionChanged(const lsl::stream_info& stream);
 
+    //=========================================================================================================
+    /**
+    * This tells the LSL Adapter that the user has changed the desired output block size
+    */
+    void blockSizeChanged(const int newBlockSize);
+
 public slots:
 
     //=========================================================================================================
@@ -125,6 +131,8 @@ private slots:
     void on_refreshAvailableStreams_released();
 
     void on_listLSLStreams_itemDoubleClicked(QListWidgetItem *pItem);
+
+    void on_blockSizeEdit_editingFinished();
 
 private:
 

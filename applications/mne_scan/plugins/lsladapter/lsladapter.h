@@ -157,9 +157,15 @@ public slots:
 
     //=========================================================================================================
     /**
-    * This is called by the UI, whenever the user wants to changed the stream to connect to.
+    * This is called by the UI, whenever the user has changed the stream to connect to.
     */
     void onStreamSelectionChanged(const lsl::stream_info& newStream);
+
+    //=========================================================================================================
+    /**
+    * This is called by the UI, whenever the user has changed the desired output block size.
+    */
+    void onBlockSizeChanged(const int newBlockSize);
 
 protected:
 
@@ -207,6 +213,7 @@ private:
     // fiff info / data output
     float                                           m_fSamplingFrequency;
     int                                             m_iNumberChannels;
+    int                                             m_iOutputBlockSize;
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
     QMutex                                          m_mutex;
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA;
@@ -251,6 +258,17 @@ inline bool contains(const QVector<lsl::stream_info>& v, const lsl::stream_info&
     for(const auto& s2 : v)
         result = result | (s2.uid() == s.uid());
     return result;
+}
+
+
+//************************************************************************************************************
+/**
+* @brief Simple validity check for stream infos.
+*/
+inline bool isValid(const lsl::stream_info& s)
+{
+    // stream with nonempty ID and name should be valid
+    return (s.uid().empty() == false && s.name().empty() == false);
 }
 
 } // NAMESPACE

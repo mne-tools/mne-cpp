@@ -183,3 +183,11 @@ void LSLAdapterProducer::reset()
     delete m_StreamInlet;
     m_StreamInlet = Q_NULLPTR;
 }
+
+
+//*************************************************************************************************************
+
+void LSLAdapterProducer::setOutputBlockSize(const int iNewBlockSize)
+{
+    m_iOutputBlockSize = iNewBlockSize;
+}

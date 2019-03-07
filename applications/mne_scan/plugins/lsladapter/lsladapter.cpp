@@ -90,6 +90,7 @@ LSLAdapter::LSLAdapter()
     : ISensor()
     , m_fSamplingFrequency(-1.0f)
     , m_iNumberChannels(-1)
+    , m_iOutputBlockSize(100)
     , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
     , m_mutex()
     , m_pRTMSA(PluginOutputData<RealTimeMultiSampleArray>::create(this, "LSL Adapter", "LSL stream data"))
@@ -98,7 +99,7 @@ LSLAdapter::LSLAdapter()
     , m_currentStream()
     , m_bHasValidStream(false)
     , m_pProducerThread()
-    , m_pProducer(new LSLAdapterProducer(m_pRTMSA, 100))
+    , m_pProducer(new LSLAdapterProducer(m_pRTMSA, m_iOutputBlockSize))
 {
     // would be better to do this on a single occasion
     qRegisterMetaType<lsl::stream_info>("lsl::stream_info");
@@ -192,6 +193,7 @@ bool LSLAdapter::start()
         m_pRTMSA->data()->setVisibility(true);
 
         // start producer
+        m_pProducer->setOutputBlockSize(m_iOutputBlockSize);
         m_pProducer->setStreamInfo(m_currentStream);
         m_pProducerThread.start();
 
@@ -227,9 +229,10 @@ QWidget* LSLAdapter::setupWidget()
 {
     // apparently the widget may get deleted during runtime,
     // so we have to return a new one everytime this method is called
-    LSLAdapterSetup* temp = new LSLAdapterSetup();
+    LSLAdapterSetup* temp = new LSLAdapterSetup(m_iOutputBlockSize);
     connect(temp, &LSLAdapterSetup::refreshAvailableStreams, this, &LSLAdapter::onRefreshAvailableStreams);
     connect(temp, &LSLAdapterSetup::streamSelectionChanged, this, &LSLAdapter::onStreamSelectionChanged);
+    connect(temp, &LSLAdapterSetup::blockSizeChanged, this, &LSLAdapter::onBlockSizeChanged);
     connect(this, &LSLAdapter::updatedAvailableLSLStreams, temp, &LSLAdapterSetup::onLSLScanResults);
 
     // check if we have some information about previously available lsl streams:
@@ -304,8 +307,16 @@ void LSLAdapter::onLSLStreamScanReady()
 QVector<lsl::stream_info> LSLAdapter::scanAvailableLSLStreams()
 {
     // no filtering implemented so far, simply get all streams
-    QVector<lsl::stream_info> temp = QVector<lsl::stream_info>::fromStdVector(lsl::resolve_streams());
-    return temp;
+    QVector<lsl::stream_info> vAvailableStreams = QVector<lsl::stream_info>::fromStdVector(lsl::resolve_streams());
+    // do validity checks for all stream infos
+    for(int i = 0; i < vAvailableStreams.size(); ++i) {
+        if(isValid(vAvailableStreams[i]) == false) {
+            vAvailableStreams.remove(i);
+            i--;
+            qDebug() << "[LSLAdapter::scanAvailableLSLStreams] Found and removed an invalid stream !";
+        }
+    }
+    return vAvailableStreams;
 }
 
 
@@ -314,6 +325,7 @@ QVector<lsl::stream_info> LSLAdapter::scanAvailableLSLStreams()
 
 void LSLAdapter::onStreamSelectionChanged(const lsl::stream_info& newStream)
 {
+    // no validity checks are done, since the UI only knows the streams we told it about
     m_bHasValidStream = true;
     m_currentStream = newStream;
 }
@@ -415,4 +427,13 @@ void LSLAdapter::prepareFiffInfo(const lsl::stream_info &stream)
         qDebug() << "[LSLAdapterProducer::setStreamInfo] Type " << type << " not implemented !";
         return;
     }
+}
+
+
+//*************************************************************************************************************
+
+void LSLAdapter::onBlockSizeChanged(const int newBlockSize)
+{
+    qDebug() << "new block size arrived";
+    m_iOutputBlockSize = newBlockSize;
 }
