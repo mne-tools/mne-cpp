@@ -106,7 +106,7 @@ public:
     * Constructs a LSLAdapterProducer which is a child of parent.
     */
     LSLAdapterProducer(QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > pRTMSA,
-                       int iOutputBlockSize = 100,
+                       unsigned int iOutputBlockSize = 100,
                        QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
@@ -164,16 +164,16 @@ signals:
 private:
 
     // LSL stuff
-    lsl::stream_info            m_StreamInfo;
-    lsl::stream_inlet*          m_StreamInlet;
-    bool                        m_bHasStreamInfo;
+    lsl::stream_info                m_StreamInfo;
+    lsl::stream_inlet*              m_StreamInlet;
+    bool                            m_bHasStreamInfo;
 
     // synchronization with main thread
-    volatile bool               m_bIsRunning;
+    volatile bool                   m_bIsRunning;
 
     // buffering and output parameters
-    int                         m_iOutputBlockSize;
-    QVector<std::vector<float>> m_vBufferedSamples; // @TODO maybe refactor buffering as list of chunks instead of singular samples (?)
+    unsigned int                    m_iOutputBlockSize;
+    std::vector<std::vector<float>> m_vBufferedSamples;
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA;
 };
 
