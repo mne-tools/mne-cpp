@@ -72,7 +72,7 @@ using namespace SCMEASLIB;
 //=============================================================================================================
 
 LSLAdapterProducer::LSLAdapterProducer(QSharedPointer<PluginOutputData<RealTimeMultiSampleArray> > pRTMSA,
-                                       int iOutputBlockSize,
+                                       unsigned int iOutputBlockSize,
                                        QObject *parent)
     : QObject(parent)
     , m_StreamInfo()
@@ -110,37 +110,42 @@ void LSLAdapterProducer::readStream()
     m_StreamInlet = new lsl::stream_inlet(m_StreamInfo);
     m_StreamInlet->open_stream();
 
-    int iNumChannels = m_StreamInfo.channel_count();
+    if(m_StreamInfo.channel_count() <= 0) {
+        qDebug() << "[LSLAdapterProducer::readStream] Non-positive channel count, returning...";
+        return;
+    }
+
+    const unsigned int iNumChannels = static_cast<unsigned>(m_StreamInfo.channel_count());
 
     while(m_bIsRunning) {
         if(m_StreamInlet->samples_available() == false) {
-            // save a bit of CPU, then check again
+            // save CPU time, then check again
             QThread::msleep(5);
             continue;
         }
         std::vector<std::vector<float>> chunk = m_StreamInlet->pull_chunk<float>();
 
-        // copy samples into buffer
-        for(const auto& vSample : chunk) {
-            m_vBufferedSamples.append(vSample);
-        }
+        // append chunk to buffer
+        m_vBufferedSamples.insert(std::end(m_vBufferedSamples), std::begin(chunk), std::end(chunk));
 
         // check if we can output another block
         if(m_vBufferedSamples.size() >= m_iOutputBlockSize) {
-            Eigen::MatrixXd matData(iNumChannels, m_iOutputBlockSize);
+            Eigen::MatrixXd matOutput(iNumChannels, m_iOutputBlockSize);
 
             // copy samples
-            for(int sampleIdx = 0; sampleIdx < m_iOutputBlockSize; ++sampleIdx) {
-                for(int channelIdx = 0; channelIdx < iNumChannels; ++channelIdx) {
-                    matData(channelIdx, sampleIdx) = static_cast<double>(m_vBufferedSamples[sampleIdx][static_cast<unsigned>(channelIdx)]);
+            for(unsigned int iSampleIdx = 0; iSampleIdx < m_iOutputBlockSize; ++iSampleIdx) {
+                for(unsigned int iChannelIdx = 0; iChannelIdx < iNumChannels; ++iChannelIdx) {
+                    matOutput(iChannelIdx, iSampleIdx) = static_cast<double>(m_vBufferedSamples[iSampleIdx][iChannelIdx]);
                 }
             }
 
-            // remove copied samples from list
-            m_vBufferedSamples.remove(0, m_iOutputBlockSize);
+            // remove copied samples
+            for(unsigned int i = 0; i < m_iOutputBlockSize; ++i) {
+                m_vBufferedSamples.erase(m_vBufferedSamples.begin());
+            }
 
             // publish new block
-            m_pRTMSA->data()->setValue(matData);
+            m_pRTMSA->data()->setValue(matOutput);
         }
     }
 
