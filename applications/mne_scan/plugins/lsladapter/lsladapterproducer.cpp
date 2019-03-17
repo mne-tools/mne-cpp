@@ -149,9 +149,8 @@ void LSLAdapterProducer::readStream()
         }
     }
 
-    // cleanup, have to use delete, only calling close_stream results in an warning "Stream transmission broke off"
-    // @TODO check if this behaviour results from exterior threading issues.
-    delete m_StreamInlet;
+    // cleanup: close stream
+    m_StreamInlet->close_stream();
 
     emit finished();
 }
