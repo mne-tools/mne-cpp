@@ -92,13 +92,12 @@ LSLAdapter::LSLAdapter()
     , m_iNumberChannels(-1)
     , m_iOutputBlockSize(100)
     , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
-    , m_mutex()
     , m_pRTMSA(PluginOutputData<RealTimeMultiSampleArray>::create(this, "LSL Adapter", "LSL stream data"))
     , m_updateStreamsFutureWatcher()
     , m_vAvailableStreams()
     , m_currentStream()
     , m_bHasValidStream(false)
-    , m_pProducerThread()
+    , m_producerThread()
     , m_pProducer(new LSLAdapterProducer(m_pRTMSA, m_iOutputBlockSize))
 {
     // would be better to do this on a single occasion
@@ -112,9 +111,9 @@ LSLAdapter::LSLAdapter()
 LSLAdapter::~LSLAdapter()
 {
     m_pProducer->stop();
-    m_pProducerThread.wait();
+    m_producerThread.wait();
     m_pProducer->deleteLater();
-    m_pProducerThread.deleteLater();
+    m_producerThread.deleteLater();
 }
 
 
@@ -131,14 +130,14 @@ QSharedPointer<IPlugin> LSLAdapter::clone() const
 void LSLAdapter::init()
 {
     // move producer to thread and connect a few synchronization points
-    m_pProducer->moveToThread(&m_pProducerThread);
-    connect(&m_pProducerThread,
+    m_pProducer->moveToThread(&m_producerThread);
+    connect(&m_producerThread,
             &QThread::started,
             m_pProducer,
             &LSLAdapterProducer::readStream);
     connect(m_pProducer,
             &LSLAdapterProducer::finished,
-            &m_pProducerThread,
+            &m_producerThread,
             &QThread::quit,
             Qt::DirectConnection);  // apparently a direct connection is needed in order to avoid a crash upon 'stop'
 
@@ -165,9 +164,9 @@ void LSLAdapter::unload()
 {
     // stop producer
     m_pProducer->stop();
-    m_pProducerThread.wait();
+    m_producerThread.wait();
     m_pProducer->deleteLater();
-    m_pProducerThread.deleteLater();
+    m_producerThread.deleteLater();
 
     // save filtering settings etc.
 }
@@ -195,7 +194,7 @@ bool LSLAdapter::start()
         // start producer
         m_pProducer->setOutputBlockSize(m_iOutputBlockSize);
         m_pProducer->setStreamInfo(m_currentStream);
-        m_pProducerThread.start();
+        m_producerThread.start();
 
         return true;
     }
@@ -217,7 +216,7 @@ bool LSLAdapter::stop()
 
     // stop the producer and wait for it
     m_pProducer->stop();
-    m_pProducerThread.wait();
+    m_producerThread.wait();
 
     return true;
 }
