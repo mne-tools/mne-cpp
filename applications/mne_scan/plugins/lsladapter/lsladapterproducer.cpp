@@ -72,7 +72,7 @@ using namespace SCMEASLIB;
 //=============================================================================================================
 
 LSLAdapterProducer::LSLAdapterProducer(QSharedPointer<PluginOutputData<RealTimeMultiSampleArray> > pRTMSA,
-                                       unsigned int iOutputBlockSize,
+                                       int iOutputBlockSize,
                                        QObject *parent)
     : QObject(parent)
     , m_StreamInfo()
@@ -105,52 +105,61 @@ void LSLAdapterProducer::readStream()
         return;
     }
 
-    // start to stream, build a stream inlet
-    m_bIsRunning = true;
-    m_StreamInlet = new lsl::stream_inlet(m_StreamInfo);
-    m_StreamInlet->open_stream();
-
-    if(m_StreamInfo.channel_count() <= 0) {
-        qDebug() << "[LSLAdapterProducer::readStream] Non-positive channel count, returning...";
-        return;
+    // start to stream: build a stream inlet
+    try {
+        m_StreamInlet = new lsl::stream_inlet(m_StreamInfo);
+        m_StreamInlet->open_stream();
+    }
+    catch (std::exception& e) {
+        qDebug() << "[LSLAdapterProducer::readStream] Something went wrong when trying to open LSL stream inlet: " << e.what();
     }
 
-    const unsigned int iNumChannels = static_cast<unsigned>(m_StreamInfo.channel_count());
-
+    m_bIsRunning = true;
     while(m_bIsRunning) {
-        if(m_StreamInlet->samples_available() == false) {
-            // save CPU time, then check again
-            QThread::msleep(5);
-            continue;
-        }
-        std::vector<std::vector<float>> chunk = m_StreamInlet->pull_chunk<float>();
+        try {
+            if(m_StreamInlet->samples_available() == false) {
+                // save CPU time, then check again
+                QThread::msleep(5);
+                continue;
+            }
+            std::vector<std::vector<float>> chunk = m_StreamInlet->pull_chunk<float>();
 
-        // append chunk to buffer
-        m_vBufferedSamples.insert(std::end(m_vBufferedSamples), std::begin(chunk), std::end(chunk));
+            // append chunk to buffer
+            m_vBufferedSamples.insert(std::end(m_vBufferedSamples), std::begin(chunk), std::end(chunk));
 
-        // check if we can output another block
-        if(m_vBufferedSamples.size() >= m_iOutputBlockSize) {
-            Eigen::MatrixXd matOutput(iNumChannels, m_iOutputBlockSize);
+            // check if we can output another block
+            if(m_vBufferedSamples.size() >= m_iOutputBlockSize) {
+                Eigen::MatrixXd matOutput(m_StreamInfo.channel_count(), m_iOutputBlockSize);
 
-            // copy samples
-            for(unsigned int iSampleIdx = 0; iSampleIdx < m_iOutputBlockSize; ++iSampleIdx) {
-                for(unsigned int iChannelIdx = 0; iChannelIdx < iNumChannels; ++iChannelIdx) {
-                    matOutput(iChannelIdx, iSampleIdx) = static_cast<double>(m_vBufferedSamples[iSampleIdx][iChannelIdx]);
+                // copy samples
+                for(int iSampleIdx = 0; iSampleIdx < m_iOutputBlockSize; ++iSampleIdx) {
+                    for(int iChannelIdx = 0; iChannelIdx < m_StreamInfo.channel_count(); ++iChannelIdx) {
+                        matOutput(iChannelIdx, iSampleIdx) = static_cast<double>(m_vBufferedSamples[iSampleIdx][iChannelIdx]);
+                    }
                 }
-            }
 
-            // remove copied samples
-            for(unsigned int i = 0; i < m_iOutputBlockSize; ++i) {
-                m_vBufferedSamples.erase(m_vBufferedSamples.begin());
-            }
+                // remove copied samples
+                for(int i = 0; i < m_iOutputBlockSize; ++i) {
+                    m_vBufferedSamples.erase(m_vBufferedSamples.begin());
+                }
 
-            // publish new block
-            m_pRTMSA->data()->setValue(matOutput);
+                // publish new block
+                m_pRTMSA->data()->setValue(matOutput);
+            }
+        }
+        catch (std::exception& e) {
+            qDebug() << "[LSLAdapterProducer::readStream] Something went wrong while streaming data: " << e.what();
+            m_bIsRunning = false;
         }
     }
 
     // cleanup: close stream
-    m_StreamInlet->close_stream();
+    try {
+        m_StreamInlet->close_stream();
+    }
+    catch (std::exception& e) {
+        qDebug() << "[LSLAdapterProducer::readStream] Something went wrong when trying to close LSL stream: " << e.what();
+    }
 
     emit finished();
 }
@@ -160,7 +169,7 @@ void LSLAdapterProducer::readStream()
 
 void LSLAdapterProducer::setStreamInfo(const lsl::stream_info& stream)
 {
-    m_StreamInfo = stream;
+    m_StreamInfo = stream;   
     m_bHasStreamInfo = true;
 }
 

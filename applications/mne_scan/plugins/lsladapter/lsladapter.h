@@ -215,7 +215,6 @@ private:
     int                                             m_iNumberChannels;
     int                                             m_iOutputBlockSize;
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
-    QMutex                                          m_mutex;
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA;
 
     // LSL stream management
@@ -225,7 +224,7 @@ private:
     bool                                            m_bHasValidStream;
 
     // producer management
-    QThread                                         m_pProducerThread;
+    QThread                                         m_producerThread;
     LSLAdapterProducer*                             m_pProducer;
 };
 
