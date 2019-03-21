@@ -59,8 +59,11 @@ contains(MNECPP_CONFIG, buildBasicMneScanVersion) {
         # eegosports \
         # brainamp \
         # tmsi \
-        natus \
-        lsladapter \
+        natus
+
+    USE_LSL {
+            SUBDIRS += lsladapter
+    }
 
     #Algorithms
     SUBDIRS += \
