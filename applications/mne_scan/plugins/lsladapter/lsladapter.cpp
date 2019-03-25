@@ -433,6 +433,5 @@ void LSLAdapter::prepareFiffInfo(const lsl::stream_info &stream)
 
 void LSLAdapter::onBlockSizeChanged(const int newBlockSize)
 {
-    qDebug() << "new block size arrived";
     m_iOutputBlockSize = newBlockSize;
 }
