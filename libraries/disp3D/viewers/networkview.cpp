@@ -72,7 +72,7 @@ using namespace CONNECTIVITYLIB;
 NetworkView::NetworkView(QWidget* parent,
                          Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create())
+, m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create("NetworkView"))
 {
     QList<QSharedPointer<QWidget> > lWidgets;
     lWidgets << m_pConnectivitySettingsView;

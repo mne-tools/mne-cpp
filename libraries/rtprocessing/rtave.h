@@ -166,15 +166,9 @@ public:
     /**
     * Sets the artifact reduction
     *
-    * @param[in] bActivateThreshold     Whether to activate threshold artifact reduction or not
-    * @param[in] dValueThreshold        The artifact threshold value
-    * @param[in] bActivateVariance      Whether to activate variance artifact reduction or not
-    * @param[in] dValueVariance         The artifact variance value
+    * @param[in] mapThresholds       The new map including the current thresholds for the channels
     */
-    void setArtifactReduction(bool bActivateThreshold,
-                              double dValueThreshold,
-                              bool bActivateVariance,
-                              double dValueVariance);
+    void setArtifactReduction(const QMap<QString, double> &mapThresholds);
 
     //=========================================================================================================
     /**
@@ -262,12 +256,8 @@ protected:
 
     float                                           m_fTriggerThreshold;        /**< Threshold to detect trigger */
 
-    int                                             m_dValueVariance;           /**< Variance value to detect artifacts */
-
-    double                                          m_dValueThreshold;          /**< Threshold to detect artifacts */
-
     bool                                            m_bActivateThreshold;       /**< Whether to do threshold artifact reduction or not. */
-    bool                                            m_bActivateVariance;        /**< Whether to do variance artifact reduction or not. */
+
     bool                                            m_bDoBaselineCorrection;    /**< Whether to perform baseline correction. */
 
     QPair<QVariant,QVariant>                        m_pairBaselineSec;          /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
@@ -276,6 +266,7 @@ protected:
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                /**< Holds the fiff measurement information. */
     FIFFLIB::FiffEvokedSet                          m_stimEvokedSet;            /**< Holds the evoked information. */
 
+    QMap<QString,double>                            m_mapThresholds;            /**< Holds the current thresholds for artifact rejection. */
     QMap<double,QList<Eigen::MatrixXd> >            m_mapStimAve;               /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
     QMap<double,Eigen::MatrixXd>                    m_mapDataPre;               /**< The matrix holding pre stim data. */
     QMap<double,Eigen::MatrixXd>                    m_mapDataPost;              /**< The matrix holding post stim data. */
@@ -411,15 +402,9 @@ public:
     /**
     * Sets the artifact reduction
     *
-    * @param[in] bActivateThreshold     Whether to activate threshold artifact reduction or not
-    * @param[in] dValueThreshold        The artifact threshold value
-    * @param[in] bActivateVariance      Whether to activate variance artifact reduction or not
-    * @param[in] dValueVariance         The artifact variance value
+    * @param[in] mapThresholds       The new map including the current thresholds for the channels
     */
-    void setArtifactReduction(bool bActivateThreshold,
-                              double dValueThreshold,
-                              bool bActivateVariance,
-                              double dValueVariance);
+    void setArtifactReduction(const QMap<QString, double> &mapThresholds);
 
     //=========================================================================================================
     /**
@@ -475,10 +460,7 @@ signals:
     void averagePostStimChanged(qint32 samples,
                                 qint32 secs);
     void averageTriggerChIdxChanged(qint32 idx);
-    void averageArtifactReductionChanged(bool bActivateThreshold,
-                                         double dValueThreshold,
-                                         bool bActivateVariance,
-                                         double dValueVariance);
+    void averageArtifactReductionChanged(const QMap<QString, double> &mapThresholds);
     void averageBaselineActiveChanged(bool activate);
     void averageBaselineFromChanged(int fromSamp,
                                     int fromMSec);

@@ -70,7 +70,12 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
-: QOpenGLWidget(parent)
+:
+#if defined(USE_OPENGL)
+    QOpenGLWidget(parent)
+#else
+    QWidget(parent)
+#endif
 , m_pEvokedSetModel(NULL)
 , m_bIsInit(false)
 , m_bShowMAG(true)
@@ -261,7 +266,11 @@ void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels
 
 //*************************************************************************************************************
 
-void ButterflyView::paintGL()
+#if defined(USE_OPENGL)
+    void ButterflyView::paintGL()
+#else
+    void ButterflyView::paintEvent(QPaintEvent *event)
+#endif
 {
     QPainter painter(this);
 
@@ -424,7 +433,11 @@ void ButterflyView::paintGL()
         }
     }
 
+#if defined(USE_OPENGL)
     return QOpenGLWidget::paintGL();
+#else
+    return QWidget::paintEvent(event);
+#endif
 }
 
 

@@ -239,6 +239,8 @@ void ProjectorsView::onEnableDisableAllProj(bool status)
     }
 
     emit projSelectionChanged(m_pProjs);
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -262,4 +264,6 @@ void ProjectorsView::onCheckProjStatusChanged()
     }
 
     emit projSelectionChanged(m_pProjs);
+
+    saveSettings(m_sSettingsPath);
 }

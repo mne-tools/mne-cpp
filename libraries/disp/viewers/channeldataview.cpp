@@ -87,13 +87,16 @@ ChannelDataView::ChannelDataView(const QString& sSettingsPath,
 , m_bHideBadChannels(false)
 , m_sSettingsPath(sSettingsPath)
 {
+    m_pTableView = new QTableView;
+
+#if defined(USE_OPENGL)
     // Use QGLWidget for rendering the table view.
     // Unfortunatley, QOpenGLWidget is not able to change the background color, which is a must for this ChanalDataViewer.
-    m_pTableView = new QTableView;
     QGLFormat currentFormat = QGLFormat(QGL::SampleBuffers);
     currentFormat.setSamples(10);
     QGLWidget* pGLWidget = new QGLWidget(currentFormat);
     m_pTableView->setViewport(pGLWidget);
+#endif
 
     // Install event filter for tracking mouse movements
     m_pTableView->viewport()->installEventFilter(this);

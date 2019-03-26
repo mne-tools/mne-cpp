@@ -248,5 +248,7 @@ void ModalitySelectionView::onUpdateModalityCheckbox(qint32 state)
     }
 
     emit modalitiesChanged(m_modalityMap);
+
+    saveSettings(m_sSettingsPath);
 }
 

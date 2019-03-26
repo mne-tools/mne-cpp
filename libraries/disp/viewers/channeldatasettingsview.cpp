@@ -50,6 +50,7 @@
 
 #include <QColorDialog>
 #include <QSettings>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -277,7 +278,7 @@ void ChannelDataSettingsView::loadSettings(const QString& settingsPath)
     setWindowSize(settings.value(settingsPath + QString("/viewWindowSize"), 10).toInt());
     QColor color = Qt::blue;
     setSignalColor(settings.value(settingsPath + QString("/signalColor"), color).value<QColor>());
-    color = Qt::black;
+    color = Qt::white;
     setBackgroundColor(settings.value(settingsPath + QString("/backgroundColor"), color).value<QColor>());
     setDistanceTimeSpacer(settings.value(settingsPath + QString("/distanceTimeSpacer"), 1000).toInt());
 }
@@ -306,6 +307,8 @@ void ChannelDataSettingsView::onDistanceTimeSpacerChanged(qint32 value)
     }
 
     //emit updateConnectedView();
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -341,6 +344,8 @@ void ChannelDataSettingsView::onViewColorButtonClicked()
 
         emit backgroundColorChanged(m_colCurrentBackgroundColor);
     }
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -349,6 +354,8 @@ void ChannelDataSettingsView::onViewColorButtonClicked()
 void ChannelDataSettingsView::onTimeWindowChanged(int value)
 {
     emit timeWindowChanged(value);
+
+    saveSettings(m_sSettingsPath);
 }
 
 
@@ -357,6 +364,8 @@ void ChannelDataSettingsView::onTimeWindowChanged(int value)
 void ChannelDataSettingsView::onZoomChanged(double value)
 {
     emit zoomChanged(value);
+
+    saveSettings(m_sSettingsPath);
 }
 
 

@@ -190,7 +190,6 @@ void Natus::setUpFiffInfo()
 
             //Set unit
             fChInfo.unit = FIFF_UNIT_V;
-            fChInfo.unit_mul = 0;
 
             //Set EEG electrode location - Convert from mm to m
             fChInfo.eeg_loc(0,0) = 0;

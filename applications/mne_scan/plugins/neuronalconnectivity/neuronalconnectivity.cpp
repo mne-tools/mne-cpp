@@ -97,7 +97,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_fFreqBandLow(7.0f)
 , m_fFreqBandHigh(13.0f)
 , m_iBlockSize(1)
-, m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create())
+, m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create(this->getName()))
 {
 }
 
@@ -156,6 +156,12 @@ void NeuronalConnectivity::init()
     connect(m_pConnectivitySettingsView.data(), &ConnectivitySettingsView::freqBandChanged,
             this, &NeuronalConnectivity::onFrequencyBandChanged);
 
+    onFrequencyBandChanged(m_pConnectivitySettingsView->getLowerFreq(), m_pConnectivitySettingsView->getUpperFreq());
+    onMetricChanged(m_pConnectivitySettingsView->getConnectivityMetric());
+    onWindowTypeChanged(m_pConnectivitySettingsView->getWindowType());
+    onNumberTrialsChanged(m_pConnectivitySettingsView->getNumberTrials());
+    onTriggerTypeChanged(m_pConnectivitySettingsView->getTriggerType());
+
     m_pRTCEOutput->data()->addControlWidget(m_pConnectivitySettingsView);
 
     //Init rt connectivity worker
@@ -164,11 +170,6 @@ void NeuronalConnectivity::init()
             this, &NeuronalConnectivity::onNewConnectivityResultAvailable);
 
     m_pCircularNetworkBuffer = QSharedPointer<CircularBuffer<CONNECTIVITYLIB::Network> >(new CircularBuffer<CONNECTIVITYLIB::Network>(10));
-
-    //Init connectivity settings
-    m_sConnectivityMethods = QStringList() << "COR";
-    m_connectivitySettings.setConnectivityMethods(m_sConnectivityMethods);
-    m_connectivitySettings.setWindowType("Hanning");
 }
 
 
@@ -478,9 +479,6 @@ void NeuronalConnectivity::generateNodeVertices()
             if(!m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(picksTmp(i)))) {
                 m_vecPicks.conservativeResize(m_vecPicks.cols()+1);
                 m_vecPicks(m_vecPicks.cols()-1) = picksTmp(i);
-            } else if(!m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(picksTmp(i+1)))) {
-                m_vecPicks.conservativeResize(m_vecPicks.cols()+1);
-                m_vecPicks(m_vecPicks.cols()-1) = picksTmp(i+1);
             }
         }
     } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
@@ -500,23 +498,16 @@ void NeuronalConnectivity::generateNodeVertices()
 
 void NeuronalConnectivity::run()
 {
-    //
     // Wait for Fiff Info
-    //
     while(!m_pFiffInfo) {
         msleep(10);
     }    
 
-    // Init the frequency band selection to 1 to 50Hz
-    onFrequencyBandChanged(1,50);
-
     int skip_count = 0;
 
-    while(m_bIsRunning)
-    {
+    while(m_bIsRunning) {
         //Do processing after skip count has reached limit
-        if((skip_count % m_iDownSample) == 0)
-        {
+        if((skip_count % m_iDownSample) == 0) {
             //QMutexLocker locker(&m_mutex);
             //Do connectivity estimation here
             m_currentConnectivityResult = m_pCircularNetworkBuffer->pop();
@@ -524,7 +515,7 @@ void NeuronalConnectivity::run()
             //Send the data to the connected plugins and the online display
             if(!m_currentConnectivityResult.isEmpty()) {
                 //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
-                m_currentConnectivityResult.setFrequencyBins(m_fFreqBandLow, m_fFreqBandHigh);
+                m_currentConnectivityResult.setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
                 m_currentConnectivityResult.normalize();
                 m_pRTCEOutput->data()->setValue(m_currentConnectivityResult);
             } else {
@@ -561,7 +552,8 @@ void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
     }
 
     m_sConnectivityMethods = QStringList() << sMetric;
-    if(m_pRtConnectivity) {
+    m_connectivitySettings.setConnectivityMethods(m_sConnectivityMethods);
+    if(m_pRtConnectivity && m_bIsRunning) {
         m_pRtConnectivity->restart();
         m_pRtConnectivity->append(m_connectivitySettings);
     }
@@ -608,7 +600,7 @@ void NeuronalConnectivity::onFrequencyBandChanged(float fFreqLow, float fFreqHig
 
     //QMutexLocker locker(&m_mutex);
     if(!m_currentConnectivityResult.isEmpty()) {
-        m_currentConnectivityResult.setFrequencyBins(m_fFreqBandLow, m_fFreqBandHigh);
+        m_currentConnectivityResult.setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
         m_currentConnectivityResult.normalize();
         m_pCircularNetworkBuffer->push(m_currentConnectivityResult);
     }

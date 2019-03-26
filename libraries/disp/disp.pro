@@ -45,6 +45,10 @@ qtHaveModule(charts): QT += charts
 
 DEFINES += DISP_LIBRARY
 
+contains(MNECPP_CONFIG, dispOpenGL) {
+    DEFINES += USE_OPENGL
+}
+
 TARGET = Disp
 TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
@@ -120,6 +124,7 @@ SOURCES += \
     viewers/averagingsettingsview.cpp \
     viewers/projectsettingsview.cpp \
     viewers/control3dview.cpp \
+    viewers/artifactsettingsview.cpp \
     viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
@@ -164,6 +169,7 @@ HEADERS += \
     viewers/averagingsettingsview.h \
     viewers/projectsettingsview.h \
     viewers/control3dview.h \
+    viewers/artifactsettingsview.h \
     viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \

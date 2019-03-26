@@ -83,8 +83,8 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
     this->setMaximumWidth(330);
 
     m_pFilterView = FilterDesignView::SPtr::create(m_sSettingsPath,
-                                             this,
-                                             Qt::Window);
+                                                   this,
+                                                   Qt::Window);
 
     //Delete all widgets in the filter layout
     QGridLayout* topLayout = static_cast<QGridLayout*>(this->layout());
@@ -96,7 +96,7 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
     m_pCheckBox = new QCheckBox("Activate filter");
 
     connect(m_pCheckBox.data(), &QCheckBox::toggled,
-            this, &FilterSettingsView::filterActivationChanged);
+            this, &FilterSettingsView::onFilterActivationChanged);
 
     topLayout->addWidget(m_pCheckBox, 0, 0);
 
@@ -177,4 +177,14 @@ void FilterSettingsView::onShowFilterView()
         m_pFilterView->activateWindow();
         m_pFilterView->show();
     }
+}
+
+
+//*************************************************************************************************************
+
+void FilterSettingsView::onFilterActivationChanged()
+{
+    emit filterActivationChanged(m_pCheckBox->isChecked());
+
+    saveSettings(m_sSettingsPath);
 }
