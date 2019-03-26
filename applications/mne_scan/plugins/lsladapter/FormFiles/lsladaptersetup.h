@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2019, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -81,7 +81,6 @@ class LSLAdapterSetup : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a LSLAdapterSetup which is a child of parent.
@@ -96,38 +95,18 @@ public:
     */
     ~LSLAdapterSetup() = default;
 
-signals:
-
-    //=========================================================================================================
-    /**
-    * This tells the LSL Adapter that the user wants to refresh the displayed list of available LSL streams.
-    */
-    void refreshAvailableStreams();
-
-    //=========================================================================================================
-    /**
-    * This tells the LSL Adapter that the user has changed the stream selection.
-    */
-    void streamSelectionChanged(const lsl::stream_info& stream);
-
-    //=========================================================================================================
-    /**
-    * This tells the LSL Adapter that the user has changed the desired output block size
-    */
-    void blockSizeChanged(const int newBlockSize);
-
 public slots:
-
     //=========================================================================================================
     /**
     * This is called by the LSL Adapter, when it has finished scanning and filtering available LSL streams.
+    *
+    * @param [in] vStreamInfos A vector of available LSL streams
+    * @param [in] currentStream The current LSL stream.
     */
     void onLSLScanResults(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
 
 private slots:
-
     // auto-generated slots:
-
     void on_refreshAvailableStreams_released();
 
     void on_listLSLStreams_itemDoubleClicked(QListWidgetItem *pItem);
@@ -135,7 +114,6 @@ private slots:
     void on_blockSizeEdit_editingFinished();
 
 private:
-
     //=========================================================================================================
     /**
     * Helper method to update textfields.
@@ -146,6 +124,27 @@ private:
     QListWidgetItem*                            m_pCurrentSelectedStream;
 
     Ui::LSLSetupWidget                          ui;
+
+signals:
+    //=========================================================================================================
+    /**
+    * This tells the LSL Adapter that the user wants to refresh the displayed list of available LSL streams.
+    */
+    void refreshAvailableStreams();
+
+    //=========================================================================================================
+    /**
+    * This tells the LSL Adapter that the user has changed the stream selection.
+    *
+    * @param [in] stream The newly selected LSL stream, represented by stream_info object.
+    */
+    void streamSelectionChanged(const lsl::stream_info& stream);
+
+    //=========================================================================================================
+    /**
+    * This tells the LSL Adapter that the user has changed the desired output block size
+    */
+    void blockSizeChanged(const int newBlockSize);
 };
 
 } // NAMESPACE

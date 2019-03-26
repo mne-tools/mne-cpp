@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Simon Heinke and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2019, Simon Heinke and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -148,7 +148,6 @@ public:
     virtual inline QString getName() const;
 
 public slots:
-
     //=========================================================================================================
     /**
     * This is called by the UI, whenever the user wants to manually refresh the list of available LSL streams.
@@ -168,7 +167,6 @@ public slots:
     void onBlockSizeChanged(const int newBlockSize);
 
 protected:
-
     //=========================================================================================================
     /**
     * The LSLAdapter has an empty run method, as all of the work is done in the producer.
@@ -178,18 +176,7 @@ protected:
     */
     virtual void run();
 
-signals:
-
-    //=========================================================================================================
-    /**
-    * @brief This is emitted in order to tell the UI that the list of available LSL streams has been updated.
-    * @param vStreamInfos Vector of available LSL streams
-    * @param currentStream The LSL stream that the Adapter would currently connect to (upon start)
-    */
-    void updatedAvailableLSLStreams(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
-
 private slots:
-
     //=========================================================================================================
     /**
     * This is called by the QFutureWatcher, indicating that the background scanning is complete.
@@ -197,7 +184,6 @@ private slots:
     void onLSLStreamScanReady();
 
 private:
-
     //=========================================================================================================
     /**
     * Helper function for getting a list of LSL streams that fulfill the current filtering settings.
@@ -209,6 +195,18 @@ private:
     * Helper function that fills the FiffInfo member based on an LSL stream info.
     */
     void prepareFiffInfo(const lsl::stream_info& stream);
+
+    //=========================================================================================================
+    /**
+    * Helper function: apparently LSL does not have an '==' operator where one side is const, so this function compares the UIDs instead.
+    */
+    inline static bool contains(const QVector<lsl::stream_info>& v, const lsl::stream_info& s);
+
+    //=========================================================================================================
+    /**
+    * Helper function: simple validity check for stream infos (sometimes the resolved stream infos are empty)
+    */
+    inline static bool isValid(const lsl::stream_info& s);
 
     // fiff info / data output
     float                                           m_fSamplingFrequency;
@@ -226,6 +224,16 @@ private:
     // producer management
     QThread                                         m_producerThread;
     LSLAdapterProducer*                             m_pProducer;
+
+signals:
+    //=========================================================================================================
+    /**
+    * This is emitted in order to tell the UI that the list of available LSL streams has been updated.
+    *
+    * @param [in] vStreamInfos Vector of available LSL streams
+    * @param [in] currentStream The LSL stream that the Adapter would currently connect to (upon start)
+    */
+    void updatedAvailableLSLStreams(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
 };
 
 //*************************************************************************************************************
@@ -248,10 +256,8 @@ inline QString LSLAdapter::getName() const
 
 
 //************************************************************************************************************
-/**
-* @brief Apparently LSL does not have an '==' operator where one side is const, so this function compares the UIDs instead.
-*/
-inline bool contains(const QVector<lsl::stream_info>& v, const lsl::stream_info& s)
+
+inline bool LSLAdapter::contains(const QVector<lsl::stream_info>& v, const lsl::stream_info& s)
 {
     bool result = false;
     for(const auto& s2 : v)
@@ -261,10 +267,8 @@ inline bool contains(const QVector<lsl::stream_info>& v, const lsl::stream_info&
 
 
 //************************************************************************************************************
-/**
-* @brief Simple validity check for stream infos.
-*/
-inline bool isValid(const lsl::stream_info& s)
+
+inline bool LSLAdapter::isValid(const lsl::stream_info& s)
 {
     // stream with nonempty ID and name should be valid
     return (s.uid().empty() == false && s.name().empty() == false);

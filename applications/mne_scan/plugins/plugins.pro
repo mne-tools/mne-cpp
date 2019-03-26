@@ -61,9 +61,7 @@ contains(MNECPP_CONFIG, buildBasicMneScanVersion) {
         # tmsi \
         natus
 
-    USE_LSL {
-            SUBDIRS += lsladapter
-    }
+    contains(MNECPP_CONFIG, useLSL) { SUBDIRS += lsladapter }
 
     #Algorithms
     SUBDIRS += \
