@@ -82,6 +82,11 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
         return;
     }
 
+    if(connectivitySettings.getConnectivityMethods().isEmpty()) {
+        qDebug()<<"RtConnectivityWorker::doWork() - Network methods are empty";
+        return;
+    }
+
     ConnectivitySettings connectivitySettingsTemp = connectivitySettings;
 
     QElapsedTimer time;

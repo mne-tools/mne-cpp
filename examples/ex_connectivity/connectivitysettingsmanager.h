@@ -189,7 +189,7 @@ public:
         m_networkData = connectivityResults;
 
         for(int i = 0; i < connectivityResults.size(); ++i) {
-            m_networkData[i].setFrequencyBins(m_fFreqBandLow, m_fFreqBandHigh);
+            m_networkData[i].setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
             m_networkData[i].normalize();
         }
 

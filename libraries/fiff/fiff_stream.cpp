@@ -1987,7 +1987,7 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
 
 //*************************************************************************************************************
 
-FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel)
+FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel, bool bResetRange)
 {
     //
     //   We will always write floats
@@ -2150,8 +2150,11 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
         //
         //    Scan numbers may have been messed up
         //
-        chs[k].scanNo = k+1;//+1 because
-        cals[k] = chs[k].range * chs[k].cal; //See description FiffRawData.cals
+        chs[k].scanNo = k+1;
+        if(bResetRange) {
+            chs[k].range = 1.0; // Reset to 1.0 because we always write floats.
+        }
+        cals[k] = chs[k].cal;
         t_pStream->write_ch_info(chs[k]);
     }
     //

@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     filtersettingsview.h
-* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+* @file     artifactsettingsview.h
+* @author   Lorenz Esch <lorenzesch@hotmail.com>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2018
+* @date     January, 2018
 *
 * @section  LICENSE
 *
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the FilterSettingsView Class.
+* @brief    Declaration of the ArtifactSettingsView class.
 *
 */
 
-#ifndef FILTERSETTINGSVIEW_H
-#define FILTERSETTINGSVIEW_H
+#ifndef ARTIFACTSETTINGSVIEW_H
+#define ARTIFACTSETTINGSVIEW_H
 
 
 //*************************************************************************************************************
@@ -44,21 +44,17 @@
 
 #include "../disp_global.h"
 
+#include <fiff/fiff_ch_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
+#include <QPointer>
 #include <QWidget>
 #include <QMap>
-#include <QPointer>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -66,17 +62,18 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QPushButton;
 class QCheckBox;
+class QDoubleSpinBox;
+class QSpinBox;
+class QGridLayout;
 
+namespace Ui {
+    class AverageSettingsViewWidget;
+}
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace UTILSLIB {
-    class FilterData;
+namespace FIFFLIB {
+    class FiffEvokedSet;
+    class FiffChInfo;
 }
 
 
@@ -94,44 +91,45 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FilterDesignView;
 
-
-//=============================================================================================================
 /**
-* DECLARE CLASS FilterSettingsView
+* DECLARE CLASS ArtifactSettingsView
 *
-* @brief The FilterSettingsView class provides a view to select between different modalities
+* @brief The ArtifactSettingsView class provides an artifact rejection settings view.
 */
-class DISPSHARED_EXPORT FilterSettingsView : public QWidget
+class DISPSHARED_EXPORT ArtifactSettingsView : public QWidget
 {
     Q_OBJECT
 
-public:    
-    typedef QSharedPointer<FilterSettingsView> SPtr;              /**< Shared pointer type for FilterSettingsView. */
-    typedef QSharedPointer<const FilterSettingsView> ConstSPtr;   /**< Const shared pointer type for FilterSettingsView. */
+public:
+    typedef QSharedPointer<ArtifactSettingsView> SPtr;         /**< Shared pointer type for AveragingAdjustmentWidget. */
+    typedef QSharedPointer<ArtifactSettingsView> ConstSPtr;    /**< Const shared pointer type for AveragingAdjustmentWidget. */
+
+    explicit ArtifactSettingsView(const QString& sSettingsPath = "",
+                                 const QList<FIFFLIB::FiffChInfo>& fiffChInfoList = QList<FIFFLIB::FiffChInfo>(),
+                                 QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Constructs a FilterSettingsView which is a child of parent.
-    *
-    * @param [in] parent        parent of widget
+    * Destroys the ArtifactSettingsView.
     */
-    FilterSettingsView(const QString& sSettingsPath = "",
-                       QWidget *parent = 0,
-                       Qt::WindowFlags f = Qt::Widget);
+    ~ArtifactSettingsView();
 
-    //=========================================================================================================
-    /**
-    * Destroys the FilterSettingsView.
-    */
-    ~FilterSettingsView();
+    void setChInfo(const QList<FIFFLIB::FiffChInfo>& fiffChInfoList);
 
-    QSharedPointer<FilterDesignView> getFilterView();
+    QMap<QString,double> getThresholdMap();
 
-    bool getFilterActive();
+    void setThresholdMap(const QMap<QString,double>& mapThresholds);
+
+    bool getDoArtifactThresholdRejection();
 
 protected:
+    //=========================================================================================================
+    /**
+    * Redraw the GUI.
+    */
+    void redrawGUI();
+
     //=========================================================================================================
     /**
     * Saves all important settings of this view via QSettings.
@@ -148,28 +146,28 @@ protected:
     */
     void loadSettings(const QString& settingsPath);
 
-    //=========================================================================================================
-    /**
-    * Show the filter option screen to the user.
-    */
-    void onShowFilterView();
+    void onChangeArtifactThreshold();
 
-    //=========================================================================================================
-    /**
-    * Whenever the filter activation changed
-    */
-    void onFilterActivationChanged();
+    QString                         m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
 
-    QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QMap<QString,QDoubleSpinBox*>   m_mapChThresholdsDoubleSpinBoxes;
+    QMap<QString,QSpinBox*>         m_mapChThresholdsSpinBoxes;
 
-    QSharedPointer<FilterDesignView>              m_pFilterView;                  /**< The filter view. */
+    QMap<QString,double>            m_mapThresholdsFirst;
+    QMap<QString,int>               m_mapThresholdsSecond;
+    QMap<QString,double>            m_mapThresholds;
 
-    QPointer<QCheckBox>                     m_pCheckBox;                    /**< The filter activation check box. */
+    QList<FIFFLIB::FiffChInfo>      m_fiffChInfoList;
+
+    bool                            m_bDoArtifactThresholdReduction;
+
+    QPointer<QCheckBox>             m_pArtifactRejectionCheckBox;
 
 signals:
-    void filterActivationChanged(bool activated);
+    void changeArtifactThreshold(const QMap<QString,double>& mapThresholds);
+
 };
 
 } // NAMESPACE
 
-#endif // FILTERSETTINGSVIEW_H
+#endif // ARTIFACTSETTINGSVIEW_H

@@ -378,25 +378,25 @@ double Network::getThreshold()
 
 //*************************************************************************************************************
 
-void Network::setFrequencyBins(float fLowerFreq, float fUpperFreq)
+void Network::setFrequencyRange(float fLowerFreq, float fUpperFreq)
 {
     if(fLowerFreq > fUpperFreq || fUpperFreq < fLowerFreq) {
-        qDebug() << "Network::setFrequencyBins - Upper and lower frequency are out of range from each other. Weights will not be recalculated. Returning.";
+        qDebug() << "Network::setFrequencyRange - Upper and lower frequency are out of range from each other. Weights will not be recalculated. Returning.";
         return;
     }
 
     if(m_fSFreq <= 0.0f) {
-        qDebug() << "Network::setFrequencyBins - Sampling frequency has not been set. Returning.";
+        qDebug() << "Network::setFrequencyRange - Sampling frequency has not been set. Returning.";
         return;
     }
 
     if(fUpperFreq > m_fSFreq/2.0f) {
-        qDebug() << "Network::setFrequencyBins - Upper frequency is bigger than nyquist frequency. You might check the set sampling frequency. Returning.";
+        qDebug() << "Network::setFrequencyRange - Upper frequency is bigger than nyquist frequency. You might check the set sampling frequency. Returning.";
         return;
     }
 
     if(m_iNumberSamples <= 0) {
-        qDebug() << "Network::setFrequencyBins - Number of samples has not been set. Returning.";
+        qDebug() << "Network::setFrequencyRange - Number of samples has not been set. Returning.";
         return;
     }
 
@@ -425,7 +425,7 @@ void Network::setFrequencyBins(float fLowerFreq, float fUpperFreq)
 
 //*************************************************************************************************************
 
-const QPair<float,float>& Network::getFrequencyBins() const
+const QPair<float,float>& Network::getFrequencyRange() const
 {
     return m_minMaxFrequency;
 }
