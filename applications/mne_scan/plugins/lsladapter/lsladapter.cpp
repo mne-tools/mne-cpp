@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Simon Heinke and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2019, Simon Heinke and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -87,18 +87,18 @@ Q_DECLARE_METATYPE(QVector<lsl::stream_info>);
 //=============================================================================================================
 
 LSLAdapter::LSLAdapter()
-    : ISensor()
-    , m_fSamplingFrequency(-1.0f)
-    , m_iNumberChannels(-1)
-    , m_iOutputBlockSize(100)
-    , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
-    , m_pRTMSA(PluginOutputData<RealTimeMultiSampleArray>::create(this, "LSL Adapter", "LSL stream data"))
-    , m_updateStreamsFutureWatcher()
-    , m_vAvailableStreams()
-    , m_currentStream()
-    , m_bHasValidStream(false)
-    , m_producerThread()
-    , m_pProducer(new LSLAdapterProducer(m_pRTMSA, m_iOutputBlockSize))
+: ISensor()
+, m_fSamplingFrequency(-1.0f)
+, m_iNumberChannels(-1)
+, m_iOutputBlockSize(100)
+, m_pFiffInfo(QSharedPointer<FiffInfo>::create())
+, m_pRTMSA(PluginOutputData<RealTimeMultiSampleArray>::create(this, "LSL Adapter", "LSL stream data"))
+, m_updateStreamsFutureWatcher()
+, m_vAvailableStreams()
+, m_currentStream()
+, m_bHasValidStream(false)
+, m_producerThread()
+, m_pProducer(new LSLAdapterProducer(m_pRTMSA, m_iOutputBlockSize))
 {
     // would be better to do this on a single occasion
     qRegisterMetaType<lsl::stream_info>("lsl::stream_info");

@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Simon Heinke and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2019, Simon Heinke and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -67,10 +67,10 @@ using namespace LSLADAPTERPLUGIN;
 //=============================================================================================================
 
 LSLAdapterSetup::LSLAdapterSetup(int initialBlockSize, QWidget* parent)
-    : QWidget(parent)
-    , m_mItemToStreamInfo()
-    , m_pCurrentSelectedStream(Q_NULLPTR)
-    , ui()
+: QWidget(parent)
+, m_mItemToStreamInfo()
+, m_pCurrentSelectedStream(Q_NULLPTR)
+, ui()
 {
     ui.setupUi(this);
     // copy start value for block size into UI:
@@ -152,7 +152,6 @@ void LSLAdapterSetup::updateTextFields()
     }
     ui.currentStreamDescription->setStyleSheet("font: bold");
 }
-
 
 
 //*************************************************************************************************************

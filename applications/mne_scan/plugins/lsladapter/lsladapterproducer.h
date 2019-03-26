@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2019, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -146,23 +146,13 @@ public:
     void setOutputBlockSize(const int iNewBlockSize);
 
 public slots:
-
     //=========================================================================================================
     /**
     * The background thread of the LSLAdapter will run this function.
     */
     void readStream();
 
-signals:
-
-    //=========================================================================================================
-    /**
-    * This tells the LSLAdapter that the stream was stopped.
-    */
-    void finished();
-
 private:
-
     // LSL stuff
     lsl::stream_info                m_StreamInfo;
     lsl::stream_inlet*              m_StreamInlet;
@@ -175,6 +165,13 @@ private:
     int                             m_iOutputBlockSize;
     std::vector<std::vector<float>> m_vBufferedSamples;
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA;
+
+signals:
+    //=========================================================================================================
+    /**
+    * This tells the LSLAdapter that the stream was stopped.
+    */
+    void finished();
 };
 
 //*************************************************************************************************************

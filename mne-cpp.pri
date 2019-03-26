@@ -128,6 +128,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2018 Authors of mne-cpp. All rights reser
 ## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=static
 ## To build MNE-CPP Deep library based CNTK: qmake MNECPP_CONFIG+=buildDeep
 ## To build MNE-CPP with FFTW support in Eigen (make sure to specify FFTW_DIRs below): qmake MNECPP_CONFIG+=useFFTW
+## To build MNE Scan to support LSL data streams: qmake MNECPP_CONFIG+=useLSL
 
 # Default flags
 MNECPP_CONFIG +=
@@ -219,7 +220,3 @@ isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
 # FFTW dir
 FFTW_DIR_LIBS = $$shell_path(C:\fftw-3.3.5-dll64)
 FFTW_DIR_INCLUDE = $$shell_path(C:\fftw-3.3.5-dll64)
-
-
-# uncomment to use labstreaminglayer (LSL) library:
-# CONFIG += USE_LSL
