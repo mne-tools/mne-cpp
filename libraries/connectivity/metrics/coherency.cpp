@@ -96,8 +96,8 @@ Coherency::Coherency()
 
 //*************************************************************************************************************
 
-void Coherency::calculateReal(Network& finalNetwork,
-                              ConnectivitySettings &connectivitySettings)
+void Coherency::calculateAbs(Network& finalNetwork,
+                             ConnectivitySettings &connectivitySettings)
 {
 //    QElapsedTimer timer;
 //    qint64 iTime = 0;
@@ -154,10 +154,10 @@ void Coherency::calculateReal(Network& finalNetwork,
 
     // Compute CSD/sqrt(PSD_X * PSD_Y)
     std::function<void(QPair<int,MatrixXcd>&)> computePSDCSDLambda = [&](QPair<int,MatrixXcd>& pairInput) {
-        computePSDCSDReal(mutex,
-                          finalNetwork,
-                          pairInput,
-                          connectivitySettings.getIntermediateSumData().matPsdSum);
+        computePSDCSDAbs(mutex,
+                         finalNetwork,
+                         pairInput,
+                         connectivitySettings.getIntermediateSumData().matPsdSum);
     };
 
     QFuture<void> resultCSDPSD = QtConcurrent::map(connectivitySettings.getIntermediateSumData().vecPairCsdSum,
@@ -380,10 +380,10 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
 
 //*************************************************************************************************************
 
-void Coherency::computePSDCSDReal(QMutex& mutex,
-                                  Network& finalNetwork,
-                                  const QPair<int,MatrixXcd>& pairInput,
-                                  const MatrixXd& matPsdSum)
+void Coherency::computePSDCSDAbs(QMutex& mutex,
+                                 Network& finalNetwork,
+                                 const QPair<int,MatrixXcd>& pairInput,
+                                 const MatrixXd& matPsdSum)
 {
     MatrixXd matPSDtmp(matPsdSum.rows(), matPsdSum.cols());
     RowVectorXd rowPsdSum = matPsdSum.row(pairInput.first);

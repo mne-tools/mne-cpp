@@ -134,7 +134,7 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
 //    timer.restart();
 
     //Calculate all-to-all coherence matrix over epochs
-    Coherency::calculateReal(finalNetwork,
+    Coherency::calculateAbs(finalNetwork,
                              connectivitySettings);
 
 //    iTime = timer.elapsed();

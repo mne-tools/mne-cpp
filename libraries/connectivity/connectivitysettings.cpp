@@ -96,7 +96,8 @@ ConnectivitySettings::ConnectivitySettings()
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::clearAllData() {
+void ConnectivitySettings::clearAllData() 
+{
     m_trialData.clear();
 
     clearIntermediateData();
@@ -105,7 +106,8 @@ void ConnectivitySettings::clearAllData() {
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::clearIntermediateData() {
+void ConnectivitySettings::clearIntermediateData() 
+{
     for (int i = 0; i < m_trialData.size(); ++i) {
         m_trialData[i].matPsd.resize(0,0);
         m_trialData[i].vecPairCsd.clear();
