@@ -110,7 +110,7 @@ class GeometryMultiplier;
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DSHARED_EXPORT NetworkTreeItem : public AbstractMeshTreeItem
+class DISP3DSHARED_EXPORT NetworkTreeItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 
