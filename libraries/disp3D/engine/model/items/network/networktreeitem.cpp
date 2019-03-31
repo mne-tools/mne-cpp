@@ -93,7 +93,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 NetworkTreeItem::NetworkTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, const QString &text)
-: AbstractMeshTreeItem(p3DEntityParent, iType, text)
+: Abstract3DTreeItem(p3DEntityParent, iType, text)
 {
     initItem();
 }
@@ -338,7 +338,7 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
     if(!m_pEdges) {
         if(!m_pEdgesGeometry) {
             m_pEdgesGeometry = QSharedPointer<Qt3DExtras::QCylinderGeometry>::create();
-            m_pEdgesGeometry->setRadius(0.0005f);
+            m_pEdgesGeometry->setRadius(0.00025f);
             m_pEdgesGeometry->setLength(1.0f);
         }
 

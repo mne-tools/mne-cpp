@@ -158,7 +158,6 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
 }
 
 
-
 //*************************************************************************************************************
 
 MatrixXd Correlation::compute(const ConnectivitySettings::IntermediateTrialData& inputData)

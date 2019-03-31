@@ -112,13 +112,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Calculates the real part of coherency of the rows of the data matrix.
+    * Calculates the absolute value of coherency of the rows of the data matrix.
     *
     * @param[out]   finalNetwork          The resulting network.
     * @param[in]    connectivitySettings  The input data and parameters.
     */
-    static void calculateReal(Network& finalNetwork,
-                              ConnectivitySettings &connectivitySettings);
+    static void calculateAbs(Network& finalNetwork,
+                             ConnectivitySettings &connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -157,10 +157,10 @@ private:
     /**
     * Computes the PSD and CSD. This function gets called in parallel.
     */
-    static void computePSDCSDReal(QMutex& mutex,
-                                  Network& finalNetwork,
-                                  const QPair<int,Eigen::MatrixXcd>& pairInput,
-                                  const Eigen::MatrixXd& matPsdSum);
+    static void computePSDCSDAbs(QMutex& mutex,
+                                 Network& finalNetwork,
+                                 const QPair<int,Eigen::MatrixXcd>& pairInput,
+                                 const Eigen::MatrixXd& matPsdSum);
     static void computePSDCSDImag(QMutex& mutex,
                                   Network& finalNetwork,
                                   const QPair<int,Eigen::MatrixXcd>& pairInput,
