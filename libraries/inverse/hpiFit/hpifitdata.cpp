@@ -98,15 +98,19 @@ void HPIFitData::doDipfitConcurrent()
     int simplex_numitr = 0;
 
     this->coilPos = fminsearch(currentCoil,
-                                       maxiter,
-                                       2 * maxiter * currentCoil.cols(),
-                                       display,
-                                       currentData,
-                                       this->matProjector,
-                                       currentSensors,
-                                       simplex_numitr);
+                               maxiter,
+                               2 * maxiter * currentCoil.cols(),
+                               display,
+                               currentData,
+                               this->matProjector,
+                               currentSensors,
+                               simplex_numitr);
 
-    this->errorInfo = dipfitError(currentCoil, currentData, currentSensors, this->matProjector);
+    this->errorInfo = dipfitError(currentCoil,
+                                  currentData,
+                                  currentSensors,
+                                  this->matProjector);
+
     this->errorInfo.numIterations = simplex_numitr;
 }
 
@@ -218,13 +222,13 @@ bool HPIFitData::compare(HPISortStruct a, HPISortStruct b)
 //*************************************************************************************************************
 
 Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
-                           int maxiter,
-                           int maxfun,
-                           int display,
-                           const Eigen::MatrixXd& data,
-                           const Eigen::MatrixXd& matProjectors,
-                           const struct SensorInfo& sensors,
-                           int &simplex_numitr)
+                                       int maxiter,
+                                       int maxfun,
+                                       int display,
+                                       const Eigen::MatrixXd& data,
+                                       const Eigen::MatrixXd& matProjectors,
+                                       const struct SensorInfo& sensors,
+                                       int &simplex_numitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;
     std::string header, how;

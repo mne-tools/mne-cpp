@@ -122,7 +122,7 @@ void MeasurementTreeItem::initItem()
 //*************************************************************************************************************
 
 QList<SourceSpaceTreeItem*> MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace,
-                                                  Qt3DCore::QEntity* p3DEntityParent)
+                                                         Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
     QList<SourceSpaceTreeItem*> pReturnItem;
