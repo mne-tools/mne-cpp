@@ -134,7 +134,7 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
 
     //create geometry
     QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphereGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
-    pSourceSphereGeometry->setRadius(0.001f);
+    pSourceSphereGeometry->setRadius(0.00075f);
     //create instanced renderer
     GeometryMultiplier *pSphereMesh = new GeometryMultiplier(pSourceSphereGeometry);
 
@@ -185,8 +185,9 @@ void SourceSpaceTreeItem::plotSources(const MNEHemisphere& tHemisphere)
 
     //Add material
     GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
-    QColor defaultColor(255,0,0);
+    QColor defaultColor(212, 28, 92);
     pMaterial->setAmbient(defaultColor);
+    pMaterial->setAlpha(1.0f);
 
     pSourceSphereEntity->addComponent(pMaterial);
 }

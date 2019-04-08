@@ -119,6 +119,8 @@ int main(int argc, char *argv[])
 
     MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
     p3DDataModel->addForwardSolution(parser.value(subjectOption), "ClusteredForwardSolution", t_clusteredFwd);
+    p3DDataModel->addForwardSolution(parser.value(subjectOption), "ForwardSolution", t_forwardSolution);
+
 
     //Visualize result in 3D
     p3DAbstractView->show();
