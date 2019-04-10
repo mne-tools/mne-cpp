@@ -88,6 +88,14 @@ SUBDIRS += \
             ex_interpolation \
             ex_spectral \
             ex_tf_plot \
+            ex_edf_to_fif \
+
+        !isEmpty( CNTK_INCLUDE_DIR ) {
+            SUBDIRS += \
+                ex_deep \
+                ex_deep_eval \
+                ex_deep_model_viewer
+        }
     }
     else {
         message("examples.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
