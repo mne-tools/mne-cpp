@@ -116,7 +116,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
+    * Adds FreeSurfer data based on surfaces and annotation sets to this item.
     *
     * @param[in] tSensor            The BEM data.
     * @param[in] lChInfo            The channel information used to plot the MEG channels.

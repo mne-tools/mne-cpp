@@ -223,6 +223,14 @@ public:
     */
     FiffDigPointSet& operator<< (const FiffDigPoint* dig);
 
+    //=========================================================================================================
+    /**
+    * Apply a transforamtion matrix on the 3D position of the digitzed points.
+    *
+    * @param[in] coordTrans    FiffCoordTrans which is to be applied
+    */
+    void applyTransforamtion(const FiffCoordTrans& coordTrans);
+
 //    ToDo:
 //    //=========================================================================================================
 //    /**
