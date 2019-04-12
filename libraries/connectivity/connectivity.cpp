@@ -106,56 +106,57 @@ QList<Network> Connectivity::calculate(ConnectivitySettings& connectivitySetting
 
     if(lMethods.contains("WPLI")) {
         timer.restart();
-        results.append(WeightedPhaseLagIndex::calculate(connectivitySettings));
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated WPLI for" << iNTrials << "trials in"<< timer.elapsed() << "msecs.";
+        Network networktemp = WeightedPhaseLagIndex::calculate(connectivitySettings);
+        qWarning() << "Connectivity::calculateMultiMethods - Calculated WPLI for" << iNTrials << "trials in"<< timer.elapsed() << "msecs.";
+        results.append(networktemp);
     }
 
     if(lMethods.contains("USPLI")) {
         timer.restart();
         results.append(UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings));
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated USPLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Connectivity::calculateMultiMethods - Calculated USPLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
     }
 
     if(lMethods.contains("COR")) {
         timer.restart();
         results.append(Correlation::calculate(connectivitySettings));
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated COR for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Connectivity::calculateMultiMethods - Calculated COR for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
     }
 
     if(lMethods.contains("XCOR")) {
         timer.restart();
         results.append(CrossCorrelation::calculate(connectivitySettings));
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated XCOR for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Connectivity::calculateMultiMethods - Calculated XCOR for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
     }
 
     if(lMethods.contains("PLI")) {
         timer.restart();
         results.append(PhaseLagIndex::calculate(connectivitySettings));
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated PLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Connectivity::calculateMultiMethods - Calculated PLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
     }
 
     if(lMethods.contains("COH")) {
         timer.restart();
         results.append(Coherence::calculate(connectivitySettings));
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated COH for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Connectivity::calculateMultiMethods - Calculated COH for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
     }
 
     if(lMethods.contains("IMAGCOH")) {
         timer.restart();
         results.append(ImagCoherence::calculate(connectivitySettings));
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated IMAGCOH for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Connectivity::calculateMultiMethods - Calculated IMAGCOH for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
     }
 
     if(lMethods.contains("PLV")) {
         timer.restart();
         results.append(PhaseLockingValue::calculate(connectivitySettings));
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated PLV for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Connectivity::calculateMultiMethods - Calculated PLV for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
     }
 
     if(lMethods.contains("DSWPLI")) {
         timer.restart();
         results.append(DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings));
-        qDebug() << "Connectivity::calculateMultiMethods - Calculated DSWPLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Connectivity::calculateMultiMethods - Calculated DSWPLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
     }
 
     return results;

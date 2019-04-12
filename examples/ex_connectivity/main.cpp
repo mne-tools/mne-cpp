@@ -82,6 +82,7 @@
 #include <QFile>
 #include <QObject>
 #include <QVariant>
+#include <QDateTime>
 
 
 //*************************************************************************************************************
@@ -104,6 +105,51 @@ using namespace UTILSLIB;
 // MAIN
 //=============================================================================================================
 
+QString m_sFileName;
+
+void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    Q_UNUSED(context);
+
+    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
+    QString txt = QString("[%1] ").arg(dt);
+
+    bool writeToLog = false;
+
+    switch (type) {
+        //      case QtDebugMsg:
+        //         txt += QString("{Debug} \t\t %1").arg(msg);
+        //         break;
+              case QtWarningMsg:
+                 txt += QString("{Warning} \t %1").arg(msg);
+                 writeToLog=true;
+                 break;
+        //      case QtCriticalMsg:
+        //         txt += QString("{Critical} \t %1").arg(msg);
+        //         break;
+//        case QtFatalMsg:
+//            txt += QString("{Fatal} \t\t %1").arg(msg);
+//            abort();
+//            break;
+    }
+
+    if(!writeToLog) {
+        return;
+    }
+
+    if(m_sFileName.isEmpty()) {
+        QString dtf = QDateTime::currentDateTime().toString("yyyy_MM_dd_hh_mm_ss");
+        m_sFileName = dtf + "_ex_connectivity_LogFile.log";
+    }
+
+    QFile outFile(m_sFileName);
+    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
+
+    QTextStream textStream(&outFile);
+    textStream << txt << endl;
+}
+
+
 //=============================================================================================================
 /**
 * The function main marks the entry point of the program.
@@ -115,6 +161,8 @@ using namespace UTILSLIB;
 */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(customMessageHandler);
+
     QApplication a(argc, argv);
 
     QCommandLineParser parser;
@@ -122,16 +170,16 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
 
     QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
-    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
+    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "WPLI");
+    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
-    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.4");
+    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.0");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "1.66666");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
@@ -266,7 +314,7 @@ int main(int argc, char *argv[])
 
         // Transform to a more generic data matrix list, pick only channels of interest and remove EOG channel
         MatrixXd matData;
-        int iNumberRows = picks.cols(); //picks.cols() 32
+        int iNumberRows = 32; //picks.cols() 32
 
         for(int i = 0; i < data.size(); ++i) {
             matData.resize(iNumberRows, data.at(i)->epoch.cols());
@@ -339,71 +387,119 @@ int main(int argc, char *argv[])
         pConnectivitySettingsManager->m_settings.setNodePositions(t_clusteredFwd, tSurfSetInflated);
     }
 
+
+    // ------------------------------------- TIMING and performance measurement START -------------------------------------
+
+    int iNumberTrials = 1;
+
+    if(!matDataList.isEmpty()) {
+        qWarning() << "sConnectivityMethod" << sConnectivityMethod;
+        qWarning() << "sAnnotType" << sAnnotType;
+        qWarning() << "sSubj" << sSubj;
+        qWarning() << "sSubjDir" << sSubjDir;
+        qWarning() << "sFwd" << sFwd;
+        qWarning() << "sCov" << sCov;
+        qWarning() << "sSourceLocMethod" << sSourceLocMethod;
+        qWarning() << "sCoilType" << sCoilType;
+        qWarning() << "sChType" << sChType;
+        qWarning() << "sEve" << sEve;
+        qWarning() << "sRaw" << sRaw;
+        qWarning() << "fTMin" << fTMin;
+        qWarning() << "fTMax" << fTMax;
+        qWarning() << "dSnr" << dSnr;
+        qWarning() << "iEvent" << iEvent;
+        qWarning() << "iNumberSamples" << matDataList.first().cols();
+        qWarning() << "iNumberChannels" << matDataList.first().rows();
+        qWarning() << "iNumberTrials" << iNumberTrials;
+    } else {
+        return a.exec();
+    }
+
     //Do connectivity estimation and visualize results
-    pConnectivitySettingsManager->m_settings.setConnectivityMethods(QStringList() << sConnectivityMethod);
-    pConnectivitySettingsManager->m_settings.setSamplingFrequency(raw.info.sfreq);
-    pConnectivitySettingsManager->m_settings.setWindowType("hanning");
+    ConnectivitySettings connectivitySettings;
+    connectivitySettings.setConnectivityMethods(QStringList() << sConnectivityMethod);
+    connectivitySettings.setSamplingFrequency(raw.info.sfreq);
+    connectivitySettings.setWindowType("hanning");
 
     ConnectivitySettings::IntermediateTrialData connectivityData;
-    for(int i = 0; i < matDataList.size(); i++) {
+    for(int i = 0; i < iNumberTrials; i++) {
         // Only calculate connectivity for post stim
         connectivityData.matData = matDataList.at(i).block(0,
                                                            samplesToCutOut,
                                                            matDataList.at(i).rows(),
                                                            matDataList.at(i).cols()-samplesToCutOut);
-        pConnectivitySettingsManager->m_settings.append(connectivityData);
-        pConnectivitySettingsManager->m_dataListOriginal.append(connectivityData);
+        connectivitySettings.append(connectivityData);
     }
 
-    //Create NetworkView
-    NetworkView tNetworkView;
-    tNetworkView.show();
+    Connectivity connectivityObj;
+    connectivityObj.calculate(connectivitySettings);
 
-    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::connectivityMetricChanged,
-                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onConnectivityMetricChanged);
+    return 0;
 
-    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::numberTrialsChanged,
-                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onNumberTrialsChanged);
+    // ------------------------------------- TIMING and performance measurement END -------------------------------------
 
-    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::freqBandChanged,
-                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onFreqBandChanged);
 
-    QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
-                     [&](const QString& a, const QString& b, const Network& c) {if(NetworkTreeItem* pNetworkTreeItem = tNetworkView.addData(a,b,c)) {
-                                                                                    pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
-                                                                                }}
-    );
+//    ConnectivitySettings::IntermediateTrialData connectivityData;
+//    for(int i = 0; i < matDataList.size(); i++) {
+//        // Only calculate connectivity for post stim
+//        connectivityData.matData = matDataList.at(i).block(0,
+//                                                           samplesToCutOut,
+//                                                           matDataList.at(i).rows(),
+//                                                           matDataList.at(i).cols()-samplesToCutOut);
+//        pConnectivitySettingsManager->m_settings.append(connectivityData);
+//        pConnectivitySettingsManager->m_dataListOriginal.append(connectivityData);
+//    }
 
-    //Read and show sensor helmets
-    if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
-        QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
-        MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-        tNetworkView.getTreeModel()->addMegSensorInfo("Sensors",
-                                                      "VectorView",
-                                                      raw.info.chs,
-                                                      t_sensorSurfaceVV,
-                                                      raw.info.bads);
-    } else {
-        //Add source loc data and init some visualization values
-        if(MneEstimateTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
-                                                                                         evoked.comment,
-                                                                                         sourceEstimateEvoked,
-                                                                                         t_clusteredFwd,
-                                                                                         tSurfSetInflated,
-                                                                                         tAnnotSet)) {
-            pRTDataItem->setLoopState(true);
-            pRTDataItem->setTimeInterval(17);
-            pRTDataItem->setNumberAverages(1);
-            pRTDataItem->setStreamingState(false);
-            pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
-            pRTDataItem->setVisualizationType("Interpolation based");
-            pRTDataItem->setColormapType("Jet");
-            pRTDataItem->setAlpha(0.5f);
-        }
-    }
+//    //Create NetworkView
+//    NetworkView tNetworkView;
+//    tNetworkView.show();
 
-    tNetworkView.getConnectivitySettingsView()->setNumberTrials(1);
-    pConnectivitySettingsManager->onNumberTrialsChanged(1);
+//    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::connectivityMetricChanged,
+//                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onConnectivityMetricChanged);
 
-    return a.exec();
+//    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::numberTrialsChanged,
+//                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onNumberTrialsChanged);
+
+//    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::freqBandChanged,
+//                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onFreqBandChanged);
+
+//    QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
+//                     [&](const QString& a, const QString& b, const Network& c) {if(NetworkTreeItem* pNetworkTreeItem = tNetworkView.addData(a,b,c)) {
+//                                                                                    pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
+//                                                                                }}
+//    );
+
+//    //Read and show sensor helmets
+//    if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
+//        QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+//        MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+//        tNetworkView.getTreeModel()->addMegSensorInfo("Sensors",
+//                                                      "VectorView",
+//                                                      raw.info.chs,
+//                                                      t_sensorSurfaceVV,
+//                                                      raw.info.bads);
+//    } else {
+//        //Add source loc data and init some visualization values
+//        if(MneEstimateTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
+//                                                                                         evoked.comment,
+//                                                                                         sourceEstimateEvoked,
+//                                                                                         t_clusteredFwd,
+//                                                                                         tSurfSetInflated,
+//                                                                                         tAnnotSet)) {
+//            pRTDataItem->setLoopState(true);
+//            pRTDataItem->setTimeInterval(17);
+//            pRTDataItem->setNumberAverages(1);
+//            pRTDataItem->setStreamingState(false);
+//            pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
+//            pRTDataItem->setVisualizationType("Interpolation based");
+//            pRTDataItem->setColormapType("Jet");
+//            pRTDataItem->setAlpha(0.5f);
+//        }
+//    }
+
+//    int iNumberTrials = 1;
+//    tNetworkView.getConnectivitySettingsView()->setNumberTrials(iNumberTrials);
+//    pConnectivitySettingsManager->onNumberTrialsChanged(iNumberTrials);
+
+//    return a.exec();
 }

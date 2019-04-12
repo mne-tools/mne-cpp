@@ -96,9 +96,9 @@ Coherence::Coherence()
 
 Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
 
     Network finalNetwork("COH");
     if(connectivitySettings.isEmpty()) {
@@ -109,9 +109,9 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
     finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
-//    iTime = timer.elapsed();
-//    qDebug() << "Coherence::coherence timer - Empty network creation:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qDebug() << "Coherence::coherence timer - Empty network creation:" << iTime;
+    timer.restart();
 
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();
@@ -129,17 +129,17 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-//    iTime = timer.elapsed();
-//    qDebug() << "Coherence::coherence timer - Create nodes:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qDebug() << "Coherence::coherence timer - Create nodes:" << iTime;
+    timer.restart();
 
     //Calculate all-to-all coherence matrix over epochs
     Coherency::calculateAbs(finalNetwork,
                              connectivitySettings);
 
-//    iTime = timer.elapsed();
-//    qDebug() << "Coherence::coherence timer - Actual computation:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qDebug() << "Coherence::coherence timer - Actual computation:" << iTime;
+    timer.restart();
 
     return finalNetwork;
 }
