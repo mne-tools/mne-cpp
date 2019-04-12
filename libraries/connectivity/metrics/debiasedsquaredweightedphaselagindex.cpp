@@ -98,9 +98,9 @@ DebiasedSquaredWeightedPhaseLagIndex::DebiasedSquaredWeightedPhaseLagIndex()
 
 Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
 
     Network finalNetwork("DSWPLI");
 
@@ -160,26 +160,26 @@ Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& co
                        tapers);
     };
 
-    //    iTime = timer.elapsed();
-    //    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::calculate timer - Preparation:" << iTime;
-    //    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "Preparation" << iTime;
+    timer.restart();
 
     // Compute DSWPLI in parallel for all trials
     QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
-//    iTime = timer.elapsed();
-//    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::calculate timer - Compute DSWPLI per trial:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+    timer.restart();
 
     // Compute DSWPLI
     computeDSWPLI(connectivitySettings,
                   finalNetwork);
 
-//    iTime = timer.elapsed();
-//    qDebug() << "DebiasedSquaredWeightedPhaseLagIndex::calculate timer - Compute DSWPLI, Network creation:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "Compute" << iTime;
+    timer.restart();
 
     return finalNetwork;
 }

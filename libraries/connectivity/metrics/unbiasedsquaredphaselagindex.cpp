@@ -98,9 +98,9 @@ UnbiasedSquaredPhaseLagIndex::UnbiasedSquaredPhaseLagIndex()
 
 Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
 
     Network finalNetwork("USPLI");
 
@@ -159,26 +159,26 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
                 tapers);
     };
 
-//    iTime = timer.elapsed();
-//    qDebug() << "UnbiasedSquaredPhaseLagIndex::calculate timer - Preparation:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "Preparation" << iTime;
+    timer.restart();
 
     // Compute DSWPLV in parallel for all trials
     QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
-//    iTime = timer.elapsed();
-//    qDebug() << "UnbiasedSquaredPhaseLagIndex::calculate timer - Compute USPLI per trial:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+    timer.restart();
 
     // Compute USPLI
     computeUSPLI(connectivitySettings,
                  finalNetwork);
 
-//    iTime = timer.elapsed();
-//    qDebug() << "UnbiasedSquaredPhaseLagIndex::calculate timer - Compute USPLI, Network creation:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "Compute" << iTime;
+    timer.restart();
 
     return finalNetwork;
 }

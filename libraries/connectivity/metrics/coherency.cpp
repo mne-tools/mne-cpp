@@ -141,7 +141,7 @@ void Coherency::calculateAbs(Network& finalNetwork,
     };
 
     iTime = timer.elapsed();
-    qDebug() << "Coherency::computeCoherencyReal timer - Preparation:" << iTime;
+    qWarning() << "Preparation" << iTime;
     timer.restart();
 
     QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
@@ -149,7 +149,7 @@ void Coherency::calculateAbs(Network& finalNetwork,
     result.waitForFinished();
 
     iTime = timer.elapsed();
-    qDebug() << "Coherency::computeCoherencyReal timer - PSD/CSD computation:" << iTime;
+    qWarning() << "ComputeSpectraPSDCSD" << iTime;
     timer.restart();
 
     // Compute CSD/sqrt(PSD_X * PSD_Y)
@@ -165,7 +165,7 @@ void Coherency::calculateAbs(Network& finalNetwork,
     resultCSDPSD.waitForFinished();
 
     iTime = timer.elapsed();
-    qDebug() << "Coherency::computeCoherencyReal timer - Network creation CSD/sqrt(PSD_X * PSD_Y):" << iTime;
+    qWarning() << "Compute" << iTime;
     timer.restart();
 }
 
@@ -175,9 +175,9 @@ void Coherency::calculateAbs(Network& finalNetwork,
 void Coherency::calculateImag(Network& finalNetwork,
                               ConnectivitySettings &connectivitySettings)
 {
-//        QElapsedTimer timer;
-//        qint64 iTime = 0;
-//        timer.start();
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "Coherency::calculateImag - Input data is empty";
@@ -216,17 +216,17 @@ void Coherency::calculateImag(Network& finalNetwork,
                 tapers);
     };
 
-//        iTime = timer.elapsed();
-//        qDebug() << "Coherency::computeCoherencyImag timer - Preparation:" << iTime;
-//        timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "Preparation" << iTime;
+    timer.restart();
 
     QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
-//        iTime = timer.elapsed();
-//        qDebug() << "Coherency::computeCoherencyImag timer - PSD/CSD computation:" << iTime;
-//        timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+    timer.restart();
 
     // Compute CSD/sqrt(PSD_X * PSD_Y)
     std::function<void(QPair<int,MatrixXcd>&)> computePSDCSDLambda = [&](QPair<int,MatrixXcd>& pairInput) {
@@ -240,9 +240,9 @@ void Coherency::calculateImag(Network& finalNetwork,
                                                    computePSDCSDLambda);
     resultCSDPSD.waitForFinished();
 
-//        iTime = timer.elapsed();
-//        qDebug() << "Coherency::computeCoherencyImag timer - Network creation CSD/sqrt(PSD_X * PSD_Y):" << iTime;
-//        timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "Compute" << iTime;
+    timer.restart();
 }
 
 

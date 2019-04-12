@@ -161,7 +161,7 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
     };
 
     iTime = timer.elapsed();
-    qWarning() << "WeightedPhaseLagIndex::calculate timer - Preparation:" << iTime;
+    qWarning() << "Preparation" << iTime;
     timer.restart();
 
     // Compute WPLI in parallel for all trials
@@ -170,7 +170,7 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
     result.waitForFinished();
 
     iTime = timer.elapsed();
-    qWarning() << "WeightedPhaseLagIndex::calculate timer - Compute Spectra, PSD, CSD per trial:" << iTime;
+    qWarning() << "ComputeSpectraPSDCSD" << iTime;
     timer.restart();
 
     // Compute WPLI
@@ -178,7 +178,7 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
                finalNetwork);
 
     iTime = timer.elapsed();
-    qWarning() << "WeightedPhaseLagIndex::calculate timer - Compute WPLI, create Network:" << iTime;
+    qWarning() << "Compute" << iTime;
     timer.restart();
 
     return finalNetwork;
@@ -315,9 +315,11 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
     }
 
     //Do not store data to save memory
-    inputData.vecPairCsd.clear();
-    inputData.vecPairCsdImagAbs.clear();
-    inputData.vecTapSpectra.clear();
+    if(!m_bStorageModeIsActive) {
+        inputData.vecPairCsd.clear();
+        inputData.vecPairCsdImagAbs.clear();
+        inputData.vecTapSpectra.clear();
+    }
 }
 
 

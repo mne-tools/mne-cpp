@@ -98,9 +98,9 @@ PhaseLagIndex::PhaseLagIndex()
 
 Network PhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
 
     Network finalNetwork("PLI");
 
@@ -158,26 +158,25 @@ Network PhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
                 tapers);
     };
 
-//    iTime = timer.elapsed();
-//    qDebug() << "PhaseLagIndex::calculate timer - Preparation:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "Preparation" << iTime;
+    timer.restart();
 
     // Compute DSWPLV in parallel for all trials
     QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
-//    iTime = timer.elapsed();
-//    qDebug() << "PhaseLagIndex::calculate timer - Compute PLI per trial:" << iTime;
-//    timer.restart();
-
+    iTime = timer.elapsed();
+    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+    timer.restart();
     // Compute PLI
     computePLI(connectivitySettings,
                finalNetwork);
 
-//    iTime = timer.elapsed();
-//    qDebug() << "PhaseLagIndex::calculate timer - Compute PLI, Network creation:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "Compute" << iTime;
+    timer.restart();
 
     return finalNetwork;
 }
