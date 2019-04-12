@@ -286,6 +286,12 @@ void PhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputDa
             mutex.unlock();
         }
     }
+
+    if(!m_bStorageModeIsActive) {
+        inputData.vecPairCsd.clear();
+        inputData.vecTapSpectra.clear();
+        inputData.vecPairCsdImagSign.clear();
+    }
 }
 
 

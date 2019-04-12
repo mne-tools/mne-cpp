@@ -277,4 +277,8 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
 //    iTime = timer.elapsed();
 //    qDebug() << QThread::currentThreadId() << "CrossCorrelation::compute timer - Summing up matDist:" << iTime;
 //    timer.restart();
+
+    if(!m_bStorageModeIsActive) {
+        inputData.vecTapSpectra.clear();
+    }
 }

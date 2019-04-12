@@ -294,6 +294,12 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
             mutex.unlock();
         }
     }
+
+    if(!m_bStorageModeIsActive) {
+        inputData.vecPairCsd.clear();
+        inputData.vecTapSpectra.clear();
+        inputData.vecPairCsdImagSign.clear();
+    }
 }
 
 

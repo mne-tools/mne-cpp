@@ -313,6 +313,13 @@ void DebiasedSquaredWeightedPhaseLagIndex::compute(ConnectivitySettings::Interme
             mutex.unlock();
         }
     }
+
+    if(!m_bStorageModeIsActive) {
+        inputData.vecPairCsd.clear();
+        inputData.vecTapSpectra.clear();
+        inputData.vecPairCsdImagAbs.clear();
+        inputData.vecPairCsdImagSqrd.clear();
+    }
 }
 
 
