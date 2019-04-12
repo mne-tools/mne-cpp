@@ -92,6 +92,10 @@ Correlation::Correlation()
 
 Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
 {
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
+
     Network finalNetwork("COR");
 
     if(connectivitySettings.isEmpty()) {
@@ -118,6 +122,10 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
+    iTime = timer.elapsed();
+    qWarning() << "Preparation" << iTime;
+    timer.restart();
+
     // Calculate connectivity matrix over epochs and average afterwards
     //double dScalingStep = 1.0/matDataList.size();
     //dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
@@ -137,6 +145,10 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
 
     matDist /= connectivitySettings.size();
 
+    iTime = timer.elapsed();
+    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+    timer.restart();
+
     //Add edges to network
     MatrixXd matWeight(1,1);
     QSharedPointer<NetworkEdge> pEdge;
@@ -153,6 +165,10 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
             finalNetwork.append(pEdge);
         }
     }
+
+    iTime = timer.elapsed();
+    qWarning() << "Compute" << iTime;
+    timer.restart();
 
     return finalNetwork;
 }

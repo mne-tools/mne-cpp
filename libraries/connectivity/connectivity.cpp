@@ -102,61 +102,58 @@ QList<Network> Connectivity::calculate(ConnectivitySettings& connectivitySetting
     QList<Network> results;
     QElapsedTimer timer;
 
-    int iNTrials = connectivitySettings.getTrialData().size();
-
     if(lMethods.contains("WPLI")) {
         timer.restart();
-        Network networktemp = WeightedPhaseLagIndex::calculate(connectivitySettings);
-        qWarning() << "Connectivity::calculateMultiMethods - Calculated WPLI for" << iNTrials << "trials in"<< timer.elapsed() << "msecs.";
-        results.append(networktemp);
+        results.append(WeightedPhaseLagIndex::calculate(connectivitySettings));
+        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("USPLI")) {
         timer.restart();
         results.append(UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings));
-        qWarning() << "Connectivity::calculateMultiMethods - Calculated USPLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("COR")) {
         timer.restart();
         results.append(Correlation::calculate(connectivitySettings));
-        qWarning() << "Connectivity::calculateMultiMethods - Calculated COR for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("XCOR")) {
         timer.restart();
         results.append(CrossCorrelation::calculate(connectivitySettings));
-        qWarning() << "Connectivity::calculateMultiMethods - Calculated XCOR for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("PLI")) {
         timer.restart();
         results.append(PhaseLagIndex::calculate(connectivitySettings));
-        qWarning() << "Connectivity::calculateMultiMethods - Calculated PLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("COH")) {
         timer.restart();
         results.append(Coherence::calculate(connectivitySettings));
-        qWarning() << "Connectivity::calculateMultiMethods - Calculated COH for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("IMAGCOH")) {
         timer.restart();
         results.append(ImagCoherence::calculate(connectivitySettings));
-        qWarning() << "Connectivity::calculateMultiMethods - Calculated IMAGCOH for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("PLV")) {
         timer.restart();
         results.append(PhaseLockingValue::calculate(connectivitySettings));
-        qWarning() << "Connectivity::calculateMultiMethods - Calculated PLV for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("DSWPLI")) {
         timer.restart();
         results.append(DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings));
-        qWarning() << "Connectivity::calculateMultiMethods - Calculated DSWPLI for" << iNTrials << "trials in" << timer.elapsed() << "msecs.";
+        qWarning() << "Total" << timer.elapsed();
     }
 
     return results;
