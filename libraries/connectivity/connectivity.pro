@@ -109,7 +109,6 @@ HEADERS += \
     network/networkedge.h \
     connectivitysettings.h \
     connectivity.h \
-
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
