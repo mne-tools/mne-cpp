@@ -287,6 +287,12 @@ void PhaseLockingValue::compute(ConnectivitySettings::IntermediateTrialData& inp
             mutex.unlock();
         }
     }
+
+    if(!m_bStorageModeIsActive) {
+        inputData.vecPairCsd.clear();
+        inputData.vecTapSpectra.clear();
+        inputData.vecPairCsdNormalized.clear();
+    }
 }
 
 
