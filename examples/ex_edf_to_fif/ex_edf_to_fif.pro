@@ -78,10 +78,10 @@ else {
 
 DESTDIR =  $${MNE_BINARY_DIR}
 
-SOURCES += \
-        main.cpp \
+SOURCES +=  main.cpp \
+            edfinfo.cpp \
 
-HEADERS += \
+HEADERS +=  edfinfo.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
