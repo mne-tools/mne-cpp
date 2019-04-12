@@ -127,23 +127,23 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
     timer.restart();
 
     // Calculate connectivity matrix over epochs and average afterwards
-    //double dScalingStep = 1.0/matDataList.size();
-    //dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
+//    double dScalingStep = 1.0/matDataList.size();
+//    dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
 
-//    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.getTrialData(),
-//                                                              compute,
-//                                                              reduce);
-//    resultMat.waitForFinished();
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.getTrialData(),
+                                                              compute,
+                                                              reduce);
+    resultMat.waitForFinished();
 
-//    MatrixXd matDist = resultMat.result();
+    MatrixXd matDist = resultMat.result();
 
-    MatrixXd matDist;
+//    MatrixXd matDist;
 
-    for(int i = 0; i < connectivitySettings.getTrialData().size(); ++i) {
-        reduce(matDist, compute(connectivitySettings.getTrialData().at(i)));
-    }
+//    for(int i = 0; i < connectivitySettings.getTrialData().size(); ++i) {
+//        reduce(matDist, compute(connectivitySettings.getTrialData().at(i)));
+//    }
 
-    matDist /= connectivitySettings.size();
+//    matDist /= connectivitySettings.size();
 
     iTime = timer.elapsed();
     qWarning() << "ComputeSpectraPSDCSD" << iTime;
