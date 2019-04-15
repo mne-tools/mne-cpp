@@ -92,9 +92,9 @@ Correlation::Correlation()
 
 Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
 {
-    QElapsedTimer timer;
-    qint64 iTime = 0;
-    timer.start();
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
 
     Network finalNetwork("COR");
 
@@ -122,9 +122,9 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-    iTime = timer.elapsed();
-    qWarning() << "Preparation" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "Preparation" << iTime;
+//    timer.restart();
 
     // Calculate connectivity matrix over epochs and average afterwards
 //    double dScalingStep = 1.0/matDataList.size();
@@ -145,9 +145,9 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
 
 //    matDist /= connectivitySettings.size();
 
-    iTime = timer.elapsed();
-    qWarning() << "ComputeSpectraPSDCSD" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+//    timer.restart();
 
     //Add edges to network
     MatrixXd matWeight(1,1);
@@ -166,9 +166,9 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
         }
     }
 
-    iTime = timer.elapsed();
-    qWarning() << "Compute" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "Compute" << iTime;
+//    timer.restart();
 
     return finalNetwork;
 }
@@ -182,13 +182,15 @@ MatrixXd Correlation::compute(const ConnectivitySettings::IntermediateTrialData&
     RowVectorXd vecRow;
     int j;
 
-    for(int i = 0; i < inputData.matData.rows(); ++i) {
-        vecRow = inputData.matData.row(i);
+    matDist = inputData.matData * inputData.matData.transpose();
 
-        for(j = i; j < inputData.matData.rows(); ++j) {
-            matDist(i,j) += (vecRow.dot(inputData.matData.row(j))/vecRow.cols());
-        }
-    }
+//    for(int i = 0; i < inputData.matData.rows(); ++i) {
+//        vecRow = inputData.matData.row(i);
+
+//        for(j = i; j < inputData.matData.rows(); ++j) {
+//            matDist(i,j) += (vecRow.dot(inputData.matData.row(j))/vecRow.cols());
+//        }
+//    }
 
     return matDist;
 }

@@ -64,6 +64,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QCoreApplication>
+#include <QHostInfo>
 
 
 //*************************************************************************************************************
@@ -144,13 +145,13 @@ int main(int argc, char *argv[])
     QStringList sConnectivityMethodList = QStringList() << "COR" << "XCOR" << "COH" << "IMAGCOH" << "PLI" << "WPLI" << "USPLI" << "DSWPLI" << "PLV";
     QList<int> lNumberTrials = QList<int>() << 1 << 5 << 10 << 20 << 50 << 100 << 200;
     QList<int> lNumberChannels = QList<int>() << 32 << 64 << 128 << 256;
-    QList<int> lNumberSamples = QList<int>() << 500 << 1000 << 2000 << 4000;
+    QList<int> lNumberSamples = QList<int>() << 100 << 200 << 300 << 400 << 500 << 600 << 700 << 800 << 900 << 1000 << 2000 << 3000 << 4000 << 5000 << 6000 << 7000 << 8000 << 9000 << 10000 << 20000 << 30000 << 40000 << 50000 << 60000 << 70000 << 80000 << 90000 << 100000;
 
-    int iNumberCSDFreqBins = 301;
     int iNumberRepeats = 20;
     int iStorageModeActive = 0;
 
     AbstractMetric::m_bStorageModeIsActive = iStorageModeActive;
+    AbstractMetric::m_iNumberBins = 4;
 
     // Create sensor level data
     QString sRaw = "/cluster/fusion/lesch/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
@@ -159,7 +160,7 @@ int main(int argc, char *argv[])
     QFile t_fileRaw(sRaw);
     FiffRawData raw(t_fileRaw);
 
-    raw.read_raw_segment(matDataOrig, times, raw.first_samp, raw.first_samp+10000);
+    raw.read_raw_segment(matDataOrig, times, raw.first_samp, raw.first_samp+100001);
 
     //Perform connectivity performance tests
     Connectivity connectivityObj;
@@ -182,7 +183,7 @@ int main(int argc, char *argv[])
                         m_iNumberSamples = lNumberSamples.at(j);
 
                         //Create new folder
-                        m_sCurrentDir = "/cluster/fusion/lesch/connectivity_performance/" + sConnectivityMethodList.at(i) + "/" + QString::number(lNumberChannels.at(k)) + "_" + QString::number(lNumberSamples.at(j)) + "_" + QString::number(lNumberTrials.at(l)) + "_" + QString::number(iNumberCSDFreqBins);
+                        m_sCurrentDir = QString("/cluster/fusion/lesch/connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBins).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
                         QDir().mkpath(m_sCurrentDir);
 
                         //Write basic information to file
@@ -193,7 +194,7 @@ int main(int argc, char *argv[])
                         qWarning() << "iNumberSamples" << lNumberSamples.at(j);
                         qWarning() << "iNumberChannels" << lNumberChannels.at(k);
                         qWarning() << "iNumberTrials" << lNumberTrials.at(l);
-                        qWarning() << "iNumberCSDFreqBins" << iNumberCSDFreqBins;
+                        qWarning() << "iNumberCSDFreqBins" << AbstractMetric::m_iNumberBins;
                         qWarning() << "rows" << matData.rows();
                         qWarning() << "cols" << matData.cols();
                         qWarning() << "picks" << picks.cols();

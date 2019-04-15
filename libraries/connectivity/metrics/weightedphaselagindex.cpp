@@ -99,9 +99,9 @@ WeightedPhaseLagIndex::WeightedPhaseLagIndex()
 
 Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 {
-    QElapsedTimer timer;
-    qint64 iTime = 0;
-    timer.start();
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
 
     Network finalNetwork("WPLI");
 
@@ -160,26 +160,26 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
                 tapers);
     };
 
-    iTime = timer.elapsed();
-    qWarning() << "Preparation" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "Preparation" << iTime;
+//    timer.restart();
 
     // Compute WPLI in parallel for all trials
     QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
-    iTime = timer.elapsed();
-    qWarning() << "ComputeSpectraPSDCSD" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+//    timer.restart();
 
     // Compute WPLI
     computeWPLI(connectivitySettings,
                finalNetwork);
 
-    iTime = timer.elapsed();
-    qWarning() << "Compute" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "Compute" << iTime;
+//    timer.restart();
 
     return finalNetwork;
 }
@@ -243,23 +243,20 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
 
     // Compute CSD
     if(inputData.vecPairCsd.isEmpty()) {
-        //int iNumberBins = 10;
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
-        //double denomCSD = sqrt(tapers.second.segment(0,iNumberBins).cwiseAbs2().sum()) * sqrt(tapers.second.segment(0,iNumberBins).cwiseAbs2().sum()) / 2.0;
-
         bool bNfftEven = false;
         if (iNfft % 2 == 0){
             bNfftEven = true;
         }
 
-        MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-        //MatrixXcd matCsd = MatrixXcd(iNRows, iNumberBins);
+        //MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
+        MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBins);
 
         for (i = 0; i < iNRows; ++i) {
             for (j = i; j < iNRows; ++j) {
                 // Compute CSD (average over tapers if necessary)
-                matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
-                //matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,0,inputData.vecTapSpectra.at(i).rows(),iNumberBins).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,0,inputData.vecTapSpectra.at(j).rows(),iNumberBins).conjugate()).colwise().sum() / denomCSD;
+                //matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,0,inputData.vecTapSpectra.at(i).rows(),m_iNumberBins).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,0,inputData.vecTapSpectra.at(j).rows(),m_iNumberBins).conjugate()).colwise().sum() / denomCSD;
 
                 // Divide first and last element by 2 due to half spectrum
                 matCsd.row(j)(0) /= 2.0;
