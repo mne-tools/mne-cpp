@@ -94,9 +94,9 @@ CrossCorrelation::CrossCorrelation()
 
 Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
 {
-    QElapsedTimer timer;
-    qint64 iTime = 0;
-    timer.start();
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
 
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
@@ -149,9 +149,9 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
                 tapers);
     };
 
-    iTime = timer.elapsed();
-    qWarning() << "Preparation" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "Preparation" << iTime;
+//    timer.restart();
 
     // Calculate connectivity matrix over epochs and average afterwards
     QFuture<void> resultMat = QtConcurrent::map(connectivitySettings.getTrialData(),
@@ -160,9 +160,9 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
 
     matDist /= connectivitySettings.size();
 
-    iTime = timer.elapsed();
-    qWarning() << "ComputeSpectraPSDCSD" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+//    timer.restart();
 
     //Add edges to network
     MatrixXd matWeight(1,1);
@@ -181,9 +181,9 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
         }
     }
 
-    iTime = timer.elapsed();
-    qWarning() << "Compute" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "Compute" << iTime;
+//    timer.restart();
 
     return finalNetwork;
 }
@@ -248,7 +248,7 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
         vecResultFreq = inputData.vecTapSpectra.at(i).colwise().sum() / denom;
 
         for(j = i; j < inputData.vecTapSpectra.size(); ++j) {
-            vecResultXCor = vecResultFreq.cwiseProduct(inputData.vecTapSpectra.at(j).colwise().sum().conjugate() / denom);
+            vecResultXCor = vecResultFreq.cwiseProduct(inputData.vecTapSpectra.at(j).colwise().sum() / denom);
 
             fft.inv(vecInputFFT, vecResultXCor, iNfft);
 

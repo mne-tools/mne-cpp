@@ -101,7 +101,8 @@ public:
     */
     explicit AbstractMetric();
 
-    static bool m_bStorageModeIsActive;
+    static bool     m_bStorageModeIsActive;
+    static int      m_iNumberBins;
 
 protected:
 
