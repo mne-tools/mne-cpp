@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     QList<int> lNumberChannels = QList<int>() << 32 << 64 << 128 << 256;
     QList<int> lNumberSamples = QList<int>() << 100 << 200 << 300 << 400 << 500 << 600 << 700 << 800 << 900 << 1000 << 2000 << 3000 << 4000 << 5000 << 6000 << 7000 << 8000 << 9000 << 10000 << 20000 << 30000 << 40000 << 50000 << 60000 << 70000 << 80000 << 90000 << 100000;
 
-    int iNumberRepeats = 20;
+    int iNumberRepeats = 10;
     int iStorageModeActive = 0;
 
     AbstractMetric::m_bStorageModeIsActive = iStorageModeActive;
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
                         m_iNumberSamples = lNumberSamples.at(j);
 
                         //Create new folder
-                        m_sCurrentDir = QString("/cluster/fusion/lesch/connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBins).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
+                        m_sCurrentDir = QString("/homes/8/lesch/connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBins).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
                         QDir().mkpath(m_sCurrentDir);
 
                         //Write basic information to file
