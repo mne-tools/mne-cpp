@@ -65,6 +65,7 @@
 #include <QDir>
 #include <QCoreApplication>
 #include <QHostInfo>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -139,13 +140,13 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(customMessageHandler);
+    //qInstallMessageHandler(customMessageHandler);
 
     //Parameters for performance test
-    QStringList sConnectivityMethodList = QStringList() << "COR" << "XCOR" << "COH" << "IMAGCOH" << "PLI" << "WPLI" << "USPLI" << "DSWPLI" << "PLV";
-    QList<int> lNumberTrials = QList<int>() << 1 << 5 << 10 << 20 << 50 << 100 << 200;
-    QList<int> lNumberChannels = QList<int>() << 32 << 64 << 128 << 256;
-    QList<int> lNumberSamples = QList<int>() << 100 << 200 << 300 << 400 << 500 << 600 << 700 << 800 << 900 << 1000 << 2000 << 3000 << 4000 << 5000 << 6000 << 7000 << 8000 << 9000 << 10000 << 20000 << 30000 << 40000 << 50000 << 60000 << 70000 << 80000 << 90000 << 100000;
+    QStringList sConnectivityMethodList = QStringList() << "COH"; //<< "COR" << "XCOR" << "COH" << "IMAGCOH" << "PLI" << "WPLI" << "USPLI" << "DSWPLI" << "PLV";
+    QList<int> lNumberTrials = QList<int>() << /*1 << 5 << 10 << 20 << 50 << 100 << */200;
+    QList<int> lNumberChannels = QList<int>() << /*32 << 64 << 128 <<*/ 256;
+    QList<int> lNumberSamples = QList<int>() << /*100 << 200 << 300 << 400 << 500 << 600 << 700 << 800 << 900 << 1000 << 2000 << 3000 << 4000 << 5000 << 6000 << 7000 << 8000 << 9000 << 10000 << 20000 << 30000 <<*/ 40000 << 50000 << 60000 << 70000 << 80000 << 90000 << 100000;
 
     int iNumberRepeats = 10;
     int iStorageModeActive = 0;
@@ -169,13 +170,30 @@ int main(int argc, char *argv[])
     connectivitySettings.setSamplingFrequency(raw.info.sfreq);
     connectivitySettings.setWindowType("hanning");
 
+    QList<QList<MatrixXd> > matInputData;
+    matInputData.reserve(lNumberTrials.size());
+
+    for(int p = 0; p < matInputData.size(); ++p) {
+        for(int i = 0; i < lNumberTrials.at(p); ++i) {
+            matInputData[p].append(matData);
+        }
+    }
+
     for(int u = 0; u < iNumberRepeats; ++u) {
         for(int i = 0; i < sConnectivityMethodList.size(); ++i) {
             for(int j = 0; j < lNumberSamples.size(); ++j) {
                 for(int k = 0; k < lNumberChannels.size(); ++k) {
+                    QElapsedTimer timer;
+                    qint64 iTime = 0;
+                    timer.start();
+
                     matData = matDataOrig.block(0,0,lNumberChannels.at(k), lNumberSamples.at(j));
                     RowVectorXi picks = RowVectorXi::LinSpaced(lNumberChannels.at(k),1,lNumberChannels.at(k)+1);
                     connectivitySettings.setNodePositions(raw.info, picks);
+
+                    iTime = timer.elapsed();
+                    printf("Reading data %d\n", iTime);
+                    timer.restart();
 
                     for(int l = 0; l < lNumberTrials.size(); ++l) {
                         m_iNumberTrials = lNumberTrials.at(l);
@@ -183,7 +201,7 @@ int main(int argc, char *argv[])
                         m_iNumberSamples = lNumberSamples.at(j);
 
                         //Create new folder
-                        m_sCurrentDir = QString("/homes/8/lesch/connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBins).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
+                        m_sCurrentDir = QString("/homes/8/lesch/temp_connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBins).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
                         QDir().mkpath(m_sCurrentDir);
 
                         //Write basic information to file
@@ -212,6 +230,10 @@ int main(int argc, char *argv[])
                         int iNFreqs = int(floor(iNfft / 2.0)) + 1;
                         qWarning() << "iNFreqs" << iNFreqs;
 
+                        QElapsedTimer timer;
+                        qint64 iTime = 0;
+                        timer.start();
+
                         //Create data to work on
                         connectivitySettings.clearAllData();
 
@@ -220,6 +242,10 @@ int main(int argc, char *argv[])
                         }
 
                         connectivitySettings.setConnectivityMethods(QStringList() << sConnectivityMethodList.at(i));
+
+                        iTime = timer.elapsed();
+                        printf("Prepare conn data %d\n", iTime);
+                        timer.restart();
 
                         //Do connectivity estimation
                         connectivityObj.calculate(connectivitySettings);
