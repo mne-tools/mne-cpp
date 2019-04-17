@@ -113,7 +113,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
         return;
     }
 
-    QString sFileName = m_sCurrentDir + "/itr" + QString::number(m_iCurrentIteration) + "_" + QString::number(m_iNumberChannels) + "_" + QString::number(m_iNumberSamples) + "_" + QString::number(m_iNumberTrials) + ".log";
+    QString sFileName = m_sCurrentDir + "/" + QString::number(m_iNumberChannels) + "_" + QString::number(m_iNumberSamples) + "_" + QString::number(m_iNumberTrials) + ".log";
 
     QFile outFile(sFileName);
     outFile.open(QIODevice::WriteOnly | QIODevice::Append);
@@ -140,21 +140,25 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 */
 int main(int argc, char *argv[])
 {
-    //qInstallMessageHandler(customMessageHandler);
+    qInstallMessageHandler(customMessageHandler);
 
     //Parameters for performance test
-    QStringList sConnectivityMethodList = QStringList() << "COH"; //<< "COR" << "XCOR" << "COH" << "IMAGCOH" << "PLI" << "WPLI" << "USPLI" << "DSWPLI" << "PLV";
-    QList<int> lNumberTrials = QList<int>() << /*1 << 5 << 10 << 20 << 50 << 100 << */200;
-    QList<int> lNumberChannels = QList<int>() << /*32 << 64 << 128 <<*/ 256;
-    QList<int> lNumberSamples = QList<int>() << /*100 << 200 << 300 << 400 << 500 << 600 << 700 << 800 << 900 << 1000 << 2000 << 3000 << 4000 << 5000 << 6000 << 7000 << 8000 << 9000 << 10000 << 20000 << 30000 <<*/ 40000 << 50000 << 60000 << 70000 << 80000 << 90000 << 100000;
+    QStringList sConnectivityMethodList = QStringList() << "COR" << "XCOR" << "COH" << "IMAGCOH" << "PLI" << "WPLI" << "USPLI" << "DSWPLI" << "PLV";
+    QList<int> lNumberTrials = QList<int>() << 1 << 5 << 10 << 20 << 50 << 100 << 200;
+    QList<int> lNumberChannels = QList<int>() << 32 << 64 << 128 << 256;
+    QList<int> lNumberSamples = QList<int>() << 100 << 200 << 300 << 400 << 500 << 600 << 700 << 800 << 900 << 1000 << 2000 << 3000 << 4000 << 5000 << 6000 << 7000 << 8000 << 9000 << 10000 << 20000 << 30000 << 40000 << 50000 << 60000 << 70000 << 80000 << 90000 << 100000;
 
-    int iNumberRepeats = 10;
+    int iNumberRepeats = 5;
     int iStorageModeActive = 0;
 
     AbstractMetric::m_bStorageModeIsActive = iStorageModeActive;
     AbstractMetric::m_iNumberBins = 4;
 
     // Create sensor level data
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
+
     QString sRaw = "/cluster/fusion/lesch/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
     MatrixXd matDataOrig, matData;
     MatrixXd times;
@@ -170,93 +174,96 @@ int main(int argc, char *argv[])
     connectivitySettings.setSamplingFrequency(raw.info.sfreq);
     connectivitySettings.setWindowType("hanning");
 
-    QList<QList<MatrixXd> > matInputData;
-    matInputData.reserve(lNumberTrials.size());
+    QMap<int, QMap<int, MatrixXd > > matInputData;
 
-    for(int p = 0; p < matInputData.size(); ++p) {
-        for(int i = 0; i < lNumberTrials.at(p); ++i) {
-            matInputData[p].append(matData);
+    for(int j = 0; j < lNumberChannels.size(); ++j) {
+        QMap<int, MatrixXd > mapChannelsSamples;
+
+        for(int i = 0; i < lNumberSamples.size(); ++i) {
+            mapChannelsSamples[lNumberSamples.at(i)] = matDataOrig.block(0,0,lNumberChannels.at(j), lNumberSamples.at(i));
         }
+
+        matInputData[lNumberChannels.at(j)] = mapChannelsSamples;
     }
 
-    for(int u = 0; u < iNumberRepeats; ++u) {
-        for(int i = 0; i < sConnectivityMethodList.size(); ++i) {
-            for(int j = 0; j < lNumberSamples.size(); ++j) {
-                for(int k = 0; k < lNumberChannels.size(); ++k) {
-                    QElapsedTimer timer;
-                    qint64 iTime = 0;
-                    timer.start();
+    iTime = timer.elapsed();
+    printf("Prepare data %d\n", iTime);
+    timer.restart();
 
-                    matData = matDataOrig.block(0,0,lNumberChannels.at(k), lNumberSamples.at(j));
-                    RowVectorXi picks = RowVectorXi::LinSpaced(lNumberChannels.at(k),1,lNumberChannels.at(k)+1);
-                    connectivitySettings.setNodePositions(raw.info, picks);
+    qWarning() << "matInputData[256][40000].first().rows()" << matInputData[256][40000].rows();
+    qWarning() << "matInputData[256][40000].first().cols()" << matInputData[256][40000].cols();
+    qWarning() << "matInputData[32][500].rows()" << matInputData[32][500].rows();
+    qWarning() << "matInputData[32][500].cols()" << matInputData[32][500].cols();
+    qWarning() << "matInputData[64][100000].rows()" << matInputData[64][100000].rows();
+    qWarning() << "matInputData[64][100000].cols()" << matInputData[64][100000].cols();
 
-                    iTime = timer.elapsed();
-                    printf("Reading data %d\n", iTime);
-                    timer.restart();
+    for(int j = 0; j < lNumberSamples.size(); ++j) {
+        for(int k = 0; k < lNumberChannels.size(); ++k) {
+            connectivitySettings.clearAllData();
 
-                    for(int l = 0; l < lNumberTrials.size(); ++l) {
-                        m_iNumberTrials = lNumberTrials.at(l);
-                        m_iNumberChannels = lNumberChannels.at(k);
-                        m_iNumberSamples = lNumberSamples.at(j);
+            matData = matInputData[lNumberChannels.at(k)][lNumberSamples.at(j)];
 
-                        //Create new folder
-                        m_sCurrentDir = QString("/homes/8/lesch/temp_connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBins).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
-                        QDir().mkpath(m_sCurrentDir);
+            RowVectorXi picks = RowVectorXi::LinSpaced(lNumberChannels.at(k),1,lNumberChannels.at(k)+1);
+            connectivitySettings.setNodePositions(raw.info, picks);
 
-                        //Write basic information to file
-                        qWarning() << "sConnectivityMethod" << sConnectivityMethodList.at(i);
-                        qWarning() << "sRaw" << sRaw;
-                        qWarning() << "storageModeActive" << iStorageModeActive;
+            for(int l = 0; l < lNumberTrials.size(); ++l) {
+                //Create data to work on
+
+                while(connectivitySettings.size() < lNumberTrials.at(l)) {
+                    connectivitySettings.append(matData);
+                }
+
+                for(int i = 0; i < sConnectivityMethodList.size(); ++i) {
+                    m_iNumberTrials = lNumberTrials.at(l);
+                    m_iNumberChannels = lNumberChannels.at(k);
+                    m_iNumberSamples = lNumberSamples.at(j);
+
+                    //Create new folder
+                    m_sCurrentDir = QString("/cluster/fusion/lesch/connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBins).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
+                    QDir().mkpath(m_sCurrentDir);
+
+                    //Write basic information to file
+                    qWarning() << "sConnectivityMethod" << sConnectivityMethodList.at(i);
+                    qWarning() << "sRaw" << sRaw;
+                    qWarning() << "storageModeActive" << iStorageModeActive;
+                    qWarning() << "iNumberSamples" << lNumberSamples.at(j);
+                    qWarning() << "iNumberChannels" << lNumberChannels.at(k);
+                    qWarning() << "iNumberTrials" << lNumberTrials.at(l);
+                    qWarning() << "iNumberCSDFreqBins" << AbstractMetric::m_iNumberBins;
+                    qWarning() << "rows" << matData.rows();
+                    qWarning() << "cols" << matData.cols();
+                    qWarning() << "numberNodes" << connectivitySettings.getNodePositions().rows();
+
+                    // Check that iNfft >= signal length
+                    int iSignalLength = lNumberSamples.at(j);
+                    int iNfft = int(raw.info.sfreq/1.0);
+                    if(iNfft > iSignalLength) {
+                        iNfft = iSignalLength;
+                    }
+
+                    qWarning() << "iNfft" << iNfft;
+
+                    int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+                    qWarning() << "iNFreqs" << iNFreqs;
+
+                    connectivitySettings.setConnectivityMethods(QStringList() << sConnectivityMethodList.at(i));
+
+                    m_iCurrentIteration = 0;
+                    for(int u = 0; u < iNumberRepeats; ++u) {
+                        connectivitySettings.clearIntermediateData();
+
                         qWarning() << "iteration" << m_iCurrentIteration;
-                        qWarning() << "iNumberSamples" << lNumberSamples.at(j);
-                        qWarning() << "iNumberChannels" << lNumberChannels.at(k);
-                        qWarning() << "iNumberTrials" << lNumberTrials.at(l);
-                        qWarning() << "iNumberCSDFreqBins" << AbstractMetric::m_iNumberBins;
-                        qWarning() << "rows" << matData.rows();
-                        qWarning() << "cols" << matData.cols();
-                        qWarning() << "picks" << picks.cols();
-                        qWarning() << "numberNodes" << connectivitySettings.getNodePositions().rows();
-
-                        // Check that iNfft >= signal length
-                        int iSignalLength = lNumberSamples.at(j);
-                        int iNfft = int(raw.info.sfreq/1.0);
-                        if(iNfft > iSignalLength) {
-                            iNfft = iSignalLength;
-                        }
-
-                        qWarning() << "iNfft" << iNfft;
-
-                        int iNFreqs = int(floor(iNfft / 2.0)) + 1;
-                        qWarning() << "iNFreqs" << iNFreqs;
-
-                        QElapsedTimer timer;
-                        qint64 iTime = 0;
-                        timer.start();
-
-                        //Create data to work on
-                        connectivitySettings.clearAllData();
-
-                        for(int p = 0; p < lNumberTrials.at(l); ++p) {
-                            connectivitySettings.append(matData);
-                        }
-
-                        connectivitySettings.setConnectivityMethods(QStringList() << sConnectivityMethodList.at(i));
-
-                        iTime = timer.elapsed();
-                        printf("Prepare conn data %d\n", iTime);
-                        timer.restart();
 
                         //Do connectivity estimation
                         connectivityObj.calculate(connectivitySettings);
 
-                        printf("Iteration %d: Calculating %s for %d trials, %d channels, %d samples\n", m_iCurrentIteration, sConnectivityMethodList.at(i).toLatin1().data(), lNumberTrials.at(l), lNumberChannels.at(k), lNumberSamples.at(j));
+                        printf("Iteration %d: Calculating %s for %d trials, %d channels, %d samples\n", m_iCurrentIteration, sConnectivityMethodList.at(i).toLatin1().data(), connectivitySettings.size(), lNumberChannels.at(k), lNumberSamples.at(j));
+
+                        m_iCurrentIteration++;
                     }
                 }
             }
         }
-
-        m_iCurrentIteration++;
     }
 
     return 0;
