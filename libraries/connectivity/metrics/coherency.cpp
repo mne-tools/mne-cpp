@@ -175,9 +175,9 @@ void Coherency::calculateAbs(Network& finalNetwork,
 void Coherency::calculateImag(Network& finalNetwork,
                               ConnectivitySettings &connectivitySettings)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "Coherency::calculateImag - Input data is empty";
@@ -216,17 +216,17 @@ void Coherency::calculateImag(Network& finalNetwork,
                 tapers);
     };
 
-//    iTime = timer.elapsed();
-//    qWarning() << "Preparation" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "Preparation" << iTime;
+    timer.restart();
 
     QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
-//    iTime = timer.elapsed();
-//    qWarning() << "ComputeSpectraPSDCSD" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+    timer.restart();
 
     // Compute CSD/sqrt(PSD_X * PSD_Y)
     std::function<void(QPair<int,MatrixXcd>&)> computePSDCSDLambda = [&](QPair<int,MatrixXcd>& pairInput) {
@@ -240,9 +240,9 @@ void Coherency::calculateImag(Network& finalNetwork,
                                                    computePSDCSDLambda);
     resultCSDPSD.waitForFinished();
 
-//    iTime = timer.elapsed();
-//    qWarning() << "Compute" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << "Compute" << iTime;
+    timer.restart();
 }
 
 
@@ -257,9 +257,9 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         int iNfft,
                         const QPair<MatrixXd, VectorXd>& tapers)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
 
     if(inputData.vecPairCsd.size() == iNRows &&
        inputData.matPsd.rows() == iNRows &&
@@ -329,9 +329,9 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
 
     mutex.unlock();
 
-//    iTime = timer.elapsed();
-//    qWarning() << QThread::currentThreadId() << "Coherency::compute timer - compute - Tapered spectra and PSD (summing):" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << QThread::currentThreadId() << "Coherency::compute timer - compute - Tapered spectra and PSD (summing):" << iTime;
+    timer.restart();
 
     // Compute CSD
     //MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
@@ -376,9 +376,9 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         mutex.unlock();
     }
 
-//    iTime = timer.elapsed();
-//    qWarning() << QThread::currentThreadId() << "Coherency::compute timer - compute - CSD summing:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << QThread::currentThreadId() << "Coherency::compute timer - compute - CSD summing:" << iTime;
+    timer.restart();
 
     //Do not store data to save memory
     if(!m_bStorageModeIsActive) {
@@ -386,9 +386,9 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         inputData.vecTapSpectra.clear();
     }
 
-//    iTime = timer.elapsed();
-//    qWarning() << QThread::currentThreadId() << "Coherency::compute timer - compute - Deleting data:" << iTime;
-//    timer.restart();
+    iTime = timer.elapsed();
+    qWarning() << QThread::currentThreadId() << "Coherency::compute timer - compute - Deleting data:" << iTime;
+    timer.restart();
 }
 
 
