@@ -195,8 +195,12 @@ void RtSensorDataWorker::streamData()
         if(m_bIsLooping && !m_lDataLoopQ.isEmpty()) {
             if(m_vecAverage.rows() != m_lDataLoopQ.front().rows()) {
                 m_vecAverage = m_lDataLoopQ.front();
+                m_iCurrentSample++;
+                m_iSampleCtr++;
             } else if (m_iCurrentSample < m_lDataLoopQ.size()){
                 m_vecAverage += m_lDataLoopQ.at(m_iCurrentSample);
+                m_iCurrentSample++;
+                m_iSampleCtr++;
             }
 
             //Set iterator back to the front if needed
@@ -209,8 +213,12 @@ void RtSensorDataWorker::streamData()
     } else {
         if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
             m_vecAverage = m_lDataQ.takeFirst();
+            m_iCurrentSample++;
+            m_iSampleCtr++;
         } else {
             m_vecAverage += m_lDataQ.takeFirst();
+            m_iCurrentSample++;
+            m_iSampleCtr++;
         }
 
         //Set iterator back to the front if needed
@@ -218,9 +226,6 @@ void RtSensorDataWorker::streamData()
             m_iCurrentSample = 0;
         }
     }
-
-    m_iCurrentSample++;
-    m_iSampleCtr++;
 
     if(m_iSampleCtr % m_iAverageSamples == 0
         && m_iAverageSamples != 0) {
