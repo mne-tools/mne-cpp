@@ -52,12 +52,15 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_dig_point_set.h>
+#include <fiff/fiff_coord_trans.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <Qt3DCore/QTransform>
 
 
 //*************************************************************************************************************
@@ -72,6 +75,7 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -107,6 +111,10 @@ void DigitizerSetTreeItem::initItem()
 
 void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Qt3DCore::QEntity* parent)
 {
+    if(!m_pRenderable3DEntity) {
+        m_pRenderable3DEntity = new Renderable3DEntity(parent);
+    }
+
     //Add data
     //parsing the digitizer List
     QList<FIFFLIB::FiffDigPoint> tNasion;
@@ -168,7 +176,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
 
 //    if (!tLAP.empty()){
 //        //Create a LAP digitizer item
-//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"LAP");
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"LAP");
 //        digitizerItem->addData(tLAP);
 //        itemList << digitizerItem;
 //        itemList << new QStandardItem(digitizerItem->toolTip());
@@ -177,7 +185,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
 //    }
 //    if (!tNasion.empty()){
 //        //Create a Nasion digitizer item
-//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"Nasion");
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"Nasion");
 //         digitizerItem->addData(tNasion);
 //        itemList << digitizerItem;
 //        itemList << new QStandardItem(digitizerItem->toolTip());
@@ -186,7 +194,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
 //    }
 //    if (!tRAP.empty()){
 //        //Create a RAO digitizer item
-//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"RAP");
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"RAP");
 //        digitizerItem->addData(tRAP);
 //        itemList << digitizerItem;
 //        itemList << new QStandardItem(digitizerItem->toolTip());
@@ -195,7 +203,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
 //    }
 //    if (!tHpi.empty()){
 //        //Create a HPI digitizer item
-//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"HPI");
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"HPI");
 //        digitizerItem->addData(tHpi);
 //        itemList << digitizerItem;
 //        itemList << new QStandardItem(digitizerItem->toolTip());
@@ -204,7 +212,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
 //    }
 //    if (!tEeg.empty()){
 //        //Create a EEG digitizer item
-//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
 //        digitizerItem->addData(tEeg);
 //        itemList << digitizerItem;
 //        itemList << new QStandardItem(digitizerItem->toolTip());
@@ -213,7 +221,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
 //    }
 //    if (!tExtra.empty()){
 //        //Create a extra digitizer item
-//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"Extra");
+//        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"Extra");
 //        digitizerItem->addData(tExtra);
 //        itemList << digitizerItem;
 //        itemList << new QStandardItem(digitizerItem->toolTip());
@@ -268,7 +276,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     if (!bFoundNasionlItem && !tNasion.empty()){
         //Create a cardinal digitizer item
         QList<QStandardItem*> itemListCardinal;
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"Nasion");
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"Nasion");
         digitizerItem->addData(tNasion, 0.002f, Qt::yellow);
         itemListCardinal << digitizerItem;
         itemListCardinal << new QStandardItem(digitizerItem->toolTip());
@@ -278,7 +286,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     if (!bFoundLAPItem && !tLAP.empty()){
         //Create a cardinal digitizer item
         QList<QStandardItem*> itemListCardinal;
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"LAP");
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"LAP");
         digitizerItem->addData(tLAP, 0.002f, Qt::green);
         itemListCardinal << digitizerItem;
         itemListCardinal << new QStandardItem(digitizerItem->toolTip());
@@ -288,7 +296,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     if (!bFoundRAPItem && !tRAP.empty()){
         //Create a cardinal digitizer item
         QList<QStandardItem*> itemListCardinal;
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"RAP");
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"RAP");
         digitizerItem->addData(tRAP, 0.002f, Qt::magenta);
         itemListCardinal << digitizerItem;
         itemListCardinal << new QStandardItem(digitizerItem->toolTip());
@@ -298,7 +306,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     if (!bFoundHPIItem && !tHpi.empty()){
         //Create a hpi digitizer item
         QList<QStandardItem*> itemListHPI;
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"HPI");
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"HPI");
         digitizerItem->addData(tHpi, 0.001f, Qt::red);
         itemListHPI << digitizerItem;
         itemListHPI << new QStandardItem(digitizerItem->toolTip());
@@ -308,7 +316,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     if (!bFoundEEGItem && !tEeg.empty()){
         //Create a eeg ecg digitizer item
         QList<QStandardItem*> itemListEEG;
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"EEG/ECG");
         digitizerItem->addData(tEeg, 0.001f, Qt::cyan);
         itemListEEG << digitizerItem;
         itemListEEG << new QStandardItem(digitizerItem->toolTip());
@@ -318,7 +326,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     if (!bFoundExtraItem && !tExtra.empty()){
         //Create a extra digitizer item
         QList<QStandardItem*> itemListExtra;
-        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(parent, Data3DTreeModelItemTypes::DigitizerItem,"Extra");
+        DigitizerTreeItem* digitizerItem = new DigitizerTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::DigitizerItem,"Extra");
         digitizerItem->addData(tExtra, 0.001f, Qt::magenta);
         itemListExtra << digitizerItem;
         itemListExtra << new QStandardItem(digitizerItem->toolTip());
@@ -326,3 +334,42 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     }
 }
 
+
+//*************************************************************************************************************
+
+void DigitizerSetTreeItem::setTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pRenderable3DEntity) {
+        m_pRenderable3DEntity->setTransform(transform);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DigitizerSetTreeItem::setTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+{
+    if(m_pRenderable3DEntity) {
+        m_pRenderable3DEntity->setTransform(transform, bApplyInverse);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DigitizerSetTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pRenderable3DEntity) {
+        m_pRenderable3DEntity->applyTransform(transform);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DigitizerSetTreeItem::applyTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+{
+    if(m_pRenderable3DEntity) {
+        m_pRenderable3DEntity->applyTransform(transform, bApplyInverse);
+    }
+}

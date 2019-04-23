@@ -42,6 +42,7 @@
 #include "rtsourcedataworker.h"
 #include <disp/plots/helpers/colormap.h>
 #include "../../../../helpers/interpolation/interpolation.h"
+#include "../../items/common/abstractmeshtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -125,8 +126,10 @@ void RtSourceDataWorker::addData(const MatrixXd& data)
 void RtSourceDataWorker::setNumberVertices(int iNumberVertsLeft,
                                            int iNumberVertsRight)
 {
-    m_lHemiVisualizationInfo[0].matOriginalVertColor.setZero(iNumberVertsLeft,3);
-    m_lHemiVisualizationInfo[1].matOriginalVertColor.setZero(iNumberVertsRight,3);
+//    m_lHemiVisualizationInfo[0].matOriginalVertColor.setZero(iNumberVertsLeft,3);
+//    m_lHemiVisualizationInfo[1].matOriginalVertColor.setZero(iNumberVertsRight,3);
+    m_lHemiVisualizationInfo[0].matOriginalVertColor = AbstractMeshTreeItem::createVertColor(iNumberVertsLeft);
+    m_lHemiVisualizationInfo[1].matOriginalVertColor = AbstractMeshTreeItem::createVertColor(iNumberVertsRight);
 }
 
 

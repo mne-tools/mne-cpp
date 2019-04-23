@@ -42,6 +42,7 @@
 #include "rtsensordataworker.h"
 #include <disp/plots/helpers/colormap.h>
 #include "../../../../helpers/interpolation/interpolation.h"
+#include "../../items/common/abstractmeshtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -117,8 +118,9 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
 
 void RtSensorDataWorker::setNumberVertices(int iNumberVerts)
 {
-    m_lVisualizationInfo.matOriginalVertColor.resize(iNumberVerts,3);
-    m_lVisualizationInfo.matOriginalVertColor.setZero();
+//    m_lVisualizationInfo.matOriginalVertColor.resize(iNumberVerts,3);
+//    m_lVisualizationInfo.matOriginalVertColor.setZero();
+    m_lVisualizationInfo.matOriginalVertColor = AbstractMeshTreeItem::createVertColor(iNumberVerts);
 }
 
 
@@ -302,7 +304,11 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
                 fSample = 1.0f;
             } else {
                 if(fSample != 0.0f && dTresholdDiff != 0.0 ) {
-                    fSample = (fSample - dThresholdX) / (dTresholdDiff);
+                    if(vecData(r) < 0) {
+                        fSample = (fSample - dThresholdX) / (dTresholdDiff * 2);
+                    } else {
+                        fSample = 0.5 + (fSample - dThresholdX) / (dTresholdDiff * 2);
+                    }
                 } else {
                     fSample = 0.0f;
                 }

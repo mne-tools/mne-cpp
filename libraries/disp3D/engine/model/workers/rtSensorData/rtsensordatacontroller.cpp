@@ -215,13 +215,13 @@ void RtSensorDataController::setInterpolationInfo(const Eigen::MatrixX3f &matVer
                                                   const FiffInfo &fiffInfo,
                                                   int iSensorType)
 {
+    emit numberVerticesChanged(matVertices.rows());
+
     emit interpolationInfoChanged(matVertices,
                                   vecNeighborVertices,
                                   vecSensorPos,
                                   fiffInfo,
                                   iSensorType);
-
-    emit numberVerticesChanged(matVertices.rows());
 }
 
 

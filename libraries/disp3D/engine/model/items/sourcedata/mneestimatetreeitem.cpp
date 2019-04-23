@@ -44,6 +44,7 @@
 #include "../common/abstractmeshtreeitem.h"
 #include "../common/gpuinterpolationitem.h"
 #include "../../3dhelpers/custommesh.h"
+#include "../../materials/pervertexphongalphamaterial.h"
 
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_forwardsolution.h>
@@ -361,6 +362,10 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
             this->appendRow(list);
 
             m_pInterpolationItemLeftCPU->setAlpha(1.0f);
+
+            //Set material to enable sorting
+            QPointer<PerVertexPhongAlphaMaterial> pBemMaterial = new PerVertexPhongAlphaMaterial(true);
+            m_pInterpolationItemLeftCPU->setMaterial(pBemMaterial);
         }
 
         if(!m_pInterpolationItemRightCPU)
@@ -388,6 +393,10 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
             this->appendRow(list);
 
             m_pInterpolationItemRightCPU->setAlpha(1.0f);
+
+            //Set material to enable sorting
+            QPointer<PerVertexPhongAlphaMaterial> pBemMaterial = new PerVertexPhongAlphaMaterial(true);
+            m_pInterpolationItemRightCPU->setMaterial(pBemMaterial);
         }
 
         connect(m_pRtSourceDataController.data(), &RtSourceDataController::newRtSmoothedDataAvailable,
