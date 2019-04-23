@@ -68,7 +68,8 @@ using namespace CONNECTIVITYLIB;
 //=============================================================================================================
 
 bool AbstractMetric::m_bStorageModeIsActive = true;
-int AbstractMetric::m_iNumberBins = -1;
+int AbstractMetric::m_iNumberBinStart = -1;
+int AbstractMetric::m_iNumberBinAmount = -1;
 
 //*************************************************************************************************************
 //=============================================================================================================

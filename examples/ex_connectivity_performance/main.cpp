@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
     int iStorageModeActive = 0;
 
     AbstractMetric::m_bStorageModeIsActive = iStorageModeActive;
-    AbstractMetric::m_iNumberBins = 4;
+    AbstractMetric::m_iNumberBinAmount = 4;
 
     // Create sensor level data
     QElapsedTimer timer;
@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
                     m_iNumberSamples = lNumberSamples.at(j);
 
                     //Create new folder
-                    m_sCurrentDir = QString("C:/connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBins).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
+                    m_sCurrentDir = QString("C:/connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBinAmount).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
                     QDir().mkpath(m_sCurrentDir);
 
                     //Write basic information to file
@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
                     qWarning() << "iNumberSamples" << lNumberSamples.at(j);
                     qWarning() << "iNumberChannels" << lNumberChannels.at(k);
                     qWarning() << "iNumberTrials" << lNumberTrials.at(l);
-                    qWarning() << "iNumberCSDFreqBins" << AbstractMetric::m_iNumberBins;
+                    qWarning() << "iNumberCSDFreqBins" << AbstractMetric::m_iNumberBinAmount;
                     qWarning() << "rows" << matData.rows();
                     qWarning() << "cols" << matData.cols();
                     qWarning() << "numberNodes" << connectivitySettings.getNodePositions().rows();
