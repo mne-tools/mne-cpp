@@ -175,9 +175,9 @@ void Coherency::calculateAbs(Network& finalNetwork,
 void Coherency::calculateImag(Network& finalNetwork,
                               ConnectivitySettings &connectivitySettings)
 {
-    QElapsedTimer timer;
-    qint64 iTime = 0;
-    timer.start();
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
 
     if(connectivitySettings.isEmpty()) {
         qDebug() << "Coherency::calculateImag - Input data is empty";
@@ -216,17 +216,17 @@ void Coherency::calculateImag(Network& finalNetwork,
                 tapers);
     };
 
-    iTime = timer.elapsed();
-    qWarning() << "Preparation" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "Preparation" << iTime;
+//    timer.restart();
 
     QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
                                              computeLambda);
     result.waitForFinished();
 
-    iTime = timer.elapsed();
-    qWarning() << "ComputeSpectraPSDCSD" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+//    timer.restart();
 
     // Compute CSD/sqrt(PSD_X * PSD_Y)
     std::function<void(QPair<int,MatrixXcd>&)> computePSDCSDLambda = [&](QPair<int,MatrixXcd>& pairInput) {
@@ -240,9 +240,9 @@ void Coherency::calculateImag(Network& finalNetwork,
                                                    computePSDCSDLambda);
     resultCSDPSD.waitForFinished();
 
-    iTime = timer.elapsed();
-    qWarning() << "Compute" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "Compute" << iTime;
+//    timer.restart();
 }
 
 
@@ -257,9 +257,9 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         int iNfft,
                         const QPair<MatrixXd, VectorXd>& tapers)
 {
-    QElapsedTimer timer;
-    qint64 iTime = 0;
-    timer.start();
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
 
     if(inputData.vecPairCsd.size() == iNRows &&
        inputData.matPsd.rows() == iNRows &&
@@ -289,8 +289,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
 
     int i,j;
 
-    //inputData.matPsd = MatrixXd(iNRows, iNFreqs);
-    inputData.matPsd = MatrixXd(iNRows, m_iNumberBins);
+    inputData.matPsd = MatrixXd(iNRows, m_iNumberBinAmount);
 
     for (i = 0; i < iNRows; ++i) {
         // Substract mean
@@ -309,8 +308,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         }
 
         // Compute PSD (average over tapers if necessary).
-        //inputData.matPsd.row(i) = inputData.vecTapSpectra.at(i).cwiseAbs2().colwise().sum() / denomPSD;
-        inputData.matPsd.row(i) = inputData.vecTapSpectra.at(i).block(0,0,inputData.vecTapSpectra.at(i).rows(),m_iNumberBins).cwiseAbs2().colwise().sum() / denomPSD;
+        inputData.matPsd.row(i) = inputData.vecTapSpectra.at(i).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(i).rows(),m_iNumberBinAmount).cwiseAbs2().colwise().sum() / denomPSD;
 
         // Divide first and last element by 2 due to half spectrum
         inputData.matPsd.row(i)(0) /= 2.0;
@@ -329,13 +327,13 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
 
     mutex.unlock();
 
-    iTime = timer.elapsed();
-    qWarning() << QThread::currentThreadId() << "Coherency::compute timer - compute - Tapered spectra and PSD (summing):" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << QThread::currentThreadId() << "Coherency::compute timer - compute - Tapered spectra and PSD (summing):" << iTime;
+//    timer.restart();
 
     // Compute CSD
     //MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-    MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBins);
+    MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBinAmount);
 
     if(inputData.vecPairCsd.size() != iNRows) {
         inputData.vecPairCsd.clear();
@@ -350,8 +348,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         for (i = 0; i < iNRows; ++i) {
             for (j = i; j < iNRows; ++j) {
                 // Compute CSD (average over tapers if necessary)
-                //matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
-                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,0,inputData.vecTapSpectra.at(i).rows(),m_iNumberBins).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,0,inputData.vecTapSpectra.at(j).rows(),m_iNumberBins).conjugate()).colwise().sum() / denomCSD;
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(i).rows(),m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(j).rows(),m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
 
                 // Divide first and last element by 2 due to half spectrum
                 matCsd.row(j)(0) /= 2.0;
@@ -376,9 +373,9 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         mutex.unlock();
     }
 
-    iTime = timer.elapsed();
-    qWarning() << QThread::currentThreadId() << "Coherency::compute timer - compute - CSD summing:" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << QThread::currentThreadId() << "Coherency::compute timer - compute - CSD summing:" << iTime;
+//    timer.restart();
 
     //Do not store data to save memory
     if(!m_bStorageModeIsActive) {
@@ -386,9 +383,9 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         inputData.vecTapSpectra.clear();
     }
 
-    iTime = timer.elapsed();
-    qWarning() << QThread::currentThreadId() << "Coherency::compute timer - compute - Deleting data:" << iTime;
-    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << QThread::currentThreadId() << "Coherency::compute timer - compute - Deleting data:" << iTime;
+//    timer.restart();
 }
 
 

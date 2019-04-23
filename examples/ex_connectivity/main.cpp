@@ -122,7 +122,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     AbstractMetric::m_bStorageModeIsActive = true;
-    AbstractMetric::m_iNumberBins = 4;
+    AbstractMetric::m_iNumberBinStart = 8;
+    AbstractMetric::m_iNumberBinAmount = 4;
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Example");
