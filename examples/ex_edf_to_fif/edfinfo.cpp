@@ -215,6 +215,52 @@ EDFInfo::EDFInfo(QIODevice* pDev, QObject *parent)
                                          numbersOfSamplesPerRecords[i] * iNumDataRecords,
                                          numbersOfSamplesPerRecords[i] / fDataRecordsDuration));
     }
+
+    // we should have reached the end of the header
+    if(pDev->pos() != iNumBytesInHeader) {
+        qDebug() << "FATAL: Number of bytes read is not equal to number of bytes in header!";
+    }
+
+    // read whole file data-record-sized portions (this is probably quite ineffective, better read bigger chunks)
+    int sizeOfDataRecordInBytes = 0;
+    for(const auto& signal : vSignals) {
+        sizeOfDataRecordInBytes += signal.iNumberOfSamplesPerRecord * 2;  // 2 bytes per integer value, this might be different for bdf files
+    }
+    QVector<QByteArray> vRecords;
+    for(int i = 0; i < iNumDataRecords; ++i) {
+        vRecords.push_back(pDev->read(sizeOfDataRecordInBytes));
+    }
+
+    // we should have reached the end of the file
+    if(pDev->pos() != pDev->size()) {
+        qDebug() << "FATAL: Number of bytes read is not equal to number of bytes in file!";
+    }
+
+    // translate data records into signals, start with empty series
+    QVector<QVector<int>> signalValues;
+    for(int i = 0; i < iNumSignals; ++i) {
+        signalValues.append(QVector<int>());
+    }
+    // go through each record
+    for(int recIdx = 0; recIdx < vRecords.size(); ++recIdx) {
+        for(int sigIdx = 0; sigIdx < iNumSignals; ++sigIdx) {
+            for(int sampIdx = 0; sampIdx < vSignals[sigIdx].iNumberOfSamplesPerRecord; ++sampIdx) {
+                // factor 2 because of 2 byte representation, this is different for bdf files
+                signalValues[sigIdx].append((vRecords[recIdx].at(sampIdx * 2 + 1) << 8) | vRecords[recIdx].at(sampIdx * 2));
+            }
+        }
+    }
+
+    // basic sanity check: number of signal values read should be number of bytes divided by 2
+    int numBytes = 0;
+    for(const auto& r : vRecords) {
+        numBytes += r.size();
+    }
+    int numSignalValues = 0;
+    for(const auto& s : signalValues) {
+        numSignalValues += s.size();
+    }
+    qDebug() << numBytes << "   " << numSignalValues << "    " << numSignalValues * 2;
 }
 
 
