@@ -45,6 +45,7 @@
 #include "../common/gpuinterpolationitem.h"
 #include "../common/abstractmeshtreeitem.h"
 #include "../../3dhelpers/custommesh.h"
+#include "../../materials/pervertexphongalphamaterial.h"
 
 #include <mne/mne_bem.h>
 
@@ -56,6 +57,7 @@
 
 #include <QVector3D>
 #include <QGeometryRenderer>
+#include <Qt3DCore/QTransform>
 
 
 //*************************************************************************************************************
@@ -196,6 +198,10 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
             list << m_pInterpolationItemCPU;
             list << new QStandardItem(m_pInterpolationItemCPU->toolTip());
             this->appendRow(list);
+
+            //Set material to enable sorting
+            QPointer<PerVertexPhongAlphaMaterial> pBemMaterial = new PerVertexPhongAlphaMaterial(true);
+            m_pInterpolationItemCPU->setMaterial(pBemMaterial);
         }
 
         connect(m_pSensorRtDataWorkController.data(), &RtSensorDataController::newRtSmoothedDataAvailable,
@@ -429,6 +435,62 @@ void SensorDataTreeItem::setBadChannels(const FIFFLIB::FiffInfo &info)
 
         //qDebug() << "SensorDataTreeItem::setBadChannels - m_iSensorsBad" << m_iSensorsBad;
         m_pSensorRtDataWorkController->setBadChannels(info);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorDataTreeItem::setTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pInterpolationItemGPU) {
+        m_pInterpolationItemGPU->setTransform(transform);
+    }
+
+    if(m_pInterpolationItemCPU) {
+        m_pInterpolationItemCPU->setTransform(transform);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorDataTreeItem::setTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+{
+    if(m_pInterpolationItemGPU) {
+        m_pInterpolationItemGPU->setTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemCPU) {
+        m_pInterpolationItemCPU->setTransform(transform, bApplyInverse);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorDataTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pInterpolationItemGPU) {
+        m_pInterpolationItemGPU->applyTransform(transform);
+    }
+
+    if(m_pInterpolationItemCPU) {
+        m_pInterpolationItemCPU->applyTransform(transform);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorDataTreeItem::applyTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+{
+    if(m_pInterpolationItemGPU) {
+        m_pInterpolationItemGPU->applyTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemCPU) {
+        m_pInterpolationItemCPU->applyTransform(transform, bApplyInverse);
     }
 }
 

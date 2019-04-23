@@ -42,6 +42,7 @@
 #include <disp3D/viewers/abstractview.h>
 #include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 #include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
+#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/helpers/geometryinfo/geometryinfo.h>
@@ -267,9 +268,8 @@ int main(int argc, char *argv[])
     QFile coordTransfile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif");
     FiffCoordTrans coordTrans(coordTransfile);
 
-    t_Dig.applyTransforamtion(coordTrans);
-
-    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+    DigitizerSetTreeItem* pDigitizerSetTreeItem = p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+    pDigitizerSetTreeItem->applyTransform(coordTrans, true);
 
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),

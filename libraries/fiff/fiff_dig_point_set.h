@@ -228,8 +228,9 @@ public:
     * Apply a transforamtion matrix on the 3D position of the digitzed points.
     *
     * @param[in] coordTrans    FiffCoordTrans which is to be applied
+    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
     */
-    void applyTransforamtion(const FiffCoordTrans& coordTrans);
+    void applyTransform(const FiffCoordTrans& coordTrans, bool bApplyInverse = false);
 
 //    ToDo:
 //    //=========================================================================================================
