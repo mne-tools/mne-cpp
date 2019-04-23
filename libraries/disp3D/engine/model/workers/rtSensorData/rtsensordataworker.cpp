@@ -305,7 +305,7 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
             } else {
                 if(fSample != 0.0f && dTresholdDiff != 0.0 ) {
                     if(vecData(r) < 0) {
-                        fSample = (fSample - dThresholdX) / (dTresholdDiff * 2);
+                        fSample = 0.5 - (fSample - dThresholdX) / (dTresholdDiff * 2);
                     } else {
                         fSample = 0.5 + (fSample - dThresholdX) / (dTresholdDiff * 2);
                     }

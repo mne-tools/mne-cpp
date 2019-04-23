@@ -204,7 +204,7 @@ void Renderable3DEntity::applyTransform(const Qt3DCore::QTransform& transform)
         this->addComponent(m_pTransform);
     }
 
-    m_pTransform->setMatrix(m_pTransform->matrix() * transform.matrix());
+    m_pTransform->setMatrix(transform.matrix() * m_pTransform->matrix());
 }
 
 
@@ -259,7 +259,7 @@ void Renderable3DEntity::applyTransform(const FiffCoordTrans& transform, bool bA
         transform3d.setMatrix(matrix);
     }
 
-    m_pTransform->setMatrix(m_pTransform->matrix() * transform3d.matrix());
+    m_pTransform->setMatrix(transform3d.matrix() * m_pTransform->matrix());
 }
 
 
