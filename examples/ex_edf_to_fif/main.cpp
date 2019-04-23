@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 
     EDFInfo info(&file);
 
-    qDebug().noquote() << info.getAsString();
+    // qDebug().noquote() << info.getAsString();
 
     return 0;
 }
