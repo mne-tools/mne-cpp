@@ -137,8 +137,8 @@ int main(int argc, char *argv[])
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
-    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "2");
+    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
@@ -433,22 +433,24 @@ int main(int argc, char *argv[])
     tNetworkView.getTreeModel()->addMegSensorInfo("Sensors", "VectorView", evoked.info.chs, t_sensorSurfaceVV, evoked.info.bads);
 
     // Read, co-register and show digitizer points
-    QFile t_fileDig(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QFile t_fileDig(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     FiffDigPointSet t_Dig(t_fileDig);
 
     QFile coordTransfile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif");
     FiffCoordTrans coordTrans(coordTransfile);
 
     DigitizerSetTreeItem* pDigitizerSetTreeItem = tNetworkView.getTreeModel()->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
-    pDigitizerSetTreeItem->applyTransform(coordTrans, true);
+
+    pDigitizerSetTreeItem->applyTransform(raw.info.dev_head_t, true);
 
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
-                                                                             evoked.comment,
-                                                                             evoked.data.block(0,0.2*evoked.info.sfreq,evoked.data.rows(),1),
-                                                                             t_sensorSurfaceVV[0],
-                                                                             evoked.info,
-                                                                             "MEG")) {
+                                                                                            evoked.comment,
+                                                                                            evoked.data.block(0,0.2*evoked.info.sfreq,evoked.data.rows(),1),
+                                                                                            //evoked.data,
+                                                                                            t_sensorSurfaceVV[0],
+                                                                                            evoked.info,
+                                                                                            "MEG")) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
@@ -456,26 +458,43 @@ int main(int argc, char *argv[])
         pMegSensorTreeItem->setThresholds(QVector3D(1.5e-13f, 13.0e-13f*0.5f, 13.0e-13f));
         pMegSensorTreeItem->setColormapType("Jet");
         pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
-
-        // Apply head to device transformation
-        pMegSensorTreeItem->applyTransform(coordTrans, true);
-        pMegSensorTreeItem->applyTransform(raw.info.dev_head_t);
     }
 
     //add sensor item for EEG data
+
+    //Co-Register EEG points in order to correctly map them to the scalp
+    for(int i = 0; i < evoked.info.chs.size(); ++i) {
+        if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
+            Vector4f tempvec;
+            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
+            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
+            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
+            tempvec(3) = 1;
+            tempvec = coordTrans.invtrans * tempvec;
+            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
+            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
+            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
+        }
+    }
+
     if (SensorDataTreeItem* pEegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
-                                                                             evoked.comment,
-                                                                             evoked.data.block(0,0.2*evoked.info.sfreq,evoked.data.rows(),1),
-                                                                             t_Bemhead[0],
-                                                                             evoked.info,
-                                                                             "EEG")) {
+                                                                                            evoked.comment,
+                                                                                            evoked.data.block(0,0.2*evoked.info.sfreq,evoked.data.rows(),1),
+                                                                                            //evoked.data,
+                                                                                            t_Bemhead[0],
+                                                                                            evoked.info,
+                                                                                            "EEG")) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
         pEegSensorTreeItem->setStreamingState(false);
-        pEegSensorTreeItem->setThresholds(QVector3D(3.0e-6f, 6.0e-6f*0.5f, 6.0e-6f));
+        pEegSensorTreeItem->setThresholds(QVector3D(0.0e-9f, 6.0e-6f*0.5f, 6.0e-6f));
         pEegSensorTreeItem->setColormapType("Jet");
         pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
+
+        // Apply head to device transformation
+        pEegSensorTreeItem->applyTransform(coordTrans);
+        pEegSensorTreeItem->applyTransform(raw.info.dev_head_t, true);
     }
 
     // ------- TEMP data END -------

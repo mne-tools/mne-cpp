@@ -288,6 +288,22 @@ int main(int argc, char *argv[])
     }
 
     //add sensor item for EEG data
+
+    //Co-Register EEG points in order to correctly map them to the scalp
+    for(int i = 0; i < evoked.info.chs.size(); ++i) {
+        if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
+            Vector4f tempvec;
+            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
+            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
+            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
+            tempvec(3) = 1;
+            tempvec = coordTrans.invtrans * tempvec;
+            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
+            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
+            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
+        }
+    }
+
     if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
                                                                              evoked.comment,
                                                                              evoked.data,
