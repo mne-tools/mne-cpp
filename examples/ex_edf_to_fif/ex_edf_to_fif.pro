@@ -39,7 +39,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT -= gui
+QT += gui widgets charts
 
 CONFIG   += console
 CONFIG   -= app_bundle

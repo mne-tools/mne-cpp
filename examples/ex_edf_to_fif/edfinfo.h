@@ -151,6 +151,8 @@ public:
     */
     EDFInfo(QIODevice* pDev, QObject *parent = nullptr);
 
+    QVector<QVector<float>> readRawData();
+
     //=========================================================================================================
     /**
     * Obtain textual representation of signal.
@@ -158,6 +160,8 @@ public:
     * @return Textual representation of signal.
     */
     QString getAsString() const;
+
+    QIODevice* pDev;
 
     // data fields for EDF header. The member order does not correlate with the position in the header.
     QString     sEDFVersionNo;
