@@ -108,7 +108,7 @@ RtSourceDataController::RtSourceDataController()
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setInterpolationMatrixRight);
 
        connect(this, &RtSourceDataController::thresholdsChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setThresholds);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setThresholds, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::sFreqChanged,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setSFreq);
@@ -117,7 +117,7 @@ RtSourceDataController::RtSourceDataController()
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setLoopState);
 
        connect(this, &RtSourceDataController::numberAveragesChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setNumberAverages);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setNumberAverages, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::colormapTypeChanged,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setColormapType);

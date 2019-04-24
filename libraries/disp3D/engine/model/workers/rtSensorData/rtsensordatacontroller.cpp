@@ -101,7 +101,7 @@ RtSensorDataController::RtSensorDataController()
                m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setInterpolationMatrix);
 
        connect(this, &RtSensorDataController::thresholdsChanged,
-               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setThresholds);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setThresholds, Qt::DirectConnection);
 
        connect(this, &RtSensorDataController::sFreqChanged,
                m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setSFreq);
@@ -110,7 +110,7 @@ RtSensorDataController::RtSensorDataController()
                m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setLoopState);
 
        connect(this, &RtSensorDataController::numberAveragesChanged,
-               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setNumberAverages);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setNumberAverages, Qt::DirectConnection);
 
        connect(this, &RtSensorDataController::colormapTypeChanged,
                m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setColormapType);
@@ -197,10 +197,10 @@ void RtSensorDataController::setCancelDistance(double dCancelDist)
 
 void RtSensorDataController::setTimeInterval(int iMSec)
 {
-    if(iMSec < 17) {
-        qDebug() << "RtSensorDataController::setTimeInterval - The minimum time interval is 17mSec.";
-        iMSec = 17;
-    }
+//    if(iMSec < 17) {
+//        qDebug() << "RtSensorDataController::setTimeInterval - The minimum time interval is 17mSec.";
+//        iMSec = 17;
+//    }
 
     m_iMSecInterval = iMSec;
     m_timer.setInterval(m_iMSecInterval);
