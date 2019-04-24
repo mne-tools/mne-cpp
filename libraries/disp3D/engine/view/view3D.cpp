@@ -334,7 +334,7 @@ void View3D::startModelRotationRecursive(QObject* pObject)
     //TODO this won't work with QEntities
     if(Renderable3DEntity* pItem = dynamic_cast<Renderable3DEntity*>(pObject)) {
         QPropertyAnimation *anim = new QPropertyAnimation(pItem, QByteArrayLiteral("rotZ"));
-        anim->setDuration(500);
+        anim->setDuration(1000);
         anim->setStartValue(QVariant::fromValue(pItem->rotZ()));
         anim->setEndValue(QVariant::fromValue(pItem->rotZ() + 360.0f));
         anim->setLoopCount(-1);

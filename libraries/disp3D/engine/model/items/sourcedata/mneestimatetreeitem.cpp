@@ -629,6 +629,94 @@ void MneEstimateTreeItem::setAlpha(float fAlpha)
 
 //*************************************************************************************************************
 
+void MneEstimateTreeItem::setTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pInterpolationItemLeftCPU) {
+        m_pInterpolationItemLeftCPU->setTransform(transform);
+    }
+
+    if(m_pInterpolationItemLeftGPU) {
+        m_pInterpolationItemLeftGPU->setTransform(transform);
+    }
+
+    if(m_pInterpolationItemRightCPU) {
+        m_pInterpolationItemRightCPU->setTransform(transform);
+    }
+
+    if(m_pInterpolationItemRightGPU) {
+        m_pInterpolationItemRightGPU->setTransform(transform);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::setTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+{
+    if(m_pInterpolationItemLeftCPU) {
+        m_pInterpolationItemLeftCPU->setTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemLeftGPU) {
+        m_pInterpolationItemLeftGPU->setTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemRightCPU) {
+        m_pInterpolationItemRightCPU->setTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemRightGPU) {
+        m_pInterpolationItemRightGPU->setTransform(transform, bApplyInverse);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pInterpolationItemLeftCPU) {
+        m_pInterpolationItemLeftCPU->applyTransform(transform);
+    }
+
+    if(m_pInterpolationItemLeftGPU) {
+        m_pInterpolationItemLeftGPU->applyTransform(transform);
+    }
+
+    if(m_pInterpolationItemRightCPU) {
+        m_pInterpolationItemRightCPU->applyTransform(transform);
+    }
+
+    if(m_pInterpolationItemRightGPU) {
+        m_pInterpolationItemRightGPU->applyTransform(transform);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneEstimateTreeItem::applyTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+{
+    if(m_pInterpolationItemLeftCPU) {
+        m_pInterpolationItemLeftCPU->applyTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemLeftGPU) {
+        m_pInterpolationItemLeftGPU->applyTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemRightCPU) {
+        m_pInterpolationItemRightCPU->applyTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemRightGPU) {
+        m_pInterpolationItemRightGPU->applyTransform(transform, bApplyInverse);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
     if(m_pRtSourceDataController) {

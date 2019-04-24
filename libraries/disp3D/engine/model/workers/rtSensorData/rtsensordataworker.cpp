@@ -52,6 +52,7 @@
 
 #include <QVector3D>
 #include <QDebug>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -153,6 +154,10 @@ void RtSensorDataWorker::setColormapType(const QString& sColormapType)
         m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHotNegative2;
     } else if(sColormapType == "Jet") {
         m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToJet;
+    } else if(sColormapType == "Bone") {
+        m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToBone;
+    } else if(sColormapType == "RedBlue") {
+        m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToRedBlue;
     }
 }
 
@@ -193,6 +198,10 @@ void RtSensorDataWorker::setInterpolationMatrix(QSharedPointer<SparseMatrix<floa
 
 void RtSensorDataWorker::streamData()
 {
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
+
     if(m_lDataQ.isEmpty()) {
         if(m_bIsLooping && !m_lDataLoopQ.isEmpty()) {
             if(m_vecAverage.rows() != m_lDataLoopQ.front().rows()) {
@@ -243,6 +252,10 @@ void RtSensorDataWorker::streamData()
         //reset sample counter
         m_iSampleCtr = 0;
     }
+
+//    iTime = timer.elapsed();
+//    qWarning() << "streamData" << iTime;
+//    timer.restart();
 
     //qDebug()<<"RtSensorDataWorker::streamData - this->thread() "<< this->thread();
     //qDebug()<<"RtSensorDataWorker::streamData - m_lDataQ.size()"<<m_lDataQ.size();
@@ -301,7 +314,12 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
         if(fSample >= dThresholdX) {
             //Check lower and upper thresholds and normalize to one
             if(fSample >= dThreholdZ) {
-                fSample = 1.0f;
+                if(vecData(r) < 0) {
+                    fSample = 0.0;
+                } else {
+                    fSample = 1.0;
+                }
+                //fSample = 1.0f;
             } else {
                 if(fSample != 0.0f && dTresholdDiff != 0.0 ) {
                     if(vecData(r) < 0) {

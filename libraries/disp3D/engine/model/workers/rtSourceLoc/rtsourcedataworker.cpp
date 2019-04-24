@@ -166,6 +166,12 @@ void RtSourceDataWorker::setColormapType(const QString& sColormapType)
     } else if(sColormapType == QStringLiteral("Jet")) {
         m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToJet;
         m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToJet;
+    } else if(sColormapType == "Bone") {
+        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToBone;
+        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToBone;
+    } else if(sColormapType == "RedBlue") {
+        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToRedBlue;
+        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToRedBlue;
     }
 }
 
