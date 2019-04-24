@@ -221,6 +221,38 @@ EDFInfo::EDFInfo(QIODevice* pDev, QObject *parent)
         qDebug() << "FATAL: Number of bytes read is not equal to number of bytes in header!";
     }
 
+    this->pDev = pDev;
+}
+
+
+//*************************************************************************************************************
+
+QString EDFInfo::getAsString() const
+{
+    QString result;
+    result += "======================";
+    result += "\nEDF Version Number: " + sEDFVersionNo;
+    result += "\nLocal Patient Identification: " + sLocalPatientIdentification;
+    result += "\nLocal Recording Identification: " + sLocalRecordingIdentification;
+    result += "\nDate of Recording: " + startDateTime.date().toString("dd.MM.yyyy");
+    result += "\nTime of Recording: " + startDateTime.time().toString("hh:mm:ss");
+    result += "\nNumber of Bytes in the EDF Header: " + QString::number(iNumBytesInHeader);
+    result += "\nNumber of Data Records: " + QString::number(iNumDataRecords);
+    result += "\nDuration of each Data Record (in Seconds): " + QString::number(fDataRecordsDuration);
+    result += "\nNumber of Signals in EDF File: " + QString::number(iNumSignals);
+
+    for(const auto& signal : vSignals) {
+        result += signal.getAsString();
+    }
+
+    result += "\n======================";
+
+    return result;
+}
+
+
+QVector<QVector<float>> EDFInfo::readRawData()
+{
     // read whole file data-record-sized portions (this is probably quite ineffective, better read bigger chunks)
     int sizeOfDataRecordInBytes = 0;
     for(const auto& signal : vSignals) {
@@ -246,7 +278,7 @@ EDFInfo::EDFInfo(QIODevice* pDev, QObject *parent)
         for(int sigIdx = 0; sigIdx < iNumSignals; ++sigIdx) {
             for(int sampIdx = 0; sampIdx < vSignals[sigIdx].iNumberOfSamplesPerRecord; ++sampIdx) {
                 // factor 2 because of 2 byte representation, this is different for bdf files
-                signalValues[sigIdx].append((vRecords[recIdx].at(sampIdx * 2 + 1) << 8) | vRecords[recIdx].at(sampIdx * 2));
+                signalValues[sigIdx].append((vRecords[recIdx].at(sampIdx * 2 + 1) << 8) | (vRecords[recIdx].at(sampIdx * 2) & 0x00ff));
             }
         }
     }
@@ -260,31 +292,19 @@ EDFInfo::EDFInfo(QIODevice* pDev, QObject *parent)
     for(const auto& s : signalValues) {
         numSignalValues += s.size();
     }
-    qDebug() << numBytes << "   " << numSignalValues << "    " << numSignalValues * 2;
-}
-
-
-//*************************************************************************************************************
-
-QString EDFInfo::getAsString() const
-{
-    QString result;
-    result += "======================";
-    result += "\nEDF Version Number: " + sEDFVersionNo;
-    result += "\nLocal Patient Identification: " + sLocalPatientIdentification;
-    result += "\nLocal Recording Identification: " + sLocalRecordingIdentification;
-    result += "\nDate of Recording: " + startDateTime.date().toString("dd.MM.yyyy");
-    result += "\nTime of Recording: " + startDateTime.time().toString("hh:mm:ss");
-    result += "\nNumber of Bytes in the EDF Header: " + QString::number(iNumBytesInHeader);
-    result += "\nNumber of Data Records: " + QString::number(iNumDataRecords);
-    result += "\nDuration of each Data Record (in Seconds): " + QString::number(fDataRecordsDuration);
-    result += "\nNumber of Signals in EDF File: " + QString::number(iNumSignals);
-
-    for(const auto& signal : vSignals) {
-        result += signal.getAsString();
+    if(numSignalValues * 2 != numBytes) {
+        qDebug() << "FATAL Divergence between total number of samples and read bytes";
     }
 
-    result += "\n======================";
+    QVector<QVector<float>> result;
+
+    for(const auto& sv : signalValues) {
+        QVector<float> temp;
+        for(const int v : sv) {
+            temp.append(static_cast<float>(v));
+        }
+        result.append(temp);
+    }
 
     return result;
 }
