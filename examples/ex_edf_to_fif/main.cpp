@@ -51,8 +51,12 @@
 //=============================================================================================================
 
 #include <QFile>
-#include <QtCore/QCoreApplication>
+#include <QApplication>
 #include <QDebug>
+#include <QMainWindow>
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
 
 
 //*************************************************************************************************************
@@ -61,6 +65,8 @@
 //=============================================================================================================
 
 using namespace EDFINFOEXAMPLE;
+using namespace QtCharts;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -79,13 +85,35 @@ using namespace EDFINFOEXAMPLE;
 */
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QApplication app(argc, argv);
 
     QFile file("C:\\Users\\Simon\\Desktop\\hiwi\\edf_files\\00000929_s005_t000.edf");
 
     EDFInfo info(&file);
 
-    // qDebug().noquote() << info.getAsString();
+    QVector<QVector<float>> rawData =  info.readRawData();
 
-    return 0;
+    QMainWindow* temp = new QMainWindow();
+
+    QChart* chart = new QChart();
+
+    chart->legend()->hide();
+
+    QLineSeries* series = new QLineSeries();
+
+    for(int i = 20200; i < 21000; ++i) {
+        series->append(i, static_cast<double>(rawData[0][i]));
+    }
+
+    chart->addSeries(series);
+    chart->createDefaultAxes();
+    chart->setTitle("Singular EEG Channel)");
+
+    QChartView* cView = new QChartView(chart);
+
+    temp->setCentralWidget(cView);
+    temp->resize(1000, 300);
+    temp->show();
+
+    return app.exec();
 }
