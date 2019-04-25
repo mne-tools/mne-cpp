@@ -196,7 +196,7 @@ public:
         if(!m_networkData.isEmpty()) {
             for(int i = 0; i < m_networkData.size(); ++i) {
                 emit newConnectivityResultAvailable("sample",
-                                                    "Connectivity",
+                                                    "1",
                                                     m_networkData.at(i));
             }
         }

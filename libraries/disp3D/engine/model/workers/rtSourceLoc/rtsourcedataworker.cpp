@@ -86,7 +86,6 @@ RtSourceDataWorker::RtSourceDataWorker()
 , m_dSFreq(1000.0)
 , m_bStreamSmoothedData(true)
 , m_iCurrentSample(0)
-, m_iSampleCtr(0)
 {
     VisualizationInfo leftHemiInfo;
     VisualizationInfo rightHemiInfo;
@@ -224,70 +223,81 @@ void RtSourceDataWorker::setInterpolationMatrixRight(QSharedPointer<Eigen::Spars
 
 void RtSourceDataWorker::streamData()
 {
-    //QElapsedTimer time;
-    //time.start();
-    if(m_lDataQ.isEmpty()) {
-        if(m_bIsLooping && !m_lDataLoopQ.isEmpty()) {
-            if(m_vecAverage.rows() != m_lDataLoopQ.front().rows()) {
-                m_vecAverage = m_lDataLoopQ.front();
-                m_iCurrentSample++;
-                m_iSampleCtr++;
-            } else if (m_iCurrentSample < m_lDataLoopQ.size()){
-                m_vecAverage += m_lDataLoopQ.at(m_iCurrentSample);
-                m_iCurrentSample++;
-                m_iSampleCtr++;
-            }
+    QElapsedTimer timer;
+    qint64 iTime = 0;
+    timer.start();
 
-            //Set iterator back to the front if needed
-            if(m_iCurrentSample == m_lDataLoopQ.size()) {
-                m_iCurrentSample = 0;
-            }
-        } else {
-            return;
-        }
-    } else {
-        if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
-            m_vecAverage = m_lDataQ.takeFirst();
-            m_iCurrentSample++;
-            m_iSampleCtr++;
-        } else {
-            m_vecAverage += m_lDataQ.takeFirst();
-            m_iCurrentSample++;
-            m_iSampleCtr++;
-        }
+    if(m_iAverageSamples != 0 && !m_lDataLoopQ.isEmpty()) {
+        int iSampleCtr = 0;
 
-        //Set iterator back to the front if needed
-        if(m_iCurrentSample == m_lDataQ.size()) {
-            m_iCurrentSample = 0;
-        }
-    }
-
-    if(m_iSampleCtr % m_iAverageSamples == 0
-       && m_iAverageSamples != 0
-       && m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols() != 0
-       && m_lHemiVisualizationInfo[1].pMatInterpolationMatrix->cols() != 0) {
         //Perform the actual interpolation and send signal
-        m_vecAverage /= (double)m_iAverageSamples;
-        if(m_bStreamSmoothedData) {
-            m_lHemiVisualizationInfo[0].vecSensorValues = m_vecAverage.segment(0, m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols());
-            m_lHemiVisualizationInfo[1].vecSensorValues = m_vecAverage.segment(m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols(), m_lHemiVisualizationInfo[1].pMatInterpolationMatrix->cols());
+        while((iSampleCtr <= m_iAverageSamples)) {
+            if(m_lDataQ.isEmpty()) {
+                if(m_bIsLooping && !m_lDataLoopQ.isEmpty()) {
+                    if(m_vecAverage.rows() != m_lDataLoopQ.front().rows()) {
+                        m_vecAverage = m_lDataLoopQ.front();
+                        m_iCurrentSample++;
+                        iSampleCtr++;
+                    } else if (m_iCurrentSample < m_lDataLoopQ.size()){
+                        m_vecAverage += m_lDataLoopQ.at(m_iCurrentSample);
+                        m_iCurrentSample++;
+                        iSampleCtr++;
+                    }
 
-            //Do calculations for both hemispheres in parallel
-            QFuture<void> result = QtConcurrent::map(m_lHemiVisualizationInfo,
-                                                     generateColorsFromSensorValues);
-            result.waitForFinished();
+                    //Set iterator back to the front if needed
+                    if(m_iCurrentSample == m_lDataLoopQ.size()) {
+                        m_iCurrentSample = 0;
+                        break;
+                    }
+                } else {
+                    return;
+                }
+            } else {
+                if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
+                    m_vecAverage = m_lDataQ.takeFirst();
+                    m_iCurrentSample++;
+                    iSampleCtr++;
+                } else {
+                    m_vecAverage += m_lDataQ.takeFirst();
+                    m_iCurrentSample++;
+                    iSampleCtr++;
+                }
 
-            emit newRtSmoothedData(m_lHemiVisualizationInfo[0].matFinalVertColor,
-                                   m_lHemiVisualizationInfo[1].matFinalVertColor);
-        } else {
-            emit newRtRawData(m_vecAverage.segment(0, m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols()),
-                              m_vecAverage.segment(m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols(), m_lHemiVisualizationInfo[1].pMatInterpolationMatrix->cols()));
+                //Set iterator back to the front if needed
+                if(m_iCurrentSample == m_lDataQ.size()) {
+                    m_iCurrentSample = 0;
+                    break;
+                }
+            }
         }
-        m_vecAverage.setZero(m_vecAverage.rows());
 
-        //reset sample counter
-        m_iSampleCtr = 0;
+        if(m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols() != 0
+           && m_lHemiVisualizationInfo[1].pMatInterpolationMatrix->cols() != 0) {
+            //Perform the actual interpolation and send signal
+            m_vecAverage /= (double)m_iAverageSamples;
+
+            if(m_bStreamSmoothedData) {
+                m_lHemiVisualizationInfo[0].vecSensorValues = m_vecAverage.segment(0, m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols());
+                m_lHemiVisualizationInfo[1].vecSensorValues = m_vecAverage.segment(m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols(), m_lHemiVisualizationInfo[1].pMatInterpolationMatrix->cols());
+
+                //Do calculations for both hemispheres in parallel
+                QFuture<void> result = QtConcurrent::map(m_lHemiVisualizationInfo,
+                                                         generateColorsFromSensorValues);
+                result.waitForFinished();
+
+                emit newRtSmoothedData(m_lHemiVisualizationInfo[0].matFinalVertColor,
+                                       m_lHemiVisualizationInfo[1].matFinalVertColor);
+            } else {
+                emit newRtRawData(m_vecAverage.segment(0, m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols()),
+                                  m_vecAverage.segment(m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols(), m_lHemiVisualizationInfo[1].pMatInterpolationMatrix->cols()));
+            }
+            m_vecAverage.setZero(m_vecAverage.rows());
+        }
     }
+
+iTime = timer.elapsed();
+qWarning() << "RtSourceDataWorker::streamData iTime" << iTime;
+timer.restart();
 
     //qDebug()<<"RtSourceDataWorker::streamData - this->thread() "<< this->thread();
     //qDebug()<<"RtSourceDataWorker::streamData - time.elapsed()" << time.elapsed();

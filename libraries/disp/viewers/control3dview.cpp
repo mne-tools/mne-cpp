@@ -175,7 +175,7 @@ void Control3DView::setModel(QStandardItemModel* pDataTreeModel)
     ui->m_treeView_loadedData->setModel(pDataTreeModel);
 
     //Set description hidden as default
-    ui->m_treeView_loadedData->setColumnHidden(1, true);
+    //ui->m_treeView_loadedData->setColumnHidden(1, true);
 }
 
 
@@ -242,9 +242,9 @@ void Control3DView::onCustomContextMenuRequested(QPoint pos)
     connect(pHideHeader, &QAction::triggered,
             this, &Control3DView::onTreeViewHeaderHide);
 
-//    QAction* pHideDesc = menu->addAction(tr("Toggle description"));
-//    connect(pHideDesc, &QAction::triggered,
-//            this, &Control3DView::onTreeViewDescriptionHide);
+    QAction* pHideDesc = menu->addAction(tr("Toggle description"));
+    connect(pHideDesc, &QAction::triggered,
+            this, &Control3DView::onTreeViewDescriptionHide);
 
     //show context menu
     menu->popup(ui->m_treeView_loadedData->viewport()->mapToGlobal(pos));

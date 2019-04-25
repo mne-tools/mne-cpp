@@ -411,7 +411,7 @@ int main(int argc, char *argv[])
                                                                                          tAnnotSet)) {
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(1);
-            pRTDataItem->setNumberAverages(17);
+            pRTDataItem->setNumberAverages(1);
             pRTDataItem->setStreamingState(false);
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Interpolation based");
@@ -434,7 +434,7 @@ int main(int argc, char *argv[])
     //Read and show BEM
     QFile t_fileBem(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_Bem(t_fileBem);
-    tNetworkView.getTreeModel()->addBemData(parser.value(subjectOption), "BEM", t_Bem);
+//    tNetworkView.getTreeModel()->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
     QFile t_fileBemhead(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
     MNEBem t_Bemhead(t_fileBemhead);
@@ -447,11 +447,11 @@ int main(int argc, char *argv[])
     pSensorSetTreeItem->applyTransform(transformtrans);
 
     // Read, co-register and show digitizer points
-    QFile t_fileDig(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    FiffDigPointSet t_Dig(t_fileDig);
+//    QFile t_fileDig(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    FiffDigPointSet t_Dig(t_fileDig);
 
-    DigitizerSetTreeItem* pDigitizerSetTreeItem = tNetworkView.getTreeModel()->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
-    pDigitizerSetTreeItem->applyTransform(coordTrans, true);
+//    DigitizerSetTreeItem* pDigitizerSetTreeItem = tNetworkView.getTreeModel()->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+//    pDigitizerSetTreeItem->applyTransform(coordTrans, true);
 
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
@@ -463,7 +463,7 @@ int main(int argc, char *argv[])
                                                                                             "MEG")) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(1);
-        pMegSensorTreeItem->setNumberAverages(17);
+        pMegSensorTreeItem->setNumberAverages(1);
         pMegSensorTreeItem->setStreamingState(false);
         pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 13.0e-13f*0.5f, 13.0e-14f));
         pMegSensorTreeItem->setColormapType("Jet");
@@ -496,12 +496,12 @@ int main(int argc, char *argv[])
                                                                                             evoked.comment,
                                                                                             //evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
                                                                                             evoked.data,
-                                                                                            t_Bemhead[0],
+                                                                                            t_Bem[0],
                                                                                             evoked.info,
                                                                                             "EEG")) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(1);
-        pEegSensorTreeItem->setNumberAverages(17);
+        pEegSensorTreeItem->setNumberAverages(1);
         pEegSensorTreeItem->setStreamingState(false);
         pEegSensorTreeItem->setThresholds(QVector3D(0.0f, 3.0e-6f, 6.0e-6f));
         pEegSensorTreeItem->setColormapType("Jet");

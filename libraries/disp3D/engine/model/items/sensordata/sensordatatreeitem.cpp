@@ -561,7 +561,7 @@ void SensorDataTreeItem::initItem()
     connect(pItemLoopedStreaming, &MetaTreeItem::checkStateChanged,
             this, &SensorDataTreeItem::onLoopStateChanged);
 
-    MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, "1");
+    MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, "17");
     list.clear();
     list << pItemAveragedStreaming;
     list << new QStandardItem(pItemAveragedStreaming->toolTip());
