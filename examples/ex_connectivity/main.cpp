@@ -74,6 +74,7 @@
 #include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
 #include <disp3D/engine/model/items/sensorspace/sensorsettreeitem.h>
 #include <connectivity/metrics/abstractmetric.h>
+#include <mne/mne_bem_surface.h>
 
 
 //*************************************************************************************************************
@@ -350,7 +351,7 @@ int main(int argc, char *argv[])
 
         MinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
         sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked);
-        //sourceEstimateEvoked = sourceEstimateEvoked.reduce(0.24*evoked.info.sfreq,1);
+        sourceEstimateEvoked = sourceEstimateEvoked.reduce(0.24*evoked.info.sfreq,1);
 
         // Generate network nodes
         pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matDataList.first().cols()-samplesToCutOut);
@@ -410,9 +411,9 @@ int main(int argc, char *argv[])
                                                                                          tSurfSetInflated,
                                                                                          tAnnotSet)) {
             pRTDataItem->setLoopState(true);
-            pRTDataItem->setTimeInterval(1);
+            pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
-            pRTDataItem->setStreamingState(false);
+            pRTDataItem->setStreamingState(true);
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Interpolation based");
             pRTDataItem->setColormapType("Jet");
@@ -456,15 +457,15 @@ int main(int argc, char *argv[])
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
                                                                                             evoked.comment,
-                                                                                            //evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
-                                                                                            evoked.data,
+                                                                                            evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
+                                                                                            //evoked.data,
                                                                                             t_sensorSurfaceVV[0],
                                                                                             evoked.info,
                                                                                             "MEG")) {
         pMegSensorTreeItem->setLoopState(true);
-        pMegSensorTreeItem->setTimeInterval(1);
+        pMegSensorTreeItem->setTimeInterval(17);
         pMegSensorTreeItem->setNumberAverages(1);
-        pMegSensorTreeItem->setStreamingState(false);
+        pMegSensorTreeItem->setStreamingState(true);
         pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 13.0e-13f*0.5f, 13.0e-14f));
         pMegSensorTreeItem->setColormapType("Jet");
         pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
@@ -494,23 +495,29 @@ int main(int argc, char *argv[])
 
     if (SensorDataTreeItem* pEegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
                                                                                             evoked.comment,
-                                                                                            //evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
-                                                                                            evoked.data,
+                                                                                            evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
+                                                                                            //evoked.data,
                                                                                             t_Bem[0],
                                                                                             evoked.info,
                                                                                             "EEG")) {
         pEegSensorTreeItem->setLoopState(true);
-        pEegSensorTreeItem->setTimeInterval(1);
+        pEegSensorTreeItem->setTimeInterval(17);
         pEegSensorTreeItem->setNumberAverages(1);
-        pEegSensorTreeItem->setStreamingState(false);
+        pEegSensorTreeItem->setStreamingState(true);
         pEegSensorTreeItem->setThresholds(QVector3D(0.0f, 3.0e-6f, 6.0e-6f));
         pEegSensorTreeItem->setColormapType("Jet");
         pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
+        pEegSensorTreeItem->setCancelDistance(0.20);
 
         // Apply head to device transformation
         //pEegSensorTreeItem->applyTransform(coordTrans);
         //pEegSensorTreeItem->applyTransform(raw.info.dev_head_t, true);
     }
+    qDebug() << "-----------------t_Bemhead[0].np" << t_Bemhead[0].np;
+    qDebug() << "-----------------t_Bem[0].np" << t_Bem[0].np;
+    qDebug() << "-----------------t_sensorSurfaceVV[0].np" << t_sensorSurfaceVV[0].np;
+    qDebug() << "-----------------tSurfSetInflated[0].rr().rows()" << tSurfSetInflated[0].rr().rows();
+    qDebug() << "-----------------tSurfSetInflated[1].rr().rows()" << tSurfSetInflated[1].rr().rows();
 
     // ------- TEMP data END -------
 
