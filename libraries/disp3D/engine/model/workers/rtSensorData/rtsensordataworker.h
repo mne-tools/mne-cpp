@@ -227,7 +227,6 @@ protected:
 
     int                                                 m_iCurrentSample;                   /**< Iterator to current sample which is/was streamed. */
     int                                                 m_iAverageSamples;                  /**< Number of average to compute. */
-    int                                                 m_iSampleCtr;                       /**< The sample counter. */
 
     double                                              m_dSFreq;                           /**< The current sampling frequency. */
 

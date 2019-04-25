@@ -179,7 +179,7 @@ void MneEstimateTreeItem::initItem()
     list << new QStandardItem(pItemLoopedStreaming->toolTip());
     this->appendRow(list);
 
-    MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, "1");
+    MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, "17");
     connect(pItemAveragedStreaming, &MetaTreeItem::dataChanged,
             this, &MneEstimateTreeItem::onNumberAveragesChanged);
     list.clear();
