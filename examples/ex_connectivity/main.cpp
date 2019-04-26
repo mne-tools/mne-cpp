@@ -351,7 +351,7 @@ int main(int argc, char *argv[])
 
         MinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
         sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked);
-        sourceEstimateEvoked = sourceEstimateEvoked.reduce(0.24*evoked.info.sfreq,1);
+        //sourceEstimateEvoked = sourceEstimateEvoked.reduce(0.24*evoked.info.sfreq,1);
 
         // Generate network nodes
         pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matDataList.first().cols()-samplesToCutOut);
@@ -412,7 +412,7 @@ int main(int argc, char *argv[])
                                                                                          tAnnotSet)) {
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
-            pRTDataItem->setNumberAverages(1);
+            pRTDataItem->setNumberAverages(17);
             pRTDataItem->setStreamingState(true);
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Interpolation based");
@@ -457,14 +457,14 @@ int main(int argc, char *argv[])
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
                                                                                             evoked.comment,
-                                                                                            evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
-                                                                                            //evoked.data,
+                                                                                            //evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
+                                                                                            evoked.data,
                                                                                             t_sensorSurfaceVV[0],
                                                                                             evoked.info,
                                                                                             "MEG")) {
         pMegSensorTreeItem->setLoopState(true);
         pMegSensorTreeItem->setTimeInterval(17);
-        pMegSensorTreeItem->setNumberAverages(1);
+        pMegSensorTreeItem->setNumberAverages(17);
         pMegSensorTreeItem->setStreamingState(true);
         pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 13.0e-13f*0.5f, 13.0e-14f));
         pMegSensorTreeItem->setColormapType("Jet");
@@ -495,14 +495,14 @@ int main(int argc, char *argv[])
 
     if (SensorDataTreeItem* pEegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
                                                                                             evoked.comment,
-                                                                                            evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
-                                                                                            //evoked.data,
+                                                                                            //evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
+                                                                                            evoked.data,
                                                                                             t_Bem[0],
                                                                                             evoked.info,
                                                                                             "EEG")) {
         pEegSensorTreeItem->setLoopState(true);
         pEegSensorTreeItem->setTimeInterval(17);
-        pEegSensorTreeItem->setNumberAverages(1);
+        pEegSensorTreeItem->setNumberAverages(17);
         pEegSensorTreeItem->setStreamingState(true);
         pEegSensorTreeItem->setThresholds(QVector3D(0.0f, 3.0e-6f, 6.0e-6f));
         pEegSensorTreeItem->setColormapType("Jet");

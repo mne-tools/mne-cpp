@@ -223,9 +223,9 @@ void RtSourceDataWorker::setInterpolationMatrixRight(QSharedPointer<Eigen::Spars
 
 void RtSourceDataWorker::streamData()
 {
-    QElapsedTimer timer;
-    qint64 iTime = 0;
-    timer.start();
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
 
     if(m_iAverageSamples != 0 && !m_lDataLoopQ.isEmpty()) {
         int iSampleCtr = 0;
@@ -295,9 +295,9 @@ void RtSourceDataWorker::streamData()
         }
     }
 
-iTime = timer.elapsed();
-qWarning() << "RtSourceDataWorker::streamData iTime" << iTime;
-timer.restart();
+//iTime = timer.elapsed();
+//qWarning() << "RtSourceDataWorker::streamData iTime" << iTime;
+//timer.restart();
 
     //qDebug()<<"RtSourceDataWorker::streamData - this->thread() "<< this->thread();
     //qDebug()<<"RtSourceDataWorker::streamData - time.elapsed()" << time.elapsed();
