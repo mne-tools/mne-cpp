@@ -42,6 +42,7 @@
 #include "rtsensordataworker.h"
 #include <disp/plots/helpers/colormap.h>
 #include "../../../../helpers/interpolation/interpolation.h"
+#include "../../items/common/abstractmeshtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -51,6 +52,7 @@
 
 #include <QVector3D>
 #include <QDebug>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -83,7 +85,6 @@ RtSensorDataWorker::RtSensorDataWorker()
 , m_dSFreq(1000.0)
 , m_bStreamSmoothedData(true)
 , m_iCurrentSample(0)
-, m_iSampleCtr(0)
 , m_pMatInterpolationMatrix(QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>()))
 {
     m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
@@ -117,8 +118,9 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
 
 void RtSensorDataWorker::setNumberVertices(int iNumberVerts)
 {
-    m_lVisualizationInfo.matOriginalVertColor.resize(iNumberVerts,3);
-    m_lVisualizationInfo.matOriginalVertColor.setZero();
+//    m_lVisualizationInfo.matOriginalVertColor.resize(iNumberVerts,3);
+//    m_lVisualizationInfo.matOriginalVertColor.setZero();
+    m_lVisualizationInfo.matOriginalVertColor = AbstractMeshTreeItem::createVertColor(iNumberVerts);
 }
 
 
@@ -151,6 +153,10 @@ void RtSensorDataWorker::setColormapType(const QString& sColormapType)
         m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHotNegative2;
     } else if(sColormapType == "Jet") {
         m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToJet;
+    } else if(sColormapType == "Bone") {
+        m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToBone;
+    } else if(sColormapType == "RedBlue") {
+        m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToRedBlue;
     }
 }
 
@@ -191,40 +197,54 @@ void RtSensorDataWorker::setInterpolationMatrix(QSharedPointer<SparseMatrix<floa
 
 void RtSensorDataWorker::streamData()
 {
-    if(m_lDataQ.isEmpty()) {
-        if(m_bIsLooping && !m_lDataLoopQ.isEmpty()) {
-            if(m_vecAverage.rows() != m_lDataLoopQ.front().rows()) {
-                m_vecAverage = m_lDataLoopQ.front();
-            } else if (m_iCurrentSample < m_lDataLoopQ.size()){
-                m_vecAverage += m_lDataLoopQ.at(m_iCurrentSample);
-            }
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
 
-            //Set iterator back to the front if needed
-            if(m_iCurrentSample == m_lDataLoopQ.size()) {
-                m_iCurrentSample = 0;
-            }
-        } else {
-            return;
-        }
-    } else {
-        if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
-            m_vecAverage = m_lDataQ.takeFirst();
-        } else {
-            m_vecAverage += m_lDataQ.takeFirst();
-        }
+    if(m_iAverageSamples != 0 && !m_lDataLoopQ.isEmpty()) {
+        int iSampleCtr = 0;
 
-        //Set iterator back to the front if needed
-        if(m_iCurrentSample == m_lDataQ.size()) {
-            m_iCurrentSample = 0;
-        }
-    }
-
-    m_iCurrentSample++;
-    m_iSampleCtr++;
-
-    if(m_iSampleCtr % m_iAverageSamples == 0
-        && m_iAverageSamples != 0) {
         //Perform the actual interpolation and send signal
+        while((iSampleCtr <= m_iAverageSamples)) {
+            if(m_lDataQ.isEmpty()) {
+                if(m_bIsLooping && !m_lDataLoopQ.isEmpty()) {
+                    if(m_vecAverage.rows() != m_lDataLoopQ.front().rows()) {
+                        m_vecAverage = m_lDataLoopQ.front();
+                        m_iCurrentSample++;
+                        iSampleCtr++;
+                    } else if (m_iCurrentSample < m_lDataLoopQ.size()){
+                        m_vecAverage += m_lDataLoopQ.at(m_iCurrentSample);
+                        m_iCurrentSample++;
+                        iSampleCtr++;
+                    }
+
+                    //Set iterator back to the front if needed
+                    if(m_iCurrentSample == m_lDataLoopQ.size()) {
+                        m_iCurrentSample = 0;
+                        break;
+                    }
+                } else {
+                    return;
+                }
+            } else {
+                if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
+                    m_vecAverage = m_lDataQ.takeFirst();
+                    m_iCurrentSample++;
+                    iSampleCtr++;
+                } else {
+                    m_vecAverage += m_lDataQ.takeFirst();
+                    m_iCurrentSample++;
+                    iSampleCtr++;
+                }
+
+                //Set iterator back to the front if needed
+                if(m_iCurrentSample == m_lDataQ.size()) {
+                    m_iCurrentSample = 0;
+                    break;
+                }
+            }
+        }
+
         m_vecAverage /= (double)m_iAverageSamples;
         if(m_bStreamSmoothedData) {
             emit newRtSmoothedData(generateColorsFromSensorValues(m_vecAverage));
@@ -232,10 +252,11 @@ void RtSensorDataWorker::streamData()
             emit newRtRawData(m_vecAverage);
         }
         m_vecAverage.setZero(m_vecAverage.rows());
-
-        //reset sample counter
-        m_iSampleCtr = 0;
     }
+
+    //    iTime = timer.elapsed();
+    //    qWarning() << "RtSensorDataWorker::streamData iTime" << iTime;
+    //    timer.restart();
 
     //qDebug()<<"RtSensorDataWorker::streamData - this->thread() "<< this->thread();
     //qDebug()<<"RtSensorDataWorker::streamData - m_lDataQ.size()"<<m_lDataQ.size();
@@ -294,10 +315,19 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
         if(fSample >= dThresholdX) {
             //Check lower and upper thresholds and normalize to one
             if(fSample >= dThreholdZ) {
-                fSample = 1.0f;
+                if(vecData(r) < 0) {
+                    fSample = 0.0;
+                } else {
+                    fSample = 1.0;
+                }
+                //fSample = 1.0f;
             } else {
                 if(fSample != 0.0f && dTresholdDiff != 0.0 ) {
-                    fSample = (fSample - dThresholdX) / (dTresholdDiff);
+                    if(vecData(r) < 0) {
+                        fSample = 0.5 - (fSample - dThresholdX) / (dTresholdDiff * 2);
+                    } else {
+                        fSample = 0.5 + (fSample - dThresholdX) / (dTresholdDiff * 2);
+                    }
                 } else {
                     fSample = 0.0f;
                 }

@@ -289,8 +289,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
 
     int i,j;
 
-    //inputData.matPsd = MatrixXd(iNRows, iNFreqs);
-    inputData.matPsd = MatrixXd(iNRows, m_iNumberBins);
+    inputData.matPsd = MatrixXd(iNRows, m_iNumberBinAmount);
 
     for (i = 0; i < iNRows; ++i) {
         // Substract mean
@@ -309,8 +308,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         }
 
         // Compute PSD (average over tapers if necessary).
-        //inputData.matPsd.row(i) = inputData.vecTapSpectra.at(i).cwiseAbs2().colwise().sum() / denomPSD;
-        inputData.matPsd.row(i) = inputData.vecTapSpectra.at(i).block(0,0,inputData.vecTapSpectra.at(i).rows(),m_iNumberBins).cwiseAbs2().colwise().sum() / denomPSD;
+        inputData.matPsd.row(i) = inputData.vecTapSpectra.at(i).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(i).rows(),m_iNumberBinAmount).cwiseAbs2().colwise().sum() / denomPSD;
 
         // Divide first and last element by 2 due to half spectrum
         inputData.matPsd.row(i)(0) /= 2.0;
@@ -335,7 +333,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
 
     // Compute CSD
     //MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-    MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBins);
+    MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBinAmount);
 
     if(inputData.vecPairCsd.size() != iNRows) {
         inputData.vecPairCsd.clear();
@@ -350,8 +348,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         for (i = 0; i < iNRows; ++i) {
             for (j = i; j < iNRows; ++j) {
                 // Compute CSD (average over tapers if necessary)
-                //matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
-                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,0,inputData.vecTapSpectra.at(i).rows(),m_iNumberBins).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,0,inputData.vecTapSpectra.at(j).rows(),m_iNumberBins).conjugate()).colwise().sum() / denomCSD;
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(i).rows(),m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(j).rows(),m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
 
                 // Divide first and last element by 2 due to half spectrum
                 matCsd.row(j)(0) /= 2.0;

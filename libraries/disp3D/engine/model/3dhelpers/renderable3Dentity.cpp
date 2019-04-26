@@ -48,6 +48,8 @@
 
 #include <Qt3DCore/QTransform>
 
+#include <Fiff/fiff_coord_trans.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,6 +80,7 @@
 using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace Qt3DCore;
+using namespace FIFFLIB;
 using namespace Qt3DRender;
 
 
@@ -141,6 +144,59 @@ void Renderable3DEntity::setTransform(const Qt3DCore::QTransform& transform)
 
 //*************************************************************************************************************
 
+void Renderable3DEntity::setTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+{
+    if(!m_pTransform) {
+        m_pTransform = new Qt3DCore::QTransform();
+        this->addComponent(m_pTransform);
+    }
+
+    Qt3DCore::QTransform transform3d;
+
+    if(bApplyInverse) {
+        QMatrix4x4 matrix(transform.invtrans(0,0),
+                            transform.invtrans(0,1),
+                            transform.invtrans(0,2),
+                            transform.invtrans(0,3),
+                            transform.invtrans(1,0),
+                            transform.invtrans(1,1),
+                            transform.invtrans(1,2),
+                            transform.invtrans(1,3),
+                            transform.invtrans(2,0),
+                            transform.invtrans(2,1),
+                            transform.invtrans(2,2),
+                            transform.invtrans(2,3),
+                            transform.invtrans(3,0),
+                            transform.invtrans(3,1),
+                            transform.invtrans(3,2),
+                            transform.invtrans(3,3));
+        transform3d.setMatrix(matrix);
+    } else {
+        QMatrix4x4 matrix(transform.trans(0,0),
+                            transform.trans(0,1),
+                            transform.trans(0,2),
+                            transform.trans(0,3),
+                            transform.trans(1,0),
+                            transform.trans(1,1),
+                            transform.trans(1,2),
+                            transform.trans(1,3),
+                            transform.trans(2,0),
+                            transform.trans(2,1),
+                            transform.trans(2,2),
+                            transform.trans(2,3),
+                            transform.trans(3,0),
+                            transform.trans(3,1),
+                            transform.trans(3,2),
+                            transform.trans(3,3));
+        transform3d.setMatrix(matrix);
+    }
+
+    m_pTransform->setMatrix(transform3d.matrix());
+}
+
+
+//*************************************************************************************************************
+
 void Renderable3DEntity::applyTransform(const Qt3DCore::QTransform& transform)
 {
     if(!m_pTransform) {
@@ -148,7 +204,62 @@ void Renderable3DEntity::applyTransform(const Qt3DCore::QTransform& transform)
         this->addComponent(m_pTransform);
     }
 
-    m_pTransform->setMatrix(m_pTransform->matrix() * transform.matrix());
+    m_pTransform->setMatrix(transform.matrix() * m_pTransform->matrix());
+}
+
+
+
+
+//*************************************************************************************************************
+
+void Renderable3DEntity::applyTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+{
+    if(!m_pTransform) {
+        m_pTransform = new Qt3DCore::QTransform();
+        this->addComponent(m_pTransform);
+    }
+
+    Qt3DCore::QTransform transform3d;
+
+    if(bApplyInverse) {
+        QMatrix4x4 matrix(transform.invtrans(0,0),
+                          transform.invtrans(0,1),
+                          transform.invtrans(0,2),
+                          transform.invtrans(0,3),
+                          transform.invtrans(1,0),
+                          transform.invtrans(1,1),
+                          transform.invtrans(1,2),
+                          transform.invtrans(1,3),
+                          transform.invtrans(2,0),
+                          transform.invtrans(2,1),
+                          transform.invtrans(2,2),
+                          transform.invtrans(2,3),
+                          transform.invtrans(3,0),
+                          transform.invtrans(3,1),
+                          transform.invtrans(3,2),
+                          transform.invtrans(3,3));
+        transform3d.setMatrix(matrix);
+    } else {
+        QMatrix4x4 matrix(transform.trans(0,0),
+                          transform.trans(0,1),
+                          transform.trans(0,2),
+                          transform.trans(0,3),
+                          transform.trans(1,0),
+                          transform.trans(1,1),
+                          transform.trans(1,2),
+                          transform.trans(1,3),
+                          transform.trans(2,0),
+                          transform.trans(2,1),
+                          transform.trans(2,2),
+                          transform.trans(2,3),
+                          transform.trans(3,0),
+                          transform.trans(3,1),
+                          transform.trans(3,2),
+                          transform.trans(3,3));
+        transform3d.setMatrix(matrix);
+    }
+
+    m_pTransform->setMatrix(transform3d.matrix() * m_pTransform->matrix());
 }
 
 
