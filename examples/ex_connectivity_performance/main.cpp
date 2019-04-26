@@ -66,6 +66,7 @@
 #include <QCoreApplication>
 #include <QHostInfo>
 #include <QElapsedTimer>
+#include <QThreadPool>
 
 
 //*************************************************************************************************************
@@ -141,6 +142,9 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 int main(int argc, char *argv[])
 {
     qInstallMessageHandler(customMessageHandler);
+
+//    printf("globalInstance()->maxThreadCount(): %d\n",QThreadPool::globalInstance()->maxThreadCount());
+//    QThreadPool::globalInstance()->setMaxThreadCount(24);
 
     //Parameters for performance test
     QStringList sConnectivityMethodList = QStringList() << "COR" << "XCOR" << "COH" << "IMAGCOH" << "PLI" << "WPLI" << "USPLI" << "DSWPLI" << "PLV";
@@ -219,7 +223,7 @@ int main(int argc, char *argv[])
                     m_iNumberSamples = lNumberSamples.at(j);
 
                     //Create new folder
-                    m_sCurrentDir = QString("/cluster/fusion/lesch/connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBins).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
+                    m_sCurrentDir = QString("/cluster/fusion/lesch/connectivity_performance_%1_ht_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBins).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
                     QDir().mkpath(m_sCurrentDir);
 
                     //Write basic information to file
