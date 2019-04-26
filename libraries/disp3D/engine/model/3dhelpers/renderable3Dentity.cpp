@@ -48,7 +48,7 @@
 
 #include <Qt3DCore/QTransform>
 
-#include <Fiff/fiff_coord_trans.h>
+#include <fiff/fiff_coord_trans.h>
 
 
 //*************************************************************************************************************
