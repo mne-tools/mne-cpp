@@ -140,8 +140,10 @@ int main(int argc, char *argv[])
     }
 
     //acquire surface data
-    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+
+    std::cout << "Nubmer vertices t_sensorSurfaceVV[0].np:" << t_sensorSurfaceVV[0].np << std::endl;
 
     //projecting with MEG
     qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
@@ -150,7 +152,7 @@ int main(int argc, char *argv[])
 
     //SCDC with cancel distance 0.03
     qint64 startTimeScdc = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(t_sensorSurfaceVV[0].rr, t_sensorSurfaceVV[0].neighbor_vert, mappedSubSet, 0.03);
+    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(t_sensorSurfaceVV[0].rr, t_sensorSurfaceVV[0].neighbor_vert, mappedSubSet, 0.2);
     std::cout << "SCDC duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeScdc<< " ms " << std::endl;
 
     //filter out bad MEG channels
