@@ -366,6 +366,30 @@ void Spline::setColorMap(QString colorMap)
         plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToJet(1));
     }
 
+    else if (colorMap == "RedBlue")
+    {
+        plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToRedBlue(0));
+
+        for (int i = 1; i < stepsNumber; ++i)
+        {
+            plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToRedBlue((double)i * (0.5 / (double)stepsNumber)));
+            plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToRedBlue((double)0.5 + (i * (0.5 / (double)stepsNumber))));
+        }
+        plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToRedBlue(1));
+    }
+
+    else if (colorMap == "Bone")
+    {
+        plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToBone(0));
+
+        for (int i = 1; i < stepsNumber; ++i)
+        {
+            plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToBone((double)i * (0.5 / (double)stepsNumber)));
+            plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToBone((double)0.5 + (i * (0.5 / (double)stepsNumber))));
+        }
+        plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToBone(1));
+    }
+
     else
     {
         return;

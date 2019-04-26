@@ -90,8 +90,8 @@ void SensorSurfaceTreeItem::initItem()
     this->setCheckState(Qt::Checked);
     this->setToolTip("Sensor surface item");
 
-    //Set materials
-    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial();
+    //Set material to enable sorting
+    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial(true);
     this->setMaterial(pBemMaterial);
 }
 

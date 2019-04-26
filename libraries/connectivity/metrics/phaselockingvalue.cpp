@@ -145,6 +145,17 @@ Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
     // Initialize
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
+    // Check if start and bin amount need to be reset to full spectrum
+    if(m_iNumberBinStart == -1 ||
+       m_iNumberBinAmount == -1 ||
+       m_iNumberBinStart > iNFreqs ||
+       m_iNumberBinAmount > iNFreqs ||
+       m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
+        qDebug() << "PhaseLockingValue::calculate - Resetting to full spectrum";
+        AbstractMetric::m_iNumberBinStart = 0;
+        AbstractMetric::m_iNumberBinAmount = iNFreqs;
+    }
+
     QMutex mutex;
 
     std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
@@ -230,8 +241,7 @@ void PhaseLockingValue::compute(ConnectivitySettings::IntermediateTrialData& inp
 
     // Compute CSD
     if(inputData.vecPairCsd.isEmpty()) {
-        //MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-        MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBins);
+        MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBinAmount);
 
         bool bNfftEven = false;
         if (iNfft % 2 == 0){
@@ -243,8 +253,7 @@ void PhaseLockingValue::compute(ConnectivitySettings::IntermediateTrialData& inp
         for (i = 0; i < iNRows; ++i) {
             for (j = i; j < iNRows; ++j) {
                 // Compute CSD (average over tapers if necessary)
-                //matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
-                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,0,inputData.vecTapSpectra.at(i).rows(),m_iNumberBins).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,0,inputData.vecTapSpectra.at(j).rows(),m_iNumberBins).conjugate()).colwise().sum() / denomCSD;
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(i).rows(),m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(j).rows(),m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
 
                 // Divide first and last element by 2 due to half spectrum
                 matCsd.row(j)(0) /= 2.0;
