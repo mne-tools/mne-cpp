@@ -115,7 +115,7 @@ public:
     /**
     * Default destructor.
     */
-    ~ShowNormalsMaterial();
+    ~ShowNormalsMaterial() = default;
 
 private:
     //=========================================================================================================

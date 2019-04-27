@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the PluginInputConnector class.
+* @brief    Definition of the PluginInputConnector class.
 *
 */
 
@@ -79,7 +79,7 @@ bool PluginInputConnector::isOutputConnector() const
 
 //*************************************************************************************************************
 
-void PluginInputConnector::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void PluginInputConnector::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     emit notify(pMeasurement);
 }

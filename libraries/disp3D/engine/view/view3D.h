@@ -2,13 +2,14 @@
 /**
 * @file     view3D.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Lars Debor <lars.debor@tu-ilmenau.de>
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     November, 2015
 *
 * @section  LICENSE
 *
-* Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2015, Lorenz Esch, Lars Debor and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -43,11 +44,6 @@
 
 #include "../../disp3D_global.h"
 
-#include <fs/annotationset.h>
-#include <fs/annotation.h>
-#include <mne/mne_forwardsolution.h>
-#include <connectivity/network/network.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,17 +62,9 @@
 
 class QPropertyAnimation;
 
-namespace Qt3DCore {
-    class QTransform;
-}
-
 namespace Qt3DRender {
-    class QDirectionalLight;
     class QPointLight;
-}
-
-namespace Qt3DExtras {
-    class QPhongMaterial;
+    class QRenderCaptureReply;
 }
 
 
@@ -115,7 +103,6 @@ public:
     //=========================================================================================================
     /**
     * Default constructor
-    *
     */
     explicit View3D(/*QWidget *parent = 0*/);
 
@@ -123,7 +110,7 @@ public:
     /**
     * Default destructor
     */
-    ~View3D();
+    ~View3D() = default;
 
     //=========================================================================================================
     /**
@@ -140,8 +127,6 @@ public:
     * @param[in] colSceneColor          The new background color of the view.
     */
     void setSceneColor(const QColor& colSceneColor);
-
-    void startModelRotationRecursive(QObject* pObject);
 
     //=========================================================================================================
     /**
@@ -165,7 +150,7 @@ public:
     /**
     * Change light color.
     */
-    void setLightColor(QColor color);
+    void setLightColor(const QColor &color);
 
     //=========================================================================================================
     /**
@@ -173,12 +158,17 @@ public:
     */
     void setLightIntensity(double value);
 
-protected:
     //=========================================================================================================
     /**
-    * Init the 3D view
+    * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
+    *
+    * @param [in] fileName     The file name and path where to store the screenshot.
     */
-    void init();
+    void takeScreenshot();
+
+protected:
+
+    void saveScreenshot();
 
     //=========================================================================================================
     /**
@@ -188,20 +178,9 @@ protected:
 
     //=========================================================================================================
     /**
-    * Init the 3D views transformation matrices
+    * Window function
     */
-    void initTransformations();
-
-    //=========================================================================================================
-    /**
-    * Window functions
-    */
-    void keyPressEvent(QKeyEvent* e);
-    void keyReleaseEvent(QKeyEvent* e);
-    void mousePressEvent(QMouseEvent* e);
-    void wheelEvent(QWheelEvent* e);
-    void mouseReleaseEvent(QMouseEvent* e);
-    void mouseMoveEvent(QMouseEvent* e);
+    void keyPressEvent(QKeyEvent* e) override;
 
     //=========================================================================================================
     /**
@@ -209,43 +188,29 @@ protected:
     *
     * @param[in] parent         The parent identity which will "hold" the coordinate system.
     */
-    void createCoordSystem(Qt3DCore::QEntity *parent);
+    void createCoordSystem(Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**
-    * Sets the rotation for all 3D models being children.
+    * Starts the automated rotation animation for all 3D models being childern.
     *
-    * @param[in] obj         The parent of the children to be rotated.
+    * @param[in] pObject         The parent of the children to be rotated.
     */
-    void setRotationRecursive(QObject* obj);
+    void startModelRotationRecursive(QObject* pObject);
 
-    QPointer<Qt3DCore::QEntity>         m_pRootEntity;                  /**< The root/most top level entity buffer. */
-    QPointer<Qt3DCore::QEntity>         m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
-    QPointer<Qt3DCore::QEntity>         m_pLightEntity;                 /**< The root/most top level entity buffer. */
-    QPointer<Qt3DRender::QCamera>       m_pCameraEntity;                /**< The camera entity. */
-    QPointer<CustomFrameGraph>          m_pFrameGraph;                  /**< The frameGraph entity. */
 
-    QSharedPointer<Qt3DCore::QEntity>   m_XAxisEntity;                  /**< The entity representing a torus in x direction. */
-    QSharedPointer<Qt3DCore::QEntity>   m_YAxisEntity;                  /**< The entity representing a torus in y direction. */
-    QSharedPointer<Qt3DCore::QEntity>   m_ZAxisEntity;                  /**< The entity representing a torus in z direction. */
+    QPointer<Qt3DCore::QEntity>                 m_pRootEntity;                  /**< The root/most top level entity buffer. */
+    QPointer<Qt3DCore::QEntity>                 m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
+    QPointer<Qt3DCore::QEntity>                 m_pLightEntity;                 /**< The root/most top level entity buffer. */
+    QSharedPointer<Qt3DCore::QEntity>           m_pCoordSysEntity;              /**< The entity representing the x/y/z coord system. */
 
-    QPointer<Qt3DCore::QTransform>      m_pCameraTransform;             /**< The main camera transform. */
+    QPointer<CustomFrameGraph>                  m_pFrameGraph;                  /**< The frameGraph entity. */
+    QPointer<Qt3DRender::QCamera>               m_pCamera;                      /**< The camera entity. */
+    QPointer<Qt3DRender::QRenderCaptureReply>   m_pScreenCaptureReply;          /**< The capture reply object to save screenshots. */
 
-    bool                                m_bCameraTransMode;             /**< Flag for activating/deactivating the translation camera mode. */
-    bool                                m_bRotationMode;                /**< Flag for activating/deactivating the rotation mode. */
-    bool                                m_bModelRotationMode;           /**< Flag for activating/deactivating the rotation model mode (camera is default). */
+    QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;         /**< The animations for each 3D object. */
+    QList<QPointer<Qt3DRender::QPointLight> >  m_lLightSources;          /**< The light sources. */
 
-    QPoint                              m_mousePressPositon;            /**< Position when the mouse was pressed. */
-
-    QVector3D                           m_vecViewTrans;                 /**< The camera translation vector. */
-    QVector3D                           m_vecViewTransOld;              /**< The camera old translation vector. */
-    QVector3D                           m_vecViewRotation;              /**< The camera rotation vector. */
-    QVector3D                           m_vecViewRotationOld;           /**< The camera old rotation vector. */
-    QVector3D                           m_vecModelRotation;             /**< The model rotation vector. */
-    QVector3D                           m_vecModelRotationOld;          /**< The model old rotation vector. */
-
-    QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;        /**< The animations for each 3D object. */
-    QList<QPair<QPointer<Qt3DRender::QPointLight> , QPointer<Qt3DExtras::QPhongMaterial> > >  m_lLightSources;        /**< The light sources. */
 };
 
 } // NAMESPACE

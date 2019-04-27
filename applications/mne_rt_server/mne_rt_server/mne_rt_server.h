@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the MNERTServer Class.
+* @brief     Declaration of the MNERTServer Class.
 *
 */
 
@@ -41,7 +41,7 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <realtime/rtCommand/commandmanager.h>
+#include <communication/rtCommand/commandmanager.h>
 #include "connectormanager.h"
 #include "commandserver.h"
 #include "fiffstreamserver.h"
@@ -76,7 +76,7 @@ namespace RTSERVER
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace REALTIMELIB;
+using namespace COMMUNICATIONLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================

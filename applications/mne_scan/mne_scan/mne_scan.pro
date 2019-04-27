@@ -43,13 +43,17 @@ qtHaveModule(3dextras) {
     QT += 3dextras
 }
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
 TARGET = mne_scan
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += console #DEBUG
+CONFIG += console
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -60,7 +64,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}Realtimed \
+            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}Disp3Dd \
             -lscMeasd \
@@ -75,7 +79,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}Realtime \
+            -lMNE$${MNE_LIB_VERSION}RtProcessing \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}Disp3D \
             -lscMeas \
@@ -126,21 +130,11 @@ macx {
     ICON = images/appIcons/mne_scan.icns
 }
 
-# Deploy Qt Dependencies
+# Deploy dependencies
 win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .exe
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
     # === Unix ===
@@ -151,46 +145,64 @@ macx {
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 
     # Copy Resource folder to app bundle
-    filtrc.path = Contents/MacOS/resources/general/default_filters
+    filtrc.path = Contents/MacOS/resources/general/
     filtrc.files = $${ROOT_DIR}/resources/general/default_filters
     QMAKE_BUNDLE_DATA += filtrc
 
-    sgrc.path = Contents/MacOS/resources/general/selectionGroups
+    sgrc.path = Contents/MacOS/resources/general/
     sgrc.files = $${ROOT_DIR}/resources/general/selectionGroups
     QMAKE_BUNDLE_DATA += sgrc
 
-    loutrc.path = Contents/MacOS/resources/general/2DLayouts
+    loutrc.path = Contents/MacOS/resources/general/
     loutrc.files = $${ROOT_DIR}/resources/general/2DLayouts
     QMAKE_BUNDLE_DATA += loutrc
 
-    hpirc.path = Contents/MacOS/resources/general/hpiAlignment
+    hpirc.path = Contents/MacOS/resources/general/
     hpirc.files = $${ROOT_DIR}/resources/general/hpiAlignment
     QMAKE_BUNDLE_DATA += hpirc
 
-    ssrc.path = Contents/MacOS/resources/general/sensorSurfaces
+    ssrc.path = Contents/MacOS/resources/general/
     ssrc.files = $${ROOT_DIR}/resources/general/sensorSurfaces
     QMAKE_BUNDLE_DATA += ssrc
 
-    lout3rc.path = Contents/MacOS/resources/general/3DLayouts
+    lout3rc.path = Contents/MacOS/resources/general/
     lout3rc.files = $${ROOT_DIR}/resources/general/3DLayouts
     QMAKE_BUNDLE_DATA += lout3rc
 
-    plugins.path = Contents/MacOS/resources/mne_scan/plugins
-    plugins.files = $${ROOT_DIR}/resources/mne_scan/plugins
+    rcplugins.path = Contents/MacOS/resources/mne_scan/
+    rcplugins.files = $${ROOT_DIR}/resources/mne_scan/plugins
+    QMAKE_BUNDLE_DATA += rcplugins
+
+    plugins.path = Contents/MacOS/
+    plugins.files = $${ROOT_DIR}/bin/mne_scan_plugins
     QMAKE_BUNDLE_DATA += plugins
+    EXTRA_ARGS = -dmg
+ 
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
 
-#    isEmpty(TARGET_EXT) {
-#        TARGET_CUSTOM_EXT = .app
-#    } else {
-#        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-#    }
+    deploy_app = $$member(DEPLOY_CMD, 1)
+    dmg_file = $$replace(deploy_app, .app, .dmg)
+    QMAKE_CLEAN += -r $${deploy_app} $${dmg_file}
+}
 
-#    # Copy libs
-#    BUNDLEFRAMEDIR = $$shell_quote($${DESTDIR}/$${TARGET}$${TARGET_CUSTOM_EXT}/Contents/Frameworks)
-#    QMAKE_POST_LINK = $${QMAKE_MKDIR} $${BUNDLEFRAMEDIR} &
-#    QMAKE_POST_LINK += $${QMAKE_COPY} $${MNE_LIBRARY_DIR}/{libMNE1Generics.*,libMNE1Utils.*,libMNE1Fs.*,libMNE1Fiff.*,libMNE1Mne*,libMNE1Disp.*} $${BUNDLEFRAMEDIR}
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
 
-#    DEPLOY_COMMAND = macdeployqt
-#    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-#    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
 }

@@ -38,7 +38,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
+contains(MNECPP_CONFIG, buildBasicMneScanVersion) {
     message(Building basic MNE Scan version!)
     #Sensors
     SUBDIRS += \
@@ -59,6 +59,9 @@ contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
         # eegosports \
         # brainamp \
         # tmsi \
+        natus
+
+    contains(MNECPP_CONFIG, useLSL) { SUBDIRS += lsladapter }
 
     #Algorithms
     SUBDIRS += \

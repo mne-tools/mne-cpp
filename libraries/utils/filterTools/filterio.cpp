@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FilterIO class
+* @brief    Definition of the FilterIO class
 *
 */
 
@@ -49,6 +49,7 @@
 
 #include <QFile>
 #include <QDebug>
+#include <QStringList>
 
 
 //*************************************************************************************************************

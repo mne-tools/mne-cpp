@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeSourceEstimate class.
+* @brief    Definition of the RealTimeSourceEstimate class.
 *
 */
 
@@ -53,7 +53,6 @@
 //=============================================================================================================
 
 using namespace SCMEASLIB;
-//using namespace IOBUFFER;
 
 
 //*************************************************************************************************************
@@ -62,13 +61,12 @@ using namespace SCMEASLIB;
 //=============================================================================================================
 
 RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
-, m_bStcSend(true)
-, m_pMNEStc(new MNESourceEstimate)
+: Measurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
 , m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
 , m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
 , m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
 , m_bInitialized(false)
+, m_iSourceEstimateSize(1)
 {
 
 }
@@ -84,7 +82,7 @@ RealTimeSourceEstimate::~RealTimeSourceEstimate()
 
 //*************************************************************************************************************
 
-MNESourceEstimate::SPtr& RealTimeSourceEstimate::getValue()
+QList<MNESourceEstimate::SPtr>& RealTimeSourceEstimate::getValue()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pMNEStc;
@@ -98,12 +96,19 @@ void RealTimeSourceEstimate::setValue(MNESourceEstimate& v)
     m_qMutex.lock();
 
     //Store
-    *m_pMNEStc = v;
+    MNESourceEstimate::SPtr pMNESourceEstimate = MNESourceEstimate::SPtr::create(v);
+    m_pMNEStc.append(pMNESourceEstimate);
 
     m_bInitialized = true;
 
     m_qMutex.unlock();
 
-    emit notify();
+    if(m_pMNEStc.size() >= m_iSourceEstimateSize)
+    {
+        emit notify();
+        m_qMutex.lock();
+        m_pMNEStc.clear();
+        m_qMutex.unlock();
+    }
 }
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffRawData Class.
+* @brief    Definition of the FiffRawData Class.
 *
 */
 
@@ -120,12 +120,19 @@ void FiffRawData::clear()
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t from, fiff_int_t to, const RowVectorXi& sel, bool do_debug)
+bool FiffRawData::read_raw_segment(MatrixXd& data,
+                                   MatrixXd& times,
+                                   fiff_int_t from,
+                                   fiff_int_t to,
+                                   const RowVectorXi& sel,
+                                   bool do_debug) const
 {
     bool projAvailable = true;
 
-    if (this->proj.size() == 0)
+    if (this->proj.size() == 0) {
+        qDebug() << "FiffRawData::read_raw_segment - No projectors setup. Consider calling MNE::setup_compensators.";
         projAvailable = false;
+    }
 
     if(from == -1)
         from = this->first_samp;
@@ -296,6 +303,8 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
                             one = cal*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
                         else if(t_pTag->type == FIFFT_FLOAT)
                             one = cal*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+                        else if(t_pTag->type == FIFFT_SHORT)
+                            one = cal*(Map< MatrixShort >( t_pTag->toShort(),nchan, thisRawDir.nsamp)).cast<double>();
                         else
                             printf("Data Storage Format not known jet [1]!! Type: %d\n", t_pTag->type);
                     }
@@ -322,6 +331,13 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
                         else if(t_pTag->type == FIFFT_FLOAT)
                         {
                             MatrixXd tmp_data = (Map< MatrixXf > ( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+
+                            for(r = 0; r < sel.size(); ++r)
+                                newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
+                        }
+                        else if(t_pTag->type == FIFFT_SHORT)
+                        {
+                            MatrixXd tmp_data = (Map< MatrixShort > ( t_pTag->toShort(),nchan, thisRawDir.nsamp)).cast<double>();
 
                             for(r = 0; r < sel.size(); ++r)
                                 newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
@@ -437,12 +453,20 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix<double>& multSegment, fiff_int_t from, fiff_int_t to, const RowVectorXi& sel, bool do_debug)
+bool FiffRawData::read_raw_segment(MatrixXd& data,
+                                   MatrixXd& times,
+                                   SparseMatrix<double>& multSegment,
+                                   fiff_int_t from,
+                                   fiff_int_t to,
+                                   const RowVectorXi& sel,
+                                   bool do_debug) const
 {
     bool projAvailable = true;
 
-    if (this->proj.size() == 0)
+    if (this->proj.size() == 0) {
+        qDebug() << "FiffRawData::read_raw_segment - No projectors setup. Consider calling MNE::setup_compensators.";
         projAvailable = false;
+    }
 
     if(from == -1)
         from = this->first_samp;
@@ -613,6 +637,8 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix
                             one = cal*(Map< MatrixXi >( t_pTag->toInt(),nchan, thisRawDir.nsamp)).cast<double>();
                         else if(t_pTag->type == FIFFT_FLOAT)
                             one = cal*(Map< MatrixXf >( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+                        else if(t_pTag->type == FIFFT_SHORT)
+                            one = cal*(Map< MatrixShort >( t_pTag->toShort(),nchan, thisRawDir.nsamp)).cast<double>();
                         else
                             printf("Data Storage Format not known jet [1]!! Type: %d\n", t_pTag->type);
                     }
@@ -639,6 +665,13 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix
                         else if(t_pTag->type == FIFFT_FLOAT)
                         {
                             MatrixXd tmp_data = (Map< MatrixXf > ( t_pTag->toFloat(),nchan, thisRawDir.nsamp)).cast<double>();
+
+                            for(r = 0; r < sel.size(); ++r)
+                                newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
+                        }
+                        else if(t_pTag->type == FIFFT_SHORT)
+                        {
+                            MatrixXd tmp_data = (Map< MatrixShort > ( t_pTag->toShort(),nchan, thisRawDir.nsamp)).cast<double>();
 
                             for(r = 0; r < sel.size(); ++r)
                                 newData.block(r,0,1,thisRawDir.nsamp) = tmp_data.block(sel[r],0,1,thisRawDir.nsamp);
@@ -758,7 +791,11 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, SparseMatrix
 
 //*************************************************************************************************************
 
-bool FiffRawData::read_raw_segment_times(MatrixXd& data, MatrixXd& times, float from, float to, const RowVectorXi& sel)
+bool FiffRawData::read_raw_segment_times(MatrixXd& data,
+                                         MatrixXd& times,
+                                         float from,
+                                         float to,
+                                         const RowVectorXi& sel) const
 {
     //
     //   Convert to samples

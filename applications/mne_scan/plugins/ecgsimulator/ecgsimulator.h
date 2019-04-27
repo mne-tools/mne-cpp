@@ -48,7 +48,7 @@
 
 #include <scShared/Interfaces/ISensor.h>
 #include <utils/generics/circularbuffer.h>
-#include <scMeas/newrealtimesamplearray.h>
+#include <scMeas/realtimesamplearray.h>
 
 
 //*************************************************************************************************************
@@ -162,9 +162,9 @@ protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_I_new;   /**< The RealTimeSampleArray to provide the channel ECG I.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_II_new;  /**< The RealTimeSampleArray to provide the channel ECG II.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_ECG_III_new; /**< The RealTimeSampleArray to provide the channel ECG III.*/
+    PluginOutputData<RealTimeSampleArray>::SPtr m_pRTSA_ECG_I_new;   /**< The RealTimeSampleArray to provide the channel ECG I.*/
+    PluginOutputData<RealTimeSampleArray>::SPtr m_pRTSA_ECG_II_new;  /**< The RealTimeSampleArray to provide the channel ECG II.*/
+    PluginOutputData<RealTimeSampleArray>::SPtr m_pRTSA_ECG_III_new; /**< The RealTimeSampleArray to provide the channel ECG III.*/
 
     float           m_fSamplingRate;        /**< the sampling rate.*/
     int             m_iDownsamplingFactor;  /**< the down sampling factor.*/

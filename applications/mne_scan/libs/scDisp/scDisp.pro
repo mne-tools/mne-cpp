@@ -39,8 +39,11 @@ TEMPLATE = lib
 
 QT += widgets concurrent xml svg 3dextras
 
-
 DEFINES += SCDISP_LIBRARY
+
+contains(MNECPP_CONFIG, dispOpenGL) {
+    DEFINES += USE_OPENGL
+}
 
 TARGET = scDisp
 CONFIG(debug, debug|release) {
@@ -56,7 +59,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
-            -lMNE$${MNE_LIB_VERSION}Realtimed \
+            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lMNE$${MNE_LIB_VERSION}Disp3Dd \
             -lscMeasd
@@ -69,7 +72,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Connectivity \
-            -lMNE$${MNE_LIB_VERSION}Realtime \
+            -lMNE$${MNE_LIB_VERSION}RtProcessing \
             -lMNE$${MNE_LIB_VERSION}Disp \
             -lMNE$${MNE_LIB_VERSION}Disp3D \
             -lscMeas
@@ -77,83 +80,34 @@ else {
 
 DESTDIR = $${MNE_LIBRARY_DIR}
 
-#
-# win32: copy dll's to bin dir
-# unix: add lib folder to LD_LIBRARY_PATH
-#
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    BINDIR = $${DESTDIR}/../bin
-    FILE ~= s,/,\\,g
-    BINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-}
-
 SOURCES += \
     measurementwidget.cpp \
-    newmeasurementwidget.cpp \
     realtimemultisamplearraywidget.cpp \
     realtimesamplearraywidget.cpp \
     realtimeevokedsetwidget.cpp \
-    realtimeevokedwidget.cpp \
     realtimecovwidget.cpp \
-    frequencyspectrumwidget.cpp \
-    helpers/realtimebutterflyplot.cpp \
-    helpers/realtimemultisamplearraymodel.cpp \
-    helpers/realtimemultisamplearraydelegate.cpp \
-    helpers/realtimeevokedmodel.cpp \
-    helpers/realtimeevokedsetmodel.cpp \
-    helpers/covmodalitywidget.cpp \
-    helpers/frequencyspectrummodel.cpp \
-    helpers/frequencyspectrumdelegate.cpp \
-    helpers/frequencyspectrumsettingswidget.cpp \
-    helpers/quickcontrolwidget.cpp \
+    realtimespectrumwidget.cpp \
     realtimesourceestimatewidget.cpp \
     realtimeconnectivityestimatewidget.cpp \
-    hpiwidget.cpp \
 
 HEADERS += \
     scdisp_global.h \
     measurementwidget.h \
-    newmeasurementwidget.h \
     realtimemultisamplearraywidget.h \
     realtimesamplearraywidget.h \
     realtimeevokedsetwidget.h \
-    realtimeevokedwidget.h \
     realtimecovwidget.h \
-    frequencyspectrumwidget.h \
-    helpers/realtimemultisamplearraymodel.h \
-    helpers/realtimemultisamplearraydelegate.h \
-    helpers/realtimeevokedmodel.h \
-    helpers/realtimeevokedsetmodel.h \
-    helpers/realtimebutterflyplot.h \
-    helpers/covmodalitywidget.h \
-    helpers/frequencyspectrumdelegate.h \
-    helpers/frequencyspectrummodel.h \
-    helpers/frequencyspectrumsettingswidget.h \
-    helpers/quickcontrolwidget.h \
+    realtimespectrumwidget.h \
     realtimesourceestimatewidget.h \
     realtimeconnectivityestimatewidget.h \
-    hpiwidget.h \
 
 FORMS += \
-    FormFiles/realtimesamplearraywidget.ui \
-    helpers/quickcontrolwidget.ui \
-    FormFiles/hpiwidget.ui
+    formfiles/realtimesamplearraywidget.ui \
 
 RESOURCES += \
     scDisp.qrc
 
 RESOURCE_FILES +=\
-    $${ROOT_DIR}/resources/general/sensorSurfaces/306m.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/306m_rt.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/BabyMEG.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
-    $${ROOT_DIR}/resources/general/sensorSurfaces/BabySQUID.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-fiducials.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-head.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-inner_skull-bem.fif \
-    $${ROOT_DIR}/resources/general/hpiAlignment/fsaverage-trans.fif \
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt \
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt \
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt \
@@ -161,52 +115,51 @@ RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt \
     $${ROOT_DIR}/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt \
 
-# Copy resource files to bin resource folder
-for(FILE, RESOURCE_FILES) {
-    FILEDIR = $$dirname(FILE)
-    FILEDIR = $$dirname(FILE)
-    FILEDIR ~= s,/resources,/bin/resources,g
-    FILEDIR = $$shell_path($${FILEDIR})
-    TRGTDIR = $${FILEDIR}
-
-    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
-
-    FILE = $$shell_path($${FILE})
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
-}
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
 
 UI_DIR = $${PWD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
-
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 # Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_SCAN_INCLUDE_DIR}/scDisp
+header_files.files = $${HEADERS}
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/scDisp
 
 INSTALLS += header_files
 
 OTHER_FILES +=
 
-contains(MNECPP_CONFIG, BuildBasicMNESCANVersion) {
+contains(MNECPP_CONFIG, buildBasicMneScanVersion) {
     DEFINES += BUILD_BASIC_MNESCAN_VERSION
 }
 
-# Deploy Qt Dependencies
+# Deploy library
 win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .dll
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+}
+
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
     }
 
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
 }

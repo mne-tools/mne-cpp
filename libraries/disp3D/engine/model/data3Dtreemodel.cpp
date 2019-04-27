@@ -64,10 +64,9 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-
 #include <Qt3DCore/QEntity>
-
 #include <QSurfaceFormat>
+#include <QGLFormat>
 
 
 //*************************************************************************************************************
@@ -126,6 +125,7 @@ QVariant Data3DTreeModel::data(const QModelIndex& index,
 int Data3DTreeModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
+    // Return 2 to activate item description in tree view
     return 2;
 }
 
@@ -214,11 +214,11 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject,
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& sSubject,
-                                                     const QString& sMeasurementSetName,
-                                                     const MNESourceSpace& sourceSpace)
+QList<SourceSpaceTreeItem*> Data3DTreeModel::addSourceSpace(const QString& sSubject,
+                                                            const QString& sMeasurementSetName,
+                                                            const MNESourceSpace& sourceSpace)
 {
-    SourceSpaceTreeItem* pReturnItem = Q_NULLPTR;
+    QList<SourceSpaceTreeItem*> pReturnItem;
 
     //Handle subject item
     SubjectTreeItem* pSubjectItem = addSubject(sSubject);
@@ -241,9 +241,9 @@ SourceSpaceTreeItem* Data3DTreeModel::addSourceSpace(const QString& sSubject,
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem* Data3DTreeModel::addForwardSolution(const QString& sSubject,
-                                                         const QString& sMeasurementSetName,
-                                                         const MNEForwardSolution& forwardSolution)
+QList<SourceSpaceTreeItem*> Data3DTreeModel::addForwardSolution(const QString& sSubject,
+                                                                const QString& sMeasurementSetName,
+                                                                const MNEForwardSolution& forwardSolution)
 {
     return this->addSourceSpace(sSubject, sMeasurementSetName, forwardSolution.src);
 }
@@ -256,18 +256,12 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
                                                     const MNESourceEstimate& tSourceEstimate,
                                                     const MNELIB::MNEForwardSolution& tForwardSolution,
                                                     const FSLIB::SurfaceSet& tSurfSet,
-                                                    const FSLIB::AnnotationSet& tAnnotSet,
-                                                    const QSurfaceFormat &tSurfaceFormat)
+                                                    const FSLIB::AnnotationSet& tAnnotSet)
 {
     bool bUseGPU = false;
 
     // Only support CPU support until we figured out the QBuffer memory problem when dealing with large matrices
-//    //Test for OpenGL version 4.3
-//    if((tSurfaceFormat.majorVersion() == 4
-//            && tSurfaceFormat.minorVersion() >= 3
-//            || tSurfaceFormat.majorVersion() > 4))
-//    {
-//        //use compute shader version
+//    if(QGLFormat::openGLVersionFlags() >= QGLFormat::OpenGL_Version_4_3) {
 //        bUseGPU = true;
 //        qDebug("Using compute shader version for 3D visualization.");
 //    }
@@ -336,6 +330,24 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject,
 
 //*************************************************************************************************************
 
+QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& sSubject,
+                                                             const QString& sMeasurementSetName,
+                                                             const QList<Network>& networkData)
+{
+    QList<NetworkTreeItem*> returnList;
+
+    for(int i = 0; i < networkData.size(); ++i) {
+        returnList.append(addConnectivityData(sSubject,
+                                              sMeasurementSetName,
+                                              networkData.at(i)));
+    }
+
+    return returnList;
+}
+
+
+//*************************************************************************************************************
+
 NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject,
                                                       const QString& sMeasurementSetName,
                                                       const Network& networkData)
@@ -394,7 +406,8 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject,
 SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
                                                      const QString& sSensorSetName,
                                                      const QList<FIFFLIB::FiffChInfo>& lChInfo,
-                                                     const MNELIB::MNEBem& sensor)
+                                                     const MNELIB::MNEBem& sensor,
+                                                     const QStringList& bads)
 {
     SensorSetTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -406,11 +419,11 @@ SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
 
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::SensorSetItem)) {
         pReturnItem = dynamic_cast<SensorSetTreeItem*>(itemList.first());
-        pReturnItem->addData(sensor, lChInfo, "MEG", m_pModelEntity);
+        pReturnItem->addData(sensor, lChInfo, "MEG", bads, m_pModelEntity);
     } else {
         pReturnItem = new SensorSetTreeItem(Data3DTreeModelItemTypes::SensorSetItem, sSensorSetName);
         AbstractTreeItem::addItemWithDescription(pSubjectItem, pReturnItem);
-        pReturnItem->addData(sensor, lChInfo, "MEG", m_pModelEntity);
+        pReturnItem->addData(sensor, lChInfo, "MEG", bads, m_pModelEntity);
     }
 
     return pReturnItem;
@@ -421,7 +434,8 @@ SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
 
 SensorSetTreeItem* Data3DTreeModel::addEegSensorInfo(const QString& sSubject,
                                                      const QString& sSensorSetName,
-                                                     const QList<FIFFLIB::FiffChInfo>& lChInfo)
+                                                     const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                                                     const QStringList& bads)
 {
     SensorSetTreeItem* pReturnItem = Q_NULLPTR;
 
@@ -435,11 +449,11 @@ SensorSetTreeItem* Data3DTreeModel::addEegSensorInfo(const QString& sSubject,
 
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::SensorSetItem)) {
         pReturnItem = dynamic_cast<SensorSetTreeItem*>(itemList.first());
-        pReturnItem->addData(tempBem, lChInfo, "EEG", m_pModelEntity);
+        pReturnItem->addData(tempBem, lChInfo, "EEG", bads, m_pModelEntity);
     } else {
         pReturnItem = new SensorSetTreeItem(Data3DTreeModelItemTypes::SensorSetItem, sSensorSetName);
         AbstractTreeItem::addItemWithDescription(pSubjectItem, pReturnItem);
-        pReturnItem->addData(tempBem, lChInfo, "EEG", m_pModelEntity);
+        pReturnItem->addData(tempBem, lChInfo, "EEG", bads, m_pModelEntity);
     }
 
     return pReturnItem;
@@ -480,20 +494,14 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                                                    const MatrixXd& matSensorData,
                                                    const MNEBemSurface& tBemSurface,
                                                    const FiffInfo& fiffInfo,
-                                                   const QString& sDataType,
-                                                   const QSurfaceFormat &tSurfaceFormat)
+                                                   const QString& sDataType)
 {
     bool bUseGPU = false;
 
     // Only support CPU support until we figured out the QBuffer memory problem when dealing with large matrices
-//    //Test for OpenGL version 4.3
-//    if((tSurfaceFormat.majorVersion() == 4
-//            && tSurfaceFormat.minorVersion() >= 3
-//            || tSurfaceFormat.majorVersion() > 4))
-//    {
-//        //use compute shader version
+//    if(QGLFormat::openGLVersionFlags() >= QGLFormat::OpenGL_Version_4_3) {
 //        bUseGPU = true;
-//        qDebug("Using compute shader version of SensorDataTreeItem.");
+//        qDebug("Using compute shader version for 3D visualization.");
 //    }
 
     SensorDataTreeItem* pReturnItem = Q_NULLPTR;

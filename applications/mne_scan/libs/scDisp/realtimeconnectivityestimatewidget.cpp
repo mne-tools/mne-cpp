@@ -29,11 +29,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RealTimeConnectivityEstimateWidget Class.
+* @brief    Definition of the RealTimeConnectivityEstimateWidget Class.
 *
 */
-
-//ToDo Paint to render area
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -44,20 +42,14 @@
 
 #include <scMeas/realtimeconnectivityestimate.h>
 
+#include <connectivity/network/network.h>
+
+#include <disp/viewers/quickcontrolview.h>
+
+#include <disp3D/viewers/networkview.h>
 #include <disp3D/engine/model/items/network/networktreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
-
-#include <mne/mne_forwardsolution.h>
-#include <mne/mne_inverse_operator.h>
-
-#include <fs/surfaceset.h>
-#include <fs/annotationset.h>
-
-#include <inverse/minimumNorm/minimumnorm.h>
-
-#include <math.h>
+#include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
 
 
 //*************************************************************************************************************
@@ -65,20 +57,13 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSlider>
-#include <QAction>
-#include <QLabel>
 #include <QGridLayout>
-#include <QSettings>
-#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
-#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -88,9 +73,9 @@
 
 using namespace SCDISPLIB;
 using namespace DISP3DLIB;
-using namespace MNELIB;
 using namespace SCMEASLIB;
-using namespace INVERSELIB;
+using namespace DISPLIB;
+using namespace CONNECTIVITYLIB;
 
 
 //*************************************************************************************************************
@@ -99,36 +84,33 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate> &pRTCE, QWidget* parent)
-: NewMeasurementWidget(parent)
+: MeasurementWidget(parent)
 , m_pRTCE(pRTCE)
 , m_bInitialized(false)
 , m_pRtItem(Q_NULLPTR)
+, m_pAbstractView(new AbstractView())
+, m_iNumberBadChannels(0)
 {
-    m_pAction3DControl = new QAction(QIcon(":/images/3DControl.png"), tr("Shows the 3D control widget (F9)"),this);
-    m_pAction3DControl->setShortcut(tr("F9"));
-    m_pAction3DControl->setToolTip(tr("Shows the 3D control widget (F9)"));
-    connect(m_pAction3DControl, &QAction::triggered,
-            this, &RealTimeConnectivityEstimateWidget::show3DControlWidget);
-    addDisplayAction(m_pAction3DControl);
-    m_pAction3DControl->setVisible(true);
+    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget (F9)"),this);
+    m_pActionQuickControl->setShortcut(tr("F9"));
+    m_pActionQuickControl->setStatusTip(tr("Show quick control widget (F9)"));
+    connect(m_pActionQuickControl.data(), &QAction::triggered,
+            this, &RealTimeConnectivityEstimateWidget::showQuickControlView);
+    addDisplayAction(m_pActionQuickControl);
+    m_pActionQuickControl->setVisible(true);
 
-    m_p3DView = View3D::SPtr(new View3D());
-    m_pData3DModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+    QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTCE->getControlWidgets();
+    m_pAbstractView->setQuickControlWidgets(lControlWidgets);
 
-    m_p3DView->setModel(m_pData3DModel);
+    m_pQuickControlView = m_pAbstractView->getQuickControl();
+    m_pQuickControlView->setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
+    m_pQuickControlView->setDraggable(true);
+    m_pQuickControlView->setVisiblityHideOpacityClose(true);
 
-    m_pControl3DView = Control3DWidget::SPtr(new Control3DWidget(this,
-                                                                 QStringList() << "Minimize" << "Data" << "Window" << "View" << "Light",
-                                                                 Qt::Window));
-    m_pControl3DView->init(m_pData3DModel, m_p3DView);
-
-    QGridLayout *mainLayoutView = new QGridLayout;
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data());
-    mainLayoutView->addWidget(pWidgetContainer);
-
+    QGridLayout *mainLayoutView = new QGridLayout();
+    mainLayoutView->addWidget(m_pAbstractView.data());
+    mainLayoutView->setContentsMargins(0,0,0,0);
     this->setLayout(mainLayoutView);
-
-    getData();
 }
 
 
@@ -136,18 +118,15 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
 
 RealTimeConnectivityEstimateWidget::~RealTimeConnectivityEstimateWidget()
 {
-    //
     // Store Settings
-    //
-    if(!m_pRTCE->getName().isEmpty())
-    {
+    if(!m_pRTCE->getName().isEmpty()) {
     }
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::NewMeasurement::SPtr)
+void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     getData();
 }
@@ -157,33 +136,56 @@ void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::NewMeasurement::SPtr)
 
 void RealTimeConnectivityEstimateWidget::getData()
 {
-    if(m_bInitialized)
-    {
-        //
-        // Add rt brain data
-        //
-        if(!m_pRtItem) {
-            qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem list";
-            m_pRtItem = m_pData3DModel->addConnectivityData("Subject", "Data", *(m_pRTCE->getValue().data()));
-        } else {
-            qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem list";
-
-            if(m_pRtItem) {
-                m_pRtItem->addData(*(m_pRTCE->getValue().data()));
-            }
+    if(m_pRTCE) {
+        if(m_pRTCE->getValue().data()->isEmpty()) {
+            return;
         }
-    }
-    else
-    {
-        if(m_pRTCE->getAnnotSet() && m_pRTCE->getSurfSet())
-        {
-            m_pRTCE->m_bConnectivitySend = false;
-            init();
 
-            //
-            // Add brain data
-            //
-            m_pData3DModel->addSurfaceSet("Subject", "MRI", *m_pRTCE->getSurfSet(), *m_pRTCE->getAnnotSet());
+        // Add rt brain data
+        if(!m_pRtItem) {
+            //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Creating m_pRtItem";
+            m_pRtItem = m_pAbstractView->getTreeModel()->addConnectivityData("sample",
+                                                                             "Connectivity",
+                                                                             *(m_pRTCE->getValue().data()));
+
+            m_pRtItem->setThresholds(QVector3D(0.9f,0.95f,1.0f));
+
+            if(m_pRTCE->getSurfSet() && m_pRTCE->getAnnotSet()) {
+                QList<FsSurfaceTreeItem*> lSurfaces = m_pAbstractView->getTreeModel()->addSurfaceSet("sample",
+                                                                                                     "MRI",
+                                                                                                     *(m_pRTCE->getSurfSet().data()),
+                                                                                                     *(m_pRTCE->getAnnotSet().data()));
+
+                for(int i = 0; i < lSurfaces.size(); i++) {
+                    lSurfaces.at(i)->setAlpha(0.3f);
+                }
+            }
+
+            if(m_pRTCE->getSensorSurface() && m_pRTCE->getFiffInfo()) {
+                m_pAbstractView->getTreeModel()->addMegSensorInfo("sample",
+                                                                  "Sensors",
+                                                                  m_pRTCE->getFiffInfo()->chs,
+                                                                  *(m_pRTCE->getSensorSurface()),
+                                                                  m_pRTCE->getFiffInfo()->bads);
+                m_iNumberBadChannels = m_pRTCE->getFiffInfo()->bads.size();
+            }
+        } else {
+            //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem";
+            QPair<float,float> freqs = m_pRTCE->getValue()->getFrequencyRange();
+            QString sItemName = QString("%1_%2_%3").arg(m_pRTCE->getValue()->getConnectivityMethod()).arg(QString::number(freqs.first)).arg(QString::number(freqs.second));
+            m_pRtItem->setText(sItemName);
+            m_pRtItem->addData(*(m_pRTCE->getValue().data()));
+
+            if(m_pRTCE->getSensorSurface() && m_pRTCE->getFiffInfo()) {
+                if(m_iNumberBadChannels != m_pRTCE->getFiffInfo()->bads.size()) {
+                    m_pAbstractView->getTreeModel()->addMegSensorInfo("sample",
+                                                                      "Sensors",
+                                                                      m_pRTCE->getFiffInfo()->chs,
+                                                                      *(m_pRTCE->getSensorSurface()),
+                                                                      m_pRTCE->getFiffInfo()->bads);
+                    m_iNumberBadChannels = m_pRTCE->getFiffInfo()->bads.size();
+                }
+            }
         }
     }
 }
@@ -194,24 +196,15 @@ void RealTimeConnectivityEstimateWidget::getData()
 void RealTimeConnectivityEstimateWidget::init()
 {
     m_bInitialized = true;
-    m_pRTCE->m_bConnectivitySend = true;
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeConnectivityEstimateWidget::show3DControlWidget()
+void RealTimeConnectivityEstimateWidget::showQuickControlView()
 {
-    if(m_pControl3DView->isActiveWindow())
-        m_pControl3DView->hide();
-    else {
-        m_pControl3DView->activateWindow();
-        m_pControl3DView->show();
+    if(m_pQuickControlView) {
+        m_pQuickControlView->raise();
+        m_pQuickControlView->show();
     }
 }
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================

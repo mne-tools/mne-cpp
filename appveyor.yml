@@ -9,7 +9,7 @@ configuration:
     - windows_tests
 
 install:
-    - set QTDIR=C:\Qt\5.9.3\msvc2017_64
+    - set QTDIR=C:\Qt\5.10\msvc2017_64
     - set PATH=%PATH%;%QTDIR%\bin;C:\Qt\Tools\QtCreator\bin;C:\Qt\QtIFW2.0.1\bin
     - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
 

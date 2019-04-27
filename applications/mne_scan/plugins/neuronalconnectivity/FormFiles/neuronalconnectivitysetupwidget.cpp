@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the NeuronalConnectivitySetupWidget class.
+* @brief    Definition of the NeuronalConnectivitySetupWidget class.
 *
 */
 

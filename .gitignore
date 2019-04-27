@@ -43,6 +43,10 @@
 
 # Compiled Dynamic libraries
 *.so
+*.so.1
+*.so.1.0
+*.so.1.0.0
+*.so
 *.so.debug
 *.debug
 

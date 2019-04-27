@@ -53,6 +53,7 @@
 #include <QTextStream>
 #include <QFile>
 #include <QDebug>
+#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -65,7 +66,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FSLIB
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
 namespace UTILSLIB
@@ -297,8 +298,11 @@ bool IOUtils::write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QS
     if(file.open(QIODevice::WriteOnly|QIODevice::Truncate))
     {
         QTextStream stream(&file);
-//        stream<<"# Dimensions (rows x cols): "<<in.rows()<<" x "<<in.cols()<<"\n";
-//        stream<<"# Description: "<<sDescription<<"\n";
+        if(!sDescription.isEmpty()) {
+            stream<<"# Dimensions (rows x cols): "<<in.rows()<<" x "<<in.cols()<<"\n";
+            stream<<"# Description: "<<sDescription<<"\n";
+        }
+
         for(int row = 0; row<in.rows(); row++) {
             for(int col = 0; col<in.cols(); col++)
                 stream << in(row, col)<<" ";
@@ -354,7 +358,6 @@ bool IOUtils::read_eigen_matrix(Matrix<T, Dynamic, 1>& out, const QString& path)
 template<typename T>
 bool IOUtils::read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString& path)
 {
-    qDebug() << "Matrix!";
     QFile file(path);
 
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {

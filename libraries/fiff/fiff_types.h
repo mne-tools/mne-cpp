@@ -81,6 +81,7 @@ const static Eigen::RowVectorXi defaultRowVectorXi;
 const static QPair<QVariant,QVariant> defaultVariantPair;
 
 typedef Eigen::Matrix<qint16, Eigen::Dynamic, Eigen::Dynamic> MatrixDau16;
+typedef Eigen::Matrix<short, Eigen::Dynamic, Eigen::Dynamic> MatrixShort;
 
 
 //*************************************************************************************************************

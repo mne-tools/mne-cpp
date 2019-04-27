@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "scmeas_global.h"
-#include "newmeasurement.h"
+#include "measurement.h"
 #include "realtimesamplearraychinfo.h"
 
 #include <fiff/fiff_cov.h>
@@ -85,7 +85,7 @@ using namespace FIFFLIB;
 *
 * @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
 */
-class SCMEASSHARED_EXPORT RealTimeCov : public NewMeasurement
+class SCMEASSHARED_EXPORT RealTimeCov : public Measurement
 {
     Q_OBJECT
 public:
@@ -106,11 +106,27 @@ public:
 
     //=========================================================================================================
     /**
+    * Set the fiff info
+    *
+    * @param [in] pFiffInfo     the new fiff info.
+    */
+    void setFiffInfo(QSharedPointer<FiffInfo> pFiffInfo);
+
+    //=========================================================================================================
+    /**
+    * Get the fiff info
+    *
+    * @return     the current fiff info.
+    */
+    QSharedPointer<FiffInfo> getFiffInfo();
+
+    //=========================================================================================================
+    /**
     * New covariance to distribute
     *
     * @param [in] v     the covariance which should be distributed.
     */
-    virtual void setValue(FiffCov& v);
+    virtual void setValue(const FiffCov& v);
 
     //=========================================================================================================
     /**
@@ -133,6 +149,7 @@ private:
     mutable QMutex  m_qMutex;       /**< Mutex to ensure thread safety */
 
     FiffCov::SPtr   m_pFiffCov;     /**< Covariance data set */
+    FiffInfo::SPtr  m_pFiffInfo;    /**< The Fiff Info. */
 
     bool            m_bInitialized; /**< If values are stored.*/
 };

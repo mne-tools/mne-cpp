@@ -260,7 +260,12 @@ public:
     *
     * @return clustered MNE forward solution
     */
-    MNEForwardSolution cluster_forward_solution(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D = defaultD, const FiffCov &p_pNoise_cov = defaultCov, const FiffInfo &p_pInfo = defaultInfo, QString p_sMethod = "cityblock") const;
+    MNEForwardSolution cluster_forward_solution(const AnnotationSet &p_AnnotationSet,
+                                                qint32 p_iClusterSize,
+                                                MatrixXd& p_D = defaultD,
+                                                const FiffCov &p_pNoise_cov = defaultCov,
+                                                const FiffInfo &p_pInfo = defaultInfo,
+                                                QString p_sMethod = "cityblock") const;
 
     //=========================================================================================================
     /**
@@ -286,7 +291,13 @@ public:
     *
     * @return the depth prior
     */
-    static FiffCov compute_depth_prior(const MatrixXd &Gain, const FiffInfo &gain_info, bool is_fixed_ori, double exp = 0.8, double limit = 10.0, const MatrixXd &patch_areas = defaultConstMatrixXd, bool limit_depth_chs = false);
+    static FiffCov compute_depth_prior(const MatrixXd &Gain,
+                                       const FiffInfo &gain_info,
+                                       bool is_fixed_ori,
+                                       double exp = 0.8,
+                                       double limit = 10.0,
+                                       const MatrixXd &patch_areas = defaultConstMatrixXd,
+                                       bool limit_depth_chs = false);
 
     //=========================================================================================================
     /**
@@ -363,7 +374,14 @@ public:
     * @param[out] p_outWhitener     Whitener
     * @param[out] p_outNumNonZero   the rank (non zeros)
     */
-    void prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, FiffInfo &p_outFwdInfo, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero) const;
+    void prepare_forward(const FiffInfo &p_info,
+                         const FiffCov &p_noise_cov,
+                         bool p_pca,
+                         FiffInfo &p_outFwdInfo,
+                         MatrixXd &gain,
+                         FiffCov &p_outNoiseCov,
+                         MatrixXd &p_outWhitener,
+                         qint32 &p_outNumNonZero) const;
 
 //    //=========================================================================================================
 //    /**
@@ -424,7 +442,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the mne_read_forward_solution function
+    * ### MNE toolbox root function ###: Definition of the mne_read_forward_solution function
     *
     * Reads a forward solution from a fif file
     *
@@ -485,7 +503,7 @@ private:
 
     //=========================================================================================================
     /**
-    * Implementation of the read_one function in mne_read_forward_solution.m
+    * Definition of the read_one function in mne_read_forward_solution.m
     *
     * Reads all interesting stuff for one forward solution
     *

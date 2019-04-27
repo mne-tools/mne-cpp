@@ -40,8 +40,9 @@
 //=============================================================================================================
 
 #include "rtsourcedataworker.h"
-#include <disp/helpers/colormap.h>
+#include <disp/plots/helpers/colormap.h>
 #include "../../../../helpers/interpolation/interpolation.h"
+#include "../../items/common/abstractmeshtreeitem.h"
 
 
 //*************************************************************************************************************
@@ -51,6 +52,8 @@
 
 #include <QVector3D>
 #include <QDebug>
+#include <QElapsedTimer>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -82,13 +85,15 @@ RtSourceDataWorker::RtSourceDataWorker()
 , m_iAverageSamples(1)
 , m_dSFreq(1000.0)
 , m_bStreamSmoothedData(true)
-, m_itCurrentSample(0)
-, m_iSampleCtr(0)
+, m_iCurrentSample(0)
 {
-    m_lVisualizationInfoLeft.functionHandlerColorMap = ColorMap::valueToHot;
-    m_lVisualizationInfoRight.functionHandlerColorMap = ColorMap::valueToHot;
-    m_lVisualizationInfoLeft.pMatInterpolationMatrix = QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>());
-    m_lVisualizationInfoRight.pMatInterpolationMatrix = QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>());
+    VisualizationInfo leftHemiInfo;
+    VisualizationInfo rightHemiInfo;
+    leftHemiInfo.functionHandlerColorMap = ColorMap::valueToHot;
+    rightHemiInfo.functionHandlerColorMap = ColorMap::valueToHot;
+    leftHemiInfo.pMatInterpolationMatrix = QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>());
+    rightHemiInfo.pMatInterpolationMatrix = QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>());
+    m_lHemiVisualizationInfo << leftHemiInfo << rightHemiInfo;
 }
 
 
@@ -97,6 +102,7 @@ RtSourceDataWorker::RtSourceDataWorker()
 void RtSourceDataWorker::addData(const MatrixXd& data)
 {
     if(data.rows() == 0) {
+        qDebug() <<"RtSourceDataWorker::addData - Passed data is empty!";
         return;
     }
 
@@ -105,10 +111,12 @@ void RtSourceDataWorker::addData(const MatrixXd& data)
         if(m_lDataQ.size() < m_dSFreq) {
             m_lDataQ.push_back(data.col(i));
         } else {
-            qDebug() <<"RtSourceDataWorker::addData - worker is full!";
+            qDebug() <<"RtSourceDataWorker::addData - worker is full ("<<m_lDataQ.size()<<")";
             break;
         }
     }
+
+    m_lDataLoopQ = m_lDataQ;
 }
 
 
@@ -117,8 +125,10 @@ void RtSourceDataWorker::addData(const MatrixXd& data)
 void RtSourceDataWorker::setNumberVertices(int iNumberVertsLeft,
                                            int iNumberVertsRight)
 {
-    m_lVisualizationInfoLeft.matOriginalVertColor.setZero(iNumberVertsLeft,3);
-    m_lVisualizationInfoRight.matOriginalVertColor.setZero(iNumberVertsRight,3);
+//    m_lHemiVisualizationInfo[0].matOriginalVertColor.setZero(iNumberVertsLeft,3);
+//    m_lHemiVisualizationInfo[1].matOriginalVertColor.setZero(iNumberVertsRight,3);
+    m_lHemiVisualizationInfo[0].matOriginalVertColor = AbstractMeshTreeItem::createVertColor(iNumberVertsLeft);
+    m_lHemiVisualizationInfo[1].matOriginalVertColor = AbstractMeshTreeItem::createVertColor(iNumberVertsRight);
 }
 
 
@@ -144,17 +154,23 @@ void RtSourceDataWorker::setColormapType(const QString& sColormapType)
 {
     //Create function handler to corresponding color map function
     if(sColormapType == QStringLiteral("Hot Negative 1")) {
-        m_lVisualizationInfoLeft.functionHandlerColorMap = ColorMap::valueToHotNegative1;
-        m_lVisualizationInfoRight.functionHandlerColorMap = ColorMap::valueToHotNegative1;
+        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative1;
+        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHotNegative1;
     } else if(sColormapType == QStringLiteral("Hot")) {
-        m_lVisualizationInfoLeft.functionHandlerColorMap = ColorMap::valueToHot;
-        m_lVisualizationInfoRight.functionHandlerColorMap = ColorMap::valueToHot;
+        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHot;
+        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHot;
     } else if(sColormapType == QStringLiteral("Hot Negative 2")) {
-        m_lVisualizationInfoLeft.functionHandlerColorMap = ColorMap::valueToHotNegative2;
-        m_lVisualizationInfoRight.functionHandlerColorMap = ColorMap::valueToHotNegative2;
+        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative2;
+        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHotNegative2;
     } else if(sColormapType == QStringLiteral("Jet")) {
-        m_lVisualizationInfoLeft.functionHandlerColorMap = ColorMap::valueToJet;
-        m_lVisualizationInfoRight.functionHandlerColorMap = ColorMap::valueToJet;
+        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToJet;
+        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToJet;
+    } else if(sColormapType == "Bone") {
+        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToBone;
+        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToBone;
+    } else if(sColormapType == "RedBlue") {
+        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToRedBlue;
+        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToRedBlue;
     }
 }
 
@@ -163,10 +179,10 @@ void RtSourceDataWorker::setColormapType(const QString& sColormapType)
 
 void RtSourceDataWorker::setThresholds(const QVector3D& vecThresholds)
 {
-    m_lVisualizationInfoLeft.dThresholdX = vecThresholds.x();
-    m_lVisualizationInfoLeft.dThresholdZ = vecThresholds.z();
-    m_lVisualizationInfoRight.dThresholdX = vecThresholds.x();
-    m_lVisualizationInfoRight.dThresholdZ = vecThresholds.z();
+    m_lHemiVisualizationInfo[0].dThresholdX = vecThresholds.x();
+    m_lHemiVisualizationInfo[0].dThresholdZ = vecThresholds.z();
+    m_lHemiVisualizationInfo[1].dThresholdX = vecThresholds.x();
+    m_lHemiVisualizationInfo[1].dThresholdZ = vecThresholds.z();
 }
 
 
@@ -190,7 +206,7 @@ void RtSourceDataWorker::setSFreq(const double dSFreq)
 
 void RtSourceDataWorker::setInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeft)
 {
-    m_lVisualizationInfoLeft.pMatInterpolationMatrix = pMatInterpolationMatrixLeft;
+    m_lHemiVisualizationInfo[0].pMatInterpolationMatrix = pMatInterpolationMatrixLeft;
 }
 
 
@@ -198,7 +214,7 @@ void RtSourceDataWorker::setInterpolationMatrixLeft(QSharedPointer<Eigen::Sparse
 
 void RtSourceDataWorker::setInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRight)
 {
-    m_lVisualizationInfoRight.pMatInterpolationMatrix = pMatInterpolationMatrixRight;
+    m_lHemiVisualizationInfo[1].pMatInterpolationMatrix = pMatInterpolationMatrixRight;
 
 }
 
@@ -207,70 +223,98 @@ void RtSourceDataWorker::setInterpolationMatrixRight(QSharedPointer<Eigen::Spars
 
 void RtSourceDataWorker::streamData()
 {
-    if(m_lDataQ.size() > 0) {
-        if(m_itCurrentSample == 0) {
-            m_itCurrentSample = m_lDataQ.cbegin();
-        }
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
 
-        if(m_bIsLooping) {
-            //Down sampling in loop mode
-            if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
-                m_vecAverage = *m_itCurrentSample;
+    if(m_iAverageSamples != 0 && !m_lDataLoopQ.isEmpty()) {
+        int iSampleCtr = 0;
+
+        //Perform the actual interpolation and send signal
+        while((iSampleCtr <= m_iAverageSamples)) {
+            if(m_lDataQ.isEmpty()) {
+                if(m_bIsLooping && !m_lDataLoopQ.isEmpty()) {
+                    if(m_vecAverage.rows() != m_lDataLoopQ.front().rows()) {
+                        m_vecAverage = m_lDataLoopQ.front();
+                        m_iCurrentSample++;
+                        iSampleCtr++;
+                    } else if (m_iCurrentSample < m_lDataLoopQ.size()){
+                        m_vecAverage += m_lDataLoopQ.at(m_iCurrentSample);
+                        m_iCurrentSample++;
+                        iSampleCtr++;
+                    }
+
+                    //Set iterator back to the front if needed
+                    if(m_iCurrentSample == m_lDataLoopQ.size()) {
+                        m_iCurrentSample = 0;
+                        break;
+                    }
+                } else {
+                    return;
+                }
             } else {
-                m_vecAverage += *m_itCurrentSample;
-            }
-        } else {
-            //Down sampling in stream mode
-            if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
-                m_vecAverage = m_lDataQ.front();
-            } else {
-                m_vecAverage += m_lDataQ.front();
-            }
+                if(m_vecAverage.rows() != m_lDataQ.front().rows()) {
+                    m_vecAverage = m_lDataQ.takeFirst();
+                    m_iCurrentSample++;
+                    iSampleCtr++;
+                } else {
+                    m_vecAverage += m_lDataQ.takeFirst();
+                    m_iCurrentSample++;
+                    iSampleCtr++;
+                }
 
-            m_lDataQ.pop_front();
+                //Set iterator back to the front if needed
+                if(m_iCurrentSample == m_lDataQ.size()) {
+                    m_iCurrentSample = 0;
+                    break;
+                }
+            }
         }
 
-        m_itCurrentSample++;
-        m_iSampleCtr++;
-
-        //Set iterator back to the front if needed
-        if(m_itCurrentSample == m_lDataQ.cend()) {
-            m_itCurrentSample = m_lDataQ.cbegin();
-        }
-
-        if(m_iSampleCtr % m_iAverageSamples == 0) {
+        if(m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols() != 0
+           && m_lHemiVisualizationInfo[1].pMatInterpolationMatrix->cols() != 0) {
             //Perform the actual interpolation and send signal
             m_vecAverage /= (double)m_iAverageSamples;
+
             if(m_bStreamSmoothedData) {
-                emit newRtSmoothedData(generateColorsFromSensorValues(m_vecAverage.segment(0, m_lVisualizationInfoLeft.pMatInterpolationMatrix->cols()), m_lVisualizationInfoLeft),
-                                       generateColorsFromSensorValues(m_vecAverage.segment(m_lVisualizationInfoLeft.pMatInterpolationMatrix->cols(), m_lVisualizationInfoRight.pMatInterpolationMatrix->cols()), m_lVisualizationInfoRight));
+                m_lHemiVisualizationInfo[0].vecSensorValues = m_vecAverage.segment(0, m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols());
+                m_lHemiVisualizationInfo[1].vecSensorValues = m_vecAverage.segment(m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols(), m_lHemiVisualizationInfo[1].pMatInterpolationMatrix->cols());
+
+                //Do calculations for both hemispheres in parallel
+                QFuture<void> result = QtConcurrent::map(m_lHemiVisualizationInfo,
+                                                         generateColorsFromSensorValues);
+                result.waitForFinished();
+
+                emit newRtSmoothedData(m_lHemiVisualizationInfo[0].matFinalVertColor,
+                                       m_lHemiVisualizationInfo[1].matFinalVertColor);
             } else {
-                emit newRtRawData(m_vecAverage.segment(0, m_lVisualizationInfoLeft.pMatInterpolationMatrix->cols()),
-                                  m_vecAverage.segment(m_lVisualizationInfoLeft.pMatInterpolationMatrix->cols(), m_lVisualizationInfoRight.pMatInterpolationMatrix->cols()));
+                emit newRtRawData(m_vecAverage.segment(0, m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols()),
+                                  m_vecAverage.segment(m_lHemiVisualizationInfo[0].pMatInterpolationMatrix->cols(), m_lHemiVisualizationInfo[1].pMatInterpolationMatrix->cols()));
             }
             m_vecAverage.setZero(m_vecAverage.rows());
-
-            //reset sample counter
-            m_iSampleCtr = 0;
         }
-
-        //qDebug()<<"RtSourceDataWorker::streamData - this->thread() "<< this->thread();
     }
+
+//iTime = timer.elapsed();
+//qWarning() << "RtSourceDataWorker::streamData iTime" << iTime;
+//timer.restart();
+
+    //qDebug()<<"RtSourceDataWorker::streamData - this->thread() "<< this->thread();
+    //qDebug()<<"RtSourceDataWorker::streamData - time.elapsed()" << time.elapsed();
 }
 
 
 //*************************************************************************************************************
 
-MatrixX3f RtSourceDataWorker::generateColorsFromSensorValues(const VectorXd &vecSensorValues,
-                                                             VisualizationInfo &visualizationInfoHemi)
+void RtSourceDataWorker::generateColorsFromSensorValues(VisualizationInfo &visualizationInfoHemi)
 {
-    if(vecSensorValues.rows() != visualizationInfoHemi.pMatInterpolationMatrix->cols()) {
-        qDebug() << "RtSourceDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of sensors (" << visualizationInfoHemi.pMatInterpolationMatrix->cols() << "). Returning...";
-        return visualizationInfoHemi.matOriginalVertColor;
+    if(visualizationInfoHemi.vecSensorValues.rows() != visualizationInfoHemi.pMatInterpolationMatrix->cols()) {
+        qDebug() << "RtSourceDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << visualizationInfoHemi.vecSensorValues.rows() << ") do not match with previously set number of sensors (" << visualizationInfoHemi.pMatInterpolationMatrix->cols() << "). Returning...";
+        return;
     }
 
     // interpolate sensor signals
-    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(visualizationInfoHemi.pMatInterpolationMatrix, vecSensorValues);
+    VectorXf vecIntrpltdVals = Interpolation::interpolateSignal(*visualizationInfoHemi.pMatInterpolationMatrix, visualizationInfoHemi.vecSensorValues.cast<float>());
 
     // Reset to original color as default
     visualizationInfoHemi.matFinalVertColor = visualizationInfoHemi.matOriginalVertColor;
@@ -281,8 +325,6 @@ MatrixX3f RtSourceDataWorker::generateColorsFromSensorValues(const VectorXd &vec
                                  visualizationInfoHemi.dThresholdX,
                                  visualizationInfoHemi.dThresholdZ,
                                  visualizationInfoHemi.functionHandlerColorMap);
-
-    return visualizationInfoHemi.matFinalVertColor;
 }
 
 
@@ -291,7 +333,7 @@ MatrixX3f RtSourceDataWorker::generateColorsFromSensorValues(const VectorXd &vec
 void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
                                                       MatrixX3f& matFinalVertColor,
                                                       double dThresholdX,
-                                                      double dThreholdZ,
+                                                      double dThresholdZ,
                                                       QRgb (*functionHandlerColorMap)(double v))
 {
     //Note: This function needs to be implemented extremly efficient.
@@ -302,7 +344,7 @@ void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
 
     float fSample;
     QRgb qRgb;
-    const double dTresholdDiff = dThreholdZ - dThresholdX;
+    const double dTresholdDiff = dThresholdZ - dThresholdX;
 
     for(int r = 0; r < vecData.rows(); ++r) {
         //Take the absolute values because the histogram threshold is also calcualted using the absolute values
@@ -310,7 +352,7 @@ void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
 
         if(fSample >= dThresholdX) {
             //Check lower and upper thresholds and normalize to one
-            if(fSample >= dThreholdZ) {
+            if(fSample >= dThresholdZ) {
                 fSample = 1.0f;
             } else {
                 if(fSample != 0.0f && dTresholdDiff != 0.0 ) {
@@ -328,5 +370,3 @@ void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
         }
     }
 }
-
-//*************************************************************************************************************

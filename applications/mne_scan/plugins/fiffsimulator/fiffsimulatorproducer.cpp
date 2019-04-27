@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffSimulatorProducer class.
+* @brief    Definition of the FiffSimulatorProducer class.
 *
 */
 
@@ -56,7 +56,7 @@
 //=============================================================================================================
 
 using namespace FIFFSIMULATORPLUGIN;
-using namespace REALTIMELIB;
+using namespace COMMUNICATIONLIB;
 
 
 //*************************************************************************************************************

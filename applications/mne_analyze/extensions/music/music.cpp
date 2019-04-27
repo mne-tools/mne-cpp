@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the Music class.
+* @brief    Definition of the Music class.
 *
 */
 
@@ -56,9 +56,10 @@
 #include <inverse/rapMusic/rapmusic.h>
 
 #include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/control/control3dwidget.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
+
+#include <disp/viewers/control3dview.h>
 
 #include <utils/mnemath.h>
 
@@ -174,10 +175,10 @@ QWidget *Music::getView()
 
 void Music::calculate()
 {
-    QString fwdFileOption("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QString evokedFileOption("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QString fwdFileOption(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QString evokedFileOption(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QString subjectOption("sample");
-    QString subjectDirectoryOption("./MNE-sample-data/subjects");
+    QString subjectDirectoryOption(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
 
     QString t_sFileNameStc("");//"RapMusic.stc");
     QString annotOption("aparc.a2009s");
@@ -274,7 +275,7 @@ void Music::calculate()
 //    }
 //    testWindow->show();
 
-//    Control3DWidget::SPtr control3DWidget = Control3DWidget::SPtr(new Control3DWidget());
+//    Control3DView::SPtr control3DWidget = Control3DView::SPtr(new Control3DView());
 //    control3DWidget->init(p3DDataModel, testWindow);
 //    control3DWidget->show();
 

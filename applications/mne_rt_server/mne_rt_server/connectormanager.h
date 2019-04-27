@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the ConnectorManager Class.
+* @brief     Declaration of the ConnectorManager Class.
 *
 */
 
@@ -76,7 +76,7 @@ namespace RTSERVER
 //=============================================================================================================
 
 using namespace FIFFLIB;
-using namespace REALTIMELIB;
+using namespace COMMUNICATIONLIB;
 
 
 //*************************************************************************************************************

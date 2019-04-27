@@ -41,10 +41,9 @@
 #include "pluginconnectorconnection.h"
 #include "pluginconnectorconnectionwidget.h"
 
-#include <scMeas/newnumeric.h>
-#include <scMeas/newrealtimesamplearray.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-#include <scMeas/realtimeevoked.h>
+#include <scMeas/numeric.h>
+#include <scMeas/realtimesamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimesourceestimate.h>
@@ -111,9 +110,9 @@ bool PluginConnectorConnection::createConnection()
             //ToDo make this auto connection more fancy
             // < --- Type Check --- >
 
-            //Cast to NewRealTimeSampleArray
-            QSharedPointer< PluginOutputData<NewRealTimeSampleArray> > senderRTSA = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<NewRealTimeSampleArray> >();
-            QSharedPointer< PluginInputData<NewRealTimeSampleArray> > receiverRTSA = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<NewRealTimeSampleArray> >();
+            //Cast to RealTimeSampleArray
+            QSharedPointer< PluginOutputData<RealTimeSampleArray> > senderRTSA = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeSampleArray> >();
+            QSharedPointer< PluginInputData<RealTimeSampleArray> > receiverRTSA = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeSampleArray> >();
             if(senderRTSA && receiverRTSA)
             {
                 m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(), m_pReceiver->getInputConnectors()[j]->getName()), connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
@@ -122,21 +121,10 @@ bool PluginConnectorConnection::createConnection()
                 break;
             }
 
-            //Cast to NewRealTimeMultiSampleArray
-            QSharedPointer< PluginOutputData<NewRealTimeMultiSampleArray> > senderRTMSA = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >();
-            QSharedPointer< PluginInputData<NewRealTimeMultiSampleArray> > receiverRTMSA = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<NewRealTimeMultiSampleArray> >();
+            //Cast to RealTimeMultiSampleArray
+            QSharedPointer< PluginOutputData<RealTimeMultiSampleArray> > senderRTMSA = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >();
+            QSharedPointer< PluginInputData<RealTimeMultiSampleArray> > receiverRTMSA = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeMultiSampleArray> >();
             if(senderRTMSA && receiverRTMSA)
-            {
-                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(), m_pReceiver->getInputConnectors()[j]->getName()), connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
-                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
-                bConnected = true;
-                break;
-            }
-
-            //Cast to RealTimeEvoked
-            QSharedPointer< PluginOutputData<RealTimeEvoked> > senderRTE = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeEvoked> >();
-            QSharedPointer< PluginInputData<RealTimeEvoked> > receiverRTE = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeEvoked> >();
-            if(senderRTE && receiverRTE)
             {
                 m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(), m_pReceiver->getInputConnectors()[j]->getName()), connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
                         m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
@@ -196,20 +184,15 @@ bool PluginConnectorConnection::createConnection()
 
 ConnectorDataType PluginConnectorConnection::getDataType(QSharedPointer<PluginConnector> pPluginConnector)
 {
-    QSharedPointer< PluginOutputData<SCMEASLIB::NewRealTimeSampleArray> > RTSA_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::NewRealTimeSampleArray> >();
-    QSharedPointer< PluginInputData<SCMEASLIB::NewRealTimeSampleArray> > RTSA_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::NewRealTimeSampleArray> >();
+    QSharedPointer< PluginOutputData<SCMEASLIB::RealTimeSampleArray> > RTSA_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::RealTimeSampleArray> >();
+    QSharedPointer< PluginInputData<SCMEASLIB::RealTimeSampleArray> > RTSA_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeSampleArray> >();
     if(RTSA_Out || RTSA_In)
         return ConnectorDataType::_RTSA;
 
-    QSharedPointer< PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray> > RTMSA_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray> >();
-    QSharedPointer< PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray> > RTMSA_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray> >();
+    QSharedPointer< PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > RTMSA_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >();
+    QSharedPointer< PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> > RTMSA_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >();
     if(RTMSA_Out || RTMSA_In)
         return ConnectorDataType::_RTMSA;
-
-    QSharedPointer< PluginOutputData<SCMEASLIB::RealTimeEvoked> > RTE_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::RealTimeEvoked> >();
-    QSharedPointer< PluginInputData<SCMEASLIB::RealTimeEvoked> > RTE_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeEvoked> >();
-    if(RTE_Out || RTE_In)
-        return ConnectorDataType::_RTE;
 
     QSharedPointer< PluginOutputData<SCMEASLIB::RealTimeCov> > RTC_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::RealTimeCov> >();
     QSharedPointer< PluginInputData<SCMEASLIB::RealTimeCov> > RTC_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeCov> >();
@@ -221,8 +204,8 @@ ConnectorDataType PluginConnectorConnection::getDataType(QSharedPointer<PluginCo
     if(RTSE_Out || RTSE_In)
         return ConnectorDataType::_RTSE;
 
-    QSharedPointer< PluginOutputData<SCMEASLIB::NewNumeric> > Num_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::NewNumeric> >();
-    QSharedPointer< PluginInputData<SCMEASLIB::NewNumeric> > Num_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::NewNumeric> >();
+    QSharedPointer< PluginOutputData<SCMEASLIB::Numeric> > Num_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::Numeric> >();
+    QSharedPointer< PluginInputData<SCMEASLIB::Numeric> > Num_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::Numeric> >();
     if(Num_Out || Num_In)
         return ConnectorDataType::_N;
 

@@ -139,53 +139,53 @@ public:
 public:
     QString bemname;                    /**< Boundary-element model */
     Eigen::Vector3f r0;                 /**< Sphere model origin  */
-    bool   accurate    = false;         /**< Use accurate coil definitions? */
+    bool   accurate;         		/**< Use accurate coil definitions? */
     QString mriname;                    /**< Gives the MRI <-> head transform */
 
     QString guessname;                  /**< Initial guess grid (if not present, the values below will be employed to generate the grid) */
     QString guess_surfname;             /**< Load the inner skull surface from this BEM file */
-    float guess_rad     = 0.080f;       /**< Radius of spherical guess surface */
-    float guess_mindist = 0.010f;       /**< Minimum allowed distance to the surface */
-    float guess_exclude = 0.020f;       /**< Exclude points closer than this to the origin */
-    float guess_grid    = 0.010f;       /**< Grid spacing */
+float guess_rad;       			/**< Radius of spherical guess surface */
+    float guess_mindist;       		/**< Minimum allowed distance to the surface */
+    float guess_exclude;       		/**< Exclude points closer than this to the origin */
+    float guess_grid;       		/**< Grid spacing */
 
     QString noisename;                  /**< Noise-covariance matrix */
-    float grad_std     = 5e-13f;        /**< Standard deviations to be used if noise covariance is not specified */
-    float mag_std      = 20e-15f;
-    float eeg_std      = 0.2e-6f;
-    bool  diagnoise    = false;         /**< Use only the diagonals of the noise-covariance matrix */
+    float grad_std;        		/**< Standard deviations to be used if noise covariance is not specified */
+    float mag_std;
+    float eeg_std;
+    bool  diagnoise;         		/**< Use only the diagonals of the noise-covariance matrix */
 
     QString measname;                   /**< Data file */
-    bool  is_raw       = false;         /**< Is this a raw data file */
-    char  *badname     = NULL;          /**< Bad channels */
-    bool  include_meg  = false;         /**< Use MEG? */
-    bool  include_eeg  = false;         /**< Use EEG? */
-    float tmin         = -2*BIG_TIME;   /**< Possibility to set these from the command line */
-    float tmax         = 2*BIG_TIME;
-    float tstep        = -1.0;          /**< Step between fits */
-    float integ        = 0.0;
-    float bmin         = BIG_TIME;      /**< Possibility to set these from the command line */
-    float bmax         = BIG_TIME;
-    bool  do_baseline  = false;         /**< Are both baseline limits set? */
-    int   setno        = 1;             /**< Which data set */
-    bool  verbose      = false;
-    mneFilterDefRec     filter;
+    bool  is_raw;         		/**< Is this a raw data file */
+    char  *badname;          		/**< Bad channels */
+    bool  include_meg;         		/**< Use MEG? */
+    bool  include_eeg;         		/**< Use EEG? */
+    float tmin;   			/**< Possibility to set these from the command line */
+    float tmax;
+    float tstep;          		/**< Step between fits */
+    float integ;
+    float bmin;      			/**< Possibility to set these from the command line */
+    float bmax;
+    bool  do_baseline;         		/**< Are both baseline limits set? */
+    int   setno;             		/**< Which data set */
+    bool  verbose;
+    mneFilterDefRec filter;
     QStringList projnames;              /**< Projection file names */
-    bool omit_data_proj = false;
+    bool omit_data_proj;
 
     QString eeg_model_file;             /**< File of EEG sphere model specifications */
     QString eeg_model_name;             /**< Name of the EEG model to use */
-    float  eeg_sphere_rad = 0.09f;      /**< Scalp radius to use in EEG sphere model */
-    bool    scale_eeg_pos  = false;     /**< Scale the electrode locations to scalp in the sphere model */
-    float  mag_reg      = 0.1f;         /**< Noise-covariance matrix regularization for MEG (magnetometers and axial gradiometers)  */
-    bool   fit_mag_dipoles = false;
+float  eeg_sphere_rad;      		/**< Scalp radius to use in EEG sphere model */
+    bool    scale_eeg_pos;     		/**< Scale the electrode locations to scalp in the sphere model */
+    float  mag_reg;         		/**< Noise-covariance matrix regularization for MEG (magnetometers and axial gradiometers)  */
+    bool   fit_mag_dipoles;
 
-    float  grad_reg     = 0.1f;         /**< Noise-covariance matrix regularization for EEG (planar gradiometers) */
-    float  eeg_reg      = 0.1f;         /**< Noise-covariance matrix regularization for EEG  */
+float  grad_reg;         		/**< Noise-covariance matrix regularization for EEG (planar gradiometers) */
+    float  eeg_reg;         		/**< Noise-covariance matrix regularization for EEG  */
     QString dipname;                    /**< Output file in dip format */
     QString bdipname;                   /**< Output file in bdip format */
 
-    bool gui    = false;                /**< Should the gui been shown? */
+    bool gui;                		/**< Should the gui been shown? */
 
 private:
     void initMembers();

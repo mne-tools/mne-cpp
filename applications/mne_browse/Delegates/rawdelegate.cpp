@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of delegate of mne_browse
+* @brief    Definition of delegate of mne_browse
 *
 */
 
@@ -99,6 +99,8 @@ RawDelegate::RawDelegate(QObject *parent)
 void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     float t_fPlotHeight = option.rect.height();
+    painter->setRenderHint(QPainter::Antialiasing, true);
+
     switch(index.column()) {
     case 0: { //chnames
         painter->save();
@@ -137,7 +139,6 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         QPainterPath path(QPointF(option.rect.x()+t_rawModel->relFiffCursor()-1,option.rect.y()));
 
         //Plot grid
-        painter->setRenderHint(QPainter::Antialiasing, false);
         createGridPath(path,option,listPairs);
 
         painter->save();
@@ -160,7 +161,6 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         }
 
         painter->translate(0,t_fPlotHeight/2);
-        painter->setRenderHint(QPainter::Antialiasing, true);
         painter->drawPath(path);
         painter->restore();
 

@@ -148,7 +148,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    SourceSpaceTreeItem* addData(const MNELIB::MNESourceSpace& tSourceSpace,
+    QList<SourceSpaceTreeItem*> addData(const MNELIB::MNESourceSpace& tSourceSpace,
                                  Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================

@@ -42,6 +42,8 @@
 #include "sensorsurfacetreeitem.h"
 #include "sensorpositiontreeitem.h"
 
+#include "../../3dhelpers/renderable3Dentity.h"
+
 #include <mne/mne_bem.h>
 #include <fiff/fiff_ch_info.h>
 
@@ -99,11 +101,16 @@ void SensorSetTreeItem::initItem()
 void SensorSetTreeItem::addData(const MNEBem &tSensor,
                                 const QList<FiffChInfo>& lChInfo,
                                 const QString& sDataType,
+                                const QStringList& bads,
                                 Qt3DCore::QEntity* p3DEntityParent)
 {
+    if(!m_pRenderable3DEntity) {
+        m_pRenderable3DEntity = new Renderable3DEntity(p3DEntityParent);
+    }
+
     //Generate sensor surfaces as childs
     for(int i = 0; i < tSensor.size(); ++i) {
-        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorSurfaceItem);
+        SensorSurfaceTreeItem* pSurfItem = new SensorSurfaceTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::SensorSurfaceItem);
         pSurfItem->addData(tSensor[i]);
 
         QList<QStandardItem*> list;
@@ -129,8 +136,8 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor,
 
     //Add sensor locations as child items
     if(!lChInfoGrad.isEmpty() && sDataType == "MEG") {
-        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "Grad");
-        pSensorPosItem->addData(lChInfoGrad, "MEG");
+        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::SensorPositionItem, "Grad");
+        pSensorPosItem->addData(lChInfoGrad, "MEG", bads);
 
         QList<QStandardItem*> list;
         list << pSensorPosItem;
@@ -139,8 +146,8 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor,
     }
 
     if(!lChInfoMag.isEmpty() && sDataType == "MEG") {
-        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "Mag");
-        pSensorPosItem->addData(lChInfoMag, "MEG");
+        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::SensorPositionItem, "Mag");
+        pSensorPosItem->addData(lChInfoMag, "MEG", bads);
 
         QList<QStandardItem*> list;
         list << pSensorPosItem;
@@ -149,12 +156,52 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor,
     }
 
     if(!lChInfoEEG.isEmpty() && sDataType == "EEG") {
-        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(p3DEntityParent, Data3DTreeModelItemTypes::SensorPositionItem, "EEG");
-        pSensorPosItem->addData(lChInfoEEG, "EEG");
+        SensorPositionTreeItem* pSensorPosItem = new SensorPositionTreeItem(m_pRenderable3DEntity, Data3DTreeModelItemTypes::SensorPositionItem, "EEG");
+        pSensorPosItem->addData(lChInfoEEG, "EEG", bads);
 
         QList<QStandardItem*> list;
         list << pSensorPosItem;
         list << new QStandardItem(pSensorPosItem->toolTip());
         this->appendRow(list);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorSetTreeItem::setTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pRenderable3DEntity) {
+        m_pRenderable3DEntity->setTransform(transform);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorSetTreeItem::setTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+{
+    if(m_pRenderable3DEntity) {
+        m_pRenderable3DEntity->setTransform(transform, bApplyInverse);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorSetTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pRenderable3DEntity) {
+        m_pRenderable3DEntity->applyTransform(transform);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorSetTreeItem::applyTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+{
+    if(m_pRenderable3DEntity) {
+        m_pRenderable3DEntity->applyTransform(transform, bApplyInverse);
     }
 }

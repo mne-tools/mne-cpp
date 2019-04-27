@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the NoiseReductionSetupWidget class.
+* @brief    Definition of the NoiseReductionSetupWidget class.
 *
 */
 
@@ -54,7 +54,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace NoiseReductionPlugin;
+using namespace NOISEREDUCTIONPLUGIN;
 
 
 //*************************************************************************************************************

@@ -178,7 +178,12 @@ void MNEForwardSolution::clear()
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, const FiffCov &p_pNoise_cov, const FiffInfo &p_pInfo, QString p_sMethod) const
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const AnnotationSet &p_AnnotationSet,
+                                                                qint32 p_iClusterSize,
+                                                                MatrixXd& p_D,
+                                                                const FiffCov &p_pNoise_cov,
+                                                                const FiffInfo &p_pInfo,
+                                                                QString p_sMethod) const
 {
     printf("Cluster forward solution using %s.\n", p_sMethod.toUtf8().constData());
 
@@ -1120,7 +1125,14 @@ MNEForwardSolution MNEForwardSolution::pick_types(bool meg, bool eeg, const QStr
 
 //*************************************************************************************************************
 
-void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &p_noise_cov, bool p_pca, FiffInfo &p_outFwdInfo, MatrixXd &gain, FiffCov &p_outNoiseCov, MatrixXd &p_outWhitener, qint32 &p_outNumNonZero) const
+void MNEForwardSolution::prepare_forward(const FiffInfo &p_info,
+                                         const FiffCov &p_noise_cov,
+                                         bool p_pca,
+                                         FiffInfo &p_outFwdInfo,
+                                         MatrixXd &gain,
+                                         FiffCov &p_outNoiseCov,
+                                         MatrixXd &p_outWhitener,
+                                         qint32 &p_outNumNonZero) const
 {
     QStringList fwd_ch_names, ch_names;
     for(qint32 i = 0; i < this->info.chs.size(); ++i)
@@ -1128,9 +1140,10 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info, const FiffCov &
 
     ch_names.clear();
     for(qint32 i = 0; i < p_info.chs.size(); ++i)
-        if(     !p_info.bads.contains(p_info.chs[i].ch_name)
-            &&  !p_noise_cov.bads.contains(p_info.chs[i].ch_name)
-            &&  fwd_ch_names.contains(p_info.chs[i].ch_name))
+        if(!p_info.bads.contains(p_info.chs[i].ch_name)
+            && !p_noise_cov.bads.contains(p_info.chs[i].ch_name)
+            && p_noise_cov.names.contains(p_info.chs[i].ch_name)
+            && fwd_ch_names.contains(p_info.chs[i].ch_name))
             ch_names << p_info.chs[i].ch_name;
 
     qint32 n_chan = ch_names.size();

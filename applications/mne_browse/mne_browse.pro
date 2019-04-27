@@ -40,24 +40,23 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += gui network core widgets concurrent svg
+QT += gui network core widgets concurrent svg opengl
+
+contains(MNECPP_CONFIG, dispOpenGL) {
+    DEFINES += USE_OPENGL
+}
 
 TARGET = mne_browse
-
-#If one single executable is to be build
-#-> comment out flag in .pri file
-#-> add DEFINES += BUILD_MNECPP_STATIC_LIB in projects .pro file
-#-> This needs to be done in order to avoid problem with the Q_DECL_EXPORT/Q_DECL_IMPORT flag in the global headers
-contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
-    DEFINES += BUILD_MNECPP_STATIC_LIB
-}
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-#Note that the static flag is ingored when building against a dynamic qt version
-CONFIG += static console #DEBUG console
+CONFIG += console
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -168,21 +167,11 @@ macx {
     ICON = Resources/Images/ApplicationIcons/mne_browse.icns
 }
 
-# Deploy Qt Dependencies
+# Deploy dependencies
 win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .exe
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
     # === Unix ===
@@ -193,27 +182,56 @@ macx {
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 
     # Copy resources to app bundle
-    sgrc.path = Contents/MacOS/resources/general/selectionGroups
+    sgrc.path = Contents/MacOS/resources/general/
     sgrc.files = $${ROOT_DIR}/resources/general/selectionGroups
     QMAKE_BUNDLE_DATA += sgrc
 
-    loutrc.path = Contents/MacOS/resources/general/2DLayouts
+    loutrc.path = Contents/MacOS/resources/general/
     loutrc.files = $${ROOT_DIR}/resources/general/2DLayouts
+
+    filtrc.path = Contents/MacOS/resources/general/
+    filtrc.files = $${ROOT_DIR}/resources/general/default_filters
+    QMAKE_BUNDLE_DATA += filtrc
+
+    hpirc.path = Contents/MacOS/resources/general/
+    hpirc.files = $${ROOT_DIR}/resources/general/hpiAlignment
+    QMAKE_BUNDLE_DATA += hpirc
+
+    ssrc.path = Contents/MacOS/resources/general/
+    ssrc.files = $${ROOT_DIR}/resources/general/sensorSurfaces
+    QMAKE_BUNDLE_DATA += ssrc
+
+    lout3rc.path = Contents/MacOS/resources/general/
+    lout3rc.files = $${ROOT_DIR}/resources/general/3DLayouts
+    QMAKE_BUNDLE_DATA += lout3rc
     QMAKE_BUNDLE_DATA += loutrc
+    EXTRA_ARGS = -dmg
+ 
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
 
-#    isEmpty(TARGET_EXT) {
-#        TARGET_CUSTOM_EXT = .app
-#    } else {
-#        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-#    }
-
-#    # Copy libs
-#    BUNDLEFRAMEDIR = $$shell_quote($${DESTDIR}/$${TARGET}$${TARGET_CUSTOM_EXT}/Contents/Frameworks)
-#    QMAKE_POST_LINK = $${QMAKE_MKDIR} $${BUNDLEFRAMEDIR} &
-#    QMAKE_POST_LINK += $${QMAKE_COPY} $${MNE_LIBRARY_DIR}/{libMNE1Generics.*,libMNE1Utils.*,libMNE1Fs.*,libMNE1Fiff.*,libMNE1Mne*,libMNE1Disp.*} $${BUNDLEFRAMEDIR}
-
-#    DEPLOY_COMMAND = macdeployqt
-#    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-#    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} -verbose=0
+    deploy_app = $$member(DEPLOY_CMD, 1)
+    dmg_file = $$replace(deploy_app, .app, .dmg)
+    QMAKE_CLEAN += -r $${deploy_app} $${dmg_file}
 }
 
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}

@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D_global.h>
+#include "../../disp3D_global.h"
 
 
 //*************************************************************************************************************
@@ -84,9 +84,9 @@ namespace Qt3DRender {
         class QBlendEquationArguments;
         class QBlendEquation;
         class QCullFace;
+        class QRenderCapture;
+        class QRenderCaptureReply;
 }
-
-class QSurfaceFormat;
 
 
 //*************************************************************************************************************
@@ -105,7 +105,7 @@ namespace DISP3DLIB {
 
 //=============================================================================================================
 /**
-* This class holds a custom framegraph that can be used for computations with OpenGL compute shadern.
+* This class holds a custom framegraph that can be used for computations with OpenGL compute shader.
 *
 * @brief Custom framegaph class.
 */
@@ -121,10 +121,9 @@ public:
     /**
     * Constructs a CustomFrameGraph object.
     *
-    * @param[in] tSurfaceFormat         Surface format for OpenGL version detection.
     * @param[in] parent                 Pointer to parent node.
     */
-    explicit CustomFrameGraph(const QSurfaceFormat &tSurfaceFormat, Qt3DCore::QNode *parent = 0);
+    explicit CustomFrameGraph(Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
@@ -157,6 +156,14 @@ public:
      * @param tColor        New clear color.
      */
     void setClearColor(const QColor &tColor);
+
+    //=========================================================================================================
+    /**
+     * Used to request render capture. Only one render capture result is produced per requestCapture call.
+     * The function returns a QRenderCaptureReply object, which receives the captured image when it is done.
+     * The user is responsible for deallocating the returned object.
+     */
+    Qt3DRender::QRenderCaptureReply* requestRenderCaptureReply();
 
 protected:
 
@@ -211,6 +218,8 @@ private:
     QPointer<Qt3DRender::QBlendEquationArguments>   m_pBlendArguments;      /**< Blend equation arguments render state. */
 
     QPointer<Qt3DRender::QNoDepthMask>              m_pNoDepthMask;         /**< Render state for disableling writing to depth buffer. */
+
+    QPointer<Qt3DRender::QRenderCapture>            m_pCapture;             /**< Used to take a screenshot of the render result. */
 
     bool                                            m_bUseOpenGl4_3;        /**< OpenGL version 4.3 status flag. */
 };

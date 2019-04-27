@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffCov Class.
+* @brief    Definition of the FiffCov Class.
 *
 */
 
@@ -83,7 +83,8 @@ FiffCov::FiffCov()
 , dim(-1)
 , nfree(-1)
 {
-
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov> >("QSharedPointer<FIFFLIB::FiffCov>");
+    qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
 
@@ -105,6 +106,9 @@ FiffCov::FiffCov(QIODevice &p_IODevice)
 
     if(!t_pStream->read_cov(t_pStream->dirtree(), FIFFV_MNE_NOISE_COV, *this))
         printf("\tFiff covariance not found.\n");//ToDo Throw here
+
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov> >("QSharedPointer<FIFFLIB::FiffCov>");
+    qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
 
@@ -123,7 +127,8 @@ FiffCov::FiffCov(const FiffCov &p_FiffCov)
 , eig(p_FiffCov.eig)
 , eigvec(p_FiffCov.eigvec)
 {
-
+    qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov> >("QSharedPointer<FIFFLIB::FiffCov>");
+    qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
 
@@ -343,9 +348,14 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
     }
 
     //Allways exclude all STI channels from covariance computation
-    for(int i=0; i<p_info.chs.size(); i++)
-        if(p_info.chs[i].kind == FIFFV_STIM_CH)
+    int iNoStimCh = 0;
+
+    for(int i=0; i<p_info.chs.size(); i++) {
+        if(p_info.chs[i].kind == FIFFV_STIM_CH) {
             p_exclude << p_info.chs[i].ch_name;
+            iNoStimCh++;
+        }
+    }
 
     RowVectorXi sel_eeg = p_info.pick_types(false, true, false, defaultQStringList, p_exclude);
     RowVectorXi sel_mag = p_info.pick_types(QString("mag"), false, false, defaultQStringList, p_exclude);
@@ -378,8 +388,10 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
     MatrixXd C(cov_good.data);
 
-    if((unsigned) C.rows() != idx_eeg.size() + idx_mag.size() + idx_grad.size())
+    //Subtract number of found stim channels because they are still in C but not the idx_eeg, idx_mag or idx_grad
+    if((unsigned) C.rows() - iNoStimCh != idx_eeg.size() + idx_mag.size() + idx_grad.size()) {
         printf("Error in FiffCov::regularize: Channel dimensions do not fit.\n");//ToDo Throw
+    }
 
     QList<FiffProj> t_listProjs;
     if(p_bProj)

@@ -39,11 +39,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/adapters/abstractview.h>
+#include <disp3D/viewers/abstractview.h>
 #include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
 #include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
+#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/view/view3D.h>
+#include <disp3D/helpers/geometryinfo/geometryinfo.h>
+#include <disp3D/helpers/interpolation/interpolation.h>
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
@@ -55,8 +58,6 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <disp3D/helpers/geometryinfo/geometryinfo.h>
-#include <disp3D/helpers/interpolation/interpolation.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -109,13 +110,13 @@ int main(int argc, char *argv[])
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
-    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
     QCommandLineOption sourceLocOption("doSourceLoc", "Do real time source localization.", "doSourceLoc", "true");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption invOpOption("inv", "Path to inverse operator <file>.", "file", "");
     QCommandLineOption clustOption("doClust", "Path to clustered inverse operator <doClust>.", "doClust", "true");
-    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");//"MNE" | "dSPM" | "sLORETA"
     QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "3.0");//3.0;//0.1;//3.0;
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
@@ -251,90 +252,90 @@ int main(int argc, char *argv[])
                                 tAnnotSet);
 
     //Read and show BEM
-    QFile t_fileBem("./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+    QFile t_fileBem(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_Bem(t_fileBem);
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
-    //Read and show sensor helmets
-    QFile t_filesensorSurfaceVV("./resources/general/sensorSurfaces/306m_rt.fif");
-    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-    p3DDataModel->addMegSensorInfo("Sensors", "VectorView", evoked.info.chs, t_sensorSurfaceVV);
+//    //Read and show sensor helmets
+//    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+//    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+//    p3DDataModel->addMegSensorInfo("Sensors", "VectorView", evoked.info.chs, t_sensorSurfaceVV, evoked.info.bads);
 
-    // Read & show digitizer points
-    QFile t_fileDig("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    // Read, co-register and show digitizer points
+    QFile t_fileDig(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     FiffDigPointSet t_Dig(t_fileDig);
-    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
-    //Co-Register EEG points
-    QFile coordTransfile("./MNE-sample-data/MEG/sample/all-trans.fif");
-    FiffCoordTrans coordTransA(coordTransfile);
+    QFile coordTransfile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif");
+    FiffCoordTrans coordTrans(coordTransfile);
 
-    for(int i = 0; i < evoked.info.chs.size(); ++i) {
-        if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
-            Vector4f tempvec;
-            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
-            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
-            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
-            tempvec(3) = 1;
-            tempvec = coordTransA.invtrans * tempvec;
-            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
-            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
-            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
-        }
-    }
+    DigitizerSetTreeItem* pDigitizerSetTreeItem = p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+    pDigitizerSetTreeItem->applyTransform(coordTrans, true);
 
-    //add sensor item for MEG data
-    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
-                                                                             evoked.comment,
-                                                                             evoked.data,
-                                                                             t_sensorSurfaceVV[0],
-                                                                             evoked.info,
-                                                                             "MEG",
-                                                                             p3DAbstractView->getView()->format())) {
-        pMegSensorTreeItem->setLoopState(true);
-        pMegSensorTreeItem->setTimeInterval(17);
-        pMegSensorTreeItem->setNumberAverages(1);
-        pMegSensorTreeItem->setStreamingState(false);
-        pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 3e-12f*0.5f, 3e-12f));
-        pMegSensorTreeItem->setColormapType("Jet");
-        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
-    }
+//    //add sensor item for MEG data
+//    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
+//                                                                             evoked.comment,
+//                                                                             evoked.data,
+//                                                                             t_sensorSurfaceVV[0],
+//                                                                             evoked.info,
+//                                                                             "MEG")) {
+//        pMegSensorTreeItem->setLoopState(true);
+//        pMegSensorTreeItem->setTimeInterval(17);
+//        pMegSensorTreeItem->setNumberAverages(1);
+//        pMegSensorTreeItem->setStreamingState(false);
+//        pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 3e-12f*0.5f, 3e-12f));
+//        pMegSensorTreeItem->setColormapType("Jet");
+//        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
+//    }
 
-    //add sensor item for EEG data
-    if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
-                                                                             evoked.comment,
-                                                                             evoked.data,
-                                                                             t_Bem[0],
-                                                                             evoked.info,
-                                                                             "EEG",
-                                                                             p3DAbstractView->getView()->format())) {
-        pEegSensorTreeItem->setLoopState(true);
-        pEegSensorTreeItem->setTimeInterval(17);
-        pEegSensorTreeItem->setNumberAverages(1);
-        pEegSensorTreeItem->setStreamingState(false);
-        pEegSensorTreeItem->setThresholds(QVector3D(0.0f, 6.0e-6f*0.5f, 6.0e-6f));
-        pEegSensorTreeItem->setColormapType("Jet");
-        pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
-    }
+//    //add sensor item for EEG data
 
-    if(bAddRtSourceLoc) {
-        //Add rt source loc data and init some visualization values
-        if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
-                                                                          evoked.comment,
-                                                                          sourceEstimate,
-                                                                          t_clusteredFwd,
-                                                                          tSurfSet,
-                                                                          tAnnotSet,
-                                                                          p3DAbstractView->getView()->format())) {
-            pRTDataItem->setLoopState(true);
-            pRTDataItem->setTimeInterval(17);
-            pRTDataItem->setNumberAverages(1);
-            pRTDataItem->setStreamingState(false);
-            pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
-            pRTDataItem->setVisualizationType("Annotation based");
-            pRTDataItem->setColormapType("Jet");
-        }
-    }
+//    //Co-Register EEG points in order to correctly map them to the scalp
+//    for(int i = 0; i < evoked.info.chs.size(); ++i) {
+//        if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
+//            Vector4f tempvec;
+//            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
+//            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
+//            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
+//            tempvec(3) = 1;
+//            tempvec = coordTrans.invtrans * tempvec;
+//            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
+//            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
+//            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
+//        }
+//    }
+
+//    if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
+//                                                                             evoked.comment,
+//                                                                             evoked.data,
+//                                                                             t_Bem[0],
+//                                                                             evoked.info,
+//                                                                             "EEG")) {
+//        pEegSensorTreeItem->setLoopState(true);
+//        pEegSensorTreeItem->setTimeInterval(17);
+//        pEegSensorTreeItem->setNumberAverages(1);
+//        pEegSensorTreeItem->setStreamingState(false);
+//        pEegSensorTreeItem->setThresholds(QVector3D(0.0f, 6.0e-6f*0.5f, 6.0e-6f));
+//        pEegSensorTreeItem->setColormapType("Jet");
+//        pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
+//    }
+
+//    if(bAddRtSourceLoc) {
+//        //Add rt source loc data and init some visualization values
+//        if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
+//                                                                          evoked.comment,
+//                                                                          sourceEstimate,
+//                                                                          t_clusteredFwd,
+//                                                                          tSurfSet,
+//                                                                          tAnnotSet)) {
+//            pRTDataItem->setLoopState(true);
+//            pRTDataItem->setTimeInterval(17);
+//            pRTDataItem->setNumberAverages(1);
+//            pRTDataItem->setStreamingState(false);
+//            pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
+//            pRTDataItem->setVisualizationType("Annotation based");
+//            pRTDataItem->setColormapType("Jet");
+//        }
+//    }
 
     p3DAbstractView->show();
 

@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lroenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -99,95 +99,88 @@ void SensorPositionTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString& sDataType)
+void SensorPositionTreeItem::addData(const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                                     const QString& sDataType,
+                                     const QStringList& bads)
 {
-    plotSensors(lChInfo, sDataType);
+    if(sDataType == "MEG") {
+        plotMEGSensors(lChInfo, bads);
+    } else if (sDataType == "EEG") {
+        plotEEGSensors(lChInfo, bads);
+    }
 }
 
 
 //*************************************************************************************************************
 
-void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString& sDataType)
+void SensorPositionTreeItem::plotMEGSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                                            const QStringList& bads)
 {
-    //Create digitizers
-    Renderable3DEntity* pSensorEntity = new Renderable3DEntity(this);
+    if(lChInfo.isEmpty()) {
+        qDebug() << "SensorPositionTreeItem::plotMEGSensors - Channel data is empty. Returning.";
+        return;
+    }
 
-    GeometryMultiplier *pMesh;
+    if(!m_pMEGSensorEntity) {
+        m_pMEGSensorEntity = new QEntity(this);
+    }
 
-    if(sDataType == "MEG")
-    {
-        QSharedPointer<Qt3DExtras::QCuboidGeometry> pSensorRect = QSharedPointer<Qt3DExtras::QCuboidGeometry>::create();
-        pSensorRect->setXExtent(0.01f);
-        pSensorRect->setYExtent(0.01f);
-        pSensorRect->setZExtent(0.001f);
+    //create geometry
+    if(!m_pMEGSensors) {
+        if(!m_pMEGSensorGeometry) {
+            m_pMEGSensorGeometry = QSharedPointer<Qt3DExtras::QCuboidGeometry>::create();
+            m_pMEGSensorGeometry->setXExtent(0.01f);
+            m_pMEGSensorGeometry->setYExtent(0.01f);
+            m_pMEGSensorGeometry->setZExtent(0.001f);
+        }
 
-        pMesh = new GeometryMultiplier(pSensorRect);
+        m_pMEGSensors = new GeometryMultiplier(m_pMEGSensorGeometry);
 
-        //Create transform matrix for each cuboid instance
-        QVector<QMatrix4x4> vTransforms;
-        vTransforms.reserve(lChInfo.size());
-        QVector3D tempPos;
+        m_pMEGSensorEntity->addComponent(m_pMEGSensors);
 
-        for(int i = 0; i < lChInfo.size(); ++i) {
-            QMatrix4x4 tempTransform;
+        //Add material
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(false);
+        pMaterial->setAmbient(QColor(100,100,100));
+        pMaterial->setAlpha(0.75);
+        m_pMEGSensorEntity->addComponent(pMaterial);
+    }
 
-            tempPos.setX(lChInfo[i].chpos.r0(0));
-            tempPos.setY(lChInfo[i].chpos.r0(1));
-            tempPos.setZ(lChInfo[i].chpos.r0(2));
-            //Set position
-            tempTransform.translate(tempPos);
+    //Create transform matrix for each cuboid instance
+    QVector<QMatrix4x4> vTransforms;
+    vTransforms.reserve(lChInfo.size());
+    QVector<QColor> vColorsNodes;
+    QVector3D tempPos;
 
-            //Set orientation
-            for(int j = 0; j < 4; ++j) {
-                tempTransform(j, 0) = lChInfo[i].coil_trans.row(j)(0);
-                tempTransform(j, 1) = lChInfo[i].coil_trans.row(j)(1);
-                tempTransform(j, 2) = lChInfo[i].coil_trans.row(j)(2);
-            }
+    for(int i = 0; i < lChInfo.size(); ++i) {
+        QMatrix4x4 tempTransform;
 
+        tempPos.setX(lChInfo[i].chpos.r0(0));
+        tempPos.setY(lChInfo[i].chpos.r0(1));
+        tempPos.setZ(lChInfo[i].chpos.r0(2));
+        //Set position
+        tempTransform.translate(tempPos);
+
+        //Set orientation
+        for(int j = 0; j < 4; ++j) {
+            tempTransform(j, 0) = lChInfo[i].coil_trans.row(j)(0);
+            tempTransform(j, 1) = lChInfo[i].coil_trans.row(j)(1);
+            tempTransform(j, 2) = lChInfo[i].coil_trans.row(j)(2);
+        }
+
+        if(!vTransforms.contains(tempTransform)) {
             vTransforms.push_back(tempTransform);
         }
 
-        //Set instance Transform
-        pMesh->setTransforms(vTransforms);
-    }
-    else if (sDataType == "EEG")
-    {
-        QSharedPointer<Qt3DExtras::QSphereGeometry> pSourceSphere = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
-        pSourceSphere->setRadius(0.001f);
-
-        pMesh = new GeometryMultiplier(pSourceSphere);
-
-        //Create transform matrix for each cuboid instance
-        QVector<QMatrix4x4> vTransforms;
-        vTransforms.reserve(lChInfo.size());
-        QVector3D tempPos;
-
-        for(int i = 0; i < lChInfo.size(); ++i) {
-            QMatrix4x4 tempTransform;
-
-            tempPos.setX(lChInfo[i].chpos.r0(0));
-            tempPos.setY(lChInfo[i].chpos.r0(1));
-            tempPos.setZ(lChInfo[i].chpos.r0(2));
-            //Set position
-            tempTransform.translate(tempPos);
-
-            vTransforms.push_back(tempTransform);
+        if(bads.contains(lChInfo.at(i).ch_name)) {
+            vColorsNodes.push_back(QColor(255,0,0));
+        } else {
+            vColorsNodes.push_back(QColor(100,100,100));
         }
-
-        //Set instance Transform
-        pMesh->setTransforms(vTransforms);
     }
 
-    pSensorEntity->addComponent(pMesh);
-
-    //Add material
-    GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
-
-    QColor colDefault(100,100,100);
-    pMaterial->setAmbient(colDefault);
-    pMaterial->setAlpha(1.0f);
-    pSensorEntity->addComponent(pMaterial);
-
+    //Set instance Transform
+    m_pMEGSensors->setTransforms(vTransforms);
+    m_pMEGSensors->setColors(vColorsNodes);
 
     //Update colors in color item
     QList<QStandardItem*> items = this->findChildren(MetaTreeItemTypes::Color);
@@ -195,7 +188,81 @@ void SensorPositionTreeItem::plotSensors(const QList<FIFFLIB::FiffChInfo>& lChIn
     for(int i = 0; i < items.size(); ++i) {
         if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
             QVariant data;
-            data.setValue(colDefault);
+            data.setValue(QColor(100,100,100));
+            item->setData(data, MetaTreeItemRoles::Color);
+            item->setData(data, Qt::DecorationRole);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SensorPositionTreeItem::plotEEGSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                                            const QStringList& bads)
+{
+    if(lChInfo.isEmpty()) {
+        qDebug() << "SensorPositionTreeItem::plotEEGSensors - Channel data is empty. Returning.";
+        return;
+    }
+
+    if(!m_pEEGSensorEntity) {
+        m_pEEGSensorEntity = new QEntity(this);
+    }
+
+    //create geometry
+    if(!m_pEEGSensors) {
+        if(!m_pEEGSensorGeometry) {
+            m_pEEGSensorGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
+            m_pEEGSensorGeometry->setRadius(0.001f);
+        }
+
+        m_pEEGSensors = new GeometryMultiplier(m_pEEGSensorGeometry);
+
+        m_pEEGSensorEntity->addComponent(m_pEEGSensors);
+
+        //Add material
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(false);
+        pMaterial->setAmbient(QColor(100,100,100));
+        pMaterial->setAlpha(0.75);
+        m_pEEGSensorEntity->addComponent(pMaterial);
+    }
+
+    //Create transform matrix for each cuboid instance
+    QVector<QMatrix4x4> vTransforms;
+    vTransforms.reserve(lChInfo.size());
+    QVector<QColor> vColorsNodes;
+    QVector3D tempPos;
+
+    for(int i = 0; i < lChInfo.size(); ++i) {
+        QMatrix4x4 tempTransform;
+
+        tempPos.setX(lChInfo[i].chpos.r0(0));
+        tempPos.setY(lChInfo[i].chpos.r0(1));
+        tempPos.setZ(lChInfo[i].chpos.r0(2));
+        //Set position
+        tempTransform.translate(tempPos);
+
+        vTransforms.push_back(tempTransform);
+
+        if(bads.contains(lChInfo.at(i).ch_name)) {
+            vColorsNodes.push_back(Qt::red);
+        } else {
+            vColorsNodes.push_back(Qt::gray);
+        }
+    }
+
+    //Set instance Transform
+    m_pEEGSensors->setTransforms(vTransforms);
+    m_pEEGSensors->setColors(vColorsNodes);
+
+    //Update colors in color item
+    QList<QStandardItem*> items = this->findChildren(MetaTreeItemTypes::Color);
+
+    for(int i = 0; i < items.size(); ++i) {
+        if(MetaTreeItem* item = dynamic_cast<MetaTreeItem*>(items.at(i))) {
+            QVariant data;
+            data.setValue(QColor(100,100,100));
             item->setData(data, MetaTreeItemRoles::Color);
             item->setData(data, Qt::DecorationRole);
         }

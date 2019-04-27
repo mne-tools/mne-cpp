@@ -2070,12 +2070,12 @@ void ComputeFwd::calculateFwd() const
         //#else
         //        char *coilfile = mne_compose_mne_name("setup/mne","coil_def.dat");
 
-        qPath = QString("./resources/general/coilDefinitions/coil_def.dat");
+        qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
         file.setFileName(qPath);
         if ( !QCoreApplication::startingUp() )
-            qPath = QCoreApplication::applicationDirPath() + QString("/resources/general/resources/coilDefinitions/coil_def.dat");
+            qPath = QCoreApplication::applicationDirPath() + QString("/resources/general/coilDefinitions/coil_def.dat");
         else if (!file.exists())
-            qPath = "./bin/resources/general/coilDefinitions/coil_def.dat";
+            qPath = "./resources/general/coilDefinitions/coil_def.dat";
 
         char *coilfile = MALLOC_41(strlen(qPath.toUtf8().data())+1,char);
         strcpy(coilfile,qPath.toUtf8().data());

@@ -216,16 +216,17 @@ protected:
     */
     Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd& vecSensorValues);
 
-    QLinkedList<Eigen::VectorXd>                        m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
-    QLinkedList<Eigen::VectorXd>::const_iterator        m_itCurrentSample;                  /**< Iterator to current sample which is/was streamed. */
+    QList<Eigen::VectorXd>                              m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
+    QList<Eigen::VectorXd>                              m_lDataLoopQ;                       /**< List that holds the matrix data <n_channels x n_samples> for looping. */
+
     Eigen::VectorXd                                     m_vecAverage;                       /**< The averaged data to be streamed. */
     QSharedPointer<Eigen::SparseMatrix<float> >         m_pMatInterpolationMatrix;          /**< The interpolation matrix. */
 
     bool                                                m_bIsLooping;                       /**< Flag if this thread should repeat sending the same data over and over again. */
     bool                                                m_bStreamSmoothedData;              /**< Flag if this thread's streams the raw or already smoothed data. Latter are produced by multiplying the smoothing operator here in this thread. */
 
+    int                                                 m_iCurrentSample;                   /**< Iterator to current sample which is/was streamed. */
     int                                                 m_iAverageSamples;                  /**< Number of average to compute. */
-    int                                                 m_iSampleCtr;                       /**< The sample counter. */
 
     double                                              m_dSFreq;                           /**< The current sampling frequency. */
 

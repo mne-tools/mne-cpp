@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lroenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -72,6 +72,11 @@ namespace Qt3DCore {
     class QEntity;
 }
 
+namespace Qt3DExtras {
+    class QCuboidGeometry;
+    class QSphereGeometry;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,6 +90,8 @@ namespace DISP3DLIB
 //=============================================================================================================
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
+
+class GeometryMultiplier;
 
 
 //=============================================================================================================
@@ -119,24 +126,46 @@ public:
     *
     * @param[in] lChInfo            The channel information used to plot the MEG channels.
     * @param[in] sDataType          The data type: EEG, MEG.
+    * @param[in] bads               The bad channel list.
     */
-    void addData(const QList<FIFFLIB::FiffChInfo> &lChInfo, const QString &sDataType);
+    void addData(const QList<FIFFLIB::FiffChInfo> &lChInfo,
+                 const QString& sDataType,
+                 const QStringList& bads = QStringList());
 
 protected:
     //=========================================================================================================
     /**
-    * Plots the sensors.
+    * Plots the MEG sensors.
     *
     * @param[in] lChInfo            The channel information used to plot the MEG channels.
-    * @param[in] sDataType          The data type: EEG, MEG.
+    * @param[in] bads               The bad channel list.
     */
-    void plotSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo, const QString &sDataType);
+    void plotMEGSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                        const QStringList& bads = QStringList());
+
+    //=========================================================================================================
+    /**
+    * Plots the EEG sensors.
+    *
+    * @param[in] lChInfo            The channel information used to plot the EEG channels.
+    * @param[in] bads               The bad channel list.
+    */
+    void plotEEGSensors(const QList<FIFFLIB::FiffChInfo>& lChInfo,
+                        const QStringList& bads = QStringList());
 
     //=========================================================================================================
     /**
     * AbstractTreeItem functions
     */
     void initItem();
+
+    QPointer<QEntity>                               m_pMEGSensorEntity;                /**< The MEG sensor entity. */
+    QPointer<GeometryMultiplier>                    m_pMEGSensors;                     /**< The MEG sensors. */
+    QSharedPointer<Qt3DExtras::QCuboidGeometry>     m_pMEGSensorGeometry;              /**< The MEG sensor geometry. */
+
+    QPointer<QEntity>                               m_pEEGSensorEntity;                /**< The EEG sensor entity. */
+    QPointer<GeometryMultiplier>                    m_pEEGSensors;                     /**< The EEG sensors. */
+    QSharedPointer<Qt3DExtras::QSphereGeometry>     m_pEEGSensorGeometry;              /**< The EEG sensor geometry. */
 };
 
 } //NAMESPACE DISP3DLIB

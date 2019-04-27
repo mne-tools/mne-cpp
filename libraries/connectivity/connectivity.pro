@@ -2,13 +2,14 @@
 #
 # @file     connectivity.pro
 # @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+#           Daniel Strohmeier <daniel.Strohmeier@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Lorenz Esch, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -37,6 +38,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+QT += concurrent
 QT -= gui
 
 DEFINES += CONNECTIVITY_LIBRARY
@@ -53,42 +55,36 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Fwdd \
-            -lMNE$${MNE_LIB_VERSION}Inversed \
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Fwd \
-            -lMNE$${MNE_LIB_VERSION}Inverse \
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
 
-contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
-    DEFINES += BUILD_MNECPP_STATIC_LIB
+    DEFINES += STATICLIB
 }
 else {
     CONFIG += dll
-
-    #
-    # win32: copy dll's to bin dir
-    # unix: add lib folder to LD_LIBRARY_PATH
-    #
-    win32 {
-        FILE = $${DESTDIR}/$${TARGET}.dll
-        BINDIR = $${DESTDIR}/../bin
-        FILE ~= s,/,\\,g
-        BINDIR ~= s,/,\\,g
-        QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-    }
 }
 
 SOURCES += \
-    connectivitymeasures.cpp \
+    metrics/abstractmetric.cpp \
+    metrics/correlation.cpp \
+    metrics/crosscorrelation.cpp \
+    metrics/coherency.cpp \
+    metrics/coherence.cpp \
+    metrics/imagcoherence.cpp \
+    metrics/unbiasedsquaredphaselagindex.cpp \
+    metrics/phaselockingvalue.cpp \
+    metrics/weightedphaselagindex.cpp \
+    metrics/debiasedsquaredweightedphaselagindex.cpp \
+    metrics/phaselagindex.cpp \
     network/network.cpp \
     network/networknode.cpp \
     network/networkedge.cpp \
@@ -97,7 +93,17 @@ SOURCES += \
 
 HEADERS += \
     connectivity_global.h \
-    connectivitymeasures.h \
+    metrics/abstractmetric.h \
+    metrics/correlation.h \
+    metrics/crosscorrelation.h \
+    metrics/coherency.h \
+    metrics/coherence.h \
+    metrics/imagcoherence.h \
+    metrics/unbiasedsquaredphaselagindex.h \
+    metrics/phaselockingvalue.h \
+    metrics/weightedphaselagindex.h \
+    metrics/debiasedsquaredweightedphaselagindex.h \
+    metrics/phaselagindex.h \
     network/network.h \
     network/networknode.h \
     network/networkedge.h \
@@ -108,26 +114,36 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/connectivity
+header_files.files = $${HEADERS}
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/connectivity
 
 INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
-# Deploy Qt Dependencies
+# Deploy library
 win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .dll
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+}
+
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
     }
 
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
 }

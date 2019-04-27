@@ -42,7 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/circularbuffer_old.h>
 
 
 //*************************************************************************************************************
@@ -50,7 +49,7 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <realtime/rtClient/rtdataclient.h>
+#include <communication/rtClient/rtdataclient.h>
 
 
 //*************************************************************************************************************
@@ -64,10 +63,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MneRtClientPlugin
+// DEFINE NAMESPACE NEUROMAGPLUGIN
 //=============================================================================================================
 
-namespace MneRtClientPlugin
+namespace NEUROMAGPLUGIN
 {
 
 
@@ -76,8 +75,7 @@ namespace MneRtClientPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace IOBUFFER;
-using namespace REALTIMELIB;
+using namespace COMMUNICATIONLIB;
 
 
 //*************************************************************************************************************
@@ -155,9 +153,9 @@ protected:
 
 private:
 
-    QMutex producerMutex;
+    QMutex m_mutex;
 
-    Neuromag* m_pNeuromag;    /**< Holds a pointer to corresponding Neuromag.*/
+    Neuromag*   m_pNeuromag;    /**< Holds a pointer to corresponding Neuromag.*/
     bool        m_bIsRunning;       /**< Whether NeuromagProducer is running.*/
 
     QSharedPointer<RtDataClient> m_pRtDataClient;   /**< The data client.*/

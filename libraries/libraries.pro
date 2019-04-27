@@ -2,13 +2,14 @@
 #
 # @file     libraries.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2012
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2012, Christoph Dinh, Daniel Strohmeier and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -37,7 +38,6 @@ include(../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-# TBD change the dependency order - forward before inverse
 SUBDIRS += \
     utils \
     fs \
@@ -45,27 +45,38 @@ SUBDIRS += \
     mne \
     fwd \
     inverse \
-    connectivity \
-    realtime \
+    communication \
 
-
+# Libraries which are not supported in the minimalVersion
 !contains(MNECPP_CONFIG, minimalVersion) {
-
     !isEmpty( CNTK_INCLUDE_DIR ) {
         SUBDIRS += \
             deep
     }
 
     SUBDIRS += \
-        disp
+        rtprocessing \
+        connectivity \
+        disp \
 
     qtHaveModule(charts) {
         SUBDIRS += \
-            disp3D \
+            disp3D
     } else {
-        message("libraries.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
+        message("libraries.pro - The Qt Charts module is missing. Please install to build the disp3D library.")
     }
 }
 
-
-CONFIG += ordered
+# Specify library dependencies
+utils.depends =
+fs.depends = utils
+fiff.depends = utils
+mne.depends = utils fs fiff
+fwd.depends = utils fs fiff mne
+inverse.depends = utils fs fiff mne fwd
+communication.depends = utils fiff
+deep.depends = utils fs fiff mne
+rtprocessing.depends = utils connectivity fiff mne fwd inverse
+connectivity.depends = utils fs fiff mne
+disp.depends = utils fs fiff mne fwd inverse
+disp3D.depends = utils connectivity rtprocessing fs fiff mne fwd inverse disp

@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of FormulaEditor class.
+* @brief    Definition of FormulaEditor class.
 */
 
 //*************************************************************************************************************
