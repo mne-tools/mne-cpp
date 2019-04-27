@@ -397,6 +397,8 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
     QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA && m_bReceiveData) {
+        qInfo() << m_iBlockNumber++ << "MNE Received";
+
         //Check if buffer initialized
         if(!m_pMatrixDataBuffer) {
             m_pMatrixDataBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
@@ -453,6 +455,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
     if(!pRTES) {
         return;
     }
+    qInfo() << m_iBlockNumber++ << "MNE Received";
 
     QMutexLocker locker(&m_qMutex);
 
@@ -647,6 +650,7 @@ void MNE::run()
                 m_qMutex.unlock();
 
                 if(!sourceEstimate.isEmpty()) {
+                    qInfo() << m_iBlockNumber << "MNE Processed";
                     m_pRTSEOutput->data()->setValue(sourceEstimate);
                 }
             } else {
@@ -673,6 +677,7 @@ void MNE::run()
                 m_qMutex.unlock();
 
                 if(!sourceEstimate.isEmpty()) {
+                    qInfo() << m_iBlockNumber << "MNE Processed";
                     m_pRTSEOutput->data()->setValue(sourceEstimate);
                 }
             } else {

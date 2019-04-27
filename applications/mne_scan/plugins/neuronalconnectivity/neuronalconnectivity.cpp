@@ -241,6 +241,7 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
     QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
 
     if(pRTSE) {
+        qInfo() << m_iBlockNumber++ << "NeuronalConnectivity Received";
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTSE->getFiffInfo();
@@ -302,6 +303,7 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
     QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
+        qInfo() << m_iBlockNumber++ << "NeuronalConnectivity Received";
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
@@ -372,6 +374,7 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
     QSharedPointer<RealTimeEvokedSet> pRTEV = pMeasurement.dynamicCast<RealTimeEvokedSet>();
 
     if(pRTEV) {
+        qInfo() << m_iBlockNumber++ << "NeuronalConnectivity Received";
         FiffEvokedSet::SPtr pFiffEvokedSet = pRTEV->getValue();
         QStringList lResponsibleTriggerTypes = pRTEV->getResponsibleTriggerTypes();
 
@@ -517,6 +520,7 @@ void NeuronalConnectivity::run()
                 //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
                 m_currentConnectivityResult.setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
                 m_currentConnectivityResult.normalize();
+                qInfo() << m_iBlockNumber << "NeuronalConnectivity Processed";
                 m_pRTCEOutput->data()->setValue(m_currentConnectivityResult);
             } else {
                 qDebug()<<"NeuronalConnectivity::run - Network is empty";

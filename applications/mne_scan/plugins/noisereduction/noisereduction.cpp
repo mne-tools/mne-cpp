@@ -711,7 +711,7 @@ void NoiseReduction::run()
 
             t_mat = m_matSparseSpharaMult * t_mat;
         }
-        qInfo()<<timer.elapsed()<<"NoiseReduction Processed";
+        qInfo() << m_iBlockNumber << "NoiseReduction Processed";
 
 //        //Common average
 //        MatrixXd commonAvr = MatrixXd(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
