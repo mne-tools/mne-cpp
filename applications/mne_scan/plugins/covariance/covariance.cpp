@@ -220,6 +220,7 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
+
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
@@ -239,6 +240,7 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
             for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i) {
                 t_mat = pRTMSA->getMultiSampleArray()[i];
+                qInfo() << m_iBlockNumber++ << "Covariance Received";
                 m_pRtCov->append(t_mat);
             }
         }
@@ -285,6 +287,7 @@ void Covariance::run()
             //Add to covariance estimation
             QMutexLocker locker(&mutex);
             if(!m_qVecCovData.isEmpty()) {
+                qInfo() << m_iBlockNumber << "Covariance Processed";
                 m_pCovarianceOutput->data()->setValue(m_qVecCovData.takeFirst());
             }
         }
