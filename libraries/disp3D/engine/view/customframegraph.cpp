@@ -64,7 +64,8 @@
 #include <Qt3DRender/QBlendEquation>
 #include <Qt3DRender/QBlendEquationArguments>
 #include <Qt3DRender/QCullFace>
-#include <QSurfaceFormat>
+#include <Qt3DRender/QRenderCapture>
+#include <QGLFormat>
 
 
 //*************************************************************************************************************
@@ -93,24 +94,21 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CustomFrameGraph::CustomFrameGraph(const QSurfaceFormat &tSurfaceFormat, Qt3DCore::QNode *parent)
-    : QViewport(parent)
-    , m_pForwardTranspKey(new QFilterKey)
-    , m_pForwardKey(new QFilterKey)
-    , m_pForwardSortedKey(new QFilterKey)
-    , m_pComputeKey(new QFilterKey)
-    , m_pDepthTest(new QDepthTest)
-    , m_pCullFace(new QCullFace)
-    , m_pBlendEquation(new QBlendEquation)
-    , m_pBlendArguments(new QBlendEquationArguments)
-    , m_pNoDepthMask( new QNoDepthMask)
-    , m_bUseOpenGl4_3(false)
+CustomFrameGraph::CustomFrameGraph(Qt3DCore::QNode *parent)
+: QViewport(parent)
+, m_pForwardTranspKey(new QFilterKey)
+, m_pForwardKey(new QFilterKey)
+, m_pForwardSortedKey(new QFilterKey)
+, m_pComputeKey(new QFilterKey)
+, m_pDepthTest(new QDepthTest)
+, m_pCullFace(new QCullFace)
+, m_pBlendEquation(new QBlendEquation)
+, m_pBlendArguments(new QBlendEquationArguments)
+, m_pNoDepthMask( new QNoDepthMask)
+, m_bUseOpenGl4_3(false)
 {
     //Test for OpenGL version 4.3
-    if((tSurfaceFormat.majorVersion() == 4
-            && tSurfaceFormat.minorVersion() >= 3
-            || tSurfaceFormat.majorVersion() > 4))
-    {
+    if(QGLFormat::openGLVersionFlags() >= QGLFormat::OpenGL_Version_4_3) {
         m_bUseOpenGl4_3 = true;
     }
 
@@ -130,7 +128,6 @@ CustomFrameGraph::~CustomFrameGraph()
     m_pCameraSelector->deleteLater();
     m_pForwardFilter->deleteLater();
     m_pSortPolicy->deleteLater();
-    m_pMemoryBarrier->deleteLater();
     m_pForwardKey->deleteLater();
     m_pComputeKey->deleteLater();
     m_pForwardState->deleteLater();
@@ -144,6 +141,9 @@ CustomFrameGraph::~CustomFrameGraph()
     m_pBlendEquation->deleteLater();
     m_pBlendArguments->deleteLater();
     m_pNoDepthMask->deleteLater();
+    if(m_bUseOpenGl4_3){
+        m_pMemoryBarrier->deleteLater();
+    }
 }
 
 
@@ -175,37 +175,51 @@ void CustomFrameGraph::setClearColor(const QColor &tColor)
 
 //*************************************************************************************************************
 
+QRenderCaptureReply* CustomFrameGraph::requestRenderCaptureReply()
+{
+    return m_pCapture->requestCapture();
+}
+
+
+//*************************************************************************************************************
+
 void CustomFrameGraph::init()
 {
     //Build the frame graph
     m_pSurfaceSelector = new QRenderSurfaceSelector(this);
+
     //Clear buffer branch
     m_pClearBuffers = new QClearBuffers(m_pSurfaceSelector);
     m_pNoDraw = new QNoDraw(m_pClearBuffers);
+
     //Compute branch
     m_pDispatchCompute = new QDispatchCompute(m_pSurfaceSelector);
     m_pComputeFilter = new QTechniqueFilter(m_pDispatchCompute);
+
     // Forward render branch
     m_pCameraSelector = new QCameraSelector(m_pSurfaceSelector);
 
-    if(m_bUseOpenGl4_3)
-    {
+    if(m_bUseOpenGl4_3) {
         m_pMemoryBarrier = new QMemoryBarrier(m_pCameraSelector);
         m_pForwardState = new QRenderStateSet(m_pMemoryBarrier);
-    }
-    else
-    {
+
+        //Set Memory Barrier it ensures the finishing of the compute shader run before drawing the scene.
+        m_pMemoryBarrier->setWaitOperations(QMemoryBarrier::VertexAttributeArray);
+    } else {
         //don't use memory barrier
         m_pForwardState = new QRenderStateSet(m_pCameraSelector);
     }
 
     m_pForwardFilter = new QTechniqueFilter(m_pForwardState);
+
     //Transparent forward render branch
     m_pTransparentState = new QRenderStateSet(m_pForwardState);
     m_pForwardTranspFilter = new QTechniqueFilter(m_pTransparentState);
+
     //Transparent sorted forward render branch
     m_pForwardSortedFilter = new QTechniqueFilter(m_pTransparentState);
     m_pSortPolicy = new QSortPolicy(m_pForwardSortedFilter);
+    m_pCapture = new QRenderCapture(m_pSortPolicy);
 
     //Init frame graph nodes
     this->setNormalizedRect(QRectF(0.0f, 0.0f, 1.0f, 1.0f));
@@ -219,7 +233,6 @@ void CustomFrameGraph::init()
     m_pForwardState->addRenderState(m_pDepthTest);
     m_pCullFace->setMode(QCullFace::Back);
     m_pForwardState->addRenderState(m_pCullFace);
-
 
     //Set Transparent states
     m_pBlendArguments->setSourceRgb(QBlendEquationArguments::SourceAlpha);
@@ -251,9 +264,6 @@ void CustomFrameGraph::init()
     //Set draw policy
     QVector<QSortPolicy::SortType> sortTypes = {QSortPolicy::StateChangeCost, QSortPolicy::BackToFront};
     m_pSortPolicy->setSortTypes(sortTypes);
-
-    //Set Memory Barrier it ensures the finishing of the compute shader run before drawing the scene.
-    m_pMemoryBarrier->setWaitOperations(QMemoryBarrier::VertexAttributeArray);
 }
 
 

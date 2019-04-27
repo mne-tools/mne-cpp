@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of EnhancedEditorWindow class.
+* @brief    Definition of EnhancedEditorWindow class.
 */
 
 //*************************************************************************************************************

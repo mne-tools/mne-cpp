@@ -42,6 +42,10 @@ TARGET = mne_launch
 
 CONFIG += c++11
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+}
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -52,6 +56,10 @@ SOURCES += main.cpp \
     application.cpp \
     mnelaunchcontrol.cpp
 
+HEADERS += \
+    application.h \
+    mnelaunchcontrol.h
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
@@ -59,24 +67,11 @@ INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 RESOURCES +=    qml.qrc \
                 images.qrc
 
-
-# Deploy Qt Dependencies
+# Deploy dependencies
 win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .exe
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
-    }
-
-    DEPLOY_COMMAND = windeployqt
-
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    # remember to also deploy qml depnedencies with --qmldir $${PWD} $${DESTDIR}
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} --qmldir $${PWD}/qml $${DESTDIR}
+    EXTRA_ARGS = -qmldir=$${PWD}/qml
+    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 unix:!macx {
     # === Unix ===
@@ -85,10 +80,12 @@ unix:!macx {
 macx {
     # === Mac ===
     QMAKE_RPATHDIR += @executable_path/../Frameworks
+    EXTRA_ARGS = -qmldir=$${PWD}/qml
+ 
+    # 3 entries returned in DEPLOY_CMD
+    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
 
-    #ToDo copy dependcies to app bundle
+    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
 
-HEADERS += \
-    application.h \
-    mnelaunchcontrol.h

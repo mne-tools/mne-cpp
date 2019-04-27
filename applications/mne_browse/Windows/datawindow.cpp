@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the DataWindow class.
+* @brief    Definition of the DataWindow class.
 *
 */
 
@@ -40,6 +40,8 @@
 //=============================================================================================================
 
 #include "datawindow.h"
+
+#include <QGLWidget>
 
 
 //*************************************************************************************************************
@@ -202,6 +204,15 @@ void DataWindow::initMVCSettings()
     //-----------------------------------
     //------ Init data window view ------
     //-----------------------------------
+
+#if defined(USE_OPENGL)
+    //Use GPU rendering
+    QGLFormat currentFormat = QGLFormat(QGL::SampleBuffers);
+    currentFormat.setSamples(10);
+    QGLWidget* pGLWidget = new QGLWidget(currentFormat);
+    ui->m_tableView_rawTableView->setViewport(pGLWidget);
+#endif
+
     //Set MVC model
     ui->m_tableView_rawTableView->setModel(m_pRawModel);
 
@@ -614,10 +625,10 @@ void DataWindow::updateMarkerPosition()
 
 void DataWindow::highlightChannelsInSelectionManager()
 {
-    if(m_pMainWindow->m_pSelectionManagerWindow->isVisible()) {
+    if(m_pMainWindow->m_pChannelSelectionView->isVisible()) {
         QModelIndexList selectedIndexes = ui->m_tableView_rawTableView->selectionModel()->selectedIndexes();
 
-        m_pMainWindow->m_pSelectionManagerWindow->highlightChannels(selectedIndexes);
+        m_pMainWindow->m_pChannelSelectionView->highlightChannels(selectedIndexes);
     }
 }
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the STCControl class.
+* @brief    Definition of the STCControl class.
 *
 */
 

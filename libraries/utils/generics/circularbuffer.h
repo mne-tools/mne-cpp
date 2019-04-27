@@ -236,8 +236,8 @@ inline _Tp CircularBuffer<_Tp>::pop()
         element = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
         m_pFreeElements->release();
     }
-    else
-        element = 0;
+//    else
+//        element = 0;
 
     return element;
 }

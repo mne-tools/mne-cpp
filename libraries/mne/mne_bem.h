@@ -153,7 +153,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the mne_read_bem_surface function
+    * ### MNE toolbox root function ###: Definition of the mne_read_bem_surface function
     *
     * Reads Bem surface from a fif file
     *
@@ -260,7 +260,7 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Implementation of the read_bem_surface function in e.g. mne_read_bem_surface.m
+    * Definition of the read_bem_surface function in e.g. mne_read_bem_surface.m
     * Reads a single bem surface
     *
     * @param [in] p_pStream         The opened fif file

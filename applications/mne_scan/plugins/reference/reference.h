@@ -47,7 +47,7 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <utils/generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 #include <eegref.h>
 
 #include "FormFiles/referencesetupwidget.h"
@@ -123,9 +123,9 @@ public:
     /**
     * Udates the pugin with new (incoming) data.
     *
-    * @param[in] pMeasurement    The incoming data in form of a generalized NewMeasurement.
+    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
     */
-    void update(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
@@ -150,8 +150,8 @@ private:
 
     QSharedPointer<IOBUFFER::_double_CircularMatrixBuffer>  m_pRefBuffer;                   /**< Holds incoming data.*/
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr      m_pRefInput;      /**< The NewRealTimeMultiSampleArray of the Reference input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr     m_pRefOutput;     /**< The NewRealTimeMultiSampleArray of the Reference output.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pRefInput;      /**< The RealTimeMultiSampleArray of the Reference input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pRefOutput;     /**< The RealTimeMultiSampleArray of the Reference output.*/
 
 signals:
     //=========================================================================================================

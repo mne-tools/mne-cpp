@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of delegate of EventDelegate
+* @brief    Definition of delegate of EventDelegate
 *
 */
 

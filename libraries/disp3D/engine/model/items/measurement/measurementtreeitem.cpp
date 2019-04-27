@@ -121,11 +121,11 @@ void MeasurementTreeItem::initItem()
 
 //*************************************************************************************************************
 
-SourceSpaceTreeItem* MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace,
-                                                  Qt3DCore::QEntity* p3DEntityParent)
+QList<SourceSpaceTreeItem*> MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace,
+                                                         Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
-    SourceSpaceTreeItem* pReturnItem = Q_NULLPTR;
+    QList<SourceSpaceTreeItem*> pReturnItem;
 
     QList<QStandardItem*> itemList = this->findChildren(Data3DTreeModelItemTypes::HemisphereItem);
 
@@ -138,7 +138,7 @@ SourceSpaceTreeItem* MeasurementTreeItem::addData(const MNESourceSpace& tSourceS
             if(HemisphereTreeItem* pHemiItem = dynamic_cast<HemisphereTreeItem*>(itemList.at(j))) {
                 if(pHemiItem->data(Data3DTreeModelItemRoles::SurfaceHemi).toInt() == i) {
                     hemiItemFound = true;
-                    pReturnItem = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
+                    pReturnItem.append(pHemiItem->addData(tSourceSpace[i], p3DEntityParent));
                 }
             }
         }
@@ -147,7 +147,7 @@ SourceSpaceTreeItem* MeasurementTreeItem::addData(const MNESourceSpace& tSourceS
             //Item does not exist yet, create it here.
             HemisphereTreeItem* pHemiItem = new HemisphereTreeItem(Data3DTreeModelItemTypes::HemisphereItem);
 
-            pReturnItem = pHemiItem->addData(tSourceSpace[i], p3DEntityParent);
+            pReturnItem.append(pHemiItem->addData(tSourceSpace[i], p3DEntityParent));
 
             QList<QStandardItem*> list;
             list << pHemiItem;
@@ -349,26 +349,34 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData,
                                               Qt3DCore::QEntity* p3DEntityParent)
 {
     if(!tNetworkData.getNodes().isEmpty()) {
-        //Add source estimation data as child
-        if(this->findChildren(Data3DTreeModelItemTypes::NetworkItem).size() == 0) {
-            //If rt data item does not exists yet, create it here!
-            if(!m_pNetworkTreeItem) {
-                m_pNetworkTreeItem = new NetworkTreeItem(p3DEntityParent);
-            }
+        NetworkTreeItem* pReturnItem = Q_NULLPTR;
+
+        QPair<float,float> freqs = tNetworkData.getFrequencyRange();
+        QString sItemName = QString("%1_%2_%3").arg(tNetworkData.getConnectivityMethod()).arg(QString::number(freqs.first)).arg(QString::number(freqs.second));
+
+        //Add network estimation data as child
+        QList<QStandardItem*> lItems = this->findChildren(sItemName);
+
+        if(lItems.isEmpty()) {
+            pReturnItem = new NetworkTreeItem(p3DEntityParent);
+
+            pReturnItem->setText(sItemName);
 
             QList<QStandardItem*> list;
-            list << m_pNetworkTreeItem;
-            list << new QStandardItem(m_pNetworkTreeItem->toolTip());
+            list << pReturnItem;
+            list << new QStandardItem(pReturnItem->toolTip());
             this->appendRow(list);
 
-            m_pNetworkTreeItem->addData(tNetworkData);
+            pReturnItem->addData(tNetworkData);
         } else {
-            if(m_pNetworkTreeItem) {
-                m_pNetworkTreeItem->addData(tNetworkData);
+            if(lItems.first()) {
+                if(pReturnItem = dynamic_cast<NetworkTreeItem*>(lItems.first())) {
+                    pReturnItem->addData(tNetworkData);
+                }
             }
         }
 
-        return m_pNetworkTreeItem;
+        return pReturnItem;
     } else {
         qDebug() << "MeasurementTreeItem::addData - network data is empty";
     }

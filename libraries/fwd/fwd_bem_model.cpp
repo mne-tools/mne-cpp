@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FwdBemModel Class.
+* @brief    Definition of the FwdBemModel Class.
 *
 */
 
@@ -834,11 +834,11 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
 
         //    QFile bemFile("/usr/pubsw/packages/mne/stable/share/mne/icos.fif");
 
-        QFile bemFile(QString("./resources/general/surf2bem/icos.fif"));
+        QFile bemFile(QString(QCoreApplication::applicationDirPath() + "/resources/general/surf2bem/icos.fif"));
         if ( !QCoreApplication::startingUp() )
             bemFile.setFileName(QCoreApplication::applicationDirPath() + QString("/resources/general/surf2bem/icos.fif"));
         else if (!bemFile.exists())
-            bemFile.setFileName("./bin/resources/general/surf2bem/icos.fif");
+            bemFile.setFileName("./resources/general/surf2bem/icos.fif");
 
         if( !bemFile.exists () ){
             qDebug() << bemFile.fileName() << "does not exists.";

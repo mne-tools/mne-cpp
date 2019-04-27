@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneMshColorScaleDef Class.
+* @brief    Definition of the MneMshColorScaleDef Class.
 *
 */
 

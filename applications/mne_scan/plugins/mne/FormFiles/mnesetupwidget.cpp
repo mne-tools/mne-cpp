@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the MNESetupWidget class.
+* @brief    Definition of the MNESetupWidget class.
 *
 */
 
@@ -63,7 +63,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEPlugin;
+using namespace MNEPLUGIN;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************

@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Annotation class.
+* @brief    Definition of the Annotation class.
 *
 */
 

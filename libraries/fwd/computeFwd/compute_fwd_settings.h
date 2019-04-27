@@ -60,6 +60,7 @@
 
 #include <QSharedPointer>
 #include <QString>
+#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -125,26 +126,26 @@ public:
     QString bemname;            /**< BEM model file */
     QString solname;            /**< Solution file */
     QString mindistoutname;     /**< Output file for omitted source space points */
-    bool filter_spaces = true;  /**< Filter the source space points */
+    bool filter_spaces;  	/**< Filter the source space points */
     Eigen::Vector3f r0;         /**< Sphere model origin  */
-    bool accurate = false;      /**< Use accurate calculations */
-    bool fixed_ori = false;     /**< Fixed-orientation dipoles? */
-    bool include_meg = false;
-    bool include_eeg = false;
-    bool compute_grad = false;
+    bool accurate;      	/**< Use accurate calculations */
+    bool fixed_ori;     	/**< Fixed-orientation dipoles? */
+    bool include_meg;
+    bool include_eeg;
+    bool compute_grad;
     QString command;            /**< Saves the recognized command line for future use */
-    float mindist = 0.0f;       /**< Minimum allowed distance of the sources from the inner skull surface */
-    int coord_frame = FIFFV_COORD_HEAD; /**< Can be changed with the --mricoord option */
-    bool do_all = false;
+    float mindist;       	/**< Minimum allowed distance of the sources from the inner skull surface */
+    int coord_frame; 		/**< Can be changed with the --mricoord option */
+    bool do_all;
     QStringList labels;         /**< Compute the solution only for these labels */
-    int nlabel = 0;
+    int nlabel;
 
     QString eeg_model_file;     /**< File of EEG sphere model specifications */
     QString eeg_model_name;     /**< Name of the EEG model to use */
-    float eeg_sphere_rad = 0.09f;   /**< Scalp radius to use in EEG sphere model */
-    bool scale_eeg_pos = false;     /**< Scale the electrode locations to scalp in the sphere model */
-    bool use_equiv_eeg = true;      /**< Use the equivalent source approach for the EEG sphere model */
-    bool use_threads = true;        /**< Parallelize? */
+    float eeg_sphere_rad;   	/**< Scalp radius to use in EEG sphere model */
+    bool scale_eeg_pos;     	/**< Scale the electrode locations to scalp in the sphere model */
+    bool use_equiv_eeg;      	/**< Use the equivalent source approach for the EEG sphere model */
+    bool use_threads;        	/**< Parallelize? */
 
 private:
     void initMembers();

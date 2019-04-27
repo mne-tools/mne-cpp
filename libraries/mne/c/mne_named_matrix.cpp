@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the  MNE Named Matrix (MneNamedMatrix) Class.
+* @brief    Definition of the  MNE Named Matrix (MneNamedMatrix) Class.
 *
 */
 

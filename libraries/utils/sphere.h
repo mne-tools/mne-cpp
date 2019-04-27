@@ -89,7 +89,7 @@ public:
     * @param[in] center     The sphere's center
     * @param[in] radius     The sphere's radius
     */
-    Sphere( const Eigen::Vector3f& center, float radius );
+    Sphere(const Eigen::Vector3f& center, float radius);
 
     //=========================================================================================================
     /**
@@ -139,9 +139,8 @@ public:
     *
     * @return true if successful.
     */
-    static bool fit_sphere_to_points ( const Eigen::MatrixXf &rr, float simplex_size, Eigen::VectorXf &r0, float &R );
-    static bool fit_sphere_to_points ( float **rr, int np, float simplex_size, float *r0, float *R);
-
+    static bool fit_sphere_to_points(const Eigen::MatrixXf &rr, float simplex_size, Eigen::VectorXf &r0, float &R);
+    static bool fit_sphere_to_points(float **rr, int np, float simplex_size, float *r0, float *R);
 
 private:
     Eigen::Vector3f m_center;   /**< Sphere's center */
@@ -155,7 +154,7 @@ private:
     * @param[out] cm    The average center of the caretsian data (1 x 3 matrix)
     * @param[out] avep  The average distance to the average center.
     */
-    static void calculate_cm_ave_dist(  const Eigen::MatrixXf &rr, Eigen::VectorXf &cm, float &avep );
+    static void calculate_cm_ave_dist(const Eigen::MatrixXf &rr, Eigen::VectorXf &cm, float &avep);
 
     //=========================================================================================================
     /**
@@ -166,7 +165,7 @@ private:
     *
     * @return the inital simplex.
     */
-    static Eigen::MatrixXf make_initial_simplex( const Eigen::VectorXf &pars,  float size );
+    static Eigen::MatrixXf make_initial_simplex(const Eigen::VectorXf &pars, float size);
 
     //=========================================================================================================
     /**
@@ -177,7 +176,7 @@ private:
     *
     * @return the distance (cost) of the given vertex (sphere center).
     */
-    static float fit_eval( const Eigen::VectorXf &fitpar, const void  *user_data );
+    static float fit_eval(const Eigen::VectorXf &fitpar, const void  *user_data);
 
     //=========================================================================================================
     /**
@@ -189,7 +188,7 @@ private:
     *
     * @return true if reporting was successful.
     */
-    static bool report_func( int loop, const Eigen::VectorXf &fitpar, double fval);
+    static bool report_func(int loop, const Eigen::VectorXf &fitpar, double fval);
 
     //=========================================================================================================
     /**
@@ -200,7 +199,7 @@ private:
     *
     * @return the optimal radius
     */
-    static float opt_rad( const Eigen::VectorXf &r0, const fitUserNew user);
+    static float opt_rad(const Eigen::VectorXf &r0, const fitUserNew user);
 };
 
 } // NAMESPACE

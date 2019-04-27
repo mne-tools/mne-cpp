@@ -172,7 +172,7 @@ void TestInterpolation::testDimensionsForInterpolation()
     QVERIFY(testWeightMatrix->cols() == testSignal.rows());
 
     // interpolate with random data set
-    VectorXf testInterpolatedSignal = Interpolation::interpolateSignal(testWeightMatrix, testSignal);
+    VectorXf testInterpolatedSignal = Interpolation::interpolateSignal(*testWeightMatrix, testSignal.cast<float>());
 
     QVERIFY(testInterpolatedSignal.rows() == smallSurface.rr.rows());
     QVERIFY(testInterpolatedSignal.cols() == 1);

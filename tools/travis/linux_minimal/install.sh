@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Install Qt 5.6 & Doxygen
-sudo apt-get install -qq qt56base qt563d qt56svg qt56serialport
+# Install Qt 5.2.1 & Doxygen
+sudo apt-get install -qq qt52base qt52svg qt52serialport
 
 # Setup Qt environment
-source /opt/qt56/bin/qt56-env.sh
+source /opt/qt52/bin/qt52-env.sh

@@ -70,6 +70,7 @@
 #include <QPair>
 #include <QSemaphore>
 #include <QSharedPointer>
+#include <stdio.h>
 
 
 //*************************************************************************************************************

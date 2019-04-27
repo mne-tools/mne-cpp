@@ -43,14 +43,13 @@
 
 
 #include <scMeas/measurementtypes.h>
-#include <scMeas/newrealtimemultisamplearray.h>
-#include <scMeas/newnumeric.h>
+#include <scMeas/realtimemultisamplearray.h>
+#include <scMeas/numeric.h>
 
 #include <scShared/Management/pluginconnectorconnection.h>
 #include <scShared/Management/pluginoutputdata.h>
 #include <scShared/Management/plugininputdata.h>
 #include <scShared/Interfaces/IPlugin.h>
-
 
 #include <Eigen/Core>
 
@@ -144,7 +143,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
 
 
-//void debugTest(QSharedPointer<NewRealTimeMultiSampleArray> testData)
+//void debugTest(QSharedPointer<RealTimeMultiSampleArray> testData)
 //{
 //    qDebug() << "Here in debug Test Callback new";
 
@@ -176,7 +175,7 @@ int main(int argc, char *argv[])
 
     //Store application info to use QSettings
     QCoreApplication::setOrganizationName("MNE-CPP");
-    QCoreApplication::setOrganizationDomain("www.tu-ilmenau.de/mne-cpp");
+    QCoreApplication::setOrganizationDomain("www.mne-cpp.org");
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
 
     SCMEASLIB::MeasurementTypes::registerTypes();
@@ -201,6 +200,10 @@ int main(int argc, char *argv[])
     //ToDo Check the message handler and FiffSimulator
 
     qInstallMessageHandler(customMessageHandler);
+
+    QSurfaceFormat fmt;
+    fmt.setSamples(10);
+    QSurfaceFormat::setDefaultFormat(fmt);
 
     return app.exec();
 }

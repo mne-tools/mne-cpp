@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNE Derivation Set (MneDerivSet) Class.
+* @brief    Definition of the MNE Derivation Set (MneDerivSet) Class.
 *
 */
 

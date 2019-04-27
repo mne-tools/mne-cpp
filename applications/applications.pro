@@ -58,5 +58,3 @@ SUBDIRS += \
             message("applications.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
         }
 }
-
-CONFIG += ordered

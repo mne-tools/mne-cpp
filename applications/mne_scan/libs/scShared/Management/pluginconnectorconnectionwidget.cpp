@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the PluginConnectorConnectionWidget class.
+* @brief    Definition of the PluginConnectorConnectionWidget class.
 *
 */
 

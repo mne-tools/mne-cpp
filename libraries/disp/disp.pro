@@ -37,14 +37,17 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT  += core widgets svg
+QT  += core widgets svg concurrent
 
-# Deep Model Viewer
 qtHaveModule(printsupport): QT += printsupport
-qtHaveModule(opengl): QT += opengl
 qtHaveModule(charts): QT += charts
 
 DEFINES += DISP_LIBRARY
+
+contains(MNECPP_CONFIG, dispOpenGL) {
+    qtHaveModule(opengl): QT += opengl
+    DEFINES += USE_OPENGL
+}
 
 TARGET = Disp
 TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
@@ -83,106 +86,151 @@ else {
     }
 }
 
-
-
 DESTDIR = $${MNE_LIBRARY_DIR}
 
-contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
-    DEFINES += BUILD_MNECPP_STATIC_LIB
+    DEFINES += STATICLIB
 }
 else {
     CONFIG += dll
-
-    #
-    # win32: copy dll's to bin dir
-    # unix: add lib folder to LD_LIBRARY_PATH
-    #
-    win32 {
-        FILE = $${DESTDIR}/$${TARGET}.dll
-        BINDIR = $${DESTDIR}/../bin
-        FILE ~= s,/,\\,g
-        BINDIR ~= s,/,\\,g
-        QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-    }
 }
 
 SOURCES += \
-    helpers/colormap.cpp \
-    imagesc.cpp \
-    plot.cpp \
-    graph.cpp \
-    rtplot.cpp \
-    tfplot.cpp \
-    filterwindow.cpp \
-    helpers/layoutscene.cpp \
-    helpers/averagescene.cpp \
-    helpers/averagesceneitem.cpp \
-    helpers/filterdatadelegate.cpp \
-    helpers/filterdatamodel.cpp \
-    helpers/filterplotscene.cpp \
-    helpers/selectionscene.cpp \
-    helpers/selectionsceneitem.cpp \
-    selectionmanagerwindow.cpp \
-    helpers/chinfomodel.cpp \
-    helpers/mneoperator.cpp \
-    helpers/roundededgeswidget.cpp \
+    plots/imagesc.cpp \
+    plots/plot.cpp \
+    plots/graph.cpp \
+    plots/tfplot.cpp \
+    plots/helpers/colormap.cpp \
+    viewers/filterdesignview.cpp \
+    viewers/averagelayoutview.cpp \
+    viewers/spectrumview.cpp \
+    viewers/modalityselectionview.cpp \
+    viewers/butterflyview.cpp \
+    viewers/channeldataview.cpp \
+    viewers/channelselectionview.cpp \
+    viewers/spectrumsettingsview.cpp \
+    viewers/scalingview.cpp \
+    viewers/projectorsview.cpp \
+    viewers/compensatorview.cpp \
+    viewers/filtersettingsview.cpp \
+    viewers/spharasettingsview.cpp \
+    viewers/channeldatasettingsview.cpp \
+    viewers/averageselectionview.cpp \
+    viewers/triggerdetectionview.cpp \
+    viewers/quickcontrolview.cpp \
+    viewers/connectivitysettingsview.cpp \
+    viewers/minimumnormsettingsview.cpp \
+    viewers/averagingsettingsview.cpp \
+    viewers/projectsettingsview.cpp \
+    viewers/control3dview.cpp \
+    viewers/artifactsettingsview.cpp \
+    viewers/helpers/evokedsetmodel.cpp \
+    viewers/helpers/layoutscene.cpp \
+    viewers/helpers/averagescene.cpp \
+    viewers/helpers/averagesceneitem.cpp \
+    viewers/helpers/filterplotscene.cpp \
+    viewers/helpers/selectionscene.cpp \
+    viewers/helpers/selectionsceneitem.cpp \
+    viewers/helpers/channelinfomodel.cpp \
+    viewers/helpers/mneoperator.cpp \
+    viewers/helpers/draggableframelesswidget.cpp \
+    viewers/helpers/frequencyspectrumdelegate.cpp \
+    viewers/helpers/frequencyspectrummodel.cpp \
+    viewers/helpers/channeldatamodel.cpp \
+    viewers/helpers/channeldatadelegate.cpp \
 
 HEADERS += \
     disp_global.h \
-    helpers/colormap.h \
-    imagesc.h \
-    plot.h \
-    graph.h \
-    rtplot.h \
-    tfplot.h \
-    filterwindow.h \
-    selectionmanagerwindow.h \
-    helpers/layoutscene.h \
-    helpers/averagescene.h \
-    helpers/averagesceneitem.h \
-    helpers/filterdatadelegate.h \
-    helpers/filterdatamodel.h \
-    helpers/filterplotscene.h \
-    helpers/selectionscene.h \
-    helpers/selectionsceneitem.h \
-    helpers/chinfomodel.h \
-    helpers/mneoperator.h \
-    helpers/roundededgeswidget.h \
+    plots/imagesc.h \
+    plots/plot.h \
+    plots/graph.h \
+    plots/tfplot.h \
+    plots/helpers/colormap.h \
+    viewers/filterdesignview.h \
+    viewers/averagelayoutview.h \
+    viewers/spectrumview.h \
+    viewers/modalityselectionview.h \
+    viewers/butterflyview.h \
+    viewers/channeldataview.h \
+    viewers/channelselectionview.h \
+    viewers/spectrumsettingsview.h \
+    viewers/scalingview.h \
+    viewers/projectorsview.h \
+    viewers/compensatorview.h \
+    viewers/filtersettingsview.h \
+    viewers/spharasettingsview.h \
+    viewers/channeldatasettingsview.h \
+    viewers/averageselectionview.h \
+    viewers/triggerdetectionview.h \
+    viewers/quickcontrolview.h \
+    viewers/connectivitysettingsview.h \
+    viewers/minimumnormsettingsview.h \
+    viewers/averagingsettingsview.h \
+    viewers/projectsettingsview.h \
+    viewers/control3dview.h \
+    viewers/artifactsettingsview.h \
+    viewers/helpers/evokedsetmodel.h \
+    viewers/helpers/layoutscene.h \
+    viewers/helpers/averagescene.h \
+    viewers/helpers/averagesceneitem.h \
+    viewers/helpers/filterplotscene.h \
+    viewers/helpers/selectionscene.h \
+    viewers/helpers/selectionsceneitem.h \
+    viewers/helpers/channelinfomodel.h \
+    viewers/helpers/mneoperator.h \
+    viewers/helpers/draggableframelesswidget.h \
+    viewers/helpers/frequencyspectrumdelegate.h \
+    viewers/helpers/frequencyspectrummodel.h \
+    viewers/helpers/channeldatamodel.h \
+    viewers/helpers/channeldatadelegate.h \
 
 qtHaveModule(charts) {
     SOURCES += \
-        bar.cpp \
-        spline.cpp \
-        lineplot.cpp \
+        plots/bar.cpp \
+        plots/spline.cpp \
+        plots/lineplot.cpp \
 
     HEADERS += \
-        bar.h \
-        spline.h \
-        lineplot.h \
+        plots/bar.h \
+        plots/spline.h \
+        plots/lineplot.h \
 }
 
 # CNTK related stuff
 !isEmpty( CNTK_INCLUDE_DIR ) {
     SOURCES += \
-        deepmodelviewer/controls.cpp \
-        deepmodelviewer/edge.cpp \
-        deepmodelviewer/node.cpp \
-        deepmodelviewer/view.cpp \
-        deepmodelviewer/network.cpp \
-        deepmodelviewer/deepviewer.cpp
+        viewers/deepmodelviewers/controls.cpp \
+        viewers/deepmodelviewers/edge.cpp \
+        viewers/deepmodelviewers/node.cpp \
+        viewers/deepmodelviewers/view.cpp \
+        viewers/deepmodelviewers/network.cpp \
+        viewers/deepmodelviewers/deepviewer.cpp
 
     HEADERS += \
-        deepmodelviewer/controls.h \
-        deepmodelviewer/edge.h \
-        deepmodelviewer/node.h \
-        deepmodelviewer/view.h \
-        deepmodelviewer/network.h \
-        deepmodelviewer/deepviewer.h
+        viewers/deepmodelviewers/controls.h \
+        viewers/deepmodelviewers/edge.h \
+        viewers/deepmodelviewers/node.h \
+        viewers/deepmodelviewers/view.h \
+        viewers/deepmodelviewers/network.h \
+        viewers/deepmodelviewers/deepviewer.h
 
     RESOURCES += \
-        deepmodelviewer/images.qrc
+        viewers/deepmodelviewers/images.qrc
 }
+
+FORMS += \
+    viewers/formfiles/filterdesignview.ui \
+    viewers/formfiles/channelselectionview.ui \
+    viewers/formfiles/spharasettingsview.ui \
+    viewers/formfiles/channeldatasettingsview.ui \
+    viewers/formfiles/triggerdetectionview.ui \
+    viewers/formfiles/quickcontrolview.ui \
+    viewers/formfiles/connectivitysettingsview.ui \
+    viewers/formfiles/minimumnormsettingsview.ui \
+    viewers/formfiles/averagingsettingsview.ui \
+    viewers/formfiles/projectsettingsview.ui \
+    viewers/formfiles/control3dview.ui \
 
 RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/default_filters/BP_1Hz_40Hz_Fs1kHz.txt \
@@ -206,48 +254,45 @@ RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_vv.sel \
     $${ROOT_DIR}/resources/general/selectionGroups/mne_browse_raw_vv_new.sel \
 
-# Copy resource files to bin resource folder
-for(FILE, RESOURCE_FILES) {
-    FILEDIR = $$dirname(FILE)
-    FILEDIR ~= s,/resources,/bin/resources,g
-    FILEDIR = $$shell_path($${FILEDIR})
-    TRGTDIR = $${FILEDIR}
-
-    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
-
-    FILE = $$shell_path($${FILE})
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
-}
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${CNTK_INCLUDE_DIR}
 
 # Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/disp
+header_files.files = $${HEADERS}
+header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/disp
 
 INSTALLS += header_files
 
-FORMS += \
-    filterwindowwidget.ui \
-    selectionmanagerwindow.ui
-
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
-# Deploy Qt Dependencies
+# Deploy library
 win32 {
-    isEmpty(TARGET_EXT) {
-        TARGET_CUSTOM_EXT = .dll
-    } else {
-        TARGET_CUSTOM_EXT = $${TARGET_EXT}
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+}
+
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
     }
 
-    DEPLOY_COMMAND = windeployqt
-
-    DEPLOY_TARGET = $$shell_quote($$shell_path($${MNE_BINARY_DIR}/$${TARGET}$${TARGET_CUSTOM_EXT}))
-
-    #  # Uncomment the following line to help debug the deploy command when running qmake
-    #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
-    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
 }

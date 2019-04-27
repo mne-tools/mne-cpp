@@ -80,6 +80,11 @@ namespace Qt3DCore {
     class QEntity;
 }
 
+namespace Qt3DExtras {
+    class QCylinderGeometry;
+    class QSphereGeometry;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -95,8 +100,8 @@ namespace DISP3DLIB
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class Renderable3DEntity;
 class MetaTreeItem;
+class GeometryMultiplier;
 
 
 //=============================================================================================================
@@ -105,7 +110,7 @@ class MetaTreeItem;
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DSHARED_EXPORT NetworkTreeItem : public AbstractMeshTreeItem
+class DISP3DSHARED_EXPORT NetworkTreeItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 
@@ -133,6 +138,14 @@ public:
     */
     void addData(const CONNECTIVITYLIB::Network& tNetworkData);
 
+    //=========================================================================================================
+    /**
+    * This function set the threshold values.
+    *
+    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
+    */
+    void setThresholds(const QVector3D& vecThresholds);
+
 private:
     //=========================================================================================================
     /**
@@ -150,16 +163,45 @@ private:
 
     //=========================================================================================================
     /**
+    * Call this function whenever the surface color was changed.
+    *
+    * @param[in] color        The new surface color.
+    */
+    virtual void onColorChanged(const QVariant& color);
+
+    //=========================================================================================================
+    /**
     * Call this function whenever you want to calculate the indices/tris for a network.
     *
     * @param[in] tNetworkData     The network data.
-    * @param[in] vecThreshold     The threshold data.
     */
-    void plotNetwork(const CONNECTIVITYLIB::Network& tNetworkData, const QVector3D& vecThreshold);
+    void plotNetwork(const CONNECTIVITYLIB::Network& tNetworkData);
 
-    bool                                        m_bNodesPlotted;                /**< Flag whether nodes were plotted. */
+    //=========================================================================================================
+    /**
+    * Call this function whenever you want plot the network nodes.
+    *
+    * @param[in] tNetworkData     The network data.
+    */
+    void plotNodes(const CONNECTIVITYLIB::Network &tNetworkData);
 
-    QPointer<MetaTreeItem>                      m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
+    //=========================================================================================================
+    /**
+    * Call this function whenever you want plot the network edges.
+    *
+    * @param[in] tNetworkData     The network data.
+    */
+    void plotEdges(const CONNECTIVITYLIB::Network& tNetworkData);
+
+    QPointer<MetaTreeItem>                          m_pItemNetworkThreshold;        /**< The item to access the threshold values. */
+
+    QPointer<QEntity>                               m_pNodesEntity;                 /**< The network node entity. */
+    QSharedPointer<Qt3DExtras::QSphereGeometry>     m_pNodesGeometry;               /**< The network node geometry. */
+    QPointer<GeometryMultiplier>                    m_pNodes;                       /**< The network nodes. */
+
+    QPointer<QEntity>                               m_pEdgeEntity;                  /**< The network edge entity. */
+    QSharedPointer<Qt3DExtras::QCylinderGeometry>   m_pEdgesGeometry;               /**< The network geomtries for edges. */
+    QPointer<GeometryMultiplier>                    m_pEdges;                       /**< The geometry multiplier for edges. */
 
 };
 

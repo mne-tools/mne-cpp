@@ -46,18 +46,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QColor>
-#include <Qt3DRender/qeffect.h>
-#include <Qt3DRender/qtechnique.h>
 #include <Qt3DRender/qshaderprogram.h>
-#include <Qt3DRender/qparameter.h>
-#include <Qt3DRender/qrenderpass.h>
-#include <QFilterKey>
-#include <Qt3DRender/qgraphicsapifilter.h>
-
 #include <QUrl>
-#include <QVector3D>
-#include <QVector4D>
 
 
 //*************************************************************************************************************
@@ -75,133 +65,28 @@ using namespace Qt3DRender;
 //=============================================================================================================
 
 PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(bool bUseSortPolicy, QNode *parent)
-: QMaterial(parent)
-, m_pVertexEffect(new QEffect())
-, m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
-, m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
-, m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 4.5f))
-, m_pAlphaParameter(new QParameter("alpha", 0.5f))
-, m_pVertexGL3Technique(new QTechnique())
-, m_pVertexGL3RenderPass(new QRenderPass())
+: AbstractPhongAlphaMaterial(bUseSortPolicy, parent)
 , m_pVertexGL3Shader(new QShaderProgram())
-, m_pVertexGL2Technique(new QTechnique())
-, m_pVertexGL2RenderPass(new QRenderPass())
-, m_pVertexES2Technique(new QTechnique())
-, m_pVertexES2RenderPass(new QRenderPass())
 , m_pVertexES2Shader(new QShaderProgram())
-, m_pFilterKey(new QFilterKey)
-, m_bUseSortPolicy(bUseSortPolicy)
 {
-    this->init();
+    init();
+    setShaderCode();
 }
 
 
 //*************************************************************************************************************
 
-PerVertexPhongAlphaMaterial::~PerVertexPhongAlphaMaterial()
+void PerVertexPhongAlphaMaterial::setShaderCode()
 {
-}
-
-
-//*************************************************************************************************************
-
-void PerVertexPhongAlphaMaterial::init()
-{
-    //Set shader
     m_pVertexGL3Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/gl3/pervertexphongalpha.vert"))));
     m_pVertexGL3Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/gl3/pervertexphongalpha.frag"))));
 
     m_pVertexES2Shader->setVertexShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/es2/pervertexphongalpha.vert"))));
     m_pVertexES2Shader->setFragmentShaderCode(QShaderProgram::loadSource(QUrl(QStringLiteral("qrc:/engine/model/materials/shaders/es2/pervertexphongalpha.frag"))));
 
-    m_pVertexGL3RenderPass->setShaderProgram(m_pVertexGL3Shader);
-    m_pVertexGL2RenderPass->setShaderProgram(m_pVertexES2Shader);
-    m_pVertexES2RenderPass->setShaderProgram(m_pVertexES2Shader);
-
-    //Set OpenGL version
-    m_pVertexGL3Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMajorVersion(3);
-    m_pVertexGL3Technique->graphicsApiFilter()->setMinorVersion(2);
-    m_pVertexGL3Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::CoreProfile);
-
-    m_pVertexGL2Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGL);
-    m_pVertexGL2Technique->graphicsApiFilter()->setMajorVersion(2);
-    m_pVertexGL2Technique->graphicsApiFilter()->setMinorVersion(0);
-    m_pVertexGL2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
-
-    m_pVertexES2Technique->graphicsApiFilter()->setApi(QGraphicsApiFilter::OpenGLES);
-    m_pVertexES2Technique->graphicsApiFilter()->setMajorVersion(2);
-    m_pVertexES2Technique->graphicsApiFilter()->setMinorVersion(0);
-    m_pVertexES2Technique->graphicsApiFilter()->setProfile(QGraphicsApiFilter::NoProfile);
-
-    m_pVertexGL3Technique->addFilterKey(m_pFilterKey);
-    m_pVertexGL2Technique->addFilterKey(m_pFilterKey);
-    m_pVertexES2Technique->addFilterKey(m_pFilterKey);
-
-    m_pVertexGL3Technique->addRenderPass(m_pVertexGL3RenderPass);
-    m_pVertexGL2Technique->addRenderPass(m_pVertexGL2RenderPass);
-    m_pVertexES2Technique->addRenderPass(m_pVertexES2RenderPass);
-
-    m_pVertexEffect->addTechnique(m_pVertexGL3Technique);
-    m_pVertexEffect->addTechnique(m_pVertexGL2Technique);
-    m_pVertexEffect->addTechnique(m_pVertexES2Technique);
-
-    m_pVertexEffect->addParameter(m_pDiffuseParameter);
-    m_pVertexEffect->addParameter(m_pSpecularParameter);
-    m_pVertexEffect->addParameter(m_pShininessParameter);
-    m_pVertexEffect->addParameter(m_pAlphaParameter);
-
-    this->setEffect(m_pVertexEffect);
-
-    connect(m_pAlphaParameter.data(), &QParameter::valueChanged,
-            this, &PerVertexPhongAlphaMaterial::onAlphaChanged);
-
-    //Init filter keys
-    m_pFilterKey->setName(QStringLiteral("renderingStyle"));
-    onAlphaChanged(m_pAlphaParameter->value());
-}
-
-
-//*************************************************************************************************************
-
-float PerVertexPhongAlphaMaterial::alpha()
-{
-    return m_pAlphaParameter->value().toFloat();
-}
-
-
-//*************************************************************************************************************
-
-void PerVertexPhongAlphaMaterial::setAlpha(float alpha)
-{
-    m_pAlphaParameter->setValue(alpha);
-}
-
-
-//*************************************************************************************************************
-
-void PerVertexPhongAlphaMaterial::onAlphaChanged(const QVariant &fAlpha)
-{
-    if(fAlpha.canConvert<float>())
-    {
-        float tempAlpha = fAlpha.toFloat();
-
-        if(tempAlpha == 1.0f)
-        {
-            m_pFilterKey->setValue(QStringLiteral("forward"));
-        }
-        else if(tempAlpha < 1.0f)
-        {
-            if(m_bUseSortPolicy)
-            {
-                m_pFilterKey->setValue(QStringLiteral("forwardSorted"));
-            }
-            else
-            {
-                m_pFilterKey->setValue(QStringLiteral("forwardTransparent"));
-            }
-        }
-    }
+    addShaderToRenderPass(QStringLiteral("pVertexGL3RenderPass"), m_pVertexGL3Shader);
+    addShaderToRenderPass(QStringLiteral("pVertexGL2RenderPass"), m_pVertexES2Shader);
+    addShaderToRenderPass(QStringLiteral("pVertexES2RenderPass"), m_pVertexES2Shader);
 }
 
 

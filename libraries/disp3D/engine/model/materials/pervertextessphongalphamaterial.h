@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../../../disp3D_global.h"
+#include "abstractphongalphamaterial.h"
 
 
 //*************************************************************************************************************
@@ -49,7 +50,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRender/qmaterial.h>
 #include <QPointer>
 
 
@@ -65,11 +65,8 @@
 //=============================================================================================================
 
 namespace Qt3DRender {
-    class QMaterial;
-    class QEffect;
     class QParameter;
     class QShaderProgram;
-    class QMaterial;
     class QFilterKey;
     class QTechnique;
     class QRenderPass;
@@ -98,7 +95,7 @@ namespace DISP3DLIB
 *
 * @brief PerVertexTessPhongAlphaMaterial is provides a Qt3D material with own shader support.
 */
-class DISP3DSHARED_EXPORT PerVertexTessPhongAlphaMaterial : public Qt3DRender::QMaterial
+class DISP3DSHARED_EXPORT PerVertexTessPhongAlphaMaterial : public AbstractPhongAlphaMaterial
 {
     Q_OBJECT
 
@@ -107,55 +104,29 @@ public:
     /**
     * Default constructor.
     *
-    * @param[in] parent         The parent of this class.
+    * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
+    * @param[in] parent             The parent of this class.
     */
-    explicit PerVertexTessPhongAlphaMaterial(Qt3DCore::QNode *parent = 0);
+    explicit PerVertexTessPhongAlphaMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = nullptr);
 
     //=========================================================================================================
     /**
     * Default destructor.
     */
-    ~PerVertexTessPhongAlphaMaterial();
-
-    //=========================================================================================================
-    /**
-    * Get the current alpha value.
-    *
-    * @return The current alpha value.
-    */
-    float alpha();
-
-    //=========================================================================================================
-    /**
-    * Set the current alpha value.
-    *
-    * @param[in] alpha  The new alpha value.
-    */
-    void setAlpha(float alpha);
+    ~PerVertexTessPhongAlphaMaterial() = default;
 
 private:
     //=========================================================================================================
     /**
     * Init the PerVertexTessPhongAlphaMaterial class.
     */
-    void init();
+    void init() override;
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the alpha value is changed.
-    * It handles the change between opaque and transparent depending on the new alpha.
-    *
-    * @param[in] fAlpha         The new alpha value.
+    * Add the shader code to the material.
     */
-    void onAlphaChanged(const QVariant &fAlpha);
-
-    QPointer<Qt3DRender::QEffect>                   m_pVertexEffect;
-
-    QPointer<Qt3DRender::QParameter>                m_pDiffuseParameter;
-    QPointer<Qt3DRender::QParameter>                m_pSpecularParameter;
-    QPointer<Qt3DRender::QParameter>                m_pShininessParameter;
-    QPointer<Qt3DRender::QParameter>                m_pAlphaParameter;
-    QPointer<Qt3DRender::QFilterKey>                m_pFilterKey;
+    void setShaderCode() override;
 
     QPointer<Qt3DRender::QParameter>                m_pInnerTessParameter;
     QPointer<Qt3DRender::QParameter>                m_pOuterTessParameter;

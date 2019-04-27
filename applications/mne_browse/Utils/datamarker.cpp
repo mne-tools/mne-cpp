@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the DataWindow class.
+* @brief    Definition of the DataWindow class.
 *
 */
 

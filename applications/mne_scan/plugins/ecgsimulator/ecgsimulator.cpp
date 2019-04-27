@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ECGSimulator class.
+* @brief    Definition of the ECGSimulator class.
 *
 */
 
@@ -117,19 +117,19 @@ void ECGSimulator::init()
 {
     if(m_pECGChannel_ECG_I->isEnabled())
     {
-        m_pRTSA_ECG_I_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG I", "ECG I output data");
+        m_pRTSA_ECG_I_new = PluginOutputData<RealTimeSampleArray>::create(this, "ECG I", "ECG I output data");
         m_outputConnectors.append(m_pRTSA_ECG_I_new);
     }
 
     if(m_pECGChannel_ECG_II->isEnabled())
     {
-        m_pRTSA_ECG_II_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG II", "ECG II output data");
+        m_pRTSA_ECG_II_new = PluginOutputData<RealTimeSampleArray>::create(this, "ECG II", "ECG II output data");
         m_outputConnectors.append(m_pRTSA_ECG_II_new);
     }
 
     if(m_pECGChannel_ECG_III->isEnabled())
     {
-        m_pRTSA_ECG_III_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG III", "ECG III output data");
+        m_pRTSA_ECG_III_new = PluginOutputData<RealTimeSampleArray>::create(this, "ECG III", "ECG III output data");
         m_outputConnectors.append(m_pRTSA_ECG_III_new);
     }
 }

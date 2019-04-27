@@ -108,7 +108,7 @@ RtSourceDataController::RtSourceDataController()
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setInterpolationMatrixRight);
 
        connect(this, &RtSourceDataController::thresholdsChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setThresholds);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setThresholds, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::sFreqChanged,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setSFreq);
@@ -117,7 +117,7 @@ RtSourceDataController::RtSourceDataController()
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setLoopState);
 
        connect(this, &RtSourceDataController::numberAveragesChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setNumberAverages);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setNumberAverages, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::colormapTypeChanged,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setColormapType);
@@ -236,10 +236,10 @@ void RtSourceDataController::setCancelDistance(double dCancelDist)
 
 void RtSourceDataController::setTimeInterval(int iMSec)
 {
-    if(iMSec < 17) {
-        qDebug() << "RtSourceDataController::setTimeInterval - The minimum time interval is 17mSec.";
-        iMSec = 17;
-    }
+//    if(iMSec < 17) {
+//        qDebug() << "RtSourceDataController::setTimeInterval - The minimum time interval is 17mSec.";
+//        iMSec = 17;
+//    }
 
     m_iMSecInterval = iMSec;
     m_timer.setInterval(m_iMSecInterval);

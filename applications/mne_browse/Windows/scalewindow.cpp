@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ScaleWindow class.
+* @brief    Definition of the ScaleWindow class.
 *
 */
 

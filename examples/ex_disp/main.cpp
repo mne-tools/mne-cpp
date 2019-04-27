@@ -38,10 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/imagesc.h>
-#include <disp/plot.h>
-#include <disp/rtplot.h>
-#include <disp/tfplot.h>
+#include <disp/plots/imagesc.h>
+#include <disp/plots/plot.h>
+#include <disp/plots/tfplot.h>
 
 #include <fiff/fiff.h>
 
@@ -106,9 +105,9 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Disp Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption fromOption("from", "Read data from <from> (in seconds).", "from", "42.956");
-    QCommandLineOption toOption("to", "Read data from <to> (in seconds).", "to", "320.670");
+    QCommandLineOption toOption("to", "Read data from <to> (in seconds).", "to", "44.670");
     QCommandLineOption inSamplesOption("inSamples", "Timing is set in samples.", "inSamples", "false");
     QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
 
@@ -246,21 +245,13 @@ int main(int argc, char *argv[])
     plot.setWindowTitle("Corresponding function to MATLABs plot");
     plot.show();
 
-    //Rt plot example
-    RtPlot rtplot(dataCol);
-    rtplot.setTitle("Data Row 0 RtPlot");
-    rtplot.setXLabel("X Axes");
-    rtplot.setYLabel("Y Axes");
-    rtplot.setWindowTitle("Rt Plot");
-    rtplot.show();
+    //ToDo: Debug tfplot
+    //tf plot example
+    dataCol = data.row(0).transpose();
+    MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq*0.2);
 
-//    //ToDo: Debug tfplot
-//    //tf plot example
-//    dataCol = data.row(0).transpose();
-//    MatrixXd dataSpectrum = Spectrogram::make_spectrogram(dataCol, 0);
-
-//    TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 600, ColorMaps::Jet);
-//    tfplot.show();
+    TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet);
+    tfplot.show();
 
     return a.exec();
 }

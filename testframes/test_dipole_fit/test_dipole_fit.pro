@@ -40,6 +40,7 @@ TEMPLATE = app
 VERSION = $${MNE_CPP_VERSION}
 
 QT += testlib
+QT -= gui
 
 CONFIG   += console
 CONFIG   -= app_bundle
@@ -75,6 +76,15 @@ SOURCES += \
 
 HEADERS += \
 
+RESOURCE_FILES +=\
+    $${ROOT_DIR}/resources/general/surf2bem/icos.fif \
+    $${ROOT_DIR}/resources/general/coilDefinitions/coil_def.dat \
+    $${ROOT_DIR}/resources/general/coilDefinitions/coil_def_Elekta.dat \
+
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
+
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
@@ -82,3 +92,30 @@ contains(MNECPP_CONFIG, withCodeCov) {
     LIBS += -lgcov
     QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
 }
+
+win32 {
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+}
+
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}
+

@@ -54,7 +54,7 @@
 
 #include <inverse/rapMusic/rapmusic.h>
 
-#include <disp3D/adapters/abstractview.h>
+#include <disp3D/viewers/abstractview.h>
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
@@ -111,11 +111,11 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Clustered Inverse Rap Music Raw Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
-    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
     QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
@@ -540,8 +540,7 @@ int main(int argc, char *argv[])
                                                                       sourceEstimate,
                                                                       t_clusteredFwd,
                                                                       t_surfSet,
-                                                                      t_annotationSet,
-                                                                      p3DAbstractView->getView()->format())) {
+                                                                      t_annotationSet)) {
         pRTDataItem->setLoopState(true);
         pRTDataItem->setTimeInterval(17);
         pRTDataItem->setNumberAverages(1);

@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef MEASUREMENTWIDGET_H
-#define MEASUREMENTWIDGET_H
+#ifndef NEWMEASUREMENTWIDGET_H
+#define NEWMEASUREMENTWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,13 +43,7 @@
 
 #include "scdisp_global.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <utils/generics/observerpattern.h>
+#include <scMeas/measurement.h>
 
 
 //*************************************************************************************************************
@@ -62,15 +56,26 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace DISPLIB {
+    class QuickControlView;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE SCDISPLIB
 //=============================================================================================================
 
 namespace SCDISPLIB
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// SCDISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 //*************************************************************************************************************
@@ -78,15 +83,15 @@ namespace SCDISPLIB
 // ENUMERATIONS
 //=============================================================================================================
 
-////=============================================================================================================
-///**
-//* Tool enumeration.
-//*/
-//enum Tool
-//{
-//    Freeze     = 0,     /**< Freezing tool. */
-//    Annotation = 1      /**< Annotation tool. */
-//};
+//=============================================================================================================
+/**
+* Tool enumeration.
+*/
+enum Tool
+{
+    Freeze     = 0,       /**< Freezing tool. */
+    Annotation = 1        /**< Annotation tool. */
+};
 
 
 //=============================================================================================================
@@ -95,7 +100,7 @@ namespace SCDISPLIB
 *
 * @brief The MeasurementWidget class is the base class of all measurement widgets.
 */
-class SCDISPSHARED_EXPORT MeasurementWidget : public QWidget, public IObserver
+class SCDISPSHARED_EXPORT MeasurementWidget : public QWidget
 {
     Q_OBJECT
 public:
@@ -121,7 +126,7 @@ public:
     *
     * @param [in] pSubject  pointer to Subject -> not used because its direct attached to the measurement.
     */
-    virtual void update(Subject* pSubject) = 0;
+    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement) = 0;
 
     //=========================================================================================================
     /**
@@ -129,8 +134,91 @@ public:
     * Pure virtual method.
     */
     virtual void init() = 0;
+
+    //=========================================================================================================
+    /**
+    * A list of display actions for the current measurement widget.
+    *
+    * @return a list of display actions
+    */
+    inline QList< QAction* > getDisplayActions();
+
+    //=========================================================================================================
+    /**
+    * A list of display widgets for the current measurement widget.
+    *
+    * @return a list of display widgets
+    */
+    inline QList< QWidget* > getDisplayWidgets();
+
+protected:
+    //=========================================================================================================
+    /**
+    * Adds a display action to the current measurement widget.
+    *
+    * @param [in] pAction  pointer to the action to be added to the measurement widget
+    */
+    inline void addDisplayAction(QAction* pAction);
+
+    //=========================================================================================================
+    /**
+    * Adds a display widgetto the current measurement widget, which is attached to the toolbar
+    *
+    * @param [in] pWidget  pointer to the widget to be added to the measurement widget
+    */
+    inline void addDisplayWidget(QWidget* pWidget);
+
+    //=========================================================================================================
+    /**
+    * Adds control widgets to a QuickControlView based on their set objects names
+    *
+    * @param [in] pQuickControlView  The quick control view to add the control widgets to
+    * @param [in] lControlWidgets  The control widgets
+    */
+    void addControlWidgets(QSharedPointer<DISPLIB::QuickControlView> pQuickControlView,
+                           const QList<QSharedPointer<QWidget> >& lControlWidgets);
+
+private:
+    QList< QAction* >   m_qListDisplayActions;      /**< List of display actions */
+    QList< QWidget* >   m_qListDisplayWidgets;       /**< List of display widgets to attach to the toolbar */
+
 };
 
-} // NAMESPACE
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
-#endif // MEASUREMENTWIDGET_H
+QList< QAction* > MeasurementWidget::getDisplayActions()
+{
+    return m_qListDisplayActions;
+}
+
+
+//*************************************************************************************************************
+
+QList< QWidget* > MeasurementWidget::getDisplayWidgets()
+{
+    return m_qListDisplayWidgets;
+}
+
+
+//*************************************************************************************************************
+
+inline void MeasurementWidget::addDisplayAction(QAction* pAction)
+{
+    m_qListDisplayActions.append(pAction);
+}
+
+
+//*************************************************************************************************************
+
+inline void MeasurementWidget::addDisplayWidget(QWidget* pWidget)
+{
+    m_qListDisplayWidgets.append(pWidget);
+}
+
+
+} //NAMESPACE
+
+#endif // NEWMEASUREMENTWIDGET_H

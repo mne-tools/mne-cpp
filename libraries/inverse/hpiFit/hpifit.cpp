@@ -98,14 +98,14 @@ HPIFit::HPIFit()
 //*************************************************************************************************************
 
 void HPIFit::fitHPI(const MatrixXd& t_mat,
-                        const Eigen::MatrixXd& t_matProjectors,
-                        FiffCoordTrans& transDevHead,
-                        const QVector<int>& vFreqs,
-                        QVector<double>& vGof,
-                        FiffDigPointSet& fittedPointSet,
-                        FiffInfo::SPtr pFiffInfo,
-                        bool bDoDebug,
-                        const QString& sHPIResourceDir)
+                    const Eigen::MatrixXd& t_matProjectors,
+                    FiffCoordTrans& transDevHead,
+                    const QVector<int>& vFreqs,
+                    QVector<double>& vGof,
+                    FiffDigPointSet& fittedPointSet,
+                    FiffInfo::SPtr pFiffInfo,
+                    bool bDoDebug,
+                    const QString& sHPIResourceDir)
 {
     //Check if data was passed
     if(t_mat.rows() == 0 || t_mat.cols() == 0 ) {
@@ -308,6 +308,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     coil.pos = coilPos;
 
+    // Perform actual localization
     coil = dipfit(coil, sensors, amp, numCoils, matProjectorsInnerind);
 
     Eigen::Matrix4d trans = computeTransformation(headHPI, coil.pos);
@@ -418,7 +419,7 @@ CoilParam HPIFit::dipfit(struct CoilParam coil, struct SensorInfo sensors, const
 
         //Do concurrent
         QFuture<void> future = QtConcurrent::map(lCoilData,
-                                             &HPIFitData::doDipfitConcurrent);
+                                                 &HPIFitData::doDipfitConcurrent);
         future.waitForFinished();
 
         //Transform results to final coil information

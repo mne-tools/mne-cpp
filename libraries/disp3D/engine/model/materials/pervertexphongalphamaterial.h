@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "../../../disp3D_global.h"
+#include "abstractphongalphamaterial.h"
 
 
 //*************************************************************************************************************
@@ -49,7 +50,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRender/qmaterial.h>
 #include <QPointer>
 
 
@@ -65,15 +65,7 @@
 //=============================================================================================================
 
 namespace Qt3DRender {
-    class QMaterial;
-    class QEffect;
-    class QParameter;
     class QShaderProgram;
-    class QMaterial;
-    class QFilterKey;
-    class QTechnique;
-    class QRenderPass;
-    class QGraphicsApiFilter;
 }
 
 
@@ -98,7 +90,7 @@ namespace DISP3DLIB
 *
 * @brief PerVertexPhongAlphaMaterial is provides a Qt3D material with own shader support.
 */
-class DISP3DSHARED_EXPORT PerVertexPhongAlphaMaterial : public Qt3DRender::QMaterial
+class DISP3DSHARED_EXPORT PerVertexPhongAlphaMaterial : public AbstractPhongAlphaMaterial
 {
     Q_OBJECT
 
@@ -108,68 +100,26 @@ public:
     * Default constructor.
     *
     * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
-    * @param[in] parent             The parent of this class.
+    * @param[in] parent             The parent of this object.
     */
-    explicit PerVertexPhongAlphaMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = 0);
+    explicit PerVertexPhongAlphaMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = nullptr);
 
     //=========================================================================================================
     /**
     * Default destructor.
     */
-    ~PerVertexPhongAlphaMaterial();
-
-    //=========================================================================================================
-    /**
-    * Get the current alpha value.
-    *
-    * @return The current alpha value.
-    */
-    float alpha();
-
-    //=========================================================================================================
-    /**
-    * Set the current alpha value.
-    *
-    * @param[in] alpha  The new alpha value.
-    */
-    void setAlpha(float alpha);
+    ~PerVertexPhongAlphaMaterial() = default;
 
 private:
-    //=========================================================================================================
-    /**
-    * Init the PerVertexPhongAlphaMaterial class.
-    */
-    void init();
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the alpha value is changed.
-    * It handles the change between opaque and transparent depending on the new alpha.
-    *
-    * @param[in] fAlpha         The new alpha value.
+    * Adds the shader code to the material.
     */
-    void onAlphaChanged(const QVariant &fAlpha);
+    void setShaderCode() override;
 
-    QPointer<Qt3DRender::QEffect>           m_pVertexEffect;
-
-    QPointer<Qt3DRender::QParameter>        m_pDiffuseParameter;
-    QPointer<Qt3DRender::QParameter>        m_pSpecularParameter;
-    QPointer<Qt3DRender::QParameter>        m_pShininessParameter;
-    QPointer<Qt3DRender::QParameter>        m_pAlphaParameter;
-    QPointer<Qt3DRender::QFilterKey>        m_pFilterKey;
-
-    QPointer<Qt3DRender::QTechnique>        m_pVertexGL3Technique;
-    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL3RenderPass;
-    QPointer<Qt3DRender::QShaderProgram>    m_pVertexGL3Shader;    
-
-    QPointer<Qt3DRender::QTechnique>        m_pVertexGL2Technique;
-    QPointer<Qt3DRender::QRenderPass>       m_pVertexGL2RenderPass;
-
-    QPointer<Qt3DRender::QTechnique>        m_pVertexES2Technique;
-    QPointer<Qt3DRender::QRenderPass>       m_pVertexES2RenderPass;
-    QPointer<Qt3DRender::QShaderProgram>    m_pVertexES2Shader;
-
-    bool        m_bUseSortPolicy;
+    QPointer<Qt3DRender::QShaderProgram>    m_pVertexES2Shader;         /**< Shader program for OpenGL version ES2.0. */
+    QPointer<Qt3DRender::QShaderProgram>    m_pVertexGL3Shader;         /**< Shader program for OpenGL version 3. */
 };
 
 } // namespace DISP3DLIB

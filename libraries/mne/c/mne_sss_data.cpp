@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNE SSS Data (MneSssData) Class.
+* @brief    Definition of the MNE SSS Data (MneSssData) Class.
 *
 */
 

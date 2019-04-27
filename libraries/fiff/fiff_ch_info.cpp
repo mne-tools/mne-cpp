@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffChInfo Class.
+* @brief    Definition of the FiffChInfo Class.
 *
 */
 
@@ -58,7 +58,7 @@ FiffChInfo::FiffChInfo()
 : scanNo(0)
 , logNo(0)
 , kind(0)
-, range(-1)
+, range(1.0f)
 , cal(1.0f)
 , coord_frame(FIFFV_COORD_UNKNOWN)
 , unit(0)

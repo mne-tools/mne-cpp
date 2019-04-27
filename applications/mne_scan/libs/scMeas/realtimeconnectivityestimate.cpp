@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeConnectivityEstimate class.
+* @brief    Definition of the RealTimeConnectivityEstimate class.
 *
 */
 
@@ -72,8 +72,7 @@ using namespace MNELIB;
 //=============================================================================================================
 
 RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeConnectivityEstimate::SPtr"), parent)
-, m_bConnectivitySend(true)
+: Measurement(QMetaType::type("RealTimeConnectivityEstimate::SPtr"), parent)
 , m_pNetwork(Network::SPtr(new Network))
 , m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
 , m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
@@ -88,7 +87,6 @@ RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject *parent)
 
 RealTimeConnectivityEstimate::~RealTimeConnectivityEstimate()
 {
-
 }
 
 
@@ -103,7 +101,7 @@ QSharedPointer<Network> &RealTimeConnectivityEstimate::getValue()
 
 //*************************************************************************************************************
 
-void RealTimeConnectivityEstimate::setValue(Network& v)
+void RealTimeConnectivityEstimate::setValue(const Network& v)
 {
     m_qMutex.lock();
 
@@ -115,6 +113,5 @@ void RealTimeConnectivityEstimate::setValue(Network& v)
     m_qMutex.unlock();
 
     emit notify();
-
 }
 

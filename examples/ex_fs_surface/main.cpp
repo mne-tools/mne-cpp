@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/adapters/abstractview.h>
+#include <disp3D/viewers/abstractview.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <fs/surfaceset.h>
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
-    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
 
     parser.addOption(hemiOption);
     parser.addOption(subjectOption);

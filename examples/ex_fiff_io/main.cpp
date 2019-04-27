@@ -91,12 +91,12 @@ int main(int argc, char *argv[])
 
     //create list of fiff data to read
     QList<QIODevice*> t_listSampleFilesIn;
-    t_listSampleFilesIn.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
-//    t_listSampleFilesIn.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
-//    t_listSampleFilesIn.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif"));
-//    t_listSampleFilesIn.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-no-filter-ave.fif"));
-//    t_listSampleFilesIn.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"));
-//    t_listSampleFilesIn.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif"));
+    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
+//    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
+//    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif"));
+//    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-no-filter-ave.fif"));
+//    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"));
+//    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif"));
 
 
     FiffIO p_fiffIO(t_listSampleFilesIn);
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     p_fiffIO.m_qlistRaw[0]->read_raw_segment_times(data,times,100,102);
 
     //Write some raw data
-    QFile t_fileToWrite("./MNE-sample-data/MEG/sample/sample_write/sample_out.fif");
+    QFile t_fileToWrite(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_write/sample_out.fif");
     p_fiffIO.write(t_fileToWrite,FIFFB_RAW_DATA,-1);
 
     return a.exec();

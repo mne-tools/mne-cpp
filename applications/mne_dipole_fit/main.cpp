@@ -44,7 +44,7 @@
 
 #include <mne/mne_bem.h>
 
-#include <disp3D/adapters/ecdview.h>
+#include <disp3D/viewers/ecdview.h>
 
 #include <fs/label.h>
 #include <fs/surfaceset.h>

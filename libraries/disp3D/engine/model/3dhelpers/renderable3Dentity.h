@@ -72,6 +72,10 @@ namespace Qt3DCore {
     class QTransform;
 }
 
+namespace FIFFLIB {
+    class FiffCoordTrans;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -137,11 +141,29 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the entity's transformation. This will clear the old transformation.
+    *
+    * @param[in] transform     The new entity's transform.
+    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+    */
+    virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
+
+    //=========================================================================================================
+    /**
     * Applies a transformation o ntop of the present one.
     *
     * @param[in] transform     The new entity's transform.
     */
     virtual void applyTransform(const Qt3DCore::QTransform& transform);
+
+    //=========================================================================================================
+    /**
+    * Applies a transformation o ntop of the present one.
+    *
+    * @param[in] transform     The new entity's transform.
+    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+    */
+    virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
 
     //=========================================================================================================
     /**
@@ -289,8 +311,6 @@ protected:
     float                                       m_fRotY;                 /**< The y axis rotation value. */
     float                                       m_fRotZ;                 /**< The z axis rotation value. */
     QVector3D                                   m_position;              /**< The position/translation value. */
-
-
 
 signals:
     //=========================================================================================================

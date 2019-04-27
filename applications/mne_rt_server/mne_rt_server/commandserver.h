@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the CommandServer Class.
+* @brief     Definition of the CommandServer Class.
 *
 */
 
@@ -41,8 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <realtime/rtCommand/commandparser.h>
-#include <realtime/rtCommand/commandmanager.h>
+#include <communication/rtCommand/commandparser.h>
+#include <communication/rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************
@@ -67,7 +67,7 @@ namespace RTSERVER
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace REALTIMELIB;
+using namespace COMMUNICATIONLIB;
 
 
 //*************************************************************************************************************

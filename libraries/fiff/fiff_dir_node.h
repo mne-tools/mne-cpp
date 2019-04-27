@@ -104,7 +104,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_copy_tree function
+    * ### MNE toolbox root function ###: Definition of the fiff_copy_tree function
     *
     * Copies directory subtrees from fidin to fidout
     *
@@ -130,8 +130,8 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE C function ###: implementation of the fiff_dir_tree_find
-    * ### MNE toolbox root function ###: implementation of the fiff_dir_tree_find function
+    * ### MNE C function ###: Definition of the fiff_dir_tree_find
+    * ### MNE toolbox root function ###: Definition of the fiff_dir_tree_find function
     *
     * Find nodes of the given kind from a directory tree structure
     *
@@ -143,8 +143,8 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE C function ###: implementation of the fiff_dir_tree_get_tag
-    * Implementation of the find_tag function in various files e.g. fiff_read_named_matrix.m,
+    * ### MNE C function ###: Definition of the fiff_dir_tree_get_tag
+    * Definition of the find_tag function in various files e.g. fiff_read_named_matrix.m,
     *
     * Founds a tag of a given kind within a tree, and reeds it from file.
     * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirNode
@@ -160,8 +160,8 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE C function ###: implementation of the fiff_dir_tree_get_tag
-    * Implementation of the find_tag function in various files e.g. fiff_read_named_matrix.m,
+    * ### MNE C function ###: Definition of the fiff_dir_tree_get_tag
+    * Definition of the find_tag function in various files e.g. fiff_read_named_matrix.m,
     *
     * Founds a tag of a given kind within a tree, and reeds it from file.
     * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirNode
@@ -177,7 +177,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Implementation of the has_tag function in fiff_read_named_matrix.m
+    * Definition of the has_tag function in fiff_read_named_matrix.m
     *
     * @param[in] findkind kind to find
     *

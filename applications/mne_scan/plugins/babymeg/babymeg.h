@@ -57,10 +57,10 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QVector>
-#include <QTimer>
-#include <QMutex>
+#include <QMessageBox>
+#include <QScrollBar>
+#include <QTime>
+#include <QPointer>
 
 
 //*************************************************************************************************************
@@ -70,7 +70,6 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <QQuaternion>
 
 
 //*************************************************************************************************************
@@ -79,11 +78,15 @@
 //=============================================================================================================
 
 namespace SCMEASLIB {
-    class NewRealTimeMultiSampleArray;
+    class RealTimeMultiSampleArray;
 }
 
-namespace SCDISPLIB {
-    class HPIWidget;
+namespace DISP3DLIB {
+    class HpiView;
+}
+
+namespace DISPLIB {
+    class ProjectSettingsView;
 }
 
 #define MAX_DATA_LEN    2000000000L
@@ -104,11 +107,9 @@ namespace BABYMEGPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BabyMEGProjectDialog;
 class BabyMEGClient;
 class BabyMEGInfo;
 class BabyMEGSetupWidget;
-class BabyMEGProjectDialog;
 class BabyMEGSQUIDControlDgl;
 
 
@@ -126,7 +127,6 @@ class BABYMEGSHARED_EXPORT BabyMEG : public SCSHAREDLIB::ISensor
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
     friend class BabyMEGSetupWidget;
-    friend class BabyMEGProjectDialog;
     friend class BabyMEGSQUIDControlDgl;
 
 public:
@@ -212,24 +212,6 @@ protected:
     * Initialize the connector.
     */
     void initConnector();
-
-    //=========================================================================================================
-    /**
-    * Returns the babyMEG file path which is to be written to.
-    *
-    * @param[in] currentTime    insert current time stamp.
-    *
-    * @return the storage filepath
-    */
-    QString getFilePath(bool currentTime = false) const;
-
-    //=========================================================================================================
-    /**
-    * Returns the path where the subjects folders are stored.
-    *
-    * @return the data path
-    */
-    QString getDataPath() const;
 
     //=========================================================================================================
     /**
@@ -325,6 +307,14 @@ protected:
 
     //=========================================================================================================
     /**
+    * Set the final file name including its full path.
+    *
+    * @param[in] sFileName   The new file name.
+    */
+    void setFileName(const QString& sFileName);
+
+    //=========================================================================================================
+    /**
     * Shows the project dialog/window.
     */
     void showProjectDialog();
@@ -399,16 +389,16 @@ protected:
     */
     void onRecordingRemainingTimeChange();
 
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<IOBUFFER::RawMatrixBuffer>                                   m_pRawMatrixBuffer; /**< Holds incoming raw data. */
 
-    QSharedPointer<BabyMEGClient>           m_pMyClient;                    /**< TCP/IP communication between Qt and Labview. */
-    QSharedPointer<BabyMEGClient>           m_pMyClientComm;                /**< TCP/IP communication between Qt and Labview - communication. */
-    QSharedPointer<BabyMEGInfo>             pInfo;                          /**< Set up the babyMEG info. */
-    QSharedPointer<BabyMEGProjectDialog>    m_pBabyMEGProjectDialog;        /**< Window to setup the recording tiem and fiel name. */
-    QSharedPointer<BabyMEGSQUIDControlDgl>  SQUIDCtrlDlg;                   /**< Nonmodal dialog for squid control. */
-    QSharedPointer<SCDISPLIB::HPIWidget>    m_pHPIWidget;                   /**< HPI widget. */
+    QSharedPointer<BabyMEGClient>                   m_pMyClient;                    /**< TCP/IP communication between Qt and Labview. */
+    QSharedPointer<BabyMEGClient>                   m_pMyClientComm;                /**< TCP/IP communication between Qt and Labview - communication. */
+    QSharedPointer<BabyMEGInfo>                     m_pInfo;                        /**< Set up the babyMEG info. */
+    QSharedPointer<DISPLIB::ProjectSettingsView>    m_pProjectSettingsView;         /**< Window to setup the recording tiem and fiel name. */
+    QSharedPointer<BabyMEGSQUIDControlDgl>          m_pSQUIDCtrlDlg;                /**< Nonmodal dialog for squid control. */
+    QSharedPointer<DISP3DLIB::HpiView>              m_pHPIWidget;                   /**< HPI widget. */
 
     QSharedPointer<QTimer>                  m_pUpdateTimeInfoTimer;         /**< timer to control remaining time. */
     QSharedPointer<QTimer>                  m_pBlinkingRecordButtonTimer;   /**< timer to control blinking recording button. */
@@ -428,10 +418,6 @@ protected:
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
     bool                                    m_bIsRunning;                   /**< If thread is running flag.*/
     bool                                    m_bDoContinousHPI;              /**< Whether to do continous HPI.*/
-    QString                                 m_sBabyMEGDataPath;             /**< The data storage path.*/
-    QString                                 m_sCurrentProject;              /**< The current project which is part of the filename to be recorded.*/
-    QString                                 m_sCurrentSubject;              /**< The current subject which is part of the filename to be recorded.*/
-    QString                                 m_sCurrentParadigm;             /**< The current paradigm which is part of the filename to be recorded.*/
     QString                                 m_sRecordFile;                  /**< Current record file. */
     QString                                 m_sFiffProjections;             /**< Fiff projection information */
     QString                                 m_sFiffCompensators;            /**< Fiff compensator information */
@@ -444,11 +430,11 @@ protected:
     Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
     Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
 
-    QAction*                m_pActionSetupProject;          /**< shows setup project dialog */
-    QAction*                m_pActionRecordFile;            /**< start recording action */
-    QAction*                m_pActionSqdCtrl;               /**< show squid control */
-    QAction*                m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
-    QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
+    QPointer<QAction>                       m_pActionSetupProject;          /**< shows setup project dialog */
+    QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action */
+    QPointer<QAction>                       m_pActionSqdCtrl;               /**< show squid control */
+    QPointer<QAction>                       m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
+    QPointer<QAction>                       m_pActionComputeHPI;            /**< The Action to show the HPI view */
 
 signals:
     //=========================================================================================================
@@ -471,7 +457,7 @@ signals:
     *
     * @param[in] tmp    data to squid control
     */
-    void DataToSquidCtrlGUI(Eigen::MatrixXf tmp);
+    void dataToSquidCtrlGUI(Eigen::MatrixXf tmp);
 
     //=========================================================================================================
     /**
@@ -479,7 +465,7 @@ signals:
     *
     * @param[in] DATA    data to squid control
     */
-    void SendCMDDataToSQUIDControl(QByteArray DATA);
+    void sendCMDDataToSQUIDControl(QByteArray DATA);
 };
 
 } // NAMESPACE

@@ -74,9 +74,9 @@ BrainAMPSetupWidget::BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget* parent)
 
     //Connect device sampling properties
     connect(ui.m_comboBox_SamplingFreq, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &BrainAMPSetupWidget::setDeviceSamplingProperties);
+            this, &BrainAMPSetupWidget::setSamplingFreq);
     connect(ui.m_spinBox_BlockSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &BrainAMPSetupWidget::setDeviceSamplingProperties);
+            this, &BrainAMPSetupWidget::setSamplesPerBlock);
 
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &BrainAMPSetupWidget::showAboutDialog);
@@ -116,9 +116,16 @@ void BrainAMPSetupWidget::initGui()
 
 //*************************************************************************************************************
 
-void BrainAMPSetupWidget::setDeviceSamplingProperties()
+void BrainAMPSetupWidget::setSamplingFreq()
 {
     m_pBrainAMP->m_iSamplingFreq = ui.m_comboBox_SamplingFreq->currentText().toInt();
+}
+
+
+//*************************************************************************************************************
+
+void BrainAMPSetupWidget::setSamplesPerBlock()
+{
     m_pBrainAMP->m_iSamplesPerBlock = ui.m_spinBox_BlockSize->value();
 }
 

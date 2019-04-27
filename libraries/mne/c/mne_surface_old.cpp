@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneSurfaceOld Class.
+* @brief    Definition of the MneSurfaceOld Class.
 *
 */
 

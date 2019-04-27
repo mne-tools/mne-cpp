@@ -147,7 +147,22 @@ public:
     * @return                              Interpolated values for all vertices of the mesh
     */
     static Eigen::VectorXf interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<float> > matInterpolationMatrix,
-                                             const Eigen::VectorXd &vecMeasurementData);
+                                             const QSharedPointer<Eigen::VectorXf> &vecMeasurementData);
+
+    //=========================================================================================================
+    /**
+    * The interpolation essentially corresponds to a matrix * vector multiplication. A vector of sensor data (i.e. a vector of double-values)
+    * is multiplied with the result of the <i>createInterpolationMat</i>.
+    * The result is a vector that contains interpolated values for all vertices of the mesh that was used to create the weight matrix,
+    * i.e. in first instance the distance table that the weight matrix is based on.
+    *
+    * @param[in] matInterpolationMatrix    The weight matrix which should be used for multiplying
+    * @param[in] vecMeasurementData        A vector with measured sensor data
+    *
+    * @return                              Interpolated values for all vertices of the mesh
+    */
+    static Eigen::VectorXf interpolateSignal(const Eigen::SparseMatrix<float> &matInterpolationMatrix,
+                                             const Eigen::VectorXf &vecMeasurementData);
 
     //=========================================================================================================
     /**

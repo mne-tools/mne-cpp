@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Label class.
+* @brief    Definition of the Label class.
 *
 */
 

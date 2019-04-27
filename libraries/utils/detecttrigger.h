@@ -114,7 +114,12 @@ public:
     *
     * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggersand corresponding signal values are written to the value of the map.
     */
-    static QMap<int, QList<QPair<int, double> > > detectTriggerFlanksMax(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset, int iBurstLengthSamp = 100);
+    static QMap<int, QList<QPair<int, double> > > detectTriggerFlanksMax(const MatrixXd &data,
+                                                                         const QList<int>& lTriggerChannels,
+                                                                         int iOffsetIndex,
+                                                                         double dThreshold,
+                                                                         bool bRemoveOffset,
+                                                                         int iBurstLengthSamp = 100);
 
     //=========================================================================================================
     /**
@@ -129,7 +134,12 @@ public:
     *
     * @param return     This list holds the found trigger indices and corresponding signal values.
     */
-    static QList<QPair<int,double> > detectTriggerFlanksMax(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset, int iBurstLengthSamp = 100);
+    static QList<QPair<int,double> > detectTriggerFlanksMax(const MatrixXd &data,
+                                                            int iTriggerChannelIdx,
+                                                            int iOffsetIndex,
+                                                            double dThreshold,
+                                                            bool bRemoveOffset,
+                                                            int iBurstLengthSamp = 100);
 
     //=========================================================================================================
     /**
@@ -145,7 +155,13 @@ public:
     *
     * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers and corresponding signal values are written to the value of the map.
     */
-    static QMap<int,QList<QPair<int,double> > > detectTriggerFlanksGrad(const MatrixXd &data, const QList<int>& lTriggerChannels, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type, int iBurstLengthSamp = 100);
+    static QMap<int,QList<QPair<int,double> > > detectTriggerFlanksGrad(const MatrixXd &data,
+                                                                        const QList<int>& lTriggerChannels,
+                                                                        int iOffsetIndex,
+                                                                        double dThreshold,
+                                                                        bool bRemoveOffset,
+                                                                        const QString& type,
+                                                                        int iBurstLengthSamp = 100);
 
     //=========================================================================================================
     /**
@@ -161,7 +177,13 @@ public:
     *
     * @param return     This list holds the found trigger indices and corresponding signal values.
     */
-    static QList<QPair<int,double> > detectTriggerFlanksGrad(const MatrixXd &data, int iTriggerChannelIdx, int iOffsetIndex, double dThreshold, bool bRemoveOffset, const QString& type, int iBurstLengthSamp = 100);
+    static QList<QPair<int,double> > detectTriggerFlanksGrad(const MatrixXd &data,
+                                                             int iTriggerChannelIdx,
+                                                             int iOffsetIndex,
+                                                             double dThreshold,
+                                                             bool bRemoveOffset,
+                                                             const QString& type,
+                                                             int iBurstLengthSamp = 100);
 };
 
 //*************************************************************************************************************

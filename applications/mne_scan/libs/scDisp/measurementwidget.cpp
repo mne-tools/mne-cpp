@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MeasurementWidget Class.
+* @brief    Definition of the MeasurementWidget Class.
 *
 */
 
@@ -40,6 +40,8 @@
 
 #include "measurementwidget.h"
 
+#include <disp/viewers/quickcontrolview.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -47,6 +49,7 @@
 //=============================================================================================================
 
 using namespace SCDISPLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -56,7 +59,6 @@ using namespace SCDISPLIB;
 
 MeasurementWidget::MeasurementWidget(QWidget* parent)
 : QWidget(parent)
-
 {
 
 }
@@ -67,4 +69,38 @@ MeasurementWidget::MeasurementWidget(QWidget* parent)
 MeasurementWidget::~MeasurementWidget()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void MeasurementWidget::addControlWidgets(QSharedPointer<DISPLIB::QuickControlView> pQuickControlView,
+                                          const QList<QSharedPointer<QWidget> >& lControlWidgets)
+{
+    if(!pQuickControlView) {
+        return;
+    }
+
+    for(int i = 0; i < lControlWidgets.size(); ++i) {
+        QString sObjectName = lControlWidgets.at(i)->objectName();
+
+        if(sObjectName.contains("widget_", Qt::CaseInsensitive)) {
+            pQuickControlView->addWidget(lControlWidgets.at(i));
+        }
+
+        if(sObjectName.contains("group_", Qt::CaseInsensitive)) {
+            if(sObjectName.contains("group_tab_", Qt::CaseInsensitive)) {
+                sObjectName.remove("group_tab_");
+                QStringList sList = sObjectName.split("_");
+                if(sList.size() >= 2) {
+                    pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), sList.at(0), sList.at(1));
+                } else {
+                    pQuickControlView->addGroupBoxWithTabs(lControlWidgets.at(i), "", sObjectName);
+                }
+            } else {
+                sObjectName.remove("group_");
+                pQuickControlView->addGroupBox(lControlWidgets.at(i), sObjectName);
+            }
+        }
+    }
 }

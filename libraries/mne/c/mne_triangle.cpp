@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MneTriangle Class.
+* @brief    Definition of the MneTriangle Class.
 *
 */
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains implementation of StartUpWidget class.
+* @brief    Contains Definition of StartUpWidget class.
 *
 */
 

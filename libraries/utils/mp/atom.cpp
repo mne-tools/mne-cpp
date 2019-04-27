@@ -132,7 +132,7 @@ MatrixXd Atom::make_tf(qint32 sample_count, qreal scale, quint32 translation, qr
 FixDictAtom::FixDictAtom(qint32 _id, qint32 _sample_count, QString _dict_source)
 : id(_id)
 , dict_source(dict_source)
-, type(AtomType::GABORATOM)
+, type(GABORATOM)
 , translation(0)
 {
     sample_count = _sample_count;
@@ -161,7 +161,7 @@ FixDictAtom::FixDictAtom(qint32 _id, qint32 _sample_count, QString _dict_source)
 FixDictAtom::FixDictAtom()
 : id(0)
 , dict_source("")
-, type(AtomType::GABORATOM)
+, type(GABORATOM)
 , translation(0)
 {
     gabor_atom.scale = 0;

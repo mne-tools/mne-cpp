@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FIFFEvoked Class.
+* @brief    Definition of the FIFFEvoked Class.
 *
 */
 
@@ -156,7 +156,11 @@ FiffEvoked FiffEvoked::pick_channels(const QStringList& include, const QStringLi
         selBlock.resize(sel.cols(), res.data.cols());
     for(qint32 l = 0; l < sel.cols(); ++l)
     {
-        selBlock.block(l,0,1,selBlock.cols()) = res.data.block(sel(0,l),0,1,selBlock.cols());
+        if(sel(0,l) <= res.data.rows()) {
+            selBlock.block(l,0,1,selBlock.cols()) = res.data.block(sel(0,l),0,1,selBlock.cols());
+        } else {
+            qWarning("FiffEvoked::pick_channels - Warning : Selected channel index out of bound.\n");
+        }
     }
     res.data.resize(sel.cols(), res.data.cols());
     res.data = selBlock;

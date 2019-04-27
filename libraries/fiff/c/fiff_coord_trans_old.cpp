@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffCoordTransOld Class.
+* @brief    Definition of the FiffCoordTransOld Class.
 *
 */
 

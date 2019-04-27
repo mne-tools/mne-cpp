@@ -43,9 +43,10 @@
 //=============================================================================================================
 
 #include "ui_chinfowindow.h"
-#include "fiff/fiff.h"
 
-#include "disp/helpers/chinfomodel.h"
+#include <fiff/fiff.h>
+
+#include <disp/viewers/helpers/channelinfomodel.h>
 
 
 //*************************************************************************************************************
@@ -107,9 +108,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the ChInfoModel of this window
+    * Returns the ChannelInfoModel of this window
     */
-    ChInfoModel::SPtr getDataModel();
+    ChannelInfoModel::SPtr getDataModel();
 
 private:
     //=========================================================================================================
@@ -128,7 +129,7 @@ private:
 
     Ui::ChInfoWindow*   ui;                 /**< Pointer to the qt designer generated ui class.*/
 
-    ChInfoModel::SPtr   m_pChInfoModel;     /**< The channel info model.*/
+    ChannelInfoModel::SPtr   m_pChannelInfoModel;     /**< The channel info model.*/
 };
 
 } // NAMESPACE MNEBROWSE

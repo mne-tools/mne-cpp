@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNEProjItem Class.
+* @brief    Definition of the MNEProjItem Class.
 *
 */
 

@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "scmeas_global.h"
-#include "newmeasurement.h"
+#include "measurement.h"
 
 
 //*************************************************************************************************************
@@ -73,6 +73,7 @@ namespace FIFFLIB {
 
 namespace MNELIB {
     class MNEForwardSolution;
+    class MNEBem;
 }
 
 namespace FSLIB {
@@ -96,7 +97,7 @@ namespace SCMEASLIB
 *
 * @brief Real-time source estimate measurement.
 */
-class SCMEASSHARED_EXPORT RealTimeConnectivityEstimate : public NewMeasurement
+class SCMEASSHARED_EXPORT RealTimeConnectivityEstimate : public Measurement
 {
 public:
     typedef QSharedPointer<RealTimeConnectivityEstimate> SPtr;               /**< Shared pointer type for RealTimeConnectivityEstimate. */
@@ -122,7 +123,7 @@ public:
     *
     * @param[in] annotSet   the annotation set to set
     */
-    inline void setAnnotSet(QSharedPointer<FSLIB::AnnotationSet>& annotSet);
+    inline void setAnnotSet(const QSharedPointer<FSLIB::AnnotationSet>& annotSet);
 
     //=========================================================================================================
     /**
@@ -134,11 +135,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the surface set.
+    * Sets the sensor surface.
+    *
+    * @param[in] sensorSurface   the sensor surface
+    */
+    inline void setSensorSurface(const QSharedPointer<MNELIB::MNEBem>& sensorSurface);
+
+    //=========================================================================================================
+    /**
+    * Returns the sensor surface.
+    *
+    * @return the sensor surfac
+    */
+    inline QSharedPointer<MNELIB::MNEBem>& getSensorSurface();
+
+    //=========================================================================================================
+    /**
+    * Sets the sensor surface.
     *
     * @param[in] surfSet   the surface set to set
     */
-    inline void setSurfSet(QSharedPointer<FSLIB::SurfaceSet>& surfSet);
+    inline void setSurfSet(const QSharedPointer<FSLIB::SurfaceSet>& surfSet);
 
     //=========================================================================================================
     /**
@@ -154,7 +171,7 @@ public:
     *
     * @param[in] fwdSolution   the forward solution to set
     */
-    inline void setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution>& fwdSolution);
+    inline void setFwdSolution(const QSharedPointer<MNELIB::MNEForwardSolution>& fwdSolution);
 
     //=========================================================================================================
     /**
@@ -171,7 +188,7 @@ public:
     *
     * @param [in] v the value which is attached to the sample array vector.
     */
-    virtual void setValue(CONNECTIVITYLIB::Network &v);
+    virtual void setValue(const CONNECTIVITYLIB::Network &v);
 
     //=========================================================================================================
     /**
@@ -196,7 +213,7 @@ public:
     *
     * @param [in] p_fiffInfo the new FiffInfo..
     */
-    void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> p_fiffInfo);
+    void setFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo>& p_fiffInfo);
 
     //=========================================================================================================
     /**
@@ -206,19 +223,18 @@ public:
     */
     QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo();
 
-    bool m_bConnectivitySend; /**< dirty hack */
-
 private:
-    mutable QMutex                              m_qMutex;       /**< Mutex to ensure thread safety */
+    mutable QMutex                              m_qMutex;           /**< Mutex to ensure thread safety */
 
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;    /**< The Fiff info. */
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The Fiff info. */
 
-    QSharedPointer<FSLIB::AnnotationSet>        m_pAnnotSet;    /**< Annotation set. */
-    QSharedPointer<FSLIB::SurfaceSet>           m_pSurfSet;     /**< Surface set. */
-    QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwdSolution; /**< Forward solution. */
+    QSharedPointer<FSLIB::AnnotationSet>        m_pAnnotSet;        /**< Annotation set. Needed for visualization. */
+    QSharedPointer<FSLIB::SurfaceSet>           m_pSurfSet;         /**< Surface set. Needed for visualization. */
+    QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwdSolution;     /**< Forward solution. Needed for visualization. */
+    QSharedPointer<MNELIB::MNEBem>              m_pSensorSurface;   /**< The sensor surface. Needed for visualization. */
 
-    QSharedPointer<CONNECTIVITYLIB::Network>    m_pNetwork;     /**< The network/connectivity estimate. */
-    bool                                        m_bInitialized; /**< Is initialized */
+    QSharedPointer<CONNECTIVITYLIB::Network>    m_pNetwork;         /**< The network/connectivity estimate. */
+    bool                                        m_bInitialized;     /**< Is initialized */
 };
 
 
@@ -227,7 +243,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void RealTimeConnectivityEstimate::setAnnotSet(QSharedPointer<FSLIB::AnnotationSet> &annotSet)
+inline void RealTimeConnectivityEstimate::setAnnotSet(const QSharedPointer<FSLIB::AnnotationSet> &annotSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pAnnotSet = annotSet;
@@ -245,7 +261,25 @@ inline QSharedPointer<FSLIB::AnnotationSet>& RealTimeConnectivityEstimate::getAn
 
 //*************************************************************************************************************
 
-inline void RealTimeConnectivityEstimate::setSurfSet(QSharedPointer<FSLIB::SurfaceSet> &surfSet)
+inline void RealTimeConnectivityEstimate::setSensorSurface(const QSharedPointer<MNELIB::MNEBem> &annotSet)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_pSensorSurface = annotSet;
+}
+
+
+//*************************************************************************************************************
+
+inline QSharedPointer<MNELIB::MNEBem>& RealTimeConnectivityEstimate::getSensorSurface()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_pSensorSurface;
+}
+
+
+//*************************************************************************************************************
+
+inline void RealTimeConnectivityEstimate::setSurfSet(const QSharedPointer<FSLIB::SurfaceSet> &surfSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pSurfSet = surfSet;
@@ -263,7 +297,7 @@ inline QSharedPointer<FSLIB::SurfaceSet>& RealTimeConnectivityEstimate::getSurfS
 
 //*************************************************************************************************************
 
-inline void RealTimeConnectivityEstimate::setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution> &fwdSolution)
+inline void RealTimeConnectivityEstimate::setFwdSolution(const QSharedPointer<MNELIB::MNEForwardSolution>& fwdSolution)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFwdSolution = fwdSolution;
@@ -290,7 +324,7 @@ inline bool RealTimeConnectivityEstimate::isInitialized() const
 
 //*************************************************************************************************************
 
-inline void RealTimeConnectivityEstimate::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> p_fiffInfo)
+inline void RealTimeConnectivityEstimate::setFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo>& p_fiffInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFiffInfo = p_fiffInfo;

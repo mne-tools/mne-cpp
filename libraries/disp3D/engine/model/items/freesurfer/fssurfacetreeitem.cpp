@@ -127,6 +127,8 @@ void FsSurfaceTreeItem::initItem()
     data.setValue(QColor(125,125,125));
     m_pItemSurfColGyri->setData(data, MetaTreeItemRoles::SurfaceColorGyri);
     m_pItemSurfColGyri->setData(data, Qt::DecorationRole);
+
+    this->setAlpha(1.0f);
 }
 
 

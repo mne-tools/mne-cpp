@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the Forward Thread Argument (FwdThreadArg) Class.
+* @brief    Definition of the Forward Thread Argument (FwdThreadArg) Class.
 *
 */
 

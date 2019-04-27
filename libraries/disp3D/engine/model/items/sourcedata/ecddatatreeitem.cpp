@@ -129,8 +129,6 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
 {
     //Plot dipoles
 
-    Renderable3DEntity* dipoleEntity = new Renderable3DEntity(this);
-
     //create geometry
     QSharedPointer<Qt3DExtras::QConeGeometry> pDipolGeometry = QSharedPointer<Qt3DExtras::QConeGeometry>::create();
     pDipolGeometry->setBottomRadius(0.001f);
@@ -179,13 +177,13 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
     //Set instance colors
     pDipolMesh->setColors(vColors);
 
-    dipoleEntity->addComponent(pDipolMesh);
+    this->addComponent(pDipolMesh);
 
     //Add material
     GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial;
     pMaterial->setAmbient(QColor(0,0,0));
     pMaterial->setAlpha(1.0f);
-    dipoleEntity->addComponent(pMaterial);
+    this->addComponent(pMaterial);
 }
 
 

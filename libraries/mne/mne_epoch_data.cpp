@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the MNEEpochData Class.
+* @brief     Definition of the MNEEpochData Class.
 *
 */
 
@@ -40,6 +40,8 @@
 
 #include "mne_epoch_data.h"
 
+#include <utils/mnemath.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -47,6 +49,8 @@
 //=============================================================================================================
 
 using namespace MNELIB;
+using namespace Eigen;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -58,6 +62,7 @@ MNEEpochData::MNEEpochData()
 : event(-1)
 , tmin(-1)
 , tmax(-1)
+, bReject(false)
 {
 
 }
@@ -70,6 +75,7 @@ MNEEpochData::MNEEpochData(const MNEEpochData &p_MNEEpochData)
 , event(p_MNEEpochData.event)
 , tmin(p_MNEEpochData.tmin)
 , tmax(p_MNEEpochData.tmax)
+, bReject(p_MNEEpochData.bReject)
 {
 
 }
@@ -79,4 +85,42 @@ MNEEpochData::MNEEpochData(const MNEEpochData &p_MNEEpochData)
 MNEEpochData::~MNEEpochData()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void MNEEpochData::applyBaselineCorrection(QPair<QVariant, QVariant>& baseline)
+{
+    // Run baseline correction
+    RowVectorXf times = RowVectorXf::LinSpaced(this->epoch.cols(), this->tmin, this->tmax);
+    this->epoch = MNEMath::rescale(this->epoch, times, baseline, QString("mean"));
+}
+
+
+//*************************************************************************************************************
+
+void MNEEpochData::pick_channels(const RowVectorXi& sel)
+{
+    if (sel.cols() == 0) {
+        qWarning("MNEEpochData::pick_channels - Warning : No channels were provided.\n");
+        return;
+    }
+
+    // Reduce data set
+    MatrixXd selBlock(1,1);
+
+    if(selBlock.rows() != sel.cols() || selBlock.cols() != epoch.cols()) {
+        selBlock.resize(sel.cols(), epoch.cols());
+    }
+
+    for(qint32 l = 0; l < sel.cols(); ++l) {
+        if(sel(l) <= epoch.rows()) {
+            selBlock.row(l) = epoch.row(sel(0,l));
+        } else {
+            qWarning("FiffEvoked::pick_channels - Warning : Selected channel index out of bound.\n");
+        }
+    }
+
+    epoch = selBlock;
 }

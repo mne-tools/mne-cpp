@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffStream Class.
+* @brief    Definition of the FiffStream Class.
 *
 */
 
@@ -1987,7 +1987,7 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
 
 //*************************************************************************************************************
 
-FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel, bool resetRange)
+FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel, bool bResetRange)
 {
     //
     //   We will always write floats
@@ -2145,29 +2145,17 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
     //    Channel info
     //
     cals = RowVectorXd(nchan);
-
-    if(resetRange)
+    for(k = 0; k < nchan; ++k)
     {
-        for(k = 0; k < nchan; ++k)
-        {
-            //
-            //    Scan numbers may have been messed up
-            //
-            chs[k].scanNo = k+1;//+1 because
-            chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
-            cals[k] = chs[k].cal;
-            t_pStream->write_ch_info(chs[k]);
+        //
+        //    Scan numbers may have been messed up
+        //
+        chs[k].scanNo = k+1;
+        if(bResetRange) {
+            chs[k].range = 1.0; // Reset to 1.0 because we always write floats.
         }
-    } else {
-        for(k = 0; k < nchan; ++k)
-        {
-            //
-            //    Scan numbers may have been messed up
-            //
-            chs[k].scanNo = k+1;//+1 because
-            cals[k] = chs[k].cal;
-            t_pStream->write_ch_info(chs[k]);
-        }
+        cals[k] = chs[k].cal;
+        t_pStream->write_ch_info(chs[k]);
     }
     //
     //
@@ -2946,7 +2934,6 @@ fiff_long_t FiffStream::write_info_base(const FiffInfoBase & p_FiffInfoBase)
         //    Scan numbers may have been messed up
         //
         chs[k].scanNo = k+1;//+1 because
-//        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
         this->write_ch_info(chs[k]);
     }
 

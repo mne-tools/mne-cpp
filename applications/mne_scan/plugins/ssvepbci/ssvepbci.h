@@ -47,8 +47,8 @@
 
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <utils/generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimesamplearray.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimesamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimesourceestimate.h>
 #include <utils/filterTools/filterdata.h>
 
@@ -216,7 +216,7 @@ protected:
     *
     * @param [in] pMeasurement measurement object.
     */
-    void updateSensor(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateSensor(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -224,7 +224,7 @@ protected:
     *
     * @param [in] pMeasurement measurement object.
     */
-    void updateSource(SCMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateSource(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -398,7 +398,7 @@ private:
     QSharedPointer<SsvepBciConfigurationWidget>         m_pSsvepBciConfigurationWidget;     /**< Holds pointer to Widget for BCI configuration. */
     QSharedPointer<SsvepBciSetupStimulusWidget>         m_pSsvepBciSetupStimulusWidget;     /**< Widget for stimulus setup */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
@@ -455,11 +455,11 @@ private:
     bool                                m_bInitializeSource;                /**< Source level: initalizie parameter for processing on source level. */
 
     // output
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeSampleArray>::SPtr      m_pBCIOutputOne;        /**< The first RealTimeSampleArray of the BCI output.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeSampleArray>::SPtr      m_pBCIOutputTwo;        /**< The second RealTimeSampleArray of the BCI output.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeSampleArray>::SPtr      m_pBCIOutputThree;      /**< The third RealTimeSampleArray of the BCI output.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeSampleArray>::SPtr      m_pBCIOutputFour;       /**< The fourth RealTimeSampleArray of the BCI output.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeSampleArray>::SPtr      m_pBCIOutputFive;       /**< The fifth RealTimeSampleArray of the BCI output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSampleArray>::SPtr      m_pBCIOutputOne;        /**< The first RealTimeSampleArray of the BCI output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSampleArray>::SPtr      m_pBCIOutputTwo;        /**< The second RealTimeSampleArray of the BCI output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSampleArray>::SPtr      m_pBCIOutputThree;      /**< The third RealTimeSampleArray of the BCI output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSampleArray>::SPtr      m_pBCIOutputFour;       /**< The fourth RealTimeSampleArray of the BCI output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSampleArray>::SPtr      m_pBCIOutputFive;       /**< The fifth RealTimeSampleArray of the BCI output.*/
 
 };
 

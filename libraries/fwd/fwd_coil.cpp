@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FwdCoil Class.
+* @brief    Definition of the FwdCoil Class.
 *
 */
 
@@ -40,6 +40,7 @@
 
 #include "fwd_coil.h"
 #include <fiff/fiff_types.h>
+#include <stdio.h>
 
 
 //*************************************************************************************************************

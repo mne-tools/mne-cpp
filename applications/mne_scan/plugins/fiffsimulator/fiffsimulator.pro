@@ -57,7 +57,11 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Realtimed \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd \
+            -lMNE$${MNE_LIB_VERSION}RtProcessingd \
+            -lMNE$${MNE_LIB_VERSION}Communicationd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd \
             -lscMeasd \
             -lscDispd \
             -lscSharedd
@@ -69,7 +73,11 @@ else {
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Realtime \
+            -lMNE$${MNE_LIB_VERSION}Connectivity \
+            -lMNE$${MNE_LIB_VERSION}RtProcessing \
+            -lMNE$${MNE_LIB_VERSION}Communication \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}Disp3D \
             -lscMeas \
             -lscDisp \
             -lscShared
@@ -98,18 +106,9 @@ RESOURCE_FILES +=\
     $${ROOT_DIR}/resources/mne_scan/plugins/FiffSimulator/inputFile.txt \
     $${ROOT_DIR}/resources/mne_scan/plugins/FiffSimulator/VectorViewSimLayout.xml \
 
-# Copy resource files to bin resource folder
-for(FILE, RESOURCE_FILES) {
-    FILEDIR = $$dirname(FILE)
-    FILEDIR ~= s,/resources,/bin/resources,g
-    FILEDIR = $$shell_path($${FILEDIR})
-    TRGTDIR = $${FILEDIR}
-
-    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
-
-    FILE = $$shell_path($${FILE})
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
-}
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -128,3 +127,23 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
+
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}

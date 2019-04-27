@@ -80,6 +80,7 @@ namespace QtCore {
         class QMatrix4x4;
 }
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
@@ -137,56 +138,45 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the transformation matrix for each instance of the geometry.
-     * It can be used to translate, scale and rotate each instance individually.
-     *
-     * @param tInstanceTansform         Transformation matrix.
-     */
+    * Sets the transformation matrix for each instance of the geometry.
+    * It can be used to translate, scale and rotate each instance individually.
+    *
+    * @param tInstanceTansform         Transformation matrix.
+    */
     void setTransforms(const QVector<QMatrix4x4> &tInstanceTansform);
 
     //=========================================================================================================
     /**
-     * Sets the color for each instance of the geometry.
-     *
-     * @param tInstanceColors           Color of the geometry;
-     */
+    * Sets the color for each instance of the geometry.
+    *
+    * @param tInstanceColors           Color of the geometry;
+    */
     void setColors(const QVector<QColor> &tInstanceColors);
 
-protected:
-
 private:
-
     //=========================================================================================================
     /**
-     * Initialize GeometryMultiplier object.
-     */
+    * Initialize GeometryMultiplier object.
+    */
     void init();
 
     //=========================================================================================================
     /**
-     * Builds the transform matrix buffer content.
-     *
-     * @param tInstanceTransform        Transformation matrix for each instance.
-     * @return                          buffer content.
-     */
+    * Builds the transform matrix buffer content.
+    *
+    * @param tInstanceTransform        Transformation matrix for each instance.
+    * @return                          buffer content.
+    */
     QByteArray buildTransformBuffer(const QVector<QMatrix4x4> &tInstanceTransform);
 
     //=========================================================================================================
     /**
-     * Builds color buffer content.
-     *
-     * @param tInstanceColor            Color for each instance.
-     * @return                          buffer content.
-     */
+    * Builds color buffer content.
+    *
+    * @param tInstanceColor            Color for each instance.
+    * @return                          buffer content.
+    */
     QByteArray buildColorBuffer(const QVector<QColor> &tInstanceColor);
-
-    //=========================================================================================================
-    /**
-     * Updates the instance count and warns about instance count mismatch.
-     * @param tCount                    The new count.
-     */
-    void updateInstanceCount(const uint tCount);
-
 
     QSharedPointer<Qt3DRender::QGeometry>           m_pGeometry;
 

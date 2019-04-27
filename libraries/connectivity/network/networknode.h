@@ -109,27 +109,51 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the ingoing edges.
+    * Returns the ingoing edges corresponding to the full network.
     *
     * @return   Returns the list with all ingoing edges.
     */
-    const QList<QSharedPointer<NetworkEdge> >& getEdgesIn() const;
+    const QList<QSharedPointer<NetworkEdge> >& getFullEdges() const;
 
     //=========================================================================================================
     /**
-    * Returns the outgoing edges.
+    * Returns the ingoing edges corresponding to the thresholded network.
+    *
+    * @return   Returns the list with all ingoing edges.
+    */
+    QList<QSharedPointer<NetworkEdge> > getThresholdedEdges() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the ingoing edges corresponding to the full network.
+    *
+    * @return   Returns the list with all ingoing edges.
+    */
+    QList<QSharedPointer<NetworkEdge> > getFullEdgesIn() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the ingoing edges corresponding to the thresholded network.
+    *
+    * @return   Returns the list with all ingoing edges.
+    */
+    QList<QSharedPointer<NetworkEdge> > getThresholdedEdgesIn() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the outgoing edges corresponding to the full network.
     *
     * @return   Returns the list with all outgoing edges.
     */
-    const QList<QSharedPointer<NetworkEdge>>& getEdgesOut() const;
+    QList<QSharedPointer<NetworkEdge> > getFullEdgesOut() const;
 
     //=========================================================================================================
     /**
-    * Returns the number of all edges.
+    * Returns the outgoing edges corresponding to the thresholded network.
     *
-    * @return   Returns the number of all edges.
+    * @return   Returns the list with all outgoing edges.
     */
-    int getNumberEdges() const;
+    QList<QSharedPointer<NetworkEdge> > getThresholdedEdgesOut() const;
 
     //=========================================================================================================
     /**
@@ -149,51 +173,99 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns node degree.
+    * Returns node degree corresponding to the full network.
     *
     * @return   The node degree calculated as the number of edges connected to a node (undirected gaph).
     */
-    qint16 getDegree() const;
+    qint16 getFullDegree() const;
 
     //=========================================================================================================
     /**
-    * Returns node indegree.
+    * Returns node degree corresponding to the thresholded network.
+    *
+    * @return   The node degree calculated as the number of edges connected to a node (undirected gaph).
+    */
+    qint16 getThresholdedDegree() const;
+
+    //=========================================================================================================
+    /**
+    * Returns node indegree corresponding to the full network.
     *
     * @return   The node degree calculated as the number of incoming edges (only in directed graphs).
     */
-    qint16 getIndegree() const;
+    qint16 getFullIndegree() const;
 
     //=========================================================================================================
     /**
-    * Returns node outdegree.
+    * Returns node indegree corresponding to the thresholded network.
+    *
+    * @return   The node degree calculated as the number of incoming edges (only in directed graphs).
+    */
+    qint16 getThresholdedIndegree() const;
+
+    //=========================================================================================================
+    /**
+    * Returns node outdegree corresponding to the full network.
     *
     * @return   The node degree calculated as the number of outgoing edges (only in directed graphs).
     */
-    qint16 getOutdegree() const;
+    qint16 getFullOutdegree() const;
 
     //=========================================================================================================
     /**
-    * Returns node strength.
+    * Returns node outdegree corresponding to the thresholded network.
+    *
+    * @return   The node degree calculated as the number of outgoing edges (only in directed graphs).
+    */
+    qint16 getThresholdedOutdegree() const;
+
+    //=========================================================================================================
+    /**
+    * Returns node strength corresponding to the full network.
     *
     * @return   The node strength calculated as the sum of all weights of all edges of a node.
     */
-    double getStrength() const;
+    double getFullStrength() const;
 
     //=========================================================================================================
     /**
-    * Returns node strength of all ingoing edges.
+    * Returns node strength corresponding to the thresholded network.
+    *
+    * @return   The node strength calculated as the sum of all weights of all edges of a node.
+    */
+    double getThresholdedStrength() const;
+
+    //=========================================================================================================
+    /**
+    * Returns node strength of all ingoing edges corresponding to the full network.
     *
     * @return   The node strength calculated as the sum of all weights of all ingoing edges of a node.
     */
-    double getInstrength() const;
+    double getFullInstrength() const;
 
     //=========================================================================================================
     /**
-    * Returns node strength of all outgoing edges.
+    * Returns node strength of all ingoing edges corresponding to the thresholded network.
+    *
+    * @return   The node strength calculated as the sum of all weights of all ingoing edges of a node.
+    */
+    double getThresholdedInstrength() const;
+
+    //=========================================================================================================
+    /**
+    * Returns node strength of all outgoing edges corresponding to the full network.
     *
     * @return   The node strength calculated as the sum of all weights of all outgoing edges of a node.
     */
-    double getOutstrength() const;
+    double getFullOutstrength() const;
+
+    //=========================================================================================================
+    /**
+    * Returns node strength of all outgoing edges corresponding to the thresholded network.
+    *
+    * @return   The node strength calculated as the sum of all weights of all outgoing edges of a node.
+    */
+    double getThresholdedOutstrength() const;
 
     //=========================================================================================================
     /**
@@ -213,11 +285,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Overloaded stream operator to add a network edge to this network node.
+    * Appends a network edge to this network node. Automatically decides whether to add to the in or out edges.
     *
-    * @param[in] newEdge    The new edge item as a reference.
+    * @param[in] newEdge    The new edge item.
     */
-    NetworkNode &operator<<(QSharedPointer<NetworkEdge> newEdge);
+    void append(QSharedPointer<NetworkEdge> newEdge);
 
 protected:
     bool                                    m_bIsHub;       /**< Whether this node is a hub.*/
@@ -226,8 +298,7 @@ protected:
 
     Eigen::RowVectorXf                      m_vecVert;      /**< The 3D position of the node.*/
 
-    QList<QSharedPointer<NetworkEdge> >     m_lEdgesIn;     /**< List with all incoming edges of the node.*/
-    QList<QSharedPointer<NetworkEdge> >     m_lEdgesOut;    /**< List with all outgoing edges of the node.*/
+    QList<QSharedPointer<NetworkEdge> >     m_lEdges;     /**< List with all incoming edges of the node.*/
 };
 
 

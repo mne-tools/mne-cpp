@@ -153,14 +153,30 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
 //*************************************************************************************************************
 
 VectorXf Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<float> > matInterpolationMatrix,
-                                          const VectorXd &vecMeasurementData)
+                                          const QSharedPointer<VectorXf> &vecMeasurementData)
 {
-    if (matInterpolationMatrix->cols() != vecMeasurementData.rows()) {
+    if (matInterpolationMatrix->cols() != vecMeasurementData->rows()) {
         qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
         return VectorXf();
     }
 
-    VectorXf pOutVec = *matInterpolationMatrix * vecMeasurementData.cast<float>();
+    VectorXf pOutVec = *matInterpolationMatrix * (*vecMeasurementData);
+
+    return pOutVec;
+}
+
+
+//*************************************************************************************************************
+
+VectorXf Interpolation::interpolateSignal(const SparseMatrix<float> &matInterpolationMatrix,
+                                          const VectorXf &vecMeasurementData)
+{
+    if (matInterpolationMatrix.cols() != vecMeasurementData.rows()) {
+        qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
+        return VectorXf();
+    }
+
+    VectorXf pOutVec = matInterpolationMatrix * vecMeasurementData;
 
     return pOutVec;
 }

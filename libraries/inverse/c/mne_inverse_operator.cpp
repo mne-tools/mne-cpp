@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the MNE Patch Information (MnePatchInfo) Class.
+* @brief    Definition of the MNE Patch Information (MnePatchInfo) Class.
 *
 */
 

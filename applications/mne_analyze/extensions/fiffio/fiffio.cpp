@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the FiffIO class.
+* @brief    Definition of the FiffIO class.
 *
 */
 

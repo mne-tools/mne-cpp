@@ -44,7 +44,7 @@
 
 #include "pluginoutputdata.h"
 
-#include <scMeas/newmeasurement.h>
+#include <scMeas/measurement.h>
 
 #include <QDebug>
 #include <QSharedPointer>
@@ -76,12 +76,12 @@ PluginOutputData<T>::PluginOutputData(IPlugin *parent, const QString &name, cons
 {
     m_pMeasurement = QSharedPointer<T>(new T);
 
-    QSharedPointer<SCMEASLIB::NewMeasurement> t_measurement = qSharedPointerDynamicCast<SCMEASLIB::NewMeasurement>(m_pMeasurement);
+    QSharedPointer<SCMEASLIB::Measurement> t_measurement = qSharedPointerDynamicCast<SCMEASLIB::Measurement>(m_pMeasurement);
 
     if(t_measurement.isNull())
         qFatal("Template type is not a measurement and therefor not supported!");
     else
-        connect(t_measurement.data(), &SCMEASLIB::NewMeasurement::notify, this, &PluginOutputData<T>::update, Qt::DirectConnection);
+        connect(t_measurement.data(), &SCMEASLIB::Measurement::notify, this, &PluginOutputData<T>::update, Qt::DirectConnection);
 }
 
 
@@ -90,7 +90,7 @@ PluginOutputData<T>::PluginOutputData(IPlugin *parent, const QString &name, cons
 template <class T>
 void PluginOutputData<T>::update()
 {
-    emit notify(qSharedPointerDynamicCast<SCMEASLIB::NewMeasurement>(m_pMeasurement));
+    emit notify(qSharedPointerDynamicCast<SCMEASLIB::Measurement>(m_pMeasurement));
 }
 
 }//Namespace

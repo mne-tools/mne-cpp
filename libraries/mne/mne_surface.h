@@ -128,7 +128,7 @@ public:
 
     //=========================================================================================================
     /**
-     * ### MNE toolbox root function ###: Implementation of the mne_read_bem_surfaces function
+     * ### MNE toolbox root function ###: Definition of the mne_read_bem_surfaces function
      *
      * Reads a BEM surface from a fif stream
      *

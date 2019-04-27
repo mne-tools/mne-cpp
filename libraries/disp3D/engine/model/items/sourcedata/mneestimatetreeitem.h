@@ -1,4 +1,4 @@
-//=============================================================================================================
+ //=============================================================================================================
 /**
 * @file     mneestimatetreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
@@ -53,6 +53,7 @@
 //=============================================================================================================
 
 #include <QPointer>
+#include <Qt3DCore/QTransform>
 
 
 //*************************************************************************************************************
@@ -78,6 +79,7 @@ namespace FSLIB {
 
 namespace Qt3DCore {
     class QEntity;
+    class QTransform;
 }
 
 
@@ -123,7 +125,7 @@ public:
     * @param[in] bUseGPU    Whether to use the GPU to visualize the data.
     */
     explicit MneEstimateTreeItem(int iType = Data3DTreeModelItemTypes::MNEEstimateItem,
-                                 const QString& text = "MNE data",
+                                 const QString& text = "MNE",
                                  bool bUseGPU = false);
 
     //=========================================================================================================
@@ -242,6 +244,48 @@ public:
     * @param[in] dSFreq                 The new sampling frequency.
     */
     void setSFreq(const double dSFreq);
+
+    //=========================================================================================================
+    /**
+    * Set the alpha value.
+    *
+    * @param[in] fAlpha    The new alpha value.
+    */
+    void setAlpha(float fAlpha);
+
+    //=========================================================================================================
+    /**
+    * Sets the entity's transformation. This will clear the old transformation.
+    *
+    * @param[in] transform     The new entity's transform.
+    */
+    virtual void setTransform(const Qt3DCore::QTransform &transform);
+
+    //=========================================================================================================
+    /**
+    * Sets the entity's transformation. This will clear the old transformation.
+    *
+    * @param[in] transform     The new entity's transform.
+    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+    */
+    virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
+
+    //=========================================================================================================
+    /**
+    * Applies a transformation o ntop of the present one.
+    *
+    * @param[in] transform     The new entity's transform.
+    */
+    virtual void applyTransform(const Qt3DCore::QTransform& transform);
+
+    //=========================================================================================================
+    /**
+    * Applies a transformation o ntop of the present one.
+    *
+    * @param[in] transform     The new entity's transform.
+    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+    */
+    virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
 
 protected:
     //=========================================================================================================

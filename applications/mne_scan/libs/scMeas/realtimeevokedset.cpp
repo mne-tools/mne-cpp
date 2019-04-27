@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeEvokedSet class.
+* @brief    Definition of the RealTimeEvokedSet class.
 *
 */
 
@@ -64,7 +64,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 RealTimeEvokedSet::RealTimeEvokedSet(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeEvokedSet::SPtr"), parent)
+: Measurement(QMetaType::type("RealTimeEvokedSet::SPtr"), parent)
 , m_pFiffEvokedSet(new FiffEvokedSet)
 , m_bInitialized(false)
 , m_iPreStimSamples(0)
@@ -132,11 +132,23 @@ FiffEvokedSet::SPtr& RealTimeEvokedSet::getValue()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedSet::setValue(FiffEvokedSet& v, FiffInfo::SPtr p_fiffinfo)
+const QStringList& RealTimeEvokedSet::getResponsibleTriggerTypes()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_lResponsibleTriggerTypes;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedSet::setValue(const FiffEvokedSet &v,
+                                 const FiffInfo::SPtr &p_fiffinfo,
+                                 const QStringList &lResponsibleTriggerTypes)
 {
     //Store
     m_qMutex.lock();
     *m_pFiffEvokedSet = v;
+    m_lResponsibleTriggerTypes = lResponsibleTriggerTypes;
     m_qMutex.unlock();
 
     if(!m_bInitialized)

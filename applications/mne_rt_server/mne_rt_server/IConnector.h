@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
-#include <realtime/rtCommand/commandmanager.h>
+#include <communication/rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************
@@ -106,7 +106,7 @@ enum ConnectorID
 //=============================================================================================================
 
 using namespace FIFFLIB;
-using namespace REALTIMELIB;
+using namespace COMMUNICATIONLIB;
 using namespace Eigen;
 
 

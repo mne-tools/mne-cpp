@@ -196,7 +196,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_end_block function
+    * ### MNE toolbox root function ###: Definition of the fiff_end_block function
     *
     * Writes a FIFF_BLOCK_END tag
     *
@@ -216,7 +216,7 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Implementation of the fiff_finish_writing_raw function
+    * ### MNE toolbox root function ###: Definition of the fiff_finish_writing_raw function
     *
     * Finishes a raw file by writing all necessary end tags.
     *
@@ -516,15 +516,19 @@ public:
     *
     * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
     *
-    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
     * @param[in] info           The measurement info block of the source file
-    * @param[out] cals          Thecalibration matrix
+    * @param[out] cals          A copy of the calibration values
     * @param[in] sel            Which channels will be included in the output file (optional)
-    * @param[in] resetRange     Flag if the channel range is to be resetted to 1.0f (TODO: The flag was introduced due to conformity to the babyMEG system. See Limin commit from Oct 1st 2014)
+    * @param[in] bResetRange    Flag whether to reset the channel range to 1.0. Default is true.
     *
     * @return the started fiff file
     */
-    static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel = defaultMatrixXi, bool resetRange = false);
+    static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice,
+                                              const FiffInfo& info,
+                                              RowVectorXd& cals,
+                                              MatrixXi sel = defaultMatrixXi,
+                                              bool bResetRange = true);
 
     //=========================================================================================================
     /**

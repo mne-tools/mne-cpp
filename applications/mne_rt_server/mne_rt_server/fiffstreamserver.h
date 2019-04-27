@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the FiffStreamServer Class.
+* @brief     Declaration of the FiffStreamServer Class.
 *
 */
 
@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
-#include <realtime/rtCommand/commandmanager.h>
+#include <communication/rtCommand/commandmanager.h>
 
 
 //*************************************************************************************************************
@@ -68,7 +68,7 @@ namespace RTSERVER
 //=============================================================================================================
 
 using namespace FIFFLIB;
-using namespace REALTIMELIB;
+using namespace COMMUNICATIONLIB;
 
 
 //*************************************************************************************************************

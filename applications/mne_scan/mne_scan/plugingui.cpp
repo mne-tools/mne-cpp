@@ -263,13 +263,13 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
                     PluginItem* endItem = Q_NULLPTR;
                     for(qint32 i = 0; i < m_pPluginScene->items().size(); ++i)
                     {
-                        PluginItem* item = qgraphicsitem_cast<PluginItem *>(m_pPluginScene->items()[i]);
-                        if(item->plugin()->getName() == sSender)
-                            startItem = item;
+                        if(PluginItem* item = qgraphicsitem_cast<PluginItem *>(m_pPluginScene->items()[i])) {
+                            if(item->plugin()->getName() == sSender)
+                                startItem = item;
 
-                        if(item->plugin()->getName() == sReceiver)
-                            endItem = item;
-
+                            if(item->plugin()->getName() == sReceiver)
+                                endItem = item;
+                        }
                     }
 
                     if(!startItem || !endItem)
@@ -361,7 +361,6 @@ void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
 
 
 //*************************************************************************************************************
-
 
 void PluginGui::uiSetupRunningState(bool state)
 {

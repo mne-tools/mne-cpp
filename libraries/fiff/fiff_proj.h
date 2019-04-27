@@ -135,7 +135,7 @@ public:
     *
     * ToDo move this to fiff_proj; Before: check if info is needed and if make_projector_info should be also moved.
     *
-    * ### MNE toolbox root function ### Implementation of the mne_make_projector function
+    * ### MNE toolbox root function ### Definition of the mne_make_projector function
     *
     * Make an SSP operator
     *

@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/adapters/abstractview.h>
+#include <disp3D/viewers/abstractview.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <mne/mne_forwardsolution.h>
@@ -88,11 +88,11 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Read Forward and Visualize in 3D Example");
     parser.addHelpOption();
 
-    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption surfOption("surfType", "Surface type <type>.", "type", "orig");
     QCommandLineOption annotOption("annotType", "Annotation type <type>.", "type", "aparc.a2009s");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
-    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "./MNE-sample-data/subjects");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
 
     parser.addOption(fwdFileOption);
@@ -111,14 +111,16 @@ int main(int argc, char *argv[])
     AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
     Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
 
-    //Option 1 - Visualize full source space
-    p3DDataModel->addForwardSolution(parser.value(subjectOption), "FullForwardSolution", t_forwardSolution);
+//    //Option 1 - Visualize full source space
+//    p3DDataModel->addForwardSolution(parser.value(subjectOption), "FullForwardSolution", t_forwardSolution);
 
-//    //Option 2 - Visualize clustered source space
-//    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+    //Option 2 - Visualize clustered source space
+    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
-//    MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
-//    p3DDataModel->addForwardSolution(parser.value(subjectOption), "ClusteredForwardSolution", t_clusteredFwd);
+    MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
+    p3DDataModel->addForwardSolution(parser.value(subjectOption), "ClusteredForwardSolution", t_clusteredFwd);
+    p3DDataModel->addForwardSolution(parser.value(subjectOption), "ForwardSolution", t_forwardSolution);
+
 
     //Visualize result in 3D
     p3DAbstractView->show();

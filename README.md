@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="http://www.mne-cpp.org/wp-content/uploads/2016/06/MNE-CPP_GitHub_Logo.png" width="600" height="300" alt="MNE-CPP"><br><br>
+  <img src="/tools/design/logos/MNE-CPP_Logo.svg" width="400" height="200" alt="MNE-CPP"><br><br>
 </div>
 
 -----------------
@@ -36,7 +36,7 @@ Requirements
 Dependencies
 ------------
 
-[>= Qt 5.9.1](http://download.qt.io/official_releases/qt/)
+[>= Qt 5.10](http://download.qt.io/official_releases/qt/5.10/)
 
 
 Contact
@@ -58,7 +58,7 @@ License
 
 MNE-CPP is available under the **BSD-3-Clause** open source license:
 
-Copyright (C) 2010-2017, <a href="https://www.mne-cpp.org/index.php/team/" target="_blank">Authors</a> of MNE-CPP.
+Copyright (C) 2010-2019, <a href="https://www.mne-cpp.org/index.php/team/" target="_blank">Authors</a> of MNE-CPP.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

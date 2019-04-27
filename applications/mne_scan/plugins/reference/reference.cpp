@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the Reference class.
+* @brief    Definition of the Reference class.
 *
 */
 
@@ -98,13 +98,13 @@ QSharedPointer<IPlugin> Reference::clone() const
 void Reference::init()
 {
     // Input
-    m_pRefInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "ReferenceIn", "Reference input data");
+    m_pRefInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "ReferenceIn", "Reference input data");
     connect(m_pRefInput.data(), &PluginInputConnector::notify, this, &Reference::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pRefInput);
 
     // Output - Uncomment this if you don't want to send processed data (in form of a matrix) to other plugins.
     // Also, this output stream will generate an online display in your plugin
-    m_pRefOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "ReferenceOut", "Reference output data");
+    m_pRefOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "ReferenceOut", "Reference output data");
     m_outputConnectors.append(m_pRefOutput);
 
     //Delete Buffer - will be initailzed with first incoming data
@@ -180,9 +180,9 @@ QWidget* Reference::setupWidget()
 
 //*************************************************************************************************************
 
-void Reference::update(SCMEASLIB::NewMeasurement::SPtr pMeasurement)
+void Reference::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
         //Check if buffer initialized
