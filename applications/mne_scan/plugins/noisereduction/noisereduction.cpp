@@ -268,7 +268,6 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     m_pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(m_pRTMSA) {
-        qInfo() << m_iBlockNumber++ << "NoiseReduction Received";
         //Check if buffer initialized
         if(!m_pNoiseReductionBuffer) {
             m_pNoiseReductionBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, m_pRTMSA->getNumChannels(), m_pRTMSA->getMultiSampleArray()[0].cols()));
@@ -310,6 +309,7 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         MatrixXd t_mat;
+        qInfo() << m_iBlockNumber++ << "NoiseReduction Received";
 
         for(unsigned char i = 0; i < m_pRTMSA->getMultiArraySize(); ++i) {
             t_mat = m_pRTMSA->getMultiSampleArray()[i];
@@ -711,7 +711,6 @@ void NoiseReduction::run()
 
             t_mat = m_matSparseSpharaMult * t_mat;
         }
-        qInfo() << m_iBlockNumber << "NoiseReduction Processed";
 
 //        //Common average
 //        MatrixXd commonAvr = MatrixXd(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
@@ -738,6 +737,7 @@ void NoiseReduction::run()
         m_mutex.unlock();
 
         //Send the data to the connected plugins and the online display
+        qInfo() << m_iBlockNumberB++ << "NoiseReduction Processed";
         m_pNoiseReductionOutput->data()->setValue(t_mat);
     }
 }
