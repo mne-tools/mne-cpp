@@ -455,7 +455,6 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
     if(!pRTES) {
         return;
     }
-    qInfo() << m_iBlockNumber++ << "MNE Received";
 
     QMutexLocker locker(&m_qMutex);
 
@@ -485,6 +484,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
         for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
             if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                 //qDebug()<<"MNE::updateRTE - average found type" << m_sAvrType;
+                qInfo() << m_iBlockNumber++ << "MNE Received";
                 m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
                 break;
             }

@@ -222,6 +222,7 @@ protected:
     OutputConnectorList m_outputConnectors;  /**< Set of output connectors associated with this plug-in. */
 
     int m_iBlockNumber = 0;
+    int m_iBlockNumberB = 0;
 private:
     QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions */
 };
