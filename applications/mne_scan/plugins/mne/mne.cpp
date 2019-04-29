@@ -433,7 +433,7 @@ void MNE::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 
     //MEG
     if(pRTC && m_bReceiveData) {
-        qInfo() << m_iBlockNumberReceivedTwo++ << "MNE ReceivedTwo";
+        qInfo() << m_iBlockNumberReceivedTwo++ << "MNE CovReceived";
 
         // Init Real-Time inverse estimator
         if(!m_pRtInvOp && m_pFiffInfo && m_pClusteredFwd) {
