@@ -396,8 +396,13 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
-    if(pRTMSA && m_bReceiveData) {
-        qInfo() << m_iBlockNumber++ << "MNE Received";
+    if(pRTMSA) {
+
+        qInfo() << m_iBlockNumberReceived++ << "MNE Received";
+
+        if(!m_bReceiveData) {
+            return;
+        }
 
         //Check if buffer initialized
         if(!m_pMatrixDataBuffer) {
@@ -412,6 +417,7 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 
         if(m_bProcessData) {
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
+                qInfo() << m_iBlockNumberStartedProcessing++ << "MNE StartedProcessing";
                 m_pMatrixDataBuffer->push(&pRTMSA->getMultiSampleArray()[i]);
             }
         }
@@ -427,6 +433,8 @@ void MNE::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 
     //MEG
     if(pRTC && m_bReceiveData) {
+        qInfo() << m_iBlockNumberReceivedTwo++ << "MNE ReceivedTwo";
+
         // Init Real-Time inverse estimator
         if(!m_pRtInvOp && m_pFiffInfo && m_pClusteredFwd) {
             m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
@@ -455,6 +463,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
     if(!pRTES) {
         return;
     }
+    qInfo() << m_iBlockNumberReceived++ << "MNE Received";
 
     QMutexLocker locker(&m_qMutex);
 
@@ -484,7 +493,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
         for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
             if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                 //qDebug()<<"MNE::updateRTE - average found type" << m_sAvrType;
-                qInfo() << m_iBlockNumber++ << "MNE Received";
+                qInfo() << m_iBlockNumberStartedProcessing++ << "MNE StartedProcessing";
                 m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
                 break;
             }
@@ -650,7 +659,7 @@ void MNE::run()
                 m_qMutex.unlock();
 
                 if(!sourceEstimate.isEmpty()) {
-                    qInfo() << m_iBlockNumber << "MNE Processed";
+                    qInfo() << m_iBlockNumberProcessed++ << "MNE Processed";
                     m_pRTSEOutput->data()->setValue(sourceEstimate);
                 }
             } else {
@@ -677,7 +686,7 @@ void MNE::run()
                 m_qMutex.unlock();
 
                 if(!sourceEstimate.isEmpty()) {
-                    qInfo() << m_iBlockNumber << "MNE Processed";
+                    qInfo() << m_iBlockNumberProcessed++ << "MNE Processed";
                     m_pRTSEOutput->data()->setValue(sourceEstimate);
                 }
             } else {

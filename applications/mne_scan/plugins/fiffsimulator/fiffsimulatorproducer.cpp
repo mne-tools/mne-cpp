@@ -227,7 +227,7 @@ void FiffSimulatorProducer::run()
 
             if(kind == FIFF_DATA_BUFFER)
             {
-                //qInfo() << m_pFiffSimulator->m_iBlockNumber++ << "FiffSimulator Received";
+                qInfo() << m_pFiffSimulator->m_iBlockNumberReceived++ << "FiffSimulator Received";
 
                 to += t_matRawBuffer.cols();
                 from += t_matRawBuffer.cols();

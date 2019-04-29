@@ -90,6 +90,10 @@ QSharedPointer<MainWindow> mainWin;
 * @param [in] context   additional information about a log message
 * @param [in] msg       the message to log
 */
+
+QFile outFile;
+QTextStream textStream;
+
 void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     Q_UNUSED(context);
@@ -109,14 +113,13 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 //                txt += QString("{Info} \t\t %1").arg(msg);
 //                mainWin->writeToLog(txt,_LogKndMessage, _LogLvMax);
                 {
-                    QString dt = QDateTime::currentDateTime().toString("hh:mm:ss.z");
-                    QString txt = QString("%1 %2").arg(dt).arg(msg);
+                    if(!outFile.isOpen()) {
+                        outFile.setFileName("LogFileMneScan.log");
+                        outFile.open(QIODevice::WriteOnly);
+                        textStream.setDevice(&outFile);
+                    }
 
-                    QFile outFile("LogFileMneScan.log");
-                    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
-
-                    QTextStream textStream(&outFile);
-                    textStream << txt << endl;
+                    textStream << QDateTime::currentDateTime().toString("hh:mm:ss.z") << " " << msg << endl;
                 }
 
                 break;

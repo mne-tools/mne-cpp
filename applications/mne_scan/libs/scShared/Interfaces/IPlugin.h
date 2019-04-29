@@ -221,8 +221,11 @@ protected:
     InputConnectorList m_inputConnectors;    /**< Set of input connectors associated with this plug-in. */
     OutputConnectorList m_outputConnectors;  /**< Set of output connectors associated with this plug-in. */
 
-    int m_iBlockNumber = 0;
-    int m_iBlockNumberB = 0;
+    int m_iBlockNumberReceived = 0;
+    int m_iBlockNumberReceivedTwo = 0;
+    int m_iBlockNumberStartedProcessing = 0;
+    int m_iBlockNumberProcessed = 0;
+
 private:
     QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions */
 };
