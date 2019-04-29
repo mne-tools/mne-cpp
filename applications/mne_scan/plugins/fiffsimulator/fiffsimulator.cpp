@@ -280,7 +280,7 @@ void FiffSimulator::run()
         }
 
         //emit values
-        qInfo() << m_iBlockNumber++ << "FiffSimulator Forwarded";
+        qInfo() << m_iBlockNumberProcessed++ << "FiffSimulator Processed";
         m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
     }
 }
