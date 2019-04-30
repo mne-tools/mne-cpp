@@ -119,7 +119,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
                         textStream.setDevice(&outFile);
                     }
 
-                    textStream << QDateTime::currentDateTime().toString("hh:mm:ss.z") << " " << msg << endl;
+                    textStream << msg << endl;
                 }
 
                 break;

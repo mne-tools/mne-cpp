@@ -268,7 +268,7 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     m_pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(m_pRTMSA) {
-        qInfo() << m_iBlockNumberReceived++ << "NoiseReduction Received";
+        qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberReceived++ << "NoiseReduction Received";
 
         //Check if buffer initialized
         if(!m_pNoiseReductionBuffer) {
@@ -314,7 +314,7 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
         for(unsigned char i = 0; i < m_pRTMSA->getMultiArraySize(); ++i) {
             t_mat = m_pRTMSA->getMultiSampleArray()[i];
-            qInfo() << m_iBlockNumberStartedProcessing++ << "NoiseReduction StartedProcessing";
+            qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberStartedProcessing++ << "NoiseReduction StartedProcessing";
             m_pNoiseReductionBuffer->push(&t_mat);
         }
     }
@@ -667,6 +667,9 @@ void NoiseReduction::run()
         //Dispatch the inputs
         MatrixXd t_mat = m_pNoiseReductionBuffer->pop();
 
+        QElapsedTimer time;
+        time.start();
+
         m_mutex.lock();
 
         QElapsedTimer timer;
@@ -739,7 +742,8 @@ void NoiseReduction::run()
         m_mutex.unlock();
 
         //Send the data to the connected plugins and the online display
-        qInfo() << m_iBlockNumberProcessed++ << "NoiseReduction Processed";
+        qInfo() << time.elapsed() << m_iBlockNumberReceived << "NoiseReduction Time";
+        qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "NoiseReduction Processed";
         m_pNoiseReductionOutput->data()->setValue(t_mat);
     }
 }

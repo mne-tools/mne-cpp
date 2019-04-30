@@ -72,6 +72,9 @@ using namespace FIFFLIB;
 
 void RtCovWorker::doWork(const RtCovInput &inputData)
 {
+    QElapsedTimer time;
+    time.start();
+
     if(this->thread()->isInterruptionRequested()) {
         return;
     }
@@ -130,6 +133,7 @@ void RtCovWorker::doWork(const RtCovInput &inputData)
         qDebug() << "RtCovWorker::doWork - Number of samples equals zero. Regularization not possible. Returning without result.";
     }
 
+    qInfo() << time.elapsed() << m_iBlockNumberReceived++ << "RtCovWorker Time";
 }
 
 
