@@ -118,8 +118,8 @@ RtAveWorker::RtAveWorker(quint32 numAverages,
 
 void RtAveWorker::doWork(const MatrixXd& rawSegment)
 {
-    //QElapsedTimer time;
-    //time.start();
+    QElapsedTimer time;
+    time.start();
 
     if(this->thread()->isInterruptionRequested()) {
         return;
@@ -132,6 +132,7 @@ void RtAveWorker::doWork(const MatrixXd& rawSegment)
     doAveraging(rawSegment);
 
     //qDebug()<<"RtAveWorker::doWork() - time for procesing"<<time.elapsed();
+    qInfo() << time.elapsed() << m_iBlockNumberReceived++ << "RtAveWorker Time";
 }
 
 

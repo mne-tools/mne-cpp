@@ -280,7 +280,7 @@ void FiffSimulator::run()
         }
 
         //emit values
-        qInfo() << m_iBlockNumberProcessed++ << "FiffSimulator Processed";
+        qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "FiffSimulator Processed";
         m_pRTMSA_FiffSimulator->data()->setValue(matValue.cast<double>());
     }
 }

@@ -95,17 +95,19 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
 
     QList<Network> finalNetworks = Connectivity::calculate(connectivitySettingsTemp);
 
-    iTime = time.elapsed();
+    qInfo() << time.elapsed() << m_iBlockNumberReceived++ << "RtConnectivityWorker Time";
 
-    qDebug()<<"----------------------------------------";
-    qDebug()<<"----------------------------------------";
-    qDebug()<<"------RtConnectivityWorker::doWork()";
-    qDebug()<<"------Method:"<<connectivitySettings.getConnectivityMethods().first();
-    qDebug()<<"------Data dim:"<<connectivitySettings.at(0).matData.rows() << "x" << connectivitySettings.at(0).matData.cols();
-    qDebug()<<"------Number trials:"<< connectivitySettings.size();
-    qDebug()<<"------Total time:"<<iTime << "ms";
-    qDebug()<<"----------------------------------------";
-    qDebug()<<"----------------------------------------";
+//    iTime = time.elapsed();
+
+//    qDebug()<<"----------------------------------------";
+//    qDebug()<<"----------------------------------------";
+//    qDebug()<<"------RtConnectivityWorker::doWork()";
+//    qDebug()<<"------Method:"<<connectivitySettings.getConnectivityMethods().first();
+//    qDebug()<<"------Data dim:"<<connectivitySettings.at(0).matData.rows() << "x" << connectivitySettings.at(0).matData.cols();
+//    qDebug()<<"------Number trials:"<< connectivitySettings.size();
+//    qDebug()<<"------Total time:"<<iTime << "ms";
+//    qDebug()<<"----------------------------------------";
+//    qDebug()<<"----------------------------------------";
 
     emit resultReady(finalNetworks, connectivitySettingsTemp);
 }

@@ -138,6 +138,8 @@ protected:
     */
     static void reduce(RtCovComputeResult& finalResult, const RtCovComputeResult &tempResult);
 
+    int m_iBlockNumberReceived = 0;
+
 signals:
     //=========================================================================================================
     /**

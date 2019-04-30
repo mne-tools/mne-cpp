@@ -398,7 +398,7 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 
     if(pRTMSA) {
 
-        qInfo() << m_iBlockNumberReceived++ << "MNE Received";
+        qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberReceived++ << "MNE Received";
 
         if(!m_bReceiveData) {
             return;
@@ -417,7 +417,7 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 
         if(m_bProcessData) {
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
-                qInfo() << m_iBlockNumberStartedProcessing++ << "MNE StartedProcessing";
+                qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberStartedProcessing++ << "MNE StartedProcessing";
                 m_pMatrixDataBuffer->push(&pRTMSA->getMultiSampleArray()[i]);
             }
         }
@@ -433,7 +433,7 @@ void MNE::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 
     //MEG
     if(pRTC && m_bReceiveData) {
-        qInfo() << m_iBlockNumberReceivedTwo++ << "MNE CovReceived";
+        qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberReceivedTwo++ << "MNE CovReceived";
 
         // Init Real-Time inverse estimator
         if(!m_pRtInvOp && m_pFiffInfo && m_pClusteredFwd) {
@@ -463,7 +463,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
     if(!pRTES) {
         return;
     }
-    qInfo() << m_iBlockNumberReceived++ << "MNE Received";
+    qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberReceived++ << "MNE Received";
 
     QMutexLocker locker(&m_qMutex);
 
@@ -493,7 +493,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
         for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
             if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                 //qDebug()<<"MNE::updateRTE - average found type" << m_sAvrType;
-                qInfo() << m_iBlockNumberStartedProcessing++ << "MNE StartedProcessing";
+                qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberStartedProcessing++ << "MNE StartedProcessing";
                 m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
                 break;
             }
@@ -659,7 +659,7 @@ void MNE::run()
                 m_qMutex.unlock();
 
                 if(!sourceEstimate.isEmpty()) {
-                    qInfo() << m_iBlockNumberProcessed++ << "MNE Processed";
+                    qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "MNE Processed";
                     m_pRTSEOutput->data()->setValue(sourceEstimate);
                 }
             } else {
@@ -677,6 +677,9 @@ void MNE::run()
         if(t_evokedSize > 0) {
             //qDebug() << "MNE::run - Processing RTE data - t_evokedSize" << t_evokedSize;
             if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0)) {
+                QElapsedTimer time;
+                time.start();
+
                 m_qMutex.lock();
                 t_fiffEvoked = m_qVecFiffEvoked.takeFirst();
                 //qDebug()<<"MNE::run - t_fiffEvoked.data.rows()"<<t_fiffEvoked.data.rows();
@@ -686,9 +689,11 @@ void MNE::run()
                 m_qMutex.unlock();
 
                 if(!sourceEstimate.isEmpty()) {
-                    qInfo() << m_iBlockNumberProcessed++ << "MNE Processed";
+                    qInfo() << time.elapsed() << m_iBlockNumberProcessed << "MNE Time";
+                    qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "MNE Processed";
                     m_pRTSEOutput->data()->setValue(sourceEstimate);
                 }
+
             } else {
                 m_qMutex.lock();
                 m_qVecFiffEvoked.pop_front();
