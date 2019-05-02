@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     edf_raw_data.cpp
 * @author   Simon Heinke <simon.heinke@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,20 +29,15 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of using the EDF utilities
+* @brief    Definition of the EDFRawData class.
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <vector>
-
-#include "edfinfo.h"
 #include "edf_raw_data.h"
 
 
@@ -51,13 +46,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
-#include <QApplication>
 #include <QDebug>
-#include <QMainWindow>
-#include <QtCharts/QChart>
-#include <QtCharts/QChartView>
-#include <QtCharts/QLineSeries>
 
 
 //*************************************************************************************************************
@@ -66,56 +55,15 @@
 //=============================================================================================================
 
 using namespace EDFINFOEXAMPLE;
-using namespace QtCharts;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
 
-//=============================================================================================================
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
-int main(int argc, char *argv[])
+EDFRawData::EDFRawData(QObject *parent) : QObject(parent)
 {
-    QApplication app(argc, argv);
-
-    QFile file("C:\\Users\\Simon\\Desktop\\hiwi\\edf_files\\00000929_s005_t000.edf");
-
-    EDFInfo info(&file);
-    // qDebug().noquote() << info.getAsString();
-
-    QVector<QVector<float>> rawData =  info.readRawData();
-
-    QMainWindow* temp = new QMainWindow();
-
-    QChart* chart = new QChart();
-
-    chart->legend()->hide();
-
-    QLineSeries* series = new QLineSeries();
-
-    for(int i = 20200; i < 21000; ++i) {
-        series->append(i, static_cast<double>(rawData[0][i]));
-    }
-
-    chart->addSeries(series);
-    chart->createDefaultAxes();
-    chart->setTitle("Singular EEG Channel");
-
-    QChartView* cView = new QChartView(chart);
-
-    temp->setCentralWidget(cView);
-    temp->resize(1000, 300);
-    temp->show();
-
-    return app.exec();
+    qDebug() << "alive";
 }
