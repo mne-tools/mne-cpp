@@ -95,7 +95,7 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
 
     QList<Network> finalNetworks = Connectivity::calculate(connectivitySettingsTemp);
 
-    qInfo() << time.elapsed() << m_iBlockNumberReceived++ << "RtConnectivityWorker Time";
+//    qInfo() << time.elapsed() << m_iBlockNumberReceived++ << "RtConnectivityWorker Time";
 
 //    iTime = time.elapsed();
 

@@ -227,7 +227,7 @@ void FiffSimulatorProducer::run()
 
             if(kind == FIFF_DATA_BUFFER)
             {
-                qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_pFiffSimulator->m_iBlockNumberReceived++ << "FiffSimulator Received";
+                //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_pFiffSimulator->m_iBlockNumberReceived++ << "FiffSimulator Received";
 
                 to += t_matRawBuffer.cols();
                 from += t_matRawBuffer.cols();

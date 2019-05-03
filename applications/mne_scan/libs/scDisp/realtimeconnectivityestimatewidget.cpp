@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 #include <QGridLayout>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -170,6 +171,9 @@ void RealTimeConnectivityEstimateWidget::getData()
                 m_iNumberBadChannels = m_pRTCE->getFiffInfo()->bads.size();
             }
         } else {
+            QElapsedTimer time;
+            time.start();
+
             //qDebug()<<"RealTimeConnectivityEstimateWidget::getData - Working with m_pRtItem";
             QPair<float,float> freqs = m_pRTCE->getValue()->getFrequencyRange();
             QString sItemName = QString("%1_%2_%3").arg(m_pRTCE->getValue()->getConnectivityMethod()).arg(QString::number(freqs.first)).arg(QString::number(freqs.second));
@@ -186,6 +190,8 @@ void RealTimeConnectivityEstimateWidget::getData()
                     m_iNumberBadChannels = m_pRTCE->getFiffInfo()->bads.size();
                 }
             }
+
+            qInfo() << time.elapsed() << "0" << "RealTimeConnectivityEstimateWidget Time";
         }
     }
 }

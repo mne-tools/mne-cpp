@@ -70,6 +70,7 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QSettings>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -168,8 +169,11 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr)
             init();
         }
     } else {
+        QElapsedTimer time;
+        time.start();
         //Add data to table view
         m_pChannelDataView->addData(m_pRTMSA->getMultiSampleArray());
+        qInfo() << time.elapsed() << "0" << "RealTimeMultiSampleArrayWidget Time";
     }
 }
 

@@ -114,7 +114,7 @@ RtSourceDataController::RtSourceDataController()
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setSFreq);
 
        connect(this, &RtSourceDataController::loopStateChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setLoopState);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setLoopState, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::numberAveragesChanged,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setNumberAverages, Qt::DirectConnection);
