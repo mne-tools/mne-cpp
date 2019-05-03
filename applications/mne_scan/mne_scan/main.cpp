@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
 
     //ToDo Check the message handler and FiffSimulator
 
-    qInstallMessageHandler(customMessageHandler);
+    //qInstallMessageHandler(customMessageHandler);
 
     QSurfaceFormat fmt;
     fmt.setSamples(10);

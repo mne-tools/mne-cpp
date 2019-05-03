@@ -219,7 +219,7 @@ void RtSensorDataWorker::streamData()
                     }
 
                     //Set iterator back to the front if needed
-                    if(m_iCurrentSample == m_lDataLoopQ.size()) {
+                    if(m_iCurrentSample >= m_lDataLoopQ.size()) {
                         m_iCurrentSample = 0;
                         break;
                     }
@@ -238,7 +238,7 @@ void RtSensorDataWorker::streamData()
                 }
 
                 //Set iterator back to the front if needed
-                if(m_iCurrentSample == m_lDataQ.size()) {
+                if(m_iCurrentSample >= m_lDataQ.size()) {
                     m_iCurrentSample = 0;
                     break;
                 }

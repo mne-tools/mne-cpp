@@ -67,6 +67,7 @@
 #include <QVBoxLayout>
 #include <QSharedPointer>
 #include <QAction>
+#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -151,6 +152,8 @@ void RealTimeCovWidget::getData()
         }
     } else {
         if(m_pImageSc) {
+            QElapsedTimer time;
+            time.start();
             MatrixXd data(m_qListSelChannel.size(), m_qListSelChannel.size());
 
             for(int i = 0; i < m_qListSelChannel.size(); i++) {
@@ -160,6 +163,7 @@ void RealTimeCovWidget::getData()
             }
 
             m_pImageSc->updateData(data);
+            qInfo() << time.elapsed() << "0" << "RealTimeCovWidget Time";
         }
     }
 }
