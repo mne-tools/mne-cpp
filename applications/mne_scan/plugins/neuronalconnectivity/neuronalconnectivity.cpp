@@ -472,7 +472,7 @@ void NeuronalConnectivity::generateNodeVertices()
     }
 
     QString sCoilType = "grad";
-    QString sChType = "mag";
+    QString sChType = "meg";
 
     QStringList exclude;
     exclude << m_pFiffInfo->bads << m_pFiffInfo->ch_names.filter("EOG");
