@@ -256,8 +256,11 @@ void PhaseLockingValue::compute(ConnectivitySettings::IntermediateTrialData& inp
                 matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(i).rows(),m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(j).rows(),m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
 
                 // Divide first and last element by 2 due to half spectrum
-                matCsd.row(j)(0) /= 2.0;
-                if(bNfftEven) {
+                if(m_iNumberBinStart == 0) {
+                    matCsd.row(j)(0) /= 2.0;
+                }
+
+                if(bNfftEven && m_iNumberBinAmount == iNFreqs) {
                     matCsd.row(j).tail(1) /= 2.0;
                 }
             }
