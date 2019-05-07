@@ -127,8 +127,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     AbstractMetric::m_bStorageModeIsActive = true;
-    AbstractMetric::m_iNumberBinStart = 8;
-    AbstractMetric::m_iNumberBinAmount = 4;
+//    AbstractMetric::m_iNumberBinStart = 8;
+//    AbstractMetric::m_iNumberBinAmount = 4;
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Example");
@@ -413,113 +413,113 @@ int main(int argc, char *argv[])
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(17);
-            pRTDataItem->setStreamingState(true);
+            pRTDataItem->setStreamingState(false);
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Interpolation based");
             pRTDataItem->setColormapType("Jet");
-            pRTDataItem->setAlpha(1.0f);
+            pRTDataItem->setAlpha(0.1f);
         }
     }
 
     tNetworkView.getConnectivitySettingsView()->setNumberTrials(1);
     pConnectivitySettingsManager->onNumberTrialsChanged(1);
 
-    // ------- TEMP data -------
+//    // ------- TEMP data -------
 
-    QMatrix4x4 matrix;
-    matrix.setToIdentity();
-    matrix.translate(0,-0.02,0.05200);
-    Qt3DCore::QTransform transformtrans;
-    transformtrans.setMatrix(matrix);
+//    QMatrix4x4 matrix;
+//    matrix.setToIdentity();
+//    matrix.translate(0,-0.02,0.05200);
+//    Qt3DCore::QTransform transformtrans;
+//    transformtrans.setMatrix(matrix);
 
-    //Read and show BEM
-    QFile t_fileBem(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-    MNEBem t_Bem(t_fileBem);
-//    tNetworkView.getTreeModel()->addBemData(parser.value(subjectOption), "BEM", t_Bem);
+//    //Read and show BEM
+//    QFile t_fileBem(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+//    MNEBem t_Bem(t_fileBem);
+////    tNetworkView.getTreeModel()->addBemData(parser.value(subjectOption), "BEM", t_Bem);
 
-    QFile t_fileBemhead(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
-    MNEBem t_Bemhead(t_fileBemhead);
+//    QFile t_fileBemhead(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
+//    MNEBem t_Bemhead(t_fileBemhead);
 
-    //Read and show sensor helmets
-    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m.fif");
-    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
+//    //Read and show sensor helmets
+//    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m.fif");
+//    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
 
-    SensorSetTreeItem* pSensorSetTreeItem = tNetworkView.getTreeModel()->addMegSensorInfo("Sensors", "VectorView", evoked.info.chs, t_sensorSurfaceVV, evoked.info.bads);
-    pSensorSetTreeItem->applyTransform(transformtrans);
+//    SensorSetTreeItem* pSensorSetTreeItem = tNetworkView.getTreeModel()->addMegSensorInfo("Sensors", "VectorView", evoked.info.chs, t_sensorSurfaceVV, evoked.info.bads);
+//    pSensorSetTreeItem->applyTransform(transformtrans);
 
-    // Read, co-register and show digitizer points
-//    QFile t_fileDig(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    FiffDigPointSet t_Dig(t_fileDig);
+//    // Read, co-register and show digitizer points
+////    QFile t_fileDig(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+////    FiffDigPointSet t_Dig(t_fileDig);
 
-//    DigitizerSetTreeItem* pDigitizerSetTreeItem = tNetworkView.getTreeModel()->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
-//    pDigitizerSetTreeItem->applyTransform(coordTrans, true);
+////    DigitizerSetTreeItem* pDigitizerSetTreeItem = tNetworkView.getTreeModel()->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+////    pDigitizerSetTreeItem->applyTransform(coordTrans, true);
 
-    //add sensor item for MEG data
-    if (SensorDataTreeItem* pMegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
-                                                                                            evoked.comment,
-                                                                                            //evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
-                                                                                            evoked.data,
-                                                                                            t_sensorSurfaceVV[0],
-                                                                                            evoked.info,
-                                                                                            "MEG")) {
-        pMegSensorTreeItem->setLoopState(true);
-        pMegSensorTreeItem->setTimeInterval(17);
-        pMegSensorTreeItem->setNumberAverages(17);
-        pMegSensorTreeItem->setStreamingState(true);
-        pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 13.0e-13f*0.5f, 13.0e-14f));
-        pMegSensorTreeItem->setColormapType("Jet");
-        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
+//    //add sensor item for MEG data
+//    if (SensorDataTreeItem* pMegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
+//                                                                                            evoked.comment,
+//                                                                                            //evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
+//                                                                                            evoked.data,
+//                                                                                            t_sensorSurfaceVV[0],
+//                                                                                            evoked.info,
+//                                                                                            "MEG")) {
+//        pMegSensorTreeItem->setLoopState(true);
+//        pMegSensorTreeItem->setTimeInterval(17);
+//        pMegSensorTreeItem->setNumberAverages(17);
+//        pMegSensorTreeItem->setStreamingState(true);
+//        pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 13.0e-13f*0.5f, 13.0e-14f));
+//        pMegSensorTreeItem->setColormapType("Jet");
+//        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
 
-        // Apply head to device transformation
-        //pMegSensorTreeItem->applyTransform(coordTrans,true);
-        //pMegSensorTreeItem->applyTransform(raw.info.dev_head_t);
-        pMegSensorTreeItem->setTransform(transformtrans);
-    }
+//        // Apply head to device transformation
+//        //pMegSensorTreeItem->applyTransform(coordTrans,true);
+//        //pMegSensorTreeItem->applyTransform(raw.info.dev_head_t);
+//        pMegSensorTreeItem->setTransform(transformtrans);
+//    }
 
-    //add sensor item for EEG data
+//    //add sensor item for EEG data
 
-    //Co-Register EEG points in order to correctly map them to the scalp
-    for(int i = 0; i < evoked.info.chs.size(); ++i) {
-        if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
-            Vector4f tempvec;
-            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
-            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
-            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
-            tempvec(3) = 1;
-            tempvec = coordTrans.invtrans * tempvec;
-            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
-            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
-            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
-        }
-    }
+//    //Co-Register EEG points in order to correctly map them to the scalp
+//    for(int i = 0; i < evoked.info.chs.size(); ++i) {
+//        if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
+//            Vector4f tempvec;
+//            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
+//            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
+//            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
+//            tempvec(3) = 1;
+//            tempvec = coordTrans.invtrans * tempvec;
+//            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
+//            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
+//            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
+//        }
+//    }
 
-    if (SensorDataTreeItem* pEegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
-                                                                                            evoked.comment,
-                                                                                            //evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
-                                                                                            evoked.data,
-                                                                                            t_Bem[0],
-                                                                                            evoked.info,
-                                                                                            "EEG")) {
-        pEegSensorTreeItem->setLoopState(true);
-        pEegSensorTreeItem->setTimeInterval(17);
-        pEegSensorTreeItem->setNumberAverages(17);
-        pEegSensorTreeItem->setStreamingState(true);
-        pEegSensorTreeItem->setThresholds(QVector3D(0.0f, 3.0e-6f, 6.0e-6f));
-        pEegSensorTreeItem->setColormapType("Jet");
-        pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
-        pEegSensorTreeItem->setCancelDistance(0.20);
+//    if (SensorDataTreeItem* pEegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
+//                                                                                            evoked.comment,
+//                                                                                            //evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
+//                                                                                            evoked.data,
+//                                                                                            t_Bem[0],
+//                                                                                            evoked.info,
+//                                                                                            "EEG")) {
+//        pEegSensorTreeItem->setLoopState(true);
+//        pEegSensorTreeItem->setTimeInterval(17);
+//        pEegSensorTreeItem->setNumberAverages(17);
+//        pEegSensorTreeItem->setStreamingState(true);
+//        pEegSensorTreeItem->setThresholds(QVector3D(0.0f, 3.0e-6f, 6.0e-6f));
+//        pEegSensorTreeItem->setColormapType("Jet");
+//        pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
+//        pEegSensorTreeItem->setCancelDistance(0.20);
 
-        // Apply head to device transformation
-        //pEegSensorTreeItem->applyTransform(coordTrans);
-        //pEegSensorTreeItem->applyTransform(raw.info.dev_head_t, true);
-    }
-    qDebug() << "-----------------t_Bemhead[0].np" << t_Bemhead[0].np;
-    qDebug() << "-----------------t_Bem[0].np" << t_Bem[0].np;
-    qDebug() << "-----------------t_sensorSurfaceVV[0].np" << t_sensorSurfaceVV[0].np;
-    qDebug() << "-----------------tSurfSetInflated[0].rr().rows()" << tSurfSetInflated[0].rr().rows();
-    qDebug() << "-----------------tSurfSetInflated[1].rr().rows()" << tSurfSetInflated[1].rr().rows();
+//        // Apply head to device transformation
+//        //pEegSensorTreeItem->applyTransform(coordTrans);
+//        //pEegSensorTreeItem->applyTransform(raw.info.dev_head_t, true);
+//    }
+//    qDebug() << "-----------------t_Bemhead[0].np" << t_Bemhead[0].np;
+//    qDebug() << "-----------------t_Bem[0].np" << t_Bem[0].np;
+//    qDebug() << "-----------------t_sensorSurfaceVV[0].np" << t_sensorSurfaceVV[0].np;
+//    qDebug() << "-----------------tSurfSetInflated[0].rr().rows()" << tSurfSetInflated[0].rr().rows();
+//    qDebug() << "-----------------tSurfSetInflated[1].rr().rows()" << tSurfSetInflated[1].rr().rows();
 
-    // ------- TEMP data END -------
+//    // ------- TEMP data END -------
 
     return a.exec();
 }

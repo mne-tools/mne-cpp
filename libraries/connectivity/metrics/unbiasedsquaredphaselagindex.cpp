@@ -211,8 +211,6 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
         return;
     }
 
-    inputData.vecPairCsdImagSign.clear();
-
     int i,j;
 
     // Calculate tapered spectra if not available already
@@ -224,8 +222,6 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
         RowVectorXcd vecTmpFreq;
 
         MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
-
-        QVector<Eigen::MatrixXcd> vecTapSpectra;
 
         FFT<double> fft;
         fft.SetFlag(fft.HalfSpectrum);
@@ -255,7 +251,7 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
             bNfftEven = true;
         }
 
-        MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBinStart);
+        MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBinAmount);
 
         for (i = 0; i < iNRows; ++i) {
             for (j = i; j < iNRows; ++j) {
@@ -263,8 +259,11 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
                 matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(i).rows(),m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(j).rows(),m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
 
                 // Divide first and last element by 2 due to half spectrum
-                matCsd.row(j)(0) /= 2.0;
-                if(bNfftEven) {
+                if(m_iNumberBinStart == 0) {
+                    matCsd.row(j)(0) /= 2.0;
+                }
+
+                if(bNfftEven && m_iNumberBinAmount == iNFreqs) {
                     matCsd.row(j).tail(1) /= 2.0;
                 }
             }
