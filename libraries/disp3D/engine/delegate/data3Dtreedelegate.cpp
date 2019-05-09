@@ -83,7 +83,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 Data3DTreeDelegate::Data3DTreeDelegate(QObject* parent)
-: QItemDelegate(parent)
+: QStyledItemDelegate(parent)
 {
 }
 
@@ -130,12 +130,12 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
         }
 
         case MetaTreeItemTypes::DataThreshold: {
-            Spline* pSpline = new Spline("Set Threshold", parent);
-            pSpline->setWindowFlags(Qt::Window);
+            Spline* pSpline = new Spline(parent);
             connect(pSpline, static_cast<void (Spline::*)(double, double, double)>(&Spline::borderChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
+            pSpline->setWindowFlags(Qt::Window);
+            pSpline->setWindowTitle("Set Threshold");
             pSpline->show();
-
             return pSpline;
         }
 
@@ -269,6 +269,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             pPlotLA->resize(400,300);
             pPlotLA->setWindowFlags(Qt::Window);
             pPlotLA->show();
+            break;
             //return pPlotLA;
         }
 
@@ -306,7 +307,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
         }
     }
 
-    return QItemDelegate::createEditor(parent, option, index);
+    return QStyledItemDelegate::createEditor(parent, option, index);
 }
 
 
@@ -386,7 +387,7 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
 
         // Handle basic types (QString, int, double, etc.) by default via QItemDelegate::setEditorData
         default: {
-            QItemDelegate::setEditorData(editor, index);
+            QStyledItemDelegate::setEditorData(editor, index);
         }
     }
 }
@@ -434,7 +435,7 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
         }
 
         case MetaTreeItemTypes::DataThreshold: {
-            if(Spline* pSpline = dynamic_cast<Spline*>(editor)) {
+            if(Spline* pSpline = static_cast<Spline*>(editor)) {
                 QVector3D returnVector;
                 returnVector = pSpline->getThreshold();
 
@@ -604,7 +605,7 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
 
         // Handle all other item types via QItemDelegate::setModelData handling
         default: {
-            QItemDelegate::setModelData(editor, model, index);
+            QStyledItemDelegate::setModelData(editor, model, index);
             break;
         }
     }
@@ -613,9 +614,10 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
 
 //*************************************************************************************************************
 
-void Data3DTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+void Data3DTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem &option, const QModelIndex& index) const
 {
-    editor->setGeometry(option.rect);
+    QStyledItemDelegate::updateEditorGeometry(editor, option, index);
+    //editor->setGeometry(option.rect);
 }
 
 

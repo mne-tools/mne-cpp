@@ -74,7 +74,7 @@ using namespace QtCharts;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Spline::Spline(const QString& title, QWidget* parent)
+Spline::Spline(QWidget* parent, const QString& title)
 : QWidget(parent)
 , m_dMinAxisX(0)
 , m_dMaxAxisX(0)
@@ -84,7 +84,7 @@ Spline::Spline(const QString& title, QWidget* parent)
 , m_iMaximumFrequency(0)
 {
     m_pChart = new QChart();
-    m_pChart->setTitle(title);
+    //m_pChart->setTitle(title);
     m_pChart->setAnimationOptions(QChart::SeriesAnimations);
     m_pChart->setAcceptHoverEvents(false);
     m_pSeries = new QSplineSeries();

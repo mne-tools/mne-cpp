@@ -200,8 +200,12 @@ void ECGSimulator::initChannels()
 bool ECGSimulator::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning())
-        QThread::wait();
+
+//    qDebug() << "-------------------------------------------- THREAD ID start " << QThread::currentThreadId();
+//    if(this->isRunning()) {
+//        m_bIsRunning = false;
+//        QThread::wait();
+//    }
 
     initChannels();
 
@@ -293,6 +297,7 @@ void ECGSimulator::run()
     double dValue_I = 0;
     double dValue_II = 0;
     double dValue_III = 0;
+    qDebug() << "-------------------------------------------- THREAD ID run " << QThread::currentThreadId();
 
     while(m_bIsRunning)
     {

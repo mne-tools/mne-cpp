@@ -108,8 +108,7 @@ public:
     * @param[in]  title     string to specify the title displayed on the histogram, defaults to "Spline Histogram"
     * @param[in]  parent    sets the behaviour of Spline as an object, defaults to no parent QWidget
     */
-    Spline(const QString& title = "Spline Histogram",
-           QWidget* parent = 0);
+    Spline(QWidget* parent = 0, const QString& title = "Spline Histogram");
 
     //=========================================================================================================
     /**

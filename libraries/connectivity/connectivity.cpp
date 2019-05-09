@@ -101,60 +101,46 @@ QList<Network> Connectivity::calculate(ConnectivitySettings& connectivitySetting
     QStringList lMethods = connectivitySettings.getConnectivityMethods();
     QList<Network> results;
     QElapsedTimer timer;
+    timer.start();
 
     if(lMethods.contains("WPLI")) {
-        timer.restart();
         results.append(WeightedPhaseLagIndex::calculate(connectivitySettings));
-        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("USPLI")) {
-        timer.restart();
         results.append(UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings));
-        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("COR")) {
-        timer.restart();
         results.append(Correlation::calculate(connectivitySettings));
-        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("XCOR")) {
-        timer.restart();
         results.append(CrossCorrelation::calculate(connectivitySettings));
-        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("PLI")) {
-        timer.restart();
         results.append(PhaseLagIndex::calculate(connectivitySettings));
-        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("COH")) {
-        timer.restart();
         results.append(Coherence::calculate(connectivitySettings));
-        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("IMAGCOH")) {
-        timer.restart();
         results.append(ImagCoherence::calculate(connectivitySettings));
-        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("PLV")) {
-        timer.restart();
         results.append(PhaseLockingValue::calculate(connectivitySettings));
-        qWarning() << "Total" << timer.elapsed();
     }
 
     if(lMethods.contains("DSWPLI")) {
-        timer.restart();
         results.append(DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings));
-        qWarning() << "Total" << timer.elapsed();
     }
+
+
+    qDebug() << "Connectivity::calculateMultiMethods - Calculated"<< lMethods <<"for" << connectivitySettings.size() << "trials in"<< timer.elapsed() << "msecs.";
 
     return results;
 }

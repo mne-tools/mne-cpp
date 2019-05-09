@@ -241,7 +241,7 @@ bool TriggerControl::stop()
 
     // Stop threads
     QThread::terminate();
-    QThread::wait();
+    //QThread::wait();
 
     m_pDataSingleChannel->clear();
 

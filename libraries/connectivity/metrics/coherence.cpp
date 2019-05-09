@@ -96,8 +96,8 @@ Coherence::Coherence()
 
 Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
 {
-
     Network finalNetwork("COH");
+
     if(connectivitySettings.isEmpty()) {
         qDebug() << "Coherence::calculate - Input data is empty";
         return finalNetwork;
