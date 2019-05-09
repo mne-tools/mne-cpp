@@ -340,11 +340,6 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
 
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
-        bool bNfftEven = false;
-        if (iNfft % 2 == 0){
-            bNfftEven = true;
-        }
-
         for (i = 0; i < iNRows; ++i) {
             for (j = i; j < iNRows; ++j) {
                 // Compute CSD (average over tapers if necessary)

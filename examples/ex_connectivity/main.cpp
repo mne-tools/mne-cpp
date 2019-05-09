@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COR");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
     MNEForwardSolution t_clusteredFwd;
     MNEForwardSolution t_Fwd;
 
-    SurfaceSet tSurfSetInflated (sSubj, 2, "pial", sSubjDir);
+    SurfaceSet tSurfSetInflated (sSubj, 2, "inflated", sSubjDir);
     AnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
 
     QFile coordTransfile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif");
@@ -390,8 +390,7 @@ int main(int argc, char *argv[])
     QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
                      [&](const QString& a, const QString& b, const Network& c) {if(NetworkTreeItem* pNetworkTreeItem = tNetworkView.addData(a,b,c)) {
                                                                                     pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
-                                                                                }}
-    );
+                                                                                }});
 
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
