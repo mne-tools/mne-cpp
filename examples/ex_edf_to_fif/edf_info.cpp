@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     edfinfo.cpp
+* @file     edf_info.cpp
 * @author   Simon Heinke <simon.heinke@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "edfinfo.h"
+#include "edf_info.h"
 
 
 //*************************************************************************************************************
@@ -81,10 +81,8 @@ EDFSignalInfo::EDFSignalInfo(const QString label,
                              const long digitalMax,
                              const long numberOfSamplesPerRecord,
                              const long numberOfSamplesTotal,
-                             const float mfrequency,
-                             QObject *parent)
-: QObject(parent),
-  sLabel(label),
+                             const float mfrequency)
+: sLabel(label),
   sTransducerType(transducer),
   sPhysicalDimension(physicalDimension),
   sPrefiltering(prefiltering),
@@ -125,7 +123,7 @@ QString EDFSignalInfo::getAsString() const
 {
     QString result;
 
-    result += "\n======================";
+    result += "\n== EDF SIGNAL INFO START ==";
     result += "\nChannel Label: " + sLabel;
     result += "\nTransducer Type: " + sTransducerType;
     result += "\nPhysical Dimension: " + sPhysicalDimension;
@@ -144,16 +142,28 @@ QString EDFSignalInfo::getAsString() const
 
 //*************************************************************************************************************
 
-EDFInfo::EDFInfo(QIODevice* pDev, QObject *parent)
-: QObject(parent)
+EDFInfo::EDFInfo()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+EDFInfo::EDFInfo(QIODevice* pDev)
 {
     // simply parse header and fill datafields
-    if (!pDev->open(QIODevice::ReadOnly)) {
+    if(!pDev->open(QIODevice::ReadOnly)) {
         qDebug() << "[EDFInfo::EDFInfo] Fatal: could not open device !";
         return;
     }
 
-    // general info, which is not independent of the signals
+    // check if we are really at the start of the file
+    if(pDev->pos() != 0) {
+        qDebug() << "[EDFInfo::EDFInfo] Warning: device not at position zero, this will most probably crash...";
+    }
+
+    // general info, which is not independent of individual signals
     sEDFVersionNo = QString::fromLatin1(pDev->read(8)).trimmed();
     sLocalPatientIdentification = QString::fromLatin1(pDev->read(80)).trimmed();
     sLocalRecordingIdentification = QString::fromLatin1(pDev->read(80)).trimmed();
@@ -218,10 +228,8 @@ EDFInfo::EDFInfo(QIODevice* pDev, QObject *parent)
 
     // we should have reached the end of the header
     if(pDev->pos() != iNumBytesInHeader) {
-        qDebug() << "FATAL: Number of bytes read is not equal to number of bytes in header!";
+        qDebug() << "[EDFInfo::EDFInfo] Fatal: Number of bytes read is not equal to number of bytes in header!";
     }
-
-    this->pDev = pDev;
 }
 
 
@@ -230,7 +238,7 @@ EDFInfo::EDFInfo(QIODevice* pDev, QObject *parent)
 QString EDFInfo::getAsString() const
 {
     QString result;
-    result += "======================";
+    result += "== EDF INFO START ==";
     result += "\nEDF Version Number: " + sEDFVersionNo;
     result += "\nLocal Patient Identification: " + sLocalPatientIdentification;
     result += "\nLocal Recording Identification: " + sLocalRecordingIdentification;
@@ -245,66 +253,7 @@ QString EDFInfo::getAsString() const
         result += signal.getAsString();
     }
 
-    result += "\n======================";
-
-    return result;
-}
-
-
-QVector<QVector<float>> EDFInfo::readRawData()
-{
-    // read whole file data-record-sized portions (this is probably quite ineffective, better read bigger chunks)
-    int sizeOfDataRecordInBytes = 0;
-    for(const auto& signal : vSignals) {
-        sizeOfDataRecordInBytes += signal.iNumberOfSamplesPerRecord * 2;  // 2 bytes per integer value, this might be different for bdf files
-    }
-    QVector<QByteArray> vRecords;
-    for(int i = 0; i < iNumDataRecords; ++i) {
-        vRecords.push_back(pDev->read(sizeOfDataRecordInBytes));
-    }
-
-    // we should have reached the end of the file
-    if(pDev->pos() != pDev->size()) {
-        qDebug() << "FATAL: Number of bytes read is not equal to number of bytes in file!";
-    }
-
-    // translate data records into signals, start with empty series
-    QVector<QVector<int>> signalValues;
-    for(int i = 0; i < iNumSignals; ++i) {
-        signalValues.append(QVector<int>());
-    }
-    // go through each record
-    for(int recIdx = 0; recIdx < vRecords.size(); ++recIdx) {
-        for(int sigIdx = 0; sigIdx < iNumSignals; ++sigIdx) {
-            for(int sampIdx = 0; sampIdx < vSignals[sigIdx].iNumberOfSamplesPerRecord; ++sampIdx) {
-                // factor 2 because of 2 byte representation, this is different for bdf files
-                signalValues[sigIdx].append((vRecords[recIdx].at(sampIdx * 2 + 1) << 8) | (vRecords[recIdx].at(sampIdx * 2) & 0x00ff));
-            }
-        }
-    }
-
-    // basic sanity check: number of signal values read should be number of bytes divided by 2
-    int numBytes = 0;
-    for(const auto& r : vRecords) {
-        numBytes += r.size();
-    }
-    int numSignalValues = 0;
-    for(const auto& s : signalValues) {
-        numSignalValues += s.size();
-    }
-    if(numSignalValues * 2 != numBytes) {
-        qDebug() << "FATAL Divergence between total number of samples and read bytes";
-    }
-
-    QVector<QVector<float>> result;
-
-    for(const auto& sv : signalValues) {
-        QVector<float> temp;
-        for(const int v : sv) {
-            temp.append(static_cast<float>(v));
-        }
-        result.append(temp);
-    }
+    result += "\n== EDF INFO END ==";
 
     return result;
 }

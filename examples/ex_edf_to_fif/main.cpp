@@ -42,7 +42,7 @@
 #include <iostream>
 #include <vector>
 
-#include "edfinfo.h"
+#include "edf_info.h"
 #include "edf_raw_data.h"
 
 
@@ -90,10 +90,11 @@ int main(int argc, char *argv[])
 
     QFile file("C:\\Users\\Simon\\Desktop\\hiwi\\edf_files\\00000929_s005_t000.edf");
 
-    EDFInfo info(&file);
-    // qDebug().noquote() << info.getAsString();
+    EDFRawData raw(&file);
+    EDFInfo info = raw.getInfo();
+    qDebug().noquote() << info.getAsString();
 
-    QVector<QVector<float>> rawData =  info.readRawData();
+    QVector<QVector<float>> rawData =  raw.readRawData();
 
     QMainWindow* temp = new QMainWindow();
 

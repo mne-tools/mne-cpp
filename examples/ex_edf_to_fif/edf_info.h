@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     edfinfo.h
+* @file     edf_info.h
 * @author   Simon Heinke <simon.heinke@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -33,8 +33,8 @@
 *
 */
 
-#ifndef EDFINFO_H
-#define EDFINFO_H
+#ifndef EDF_INFO_H
+#define EDF_INFO_H
 
 
 //*************************************************************************************************************
@@ -48,7 +48,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
 #include <QDateTime>
 #include <QVector>
 
@@ -76,20 +75,20 @@ namespace EDFINFOEXAMPLE
 *
 * @brief The EDFSignalInfo holds all relevant information for EDF signals.
 */
-class EDFSignalInfo : public QObject
+class EDFSignalInfo
 {
 
 public:
 
     //=========================================================================================================
     /**
-    * Qt containers require a default constructor
+    * Default constructor.
     */
     EDFSignalInfo();
 
     //=========================================================================================================
     /**
-    * Constructor just copies values
+    * Constructor just copies values.
     */
     EDFSignalInfo(const QString label,
                   const QString transducer,
@@ -101,12 +100,11 @@ public:
                   const long digitalMax,
                   const long numberOfSamplesPerRecord,
                   const long numberOfSamplesTotal,
-                  const float mfrequency,
-                  QObject* parent = Q_NULLPTR);
+                  const float mfrequency);
 
     //=========================================================================================================
     /**
-    * Qt containers require a copy constructor.
+    * Copy constructor.
     */
     EDFSignalInfo(const EDFSignalInfo& other);
 
@@ -129,8 +127,9 @@ public:
     long digitalMaximum;            // e.g. 2047
     long iNumberOfSamplesPerRecord; // e.g. 250 or 1
 
-    long iNumberOfSamplesTotal;     // convenience field
-    float frequency;                // convenience field
+    // convenience fields, calculated using EDF data fields
+    long iNumberOfSamplesTotal;
+    float frequency;
 };
 
 
@@ -140,18 +139,21 @@ public:
 *
 * @brief The EDFInfo holds all relevant information for EDF files.
 */
-class EDFInfo : public QObject
+class EDFInfo
 {
-    Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs an EDFInfo by parsing the header of the passed edf file pDev
+    * Constructs an EDFInfo by parsing the header of the passed edf file pDev.
     */
-    EDFInfo(QIODevice* pDev, QObject *parent = nullptr);
+    EDFInfo();
 
-    QVector<QVector<float>> readRawData();
+    //=========================================================================================================
+    /**
+    * Constructs an EDFInfo by parsing the passed IO device.
+    */
+    EDFInfo(QIODevice* pDev);
 
     //=========================================================================================================
     /**
@@ -160,8 +162,6 @@ public:
     * @return Textual representation of signal.
     */
     QString getAsString() const;
-
-    QIODevice* pDev;
 
     // data fields for EDF header. The member order does not correlate with the position in the header.
     QString     sEDFVersionNo;
@@ -173,9 +173,10 @@ public:
     float       fDataRecordsDuration;
     int         iNumSignals;
 
+    // vector of all signals contained in the EDF file
     QVector<EDFSignalInfo>  vSignals;
 };
 
 } // NAMESPACE
 
-#endif // EDFINFO_H
+#endif // EDF_INFO_H
