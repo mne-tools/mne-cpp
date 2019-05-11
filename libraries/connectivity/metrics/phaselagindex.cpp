@@ -122,7 +122,6 @@ Network PhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 
     for(int i = 0; i < iNRows; ++i) {
         rowVert = RowVectorXf::Zero(3);
-
         if(connectivitySettings.getNodePositions().rows() != 0 && i < connectivitySettings.getNodePositions().rows()) {
             rowVert(0) = connectivitySettings.getNodePositions().row(i)(0);
             rowVert(1) = connectivitySettings.getNodePositions().row(i)(1);
