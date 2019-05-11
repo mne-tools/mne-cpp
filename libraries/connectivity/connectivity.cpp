@@ -139,7 +139,6 @@ QList<Network> Connectivity::calculate(ConnectivitySettings& connectivitySetting
         results.append(DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings));
     }
 
-
     qDebug() << "Connectivity::calculateMultiMethods - Calculated"<< lMethods <<"for" << connectivitySettings.size() << "trials in"<< timer.elapsed() << "msecs.";
 
     return results;

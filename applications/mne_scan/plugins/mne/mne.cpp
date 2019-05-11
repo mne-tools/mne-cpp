@@ -701,17 +701,17 @@ void MNE::run()
                 time.start();
                 //qDebug()<<"MNE::run - t_fiffEvoked.data.rows()"<<t_fiffEvoked.data.rows();
 
-                if(m_iTimePointSps >= m_currentEvoked.data.cols()) {
+                //if(m_iTimePointSps >= m_currentEvoked.data.cols()) {
                     sourceEstimate = m_pMinimumNorm->calculateInverse(m_currentEvoked);
-                } else {
-                    m_currentEvoked = m_currentEvoked.pick_channels(m_invOp.noise_cov->names);
-                    tmin = 0.0f;
-                    tstep = 1.0f / m_pFiffInfoInput->sfreq;
-                    m_pMinimumNorm->doInverseSetup(m_currentEvoked.nave);
-                    sourceEstimate = m_pMinimumNorm->calculateInverse(m_currentEvoked.data.block(0,m_iTimePointSps,m_currentEvoked.data.rows(),1),
-                                                                      tmin,
-                                                                      tstep);
-                }
+//                } else {
+//                    m_currentEvoked = m_currentEvoked.pick_channels(m_invOp.noise_cov->names);
+//                    tmin = 0.0f;
+//                    tstep = 1.0f / m_pFiffInfoInput->sfreq;
+//                    m_pMinimumNorm->doInverseSetup(m_currentEvoked.nave);
+//                    sourceEstimate = m_pMinimumNorm->calculateInverse(m_currentEvoked.data.block(0,m_iTimePointSps,m_currentEvoked.data.rows(),1),
+//                                                                      tmin,
+//                                                                      tstep);
+//                }
 
 
                 m_qMutex.unlock();

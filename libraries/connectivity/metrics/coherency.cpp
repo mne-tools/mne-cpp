@@ -261,10 +261,8 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
 //    qint64 iTime = 0;
 //    timer.start();
 
-    if(inputData.vecPairCsd.size() == iNRows &&
-       inputData.matPsd.rows() == iNRows &&
-       inputData.matPsd.cols() == iNFreqs) {
-        //qDebug() << "Coherency::compute - vecPairCsd and matPsd were already computed for this trial.";
+    if(inputData.vecPairCsd.size() == iNRows) {
+        //qDebug() << "Coherency::compute - vecPairCsd were already computed for this trial.";
         return;
     }
 
