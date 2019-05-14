@@ -264,7 +264,7 @@ void Music::calculate()
 //    p3DDataModel->addSurfaceSet(parser.value(subjectOption), evoked.comment, t_surfSet, t_annotationSet);
 
 //    //Add rt source loc data and init some visualization values
-//    if(mnedatatreeitem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
+//    if(MNEDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption), evoked.comment, sourceEstimate, t_clusteredFwd)) {
 //        pRTDataItem->setLoopState(true);
 //        pRTDataItem->setTimeInterval(17);
 //        pRTDataItem->setNumberAverages(1);
