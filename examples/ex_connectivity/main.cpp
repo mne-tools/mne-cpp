@@ -416,7 +416,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Interpolation based");
             pRTDataItem->setColormapType("Jet");
-            pRTDataItem->setAlpha(0.1f);
+            pRTDataItem->setAlpha(0.25f);
         }
     }
 
