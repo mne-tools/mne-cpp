@@ -123,8 +123,8 @@ public:
     * @param[in] bUseGPU    Whether to use the GPU to visualize the data.
     */
     explicit MneDataTreeItem(int iType = Data3DTreeModelItemTypes::MNEDataItem,
-                                 const QString& text = "MNE",
-                                 bool bUseGPU = false);
+                             const QString& text = "MNE",
+                             bool bUseGPU = false);
 
     //=========================================================================================================
     /**

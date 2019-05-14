@@ -574,11 +574,11 @@ int main(int argc, char *argv[])
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", t_surfSet, t_annotationSet);
 
     if(MneDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
-                                                                      evoked.comment,
-                                                                      sourceEstimate,
-                                                                      t_Fwd,
-                                                                      t_surfSet,
-                                                                      t_annotationSet)) {
+                                                                  evoked.comment,
+                                                                  sourceEstimate,
+                                                                  t_Fwd,
+                                                                  t_surfSet,
+                                                                  t_annotationSet)) {
         pRTDataItem->setLoopState(true);
         pRTDataItem->setTimeInterval(17);
         pRTDataItem->setNumberAverages(1);
