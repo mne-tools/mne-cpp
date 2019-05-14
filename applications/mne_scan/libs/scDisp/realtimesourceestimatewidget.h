@@ -68,7 +68,7 @@
 //=============================================================================================================
 
 namespace DISP3DLIB {
-    class MneEstimateTreeItem;
+    class MneDataTreeItem;
     class SourceEstimateView;
 }
 
@@ -152,7 +152,7 @@ protected:
     QSharedPointer<SCMEASLIB::RealTimeSourceEstimate>   m_pRTSE;                /**< The real-time source estimate measurement. */
     QSharedPointer<DISP3DLIB::SourceEstimateView>       m_pSourceEstimateView;  /**< The 3D source estimate view. */
 
-    QPointer<DISP3DLIB::MneEstimateTreeItem>            m_pRtItem;              /**< The Disp3D real time items. */
+    QPointer<DISP3DLIB::MneDataTreeItem>            m_pRtItem;              /**< The Disp3D real time items. */
     QPointer<DISPLIB::QuickControlView>                 m_pQuickControlView;    /**< Quick control widget. */
     QPointer<QAction>                                   m_pActionQuickControl;  /**< Show quick control widget. */
 

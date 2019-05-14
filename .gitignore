@@ -65,3 +65,6 @@ Makefile
 .project
 .settings
 .vscode
+
+#builds folder
+/builds

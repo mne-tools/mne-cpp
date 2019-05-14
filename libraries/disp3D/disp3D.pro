@@ -91,7 +91,6 @@ SOURCES += \
     engine/model/items/freesurfer/fsannotationtreeitem.cpp \
     engine/model/items/hemisphere/hemispheretreeitem.cpp \
     engine/model/items/sourcespace/sourcespacetreeitem.cpp \
-    engine/model/items/sourcedata/mneestimatetreeitem.cpp \
     engine/model/items/sourcedata/ecddatatreeitem.cpp \
     engine/model/items/network/networktreeitem.cpp \
     engine/model/items/bem/bemtreeitem.cpp \
@@ -132,7 +131,8 @@ SOURCES += \
     engine/view/customframegraph.cpp \
     engine/model/materials/gpuinterpolationmaterial.cpp \
     engine/model/materials/abstractphongalphamaterial.cpp \
-    engine/view/orbitalcameracontroller.cpp
+    engine/view/orbitalcameracontroller.cpp \
+    engine/model/items/sourcedata/mnedatatreeitem.cpp
 
 HEADERS += \
     engine/view/view3D.h \
@@ -144,7 +144,6 @@ HEADERS += \
     engine/model/items/freesurfer/fsannotationtreeitem.h \
     engine/model/items/hemisphere/hemispheretreeitem.h \
     engine/model/items/sourcespace/sourcespacetreeitem.h \
-    engine/model/items/sourcedata/mneestimatetreeitem.h \
     engine/model/items/sourcedata/ecddatatreeitem.h \
     engine/model/items/network/networktreeitem.h \
     engine/model/items/bem/bemtreeitem.h \
@@ -188,7 +187,8 @@ HEADERS += \
     engine/view/customframegraph.h \
     engine/model/materials/gpuinterpolationmaterial.h \
     engine/model/materials/abstractphongalphamaterial.h \
-    engine/view/orbitalcameracontroller.h
+    engine/view/orbitalcameracontroller.h \
+    engine/model/items/sourcedata/mnedatatreeitem.h
 
 FORMS += \
     viewers/formfiles/hpiview.ui \
