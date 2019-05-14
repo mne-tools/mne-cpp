@@ -109,7 +109,7 @@ void MneDataTreeItem::initItem()
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setEditable(false);
-    this->setToolTip("MNE Estimate item");
+    this->setToolTip("MNE Data item");
 
     //Add items
     QList<QStandardItem*> list;
