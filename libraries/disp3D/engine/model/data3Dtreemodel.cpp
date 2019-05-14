@@ -251,7 +251,7 @@ QList<SourceSpaceTreeItem*> Data3DTreeModel::addForwardSolution(const QString& s
 
 //*************************************************************************************************************
 
-MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
+MneDataTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
                                                     const QString& sMeasurementSetName,
                                                     const MNESourceEstimate& tSourceEstimate,
                                                     const MNELIB::MNEForwardSolution& tForwardSolution,
@@ -266,7 +266,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
 //        qDebug("Using compute shader version for 3D visualization.");
 //    }
 
-    MneEstimateTreeItem* pReturnItem = Q_NULLPTR;
+    MneDataTreeItem* pReturnItem = Q_NULLPTR;
 
     //Handle subject item
     SubjectTreeItem* pSubjectItem = addSubject(sSubject);

@@ -106,7 +106,7 @@ namespace DISP3DLIB
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneEstimateTreeItem;
+class MneDataTreeItem;
 class SensorDataTreeItem;
 class NetworkTreeItem;
 class EcdDataTreeItem;
@@ -164,7 +164,7 @@ public:
     *
     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    MneEstimateTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate,
+    MneDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate,
                                  const MNELIB::MNEForwardSolution& tForwardSolution,
                                  const FSLIB::SurfaceSet &tSurfSet,
                                  const FSLIB::AnnotationSet &tAnnotSet,
@@ -242,7 +242,7 @@ protected:
     */
     void onSourceColorChanged(const QVariant& vertColors);
 
-    QPointer<MneEstimateTreeItem>                m_pMneEstimateTreeItem;         /**< The rt source loc data item of this item. */
+    QPointer<MneDataTreeItem>                m_pMneDataTreeItem;         /**< The rt source loc data item of this item. */
 
     QPointer<SensorDataTreeItem>                 m_pEEGSensorDataTreeItem;       /**< The rt sensor EEG data item of this item. */
     QPointer<SensorDataTreeItem>                 m_pMEGSensorDataTreeItem;       /**< The rt sensor MEG data item of this item. */

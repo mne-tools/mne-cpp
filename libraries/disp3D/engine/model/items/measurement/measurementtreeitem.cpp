@@ -41,7 +41,7 @@
 #include "measurementtreeitem.h"
 #include "../hemisphere/hemispheretreeitem.h"
 #include "../sourcespace/sourcespacetreeitem.h"
-#include "../sourcedata/mneestimatetreeitem.h"
+#include "../sourcedata/mnedatatreeitem.h"
 #include "../sourcedata/ecddatatreeitem.h"
 #include "../network/networktreeitem.h"
 #include "../freesurfer/fssurfacetreeitem.h"
@@ -164,7 +164,7 @@ QList<SourceSpaceTreeItem*> MeasurementTreeItem::addData(const MNESourceSpace& t
 
 //*************************************************************************************************************
 
-MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSourceEstimate,
+MneDataTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSourceEstimate,
                                                   const MNEForwardSolution& tForwardSolution,
                                                   const SurfaceSet& tSurfSet,
                                                   const AnnotationSet& tAnnotSet,
@@ -173,29 +173,29 @@ MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSour
 {
     if(!tSourceEstimate.isEmpty()) {        
         //CPU for source data
-        if(m_pMneEstimateTreeItem) {
-            m_pMneEstimateTreeItem->addData(tSourceEstimate);
+        if(m_pMneDataTreeItem) {
+            m_pMneDataTreeItem->addData(tSourceEstimate);
         } else {
             //Add sensor data as child
             //If item does not exists yet, create it here!
-            m_pMneEstimateTreeItem = new MneEstimateTreeItem(Data3DTreeModelItemTypes::MNEEstimateItem,
+            m_pMneDataTreeItem = new MneDataTreeItem(Data3DTreeModelItemTypes::MNEDataItem,
                                                              "MNE data",
                                                              bUseGPU);
 
             QList<QStandardItem*> list;
-            list << m_pMneEstimateTreeItem;
-            list << new QStandardItem(m_pMneEstimateTreeItem->toolTip());
+            list << m_pMneDataTreeItem;
+            list << new QStandardItem(m_pMneDataTreeItem->toolTip());
             this->appendRow(list);
 
-            m_pMneEstimateTreeItem->initData(tForwardSolution,
+            m_pMneDataTreeItem->initData(tForwardSolution,
                                              tSurfSet,
                                              tAnnotSet,
                                              p3DEntityParent);
 
-            m_pMneEstimateTreeItem->addData(tSourceEstimate);
+            m_pMneDataTreeItem->addData(tSourceEstimate);
         }
 
-        return m_pMneEstimateTreeItem;
+        return m_pMneDataTreeItem;
     }
 
     return Q_NULLPTR;
