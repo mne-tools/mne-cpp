@@ -386,11 +386,11 @@ int main(int argc, char *argv[])
     } else {
         //Add source loc data and init some visualization values
         if(MneDataTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
-                                                                                         evoked.comment,
-                                                                                         sourceEstimateEvoked,
-                                                                                         t_clusteredFwd,
-                                                                                         tSurfSetInflated,
-                                                                                         tAnnotSet)) {
+                                                                                     evoked.comment,
+                                                                                     sourceEstimateEvoked,
+                                                                                     t_clusteredFwd,
+                                                                                     tSurfSetInflated,
+                                                                                     tAnnotSet)) {
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);

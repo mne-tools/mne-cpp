@@ -580,11 +580,11 @@ int main(int argc, char *argv[])
 
     //Add rt source loc data and init some visualization values
     if(MneDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
-                                                                      evoked.comment,
-                                                                      sourceEstimate,
-                                                                      t_clusteredFwd,
-                                                                      t_surfSet,
-                                                                      t_annotationSet)) {
+                                                                  evoked.comment,
+                                                                  sourceEstimate,
+                                                                  t_clusteredFwd,
+                                                                  t_surfSet,
+                                                                  t_annotationSet)) {
         pRTDataItem->setLoopState(true);
         pRTDataItem->setTimeInterval(17);
         pRTDataItem->setNumberAverages(1);

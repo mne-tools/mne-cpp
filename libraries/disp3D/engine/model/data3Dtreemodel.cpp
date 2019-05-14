@@ -252,11 +252,11 @@ QList<SourceSpaceTreeItem*> Data3DTreeModel::addForwardSolution(const QString& s
 //*************************************************************************************************************
 
 MneDataTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
-                                                    const QString& sMeasurementSetName,
-                                                    const MNESourceEstimate& tSourceEstimate,
-                                                    const MNELIB::MNEForwardSolution& tForwardSolution,
-                                                    const FSLIB::SurfaceSet& tSurfSet,
-                                                    const FSLIB::AnnotationSet& tAnnotSet)
+                                                const QString& sMeasurementSetName,
+                                                const MNESourceEstimate& tSourceEstimate,
+                                                const MNELIB::MNEForwardSolution& tForwardSolution,
+                                                const FSLIB::SurfaceSet& tSurfSet,
+                                                const FSLIB::AnnotationSet& tAnnotSet)
 {
     bool bUseGPU = false;
 

@@ -84,8 +84,8 @@ using namespace DISP3DLIB;
 //=============================================================================================================
 
 MneDataTreeItem::MneDataTreeItem(int iType,
-                                         const QString &text,
-                                         bool bUseGPU)
+                                 const QString &text,
+                                 bool bUseGPU)
 : AbstractTreeItem(iType, text)
 , m_bIsDataInit(false)
 , m_bUseGPU(bUseGPU)
@@ -213,9 +213,9 @@ void MneDataTreeItem::initItem()
 //*************************************************************************************************************
 
 void MneDataTreeItem::initData(const MNEForwardSolution& tForwardSolution,
-                                   const SurfaceSet& tSurfSet,
-                                   const AnnotationSet& tAnnotSet,
-                                   Qt3DCore::QEntity* p3DEntityParent)
+                               const SurfaceSet& tSurfSet,
+                               const AnnotationSet& tAnnotSet,
+                               Qt3DCore::QEntity* p3DEntityParent)
 {   
     if(tForwardSolution.src.size() < 2 || tAnnotSet.size() < 2 || tSurfSet.size() < 2) {
         qDebug() << "MneDataTreeItem::initData - Two hemisphere were not found. Check input.";
@@ -635,7 +635,7 @@ void MneDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState
 //*************************************************************************************************************
 
 void MneDataTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
-                                                       const Eigen::MatrixX3f &matColorMatrixRightHemi)
+                                                   const Eigen::MatrixX3f &matColorMatrixRightHemi)
 {    
     QVariant data;
 
@@ -676,7 +676,7 @@ void MneDataTreeItem::onNewInterpolationMatrixRightAvailable(QSharedPointer<Eige
 //*************************************************************************************************************
 
 void MneDataTreeItem::onNewRtRawData(const Eigen::VectorXd &vecDataVectorLeftHemi,
-                                         const Eigen::VectorXd &vecDataVectorRightHemi)
+                                     const Eigen::VectorXd &vecDataVectorRightHemi)
 {
     if(m_pInterpolationItemLeftGPU) {
         m_pInterpolationItemLeftGPU->addNewRtData(vecDataVectorLeftHemi.cast<float>());

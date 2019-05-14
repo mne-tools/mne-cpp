@@ -165,11 +165,11 @@ QList<SourceSpaceTreeItem*> MeasurementTreeItem::addData(const MNESourceSpace& t
 //*************************************************************************************************************
 
 MneDataTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSourceEstimate,
-                                                  const MNEForwardSolution& tForwardSolution,
-                                                  const SurfaceSet& tSurfSet,
-                                                  const AnnotationSet& tAnnotSet,
-                                                  Qt3DCore::QEntity* p3DEntityParent,
-                                                  bool bUseGPU)
+                                              const MNEForwardSolution& tForwardSolution,
+                                              const SurfaceSet& tSurfSet,
+                                              const AnnotationSet& tAnnotSet,
+                                              Qt3DCore::QEntity* p3DEntityParent,
+                                              bool bUseGPU)
 {
     if(!tSourceEstimate.isEmpty()) {        
         //CPU for source data
