@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mneestimatetreeitem.cpp
+* @file     mnedatatreeitem.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MneEstimateTreeItem class definition.
+* @brief    MneDataTreeItem class definition.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mneestimatetreeitem.h"
+#include "mnedatatreeitem.h"
 #include "../../workers/rtSourceLoc/rtsourcedatacontroller.h"
 #include "../common/metatreeitem.h"
 #include "../common/abstractmeshtreeitem.h"
@@ -83,9 +83,9 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneEstimateTreeItem::MneEstimateTreeItem(int iType,
-                                         const QString &text,
-                                         bool bUseGPU)
+MneDataTreeItem::MneDataTreeItem(int iType,
+                                 const QString &text,
+                                 bool bUseGPU)
 : AbstractTreeItem(iType, text)
 , m_bIsDataInit(false)
 , m_bUseGPU(bUseGPU)
@@ -96,7 +96,7 @@ MneEstimateTreeItem::MneEstimateTreeItem(int iType,
 
 //*************************************************************************************************************
 
-MneEstimateTreeItem::~MneEstimateTreeItem()
+MneDataTreeItem::~MneDataTreeItem()
 {
     m_pRtSourceDataController->deleteLater();
 }
@@ -104,12 +104,12 @@ MneEstimateTreeItem::~MneEstimateTreeItem()
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::initItem()
+void MneDataTreeItem::initItem()
 {    
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setEditable(false);
-    this->setToolTip("MNE Estimate item");
+    this->setToolTip("MNE Data item");
 
     //Add items
     QList<QStandardItem*> list;
@@ -117,7 +117,7 @@ void MneEstimateTreeItem::initItem()
 
     MetaTreeItem* pItemStreamStatus = new MetaTreeItem(MetaTreeItemTypes::StreamStatus, "Stream data on/off");
     connect(pItemStreamStatus, &MetaTreeItem::checkStateChanged,
-            this, &MneEstimateTreeItem::onCheckStateWorkerChanged);
+            this, &MneDataTreeItem::onCheckStateWorkerChanged);
     list << pItemStreamStatus;
     list << new QStandardItem(pItemStreamStatus->toolTip());
     this->appendRow(list);
@@ -130,7 +130,7 @@ void MneEstimateTreeItem::initItem()
     QString defaultVisualizationType = "Interpolation based";
     MetaTreeItem* pItemVisuaizationType = new MetaTreeItem(MetaTreeItemTypes::VisualizationType, defaultVisualizationType);
     connect(pItemVisuaizationType, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onVisualizationTypeChanged);
+            this, &MneDataTreeItem::onVisualizationTypeChanged);
     list.clear();
     list << pItemVisuaizationType;
     list << new QStandardItem(pItemVisuaizationType->toolTip());
@@ -140,7 +140,7 @@ void MneEstimateTreeItem::initItem()
 
     MetaTreeItem* pItemColormapType = new MetaTreeItem(MetaTreeItemTypes::ColormapType, "Hot");
     connect(pItemColormapType, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onColormapTypeChanged);
+            this, &MneDataTreeItem::onColormapTypeChanged);
     list.clear();
     list << pItemColormapType;
     list << new QStandardItem(pItemColormapType->toolTip());
@@ -150,7 +150,7 @@ void MneEstimateTreeItem::initItem()
 
     MetaTreeItem* pItemSourceLocNormValue = new MetaTreeItem(MetaTreeItemTypes::DataThreshold, "0.0,5.5,15");
     connect(pItemSourceLocNormValue, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onDataThresholdChanged);
+            this, &MneDataTreeItem::onDataThresholdChanged);
     list.clear();
     list << pItemSourceLocNormValue;
     list << new QStandardItem(pItemSourceLocNormValue->toolTip());
@@ -160,7 +160,7 @@ void MneEstimateTreeItem::initItem()
 
     MetaTreeItem *pItemStreamingInterval = new MetaTreeItem(MetaTreeItemTypes::StreamingTimeInterval, "17");
     connect(pItemStreamingInterval, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onTimeIntervalChanged);
+            this, &MneDataTreeItem::onTimeIntervalChanged);
     list.clear();
     list << pItemStreamingInterval;
     list << new QStandardItem(pItemStreamingInterval->toolTip());
@@ -170,7 +170,7 @@ void MneEstimateTreeItem::initItem()
 
     MetaTreeItem *pItemLoopedStreaming = new MetaTreeItem(MetaTreeItemTypes::LoopedStreaming, "Loop last data");
     connect(pItemLoopedStreaming, &MetaTreeItem::checkStateChanged,
-            this, &MneEstimateTreeItem::onCheckStateLoopedStateChanged);
+            this, &MneDataTreeItem::onCheckStateLoopedStateChanged);
     pItemLoopedStreaming->setCheckable(true);
     pItemLoopedStreaming->setCheckState(Qt::Checked);
     list.clear();
@@ -180,7 +180,7 @@ void MneEstimateTreeItem::initItem()
 
     MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, "1");
     connect(pItemAveragedStreaming, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onNumberAveragesChanged);
+            this, &MneDataTreeItem::onNumberAveragesChanged);
     list.clear();
     list << pItemAveragedStreaming;
     list << new QStandardItem(pItemAveragedStreaming->toolTip());
@@ -196,11 +196,11 @@ void MneEstimateTreeItem::initItem()
 //    data.setValue(0.05);
 //    pItemCancelDistance->setData(data, MetaTreeItemRoles::CancelDistance);
 //    connect(pItemCancelDistance, &MetaTreeItem::dataChanged,
-//            this, &MneEstimateTreeItem::onCancelDistanceChanged);
+//            this, &MneDataTreeItem::onCancelDistanceChanged);
 
     MetaTreeItem* pInterpolationFunction = new MetaTreeItem(MetaTreeItemTypes::InterpolationFunction, "Cubic");
     connect(pInterpolationFunction, &MetaTreeItem::dataChanged,
-            this, &MneEstimateTreeItem::onInterpolationFunctionChanged);
+            this, &MneDataTreeItem::onInterpolationFunctionChanged);
     list.clear();
     list << pInterpolationFunction;
     list << new QStandardItem(pInterpolationFunction->toolTip());
@@ -212,16 +212,16 @@ void MneEstimateTreeItem::initItem()
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
-                                   const SurfaceSet& tSurfSet,
-                                   const AnnotationSet& tAnnotSet,
-                                   Qt3DCore::QEntity* p3DEntityParent)
+void MneDataTreeItem::initData(const MNEForwardSolution& tForwardSolution,
+                               const SurfaceSet& tSurfSet,
+                               const AnnotationSet& tAnnotSet,
+                               Qt3DCore::QEntity* p3DEntityParent)
 {   
     if(tForwardSolution.src.size() < 2 || tAnnotSet.size() < 2 || tSurfSet.size() < 2) {
-        qDebug() << "MneEstimateTreeItem::initData - Two hemisphere were not found. Check input.";
-        qDebug() << "MneEstimateTreeItem::initData - tForwardSolution.src.size(): "<<tForwardSolution.src.size();
-        qDebug() << "MneEstimateTreeItem::initData - tSurfSet.size(): "<<tSurfSet.size();
-        qDebug() << "MneEstimateTreeItem::initData - tAnnotSet.size(): "<<tAnnotSet.size();
+        qDebug() << "MneDataTreeItem::initData - Two hemisphere were not found. Check input.";
+        qDebug() << "MneDataTreeItem::initData - tForwardSolution.src.size(): "<<tForwardSolution.src.size();
+        qDebug() << "MneDataTreeItem::initData - tSurfSet.size(): "<<tSurfSet.size();
+        qDebug() << "MneDataTreeItem::initData - tAnnotSet.size(): "<<tAnnotSet.size();
         return;
     }
 
@@ -328,13 +328,13 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
         m_pRtSourceDataController->setStreamSmoothedData(false);
 
         connect(m_pRtSourceDataController.data(), &RtSourceDataController::newInterpolationMatrixLeftAvailable,
-                        this, &MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable);
+                        this, &MneDataTreeItem::onNewInterpolationMatrixLeftAvailable);
 
         connect(m_pRtSourceDataController.data(), &RtSourceDataController::newInterpolationMatrixRightAvailable,
-                        this, &MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable);
+                        this, &MneDataTreeItem::onNewInterpolationMatrixRightAvailable);
 
         connect(m_pRtSourceDataController.data(), &RtSourceDataController::newRtRawDataAvailable,
-                this, &MneEstimateTreeItem::onNewRtRawData);
+                this, &MneDataTreeItem::onNewRtRawData);
     } else {
         if(!m_pInterpolationItemLeftCPU)
         {
@@ -391,7 +391,7 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
         }
 
         connect(m_pRtSourceDataController.data(), &RtSourceDataController::newRtSmoothedDataAvailable,
-                this, &MneEstimateTreeItem::onNewRtSmoothedDataAvailable);
+                this, &MneDataTreeItem::onNewRtSmoothedDataAvailable);
     }
 
     m_pRtSourceDataController->setInterpolationInfo(tForwardSolution.src[0].rr,
@@ -414,10 +414,10 @@ void MneEstimateTreeItem::initData(const MNEForwardSolution& tForwardSolution,
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
+void MneDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
 {
     if(!m_bIsDataInit) {
-        qDebug() << "MneEstimateTreeItem::addData - Item has not been initialized yet!";
+        qDebug() << "MneDataTreeItem::addData - Item has not been initialized yet!";
         return;
     }
 
@@ -435,7 +435,7 @@ void MneEstimateTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setLoopState(bool state)
+void MneDataTreeItem::setLoopState(bool state)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::LoopedStreaming);
 
@@ -452,7 +452,7 @@ void MneEstimateTreeItem::setLoopState(bool state)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setStreamingState(bool state)
+void MneDataTreeItem::setStreamingState(bool state)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::StreamStatus);
 
@@ -469,7 +469,7 @@ void MneEstimateTreeItem::setStreamingState(bool state)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setTimeInterval(int iMSec)
+void MneDataTreeItem::setTimeInterval(int iMSec)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::StreamingTimeInterval);
 
@@ -486,7 +486,7 @@ void MneEstimateTreeItem::setTimeInterval(int iMSec)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setNumberAverages(int iNumberAverages)
+void MneDataTreeItem::setNumberAverages(int iNumberAverages)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::NumberAverages);
 
@@ -503,7 +503,7 @@ void MneEstimateTreeItem::setNumberAverages(int iNumberAverages)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setColormapType(const QString& sColormap)
+void MneDataTreeItem::setColormapType(const QString& sColormap)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::ColormapType);
 
@@ -520,7 +520,7 @@ void MneEstimateTreeItem::setColormapType(const QString& sColormap)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setVisualizationType(const QString& sVisualizationType)
+void MneDataTreeItem::setVisualizationType(const QString& sVisualizationType)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::VisualizationType);
 
@@ -537,7 +537,7 @@ void MneEstimateTreeItem::setVisualizationType(const QString& sVisualizationType
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setThresholds(const QVector3D& vecThresholds)
+void MneDataTreeItem::setThresholds(const QVector3D& vecThresholds)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::DataThreshold);
 
@@ -557,7 +557,7 @@ void MneEstimateTreeItem::setThresholds(const QVector3D& vecThresholds)
 
 //*************************************************************************************************************
 
-//void MneEstimateTreeItem::setCancelDistance(double dCancelDist)
+//void MneDataTreeItem::setCancelDistance(double dCancelDist)
 //{
 //    QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::CancelDistance);
 
@@ -574,7 +574,7 @@ void MneEstimateTreeItem::setThresholds(const QVector3D& vecThresholds)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setInterpolationFunction(const QString &sInterpolationFunction)
+void MneDataTreeItem::setInterpolationFunction(const QString &sInterpolationFunction)
 {
     QList<QStandardItem*> lItems = this->findChildren(MetaTreeItemTypes::InterpolationFunction);
 
@@ -591,7 +591,7 @@ void MneEstimateTreeItem::setInterpolationFunction(const QString &sInterpolation
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setSFreq(const double dSFreq)
+void MneDataTreeItem::setSFreq(const double dSFreq)
 {
     if(m_pRtSourceDataController) {
         m_pRtSourceDataController->setSFreq(dSFreq);
@@ -601,7 +601,7 @@ void MneEstimateTreeItem::setSFreq(const double dSFreq)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::setAlpha(float fAlpha)
+void MneDataTreeItem::setAlpha(float fAlpha)
 {
     if(m_pInterpolationItemLeftCPU) {
         m_pInterpolationItemLeftCPU->setAlpha(fAlpha);
@@ -620,7 +620,7 @@ void MneEstimateTreeItem::setAlpha(float fAlpha)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
+void MneDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
     if(m_pRtSourceDataController) {
         if(checkState == Qt::Checked) {
@@ -634,8 +634,8 @@ void MneEstimateTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkS
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
-                                                       const Eigen::MatrixX3f &matColorMatrixRightHemi)
+void MneDataTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
+                                                   const Eigen::MatrixX3f &matColorMatrixRightHemi)
 {    
     QVariant data;
 
@@ -653,9 +653,9 @@ void MneEstimateTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &m
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi)
+void MneDataTreeItem::onNewInterpolationMatrixLeftAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi)
 {
-    //qDebug()<<"MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable";
+    //qDebug()<<"MneDataTreeItem::onNewInterpolationMatrixLeftAvailable";
     if(m_pInterpolationItemLeftGPU) {
         m_pInterpolationItemLeftGPU->setInterpolationMatrix(pMatInterpolationMatrixLeftHemi);
     }
@@ -664,9 +664,9 @@ void MneEstimateTreeItem::onNewInterpolationMatrixLeftAvailable(QSharedPointer<E
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRightHemi)
+void MneDataTreeItem::onNewInterpolationMatrixRightAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRightHemi)
 {
-    //qDebug()<<"MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable";
+    //qDebug()<<"MneDataTreeItem::onNewInterpolationMatrixRightAvailable";
     if(m_pInterpolationItemRightGPU) {
         m_pInterpolationItemRightGPU->setInterpolationMatrix(pMatInterpolationMatrixRightHemi);
     }
@@ -675,8 +675,8 @@ void MneEstimateTreeItem::onNewInterpolationMatrixRightAvailable(QSharedPointer<
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNewRtRawData(const Eigen::VectorXd &vecDataVectorLeftHemi,
-                                         const Eigen::VectorXd &vecDataVectorRightHemi)
+void MneDataTreeItem::onNewRtRawData(const Eigen::VectorXd &vecDataVectorLeftHemi,
+                                     const Eigen::VectorXd &vecDataVectorRightHemi)
 {
     if(m_pInterpolationItemLeftGPU) {
         m_pInterpolationItemLeftGPU->addNewRtData(vecDataVectorLeftHemi.cast<float>());
@@ -690,7 +690,7 @@ void MneEstimateTreeItem::onNewRtRawData(const Eigen::VectorXd &vecDataVectorLef
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
+void MneDataTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 {
     if(sColormapType.canConvert<QString>()) {
         if(m_bUseGPU) {
@@ -712,7 +712,7 @@ void MneEstimateTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
+void MneDataTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 {
     if(iMSec.canConvert<int>()) {
         if(m_pRtSourceDataController) {
@@ -724,7 +724,7 @@ void MneEstimateTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onDataThresholdChanged(const QVariant& vecThresholds)
+void MneDataTreeItem::onDataThresholdChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
         if(m_bUseGPU) {
@@ -746,7 +746,7 @@ void MneEstimateTreeItem::onDataThresholdChanged(const QVariant& vecThresholds)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
+void MneDataTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
 {
     if(sVisType.canConvert<QString>()) {
         int iVisType = Data3DTreeModelItemRoles::InterpolationBased;
@@ -764,7 +764,7 @@ void MneEstimateTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
+void MneDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
 {
     if(m_pRtSourceDataController) {
         if(checkState == Qt::Checked) {
@@ -778,7 +778,7 @@ void MneEstimateTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& c
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
+void MneDataTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 {
     if(iNumAvr.canConvert<int>()) {
         if(m_pRtSourceDataController) {
@@ -790,7 +790,7 @@ void MneEstimateTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 
 //*************************************************************************************************************
 
-//void MneEstimateTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
+//void MneDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
 //{
 //    if(dCancelDist.canConvert<double>())
 //    {
@@ -803,7 +803,7 @@ void MneEstimateTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 
 //*************************************************************************************************************
 
-void MneEstimateTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
+void MneDataTreeItem::onInterpolationFunctionChanged(const QVariant &sInterpolationFunction)
 {
     if(sInterpolationFunction.canConvert<QString>()) {
         if(m_pRtSourceDataController) {
