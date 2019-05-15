@@ -46,7 +46,7 @@
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/network/networktreeitem.h>
 #include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
-#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
 
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
@@ -385,12 +385,12 @@ int main(int argc, char *argv[])
                                                       raw.info.bads);
     } else {
         //Add source loc data and init some visualization values
-        if(MneEstimateTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
-                                                                                         evoked.comment,
-                                                                                         sourceEstimateEvoked,
-                                                                                         t_clusteredFwd,
-                                                                                         tSurfSetInflated,
-                                                                                         tAnnotSet)) {
+        if(MneDataTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
+                                                                                     evoked.comment,
+                                                                                     sourceEstimateEvoked,
+                                                                                     t_clusteredFwd,
+                                                                                     tSurfSetInflated,
+                                                                                     tAnnotSet)) {
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
