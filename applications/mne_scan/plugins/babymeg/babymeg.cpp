@@ -156,12 +156,6 @@ BabyMEG::BabyMEG()
         connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout,
                 this, &BabyMEG::onRecordingRemainingTimeChange);
     }
-
-    //If the basic MNE Scan version is to be build hide the HPI and squid control actions in the toolbar
-    #ifdef BUILD_BASIC_MNESCAN_VERSION
-    m_pActionSqdCtrl->setVisible(false);
-    m_pActionComputeHPI->setVisible(false);
-    #endif
 }
 
 
