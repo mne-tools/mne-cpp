@@ -1,6 +1,6 @@
  //=============================================================================================================
 /**
-* @file     mneestimatetreeitem.h
+* @file     mnedatatreeitem.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     MneEstimateTreeItem class declaration.
+* @brief     MneDataTreeItem class declaration.
 *
 */
 
-#ifndef DISP3DLIB_MNEESTIMATETREEITEM_H
-#define DISP3DLIB_MNEESTIMATETREEITEM_H
+#ifndef DISP3DLIB_MNEDATATREEITEM_H
+#define DISP3DLIB_MNEDATATREEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -104,17 +104,17 @@ class GpuInterpolationItem;
 
 //=============================================================================================================
 /**
-* MneEstimateTreeItem provides a generic item to hold information about real time source localization data to plot onto the brain surface.
+* MneDataTreeItem provides a generic item to hold information about real time source localization data to plot onto the brain surface.
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DSHARED_EXPORT MneEstimateTreeItem : public AbstractTreeItem
+class DISP3DSHARED_EXPORT MneDataTreeItem : public AbstractTreeItem
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<MneEstimateTreeItem> SPtr;             /**< Shared pointer type for MneEstimateTreeItem class. */
-    typedef QSharedPointer<const MneEstimateTreeItem> ConstSPtr;  /**< Const shared pointer type for MneEstimateTreeItem class. */
+    typedef QSharedPointer<MneDataTreeItem> SPtr;             /**< Shared pointer type for MneDataTreeItem class. */
+    typedef QSharedPointer<const MneDataTreeItem> ConstSPtr;  /**< Const shared pointer type for MneDataTreeItem class. */
 
     //=========================================================================================================
     /**
@@ -124,15 +124,15 @@ public:
     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
     * @param[in] bUseGPU    Whether to use the GPU to visualize the data.
     */
-    explicit MneEstimateTreeItem(int iType = Data3DTreeModelItemTypes::MNEEstimateItem,
-                                 const QString& text = "MNE",
-                                 bool bUseGPU = false);
+    explicit MneDataTreeItem(int iType = Data3DTreeModelItemTypes::MNEDataItem,
+                             const QString& text = "MNE",
+                             bool bUseGPU = false);
 
     //=========================================================================================================
     /**
     * Default destructor
     */
-    ~MneEstimateTreeItem();
+    ~MneDataTreeItem();
 
     //=========================================================================================================
     /**
@@ -421,7 +421,7 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool MneEstimateTreeItem::isDataInit() const
+inline bool MneDataTreeItem::isDataInit() const
 {
     return m_bIsDataInit;
 }
