@@ -59,7 +59,7 @@
 #include <disp3D/viewers/abstractview.h>
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
 
 #include <utils/mnemath.h>
 
@@ -650,12 +650,12 @@ int main(int argc, char *argv[])
 
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", t_surfSet, t_annotationSet);
 
-    if(MneEstimateTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
-                                                                      evoked.comment,
-                                                                      sourceEstimate,
-                                                                      t_clusteredFwd,
-                                                                      t_surfSet,
-                                                                      t_annotationSet)) {
+    if(MneDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
+                                                                  evoked.comment,
+                                                                  sourceEstimate,
+                                                                  t_clusteredFwd,
+                                                                  t_surfSet,
+                                                                  t_annotationSet)) {
         pRTDataItem->setLoopState(true);
         pRTDataItem->setTimeInterval(17);
         pRTDataItem->setNumberAverages(1);

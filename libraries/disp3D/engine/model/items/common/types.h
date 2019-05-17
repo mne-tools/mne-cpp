@@ -88,7 +88,7 @@ namespace Data3DTreeModelItemTypes
                     HemisphereItem = QStandardItem::UserType + 2,
                     SurfaceItem = QStandardItem::UserType + 3,
                     AnnotationItem = QStandardItem::UserType + 4,
-                    MNEEstimateItem = QStandardItem::UserType + 5,
+                    MNEDataItem = QStandardItem::UserType + 5,
                     SourceSpaceItem = QStandardItem::UserType + 6,
                     NetworkItem = QStandardItem::UserType + 7,
                     SubjectItem = QStandardItem::UserType + 8,
