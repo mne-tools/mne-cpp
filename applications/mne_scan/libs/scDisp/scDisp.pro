@@ -133,10 +133,6 @@ INSTALLS += header_files
 
 OTHER_FILES +=
 
-contains(MNECPP_CONFIG, buildBasicMneScanVersion) {
-    DEFINES += BUILD_BASIC_MNESCAN_VERSION
-}
-
 # Deploy library
 win32 {
     EXTRA_ARGS =
