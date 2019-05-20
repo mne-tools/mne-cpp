@@ -120,6 +120,11 @@ RESOURCES += \
 OTHER_FILES += \
     neuromag.json
 
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../../lib
+}
+
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
 
