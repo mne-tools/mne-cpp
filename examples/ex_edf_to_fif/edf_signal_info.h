@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     edf_info.h
+* @file     edf_signal_info.h
 * @author   Simon Heinke <simon.heinke@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     April, 2019
+* @date     May, 2019
 *
 * @section  LICENSE
 *
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the EDFInfo class.
+* @brief    Contains the declaration of the EDFSignalInfo class.
 *
 */
 
-#ifndef EDF_INFO_H
-#define EDF_INFO_H
+#ifndef EDF_SIGNAL_INFO_H
+#define EDF_SIGNAL_INFO_H
 
 
 //*************************************************************************************************************
@@ -42,24 +42,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "edf_signal_info.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDateTime>
-#include <QVector>
+#include <QString>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class QIODevice;
 
 
 //*************************************************************************************************************
@@ -73,25 +68,42 @@ namespace EDFINFOEXAMPLE
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EDFInfo
+* DECLARE CLASS EDFSignalInfo
 *
-* @brief The EDFInfo holds all relevant information for EDF files.
+* @brief The EDFSignalInfo is a simple container class that holds all relevant information for EDF signals.
 */
-class EDFInfo
+class EDFSignalInfo
 {
 
 public:
-    //=========================================================================================================
-    /**
-    * Constructs an EDFInfo by parsing the header of the passed edf file pDev.
-    */
-    EDFInfo();
 
     //=========================================================================================================
     /**
-    * Constructs an EDFInfo by parsing the passed IO device.
+    * Default constructor.
     */
-    EDFInfo(QIODevice* pDev);
+    EDFSignalInfo();
+
+    //=========================================================================================================
+    /**
+    * Constructor just copies values.
+    */
+    EDFSignalInfo(const QString label,
+                  const QString transducer,
+                  const QString physicalDimension,
+                  const QString prefiltering,
+                  const float physicalMin,
+                  const float physicalMax,
+                  const long digitalMin,
+                  const long digitalMax,
+                  const long numberOfSamplesPerRecord,
+                  const long numberOfSamplesTotal,
+                  const float mfrequency);
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    */
+    EDFSignalInfo(const EDFSignalInfo& other);
 
     //=========================================================================================================
     /**
@@ -101,27 +113,27 @@ public:
     */
     QString getAsString() const;
 
-    inline QVector<EDFSignalInfo> getMeasurementSignalInfos() const;
+    inline QString getLabel() const;
 
-    inline int getNumberOfDataRecords() const;
+    inline int getNumberOfSamplesPerRecord() const;
 
-    inline int getNumberOfSignals() const;
+    inline float getFrequency() const;
 
 private:
-    // data fields for EDF header. The member order does not correlate with the position in the header.
-    QString     m_sEDFVersionNo;
-    QString     m_sLocalPatientIdentification;
-    QString     m_sLocalRecordingIdentification;
-    QDateTime   m_startDateTime;
-    int         m_iNumBytesInHeader;
-    int         m_iNumDataRecords;
-    float       m_fDataRecordsDuration;
-    int         m_iNumSignals;
+    // data fields for EDF signals. The member order does not correlate with the position in the header.
+    QString m_sLabel;                 // e.g. EEG Fpz-Cz or Body temp
+    QString m_sTransducerType;        // e.g. AgAgCl electrode
+    QString m_sPhysicalDimension;     // e.g. uV or degreeC
+    QString m_sPrefiltering;          // e.g. HP: 0.1Hz LP: 75Hz
+    float m_fPhysicalMinimum;          // e.g. -500 or 34
+    float m_fPhysicalMaximum;          // e.g. -500 or 34
+    long m_iDigitalMinimum;            // e.g. -2048
+    long m_iDigitalMaximum;            // e.g. 2047
+    long m_iNumberOfSamplesPerRecord; // e.g. 250 or 1
 
-    // vector of all signals that (probably) contain continuous measurement data
-    QVector<EDFSignalInfo>  m_vMeasurementSignals;
-    // vector for all other signals, e.g. stimuli etc.
-    QVector<EDFSignalInfo>  m_vExtraSignals;
+    // convenience fields, calculated using EDF data fields
+    long m_iNumberOfSamplesTotal;
+    float m_frequency;
 };
 
 //*************************************************************************************************************
@@ -129,25 +141,24 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-
-inline QVector<EDFSignalInfo> EDFInfo::getMeasurementSignalInfos() const {
-    return m_vMeasurementSignals;
+inline QString EDFSignalInfo::getLabel() const {
+    return m_sLabel;
 }
 
 
 //*************************************************************************************************************
 
-inline int EDFInfo::getNumberOfDataRecords() const {
-    return m_iNumDataRecords;
+inline int EDFSignalInfo::getNumberOfSamplesPerRecord() const {
+    return m_iNumberOfSamplesPerRecord;
 }
 
 
 //*************************************************************************************************************
 
-inline int EDFInfo::getNumberOfSignals() const {
-    return m_iNumSignals;
+inline float EDFSignalInfo::getFrequency() const {
+    return m_frequency;
 }
 
 } // NAMESPACE
 
-#endif // EDF_INFO_H
+#endif // EDF_SIGNAL_INFO_H
