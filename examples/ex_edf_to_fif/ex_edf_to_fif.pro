@@ -80,10 +80,12 @@ DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES +=  main.cpp \
             edf_info.cpp \
-            edf_raw_data.cpp
+            edf_raw_data.cpp \
+            edf_signal_info.cpp
 
 HEADERS +=  edf_info.h \
-            edf_raw_data.h
+            edf_raw_data.h \
+            edf_signal_info.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

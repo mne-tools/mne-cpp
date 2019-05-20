@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     edf_signal_info.cpp
 * @author   Simon Heinke <simon.heinke@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     April, 2019
+* @date     May, 2019
 *
 * @section  LICENSE
 *
@@ -29,35 +29,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of using the EDF utilities
+* @brief    Definition of the EDFSignalInfo class.
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <vector>
-
-#include "edf_info.h"
-#include "edf_raw_data.h"
+#include "edf_signal_info.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QFile>
-#include <QApplication>
-#include <QDebug>
-#include <QMainWindow>
-#include <QtCharts/QChart>
-#include <QtCharts/QChartView>
-#include <QtCharts/QLineSeries>
 
 
 //*************************************************************************************************************
@@ -66,59 +53,85 @@
 //=============================================================================================================
 
 using namespace EDFINFOEXAMPLE;
-using namespace QtCharts;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
-int main(int argc, char *argv[])
+EDFSignalInfo::EDFSignalInfo()
 {
-    QApplication app(argc, argv);
 
-    QFile file("C:\\Users\\Simon\\Desktop\\hiwi\\edf_files\\00000929_s005_t000.edf");
+}
 
-    EDFRawData raw(&file);
-    EDFInfo info = raw.getInfo();
-    qDebug().noquote() << info.getAsString();
 
-    /*
-    QVector<QVector<float>> rawData =  raw.readRawData();
+//*************************************************************************************************************
 
-    QMainWindow* temp = new QMainWindow();
+EDFSignalInfo::EDFSignalInfo(const QString label,
+                             const QString transducer,
+                             const QString physicalDimension,
+                             const QString prefiltering,
+                             const float physicalMin,
+                             const float physicalMax,
+                             const long digitalMin,
+                             const long digitalMax,
+                             const long numberOfSamplesPerRecord,
+                             const long numberOfSamplesTotal,
+                             const float mfrequency)
+: m_sLabel(label),
+  m_sTransducerType(transducer),
+  m_sPhysicalDimension(physicalDimension),
+  m_sPrefiltering(prefiltering),
+  m_fPhysicalMinimum(physicalMin),
+  m_fPhysicalMaximum(physicalMax),
+  m_iDigitalMinimum(digitalMin),
+  m_iDigitalMaximum(digitalMax),
+  m_iNumberOfSamplesPerRecord(numberOfSamplesPerRecord),
+  m_iNumberOfSamplesTotal(numberOfSamplesTotal),
+  m_frequency(mfrequency)
+{
 
-    QChart* chart = new QChart();
+}
 
-    chart->legend()->hide();
 
-    QLineSeries* series = new QLineSeries();
+//*************************************************************************************************************
 
-    for(int i = 20200; i < 21000; ++i) {
-        series->append(i, static_cast<double>(rawData[0][i]));
-    }
+EDFSignalInfo::EDFSignalInfo(const EDFSignalInfo& other)
+: m_sLabel(other.m_sLabel),
+  m_sTransducerType(other.m_sTransducerType),
+  m_sPhysicalDimension(other.m_sPhysicalDimension),
+  m_sPrefiltering(other.m_sPrefiltering),
+  m_fPhysicalMinimum(other.m_fPhysicalMinimum),
+  m_fPhysicalMaximum(other.m_fPhysicalMaximum),
+  m_iDigitalMinimum(other.m_iDigitalMinimum),
+  m_iDigitalMaximum(other.m_iDigitalMaximum),
+  m_iNumberOfSamplesPerRecord(other.m_iNumberOfSamplesPerRecord),
+  m_iNumberOfSamplesTotal(other.m_iNumberOfSamplesTotal),
+  m_frequency(other.m_frequency)
+{
 
-    chart->addSeries(series);
-    chart->createDefaultAxes();
-    chart->setTitle("Singular EEG Channel");
+}
 
-    QChartView* cView = new QChartView(chart);
 
-    temp->setCentralWidget(cView);
-    temp->resize(1000, 300);
-    temp->show();
-    */
+//*************************************************************************************************************
 
-    return app.exec();
+QString EDFSignalInfo::getAsString() const
+{
+    QString result;
+
+    result += "\n== EDF SIGNAL INFO START ==";
+    result += "\nChannel Label: " + m_sLabel;
+    result += "\nTransducer Type: " + m_sTransducerType;
+    result += "\nPhysical Dimension: " + m_sPhysicalDimension;
+    result += "\nPrefiltering: " + m_sPrefiltering;
+    result += "\nPhysical Minimum: " + QString::number(m_fPhysicalMinimum);
+    result += "\nPhysical Maximum: " + QString::number(m_fPhysicalMaximum);
+    result += "\nDigital Minimum: " + QString::number(m_iDigitalMinimum);
+    result += "\nDigital Maximum: " + QString::number(m_iDigitalMaximum);
+    result += "\nNumber of Samples per Record: " + QString::number(m_iNumberOfSamplesPerRecord);
+    result += "\nTotal Number of Samples: " + QString::number(m_iNumberOfSamplesTotal);
+    result += "\nChannel Frequency: " + QString::number(m_frequency);
+
+    return result;
 }

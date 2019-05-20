@@ -63,85 +63,6 @@ using namespace EDFINFOEXAMPLE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EDFSignalInfo::EDFSignalInfo()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-EDFSignalInfo::EDFSignalInfo(const QString label,
-                             const QString transducer,
-                             const QString physicalDimension,
-                             const QString prefiltering,
-                             const float physicalMin,
-                             const float physicalMax,
-                             const long digitalMin,
-                             const long digitalMax,
-                             const long numberOfSamplesPerRecord,
-                             const long numberOfSamplesTotal,
-                             const float mfrequency)
-: sLabel(label),
-  sTransducerType(transducer),
-  sPhysicalDimension(physicalDimension),
-  sPrefiltering(prefiltering),
-  physicalMinimum(physicalMin),
-  physicalMaximum(physicalMax),
-  digitalMinimum(digitalMin),
-  digitalMaximum(digitalMax),
-  iNumberOfSamplesPerRecord(numberOfSamplesPerRecord),
-  iNumberOfSamplesTotal(numberOfSamplesTotal),
-  frequency(mfrequency)
-{
-
-}
-
-
-//*************************************************************************************************************
-
-EDFSignalInfo::EDFSignalInfo(const EDFSignalInfo& other)
-: sLabel(other.sLabel),
-  sTransducerType(other.sTransducerType),
-  sPhysicalDimension(other.sPhysicalDimension),
-  sPrefiltering(other.sPrefiltering),
-  physicalMinimum(other.physicalMinimum),
-  physicalMaximum(other.physicalMaximum),
-  digitalMinimum(other.digitalMinimum),
-  digitalMaximum(other.digitalMaximum),
-  iNumberOfSamplesPerRecord(other.iNumberOfSamplesPerRecord),
-  iNumberOfSamplesTotal(other.iNumberOfSamplesTotal),
-  frequency(other.frequency)
-{
-
-}
-
-
-//*************************************************************************************************************
-
-QString EDFSignalInfo::getAsString() const
-{
-    QString result;
-
-    result += "\n== EDF SIGNAL INFO START ==";
-    result += "\nChannel Label: " + sLabel;
-    result += "\nTransducer Type: " + sTransducerType;
-    result += "\nPhysical Dimension: " + sPhysicalDimension;
-    result += "\nPrefiltering: " + sPrefiltering;
-    result += "\nPhysical Minimum: " + QString::number(physicalMinimum);
-    result += "\nPhysical Maximum: " + QString::number(physicalMaximum);
-    result += "\nDigital Minimum: " + QString::number(digitalMinimum);
-    result += "\nDigital Maximum: " + QString::number(digitalMaximum);
-    result += "\nNumber of Samples per Record: " + QString::number(iNumberOfSamplesPerRecord);
-    result += "\nTotal Number of Samples: " + QString::number(iNumberOfSamplesTotal);
-    result += "\nChannel Frequency: " + QString::number(frequency);
-
-    return result;
-}
-
-
-//*************************************************************************************************************
-
 EDFInfo::EDFInfo()
 {
 
@@ -164,21 +85,18 @@ EDFInfo::EDFInfo(QIODevice* pDev)
     }
 
     // general info, which is not independent of individual signals
-    sEDFVersionNo = QString::fromLatin1(pDev->read(8)).trimmed();
-    sLocalPatientIdentification = QString::fromLatin1(pDev->read(80)).trimmed();
-    sLocalRecordingIdentification = QString::fromLatin1(pDev->read(80)).trimmed();
-    startDateTime.setDate(QDate::fromString(QString::fromLatin1(pDev->read(8)), "dd.MM.yy"));
-    // original paper on EDF was first published in 1992 (this code is future-proof only for the next 73 years)
-    if(startDateTime.date().year() <= 1990) {
-        // timetravel into the 2000's
-        startDateTime = startDateTime.addYears(100);
-    }
-    startDateTime.setTime(QTime::fromString(QString::fromLatin1(pDev->read(8)), "hh.mm.ss"));
-    iNumBytesInHeader = QString::fromLatin1(pDev->read(8)).toInt();
+    m_sEDFVersionNo = QString::fromLatin1(pDev->read(8)).trimmed();
+    m_sLocalPatientIdentification = QString::fromLatin1(pDev->read(80)).trimmed();
+    m_sLocalRecordingIdentification = QString::fromLatin1(pDev->read(80)).trimmed();
+    m_startDateTime.setDate(QDate::fromString(QString::fromLatin1(pDev->read(8)), "dd.MM.yy"));
+    // the format only contains two digits for the year, so we need to do a bit of timetraveling in order not to end up in the 1910's
+    m_startDateTime = m_startDateTime.addYears(100);  // NOTE: this code might only be futureproof for the next 81 years.
+    m_startDateTime.setTime(QTime::fromString(QString::fromLatin1(pDev->read(8)), "hh.mm.ss"));
+    m_iNumBytesInHeader = QString::fromLatin1(pDev->read(8)).toInt();
     pDev->read(44);  // next 44 bytes are unused
-    iNumDataRecords = QString::fromLatin1(pDev->read(8)).toInt();
-    fDataRecordsDuration = QString::fromLatin1(pDev->read(8)).toFloat();
-    iNumSignals = QString::fromLatin1(pDev->read(4)).toInt();
+    m_iNumDataRecords = QString::fromLatin1(pDev->read(8)).toInt();
+    m_fDataRecordsDuration = QString::fromLatin1(pDev->read(8)).toFloat();
+    m_iNumSignals = QString::fromLatin1(pDev->read(4)).toInt();
 
     // use the order specified by EDF
     QVector<QString> labels;
@@ -191,44 +109,75 @@ EDFInfo::EDFInfo(QIODevice* pDev)
     QVector<QString> prefilterings;
     QVector<long> numbersOfSamplesPerRecords;
 
-    for(int i = 0; i < iNumSignals; ++i)
+    for(int i = 0; i < m_iNumSignals; ++i)
         labels.push_back(QString::fromLatin1(pDev->read(16)).trimmed());
-    for(int i = 0; i < iNumSignals; ++i)
+    for(int i = 0; i < m_iNumSignals; ++i)
         transducers.push_back(QString::fromLatin1(pDev->read(80)).trimmed());
-    for(int i = 0; i < iNumSignals; ++i)
+    for(int i = 0; i < m_iNumSignals; ++i)
         physicalDims.push_back(QString::fromLatin1(pDev->read(8)).trimmed());
-    for(int i = 0; i < iNumSignals; ++i)
+    for(int i = 0; i < m_iNumSignals; ++i)
         physicalMins.push_back(QString::fromLatin1(pDev->read(8)).toFloat());
-    for(int i = 0; i < iNumSignals; ++i)
+    for(int i = 0; i < m_iNumSignals; ++i)
         physicalMaxs.push_back(QString::fromLatin1(pDev->read(8)).toFloat());
-    for(int i = 0; i < iNumSignals; ++i)
+    for(int i = 0; i < m_iNumSignals; ++i)
         digitalMins.push_back(QString::fromLatin1(pDev->read(8)).toLong());
-    for(int i = 0; i < iNumSignals; ++i)
+    for(int i = 0; i < m_iNumSignals; ++i)
         digitalMaxs.push_back(QString::fromLatin1(pDev->read(8)).toLong());
-    for(int i = 0; i < iNumSignals; ++i)
+    for(int i = 0; i < m_iNumSignals; ++i)
         prefilterings.push_back(QString::fromLatin1(pDev->read(80)).trimmed());
-    for(int i = 0; i < iNumSignals; ++i)
+    for(int i = 0; i < m_iNumSignals; ++i)
         numbersOfSamplesPerRecords.push_back(QString::fromLatin1(pDev->read(8)).toLong());
-    for(int i = 0; i < iNumSignals; ++i)
+    for(int i = 0; i < m_iNumSignals; ++i)
         pDev->read(32);  // next 32 bytes are unused
 
-    for(int i = 0; i < iNumSignals; ++i) {
-        vSignals.push_back(EDFSignalInfo(labels[i],
-                                         transducers[i],
-                                         physicalDims[i],
-                                         prefilterings[i],
-                                         physicalMins[i],
-                                         physicalMaxs[i],
-                                         digitalMins[i],
-                                         digitalMaxs[i],
-                                         numbersOfSamplesPerRecords[i],
-                                         numbersOfSamplesPerRecords[i] * iNumDataRecords,
-                                         numbersOfSamplesPerRecords[i] / fDataRecordsDuration));
+    // create temporary vector of EDFSignalInfos
+    QVector<EDFSignalInfo> vTempSignals;
+    for(int i = 0; i < m_iNumSignals; ++i) {
+        vTempSignals.push_back(EDFSignalInfo(labels[i],
+                                             transducers[i],
+                                             physicalDims[i],
+                                             prefilterings[i],
+                                             physicalMins[i],
+                                             physicalMaxs[i],
+                                             digitalMins[i],
+                                             digitalMaxs[i],
+                                             numbersOfSamplesPerRecords[i],
+                                             numbersOfSamplesPerRecords[i] * m_iNumDataRecords,
+                                             numbersOfSamplesPerRecords[i] / m_fDataRecordsDuration));
     }
 
     // we should have reached the end of the header
-    if(pDev->pos() != iNumBytesInHeader) {
-        qDebug() << "[EDFInfo::EDFInfo] Fatal: Number of bytes read is not equal to number of bytes in header!";
+    if(pDev->pos() != m_iNumBytesInHeader) {
+        qDebug() << "[EDFInfo::EDFInfo] Warning: Number of bytes read is not equal to number of bytes in header!"
+                 << " This most certainly means that a misalignment occured and that all data fields contain unusable values.";
+    }
+
+    // do post-processing: variable channel frequencies are not supported, take highest available frequency as main frequency.
+    // use 'NumberOfSamplesPerRecord' field in order to avoid float comparisons
+    long iMaxNumberOfSamplesPerRecord = -1;
+    for(const auto& s : vTempSignals) {
+        if(s.getNumberOfSamplesPerRecord() > iMaxNumberOfSamplesPerRecord) {
+            iMaxNumberOfSamplesPerRecord = s.getNumberOfSamplesPerRecord();
+        }
+    }
+
+    // sort vector of temporary EDFSignalInfos into two groups: measurementSignals and extraSignals
+    for(const auto& signal : vTempSignals) {
+        if(signal.getNumberOfSamplesPerRecord() == iMaxNumberOfSamplesPerRecord) {
+            // this is (probably) a measurement signal
+            m_vMeasurementSignals.push_back(signal);
+        } else {
+            // this is an extra signal, e.g. stimulus
+            m_vExtraSignals.push_back(signal);
+        }
+    }
+
+    // tell user about extra signals
+    if(m_vExtraSignals.size()) {
+        qDebug() << "[EDFInfo::EDFInfo] Found " << m_vExtraSignals.size() << " extra channels, which are: ";
+        for(const auto& signal : m_vExtraSignals) {
+            qDebug() << signal.getLabel();
+        }
     }
 }
 
@@ -239,17 +188,23 @@ QString EDFInfo::getAsString() const
 {
     QString result;
     result += "== EDF INFO START ==";
-    result += "\nEDF Version Number: " + sEDFVersionNo;
-    result += "\nLocal Patient Identification: " + sLocalPatientIdentification;
-    result += "\nLocal Recording Identification: " + sLocalRecordingIdentification;
-    result += "\nDate of Recording: " + startDateTime.date().toString("dd.MM.yyyy");
-    result += "\nTime of Recording: " + startDateTime.time().toString("hh:mm:ss");
-    result += "\nNumber of Bytes in the EDF Header: " + QString::number(iNumBytesInHeader);
-    result += "\nNumber of Data Records: " + QString::number(iNumDataRecords);
-    result += "\nDuration of each Data Record (in Seconds): " + QString::number(fDataRecordsDuration);
-    result += "\nNumber of Signals in EDF File: " + QString::number(iNumSignals);
+    result += "\nEDF Version Number: " + m_sEDFVersionNo;
+    result += "\nLocal Patient Identification: " + m_sLocalPatientIdentification;
+    result += "\nLocal Recording Identification: " + m_sLocalRecordingIdentification;
+    result += "\nDate of Recording: " + m_startDateTime.date().toString("dd.MM.yyyy");
+    result += "\nTime of Recording: " + m_startDateTime.time().toString("hh:mm:ss");
+    result += "\nNumber of Bytes in the EDF Header: " + QString::number(m_iNumBytesInHeader);
+    result += "\nNumber of Data Records: " + QString::number(m_iNumDataRecords);
+    result += "\nDuration of each Data Record (in Seconds): " + QString::number(m_fDataRecordsDuration);
+    result += "\nNumber of Signals in EDF File: " + QString::number(m_iNumSignals);
 
-    for(const auto& signal : vSignals) {
+    result += "\n== MEASUREMENT SIGNALS ==";
+    for(const auto& signal : m_vMeasurementSignals) {
+        result += signal.getAsString();
+    }
+
+    result += "\n== EXTRA SIGNALS ==";
+    for(const auto& signal : m_vExtraSignals) {
         result += signal.getAsString();
     }
 

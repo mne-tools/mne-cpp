@@ -85,13 +85,15 @@ EDFInfo EDFRawData::getInfo() const
 
 QVector<QVector<float>> EDFRawData::readRawData() const
 {
+    qDebug() << "this function is temporarily unusable !";
+    /*
     // read whole file in data-record-sized portions (this is probably quite ineffective, better read bigger chunks)
     int sizeOfDataRecordInBytes = 0;
-    for(const auto& signal : m_info.vSignals) {
-        sizeOfDataRecordInBytes += signal.iNumberOfSamplesPerRecord * 2;  // 2 bytes per integer value, this might be different for bdf files
+    for(const auto& signal : m_info.getSignalInfos()) {
+        sizeOfDataRecordInBytes += signal.getNumberOfSamplesPerRecord() * 2;  // 2 bytes per integer value, this might be different for bdf files
     }
     QVector<QByteArray> vRecords;
-    for(int i = 0; i < m_info.iNumDataRecords; ++i) {
+    for(int i = 0; i < m_info.getNumberOfDataRecords(); ++i) {
         vRecords.push_back(m_pDev->read(sizeOfDataRecordInBytes));
     }
 
@@ -102,13 +104,13 @@ QVector<QVector<float>> EDFRawData::readRawData() const
 
     // translate data records into signals, start with empty vectors
     QVector<QVector<int>> signalValues;
-    for(int i = 0; i < m_info.iNumSignals; ++i) {
+    for(int i = 0; i < m_info.getNumberOfSignals(); ++i) {
         signalValues.append(QVector<int>());
     }
     // go through each record
     for(int recIdx = 0; recIdx < vRecords.size(); ++recIdx) {
-        for(int sigIdx = 0; sigIdx < m_info.iNumSignals; ++sigIdx) {
-            for(int sampIdx = 0; sampIdx < m_info.vSignals[sigIdx].iNumberOfSamplesPerRecord; ++sampIdx) {
+        for(int sigIdx = 0; sigIdx < m_info.getNumberOfSignals(); ++sigIdx) {
+            for(int sampIdx = 0; sampIdx < m_info.getSignalInfos()[sigIdx].getNumberOfSamplesPerRecord(); ++sampIdx) {
                 // factor 2 because of 2 byte representation, this is different for bdf files
                 // we need the unary AND operation with '0x00ff' on the right side in order to prevent sign flipping through unintential interpretation as 2's complement integer.
                 signalValues[sigIdx].append((vRecords[recIdx].at(sampIdx * 2 + 1) << 8) | (vRecords[recIdx].at(sampIdx * 2) & 0x00ff));
@@ -128,8 +130,10 @@ QVector<QVector<float>> EDFRawData::readRawData() const
     if(numSignalValues * 2 != numBytes) {
         qDebug() << "[EDFInfo::readRawData] Fatal: Divergence between total number of samples and read bytes";
     }
+    */
 
     // @TODO add scaling according to digitalMin, digitalMax, physicalMin, physicalMax ?
+    QVector<QVector<int>> signalValues;
     QVector<QVector<float>> result;
 
     for(const auto& sv : signalValues) {
