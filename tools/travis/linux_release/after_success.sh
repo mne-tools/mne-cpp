@@ -1,7 +1,7 @@
 #!/bin/bash
 #set -ev
 
-if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
+#if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
     echo -e "Packaging binaries and libs"
 
     # === Copy Libs ===
@@ -20,9 +20,14 @@ if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
     #Master
     if [[ $TRAVIS_BRANCH == 'master' ]]; then
         # upload artifacts
+    	echo -e "Trying old code"
         curl -u $MASTER_LOGIN:$MASTER_PASSWORD -T $archive_name ftp://$REMOTE_SERVER/ --connect-timeout 8 --retry 10 --retry-delay 3
+    	echo -e "Trying new code"
+        curl -u $MASTER_LOGIN:$MASTER_PASSWORD -T $archive_name ftp://$REMOTE_SERVER/
+    	echo -e "Trying new code 1"
+        curl -u $MASTER_LOGIN:$MASTER_PASSWORD -T $archive_name ftp://$REMOTE_SERVER/ --retry 10 --retry-delay 3
     elif [[ $TRAVIS_BRANCH == '1.0.0' ]]; then
         # upload artifacts
         curl -u $ONEOO_LOGIN:$ONEOO_PASSWORD -T $archive_name ftp://$REMOTE_SERVER/ --connect-timeout 8 --retry 10 --retry-delay 3
     fi
-fi
+#fi
