@@ -43,6 +43,7 @@
 
 #include <rtprocessing/rtconnectivity.h>
 
+#include <connectivity/metrics/abstractmetric.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
 

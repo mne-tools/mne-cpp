@@ -67,7 +67,7 @@ using namespace CONNECTIVITYLIB;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-bool AbstractMetric::m_bStorageModeIsActive = true;
+bool AbstractMetric::m_bStorageModeIsActive = false;
 int AbstractMetric::m_iNumberBinStart = -1;
 int AbstractMetric::m_iNumberBinAmount = -1;
 

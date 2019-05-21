@@ -407,14 +407,23 @@ void MNEEpochDataList::checkChThreshold(ArtifactRejectionData& inputData)
     double min = temp.minCoeff();
     double max = temp.maxCoeff();
 
-//    qDebug() << "MNEEpochDataList::checkChVariance - min" << min;
-//    qDebug() << "MNEEpochDataList::checkChVariance - max" << max;
-//    qDebug() << "MNEEpochDataList::checkChVariance - m_dValueThreshold" << m_dValueThreshold;
+    // Peak to Peak
+    double pp = max - min;
 
-    //If absolute vaue of min or max if bigger than threshold -> reject
-    if((std::fabs(min) > inputData.dThreshold) || (std::fabs(max) > inputData.dThreshold)) {
+    if(std::fabs(pp) > inputData.dThreshold) {
         inputData.bRejected = true;
     } else {
         inputData.bRejected = false;
     }
+
+//    qDebug() << "MNEEpochDataList::checkChVariance - min" << min;
+//    qDebug() << "MNEEpochDataList::checkChVariance - max" << max;
+//    qDebug() << "MNEEpochDataList::checkChVariance - m_dValueThreshold" << m_dValueThreshold;
+
+//    //If absolute vaue of min or max if bigger than threshold -> reject
+//    if((std::fabs(min) > inputData.dThreshold) || (std::fabs(max) > inputData.dThreshold)) {
+//        inputData.bRejected = true;
+//    } else {
+//        inputData.bRejected = false;
+//    }
 }

@@ -104,7 +104,6 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
     }   
 
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
-    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();

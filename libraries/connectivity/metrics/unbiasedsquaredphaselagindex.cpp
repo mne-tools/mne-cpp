@@ -109,8 +109,11 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
         return finalNetwork;
     }
 
+    if(AbstractMetric::m_bStorageModeIsActive == false) {
+        connectivitySettings.clearIntermediateData();
+    }
+
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
-    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
@@ -156,6 +159,8 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
         AbstractMetric::m_iNumberBinStart = 0;
         AbstractMetric::m_iNumberBinAmount = iNFreqs;
     }
+
+    finalNetwork.setNumberFreqBins(AbstractMetric::m_iNumberBinAmount);
 
     QMutex mutex;
 

@@ -109,8 +109,11 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
         return finalNetwork;
     }
 
+    if(AbstractMetric::m_bStorageModeIsActive == false) {
+        connectivitySettings.clearIntermediateData();
+    }
+
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
-    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();
@@ -131,9 +134,10 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
     // Generate tapers
     int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getNumberFFT();
-    if(iNfft > iSignalLength) {
-        iNfft = iSignalLength;
-    }
+
+//    if(iNfft > iSignalLength) {
+//        iNfft = iSignalLength;
+//    }
 
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
 
