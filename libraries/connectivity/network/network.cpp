@@ -91,7 +91,7 @@ Network::Network(const QString& sConnectivityMethod,
 , m_minMaxThresholdedWeights(QPair<double,double>(std::numeric_limits<double>::max(),0.0))
 , m_dThreshold(dThreshold)
 , m_fSFreq(0.0f)
-, m_iNumberSamples(0)
+, m_iNumberFreqBins(0)
 {
     qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
     qRegisterMetaType<CONNECTIVITYLIB::Network::SPtr>("CONNECTIVITYLIB::Network::SPtr");
@@ -380,6 +380,8 @@ double Network::getThreshold()
 
 void Network::setFrequencyRange(float fLowerFreq, float fUpperFreq)
 {
+    qDebug() << "Network::setFrequencyRange - fLowerFreq" << fLowerFreq;
+    qDebug() << "Network::setFrequencyRange - fUpperFreq" << fUpperFreq;
     if(fLowerFreq > fUpperFreq || fUpperFreq < fLowerFreq) {
         qDebug() << "Network::setFrequencyRange - Upper and lower frequency are out of range from each other. Weights will not be recalculated. Returning.";
         return;
@@ -391,22 +393,28 @@ void Network::setFrequencyRange(float fLowerFreq, float fUpperFreq)
     }
 
     if(fUpperFreq > m_fSFreq/2.0f) {
-        qDebug() << "Network::setFrequencyRange - Upper frequency is bigger than nyquist frequency. You might check the set sampling frequency. Returning.";
+        qDebug() << "Network::setFrequencyRange - Upper frequency is bigger than nyquist frequency. Returning.";
         return;
     }
 
-    if(m_iNumberSamples <= 0) {
+    if(m_iNumberFreqBins <= 0) {
         qDebug() << "Network::setFrequencyRange - Number of samples has not been set. Returning.";
         return;
     }
 
-    double dScaleFactor = m_iNumberSamples/m_fSFreq;
+    double dScaleFactor = m_iNumberFreqBins/(m_fSFreq/2);
+
+    qDebug() << "Network::setFrequencyRange - m_iNumberFreqBins" << m_iNumberFreqBins;
+    qDebug() << "Network::setFrequencyRange - m_fSFreq" << m_fSFreq;
+    qDebug() << "Network::setFrequencyRange - dScaleFactor" << dScaleFactor;
 
     m_minMaxFrequency.first = fLowerFreq;
     m_minMaxFrequency.second = fUpperFreq;
 
     int iLowerBin = fLowerFreq * dScaleFactor;
     int iUpperBin = fUpperFreq * dScaleFactor;
+    qDebug() << "Network::setFrequencyRange - iLowerBin" << iLowerBin;
+    qDebug() << "Network::setFrequencyRange - iUpperBin" << iUpperBin;
 
     // Update the min max values
     m_minMaxFullWeights = QPair<double,double>(std::numeric_limits<double>::max(),0.0);
@@ -528,15 +536,15 @@ void Network::setSamplingFrequency(float fSFreq)
 
 //*************************************************************************************************************
 
-int Network::getNumberSamples() const
+int Network::getNumberFreqBins() const
 {
-    return m_iNumberSamples;
+    return m_iNumberFreqBins;
 }
 
 
 //*************************************************************************************************************
 
-void Network::setNumberSamples(int iNumberSamples)
+void Network::setNumberFreqBins(int iNumberFreqBins)
 {
-    m_iNumberSamples = iNumberSamples;
+    m_iNumberFreqBins = iNumberFreqBins;
 }

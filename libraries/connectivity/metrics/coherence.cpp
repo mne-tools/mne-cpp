@@ -103,15 +103,19 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
         return finalNetwork;
     }
 
+    if(AbstractMetric::m_bStorageModeIsActive == false) {
+        connectivitySettings.clearIntermediateData();
+    }
+
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
-    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
+    //finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     // Check if start and bin amount need to be reset to full spectrum
-    int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getNumberFFT();
-    if(iNfft > iSignalLength) {
-        iNfft = iSignalLength;
-    }
+//    int iSignalLength = connectivitySettings.at(0).matData.cols();
+//    if(iNfft > iSignalLength) {
+//        iNfft = iSignalLength;
+//    }
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     if(m_iNumberBinStart == -1 ||
@@ -123,6 +127,8 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
         AbstractMetric::m_iNumberBinStart = 0;
         AbstractMetric::m_iNumberBinAmount = iNFreqs;
     }
+
+    finalNetwork.setNumberFreqBins(AbstractMetric::m_iNumberBinAmount);
 
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();

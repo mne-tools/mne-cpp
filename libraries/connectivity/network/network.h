@@ -367,19 +367,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Get the currently set number of samples.
+    * Get the currently set number of frequency bins.
     *
     * @return The currently set number of samples.
     */
-    int getNumberSamples() const;
+    int getNumberFreqBins() const;
 
     //=========================================================================================================
     /**
-    * Set the new number of samples.
+    * Set the new number of frequency bins.
     *
-    * @param[in] iNumberSamples        The new number of samples.
+    * @param[in] iNumberFreqBins        The new number of frequency bins.
     */
-    void setNumberSamples(int iNumberSamples);
+    void setNumberFreqBins(int iNumberFreqBins);
 
 protected:
     QList<QSharedPointer<NetworkEdge> >     m_lFullEdges;               /**< List with all edges of the network.*/
@@ -397,7 +397,7 @@ protected:
 
     double                                  m_dThreshold;               /**< The current value which was used to threshold the edge weigths.*/
     float                                   m_fSFreq;                   /**< The sampling frequency used to collect the data which this network is based on.*/
-    int                                     m_iNumberSamples;           /**< The number of colelcted data samples, e.g., in time to generate this network  data with.*/
+    int                                     m_iNumberFreqBins;          /**< The number of used frequency bins.*/
 
     VisualizationInfo                       m_visualizationInfo;        /**< The current visualization info used to plot the network later on.*/
 };

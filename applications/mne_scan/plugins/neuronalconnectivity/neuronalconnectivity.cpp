@@ -42,6 +42,7 @@
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
 
 #include <connectivity/connectivity.h>
+#include <connectivity/metrics/abstractmetric.h>
 #include <rtprocessing/rtconnectivity.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
@@ -99,6 +100,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_iBlockSize(1)
 , m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create(this->getName()))
 {
+    AbstractMetric::m_bStorageModeIsActive = true;
 }
 
 

@@ -45,6 +45,7 @@
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
+#include <connectivity/metrics/abstractmetric.h>
 
 #include <disp3D/engine/model/items/network/networktreeitem.h>
 #include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
@@ -113,26 +114,30 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    AbstractMetric::m_bStorageModeIsActive = false;
+//    AbstractMetric::m_iNumberBinStart = 8;
+//    AbstractMetric::m_iNumberBinAmount = 4;
+
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Comparison Example");
     parser.addHelpOption();
 
-    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
+    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2005s");
     QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "9");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.4");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
-    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
-    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.5");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "Z:/data/Martinos/MEG/mind002/raw/mind002_050924_auditory01_raw-eve.fif");
+    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "Z:/data/Martinos/MEG/mind002/raw/mind002_050924_auditory01_raw.fif");
+    QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "mind002");
+    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "Z:/data/Martinos/subjects");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "Z:/data/Martinos/MEG/mind002/fwd/mind002_050924_auditory01-fwd.fif");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "Z:/data/Martinos/MEG/mind002/ave/mind002_050924_auditory01-cov.fif");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -235,11 +240,11 @@ int main(int argc, char *argv[])
                                      data.first()->epoch.cols()-1);
     MNESourceEstimate sourceEstimateEvoked;
 
+    QStringList exclude;
+    exclude << raw.info.bads << raw.info.ch_names.filter("EOG");
+
     if(!bDoSourceLoc) {
         // Pick relevant channels
-        QStringList exclude;
-        exclude << raw.info.bads << raw.info.ch_names.filter("EOG");
-
         if(sChType.contains("EEG", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(false,true,false,QStringList(),exclude);
         } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
@@ -307,7 +312,7 @@ int main(int argc, char *argv[])
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
         minimumNorm.doInverseSetup(1,false);
 
-        picks = raw.info.pick_types(QString("all"),true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        picks = raw.info.pick_types(QString("all"),true,false,QStringList(),exclude);
         data.pick_channels(picks);
         for(int i = 0; i < data.size(); i++) {
             sourceEstimate = minimumNorm.calculateInverse(data.at(i)->epoch,
