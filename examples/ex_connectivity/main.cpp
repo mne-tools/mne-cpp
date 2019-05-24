@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
     FiffRawData raw(t_fileRaw);
 
     int samplesToCutOut = abs((fTMin) * raw.info.sfreq);
-    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager;
+    QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create();
 
     // Select bad channels
     //raw.info.bads << "MEG2412" << "MEG2413";
@@ -297,7 +297,6 @@ int main(int argc, char *argv[])
         }
 
         // Generate network nodes
-        pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matDataList.first().cols()-samplesToCutOut);
         pConnectivitySettingsManager->m_settings.setNodePositions(raw.info, picks);
     } else {
         //Create source level data
@@ -355,7 +354,6 @@ int main(int argc, char *argv[])
         //sourceEstimateEvoked = sourceEstimateEvoked.reduce(0.24*evoked.info.sfreq,1);
 
         // Generate network nodes
-        pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create(matDataList.first().cols()-samplesToCutOut);
         pConnectivitySettingsManager->m_settings.setNodePositions(t_clusteredFwd, tSurfSetInflated);
     }
 

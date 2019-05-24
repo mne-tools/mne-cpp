@@ -106,7 +106,7 @@ MNE::MNE()
 , m_sSurfaceDir("Z:/data/Martinos/subjects/mind002/surf")
 , m_iNumAverages(1)
 , m_iDownSample(1)
-, m_sAvrType("3")
+, m_sAvrType("9")
 , m_pMinimumNormSettingsView(MinimumNormSettingsView::SPtr::create())
 , m_sMethod("dSPM")
 {
@@ -299,7 +299,7 @@ void MNE::doClustering()
 
     m_qMutex.lock();
     m_bFinishedClustering = false;
-    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
+    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
     //m_pClusteredFwd = m_pFwd;
     m_pRTSEOutput->data()->setFwdSolution(m_pClusteredFwd);
 
@@ -580,66 +580,66 @@ void MNE::run()
     m_bReceiveData = true;
     m_qMutex.unlock();
 
-    // Mode 1: Use covariance and inverse operator calcualted by incoming stream
-    while(true) {
-        {
-            QMutexLocker locker(&m_qMutex);
-            if(m_pFiffInfo)
-                break;
-        }
-
-        calcFiffInfo();
-        msleep(10);// Wait for fiff Info
-    }
-
-//    qDebug() << "MNE::run - m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
-//    qDebug() << "MNE::run - m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
-
-    // Mode 1: End
-
-//    // Mode 2: Use covariance and inverse operator loaded from pre calculated files
-//    QFile t_fileCov(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-//    FiffCov noise_cov(t_fileCov);
-//    m_qListCovChNames = noise_cov.names;
-
+//    // Mode 1: Use covariance and inverse operator calcualted by incoming stream
 //    while(true) {
 //        {
 //            QMutexLocker locker(&m_qMutex);
-//            if(m_pFiffInfoInput)
+//            if(m_pFiffInfo)
 //                break;
 //        }
 
+//        calcFiffInfo();
 //        msleep(10);// Wait for fiff Info
 //    }
 
-//    // regularize noise covariance
-//    noise_cov = noise_cov.regularize(*m_pFiffInfoInput,
-//                                     0.05,
-//                                     0.05,
-//                                     0.1,
-//                                     true);
-
-//    // make an inverse operator
-//    m_invOp = MNEInverseOperator(*m_pFiffInfoInput,
-//                                 *m_pClusteredFwd,
-//                                 noise_cov,
-//                                 0.2f,
-//                                 0.8f);
-
-//    double snr = 3.0;
-//    double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
-//    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
-//    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp,
-//                                                       lambda2,
-//                                                       method));
-//    m_pMinimumNorm->doInverseSetup(1,false);
-
-//    m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfoInput);
-
 ////    qDebug() << "MNE::run - m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
-////    qDebug() << "MNE::run - m_pFiffInfoInput->ch_names" << m_pFiffInfoInput->ch_names;
+////    qDebug() << "MNE::run - m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
 
-//    // Mode 2: End
+//    // Mode 1: End
+
+    // Mode 2: Use covariance and inverse operator loaded from pre calculated files
+    QFile t_fileCov("Z:/data/Martinos/MEG/mind002/ave/mind002_050924_auditory01-cov.fif");
+    FiffCov noise_cov(t_fileCov);
+    m_qListCovChNames = noise_cov.names;
+
+    while(true) {
+        {
+            QMutexLocker locker(&m_qMutex);
+            if(m_pFiffInfoInput)
+                break;
+        }
+
+        msleep(10);// Wait for fiff Info
+    }
+
+    // regularize noise covariance
+    noise_cov = noise_cov.regularize(*m_pFiffInfoInput,
+                                     0.05,
+                                     0.05,
+                                     0.1,
+                                     true);
+
+    // make an inverse operator
+    m_invOp = MNEInverseOperator(*m_pFiffInfoInput,
+                                 *m_pClusteredFwd,
+                                 noise_cov,
+                                 0.2f,
+                                 0.8f);
+
+    double snr = 1.0;
+    double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
+    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp,
+                                                       lambda2,
+                                                       method));
+    m_pMinimumNorm->doInverseSetup(1,false);
+
+    m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfoInput);
+
+//    qDebug() << "MNE::run - m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
+//    qDebug() << "MNE::run - m_pFiffInfoInput->ch_names" << m_pFiffInfoInput->ch_names;
+
+    // Mode 2: End
 
     // Init parameters
     m_bProcessData = true;
