@@ -91,7 +91,7 @@ class ConnectivitySettingsManager : public QObject
 
 public:
 
-    ConnectivitySettingsManager(int iBlockSize, QObject *parent = 0)
+    ConnectivitySettingsManager(QObject *parent = 0)
     : QObject(parent)
     , m_pRtConnectivity(RtConnectivity::SPtr::create())
     {
@@ -143,23 +143,29 @@ public:
 
         if(size > iNumberTrials) {
             m_settings.removeLast(size-iNumberTrials);
+        } else {
+            while(m_settings.size() < iNumberTrials) {
+    //            bool finish = false;
+    //            int index = 0;
+
+    //            while(!finish) {
+    //                index = rand() % iNumberTrials;
+
+    //                if(!m_indexList.contains(index)) {
+    //                    m_indexList.append(index);
+    //                    finish = true;
+    //                }
+    //            }
+
+                m_settings.append(m_dataListOriginal.at(m_settings.size()));
+            }
         }
 
-        while(m_settings.size() < iNumberTrials) {
-//            bool finish = false;
-//            int index = 0;
 
-//            while(!finish) {
-//                index = rand() % iNumberTrials;
 
-//                if(!m_indexList.contains(index)) {
-//                    m_indexList.append(index);
-//                    finish = true;
-//                }
-//            }
-
-            m_settings.append(m_dataListOriginal.at(m_settings.size()-1));
-        }
+        qDebug() << "m_settings.size()" << m_settings.size();
+        qDebug() << "iNumberTrials" << iNumberTrials;
+        qDebug() << "size" << size;
 
         //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - m_indexList" << m_indexList;
 

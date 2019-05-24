@@ -296,9 +296,9 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
             if(visualizationInfo.sMethod == "Map") {
                 // Normalize colors
                 if(iMaxDegree != 0.0f) {
-                    vColorsNodes.push_back(QColor(ColorMap::valueToColor((float)iDegree/(float)iMaxDegree, visualizationInfo.sMethod)));
+                    vColorsNodes.push_back(QColor(ColorMap::valueToColor((float)iDegree/(float)iMaxDegree, visualizationInfo.sColormap)));
                 } else {
-                    vColorsNodes.push_back(QColor(ColorMap::valueToColor(0.0f, visualizationInfo.sMethod)));
+                    vColorsNodes.push_back(QColor(ColorMap::valueToColor(0.0f, visualizationInfo.sColormap)));
                 }
             } else {
                 vColorsNodes.push_back(QColor(visualizationInfo.colEdges[0],
@@ -395,9 +395,9 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
                     if(visualizationInfo.sMethod == "Map") {
                         // Normalize colors
                         if(dMaxWeight != 0.0f) {
-                            vColorsEdges.push_back(QColor(ColorMap::valueToColor(dWeight/dMaxWeight, visualizationInfo.sMethod)));
+                            vColorsEdges.push_back(QColor(ColorMap::valueToColor(dWeight/dMaxWeight, visualizationInfo.sColormap)));
                         } else {
-                            vColorsEdges.push_back(QColor(ColorMap::valueToColor(0.0f, visualizationInfo.sMethod)));
+                            vColorsEdges.push_back(QColor(ColorMap::valueToColor(0.0f, visualizationInfo.sColormap)));
                         }
                     } else {
                         vColorsEdges.push_back(QColor(visualizationInfo.colNodes[0],
