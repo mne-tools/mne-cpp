@@ -380,8 +380,6 @@ double Network::getThreshold()
 
 void Network::setFrequencyRange(float fLowerFreq, float fUpperFreq)
 {
-    qDebug() << "Network::setFrequencyRange - fLowerFreq" << fLowerFreq;
-    qDebug() << "Network::setFrequencyRange - fUpperFreq" << fUpperFreq;
     if(fLowerFreq > fUpperFreq || fUpperFreq < fLowerFreq) {
         qDebug() << "Network::setFrequencyRange - Upper and lower frequency are out of range from each other. Weights will not be recalculated. Returning.";
         return;
@@ -404,17 +402,11 @@ void Network::setFrequencyRange(float fLowerFreq, float fUpperFreq)
 
     double dScaleFactor = m_iNumberFreqBins/(m_fSFreq/2);
 
-    qDebug() << "Network::setFrequencyRange - m_iNumberFreqBins" << m_iNumberFreqBins;
-    qDebug() << "Network::setFrequencyRange - m_fSFreq" << m_fSFreq;
-    qDebug() << "Network::setFrequencyRange - dScaleFactor" << dScaleFactor;
-
     m_minMaxFrequency.first = fLowerFreq;
     m_minMaxFrequency.second = fUpperFreq;
 
     int iLowerBin = fLowerFreq * dScaleFactor;
     int iUpperBin = fUpperFreq * dScaleFactor;
-    qDebug() << "Network::setFrequencyRange - iLowerBin" << iLowerBin;
-    qDebug() << "Network::setFrequencyRange - iUpperBin" << iUpperBin;
 
     // Update the min max values
     m_minMaxFullWeights = QPair<double,double>(std::numeric_limits<double>::max(),0.0);

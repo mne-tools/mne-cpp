@@ -161,12 +161,6 @@ public:
             }
         }
 
-
-
-        qDebug() << "m_settings.size()" << m_settings.size();
-        qDebug() << "iNumberTrials" << iNumberTrials;
-        qDebug() << "size" << size;
-
         //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - m_indexList" << m_indexList;
 
         m_pRtConnectivity->append(m_settings);

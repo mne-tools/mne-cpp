@@ -192,11 +192,6 @@ void Coherency::calculateImag(Network& finalNetwork,
     int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getNumberFFT();
 
-    // Check that iNfft >= signal length
-//    if(iNfft > iSignalLength) {
-//        iNfft = iSignalLength;
-//    }
-
     // Generate tapers
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
 
@@ -300,8 +295,8 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
             for(j = 0; j < tapers.first.rows(); j++) {
                 // Zero padd if necessary. The zero padding in Eigen's FFT is only working for column vectors.
                 if (rowData.cols() < iNfft) {
-                  vecInputFFT.setZero(iNfft);
-                  vecInputFFT.block(0,0,1,rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));;
+                    vecInputFFT.setZero(iNfft);
+                    vecInputFFT.block(0,0,1,rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));;
                 } else {
                     vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
                 }
@@ -339,11 +334,11 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
 //    timer.restart();
 
     // Compute CSD
-    //MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-    MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBinAmount);
-
     if(inputData.vecPairCsd.size() != iNRows) {
         inputData.vecPairCsd.clear();
+
+        //MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
+        MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBinAmount);
 
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
@@ -357,7 +352,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                     matCsd.row(j)(0) /= 2.0;
                 }
 
-                if(bNfftEven && m_iNumberBinAmount == iNFreqs) {
+                if(bNfftEven && m_iNumberBinStart + m_iNumberBinAmount >= iNFreqs) {
                     matCsd.row(j).tail(1) /= 2.0;
                 }
             }

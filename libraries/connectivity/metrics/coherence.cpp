@@ -111,10 +111,6 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
 
     // Check if start and bin amount need to be reset to full spectrum
     int iNfft = connectivitySettings.getNumberFFT();
-//    int iSignalLength = connectivitySettings.at(0).matData.cols();
-//    if(iNfft > iSignalLength) {
-//        iNfft = iSignalLength;
-//    }
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     if(m_iNumberBinStart == -1 ||

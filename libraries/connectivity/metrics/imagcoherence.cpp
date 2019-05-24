@@ -109,11 +109,7 @@ Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
 
     // Check if start and bin amount need to be reset to full spectrum
-    int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getNumberFFT();
-    if(iNfft > iSignalLength) {
-        iNfft = iSignalLength;
-    }
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     if(m_iNumberBinStart == -1 ||

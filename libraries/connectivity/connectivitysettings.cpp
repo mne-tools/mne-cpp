@@ -331,13 +331,15 @@ int ConnectivitySettings::getSamplingFrequency() const
 
 void ConnectivitySettings::setNumberFFT(int iNfft)
 {
-    if(m_fSFreq == 0) {
+    if(iNfft == 0) {
         return;
     }
 
     clearIntermediateData();
 
     m_iNfft = iNfft;
+    m_fFreqResolution  = m_fSFreq/m_iNfft;
+
 }
 
 

@@ -135,10 +135,6 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
     int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getNumberFFT();
 
-//    if(iNfft > iSignalLength) {
-//        iNfft = iSignalLength;
-//    }
-
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
 
     // Compute the cross correlation in parallel
@@ -229,8 +225,8 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
             for(j = 0; j < tapers.first.rows(); j++) {
                 // Zero padd if necessary. The zero padding in Eigen's FFT is only working for column vectors.
                 if (rowData.cols() < iNfft) {
-                  vecInputFFT.setZero(iNfft);
-                  vecInputFFT.block(0,0,1,rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));;
+                    vecInputFFT.setZero(iNfft);
+                    vecInputFFT.block(0,0,1,rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));;
                 } else {
                     vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
                 }
