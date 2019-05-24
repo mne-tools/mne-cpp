@@ -101,9 +101,9 @@ MNE::MNE()
 //, m_qFileFwdSolution(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 //, m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
 //, m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
-, m_qFileFwdSolution("Z:/data/Martinos/MEG/mind002/fwd/mind002_050924_auditory01-fwd.fif")
-, m_sAtlasDir("Z:/data/Martinos/subjects/mind002/label")
-, m_sSurfaceDir("Z:/data/Martinos/subjects/mind002/surf")
+, m_qFileFwdSolution("/cluster/fusion/lesch/data/Martinos/MEG/mind002/fwd/mind002_050924_auditory01-fwd.fif")
+, m_sAtlasDir("/cluster/fusion/lesch/data/Martinos/subjects/mind002/label")
+, m_sSurfaceDir("/cluster/fusion/lesch/data/Martinos/subjects/mind002/surf")
 , m_iNumAverages(1)
 , m_iDownSample(1)
 , m_sAvrType("9")
@@ -598,7 +598,7 @@ void MNE::run()
 //    // Mode 1: End
 
     // Mode 2: Use covariance and inverse operator loaded from pre calculated files
-    QFile t_fileCov("Z:/data/Martinos/MEG/mind002/ave/mind002_050924_auditory01-cov.fif");
+    QFile t_fileCov("/cluster/fusion/lesch/data/Martinos/MEG/mind002/ave/mind002_050924_auditory01-cov.fif");
     FiffCov noise_cov(t_fileCov);
     m_qListCovChNames = noise_cov.names;
 
