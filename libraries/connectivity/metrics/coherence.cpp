@@ -108,7 +108,6 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
     }
 
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
-    //finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     // Check if start and bin amount need to be reset to full spectrum
     int iNfft = connectivitySettings.getNumberFFT();

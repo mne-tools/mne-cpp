@@ -234,7 +234,14 @@ void PhaseLockingValue::compute(ConnectivitySettings::IntermediateTrialData& inp
 
             // Calculate tapered spectra if not available already
             for(j = 0; j < tapers.first.rows(); j++) {
-                vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
+                // Zero padd if necessary. The zero padding in Eigen's FFT is only working for column vectors.
+                if (rowData.cols() < iNfft) {
+                  vecInputFFT.setZero(iNfft);
+                  vecInputFFT.block(0,0,1,rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));;
+                } else {
+                    vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
+                }
+
                 // FFT for freq domain returning the half spectrum and multiply taper weights
                 fft.fwd(vecTmpFreq, vecInputFFT, iNfft);
                 matTapSpectrum.row(j) = vecTmpFreq * tapers.second(j);

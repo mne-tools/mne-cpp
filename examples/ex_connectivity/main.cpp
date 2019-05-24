@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    AbstractMetric::m_bStorageModeIsActive = false;
+    AbstractMetric::m_bStorageModeIsActive = true;
 //    AbstractMetric::m_iNumberBinStart = 8;
 //    AbstractMetric::m_iNumberBinAmount = 4;
 
@@ -145,12 +145,12 @@ int main(int argc, char *argv[])
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
     QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.5");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "Z:/data/Martinos/MEG/mind002/raw/mind002_050924_auditory01_raw-eve.fif");
-    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "Z:/data/Martinos/MEG/mind002/raw/mind002_050924_auditory01_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_auditory01_raw-eve.fif");
+    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_auditory01_raw.fif");
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "mind002");
-    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "Z:/data/Martinos/subjects");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "Z:/data/Martinos/MEG/mind002/fwd/mind002_050924_auditory01-fwd.fif");
-    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "Z:/data/Martinos/MEG/mind002/ave/mind002_050924_auditory01-cov.fif");
+    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "/cluster/fusion/lesch/data/Martinos/subjects");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/fwd/mind002_050924_auditory01-fwd.fif");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/ave/mind002_050924_auditory01-cov.fif");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);

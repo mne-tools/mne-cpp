@@ -100,7 +100,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_iBlockSize(1)
 , m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create(this->getName()))
 {
-    AbstractMetric::m_bStorageModeIsActive = true;
+    AbstractMetric::m_bStorageModeIsActive = false;
 }
 
 
