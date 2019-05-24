@@ -189,7 +189,7 @@ protected:
     QString                         m_sWindowType;                  /**< The window type used to compute tapered spectra. */
 
     float                           m_fSFreq;                       /**< The sampling frequency. */
-    int                             m_iNfft;                        /**< The FFT length. Gets automatically calculated if the sFreq or spectrum resolution change. */
+    int                             m_iNfft;                        /**< The FFT length. Also includes the negativ frequencies. Gets recalculated if the sFreq or spectrum resolution change. */
     float                           m_fFreqResolution;              /**< The spectrum's resolution. */
 
     Eigen::MatrixX3f                m_matNodePositions;             /**< The node position in 3D space. */
