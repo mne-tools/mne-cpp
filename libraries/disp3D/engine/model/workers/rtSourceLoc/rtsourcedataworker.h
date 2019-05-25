@@ -144,13 +144,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Set number of vertices.
+    * Set the color of the vertices for the left and right hemisphere.
     *
-    * @param[in] iNumberVertsLeft      The number of vertices for the left hemisphere.
-    * @param[in] iNumberVertsRight     The number of vertices for the right hemisphere.
+    * @param[in] matColorLeft      The color of the vertices for the left hemisphere.
+    * @param[in] matColorRight     The color of the vertices for the right hemisphere.
     */
-    void setNumberVertices(int iNumberVertsLeft,
-                           int iNumberVertsRight);
+    void setSurfaceColor(const Eigen::MatrixX3f &matColorLeft,
+                         const Eigen::MatrixX3f &matColorRight);
 
     //=========================================================================================================
     /**

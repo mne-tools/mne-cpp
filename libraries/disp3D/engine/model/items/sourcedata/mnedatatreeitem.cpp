@@ -43,6 +43,7 @@
 #include "../common/metatreeitem.h"
 #include "../common/abstractmeshtreeitem.h"
 #include "../common/gpuinterpolationitem.h"
+#include "../freesurfer/fssurfacetreeitem.h"
 #include "../../3dhelpers/custommesh.h"
 #include "../../materials/pervertexphongalphamaterial.h"
 
@@ -214,9 +215,9 @@ void MneDataTreeItem::initItem()
 //*************************************************************************************************************
 
 void MneDataTreeItem::initData(const MNEForwardSolution& tForwardSolution,
-                                   const SurfaceSet& tSurfSet,
-                                   const AnnotationSet& tAnnotSet,
-                                   Qt3DCore::QEntity* p3DEntityParent)
+                               const SurfaceSet& tSurfSet,
+                               const AnnotationSet& tAnnotSet,
+                               Qt3DCore::QEntity* p3DEntityParent)
 {   
     if(tForwardSolution.src.size() < 2 || tAnnotSet.size() < 2 || tSurfSet.size() < 2) {
         qDebug() << "MneDataTreeItem::initData - Two hemisphere were not found. Check input.";
@@ -337,19 +338,15 @@ void MneDataTreeItem::initData(const MNEForwardSolution& tForwardSolution,
         connect(m_pRtSourceDataController.data(), &RtSourceDataController::newRtRawDataAvailable,
                 this, &MneDataTreeItem::onNewRtRawData);
     } else {
-        if(!m_pInterpolationItemLeftCPU)
-        {
+        if(!m_pInterpolationItemLeftCPU) {
             m_pInterpolationItemLeftCPU = new AbstractMeshTreeItem(p3DEntityParent,
                                                             Data3DTreeModelItemTypes::AbstractMeshItem,
                                                             QStringLiteral("3D Plot - Left"));
 
-            //Create color from curvature information with default gyri and sulcus colors
-            MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(tSurfSet[0].rr().rows());
-
-            m_pInterpolationItemLeftCPU->setVertices(tSurfSet[0].rr(),
+            m_pInterpolationItemLeftCPU->setMeshData(tSurfSet[0].rr(),
                                                      tSurfSet[0].nn(),
                                                      tSurfSet[0].tris(),
-                                                     matVertColor,
+                                                     FsSurfaceTreeItem::createCurvatureVertColor(tSurfSet[0].curv()),
                                                      Qt3DRender::QGeometryRenderer::Triangles);
 
             m_pInterpolationItemLeftCPU->setPosition(QVector3D(-tSurfSet[0].offset()(0),
@@ -368,24 +365,20 @@ void MneDataTreeItem::initData(const MNEForwardSolution& tForwardSolution,
             m_pInterpolationItemLeftCPU->setMaterial(pBemMaterial);
         }
 
-        if(!m_pInterpolationItemRightCPU)
-        {
+        if(!m_pInterpolationItemRightCPU) {
             m_pInterpolationItemRightCPU = new AbstractMeshTreeItem(p3DEntityParent,
                                                             Data3DTreeModelItemTypes::AbstractMeshItem,
                                                             QStringLiteral("3D Plot - Right"));
 
-            //Create color from curvature information with default gyri and sulcus colors
-            MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(tSurfSet[1].rr().rows());
-
-            m_pInterpolationItemRightCPU->setVertices(tSurfSet[1].rr(),
+            m_pInterpolationItemRightCPU->setMeshData(tSurfSet[1].rr(),
                                                       tSurfSet[1].nn(),
                                                       tSurfSet[1].tris(),
-                                                      matVertColor,
+                                                      FsSurfaceTreeItem::createCurvatureVertColor(tSurfSet[1].curv()),
                                                       Qt3DRender::QGeometryRenderer::Triangles);
 
             m_pInterpolationItemRightCPU->setPosition(QVector3D(-tSurfSet[1].offset()(0),
-                                                               -tSurfSet[1].offset()(1),
-                                                               -tSurfSet[1].offset()(2)));
+                                                                -tSurfSet[1].offset()(1),
+                                                                -tSurfSet[1].offset()(2)));
 
             QList<QStandardItem*> list;
             list << m_pInterpolationItemRightCPU;
@@ -409,6 +402,9 @@ void MneDataTreeItem::initData(const MNEForwardSolution& tForwardSolution,
                                                     tForwardSolution.src[1].neighbor_vert,
                                                     clustVertNoLeft,
                                                     clustVertNoRight);
+
+    m_pRtSourceDataController->setSurfaceColor(FsSurfaceTreeItem::createCurvatureVertColor(tSurfSet[0].curv()),
+                                               FsSurfaceTreeItem::createCurvatureVertColor(tSurfSet[1].curv()));
 
     m_pRtSourceDataController->setAnnotationInfo(vecLabelIdsLeftHemi,
                                                  vecLabelIdsRightHemi,
@@ -732,18 +728,14 @@ void MneDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState
 //*************************************************************************************************************
 
 void MneDataTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
-                                                       const Eigen::MatrixX3f &matColorMatrixRightHemi)
-{    
-    QVariant data;
-
+                                                   const Eigen::MatrixX3f &matColorMatrixRightHemi)
+{
     if(m_pInterpolationItemLeftCPU) {
-        data.setValue(matColorMatrixLeftHemi);
-        m_pInterpolationItemLeftCPU->setVertColor(data);
+        m_pInterpolationItemLeftCPU->setVertColor(matColorMatrixLeftHemi);
     }
 
     if(m_pInterpolationItemRightCPU) {
-        data.setValue(matColorMatrixRightHemi);
-        m_pInterpolationItemRightCPU->setVertColor(data);
+        m_pInterpolationItemRightCPU->setVertColor(matColorMatrixRightHemi);
     }
 }
 

@@ -98,8 +98,8 @@ RtSourceDataController::RtSourceDataController()
        connect(this, &RtSourceDataController::rawDataChanged,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::addData);
 
-       connect(this, &RtSourceDataController::numberVerticesChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setNumberVertices);
+       connect(this, &RtSourceDataController::surfaceColorChanged,
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setSurfaceColor);
 
        connect(this, &RtSourceDataController::newInterpolationMatrixLeftAvailable,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setInterpolationMatrixLeft);
@@ -272,9 +272,16 @@ void RtSourceDataController::setInterpolationInfo(const MatrixX3f &matVerticesLe
     emit interpolationInfoRightChanged(matVerticesRight,
                                        vecNeighborVerticesRight,
                                        vecMappedSubsetRight);
+}
 
-    emit numberVerticesChanged(matVerticesLeft.rows(),
-                               matVerticesRight.rows());
+
+//*************************************************************************************************************
+
+void RtSourceDataController::setSurfaceColor(const MatrixX3f &matColorLeft,
+                                             const MatrixX3f &matColorRight)
+{
+    emit surfaceColorChanged(matColorLeft,
+                             matColorRight);
 }
 
 

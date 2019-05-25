@@ -188,7 +188,7 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
             //Create color from curvature information with default gyri and sulcus colors
             MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(bemSurface.rr.rows());
 
-            m_pInterpolationItemCPU->setVertices(bemSurface.rr,
+            m_pInterpolationItemCPU->setMeshData(bemSurface.rr,
                                                  bemSurface.nn,
                                                  bemSurface.tris,
                                                  matVertColor,
@@ -621,9 +621,7 @@ void SensorDataTreeItem::onNewRtSmoothedDataAvailable(const MatrixX3f &matColorM
 {
     if(m_pInterpolationItemCPU)
     {
-        QVariant data;
-        data.setValue(matColorMatrix);
-        m_pInterpolationItemCPU->setVertColor(data);
+        m_pInterpolationItemCPU->setVertColor(matColorMatrix);
     }
 }
 

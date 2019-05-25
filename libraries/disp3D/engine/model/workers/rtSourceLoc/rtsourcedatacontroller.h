@@ -171,8 +171,6 @@ public:
     * @param[in] vecNeighborVerticesRight        The neighbor vertices for the right hemisphere.
     * @param[in] vecVertNoLeftHemi               The vertex indexes for the left hemipshere.
     * @param[in] vecVertNoRightHemi              The vertex indexes for the right hemipshere.
-    *
-    * @return Returns the created interpolation matrix.
     */
     void setInterpolationInfo(const Eigen::MatrixX3f &matVerticesLeft,
                               const Eigen::MatrixX3f &matVerticesRight,
@@ -180,6 +178,16 @@ public:
                               const QVector<QVector<int> > &vecNeighborVerticesRight,
                               const Eigen::VectorXi& vecVertNoLeftHemi,
                               const Eigen::VectorXi& vecVertNoRightHemi);
+
+    //=========================================================================================================
+    /**
+    * Set the color of the vertices for the left and right hemisphere.
+    *
+    * @param[in] matColorLeft      The color of the vertices for the left hemisphere.
+    * @param[in] matColorRight     The color of the vertices for the right hemisphere.
+    */
+    void setSurfaceColor(const Eigen::MatrixX3f &matColorLeft,
+                         const Eigen::MatrixX3f &matColorRight);
 
     //=========================================================================================================
     /**
@@ -355,13 +363,13 @@ signals:
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the number of vertices changed.
+    * Emit this signal whenever the color of the vertices for the left and right hemisphere changed.
     *
-    * @param[in] iNumberVertsLeft      The number of vertices for the left hemisphere.
-    * @param[in] iNumberVertsRight     The number of vertices for the right hemisphere.
+    * @param[in] matColorLeft      The color of the vertices for the left hemisphere.
+    * @param[in] matColorRight     The color of the vertices for the right hemisphere.
     */
-    void numberVerticesChanged(int iNumberVertsLeft,
-                               int iNumberVertsRight);
+    void surfaceColorChanged(const Eigen::MatrixX3f &matColorLeft,
+                             const Eigen::MatrixX3f &matColorRight);
 
     //=========================================================================================================
     /**
