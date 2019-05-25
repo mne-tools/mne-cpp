@@ -94,9 +94,12 @@ QPointer<CustomMesh> AbstractMeshTreeItem::getCustomMesh()
 
 //*************************************************************************************************************
 
-void AbstractMeshTreeItem::setVertColor(const QVariant& vertColor)
+void AbstractMeshTreeItem::setVertColor(const MatrixX3f& vertColor)
 {
-    this->setData(vertColor, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+    QVariant data;
+    data.setValue(vertColor);
+
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
 
 
@@ -215,7 +218,7 @@ void AbstractMeshTreeItem::setMaterial(Qt3DRender::QMaterial* pMaterial)
 
 //*************************************************************************************************************
 
-void AbstractMeshTreeItem::setVertices(const MatrixX3f& tMatVert,
+void AbstractMeshTreeItem::setMeshData(const MatrixX3f& tMatVert,
                                        const MatrixX3f& tMatNorm,
                                        const MatrixXi& tMatTris,
                                        const MatrixX3f& tMatColors,

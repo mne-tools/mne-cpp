@@ -122,13 +122,11 @@ void RtSourceDataWorker::addData(const MatrixXd& data)
 
 //*************************************************************************************************************
 
-void RtSourceDataWorker::setNumberVertices(int iNumberVertsLeft,
-                                           int iNumberVertsRight)
+void RtSourceDataWorker::setSurfaceColor(const MatrixX3f &matColorLeft,
+                                         const MatrixX3f &matColorRight)
 {
-//    m_lHemiVisualizationInfo[0].matOriginalVertColor.setZero(iNumberVertsLeft,3);
-//    m_lHemiVisualizationInfo[1].matOriginalVertColor.setZero(iNumberVertsRight,3);
-    m_lHemiVisualizationInfo[0].matOriginalVertColor = AbstractMeshTreeItem::createVertColor(iNumberVertsLeft);
-    m_lHemiVisualizationInfo[1].matOriginalVertColor = AbstractMeshTreeItem::createVertColor(iNumberVertsRight);
+    m_lHemiVisualizationInfo[0].matOriginalVertColor = matColorLeft;
+    m_lHemiVisualizationInfo[1].matOriginalVertColor = matColorRight;
 }
 
 

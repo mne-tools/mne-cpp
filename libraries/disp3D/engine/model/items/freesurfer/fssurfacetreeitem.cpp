@@ -199,6 +199,29 @@ void FsSurfaceTreeItem::onAnnotationVisibilityChanged(bool isVisible)
 
 //*************************************************************************************************************
 
+MatrixX3f FsSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci, const QColor& colGyri)
+{
+    MatrixX3f colors(curvature.rows(), 3);
+
+    for(int i = 0; i < colors.rows(); ++i) {
+        //Color (this is the default color and will be used until the updateVertColor function was called)
+        if(curvature(i) >= 0) {
+            colors(i,0) = colSulci.redF();
+            colors(i,1) = colSulci.greenF();
+            colors(i,2) = colSulci.blueF();
+        } else {
+            colors(i,0) = colGyri.redF();
+            colors(i,1) = colGyri.greenF();
+            colors(i,2) = colGyri.blueF();
+        }
+    }
+
+    return colors;
+}
+
+
+//*************************************************************************************************************
+
 void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
 {
     if(m_pItemSurfColSulci && m_pItemSurfColGyri) {
@@ -237,25 +260,3 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
     }
 }
 
-
-//*************************************************************************************************************
-
-MatrixX3f FsSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci, const QColor& colGyri) const
-{
-    MatrixX3f colors(curvature.rows(), 3);
-
-    for(int i = 0; i < colors.rows(); ++i) {
-        //Color (this is the default color and will be used until the updateVertColor function was called)
-        if(curvature[i] >= 0) {
-            colors(i,0) = colSulci.redF();
-            colors(i,1) = colSulci.greenF();
-            colors(i,2) = colSulci.blueF();
-        } else {
-            colors(i,0) = colGyri.redF();
-            colors(i,1) = colGyri.greenF();
-            colors(i,2) = colGyri.blueF();
-        }
-    }
-
-    return colors;
-}

@@ -330,6 +330,7 @@ int main(int argc, char *argv[])
         pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
+            pRTDataItem->setAlpha(1.0);
             pRTDataItem->setStreamingState(false);
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Annotation based");
