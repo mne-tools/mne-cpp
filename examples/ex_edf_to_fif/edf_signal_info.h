@@ -97,7 +97,8 @@ public:
                   const long digitalMax,
                   const long numberOfSamplesPerRecord,
                   const long numberOfSamplesTotal,
-                  const float mfrequency);
+                  const float mfrequency,
+                  const bool bIsMeas);
 
     //=========================================================================================================
     /**
@@ -119,21 +120,38 @@ public:
 
     inline float getFrequency() const;
 
-private:
-    // data fields for EDF signals. The member order does not correlate with the position in the header.
-    QString m_sLabel;                 // e.g. EEG Fpz-Cz or Body temp
-    QString m_sTransducerType;        // e.g. AgAgCl electrode
-    QString m_sPhysicalDimension;     // e.g. uV or degreeC
-    QString m_sPrefiltering;          // e.g. HP: 0.1Hz LP: 75Hz
-    float m_fPhysicalMinimum;          // e.g. -500 or 34
-    float m_fPhysicalMaximum;          // e.g. -500 or 34
-    long m_iDigitalMinimum;            // e.g. -2048
-    long m_iDigitalMaximum;            // e.g. 2047
-    long m_iNumberOfSamplesPerRecord; // e.g. 250 or 1
+    inline long getSampleCount() const;
 
-    // convenience fields, calculated using EDF data fields
+    inline bool isMeasurementSignal() const;
+
+    void setAsMeasurementSignal();
+
+    inline long digitalMin() const;
+
+    inline long digitalMax() const;
+
+    inline float physicalMin() const;
+
+    inline float physicalMax() const;
+
+private:
+    // data fields for EDF signals. The member order does NOT correlate with the position in the header.
+    QString m_sLabel;                   // e.g. EEG Fpz-Cz or Body temp
+    QString m_sTransducerType;          // e.g. AgAgCl electrode
+    QString m_sPhysicalDimension;       // e.g. uV or degreeC
+    QString m_sPrefiltering;            // e.g. HP: 0.1Hz LP: 75Hz
+    float m_fPhysicalMinimum;           // e.g. -500 or 34
+    float m_fPhysicalMaximum;           // e.g. -500 or 34
+    long m_iDigitalMinimum;             // e.g. -2048
+    long m_iDigitalMaximum;             // e.g. 2047
+    long m_iNumberOfSamplesPerRecord;   // e.g. 250 or 1
+
+    // convenience fields, calculated using the above fields
     long m_iNumberOfSamplesTotal;
     float m_frequency;
+
+    // flag for differentiating between measurement signals and extra signals
+    bool m_bIsMeas;
 };
 
 //*************************************************************************************************************
@@ -157,6 +175,48 @@ inline int EDFSignalInfo::getNumberOfSamplesPerRecord() const {
 
 inline float EDFSignalInfo::getFrequency() const {
     return m_frequency;
+}
+
+
+//*************************************************************************************************************
+
+inline long EDFSignalInfo::getSampleCount() const {
+    return m_iNumberOfSamplesTotal;
+}
+
+
+//*************************************************************************************************************
+
+inline bool EDFSignalInfo::isMeasurementSignal() const {
+    return m_bIsMeas;
+}
+
+
+//*************************************************************************************************************
+
+inline long EDFSignalInfo::digitalMin() const {
+    return m_iDigitalMinimum;
+}
+
+
+//*************************************************************************************************************
+
+inline long EDFSignalInfo::digitalMax() const {
+    return m_iDigitalMaximum;
+}
+
+
+//*************************************************************************************************************
+
+inline float EDFSignalInfo::physicalMin() const {
+    return m_fPhysicalMinimum;
+}
+
+
+//*************************************************************************************************************
+
+inline float EDFSignalInfo::physicalMax() const {
+    return m_fPhysicalMaximum;
 }
 
 } // NAMESPACE

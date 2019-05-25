@@ -61,6 +61,18 @@ using namespace EDFINFOEXAMPLE;
 //=============================================================================================================
 
 EDFSignalInfo::EDFSignalInfo()
+: m_sLabel(),
+  m_sTransducerType(),
+  m_sPhysicalDimension(),
+  m_sPrefiltering(),
+  m_fPhysicalMinimum(),
+  m_fPhysicalMaximum(),
+  m_iDigitalMinimum(),
+  m_iDigitalMaximum(),
+  m_iNumberOfSamplesPerRecord(-1),
+  m_iNumberOfSamplesTotal(-1),
+  m_frequency(-1.0),
+  m_bIsMeas(false)
 {
 
 }
@@ -78,7 +90,8 @@ EDFSignalInfo::EDFSignalInfo(const QString label,
                              const long digitalMax,
                              const long numberOfSamplesPerRecord,
                              const long numberOfSamplesTotal,
-                             const float mfrequency)
+                             const float mfrequency,
+                             const bool bIsMeas)
 : m_sLabel(label),
   m_sTransducerType(transducer),
   m_sPhysicalDimension(physicalDimension),
@@ -89,7 +102,8 @@ EDFSignalInfo::EDFSignalInfo(const QString label,
   m_iDigitalMaximum(digitalMax),
   m_iNumberOfSamplesPerRecord(numberOfSamplesPerRecord),
   m_iNumberOfSamplesTotal(numberOfSamplesTotal),
-  m_frequency(mfrequency)
+  m_frequency(mfrequency),
+  m_bIsMeas(bIsMeas)
 {
 
 }
@@ -108,7 +122,8 @@ EDFSignalInfo::EDFSignalInfo(const EDFSignalInfo& other)
   m_iDigitalMaximum(other.m_iDigitalMaximum),
   m_iNumberOfSamplesPerRecord(other.m_iNumberOfSamplesPerRecord),
   m_iNumberOfSamplesTotal(other.m_iNumberOfSamplesTotal),
-  m_frequency(other.m_frequency)
+  m_frequency(other.m_frequency),
+  m_bIsMeas(other.m_bIsMeas)
 {
 
 }
@@ -134,4 +149,11 @@ QString EDFSignalInfo::getAsString() const
     result += "\nChannel Frequency: " + QString::number(m_frequency);
 
     return result;
+}
+
+
+//*************************************************************************************************************
+
+void EDFSignalInfo::setAsMeasurementSignal() {
+    m_bIsMeas = true;
 }
