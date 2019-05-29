@@ -51,6 +51,7 @@
 
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_sourceestimate.h>
+#include <mne/mne_epoch_data_list.h>
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
@@ -101,9 +102,9 @@ MNE::MNE()
 //, m_qFileFwdSolution(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 //, m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
 //, m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
-, m_qFileFwdSolution("/cluster/fusion/lesch/data/Martinos/MEG/mind002/fwd/mind002_050924_auditory01-fwd.fif")
-, m_sAtlasDir("/cluster/fusion/lesch/data/Martinos/subjects/mind002/label")
-, m_sSurfaceDir("/cluster/fusion/lesch/data/Martinos/subjects/mind002/surf")
+, m_qFileFwdSolution("Z:/data/Martinos/MEG/mind002/fwd/mind002_050924_index01-fwd.fif")
+, m_sAtlasDir("Z:/data/Martinos/subjects/mind002/label")
+, m_sSurfaceDir("Z:/data/Martinos/subjects/mind002/surf")
 , m_iNumAverages(1)
 , m_iDownSample(1)
 , m_sAvrType("9")
@@ -142,7 +143,7 @@ void MNE::init()
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
     //m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2005s.annot", m_sAtlasDir+"/rh.aparc.a2005s.annot"));
-    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
+    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.orig", m_sSurfaceDir+"/rh.orig"));
 
     // Input
     m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
@@ -424,7 +425,20 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(m_bProcessData) {
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberStartedProcessing++ << "MNE StartedProcessing";
-                m_pMatrixDataBuffer->push(&pRTMSA->getMultiSampleArray()[i]);
+
+                // Check for artifacts
+                bool bArtifactDetected = MNEEpochDataList::checkForArtifact(pRTMSA->getMultiSampleArray()[i],
+                                                                            *m_pFiffInfoInput,
+                                                                            150.0e-6,
+                                                                            "threshold",
+                                                                            "EOG");
+
+                if(!bArtifactDetected) {
+                    m_pMatrixDataBuffer->push(&pRTMSA->getMultiSampleArray()[i]);
+                } else {
+                    qDebug() << "NeuronalConnectivity::updateSource - Reject data block";
+                }
+
             }
         }
     }
@@ -598,7 +612,7 @@ void MNE::run()
 //    // Mode 1: End
 
     // Mode 2: Use covariance and inverse operator loaded from pre calculated files
-    QFile t_fileCov("/cluster/fusion/lesch/data/Martinos/MEG/mind002/ave/mind002_050924_auditory01-cov.fif");
+    QFile t_fileCov("Z:/data/Martinos/MEG/mind002/ave/mind002_050924_index01-cov.fif");
     FiffCov noise_cov(t_fileCov);
     m_qListCovChNames = noise_cov.names;
 
