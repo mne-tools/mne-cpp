@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     edf_signal_info.cpp
+* @file     edf_ch_info.cpp
 * @author   Simon Heinke <simon.heinke@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the EDFSignalInfo class.
+* @brief    Definition of the EDFChannelInfo class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "edf_signal_info.h"
+#include "edf_ch_info.h"
 
 
 //*************************************************************************************************************
@@ -60,7 +60,7 @@ using namespace EDFINFOEXAMPLE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EDFSignalInfo::EDFSignalInfo()
+EDFChannelInfo::EDFChannelInfo()
 : m_sLabel(),
   m_sTransducerType(),
   m_sPhysicalDimension(),
@@ -80,7 +80,7 @@ EDFSignalInfo::EDFSignalInfo()
 
 //*************************************************************************************************************
 
-EDFSignalInfo::EDFSignalInfo(const QString label,
+EDFChannelInfo::EDFChannelInfo(const QString label,
                              const QString transducer,
                              const QString physicalDimension,
                              const QString prefiltering,
@@ -111,7 +111,7 @@ EDFSignalInfo::EDFSignalInfo(const QString label,
 
 //*************************************************************************************************************
 
-EDFSignalInfo::EDFSignalInfo(const EDFSignalInfo& other)
+EDFChannelInfo::EDFChannelInfo(const EDFChannelInfo& other)
 : m_sLabel(other.m_sLabel),
   m_sTransducerType(other.m_sTransducerType),
   m_sPhysicalDimension(other.m_sPhysicalDimension),
@@ -131,11 +131,11 @@ EDFSignalInfo::EDFSignalInfo(const EDFSignalInfo& other)
 
 //*************************************************************************************************************
 
-QString EDFSignalInfo::getAsString() const
+QString EDFChannelInfo::getAsString() const
 {
     QString result;
 
-    result += "\n== EDF SIGNAL INFO START ==";
+    result += "\n== EDF CHANNEL INFO START ==";
     result += "\nChannel Label: " + m_sLabel;
     result += "\nTransducer Type: " + m_sTransducerType;
     result += "\nPhysical Dimension: " + m_sPhysicalDimension;
@@ -154,6 +154,6 @@ QString EDFSignalInfo::getAsString() const
 
 //*************************************************************************************************************
 
-void EDFSignalInfo::setAsMeasurementSignal() {
+void EDFChannelInfo::setAsMeasurementChannel() {
     m_bIsMeas = true;
 }

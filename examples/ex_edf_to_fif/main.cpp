@@ -96,16 +96,18 @@ int main(int argc, char *argv[])
     EDFInfo info = raw.getInfo();
     qDebug().noquote() << info.getAsString();
 
-    // read some raw data
-    QVector<Eigen::RowVectorXf> rawChunk = raw.read_raw_segment(345, 3491);
+    // read some raw data, second 1 to 2
+    Eigen::MatrixXf rawChunk = raw.read_raw_segment(1.0f, 2.0f);
+    qDebug() << "raw chunk rows: " << rawChunk.rows() << ", raw chunk cols: " << rawChunk.cols();
 
     // display the data
     QMainWindow* temp = new QMainWindow();
     QChart* chart = new QChart();
     chart->legend()->hide();
     QLineSeries* series = new QLineSeries();
-    for(int i = 0; i < rawChunk[4].size(); ++i)
-        series->append(i, static_cast<double>(rawChunk[4][i]));
+    Eigen::RowVectorXf channelSlice = rawChunk.row(4);  // take 5th channel
+    for(int i = 0; i < channelSlice.size(); ++i)
+        series->append(i, static_cast<double>(channelSlice[i]));
     chart->addSeries(series);
     chart->createDefaultAxes();
     chart->setTitle("Singular EEG Channel");

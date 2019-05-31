@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     edf_signal_info.h
+* @file     edf_ch_info.h
 * @author   Simon Heinke <simon.heinke@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the EDFSignalInfo class.
+* @brief    Contains the declaration of the EDFChannelInfo class.
+*           Note that "Channel" is synonymous to "Signal" in the context of EDF files.
 *
 */
 
-#ifndef EDF_SIGNAL_INFO_H
-#define EDF_SIGNAL_INFO_H
+#ifndef EDF_CH_INFO_H
+#define EDF_CH_INFO_H
 
 
 //*************************************************************************************************************
@@ -68,11 +69,11 @@ namespace EDFINFOEXAMPLE
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EDFSignalInfo
+* DECLARE CLASS EDFChannelInfo
 *
-* @brief The EDFSignalInfo is a simple container class that holds all relevant information for EDF signals.
+* @brief The EDFChannelInfo is a simple container class that holds all relevant information for EDF signals / channels
 */
-class EDFSignalInfo
+class EDFChannelInfo
 {
 
 public:
@@ -81,13 +82,13 @@ public:
     /**
     * Default constructor.
     */
-    EDFSignalInfo();
+    EDFChannelInfo();
 
     //=========================================================================================================
     /**
     * Constructor just copies values.
     */
-    EDFSignalInfo(const QString label,
+    EDFChannelInfo(const QString label,
                   const QString transducer,
                   const QString physicalDimension,
                   const QString prefiltering,
@@ -104,13 +105,13 @@ public:
     /**
     * Copy constructor.
     */
-    EDFSignalInfo(const EDFSignalInfo& other);
+    EDFChannelInfo(const EDFChannelInfo& other);
 
     //=========================================================================================================
     /**
-    * Obtain textual representation of signal.
+    * Obtain textual representation of channel info.
     *
-    * @return Textual representation of signal.
+    * @return Textual representation of channel info.
     */
     QString getAsString() const;
 
@@ -122,9 +123,9 @@ public:
 
     inline long getSampleCount() const;
 
-    inline bool isMeasurementSignal() const;
+    inline bool isMeasurementChannel() const;
 
-    void setAsMeasurementSignal();
+    void setAsMeasurementChannel();
 
     inline long digitalMin() const;
 
@@ -135,7 +136,7 @@ public:
     inline float physicalMax() const;
 
 private:
-    // data fields for EDF signals. The member order does NOT correlate with the position in the header.
+    // data fields for EDF channels. The member order does NOT correlate with the position in the header.
     QString m_sLabel;                   // e.g. EEG Fpz-Cz or Body temp
     QString m_sTransducerType;          // e.g. AgAgCl electrode
     QString m_sPhysicalDimension;       // e.g. uV or degreeC
@@ -150,7 +151,7 @@ private:
     long m_iNumberOfSamplesTotal;
     float m_frequency;
 
-    // flag for differentiating between measurement signals and extra signals
+    // flag for differentiating between measurement channels and extra channels
     bool m_bIsMeas;
 };
 
@@ -159,66 +160,66 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QString EDFSignalInfo::getLabel() const {
+inline QString EDFChannelInfo::getLabel() const {
     return m_sLabel;
 }
 
 
 //*************************************************************************************************************
 
-inline int EDFSignalInfo::getNumberOfSamplesPerRecord() const {
+inline int EDFChannelInfo::getNumberOfSamplesPerRecord() const {
     return m_iNumberOfSamplesPerRecord;
 }
 
 
 //*************************************************************************************************************
 
-inline float EDFSignalInfo::getFrequency() const {
+inline float EDFChannelInfo::getFrequency() const {
     return m_frequency;
 }
 
 
 //*************************************************************************************************************
 
-inline long EDFSignalInfo::getSampleCount() const {
+inline long EDFChannelInfo::getSampleCount() const {
     return m_iNumberOfSamplesTotal;
 }
 
 
 //*************************************************************************************************************
 
-inline bool EDFSignalInfo::isMeasurementSignal() const {
+inline bool EDFChannelInfo::isMeasurementChannel() const {
     return m_bIsMeas;
 }
 
 
 //*************************************************************************************************************
 
-inline long EDFSignalInfo::digitalMin() const {
+inline long EDFChannelInfo::digitalMin() const {
     return m_iDigitalMinimum;
 }
 
 
 //*************************************************************************************************************
 
-inline long EDFSignalInfo::digitalMax() const {
+inline long EDFChannelInfo::digitalMax() const {
     return m_iDigitalMaximum;
 }
 
 
 //*************************************************************************************************************
 
-inline float EDFSignalInfo::physicalMin() const {
+inline float EDFChannelInfo::physicalMin() const {
     return m_fPhysicalMinimum;
 }
 
 
 //*************************************************************************************************************
 
-inline float EDFSignalInfo::physicalMax() const {
+inline float EDFChannelInfo::physicalMax() const {
     return m_fPhysicalMaximum;
 }
 
 } // NAMESPACE
 
-#endif // EDF_SIGNAL_INFO_H
+#endif // EDF_CH_INFO_H
