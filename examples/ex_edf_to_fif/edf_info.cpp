@@ -83,7 +83,7 @@ EDFInfo::EDFInfo(QIODevice* pDev)
         qDebug() << "[EDFInfo::EDFInfo] Warning: device not at position zero, this will most probably crash...";
     }
 
-    // general info, which is not independent of individual signals
+    // general info, which is not dependent on individual signals
     m_sEDFVersionNo = QString::fromLatin1(pDev->read(EDF_VERSION)).trimmed();
     m_sLocalPatientIdentification = QString::fromLatin1(pDev->read(LOCAL_PATIENT_INFO)).trimmed();
     m_sLocalRecordingIdentification = QString::fromLatin1(pDev->read(LOCAL_RECORD_INFO)).trimmed();
@@ -95,7 +95,7 @@ EDFInfo::EDFInfo(QIODevice* pDev)
     pDev->read(HEADER_RESERVED);  // next 44 bytes are unused
     m_iNumDataRecords = QString::fromLatin1(pDev->read(NUM_DATA_RECORDS)).toInt();
     m_fDataRecordsDuration = QString::fromLatin1(pDev->read(DURATION_DATA_RECORDS)).toFloat();
-    m_iNumSignals = QString::fromLatin1(pDev->read(NUM_SIGNALS)).toInt();
+    m_iNumChannels = QString::fromLatin1(pDev->read(NUM_SIGNALS)).toInt();
 
     // use the order specified by EDF
     QVector<QString> labels;
@@ -108,30 +108,30 @@ EDFInfo::EDFInfo(QIODevice* pDev)
     QVector<QString> prefilterings;
     QVector<long> numbersOfSamplesPerRecords;
 
-    for(int i = 0; i < m_iNumSignals; ++i)
+    for(int i = 0; i < m_iNumChannels; ++i)
         labels.push_back(QString::fromLatin1(pDev->read(SIG_LABEL)).trimmed());
-    for(int i = 0; i < m_iNumSignals; ++i)
+    for(int i = 0; i < m_iNumChannels; ++i)
         transducers.push_back(QString::fromLatin1(pDev->read(SIG_TRANSDUCER_TYPE)).trimmed());
-    for(int i = 0; i < m_iNumSignals; ++i)
+    for(int i = 0; i < m_iNumChannels; ++i)
         physicalDims.push_back(QString::fromLatin1(pDev->read(SIG_PHYSICAL_DIMENSION)).trimmed());
-    for(int i = 0; i < m_iNumSignals; ++i)
+    for(int i = 0; i < m_iNumChannels; ++i)
         physicalMins.push_back(QString::fromLatin1(pDev->read(SIG_PHYSICAL_MIN)).toFloat());
-    for(int i = 0; i < m_iNumSignals; ++i)
+    for(int i = 0; i < m_iNumChannels; ++i)
         physicalMaxs.push_back(QString::fromLatin1(pDev->read(SIG_PHYSICAL_MAX)).toFloat());
-    for(int i = 0; i < m_iNumSignals; ++i)
+    for(int i = 0; i < m_iNumChannels; ++i)
         digitalMins.push_back(QString::fromLatin1(pDev->read(SIG_DIGITAL_MIN)).toLong());
-    for(int i = 0; i < m_iNumSignals; ++i)
+    for(int i = 0; i < m_iNumChannels; ++i)
         digitalMaxs.push_back(QString::fromLatin1(pDev->read(SIG_DIGITAL_MAX)).toLong());
-    for(int i = 0; i < m_iNumSignals; ++i)
+    for(int i = 0; i < m_iNumChannels; ++i)
         prefilterings.push_back(QString::fromLatin1(pDev->read(SIG_PREFILTERING)).trimmed());
-    for(int i = 0; i < m_iNumSignals; ++i)
+    for(int i = 0; i < m_iNumChannels; ++i)
         numbersOfSamplesPerRecords.push_back(QString::fromLatin1(pDev->read(SIG_NUM_SAMPLES_PER_DATA_RECORD)).toLong());
-    for(int i = 0; i < m_iNumSignals; ++i)
+    for(int i = 0; i < m_iNumChannels; ++i)
         pDev->read(SIG_RESERVED);  // next 32 bytes are unused
 
     // store full list of signals in original order
-    for(int i = 0; i < m_iNumSignals; ++i) {
-        m_vAllSignals.push_back(EDFSignalInfo(labels[i],
+    for(int i = 0; i < m_iNumChannels; ++i) {
+        m_vAllChannels.push_back(EDFChannelInfo(labels[i],
                                               transducers[i],
                                               physicalDims[i],
                                               prefilterings[i],
@@ -153,46 +153,46 @@ EDFInfo::EDFInfo(QIODevice* pDev)
 
     // calculate number of bytes per data record for later usage in read_raw function
     m_iNumBytesPerDataRecord = 0;
-    for(const auto& sig : m_vAllSignals) {
-        m_iNumBytesPerDataRecord += sig.getNumberOfSamplesPerRecord() * 2;  // 2 integer representation, this might be different for bdf files
+    for(const auto& chan : m_vAllChannels) {
+        m_iNumBytesPerDataRecord += chan.getNumberOfSamplesPerRecord() * 2;  // 2 integer representation, this might be different for bdf files
     }
 
     // do post-processing: variable channel frequencies are not supported, take highest available frequency as main frequency.
     // use 'NumberOfSamplesPerRecord' field in order to avoid float comparisons (duration of data records is fixed)
     long iMaxNumberOfSamplesPerRecord = -1;
-    for(const auto& sig : m_vAllSignals) {
-        if(sig.getNumberOfSamplesPerRecord() > iMaxNumberOfSamplesPerRecord) {
-            iMaxNumberOfSamplesPerRecord = sig.getNumberOfSamplesPerRecord();
+    for(const auto& chan : m_vAllChannels) {
+        if(chan.getNumberOfSamplesPerRecord() > iMaxNumberOfSamplesPerRecord) {
+            iMaxNumberOfSamplesPerRecord = chan.getNumberOfSamplesPerRecord();
         }
     }
 
-    // remember which signals were measurement signals and which were not
-    for(int i = 0; i < m_vAllSignals.size(); ++i) {
-        if(m_vAllSignals[i].getNumberOfSamplesPerRecord() == iMaxNumberOfSamplesPerRecord) {
+    // remember which channels are measurement channels and which are not
+    for(int i = 0; i < m_vAllChannels.size(); ++i) {
+        if(m_vAllChannels[i].getNumberOfSamplesPerRecord() == iMaxNumberOfSamplesPerRecord) {
             // this is (probably) a measurement signal
-            m_vAllSignals[i].setAsMeasurementSignal();
-            m_vMeasSignals.push_back(m_vAllSignals[i]);
+            m_vAllChannels[i].setAsMeasurementChannel();
+            m_vMeasChannels.push_back(m_vAllChannels[i]);
         } else {
             // this is an extra signal, e.g. stimulus. Dont have to do anything, default value for measurement flag is false.
         }
     }
 
     // tell user about extra signals
-    if(m_vAllSignals.size() - m_vMeasSignals.size() > 0) {
-        qDebug() << "[EDFInfo::EDFInfo] Found " << m_vAllSignals.size() - m_vMeasSignals.size() << " extra channels, which are: ";
-        for(const auto& sig : m_vAllSignals) {
-            if(sig.isMeasurementSignal() == false) {
-                qDebug() << sig.getLabel();
+    if(m_vAllChannels.size() - m_vMeasChannels.size() > 0) {
+        qDebug() << "[EDFInfo::EDFInfo] Found " << m_vAllChannels.size() - m_vMeasChannels.size() << " extra channels, which are: ";
+        for(const auto& chan : m_vAllChannels) {
+            if(chan.isMeasurementChannel() == false) {
+                qDebug() << chan.getLabel();
             }
         }
     }
 
     // basic sanity checks for measurement signals:
-    if(m_vMeasSignals.size()) {
-        long numSamplesPerRecord = m_vMeasSignals[0].getNumberOfSamplesPerRecord();
-        long numSamplesTotal = m_vMeasSignals[0].getSampleCount();
-        for(const auto& sig : m_vMeasSignals) {
-            if(sig.getNumberOfSamplesPerRecord() != numSamplesPerRecord || sig.getSampleCount() != numSamplesTotal) {
+    if(m_vMeasChannels.size()) {
+        long numSamplesPerRecord = m_vMeasChannels[0].getNumberOfSamplesPerRecord();
+        long numSamplesTotal = m_vMeasChannels[0].getSampleCount();
+        for(const auto& measChan : m_vMeasChannels) {
+            if(measChan.getNumberOfSamplesPerRecord() != numSamplesPerRecord || measChan.getSampleCount() != numSamplesTotal) {
                 qDebug() << "[EDFInfo::EDFInfo] Warning, major inconsistency in measurement sample counts !";
             }
         }
@@ -216,18 +216,18 @@ QString EDFInfo::getAsString() const
     result += "\nNumber of Bytes in the EDF Header: " + QString::number(m_iNumBytesInHeader);
     result += "\nNumber of Data Records: " + QString::number(m_iNumDataRecords);
     result += "\nDuration of each Data Record (in Seconds): " + QString::number(m_fDataRecordsDuration);
-    result += "\nNumber of Signals in EDF File: " + QString::number(m_iNumSignals);
+    result += "\nNumber of Signals in EDF File: " + QString::number(m_iNumChannels);
 
     result += "\n== MEASUREMENT SIGNALS ==";
-    for(const auto& sig : m_vAllSignals) {
-        if(sig.isMeasurementSignal()) {
+    for(const auto& sig : m_vAllChannels) {
+        if(sig.isMeasurementChannel()) {
             result += sig.getAsString();
         }
     }
 
     result += "\n== EXTRA SIGNALS ==";
-    for(const auto& sig : m_vAllSignals) {
-        if(sig.isMeasurementSignal() == false) {
+    for(const auto& sig : m_vAllChannels) {
+        if(sig.isMeasurementChannel() == false) {
             result += sig.getAsString();
         }
     }

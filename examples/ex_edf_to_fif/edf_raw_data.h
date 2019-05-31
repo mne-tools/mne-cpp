@@ -94,7 +94,9 @@ public:
 
     EDFInfo getInfo() const;
 
-    QVector<Eigen::RowVectorXf> read_raw_segment(int startSampleIdx, int endSampleIdx) const;
+    Eigen::MatrixXf read_raw_segment(int startSampleIdx, int endSampleIdx) const;
+
+    Eigen::MatrixXf read_raw_segment(float startTimePoint, float endTimePoint) const;
 
 signals:
 
