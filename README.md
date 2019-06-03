@@ -13,10 +13,16 @@ Cross-platform medical (real-time) applications for EEG and MEG data analysis.
 For more information please visit http://www.mne-cpp.org.
 
 
-Get and build the latest code
------------------------------
+Get and build from source
+-------------------------
 
 To get the latest code and build it follow this [guide](http://wiki.mne-cpp.org/index.php/Step_by_Step_Setup_Guide). 
+
+
+Get pre-built binaries
+----------------------
+
+Pre-built binaries for Windows, Mac and Linux are available [here](https://www.mne-cpp.org/index.php/download/). 
 
 
 Get involved
