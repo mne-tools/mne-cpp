@@ -134,7 +134,10 @@ UI_DIR = $${PWD}
 RESOURCES += \
         ssvepbci.qrc
 
-DISTFILES +=
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../../lib
+}
 
 # Activate FFTW backend in Eigen
 contains(MNECPP_CONFIG, useFFTW) {
