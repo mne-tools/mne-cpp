@@ -1,11 +1,11 @@
 #!/bin/bash
 #set -ev
-if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
+#if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
     echo -e "Packaging binaries and libs"
 
-    # === Linux Deploy Qt ===
-	#sourcing qt510 again, this is for linuxdeployqt; verified redundant, so commented out. 
-	#source /opt/qt510/bin/qt510-env.sh
+    	# === Linux Deploy Qt ===
+	#sourcing qt510 again, this is for linuxdeployqt
+	source /opt/qt510/bin/qt510-env.sh
 
 	#setting linuxdeployqt to variable
 	linuxdeployqt=linuxdeployqt-continuous-x86_64.AppImage
@@ -36,4 +36,4 @@ if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
         # upload artifacts
         ./azcopy copy $archive_name "$REMOTE_AZURE_SERVER$archive_name?sv=2018-03-28&ss=b&srt=o&sp=w&se=2022-05-31T02:17:52Z&st=2019-05-30T18:17:52Z&spr=https&sig=$SAS"
     fi
-fi
+#fi
