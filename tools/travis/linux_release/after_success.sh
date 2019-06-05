@@ -1,6 +1,6 @@
 #!/bin/bash
 #set -ev
-#if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
+if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
     echo -e "Packaging binaries and libs"
 
     	# === Linux Deploy Qt ===
@@ -36,4 +36,4 @@
         # upload artifacts
         ./azcopy copy $archive_name "$REMOTE_AZURE_SERVER$archive_name?sv=2018-03-28&ss=b&srt=o&sp=w&se=2022-05-31T02:17:52Z&st=2019-05-30T18:17:52Z&spr=https&sig=$SAS"
     fi
-#fi
+fi
