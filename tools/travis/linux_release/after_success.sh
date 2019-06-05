@@ -3,30 +3,31 @@
 if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
     echo -e "Packaging binaries and libs"
 
-    	# === Linux Deploy Qt ===
-	#sourcing qt510 again, this is for linuxdeployqt
-	source /opt/qt510/bin/qt510-env.sh
+    # === Linux Deploy Qt ===
 
-	#setting linuxdeployqt to variable
-	linuxdeployqt=linuxdeployqt-continuous-x86_64.AppImage
+    #sourcing qt510 again, this is for linuxdeployqt
+    source /opt/qt510/bin/qt510-env.sh
 
-	#archive file name created
-	archive_name="mne-cpp-linux-x86_64-$TRAVIS_BRANCH.tar.gz"
+    #setting linuxdeployqt to variable
+    linuxdeployqt=linuxdeployqt-continuous-x86_64.AppImage
 
-	#copying built data to folder for easy packaging 	
-	cp -r ./bin ./lib mne-cpp/
+    #archive file name created
+    archive_name="mne-cpp-linux-x86_64-$TRAVIS_BRANCH.tar.gz"
 
-	#dropping into folder to easily package all results from linuxdeployqt
-	cd mne-cpp
+    #copying built data to folder for easy packaging 	
+    cp -r ./bin ./lib mne-cpp/
 
-	#linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
-	../$linuxdeployqt bin/mne_scan
+    #dropping into folder to easily package all results from linuxdeployqt
+    cd mne-cpp
 
-	#creating archive of everything in current directory
-	tar cfvz ../$archive_name ./*
+    #linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
+    ../$linuxdeployqt bin/mne_scan
+
+    #creating archive of everything in current directory
+    tar cfvz ../$archive_name ./*
 	
-	#Moving up one directory level.
-	cd .. 
+    #Moving up one directory level.
+    cd .. 
 
     #Master
     if [[ $TRAVIS_BRANCH == 'master' ]]; then
