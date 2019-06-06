@@ -329,7 +329,7 @@ int ConnectivitySettings::getSamplingFrequency() const
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::setNumberFFT(int iNfft)
+void ConnectivitySettings::setFFTSize(int iNfft)
 {
     if(iNfft == 0) {
         return;
@@ -345,7 +345,7 @@ void ConnectivitySettings::setNumberFFT(int iNfft)
 
 //*******************************************************************************************************
 
-int ConnectivitySettings::getNumberFFT() const
+int ConnectivitySettings::getFFTSize() const
 {
     return m_iNfft;
 }
