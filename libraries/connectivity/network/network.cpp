@@ -91,6 +91,7 @@ Network::Network(const QString& sConnectivityMethod,
 , m_minMaxThresholdedWeights(QPair<double,double>(std::numeric_limits<double>::max(),0.0))
 , m_dThreshold(dThreshold)
 , m_fSFreq(0.0f)
+, m_iFFTSize(128)
 , m_iNumberFreqBins(0)
 {
     qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
@@ -400,7 +401,7 @@ void Network::setFrequencyRange(float fLowerFreq, float fUpperFreq)
         return;
     }
 
-    double dScaleFactor = m_iNumberFreqBins/(m_fSFreq/2);
+    double dScaleFactor = m_iFFTSize/(m_fSFreq/2);
 
     m_minMaxFrequency.first = fLowerFreq;
     m_minMaxFrequency.second = fUpperFreq;
@@ -528,7 +529,7 @@ void Network::setSamplingFrequency(float fSFreq)
 
 //*************************************************************************************************************
 
-int Network::getNumberFreqBins() const
+int Network::getUsedFreqBins() const
 {
     return m_iNumberFreqBins;
 }
@@ -536,7 +537,24 @@ int Network::getNumberFreqBins() const
 
 //*************************************************************************************************************
 
-void Network::setNumberFreqBins(int iNumberFreqBins)
+void Network::setUsedFreqBins(int iNumberFreqBins)
 {
     m_iNumberFreqBins = iNumberFreqBins;
 }
+
+
+//*************************************************************************************************************
+
+void Network::setFFTSize(int iFFTSize)
+{
+    m_iFFTSize = iFFTSize;
+}
+
+
+//*************************************************************************************************************
+
+int Network::getFFTSize()
+{
+    return m_iFFTSize;
+}
+

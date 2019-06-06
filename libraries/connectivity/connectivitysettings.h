@@ -162,9 +162,9 @@ public:
 
     int getSamplingFrequency() const;
 
-    void setNumberFFT(int iNfft);
+    void setFFTSize(int iNfft);
 
-    int getNumberFFT() const;
+    int getFFTSize() const;
 
     void setWindowType(const QString& sWindowType);
 

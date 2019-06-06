@@ -138,7 +138,7 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
 
     // Check that iNfft >= signal length
     int iSignalLength = connectivitySettings.at(0).matData.cols();
-    int iNfft = connectivitySettings.getNumberFFT();
+    int iNfft = connectivitySettings.getFFTSize();
 
     // Generate tapers
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
@@ -158,7 +158,9 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
         AbstractMetric::m_iNumberBinAmount = iNFreqs;
     }
 
-    finalNetwork.setNumberFreqBins(AbstractMetric::m_iNumberBinAmount);
+    // Pass information about the FFT length. Use iNFreqs because we only use the half spectrum
+    finalNetwork.setFFTSize(iNFreqs);
+    finalNetwork.setUsedFreqBins(AbstractMetric::m_iNumberBinAmount);
 
     QMutex mutex;
 

@@ -109,7 +109,7 @@ Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
 
     // Check if start and bin amount need to be reset to full spectrum
-    int iNfft = connectivitySettings.getNumberFFT();
+    int iNfft = connectivitySettings.getFFTSize();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
     if(m_iNumberBinStart == -1 ||
@@ -122,7 +122,9 @@ Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
         AbstractMetric::m_iNumberBinAmount = iNFreqs;
     }
 
-    finalNetwork.setNumberFreqBins(AbstractMetric::m_iNumberBinAmount);
+    // Pass information about the FFT length. Use iNFreqs because we only use the half spectrum
+    finalNetwork.setFFTSize(iNFreqs);
+    finalNetwork.setUsedFreqBins(AbstractMetric::m_iNumberBinAmount);
 
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();

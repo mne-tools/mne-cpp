@@ -371,15 +371,31 @@ public:
     *
     * @return The currently set number of samples.
     */
-    int getNumberFreqBins() const;
+    int getUsedFreqBins() const;
 
     //=========================================================================================================
     /**
-    * Set the new number of frequency bins.
+    * Set the new number of used frequency bins.
     *
-    * @param[in] iNumberFreqBins        The new number of frequency bins.
+    * @param[in] iNumberFreqBins        The new number of used frequency bins.
     */
-    void setNumberFreqBins(int iNumberFreqBins);
+    void setUsedFreqBins(int iNumberFreqBins);
+
+    //=========================================================================================================
+    /**
+    * Set the new FFT size.
+    *
+    * @param[in] iFFTSize        The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).
+    */
+    void setFFTSize(int iFFTSize);
+
+    //=========================================================================================================
+    /**
+    * Returns the current FFT size.
+    *
+    * @return   The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).
+    */
+    int getFFTSize();
 
 protected:
     QList<QSharedPointer<NetworkEdge> >     m_lFullEdges;               /**< List with all edges of the network.*/
@@ -398,6 +414,7 @@ protected:
     double                                  m_dThreshold;               /**< The current value which was used to threshold the edge weigths.*/
     float                                   m_fSFreq;                   /**< The sampling frequency used to collect the data which this network is based on.*/
     int                                     m_iNumberFreqBins;          /**< The number of used frequency bins.*/
+    int                                     m_iFFTSize;                 /**< The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).*/
 
     VisualizationInfo                       m_visualizationInfo;        /**< The current visualization info used to plot the network later on.*/
 };
