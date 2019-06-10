@@ -51,6 +51,8 @@
 
 #include "edf_ch_info.h"
 
+#include <fiff/fiff_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -136,6 +138,16 @@ public:
     */
     QString getAsString() const;
 
+    //=========================================================================================================
+    /**
+    * @brief toFiffInfo Converts the EDFInfo into a FiffInfo
+    *
+    * @return A FiffInfo that represents the EDFInfo in the best possible way.
+    */
+    FIFFLIB::FiffInfo toFiffInfo() const;
+
+    //=========================================================================================================
+    // Getters:
     inline QVector<EDFChannelInfo> getAllChannelInfos() const;
 
     inline QVector<EDFChannelInfo> getMeasurementChannelInfos() const;
