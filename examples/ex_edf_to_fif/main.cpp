@@ -42,6 +42,8 @@
 #include <iostream>
 #include <vector>
 
+#include <fiff/fiff_ch_info.h>
+
 #include "edf_info.h"
 #include "edf_raw_data.h"
 
@@ -66,6 +68,7 @@
 //=============================================================================================================
 
 using namespace EDFINFOEXAMPLE;
+using namespace FIFFLIB;
 using namespace QtCharts;
 
 
@@ -94,8 +97,20 @@ int main(int argc, char *argv[])
     EDFRawData raw(&file);
     // print basic info
     EDFInfo info = raw.getInfo();
-    qDebug().noquote() << info.getAsString();
+    // qDebug().noquote() << info.getAsString();
 
+    FiffChInfo fiffChanInfo = info.getAllChannelInfos()[1].toFiffChInfo();
+    qDebug() << fiffChanInfo.scanNo;
+    qDebug() << fiffChanInfo.logNo;
+    qDebug() << fiffChanInfo.kind;
+    qDebug() << fiffChanInfo.range;
+    qDebug() << fiffChanInfo.cal;
+    // qDebug() << fiffChanInfo.chpos;
+    qDebug() << fiffChanInfo.unit;
+    qDebug() << fiffChanInfo.unit_mul;
+    qDebug() << fiffChanInfo.ch_name;
+
+    /*
     // read some raw data, second 1 to 2
     Eigen::MatrixXf rawChunk = raw.read_raw_segment(1.0f, 2.0f);
     qDebug() << "raw chunk rows: " << rawChunk.rows() << ", raw chunk cols: " << rawChunk.cols();
@@ -115,6 +130,7 @@ int main(int argc, char *argv[])
     temp->setCentralWidget(cView);
     temp->resize(1000, 300);
     temp->show();
+    */
 
     return app.exec();
 }
