@@ -43,6 +43,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <fiff/fiff_ch_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,32 +82,21 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
-    EDFChannelInfo();
-
-    //=========================================================================================================
-    /**
     * Constructor just copies values.
     */
-    EDFChannelInfo(const QString label,
-                  const QString transducer,
-                  const QString physicalDimension,
-                  const QString prefiltering,
-                  const float physicalMin,
-                  const float physicalMax,
-                  const long digitalMin,
-                  const long digitalMax,
-                  const long numberOfSamplesPerRecord,
-                  const long numberOfSamplesTotal,
-                  const float mfrequency,
-                  const bool bIsMeas);
-
-    //=========================================================================================================
-    /**
-    * Copy constructor.
-    */
-    EDFChannelInfo(const EDFChannelInfo& other);
+    EDFChannelInfo(const int channelNumber = -1,
+                   const QString label = "",
+                   const QString transducer = "",
+                   const QString physicalDimension = "",
+                   const QString prefiltering = "",
+                   const float physicalMin = -1.0f,
+                   const float physicalMax = -1.0f,
+                   const long digitalMin = -1,
+                   const long digitalMax = -1,
+                   const long numberOfSamplesPerRecord = -1,
+                   const long numberOfSamplesTotal = -1,
+                   const float mfrequency = -1,
+                   const bool bIsMeas = false);
 
     //=========================================================================================================
     /**
@@ -115,6 +106,22 @@ public:
     */
     QString getAsString() const;
 
+    //=========================================================================================================
+    /**
+    * Mark this channel as a measurement channel.
+    */
+    void setAsMeasurementChannel();
+
+    //=========================================================================================================
+    /**
+    * @brief toFiffChInfo Converts the EDFChannelInfo into a FiffChInfo.
+    *
+    * @return A FiffChInfo that represents the EDFChannelInfo in the best possible way.
+    */
+    FIFFLIB::FiffChInfo toFiffChInfo() const;
+
+    //=========================================================================================================
+    // Getters:
     inline QString getLabel() const;
 
     inline int getNumberOfSamplesPerRecord() const;
@@ -125,8 +132,6 @@ public:
 
     inline bool isMeasurementChannel() const;
 
-    void setAsMeasurementChannel();
-
     inline long digitalMin() const;
 
     inline long digitalMax() const;
@@ -136,6 +141,9 @@ public:
     inline float physicalMax() const;
 
 private:
+    // channel / signal index, for later conversion to FiffChInfo
+    int m_iChanNo;
+
     // data fields for EDF channels. The member order does NOT correlate with the position in the header.
     QString m_sLabel;                   // e.g. EEG Fpz-Cz or Body temp
     QString m_sTransducerType;          // e.g. AgAgCl electrode
