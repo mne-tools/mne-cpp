@@ -131,18 +131,19 @@ EDFInfo::EDFInfo(QIODevice* pDev)
 
     // store full list of signals in original order
     for(int i = 0; i < m_iNumChannels; ++i) {
-        m_vAllChannels.push_back(EDFChannelInfo(labels[i],
-                                              transducers[i],
-                                              physicalDims[i],
-                                              prefilterings[i],
-                                              physicalMins[i],
-                                              physicalMaxs[i],
-                                              digitalMins[i],
-                                              digitalMaxs[i],
-                                              numbersOfSamplesPerRecords[i],
-                                              numbersOfSamplesPerRecords[i] * m_iNumDataRecords,
-                                              numbersOfSamplesPerRecords[i] / m_fDataRecordsDuration,
-                                              false));
+        m_vAllChannels.push_back(EDFChannelInfo(i,
+                                                labels[i],
+                                                transducers[i],
+                                                physicalDims[i],
+                                                prefilterings[i],
+                                                physicalMins[i],
+                                                physicalMaxs[i],
+                                                digitalMins[i],
+                                                digitalMaxs[i],
+                                                numbersOfSamplesPerRecords[i],
+                                                numbersOfSamplesPerRecords[i] * m_iNumDataRecords,
+                                                numbersOfSamplesPerRecords[i] / m_fDataRecordsDuration,
+                                                false));
     }
 
     // we should have reached the end of the header
