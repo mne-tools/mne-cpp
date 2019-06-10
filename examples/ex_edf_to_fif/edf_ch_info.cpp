@@ -53,6 +53,7 @@
 //=============================================================================================================
 
 using namespace EDFINFOEXAMPLE;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -60,39 +61,22 @@ using namespace EDFINFOEXAMPLE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EDFChannelInfo::EDFChannelInfo()
-: m_sLabel(),
-  m_sTransducerType(),
-  m_sPhysicalDimension(),
-  m_sPrefiltering(),
-  m_fPhysicalMinimum(),
-  m_fPhysicalMaximum(),
-  m_iDigitalMinimum(),
-  m_iDigitalMaximum(),
-  m_iNumberOfSamplesPerRecord(-1),
-  m_iNumberOfSamplesTotal(-1),
-  m_frequency(-1.0),
-  m_bIsMeas(false)
-{
 
-}
-
-
-//*************************************************************************************************************
-
-EDFChannelInfo::EDFChannelInfo(const QString label,
-                             const QString transducer,
-                             const QString physicalDimension,
-                             const QString prefiltering,
-                             const float physicalMin,
-                             const float physicalMax,
-                             const long digitalMin,
-                             const long digitalMax,
-                             const long numberOfSamplesPerRecord,
-                             const long numberOfSamplesTotal,
-                             const float mfrequency,
-                             const bool bIsMeas)
-: m_sLabel(label),
+EDFChannelInfo::EDFChannelInfo(const int channelNumber,
+                               const QString label,
+                               const QString transducer,
+                               const QString physicalDimension,
+                               const QString prefiltering,
+                               const float physicalMin,
+                               const float physicalMax,
+                               const long digitalMin,
+                               const long digitalMax,
+                               const long numberOfSamplesPerRecord,
+                               const long numberOfSamplesTotal,
+                               const float mfrequency,
+                               const bool bIsMeas)
+: m_iChanNo(channelNumber),
+  m_sLabel(label),
   m_sTransducerType(transducer),
   m_sPhysicalDimension(physicalDimension),
   m_sPrefiltering(prefiltering),
@@ -104,26 +88,6 @@ EDFChannelInfo::EDFChannelInfo(const QString label,
   m_iNumberOfSamplesTotal(numberOfSamplesTotal),
   m_frequency(mfrequency),
   m_bIsMeas(bIsMeas)
-{
-
-}
-
-
-//*************************************************************************************************************
-
-EDFChannelInfo::EDFChannelInfo(const EDFChannelInfo& other)
-: m_sLabel(other.m_sLabel),
-  m_sTransducerType(other.m_sTransducerType),
-  m_sPhysicalDimension(other.m_sPhysicalDimension),
-  m_sPrefiltering(other.m_sPrefiltering),
-  m_fPhysicalMinimum(other.m_fPhysicalMinimum),
-  m_fPhysicalMaximum(other.m_fPhysicalMaximum),
-  m_iDigitalMinimum(other.m_iDigitalMinimum),
-  m_iDigitalMaximum(other.m_iDigitalMaximum),
-  m_iNumberOfSamplesPerRecord(other.m_iNumberOfSamplesPerRecord),
-  m_iNumberOfSamplesTotal(other.m_iNumberOfSamplesTotal),
-  m_frequency(other.m_frequency),
-  m_bIsMeas(other.m_bIsMeas)
 {
 
 }
@@ -156,4 +120,54 @@ QString EDFChannelInfo::getAsString() const
 
 void EDFChannelInfo::setAsMeasurementChannel() {
     m_bIsMeas = true;
+}
+
+
+//*************************************************************************************************************
+
+FiffChInfo EDFChannelInfo::toFiffChInfo() const {
+    FiffChInfo result;
+
+    result.scanNo = m_iChanNo;
+    result.logNo = m_iChanNo;  // simply take index from file organisation as logical channel number, this guarantees uniqueness.
+    // check a few basic cases for channel kind:
+    QString sLabelUpper = m_sLabel.toUpper();
+    if(m_bIsMeas == false) {
+        if(sLabelUpper.contains("STIM"))
+            result.kind = FIFFV_STIM_CH;
+        else
+            result.kind = FIFFV_MISC_CH;  // declare as miscellaneous, cant be wrong.
+    }
+    else {
+        if(sLabelUpper.contains("EEG"))
+            result.kind = FIFFV_EEG_CH;
+        else if(sLabelUpper.contains("MEG"))
+            result.kind = FIFFV_MEG_CH;
+        else if(sLabelUpper.contains("EOG"))
+            result.kind = FIFFV_EOG_CH;
+        else
+            result.kind = FIFFV_MISC_CH;  // declare as miscellaneous, cant be wrong.
+    }
+
+    // check a few basic cases for physical dimension / unit:
+    QString sUnitUpper = m_sPhysicalDimension.toUpper();
+    if(sUnitUpper.endsWith("V") || sUnitUpper.endsWith("VOLT")) {
+        result.unit = FIFF_UNIT_V;
+        if(sUnitUpper.startsWith("U") || sUnitUpper.startsWith("MICRO"))
+            result.unit_mul = FIFF_UNITM_MU;
+        else
+            result.unit_mul = FIFF_UNITM_NONE;  // seems to be the best solution
+    }
+    else {
+        result.unit = FIFF_UNIT_NONE;
+        result.unit_mul = FIFF_UNITM_NONE;
+    }
+
+    // EDF has a different scaling, which is encapsulated by the interface
+    result.cal = 1.0f;
+    result.range = 1.0f;
+
+    result.ch_name = m_sLabel;
+
+    return result;
 }
