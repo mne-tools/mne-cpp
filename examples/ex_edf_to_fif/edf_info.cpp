@@ -40,6 +40,8 @@
 
 #include "edf_info.h"
 
+#include <fiff/fiff_ch_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,6 +57,7 @@
 //=============================================================================================================
 
 using namespace EDFINFOEXAMPLE;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -73,7 +76,7 @@ EDFInfo::EDFInfo()
 EDFInfo::EDFInfo(QIODevice* pDev)
 {
     // simply parse header and fill datafields
-    if(!pDev->open(QIODevice::ReadOnly)) {
+    if(pDev->open(QIODevice::ReadOnly) == false) {
         qDebug() << "[EDFInfo::EDFInfo] Fatal: could not open device !";
         return;
     }
@@ -234,6 +237,28 @@ QString EDFInfo::getAsString() const
     }
 
     result += "\n== EDF INFO END ==";
+
+    return result;
+}
+
+
+//*************************************************************************************************************
+
+FiffInfo EDFInfo::toFiffInfo() const {
+    FiffInfo result;
+
+    // fiff_info_base members
+    result.nchan = m_vMeasChannels.size();
+
+    for(const auto& edfChan : m_vMeasChannels) {
+        const FiffChInfo temp = edfChan.toFiffChInfo();
+        result.chs.append(temp);
+        result.ch_names.append(temp.ch_name);
+    }
+
+    // fiff_info members
+    result.sfreq = getFrequency();
+
 
     return result;
 }

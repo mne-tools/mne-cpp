@@ -44,6 +44,8 @@
 
 #include "edf_info.h"
 
+#include <fiff/fiff_raw_data.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -90,13 +92,50 @@ class EDFRawData : public QObject
     Q_OBJECT
 public:
 
+    //=========================================================================================================
+    /**
+    * @brief EDFRawData Constructor for EDFRawData
+    * @param pDev Pointer to a QIODevice
+    * @param parent Parent object
+    */
     EDFRawData(QIODevice* pDev, QObject *parent = nullptr);
 
+    //=========================================================================================================
+    /**
+    * @brief getInfo Returns an EDFInfo object that holds most of the metadata.
+    *
+    * @return EDFInfo object.
+    */
     EDFInfo getInfo() const;
 
+    //=========================================================================================================
+    /**
+    * @brief read_raw_segment Reads a timeslice of data.
+    * @param startSampleIdx First sample index of timeslice.
+    * @param endSampleIdx Last sample index of timeslice (exclusive).
+    *
+    * @return An Eigen matrix that holds the timeslice.
+    */
     Eigen::MatrixXf read_raw_segment(int startSampleIdx, int endSampleIdx) const;
 
+    //=========================================================================================================
+    /**
+    * @brief read_raw_segment Reads a timeslice of data. This function simply converts the passed timepoints
+    *        into sample indices by multiplying them with the sampling frequency.
+    * @param startTimePoint Start of timeslice in seconds
+    * @param endTimePoint End of timeslice in seconds.
+    *
+    * @return An Eigen matrix that holds the timeslice.
+    */
     Eigen::MatrixXf read_raw_segment(float startTimePoint, float endTimePoint) const;
+
+    //=========================================================================================================
+    /**
+    * @brief toFiffRawData Converts the EDFRawData into a FiffRawData.
+    *
+    * @return A FiffRawData that represents the EDFRawData in the best possible way.
+    */
+    FIFFLIB::FiffRawData toFiffRawData() const;
 
 signals:
 
