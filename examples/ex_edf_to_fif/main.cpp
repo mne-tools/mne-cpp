@@ -43,6 +43,8 @@
 #include <vector>
 
 #include <fiff/fiff_ch_info.h>
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_raw_data.h>
 
 #include "edf_info.h"
 #include "edf_raw_data.h"
@@ -94,25 +96,20 @@ int main(int argc, char *argv[])
     QFile file("C:\\Users\\Simon\\Desktop\\hiwi\\edf_files\\00000929_s005_t000.edf");
 
     // initialize raw data
-    EDFRawData raw(&file);
+    EDFRawData edfRaw(&file);
     // print basic info
-    EDFInfo info = raw.getInfo();
-    // qDebug().noquote() << info.getAsString();
+    EDFInfo edfInfo = edfRaw.getInfo();
+    qDebug().noquote() << edfInfo.getAsString();
 
-    FiffChInfo fiffChanInfo = info.getAllChannelInfos()[1].toFiffChInfo();
-    qDebug() << fiffChanInfo.scanNo;
-    qDebug() << fiffChanInfo.logNo;
-    qDebug() << fiffChanInfo.kind;
-    qDebug() << fiffChanInfo.range;
-    qDebug() << fiffChanInfo.cal;
-    // qDebug() << fiffChanInfo.chpos;
-    qDebug() << fiffChanInfo.unit;
-    qDebug() << fiffChanInfo.unit_mul;
-    qDebug() << fiffChanInfo.ch_name;
+    // test conversion to fiff
+    FiffRawData fiffRaw = edfRaw.toFiffRawData();
 
-    /*
+    if(fiffRaw.last_samp != edfInfo.getSampleCount()) {
+        qDebug() << "Something went horribly wrong";
+    }
+
     // read some raw data, second 1 to 2
-    Eigen::MatrixXf rawChunk = raw.read_raw_segment(1.0f, 2.0f);
+    Eigen::MatrixXf rawChunk = edfRaw.read_raw_segment(1.0f, 2.0f);
     qDebug() << "raw chunk rows: " << rawChunk.rows() << ", raw chunk cols: " << rawChunk.cols();
 
     // display the data
@@ -130,7 +127,6 @@ int main(int argc, char *argv[])
     temp->setCentralWidget(cView);
     temp->resize(1000, 300);
     temp->show();
-    */
 
     return app.exec();
 }

@@ -56,6 +56,7 @@
 //=============================================================================================================
 
 using namespace EDFINFOEXAMPLE;
+using namespace FIFFLIB;
 using namespace Eigen;
 
 
@@ -169,4 +170,17 @@ MatrixXf EDFRawData::read_raw_segment(float startTimePoint, float endTimePoint) 
     int endSampleIdx = static_cast<int>(std::ceil(endTimePoint * frequency));
 
     return read_raw_segment(startSampleIdx, endSampleIdx);
+}
+
+
+//*************************************************************************************************************
+
+FiffRawData EDFRawData::toFiffRawData() const {
+    FiffRawData result;
+
+    result.info = m_info.toFiffInfo();
+    result.first_samp = 0;  // EDF files always start at zero
+    result.last_samp = m_info.getSampleCount();
+
+    return result;
 }
