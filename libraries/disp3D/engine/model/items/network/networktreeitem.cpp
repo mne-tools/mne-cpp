@@ -112,7 +112,7 @@ void NetworkTreeItem::initItem()
     QList<QStandardItem*> list;
     QVariant data;
 
-    QVector3D vecEdgeTrehshold(0,5,10);
+    QVector3D vecEdgeTrehshold(0,0.5,1);
     if(!m_pItemNetworkThreshold) {
         m_pItemNetworkThreshold = new MetaTreeItem(MetaTreeItemTypes::DataThreshold,
                                                    QString("%1,%2,%3").arg(vecEdgeTrehshold.x()).arg(vecEdgeTrehshold.y()).arg(vecEdgeTrehshold.z()));
@@ -266,8 +266,9 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
         m_pNodesEntity->addComponent(m_pNodes);
 
         //Add material
-        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(false);
-        pMaterial->setAmbient(ColorMap::valueToJet(0.0));
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
+
+        pMaterial->setAmbient(ColorMap::valueToColor(0.0, visualizationInfo.sColormap));
         pMaterial->setAlpha(1.0);
         m_pNodesEntity->addComponent(pMaterial);
     }
@@ -296,9 +297,13 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
             if(visualizationInfo.sMethod == "Map") {
                 // Normalize colors
                 if(iMaxDegree != 0.0f) {
-                    vColorsNodes.push_back(QColor(ColorMap::valueToColor((float)iDegree/(float)iMaxDegree, visualizationInfo.sColormap)));
+                    QColor color = ColorMap::valueToColor((float)iDegree/(float)iMaxDegree, visualizationInfo.sColormap);
+                    //color.setAlphaF(pow((float)iDegree/(float)iMaxDegree,5));
+                    vColorsNodes.push_back(color);
                 } else {
-                    vColorsNodes.push_back(QColor(ColorMap::valueToColor(0.0f, visualizationInfo.sColormap)));
+                    QColor color = ColorMap::valueToColor(0.0, visualizationInfo.sColormap);
+                    //color.setAlphaF(0);
+                    vColorsNodes.push_back(color);
                 }
             } else {
                 vColorsNodes.push_back(QColor(visualizationInfo.colEdges[0],
@@ -347,8 +352,8 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
         m_pEdgeEntity->addComponent(m_pEdges);
 
         //Add material
-        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(false);
-        pMaterial->setAmbient(ColorMap::valueToJet(0.0));
+        GeometryMultiplierMaterial* pMaterial = new GeometryMultiplierMaterial(true);
+        pMaterial->setAmbient(ColorMap::valueToColor(0.0, visualizationInfo.sColormap));
         pMaterial->setAlpha(1.0f);
         m_pEdgeEntity->addComponent(pMaterial);
     }
@@ -395,9 +400,14 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
                     if(visualizationInfo.sMethod == "Map") {
                         // Normalize colors
                         if(dMaxWeight != 0.0f) {
-                            vColorsEdges.push_back(QColor(ColorMap::valueToColor(dWeight/dMaxWeight, visualizationInfo.sColormap)));
+                            QColor color = ColorMap::valueToColor(fabs(dWeight/dMaxWeight), visualizationInfo.sColormap);
+                            //qDebug() << fabs(dWeight/dMaxWeight)<< fabs(dWeight/dMaxWeight);
+                            //color.setAlphaF(pow(fabs(dWeight/dMaxWeight),7.5));
+                            vColorsEdges.push_back(color);
                         } else {
-                            vColorsEdges.push_back(QColor(ColorMap::valueToColor(0.0f, visualizationInfo.sColormap)));
+                            QColor color = ColorMap::valueToColor(0.0, visualizationInfo.sColormap);
+                            //color.setAlphaF(0.0);
+                            vColorsEdges.push_back(color);
                         }
                     } else {
                         vColorsEdges.push_back(QColor(visualizationInfo.colNodes[0],

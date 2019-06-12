@@ -125,12 +125,9 @@ void GeometryMultiplier::setColors(const QVector<QColor> &tInstanceColors)
     //Update buffer content
     m_pColorBuffer->setData(buildColorBuffer(tInstanceColors));
 
-    if(tInstanceColors.size() > 1)
-    {
+    if(tInstanceColors.size() > 1) {
         m_pColorAttribute->setDivisor(1);
-    }
-    else
-    {
+    } else {
         //enable 1 color for x transforms
         m_pColorAttribute->setDivisor(0);
     }
@@ -156,7 +153,7 @@ void GeometryMultiplier::init()
     m_pColorAttribute->setName(QStringLiteral("instanceColor"));
     m_pColorAttribute->setAttributeType(QAttribute::VertexAttribute);
     m_pColorAttribute->setVertexBaseType(QAttribute::Float);
-    m_pColorAttribute->setVertexSize(3);
+    m_pColorAttribute->setVertexSize(4);
 
     //Set divisor 0 to enable empty color buffer
     m_pColorAttribute->setDivisor(0);
@@ -215,7 +212,7 @@ QByteArray GeometryMultiplier::buildTransformBuffer(const QVector<QMatrix4x4> &t
 
 QByteArray GeometryMultiplier::buildColorBuffer(const QVector<QColor> &tInstanceColor)
 {
-    const uint iVertSize = 3;
+    const uint iVertSize = 4;
     //create byte array
     QByteArray bufferData;
     bufferData.resize(tInstanceColor.size() * iVertSize * (int)sizeof(float));
@@ -227,6 +224,7 @@ QByteArray GeometryMultiplier::buildColorBuffer(const QVector<QColor> &tInstance
         rawVertexArray[iVertSize * i] = tInstanceColor[i].redF();
         rawVertexArray[iVertSize * i + 1] = tInstanceColor[i].greenF();
         rawVertexArray[iVertSize * i + 2] = tInstanceColor[i].blueF();
+        rawVertexArray[iVertSize * i + 3] = tInstanceColor[i].alphaF();
     }
 
     return bufferData;
