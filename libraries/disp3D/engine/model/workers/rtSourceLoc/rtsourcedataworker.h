@@ -83,8 +83,8 @@ struct VisualizationInfo {
     double                      dThresholdZ;
 
     Eigen::VectorXd             vecSensorValues;
-    Eigen::MatrixX3f            matOriginalVertColor;
-    Eigen::MatrixX3f            matFinalVertColor;
+    Eigen::MatrixX4f            matOriginalVertColor;
+    Eigen::MatrixX4f            matFinalVertColor;
 
     QSharedPointer<Eigen::SparseMatrix<float> >  pMatInterpolationMatrix;         /**< The interpolation matrix. */
 
@@ -149,8 +149,8 @@ public:
     * @param[in] matColorLeft      The color of the vertices for the left hemisphere.
     * @param[in] matColorRight     The color of the vertices for the right hemisphere.
     */
-    void setSurfaceColor(const Eigen::MatrixX3f &matColorLeft,
-                         const Eigen::MatrixX3f &matColorRight);
+    void setSurfaceColor(const Eigen::MatrixX4f &matColorLeft,
+                         const Eigen::MatrixX4f &matColorRight);
 
     //=========================================================================================================
     /**
@@ -230,14 +230,14 @@ protected:
     * @param[in] vecData                       The final values for each vertex of the surface
     * @param[in,out] matFinalVertColor         The color matrix which the results are to be written to
     * @param[in] dThresholdX                   Lower threshold for normalizing
-    * @param[in] dThresholdZ                    Upper threshold for normalizing
+    * @param[in] dThresholdZ                   Upper threshold for normalizing
     * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
     */
     static void normalizeAndTransformToColor(const Eigen::VectorXf& vecData,
-                                      Eigen::MatrixX3f& matFinalVertColor,
-                                      double dThresholdX,
-                                      double dThresholdZ,
-                                      QRgb (*functionHandlerColorMap)(double v));
+                                             Eigen::MatrixX4f &matFinalVertColor,
+                                             double dThresholdX,
+                                             double dThresholdZ,
+                                             QRgb (*functionHandlerColorMap)(double v));
 
     //=========================================================================================================
     /**
@@ -280,8 +280,8 @@ signals:
     * @param[in] matColorMatrixLeftHemi          The new streamed interpolated raw data in form of RGB colors per vertex for the left hemisphere.
     * @param[in] matColorMatrixRightHemi         The new streamed interpolated raw data in form of RGB colors per vertex for the right hemisphere.
     */
-    void newRtSmoothedData(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
-                           const Eigen::MatrixX3f &matColorMatrixRightHemi);
+    void newRtSmoothedData(const Eigen::MatrixX4f &matColorMatrixLeftHemi,
+                           const Eigen::MatrixX4f &matColorMatrixRightHemi);
 };
 
 } // NAMESPACE

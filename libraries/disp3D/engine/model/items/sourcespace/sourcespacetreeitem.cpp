@@ -103,14 +103,14 @@ void SourceSpaceTreeItem::initItem()
 void SourceSpaceTreeItem::addData(const MNEHemisphere& tHemisphere)
 {
     //Create color from curvature information with default gyri and sulcus colors
-    MatrixX3f matVertColor = createVertColor(tHemisphere.rr.rows());
+    MatrixX4f matVertColor = createVertColor(tHemisphere.rr.rows());
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tHemisphere.rr,
-                                tHemisphere.nn,
-                                tHemisphere.tris,
-                                matVertColor,
-                                Qt3DRender::QGeometryRenderer::Triangles);
+                               tHemisphere.nn,
+                               tHemisphere.tris,
+                               matVertColor,
+                               Qt3DRender::QGeometryRenderer::Triangles);
 
     //Add data which is held by this SourceSpaceTreeItem
     QVariant data;

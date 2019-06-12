@@ -260,14 +260,15 @@ Abstract3DTreeItem& Abstract3DTreeItem::operator<<(Abstract3DTreeItem& newItem)
 
 //*************************************************************************************************************
 
-Eigen::MatrixX3f Abstract3DTreeItem::createVertColor(int numVert, const QColor& color)
+Eigen::MatrixX4f Abstract3DTreeItem::createVertColor(int numVert, const QColor& color)
 {
-    Eigen::MatrixX3f matColor(numVert,3);
+    Eigen::MatrixX4f matColor(numVert,4);
 
     for(int i = 0; i < numVert; ++i) {
         matColor(i,0) = color.redF();
         matColor(i,1) = color.greenF();
         matColor(i,2) = color.blueF();
+        matColor(i,3) = color.alphaF();
     }
 
     return matColor;

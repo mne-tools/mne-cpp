@@ -94,7 +94,7 @@ QPointer<CustomMesh> AbstractMeshTreeItem::getCustomMesh()
 
 //*************************************************************************************************************
 
-void AbstractMeshTreeItem::setVertColor(const MatrixX3f& vertColor)
+void AbstractMeshTreeItem::setVertColor(const MatrixX4f& vertColor)
 {
     QVariant data;
     data.setValue(vertColor);
@@ -186,7 +186,7 @@ void AbstractMeshTreeItem::setData(const QVariant& value, int role)
     switch(role) {
         case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
             if(m_pCustomMesh) {
-                m_pCustomMesh->setColor(value.value<MatrixX3f>());
+                m_pCustomMesh->setColor(value.value<MatrixX4f>());
             }
             break;
 
@@ -221,7 +221,7 @@ void AbstractMeshTreeItem::setMaterial(Qt3DRender::QMaterial* pMaterial)
 void AbstractMeshTreeItem::setMeshData(const MatrixX3f& tMatVert,
                                        const MatrixX3f& tMatNorm,
                                        const MatrixXi& tMatTris,
-                                       const MatrixX3f& tMatColors,
+                                       const MatrixX4f& tMatColors,
                                        Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 {
     if(m_pCustomMesh) {
@@ -267,7 +267,7 @@ void AbstractMeshTreeItem::onSurfaceTriangleScaleChanged(const QVariant& fTriang
 void AbstractMeshTreeItem::onColorChanged(const QVariant& color)
 {
     QVariant data;
-    MatrixX3f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::NumberVertices).toInt(),
+    MatrixX4f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::NumberVertices).toInt(),
                                                 color.value<QColor>());
 
     data.setValue(matNewVertColor);
