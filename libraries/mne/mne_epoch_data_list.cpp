@@ -93,8 +93,9 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
                                               float tmin,
                                               float tmax,
                                               qint32 event,
-                                              double dEOGThreshold,
+                                              double dThreshold,
                                               const QString& sChType,
+                                              const QStringList& lExcludeChs,
                                               const RowVectorXi& picks)
 {
     MNEEpochDataList data;
@@ -156,9 +157,10 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
 
             epoch->bReject = checkForArtifact(epoch->epoch,
                                               raw.info,
-                                              dEOGThreshold,
+                                              dThreshold,
                                               "threshold",
-                                              sChType);
+                                              sChType,
+                                              lExcludeChs);
 
             if (epoch->bReject) {
                 dropCount++;
@@ -281,14 +283,15 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
                                         const FiffInfo& pFiffInfo,
                                         double dThreshold,
                                         const QString& sCheckType,
-                                        const QString& sChType)
+                                        const QString& sChType,
+                                        const QStringList& lExcludeChs)
 {
     bool bReject = false;
 
     //Prepare concurrent data handling
     QList<ArtifactRejectionData> lchData;
 
-    int iChType = FIFFV_EOG_CH;
+    int iChType = -1;
 
     if(sChType.contains("grad", Qt::CaseInsensitive) ||
        sChType.contains("mag", Qt::CaseInsensitive) ) {
@@ -299,8 +302,17 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
         iChType = FIFFV_EEG_CH;
     }
 
+    if(sChType.contains("eog", Qt::CaseInsensitive)) {
+        iChType = FIFFV_EOG_CH;
+    }
+
+    if(iChType == -1) {
+        return bReject;
+    }
+
     for(int i = 0; i < pFiffInfo.chs.size(); ++i) {
         if(pFiffInfo.chs.at(i).kind == iChType
+           && !lExcludeChs.contains(pFiffInfo.chs.at(i).ch_name)
            && !pFiffInfo.bads.contains(pFiffInfo.chs.at(i).ch_name)
            && pFiffInfo.chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG
            && pFiffInfo.chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG2) {
@@ -402,7 +414,7 @@ void MNEEpochDataList::checkChThreshold(ArtifactRejectionData& inputData)
     RowVectorXd temp = inputData.data;
 
     // Remove offset
-    temp = temp.array() - temp(0);
+    //temp = temp.array() - temp(0);
 
     double min = temp.minCoeff();
     double max = temp.maxCoeff();
@@ -416,9 +428,10 @@ void MNEEpochDataList::checkChThreshold(ArtifactRejectionData& inputData)
         inputData.bRejected = false;
     }
 
-//    qDebug() << "MNEEpochDataList::checkChVariance - min" << min;
-//    qDebug() << "MNEEpochDataList::checkChVariance - max" << max;
-//    qDebug() << "MNEEpochDataList::checkChVariance - m_dValueThreshold" << m_dValueThreshold;
+//    qDebug() << "MNEEpochDataList::checkChThreshold - min" << min;
+//    qDebug() << "MNEEpochDataList::checkChThreshold - max" << max;
+//    qDebug() << "MNEEpochDataList::checkChThreshold - pp" << pp;
+//    qDebug() << "MNEEpochDataList::checkChThreshold - inputData.dThreshold" << inputData.dThreshold;
 
 //    //If absolute vaue of min or max if bigger than threshold -> reject
 //    if((std::fabs(min) > inputData.dThreshold) || (std::fabs(max) > inputData.dThreshold)) {

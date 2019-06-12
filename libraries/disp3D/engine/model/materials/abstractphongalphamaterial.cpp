@@ -195,12 +195,10 @@ void AbstractPhongAlphaMaterial::onAlphaChanged(const QVariant &fAlpha)
 
         if(tempAlpha >= 1.0f) {
             m_pDrawFilterKey->setValue(QStringLiteral("forward"));
-        }
-        else {
+        } else {
             if(m_bUseSortPolicy) {
                 m_pDrawFilterKey->setValue(QStringLiteral("forwardSorted"));
-            }
-            else {
+            } else {
                 m_pDrawFilterKey->setValue(QStringLiteral("forwardTransparent"));
             }
         }

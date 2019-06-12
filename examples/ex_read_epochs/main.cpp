@@ -177,6 +177,7 @@ int main(int argc, char *argv[])
                                                          event,
                                                          250.0*0.0000010,
                                                          "eog",
+                                                         QStringList(),
                                                          picks);
 
     // Drop rejected epochs

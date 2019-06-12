@@ -96,17 +96,17 @@ ConnectivitySettingsView::ConnectivitySettingsView(const QString& sSettingsPath,
     connect(ui->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &ConnectivitySettingsView::onTriggerTypeChanged);
 
-    connect(ui->m_spinBox_freqLow, &QDoubleSpinBox::editingFinished,
-            this, &ConnectivitySettingsView::onFrequencyBandChanged);
-
-    connect(ui->m_spinBox_freqHigh, &QDoubleSpinBox::editingFinished,
-            this, &ConnectivitySettingsView::onFrequencyBandChanged);
-
-//    connect(ui->m_spinBox_freqLow, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+//    connect(ui->m_spinBox_freqLow, &QDoubleSpinBox::editingFinished,
 //            this, &ConnectivitySettingsView::onFrequencyBandChanged);
 
-//    connect(ui->m_spinBox_freqHigh, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+//    connect(ui->m_spinBox_freqHigh, &QDoubleSpinBox::editingFinished,
 //            this, &ConnectivitySettingsView::onFrequencyBandChanged);
+
+    connect(ui->m_spinBox_freqLow, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &ConnectivitySettingsView::onFrequencyBandChanged);
+
+    connect(ui->m_spinBox_freqHigh, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &ConnectivitySettingsView::onFrequencyBandChanged);
 
     this->setWindowTitle("Connectivity Settings");
     this->setMinimumWidth(330);
