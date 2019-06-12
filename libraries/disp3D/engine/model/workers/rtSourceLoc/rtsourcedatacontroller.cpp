@@ -277,8 +277,8 @@ void RtSourceDataController::setInterpolationInfo(const MatrixX3f &matVerticesLe
 
 //*************************************************************************************************************
 
-void RtSourceDataController::setSurfaceColor(const MatrixX3f &matColorLeft,
-                                             const MatrixX3f &matColorRight)
+void RtSourceDataController::setSurfaceColor(const MatrixX4f &matColorLeft,
+                                             const MatrixX4f &matColorRight)
 {
     emit surfaceColorChanged(matColorLeft,
                              matColorRight);
@@ -372,8 +372,8 @@ void RtSourceDataController::onNewRtRawData(const VectorXd &vecDataVectorLeftHem
 
 //*************************************************************************************************************
 
-void RtSourceDataController::onNewSmoothedRtRawData(const MatrixX3f &matColorMatrixLeftHemi,
-                                                    const MatrixX3f &matColorMatrixRightHemi)
+void RtSourceDataController::onNewSmoothedRtRawData(const MatrixX4f &matColorMatrixLeftHemi,
+                                                    const MatrixX4f &matColorMatrixRightHemi)
 {
     emit newRtSmoothedDataAvailable(matColorMatrixLeftHemi,
                                     matColorMatrixRightHemi);

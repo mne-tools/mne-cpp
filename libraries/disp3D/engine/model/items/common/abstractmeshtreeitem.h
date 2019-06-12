@@ -140,7 +140,7 @@ public:
     void setMeshData(const Eigen::MatrixX3f& tMatVert,
                      const Eigen::MatrixX3f& tMatNorm,
                      const Eigen::MatrixXi& tMatTris,
-                     const Eigen::MatrixX3f& tMatColors,
+                     const Eigen::MatrixX4f &tMatColors,
                      Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
 
     //=========================================================================================================
@@ -159,7 +159,7 @@ public:
     *
     * @return The costum mesh.
     */
-    virtual void setVertColor(const Eigen::MatrixX3f &vertColor);
+    virtual void setVertColor(const Eigen::MatrixX4f &vertColor);
 
 protected:
     //=========================================================================================================

@@ -201,7 +201,7 @@ protected:
     * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
     */
     void normalizeAndTransformToColor(const Eigen::VectorXf& vecData,
-                                      Eigen::MatrixX3f& matFinalVertColor,
+                                      Eigen::MatrixX4f &matFinalVertColor,
                                       double dThresholdX,
                                       double dThreholdZ,
                                       QRgb (*functionHandlerColorMap)(double v));
@@ -214,7 +214,7 @@ protected:
     *
     * @return The final color values for the underlying mesh surface
     */
-    Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd& vecSensorValues);
+    Eigen::MatrixX4f generateColorsFromSensorValues(const Eigen::VectorXd& vecSensorValues);
 
     QList<Eigen::VectorXd>                              m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
     QList<Eigen::VectorXd>                              m_lDataLoopQ;                       /**< List that holds the matrix data <n_channels x n_samples> for looping. */
@@ -238,8 +238,8 @@ protected:
         double                      dThresholdX;
         double                      dThresholdZ;
 
-        Eigen::MatrixX3f            matOriginalVertColor;
-        Eigen::MatrixX3f            matFinalVertColor;
+        Eigen::MatrixX4f            matOriginalVertColor;
+        Eigen::MatrixX4f            matFinalVertColor;
 
         QRgb (*functionHandlerColorMap)(double v);
     } m_lVisualizationInfo;               /**< Container for the visualization info. */
@@ -260,7 +260,7 @@ signals:
     *
     * @param[in] matColorMatrix     The interpolated raw data in form of rgb colors for each vertex.
     */
-    void newRtSmoothedData(const Eigen::MatrixX3f &matColorMatrix);
+    void newRtSmoothedData(const Eigen::MatrixX4f &matColorMatrix);
 };
 
 } // NAMESPACE

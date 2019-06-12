@@ -291,7 +291,7 @@ void RtSensorDataController::onNewRtRawData(const VectorXd &vecDataVector)
 
 //*************************************************************************************************************
 
-void RtSensorDataController::onNewSmoothedRtRawData(const MatrixX3f &matColorMatrix)
+void RtSensorDataController::onNewSmoothedRtRawData(const MatrixX4f &matColorMatrix)
 {
     emit newRtSmoothedDataAvailable(matColorMatrix);
 }

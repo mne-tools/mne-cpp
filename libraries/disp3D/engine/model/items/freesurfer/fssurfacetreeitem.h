@@ -139,7 +139,7 @@ public:
     *
     * @return The final colors per vertex (RGB).
     */
-    static Eigen::MatrixX3f createCurvatureVertColor(const Eigen::VectorXf& curvature,
+    static Eigen::MatrixX4f createCurvatureVertColor(const Eigen::VectorXf& curvature,
                                                      const QColor& colSulci = QColor(50,50,50),
                                                      const QColor& colGyri = QColor(125,125,125));
 

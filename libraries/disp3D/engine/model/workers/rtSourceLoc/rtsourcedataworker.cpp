@@ -122,8 +122,8 @@ void RtSourceDataWorker::addData(const MatrixXd& data)
 
 //*************************************************************************************************************
 
-void RtSourceDataWorker::setSurfaceColor(const MatrixX3f &matColorLeft,
-                                         const MatrixX3f &matColorRight)
+void RtSourceDataWorker::setSurfaceColor(const MatrixX4f &matColorLeft,
+                                         const MatrixX4f &matColorRight)
 {
     m_lHemiVisualizationInfo[0].matOriginalVertColor = matColorLeft;
     m_lHemiVisualizationInfo[1].matOriginalVertColor = matColorRight;
@@ -329,7 +329,7 @@ void RtSourceDataWorker::generateColorsFromSensorValues(VisualizationInfo &visua
 //*************************************************************************************************************
 
 void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
-                                                      MatrixX3f& matFinalVertColor,
+                                                      MatrixX4f& matFinalVertColor,
                                                       double dThresholdX,
                                                       double dThresholdZ,
                                                       QRgb (*functionHandlerColorMap)(double v))
@@ -362,9 +362,24 @@ void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
 
             qRgb = functionHandlerColorMap(fSample);
 
-            matFinalVertColor(r,0) = (float)qRed(qRgb)/255.0f;
-            matFinalVertColor(r,1) = (float)qGreen(qRgb)/255.0f;
-            matFinalVertColor(r,2) = (float)qBlue(qRgb)/255.0f;
+            QColor color (matFinalVertColor(r,0) * 255 * (1.0-0.60) + (float)qRed(qRgb)*0.60,
+                          matFinalVertColor(r,1) * 255 * (1.0-0.60) + (float)qGreen(qRgb)*0.60,
+                          matFinalVertColor(r,2) * 255 * (1.0-0.60) + (float)qBlue(qRgb)*0.60,
+                          255.0 + 0.75 * (255.0-255.0));
+
+            //qDebug() << "RtSourceDataWorker::normalizeAndTransformToColor color" << color;
+
+            matFinalVertColor(r,0) = color.redF();
+            matFinalVertColor(r,1) = color.greenF();
+            matFinalVertColor(r,2) = color.blueF();
+            matFinalVertColor(r,3) = color.alphaF();
+
+//            matFinalVertColor(r,0) = (float)qRed(qRgb)/255.0f;
+//            matFinalVertColor(r,1) = (float)qGreen(qRgb)/255.0f;
+//            matFinalVertColor(r,2) = (float)qBlue(qRgb)/255.0f;
+//            matFinalVertColor(r,3) = 1.0f; //Use this if you want only vertices with activation to be plotted
+        } else {
+            //matFinalVertColor(r,3) = 0.0f; //Use this if you want only vertices with activation to be plotted
         }
     }
 }

@@ -96,14 +96,14 @@ void BemSurfaceTreeItem::initItem()
 void BemSurfaceTreeItem::addData(const MNEBemSurface& tBemSurface)
 {
     //Create default color
-    MatrixX3f matVertColor = createVertColor(tBemSurface.rr.rows());
+    MatrixX4f matVertColor = createVertColor(tBemSurface.rr.rows());
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tBemSurface.rr,
-                                tBemSurface.nn,
-                                tBemSurface.tris,
-                                matVertColor,
-                                Qt3DRender::QGeometryRenderer::Triangles);
+                               tBemSurface.nn,
+                               tBemSurface.tris,
+                               matVertColor,
+                               Qt3DRender::QGeometryRenderer::Triangles);
 
     //Find out BEM layer type and change items name
     this->setText(MNEBemSurface::id_name(tBemSurface.id));

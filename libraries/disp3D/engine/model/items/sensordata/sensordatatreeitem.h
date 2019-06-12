@@ -305,7 +305,7 @@ protected:
     *
     * @param[in] sourceColorSamples         The color values for the streamed data.
     */
-    virtual void onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrix);
+    virtual void onNewRtSmoothedDataAvailable(const Eigen::MatrixX4f &matColorMatrix);
 
     //=========================================================================================================
     /**

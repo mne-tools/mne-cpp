@@ -265,11 +265,11 @@ void RtSensorDataWorker::streamData()
 
 //*************************************************************************************************************
 
-MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vecSensorValues)
+MatrixX4f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vecSensorValues)
 {
     if(vecSensorValues.rows() != m_pMatInterpolationMatrix->cols()) {
         qDebug() << "RtSensorDataWorker::generateColorsFromSensorValues - Number of new vertex colors (" << vecSensorValues.rows() << ") do not match with previously set number of sensors (" << m_pMatInterpolationMatrix->cols() << "). Returning...";
-        MatrixX3f matColor = m_lVisualizationInfo.matOriginalVertColor;
+        MatrixX4f matColor = m_lVisualizationInfo.matOriginalVertColor;
         return matColor;
     }
 
@@ -281,10 +281,10 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vec
 
     //Generate color data for vertices
     normalizeAndTransformToColor(vecIntrpltdVals,
-                                    m_lVisualizationInfo.matFinalVertColor,
-                                    m_lVisualizationInfo.dThresholdX,
-                                    m_lVisualizationInfo.dThresholdZ,
-                                    m_lVisualizationInfo.functionHandlerColorMap);
+                                 m_lVisualizationInfo.matFinalVertColor,
+                                 m_lVisualizationInfo.dThresholdX,
+                                 m_lVisualizationInfo.dThresholdZ,
+                                 m_lVisualizationInfo.functionHandlerColorMap);
 
     return m_lVisualizationInfo.matFinalVertColor;
 }
@@ -293,7 +293,7 @@ MatrixX3f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vec
 //*************************************************************************************************************
 
 void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
-                                                      MatrixX3f& matFinalVertColor,
+                                                      MatrixX4f& matFinalVertColor,
                                                       double dThresholdX,
                                                       double dThreholdZ,
                                                       QRgb (*functionHandlerColorMap)(double v))
@@ -313,6 +313,8 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
         fSample = std::fabs(vecData(r));
 
         if(fSample >= dThresholdX) {
+            matFinalVertColor(r,3) = 1.0f;
+
             //Check lower and upper thresholds and normalize to one
             if(fSample >= dThreholdZ) {
                 if(vecData(r) < 0) {
@@ -338,6 +340,8 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
             matFinalVertColor(r,0) = (float)qRed(qRgb)/255.0f;
             matFinalVertColor(r,1) = (float)qGreen(qRgb)/255.0f;
             matFinalVertColor(r,2) = (float)qBlue(qRgb)/255.0f;
+        } else {
+            //matFinalVertColor(r,3) = 0.0f;
         }
     }
 }

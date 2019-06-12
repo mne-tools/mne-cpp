@@ -335,8 +335,8 @@ protected:
     * @param[in] matColorMatrixLeftHemi          The new streamed interpolated raw data in form of RGB colors per vertex for the left hemisphere.
     * @param[in] matColorMatrixRightHemi         The new streamed interpolated raw data in form of RGB colors per vertex for the right hemisphere.
     */
-    void onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
-                                      const Eigen::MatrixX3f &matColorMatrixRightHemi);
+    void onNewRtSmoothedDataAvailable(const Eigen::MatrixX4f &matColorMatrixLeftHemi,
+                                      const Eigen::MatrixX4f &matColorMatrixRightHemi);
 
     //=========================================================================================================
     /**

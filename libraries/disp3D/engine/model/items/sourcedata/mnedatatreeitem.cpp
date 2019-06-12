@@ -727,8 +727,8 @@ void MneDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState
 
 //*************************************************************************************************************
 
-void MneDataTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
-                                                   const Eigen::MatrixX3f &matColorMatrixRightHemi)
+void MneDataTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX4f &matColorMatrixLeftHemi,
+                                                   const Eigen::MatrixX4f &matColorMatrixRightHemi)
 {
     if(m_pInterpolationItemLeftCPU) {
         m_pInterpolationItemLeftCPU->setVertColor(matColorMatrixLeftHemi);
