@@ -70,6 +70,7 @@ struct ArtifactRejectionData {
     bool bRejected;
     Eigen::RowVectorXd data;
     double dThreshold;
+    QString sChName;
 };
 
 //=============================================================================================================

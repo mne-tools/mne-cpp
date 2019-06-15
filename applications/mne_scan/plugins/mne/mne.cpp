@@ -102,12 +102,12 @@ MNE::MNE()
 //, m_qFileFwdSolution(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 //, m_sAtlasDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label")
 //, m_sSurfaceDir(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/surf")
-//, m_qFileFwdSolution("C:/Git/rt_connectivity/data/MEG/mind002/fwd/mind002_050924_index01-fwd.fif")
-//, m_sAtlasDir("C:/Git/rt_connectivity/data/subjects/mind002/label")
-//, m_sSurfaceDir("C:/Git/rt_connectivity/data/subjects/mind002/surf")
-, m_qFileFwdSolution("/cluster/fusion/lesch/data/Martinos/MEG/mind002/fwd/mind002_050924_index01-fwd.fif")
-, m_sAtlasDir("/cluster/fusion/lesch/data/Martinos/subjects/mind002/label")
-, m_sSurfaceDir("/cluster/fusion/lesch/data/Martinos/subjects/mind002/surf")
+, m_qFileFwdSolution("C:/Git/rt_connectivity/data/MEG/mind002/fwd/mind002_050924_median01-fwd.fif")
+, m_sAtlasDir("C:/Git/rt_connectivity/data/subjects/mind002/label")
+, m_sSurfaceDir("C:/Git/rt_connectivity/data/subjects/mind002/surf")
+//, m_qFileFwdSolution("/cluster/fusion/lesch/data/Martinos/MEG/mind002/fwd/mind002_050924_median01-fwd.fif")
+//, m_sAtlasDir("/cluster/fusion/lesch/data/Martinos/subjects/mind002/label")
+//, m_sSurfaceDir("/cluster/fusion/lesch/data/Martinos/subjects/mind002/surf")
 , m_iNumAverages(1)
 , m_iDownSample(1)
 , m_sAvrType("9")
@@ -146,7 +146,7 @@ void MNE::init()
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
     //m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2005s.annot", m_sAtlasDir+"/rh.aparc.a2005s.annot"));
-    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.orig", m_sSurfaceDir+"/rh.orig"));
+    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.inflated", m_sSurfaceDir+"/rh.inflated"));
 
     // Input
     m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
@@ -578,8 +578,8 @@ void MNE::onTimePointValueChanged(int iTimePointMs)
 {
     QMutexLocker locker(&m_qMutex);
 
-    if(m_pFiffInfo) {
-        m_iTimePointSps = m_pFiffInfo->sfreq * iTimePointMs * 0.001;
+    if(m_pFiffInfoInput) {
+        m_iTimePointSps = m_pFiffInfoInput->sfreq * (float)iTimePointMs * 0.001;
 
         if(m_bProcessData) {
             m_qVecFiffEvoked.push_back(m_currentEvoked);
@@ -615,7 +615,7 @@ void MNE::run()
 //    // Mode 1: End
 
     // Mode 2: Use covariance and inverse operator loaded from pre calculated files
-    QFile t_fileCov("C:/Git/rt_connectivity/data/MEG/mind002/ave/mind002_050924_index01-cov.fif");
+    QFile t_fileCov("C:/Git/rt_connectivity/data/MEG/mind002/ave/mind002_050924_median01-cov.fif");
     FiffCov noise_cov(t_fileCov);
     m_qListCovChNames = noise_cov.names;
 
@@ -643,7 +643,7 @@ void MNE::run()
                                  0.2f,
                                  0.8f);
 
-    double snr = 1.0;
+    double snr = 3.0;
     double lambda2 = 1.0 / pow(snr, 2); //ToDo estimate lambda using covariance
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
     m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp,
@@ -722,9 +722,9 @@ void MNE::run()
                 time.start();
                 //qDebug()<<"MNE::run - t_fiffEvoked.data.rows()"<<t_fiffEvoked.data.rows();
 
-                //if(m_iTimePointSps >= m_currentEvoked.data.cols()) {
-                    sourceEstimate = m_pMinimumNorm->calculateInverse(m_currentEvoked);
-//                } else {
+                sourceEstimate = m_pMinimumNorm->calculateInverse(m_currentEvoked);
+
+//                else {
 //                    m_currentEvoked = m_currentEvoked.pick_channels(m_invOp.noise_cov->names);
 //                    tmin = 0.0f;
 //                    tstep = 1.0f / m_pFiffInfoInput->sfreq;
@@ -734,13 +734,17 @@ void MNE::run()
 //                                                                      tstep);
 //                }
 
-
                 m_qMutex.unlock();
 
                 if(!sourceEstimate.isEmpty()) {
                     //qInfo() << time.elapsed() << m_iBlockNumberProcessed << "MNE Time";
                     //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "MNE Processed";
-                    m_pRTSEOutput->data()->setValue(sourceEstimate);
+
+//                    if(m_iTimePointSps < m_currentEvoked.data.cols()) {
+//                        m_pRTSEOutput->data()->setValue(sourceEstimate.reduce(m_iTimePointSps,1));
+//                    } else {
+                        m_pRTSEOutput->data()->setValue(sourceEstimate);
+//                    }
                 }
 
             } else {

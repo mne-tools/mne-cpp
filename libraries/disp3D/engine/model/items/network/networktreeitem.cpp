@@ -298,7 +298,7 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
                 // Normalize colors
                 if(iMaxDegree != 0.0f) {
                     QColor color = ColorMap::valueToColor((float)iDegree/(float)iMaxDegree, visualizationInfo.sColormap);
-                    //color.setAlphaF(pow((float)iDegree/(float)iMaxDegree,5));
+                    color.setAlphaF(pow((float)iDegree/(float)iMaxDegree,4));
                     vColorsNodes.push_back(color);
                 } else {
                     QColor color = ColorMap::valueToColor(0.0, visualizationInfo.sColormap);
@@ -329,6 +329,7 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
     }
 
     double dMaxWeight = tNetworkData.getMinMaxThresholdedWeights().second;
+    double dMinWeight = tNetworkData.getMinMaxThresholdedWeights().first;
 
     QList<NetworkEdge::SPtr> lNetworkEdges = tNetworkData.getThresholdedEdges();
     QList<NetworkNode::SPtr> lNetworkNodes = tNetworkData.getNodes();
@@ -384,7 +385,7 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
                                vectorEnd(2));
 
             if(startPos != endPos) {
-                dWeight = pNetworkEdge->getWeight();
+                dWeight = fabs(pNetworkEdge->getWeight());
                 if(dWeight != 0.0) {
                     diff = endPos - startPos;
                     edgePos = endPos - diff/2;
@@ -392,7 +393,7 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
                     QMatrix4x4 tempTransform;
                     tempTransform.translate(edgePos);
                     tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
-                    tempTransform.scale(1.0,diff.length(),1.0);
+                    tempTransform.scale(fabs((dWeight-dMinWeight)/(dMaxWeight-dMinWeight))*4,diff.length(),fabs((dWeight-dMinWeight)/(dMaxWeight-dMinWeight))*4);
 
                     vTransformsEdges.push_back(tempTransform);
 
@@ -402,11 +403,11 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
                         if(dMaxWeight != 0.0f) {
                             QColor color = ColorMap::valueToColor(fabs(dWeight/dMaxWeight), visualizationInfo.sColormap);
                             //qDebug() << fabs(dWeight/dMaxWeight)<< fabs(dWeight/dMaxWeight);
-                            //color.setAlphaF(pow(fabs(dWeight/dMaxWeight),7.5));
+                            color.setAlphaF(pow(fabs(dWeight/dMaxWeight),1.5));
                             vColorsEdges.push_back(color);
                         } else {
                             QColor color = ColorMap::valueToColor(0.0, visualizationInfo.sColormap);
-                            //color.setAlphaF(0.0);
+                            color.setAlphaF(0.0);
                             vColorsEdges.push_back(color);
                         }
                     } else {
