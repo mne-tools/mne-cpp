@@ -323,6 +323,7 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
                     tempData.bRejected = false;
                     tempData.data = data.row(i);
                     tempData.dThreshold = dThreshold;
+                    tempData.sChName = pFiffInfo.chs.at(i).ch_name;
                     lchData.append(tempData);
                 } else if(sChType.contains("mag", Qt::CaseInsensitive) &&
                           pFiffInfo.chs.at(i).unit == FIFF_UNIT_T) {
@@ -330,6 +331,7 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
                     tempData.bRejected = false;
                     tempData.data = data.row(i);
                     tempData.dThreshold = dThreshold;
+                    tempData.sChName = pFiffInfo.chs.at(i).ch_name;
                     lchData.append(tempData);
                 }
             } else {
@@ -337,6 +339,7 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
                 tempData.bRejected = false;
                 tempData.data = data.row(i);
                 tempData.dThreshold = dThreshold;
+                tempData.sChName = pFiffInfo.chs.at(i).ch_name;
                 lchData.append(tempData);
             }
         }
@@ -359,7 +362,7 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
         for(int i = 0; i < lchData.size(); ++i) {
             if(lchData.at(i).bRejected) {
                 bReject = true;
-                qDebug() << "MNEEpochDataList::checkForArtifact - Reject trial";
+                qDebug() << "MNEEpochDataList::checkForArtifact - Reject trial because of channel"<<lchData.at(i).sChName;
                 break;
             }
         }
@@ -371,7 +374,7 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
         for(int i = 0; i < lchData.size(); ++i) {
             if(lchData.at(i).bRejected) {
                 bReject = true;
-                qDebug() << "MNEEpochDataList::checkForArtifact - Reject trial";
+                qDebug() << "MNEEpochDataList::checkForArtifact - Reject trial because of channel"<<lchData.at(i).sChName;
                 break;
             }
         }

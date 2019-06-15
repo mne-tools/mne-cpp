@@ -377,7 +377,9 @@ void RtAveWorker::emitEvoked(double dTriggerType, QStringList& lResponsibleTrigg
         lResponsibleTriggerTypes << QString::number(dTriggerType);
     }
 
-    emit resultReady(m_stimEvokedSet, lResponsibleTriggerTypes);
+    if(m_stimEvokedSet.evoked.size() > 0) {
+        emit resultReady(m_stimEvokedSet, lResponsibleTriggerTypes);
+    }
 
 //    qDebug()<<"RtAveWorker::emitEvoked() - dTriggerType:" << dTriggerType;
 //    qDebug()<<"RtAveWorker::emitEvoked() - m_mapStimAve[dTriggerType].size():" << m_mapStimAve[dTriggerType].size();
@@ -458,7 +460,7 @@ void RtAveWorker::mergeData(double dTriggerType)
     //Perform artifact threshold
     bool bArtifactDetected = false;
 
-    if(m_bActivateThreshold) {
+    if(m_bActivateThreshold && m_pFiffInfo) {
         QMapIterator<QString,double> i(m_mapThresholds);
 
         qDebug() << "Doing artifact reduction for" << m_mapThresholds;
@@ -565,7 +567,6 @@ void RtAveWorker::reset()
     m_iPreStimSamples = m_iNewPreStimSamples;
     m_iPostStimSamples = m_iNewPostStimSamples;
     m_iTriggerChIndex = m_iNewTriggerIndex;
-    //m_iAverageMode = m_iNewAverageMode;
 
     //Clear all evoked data information
     m_stimEvokedSet.evoked.clear();
