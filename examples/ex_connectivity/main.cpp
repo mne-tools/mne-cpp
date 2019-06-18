@@ -75,6 +75,7 @@
 #include <disp3D/engine/model/items/sensorspace/sensorsettreeitem.h>
 #include <connectivity/metrics/abstractmetric.h>
 #include <mne/mne_bem_surface.h>
+#include <disp/viewers/minimumnormsettingsview.h>
 
 
 //*************************************************************************************************************
@@ -162,12 +163,12 @@ int main(int argc, char *argv[])
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COH");
-    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
+    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "130");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.5");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "1.0");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -261,13 +262,17 @@ int main(int argc, char *argv[])
 
     // Read the epochs and reject bad epochs. Note, that SSPs are automatically applied to the data if MNE::setup_compensators was called beforehand.
     QStringList exludeChs("");
+    QMap<QString,double> mapReject;
+    mapReject.insert("eog", 300e-06);
+    mapReject.insert("grad", 3000e-13);
+    mapReject.insert("mag", 3.5e-12);
+
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
                                                          events,
                                                          fTMin,
                                                          fTMax,
                                                          iEvent,
-                                                         225.0e-6,
-                                                         "eog",
+                                                         mapReject,
                                                          exludeChs);
     data.dropRejected();
     QPair<QVariant, QVariant> pair(QVariant(fTMin), QVariant("0.0"));
@@ -409,6 +414,30 @@ int main(int argc, char *argv[])
                      [&](const QString& a, const QString& b, const Network& c) {if(NetworkTreeItem* pNetworkTreeItem = tNetworkView.addData(a,b,c)) {
                                                                                     //pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
                                                                                 }});
+
+    MinimumNormSettingsView::SPtr pMinimumNormSettingsView = MinimumNormSettingsView::SPtr::create();
+    QList<QSharedPointer<QWidget> > lWidgets;
+    lWidgets << pMinimumNormSettingsView;
+    tNetworkView.setQuickControlWidgets(lWidgets);
+
+    QObject::connect(pMinimumNormSettingsView.data(), &MinimumNormSettingsView::timePointChanged,
+                     [&](int a) {int aSamples = raw.info.sfreq * (float)a * 0.001;
+                                 if(a >= sourceEstimateEvoked.samples()-1) {
+                                    tNetworkView.getTreeModel()->addSourceData("sample",
+                                                                               evoked.comment,
+                                                                               sourceEstimateEvoked,
+                                                                               t_clusteredFwd,
+                                                                               tSurfSetInflated,
+                                                                               tAnnotSet);
+                                 } else {
+                                    tNetworkView.getTreeModel()->addSourceData("sample",
+                                                                               evoked.comment,
+                                                                               sourceEstimateEvoked.reduce(aSamples,1),
+                                                                               t_clusteredFwd,
+                                                                               tSurfSetInflated,
+                                                                               tAnnotSet);
+                                 }
+                                 });
 
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {

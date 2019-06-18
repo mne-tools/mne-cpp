@@ -67,7 +67,7 @@ namespace MNELIB
 {
 
 struct ArtifactRejectionData {
-    bool bRejected;
+    bool bRejected = false;
     Eigen::RowVectorXd data;
     double dThreshold;
     QString sChName;
@@ -117,8 +117,7 @@ public:
                                        float tmin,
                                        float tmax,
                                        qint32 event,
-                                       double dThreshold = 0.0,
-                                       const QString& sChType = QString(""),
+                                       const QMap<QString,double>& mapReject,
                                        const QStringList &lExcludeChs = QStringList(),
                                        const Eigen::RowVectorXi& picks = Eigen::RowVectorXi());
 
@@ -166,21 +165,16 @@ public:
     *
     * @param[in] data           The data matrix.
     * @param[in] pFiffInfo      The fiff info.
-    * @param[in] dThreshold     The thresholded value.
-    * @param[in] sCheckType     The detection type. Threshold or variance based (default is Threshold).
-    * @param[in] sChType        The channel data type to scan for. EEG, MEG or EOG (default is EOG).
+    * @param[in] mapReject      The channel data types to scan for. EEG, MEG or EOG.
     * @param[in] lExcludeChs    List of channel names to exclude.
     *
     * @return   Whether a threshold artifact was detected.
     */
     static bool checkForArtifact(const Eigen::MatrixXd& data,
                                  const FIFFLIB::FiffInfo& pFiffInfo,
-                                 double dThreshold,
-                                 const QString& sCheckType = QString("threshold"),
-                                 const QString& sChType = QString("eog"),
+                                 const QMap<QString,double>& mapReject,
                                  const QStringList &lExcludeChs = QStringList());
 
-    static void checkChVariance(ArtifactRejectionData& inputData);
     static void checkChThreshold(ArtifactRejectionData& inputData);
 };
 

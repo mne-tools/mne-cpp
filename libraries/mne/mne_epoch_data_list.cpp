@@ -93,8 +93,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
                                               float tmin,
                                               float tmax,
                                               qint32 event,
-                                              double dThreshold,
-                                              const QString& sChType,
+                                              const QMap<QString,double>& mapReject,
                                               const QStringList& lExcludeChs,
                                               const RowVectorXi& picks)
 {
@@ -157,9 +156,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
 
             epoch->bReject = checkForArtifact(epoch->epoch,
                                               raw.info,
-                                              dThreshold,
-                                              "threshold",
-                                              sChType,
+                                              mapReject,
                                               lExcludeChs);
 
             if (epoch->bReject) {
@@ -281,67 +278,63 @@ void MNEEpochDataList::pick_channels(const RowVectorXi& sel)
 
 bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
                                         const FiffInfo& pFiffInfo,
-                                        double dThreshold,
-                                        const QString& sCheckType,
-                                        const QString& sChType,
+                                        const QMap<QString,double>& mapReject,
                                         const QStringList& lExcludeChs)
 {
+    //qDebug() << "MNEEpochDataList::checkForArtifact - Doing artifact reduction for" << mapReject;
+
     bool bReject = false;
 
     //Prepare concurrent data handling
     QList<ArtifactRejectionData> lchData;
+    QList<int> lChTypes;
 
-    int iChType = -1;
-
-    if(sChType.contains("grad", Qt::CaseInsensitive) ||
-       sChType.contains("mag", Qt::CaseInsensitive) ) {
-        iChType = FIFFV_MEG_CH;
+    if(mapReject.contains("grad") ||
+       mapReject.contains("mag") ) {
+        lChTypes << FIFFV_MEG_CH;
     }
 
-    if(sChType.contains("eeg", Qt::CaseInsensitive)) {
-        iChType = FIFFV_EEG_CH;
+    if(mapReject.contains("eeg")) {
+        lChTypes << FIFFV_EEG_CH;
     }
 
-    if(sChType.contains("eog", Qt::CaseInsensitive)) {
-        iChType = FIFFV_EOG_CH;
+    if(mapReject.contains("eog")) {
+        lChTypes << FIFFV_EOG_CH;
     }
 
-    if(iChType == -1) {
+    if(lChTypes.isEmpty()) {
         return bReject;
     }
 
     for(int i = 0; i < pFiffInfo.chs.size(); ++i) {
-        if(pFiffInfo.chs.at(i).kind == iChType
+        if(lChTypes.contains(pFiffInfo.chs.at(i).kind)
            && !lExcludeChs.contains(pFiffInfo.chs.at(i).ch_name)
            && !pFiffInfo.bads.contains(pFiffInfo.chs.at(i).ch_name)
            && pFiffInfo.chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG
            && pFiffInfo.chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG2) {
-            if(iChType == FIFFV_MEG_CH) {
-                if(sChType.contains("grad", Qt::CaseInsensitive) &&
-                   pFiffInfo.chs.at(i).unit == FIFF_UNIT_T_M) {
-                    ArtifactRejectionData tempData;
-                    tempData.bRejected = false;
-                    tempData.data = data.row(i);
-                    tempData.dThreshold = dThreshold;
-                    tempData.sChName = pFiffInfo.chs.at(i).ch_name;
-                    lchData.append(tempData);
-                } else if(sChType.contains("mag", Qt::CaseInsensitive) &&
-                          pFiffInfo.chs.at(i).unit == FIFF_UNIT_T) {
-                    ArtifactRejectionData tempData;
-                    tempData.bRejected = false;
-                    tempData.data = data.row(i);
-                    tempData.dThreshold = dThreshold;
-                    tempData.sChName = pFiffInfo.chs.at(i).ch_name;
-                    lchData.append(tempData);
+            ArtifactRejectionData tempData;
+            tempData.data = data.row(i);
+
+            switch (pFiffInfo.chs.at(i).kind) {
+            case FIFFV_MEG_CH:
+                if(pFiffInfo.chs.at(i).unit == FIFF_UNIT_T) {
+                    tempData.dThreshold = mapReject["mag"];
+                } else if(pFiffInfo.chs.at(i).unit == FIFF_UNIT_T_M) {
+                    tempData.dThreshold = mapReject["grad"];
                 }
-            } else {
-                ArtifactRejectionData tempData;
-                tempData.bRejected = false;
-                tempData.data = data.row(i);
-                tempData.dThreshold = dThreshold;
-                tempData.sChName = pFiffInfo.chs.at(i).ch_name;
-                lchData.append(tempData);
+            break;
+
+            case FIFFV_EEG_CH:
+                tempData.dThreshold = mapReject["eeg"];
+            break;
+
+            case FIFFV_EOG_CH:
+                tempData.dThreshold = mapReject["eog"];
+            break;
             }
+
+            tempData.sChName = pFiffInfo.chs.at(i).ch_name;
+            lchData.append(tempData);
         }
     }
 
@@ -351,62 +344,21 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
         return bReject;
     }
 
-//    qDebug() << "MNEEpochDataList::checkForArtifact - lchData.size()" << lchData.size();
-//    qDebug() << "MNEEpochDataList::checkForArtifact - iChType" << iChType;
+    //qDebug() << "MNEEpochDataList::checkForArtifact - lchData.size()" << lchData.size();
 
-    if(sCheckType.contains("threshold", Qt::CaseInsensitive) && !lchData.isEmpty()) {
-        //Start the concurrent processing
-        QFuture<void> future = QtConcurrent::map(lchData, checkChThreshold);
-        future.waitForFinished();
+    //Start the concurrent processing
+    QFuture<void> future = QtConcurrent::map(lchData, checkChThreshold);
+    future.waitForFinished();
 
-        for(int i = 0; i < lchData.size(); ++i) {
-            if(lchData.at(i).bRejected) {
-                bReject = true;
-                qDebug() << "MNEEpochDataList::checkForArtifact - Reject trial because of channel"<<lchData.at(i).sChName;
-                break;
-            }
-        }
-    } else if(sCheckType.contains("variance", Qt::CaseInsensitive) && !lchData.isEmpty()) {
-        //Start the concurrent processing
-        QFuture<void> future = QtConcurrent::map(lchData, checkChVariance);
-        future.waitForFinished();
-
-        for(int i = 0; i < lchData.size(); ++i) {
-            if(lchData.at(i).bRejected) {
-                bReject = true;
-                qDebug() << "MNEEpochDataList::checkForArtifact - Reject trial because of channel"<<lchData.at(i).sChName;
-                break;
-            }
+    for(int i = 0; i < lchData.size(); ++i) {
+        if(lchData.at(i).bRejected) {
+            bReject = true;
+            qDebug() << "MNEEpochDataList::checkForArtifact - Reject trial because of channel"<<lchData.at(i).sChName;
+            break;
         }
     }
 
     return bReject;
-}
-
-
-//*************************************************************************************************************
-
-void MNEEpochDataList::checkChVariance(ArtifactRejectionData& inputData)
-{
-    RowVectorXd temp = inputData.data;
-
-    double dMedian = temp.norm() / temp.cols();
-
-    // Remove offset
-    temp = temp.array() - dMedian;
-
-    temp.array().square();
-
-//    qDebug() << "MNEEpochDataList::checkChVariance - dMedian" << abs(dMedian);
-//    qDebug() << "MNEEpochDataList::checkChVariance - m_iValueVariance * dMedian" << m_iValueVariance * abs(dMedian);
-//    qDebug() << "MNEEpochDataList::checkChVariance - compare value " << abs(pairData.second.norm() / pairData.second.cols());
-
-    //If variance is 3 times bigger than median -> reject
-    if(temp.norm() / temp.cols() > (inputData.dThreshold * std::fabs(dMedian))) {
-        inputData.bRejected = true;
-    } else {
-        inputData.bRejected = false;
-    }
 }
 
 

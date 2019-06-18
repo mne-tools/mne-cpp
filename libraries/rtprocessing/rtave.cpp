@@ -100,7 +100,7 @@ RtAveWorker::RtAveWorker(quint32 numAverages,
 , m_pairBaselineSec(qMakePair(QVariant(QString::number(iBaselineFromSecs)),QVariant(QString::number(iBaselineToSecs))))
 , m_bActivateThreshold(false)
 {
-    m_mapThresholds["EOG"] = 300e-6;
+    m_mapThresholds["eog"] = 300e-6;
 
     m_stimEvokedSet.info = *m_pFiffInfo.data();
 
@@ -461,21 +461,11 @@ void RtAveWorker::mergeData(double dTriggerType)
     bool bArtifactDetected = false;
 
     if(m_bActivateThreshold && m_pFiffInfo) {
-        QMapIterator<QString,double> i(m_mapThresholds);
+        qDebug() << "RtAveWorker::mergeData - Doing artifact reduction for" << m_mapThresholds;
 
-        qDebug() << "Doing artifact reduction for" << m_mapThresholds;
-
-        while (i.hasNext()) {
-            i.next();
-            bArtifactDetected = MNEEpochDataList::checkForArtifact(mergedData,
-                                                                   *m_pFiffInfo,
-                                                                   i.value(),
-                                                                   "threshold",
-                                                                   i.key());
-            if(bArtifactDetected) {
-                break;
-            }
-        }
+        bArtifactDetected = MNEEpochDataList::checkForArtifact(mergedData,
+                                                               *m_pFiffInfo,
+                                                               m_mapThresholds);
     }
 
     if(!bArtifactDetected) {
