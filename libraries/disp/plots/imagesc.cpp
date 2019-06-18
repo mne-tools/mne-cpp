@@ -132,7 +132,7 @@ void ImageSc::init()
     m_iBorderLeftRight = 60;
 
     //Colormap
-    pColorMapper = ColorMap::valueToJet;
+    pColorMapper = ColorMap::valueToHot;
 
     //Colorbar
     m_bColorbar = true;

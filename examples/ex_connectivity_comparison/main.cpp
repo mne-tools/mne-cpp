@@ -224,13 +224,15 @@ int main(int argc, char *argv[])
                      events);
 
     // Read the epochs and reject bad epochs. Note, that SSPs are automatically applied to the data if MNE::setup_compensators was called beforehand.
+    QMap<QString,double> mapReject;
+    mapReject.insert("eog", 300e-06);
+
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
                                                          events,
                                                          fTMin,
                                                          fTMax,
                                                          iEvent,
-                                                         150*pow(10.0,-06),
-                                                         "eog");
+                                                         mapReject);
     data.dropRejected();
     QPair<QVariant, QVariant> pair(QVariant(fTMin), QVariant("0.0"));
     data.applyBaselineCorrection(pair);

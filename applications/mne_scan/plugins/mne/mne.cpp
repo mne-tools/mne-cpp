@@ -429,12 +429,13 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberStartedProcessing++ << "MNE StartedProcessing";
 
-                // Check for artifacts
+                // Check for artifacts                
+                QMap<QString,double> mapReject;
+                mapReject.insert("eog", 150e-06);
+
                 bool bArtifactDetected = MNEEpochDataList::checkForArtifact(pRTMSA->getMultiSampleArray()[i],
                                                                             *m_pFiffInfoInput,
-                                                                            150.0e-6,
-                                                                            "threshold",
-                                                                            "EOG");
+                                                                            mapReject);
 
                 if(!bArtifactDetected) {
                     m_pMatrixDataBuffer->push(&pRTMSA->getMultiSampleArray()[i]);
