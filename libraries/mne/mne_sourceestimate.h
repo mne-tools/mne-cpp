@@ -43,6 +43,8 @@
 
 #include "mne_global.h"
 
+#include <fs/label.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,6 +66,12 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
@@ -73,17 +81,8 @@ namespace MNELIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// MNELIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
 
 
 //=============================================================================================================
@@ -113,7 +112,7 @@ public:
     * @param[in] p_tmin
     * @param[in] p_tstep
     */
-    MNESourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep);
+    MNESourceEstimate(const Eigen::MatrixXd &p_sol, const Eigen::VectorXi &p_vertices, float p_tmin, float p_tstep);
 
     //=========================================================================================================
     /**
@@ -196,15 +195,25 @@ public:
     */
     int samples() const;
 
+    //=========================================================================================================
+    /**
+    * Returns the indices of sources in the data matrix based on their beloning label.
+    *
+    * @param[in] lPickedLabels      The labels base the selection on.
+    * @param[in] bIsClustered       Whether the source space was clustered.
+    *
+    * @return the indices
+    */
+    Eigen::VectorXi getIndicesByLabel(const QList<FSLIB::Label> &lPickedLabels, bool bIsClustered) const;
+
 public:
-    MatrixXd data;          /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
-    VectorXi vertices;      /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; in clustered case vertices holds the ROI idcs
-    RowVectorXf times;      /**< The time vector with n_times steps. */
-    float tmin;             /**< Time starting point. */
-    float tstep;            /**< Time steps within the times vector. */
+    Eigen::MatrixXd data;           /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
+    Eigen::VectorXi vertices;       /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; in clustered case vertices holds the ROI idcs
+    Eigen::RowVectorXf times;       /**< The time vector with n_times steps. */
+    float tmin;                     /**< Time starting point. */
+    float tstep;                    /**< Time steps within the times vector. */
 
 private:
-
     //=========================================================================================================
     /**
     * Update the times attribute after changing tmin, tmax, or tstep

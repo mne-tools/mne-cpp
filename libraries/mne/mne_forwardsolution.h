@@ -45,12 +45,6 @@
 #include "mne_global.h"
 #include "mne_sourcespace.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
 #include <utils/mnemath.h>
 #include <utils/kmeans.h>
 
@@ -62,6 +56,8 @@
 #include <fiff/fiff_info_base.h>
 #include <fiff/fiff_cov.h>
 
+#include <math.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -69,14 +65,6 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <math.h>
 
 
 //*************************************************************************************************************
@@ -104,7 +92,6 @@ namespace MNELIB
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FSLIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
 
@@ -497,10 +484,18 @@ public:
     */
     friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution);
 
-
+    //=========================================================================================================
+    /**
+    * Returns the positions of the specified sources based on their beloning labels
+    *
+    * @param[in] lPickedLabels                    The stream to which the MNE forward solution should be assigned to.
+    * @param[in] tSurfSetInflated                 The surface used to pick the source from, based on their index specified bzy this forward solution.
+    *
+    * @return the source position in 3D space
+    */
+    MatrixX3f getSourcePositionsByLabel(const QList<Label> &lPickedLabels, const FSLIB::SurfaceSet& tSurfSetInflated);
 
 private:
-
     //=========================================================================================================
     /**
     * Definition of the read_one function in mne_read_forward_solution.m

@@ -60,6 +60,7 @@
 
 #include <fs/colortable.h>
 #include <fs/label.h>
+#include <fs/surfaceset.h>
 #include <utils/mnemath.h>
 #include <utils/kmeans.h>
 
@@ -1860,4 +1861,73 @@ void MNEForwardSolution::to_fixed_ori()
     this->sol->ncol = this->sol->ncol / 3;
     this->source_ori = FIFFV_MNE_FIXED_ORI;
     printf("\tConverted the forward solution into the fixed-orientation mode.\n");
+}
+
+
+//*************************************************************************************************************
+
+MatrixX3f MNEForwardSolution::getSourcePositionsByLabel(const QList<Label> &lPickedLabels, const SurfaceSet& tSurfSetInflated)
+{
+    MatrixX3f matSourceVertLeft, matSourceVertRight, matSourcePositions;
+
+    if(lPickedLabels.isEmpty()) {
+        qWarning() << "MNEForwardSolution::getSourcePositionsByLabel - picked label list is empty. Returning.";
+        return  matSourcePositions;
+    }
+
+    if(tSurfSetInflated.isEmpty()) {
+        qWarning() << "MNEForwardSolution::getSourcePositionsByLabel - tSurfSetInflated is empty. Returning.";
+        return  matSourcePositions;
+    }
+
+    if(isClustered()) {
+        for(int j = 0; j < this->src[0].vertno.rows(); ++j) {
+            for(int k = 0; k < lPickedLabels.size(); k++) {
+                if(this->src[0].vertno(j) == lPickedLabels.at(k).label_id) {
+                    matSourceVertLeft.conservativeResize(matSourceVertLeft.rows()+1,3);
+                    matSourceVertLeft.row(matSourceVertLeft.rows()-1) = tSurfSetInflated[0].rr().row(this->src[0].cluster_info.centroidVertno.at(j)) - tSurfSetInflated[0].offset().transpose();
+                    break;
+                }
+            }
+        }
+
+        for(int j = 0; j < this->src[1].vertno.rows(); ++j) {
+            for(int k = 0; k < lPickedLabels.size(); k++) {
+                if(this->src[1].vertno(j) == lPickedLabels.at(k).label_id) {
+                    matSourceVertRight.conservativeResize(matSourceVertRight.rows()+1,3);
+                    matSourceVertRight.row(matSourceVertRight.rows()-1) = tSurfSetInflated[1].rr().row(this->src[1].cluster_info.centroidVertno.at(j)) - tSurfSetInflated[1].offset().transpose();
+                    break;
+                }
+            }
+        }
+    } else {
+        for(int j = 0; j < this->src[0].vertno.rows(); ++j) {
+            for(int k = 0; k < lPickedLabels.size(); k++) {
+                for(int l = 0; l < lPickedLabels.at(k).vertices.rows(); l++) {
+                    if(this->src[0].vertno(j) == lPickedLabels.at(k).vertices(l)) {
+                        matSourceVertLeft.conservativeResize(matSourceVertLeft.rows()+1,3);
+                        matSourceVertLeft.row(matSourceVertLeft.rows()-1) = tSurfSetInflated[0].rr().row(this->src[0].vertno(j)) - tSurfSetInflated[0].offset().transpose();
+                        break;
+                    }
+                }
+            }
+        }
+
+        for(int j = 0; j < this->src[1].vertno.rows(); ++j) {
+            for(int k = 0; k < lPickedLabels.size(); k++) {
+                for(int l = 0; l < lPickedLabels.at(k).vertices.rows(); l++) {
+                    if(this->src[1].vertno(j) == lPickedLabels.at(k).vertices(l)) {
+                        matSourceVertRight.conservativeResize(matSourceVertRight.rows()+1,3);
+                        matSourceVertRight.row(matSourceVertRight.rows()-1) = tSurfSetInflated[1].rr().row(this->src[1].vertno(j)) - tSurfSetInflated[1].offset().transpose();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    matSourcePositions.resize(matSourceVertLeft.rows()+matSourceVertRight.rows(),3);
+    matSourcePositions << matSourceVertLeft, matSourceVertRight;
+
+    return matSourcePositions;
 }
