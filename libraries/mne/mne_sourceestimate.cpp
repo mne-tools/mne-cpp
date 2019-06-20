@@ -40,9 +40,16 @@
 
 #include "mne_sourceestimate.h"
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
 #include <QFile>
 #include <QDataStream>
 #include <QSharedPointer>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -51,6 +58,8 @@
 //=============================================================================================================
 
 using namespace MNELIB;
+using namespace FSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -280,4 +289,43 @@ MNESourceEstimate& MNESourceEstimate::operator= (const MNESourceEstimate &rhs)
 int MNESourceEstimate::samples() const
 {
     return data.cols();
+}
+
+
+//*************************************************************************************************************
+
+VectorXi MNESourceEstimate::getIndicesByLabel(const QList<Label> &lPickedLabels, bool bIsClustered) const
+{
+    VectorXi vIndexSourceLabels;
+
+    if(lPickedLabels.isEmpty()) {
+        qWarning() << "MNESourceEstimate::getIndicesByLabel - picked label list is empty. Returning.";
+        return  vIndexSourceLabels;
+    }
+
+    if(bIsClustered) {
+        for(int i = 0; i < this->vertices.rows(); i++) {
+            for(int k = 0; k < lPickedLabels.size(); k++) {
+                if(this->vertices(i) == lPickedLabels.at(k).label_id) {
+                    vIndexSourceLabels.conservativeResize(vIndexSourceLabels.rows()+1,1);
+                    vIndexSourceLabels(vIndexSourceLabels.rows()-1) = i;
+                    break;
+                }
+            }
+        }
+    } else {
+        for(int i = 0; i < this->vertices.rows(); i++) {
+            for(int k = 0; k < lPickedLabels.size(); k++) {
+                for(int l = 0; l < lPickedLabels.at(k).vertices.rows(); l++) {
+                    if(this->vertices(i) == lPickedLabels.at(k).vertices(l)) {
+                        vIndexSourceLabels.conservativeResize(vIndexSourceLabels.rows()+1,1);
+                        vIndexSourceLabels(vIndexSourceLabels.rows()-1) = i;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return vIndexSourceLabels;
 }
