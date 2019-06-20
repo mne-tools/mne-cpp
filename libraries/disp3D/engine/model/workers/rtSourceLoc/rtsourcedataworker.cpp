@@ -362,10 +362,11 @@ void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
 
             qRgb = functionHandlerColorMap(fSample);
 
-            QColor color (matFinalVertColor(r,0) * 255 * (1.0-0.60) + (float)qRed(qRgb)*0.60,
-                          matFinalVertColor(r,1) * 255 * (1.0-0.60) + (float)qGreen(qRgb)*0.60,
-                          matFinalVertColor(r,2) * 255 * (1.0-0.60) + (float)qBlue(qRgb)*0.60,
-                          255.0 + 0.75 * (255.0-255.0));
+            QColor color(qRgb);
+//            QColor color (matFinalVertColor(r,0) * 255 * (1.0-0.60) + (float)qRed(qRgb)*0.60,
+//                          matFinalVertColor(r,1) * 255 * (1.0-0.60) + (float)qGreen(qRgb)*0.60,
+//                          matFinalVertColor(r,2) * 255 * (1.0-0.60) + (float)qBlue(qRgb)*0.60,
+//                          255.0 + 0.75 * (255.0-255.0));
 
             //qDebug() << "RtSourceDataWorker::normalizeAndTransformToColor color" << color;
 
@@ -377,9 +378,9 @@ void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
 //            matFinalVertColor(r,0) = (float)qRed(qRgb)/255.0f;
 //            matFinalVertColor(r,1) = (float)qGreen(qRgb)/255.0f;
 //            matFinalVertColor(r,2) = (float)qBlue(qRgb)/255.0f;
-//            matFinalVertColor(r,3) = 1.0f; //Use this if you want only vertices with activation to be plotted
+//            matFinalVertColor(r,3) = 1.0f;
         } else {
-            //matFinalVertColor(r,3) = 0.0f; //Use this if you want only vertices with activation to be plotted
+            matFinalVertColor(r,3) = 0.0f; //Use this if you want only vertices with activation to be plotted
         }
     }
 }

@@ -76,6 +76,7 @@
 #include <connectivity/metrics/abstractmetric.h>
 #include <mne/mne_bem_surface.h>
 #include <disp/viewers/minimumnormsettingsview.h>
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -129,7 +130,7 @@ int main(int argc, char *argv[])
 
     AbstractMetric::m_bStorageModeIsActive = true;
     AbstractMetric::m_iNumberBinStart = 0;
-    AbstractMetric::m_iNumberBinAmount = 150;
+    AbstractMetric::m_iNumberBinAmount = 100;
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Example");
@@ -143,30 +144,38 @@ int main(int argc, char *argv[])
 //    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
 //    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
 
-    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "C:/Git/rt_connectivity/data/MEG/mind002/raw/mind002_050924_median01_raw.fif");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "C:/Git/rt_connectivity/data/MEG/mind002/raw/mind002_050924_median01_raw-eve.fif");
+//    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "C:/Git/rt_connectivity/data/MEG/mind002/raw/mind002_050924_median01_raw.fif");
+//    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "C:/Git/rt_connectivity/data/MEG/mind002/raw/mind002_050924_median01_raw-eve.fif");
+//    QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "mind002");
+//    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "C:/Git/rt_connectivity/data/subjects");
+//    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "C:/Git/rt_connectivity/data/MEG/mind002/fwd/mind002_050924_median01-fwd.fif");
+//    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "C:/Git/rt_connectivity/data/MEG/mind002/ave/mind002_050924_median01-cov.fif");
+//    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2005s");
+
+    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_median01_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_median01_raw-eve.fif");
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "mind002");
-    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "C:/Git/rt_connectivity/data/subjects");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "C:/Git/rt_connectivity/data/MEG/mind002/fwd/mind002_050924_median01-fwd.fif");
-    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "C:/Git/rt_connectivity/data/MEG/mind002/ave/mind002_050924_median01-cov.fif");
+    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "/cluster/fusion/lesch/data/Martinos/subjects");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/fwd/mind002_050924_median01-fwd.fif");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/ave/mind002_050924_median01-cov.fif");
     QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2005s");
 
-//    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_median01_raw.fif");
-//    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_median01_raw-eve.fif");
-//    QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "mind002");
-//    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "/cluster/fusion/lesch/data/Martinos/subjects");
-//    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/fwd/mind002_050924_median01-fwd.fif");
-//    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/ave/mind002_050924_median01-cov.fif");
+//    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "/cluster/fusion/MIND/MEG-anal/MGH/mind003/raw/mind003_050924_median01_raw.fif");
+//    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "/cluster/fusion/MIND/MEG-anal/MGH/mind003/raw/mind003_050924_median01_raw-eve.fif");
+//    QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "mind003");
+//    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "/cluster/fusion/MIND/MEG-anal/subjects");
+//    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "/cluster/fusion/MIND/MEG-anal/MGH/mind003/fwd/mind003_050924_median01-fwd.fif");
+//    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "/cluster/fusion/MIND/MEG-anal/MGH/mind003/ave/mind003_050924_median01-cov.fif");
 //    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2005s");
 
     QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COH");
-    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
+    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "130");
-    QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
+    QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
     QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "1.0");
 
@@ -209,13 +218,13 @@ int main(int argc, char *argv[])
 
     bool bDoSourceLoc, bDoClust = false;
     if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
-        bDoSourceLoc =false;
+        bDoSourceLoc = false;
     } else if(parser.value(sourceLocOption) == "true" || parser.value(sourceLocOption) == "1") {
         bDoSourceLoc = true;
     }
 
     if(parser.value(clustOption) == "false" || parser.value(clustOption) == "0") {
-        bDoClust =false;
+        bDoClust = false;
     } else if(parser.value(clustOption) == "true" || parser.value(clustOption) == "1") {
         bDoClust = true;
     }
@@ -268,7 +277,7 @@ int main(int argc, char *argv[])
     mapReject.insert("mag", 3.5e-12);
 
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
-                                                         events,
+                                                         events, //events.block(0,0,4,events.cols()),
                                                          fTMin,
                                                          fTMax,
                                                          iEvent,
@@ -284,6 +293,7 @@ int main(int argc, char *argv[])
                                      data.first()->epoch.cols()-1);
 
     MNESourceEstimate sourceEstimateEvoked;
+    VectorXi vDataIndices;
 
     QStringList exclude;
     exclude << raw.info.bads << raw.info.ch_names.filter("EOG");
@@ -294,14 +304,12 @@ int main(int argc, char *argv[])
             picks = raw.info.pick_types(false,true,false,QStringList(),exclude);
         } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
             // Only pick every second gradiometer which are not marked as bad.
-            RowVectorXi picksTmp = raw.info.pick_types(QString("grad"),false,false);
+            RowVectorXi picksTmp = raw.info.pick_types(QString("grad"),false,false,QStringList(),exclude);
             picks.resize(0);
 
             for(int i = 0; i < picksTmp.cols()-1; i+=2) {
-                if(!raw.info.bads.contains(raw.info.ch_names.at(picksTmp(i)))) {
-                    picks.conservativeResize(picks.cols()+1);
-                    picks(picks.cols()-1) = picksTmp(i);
-                }
+                picks.conservativeResize(picks.cols()+1);
+                picks(picks.cols()-1) = picksTmp(i);
             }
         } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(QString("mag"),false,false,QStringList(),exclude);
@@ -310,6 +318,9 @@ int main(int argc, char *argv[])
         // Transform to a more generic data matrix list, pick only channels of interest and remove EOG channel
         MatrixXd matData;
         int iNumberRows = picks.cols(); //picks.cols() 32
+
+        vDataIndices = VectorXi::LinSpaced(iNumberRows,0,iNumberRows);
+        std::cout << vDataIndices;
 
         for(int i = 0; i < data.size(); ++i) {
             matData.resize(iNumberRows, data.at(i)->epoch.cols());
@@ -344,10 +355,10 @@ int main(int argc, char *argv[])
 
         // Cluster forward solution;
         if(bDoClust) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 200);
+            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
         } else {
             t_clusteredFwd = t_Fwd;
-        }
+        }     
 
         MNEInverseOperator inverse_operator(raw.info,
                                             t_clusteredFwd,
@@ -377,8 +388,45 @@ int main(int argc, char *argv[])
         sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked);
         //sourceEstimateEvoked = sourceEstimateEvoked.reduce(0.24*evoked.info.sfreq,1);
 
-        // Generate network nodes
-        pConnectivitySettingsManager->m_settings.setNodePositions(t_clusteredFwd, tSurfSetInflated);
+        //Generate network nodes and define ROIs
+        QList<Label> lLabels;
+        QList<RowVector4i> qListLabelRGBAs;
+        QStringList lWantedLabels;
+        lWantedLabels << "G_frontal_inf-Opercular_part-lh"
+                        << "G_paracentral-lh"
+                        << "G_parietal_inferior-Supramarginal_part-lh"
+                        << "G_postcentral-lh"
+                        << "G_precentral-lh"
+                        << "G_subcentral-lh"
+                        << "Lat_Fissure-post_sgt-lh"
+                        << "S_central-lh"
+                        << "S_cingulate-Marginalis_part-lh"
+                        << "S_circular_insula_superior-lh"
+                        << "S_intermedius_primus-Jensen-lh"
+                        << "S_intraparietal-and_Parietal_transverse-lh"
+                        << "S_postcentral-lh"
+                        << "G_frontal_inf-Opercular_part-rh"
+                        << "G_paracentral-rh"
+                        << "G_parietal_inferior-Supramarginal_part-rh"
+                        << "G_postcentral-rh"
+                        << "G_precentral-rh"
+                        << "G_subcentral-rh"
+                        << "Lat_Fissure-post_sgt-rh"
+                        << "S_central-rh"
+                        << "S_cingulate-Marginalis_part-rh"
+                        << "S_circular_insula_superior-rh"
+                        << "S_intermedius_primus-Jensen-rh"
+                        << "S_intraparietal-and_Parietal_transverse-rh"
+                        << "S_postcentral-rh";
+
+        tAnnotSet.toLabels(tSurfSetInflated, lLabels, qListLabelRGBAs, lWantedLabels);
+
+        //Get active source indices based on picked labels
+        vDataIndices = sourceEstimateEvoked.getIndicesByLabel(lLabels, bDoClust);
+
+        //Generate node vertices based on picked labels
+        MatrixX3f matNodePositions = t_clusteredFwd.getSourcePositionsByLabel(lLabels, tSurfSetInflated);
+        pConnectivitySettingsManager->m_settings.setNodePositions(matNodePositions);
     }
 
     //Do connectivity estimation and visualize results
@@ -388,11 +436,13 @@ int main(int argc, char *argv[])
 
     ConnectivitySettings::IntermediateTrialData connectivityData;
     for(int i = 0; i < matDataList.size(); i++) {
-        // Only calculate connectivity for post stim
-        connectivityData.matData = matDataList.at(i).block(0,
-                                                           samplesToCutOut,
-                                                           matDataList.at(i).rows(),
-                                                           matDataList.at(i).cols()-samplesToCutOut);
+        connectivityData.matData.resize(vDataIndices.rows(),matDataList.at(i).cols()-samplesToCutOut);
+
+        for(int j = 0; j < vDataIndices.rows(); j++) {
+            // Only calculate connectivity for post stim
+            connectivityData.matData.row(j) = matDataList.at(i).row(vDataIndices(j)).segment(samplesToCutOut, matDataList.at(i).cols()-samplesToCutOut);
+        }
+
         pConnectivitySettingsManager->m_settings.append(connectivityData);
         pConnectivitySettingsManager->m_dataListOriginal.append(connectivityData);
     }
@@ -415,30 +465,6 @@ int main(int argc, char *argv[])
                                                                                     //pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
                                                                                 }});
 
-    MinimumNormSettingsView::SPtr pMinimumNormSettingsView = MinimumNormSettingsView::SPtr::create();
-    QList<QSharedPointer<QWidget> > lWidgets;
-    lWidgets << pMinimumNormSettingsView;
-    tNetworkView.setQuickControlWidgets(lWidgets);
-
-    QObject::connect(pMinimumNormSettingsView.data(), &MinimumNormSettingsView::timePointChanged,
-                     [&](int a) {int aSamples = raw.info.sfreq * (float)a * 0.001;
-                                 if(a >= sourceEstimateEvoked.samples()-1) {
-                                    tNetworkView.getTreeModel()->addSourceData("sample",
-                                                                               evoked.comment,
-                                                                               sourceEstimateEvoked,
-                                                                               t_clusteredFwd,
-                                                                               tSurfSetInflated,
-                                                                               tAnnotSet);
-                                 } else {
-                                    tNetworkView.getTreeModel()->addSourceData("sample",
-                                                                               evoked.comment,
-                                                                               sourceEstimateEvoked.reduce(aSamples,1),
-                                                                               t_clusteredFwd,
-                                                                               tSurfSetInflated,
-                                                                               tAnnotSet);
-                                 }
-                                 });
-
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
         QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
@@ -449,6 +475,30 @@ int main(int argc, char *argv[])
                                                       t_sensorSurfaceVV,
                                                       raw.info.bads);
     } else {
+        MinimumNormSettingsView::SPtr pMinimumNormSettingsView = MinimumNormSettingsView::SPtr::create();
+        QList<QSharedPointer<QWidget> > lWidgets;
+        lWidgets << pMinimumNormSettingsView;
+        tNetworkView.setQuickControlWidgets(lWidgets);
+
+        QObject::connect(pMinimumNormSettingsView.data(), &MinimumNormSettingsView::timePointChanged,
+                         [&](int a) {int aSamples = raw.info.sfreq * (float)a * 0.001;
+                                     if(aSamples >= sourceEstimateEvoked.samples()-1) {
+                                        tNetworkView.getTreeModel()->addSourceData("sample",
+                                                                                   evoked.comment,
+                                                                                   sourceEstimateEvoked,
+                                                                                   t_clusteredFwd,
+                                                                                   tSurfSetInflated,
+                                                                                   tAnnotSet);
+                                     } else {
+                                        tNetworkView.getTreeModel()->addSourceData("sample",
+                                                                                   evoked.comment,
+                                                                                   sourceEstimateEvoked.reduce(aSamples,1),
+                                                                                   t_clusteredFwd,
+                                                                                   tSurfSetInflated,
+                                                                                   tAnnotSet);
+                                     }
+                                     });
+
         //Add source loc data and init some visualization values
         if(MneDataTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
                                                                                      evoked.comment,
@@ -458,114 +508,25 @@ int main(int argc, char *argv[])
                                                                                      tAnnotSet)) {
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
-            pRTDataItem->setNumberAverages(17);
+            pRTDataItem->setNumberAverages(1);
             pRTDataItem->setStreamingState(false);
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Interpolation based");
             pRTDataItem->setColormapType("Jet");
-            pRTDataItem->setAlpha(0.25f);
+            pRTDataItem->setAlpha(0.75f);
         }
+
+        QList<FsSurfaceTreeItem*> lHemis = tNetworkView.getTreeModel()->addSurfaceSet("sample",
+                                                                                      "MRI",
+                                                                                      tSurfSetInflated,
+                                                                                      tAnnotSet);
+
+        lHemis[0]->setAlpha(0.2f);
+        lHemis[1]->setAlpha(0.2f);
     }
 
     tNetworkView.getConnectivitySettingsView()->setNumberTrials(1);
     pConnectivitySettingsManager->onNumberTrialsChanged(1);
-
-//    // ------- TEMP data -------
-
-//    QMatrix4x4 matrix;
-//    matrix.setToIdentity();
-//    matrix.translate(0,-0.02,0.05200);
-//    Qt3DCore::QTransform transformtrans;
-//    transformtrans.setMatrix(matrix);
-
-//    //Read and show BEM
-//    QFile t_fileBem(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-//    MNEBem t_Bem(t_fileBem);
-////    tNetworkView.getTreeModel()->addBemData(parser.value(subjectOption), "BEM", t_Bem);
-
-//    QFile t_fileBemhead(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
-//    MNEBem t_Bemhead(t_fileBemhead);
-
-//    //Read and show sensor helmets
-//    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m.fif");
-//    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-
-//    SensorSetTreeItem* pSensorSetTreeItem = tNetworkView.getTreeModel()->addMegSensorInfo("Sensors", "VectorView", evoked.info.chs, t_sensorSurfaceVV, evoked.info.bads);
-//    pSensorSetTreeItem->applyTransform(transformtrans);
-
-//    // Read, co-register and show digitizer points
-////    QFile t_fileDig(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-////    FiffDigPointSet t_Dig(t_fileDig);
-
-////    DigitizerSetTreeItem* pDigitizerSetTreeItem = tNetworkView.getTreeModel()->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
-////    pDigitizerSetTreeItem->applyTransform(coordTrans, true);
-
-//    //add sensor item for MEG data
-//    if (SensorDataTreeItem* pMegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
-//                                                                                            evoked.comment,
-//                                                                                            //evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
-//                                                                                            evoked.data,
-//                                                                                            t_sensorSurfaceVV[0],
-//                                                                                            evoked.info,
-//                                                                                            "MEG")) {
-//        pMegSensorTreeItem->setLoopState(true);
-//        pMegSensorTreeItem->setTimeInterval(17);
-//        pMegSensorTreeItem->setNumberAverages(17);
-//        pMegSensorTreeItem->setStreamingState(true);
-//        pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 13.0e-13f*0.5f, 13.0e-14f));
-//        pMegSensorTreeItem->setColormapType("Jet");
-//        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
-
-//        // Apply head to device transformation
-//        //pMegSensorTreeItem->applyTransform(coordTrans,true);
-//        //pMegSensorTreeItem->applyTransform(raw.info.dev_head_t);
-//        pMegSensorTreeItem->setTransform(transformtrans);
-//    }
-
-//    //add sensor item for EEG data
-
-//    //Co-Register EEG points in order to correctly map them to the scalp
-//    for(int i = 0; i < evoked.info.chs.size(); ++i) {
-//        if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
-//            Vector4f tempvec;
-//            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
-//            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
-//            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
-//            tempvec(3) = 1;
-//            tempvec = coordTrans.invtrans * tempvec;
-//            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
-//            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
-//            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
-//        }
-//    }
-
-//    if (SensorDataTreeItem* pEegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
-//                                                                                            evoked.comment,
-//                                                                                            //evoked.data.block(0,0.24*evoked.info.sfreq,evoked.data.rows(),1),
-//                                                                                            evoked.data,
-//                                                                                            t_Bem[0],
-//                                                                                            evoked.info,
-//                                                                                            "EEG")) {
-//        pEegSensorTreeItem->setLoopState(true);
-//        pEegSensorTreeItem->setTimeInterval(17);
-//        pEegSensorTreeItem->setNumberAverages(17);
-//        pEegSensorTreeItem->setStreamingState(true);
-//        pEegSensorTreeItem->setThresholds(QVector3D(0.0f, 3.0e-6f, 6.0e-6f));
-//        pEegSensorTreeItem->setColormapType("Jet");
-//        pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
-//        pEegSensorTreeItem->setCancelDistance(0.20);
-
-//        // Apply head to device transformation
-//        //pEegSensorTreeItem->applyTransform(coordTrans);
-//        //pEegSensorTreeItem->applyTransform(raw.info.dev_head_t, true);
-//    }
-//    qDebug() << "-----------------t_Bemhead[0].np" << t_Bemhead[0].np;
-//    qDebug() << "-----------------t_Bem[0].np" << t_Bem[0].np;
-//    qDebug() << "-----------------t_sensorSurfaceVV[0].np" << t_sensorSurfaceVV[0].np;
-//    qDebug() << "-----------------tSurfSetInflated[0].rr().rows()" << tSurfSetInflated[0].rr().rows();
-//    qDebug() << "-----------------tSurfSetInflated[1].rr().rows()" << tSurfSetInflated[1].rr().rows();
-
-//    // ------- TEMP data END -------
 
     return a.exec();
 }
