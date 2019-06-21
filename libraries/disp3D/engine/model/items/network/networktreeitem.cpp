@@ -258,7 +258,7 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
     if(!m_pNodes) {
         if(!m_pNodesGeometry) {
             m_pNodesGeometry = QSharedPointer<Qt3DExtras::QSphereGeometry>::create();
-            m_pNodesGeometry->setRadius(1.0f);
+            m_pNodesGeometry->setRadius(0.6f);
         }
 
         m_pNodes = new GeometryMultiplier(m_pNodesGeometry);
@@ -393,7 +393,8 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
                     QMatrix4x4 tempTransform;
                     tempTransform.translate(edgePos);
                     tempTransform.rotate(QQuaternion::rotationTo(QVector3D(0,1,0), diff.normalized()).normalized());
-                    tempTransform.scale(fabs((dWeight-dMinWeight)/(dMaxWeight-dMinWeight))*4,diff.length(),fabs((dWeight-dMinWeight)/(dMaxWeight-dMinWeight))*4);
+                    //tempTransform.scale(fabs((dWeight-dMinWeight)/(dMaxWeight-dMinWeight))*4,diff.length(),fabs((dWeight-dMinWeight)/(dMaxWeight-dMinWeight))*4);
+                    tempTransform.scale(pow(fabs(dWeight/dMaxWeight),4)*4,diff.length(),pow(fabs(dWeight/dMaxWeight),4)*4);
 
                     vTransformsEdges.push_back(tempTransform);
 
