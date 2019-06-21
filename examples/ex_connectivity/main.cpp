@@ -128,9 +128,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    AbstractMetric::m_bStorageModeIsActive = true;
-    AbstractMetric::m_iNumberBinStart = 0;
-    AbstractMetric::m_iNumberBinAmount = 100;
+    AbstractMetric::m_bStorageModeIsActive = false;
+//    AbstractMetric::m_iNumberBinStart = 0;
+//    AbstractMetric::m_iNumberBinAmount = 20;
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Example");
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "1.0");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.5");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
     mapReject.insert("mag", 3.5e-12);
 
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
-                                                         events, //events.block(0,0,4,events.cols()),
+                                                         events, //events.block(0,0,400,events.cols()),
                                                          fTMin,
                                                          fTMax,
                                                          iEvent,
@@ -392,32 +392,55 @@ int main(int argc, char *argv[])
         QList<Label> lLabels;
         QList<RowVector4i> qListLabelRGBAs;
         QStringList lWantedLabels;
-        lWantedLabels << "G_frontal_inf-Opercular_part-lh"
-                        << "G_paracentral-lh"
-                        << "G_parietal_inferior-Supramarginal_part-lh"
-                        << "G_postcentral-lh"
-                        << "G_precentral-lh"
-                        << "G_subcentral-lh"
-                        << "Lat_Fissure-post_sgt-lh"
-                        << "S_central-lh"
-                        << "S_cingulate-Marginalis_part-lh"
-                        << "S_circular_insula_superior-lh"
-                        << "S_intermedius_primus-Jensen-lh"
-                        << "S_intraparietal-and_Parietal_transverse-lh"
-                        << "S_postcentral-lh"
-                        << "G_frontal_inf-Opercular_part-rh"
-                        << "G_paracentral-rh"
-                        << "G_parietal_inferior-Supramarginal_part-rh"
-                        << "G_postcentral-rh"
-                        << "G_precentral-rh"
-                        << "G_subcentral-rh"
-                        << "Lat_Fissure-post_sgt-rh"
-                        << "S_central-rh"
-                        << "S_cingulate-Marginalis_part-rh"
-                        << "S_circular_insula_superior-rh"
-                        << "S_intermedius_primus-Jensen-rh"
-                        << "S_intraparietal-and_Parietal_transverse-rh"
-                        << "S_postcentral-rh";
+//        lWantedLabels << "G_frontal_inf-Opercular_part-lh"
+//                        << "G_insular_long-lh"
+//                        << "G_insular_short-lh"
+//                        << "G_paracentral-lh"
+//                        << "G_parietal_inferior-Supramarginal_part-lh"
+//                        << "G_postcentral-lh"
+//                        << "G_precentral-lh"
+//                        << "G_subcentral-lh"
+//                        << "G_temp_sup-G_temp_transv_and_interm_S-lh"
+//                        << "G_temp_sup-Planum_tempolare-lh"
+//                        << "Lat_Fissure-post_sgt-lh"
+//                        << "S_central-lh"
+//                        << "S_cingulate-Marginalis_part-lh"
+//                        << "S_circular_insula_superior-lh"
+//                        << "S_intermedius_primus-Jensen-lh"
+//                        << "S_postcentral-lh"
+//                        << "S_precentral-Inferior-part-lh"
+//                        << "S_precentral-Superior-part-lh"
+//                        << "S_temporal_transverse-lh"
+//                        << "G_frontal_inf-Opercular_part-lh"
+//                        << "G_insular_long-rh"
+//                        << "G_insular_short-rh"
+//                        << "G_paracentral-rh"
+//                        << "G_parietal_inferior-Supramarginal_part-rh"
+//                        << "G_postcentral-rh"
+//                        << "G_precentral-rh"
+//                        << "G_subcentral-rh"
+//                        << "G_temp_sup-G_temp_transv_and_interm_S-rh"
+//                        << "G_temp_sup-Planum_tempolare-rh"
+//                        << "Lat_Fissure-post_sgt-rh"
+//                        << "S_central-rh"
+//                        << "S_cingulate-Marginalis_part-rh"
+//                        << "S_circular_insula_superior-rh"
+//                        << "S_intermedius_primus-Jensen-rh"
+//                        << "S_postcentral-rh"
+//                        << "S_precentral-Inferior-part-rh"
+//                        << "S_precentral-Superior-part-rh"
+//                        << "S_temporal_transverse-rh";
+
+//        lWantedLabels << "G_frontal_inf-Opercular_part-lh"
+//                        << "G_postcentral-lh"
+//                        << "G_precentral-lh"
+//                        << "G_subcentral-lh"
+//                        << "S_central-lh"
+//                        << "G_frontal_inf-Opercular_part-rh"
+//                        << "G_postcentral-rh"
+//                        << "G_precentral-rh"
+//                        << "G_subcentral-rh"
+//                        << "S_central-rh";
 
         tAnnotSet.toLabels(tSurfSetInflated, lLabels, qListLabelRGBAs, lWantedLabels);
 
@@ -462,7 +485,7 @@ int main(int argc, char *argv[])
 
     QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
                      [&](const QString& a, const QString& b, const Network& c) {if(NetworkTreeItem* pNetworkTreeItem = tNetworkView.addData(a,b,c)) {
-                                                                                    //pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
+                                                                                    pNetworkTreeItem->setThresholds(QVector3D(0.75,0.95,1.0));
                                                                                 }});
 
     //Read and show sensor helmets
@@ -525,8 +548,8 @@ int main(int argc, char *argv[])
         lHemis[1]->setAlpha(0.2f);
     }
 
-    tNetworkView.getConnectivitySettingsView()->setNumberTrials(1);
-    pConnectivitySettingsManager->onNumberTrialsChanged(1);
+    tNetworkView.getConnectivitySettingsView()->setNumberTrials(20);
+    pConnectivitySettingsManager->onNumberTrialsChanged(20);
 
     return a.exec();
 }
