@@ -130,7 +130,7 @@ void TestForwardSolution::computeForward()
     settings.transname.clear();
     settings.bemname = QDir::currentPath()+QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
     settings.mindist = 5.0f/1000.0f;
-    settings.solname = QDir::currentPath()+"./mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif";
+    settings.solname = QDir::currentPath()+"/mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif";
 
     settings.checkIntegrity();
 
@@ -176,7 +176,7 @@ void TestForwardSolution::compareForward()
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    QString refFwdFileName(QDir::currentPath()+"./mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif");
+    QString refFwdFileName(QDir::currentPath()+"/mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif");
 
     //Load data
     QFile t_fileForwardSolution(refFwdFileName);
