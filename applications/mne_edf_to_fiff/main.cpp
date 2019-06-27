@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of using the EDF utilities
+* @brief    Converting EDF data into Fiff data.T
 *
 */
 
@@ -55,13 +55,10 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QtCore/QCoreApplication>
 #include <QFile>
-#include <QApplication>
+#include <QCommandLineParser>
 #include <QDebug>
-#include <QMainWindow>
-#include <QtCharts/QChart>
-#include <QtCharts/QChartView>
-#include <QtCharts/QLineSeries>
 
 
 //*************************************************************************************************************
@@ -69,9 +66,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EDFINFOEXAMPLE;
+using namespace EDF2FIFF;
 using namespace FIFFLIB;
-using namespace QtCharts;
 
 
 //*************************************************************************************************************
@@ -91,42 +87,37 @@ using namespace QtCharts;
 */
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    QCoreApplication a(argc, argv);
 
-    QFile file("C:\\Users\\Simon\\Desktop\\hiwi\\edf_files\\00000929_s005_t000.edf");
+    // command line parser
+    QCommandLineParser parser;
+    parser.setApplicationDescription("EDF to Fiff conversion");
+    parser.addHelpOption();
+
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "C:\\Users\\Simon\\Desktop\\hiwi\\edf_files\\00000929_s005_t000.edf");
+    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", "C:\\Users\\Simon\\Desktop\\out.fif");
+
+    parser.addOption(inputOption);
+    parser.addOption(outputOption);
+
+    parser.process(a);
+
+    // init data loading and writing
+    QFile t_fileIn(parser.value(inputOption));
+    QFile t_fileOut(parser.value(outputOption));
 
     // initialize raw data
-    EDFRawData edfRaw(&file);
+    EDFRawData edfRaw(&t_fileIn);
     // print basic info
     EDFInfo edfInfo = edfRaw.getInfo();
     qDebug().noquote() << edfInfo.getAsString();
 
-    // test conversion to fiff
+    // convert to fiff
     FiffRawData fiffRaw = edfRaw.toFiffRawData();
-
-    if(fiffRaw.last_samp != edfInfo.getSampleCount()) {
-        qDebug() << "Something went horribly wrong";
-    }
 
     // read some raw data, second 1 to 2
     Eigen::MatrixXf rawChunk = edfRaw.read_raw_segment(1.0f, 2.0f);
     qDebug() << "raw chunk rows: " << rawChunk.rows() << ", raw chunk cols: " << rawChunk.cols();
 
-    // display the data
-    QMainWindow* temp = new QMainWindow();
-    QChart* chart = new QChart();
-    chart->legend()->hide();
-    QLineSeries* series = new QLineSeries();
-    Eigen::RowVectorXf channelSlice = rawChunk.row(4);  // take 5th channel
-    for(int i = 0; i < channelSlice.size(); ++i)
-        series->append(i, static_cast<double>(channelSlice[i]));
-    chart->addSeries(series);
-    chart->createDefaultAxes();
-    chart->setTitle("Singular EEG Channel");
-    QChartView* cView = new QChartView(chart);
-    temp->setCentralWidget(cView);
-    temp->resize(1000, 300);
-    temp->show();
-
-    return app.exec();
+    return 0;
 }

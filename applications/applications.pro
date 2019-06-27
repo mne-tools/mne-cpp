@@ -49,11 +49,14 @@ SUBDIRS += \
     mne_forward_solution \
     mne_anonymize \
 
+
     qtHaveModule(charts) {
+
         SUBDIRS += \
             mne_dipole_fit \
             mne_scan \
-            mne_analyze
+            mne_analyze \
+            mne_edf_to_fiff
     } else {
         message("applications.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
