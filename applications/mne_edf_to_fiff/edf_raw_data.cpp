@@ -88,7 +88,7 @@ EDFInfo EDFRawData::getInfo() const
 MatrixXf EDFRawData::read_raw_segment(int startSampleIdx, int endSampleIdx) const
 {
     // basic sanity checks for indices:
-    if(startSampleIdx < 0 || startSampleIdx >= m_info.getSampleCount() || endSampleIdx < 0 || endSampleIdx >= m_info.getSampleCount()) {
+    if(startSampleIdx < 0 || startSampleIdx >= m_info.getSampleCount() || endSampleIdx < 0 || endSampleIdx > m_info.getSampleCount()) {
         qDebug() << "[EDFRawData::read_raw_segment] An index seems to be out of bounds:";
         qDebug() << "Start: " << startSampleIdx << " End: " << endSampleIdx;
         return MatrixXf();  // return empty matrix
@@ -120,14 +120,16 @@ MatrixXf EDFRawData::read_raw_segment(int startSampleIdx, int endSampleIdx) cons
 
     // again, extra channels are mostly insignificant compared to measurement channels, so we just filter them out later
     for(int recIdx = 0; recIdx < vRecords.size(); ++recIdx) {  // go through each record
+        int recordSampIdx = 0;  // this is the sample idx counter for the records
         for(int chanIdx = 0; chanIdx < m_info.getNumberOfAllChannels(); ++chanIdx) {  // go through all channels
             const EDFChannelInfo sig = m_info.getAllChannelInfos()[chanIdx];
             QVector<int> rawPatch(sig.getNumberOfSamplesPerRecord());
-            for(int sampIdx = 0; sampIdx < sig.getNumberOfSamplesPerRecord(); ++sampIdx) {
+            for(int temporarySampIdx = recordSampIdx; temporarySampIdx < recordSampIdx + sig.getNumberOfSamplesPerRecord(); ++temporarySampIdx) {  // we need a temporary sample index in order to handle the channel-dependent offsets
                 // factor 2 because of 2 byte integer representation, this might be different for bdf files
                 // we need the unary AND operation with '0x00ff' on the right side in order to prevent sign flipping through unintential interpretation as 2's complement integer.
-                rawPatch[sampIdx] = (vRecords[recIdx].at(sampIdx * 2 + 1) << 8) | (vRecords[recIdx].at(sampIdx * 2) & 0x00ff);
+                rawPatch[temporarySampIdx - recordSampIdx] = (vRecords[recIdx].at(temporarySampIdx * 2 + 1) << 8) | (vRecords[recIdx].at(temporarySampIdx * 2) & 0x00ff);
             }
+            recordSampIdx += sig.getNumberOfSamplesPerRecord();
             vRawPatches[chanIdx] += rawPatch;  // append raw patch
         }
     }
@@ -154,7 +156,7 @@ MatrixXf EDFRawData::read_raw_segment(int startSampleIdx, int endSampleIdx) cons
         vRawPatches[measChanIdx] = vRawPatches[measChanIdx].mid(relativeFirstSampleIdx);  // cut away unwanted samples in the beginning
         const EDFChannelInfo chan = vMeasChannels[measChanIdx];
         for(int sampIdx = 0; sampIdx < numSamples; ++sampIdx) {  // by only letting sampIdx go so far, we automatically exclude unwanted samples in the end
-            result(measChanIdx, sampIdx) = static_cast<float>(vRawPatches[measChanIdx][sampIdx] - chan.digitalMin()) / (chan.digitalMax() - chan.digitalMin()) * (chan.physicalMax() - chan.physicalMin()) + chan.physicalMin();
+            result(measChanIdx, sampIdx) = (static_cast<float>(vRawPatches[measChanIdx][sampIdx] - chan.digitalMin()) / (chan.digitalMax() - chan.digitalMin()) * (chan.physicalMax() - chan.physicalMin()) + chan.physicalMin()) / 1000000.0f;
         }
     }
 
