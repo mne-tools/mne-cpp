@@ -120,12 +120,15 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
             QComboBox* pComboBox = new QComboBox(parent);
             connect(pComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                     this, &Data3DTreeDelegate::onEditorEdited);
-            pComboBox->addItem("Hot Negative 1");
-            pComboBox->addItem("Hot Negative 2");
+            pComboBox->addItem("HotNegative1");
+            pComboBox->addItem("HotNegative2");
             pComboBox->addItem("Hot");
             pComboBox->addItem("Jet");
             pComboBox->addItem("RedBlue");
             pComboBox->addItem("Bone");
+            pComboBox->addItem("Cool");
+            pComboBox->addItem("Viridis");
+            pComboBox->addItem("ViridisNegated");
             return pComboBox;
         }
 
@@ -261,14 +264,24 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
         }
 
         case MetaTreeItemTypes::NetworkMatrix: {
-            QStandardItem* pParentItem = static_cast<QStandardItem*>(pAbstractItem->QStandardItem::parent());
-            QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
-            MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::Data).value<MatrixXd>();
+            if(AbstractTreeItem* pParentItem = static_cast<AbstractTreeItem*>(pAbstractItem->QStandardItem::parent())) {
+                QModelIndex indexParent = pData3DTreeModel->indexFromItem(pParentItem);
+                MatrixXd matRTData = index.model()->data(indexParent, Data3DTreeModelItemRoles::Data).value<MatrixXd>();
 
-            ImageSc* pPlotLA = new ImageSc(matRTData, parent);
-            pPlotLA->resize(400,300);
-            pPlotLA->setWindowFlags(Qt::Window);
-            pPlotLA->show();
+                ImageSc* pPlotLA = new ImageSc(matRTData, parent);
+                pPlotLA->resize(400,300);
+                pPlotLA->setWindowFlags(Qt::Window);
+                pPlotLA->show();
+
+                QList<QStandardItem*> pColormapItem = pParentItem->findChildren(MetaTreeItemTypes::ColormapType);
+                for(int i = 0; i < pColormapItem.size(); ++i) {
+                    if(pColormapItem.at(i)) {
+                        QModelIndex indexColormapItem = pData3DTreeModel->indexFromItem(pColormapItem.at(i));
+                        QString colorMap = index.model()->data(indexColormapItem, MetaTreeItemRoles::ColormapType).value<QString>();
+                        pPlotLA->setColorMap(colorMap);
+                    }
+                }
+            }
             break;
             //return pPlotLA;
         }

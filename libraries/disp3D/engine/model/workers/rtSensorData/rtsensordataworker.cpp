@@ -40,7 +40,6 @@
 //=============================================================================================================
 
 #include "rtsensordataworker.h"
-#include <disp/plots/helpers/colormap.h>
 #include "../../../../helpers/interpolation/interpolation.h"
 #include "../../items/common/abstractmeshtreeitem.h"
 
@@ -87,7 +86,6 @@ RtSensorDataWorker::RtSensorDataWorker()
 , m_iCurrentSample(0)
 , m_pMatInterpolationMatrix(QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>()))
 {
-    m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
 }
 
 
@@ -145,19 +143,7 @@ void RtSensorDataWorker::setStreamSmoothedData(bool bStreamSmoothedData)
 void RtSensorDataWorker::setColormapType(const QString& sColormapType)
 {
     //Create function handler to corresponding color map function
-    if(sColormapType == "Hot Negative 1") {
-        m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHotNegative1;
-    } else if(sColormapType == "Hot") {
-        m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHot;
-    } else if(sColormapType == "Hot Negative 2") {
-        m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToHotNegative2;
-    } else if(sColormapType == "Jet") {
-        m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToJet;
-    } else if(sColormapType == "Bone") {
-        m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToBone;
-    } else if(sColormapType == "RedBlue") {
-        m_lVisualizationInfo.functionHandlerColorMap = ColorMap::valueToRedBlue;
-    }
+    m_lVisualizationInfo.sColormapType = sColormapType;
 }
 
 
@@ -284,7 +270,8 @@ MatrixX4f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vec
                                  m_lVisualizationInfo.matFinalVertColor,
                                  m_lVisualizationInfo.dThresholdX,
                                  m_lVisualizationInfo.dThresholdZ,
-                                 m_lVisualizationInfo.functionHandlerColorMap);
+                                 m_lVisualizationInfo.functionHandlerColorMap,
+                                 m_lVisualizationInfo.sColormapType);
 
     return m_lVisualizationInfo.matFinalVertColor;
 }
@@ -296,7 +283,8 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
                                                       MatrixX4f& matFinalVertColor,
                                                       double dThresholdX,
                                                       double dThreholdZ,
-                                                      QRgb (*functionHandlerColorMap)(double v))
+                                                      QRgb (*functionHandlerColorMap)(double v, const QString& sColorMap),
+                                                      const QString& sColorMap)
 {
     //Note: This function needs to be implemented extremly efficient.
     if(vecData.rows() != matFinalVertColor.rows()) {
@@ -335,7 +323,7 @@ void RtSensorDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
                 }
             }
 
-            qRgb = functionHandlerColorMap(fSample);
+            qRgb = functionHandlerColorMap(fSample, sColorMap);
 
             matFinalVertColor(r,0) = (float)qRed(qRgb)/255.0f;
             matFinalVertColor(r,1) = (float)qGreen(qRgb)/255.0f;

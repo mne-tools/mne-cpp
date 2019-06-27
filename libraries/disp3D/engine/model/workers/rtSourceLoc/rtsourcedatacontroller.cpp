@@ -102,10 +102,10 @@ RtSourceDataController::RtSourceDataController()
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setSurfaceColor);
 
        connect(this, &RtSourceDataController::newInterpolationMatrixLeftAvailable,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setInterpolationMatrixLeft);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setInterpolationMatrixLeft, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::newInterpolationMatrixRightAvailable,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setInterpolationMatrixRight);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setInterpolationMatrixRight, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::thresholdsChanged,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setThresholds, Qt::DirectConnection);
@@ -120,7 +120,7 @@ RtSourceDataController::RtSourceDataController()
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setNumberAverages, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::colormapTypeChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setColormapType);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setColormapType, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::streamSmoothedDataChanged,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setStreamSmoothedData);
@@ -150,7 +150,7 @@ RtSourceDataController::RtSourceDataController()
                m_pRtInterpolationLeftWorker.data(), &RtSourceInterpolationMatWorker::setAnnotationInfo);
 
        connect(this, &RtSourceDataController::visualizationTypeChanged,
-               m_pRtInterpolationLeftWorker.data(), &RtSourceInterpolationMatWorker::setVisualizationType);
+               m_pRtInterpolationLeftWorker.data(), &RtSourceInterpolationMatWorker::setVisualizationType, Qt::DirectConnection);
 
        m_rtInterpolationLeftWorkerThread.start();
 
@@ -177,7 +177,7 @@ RtSourceDataController::RtSourceDataController()
                m_pRtInterpolationRightWorker.data(), &RtSourceInterpolationMatWorker::setAnnotationInfo);
 
        connect(this, &RtSourceDataController::visualizationTypeChanged,
-               m_pRtInterpolationRightWorker.data(), &RtSourceInterpolationMatWorker::setVisualizationType);
+               m_pRtInterpolationRightWorker.data(), &RtSourceInterpolationMatWorker::setVisualizationType, Qt::DirectConnection);
 
        m_rtInterpolationRightWorkerThread.start();
 }

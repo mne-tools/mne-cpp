@@ -102,7 +102,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 {
     AbstractMetric::m_bStorageModeIsActive = true;
     AbstractMetric::m_iNumberBinStart = 0;
-    AbstractMetric::m_iNumberBinAmount = 150;
+    AbstractMetric::m_iNumberBinAmount = 100;
 }
 
 

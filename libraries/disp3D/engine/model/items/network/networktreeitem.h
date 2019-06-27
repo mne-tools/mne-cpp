@@ -171,6 +171,14 @@ private:
 
     //=========================================================================================================
     /**
+    * This function gets called whenever the used colormap type changed.
+    *
+    * @param[in] sColormapType     The name of the new colormap type.
+    */
+    void onColormapTypeChanged(const QVariant& sColormapType);
+
+    //=========================================================================================================
+    /**
     * Call this function whenever you want to calculate the indices/tris for a network.
     *
     * @param[in] tNetworkData     The network data.
