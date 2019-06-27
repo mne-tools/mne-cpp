@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     ex_edf_to_fif.pro
+# @file     mne_edf_to_fiff.pro
 # @author   Simon Heinke <simon.heinke@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds an example on how to use the new EDF utilities.
+# @brief    Builds an executable that converts raw EDF into raw Fiff
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,12 +39,10 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += gui widgets charts
-
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = ex_edf_to_fif
+TARGET = mne_edf_to_fiff
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)

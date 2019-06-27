@@ -78,7 +78,6 @@ SUBDIRS += \
             ex_interpolation \
             ex_spectral \
             ex_tf_plot \
-            ex_edf_to_fif \
 
         !isEmpty( CNTK_INCLUDE_DIR ) {
             SUBDIRS += \

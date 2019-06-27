@@ -55,7 +55,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EDFINFOEXAMPLE;
+using namespace EDF2FIFF;
 using namespace FIFFLIB;
 using namespace Eigen;
 
