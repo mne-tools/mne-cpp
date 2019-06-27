@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <algorithm>
 #include <vector>
 
 #include <fiff/fiff_ch_info.h>
@@ -115,9 +116,32 @@ int main(int argc, char *argv[])
     // convert to fiff
     FiffRawData fiffRaw = edfRaw.toFiffRawData();
 
-    // read some raw data, second 1 to 2
-    Eigen::MatrixXf rawChunk = edfRaw.read_raw_segment(1.0f, 2.0f);
-    qDebug() << "raw chunk rows: " << rawChunk.rows() << ", raw chunk cols: " << rawChunk.cols();
+    // set up the reading parameters
+    float timeslice_seconds = 10.0f; //read and write in 10 sec chunks
+    int timeslice_samples = static_cast<int>(ceil(timeslice_seconds * fiffRaw.info.sfreq));
+
+    RowVectorXd cals;
+    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, fiffRaw.info, cals);
+
+    // copied from read/write example
+    fiff_int_t first = 0;  // EDF files start at index 0
+    outfid->write_int(FIFF_FIRST_SAMPLE, &first);
+
+    // read chunks, remember how many samples were already read
+    int samplesRead = 0;
+
+    while(samplesRead < edfInfo.getSampleCount()) {
+        int nextChunkSize = std::min(timeslice_samples, edfInfo.getSampleCount() - samplesRead);
+
+        MatrixXd data = edfRaw.read_raw_segment(samplesRead, samplesRead + nextChunkSize).cast<double>();
+
+        samplesRead += nextChunkSize;
+
+        outfid->write_raw_buffer(data,cals);
+    }
+
+    outfid->finish_writing_raw();
+    printf("Writing finished\n");
 
     return 0;
 }

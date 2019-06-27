@@ -143,6 +143,8 @@ FiffChInfo EDFChannelInfo::toFiffChInfo() const {
             result.kind = FIFFV_EEG_CH;
         else if(sLabelUpper.contains("MEG"))
             result.kind = FIFFV_MEG_CH;
+        else if(sLabelUpper.contains("ECG"))
+            result.kind = FIFFV_ECG_CH;
         else if(sLabelUpper.contains("EOG"))
             result.kind = FIFFV_EOG_CH;
         else
@@ -167,6 +169,7 @@ FiffChInfo EDFChannelInfo::toFiffChInfo() const {
     result.cal = 1.0f;
     result.range = 1.0f;
 
+    // simply take signal label as channel name
     result.ch_name = m_sLabel;
 
     return result;
