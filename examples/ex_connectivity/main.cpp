@@ -128,9 +128,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    AbstractMetric::m_bStorageModeIsActive = false;
-//    AbstractMetric::m_iNumberBinStart = 0;
-//    AbstractMetric::m_iNumberBinAmount = 20;
+    AbstractMetric::m_bStorageModeIsActive = true;
+    AbstractMetric::m_iNumberBinStart = 0;
+    AbstractMetric::m_iNumberBinAmount = 50;
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Example");
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
 //    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "C:/Git/rt_connectivity/data/MEG/mind002/ave/mind002_050924_median01-cov.fif");
 //    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2005s");
 
-    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_median01_raw.fif");
+    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_median01_filtered_2_40_raw.fif");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_median01_raw-eve.fif");
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "mind002");
     QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "/cluster/fusion/lesch/data/Martinos/subjects");
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.5");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "1.0");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -355,7 +355,7 @@ int main(int argc, char *argv[])
 
         // Cluster forward solution;
         if(bDoClust) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
+            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 20);
         } else {
             t_clusteredFwd = t_Fwd;
         }     
@@ -485,7 +485,7 @@ int main(int argc, char *argv[])
 
     QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
                      [&](const QString& a, const QString& b, const Network& c) {if(NetworkTreeItem* pNetworkTreeItem = tNetworkView.addData(a,b,c)) {
-                                                                                    pNetworkTreeItem->setThresholds(QVector3D(0.75,0.95,1.0));
+                                                                                    //pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
                                                                                 }});
 
     //Read and show sensor helmets

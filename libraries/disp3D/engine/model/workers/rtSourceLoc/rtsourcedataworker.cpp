@@ -40,7 +40,6 @@
 //=============================================================================================================
 
 #include "rtsourcedataworker.h"
-#include <disp/plots/helpers/colormap.h>
 #include "../../../../helpers/interpolation/interpolation.h"
 #include "../../items/common/abstractmeshtreeitem.h"
 
@@ -89,8 +88,6 @@ RtSourceDataWorker::RtSourceDataWorker()
 {
     VisualizationInfo leftHemiInfo;
     VisualizationInfo rightHemiInfo;
-    leftHemiInfo.functionHandlerColorMap = ColorMap::valueToHot;
-    rightHemiInfo.functionHandlerColorMap = ColorMap::valueToHot;
     leftHemiInfo.pMatInterpolationMatrix = QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>());
     rightHemiInfo.pMatInterpolationMatrix = QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>());
     m_lHemiVisualizationInfo << leftHemiInfo << rightHemiInfo;
@@ -151,25 +148,8 @@ void RtSourceDataWorker::setStreamSmoothedData(bool bStreamSmoothedData)
 void RtSourceDataWorker::setColormapType(const QString& sColormapType)
 {
     //Create function handler to corresponding color map function
-    if(sColormapType == QStringLiteral("Hot Negative 1")) {
-        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative1;
-        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHotNegative1;
-    } else if(sColormapType == QStringLiteral("Hot")) {
-        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHot;
-        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHot;
-    } else if(sColormapType == QStringLiteral("Hot Negative 2")) {
-        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToHotNegative2;
-        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToHotNegative2;
-    } else if(sColormapType == QStringLiteral("Jet")) {
-        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToJet;
-        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToJet;
-    } else if(sColormapType == "Bone") {
-        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToBone;
-        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToBone;
-    } else if(sColormapType == "RedBlue") {
-        m_lHemiVisualizationInfo[0].functionHandlerColorMap = ColorMap::valueToRedBlue;
-        m_lHemiVisualizationInfo[1].functionHandlerColorMap = ColorMap::valueToRedBlue;
-    }
+    m_lHemiVisualizationInfo[0].sColormapType = sColormapType;
+    m_lHemiVisualizationInfo[1].sColormapType = sColormapType;
 }
 
 
@@ -322,7 +302,8 @@ void RtSourceDataWorker::generateColorsFromSensorValues(VisualizationInfo &visua
                                  visualizationInfoHemi.matFinalVertColor,
                                  visualizationInfoHemi.dThresholdX,
                                  visualizationInfoHemi.dThresholdZ,
-                                 visualizationInfoHemi.functionHandlerColorMap);
+                                 visualizationInfoHemi.functionHandlerColorMap,
+                                 visualizationInfoHemi.sColormapType);
 }
 
 
@@ -332,7 +313,8 @@ void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
                                                       MatrixX4f& matFinalVertColor,
                                                       double dThresholdX,
                                                       double dThresholdZ,
-                                                      QRgb (*functionHandlerColorMap)(double v))
+                                                      QRgb (*functionHandlerColorMap)(double v, const QString& sColorMap),
+                                                      const QString& sColorMap)
 {
     //Note: This function needs to be implemented extremly efficient.
     if(vecData.rows() != matFinalVertColor.rows()) {
@@ -360,7 +342,7 @@ void RtSourceDataWorker::normalizeAndTransformToColor(const VectorXf& vecData,
                 }
             }
 
-            qRgb = functionHandlerColorMap(fSample);
+            qRgb = functionHandlerColorMap(fSample, sColorMap);
 
             QColor color(qRgb);
 //            QColor color (matFinalVertColor(r,0) * 255 * (1.0-0.60) + (float)qRed(qRgb)*0.60,

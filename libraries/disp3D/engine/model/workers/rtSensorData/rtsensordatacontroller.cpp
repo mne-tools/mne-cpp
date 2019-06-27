@@ -98,7 +98,7 @@ RtSensorDataController::RtSensorDataController()
                m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setNumberVertices);
 
        connect(this, &RtSensorDataController::newInterpolationMatrixAvailable,
-               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setInterpolationMatrix);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setInterpolationMatrix, Qt::DirectConnection);
 
        connect(this, &RtSensorDataController::thresholdsChanged,
                m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setThresholds, Qt::DirectConnection);
@@ -113,7 +113,7 @@ RtSensorDataController::RtSensorDataController()
                m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setNumberAverages, Qt::DirectConnection);
 
        connect(this, &RtSensorDataController::colormapTypeChanged,
-               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setColormapType);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setColormapType, Qt::DirectConnection);
 
        connect(this, &RtSensorDataController::streamSmoothedDataChanged,
                m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setStreamSmoothedData);

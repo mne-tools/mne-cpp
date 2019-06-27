@@ -45,6 +45,8 @@
 
 #include "../../../../disp3D_global.h"
 
+#include <disp/plots/helpers/colormap.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,7 +90,8 @@ struct VisualizationInfo {
 
     QSharedPointer<Eigen::SparseMatrix<float> >  pMatInterpolationMatrix;         /**< The interpolation matrix. */
 
-    QRgb (*functionHandlerColorMap)(double v);
+    QString sColormapType;
+    QRgb (*functionHandlerColorMap)(double v, const QString& sColorMap) = DISPLIB::ColorMap::valueToColor;
 }; /**< The struct specifing visualization info. */
 
 struct ColorComputationInfo {
@@ -232,12 +235,14 @@ protected:
     * @param[in] dThresholdX                   Lower threshold for normalizing
     * @param[in] dThresholdZ                   Upper threshold for normalizing
     * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
+    * @param[in] sColorMap                     The color map to use
     */
     static void normalizeAndTransformToColor(const Eigen::VectorXf& vecData,
                                              Eigen::MatrixX4f &matFinalVertColor,
                                              double dThresholdX,
                                              double dThresholdZ,
-                                             QRgb (*functionHandlerColorMap)(double v));
+                                             QRgb (*functionHandlerColorMap)(double v, const QString& sColorMap),
+                                             const QString& sColorMap);
 
     //=========================================================================================================
     /**

@@ -85,7 +85,7 @@ class NetworkNode;
 
 struct VisualizationInfo {
     QString sMethod = "Map";                                    /**< The color method: Map (uses sColormap parameter) or Color (uses colNodes and colEdges).*/
-    QString sColormap = "Hot";                                  /**< The colormap.*/
+    QString sColormap = "Viridis";                                 /**< The colormap.*/
     Eigen::Vector4i colNodes = Eigen::Vector4i(255, 0, 0, 255); /**< The node color.*/
     Eigen::Vector4i colEdges = Eigen::Vector4i(255, 0, 0, 255); /**< The edge color.*/
 };

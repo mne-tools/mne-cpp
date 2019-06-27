@@ -191,7 +191,7 @@ public:
     *
     * @param[in]  colorMap  qstring of the color gradient from user input
     */
-    void setColorMap (QString colorMap);
+    void setColorMap (const QString &colorMap);
 
     Eigen::VectorXi m_vecResultExponentValues; /**< Common exponent values for the entire histogram*/
     double          m_dMinAxisX;               /**< Display value of the smallest point of the series in x-axis */
