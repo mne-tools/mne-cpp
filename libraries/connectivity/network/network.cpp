@@ -103,7 +103,7 @@ Network::Network(const QString& sConnectivityMethod,
 
 //*************************************************************************************************************
 
-MatrixXd Network::getFullConnectivityMatrix() const
+MatrixXd Network::getFullConnectivityMatrix(bool bGetMirroredVersion) const
 {
     MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
     matDist.setZero();
@@ -114,6 +114,10 @@ MatrixXd Network::getFullConnectivityMatrix() const
 
         if(row < matDist.rows() && col < matDist.cols()) {
             matDist(row,col) = m_lFullEdges.at(i)->getWeight();
+
+            if(bGetMirroredVersion) {
+                matDist(col,row) = m_lFullEdges.at(i)->getWeight();
+            }
         }
     }
 
@@ -124,7 +128,7 @@ MatrixXd Network::getFullConnectivityMatrix() const
 
 //*************************************************************************************************************
 
-MatrixXd Network::getThresholdedConnectivityMatrix() const
+MatrixXd Network::getThresholdedConnectivityMatrix(bool bGetMirroredVersion) const
 {
     MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
     matDist.setZero();
@@ -135,6 +139,10 @@ MatrixXd Network::getThresholdedConnectivityMatrix() const
 
         if(row < matDist.rows() && col < matDist.cols()) {
             matDist(row,col) = m_lThresholdedEdges.at(i)->getWeight();
+
+            if(bGetMirroredVersion) {
+                matDist(col,row) = m_lFullEdges.at(i)->getWeight();
+            }
         }
     }
 
