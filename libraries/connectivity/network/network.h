@@ -118,17 +118,25 @@ public:
     /**
     * Returns the full connectivity matrix for this network structure.
     *
+    * @param[in] bGetMirroredVersion    Flag whether to return the mirrored version of the connectivity matrix, if the network
+    *                                   is a non-directional one. Otherwise returns zeros for the lower part of the matrix.
+    *                                   Default is set to true.
+    *
     * @return    The full connectivity matrix generated from the current network information.
     */
-    Eigen::MatrixXd getFullConnectivityMatrix() const;
+    Eigen::MatrixXd getFullConnectivityMatrix(bool bGetMirroredVersion = true) const;
 
     //=========================================================================================================
     /**
     * Returns the thresholded connectivity matrix for this network structure.
     *
+    * @param[in] bGetMirroredVersion    Flag whether to return the mirrored version of the connectivity matrix, if the network
+    *                                   is a non-directional one. Otherwise returns zeros for the lower part of the matrix.
+    *                                   Default is set to true.
+    *
     * @return    The thresholded connectivity matrix generated from the current network information.
     */
-    Eigen::MatrixXd getThresholdedConnectivityMatrix() const;
+    Eigen::MatrixXd getThresholdedConnectivityMatrix(bool bGetMirroredVersion = true) const;
 
     //=========================================================================================================
     /**
