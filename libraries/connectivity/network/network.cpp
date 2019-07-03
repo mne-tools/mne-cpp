@@ -141,7 +141,7 @@ MatrixXd Network::getThresholdedConnectivityMatrix(bool bGetMirroredVersion) con
             matDist(row,col) = m_lThresholdedEdges.at(i)->getWeight();
 
             if(bGetMirroredVersion) {
-                matDist(col,row) = m_lFullEdges.at(i)->getWeight();
+                matDist(col,row) = m_lThresholdedEdges.at(i)->getWeight();
             }
         }
     }

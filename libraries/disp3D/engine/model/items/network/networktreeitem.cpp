@@ -162,6 +162,7 @@ void NetworkTreeItem::addData(const Network& tNetworkData)
     this->setData(data, Data3DTreeModelItemRoles::NetworkData);
 
     MatrixXd matDist = tNetwork.getFullConnectivityMatrix();
+//  MatrixXd matDist = tNetwork.getThresholdedConnectivityMatrix();
     data.setValue(matDist);
     this->setData(data, Data3DTreeModelItemRoles::Data);
 
@@ -194,14 +195,7 @@ void NetworkTreeItem::onNetworkThresholdChanged(const QVariant& vecThresholds)
 {
     if(vecThresholds.canConvert<QVector3D>()) {
         Network tNetwork = this->data(Data3DTreeModelItemRoles::NetworkData).value<Network>();
-        tNetwork.setThreshold(vecThresholds.value<QVector3D>().x());
-
-        QVariant data;
-        data.setValue(tNetwork);
-
-        this->setData(data, Data3DTreeModelItemRoles::NetworkData);
-
-        plotNetwork(tNetwork);
+        addData(tNetwork);
     }
 }
 

@@ -96,7 +96,7 @@ RtSourceDataController::RtSourceDataController()
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::streamData);
 
        connect(this, &RtSourceDataController::rawDataChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::addData);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::addData, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::surfaceColorChanged,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setSurfaceColor);

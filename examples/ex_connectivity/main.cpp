@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
 
     AbstractMetric::m_bStorageModeIsActive = true;
     AbstractMetric::m_iNumberBinStart = 0;
-    AbstractMetric::m_iNumberBinAmount = 50;
+    AbstractMetric::m_iNumberBinAmount = 100;
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Example");
@@ -355,7 +355,7 @@ int main(int argc, char *argv[])
 
         // Cluster forward solution;
         if(bDoClust) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 20);
+            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 200);
         } else {
             t_clusteredFwd = t_Fwd;
         }     
@@ -506,6 +506,7 @@ int main(int argc, char *argv[])
         QObject::connect(pMinimumNormSettingsView.data(), &MinimumNormSettingsView::timePointChanged,
                          [&](int a) {int aSamples = raw.info.sfreq * (float)a * 0.001;
                                      if(aSamples >= sourceEstimateEvoked.samples()-1) {
+                                        qDebug() << "not reducing aSamples" << aSamples;
                                         tNetworkView.getTreeModel()->addSourceData("sample",
                                                                                    evoked.comment,
                                                                                    sourceEstimateEvoked,
@@ -513,6 +514,7 @@ int main(int argc, char *argv[])
                                                                                    tSurfSetInflated,
                                                                                    tAnnotSet);
                                      } else {
+                                        qDebug() << "reducing aSamples" << aSamples;
                                         tNetworkView.getTreeModel()->addSourceData("sample",
                                                                                    evoked.comment,
                                                                                    sourceEstimateEvoked.reduce(aSamples,1),
