@@ -338,7 +338,7 @@ void ConnectivitySettings::setFFTSize(int iNfft)
     clearIntermediateData();
 
     m_iNfft = iNfft;
-    m_fFreqResolution  = m_fSFreq/m_iNfft;
+    m_fFreqResolution = m_fSFreq/m_iNfft;
 
 }
 

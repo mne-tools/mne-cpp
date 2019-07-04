@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     networkedge.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     tfsettingsview.cpp
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2016
+* @date     July, 2019
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2019, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,27 +29,26 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    NetworkEdge class definition.
+* @brief    Definition of the TfSettingsView Class.
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "networkedge.h"
+#include "tfsettingsview.h"
 
-#include "networknode.h"
+#include "ui_tfsettingsview.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -63,14 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
-//=============================================================================================================
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -78,120 +70,69 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkEdge::NetworkEdge(int iStartNodeID,
-                         int iEndNodeID,
-                         const MatrixXd& matWeight,
-                         bool bIsActive,
-                         int iStartWeightBin,
-                         int iEndWeightBin)
-: m_iStartNodeID(iStartNodeID)
-, m_iEndNodeID(iEndNodeID)
-, m_bIsActive(bIsActive)
-, m_iMinMaxFreqBins(QPair<int,int>(iStartWeightBin,iEndWeightBin))
-, m_dAveragedWeight(0.0)
+TfSettingsView::TfSettingsView(const QString& sSettingsPath,
+                               QWidget *parent,
+                               Qt::WindowFlags f)
+: QWidget(parent, f)
+, ui(new Ui::TfSettingsViewWidget)
+, m_sSettingsPath(sSettingsPath)
 {
-    if(matWeight.rows() == 0 || matWeight.cols() == 0) {
-        m_matWeight = MatrixXd::Zero(1,1);
-        qDebug() << "NetworkEdge::NetworkEdge - Matrix weights number of rows and/or columns are zero. Setting to 1x1 zero matrix.";
-    } else {
-        m_matWeight = matWeight;
-    }
+    ui->setupUi(this);
 
-    calculateAveragedWeight();
+    loadSettings(m_sSettingsPath);
+
+    connect(ui->m_spinBox_trialNumber, static_cast<void (QSpinBox::*)(const QString&)>(&QSpinBox::valueChanged),
+            this, &TfSettingsView::onNumberTrialRowChanged);
+
+    connect(ui->m_spinBox_rowNumber, static_cast<void (QSpinBox::*)(const QString&)>(&QSpinBox::valueChanged),
+            this, &TfSettingsView::onNumberTrialRowChanged);
+
+    this->setWindowTitle("Time frequency Settings");
+    this->setMinimumWidth(330);
+    this->setMaximumWidth(330);
 }
 
 
 //*************************************************************************************************************
 
-int NetworkEdge::getStartNodeID()
+TfSettingsView::~TfSettingsView()
 {
-    return m_iStartNodeID;
+    saveSettings(m_sSettingsPath);
+
+    delete ui;
 }
 
 
 //*************************************************************************************************************
 
-int NetworkEdge::getEndNodeID()
+void TfSettingsView::saveSettings(const QString& settingsPath)
 {
-    return m_iEndNodeID;
-}
-
-
-//*************************************************************************************************************
-
-void NetworkEdge::setActive(bool bActiveFlag)
-{
-    m_bIsActive = bActiveFlag;
-}
-
-
-//*************************************************************************************************************
-
-bool NetworkEdge::isActive()
-{
-    return m_bIsActive;
-}
-
-
-//*************************************************************************************************************
-
-double NetworkEdge::getWeight() const
-{
-    return m_dAveragedWeight;
-}
-
-
-//*************************************************************************************************************
-
-void NetworkEdge::setWeight(double dAveragedWeight)
-{
-    m_dAveragedWeight = dAveragedWeight;
-}
-
-
-//*************************************************************************************************************
-
-void NetworkEdge::calculateAveragedWeight()
-{
-    int iStartWeightBin = m_iMinMaxFreqBins.first;
-    int iEndWeightBin = m_iMinMaxFreqBins.second;
-
-    if(iEndWeightBin < iStartWeightBin || iStartWeightBin < -1 || iEndWeightBin < -1 ) {
+    if(settingsPath.isEmpty()) {
         return;
     }
 
-    int rows = m_matWeight.rows();
-
-    if ((iEndWeightBin == -1 && iStartWeightBin == -1) ) {
-        m_dAveragedWeight = m_matWeight.mean();
-    } else if(iStartWeightBin < rows) {
-        if(iEndWeightBin < rows) {
-            m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,iEndWeightBin-iStartWeightBin+1,1).mean();
-        } else {
-            m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,rows-iStartWeightBin+1,1).mean();
-        }
-    }
+    QSettings settings;
 }
 
 
 //*************************************************************************************************************
 
-void NetworkEdge::setFrequencyBins(const QPair<int,int>& minMaxFreqBins)
+void TfSettingsView::loadSettings(const QString& settingsPath)
 {
-    m_iMinMaxFreqBins = minMaxFreqBins;
-
-    if(m_iMinMaxFreqBins.second < m_iMinMaxFreqBins.first || m_iMinMaxFreqBins.first < -1 || m_iMinMaxFreqBins.second < -1 ) {
+    if(settingsPath.isEmpty()) {
         return;
     }
 
-    calculateAveragedWeight();
+    QSettings settings;
 }
 
 
 //*************************************************************************************************************
 
-const QPair<int,int>& NetworkEdge::getFrequencyBins()
+void TfSettingsView::onNumberTrialRowChanged()
 {
-    return m_iMinMaxFreqBins;
+    emit numberTrialRowChanged(ui->m_spinBox_trialNumber->value(), ui->m_spinBox_rowNumber->value());
+    saveSettings(m_sSettingsPath);
 }
+
 
