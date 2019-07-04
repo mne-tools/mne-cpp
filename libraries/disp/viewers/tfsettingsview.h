@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     networkedge.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     tfsettingsview.h
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2016
+* @date     July, 2019
 *
 * @section  LICENSE
 *
-* Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2019, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,9 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    NetworkEdge class definition.
+* @brief    Declaration of the TfSettingsView Class.
 *
 */
+
+#ifndef TFSETTINGSVIEW_H
+#define TFSETTINGSVIEW_H
 
 
 //*************************************************************************************************************
@@ -39,9 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "networkedge.h"
-
-#include "networknode.h"
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
@@ -49,7 +50,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
+#include <QWidget>
 
 
 //*************************************************************************************************************
@@ -60,138 +61,104 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
-//=============================================================================================================
+namespace Ui {
+    class TfSettingsViewWidget;
+}
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-NetworkEdge::NetworkEdge(int iStartNodeID,
-                         int iEndNodeID,
-                         const MatrixXd& matWeight,
-                         bool bIsActive,
-                         int iStartWeightBin,
-                         int iEndWeightBin)
-: m_iStartNodeID(iStartNodeID)
-, m_iEndNodeID(iEndNodeID)
-, m_bIsActive(bIsActive)
-, m_iMinMaxFreqBins(QPair<int,int>(iStartWeightBin,iEndWeightBin))
-, m_dAveragedWeight(0.0)
-{
-    if(matWeight.rows() == 0 || matWeight.cols() == 0) {
-        m_matWeight = MatrixXd::Zero(1,1);
-        qDebug() << "NetworkEdge::NetworkEdge - Matrix weights number of rows and/or columns are zero. Setting to 1x1 zero matrix.";
-    } else {
-        m_matWeight = matWeight;
-    }
 
-    calculateAveragedWeight();
-}
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
+
+namespace DISPLIB
+{
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
 
-int NetworkEdge::getStartNodeID()
+
+//=============================================================================================================
+/**
+* DECLARE CLASS TfSettingsView
+*
+* @brief The TfSettingsView class provides a view to control settings for time frequency analysis
+*/
+class DISPSHARED_EXPORT TfSettingsView : public QWidget
 {
-    return m_iStartNodeID;
-}
+    Q_OBJECT
 
+public:    
+    typedef QSharedPointer<TfSettingsView> SPtr;              /**< Shared pointer type for TfSettingsView. */
+    typedef QSharedPointer<const TfSettingsView> ConstSPtr;   /**< Const shared pointer type for TfSettingsView. */
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Constructs a TfSettingsView which is a child of parent.
+    *
+    * @param [in] parent        parent of widget.
+    */
+    TfSettingsView(const QString& sSettingsPath = "",
+                   QWidget *parent = 0,
+                   Qt::WindowFlags f = Qt::Widget);
 
-int NetworkEdge::getEndNodeID()
-{
-    return m_iEndNodeID;
-}
+    //=========================================================================================================
+    /**
+    * Destroys the TfSettingsView.
+    */
+    ~TfSettingsView();
 
+protected:
+    //=========================================================================================================
+    /**
+    * Saves all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to store the settings to.
+    */
+    void saveSettings(const QString& settingsPath);
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Loads and inits all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to load the settings from.
+    */
+    void loadSettings(const QString& settingsPath);
 
-void NetworkEdge::setActive(bool bActiveFlag)
-{
-    m_bIsActive = bActiveFlag;
-}
+    //=========================================================================================================
+    /**
+    * Slot called when the trial or row number changed.
+    */
+    void onNumberTrialRowChanged();
 
+    Ui::TfSettingsViewWidget* ui;
 
-//*************************************************************************************************************
+    QString         m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
-bool NetworkEdge::isActive()
-{
-    return m_bIsActive;
-}
+signals:
+    //=========================================================================================================
+    /**
+    * Emit signal whenever trial number changed.
+    *
+    * @param [in] iNumberTrial        The new trial number.
+    * @param [in] iNumberRow        The new row number.
+    */
+    void numberTrialRowChanged(int iNumberTrial, int iNumberRow);
 
+};
 
-//*************************************************************************************************************
+} // NAMESPACE
 
-double NetworkEdge::getWeight() const
-{
-    return m_dAveragedWeight;
-}
-
-
-//*************************************************************************************************************
-
-void NetworkEdge::setWeight(double dAveragedWeight)
-{
-    m_dAveragedWeight = dAveragedWeight;
-}
-
-
-//*************************************************************************************************************
-
-void NetworkEdge::calculateAveragedWeight()
-{
-    int iStartWeightBin = m_iMinMaxFreqBins.first;
-    int iEndWeightBin = m_iMinMaxFreqBins.second;
-
-    if(iEndWeightBin < iStartWeightBin || iStartWeightBin < -1 || iEndWeightBin < -1 ) {
-        return;
-    }
-
-    int rows = m_matWeight.rows();
-
-    if ((iEndWeightBin == -1 && iStartWeightBin == -1) ) {
-        m_dAveragedWeight = m_matWeight.mean();
-    } else if(iStartWeightBin < rows) {
-        if(iEndWeightBin < rows) {
-            m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,iEndWeightBin-iStartWeightBin+1,1).mean();
-        } else {
-            m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,rows-iStartWeightBin+1,1).mean();
-        }
-    }
-}
-
-
-//*************************************************************************************************************
-
-void NetworkEdge::setFrequencyBins(const QPair<int,int>& minMaxFreqBins)
-{
-    m_iMinMaxFreqBins = minMaxFreqBins;
-
-    if(m_iMinMaxFreqBins.second < m_iMinMaxFreqBins.first || m_iMinMaxFreqBins.first < -1 || m_iMinMaxFreqBins.second < -1 ) {
-        return;
-    }
-
-    calculateAveragedWeight();
-}
-
-
-//*************************************************************************************************************
-
-const QPair<int,int>& NetworkEdge::getFrequencyBins()
-{
-    return m_iMinMaxFreqBins;
-}
-
+#endif // CONNECTIVITYSETTINGSVIEW_H
