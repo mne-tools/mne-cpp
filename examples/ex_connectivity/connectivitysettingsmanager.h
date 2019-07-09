@@ -225,43 +225,22 @@ public:
             return;
         }
 
-//        std::cout << "FFT result for row 0 , 0...5Hz , iNfft " << m_settings.getFFTSize() << std::endl;
-//        std::cout << m_settings.at(iTrialNumber).vecTapSpectra.at(iRowNumber).cwiseAbs().block(0,0,1,5) << std::endl << std::endl;
+        std::cout << "FFT result for row 0 , 0...5Hz , iNfft " << m_settings.getFFTSize() << std::endl;
+        std::cout << m_settings.at(iTrialNumber).vecTapSpectra.at(iRowNumber).cwiseAbs().block(0,0,1,5) << std::endl << std::endl;
 
-//        Eigen::RowVectorXd plotVec = m_settings.at(iTrialNumber).vecTapSpectra.at(iRowNumber).cwiseAbs().row(0);
-//        Eigen::Map<Eigen::VectorXd> v1(plotVec.data(), plotVec.size());
-//        Eigen::VectorXd temp =v1;
-//        if(!m_pSpectrumPlot) {
-//            m_pSpectrumPlot = new DISPLIB::Plot(temp);
-//        } else {
-//            m_pSpectrumPlot->updateData(temp);
-//        }
-
-//        m_pSpectrumPlot->setTitle(QString("Spectrum for trial %1 and row %2").arg(QString::number(iTrialNumber)).arg(QString::number(iRowNumber)));
-//        m_pSpectrumPlot->show();
-
-//        Eigen::RowVectorXd plotVeca = m_settings.at(iTrialNumber).matData.row(iRowNumber);
-//        Eigen::Map<Eigen::VectorXd> v1a(plotVeca.data(), plotVeca.size());
-//        Eigen::VectorXd tempa =v1a;
-//        if(!m_pSignalCoursePlot) {
-//            m_pSignalCoursePlot = new DISPLIB::Plot(tempa);
-//        } else {
-//            m_pSignalCoursePlot->updateData(tempa);
-//        }
-
-//        m_pSignalCoursePlot->setTitle(QString("Signal course for trial %1 and row %2").arg(QString::number(iTrialNumber)).arg(QString::number(iRowNumber)));
-//        m_pSignalCoursePlot->show();
-
-//        MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(plotVeca, m_settings.getSamplingFrequency()*0.05);
-
-//        m_pTfPlot = TFplot::SPtr::create(dataSpectrum, m_settings.getSamplingFrequency(), 2,50, ColorMaps::Jet);
-//        m_pTfPlot->show();
-
-        if(iRowNumber >= m_matEvoked.rows()) {
-            return;
+        Eigen::RowVectorXd plotVec = m_settings.at(iTrialNumber).vecTapSpectra.at(iRowNumber).cwiseAbs().row(0);
+        Eigen::Map<Eigen::VectorXd> v1(plotVec.data(), plotVec.size());
+        Eigen::VectorXd temp =v1;
+        if(!m_pSpectrumPlot) {
+            m_pSpectrumPlot = new DISPLIB::Plot(temp);
+        } else {
+            m_pSpectrumPlot->updateData(temp);
         }
 
-        Eigen::RowVectorXd plotVeca = m_matEvoked.row(iRowNumber);
+        m_pSpectrumPlot->setTitle(QString("Spectrum for trial %1 and row %2").arg(QString::number(iTrialNumber)).arg(QString::number(iRowNumber)));
+        m_pSpectrumPlot->show();
+
+        Eigen::RowVectorXd plotVeca = m_settings.at(iTrialNumber).matData.row(iRowNumber);
         Eigen::Map<Eigen::VectorXd> v1a(plotVeca.data(), plotVeca.size());
         Eigen::VectorXd tempa =v1a;
         if(!m_pSignalCoursePlot) {
@@ -273,10 +252,31 @@ public:
         m_pSignalCoursePlot->setTitle(QString("Signal course for trial %1 and row %2").arg(QString::number(iTrialNumber)).arg(QString::number(iRowNumber)));
         m_pSignalCoursePlot->show();
 
-        MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(plotVeca, m_settings.getSamplingFrequency()*0.1);
+        MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(plotVeca, m_settings.getSamplingFrequency()*0.05);
 
         m_pTfPlot = TFplot::SPtr::create(dataSpectrum, m_settings.getSamplingFrequency(), 2,50, ColorMaps::Jet);
         m_pTfPlot->show();
+
+//        if(iRowNumber >= m_matEvoked.rows()) {
+//            return;
+//        }
+
+//        Eigen::RowVectorXd plotVeca = m_matEvoked.row(iRowNumber);
+//        Eigen::Map<Eigen::VectorXd> v1a(plotVeca.data(), plotVeca.size());
+//        Eigen::VectorXd tempa =v1a;
+//        if(!m_pSignalCoursePlot) {
+//            m_pSignalCoursePlot = new DISPLIB::Plot(tempa);
+//        } else {
+//            m_pSignalCoursePlot->updateData(tempa);
+//        }
+
+//        m_pSignalCoursePlot->setTitle(QString("Signal course for trial %1 and row %2").arg(QString::number(iTrialNumber)).arg(QString::number(iRowNumber)));
+//        m_pSignalCoursePlot->show();
+
+//        MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(plotVeca, m_settings.getSamplingFrequency()*0.1);
+
+//        m_pTfPlot = TFplot::SPtr::create(dataSpectrum, m_settings.getSamplingFrequency(), 2,50, ColorMaps::Jet);
+//        m_pTfPlot->show();
     }
 
 signals:

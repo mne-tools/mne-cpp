@@ -172,7 +172,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
                 data.append(MNEEpochData::SPtr(epoch));//List takes ownwership of the pointer - no delete need
             }
         } else {
-            printf("Can't read the event data segments");
+            printf("Can't read the event data segments\n");
         }
     }
 
