@@ -139,7 +139,9 @@ int main(int argc, char *argv[])
 
     QCommandLineOption rawFileOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-simulated-raw.fif");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-simulated-eve.fif");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    //QCommandLineOption rawFileOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    //QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-fwd.fif");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
@@ -169,7 +171,7 @@ int main(int argc, char *argv[])
 //    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "/cluster/fusion/MIND/MEG-anal/MGH/mind006/ave/mind006_060626_median01-cov.fif");
 //    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2005s");
 
-    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
+    QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "false");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COH");
@@ -252,9 +254,8 @@ int main(int argc, char *argv[])
     // Create sensor level data
     QFile t_fileRaw(sRaw);
     FiffRawData raw(t_fileRaw);
-    qDebug() << "raw.info.sfreq" << raw.info.sfreq;
 
-    //int samplesToCutOut = (abs(fTMin) + 0.01) * raw.info.sfreq;
+    //int samplesToCutOut = (abs(fTMin) + 0.0) * raw.info.sfreq;
     int samplesToCutOut = 0;
     QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create();
 
@@ -271,14 +272,12 @@ int main(int argc, char *argv[])
                      sRaw,
                      events);
 
-    std::cout << events << std::endl;
-
     // Read the epochs and reject bad epochs. Note, that SSPs are automatically applied to the data if MNE::setup_compensators was called beforehand.
     QStringList exludeChs("");
     QMap<QString,double> mapReject;
-    mapReject.insert("eog", 300e-06);
-    mapReject.insert("grad", 6000e-13);
-    mapReject.insert("mag", 3.5e-12);
+//    mapReject.insert("eog", 300e-06);
+//    mapReject.insert("grad", 6000e-13);
+//    mapReject.insert("mag", 3.5e-12);
 
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
                                                          events, //events.block(0,0,400,events.cols()),
@@ -324,7 +323,6 @@ int main(int argc, char *argv[])
         int iNumberRows = picks.cols(); //picks.cols() 32
 
         vDataIndices = VectorXi::LinSpaced(iNumberRows,0,iNumberRows);
-        std::cout << vDataIndices;
 
         for(int i = 0; i < data.size(); ++i) {
             matData.resize(iNumberRows, data.at(i)->epoch.cols());
@@ -359,7 +357,7 @@ int main(int argc, char *argv[])
 
         // Cluster forward solution;
         if(bDoClust) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 200);
+            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
         } else {
             t_clusteredFwd = t_Fwd;
         }     
@@ -374,11 +372,11 @@ int main(int argc, char *argv[])
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
         minimumNorm.doInverseSetup(1,false);
 
-        picks = raw.info.pick_types(QString("all"),true,false,QStringList(),exclude);
+        picks = raw.info.pick_types(QString("all"),false,false,QStringList(),exclude);
         data.pick_channels(picks);
         for(int i = 0; i < data.size(); i++) {
             sourceEstimate = minimumNorm.calculateInverse(data.at(i)->epoch,
-                                                          0.0f,
+                                                          evoked.times[0],
                                                           1.0/raw.info.sfreq);
 
             if(sourceEstimate.isEmpty()) {
@@ -391,7 +389,7 @@ int main(int argc, char *argv[])
         MinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
         sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked);
         //sourceEstimateEvoked = sourceEstimateEvoked.reduce(0.24*evoked.info.sfreq,1);
-        //pConnectivitySettingsManager->m_matEvoked = sourceEstimateEvoked.data;
+        pConnectivitySettingsManager->m_matEvoked = evoked.data;
 
         //Generate network nodes and define ROIs
         QList<Label> lLabels;
@@ -457,6 +455,9 @@ int main(int argc, char *argv[])
         pConnectivitySettingsManager->m_settings.setNodePositions(matNodePositions);
     }
 
+    pConnectivitySettingsManager->epochs = data;
+    std::cout << vDataIndices << std::endl;
+
     //Do connectivity estimation and visualize results
     pConnectivitySettingsManager->m_settings.setConnectivityMethods(QStringList() << sConnectivityMethod);
     pConnectivitySettingsManager->m_settings.setSamplingFrequency(raw.info.sfreq);
@@ -493,6 +494,13 @@ int main(int argc, char *argv[])
                                                                                     //pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
                                                                                 }});
 
+    TfSettingsView::SPtr pTfSettingsView = TfSettingsView::SPtr::create();
+    QList<QSharedPointer<QWidget> > lWidgets;
+    lWidgets << pTfSettingsView;
+
+    QObject::connect(pTfSettingsView.data(), &TfSettingsView::numberTrialRowChanged,
+                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::plotTimeCourses);
+
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
         QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
@@ -504,7 +512,6 @@ int main(int argc, char *argv[])
                                                       raw.info.bads);
     } else {
         MinimumNormSettingsView::SPtr pMinimumNormSettingsView = MinimumNormSettingsView::SPtr::create();
-        QList<QSharedPointer<QWidget> > lWidgets;
         lWidgets << pMinimumNormSettingsView;
 
         QObject::connect(pMinimumNormSettingsView.data(), &MinimumNormSettingsView::timePointChanged,
@@ -527,13 +534,6 @@ int main(int argc, char *argv[])
                                                                                    tAnnotSet);
                                      }
                                      });
-
-        TfSettingsView::SPtr pTfSettingsView = TfSettingsView::SPtr::create();
-        lWidgets << pTfSettingsView;
-        tNetworkView.setQuickControlWidgets(lWidgets);
-
-        QObject::connect(pTfSettingsView.data(), &TfSettingsView::numberTrialRowChanged,
-                         pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::plotTimeCourses);
 
         //Add source loc data and init some visualization values
         if(MneDataTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
@@ -561,6 +561,7 @@ int main(int argc, char *argv[])
         lHemis[1]->setAlpha(0.2f);
     }
 
+    tNetworkView.setQuickControlWidgets(lWidgets);
     tNetworkView.getConnectivitySettingsView()->setNumberTrials(20);
     pConnectivitySettingsManager->onNumberTrialsChanged(20);
 
