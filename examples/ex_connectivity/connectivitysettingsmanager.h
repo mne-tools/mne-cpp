@@ -269,7 +269,7 @@ public:
                     m_pSpectrumPlot->updateData(temp);
                 }
 
-                m_pSpectrumPlot->setTitle(QString("Spectrum for trial %1 and row %2").arg(QString::number(iTrialNumber)).arg(QString::number(iRowNumber)));
+                m_pSpectrumPlot->setTitle(QString("Spectrum of conn used signal for trial %1 and row %2").arg(QString::number(iTrialNumber)).arg(QString::number(iRowNumber)));
                 m_pSpectrumPlot->show();
             }
         }

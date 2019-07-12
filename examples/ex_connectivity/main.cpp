@@ -265,8 +265,8 @@ int main(int argc, char *argv[])
     QFile t_fileRaw(sRaw);
     FiffRawData raw(t_fileRaw);
 
-    //int samplesToCutOut = (abs(fTMin) + 0.0) * raw.info.sfreq;
-    int samplesToCutOut = 0;
+    int samplesToCutOut = (abs(fTMin) + 0.0) * raw.info.sfreq;
+    //int samplesToCutOut = 0;
     QSharedPointer<ConnectivitySettingsManager> pConnectivitySettingsManager = QSharedPointer<ConnectivitySettingsManager>::create();
 
     // Select bad channels
