@@ -127,9 +127,11 @@ public:
     DISPLIB::Plot *m_pSpectrumPlot = Q_NULLPTR;
     DISPLIB::Plot *m_pEvokedSignalCoursePlot = Q_NULLPTR;
     DISPLIB::Plot *m_pEpochSignalCoursePlot = Q_NULLPTR;
+    DISPLIB::Plot *m_pEvokedSourceSignalCoursePlot = Q_NULLPTR;
 
     TFplot::SPtr m_pTfPlot;
     MatrixXd m_matEvoked;
+    MatrixXd m_matEvokedSource;
     MNELIB::MNEEpochDataList epochs;
 
     void onConnectivityMetricChanged(const QString& sMetric)
@@ -284,6 +286,20 @@ public:
 
             m_pEvokedSignalCoursePlot->setTitle(QString("Evoked signal for row %1").arg(QString::number(iRowNumber)));
             m_pEvokedSignalCoursePlot->show();
+        }
+
+        if(iRowNumber < m_matEvokedSource.rows()) {
+            Eigen::RowVectorXd plotVeca = m_matEvokedSource.row(iRowNumber);
+            Eigen::Map<Eigen::VectorXd> v1a(plotVeca.data(), plotVeca.size());
+            Eigen::VectorXd tempa =v1a;
+            if(!m_pEvokedSourceSignalCoursePlot) {
+                m_pEvokedSourceSignalCoursePlot = new DISPLIB::Plot(tempa);
+            } else {
+                m_pEvokedSourceSignalCoursePlot->updateData(tempa);
+            }
+
+            m_pEvokedSourceSignalCoursePlot->setTitle(QString("Evoked source signal for row %1").arg(QString::number(iRowNumber)));
+            m_pEvokedSourceSignalCoursePlot->show();
         }
 
 
