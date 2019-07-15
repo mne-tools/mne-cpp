@@ -954,6 +954,7 @@ FiffCov MNEForwardSolution::compute_orient_prior(float loose)
 
     if (0 <= loose && loose <= 1)
     {
+        qDebug() << "this->surf_ori" << this->surf_ori;
         if(loose < 1 && !this->surf_ori)
         {
             printf("\tForward operator is not oriented in surface coordinates. loose parameter should be None not %f.", loose);//ToDo Throw here
@@ -1904,7 +1905,7 @@ MatrixX3f MNEForwardSolution::getSourcePositionsByLabel(const QList<Label> &lPic
         for(int j = 0; j < this->src[0].vertno.rows(); ++j) {
             for(int k = 0; k < lPickedLabels.size(); k++) {
                 for(int l = 0; l < lPickedLabels.at(k).vertices.rows(); l++) {
-                    if(this->src[0].vertno(j) == lPickedLabels.at(k).vertices(l)) {
+                    if(this->src[0].vertno(j) == lPickedLabels.at(k).vertices(l) && lPickedLabels.at(k).hemi == 0) {
                         matSourceVertLeft.conservativeResize(matSourceVertLeft.rows()+1,3);
                         matSourceVertLeft.row(matSourceVertLeft.rows()-1) = tSurfSetInflated[0].rr().row(this->src[0].vertno(j)) - tSurfSetInflated[0].offset().transpose();
                         break;
@@ -1916,7 +1917,7 @@ MatrixX3f MNEForwardSolution::getSourcePositionsByLabel(const QList<Label> &lPic
         for(int j = 0; j < this->src[1].vertno.rows(); ++j) {
             for(int k = 0; k < lPickedLabels.size(); k++) {
                 for(int l = 0; l < lPickedLabels.at(k).vertices.rows(); l++) {
-                    if(this->src[1].vertno(j) == lPickedLabels.at(k).vertices(l)) {
+                    if(this->src[1].vertno(j) == lPickedLabels.at(k).vertices(l) && lPickedLabels.at(k).hemi == 1) {
                         matSourceVertRight.conservativeResize(matSourceVertRight.rows()+1,3);
                         matSourceVertRight.row(matSourceVertRight.rows()-1) = tSurfSetInflated[1].rr().row(this->src[1].vertno(j)) - tSurfSetInflated[1].offset().transpose();
                         break;
