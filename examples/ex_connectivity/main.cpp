@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 //    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2005s");
 
     QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
-    QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
+    QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "false");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COH");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
     MNEForwardSolution t_clusteredFwd;
     MNEForwardSolution t_Fwd;
 
-    SurfaceSet tSurfSetInflated (sSubj, 2, "inflated", sSubjDir);
+    SurfaceSet tSurfSetInflated (sSubj, 2, "orig", sSubjDir);
     AnnotationSet tAnnotSet(sSubj, 2, sAnnotType, sSubjDir);
 
     QFile coordTransfile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif");
@@ -348,7 +348,7 @@ int main(int argc, char *argv[])
     } else {
         //Create source level data
         QFile t_fileFwd(sFwd);
-        t_Fwd = MNEForwardSolution(t_fileFwd);
+        t_Fwd = MNEForwardSolution(t_fileFwd, false, true);
 
         // Load data
         MNESourceEstimate sourceEstimate;
@@ -367,10 +367,12 @@ int main(int argc, char *argv[])
 
         // Cluster forward solution;
         if(bDoClust) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
+            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 200);
         } else {
             t_clusteredFwd = t_Fwd;
         }     
+
+//        MNEInverseOperator inverse_operator(QFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif"));
 
         MNEInverseOperator inverse_operator(raw.info,
                                             t_clusteredFwd,
@@ -380,7 +382,7 @@ int main(int argc, char *argv[])
 
         // Compute inverse solution
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-        minimumNorm.doInverseSetup(1,false);
+        minimumNorm.doInverseSetup(1, true);
 
         picks = raw.info.pick_types(QString("all"),false,false,QStringList(),exclude);
         data.pick_channels(picks);
@@ -397,7 +399,7 @@ int main(int argc, char *argv[])
         }
 
         MinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
-        sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked);
+        sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked, true);
         //sourceEstimateEvoked = sourceEstimateEvoked.reduce(0.24*evoked.info.sfreq,1);
         pConnectivitySettingsManager->m_matEvoked = evoked.data;
         pConnectivitySettingsManager->m_matEvokedSource = sourceEstimateEvoked.data;
@@ -445,19 +447,25 @@ int main(int argc, char *argv[])
 //                        << "S_precentral-Superior-part-rh"
 //                        << "S_temporal_transverse-rh";
 
-//        lWantedLabels << "G_frontal_inf-Opercular_part-lh"
-//                        << "G_postcentral-lh"
-//                        << "G_precentral-lh"
-//                        << "G_subcentral-lh"
-//                        << "S_central-lh"
-//                        << "G_frontal_inf-Opercular_part-rh"
-//                        << "G_postcentral-rh"
-//                        << "G_precentral-rh"
-//                        << "G_subcentral-rh"
-//                        << "S_central-rh";
+        lWantedLabels << "G_frontal_inf-Opercular_part-lh"
+                        << "G_postcentral-lh"
+                        << "G_precentral-lh"
+                        << "G_subcentral-lh"
+                        << "S_central-lh"
+                        << "G_frontal_inf-Opercular_part-rh"
+                        << "G_postcentral-rh"
+                        << "G_precentral-rh"
+                        << "G_subcentral-rh"
+                        << "S_central-rh"
+                        << "G_occipital_middle-lh"
+                        << "G_occipital_middle-rh";
+
 
         tAnnotSet.toLabels(tSurfSetInflated, lLabels, qListLabelRGBAs, lWantedLabels);
 
+        for(int i = 0; i < lLabels.size(); i++) {
+            qDebug() << "lLabels.at(i).name" << lLabels.at(i).name;
+        }
         //Get active source indices based on picked labels
         vDataIndices = sourceEstimateEvoked.getIndicesByLabel(lLabels, bDoClust);
 

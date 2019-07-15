@@ -387,7 +387,7 @@ bool Annotation::toLabels(const Surface &p_surf,
             p_qListLabels.append(Label(vertices, pos, values, this->m_iHemi, name, label_id));
             // store the color
             p_qListLabelRGBAs.append(label_rgba);
-        } else if (lLabelPicks.contains(name, Qt::CaseInsensitive)) {
+        } else if (lLabelPicks.indexOf(name) != -1) {
             //t_tris
             p_qListLabels.append(Label(vertices, pos, values, this->m_iHemi, name, label_id));
             // store the color

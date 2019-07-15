@@ -314,10 +314,19 @@ VectorXi MNESourceEstimate::getIndicesByLabel(const QList<Label> &lPickedLabels,
             }
         }
     } else {
+        int hemi = 0;
+
         for(int i = 0; i < this->vertices.rows(); i++) {
+            // Detect left right hemi separation
+            if(i > 0){
+                if(this->vertices(i) < this->vertices(i-1)){
+                    hemi = 1;
+                }
+            }
+
             for(int k = 0; k < lPickedLabels.size(); k++) {
                 for(int l = 0; l < lPickedLabels.at(k).vertices.rows(); l++) {
-                    if(this->vertices(i) == lPickedLabels.at(k).vertices(l)) {
+                    if(this->vertices(i) == lPickedLabels.at(k).vertices(l) && lPickedLabels.at(k).hemi == hemi) {
                         vIndexSourceLabels.conservativeResize(vIndexSourceLabels.rows()+1,1);
                         vIndexSourceLabels(vIndexSourceLabels.rows()-1) = i;
                         break;
