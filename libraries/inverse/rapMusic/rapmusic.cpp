@@ -328,8 +328,10 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
 
 //*************************************************************************************************************
 
-MNESourceEstimate RapMusic::calculateInverse(const MatrixXd &data, float tmin, float tstep) const
+MNESourceEstimate RapMusic::calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal) const
 {
+    Q_UNUSED(pick_normal);
+
     MNESourceEstimate p_sourceEstimate;
 
     if(data.rows() != m_iNumChannels)

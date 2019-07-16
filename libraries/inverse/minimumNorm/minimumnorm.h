@@ -125,13 +125,32 @@ public:
     */
     virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const;
+    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
 
+    //=========================================================================================================
+    /**
+    * Perform the inverse setup: Prepares this inverse operator and assembles the kernel.
+    *
+    * @param[in] nave           Number of averages to use.
+    * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
+    *                           radial component is kept. This is only applied when working with loose orientations.
+    */
     virtual void doInverseSetup(qint32 nave, bool pick_normal = false);
 
-
+    //=========================================================================================================
+    /**
+    * Get the name of the inverse operator.
+    *
+    * @return the name of the inverse operator
+    */
     virtual const char* getName() const;
 
+    //=========================================================================================================
+    /**
+    * Get the source space corresponding to this inverse operator.
+    *
+    * @return the source space corresponding to this inverse operator
+    */
     virtual const MNESourceSpace& getSourceSpace() const;
 
     //=========================================================================================================
@@ -167,6 +186,12 @@ public:
     */
     void setRegularization(float lambda);
 
+    //=========================================================================================================
+    /**
+    * Get the assembled kernel
+    *
+    * @return the assembled kernel
+    */
     inline MatrixXd& getKernel();
 
 private:
