@@ -121,7 +121,7 @@ MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, 
     float tmin = p_fiffEvoked.times[0];
     float tstep = 1/t_fiffEvoked.info.sfreq;
 
-    return calculateInverse(t_fiffEvoked.data, tmin, tstep);
+    return calculateInverse(t_fiffEvoked.data, tmin, tstep, pick_normal);
 
 //    //
 //    //   Set up the inverse according to the parameters
@@ -192,7 +192,7 @@ MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, 
 
 //*************************************************************************************************************
 
-MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin, float tstep) const
+MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal) const
 {
     if(!inverseSetup)
     {
@@ -208,22 +208,20 @@ MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin
     MatrixXd sol = K * data; //apply imaging kernel
 
 
-//    if (inv.source_ori == FIFFV_MNE_FREE_ORI)
-//    {
-//        printf("combining the current components...\n");
-//        qDebug() << "sol.rows()" << sol.rows();
-//        qDebug() << "sol.cols()" << sol.cols();
+    if (inv.source_ori == FIFFV_MNE_FREE_ORI && pick_normal == false)
+    {
+        printf("combining the current components...\n");
 
-//        MatrixXd sol1(sol.rows()/3,sol.cols());
-//        for(qint32 i = 0; i < sol.cols(); ++i)
-//        {
-//            VectorXd* tmp = MNEMath::combine_xyz(sol.col(i));
-//            sol1.block(0,i,sol.rows()/3,1) = tmp->cwiseSqrt();
-//            delete tmp;
-//        }
-//        sol.resize(sol1.rows(),sol1.cols());
-//        sol = sol1;
-//    }
+        MatrixXd sol1(sol.rows()/3,sol.cols());
+        for(qint32 i = 0; i < sol.cols(); ++i)
+        {
+            VectorXd* tmp = MNEMath::combine_xyz(sol.col(i));
+            sol1.block(0,i,sol.rows()/3,1) = tmp->cwiseSqrt();
+            delete tmp;
+        }
+        sol.resize(sol1.rows(),sol1.cols());
+        sol = sol1;
+    }
 
     if (m_bdSPM)
     {
