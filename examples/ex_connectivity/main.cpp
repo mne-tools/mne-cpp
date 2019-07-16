@@ -139,23 +139,23 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Connectivity Example");
     parser.addHelpOption();
 
-//    //QCommandLineOption rawFileOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    //QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+    QCommandLineOption rawFileOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
 //    QCommandLineOption rawFileOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-simulated-raw.fif");
 //    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-simulated-eve.fif");
-//    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-fwd.fif");
-//    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
-//    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
-//    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-//    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
-
-    QCommandLineOption rawFileOption("fileIn", "The input file <in>.", "in", "Y:/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-simulated-raw.fif");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "Y:/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-simulated-eve.fif");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "Y:/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-fwd.fif");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-fwd.fif");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
-    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "Y:/Git/mne-cpp-lorenze/bin/MNE-sample-data/subjects");
-    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "Y:/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
+
+//    QCommandLineOption rawFileOption("fileIn", "The input file <in>.", "in", "Y:/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-simulated-raw.fif");
+//    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "Y:/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-simulated-eve.fif");
+//    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", "Y:/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-fwd.fif");
+//    QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+//    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", "Y:/Git/mne-cpp-lorenze/bin/MNE-sample-data/subjects");
+//    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "Y:/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+//    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
 
 //    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "C:/Git/rt_connectivity/data/MEG/mind002/raw/mind002_050924_median01_raw.fif");
 //    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "C:/Git/rt_connectivity/data/MEG/mind002/raw/mind002_050924_median01_raw-eve.fif");
@@ -182,15 +182,15 @@ int main(int argc, char *argv[])
 //    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2005s");
 
     QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
-    QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "false");
+    QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COH");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.05");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.2");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.4");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -285,9 +285,9 @@ int main(int argc, char *argv[])
     // Read the epochs and reject bad epochs. Note, that SSPs are automatically applied to the data if MNE::setup_compensators was called beforehand.
     QStringList exludeChs("");
     QMap<QString,double> mapReject;
-//    mapReject.insert("eog", 300e-06);
-//    mapReject.insert("grad", 6000e-13);
-//    mapReject.insert("mag", 3.5e-12);
+    mapReject.insert("eog", 300e-06);
+    mapReject.insert("grad", 4000e-13);
+    mapReject.insert("mag", 3.5e-12);
 
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
                                                          events, //events.block(0,0,400,events.cols()),
@@ -367,7 +367,7 @@ int main(int argc, char *argv[])
 
         // Cluster forward solution;
         if(bDoClust) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 200);
+            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
         } else {
             t_clusteredFwd = t_Fwd;
         }     
@@ -447,18 +447,18 @@ int main(int argc, char *argv[])
 //                        << "S_precentral-Superior-part-rh"
 //                        << "S_temporal_transverse-rh";
 
-        lWantedLabels << "G_frontal_inf-Opercular_part-lh"
-                        << "G_postcentral-lh"
-                        << "G_precentral-lh"
-                        << "G_subcentral-lh"
-                        << "S_central-lh"
-                        << "G_frontal_inf-Opercular_part-rh"
-                        << "G_postcentral-rh"
-                        << "G_precentral-rh"
-                        << "G_subcentral-rh"
-                        << "S_central-rh"
-                        << "G_occipital_middle-lh"
-                        << "G_occipital_middle-rh";
+//        lWantedLabels << "G_frontal_inf-Opercular_part-lh"
+//                        << "G_postcentral-lh"
+//                        << "G_precentral-lh"
+//                        << "G_subcentral-lh"
+//                        << "S_central-lh"
+//                        << "G_frontal_inf-Opercular_part-rh"
+//                        << "G_postcentral-rh"
+//                        << "G_precentral-rh"
+//                        << "G_subcentral-rh"
+//                        << "S_central-rh"
+//                        << "G_occipital_middle-lh"
+//                        << "G_occipital_middle-rh";
 
 
         tAnnotSet.toLabels(tSurfSetInflated, lLabels, qListLabelRGBAs, lWantedLabels);
@@ -475,7 +475,6 @@ int main(int argc, char *argv[])
     }
 
     pConnectivitySettingsManager->epochs = data;
-    std::cout << vDataIndices << std::endl;
 
     //Do connectivity estimation and visualize results
     pConnectivitySettingsManager->m_settings.setConnectivityMethods(QStringList() << sConnectivityMethod);
@@ -598,8 +597,8 @@ int main(int argc, char *argv[])
     }
 
     tNetworkView.setQuickControlWidgets(lWidgets);
-    tNetworkView.getConnectivitySettingsView()->setNumberTrials(20);
-    pConnectivitySettingsManager->onNumberTrialsChanged(20);
+    tNetworkView.getConnectivitySettingsView()->setNumberTrials(10);
+    pConnectivitySettingsManager->onNumberTrialsChanged(10);
 
     return a.exec();
 }
