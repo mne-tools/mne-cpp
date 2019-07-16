@@ -227,7 +227,7 @@ public:
     {
         if(iTrialNumber < m_settings.size()) {
             if(iRowNumber < m_settings.at(iTrialNumber).matData.rows()) {
-                Eigen::RowVectorXd plotVeca = m_settings.at(iTrialNumber).matData.row(iRowNumber);
+                Eigen::RowVectorXd plotVeca = m_settings.at(iTrialNumber).matData.row(iRowNumber).array() - m_settings.at(iTrialNumber).matData.row(iRowNumber).mean();
                 Eigen::Map<Eigen::VectorXd> v1a(plotVeca.data(), plotVeca.size());
                 Eigen::VectorXd tempa = v1a.array() - v1a.mean();
                 if(!m_pSignalCoursePlot) {
