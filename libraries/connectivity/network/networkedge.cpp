@@ -143,6 +143,14 @@ double NetworkEdge::getWeight() const
 
 //*************************************************************************************************************
 
+MatrixXd NetworkEdge::getMatrixWeight() const
+{
+    return m_matWeight;
+}
+
+
+//*************************************************************************************************************
+
 void NetworkEdge::setWeight(double dAveragedWeight)
 {
     m_dAveragedWeight = dAveragedWeight;
@@ -168,7 +176,7 @@ void NetworkEdge::calculateAveragedWeight()
         if(iEndWeightBin < rows) {
             m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,iEndWeightBin-iStartWeightBin+1,1).mean();
         } else {
-            m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,rows-iStartWeightBin+1,1).mean();
+            m_dAveragedWeight = m_matWeight.block(iStartWeightBin,0,rows-iStartWeightBin,1).mean();
         }
     }
 }
