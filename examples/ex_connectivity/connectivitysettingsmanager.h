@@ -46,10 +46,13 @@
 #include <connectivity/metrics/abstractmetric.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
+#include <connectivity/network/networknode.h>
+#include <connectivity/network/networkedge.h>
 
 #include <iostream>
 #include <disp/plots/plot.h>
 #include <disp/plots/tfplot.h>
+#include <disp/plots/imagesc.h>
 #include <utils/spectrogram.h>
 #include <mne/mne_epoch_data_list.h>
 
@@ -128,6 +131,7 @@ public:
     DISPLIB::Plot *m_pEvokedSignalCoursePlot = Q_NULLPTR;
     DISPLIB::Plot *m_pEpochSignalCoursePlot = Q_NULLPTR;
     DISPLIB::Plot *m_pEvokedSourceSignalCoursePlot = Q_NULLPTR;
+    DISPLIB::ImageSc *m_pImageConnWeights = Q_NULLPTR;
 
     TFplot::SPtr m_pTfPlot;
     MatrixXd m_matEvoked;
@@ -212,6 +216,35 @@ public:
         for(int i = 0; i < connectivityResults.size(); ++i) {
             m_networkData[i].setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
             m_networkData[i].normalize();
+
+            if(!m_networkData.isEmpty()) {
+                Network network = m_networkData.first();
+                MatrixXd image;
+
+                for(int i = 0; i < network.getNodes().size(); i++) {
+                    for(int j = 0; j < network.getNodes().at(i)->getFullEdges().size(); j++) {
+                        NetworkEdge::SPtr edge = network.getNodes().at(i)->getFullEdges().at(j);
+
+                        if(edge->isActive()) {
+                            if(image.cols() == 0) {
+                                image = edge->getMatrixWeight();
+                            } else {
+                                image.conservativeResize(image.rows(),image.cols()+1);
+                                image.col(image.cols()-1) = edge->getMatrixWeight();
+                            }
+                        }
+                    }
+                }
+
+                image.conservativeResize(image.rows()-1,image.cols());
+
+                if(!m_pImageConnWeights) {
+                    m_pImageConnWeights = new DISPLIB::ImageSc(image);
+                } else {
+                    m_pImageConnWeights->updateData(image);
+                }
+                m_pImageConnWeights->show();
+            }
         }
 
         if(!m_networkData.isEmpty()) {
@@ -301,9 +334,6 @@ public:
             m_pEvokedSourceSignalCoursePlot->setTitle(QString("Evoked source signal for row %1").arg(QString::number(iRowNumber)));
             m_pEvokedSourceSignalCoursePlot->show();
         }
-
-
-
     }
 
 signals:
