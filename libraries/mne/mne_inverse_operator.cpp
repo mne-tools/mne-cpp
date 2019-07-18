@@ -285,7 +285,7 @@ bool MNEInverseOperator::assemble_kernel(const Label &label, QString method, boo
         //
         //     R^0.5 has been already factored in
         //
-        printf("(eigenleads already weighted)...");
+        printf("(eigenleads already weighted)...\n");
         K = t_eigen_leads*trans;
     }
     else
@@ -293,7 +293,7 @@ bool MNEInverseOperator::assemble_kernel(const Label &label, QString method, boo
         //
         //     R^0.5 has to factored in
         //
-       printf("(eigenleads need to be weighted)...");
+       printf("(eigenleads need to be weighted)...\n");
 
        std::vector<T> tripletList2;
        tripletList2.reserve(t_source_cov.rows());
