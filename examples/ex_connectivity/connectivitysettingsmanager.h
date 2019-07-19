@@ -215,36 +215,36 @@ public:
 
         for(int i = 0; i < connectivityResults.size(); ++i) {
             m_networkData[i].setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
-            m_networkData[i].normalize();
+            //m_networkData[i].normalize();
 
-            if(!m_networkData.isEmpty()) {
-                Network network = m_networkData.first();
-                MatrixXd image;
+//            if(!m_networkData.isEmpty()) {
+//                Network network = m_networkData.first();
+//                MatrixXd image;
 
-                for(int i = 0; i < network.getNodes().size(); i++) {
-                    for(int j = 0; j < network.getNodes().at(i)->getFullEdges().size(); j++) {
-                        NetworkEdge::SPtr edge = network.getNodes().at(i)->getFullEdges().at(j);
+//                for(int i = 0; i < network.getNodes().size(); i++) {
+//                    for(int j = 0; j < network.getNodes().at(i)->getFullEdges().size(); j++) {
+//                        NetworkEdge::SPtr edge = network.getNodes().at(i)->getFullEdges().at(j);
 
-                        if(edge->isActive()) {
-                            if(image.cols() == 0) {
-                                image = edge->getMatrixWeight();
-                            } else {
-                                image.conservativeResize(image.rows(),image.cols()+1);
-                                image.col(image.cols()-1) = edge->getMatrixWeight();
-                            }
-                        }
-                    }
-                }
+//                        if(edge->isActive()) {
+//                            if(image.cols() == 0) {
+//                                image = edge->getMatrixWeight();
+//                            } else {
+//                                image.conservativeResize(image.rows(),image.cols()+1);
+//                                image.col(image.cols()-1) = edge->getMatrixWeight();
+//                            }
+//                        }
+//                    }
+//                }
 
-                image.conservativeResize(image.rows()-1,image.cols());
+//                image.conservativeResize(image.rows()-1,image.cols());
 
-                if(!m_pImageConnWeights) {
-                    m_pImageConnWeights = new DISPLIB::ImageSc(image);
-                } else {
-                    m_pImageConnWeights->updateData(image);
-                }
-                m_pImageConnWeights->show();
-            }
+//                if(!m_pImageConnWeights) {
+//                    m_pImageConnWeights = new DISPLIB::ImageSc(image);
+//                } else {
+//                    m_pImageConnWeights->updateData(image);
+//                }
+//                m_pImageConnWeights->show();
+//            }
         }
 
         if(!m_networkData.isEmpty()) {
