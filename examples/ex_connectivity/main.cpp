@@ -131,9 +131,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    AbstractMetric::m_bStorageModeIsActive = true;
-    AbstractMetric::m_iNumberBinStart = 0;
-    AbstractMetric::m_iNumberBinAmount = 100;
+    AbstractMetric::m_bStorageModeIsActive = false;
+    AbstractMetric::m_iNumberBinStart = 12;
+    AbstractMetric::m_iNumberBinAmount = 30;
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Example");
@@ -157,21 +157,21 @@ int main(int argc, char *argv[])
 //    QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", "Y:/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
 //    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2009s");
 
-    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "C:/Git/rt_connectivity/data/MEG/mind002/raw/mind002_050924_index01_raw.fif");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "C:/Git/rt_connectivity/data/MEG/mind002/raw/mind002_050924_index01_raw-eve.fif");
-    QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "mind002");
-    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "C:/Git/rt_connectivity/data/subjects");
-    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "C:/Git/rt_connectivity/data/MEG/mind002/fwd/mind002_050924_index01-fwd.fif");
-    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "C:/Git/rt_connectivity/data/MEG/mind002/ave/mind002_050924_index01-cov.fif");
-    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2005s");
-
-//    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_median01_raw.fif");
-//    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_median01_raw-eve.fif");
+//    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "C:/Git/rt_connectivity/data/MEG/mind002/raw/mind002_050924_index01_raw.fif");
+//    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "C:/Git/rt_connectivity/data/MEG/mind002/raw/mind002_050924_index01_raw-eve.fif");
 //    QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "mind002");
-//    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "/cluster/fusion/lesch/data/Martinos/subjects");
-//    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/fwd/mind002_050924_median01-fwd.fif");
-//    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/ave/mind002_050924_median01-cov.fif");
+//    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "C:/Git/rt_connectivity/data/subjects");
+//    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "C:/Git/rt_connectivity/data/MEG/mind002/fwd/mind002_050924_index01-fwd.fif");
+//    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "C:/Git/rt_connectivity/data/MEG/mind002/ave/mind002_050924_index01-cov.fif");
 //    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2005s");
+
+    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_median01_filtered_HP_2_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/raw/mind002_050924_median01_raw-eve.fif");
+    QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "mind002");
+    QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", "/cluster/fusion/lesch/data/Martinos/subjects");
+    QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/fwd/mind002_050924_median01-fwd.fif");
+    QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", "/cluster/fusion/lesch/data/Martinos/MEG/mind002/ave/mind002_050924_median01-cov.fif");
+    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2005s");
 
 //    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", "/cluster/fusion/MIND/MEG-anal/MGH/mind006/raw/mind006_060626_median01_raw.fif");
 //    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", "/cluster/fusion/MIND/MEG-anal/MGH/mind006/raw/mind006_060626_median01_raw-eve.fif");
@@ -184,13 +184,13 @@ int main(int argc, char *argv[])
     QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "false");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "COH");
+    QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "IMAGCOH");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "130");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
-    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.2");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "1.0");
+    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.150");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -285,8 +285,8 @@ int main(int argc, char *argv[])
     // Read the epochs and reject bad epochs. Note, that SSPs are automatically applied to the data if MNE::setup_compensators was called beforehand.
     QStringList exludeChs("");
     QMap<QString,double> mapReject;
-    mapReject.insert("eog", 340e-06);
-    mapReject.insert("grad", 4000e-13);
+    mapReject.insert("eog", 240e-06);
+    mapReject.insert("grad", 3000e-13);
     mapReject.insert("mag", 3.5e-12);
 
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
@@ -367,7 +367,7 @@ int main(int argc, char *argv[])
 
         // Cluster forward solution;
         if(bDoClust) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 200);
+            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
         } else {
             t_clusteredFwd = t_Fwd;
         }     
@@ -400,7 +400,7 @@ int main(int argc, char *argv[])
         }
 
         MinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
-        sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked, true);
+        sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked, false);
         //sourceEstimateEvoked = sourceEstimateEvoked.reduce(0.24*evoked.info.sfreq,1);
         pConnectivitySettingsManager->m_matEvoked = evoked.data;
         pConnectivitySettingsManager->m_matEvokedSource = sourceEstimateEvoked.data;
@@ -409,44 +409,44 @@ int main(int argc, char *argv[])
         QList<Label> lLabels;
         QList<RowVector4i> qListLabelRGBAs;
         QStringList lWantedLabels;
-        lWantedLabels << "G_frontal_inf-Opercular_part-lh"
-                        << "G_insular_long-lh"
-                        << "G_insular_short-lh"
-                        << "G_paracentral-lh"
-                        << "G_parietal_inferior-Supramarginal_part-lh"
-                        << "G_postcentral-lh"
-                        << "G_precentral-lh"
-                        << "G_subcentral-lh"
-                        << "G_temp_sup-G_temp_transv_and_interm_S-lh"
-                        << "G_temp_sup-Planum_tempolare-lh"
-                        << "Lat_Fissure-post_sgt-lh"
-                        << "S_central-lh"
-                        << "S_cingulate-Marginalis_part-lh"
-                        << "S_circular_insula_superior-lh"
-                        << "S_intermedius_primus-Jensen-lh"
-                        << "S_postcentral-lh"
-                        << "S_precentral-Inferior-part-lh"
-                        << "S_precentral-Superior-part-lh"
-                        << "S_temporal_transverse-lh"
-                        << "G_frontal_inf-Opercular_part-lh"
-                        << "G_insular_long-rh"
-                        << "G_insular_short-rh"
-                        << "G_paracentral-rh"
-                        << "G_parietal_inferior-Supramarginal_part-rh"
-                        << "G_postcentral-rh"
-                        << "G_precentral-rh"
-                        << "G_subcentral-rh"
-                        << "G_temp_sup-G_temp_transv_and_interm_S-rh"
-                        << "G_temp_sup-Planum_tempolare-rh"
-                        << "Lat_Fissure-post_sgt-rh"
-                        << "S_central-rh"
-                        << "S_cingulate-Marginalis_part-rh"
-                        << "S_circular_insula_superior-rh"
-                        << "S_intermedius_primus-Jensen-rh"
-                        << "S_postcentral-rh"
-                        << "S_precentral-Inferior-part-rh"
-                        << "S_precentral-Superior-part-rh"
-                        << "S_temporal_transverse-rh";
+//        lWantedLabels << "G_frontal_inf-Opercular_part-lh"
+//                        << "G_insular_long-lh"
+//                        << "G_insular_short-lh"
+//                        << "G_paracentral-lh"
+//                        << "G_parietal_inferior-Supramarginal_part-lh"
+//                        << "G_postcentral-lh"
+//                        << "G_precentral-lh"
+//                        << "G_subcentral-lh"
+//                        << "G_temp_sup-G_temp_transv_and_interm_S-lh"
+//                        << "G_temp_sup-Planum_tempolare-lh"
+//                        << "Lat_Fissure-post_sgt-lh"
+//                        << "S_central-lh"
+//                        << "S_cingulate-Marginalis_part-lh"
+//                        << "S_circular_insula_superior-lh"
+//                        << "S_intermedius_primus-Jensen-lh"
+//                        << "S_postcentral-lh"
+//                        << "S_precentral-Inferior-part-lh"
+//                        << "S_precentral-Superior-part-lh"
+//                        << "S_temporal_transverse-lh"
+//                        << "G_frontal_inf-Opercular_part-lh"
+//                        << "G_insular_long-rh"
+//                        << "G_insular_short-rh"
+//                        << "G_paracentral-rh"
+//                        << "G_parietal_inferior-Supramarginal_part-rh"
+//                        << "G_postcentral-rh"
+//                        << "G_precentral-rh"
+//                        << "G_subcentral-rh"
+//                        << "G_temp_sup-G_temp_transv_and_interm_S-rh"
+//                        << "G_temp_sup-Planum_tempolare-rh"
+//                        << "Lat_Fissure-post_sgt-rh"
+//                        << "S_central-rh"
+//                        << "S_cingulate-Marginalis_part-rh"
+//                        << "S_circular_insula_superior-rh"
+//                        << "S_intermedius_primus-Jensen-rh"
+//                        << "S_postcentral-rh"
+//                        << "S_precentral-Inferior-part-rh"
+//                        << "S_precentral-Superior-part-rh"
+//                        << "S_temporal_transverse-rh";
 
 //        lWantedLabels << "G_frontal_inf-Opercular_part-lh"
 //                        << "G_postcentral-lh"
@@ -581,7 +581,7 @@ int main(int argc, char *argv[])
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Interpolation based");
             pRTDataItem->setColormapType("Jet");
-            pRTDataItem->setAlpha(1.0f);
+            pRTDataItem->setAlpha(0.75f);
         }
 
         QList<FsSurfaceTreeItem*> lHemis = tNetworkView.getTreeModel()->addSurfaceSet("sample",
@@ -594,8 +594,8 @@ int main(int argc, char *argv[])
     }
 
     tNetworkView.setQuickControlWidgets(lWidgets);
-    tNetworkView.getConnectivitySettingsView()->setNumberTrials(10);
-    pConnectivitySettingsManager->onNumberTrialsChanged(10);
+    tNetworkView.getConnectivitySettingsView()->setNumberTrials(255);
+    pConnectivitySettingsManager->onNumberTrialsChanged(255);
 
     return a.exec();
 }
