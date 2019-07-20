@@ -132,8 +132,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     AbstractMetric::m_bStorageModeIsActive = false;
-    AbstractMetric::m_iNumberBinStart = 12;
-    AbstractMetric::m_iNumberBinAmount = 30;
+    AbstractMetric::m_iNumberBinStart = 0;
+    AbstractMetric::m_iNumberBinAmount = 40;
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Example");
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 //    QCommandLineOption annotOption("annotType", "Annotation <type> (for source level usage only).", "type", "aparc.a2005s");
 
     QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
-    QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "false");
+    QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "IMAGCOH");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.150");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.15");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -367,7 +367,7 @@ int main(int argc, char *argv[])
 
         // Cluster forward solution;
         if(bDoClust) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
+            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 10);
         } else {
             t_clusteredFwd = t_Fwd;
         }     
