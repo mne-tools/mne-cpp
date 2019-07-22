@@ -215,7 +215,7 @@ public:
 
         for(int i = 0; i < connectivityResults.size(); ++i) {
             m_networkData[i].setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
-            //m_networkData[i].normalize();
+            m_networkData[i].normalize();
 
 //            if(!m_networkData.isEmpty()) {
 //                Network network = m_networkData.first();
