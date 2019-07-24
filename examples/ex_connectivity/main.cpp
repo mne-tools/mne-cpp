@@ -131,18 +131,18 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    AbstractMetric::m_bStorageModeIsActive = false;
+    AbstractMetric::m_bStorageModeIsActive = true;
     AbstractMetric::m_iNumberBinStart = 0;
-    AbstractMetric::m_iNumberBinAmount = 40;
+    AbstractMetric::m_iNumberBinAmount = 30;
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Example");
     parser.addHelpOption();
 
-//    QCommandLineOption rawFileOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
-    QCommandLineOption rawFileOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-simulated-raw.fif");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-simulated-eve.fif");
+    QCommandLineOption rawFileOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+//    QCommandLineOption rawFileOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-simulated-raw.fif");
+//    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-simulated-eve.fif");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-fwd.fif");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
@@ -186,11 +186,11 @@ int main(int argc, char *argv[])
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption connectMethodOption("connectMethod", "Connectivity <method>, i.e., 'COR', 'XCOR.", "method", "IMAGCOH");
     QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
-    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
+    QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
-    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.05");
-    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.2");
+    QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
+    QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.4");
 
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
@@ -594,8 +594,8 @@ int main(int argc, char *argv[])
     }
 
     tNetworkView.setQuickControlWidgets(lWidgets);
-    tNetworkView.getConnectivitySettingsView()->setNumberTrials(100);
-    pConnectivitySettingsManager->onNumberTrialsChanged(100);
+    tNetworkView.getConnectivitySettingsView()->setNumberTrials(10);
+    pConnectivitySettingsManager->onNumberTrialsChanged(10);
 
     return a.exec();
 }
