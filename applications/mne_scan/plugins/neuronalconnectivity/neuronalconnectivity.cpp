@@ -617,7 +617,7 @@ void NeuronalConnectivity::onFrequencyBandChanged(float fFreqLow, float fFreqHig
     //QMutexLocker locker(&m_mutex);
     if(!m_currentConnectivityResult.isEmpty()) {
         m_currentConnectivityResult.setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
-        m_currentConnectivityResult.normalize();
+        //m_currentConnectivityResult.normalize();
         m_pCircularNetworkBuffer->push(m_currentConnectivityResult);
     }
 

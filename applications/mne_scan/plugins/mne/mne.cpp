@@ -143,7 +143,7 @@ QSharedPointer<IPlugin> MNE::clone() const
 void MNE::init()
 {
     // Inits
-    m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
+    m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution, false, true));
     //m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2005s.annot", m_sAtlasDir+"/rh.aparc.a2005s.annot"));
     m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.pial", m_sSurfaceDir+"/rh.pial"));
@@ -541,7 +541,7 @@ void MNE::updateInvOp(const MNEInverseOperator& invOp)
 
     //Set up the inverse according to the parameters
     // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
-    m_pMinimumNorm->doInverseSetup(1,false);
+    m_pMinimumNorm->doInverseSetup(1,true);
 }
 
 
@@ -560,7 +560,7 @@ void MNE::onMethodChanged(const QString& method)
 
         // Set up the inverse according to the parameters.
         // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
-        m_pMinimumNorm->doInverseSetup(1,false);
+        m_pMinimumNorm->doInverseSetup(1,true);
     }
 }
 
@@ -651,7 +651,7 @@ void MNE::run()
     m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(m_invOp,
                                                        lambda2,
                                                        method));
-    m_pMinimumNorm->doInverseSetup(1,false);
+    m_pMinimumNorm->doInverseSetup(1,true);
 
     m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfoInput);
 
@@ -694,7 +694,8 @@ void MNE::run()
                 //TODO: Add picking here. See evoked part as input.
                 sourceEstimate = m_pMinimumNorm->calculateInverse(data,
                                                                   tmin,
-                                                                  tstep);
+                                                                  tstep,
+                                                                  true);
 
                 m_qMutex.unlock();
 
