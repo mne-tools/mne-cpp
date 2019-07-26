@@ -311,6 +311,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         if(m_iNumberBinStart == 0) {
             inputData.matPsd.row(i)(0) /= 2.0;
         }
+
         if(bNfftEven && m_iNumberBinStart + m_iNumberBinAmount >= iNFreqs) {
             inputData.matPsd.row(i).tail(1) /= 2.0;
         }
