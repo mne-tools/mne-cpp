@@ -61,6 +61,7 @@ else {
 }
 
 SOURCES += \
+    generics/applicationlogger.cpp \
     kmeans.cpp \
     mnemath.cpp \
     ioutils.cpp \
@@ -115,6 +116,7 @@ HEADERS += \
     generics/commandpattern.h \
     generics/observerpattern.h \
     generics/typename_old.h \
+    generics/applicationlogger.h \
     spectral.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
