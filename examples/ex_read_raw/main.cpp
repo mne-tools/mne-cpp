@@ -46,6 +46,7 @@
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
+#include <utils/generics/applicationlogger.h>
 
 
 //*************************************************************************************************************
@@ -64,7 +65,7 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
-
+using namespace UTILSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,6 +73,7 @@ using namespace MNELIB;
 //=============================================================================================================
 
 //=============================================================================================================
+
 /**
  * The function main marks the entry point of the program.
  * By default, main has the storage class extern.
@@ -82,6 +84,7 @@ using namespace MNELIB;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QCoreApplication app(argc, argv);
 
     // Command Line Parser
