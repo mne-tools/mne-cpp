@@ -115,11 +115,6 @@ void Coherency::calculateAbs(Network& finalNetwork,
     int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getFFTSize();
 
-    // Check that iNfft >= signal length
-//    if(iNfft > iSignalLength) {
-//        iNfft = iSignalLength;
-//    }
-
     // Generate tapers
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
 
@@ -313,8 +308,10 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         inputData.matPsd.row(i) = inputData.vecTapSpectra.at(i).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(i).rows(),m_iNumberBinAmount).cwiseAbs2().colwise().sum() / denomPSD;
 
         // Divide first and last element by 2 due to half spectrum
-        inputData.matPsd.row(i)(0) /= 2.0;
-        if(bNfftEven) {
+        if(m_iNumberBinStart == 0) {
+            inputData.matPsd.row(i)(0) /= 2.0;
+        }
+        if(bNfftEven && m_iNumberBinStart + m_iNumberBinAmount >= iNFreqs) {
             inputData.matPsd.row(i).tail(1) /= 2.0;
         }
     }
