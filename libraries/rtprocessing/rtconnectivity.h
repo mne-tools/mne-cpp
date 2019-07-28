@@ -110,7 +110,6 @@ public:
     */
     void doWork(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
-    int m_iBlockNumberReceived = 0;
 signals:
     void resultReady(const  QList<CONNECTIVITYLIB::Network>& connectivityResults, const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 };

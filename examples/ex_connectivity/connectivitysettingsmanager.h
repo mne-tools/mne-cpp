@@ -49,7 +49,6 @@
 #include <connectivity/network/networknode.h>
 #include <connectivity/network/networkedge.h>
 
-#include <iostream>
 #include <disp/plots/plot.h>
 #include <disp/plots/tfplot.h>
 #include <disp/plots/imagesc.h>

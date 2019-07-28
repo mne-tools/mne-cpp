@@ -245,8 +245,6 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
     QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
 
     if(pRTSE) {
-        //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberReceived++ << "NeuronalConnectivity Received";
-
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTSE->getFiffInfo();
@@ -268,8 +266,8 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             int iZeroIdx = 0;
             for(int j = 0; j < pRTSE->getValue()[i]->times.cols(); ++j) {
                 if(pRTSE->getValue()[i]->times(j) >= 0) {
-                    //iZeroIdx = j;
-                    iZeroIdx = j + m_pFiffInfo->sfreq * 0.01; //Cut stimulus artifact, e.g. for median nerve stimulation.
+                    iZeroIdx = j;
+                    //iZeroIdx = j + m_pFiffInfo->sfreq * 0.01; //Cut stimulus artifact, e.g. for median nerve stimulation.
                     break;
                 }
             }
@@ -297,7 +295,6 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
         }
 
         m_timer.restart();
-        //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberStartedProcessing++ << "NeuronalConnectivity StartedProcessing";
         m_pRtConnectivity->append(m_connectivitySettings);
     }
 }
@@ -310,8 +307,6 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
     QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
-        //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberReceived++ << "NeuronalConnectivity Received";
-
         //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
@@ -368,7 +363,6 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             }
 
             m_timer.restart();
-            //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberStartedProcessing++ << "NeuronalConnectivity StartedProcessing";
             m_pRtConnectivity->append(m_connectivitySettings);
         }
     }
@@ -382,8 +376,6 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
     QSharedPointer<RealTimeEvokedSet> pRTEV = pMeasurement.dynamicCast<RealTimeEvokedSet>();
 
     if(pRTEV) {
-        //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberReceived++ << "NeuronalConnectivity Received";
-
         FiffEvokedSet::SPtr pFiffEvokedSet = pRTEV->getValue();
         QStringList lResponsibleTriggerTypes = pRTEV->getResponsibleTriggerTypes();
 
@@ -455,7 +447,6 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     }
 
                     m_timer.restart();
-                    //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberStartedProcessing++ << "NeuronalConnectivity StartedProcessing";
                     m_pRtConnectivity->append(m_connectivitySettings);
 
                     break;
@@ -531,7 +522,6 @@ void NeuronalConnectivity::run()
                 m_currentConnectivityResult.setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
                 m_currentConnectivityResult.normalize();
 
-                //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "NeuronalConnectivity Processed";
                 m_pRTCEOutput->data()->setValue(m_currentConnectivityResult);
             } else {
                 qDebug()<<"NeuronalConnectivity::run - Network is empty";

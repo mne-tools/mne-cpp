@@ -143,8 +143,6 @@ int main(int argc, char *argv[])
     QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
 
-    std::cout << "Nubmer vertices t_sensorSurfaceVV[0].np:" << t_sensorSurfaceVV[0].np << std::endl;
-
     //projecting with MEG
     qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
     QVector<qint32> mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0].rr, megSensors);

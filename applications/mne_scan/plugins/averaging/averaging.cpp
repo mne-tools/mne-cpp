@@ -179,8 +179,6 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
-        //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberReceived++ << "Averaging Received";
-
         //Check if buffer initialized
         if(!m_pAveragingBuffer) {
             m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
@@ -210,7 +208,6 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(m_bProcessData) {
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 if(m_pRtAve) {
-                    //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberStartedProcessing++ << "Averaging StartedProcessing";
                     m_pAveragingBuffer->push(&pRTMSA->getMultiSampleArray()[i]);
                 }
             }
@@ -484,8 +481,6 @@ void Averaging::run()
             m_qMutex.lock();
             if(!m_qVecEvokedData.isEmpty()) {
                 FiffEvokedSet t_fiffEvokedSet = m_qVecEvokedData.takeFirst();
-
-                //qInfo() << QDateTime::currentDateTime().toString("hh:mm:ss.z") << m_iBlockNumberProcessed++ << "Averaging Processed";
 
                 m_pAveragingOutput->data()->setValue(t_fiffEvokedSet,
                                                      m_pFiffInfo,

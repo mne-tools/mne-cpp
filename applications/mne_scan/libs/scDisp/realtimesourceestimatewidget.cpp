@@ -55,7 +55,6 @@
 
 #include <QGridLayout>
 #include <QVector3D>
-#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -142,8 +141,6 @@ void RealTimeSourceEstimateWidget::getData()
 
         // Add source estimate data
         if(!lMNEData.isEmpty()) {
-            QElapsedTimer time;
-            time.start();
             if(!m_pRtItem && m_pRTSE->getAnnotSet() && m_pRTSE->getSurfSet() && m_pRTSE->getFwdSolution()) {
                 //qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
                 m_pRtItem = m_pSourceEstimateView->addData("Subject", "Data",
@@ -168,7 +165,6 @@ void RealTimeSourceEstimateWidget::getData()
                     m_pRtItem->addData(*lMNEData.first());
                 }
             }
-            qInfo() << time.elapsed() << "0" << "RealTimeSourceEstimateWidget Time";
         }
     } else {
         init();

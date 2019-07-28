@@ -83,7 +83,6 @@
 #include <QGraphicsItem>
 #include <QDir>
 #include <QSettings>
-#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -207,8 +206,6 @@ void RealTimeEvokedSetWidget::getData()
             init();
         }
     } else {
-        QElapsedTimer time;
-        time.start();
         //Check if block size has changed, if yes update the filter
         if(!m_pRTESet->getValue()->evoked.isEmpty()) {
             if(m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {
@@ -221,7 +218,6 @@ void RealTimeEvokedSetWidget::getData()
         FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
         pEvokedSet->info = *(m_pFiffInfo.data());
         m_pEvokedSetModel->setEvokedSet(pEvokedSet);
-        qInfo() << time.elapsed() << "0" << "RealTimeEvokedSetWidget Time";
     }
 }
 
