@@ -273,8 +273,6 @@ protected:
     QMap<double,qint32>                             m_mapMatDataPostIdx;        /**< Current index inside of the matrix m_matDataPost */
     QMap<double,bool>                               m_mapFillingBackBuffer;     /**< Whether the back buffer is currently getting filled. */
 
-    int m_iBlockNumberReceived = 0;
-
 signals:
     //=========================================================================================================
     /**

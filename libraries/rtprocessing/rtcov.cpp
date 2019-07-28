@@ -44,8 +44,6 @@
 
 #include <fiff/fiff_cov.h>
 
-#include <iostream>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,9 +70,6 @@ using namespace FIFFLIB;
 
 void RtCovWorker::doWork(const RtCovInput &inputData)
 {
-//    QElapsedTimer time;
-//    time.start();
-
     if(this->thread()->isInterruptionRequested()) {
         return;
     }
@@ -128,7 +123,6 @@ void RtCovWorker::doWork(const RtCovInput &inputData)
 //            std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
 
 //            printf("%d raw buffer (%d x %d) generated\r\n", count, tmp.rows(), tmp.cols());
-//        qInfo() << time.elapsed() << m_iBlockNumberReceived++ << "RtCovWorker Time";
         emit resultReady(computedCov);
     } else {
         qDebug() << "RtCovWorker::doWork - Number of samples equals zero. Regularization not possible. Returning without result.";

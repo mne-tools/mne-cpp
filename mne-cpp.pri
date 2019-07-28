@@ -132,7 +132,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To build MNE Scan to support LSL data streams: qmake MNECPP_CONFIG+=useLSL
 
 # Default flags
-MNECPP_CONFIG += dispOpenGL useFFTW
+MNECPP_CONFIG += dispOpenGL
 
 #Build minimalVersion for qt versions < 5.10.0
 !minQtVersion(5, 10, 0) {

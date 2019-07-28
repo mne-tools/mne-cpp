@@ -297,7 +297,6 @@ void ECGSimulator::run()
     double dValue_I = 0;
     double dValue_II = 0;
     double dValue_III = 0;
-    qDebug() << "-------------------------------------------- THREAD ID run " << QThread::currentThreadId();
 
     while(m_bIsRunning)
     {
