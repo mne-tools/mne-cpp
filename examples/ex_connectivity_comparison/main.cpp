@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
     } else {
         //Create source level data
         QFile t_fileFwd(sFwd);
-        t_Fwd = MNEForwardSolution(t_fileFwd);
+        t_Fwd = MNEForwardSolution(t_fileFwd, false, true);
 
         // Load data
         MNESourceEstimate sourceEstimate;
@@ -311,14 +311,15 @@ int main(int argc, char *argv[])
 
         // Compute inverse solution
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-        minimumNorm.doInverseSetup(1,false);
+        minimumNorm.doInverseSetup(1,true);
 
         picks = raw.info.pick_types(QString("all"),true,false,QStringList(),exclude);
         data.pick_channels(picks);
         for(int i = 0; i < data.size(); i++) {
             sourceEstimate = minimumNorm.calculateInverse(data.at(i)->epoch,
                                                           0.0f,
-                                                          1.0/raw.info.sfreq);
+                                                          1.0/raw.info.sfreq,
+                                                          true);
 
             if(sourceEstimate.isEmpty()) {
                 printf("Source estimate is empty");
@@ -328,7 +329,7 @@ int main(int argc, char *argv[])
         }
 
         MinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
-        sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked);
+        sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked, false);
 
         // Generate network nodes
         conSettings.setNodePositions(t_clusteredFwd, tSurfSetInflated);
