@@ -427,7 +427,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns a Bone RGB to a given double value [-1,1]
+    * Returns a RedBlue RGB to a given double value [-1,1]
     *
     * @param[in] v      the double which has to be part of the intervall [-1,1]
     *
@@ -804,11 +804,11 @@ inline QRgb ColorMap::valueToCool(double v)
 
 inline QRgb ColorMap::valueToViridis(double v)
 {
-    if(v*255 >= m_matViridrisData.rows()) {
+    if((uint)v*255 >= m_matViridrisData.rows()) {
         return QRgb();
     }
 
-    QRgb p_qRgb = qRgb(m_matViridrisData(v*255,0), m_matViridrisData(v*255,1), m_matViridrisData(v*255,2));
+    QRgb p_qRgb = qRgb(m_matViridrisData((uint)v*255,0), m_matViridrisData((uint)v*255,1), m_matViridrisData((uint)v*255,2));
     return p_qRgb;
 }
 
@@ -817,11 +817,11 @@ inline QRgb ColorMap::valueToViridis(double v)
 
 inline QRgb ColorMap::valueToViridisNegated(double v)
 {
-    if(255-v*255 >= m_matViridrisData.rows() || 255-v*255 < 0) {
+    if(255-(uint)v*255 >= m_matViridrisData.rows() || 255-(uint)v*255 < 0) {
         return QRgb();
     }
 
-    QRgb p_qRgb = qRgb(m_matViridrisData(255-v*255,0), m_matViridrisData(255-v*255,1), m_matViridrisData(255-v*255,2));
+    QRgb p_qRgb = qRgb(m_matViridrisData(255-(uint)v*255,0), m_matViridrisData(255-(uint)v*255,1), m_matViridrisData(255-(uint)v*255,2));
     return p_qRgb;
 }
 
