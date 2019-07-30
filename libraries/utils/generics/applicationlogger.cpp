@@ -1,4 +1,12 @@
 #include "applicationlogger.h"
+
+#include <QtGlobal>
+#include <QDebug>
+#include <QTime>
+#include <iostream>
+#include <QMutex>
+#include <QMutexLocker>
+
 using namespace UTILSLIB;
 
 #define COLOR_DEBUG "\033[32;1m"
@@ -16,7 +24,12 @@ ApplicationLogger::ApplicationLogger()
 }
 
 void ApplicationLogger::myCustomLogWriter(QtMsgType type,
-                                          const QMessageLogContext &context, const QString &msg) {
+                                          const QMessageLogContext &context,
+                                          const QString &msg) {
+
+    static QMutex mutex;
+    QMutexLocker locker(&mutex);
+
     switch (type) {
         case QtWarningMsg:
             LOG_WRITE(std::cout, COLOR_WARN, "WARN", msg.toStdString());
