@@ -5,11 +5,14 @@
 cd doc
 doxygen mne-cpp_doxyfile
 
-# zip documentation build artefact
-zip -r mne-cpp_doc.zip ./html ./qt-creator_doc
+#if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
+    git clone -b gh-pages --single-branch --no-checkout --depth 1 https://github.com/mne-tools/mne-cpp mne_cpp.gh-pages
+	touch build/mne_cpp.github.io/.nojekyll
 
-# upload documentation
-curl -u $DOC_LOGIN:$DOC_PASSWORD -T mne-cpp_doc.zip ftp://$REMOTE_SERVER/
-
-# update the docu
-wget -O – -q http://doc.mne-cpp.org/maintenance/update.php
+	cp -r html/* mne_cpp.gh-pages
+	cd mne_cpp.gh-pages
+	git add *
+	git add .nojekyll
+	git commit -a -m 'Build docu'
+	git push https://$GIT_TOKEN@github.com/mne-tools/mne-cpp.git --all
+#fi
