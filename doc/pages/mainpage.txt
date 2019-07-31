@@ -18,7 +18,7 @@
  *
  * \section dependencies_sec Dependencies
  *
- * <a href="http://download.qt.io/official_releases/qt/"><b>>= Qt 5.10.0</b></a>
+ * <a href="http://download.qt.io/official_releases/qt/"><b>>= Qt 5.10</b></a>
  *
  *
  * \section contact_sec Contact
