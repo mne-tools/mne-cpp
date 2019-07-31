@@ -14,7 +14,9 @@ env:
 # 1.0.0
     - secure: YXurlzTjVZYR8t3W9K7rcFLCnpR7DerHQ15hgojGrCthKlkLuMy7maDrVx4Xq+KFuNmFzEZavla+GKdx5E+EhmZtaSx5OFfejfI1ya5WNTjwQgL5niQV4HoTCKNHZhwIovIEYkyLSaIPZbfccfXBRFegMrBQpVsSSBQoKZiUFfk=
     - secure: bQ7qDeGFDGiYIpudj50F+AXQkwi6HqBPmnrBEJ8DxAkYOy2evBxvACigUM+kx78LM1idOl+njye5HAtlLN8ZiQKikt9YSUXlxbX5es/wk0ABUZ/icWgsbiPU+ThHTNeP4mu33HW8o/vuoKARbaSjkOWn5RejGoiJKNDdnkgJTHw=
-
+# Git
+    - secure: QZZXsNkC3AlVThkLftcIOUmf2xPYiVjBXO2L5HEhdzI52qJslxFX21R+b4R/zSgsI1jzSGWiswc8XgW4mfhsAiNSRXlSXf4MPHvgiZHyVrFFHhUO9AQLVEd+CVW1IJtPWxRcbg5VcmW+OCk5bWzGhubGiS4sOp4SdGfneQ0Ymp4=
+    
 matrix:
   fast_finish: true
   include:
