@@ -14,5 +14,5 @@ doxygen mne-cpp_doxyfile
 	git add *
 	git add .nojekyll
 	git commit -a -m 'Build docu'
-	git push https://$GIT_TOKEN@github.com/mne-tools/mne-cpp.git --all
+	git push https://${GIT_TOKEN}@github.com/mne-tools/mne-cpp.git --all
 #fi
