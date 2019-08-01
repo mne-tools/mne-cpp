@@ -1,14 +1,14 @@
-﻿//=============================================================================================================
+//=============================================================================================================
 /**
-* @file     connectivity.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     tfsettingsview.cpp
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     July, 2019
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2019, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,39 +29,26 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Connectivity class definition.
+* @brief    Definition of the TfSettingsView Class.
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity.h"
+#include "tfsettingsview.h"
 
-#include "connectivitysettings.h"
-#include "network/network.h"
-#include "metrics/correlation.h"
-#include "metrics/crosscorrelation.h"
-#include "metrics/coherence.h"
-#include "metrics/imagcoherence.h"
-#include "metrics/phaselagindex.h"
-#include "metrics/phaselockingvalue.h"
-#include "metrics/weightedphaselagindex.h"
-#include "metrics/unbiasedsquaredphaselagindex.h"
-#include "metrics/debiasedsquaredweightedphaselagindex.h"
+#include "ui_tfsettingsview.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
-#include <QFutureSynchronizer>
-#include <QtConcurrent>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -75,13 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
-//=============================================================================================================
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -89,58 +70,69 @@ using namespace CONNECTIVITYLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Connectivity::Connectivity()
+TfSettingsView::TfSettingsView(const QString& sSettingsPath,
+                               QWidget *parent,
+                               Qt::WindowFlags f)
+: QWidget(parent, f)
+, ui(new Ui::TfSettingsViewWidget)
+, m_sSettingsPath(sSettingsPath)
 {
+    ui->setupUi(this);
+
+    loadSettings(m_sSettingsPath);
+
+    connect(ui->m_spinBox_trialNumber, static_cast<void (QSpinBox::*)(const QString&)>(&QSpinBox::valueChanged),
+            this, &TfSettingsView::onNumberTrialRowChanged);
+
+    connect(ui->m_spinBox_rowNumber, static_cast<void (QSpinBox::*)(const QString&)>(&QSpinBox::valueChanged),
+            this, &TfSettingsView::onNumberTrialRowChanged);
+
+    this->setWindowTitle("Time frequency Settings");
+    this->setMinimumWidth(330);
+    this->setMaximumWidth(330);
 }
 
 
 //*************************************************************************************************************
 
-QList<Network> Connectivity::calculate(ConnectivitySettings& connectivitySettings)
+TfSettingsView::~TfSettingsView()
 {
-    QStringList lMethods = connectivitySettings.getConnectivityMethods();
-    QList<Network> results;
-    QElapsedTimer timer;
-    timer.start();
+    saveSettings(m_sSettingsPath);
 
-    if(lMethods.contains("WPLI")) {
-        results.append(WeightedPhaseLagIndex::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("USPLI")) {
-        results.append(UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("COR")) {
-        results.append(Correlation::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("XCOR")) {
-        results.append(CrossCorrelation::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("PLI")) {
-        results.append(PhaseLagIndex::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("COH")) {
-        results.append(Coherence::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("IMAGCOH")) {
-        results.append(ImagCoherence::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("PLV")) {
-        results.append(PhaseLockingValue::calculate(connectivitySettings));
-    }
-
-    if(lMethods.contains("DSWPLI")) {
-        results.append(DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings));
-    }
-
-    qWarning() << "Total" << timer.elapsed();
-    qDebug() << "Connectivity::calculateMultiMethods - Calculated"<< lMethods <<"for" << connectivitySettings.size() << "trials in"<< timer.elapsed() << "msecs.";
-
-    return results;
+    delete ui;
 }
+
+
+//*************************************************************************************************************
+
+void TfSettingsView::saveSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+}
+
+
+//*************************************************************************************************************
+
+void TfSettingsView::loadSettings(const QString& settingsPath)
+{
+    if(settingsPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings;
+}
+
+
+//*************************************************************************************************************
+
+void TfSettingsView::onNumberTrialRowChanged()
+{
+    emit numberTrialRowChanged(ui->m_spinBox_trialNumber->value(), ui->m_spinBox_rowNumber->value());
+    saveSettings(m_sSettingsPath);
+}
+
+

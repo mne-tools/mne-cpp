@@ -129,6 +129,20 @@ public:
     */
     void onAnnotationVisibilityChanged(bool isVisible);
 
+    //=========================================================================================================
+    /**
+    * Creates a QByteArray of colors for given curvature and color data.
+    *
+    * @param[in] curvature      The curvature information.
+    * @param[in] colSulci       The sulci color information.
+    * @param[in] colGyri        The gyri color information.
+    *
+    * @return The final colors per vertex (RGB).
+    */
+    static Eigen::MatrixX4f createCurvatureVertColor(const Eigen::VectorXf& curvature,
+                                                     const QColor& colSulci = QColor(50,50,50),
+                                                     const QColor& colGyri = QColor(125,125,125));
+
 protected:
     //=========================================================================================================
     /**
@@ -142,19 +156,6 @@ protected:
     */
     void onColorInfoOriginOrCurvColorChanged();
 
-    //=========================================================================================================
-    /**
-    * Creates a QByteArray of colors for given curvature and color data.
-    *
-    * @param[in] curvature      The curvature information.
-    * @param[in] colSulci       The sulci color information.
-    * @param[in] colGyri        The gyri color information.
-    *
-    * @return The final colors per vertex (RGB).
-    */
-    Eigen::MatrixX3f createCurvatureVertColor(const Eigen::VectorXf& curvature,
-                                              const QColor& colSulci = QColor(50,50,50),
-                                              const QColor& colGyri = QColor(125,125,125)) const;
 
     QString                         m_sColorInfoOrigin;                         /**< The surface color origin. */
 

@@ -74,7 +74,7 @@ using namespace QtCharts;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Spline::Spline(const QString& title, QWidget* parent)
+Spline::Spline(QWidget* parent, const QString& title)
 : QWidget(parent)
 , m_dMinAxisX(0)
 , m_dMaxAxisX(0)
@@ -84,7 +84,7 @@ Spline::Spline(const QString& title, QWidget* parent)
 , m_iMaximumFrequency(0)
 {
     m_pChart = new QChart();
-    m_pChart->setTitle(title);
+    //m_pChart->setTitle(title);
     m_pChart->setAnimationOptions(QChart::SeriesAnimations);
     m_pChart->setAcceptHoverEvents(false);
     m_pSeries = new QSplineSeries();
@@ -305,7 +305,7 @@ void Spline::updateThreshold(QLineSeries* lineSeries)
 
 //*************************************************************************************************************
 
-void Spline::setColorMap(QString colorMap)
+void Spline::setColorMap(const QString& colorMap)
 {
     m_colorMap = colorMap;
     double leftThresholdValue = (m_pLeftThreshold->at(0).x())/ m_dMaxAxisX;
@@ -318,58 +318,14 @@ void Spline::setColorMap(QString colorMap)
     plotAreaGradient.setStart(QPointF(0, 0));
     plotAreaGradient.setFinalStop(QPointF(1, 0));
 
-    if (colorMap == "Hot Negative 1")
+    plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToColor(0.0, colorMap));
+
+    for (int i = 1; i < stepsNumber; ++i)
     {
-        plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToHotNegative1(0));
-
-        for (int i = 1; i < stepsNumber; ++i)
-        {
-            plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToHotNegative1((double)i * (0.5 / (double)stepsNumber)));
-            plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToHotNegative1((double)0.5 + (i * (0.5 / (double)stepsNumber))));
-        }
-        plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToHotNegative1(1));
+        plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToColor((double)i * (0.5 / (double)stepsNumber), colorMap));
+        plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToColor((double)0.5 + (i * (0.5 / (double)stepsNumber)), colorMap));
     }
-
-    else if (colorMap == "Hot Negative 2")
-    {
-        plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToHotNegative2(0));
-
-        for (int i = 1; i < stepsNumber; ++i)
-        {
-            plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToHotNegative2((double)i * (0.5 / (double)stepsNumber)));
-            plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToHotNegative2((double)0.5 + (i * (0.5 / (double)stepsNumber))));
-        }
-        plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToHotNegative2(1));
-    }
-
-    else if (colorMap == "Hot")
-    {
-        plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToHot(0));
-
-        for (int i = 1; i < stepsNumber; ++i)
-        {
-            plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToHot((double)i * (0.5 / (double)stepsNumber)));
-            plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToHot((double)0.5 + (i * (0.5 / (double)stepsNumber))));
-        }
-        plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToHot(1));
-    }
-
-    else if (colorMap == "Jet")
-    {
-        plotAreaGradient.setColorAt(leftThresholdValue, ColorMap::valueToJet(0));
-
-        for (int i = 1; i < stepsNumber; ++i)
-        {
-            plotAreaGradient.setColorAt(leftThresholdValue + (stepsSizeLeftMiddle * i), ColorMap::valueToJet((double)i * (0.5 / (double)stepsNumber)));
-            plotAreaGradient.setColorAt(middleThresholdValue + (stepsSizeMiddleRight * i), ColorMap::valueToJet((double)0.5 + (i * (0.5 / (double)stepsNumber))));
-        }
-        plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToJet(1));
-    }
-
-    else
-    {
-        return;
-    }
+    plotAreaGradient.setColorAt(rightThresholdValue, ColorMap::valueToColor(1.0, colorMap));
 
     // Customize plot area background
     plotAreaGradient.setCoordinateMode(QGradient::ObjectBoundingMode);

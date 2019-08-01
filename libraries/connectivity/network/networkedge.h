@@ -157,6 +157,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the edge weight non-averaged in form of a matrix.
+    *
+    * @return    The current edge weight matrix.
+    */
+    Eigen::MatrixXd getMatrixWeight() const;
+
+    //=========================================================================================================
+    /**
     * Set the averaged edge weight.
     *
     * @param[in] dAveragedWeight        The new weight.

@@ -85,7 +85,7 @@ AverageSceneItem::AverageSceneItem(const QString& channelName,
 , m_iChannelKind(channelKind)
 , m_iChannelUnit(channelUnit)
 , m_iFontTextSize(15)
-, m_iMaxWidth(1000)
+, m_iMaxWidth(1500)
 , m_iMaxHeigth(150)
 , m_bIsBad(false)
 , m_iTotalNumberChannels(0)

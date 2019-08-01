@@ -45,6 +45,8 @@
 
 #include "../../../../disp3D_global.h"
 
+#include <disp/plots/helpers/colormap.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -199,12 +201,15 @@ protected:
     * @param[in] dThresholdX                   Lower threshold for normalizing
     * @param[in] dThreholdZ                    Upper threshold for normalizing
     * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
+    * @param[in] sColorMap                     The color map to us
+    *
     */
     void normalizeAndTransformToColor(const Eigen::VectorXf& vecData,
-                                      Eigen::MatrixX3f& matFinalVertColor,
+                                      Eigen::MatrixX4f &matFinalVertColor,
                                       double dThresholdX,
                                       double dThreholdZ,
-                                      QRgb (*functionHandlerColorMap)(double v));
+                                      QRgb (*functionHandlerColorMap)(double v, const QString& sColorMap),
+                                      const QString& sColorMap);
 
     //=========================================================================================================
     /**
@@ -214,7 +219,7 @@ protected:
     *
     * @return The final color values for the underlying mesh surface
     */
-    Eigen::MatrixX3f generateColorsFromSensorValues(const Eigen::VectorXd& vecSensorValues);
+    Eigen::MatrixX4f generateColorsFromSensorValues(const Eigen::VectorXd& vecSensorValues);
 
     QList<Eigen::VectorXd>                              m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
     QList<Eigen::VectorXd>                              m_lDataLoopQ;                       /**< List that holds the matrix data <n_channels x n_samples> for looping. */
@@ -227,7 +232,6 @@ protected:
 
     int                                                 m_iCurrentSample;                   /**< Iterator to current sample which is/was streamed. */
     int                                                 m_iAverageSamples;                  /**< Number of average to compute. */
-    int                                                 m_iSampleCtr;                       /**< The sample counter. */
 
     double                                              m_dSFreq;                           /**< The current sampling frequency. */
 
@@ -239,10 +243,11 @@ protected:
         double                      dThresholdX;
         double                      dThresholdZ;
 
-        Eigen::MatrixX3f            matOriginalVertColor;
-        Eigen::MatrixX3f            matFinalVertColor;
+        Eigen::MatrixX4f            matOriginalVertColor;
+        Eigen::MatrixX4f            matFinalVertColor;
 
-        QRgb (*functionHandlerColorMap)(double v);
+        QString sColormapType;
+        QRgb (*functionHandlerColorMap)(double v, const QString& sColorMap) = DISPLIB::ColorMap::valueToColor;
     } m_lVisualizationInfo;               /**< Container for the visualization info. */
 
 
@@ -261,7 +266,7 @@ signals:
     *
     * @param[in] matColorMatrix     The interpolated raw data in form of rgb colors for each vertex.
     */
-    void newRtSmoothedData(const Eigen::MatrixX3f &matColorMatrix);
+    void newRtSmoothedData(const Eigen::MatrixX4f &matColorMatrix);
 };
 
 } // NAMESPACE
