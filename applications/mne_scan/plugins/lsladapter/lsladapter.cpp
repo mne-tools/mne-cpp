@@ -176,12 +176,12 @@ void LSLAdapter::unload()
 
 bool LSLAdapter::start()
 {
-    // check if the thread is already or still running.
-    // this can happen if the start button is pressed immediately after the stop button was pressed.
-    // in this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning()) {
-        this->wait();
-    }
+//    // check if the thread is already or still running.
+//    // this can happen if the start button is pressed immediately after the stop button was pressed.
+//    // in this case the stopping process is not finished yet but the start process is initiated.
+//    if(this->isRunning()) {
+//        this->wait();
+//    }
 
     if(m_bHasValidStream) {
         prepareFiffInfo(m_currentStream);
@@ -210,7 +210,7 @@ bool LSLAdapter::start()
 bool LSLAdapter::stop()
 {
     // make sure that this thread is completely finished
-    this->wait();
+    //this->wait();
     // clear data in RTMSA
     m_pRTMSA->data()->clear();
 

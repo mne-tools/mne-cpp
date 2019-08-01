@@ -193,6 +193,8 @@ protected:
     QPixmap*            m_pPixmapData;              /**< data pixmap */
     QPixmap*            m_pPixmapColorbar;          /**< colorbar pixmap */
 
+    QString             m_sColorMap;                /**< The colorbar */
+
     Eigen::MatrixXd     m_matCentNormData;          /**< centralized and normalized data */
 
     double              m_dMinValue;                /**< Minimal data value */
@@ -206,7 +208,7 @@ protected:
     QFont               m_qFontColorbar;            /**< Colorbar font */
     QPen                m_qPenColorbar;             /**< Colorbar pen */
 
-    QRgb                (*pColorMapper)(double);    /**< Function pointer to current colormap */
+    QRgb                (*pColorMapper)(double, const QString&);    /**< Function pointer to current colormap */
 
 };
 

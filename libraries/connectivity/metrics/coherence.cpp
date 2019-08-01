@@ -96,22 +96,36 @@ Coherence::Coherence()
 
 Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
 {
-//    QElapsedTimer timer;
-//    qint64 iTime = 0;
-//    timer.start();
-
     Network finalNetwork("COH");
+
     if(connectivitySettings.isEmpty()) {
         qDebug() << "Coherence::calculate - Input data is empty";
         return finalNetwork;
     }
 
-    finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
-    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
+    if(AbstractMetric::m_bStorageModeIsActive == false) {
+        connectivitySettings.clearIntermediateData();
+    }
 
-//    iTime = timer.elapsed();
-//    qDebug() << "Coherence::coherence timer - Empty network creation:" << iTime;
-//    timer.restart();
+    finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
+
+    // Check if start and bin amount need to be reset to full spectrum
+    int iNfft = connectivitySettings.getFFTSize();
+    int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+
+    if(m_iNumberBinStart == -1 ||
+       m_iNumberBinAmount == -1 ||
+       m_iNumberBinStart > iNFreqs ||
+       m_iNumberBinAmount > iNFreqs ||
+       m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
+        qDebug() << "Coherence::calculate - Resetting to full spectrum";
+        AbstractMetric::m_iNumberBinStart = 0;
+        AbstractMetric::m_iNumberBinAmount = iNFreqs;
+    }
+
+    // Pass information about the FFT length. Use iNFreqs because we only use the half spectrum
+    finalNetwork.setFFTSize(iNFreqs);
+    finalNetwork.setUsedFreqBins(AbstractMetric::m_iNumberBinAmount);
 
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();
@@ -129,17 +143,9 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
-//    iTime = timer.elapsed();
-//    qDebug() << "Coherence::coherence timer - Create nodes:" << iTime;
-//    timer.restart();
-
     //Calculate all-to-all coherence matrix over epochs
-    Coherency::calculateReal(finalNetwork,
-                             connectivitySettings);
-
-//    iTime = timer.elapsed();
-//    qDebug() << "Coherence::coherence timer - Actual computation:" << iTime;
-//    timer.restart();
+    Coherency::calculateAbs(finalNetwork,
+                             connectivitySettings);;
 
     return finalNetwork;
 }

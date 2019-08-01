@@ -65,6 +65,7 @@ SUBDIRS += \
             ex_clustered_inverse_rap_music_raw \
             ex_connectivity \
             ex_connectivity_comparison \
+            ex_connectivity_performance \
             ex_disp \
             ex_disp_3D \
             ex_fs_surface \

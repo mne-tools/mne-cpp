@@ -43,8 +43,17 @@
 
 #include <rtprocessing/rtconnectivity.h>
 
+#include <connectivity/metrics/abstractmetric.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
+#include <connectivity/network/networknode.h>
+#include <connectivity/network/networkedge.h>
+
+#include <disp/plots/plot.h>
+#include <disp/plots/tfplot.h>
+#include <disp/plots/imagesc.h>
+#include <utils/spectrogram.h>
+#include <mne/mne_epoch_data_list.h>
 
 
 //*************************************************************************************************************
@@ -70,6 +79,9 @@
 
 using namespace CONNECTIVITYLIB;
 using namespace RTPROCESSINGLIB;
+using namespace Eigen;
+using namespace DISPLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -90,7 +102,7 @@ class ConnectivitySettingsManager : public QObject
 
 public:
 
-    ConnectivitySettingsManager(int iBlockSize, QObject *parent = 0)
+    ConnectivitySettingsManager(QObject *parent = 0)
     : QObject(parent)
     , m_pRtConnectivity(RtConnectivity::SPtr::create())
     {
@@ -112,6 +124,18 @@ public:
     QVector<int>            m_indexList;
 
     QList<ConnectivitySettings::IntermediateTrialData>    m_dataListOriginal;
+
+    DISPLIB::Plot *m_pSignalCoursePlot = Q_NULLPTR;
+    DISPLIB::Plot *m_pSpectrumPlot = Q_NULLPTR;
+    DISPLIB::Plot *m_pEvokedSignalCoursePlot = Q_NULLPTR;
+    DISPLIB::Plot *m_pEpochSignalCoursePlot = Q_NULLPTR;
+    DISPLIB::Plot *m_pEvokedSourceSignalCoursePlot = Q_NULLPTR;
+    DISPLIB::ImageSc *m_pImageConnWeights = Q_NULLPTR;
+
+    TFplot::SPtr m_pTfPlot;
+    MatrixXd m_matEvoked;
+    MatrixXd m_matEvokedSource;
+    MNELIB::MNEEpochDataList epochs;
 
     void onConnectivityMetricChanged(const QString& sMetric)
     {
@@ -142,22 +166,22 @@ public:
 
         if(size > iNumberTrials) {
             m_settings.removeLast(size-iNumberTrials);
-        }
+        } else {
+            while(m_settings.size() < iNumberTrials) {
+    //            bool finish = false;
+    //            int index = 0;
 
-        while(m_settings.size() < iNumberTrials) {
-//            bool finish = false;
-//            int index = 0;
+    //            while(!finish) {
+    //                index = rand() % iNumberTrials;
 
-//            while(!finish) {
-//                index = rand() % iNumberTrials;
+    //                if(!m_indexList.contains(index)) {
+    //                    m_indexList.append(index);
+    //                    finish = true;
+    //                }
+    //            }
 
-//                if(!m_indexList.contains(index)) {
-//                    m_indexList.append(index);
-//                    finish = true;
-//                }
-//            }
-
-            m_settings.append(m_dataListOriginal.at(m_settings.size()-1));
+                m_settings.append(m_dataListOriginal.at(m_settings.size()));
+            }
         }
 
         //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - m_indexList" << m_indexList;
@@ -190,15 +214,124 @@ public:
 
         for(int i = 0; i < connectivityResults.size(); ++i) {
             m_networkData[i].setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
-            m_networkData[i].normalize();
+            //m_networkData[i].normalize();
+
+//            if(!m_networkData.isEmpty()) {
+//                Network network = m_networkData.first();
+//                MatrixXd image;
+
+//                for(int i = 0; i < network.getNodes().size(); i++) {
+//                    for(int j = 0; j < network.getNodes().at(i)->getFullEdges().size(); j++) {
+//                        NetworkEdge::SPtr edge = network.getNodes().at(i)->getFullEdges().at(j);
+
+//                        if(edge->isActive()) {
+//                            if(image.cols() == 0) {
+//                                image = edge->getMatrixWeight();
+//                            } else {
+//                                image.conservativeResize(image.rows(),image.cols()+1);
+//                                image.col(image.cols()-1) = edge->getMatrixWeight();
+//                            }
+//                        }
+//                    }
+//                }
+
+//                image.conservativeResize(image.rows()-1,image.cols());
+
+//                if(!m_pImageConnWeights) {
+//                    m_pImageConnWeights = new DISPLIB::ImageSc(image);
+//                } else {
+//                    m_pImageConnWeights->updateData(image);
+//                }
+//                m_pImageConnWeights->show();
+//            }
         }
 
         if(!m_networkData.isEmpty()) {
             for(int i = 0; i < m_networkData.size(); ++i) {
                 emit newConnectivityResultAvailable("sample",
-                                                    "Connectivity",
+                                                    "1",
                                                     m_networkData.at(i));
             }
+        }
+    }
+
+    void plotTimeCourses(int iTrialNumber, int iRowNumber)
+    {
+        if(iTrialNumber < m_settings.size()) {
+            if(iRowNumber < m_settings.at(iTrialNumber).matData.rows()) {
+                Eigen::RowVectorXd plotVeca = m_settings.at(iTrialNumber).matData.row(iRowNumber).array() - m_settings.at(iTrialNumber).matData.row(iRowNumber).mean();
+                Eigen::Map<Eigen::VectorXd> v1a(plotVeca.data(), plotVeca.size());
+                Eigen::VectorXd tempa = v1a.array() - v1a.mean();
+                if(!m_pSignalCoursePlot) {
+                    m_pSignalCoursePlot = new DISPLIB::Plot(tempa);
+                } else {
+                    m_pSignalCoursePlot->updateData(tempa);
+                }
+
+                m_pSignalCoursePlot->setTitle(QString("Conn used signal for trial %1 and source %2").arg(QString::number(iTrialNumber)).arg(QString::number(iRowNumber)));
+                m_pSignalCoursePlot->show();
+
+    //            MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(plotVeca, m_settings.getSamplingFrequency()*0.05);
+
+    //            m_pTfPlot = TFplot::SPtr::create(dataSpectrum, m_settings.getSamplingFrequency(), 2,50, ColorMaps::Jet);
+    //            m_pTfPlot->show();
+            }
+
+            if(iRowNumber < epochs.at(iTrialNumber)->epoch.rows()) {
+                Eigen::RowVectorXd plotVecc = epochs.at(iTrialNumber)->epoch.row(iRowNumber);
+                Eigen::Map<Eigen::VectorXd> v1c(plotVecc.data(), plotVecc.size());
+                Eigen::VectorXd tempc =v1c;
+                if(!m_pEpochSignalCoursePlot) {
+                    m_pEpochSignalCoursePlot = new DISPLIB::Plot(tempc);
+                } else {
+                    m_pEpochSignalCoursePlot->updateData(tempc);
+                }
+
+                m_pEpochSignalCoursePlot->setTitle(QString("Sensor signal for trial %1 and row %2").arg(QString::number(iTrialNumber)).arg(QString::number(iRowNumber)));
+                m_pEpochSignalCoursePlot->show();
+            }
+
+            if(iRowNumber < m_settings.at(iTrialNumber).vecTapSpectra.size()) {
+                Eigen::RowVectorXd plotVec = m_settings.at(iTrialNumber).vecTapSpectra.at(iRowNumber).cwiseAbs().row(0);
+                Eigen::Map<Eigen::VectorXd> v1(plotVec.data(), plotVec.size());
+                Eigen::VectorXd temp =v1;
+                if(!m_pSpectrumPlot) {
+                    m_pSpectrumPlot = new DISPLIB::Plot(temp);
+                } else {
+                    m_pSpectrumPlot->updateData(temp);
+                }
+
+                m_pSpectrumPlot->setTitle(QString("Spectrum of conn used signal for trial %1 and row %2").arg(QString::number(iTrialNumber)).arg(QString::number(iRowNumber)));
+                m_pSpectrumPlot->show();
+            }
+        }
+
+        if(iRowNumber < m_matEvoked.rows()) {
+            Eigen::RowVectorXd plotVeca = m_matEvoked.row(iRowNumber);
+            Eigen::Map<Eigen::VectorXd> v1a(plotVeca.data(), plotVeca.size());
+            Eigen::VectorXd tempa =v1a;
+            if(!m_pEvokedSignalCoursePlot) {
+                m_pEvokedSignalCoursePlot = new DISPLIB::Plot(tempa);
+            } else {
+                m_pEvokedSignalCoursePlot->updateData(tempa);
+            }
+
+            m_pEvokedSignalCoursePlot->setTitle(QString("Evoked signal for row %1").arg(QString::number(iRowNumber)));
+            m_pEvokedSignalCoursePlot->show();
+        }
+
+        if(iRowNumber < m_matEvokedSource.rows()) {
+            Eigen::RowVectorXd plotVeca = m_matEvokedSource.row(iRowNumber);
+            Eigen::Map<Eigen::VectorXd> v1a(plotVeca.data(), plotVeca.size());
+            Eigen::VectorXd tempa =v1a;
+            if(!m_pEvokedSourceSignalCoursePlot) {
+                m_pEvokedSourceSignalCoursePlot = new DISPLIB::Plot(tempa);
+            } else {
+                m_pEvokedSourceSignalCoursePlot->updateData(tempa);
+            }
+
+            m_pEvokedSourceSignalCoursePlot->setTitle(QString("Evoked source signal for row %1").arg(QString::number(iRowNumber)));
+            m_pEvokedSourceSignalCoursePlot->show();
         }
     }
 

@@ -206,6 +206,11 @@ Q_DECLARE_METATYPE(Eigen::MatrixXd);
 Q_DECLARE_METATYPE(Eigen::MatrixX3f);
 #endif
 
+#ifndef DISP3DLIB_metatype_matrixx4f
+#define DISP3DLIB_metatype_matrixx4f
+Q_DECLARE_METATYPE(Eigen::MatrixX4f);
+#endif
+
 #ifndef DISP3DLIB_metatype_vectorxf
 #define DISP3DLIB_metatype_vectorxf
 Q_DECLARE_METATYPE(Eigen::VectorXf);

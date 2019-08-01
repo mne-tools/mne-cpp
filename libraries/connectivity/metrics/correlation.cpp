@@ -92,6 +92,10 @@ Correlation::Correlation()
 
 Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
 {
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
+
     Network finalNetwork("COR");
 
     if(connectivitySettings.isEmpty()) {
@@ -100,7 +104,6 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
     }   
 
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
-    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();
@@ -118,24 +121,32 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
         finalNetwork.append(NetworkNode::SPtr(new NetworkNode(i, rowVert)));
     }
 
+//    iTime = timer.elapsed();
+//    qWarning() << "Preparation" << iTime;
+//    timer.restart();
+
     // Calculate connectivity matrix over epochs and average afterwards
-    //double dScalingStep = 1.0/matDataList.size();
-    //dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
+//    double dScalingStep = 1.0/matDataList.size();
+//    dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
 
-//    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.getTrialData(),
-//                                                              compute,
-//                                                              reduce);
-//    resultMat.waitForFinished();
+    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.getTrialData(),
+                                                              compute,
+                                                              reduce);
+    resultMat.waitForFinished();
 
-//    MatrixXd matDist = resultMat.result();
+    MatrixXd matDist = resultMat.result();
 
-    MatrixXd matDist;
+//    MatrixXd matDist;
 
-    for(int i = 0; i < connectivitySettings.getTrialData().size(); ++i) {
-        reduce(matDist, compute(connectivitySettings.getTrialData().at(i)));
-    }
+//    for(int i = 0; i < connectivitySettings.getTrialData().size(); ++i) {
+//        reduce(matDist, compute(connectivitySettings.getTrialData().at(i)));
+//    }
 
-    matDist /= connectivitySettings.size();
+//    matDist /= connectivitySettings.size();
+
+//    iTime = timer.elapsed();
+//    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+//    timer.restart();
 
     //Add edges to network
     MatrixXd matWeight(1,1);
@@ -154,9 +165,12 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
         }
     }
 
+//    iTime = timer.elapsed();
+//    qWarning() << "Compute" << iTime;
+//    timer.restart();
+
     return finalNetwork;
 }
-
 
 
 //*************************************************************************************************************
@@ -167,13 +181,15 @@ MatrixXd Correlation::compute(const ConnectivitySettings::IntermediateTrialData&
     RowVectorXd vecRow;
     int j;
 
-    for(int i = 0; i < inputData.matData.rows(); ++i) {
-        vecRow = inputData.matData.row(i);
+    matDist = inputData.matData * inputData.matData.transpose();
 
-        for(j = i; j < inputData.matData.rows(); ++j) {
-            matDist(i,j) += (vecRow.dot(inputData.matData.row(j))/vecRow.cols());
-        }
-    }
+//    for(int i = 0; i < inputData.matData.rows(); ++i) {
+//        vecRow = inputData.matData.row(i);
+
+//        for(j = i; j < inputData.matData.rows(); ++j) {
+//            matDist(i,j) += (vecRow.dot(inputData.matData.row(j))/vecRow.cols());
+//        }
+//    }
 
     return matDist;
 }

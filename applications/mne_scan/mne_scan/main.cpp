@@ -94,39 +94,40 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 {
     Q_UNUSED(context);
 
-     QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
-     QString txt = QString("[%1] ").arg(dt);
+    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss.z");
+    QString txt = QString("[%1] ").arg(dt);
 
-     if(mainWin)
-     {
-         switch (type)
-         {
+    if(mainWin)
+    {
+        switch (type)
+        {
             case QtDebugMsg:
-               txt += QString("{Debug} \t\t %1").arg(msg);
-               mainWin->writeToLog(txt,_LogKndMessage, _LogLvMax);
-               break;
+                txt += QString("{Debug} \t\t %1").arg(msg);
+                mainWin->writeToLog(txt,_LogKndMessage, _LogLvMax);
+                break;
+            case QtInfoMsg:
+                txt += QString("{Info} \t\t %1").arg(msg);
+                mainWin->writeToLog(txt,_LogKndMessage, _LogLvMax);
+                break;
             case QtWarningMsg:
-               txt += QString("{Warning} \t %1").arg(msg);
-               mainWin->writeToLog(txt,_LogKndWarning, _LogLvNormal);
-               break;
+                txt += QString("{Warning} \t %1").arg(msg);
+                mainWin->writeToLog(txt,_LogKndWarning, _LogLvNormal);
+                break;
             case QtCriticalMsg:
-               txt += QString("{Critical} \t %1").arg(msg);
-               mainWin->writeToLog(txt,_LogKndError, _LogLvMin);
-               break;
+                txt += QString("{Critical} \t %1").arg(msg);
+                mainWin->writeToLog(txt,_LogKndError, _LogLvMin);
+                break;
             case QtFatalMsg:
-               txt += QString("{Fatal} \t\t %1").arg(msg);
-               mainWin->writeToLog(txt,_LogKndError, _LogLvMin);
-               abort();
-               break;
-         }
-     }
-
-//     QFile outFile("LogFile.log");
-//     outFile.open(QIODevice::WriteOnly | QIODevice::Append);
-
-//     QTextStream textStream(&outFile);
-//     textStream << txt << endl;
-
+                txt += QString("{Fatal} \t\t %1").arg(msg);
+                mainWin->writeToLog(txt,_LogKndError, _LogLvMin);
+                abort();
+                break;
+            default:
+                txt += QString("{Unknown} \t\t %1").arg(msg);
+                mainWin->writeToLog(txt,_LogKndMessage, _LogLvNormal);
+                break;
+        }
+    }
 }
 
 
@@ -187,7 +188,7 @@ int main(int argc, char *argv[])
 
     //ToDo Check the message handler and FiffSimulator
 
-//    qInstallMessageHandler(customMessageHandler);
+    //qInstallMessageHandler(customMessageHandler);
 
     QSurfaceFormat fmt;
     fmt.setSamples(10);

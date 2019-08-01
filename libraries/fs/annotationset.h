@@ -201,10 +201,14 @@ public:
     * @param[in] p_surfSet              the SurfaceSet to read the vertex positions from
     * @param[out] p_qListLabels         the converted labels are appended to a given list. Stored data are not affected.
     * @param[out] p_qListLabelRGBAs     the converted label RGBAs are appended to a given list. Stored data are not affected.
+    * @param[out] lLabelPicks           the label names which should be picked.
     *
     * @return true if successful, false otherwise
     */
-    bool toLabels(const SurfaceSet &p_surfSet, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListLabelRGBAs) const;
+    bool toLabels(const SurfaceSet &p_surfSet,
+                  QList<Label> &p_qListLabels,
+                  QList<RowVector4i> &p_qListLabelRGBAs,
+                  const QStringList& lLabelPicks = QStringList()) const;
 
     //=========================================================================================================
     /**

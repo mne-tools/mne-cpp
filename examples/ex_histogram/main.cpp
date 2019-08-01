@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
     qDebug()<<"HistCounts timer:"<<myTimerHistCounts.elapsed();
 
     //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other
-    Spline* displayObj = new Spline("MNE-CPP Histogram Example (Spline)");
+    Spline* displayObj = new Spline(0, "MNE-CPP Histogram Example (Spline)");
     //Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
 
     QTime myTimerHistogram;

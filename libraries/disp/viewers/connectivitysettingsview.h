@@ -239,7 +239,8 @@ protected:
 
     Ui::ConnectivitySettingsViewWidget* ui;
 
-    QString           m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    QString         m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+    int             m_iNumberTrials;                /**< The number of trials are stored to check whether the number of trials actually changed. */
 
 signals:
     //=========================================================================================================
