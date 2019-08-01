@@ -110,7 +110,7 @@ class GeometryMultiplier;
 *
 * @brief Provides a generic brain tree item to hold real time data.
 */
-class DISP3DSHARED_EXPORT NetworkTreeItem : public AbstractMeshTreeItem
+class DISP3DSHARED_EXPORT NetworkTreeItem : public Abstract3DTreeItem
 {
     Q_OBJECT
 
@@ -168,6 +168,14 @@ private:
     * @param[in] color        The new surface color.
     */
     virtual void onColorChanged(const QVariant& color);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the used colormap type changed.
+    *
+    * @param[in] sColormapType     The name of the new colormap type.
+    */
+    void onColormapTypeChanged(const QVariant& sColormapType);
 
     //=========================================================================================================
     /**

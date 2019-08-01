@@ -299,3 +299,24 @@ FiffDigPointSet &FiffDigPointSet::operator<<(const FiffDigPoint *dig)
     this->m_qListDigPoint.append(*dig);
     return *this;
 }
+
+//*************************************************************************************************************
+
+void FiffDigPointSet::applyTransform(const FiffCoordTrans& coordTrans, bool bApplyInverse)
+{
+    Vector4f tempvec;
+    for(int i = 0; i < m_qListDigPoint.size(); ++i) {
+        tempvec(0) = m_qListDigPoint.at(i).r[0];
+        tempvec(1) = m_qListDigPoint.at(i).r[1];
+        tempvec(2) = m_qListDigPoint.at(i).r[2];
+        tempvec(3) = 1.0f;
+        if(bApplyInverse) {
+            tempvec = coordTrans.invtrans * tempvec;
+        } else {
+            tempvec = coordTrans.trans * tempvec;
+        }
+        m_qListDigPoint[i].r[0] = tempvec(0);
+        m_qListDigPoint[i].r[1] = tempvec(1);
+        m_qListDigPoint[i].r[2] = tempvec(2);
+    }
+}

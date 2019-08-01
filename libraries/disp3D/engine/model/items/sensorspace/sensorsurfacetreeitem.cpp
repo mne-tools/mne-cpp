@@ -90,8 +90,8 @@ void SensorSurfaceTreeItem::initItem()
     this->setCheckState(Qt::Checked);
     this->setToolTip("Sensor surface item");
 
-    //Set materials
-    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial();
+    //Set material to enable sorting
+    PerVertexPhongAlphaMaterial* pBemMaterial = new PerVertexPhongAlphaMaterial(true);
     this->setMaterial(pBemMaterial);
 }
 
@@ -101,14 +101,14 @@ void SensorSurfaceTreeItem::initItem()
 void SensorSurfaceTreeItem::addData(const MNEBemSurface& tSensorSurface)
 {
     //Create color from curvature information with default gyri and sulcus colors
-    MatrixX3f matVertColor = createVertColor(tSensorSurface.rr.rows());
+    MatrixX4f matVertColor = createVertColor(tSensorSurface.rr.rows());
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tSensorSurface.rr,
-                                tSensorSurface.nn,
-                                tSensorSurface.tris,
-                                matVertColor,
-                                Qt3DRender::QGeometryRenderer::Triangles);
+                               tSensorSurface.nn,
+                               tSensorSurface.tris,
+                               matVertColor,
+                               Qt3DRender::QGeometryRenderer::Triangles);
 
     //Add data which is held by this SensorSurfaceTreeItem
     QVariant data;

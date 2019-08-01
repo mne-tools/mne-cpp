@@ -169,14 +169,17 @@ int main(int argc, char *argv[])
                      t_fileRawName,
                      events);
 
-    // Read the epochs and reject epochs with EOG higher than 250e-06
+    // Read the epochs and reject epochs with EOG higher than 300e-06
+    QMap<QString,double> mapReject;
+    mapReject.insert("eog", 300e-06);
+
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
                                                          events,
                                                          fTMin,
                                                          fTMax,
                                                          event,
-                                                         250.0*0.0000010,
-                                                         "eog",
+                                                         mapReject,
+                                                         QStringList(),
                                                          picks);
 
     // Drop rejected epochs
