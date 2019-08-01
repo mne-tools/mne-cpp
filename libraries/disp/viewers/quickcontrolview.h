@@ -236,14 +236,6 @@ protected:
     */
     void onOpacityChange(qint32 value);
 
-    //=========================================================================================================
-    /**
-    * Is called when the minimize or maximize button was pressed.
-    *
-    * @param [in] state toggle state.
-    */
-    void onToggleHideAll(bool state);
-
 private:       
     QString                                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */

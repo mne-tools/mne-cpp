@@ -1,14 +1,14 @@
-﻿//=============================================================================================================
+//=============================================================================================================
 /**
-* @file     connectivity.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     tfsettingsview.h
+* @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2017
+* @date     July, 2019
 *
 * @section  LICENSE
 *
-* Copyright (C) 2017, Lorenz Esch and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2019, Lorenz Esch and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,9 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Connectivity class definition.
+* @brief    Declaration of the TfSettingsView Class.
 *
 */
+
+#ifndef TFSETTINGSVIEW_H
+#define TFSETTINGSVIEW_H
 
 
 //*************************************************************************************************************
@@ -39,19 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "connectivity.h"
-
-#include "connectivitysettings.h"
-#include "network/network.h"
-#include "metrics/correlation.h"
-#include "metrics/crosscorrelation.h"
-#include "metrics/coherence.h"
-#include "metrics/imagcoherence.h"
-#include "metrics/phaselagindex.h"
-#include "metrics/phaselockingvalue.h"
-#include "metrics/weightedphaselagindex.h"
-#include "metrics/unbiasedsquaredphaselagindex.h"
-#include "metrics/debiasedsquaredweightedphaselagindex.h"
+#include "../disp_global.h"
 
 
 //*************************************************************************************************************
@@ -59,9 +50,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
-#include <QFutureSynchronizer>
-#include <QtConcurrent>
+#include <QWidget>
 
 
 //*************************************************************************************************************
@@ -72,75 +61,104 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE GLOBAL METHODS
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-Connectivity::Connectivity()
-{
+namespace Ui {
+    class TfSettingsViewWidget;
 }
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-QList<Network> Connectivity::calculate(ConnectivitySettings& connectivitySettings)
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
+
+namespace DISPLIB
 {
-    QStringList lMethods = connectivitySettings.getConnectivityMethods();
-    QList<Network> results;
-    QElapsedTimer timer;
-    timer.start();
 
-    if(lMethods.contains("WPLI")) {
-        results.append(WeightedPhaseLagIndex::calculate(connectivitySettings));
-    }
 
-    if(lMethods.contains("USPLI")) {
-        results.append(UnbiasedSquaredPhaseLagIndex::calculate(connectivitySettings));
-    }
+//*************************************************************************************************************
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
 
-    if(lMethods.contains("COR")) {
-        results.append(Correlation::calculate(connectivitySettings));
-    }
 
-    if(lMethods.contains("XCOR")) {
-        results.append(CrossCorrelation::calculate(connectivitySettings));
-    }
+//=============================================================================================================
+/**
+* DECLARE CLASS TfSettingsView
+*
+* @brief The TfSettingsView class provides a view to control settings for time frequency analysis
+*/
+class DISPSHARED_EXPORT TfSettingsView : public QWidget
+{
+    Q_OBJECT
 
-    if(lMethods.contains("PLI")) {
-        results.append(PhaseLagIndex::calculate(connectivitySettings));
-    }
+public:    
+    typedef QSharedPointer<TfSettingsView> SPtr;              /**< Shared pointer type for TfSettingsView. */
+    typedef QSharedPointer<const TfSettingsView> ConstSPtr;   /**< Const shared pointer type for TfSettingsView. */
 
-    if(lMethods.contains("COH")) {
-        results.append(Coherence::calculate(connectivitySettings));
-    }
+    //=========================================================================================================
+    /**
+    * Constructs a TfSettingsView which is a child of parent.
+    *
+    * @param [in] parent        parent of widget.
+    */
+    TfSettingsView(const QString& sSettingsPath = "",
+                   QWidget *parent = 0,
+                   Qt::WindowFlags f = Qt::Widget);
 
-    if(lMethods.contains("IMAGCOH")) {
-        results.append(ImagCoherence::calculate(connectivitySettings));
-    }
+    //=========================================================================================================
+    /**
+    * Destroys the TfSettingsView.
+    */
+    ~TfSettingsView();
 
-    if(lMethods.contains("PLV")) {
-        results.append(PhaseLockingValue::calculate(connectivitySettings));
-    }
+protected:
+    //=========================================================================================================
+    /**
+    * Saves all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to store the settings to.
+    */
+    void saveSettings(const QString& settingsPath);
 
-    if(lMethods.contains("DSWPLI")) {
-        results.append(DebiasedSquaredWeightedPhaseLagIndex::calculate(connectivitySettings));
-    }
+    //=========================================================================================================
+    /**
+    * Loads and inits all important settings of this view via QSettings.
+    *
+    * @param[in] settingsPath        the path to load the settings from.
+    */
+    void loadSettings(const QString& settingsPath);
 
-    qWarning() << "Total" << timer.elapsed();
-    qDebug() << "Connectivity::calculateMultiMethods - Calculated"<< lMethods <<"for" << connectivitySettings.size() << "trials in"<< timer.elapsed() << "msecs.";
+    //=========================================================================================================
+    /**
+    * Slot called when the trial or row number changed.
+    */
+    void onNumberTrialRowChanged();
 
-    return results;
-}
+    Ui::TfSettingsViewWidget* ui;
+
+    QString         m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Emit signal whenever trial number changed.
+    *
+    * @param [in] iNumberTrial        The new trial number.
+    * @param [in] iNumberRow        The new row number.
+    */
+    void numberTrialRowChanged(int iNumberTrial, int iNumberRow);
+
+};
+
+} // NAMESPACE
+
+#endif // CONNECTIVITYSETTINGSVIEW_H

@@ -636,25 +636,27 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
     {
         for (int jr = 0; jr<matRawData.cols(); ++jr)     //iterates through all rows of the data matrix
         {
-            for (int kr = 0; kr < iClassAmount; ++kr)    //starts iteration from 1 to iClassAmount
-            {
-                if (kr == iClassAmount-1)                //used for the final iteration; if the data value is exactly the same as the final upper class limit, it will be included in the histogram
+            if(matRawData(ir,jr) != 0.0) {
+                for (int kr = 0; kr < iClassAmount; ++kr)    //starts iteration from 1 to iClassAmount
                 {
-                    if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) <= vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
+                    if (kr == iClassAmount-1)                //used for the final iteration; if the data value is exactly the same as the final upper class limit, it will be included in the histogram
                     {
-                         vecResultFrequency(kr) = vecResultFrequency(kr) + 1 ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
+                        if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) <= vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
+                        {
+                             vecResultFrequency(kr) = vecResultFrequency(kr) + 1 ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
+                        }
+                    }
+                    else
+                    {
+                        if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) < vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
+                        {
+                            vecResultFrequency(kr) = vecResultFrequency(kr) + 1 ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
+                        }
                     }
                 }
-                else
-                {
-                    if (matRawData(ir,jr) >= vecResultClassLimits(kr) && matRawData(ir,jr) < vecResultClassLimits(kr + 1))    //compares value in the matrix with lower and upper limit of each class
-                    {
-                        vecResultFrequency(kr) = vecResultFrequency(kr) + 1 ;           //if the value fits both arguments, the appropriate class frequency is increased by 1
-                    }
-                }
-             }
-         }
-     }
+            }
+        }
+    }
 }
 
 
