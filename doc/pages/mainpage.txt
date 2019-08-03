@@ -2,7 +2,7 @@
  *
  * \section intro_sec Introduction
  *
- * Cross-platform medical (real-time) applications for EEG and MEG data analysis.
+ * MNE-CPP: A Framework for Electrophysiology.
  * For more information please visit http://www.mne-cpp.org.
  *
  *
@@ -18,7 +18,7 @@
  *
  * \section dependencies_sec Dependencies
  *
- * <a href="http://download.qt.io/official_releases/qt/"><b>>= Qt 5.9.1</b></a>
+ * <a href="http://download.qt.io/official_releases/qt/"><b>>= Qt 5.10</b></a>
  *
  *
  * \section contact_sec Contact
@@ -32,7 +32,7 @@
  *
  * MNE-CPP is available under the <i>BSD-3-Clause</i> open source license:
  *
- *  Copyright (C) 2010-2017, \ref authors_sec of MNE-CPP.
+ *  Copyright (C) 2010-2019, \ref authors_sec of MNE-CPP.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
