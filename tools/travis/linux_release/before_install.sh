@@ -8,7 +8,6 @@ sudo apt-get update -qq
 wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
 sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 
-
 # Get azcopy
 wget https://aka.ms/downloadazcopy-v10-linux
 
