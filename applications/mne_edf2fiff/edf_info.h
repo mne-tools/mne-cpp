@@ -112,7 +112,7 @@ enum EDFHEADERFIELDS {  // general fields for the EDF file
 /**
 * DECLARE CLASS EDFInfo
 *
-* @brief The EDFInfo holds all relevant information for EDF files.
+* @brief The EDFInfo holds all relevant information for EDF files and allows conversion into FiffInfo.
 */
 class EDFInfo
 {
@@ -120,21 +120,23 @@ class EDFInfo
 public:
     //=========================================================================================================
     /**
-    * Constructs an EDFInfo by parsing the header of the passed edf file pDev.
+    * Constructs an empty EDFInfo.
     */
     EDFInfo();
 
     //=========================================================================================================
     /**
-    * Constructs an EDFInfo by parsing the passed IO device.
+    * Constructs an EDFInfo by parsing the passed IO device pDev.
+    *
+    * @param pDev The device to read the EDF file from.
     */
     EDFInfo(QIODevice* pDev);
 
     //=========================================================================================================
     /**
-    * Obtain textual representation of EDF Info.
+    * Obtain textual description of EDF Info.
     *
-    * @return Textual representation of EDF Info.
+    * @return Textual description of EDF Info.
     */
     QString getAsString() const;
 
@@ -149,25 +151,17 @@ public:
     //=========================================================================================================
     // Getters:
     inline QVector<EDFChannelInfo> getAllChannelInfos() const;
-
     inline QVector<EDFChannelInfo> getMeasurementChannelInfos() const;
-
     inline int getNumberOfDataRecords() const;
-
     inline int getNumberOfAllChannels() const;
-
     inline int getSampleCount() const;
-
     inline int getNumSamplesPerRecord() const;
-
     inline int getNumberOfBytesInHeader() const;
-
     inline int getNumberOfBytesPerDataRecord() const;
-
     inline float getFrequency() const;
 
 private:
-    // data fields for EDF header. The member order does NOT correlate with the position in the header.
+    // data fields for EDF header. The member order below does NOT correlate with the order in the EDF header
     QString     m_sEDFVersionNo;
     QString     m_sLocalPatientIdentification;
     QString     m_sLocalRecordingIdentification;
@@ -180,7 +174,7 @@ private:
     // convenience field, calculated by using the EDF fields
     int         m_iNumBytesPerDataRecord;
 
-    // vector of all signals / channels contained in file. We need to know the original order of signals when reading
+    // vector of all signals / channels contained in the file. We need to know the original order of signals when reading
     // raw data from data records, otherwise misalignments are inevitable.
     QVector<EDFChannelInfo> m_vAllChannels;
     // vector of all signals / channels that contain continuous measurement data (i.e. signals that have the
@@ -193,35 +187,40 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QVector<EDFChannelInfo> EDFInfo::getAllChannelInfos() const {
+inline QVector<EDFChannelInfo> EDFInfo::getAllChannelInfos() const
+{
     return m_vAllChannels;
 }
 
 
 //*************************************************************************************************************
 
-inline QVector<EDFChannelInfo> EDFInfo::getMeasurementChannelInfos() const {
+inline QVector<EDFChannelInfo> EDFInfo::getMeasurementChannelInfos() const
+{
     return m_vMeasChannels;
 }
 
 
 //*************************************************************************************************************
 
-inline int EDFInfo::getNumberOfDataRecords() const {
+inline int EDFInfo::getNumberOfDataRecords() const
+{
     return m_iNumDataRecords;
 }
 
 
 //*************************************************************************************************************
 
-inline int EDFInfo::getNumberOfAllChannels() const {
+inline int EDFInfo::getNumberOfAllChannels() const
+{
     return m_iNumChannels;
 }
 
 
 //*************************************************************************************************************
 
-inline int EDFInfo::getSampleCount() const {
+inline int EDFInfo::getSampleCount() const
+{
     if(m_vMeasChannels.size()) {
         return m_vMeasChannels[0].getSampleCount();
     } else {
@@ -233,7 +232,8 @@ inline int EDFInfo::getSampleCount() const {
 
 //*************************************************************************************************************
 
-inline int EDFInfo::getNumSamplesPerRecord() const {
+inline int EDFInfo::getNumSamplesPerRecord() const
+{
     if(m_vMeasChannels.size()) {
         return m_vMeasChannels[0].getNumberOfSamplesPerRecord();
     } else {
@@ -245,21 +245,24 @@ inline int EDFInfo::getNumSamplesPerRecord() const {
 
 //*************************************************************************************************************
 
-inline int EDFInfo::getNumberOfBytesInHeader() const {
+inline int EDFInfo::getNumberOfBytesInHeader() const
+{
     return m_iNumBytesInHeader;
 }
 
 
 //*************************************************************************************************************
 
-inline int EDFInfo::getNumberOfBytesPerDataRecord() const {
+inline int EDFInfo::getNumberOfBytesPerDataRecord() const
+{
     return m_iNumBytesPerDataRecord;
 }
 
 
 //*************************************************************************************************************
 
-inline float EDFInfo::getFrequency() const {
+inline float EDFInfo::getFrequency() const
+{
     if(m_vMeasChannels.size()) {
         return m_vMeasChannels[0].getFrequency();
     } else {

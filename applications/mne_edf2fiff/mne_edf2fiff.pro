@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_edf_to_fiff.pro
+# @file     mne_edf2fiff.pro
 # @author   Simon Heinke <simon.heinke@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -42,7 +42,7 @@ VERSION = $${MNE_CPP_VERSION}
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = mne_edf_to_fiff
+TARGET = mne_edf2fiff
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)

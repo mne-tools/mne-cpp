@@ -75,9 +75,6 @@ using namespace FIFFLIB;
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-
-
-//=============================================================================================================
 /**
 * The function main marks the entry point of the program.
 * By default, main has the storage class extern.
@@ -111,7 +108,7 @@ int main(int argc, char *argv[])
     EDFRawData edfRaw(&t_fileIn);
     // print basic info
     EDFInfo edfInfo = edfRaw.getInfo();
-    qDebug().noquote() << edfInfo.getAsString();
+    // qDebug().noquote() << edfInfo.getAsString();
 
     // convert to fiff
     FiffRawData fiffRaw = edfRaw.toFiffRawData();
@@ -132,12 +129,12 @@ int main(int argc, char *argv[])
 
     while(samplesRead < edfInfo.getSampleCount()) {
         int nextChunkSize = std::min(timeslice_samples, edfInfo.getSampleCount() - samplesRead);
-
+        // EDF sample indexing starts at 0, simply use samplesRead as argument to read_raw_segment
         MatrixXd data = edfRaw.read_raw_segment(samplesRead, samplesRead + nextChunkSize).cast<double>();
 
         samplesRead += nextChunkSize;
 
-        outfid->write_raw_buffer(data,cals);
+        outfid->write_raw_buffer(data);
     }
 
     outfid->finish_writing_raw();

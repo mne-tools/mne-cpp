@@ -73,8 +73,8 @@ EDFChannelInfo::EDFChannelInfo(const int channelNumber,
                                const long digitalMax,
                                const long numberOfSamplesPerRecord,
                                const long numberOfSamplesTotal,
-                               const float mfrequency,
-                               const bool bIsMeas)
+                               const float frequency,
+                               const bool isMeasurement)
 : m_iChanNo(channelNumber),
   m_sLabel(label),
   m_sTransducerType(transducer),
@@ -86,8 +86,8 @@ EDFChannelInfo::EDFChannelInfo(const int channelNumber,
   m_iDigitalMaximum(digitalMax),
   m_iNumberOfSamplesPerRecord(numberOfSamplesPerRecord),
   m_iNumberOfSamplesTotal(numberOfSamplesTotal),
-  m_frequency(mfrequency),
-  m_bIsMeas(bIsMeas)
+  m_frequency(frequency),
+  m_bIsMeas(isMeasurement)
 {
 
 }
@@ -97,80 +97,81 @@ EDFChannelInfo::EDFChannelInfo(const int channelNumber,
 
 QString EDFChannelInfo::getAsString() const
 {
-    QString result;
+    QString sDescription;
+    sDescription += "\n== EDF CHANNEL INFO START ==";
+    sDescription += "\nChannel Label: " + m_sLabel;
+    sDescription += "\nTransducer Type: " + m_sTransducerType;
+    sDescription += "\nPhysical Dimension: " + m_sPhysicalDimension;
+    sDescription += "\nPrefiltering: " + m_sPrefiltering;
+    sDescription += "\nPhysical Minimum: " + QString::number(static_cast<double>(m_fPhysicalMinimum));
+    sDescription += "\nPhysical Maximum: " + QString::number(static_cast<double>(m_fPhysicalMaximum));
+    sDescription += "\nDigital Minimum: " + QString::number(m_iDigitalMinimum);
+    sDescription += "\nDigital Maximum: " + QString::number(m_iDigitalMaximum);
+    sDescription += "\nNumber of Samples per Record: " + QString::number(m_iNumberOfSamplesPerRecord);
+    sDescription += "\nTotal Number of Samples: " + QString::number(m_iNumberOfSamplesTotal);
+    sDescription += "\nChannel Frequency: " + QString::number(static_cast<double>(m_frequency));
 
-    result += "\n== EDF CHANNEL INFO START ==";
-    result += "\nChannel Label: " + m_sLabel;
-    result += "\nTransducer Type: " + m_sTransducerType;
-    result += "\nPhysical Dimension: " + m_sPhysicalDimension;
-    result += "\nPrefiltering: " + m_sPrefiltering;
-    result += "\nPhysical Minimum: " + QString::number(m_fPhysicalMinimum);
-    result += "\nPhysical Maximum: " + QString::number(m_fPhysicalMaximum);
-    result += "\nDigital Minimum: " + QString::number(m_iDigitalMinimum);
-    result += "\nDigital Maximum: " + QString::number(m_iDigitalMaximum);
-    result += "\nNumber of Samples per Record: " + QString::number(m_iNumberOfSamplesPerRecord);
-    result += "\nTotal Number of Samples: " + QString::number(m_iNumberOfSamplesTotal);
-    result += "\nChannel Frequency: " + QString::number(m_frequency);
-
-    return result;
+    return sDescription;
 }
 
 
 //*************************************************************************************************************
 
-void EDFChannelInfo::setAsMeasurementChannel() {
+void EDFChannelInfo::setAsMeasurementChannel()
+{
     m_bIsMeas = true;
 }
 
 
 //*************************************************************************************************************
 
-FiffChInfo EDFChannelInfo::toFiffChInfo() const {
-    FiffChInfo result;
+FiffChInfo EDFChannelInfo::toFiffChInfo() const
+{
+    FiffChInfo fiffChInfo;
 
-    result.scanNo = m_iChanNo;
-    result.logNo = m_iChanNo;  // simply take index from file organisation as logical channel number, this guarantees uniqueness.
+    fiffChInfo.scanNo = m_iChanNo;
+    fiffChInfo.logNo = m_iChanNo;  // simply take index from file organisation as logical channel number, this guarantees uniqueness.
     // check a few basic cases for channel kind:
     QString sLabelUpper = m_sLabel.toUpper();
     if(m_bIsMeas == false) {
         if(sLabelUpper.contains("STIM"))
-            result.kind = FIFFV_STIM_CH;
+            fiffChInfo.kind = FIFFV_STIM_CH;
         else
-            result.kind = FIFFV_MISC_CH;  // declare as miscellaneous, cant be wrong.
+            fiffChInfo.kind = FIFFV_MISC_CH;  // declare as miscellaneous, cannot be wrong.
     }
     else {
         if(sLabelUpper.contains("EEG"))
-            result.kind = FIFFV_EEG_CH;
+            fiffChInfo.kind = FIFFV_EEG_CH;
         else if(sLabelUpper.contains("MEG"))
-            result.kind = FIFFV_MEG_CH;
+            fiffChInfo.kind = FIFFV_MEG_CH;
         else if(sLabelUpper.contains("ECG"))
-            result.kind = FIFFV_ECG_CH;
+            fiffChInfo.kind = FIFFV_ECG_CH;
         else if(sLabelUpper.contains("EOG"))
-            result.kind = FIFFV_EOG_CH;
+            fiffChInfo.kind = FIFFV_EOG_CH;
         else
-            result.kind = FIFFV_MISC_CH;  // declare as miscellaneous, cant be wrong.
+            fiffChInfo.kind = FIFFV_MISC_CH;  // declare as miscellaneous, cannot be wrong.
     }
 
     // check a few basic cases for physical dimension / unit:
     QString sUnitUpper = m_sPhysicalDimension.toUpper();
     if(sUnitUpper.endsWith("V") || sUnitUpper.endsWith("VOLT")) {
-        result.unit = FIFF_UNIT_V;
+        fiffChInfo.unit = FIFF_UNIT_V;
         if(sUnitUpper.startsWith("U") || sUnitUpper.startsWith("MICRO"))
-            result.unit_mul = FIFF_UNITM_MU;
+            fiffChInfo.unit_mul = FIFF_UNITM_MU;
         else
-            result.unit_mul = FIFF_UNITM_NONE;  // seems to be the best solution
+            fiffChInfo.unit_mul = FIFF_UNITM_NONE;  // seems to be the best solution
     }
     else {
-        result.unit = FIFF_UNIT_NONE;
-        result.unit_mul = FIFF_UNITM_NONE;
+        fiffChInfo.unit = FIFF_UNIT_NONE;
+        fiffChInfo.unit_mul = FIFF_UNITM_NONE;
     }
 
     // EDF has a different scaling, which is encapsulated by the interface
-    result.cal = 1.0f;
-    result.range = 1.0f;
+    fiffChInfo.cal = 1.0f;
+    fiffChInfo.range = 1.0f;
 
     // simply take signal label as channel name
-    result.ch_name = m_sLabel;
+    fiffChInfo.ch_name = m_sLabel;
 
-    return result;
+    return fiffChInfo;
 }
