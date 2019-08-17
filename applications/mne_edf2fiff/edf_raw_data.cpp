@@ -68,7 +68,7 @@ using namespace Eigen;
 EDFRawData::EDFRawData(QIODevice* pDev, QObject *parent)
 : QObject(parent),
   m_pDev(pDev),
-  m_info(m_pDev)
+  m_edfInfo(m_pDev)
 {
 
 }
@@ -79,84 +79,87 @@ EDFRawData::EDFRawData(QIODevice* pDev, QObject *parent)
 EDFInfo EDFRawData::getInfo() const
 {
     // return copy of own info
-    return m_info;
+    return m_edfInfo;
 }
 
 
 //*************************************************************************************************************
 
-MatrixXf EDFRawData::read_raw_segment(int startSampleIdx, int endSampleIdx) const
+MatrixXf EDFRawData::read_raw_segment(int iStartSampleIdx, int iEndSampleIdx) const
 {
     // basic sanity checks for indices:
-    if(startSampleIdx < 0 || startSampleIdx >= m_info.getSampleCount() || endSampleIdx < 0 || endSampleIdx > m_info.getSampleCount()) {
+    if(iStartSampleIdx < 0 || iStartSampleIdx >= m_edfInfo.getSampleCount() || iEndSampleIdx < 0 || iEndSampleIdx > m_edfInfo.getSampleCount()) {
         qDebug() << "[EDFRawData::read_raw_segment] An index seems to be out of bounds:";
-        qDebug() << "Start: " << startSampleIdx << " End: " << endSampleIdx;
+        qDebug() << "Start: " << iStartSampleIdx << " End: " << iEndSampleIdx;
         return MatrixXf();  // return empty matrix
     }
 
-    int numSamples = endSampleIdx - startSampleIdx;
-    if(numSamples <= 0) {
+    int iNumSamples = iEndSampleIdx - iStartSampleIdx;
+    if(iNumSamples <= 0) {
         qDebug() << "[EDFRawData::read_raw_segment] Timeslice is empty or negative";
-        qDebug() << "Start: " << startSampleIdx << " End: " << endSampleIdx;
+        qDebug() << "Start: " << iStartSampleIdx << " End: " << iEndSampleIdx;
         return MatrixXf();  // return empty matrix
     }
+
+    // print what segment is being read
+    qDebug() << "Reading " << iStartSampleIdx << " ... " << iEndSampleIdx << "  =   " << iStartSampleIdx / m_edfInfo.getFrequency() << " ... " << iEndSampleIdx / m_edfInfo.getFrequency() << " secs...";
 
     // calculate which is the first needed data record, the relative first sample number and the number of data records we need to read
-    int firstDataRecordIdx = (startSampleIdx - (startSampleIdx % m_info.getNumSamplesPerRecord())) / m_info.getNumSamplesPerRecord();
-    int relativeFirstSampleIdx = startSampleIdx % m_info.getNumSamplesPerRecord();
-    int numDataRecords = static_cast<int>(std::ceil(static_cast<float>(numSamples + relativeFirstSampleIdx) / m_info.getNumSamplesPerRecord()));
+    int iFirstDataRecordIdx = (iStartSampleIdx - (iStartSampleIdx % m_edfInfo.getNumSamplesPerRecord())) / m_edfInfo.getNumSamplesPerRecord();
+    int iRelativeFirstSampleIdx = iStartSampleIdx % m_edfInfo.getNumSamplesPerRecord();
+    int iNumDataRecords = static_cast<int>(std::ceil(static_cast<float>(iNumSamples + iRelativeFirstSampleIdx) / m_edfInfo.getNumSamplesPerRecord()));
 
     // because of the data-record-wise organisation of EDF, we need to patch together the channels later
-    QVector<QVector<int>> vRawPatches(m_info.getNumberOfAllChannels(), QVector<int>());
+    QVector<QVector<int>> vRawPatches(m_edfInfo.getNumberOfAllChannels(), QVector<int>());
 
     // finally start reading the file, put file pointer to beginning of first needed data record
-    m_pDev->seek(m_info.getNumberOfBytesInHeader() + firstDataRecordIdx * m_info.getNumberOfBytesPerDataRecord());
+    m_pDev->seek(m_edfInfo.getNumberOfBytesInHeader() + iFirstDataRecordIdx * m_edfInfo.getNumberOfBytesPerDataRecord());
 
     // since measurement channels make up the bulk part of most edf files, we can simply read the data records as a whole
     QVector<QByteArray> vRecords;
-    for(int i = 0; i < numDataRecords; ++i) {
-        vRecords.push_back(m_pDev->read(m_info.getNumberOfBytesPerDataRecord()));
+    for(int i = 0; i < iNumDataRecords; ++i) {
+        vRecords.push_back(m_pDev->read(m_edfInfo.getNumberOfBytesPerDataRecord()));
     }
 
     // again, extra channels are mostly insignificant compared to measurement channels, so we just filter them out later
-    for(int recIdx = 0; recIdx < vRecords.size(); ++recIdx) {  // go through each record
+    for(int iRecIdx = 0; iRecIdx < vRecords.size(); ++iRecIdx) {  // go through each record
         int recordSampIdx = 0;  // this is the sample idx counter for the records
-        for(int chanIdx = 0; chanIdx < m_info.getNumberOfAllChannels(); ++chanIdx) {  // go through all channels
-            const EDFChannelInfo sig = m_info.getAllChannelInfos()[chanIdx];
+        for(int iChanIdx = 0; iChanIdx < m_edfInfo.getNumberOfAllChannels(); ++iChanIdx) {  // go through all channels
+            const EDFChannelInfo sig = m_edfInfo.getAllChannelInfos()[iChanIdx];
             QVector<int> rawPatch(sig.getNumberOfSamplesPerRecord());
-            for(int temporarySampIdx = recordSampIdx; temporarySampIdx < recordSampIdx + sig.getNumberOfSamplesPerRecord(); ++temporarySampIdx) {  // we need a temporary sample index in order to handle the channel-dependent offsets
+            for(int iTemporarySampIdx = recordSampIdx; iTemporarySampIdx < recordSampIdx + sig.getNumberOfSamplesPerRecord(); ++iTemporarySampIdx) {  // we need a temporary sample index in order to handle the channel-dependent offsets
                 // factor 2 because of 2 byte integer representation, this might be different for bdf files
                 // we need the unary AND operation with '0x00ff' on the right side in order to prevent sign flipping through unintential interpretation as 2's complement integer.
-                rawPatch[temporarySampIdx - recordSampIdx] = (vRecords[recIdx].at(temporarySampIdx * 2 + 1) << 8) | (vRecords[recIdx].at(temporarySampIdx * 2) & 0x00ff);
+                rawPatch[iTemporarySampIdx - recordSampIdx] = (vRecords[iRecIdx].at(iTemporarySampIdx * 2 + 1) << 8) | (vRecords[iRecIdx].at(iTemporarySampIdx * 2) & 0x00ff);
             }
             recordSampIdx += sig.getNumberOfSamplesPerRecord();
-            vRawPatches[chanIdx] += rawPatch;  // append raw patch
+            vRawPatches[iChanIdx] += rawPatch;  // append raw patch
         }
     }
 
     // post-processing: filter out extra channels, start in the back to avoid ugly index offsets
-    QVector<EDFChannelInfo> vAllChannels = m_info.getAllChannelInfos();
-    for(int chanIdx = vRawPatches.size() - 1; chanIdx >= 0; --chanIdx) {
-        if(vAllChannels[chanIdx].isMeasurementChannel() == false) {
-            vRawPatches.remove(chanIdx);
+    QVector<EDFChannelInfo> vAllChannels = m_edfInfo.getAllChannelInfos();
+    for(int iChanIdx = vRawPatches.size() - 1; iChanIdx >= 0; --iChanIdx) {
+        if(vAllChannels[iChanIdx].isMeasurementChannel() == false) {
+            vRawPatches.remove(iChanIdx);
         }
     }
 
     // quick sanity check
-    QVector<EDFChannelInfo> vMeasChannels = m_info.getMeasurementChannelInfos();
+    QVector<EDFChannelInfo> vMeasChannels = m_edfInfo.getMeasurementChannelInfos();
     if(vRawPatches.size() != vMeasChannels.size()) {
        qDebug() << "[EDFRawData::read_raw_segment] Dimension mismatch for filtered raw patches";
     }
 
     // prepare result matrix
-    MatrixXf result(vRawPatches.size(), numSamples);
+    MatrixXf result(vRawPatches.size(), iNumSamples);
 
     // scale raw values according to digital und physical min/max and copy scaled values into result matrix while omitting unwanted samples in the beginning and end
-    for(int measChanIdx = 0; measChanIdx < vRawPatches.size(); ++measChanIdx) {
-        vRawPatches[measChanIdx] = vRawPatches[measChanIdx].mid(relativeFirstSampleIdx);  // cut away unwanted samples in the beginning
-        const EDFChannelInfo chan = vMeasChannels[measChanIdx];
-        for(int sampIdx = 0; sampIdx < numSamples; ++sampIdx) {  // by only letting sampIdx go so far, we automatically exclude unwanted samples in the end
-            result(measChanIdx, sampIdx) = (static_cast<float>(vRawPatches[measChanIdx][sampIdx] - chan.digitalMin()) / (chan.digitalMax() - chan.digitalMin()) * (chan.physicalMax() - chan.physicalMin()) + chan.physicalMin()) / 1000000.0f;
+    for(int iMeasChanIdx = 0; iMeasChanIdx < vRawPatches.size(); ++iMeasChanIdx) {
+        vRawPatches[iMeasChanIdx] = vRawPatches[iMeasChanIdx].mid(iRelativeFirstSampleIdx);  // cut away unwanted samples in the beginning
+        const EDFChannelInfo chan = vMeasChannels[iMeasChanIdx];
+        for(int iSampIdx = 0; iSampIdx < iNumSamples; ++iSampIdx) {  // by only letting sampIdx go so far, we automatically exclude unwanted samples in the end
+            result(iMeasChanIdx, iSampIdx) = (static_cast<float>(vRawPatches[iMeasChanIdx][iSampIdx] - chan.digitalMin()) / (chan.digitalMax() - chan.digitalMin()) * (chan.physicalMax() - chan.physicalMin()) + chan.physicalMin()) / 1000000.0f;
         }
     }
 
@@ -166,23 +169,25 @@ MatrixXf EDFRawData::read_raw_segment(int startSampleIdx, int endSampleIdx) cons
 
 //*************************************************************************************************************
 
-MatrixXf EDFRawData::read_raw_segment(float startTimePoint, float endTimePoint) const {
-    float frequency = m_info.getFrequency();
-    int startSampleIdx = static_cast<int>(std::floor(startTimePoint * frequency));
-    int endSampleIdx = static_cast<int>(std::ceil(endTimePoint * frequency));
+MatrixXf EDFRawData::read_raw_segment(float fStartTimePoint, float fEndTimePoint) const
+{
+    float fFrequency = m_edfInfo.getFrequency();
+    int iStartSampleIdx = static_cast<int>(std::floor(fStartTimePoint * fFrequency));
+    int iEndSampleIdx = static_cast<int>(std::ceil(fEndTimePoint * fFrequency));
 
-    return read_raw_segment(startSampleIdx, endSampleIdx);
+    return read_raw_segment(iStartSampleIdx, iEndSampleIdx);
 }
 
 
 //*************************************************************************************************************
 
-FiffRawData EDFRawData::toFiffRawData() const {
-    FiffRawData result;
+FiffRawData EDFRawData::toFiffRawData() const
+{
+    FiffRawData fiffRawData;
 
-    result.info = m_info.toFiffInfo();
-    result.first_samp = 0;  // EDF files always start at zero
-    result.last_samp = m_info.getSampleCount();
+    fiffRawData.info = m_edfInfo.toFiffInfo();
+    fiffRawData.first_samp = 0;  // EDF files always start at zero
+    fiffRawData.last_samp = m_edfInfo.getSampleCount();
 
-    return result;
+    return fiffRawData;
 }
