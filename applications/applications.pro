@@ -47,7 +47,7 @@ SUBDIRS += \
         mne_forward_solution \
         mne_matching_pursuit \
         mne_sample_set_downloader \
-        mne_edf_to_fiff
+        mne_edf2fiff
 
         qtHaveModule(charts) {
         SUBDIRS += \

@@ -91,7 +91,6 @@ class EDFRawData : public QObject
 {
     Q_OBJECT
 public:
-
     //=========================================================================================================
     /**
     * @brief EDFRawData Constructor for EDFRawData
@@ -116,7 +115,7 @@ public:
     *
     * @return An Eigen matrix that holds the timeslice.
     */
-    Eigen::MatrixXf read_raw_segment(int startSampleIdx, int endSampleIdx) const;
+    Eigen::MatrixXf read_raw_segment(int iStartSampleIdx, int iEndSampleIdx) const;
 
     //=========================================================================================================
     /**
@@ -127,7 +126,7 @@ public:
     *
     * @return An Eigen matrix that holds the timeslice.
     */
-    Eigen::MatrixXf read_raw_segment(float startTimePoint, float endTimePoint) const;
+    Eigen::MatrixXf read_raw_segment(float fStartTimePoint, float fEndTimePoint) const;
 
     //=========================================================================================================
     /**
@@ -142,10 +141,9 @@ signals:
 public slots:
 
 private:
+    QIODevice* m_pDev;      /** The device that is reflected by this EDFRawData object. */
 
-    QIODevice* m_pDev;
-
-    EDFInfo m_info;
+    EDFInfo m_edfInfo;         /** EDF info that holds all the relevant information. */
 };
 
 } // NAMESPACE
