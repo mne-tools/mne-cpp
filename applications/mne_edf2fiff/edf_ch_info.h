@@ -79,7 +79,6 @@ class EDFChannelInfo
 {
 
 public:
-
     //=========================================================================================================
     /**
     * Constructor just copies values.
@@ -96,13 +95,13 @@ public:
                    const long numberOfSamplesPerRecord = -1,
                    const long numberOfSamplesTotal = -1,
                    const float mfrequency = -1,
-                   const bool bIsMeas = false);
+                   const bool isMeasurement = false);
 
     //=========================================================================================================
     /**
-    * Obtain textual representation of channel info.
+    * Obtain textual description of channel info.
     *
-    * @return Textual representation of channel info.
+    * @return Textual description of channel info.
     */
     QString getAsString() const;
 
@@ -123,39 +122,31 @@ public:
     //=========================================================================================================
     // Getters:
     inline QString getLabel() const;
-
     inline int getNumberOfSamplesPerRecord() const;
-
     inline float getFrequency() const;
-
     inline long getSampleCount() const;
-
     inline bool isMeasurementChannel() const;
-
     inline long digitalMin() const;
-
     inline long digitalMax() const;
-
     inline float physicalMin() const;
-
     inline float physicalMax() const;
 
 private:
     // channel / signal index, for later conversion to FiffChInfo
     int m_iChanNo;
 
-    // data fields for EDF channels. The member order does NOT correlate with the position in the header.
-    QString m_sLabel;                   // e.g. EEG Fpz-Cz or Body temp
-    QString m_sTransducerType;          // e.g. AgAgCl electrode
-    QString m_sPhysicalDimension;       // e.g. uV or degreeC
-    QString m_sPrefiltering;            // e.g. HP: 0.1Hz LP: 75Hz
+    // data fields for EDF channels. The member order below does NOT correlate with the order in the EDF header.
+    QString m_sLabel;                   // e.g. "EEG Fpz-Cz" or "Body temp"
+    QString m_sTransducerType;          // e.g. "AgAgCl electrode"
+    QString m_sPhysicalDimension;       // e.g. "uV" or "degreeC"
+    QString m_sPrefiltering;            // e.g. "HP: 0.1Hz LP: 75Hz"
     float m_fPhysicalMinimum;           // e.g. -500 or 34
     float m_fPhysicalMaximum;           // e.g. -500 or 34
     long m_iDigitalMinimum;             // e.g. -2048
     long m_iDigitalMaximum;             // e.g. 2047
     long m_iNumberOfSamplesPerRecord;   // e.g. 250 or 1
 
-    // convenience fields, calculated using the above fields
+    // convenience fields, calculated using the EDF fields
     long m_iNumberOfSamplesTotal;
     float m_frequency;
 
@@ -168,63 +159,72 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QString EDFChannelInfo::getLabel() const {
+inline QString EDFChannelInfo::getLabel() const
+{
     return m_sLabel;
 }
 
 
 //*************************************************************************************************************
 
-inline int EDFChannelInfo::getNumberOfSamplesPerRecord() const {
+inline int EDFChannelInfo::getNumberOfSamplesPerRecord() const
+{
     return m_iNumberOfSamplesPerRecord;
 }
 
 
 //*************************************************************************************************************
 
-inline float EDFChannelInfo::getFrequency() const {
+inline float EDFChannelInfo::getFrequency() const
+{
     return m_frequency;
 }
 
 
 //*************************************************************************************************************
 
-inline long EDFChannelInfo::getSampleCount() const {
+inline long EDFChannelInfo::getSampleCount() const
+{
     return m_iNumberOfSamplesTotal;
 }
 
 
 //*************************************************************************************************************
 
-inline bool EDFChannelInfo::isMeasurementChannel() const {
+inline bool EDFChannelInfo::isMeasurementChannel() const
+{
     return m_bIsMeas;
 }
 
 
 //*************************************************************************************************************
 
-inline long EDFChannelInfo::digitalMin() const {
+inline long EDFChannelInfo::digitalMin() const
+{
     return m_iDigitalMinimum;
 }
 
 
 //*************************************************************************************************************
 
-inline long EDFChannelInfo::digitalMax() const {
+inline long EDFChannelInfo::digitalMax() const
+{
     return m_iDigitalMaximum;
 }
 
 
 //*************************************************************************************************************
 
-inline float EDFChannelInfo::physicalMin() const {
+inline float EDFChannelInfo::physicalMin() const
+{
     return m_fPhysicalMinimum;
 }
 
 
 //*************************************************************************************************************
 
-inline float EDFChannelInfo::physicalMax() const {
+inline float EDFChannelInfo::physicalMax() const
+{
     return m_fPhysicalMaximum;
 }
 

@@ -101,51 +101,51 @@ EDFInfo::EDFInfo(QIODevice* pDev)
     m_iNumChannels = QString::fromLatin1(pDev->read(NUM_SIGNALS)).toInt();
 
     // use the order specified by EDF
-    QVector<QString> labels;
-    QVector<QString> transducers;
-    QVector<QString> physicalDims;
-    QVector<float> physicalMins;
-    QVector<float> physicalMaxs;
-    QVector<long> digitalMins;
-    QVector<long> digitalMaxs;
-    QVector<QString> prefilterings;
-    QVector<long> numbersOfSamplesPerRecords;
+    QVector<QString> vLabels;
+    QVector<QString> vTransducers;
+    QVector<QString> vPhysicalDims;
+    QVector<float> vPhysicalMins;
+    QVector<float> vPhysicalMaxs;
+    QVector<long> vDigitalMins;
+    QVector<long> vDigitalMaxs;
+    QVector<QString> vPrefilterings;
+    QVector<long> vNumbersOfSamplesPerRecords;
 
     for(int i = 0; i < m_iNumChannels; ++i)
-        labels.push_back(QString::fromLatin1(pDev->read(SIG_LABEL)).trimmed());
+        vLabels.push_back(QString::fromLatin1(pDev->read(SIG_LABEL)).trimmed());
     for(int i = 0; i < m_iNumChannels; ++i)
-        transducers.push_back(QString::fromLatin1(pDev->read(SIG_TRANSDUCER_TYPE)).trimmed());
+        vTransducers.push_back(QString::fromLatin1(pDev->read(SIG_TRANSDUCER_TYPE)).trimmed());
     for(int i = 0; i < m_iNumChannels; ++i)
-        physicalDims.push_back(QString::fromLatin1(pDev->read(SIG_PHYSICAL_DIMENSION)).trimmed());
+        vPhysicalDims.push_back(QString::fromLatin1(pDev->read(SIG_PHYSICAL_DIMENSION)).trimmed());
     for(int i = 0; i < m_iNumChannels; ++i)
-        physicalMins.push_back(QString::fromLatin1(pDev->read(SIG_PHYSICAL_MIN)).toFloat());
+        vPhysicalMins.push_back(QString::fromLatin1(pDev->read(SIG_PHYSICAL_MIN)).toFloat());
     for(int i = 0; i < m_iNumChannels; ++i)
-        physicalMaxs.push_back(QString::fromLatin1(pDev->read(SIG_PHYSICAL_MAX)).toFloat());
+        vPhysicalMaxs.push_back(QString::fromLatin1(pDev->read(SIG_PHYSICAL_MAX)).toFloat());
     for(int i = 0; i < m_iNumChannels; ++i)
-        digitalMins.push_back(QString::fromLatin1(pDev->read(SIG_DIGITAL_MIN)).toLong());
+        vDigitalMins.push_back(QString::fromLatin1(pDev->read(SIG_DIGITAL_MIN)).toLong());
     for(int i = 0; i < m_iNumChannels; ++i)
-        digitalMaxs.push_back(QString::fromLatin1(pDev->read(SIG_DIGITAL_MAX)).toLong());
+        vDigitalMaxs.push_back(QString::fromLatin1(pDev->read(SIG_DIGITAL_MAX)).toLong());
     for(int i = 0; i < m_iNumChannels; ++i)
-        prefilterings.push_back(QString::fromLatin1(pDev->read(SIG_PREFILTERING)).trimmed());
+        vPrefilterings.push_back(QString::fromLatin1(pDev->read(SIG_PREFILTERING)).trimmed());
     for(int i = 0; i < m_iNumChannels; ++i)
-        numbersOfSamplesPerRecords.push_back(QString::fromLatin1(pDev->read(SIG_NUM_SAMPLES_PER_DATA_RECORD)).toLong());
+        vNumbersOfSamplesPerRecords.push_back(QString::fromLatin1(pDev->read(SIG_NUM_SAMPLES_PER_DATA_RECORD)).toLong());
     for(int i = 0; i < m_iNumChannels; ++i)
         pDev->read(SIG_RESERVED);  // next 32 bytes are unused
 
     // store full list of signals in original order
     for(int i = 0; i < m_iNumChannels; ++i) {
         m_vAllChannels.push_back(EDFChannelInfo(i,
-                                                labels[i],
-                                                transducers[i],
-                                                physicalDims[i],
-                                                prefilterings[i],
-                                                physicalMins[i],
-                                                physicalMaxs[i],
-                                                digitalMins[i],
-                                                digitalMaxs[i],
-                                                numbersOfSamplesPerRecords[i],
-                                                numbersOfSamplesPerRecords[i] * m_iNumDataRecords,
-                                                numbersOfSamplesPerRecords[i] / m_fDataRecordsDuration,
+                                                vLabels[i],
+                                                vTransducers[i],
+                                                vPhysicalDims[i],
+                                                vPrefilterings[i],
+                                                vPhysicalMins[i],
+                                                vPhysicalMaxs[i],
+                                                vDigitalMins[i],
+                                                vDigitalMaxs[i],
+                                                vNumbersOfSamplesPerRecords[i],
+                                                vNumbersOfSamplesPerRecords[i] * m_iNumDataRecords,
+                                                vNumbersOfSamplesPerRecords[i] / m_fDataRecordsDuration,
                                                 false));
     }
 
@@ -163,7 +163,7 @@ EDFInfo::EDFInfo(QIODevice* pDev)
 
     // do post-processing: variable channel frequencies are not supported, take highest available frequency as main frequency.
     // use 'NumberOfSamplesPerRecord' field in order to avoid float comparisons (duration of data records is fixed)
-    long iMaxNumberOfSamplesPerRecord = -1;
+    int iMaxNumberOfSamplesPerRecord = -1;
     for(const auto& chan : m_vAllChannels) {
         if(chan.getNumberOfSamplesPerRecord() > iMaxNumberOfSamplesPerRecord) {
             iMaxNumberOfSamplesPerRecord = chan.getNumberOfSamplesPerRecord();
@@ -201,7 +201,7 @@ EDFInfo::EDFInfo(QIODevice* pDev)
             }
         }
     } else {
-        qDebug() << "[EDFInfo::EDFInfo] No measurement signals listed. Something probably went wrong.";
+        qDebug() << "[EDFInfo::EDFInfo] No measurement signals listed. Something went wrong.";
     }
 }
 
@@ -210,55 +210,55 @@ EDFInfo::EDFInfo(QIODevice* pDev)
 
 QString EDFInfo::getAsString() const
 {
-    QString result;
-    result += "== EDF INFO START ==";
-    result += "\nEDF Version Number: " + m_sEDFVersionNo;
-    result += "\nLocal Patient Identification: " + m_sLocalPatientIdentification;
-    result += "\nLocal Recording Identification: " + m_sLocalRecordingIdentification;
-    result += "\nDate of Recording: " + m_startDateTime.date().toString("dd.MM.yyyy");
-    result += "\nTime of Recording: " + m_startDateTime.time().toString("hh:mm:ss");
-    result += "\nNumber of Bytes in the EDF Header: " + QString::number(m_iNumBytesInHeader);
-    result += "\nNumber of Data Records: " + QString::number(m_iNumDataRecords);
-    result += "\nDuration of each Data Record (in Seconds): " + QString::number(m_fDataRecordsDuration);
-    result += "\nNumber of Signals in EDF File: " + QString::number(m_iNumChannels);
+    QString sDescription;
+    sDescription += "== EDF INFO START ==";
+    sDescription += "\nEDF Version Number: " + m_sEDFVersionNo;
+    sDescription += "\nLocal Patient Identification: " + m_sLocalPatientIdentification;
+    sDescription += "\nLocal Recording Identification: " + m_sLocalRecordingIdentification;
+    sDescription += "\nDate of Recording: " + m_startDateTime.date().toString("dd.MM.yyyy");
+    sDescription += "\nTime of Recording: " + m_startDateTime.time().toString("hh:mm:ss");
+    sDescription += "\nNumber of Bytes in the EDF Header: " + QString::number(m_iNumBytesInHeader);
+    sDescription += "\nNumber of Data Records: " + QString::number(m_iNumDataRecords);
+    sDescription += "\nDuration of each Data Record (in Seconds): " + QString::number(m_fDataRecordsDuration);
+    sDescription += "\nNumber of Signals in EDF File: " + QString::number(m_iNumChannels);
 
-    result += "\n== MEASUREMENT SIGNALS ==";
+    sDescription += "\n== MEASUREMENT SIGNALS ==";
     for(const auto& sig : m_vAllChannels) {
         if(sig.isMeasurementChannel()) {
-            result += sig.getAsString();
+            sDescription += sig.getAsString();
         }
     }
 
-    result += "\n== EXTRA SIGNALS ==";
+    sDescription += "\n== EXTRA SIGNALS ==";
     for(const auto& sig : m_vAllChannels) {
         if(sig.isMeasurementChannel() == false) {
-            result += sig.getAsString();
+            sDescription += sig.getAsString();
         }
     }
 
-    result += "\n== EDF INFO END ==";
+    sDescription += "\n== EDF INFO END ==";
 
-    return result;
+    return sDescription;
 }
 
 
 //*************************************************************************************************************
 
-FiffInfo EDFInfo::toFiffInfo() const {
-    FiffInfo result;
+FiffInfo EDFInfo::toFiffInfo() const
+{
+    FiffInfo fiffInfo;
 
     // fiff_info_base members
-    result.nchan = m_vMeasChannels.size();
+    fiffInfo.nchan = m_vMeasChannels.size();
 
     for(const auto& edfChan : m_vMeasChannels) {
         const FiffChInfo temp = edfChan.toFiffChInfo();
-        result.chs.append(temp);
-        result.ch_names.append(temp.ch_name);
+        fiffInfo.chs.append(temp);
+        fiffInfo.ch_names.append(temp.ch_name);
     }
 
     // fiff_info members
-    result.sfreq = getFrequency();
+    fiffInfo.sfreq = getFrequency();
 
-
-    return result;
+    return fiffInfo;
 }
