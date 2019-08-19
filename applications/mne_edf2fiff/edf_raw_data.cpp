@@ -163,6 +163,18 @@ MatrixXf EDFRawData::read_raw_segment(int iStartSampleIdx, int iEndSampleIdx) co
         }
     }
 
+    /* Mattis version: do scaling by adjusting range and cal in the conversion from EDF to Fiff. */
+    /*
+    // copy scaled values into result matrix while omitting unwanted samples in the beginning and end
+    for(int iMeasChanIdx = 0; iMeasChanIdx < vRawPatches.size(); ++iMeasChanIdx) {
+        vRawPatches[iMeasChanIdx] = vRawPatches[iMeasChanIdx].mid(iRelativeFirstSampleIdx);  // cut away unwanted samples in the beginning
+        const EDFChannelInfo chan = vMeasChannels[iMeasChanIdx];
+        for(int iSampIdx = 0; iSampIdx < iNumSamples; ++iSampIdx) {  // by only letting sampIdx go so far, we automatically exclude unwanted samples in the end
+            result(iMeasChanIdx, iSampIdx) = vRawPatches[iMeasChanIdx][iSampIdx];
+        }
+    }
+    */
+
     return result;
 }
 
