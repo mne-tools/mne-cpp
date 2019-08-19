@@ -170,6 +170,34 @@ FiffChInfo EDFChannelInfo::toFiffChInfo() const
     fiffChInfo.cal = 1.0f;
     fiffChInfo.range = 1.0f;
 
+    /* Mattix version: do scaling by adjusting range and cal */
+    /*
+    fiffChInfo.unit = FIFF_UNIT_V;
+    fiffChInfo.unit_mul = FIFF_UNITM_NONE;
+
+    if(m_sPhysicalDimension.toUpper().contains("UV"))
+        fiffChInfo.unit_mul = FIFF_UNITM_MU;  // This will be changed by adjusting the calibration instead, see below
+
+    fiffChInfo.range = 0.0f;
+    fiffChInfo.cal = 0.0f;
+
+    fiffChInfo.cal = -m_fPhysicalMinimum;
+    fiffChInfo.cal += m_fPhysicalMaximum;
+
+    fiffChInfo.range = -m_iDigitalMinimum;
+    fiffChInfo.range += m_iDigitalMaximum;
+
+    // Final adjustment to the calibration:
+    if(fiffChInfo.unit_mul == FIFF_UNITM_MU) {
+        fiffChInfo.cal = 1e-6 * fiffChInfo.cal / fiffChInfo.range;
+        fiffChInfo.unit_mul = FIFF_UNITM_NONE;
+    }
+    else {
+        fiffChInfo.cal = fiffChInfo.cal / fiffChInfo.range;
+    }
+    fiffChInfo.range = 1.0f;
+    */
+
     // simply take signal label as channel name
     fiffChInfo.ch_name = m_sLabel;
 
