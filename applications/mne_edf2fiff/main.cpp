@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 
         samplesRead += nextChunkSize;
 
-        outfid->write_raw_buffer(data);
+        outfid->write_raw_buffer(data, cals);
     }
 
     outfid->finish_writing_raw();
