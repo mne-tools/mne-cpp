@@ -89,20 +89,39 @@ int main(int argc, char *argv[])
 
     // command line parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("EDF to Fiff conversion");
+    parser.setApplicationDescription("EDF to Fiff conversion. Variable channel frequencies are supported. Interrupted recordings are not supported.");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", "C:\\Users\\Simon\\Desktop\\hiwi\\edf_files\\00000929_s005_t000.edf");
-    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", "C:\\Users\\Simon\\Desktop\\out.fif");
+    QCommandLineOption inputOption("fileIn", "The input file. Needs to be specified.", "in", "");
+    QCommandLineOption outputOption("fileOut", "The output file. If not specified, this will be the same filename as the input file.", "out", "");
 
     parser.addOption(inputOption);
     parser.addOption(outputOption);
 
     parser.process(a);
 
+    QString sInputFile = parser.value(inputOption);
+    QString sOutputFile = parser.value(outputOption);
+
+    // check for correct usage:
+    if(sInputFile.isEmpty()) {
+        parser.showHelp(0);
+    }
+    if(!sInputFile.toUpper().endsWith(".EDF")) {
+        qDebug() << "Not an EDF file: " << sInputFile;
+        return 0;
+    }
+
+    // if the user did not specify an output file, simply use the same location as the input file:
+    if(sOutputFile.isEmpty()) {
+        qDebug() << "No output file specified, using same filename for output FIFF file";
+        sOutputFile = sInputFile.left(sInputFile.size() - 3);  // cut the 'edf'
+        sOutputFile = sOutputFile.append("fif"); // append 'fif'
+    }
+
     // init data loading and writing
-    QFile t_fileIn(parser.value(inputOption));
-    QFile t_fileOut(parser.value(outputOption));
+    QFile t_fileIn(sInputFile);
+    QFile t_fileOut(sOutputFile);
 
     // initialize raw data
     EDFRawData edfRaw(&t_fileIn);
