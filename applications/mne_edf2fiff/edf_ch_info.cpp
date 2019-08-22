@@ -170,7 +170,7 @@ FiffChInfo EDFChannelInfo::toFiffChInfo() const
     fiffChInfo.cal = 1.0f;
     fiffChInfo.range = 1.0f;
 
-    /* Mattix version: do scaling by adjusting range and cal */
+    /* Mattis version: do scaling by adjusting range and cal */
     /*
     fiffChInfo.unit = FIFF_UNIT_V;
     fiffChInfo.unit_mul = FIFF_UNITM_NONE;
