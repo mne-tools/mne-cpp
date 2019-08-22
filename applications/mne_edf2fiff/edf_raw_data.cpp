@@ -159,7 +159,11 @@ MatrixXf EDFRawData::read_raw_segment(int iStartSampleIdx, int iEndSampleIdx) co
         vRawPatches[iMeasChanIdx] = vRawPatches[iMeasChanIdx].mid(iRelativeFirstSampleIdx);  // cut away unwanted samples in the beginning
         const EDFChannelInfo chan = vMeasChannels[iMeasChanIdx];
         for(int iSampIdx = 0; iSampIdx < iNumSamples; ++iSampIdx) {  // by only letting sampIdx go so far, we automatically exclude unwanted samples in the end
-            result(iMeasChanIdx, iSampIdx) = (static_cast<float>(vRawPatches[iMeasChanIdx][iSampIdx] - chan.digitalMin()) / (chan.digitalMax() - chan.digitalMin()) * (chan.physicalMax() - chan.physicalMin()) + chan.physicalMin()) / 1000000.0f;
+            result(iMeasChanIdx, iSampIdx) = static_cast<float>(vRawPatches[iMeasChanIdx][iSampIdx] - chan.digitalMin()) / (chan.digitalMax() - chan.digitalMin()) * (chan.physicalMax() - chan.physicalMin()) + chan.physicalMin();
+            if(chan.isMeasurementChannel()) {
+                // probably uV values, need to scale them down by 1e6
+                result(iMeasChanIdx, iSampIdx) = result(iMeasChanIdx, iSampIdx) / 1000000.0f;
+            }
         }
     }
 
@@ -200,6 +204,13 @@ FiffRawData EDFRawData::toFiffRawData() const
     fiffRawData.info = m_edfInfo.toFiffInfo();
     fiffRawData.first_samp = 0;  // EDF files always start at zero
     fiffRawData.last_samp = m_edfInfo.getSampleCount();
+
+    // copy calibrations:
+    RowVectorXd cals(fiffRawData.info.nchan);
+    for(int i = 0; i < fiffRawData.info.chs.size(); ++i) {
+        cals[i] = fiffRawData.info.chs[i].cal;
+    }
+    fiffRawData.cals = cals;
 
     return fiffRawData;
 }
