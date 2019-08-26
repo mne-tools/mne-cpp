@@ -57,7 +57,7 @@
 // DEFINE NAMESPACE RapMusicToolboxPlugin
 //=============================================================================================================
 
-namespace RapMusicToolboxPlugin
+namespace RAPMUSICTOOLBOXPLUGIN
 {
 
 

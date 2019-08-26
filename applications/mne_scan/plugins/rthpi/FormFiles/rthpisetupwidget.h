@@ -72,7 +72,7 @@
 // DEFINE NAMESPACE RtHpiPlugin
 //=============================================================================================================
 
-namespace RtHpiPlugin
+namespace RTHPIPLUGIN
 {
 
 

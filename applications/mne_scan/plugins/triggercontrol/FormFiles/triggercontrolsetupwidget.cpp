@@ -61,7 +61,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TriggerControlPlugin;
+using namespace TRIGGERCONTROLPLUGIN;
 
 
 //*************************************************************************************************************
@@ -170,7 +170,7 @@ void TriggerControlSetupWidget::on_m_qPushButton_Disconnect_released()
 
 //*************************************************************************************************************
 
-void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_released()
+void TRIGGERCONTROLPLUGIN::TriggerControlSetupWidget::on_m_qPushButton_Send_released()
 {
 
     // retrieve current configuration of digital channels
@@ -223,7 +223,7 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_rele
 
 //*************************************************************************************************************
 
-void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalog_released()
+void TRIGGERCONTROLPLUGIN::TriggerControlSetupWidget::on_m_qPushButton_Sendanalog_released()
 {
 
     // retrieve current configuration
@@ -246,7 +246,7 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalo
 
 }
 
-void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveDigitalInfo_released()
+void TRIGGERCONTROLPLUGIN::TriggerControlSetupWidget::on_m_qPushButton_RetrieveDigitalInfo_released()
 {
     m_pTriggerControl->m_pSerialPort->m_retrievetyp = 0;    // digital channel desired
     m_pTriggerControl->m_pSerialPort->encoderetr();
@@ -256,7 +256,7 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveD
 
 //*************************************************************************************************************
 
-void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveAnalogInfo_released()
+void TRIGGERCONTROLPLUGIN::TriggerControlSetupWidget::on_m_qPushButton_RetrieveAnalogInfo_released()
 {
     m_pTriggerControl->m_pSerialPort->m_retrievetyp = 1;    // analog channel desired
 
@@ -278,7 +278,7 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveA
 
 //*************************************************************************************************************
 
-void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_ConnectChannel_released()
+void TRIGGERCONTROLPLUGIN::TriggerControlSetupWidget::on_m_qPushButton_ConnectChannel_released()
 {
     m_pTriggerControl->m_pSerialPort->m_wiredChannel = ui.m_qComboBox_ChannelList->currentIndex();
 }
