@@ -63,7 +63,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ECGSimulatorPlugin;
+using namespace ECGSIMULATORPLUGIN;
 using namespace SCMEASLIB;
 
 
