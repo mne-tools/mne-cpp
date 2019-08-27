@@ -59,7 +59,7 @@
 //=============================================================================================================
 
 //namespace DummyToolboxPlugin
-namespace RtHpiPlugin
+namespace RTHPIPLUGIN
 {
 
 
