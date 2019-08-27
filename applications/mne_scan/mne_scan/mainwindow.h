@@ -79,11 +79,11 @@ QT_END_NAMESPACE
 
 namespace SCSHAREDLIB
 {
-class IPlugin;
-class PluginManager;
-class PluginSceneManager;
-class PluginConnectorConnection;
-class DisplayManager;
+    class IPlugin;
+    class PluginManager;
+    class PluginSceneManager;
+    class PluginConnectorConnection;
+    class DisplayManager;
 }
 
 
@@ -95,15 +95,14 @@ class DisplayManager;
 namespace MNESCAN
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
 class StartUpWidget;
-
 class PluginGui;
-
 class RunWidget;
 class PluginDockWidget;
 
@@ -194,10 +193,7 @@ private:
     */
     void uiSetupRunningState(bool state);
 
-    /**
-     * \defgroup Class MainWindow user interface
-     */
-    /*@{*/
+    // Class MainWindow user interface
     void createActions();       /**< Creates all actions for user interface of MainWindow class. */
     void createMenus();         /**< Creates all menus for user interface of MainWindow class. */
     void createToolBars();      /**< Creates all tool bars for user interface of MainWindow class. */

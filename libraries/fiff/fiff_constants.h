@@ -196,6 +196,7 @@ namespace FIFFLIB
 #define FIFFV_COIL_ARTEMIS123_GRAD              7501    /**< Artemis123 gradiometer */
 #define FIFFV_COIL_ARTEMIS123_REF_MAG           7502    /**< Artemis123 reference magnetometer */
 #define FIFFV_COIL_ARTEMIS123_REF_GRAD          7503    /**< Artemis123 reference gradiometer */
+#define FIFFV_COIL_QUSPIN_ZFOPM_MAG             8001    /**< QuSpin ZFOPM magnetometer */
 #define FIFFV_COIL_KRISS_GRAD                   9001    /**< KRISS gradiometer */
 #define FIFFV_COIL_COMPUMEDICS_ADULT_GRAD       10001   /**< Compumedics adult gradiometer */
 #define FIFFV_COIL_COMPUMEDICS_PEDIATRIC_GRAD   10002   /**< Compumedics pediatric gradiometer */
