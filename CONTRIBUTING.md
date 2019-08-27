@@ -1,5 +1,6 @@
-Contributing
-------------
+Contributing {#page_contribute}
+==================================
+
 We recommend using Qt Creator for development.
 
 Getting Qt
@@ -7,9 +8,9 @@ Getting Qt
 
 * Download the current Qt version:
     Go to the Qt download section and download the [Qt installer](https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5). Qt 5.10.0 or higher is needed in order to have full Qt3D support. 
-    ```
+
     Windows users: Make sure NOT to download the WinRt or UWP version.
-    ```
+
     Select the appropriate version based on your compiler and development platform.
 
     For example if you are using the Microsoft Visual Studio 2015 Compiler on a Windows 32bit system, select the "MSVC 2015 32-bit" version.
@@ -33,11 +34,9 @@ Getting Qt
 
         - Add Qt bin and lib directory to the environment variables (the qt paths may differ depending on your Qt installation). 
           by adding it to your `.bashrc` file under `/home/<username>/`:
-
-            ```sh
-            $ export PATH=$PATH:~/Qt/Qt5.10.0/bin
-            $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/Qt/Qt5.10.0/lib
-            ```
+ 
+              $ export PATH=$PATH:~/Qt/Qt5.10.0/bin
+              $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/Qt/Qt5.10.0/lib
 
          Note this command may differ depending on your shell (for example `$ export env` in `.tchrc`)
 
@@ -49,6 +48,7 @@ Getting Qt
 
 Get the MNE-CPP source code
 ---------------------------
+
 Fork MNE-CPP's main repository (mne-tools/mne-cpp) to your own GitHub account:
 
 * Go to the GitHub website and sign into your GitHub account.
@@ -61,15 +61,11 @@ Clone the forked MNE-CPP repository to your local machine:
 * Navigate to your folder where you want to clone the repository to (Use cd to navigate to a specific path on your hard drive). Please note that the folder path should not contain any whitespaces. For example, `C:/Git/` would be a good candidate to clone the repository to.
 * Type in the following command to clone the repository:
 
-    ```sh
-    $ git clone https://github.com/<YourGitUserName>/mne-cpp.git
-    ```
+      $ git clone https://github.com/<YourGitUserName>/mne-cpp.git
 
 * Every time you want to pull the newest changes made in the main MNE-CPP repository use the code below. Please make sure that you are on the local `master` branch when you do this:
 
-   ```sh
-   $ git pull https://github.com/mne-tools/mne-cpp.git master
-   ```
+      $ git pull https://github.com/mne-tools/mne-cpp.git master
 
 Congrats, you now have the latest MNE-CPP source code on your remote and local machine. For a more detailed overview of how to make a pull request, we recommend checking out the [guide on the official Git website](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project).
 
