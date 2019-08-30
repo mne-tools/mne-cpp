@@ -92,7 +92,7 @@ namespace FIFFLIB
 #define FIFF_UNIT_NONE -1
 
 /*
-* 1. SI base units
+* SI base units
 */
 #define FIFF_UNIT_M   1
 #define FIFF_UNIT_KG  2
@@ -102,18 +102,18 @@ namespace FIFFLIB
 #define FIFF_UNIT_MOL 6
 
 /*
-* 2. SI Supplementary units
+* SI Supplementary units
 */
 #define FIFF_UNIT_RAD 7
 #define FIFF_UNIT_SR  8
 
 /*
-* 1. SI base candela
+* SI base candela
 */
 #define FIFF_UNIT_CD  9
 
 /*
-* 3. SI derived units
+* SI derived units
 */
 #define FIFF_UNIT_HZ  101
 #define FIFF_UNIT_N   102
@@ -133,7 +133,7 @@ namespace FIFFLIB
 #define FIFF_UNIT_LX  116
 
 /*
-* 4. Others we need
+* Others we need
 */
 #define FIFF_UNIT_T_M   201   /* T/m */
 #define FIFF_UNIT_AM    202   /* Am  */
@@ -141,7 +141,7 @@ namespace FIFFLIB
 #define FIFF_UNIT_AM_M3 204   /* Am/m^3  */
 
 /*
-* 5. Multipliers
+* Multipliers
 */
 #define FIFF_UNITM_E   18
 #define FIFF_UNITM_PET 15
@@ -198,8 +198,8 @@ namespace FIFFLIB
 #define FIFFV_COIL_ARTEMIS123_REF_GRAD          7503    /**< Artemis123 reference gradiometer */
 #define FIFFV_COIL_QUSPIN_ZFOPM_MAG             8001    /**< QuSpin ZFOPM magnetometer */
 #define FIFFV_COIL_KRISS_GRAD                   9001    /**< KRISS gradiometer */
-#define FIFFV_COIL_COMPUMEDICS_ADULT_GRAD       10001   /**< Compumedics adult gradiometer */
-#define FIFFV_COIL_COMPUMEDICS_PEDIATRIC_GRAD   10002   /**< Compumedics pediatric gradiometer */
+#define FIFFV_COIL_COMPUMEDICS_ADULT_GRAD       9101    /**< Compumedics adult gradiometer */
+#define FIFFV_COIL_COMPUMEDICS_PEDIATRIC_GRAD   9102    /**< Compumedics pediatric gradiometer */
 
 #define FIFFM_IS_VV_COIL(c) ((c)/1000 == 3)
 

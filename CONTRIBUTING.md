@@ -38,7 +38,7 @@ Getting Qt
               $ export PATH=$PATH:~/Qt/Qt5.10.0/bin
               $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/Qt/Qt5.10.0/lib
 
-         Note this command may differ depending on your shell (for example `$ export env` in `.tchrc`)
+         Note this command may differ depending on your shell (for example `$ setenv` in `.tchrc`)
 
 * In case you work on a Windows machine and do not have a compiler set up:
 
@@ -74,8 +74,9 @@ Compile the MNE-CPP source code
 
 * If you are working on an operating system on a "non-western" system, i.e. Japan, you might encounter problems with unicode interpretation. Please do the  following: Go to Control Panel -> Language and Region -> Management tab -> Language Settings for non-Unicode Programs -> Set to English (U.S.) -> Reboot your system.
 * Go to your cloned repository folder and run the `mne-cpp/mne-cpp.pro` file with the QtCreator.
-* The first time you open the mne-cpp.pro file with QtCreator you will be prompted to configure the project with an installed Qt version. Select teh appropriate Qt version, e.g. Qt MSVC 2015 32-bit and configure the project.
+* The first time you open the mne-cpp.pro file with QtCreator you will be prompted to configure the project with an installed Qt version. Select the appropriate Qt version, e.g. Qt MSVC 2015 32-bit and configure the project.
 * In QtCreator select the Release mode in the lower left corner.
 * In the Qt Creator's Projects window, right mouse click on the top level mne-cpp tree item and select Run qmake. Wait until progress bar in lower right corner turns green (this step may take some time).
 * Right mouse click again and then hit Build (this step may take some time). Wait until progress bar in lower right corner turns green.
 * After the build process is finished, go to the `mne-cpp/bin` folder. All applications and libraries should have been created throughout the build process.
+* In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download ) and extract the files to `mne-cpp/bin/MNE-sample-data`
