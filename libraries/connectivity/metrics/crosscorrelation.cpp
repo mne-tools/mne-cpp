@@ -94,6 +94,10 @@ CrossCorrelation::CrossCorrelation()
 
 Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
 {
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
+
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
     #endif
@@ -105,8 +109,11 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
         return finalNetwork;
     }
 
+    if(AbstractMetric::m_bStorageModeIsActive == false) {
+        connectivitySettings.clearIntermediateData();
+    }
+
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
-    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();
@@ -126,10 +133,7 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
 
     // Generate tapers
     int iSignalLength = connectivitySettings.at(0).matData.cols();
-    int iNfft = connectivitySettings.getNumberFFT();
-    if(iNfft > iSignalLength) {
-        iNfft = iSignalLength;
-    }
+    int iNfft = connectivitySettings.getFFTSize();
 
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
 
@@ -145,12 +149,20 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
                 tapers);
     };
 
+//    iTime = timer.elapsed();
+//    qWarning() << "Preparation" << iTime;
+//    timer.restart();
+
     // Calculate connectivity matrix over epochs and average afterwards
     QFuture<void> resultMat = QtConcurrent::map(connectivitySettings.getTrialData(),
                                                 computeLambda);
     resultMat.waitForFinished();
 
     matDist /= connectivitySettings.size();
+
+//    iTime = timer.elapsed();
+//    qWarning() << "ComputeSpectraPSDCSD" << iTime;
+//    timer.restart();
 
     //Add edges to network
     MatrixXd matWeight(1,1);
@@ -168,6 +180,10 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
             finalNetwork.append(pEdge);
         }
     }
+
+//    iTime = timer.elapsed();
+//    qWarning() << "Compute" << iTime;
+//    timer.restart();
 
     return finalNetwork;
 }
@@ -207,7 +223,14 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
 
             // Calculate tapered spectra
             for(j = 0; j < tapers.first.rows(); j++) {
-                vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
+                // Zero padd if necessary. The zero padding in Eigen's FFT is only working for column vectors.
+                if (rowData.cols() < iNfft) {
+                    vecInputFFT.setZero(iNfft);
+                    vecInputFFT.block(0,0,1,rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));;
+                } else {
+                    vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
+                }
+
                 // FFT for freq domain returning the half spectrum and multiply taper weights
                 fft.fwd(vecResultFreq, vecInputFFT, iNfft);
                 matTapSpectrum.row(j) = vecResultFreq * tapers.second(j);
@@ -232,7 +255,7 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
         vecResultFreq = inputData.vecTapSpectra.at(i).colwise().sum() / denom;
 
         for(j = i; j < inputData.vecTapSpectra.size(); ++j) {
-            vecResultXCor = vecResultFreq.cwiseProduct(inputData.vecTapSpectra.at(j).colwise().sum().conjugate() / denom);
+            vecResultXCor = vecResultFreq.cwiseProduct(inputData.vecTapSpectra.at(j).colwise().sum() / denom);
 
             fft.inv(vecInputFFT, vecResultXCor, iNfft);
 
@@ -261,4 +284,8 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
 //    iTime = timer.elapsed();
 //    qDebug() << QThread::currentThreadId() << "CrossCorrelation::compute timer - Summing up matDist:" << iTime;
 //    timer.restart();
+
+    if(!m_bStorageModeIsActive) {
+        inputData.vecTapSpectra.clear();
+    }
 }

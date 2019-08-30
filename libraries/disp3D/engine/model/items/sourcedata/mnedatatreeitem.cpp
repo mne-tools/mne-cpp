@@ -43,7 +43,9 @@
 #include "../common/metatreeitem.h"
 #include "../common/abstractmeshtreeitem.h"
 #include "../common/gpuinterpolationitem.h"
+#include "../freesurfer/fssurfacetreeitem.h"
 #include "../../3dhelpers/custommesh.h"
+#include "../../materials/pervertexphongalphamaterial.h"
 
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_forwardsolution.h>
@@ -84,8 +86,8 @@ using namespace DISP3DLIB;
 //=============================================================================================================
 
 MneDataTreeItem::MneDataTreeItem(int iType,
-                                 const QString &text,
-                                 bool bUseGPU)
+                                         const QString &text,
+                                         bool bUseGPU)
 : AbstractTreeItem(iType, text)
 , m_bIsDataInit(false)
 , m_bUseGPU(bUseGPU)
@@ -178,7 +180,7 @@ void MneDataTreeItem::initItem()
     list << new QStandardItem(pItemLoopedStreaming->toolTip());
     this->appendRow(list);
 
-    MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, "1");
+    MetaTreeItem *pItemAveragedStreaming = new MetaTreeItem(MetaTreeItemTypes::NumberAverages, "17");
     connect(pItemAveragedStreaming, &MetaTreeItem::dataChanged,
             this, &MneDataTreeItem::onNumberAveragesChanged);
     list.clear();
@@ -336,19 +338,15 @@ void MneDataTreeItem::initData(const MNEForwardSolution& tForwardSolution,
         connect(m_pRtSourceDataController.data(), &RtSourceDataController::newRtRawDataAvailable,
                 this, &MneDataTreeItem::onNewRtRawData);
     } else {
-        if(!m_pInterpolationItemLeftCPU)
-        {
+        if(!m_pInterpolationItemLeftCPU) {
             m_pInterpolationItemLeftCPU = new AbstractMeshTreeItem(p3DEntityParent,
                                                             Data3DTreeModelItemTypes::AbstractMeshItem,
                                                             QStringLiteral("3D Plot - Left"));
 
-            //Create color from curvature information with default gyri and sulcus colors
-            MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(tSurfSet[0].rr().rows());
-
-            m_pInterpolationItemLeftCPU->setVertices(tSurfSet[0].rr(),
+            m_pInterpolationItemLeftCPU->setMeshData(tSurfSet[0].rr(),
                                                      tSurfSet[0].nn(),
                                                      tSurfSet[0].tris(),
-                                                     matVertColor,
+                                                     FsSurfaceTreeItem::createCurvatureVertColor(tSurfSet[0].curv()),
                                                      Qt3DRender::QGeometryRenderer::Triangles);
 
             m_pInterpolationItemLeftCPU->setPosition(QVector3D(-tSurfSet[0].offset()(0),
@@ -361,26 +359,26 @@ void MneDataTreeItem::initData(const MNEForwardSolution& tForwardSolution,
             this->appendRow(list);
 
             m_pInterpolationItemLeftCPU->setAlpha(1.0f);
+
+            //Set material to enable sorting
+            QPointer<PerVertexPhongAlphaMaterial> pBemMaterial = new PerVertexPhongAlphaMaterial(true);
+            m_pInterpolationItemLeftCPU->setMaterial(pBemMaterial);
         }
 
-        if(!m_pInterpolationItemRightCPU)
-        {
+        if(!m_pInterpolationItemRightCPU) {
             m_pInterpolationItemRightCPU = new AbstractMeshTreeItem(p3DEntityParent,
                                                             Data3DTreeModelItemTypes::AbstractMeshItem,
                                                             QStringLiteral("3D Plot - Right"));
 
-            //Create color from curvature information with default gyri and sulcus colors
-            MatrixX3f matVertColor = AbstractMeshTreeItem::createVertColor(tSurfSet[1].rr().rows());
-
-            m_pInterpolationItemRightCPU->setVertices(tSurfSet[1].rr(),
+            m_pInterpolationItemRightCPU->setMeshData(tSurfSet[1].rr(),
                                                       tSurfSet[1].nn(),
                                                       tSurfSet[1].tris(),
-                                                      matVertColor,
+                                                      FsSurfaceTreeItem::createCurvatureVertColor(tSurfSet[1].curv()),
                                                       Qt3DRender::QGeometryRenderer::Triangles);
 
             m_pInterpolationItemRightCPU->setPosition(QVector3D(-tSurfSet[1].offset()(0),
-                                                               -tSurfSet[1].offset()(1),
-                                                               -tSurfSet[1].offset()(2)));
+                                                                -tSurfSet[1].offset()(1),
+                                                                -tSurfSet[1].offset()(2)));
 
             QList<QStandardItem*> list;
             list << m_pInterpolationItemRightCPU;
@@ -388,6 +386,10 @@ void MneDataTreeItem::initData(const MNEForwardSolution& tForwardSolution,
             this->appendRow(list);
 
             m_pInterpolationItemRightCPU->setAlpha(1.0f);
+
+            //Set material to enable sorting
+            QPointer<PerVertexPhongAlphaMaterial> pBemMaterial = new PerVertexPhongAlphaMaterial(true);
+            m_pInterpolationItemRightCPU->setMaterial(pBemMaterial);
         }
 
         connect(m_pRtSourceDataController.data(), &RtSourceDataController::newRtSmoothedDataAvailable,
@@ -400,6 +402,9 @@ void MneDataTreeItem::initData(const MNEForwardSolution& tForwardSolution,
                                                     tForwardSolution.src[1].neighbor_vert,
                                                     clustVertNoLeft,
                                                     clustVertNoRight);
+
+    m_pRtSourceDataController->setSurfaceColor(FsSurfaceTreeItem::createCurvatureVertColor(tSurfSet[0].curv()),
+                                               FsSurfaceTreeItem::createCurvatureVertColor(tSurfSet[1].curv()));
 
     m_pRtSourceDataController->setAnnotationInfo(vecLabelIdsLeftHemi,
                                                  vecLabelIdsRightHemi,
@@ -620,6 +625,94 @@ void MneDataTreeItem::setAlpha(float fAlpha)
 
 //*************************************************************************************************************
 
+void MneDataTreeItem::setTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pInterpolationItemLeftCPU) {
+        m_pInterpolationItemLeftCPU->setTransform(transform);
+    }
+
+    if(m_pInterpolationItemLeftGPU) {
+        m_pInterpolationItemLeftGPU->setTransform(transform);
+    }
+
+    if(m_pInterpolationItemRightCPU) {
+        m_pInterpolationItemRightCPU->setTransform(transform);
+    }
+
+    if(m_pInterpolationItemRightGPU) {
+        m_pInterpolationItemRightGPU->setTransform(transform);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneDataTreeItem::setTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+{
+    if(m_pInterpolationItemLeftCPU) {
+        m_pInterpolationItemLeftCPU->setTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemLeftGPU) {
+        m_pInterpolationItemLeftGPU->setTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemRightCPU) {
+        m_pInterpolationItemRightCPU->setTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemRightGPU) {
+        m_pInterpolationItemRightGPU->setTransform(transform, bApplyInverse);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneDataTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
+{
+    if(m_pInterpolationItemLeftCPU) {
+        m_pInterpolationItemLeftCPU->applyTransform(transform);
+    }
+
+    if(m_pInterpolationItemLeftGPU) {
+        m_pInterpolationItemLeftGPU->applyTransform(transform);
+    }
+
+    if(m_pInterpolationItemRightCPU) {
+        m_pInterpolationItemRightCPU->applyTransform(transform);
+    }
+
+    if(m_pInterpolationItemRightGPU) {
+        m_pInterpolationItemRightGPU->applyTransform(transform);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneDataTreeItem::applyTransform(const FiffCoordTrans& transform, bool bApplyInverse)
+{
+    if(m_pInterpolationItemLeftCPU) {
+        m_pInterpolationItemLeftCPU->applyTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemLeftGPU) {
+        m_pInterpolationItemLeftGPU->applyTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemRightCPU) {
+        m_pInterpolationItemRightCPU->applyTransform(transform, bApplyInverse);
+    }
+
+    if(m_pInterpolationItemRightGPU) {
+        m_pInterpolationItemRightGPU->applyTransform(transform, bApplyInverse);
+    }
+}
+
+
+//*************************************************************************************************************
+
 void MneDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
 {
     if(m_pRtSourceDataController) {
@@ -634,19 +727,15 @@ void MneDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState
 
 //*************************************************************************************************************
 
-void MneDataTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
-                                                   const Eigen::MatrixX3f &matColorMatrixRightHemi)
-{    
-    QVariant data;
-
+void MneDataTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX4f &matColorMatrixLeftHemi,
+                                                   const Eigen::MatrixX4f &matColorMatrixRightHemi)
+{
     if(m_pInterpolationItemLeftCPU) {
-        data.setValue(matColorMatrixLeftHemi);
-        m_pInterpolationItemLeftCPU->setVertColor(data);
+        m_pInterpolationItemLeftCPU->setVertColor(matColorMatrixLeftHemi);
     }
 
     if(m_pInterpolationItemRightCPU) {
-        data.setValue(matColorMatrixRightHemi);
-        m_pInterpolationItemRightCPU->setVertColor(data);
+        m_pInterpolationItemRightCPU->setVertColor(matColorMatrixRightHemi);
     }
 }
 
@@ -676,7 +765,7 @@ void MneDataTreeItem::onNewInterpolationMatrixRightAvailable(QSharedPointer<Eige
 //*************************************************************************************************************
 
 void MneDataTreeItem::onNewRtRawData(const Eigen::VectorXd &vecDataVectorLeftHemi,
-                                     const Eigen::VectorXd &vecDataVectorRightHemi)
+                                         const Eigen::VectorXd &vecDataVectorRightHemi)
 {
     if(m_pInterpolationItemLeftGPU) {
         m_pInterpolationItemLeftGPU->addNewRtData(vecDataVectorLeftHemi.cast<float>());

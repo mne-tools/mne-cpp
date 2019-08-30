@@ -81,6 +81,9 @@ MinimumNormSettingsView::MinimumNormSettingsView(QWidget *parent,
     connect(ui->m_comboBox_triggerType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
             this, &MinimumNormSettingsView::onTriggerTypeChanged);
 
+    connect(ui->m_spinBox_timepoint, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &MinimumNormSettingsView::onTimePointValueChanged);
+
     this->setWindowTitle("MinimumNorm Settings");
     this->setMinimumWidth(330);
     this->setMaximumWidth(330);
@@ -115,10 +118,17 @@ void MinimumNormSettingsView::onMethodChanged(const QString& method)
 }
 
 
-
 //*************************************************************************************************************
 
 void MinimumNormSettingsView::onTriggerTypeChanged(const QString& sTriggerType)
 {
     emit triggerTypeChanged(sTriggerType);
+}
+
+
+//*************************************************************************************************************
+
+void MinimumNormSettingsView::onTimePointValueChanged(int iTimePointMs)
+{
+    emit timePointChanged(iTimePointMs);
 }

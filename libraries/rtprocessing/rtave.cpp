@@ -55,7 +55,6 @@
 //=============================================================================================================
 
 #include <QDebug>
-#include <QElapsedTimer>
 
 
 //*************************************************************************************************************
@@ -100,7 +99,7 @@ RtAveWorker::RtAveWorker(quint32 numAverages,
 , m_pairBaselineSec(qMakePair(QVariant(QString::number(iBaselineFromSecs)),QVariant(QString::number(iBaselineToSecs))))
 , m_bActivateThreshold(false)
 {
-    m_mapThresholds["EOG"] = 300e-6;
+    m_mapThresholds["eog"] = 300e-6;
 
     m_stimEvokedSet.info = *m_pFiffInfo.data();
 
@@ -118,9 +117,6 @@ RtAveWorker::RtAveWorker(quint32 numAverages,
 
 void RtAveWorker::doWork(const MatrixXd& rawSegment)
 {
-    //QElapsedTimer time;
-    //time.start();
-
     if(this->thread()->isInterruptionRequested()) {
         return;
     }
@@ -130,8 +126,6 @@ void RtAveWorker::doWork(const MatrixXd& rawSegment)
     }
 
     doAveraging(rawSegment);
-
-    //qDebug()<<"RtAveWorker::doWork() - time for procesing"<<time.elapsed();
 }
 
 
@@ -376,7 +370,9 @@ void RtAveWorker::emitEvoked(double dTriggerType, QStringList& lResponsibleTrigg
         lResponsibleTriggerTypes << QString::number(dTriggerType);
     }
 
-    emit resultReady(m_stimEvokedSet, lResponsibleTriggerTypes);
+    if(m_stimEvokedSet.evoked.size() > 0) {
+        emit resultReady(m_stimEvokedSet, lResponsibleTriggerTypes);
+    }
 
 //    qDebug()<<"RtAveWorker::emitEvoked() - dTriggerType:" << dTriggerType;
 //    qDebug()<<"RtAveWorker::emitEvoked() - m_mapStimAve[dTriggerType].size():" << m_mapStimAve[dTriggerType].size();
@@ -457,22 +453,12 @@ void RtAveWorker::mergeData(double dTriggerType)
     //Perform artifact threshold
     bool bArtifactDetected = false;
 
-    if(m_bActivateThreshold) {
-        QMapIterator<QString,double> i(m_mapThresholds);
+    if(m_bActivateThreshold && m_pFiffInfo) {
+        qDebug() << "RtAveWorker::mergeData - Doing artifact reduction for" << m_mapThresholds;
 
-        qDebug() << "Doing artifact reduction for" << m_mapThresholds;
-
-        while (i.hasNext()) {
-            i.next();
-            bArtifactDetected = MNEEpochDataList::checkForArtifact(mergedData,
-                                                                   *m_pFiffInfo,
-                                                                   i.value(),
-                                                                   "threshold",
-                                                                   i.key());
-            if(bArtifactDetected) {
-                break;
-            }
-        }
+        bArtifactDetected = MNEEpochDataList::checkForArtifact(mergedData,
+                                                               *m_pFiffInfo,
+                                                               m_mapThresholds);
     }
 
     if(!bArtifactDetected) {
@@ -564,7 +550,6 @@ void RtAveWorker::reset()
     m_iPreStimSamples = m_iNewPreStimSamples;
     m_iPostStimSamples = m_iNewPostStimSamples;
     m_iTriggerChIndex = m_iNewTriggerIndex;
-    //m_iAverageMode = m_iNewAverageMode;
 
     //Clear all evoked data information
     m_stimEvokedSet.evoked.clear();

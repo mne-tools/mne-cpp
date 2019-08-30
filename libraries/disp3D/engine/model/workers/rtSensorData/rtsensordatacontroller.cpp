@@ -98,10 +98,10 @@ RtSensorDataController::RtSensorDataController()
                m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setNumberVertices);
 
        connect(this, &RtSensorDataController::newInterpolationMatrixAvailable,
-               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setInterpolationMatrix);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setInterpolationMatrix, Qt::DirectConnection);
 
        connect(this, &RtSensorDataController::thresholdsChanged,
-               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setThresholds);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setThresholds, Qt::DirectConnection);
 
        connect(this, &RtSensorDataController::sFreqChanged,
                m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setSFreq);
@@ -110,10 +110,10 @@ RtSensorDataController::RtSensorDataController()
                m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setLoopState);
 
        connect(this, &RtSensorDataController::numberAveragesChanged,
-               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setNumberAverages);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setNumberAverages, Qt::DirectConnection);
 
        connect(this, &RtSensorDataController::colormapTypeChanged,
-               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setColormapType);
+               m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setColormapType, Qt::DirectConnection);
 
        connect(this, &RtSensorDataController::streamSmoothedDataChanged,
                m_pRtSensorDataWorker.data(), &RtSensorDataWorker::setStreamSmoothedData);
@@ -197,10 +197,10 @@ void RtSensorDataController::setCancelDistance(double dCancelDist)
 
 void RtSensorDataController::setTimeInterval(int iMSec)
 {
-    if(iMSec < 17) {
-        qDebug() << "RtSensorDataController::setTimeInterval - The minimum time interval is 17mSec.";
-        iMSec = 17;
-    }
+//    if(iMSec < 17) {
+//        qDebug() << "RtSensorDataController::setTimeInterval - The minimum time interval is 17mSec.";
+//        iMSec = 17;
+//    }
 
     m_iMSecInterval = iMSec;
     m_timer.setInterval(m_iMSecInterval);
@@ -215,13 +215,13 @@ void RtSensorDataController::setInterpolationInfo(const Eigen::MatrixX3f &matVer
                                                   const FiffInfo &fiffInfo,
                                                   int iSensorType)
 {
+    emit numberVerticesChanged(matVertices.rows());
+
     emit interpolationInfoChanged(matVertices,
                                   vecNeighborVertices,
                                   vecSensorPos,
                                   fiffInfo,
                                   iSensorType);
-
-    emit numberVerticesChanged(matVertices.rows());
 }
 
 
@@ -291,7 +291,7 @@ void RtSensorDataController::onNewRtRawData(const VectorXd &vecDataVector)
 
 //*************************************************************************************************************
 
-void RtSensorDataController::onNewSmoothedRtRawData(const MatrixX3f &matColorMatrix)
+void RtSensorDataController::onNewSmoothedRtRawData(const MatrixX4f &matColorMatrix)
 {
     emit newRtSmoothedDataAvailable(matColorMatrix);
 }

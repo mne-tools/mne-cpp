@@ -90,6 +90,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 WeightedPhaseLagIndex::WeightedPhaseLagIndex()
+: AbstractMetric()
 {
 }
 
@@ -105,12 +106,15 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
     Network finalNetwork("WPLI");
 
     if(connectivitySettings.isEmpty()) {
-        qDebug() << "WeightedPhaseLagIndex::calculate - Input data is empty";
+        qWarning() << "WeightedPhaseLagIndex::calculate - Input data is empty";
         return finalNetwork;
     }
 
+    if(AbstractMetric::m_bStorageModeIsActive == false) {
+        connectivitySettings.clearIntermediateData();
+    }
+
     finalNetwork.setSamplingFrequency(connectivitySettings.getSamplingFrequency());
-    finalNetwork.setNumberSamples(connectivitySettings.getTrialData().first().matData.cols());
 
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
@@ -134,10 +138,7 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
 
     // Check that iNfft >= signal length
     int iSignalLength = connectivitySettings.at(0).matData.cols();
-    int iNfft = connectivitySettings.getNumberFFT();
-    if(iNfft > iSignalLength) {
-        iNfft = iSignalLength;
-    }
+    int iNfft = connectivitySettings.getFFTSize();
 
     // Generate tapers
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
@@ -145,6 +146,21 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
     // Initialize
     int iNRows = connectivitySettings.at(0).matData.rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+
+    // Check if start and bin amount need to be reset to full spectrum
+    if(m_iNumberBinStart == -1 ||
+       m_iNumberBinAmount == -1 ||
+       m_iNumberBinStart > iNFreqs ||
+       m_iNumberBinAmount > iNFreqs ||
+       m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
+        qDebug() << "WeightedPhaseLagIndex::calculate - Resetting to full spectrum";
+        AbstractMetric::m_iNumberBinStart = 0;
+        AbstractMetric::m_iNumberBinAmount = iNFreqs;
+    }
+
+    // Pass information about the FFT length. Use iNFreqs because we only use the half spectrum
+    finalNetwork.setFFTSize(iNFreqs);
+    finalNetwork.setUsedFreqBins(AbstractMetric::m_iNumberBinAmount);
 
     QMutex mutex;
 
@@ -159,9 +175,9 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
                 tapers);
     };
 
-    //    iTime = timer.elapsed();
-    //    qDebug() << "WeightedPhaseLagIndex::calculate timer - Preparation:" << iTime;
-    //    timer.restart();
+//    iTime = timer.elapsed();
+//    qWarning() << "Preparation" << iTime;
+//    timer.restart();
 
     // Compute WPLI in parallel for all trials
     QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
@@ -169,7 +185,7 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
     result.waitForFinished();
 
 //    iTime = timer.elapsed();
-//    qDebug() << "WeightedPhaseLagIndex::calculate timer - Compute WPLI per trial:" << iTime;
+//    qWarning() << "ComputeSpectraPSDCSD" << iTime;
 //    timer.restart();
 
     // Compute WPLI
@@ -177,7 +193,7 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
                finalNetwork);
 
 //    iTime = timer.elapsed();
-//    qDebug() << "WeightedPhaseLagIndex::calculate timer - Compute WPLI, Network creation:" << iTime;
+//    qWarning() << "Compute" << iTime;
 //    timer.restart();
 
     return finalNetwork;
@@ -195,6 +211,10 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
                                     int iNfft,
                                     const QPair<MatrixXd, VectorXd>& tapers)
 {
+//    QElapsedTimer timer;
+//    qint64 iTime = 0;
+//    timer.start();
+
     if(inputData.vecPairCsd.size() == iNRows &&
        inputData.vecPairCsdImagAbs.size() == iNRows ) {
         //qDebug() << "WeightedPhaseLagIndex::compute - vecPairCsd and vecPairCsdImagAbs were already computed for this trial.";
@@ -222,7 +242,14 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
 
             // Calculate tapered spectra if not available already
             for(j = 0; j < tapers.first.rows(); j++) {
-                vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
+                // Zero padd if necessary. The zero padding in Eigen's FFT is only working for column vectors.
+                if (rowData.cols() < iNfft) {
+                    vecInputFFT.setZero(iNfft);
+                    vecInputFFT.block(0,0,1,rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));;
+                } else {
+                    vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
+                }
+
                 // FFT for freq domain returning the half spectrum and multiply taper weights
                 fft.fwd(vecTmpFreq, vecInputFFT, iNfft);
                 matTapSpectrum.row(j) = vecTmpFreq * tapers.second(j);
@@ -230,27 +257,33 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
 
             inputData.vecTapSpectra.append(matTapSpectrum);
         }
+
+//        iTime = timer.elapsed();
+//        qWarning() << "WeightedPhaseLagIndex::compute timer - Compute spectra:" << iTime;
+//        timer.restart();
     }
 
     // Compute CSD
     if(inputData.vecPairCsd.isEmpty()) {
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
-
         bool bNfftEven = false;
         if (iNfft % 2 == 0){
             bNfftEven = true;
         }
 
-        MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
+        MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBinAmount);
 
         for (i = 0; i < iNRows; ++i) {
             for (j = i; j < iNRows; ++j) {
                 // Compute CSD (average over tapers if necessary)
-                matCsd.row(j) = inputData.vecTapSpectra.at(i).cwiseProduct(inputData.vecTapSpectra.at(j).conjugate()).colwise().sum() / denomCSD;
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(i).rows(),m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(j).rows(),m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
 
                 // Divide first and last element by 2 due to half spectrum
-                matCsd.row(j)(0) /= 2.0;
-                if(bNfftEven) {
+                if(m_iNumberBinStart == 0) {
+                    matCsd.row(j)(0) /= 2.0;
+                }
+
+                if(bNfftEven && m_iNumberBinStart + m_iNumberBinAmount >= iNFreqs) {
                     matCsd.row(j).tail(1) /= 2.0;
                 }
             }
@@ -258,6 +291,10 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
             inputData.vecPairCsd.append(QPair<int,MatrixXcd>(i,matCsd));
             inputData.vecPairCsdImagAbs.append(QPair<int,MatrixXd>(i,matCsd.imag().cwiseAbs()));
         }
+
+//        iTime = timer.elapsed();
+//        qWarning() << "WeightedPhaseLagIndex::compute timer - Compute CSD and Imag CSD:" << iTime;
+//        timer.restart();
 
         mutex.lock();
 
@@ -272,6 +309,10 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
         }
 
         mutex.unlock();
+
+//        iTime = timer.elapsed();
+//        qWarning() << "WeightedPhaseLagIndex::compute timer - Add CSD to sum:" << iTime;
+//        timer.restart();
     } else {
         if (inputData.vecPairCsdImagAbs.isEmpty()) {
             inputData.vecPairCsdImagAbs.clear();
@@ -291,6 +332,13 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
 
             mutex.unlock();
         }
+    }
+
+    //Do not store data to save memory
+    if(!m_bStorageModeIsActive) {
+        inputData.vecPairCsd.clear();
+        inputData.vecPairCsdImagAbs.clear();
+        inputData.vecTapSpectra.clear();
     }
 }
 

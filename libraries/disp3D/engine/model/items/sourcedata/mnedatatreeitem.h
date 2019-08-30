@@ -53,6 +53,7 @@
 //=============================================================================================================
 
 #include <QPointer>
+#include <Qt3DCore/QTransform>
 
 
 //*************************************************************************************************************
@@ -78,6 +79,7 @@ namespace FSLIB {
 
 namespace Qt3DCore {
     class QEntity;
+    class QTransform;
 }
 
 
@@ -251,6 +253,40 @@ public:
     */
     void setAlpha(float fAlpha);
 
+    //=========================================================================================================
+    /**
+    * Sets the entity's transformation. This will clear the old transformation.
+    *
+    * @param[in] transform     The new entity's transform.
+    */
+    virtual void setTransform(const Qt3DCore::QTransform &transform);
+
+    //=========================================================================================================
+    /**
+    * Sets the entity's transformation. This will clear the old transformation.
+    *
+    * @param[in] transform     The new entity's transform.
+    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+    */
+    virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
+
+    //=========================================================================================================
+    /**
+    * Applies a transformation o ntop of the present one.
+    *
+    * @param[in] transform     The new entity's transform.
+    */
+    virtual void applyTransform(const Qt3DCore::QTransform& transform);
+
+    //=========================================================================================================
+    /**
+    * Applies a transformation o ntop of the present one.
+    *
+    * @param[in] transform     The new entity's transform.
+    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+    */
+    virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
+
 protected:
     //=========================================================================================================
     /**
@@ -299,8 +335,8 @@ protected:
     * @param[in] matColorMatrixLeftHemi          The new streamed interpolated raw data in form of RGB colors per vertex for the left hemisphere.
     * @param[in] matColorMatrixRightHemi         The new streamed interpolated raw data in form of RGB colors per vertex for the right hemisphere.
     */
-    void onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrixLeftHemi,
-                                      const Eigen::MatrixX3f &matColorMatrixRightHemi);
+    void onNewRtSmoothedDataAvailable(const Eigen::MatrixX4f &matColorMatrixLeftHemi,
+                                      const Eigen::MatrixX4f &matColorMatrixRightHemi);
 
     //=========================================================================================================
     /**

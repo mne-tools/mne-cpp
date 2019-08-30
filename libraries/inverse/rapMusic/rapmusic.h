@@ -166,7 +166,7 @@ public:
 
     virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const;
+    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
 
     virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const;
 

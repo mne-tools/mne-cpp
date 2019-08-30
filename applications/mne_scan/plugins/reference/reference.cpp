@@ -125,9 +125,9 @@ void Reference::unload()
 
 bool Reference::start()
 {
-    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning())
-        QThread::wait();
+//    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+//    if(this->isRunning())
+//        QThread::wait();
 
     m_bIsRunning = true;
 

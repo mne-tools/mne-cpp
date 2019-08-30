@@ -125,14 +125,15 @@ ImageSc::~ImageSc()
 
 void ImageSc::init()
 {
+    //Colormap
+    pColorMapper = ColorMap::valueToColor;
+    m_sColorMap = "Hot";
+
     //Parent init
     Graph::init();
 
     m_iBorderTopBottom = 20;
     m_iBorderLeftRight = 60;
-
-    //Colormap
-    pColorMapper = ColorMap::valueToJet;
 
     //Colorbar
     m_bColorbar = true;
@@ -207,7 +208,7 @@ void ImageSc::updateMaps()
         QImage t_qImageData(x, y, QImage::Format_RGB32);
         for(i = 0; i < x; ++i)
             for(j = 0; j < y; ++j)
-                t_qImageData.setPixel(i, j, pColorMapper(m_matCentNormData(j,i)));
+                t_qImageData.setPixel(i, j, pColorMapper(m_matCentNormData(j,i), m_sColorMap));
 
         m_pPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
 
@@ -217,7 +218,7 @@ void ImageSc::updateMaps()
         double t_dQuantile = 1.0/((double)m_iColorbarGradSteps-1);
         for(j = 0; j < m_iColorbarGradSteps; ++j)
         {
-            QRgb t_qRgb = pColorMapper(t_dQuantile*((double)(m_iColorbarGradSteps-1-j))*1.0);
+            QRgb t_qRgb = pColorMapper(t_dQuantile*((double)(m_iColorbarGradSteps-1-j))*1.0, m_sColorMap);
             t_qImageColorbar.setPixel(0, j, t_qRgb);
         }
         m_pPixmapColorbar = new QPixmap(QPixmap::fromImage(t_qImageColorbar));
@@ -260,20 +261,7 @@ void ImageSc::updateMaps()
 
 void ImageSc::setColorMap(const QString &p_sColorMap)
 {
-    if(p_sColorMap == "Jet")
-        pColorMapper = ColorMap::valueToJet;
-    else if(p_sColorMap == "Hot")
-        pColorMapper = ColorMap::valueToHot;
-    else if(p_sColorMap == "HotNeg1")
-        pColorMapper = ColorMap::valueToHotNegative1;
-    else if(p_sColorMap == "HotNeg2")
-        pColorMapper = ColorMap::valueToHotNegative2;
-    else if(p_sColorMap == "Bone")
-        pColorMapper = ColorMap::valueToBone;
-    else if(p_sColorMap == "RedBlue")
-        pColorMapper = ColorMap::valueToRedBlue;
-    else
-        pColorMapper = ColorMap::valueToJet;
+    m_sColorMap = p_sColorMap;
 
     updateMaps();
 }

@@ -61,7 +61,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QItemDelegate>
+#include <QStyledItemDelegate>
 #include <QStandardItemModel>
 #include <QColorDialog>
 
@@ -158,7 +158,7 @@ Control3DView::~Control3DView()
 
 //*************************************************************************************************************
 
-void Control3DView::setDelegate(QItemDelegate* pItemDelegate)
+void Control3DView::setDelegate(QStyledItemDelegate *pItemDelegate)
 {
     //Init tree view properties
     ui->m_treeView_loadedData->setItemDelegate(pItemDelegate);
@@ -175,7 +175,7 @@ void Control3DView::setModel(QStandardItemModel* pDataTreeModel)
     ui->m_treeView_loadedData->setModel(pDataTreeModel);
 
     //Set description hidden as default
-    ui->m_treeView_loadedData->setColumnHidden(1, true);
+    //ui->m_treeView_loadedData->setColumnHidden(1, true);
 }
 
 
