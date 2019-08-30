@@ -222,6 +222,14 @@ protected:
     */
     void onTriggerTypeChanged(const QString& triggerType);
 
+    //=========================================================================================================
+    /**
+    * Slot called when the time point changes.
+    *
+    * @param [in] iTimePointMs        The new time point in ms.
+    */
+    void onTimePointValueChanged(int iTimePointMs);
+
     virtual void run();
 
     QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >      m_pRTMSAInput;              /**< The RealTimeMultiSampleArray input.*/
@@ -245,9 +253,11 @@ protected:
     QFuture<void>                   m_future;                   /**< The future monitoring the clustering. */
 
     QVector<FIFFLIB::FiffEvoked>    m_qVecFiffEvoked;           /**< The list of stored averages. */
+    FIFFLIB::FiffEvoked             m_currentEvoked;
 
     qint32                          m_iNumAverages;             /**< The number of trials/averages to store. */
     qint32                          m_iDownSample;              /**< Down sample factor. */
+    qint32                          m_iTimePointSps;            /**< The time point to pick from the data in samples. */
 
     bool                            m_bIsRunning;               /**< If source lab is running. */
     bool                            m_bReceiveData;             /**< If thread is ready to receive data. */

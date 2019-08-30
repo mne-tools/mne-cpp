@@ -56,7 +56,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 ColorMap::ColorMap()
-{
+{    
 }
 
 
@@ -77,7 +77,7 @@ double ColorMap::linearSlope(double x, double m, double n)
 
 
 //*************************************************************************************************************
-// Jet
+
 int ColorMap::jetR(double x)
 {
     //Describe the red fuzzy set
@@ -128,7 +128,7 @@ int ColorMap::jetB(double x)
 }
 
 //*************************************************************************************************************
-// Hot
+
 int ColorMap::hotR(double x)
 {
     //Describe the red fuzzy set
@@ -166,7 +166,7 @@ int ColorMap::hotB(double x)
 
 
 //*************************************************************************************************************
-// Hot negative skewed
+
 int ColorMap::hotRNeg1(double x)
 {
     //Describe the red fuzzy set
@@ -245,9 +245,8 @@ int ColorMap::hotBNeg2(double x)
 }
 
 
-
 //*************************************************************************************************************
-// Bone
+
 int ColorMap::boneR(double x)
 {
     //Describe the red fuzzy set
@@ -289,7 +288,7 @@ int ColorMap::boneB(double x)
 
 
 //*************************************************************************************************************
-// RedBlue
+
 int ColorMap::rbR(double x)
 {
     //Describe the red fuzzy set
@@ -321,4 +320,31 @@ int ColorMap::rbB(double x)
         return (int)floor(1.0*255);
     else
         return (int)floor(linearSlope(x, -1, 1)*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::coolR(double x)
+{
+    //Describe the red fuzzy set
+    return (int)floor(linearSlope(x, 1, 0)*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::coolG(double x)
+{
+    //Describe the green fuzzy set
+    return (int)floor(linearSlope(x, -1, 1)*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::coolB(double x)
+{
+    //Describe the blue fuzzy set
+    return (int)floor(1.0*255);
 }

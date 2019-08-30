@@ -107,6 +107,7 @@ ChannelDataModel::ChannelDataModel(QObject *parent)
 , m_iCurrentSampleFreeze(0)
 , m_iCurrentTriggerChIndex(0)
 , m_pFiffInfo(FiffInfo::SPtr::create())
+, m_colBackground(Qt::white)
 {
 }
 
@@ -182,31 +183,18 @@ QVariant ChannelDataModel::data(const QModelIndex &index, int role) const
                     }
 
                     return v;
-                    break;
                 }
+
                 case Qt::BackgroundRole: {
-                    if(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names[row])) {
-                        QBrush brush;
-                        brush.setStyle(Qt::SolidPattern);
-                        //qDebug() << m_qListChInfo[row].getChannelName() << "is marked as bad, index:" << row;
-                        QColor color(254,74,93);
-                        color.setAlpha(40);
-                        brush.setColor(color);
-
-                        return QVariant(brush);
-                    }
-                    else
-                        return QVariant();
-
-                    break;
+                    return QVariant(QBrush(m_colBackground));
                 }
             } // end role switch
         } // end column check
 
-        //******** first column (chname) ********
+        //******** third column (bad channel) ********
         if(index.column() == 2 && role == Qt::DisplayRole) {
             return QVariant(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names[row]));
-        }
+        } // end column check
 
     } // end index.valid() check
 
@@ -579,6 +567,7 @@ void ChannelDataModel::addData(const QList<MatrixXd> &data)
     QModelIndex topLeft = this->index(0,1);
     QModelIndex bottomRight = this->index(m_pFiffInfo->ch_names.size()-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
+
     emit dataChanged(topLeft, bottomRight, roles);
 }
 
@@ -944,6 +933,14 @@ void ChannelDataModel::setFilter(QList<FilterData> filterData)
 void ChannelDataModel::setFilterActive(bool state)
 {
     m_bPerformFiltering = state;
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataModel::setBackgroundColor(const QColor& color)
+{
+    m_colBackground = color;
 }
 
 

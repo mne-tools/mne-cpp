@@ -137,10 +137,10 @@ public:
     * @param[in] tMatColors     The color info of all the vertices.
     * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
     */
-    void setVertices(const Eigen::MatrixX3f& tMatVert,
+    void setMeshData(const Eigen::MatrixX3f& tMatVert,
                      const Eigen::MatrixX3f& tMatNorm,
                      const Eigen::MatrixXi& tMatTris,
-                     const Eigen::MatrixX3f& tMatColors,
+                     const Eigen::MatrixX4f &tMatColors,
                      Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
 
     //=========================================================================================================
@@ -155,11 +155,11 @@ public:
     /**
     * Set new vertices colors to the mesh.
     *
-    * @param[in] vertColor New color matrix MatrixX3f in form of a QVariant.
+    * @param[in] vertColor  New color matrix MatrixX3f.
     *
     * @return The costum mesh.
     */
-    virtual void setVertColor(const QVariant &vertColor);
+    virtual void setVertColor(const Eigen::MatrixX4f &vertColor);
 
 protected:
     //=========================================================================================================

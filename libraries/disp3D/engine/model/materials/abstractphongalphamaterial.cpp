@@ -88,7 +88,7 @@ AbstractPhongAlphaMaterial::AbstractPhongAlphaMaterial(bool bUseSortPolicy, QNod
     , m_pEffect(new QEffect())
     , m_pDiffuseParameter(new QParameter(QStringLiteral("kd"), QColor::fromRgbF(0.7f, 0.7f, 0.7f, 1.0f)))
     , m_pSpecularParameter(new QParameter(QStringLiteral("ks"), QColor::fromRgbF(0.1f, 0.1f, 0.1f, 1.0f)))
-    , m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 10.0f))
+    , m_pShininessParameter(new QParameter(QStringLiteral("shininess"), 2.0f))
     , m_pAlphaParameter(new QParameter("alpha", 0.75f))
     , m_pDrawFilterKey(new QFilterKey)
     , m_bUseSortPolicy(bUseSortPolicy)
@@ -195,12 +195,10 @@ void AbstractPhongAlphaMaterial::onAlphaChanged(const QVariant &fAlpha)
 
         if(tempAlpha >= 1.0f) {
             m_pDrawFilterKey->setValue(QStringLiteral("forward"));
-        }
-        else {
+        } else {
             if(m_bUseSortPolicy) {
                 m_pDrawFilterKey->setValue(QStringLiteral("forwardSorted"));
-            }
-            else {
+            } else {
                 m_pDrawFilterKey->setValue(QStringLiteral("forwardTransparent"));
             }
         }

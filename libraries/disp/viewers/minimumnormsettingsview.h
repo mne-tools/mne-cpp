@@ -144,6 +144,14 @@ protected:
     */
     void onTriggerTypeChanged(const QString& sTriggerType);
 
+    //=========================================================================================================
+    /**
+    * Slot called when the time point changes.
+    *
+    * @param [in] iTimePointMs        The new time point in ms.
+    */
+    void onTimePointValueChanged(int iTimePointMs);
+
     Ui::MinimumNormSettingsViewWidget* ui;
 
 signals:
@@ -162,6 +170,14 @@ signals:
     * @param [in] triggerType        The new trigger type.
     */
     void triggerTypeChanged(const QString& triggerType);
+
+    //=========================================================================================================
+    /**
+    * Emit signal whenever the time point changed.
+    *
+    * @param [in] iTimePoint        The new time point.
+    */
+    void timePointChanged(int iTimePoint);
 
 };
 

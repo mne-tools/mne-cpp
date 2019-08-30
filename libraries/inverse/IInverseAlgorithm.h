@@ -118,10 +118,12 @@ public:
     * @param[in] p_fiffEvoked   Evoked data.
     * @param[in] tmin           Minimal time point
     * @param[in] tmin           Time between two samples
+    * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
+    *                           radial component is kept. This is only applied when working with loose orientations.
     *
     * @return the calculated source estimation
     */
-    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const = 0;
+    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const = 0;
 
     //=========================================================================================================
     /**

@@ -42,6 +42,7 @@
 #include <disp3D/viewers/abstractview.h>
 #include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
 #include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
+#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/helpers/geometryinfo/geometryinfo.h>
@@ -260,28 +261,15 @@ int main(int argc, char *argv[])
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
     p3DDataModel->addMegSensorInfo("Sensors", "VectorView", evoked.info.chs, t_sensorSurfaceVV, evoked.info.bads);
 
-    // Read & show digitizer points
+    // Read, co-register and show digitizer points
     QFile t_fileDig(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     FiffDigPointSet t_Dig(t_fileDig);
-    p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
 
-    //Co-Register EEG points
     QFile coordTransfile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif");
-    FiffCoordTrans coordTransA(coordTransfile);
+    FiffCoordTrans coordTrans(coordTransfile);
 
-    for(int i = 0; i < evoked.info.chs.size(); ++i) {
-        if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
-            Vector4f tempvec;
-            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
-            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
-            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
-            tempvec(3) = 1;
-            tempvec = coordTransA.invtrans * tempvec;
-            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
-            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
-            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
-        }
-    }
+    DigitizerSetTreeItem* pDigitizerSetTreeItem = p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
+    pDigitizerSetTreeItem->applyTransform(coordTrans, true);
 
     //add sensor item for MEG data
     if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
@@ -300,6 +288,22 @@ int main(int argc, char *argv[])
     }
 
     //add sensor item for EEG data
+
+    //Co-Register EEG points in order to correctly map them to the scalp
+    for(int i = 0; i < evoked.info.chs.size(); ++i) {
+        if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
+            Vector4f tempvec;
+            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
+            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
+            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
+            tempvec(3) = 1;
+            tempvec = coordTrans.invtrans * tempvec;
+            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
+            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
+            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
+        }
+    }
+
     if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
                                                                              evoked.comment,
                                                                              evoked.data,
@@ -326,6 +330,7 @@ int main(int argc, char *argv[])
         pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);
+            pRTDataItem->setAlpha(1.0);
             pRTDataItem->setStreamingState(false);
             pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
             pRTDataItem->setVisualizationType("Annotation based");

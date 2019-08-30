@@ -96,7 +96,8 @@ ConnectivitySettings::ConnectivitySettings()
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::clearAllData() {
+void ConnectivitySettings::clearAllData() 
+{
     m_trialData.clear();
 
     clearIntermediateData();
@@ -105,7 +106,8 @@ void ConnectivitySettings::clearAllData() {
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::clearIntermediateData() {
+void ConnectivitySettings::clearIntermediateData() 
+{
     for (int i = 0; i < m_trialData.size(); ++i) {
         m_trialData[i].matPsd.resize(0,0);
         m_trialData[i].vecPairCsd.clear();
@@ -327,21 +329,23 @@ int ConnectivitySettings::getSamplingFrequency() const
 
 //*******************************************************************************************************
 
-void ConnectivitySettings::setNumberFFT(int iNfft)
+void ConnectivitySettings::setFFTSize(int iNfft)
 {
-    if(m_fSFreq == 0) {
+    if(iNfft == 0) {
         return;
     }
 
     clearIntermediateData();
 
     m_iNfft = iNfft;
+    m_fFreqResolution = m_fSFreq/m_iNfft;
+
 }
 
 
 //*******************************************************************************************************
 
-int ConnectivitySettings::getNumberFFT() const
+int ConnectivitySettings::getFFTSize() const
 {
     return m_iNfft;
 }

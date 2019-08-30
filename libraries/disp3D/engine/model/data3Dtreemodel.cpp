@@ -595,6 +595,9 @@ void Data3DTreeModel::initMetatypes()
     qRegisterMetaType<Eigen::MatrixX3f>();
     qRegisterMetaType<MatrixX3f>();
 
+    qRegisterMetaType<Eigen::MatrixX4f>();
+    qRegisterMetaType<MatrixX4f>();
+
     qRegisterMetaType<Eigen::VectorXf>();
     qRegisterMetaType<VectorXf>();
 
