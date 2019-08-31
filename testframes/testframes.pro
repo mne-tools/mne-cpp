@@ -46,6 +46,7 @@ SUBDIRS += \
     test_fiff_cov \
     test_fiff_digitizer \
     test_mne_msh_display_surface_set \
+    test_edf2fiff_rwr \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
