@@ -32,7 +32,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Application for anonymizing patient and personal health information from a fiff file.
+* @brief     Application for anonymizing patient and personal health information from a fiff file..
 *
 */
 
@@ -42,8 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "settingscontroller.h"
-
+//#include "fiffanonymizerapp.h"
+//#include "commandlineuser.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -56,8 +56,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
 #include <QCoreApplication>
+#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -72,33 +72,6 @@
 //=============================================================================================================
 
 //=============================================================================================================
-
-
-/**
- * @brief Creates a QApplication or a QCoreApplication according tu user's preference for a command line or a
- *  GUI application.
- * @details  Handles input arguments and searches for a "--no-gui" option. If found, this will create a
- *  QCoreApplication so that main can execute the appplication as a command line one. If not found, it creates a
- * or a QApplication depending on
- *  QApplication so that main can execute a GUI.
- * @see QT Documentation
- * @see https://doc.qt.io/qt-5/qapplication.html#details
- * @param [in] argc (argument count) number of arguments on the command line.
- * @param [in] argv (argument vector) an array of pointers to arrays of characters.
- * @return Pointer to a QApplication or a QCoreApplication.
- */
-QCoreApplication* createApplication(int &argc, char *argv[])
-{
-    //when gui is ready remove this line
-    return new QCoreApplication(argc, argv);
-
-//    for (int i = 1; i < argc; ++i)
-//        if (!qstrcmp(argv[i], "--no-gui"))
-//            return new QCoreApplication(argc, argv);
-//    return new QApplication(argc, argv);
-}
-
-
 /**
 * The function main marks the entry point of the program.
 * By default, main has the storage class extern.
@@ -107,27 +80,10 @@ QCoreApplication* createApplication(int &argc, char *argv[])
 * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-    QScopedPointer<QCoreApplication> qtApp(createApplication(argc, argv));
-
-    QString nameStr("MNE Anonymize");
-    QString versionStr("1.0");
-
-    qtApp->setApplicationName(nameStr);
-    qtApp->setApplicationVersion(versionStr);
-
-    if (qobject_cast<QApplication *>(qtApp.data())) {
-        // to do -> develop GUI version...
-        //create reader object and parse data
-        //MainWindow w;
-        //w.show();
-    } else {
-        // start non-GUI version...
-        //MNEANONYMIZE::SettingsController controller(reinterpret_cast<QCoreApplication *>(&qtApp));
-        MNEANONYMIZE::SettingsController controller(qtApp->arguments(), nameStr, versionStr);
-    }
-
-    return 0;
+    QCoreApplication qtApp(argc, argv);
+//    MNEFIFFANONYMIZER::FiffAnonymizerApp app;
+//    MNEFIFFANONYMIZER::CommandLineUser user(&app,&qtApp);
+    return qtApp.exec();
 }
-
