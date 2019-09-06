@@ -1,6 +1,10 @@
 #--------------------------------------------------------------------------------------------------------------
 #
+<<<<<<< HEAD
 # @file     mne_anonymize.pro
+=======
+# @file     mne_fiff_anonymizer.pro
+>>>>>>> creating fiffanonymizer class and main.cpp
 # @author   Juan Garcia-Prieto <Juan.GarciaPrieto@uth.tmc.edu> <juangpc@gmail.com>;
 #           Wayne Mead <wayne.mead@uth.tmc.edu> <wayne.isk@gmail.com>;
 #           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
@@ -32,7 +36,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the mne_anonymize application.
+# @brief    This project file generates the makefile to build the mne_fiff_anonymizer example.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -40,15 +44,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += widgets concurrent
-
-VERSION = $${MNE_CPP_VERSION}
-
 CONFIG   += console
-
-contains(MNECPP_CONFIG, static) {
-    CONFIG += static
-}
+CONFIG   -= app_bundle
 
 TARGET = mne_anonymize
 
@@ -69,56 +66,15 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += main.cpp \
-    settingscontroller.cpp \
-    fiffanonymizer.cpp
+    fiffanonymizer.cpp \
 
-HEADERS  += \
-    settingscontroller.h \
-    fiffanonymizer.h
+HEADERS  += fiffanonymizer.h \
+
+FORMS    +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_FIFF_ANONYMIZER_DIR}
 
-unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
-win32 {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
-unix:!macx {
-    # === Unix ===
-    QMAKE_RPATHDIR += $ORIGIN/../lib
-}
-macx {
-    # === Mac ===
-    QMAKE_RPATHDIR += @executable_path/../Frameworks
-    EXTRA_ARGS =
-
-    # 3 entries returned in DEPLOY_CMD
-    DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-
-    QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
-}
-
-# Activate FFTW backend in Eigen
-contains(MNECPP_CONFIG, useFFTW) {
-    DEFINES += EIGEN_FFTW_DEFAULT
-    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
-    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
-
-    win32 {
-        # On Windows
-        LIBS += -llibfftw3-3 \
-                -llibfftw3f-3 \
-                -llibfftw3l-3 \
-    }
-
-    unix:!macx {
-        # On Linux
-        LIBS += -lfftw3 \
-                -lfftw3_threads \
-    }
-}
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD
