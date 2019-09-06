@@ -45,6 +45,7 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
+    mne_anonymize \
     mne_rt_server \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
