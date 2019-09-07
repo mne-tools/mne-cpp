@@ -1,11 +1,9 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Juan Garcia-Prieto <Juan.GarciaPrieto@uth.tmc.edu> <juangpc@gmail.com>;
-*           Wayne Mead <wayne.mead@uth.tmc.edu> <wayne.isk@gmail.com>;
+* @file     settingscontroller.h
+* @author   Juan Garcia-Prieto <juangpc@gmail.com>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           John C. Mosher <John.C.Mosher@uth.tmc.edu> <jcmosher@gmail.com>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     September, 2019
 *
@@ -32,9 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Application for anonymizing patient and personal health information from a fiff file..
+* @brief     SettingsController class declaration.
 *
 */
+
+#ifndef FIFFANONYMIZER_SETTINGSCONTROLLER_H
+#define FIFFANONYMIZER_SETTINGSCONTROLLER_H
 
 
 //*************************************************************************************************************
@@ -42,47 +43,80 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include "commandlineuser.h"
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen
-//=============================================================================================================
-
+#include "fiffanonymizer.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
+#include <QSharedPointer>
 #include <QCommandLineParser>
+#include <QFileInfo>
+#include <QDir>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// Eigen INCLUDES
 //=============================================================================================================
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEFIFFANONYMIZER
+//=============================================================================================================
+
+namespace FIFFANONYMIZER {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNEFIFFANONYMIZER FORWARD DECLARATIONS
+//=============================================================================================================
+
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* Description of what this class is intended to do (in detail).
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief Brief description of this class.
 */
-int main(int argc, char *argv[])
+class SettingsController
 {
-    QCoreApplication qtApp(argc, argv);
-//    MNEFIFFANONYMIZER::FiffAnonymizerApp app;
-//    MNEFIFFANONYMIZER::CommandLineUser user(&app,&qtApp);
-    return qtApp.exec();
-}
+
+public:
+    typedef QSharedPointer<SettingsController> SPtr;            /**< Shared pointer type for SettingsController. */
+    typedef QSharedPointer<const SettingsController> ConstSPtr; /**< Const shared pointer type for SettingsController. */
+
+    //=========================================================================================================
+    /**
+    * Constructs a SettingsController object.
+    */
+    SettingsController();
+    SettingsController(FIFFANONYMIZER::FiffAnonymizer *app, QCoreApplication * qtApp);
+
+
+protected:
+
+private:
+
+
+};
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+} // namespace FIFFANONYMIZER
+
+#endif // SETTINGSCONTROLLER_H
