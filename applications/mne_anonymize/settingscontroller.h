@@ -100,7 +100,7 @@ public:
     * Constructs a SettingsController object.
     */
     SettingsController();
-    SettingsController(FIFFANONYMIZER::FiffAnonymizer *app, QCoreApplication * qtApp);
+    SettingsController(QCoreApplication * );
 
 
 protected:
