@@ -87,16 +87,17 @@ SettingsController::SettingsController()
 
 }
 
-SettingsController::SettingsController(FiffAnonymizer *app,
-                                   QCoreApplication * qtApp)
+SettingsController::SettingsController(QCoreApplication * qtApp)
 {
 
-    QCoreApplication::setApplicationName(app->name);
-    QCoreApplication::setApplicationName(app->versionStr);
+    FIFFANONYMIZER::FiffAnonymizer app;
+
+    QCoreApplication::setApplicationName(app.name);
+    QCoreApplication::setApplicationName(app.versionStr);
 
     QCommandLineParser parser;
 
-    parser.setApplicationDescription(app->description);
+    parser.setApplicationDescription(app.description);
     parser.addHelpOption();
     parser.addVersionOption();
 
@@ -152,7 +153,7 @@ SettingsController::SettingsController(FiffAnonymizer *app,
     const QStringList args = parser.positionalArguments();
     QString fileInName(args.at(0));
     QFile fileIn(fileInName);
-    app->setFileIn(&fileIn);
+    app.setFileIn(&fileIn);
 
     QString fileOutName;
     if(parser.isSet(outFileOpt))
@@ -164,50 +165,50 @@ SettingsController::SettingsController(FiffAnonymizer *app,
                     fInfo.baseName() + "_anonymized." + fInfo.completeSuffix());
     }
     QFile fileOut(fileOutName);
-    app->setFileOut(&fileOut);
+    app.setFileOut(&fileOut);
 
     if(parser.isSet(verboseOpt))
     {
-        app->setVerboseMode(true);
+        app.setVerboseMode(true);
     }
 
     if(parser.isSet(bruteOpt))
     {
-        app->setBruteMode(true);
+        app.setBruteMode(true);
     }
 
     if(parser.isSet(quietOpt))
     {
-        if(app->getVerboseMode())
+        if(app.getVerboseMode())
         {
-            app->setVerboseMode(false);
+            app.setVerboseMode(false);
         }
-        app->setQuietMode(true);
+        app.setQuietMode(true);
     }
 
     if(parser.isSet(measDateOffsetOpt))
     {
         QString d(parser.value(measDateOffsetOpt));
-        app->setMeasurementDayOffset(d.toInt());
+        app.setMeasurementDayOffset(d.toInt());
     }
 
     if(parser.isSet(birthdayOffsetOpt))
     {
         QString d(parser.value(birthdayOffsetOpt));
-        app->setSubjectBirthdayOffset(d.toInt());
+        app.setSubjectBirthdayOffset(d.toInt());
     }
 
     if(parser.isSet(measDateOpt))
     {
-        app->setMeasurementDay(parser.value(measDateOpt));
+        app.setMeasurementDay(parser.value(measDateOpt));
     }
 
     if(parser.isSet(birthdayOpt))
     {
-        app->setSubjectBirthday(parser.value(birthdayOpt));
+        app.setSubjectBirthday(parser.value(birthdayOpt));
     }
 
-    app->anonymizeFile();
+    app.anonymizeFile();
 
 }
 
