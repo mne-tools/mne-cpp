@@ -40,7 +40,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += widgets
+QT += widgets concurrent
 CONFIG   += console
 CONFIG   -= app_bundle
 
