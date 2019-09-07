@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include "commandlineuser.h"
+#include "settingscontroller.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,8 +55,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QApplication>
 #include <QCoreApplication>
-#include <QCommandLineParser>
 
 
 //*************************************************************************************************************
@@ -79,10 +79,33 @@
 * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
-int main(int argc, char *argv[])
+
+QCoreApplication* createApplication(int &argc, char *argv[])
 {
-    QCoreApplication qtApp(argc, argv);
-//    MNEFIFFANONYMIZER::FiffAnonymizerApp app;
-//    MNEFIFFANONYMIZER::CommandLineUser user(&app,&qtApp);
-    return qtApp.exec();
+    //when gui is ready remove this line
+    return new QCoreApplication(argc, argv);
+
+//    for (int i = 1; i < argc; ++i)
+//        if (!qstrcmp(argv[i], "-no-gui"))
+//            return new QCoreApplication(argc, argv);
+//    return new QApplication(argc, argv);
 }
+
+int main(int argc, char* argv[])
+{
+    QScopedPointer<QCoreApplication> qtApp(createApplication(argc, argv));
+
+    if (qobject_cast<QApplication *>(qtApp.data())) {
+        // to do -> develop GUI version...
+        //create reader object and parse data
+        //MainWindow w;
+        //w.show();
+    } else {
+        // start non-GUI version...
+        FIFFANONYMIZER::SettingsController controller(
+                    reinterpret_cast<QCoreApplication *>(&qtApp));
+    }
+
+    return qtApp->exec();
+}
+
