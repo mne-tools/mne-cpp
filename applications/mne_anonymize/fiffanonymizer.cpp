@@ -638,3 +638,49 @@ void FiffAnonymizer::setSubjectBirthdayOffset(bool b)
 
 
 //*************************************************************************************************************
+
+void FiffAnonymizer::setDeleteInputFileAfter(bool d)
+{
+    m_bDeleteInputFileAfter = d;
+}
+
+
+//*************************************************************************************************************
+
+void FiffAnonymizer::setDeleteInputFileAfterConfirmation(bool dc)
+{
+    m_bDeleteInputFileConfirmation = dc;
+}
+
+
+//*************************************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
