@@ -116,6 +116,8 @@ public:
     void setSubjectBirthday(QString d);
     void setSubjectBirthdayOffset(int d);
     void setSubjectBirthdayOffset(bool b);
+    void setDeleteInputFileAfter(bool d);
+    void setDeleteInputFileAfterConfirmation(bool dc);
 
 private:
     void updateBlockTypeList(FIFFLIB::FiffTag::SPtr pTag);
