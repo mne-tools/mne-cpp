@@ -67,8 +67,10 @@ DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += main.cpp \
     fiffanonymizer.cpp \
+    settingscontroller.cpp \
 
 HEADERS  += fiffanonymizer.h \
+        settingscontroller.h \
 
 FORMS    +=
 
