@@ -132,7 +132,7 @@ void SettingsController::initParser()
                                 QCoreApplication::translate("main","Anonymize weight, height XXX if present in the input fiff file."));
     m_parser.addOption(bruteOpt);
 
-    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Wildcards are allowed and seveal &lt;&lt;-in <infile>&lt;&lt; statements can be present."),
+    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Wildcards are allowed and seveal -in <infile> statements can be present."),
                                  QCoreApplication::translate("main","infile"));
     m_parser.addOption(inFileOpt);
 
