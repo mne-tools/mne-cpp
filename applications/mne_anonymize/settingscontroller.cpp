@@ -92,9 +92,6 @@ SettingsController::SettingsController(QCoreApplication * qtApp)
      m_pQCoreApp(qtApp)
 {
 
-    m_pQCoreApp->setApplicationName(m_anonymizer.name);
-    m_pQCoreApp->setApplicationVersion(m_anonymizer.versionStr);
-
     initParser();
     parseInputs();
 
@@ -108,7 +105,11 @@ SettingsController::SettingsController(QCoreApplication * qtApp)
 void SettingsController::initParser()
 {
 
-    m_parser.setApplicationDescription(m_anonymizer.description);
+    m_pQCoreApp->setApplicationName(m_anonymizer.name);
+    m_pQCoreApp->setApplicationVersion(m_anonymizer.versionStr);
+
+    m_parser.setApplicationDescription(QCoreApplication::translate("main",
+                                                                   m_anonymizer.description.toUtf8()));
     m_parser.addHelpOption();
     m_parser.addVersionOption();
 
@@ -131,7 +132,7 @@ void SettingsController::initParser()
                                 QCoreApplication::translate("main","Anonymize weight, height XXX if present in the input fiff file."));
     m_parser.addOption(bruteOpt);
 
-    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Wildcards are allowed and seveal \"-in <infile>\" statements can be present."),
+    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Wildcards are allowed and seveal &lt;&lt;-in <infile>&lt;&lt; statements can be present."),
                                  QCoreApplication::translate("main","infile"));
     m_parser.addOption(inFileOpt);
 
