@@ -1,9 +1,11 @@
 //=============================================================================================================
 /**
 * @file     settingscontroller.h
-* @author   Juan Garcia-Prieto <juangpc@gmail.com>;
+* @author   Juan Garcia-Prieto <Juan.GarciaPrieto@uth.tmc.edu> <juangpc@gmail.com>;
+*           Wayne Mead <wayne.mead@uth.tmc.edu> <wayne.isk@gmail.com>;
 *           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           John C. Mosher <John.C.Mosher@uth.tmc.edu> <jcmosher@gmail.com>;
 * @version  1.0
 * @date     September, 2019
 *
