@@ -86,12 +86,8 @@ SettingsController::SettingsController(QCoreApplication* qtApp)
 : m_bMultipleInFiles(false)
 , m_pQCoreApp(qtApp)
 {
-    m_pQCoreApp->setApplicationName(m_anonymizer.name);
-    m_pQCoreApp->setApplicationVersion(m_anonymizer.versionStr);
-
     initParser();
     parseInputs();
-
     generateAnonymizerInstances();
     execute();
 }
