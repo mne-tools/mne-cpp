@@ -45,11 +45,6 @@
 #include "settingscontroller.h"
 #include "fiffanonymizer.h"
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,7 +63,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFANONYMIZER;
+using namespace MNEANONYMIZE;
 
 
 //*************************************************************************************************************
@@ -87,29 +82,26 @@ using namespace FIFFANONYMIZER;
 
 //}
 
-SettingsController::SettingsController(QCoreApplication * qtApp)
-    :m_bMultipleInFiles(false),
-     m_pQCoreApp(qtApp)
+SettingsController::SettingsController(QCoreApplication* qtApp)
+: m_bMultipleInFiles(false)
+, m_pQCoreApp(qtApp)
 {
+    m_pQCoreApp->setApplicationName(m_anonymizer.name);
+    m_pQCoreApp->setApplicationVersion(m_anonymizer.versionStr);
 
     initParser();
     parseInputs();
 
-    generate_anonymizer_instances();
+    generateAnonymizerInstances();
     execute();
-
 }
+
 
 //*************************************************************************************************************
 
 void SettingsController::initParser()
 {
-
-    m_pQCoreApp->setApplicationName(m_anonymizer.name);
-    m_pQCoreApp->setApplicationVersion(m_anonymizer.versionStr);
-
-    m_parser.setApplicationDescription(QCoreApplication::translate("main",
-                                                                   m_anonymizer.description.toUtf8()));
+    m_parser.setApplicationDescription(m_anonymizer.description);
     m_parser.addHelpOption();
     m_parser.addVersionOption();
 
@@ -321,22 +313,27 @@ void SettingsController::parseInputAndOutputFiles()
 
 //*************************************************************************************************************
 
-void SettingsController::generate_anonymizer_instances()
+void SettingsController::generateAnonymizerInstances()
 {
+    if(m_slInFiles.isEmpty() || m_slOutFiles.isEmpty()) {
+        qDebug() << "SettingsController::generateAnonymizerInstances - No input and/or output file names specified.";
+        return;
+    }
+
     if(m_bMultipleInFiles)
     {
         for(int i=0; i< m_slInFiles.size(); ++i)
         {
             //generate copy of m_anonymizer --> need a copy constructor
-            QSharedPointer<FIFFANONYMIZER::FiffAnonymizer> pAnonymizerApp;
+            FiffAnonymizer anonymizerApp;
+            anonymizerApp.setFileIn(m_slInFiles.at(i));
+            anonymizerApp.setFileOut(m_slOutFiles.at(i));
 
-            m_appList.append(pAnonymizerApp);
+            m_appList.append(anonymizerApp);
         }
     } else {
-        QFile fileIn(m_slInFiles.at(0));
-        QFile fileOut(m_slOutFiles.at(0));
-        m_anonymizer.setFileIn(&fileIn);
-        m_anonymizer.setFileOut(&fileOut);
+        m_anonymizer.setFileIn(m_slInFiles.first());
+        m_anonymizer.setFileOut(m_slOutFiles.first());
     }
 }
 
@@ -345,21 +342,13 @@ void SettingsController::generate_anonymizer_instances()
 
 void SettingsController::execute()
 {
-
     if(m_bMultipleInFiles)
     {
-        QtConcurrent::map(m_appList,&SettingsController::signal_execution_start);
+        QFuture<void> future = QtConcurrent::map(m_appList, &FiffAnonymizer::anonymizeFile);
+        future.waitForFinished();
     } else {
         m_anonymizer.anonymizeFile();
     }
-}
-
-
-//*************************************************************************************************************
-
-void SettingsController::signal_execution_start(QSharedPointer<FIFFANONYMIZER::FiffAnonymizer> app)
-{
-    app->anonymizeFile();
 }
 
 
