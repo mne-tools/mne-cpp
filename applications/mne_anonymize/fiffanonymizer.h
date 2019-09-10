@@ -49,6 +49,7 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_types.h>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -60,6 +61,8 @@
 #include <QStack>
 #include <QDateTime>
 #include <QDebug>
+#include <QPointer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -77,8 +80,10 @@
 //=============================================================================================================
 // DEFINE NAMESPACE
 //=============================================================================================================
-namespace FIFFANONYMIZER
+
+namespace MNEANONYMIZE
 {
+
 
 //=============================================================================================================
 /**
@@ -90,22 +95,20 @@ namespace FIFFANONYMIZER
 class FiffAnonymizer
 {
 public:
-    const double version;
-    const double maxValidFiffVerion;
-    const QString versionStr;
-    const QString name;
-    const QString description;
-public:
-    //    /**
-    //    * Constructs a FiffAnonymizer object.
-    //    */
+    typedef QSharedPointer<FiffAnonymizer> SPtr;            /**< Shared pointer type for FiffAnonymizer. */
+    typedef QSharedPointer<const FiffAnonymizer> ConstSPtr; /**< Const shared pointer type for FiffAnonymizer. */
+
+    /**
+     * Constructs a FiffAnonymizer object.
+     */
     FiffAnonymizer();
+    FiffAnonymizer(const FiffAnonymizer& obj);
 
     //copy constructor
     //move constructor
     int anonymizeFile();
-    void setFileIn(QFile* file);
-    void setFileOut(QFile* file);
+    void setFileIn(const QString &sFilePathIn);
+    void setFileOut(const QString &sFilePathOut);
     void setVerboseMode(bool v);
     bool getVerboseMode();
     void setBruteMode(bool b);
@@ -118,6 +121,12 @@ public:
     void setSubjectBirthdayOffset(bool b);
     void setDeleteInputFileAfter(bool d);
     void setDeleteInputFileAfterConfirmation(bool dc);
+
+    const double version;
+    const double maxValidFiffVerion;
+    const QString versionStr;
+    const QString name;
+    const QString description;
 
 private:
     void updateBlockTypeList(FIFFLIB::FiffTag::SPtr pTag);
@@ -167,8 +176,8 @@ private:
     QString m_sFileNameIn;
     QString m_sFfileNameOut;
 
-    QFile* m_fFileIn;
-    QFile* m_fFileOut;
+    QFile m_fFileIn;
+    QFile m_fFileOut;
 
     QDebug m_printInSameLineHelper;
     const bool m_bPrintInSameLine;
@@ -201,4 +210,4 @@ inline void FiffAnonymizer::printIfVerbose(const QString str, bool sameLine)
 
 }
 
-#endif // FIFFANONYMIZER_H
+#endif // MNEANONYMIZE

@@ -32,7 +32,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Application for anonymizing patient and personal health information from a fiff file..
+* @brief     Application for anonymizing patient and personal health information from a fiff file.
 *
 */
 
@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "settingscontroller.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -102,8 +103,7 @@ int main(int argc, char* argv[])
         //w.show();
     } else {
         // start non-GUI version...
-        FIFFANONYMIZER::SettingsController controller(
-                    reinterpret_cast<QCoreApplication *>(&qtApp));
+        MNEANONYMIZE::SettingsController controller(reinterpret_cast<QCoreApplication *>(&qtApp));
     }
 
     return qtApp->exec();

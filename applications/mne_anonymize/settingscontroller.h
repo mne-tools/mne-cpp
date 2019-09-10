@@ -45,6 +45,7 @@
 
 #include "fiffanonymizer.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -71,15 +72,15 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEFIFFANONYMIZER
+// DEFINE NAMESPACE MNEANONYMIZE
 //=============================================================================================================
 
-namespace FIFFANONYMIZER {
+namespace MNEANONYMIZE {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNEFIFFANONYMIZER FORWARD DECLARATIONS
+// MNEANONYMIZE FORWARD DECLARATIONS
 //=============================================================================================================
 
 
@@ -101,25 +102,22 @@ public:
     * Constructs a SettingsController object.
     */
     //SettingsController();
-    SettingsController(QCoreApplication * );
-    void generate_anonymizer_instances();
+    SettingsController(QCoreApplication* qtApp);
+    void generateAnonymizerInstances();
     void execute();
-
-protected:
 
 private:
     void initParser();
     void parseInputs();
     void parseInputAndOutputFiles();
-    void signal_execution_start(QSharedPointer<FIFFANONYMIZER::FiffAnonymizer> app);
     //we at least create one app
     //if we later see we have more than one file we can create
     //more apps and deploy concurrent execution (one app per thread).
-    FIFFANONYMIZER::FiffAnonymizer m_anonymizer;
+    FiffAnonymizer m_anonymizer;
     QStringList m_slInFiles;
     QStringList m_slOutFiles;
     bool m_bMultipleInFiles;
-    QList<QSharedPointer<FIFFANONYMIZER::FiffAnonymizer> > m_appList;
+    QList<FiffAnonymizer> m_appList;
 
     QCoreApplication * m_pQCoreApp;
     QCommandLineParser m_parser;
@@ -133,6 +131,6 @@ private:
 //=============================================================================================================
 
 
-} // namespace FIFFANONYMIZER
+} // namespace MNEANONYMIZE
 
-#endif // SETTINGSCONTROLLER_H
+#endif // FIFFANONYMIZER_SETTINGSCONTROLLER_H
