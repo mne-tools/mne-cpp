@@ -142,50 +142,50 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , versionStr(QString::number(obj.version))
 , name(obj.name)
 , description(obj.description)
-, m_bVerboseMode(false)
-, m_bBruteMode(false)
-, m_bQuietMode(false)
-, m_bDeleteInputFileAfter(false)
-, m_bDeleteInputFileConfirmation(true)
-, m_sDfltString("mne_anonymize")
-, m_dateDfltDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0)))
-, m_iMeasurementDayOffset(0)
-, m_bUseMeasurementDayOffset(false)
-, m_iSubjectBirthdayOffset(0)
-, m_bUseSubjectBirthdayOffset(false)
-, m_dateMeasurmentDate(m_dateDfltDate)
-, m_date_IdDate(m_dateDfltDate)
-, m_iDfltSubjectId(0)
-, m_sDfltSubjectFirstName(m_sDfltString)
-, m_sDfltSubjectMidName("x")
-, m_sDfltSubjectLastName(m_sDfltString)
-, m_dateSubjectBirthDay(m_dateDfltDate)
-, m_iDfltSubjectWeight(0)
-, m_iDfltSubjectHeight(0)
-, m_sDfltSubjectComment(m_sDfltString)
-, m_sDfltSubjectHisId(m_sDfltString)
-, m_iDfltProjectId(0)
-, m_sDfltProjectName(m_sDfltString)
-, m_sDfltProjectAim(m_sDfltString)
-, m_sDfltProjectPersons(m_sDfltString)
-, m_sDfltProjectComment(m_sDfltString)
-, m_sFileNameIn("")
-, m_sFfileNameOut("")
+, m_bVerboseMode(obj.m_bVerboseMode)
+, m_bBruteMode(obj.m_bBruteMode)
+, m_bQuietMode(obj.m_bQuietMode)
+, m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
+, m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
+, m_sDfltString(obj.m_sDfltString)
+, m_dateDfltDate(obj.m_dateDfltDate)
+, m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
+, m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
+, m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
+, m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
+, m_dateMeasurmentDate(obj.m_dateMeasurmentDate)
+, m_date_IdDate(obj.m_date_IdDate)
+, m_iDfltSubjectId(obj.m_iDfltSubjectId)
+, m_sDfltSubjectFirstName(obj.m_sDfltSubjectFirstName)
+, m_sDfltSubjectMidName(obj.m_sDfltSubjectMidName)
+, m_sDfltSubjectLastName(obj.m_sDfltSubjectLastName)
+, m_dateSubjectBirthDay(obj.m_dateSubjectBirthDay)
+, m_iDfltSubjectWeight(obj.m_iDfltSubjectWeight)
+, m_iDfltSubjectHeight(obj.m_iDfltSubjectHeight)
+, m_sDfltSubjectComment(obj.m_sDfltSubjectComment)
+, m_sDfltSubjectHisId(obj.m_sDfltSubjectHisId)
+, m_iDfltProjectId(obj.m_iDfltProjectId)
+, m_sDfltProjectName(obj.m_sDfltProjectName)
+, m_sDfltProjectAim(obj.m_sDfltProjectAim)
+, m_sDfltProjectPersons(obj.m_sDfltProjectPersons)
+, m_sDfltProjectComment(obj.m_sDfltProjectComment)
+, m_sFileNameIn(obj.m_sFileNameIn)
+, m_sFfileNameOut(obj.m_sFfileNameOut)
 , m_printInSameLineHelper(qDebug())
 , m_bPrintInSameLine(true)
 {
     m_BDfltMAC.resize(8);
-    m_BDfltMAC[0] = 0x00;
-    m_BDfltMAC[1] = 0x00;
-    m_BDfltMAC[2] = 0x00;
-    m_BDfltMAC[3] = 0x00;
-    m_BDfltMAC[4] = 0x00;
-    m_BDfltMAC[5] = 0x00;
-    m_BDfltMAC[6] = 0x00;
-    m_BDfltMAC[7] = 0x00;
+    memcpy(m_BDfltMAC.data(),obj.m_BDfltMAC.data(),8);
 
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>);
+    m_pBlockTypeList->resize(obj.m_pBlockTypeList->size());
+    memcpy(m_pBlockTypeList->data(),obj.m_pBlockTypeList.data(),
+           static_cast<size_t>(obj.m_pBlockTypeList->size()));
+
     m_pOutDir = QSharedPointer<QVector<FiffDirEntry> >(new QVector<FiffDirEntry>);
+    m_pOutDir->resize(obj.m_pOutDir->size());
+    memcpy(m_pOutDir->data(),obj.m_pOutDir->data(),
+           static_cast<size_t>(obj.m_pOutDir->size()));
 }
 
 
