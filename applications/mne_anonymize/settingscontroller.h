@@ -103,7 +103,6 @@ public:
     /**
     * Constructs a SettingsController object.
     */
-    //SettingsController();
     SettingsController(QCoreApplication* qtApp);
     void generateAnonymizerInstances();
     void execute();
