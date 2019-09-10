@@ -191,6 +191,54 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 
 //*************************************************************************************************************
 
+FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
+: version(obj.version)
+, maxValidFiffVerion(obj.maxValidFiffVerion)
+, versionStr(QString::number(obj.version))
+, name(obj.name)
+, description(obj.description)
+, m_bVerboseMode(obj.m_bVerboseMode)
+, m_bBruteMode(obj.m_bBruteMode)
+, m_bQuietMode(obj.m_bQuietMode)
+, m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
+, m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
+, m_sDfltString(obj.m_sDfltString)
+, m_dateDfltDate(obj.m_dateDfltDate)
+, m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
+, m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
+, m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
+, m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
+, m_dateMeasurmentDate(obj.m_dateMeasurmentDate)
+, m_date_IdDate(obj.m_date_IdDate)
+, m_iDfltSubjectId(obj.m_iDfltSubjectId)
+, m_sDfltSubjectFirstName(obj.m_sDfltSubjectFirstName)
+, m_sDfltSubjectMidName(obj.m_sDfltSubjectMidName)
+, m_sDfltSubjectLastName(obj.m_sDfltSubjectLastName)
+, m_dateSubjectBirthDay(obj.m_dateSubjectBirthDay)
+, m_iDfltSubjectWeight(obj.m_iDfltSubjectWeight)
+, m_iDfltSubjectHeight(obj.m_iDfltSubjectHeight)
+, m_sDfltSubjectComment(obj.m_sDfltSubjectComment)
+, m_sDfltSubjectHisId(obj.m_sDfltSubjectHisId)
+, m_iDfltProjectId(obj.m_iDfltProjectId)
+, m_sDfltProjectName(obj.m_sDfltProjectName)
+, m_sDfltProjectAim(obj.m_sDfltProjectAim)
+, m_sDfltProjectPersons(obj.m_sDfltProjectPersons)
+, m_sDfltProjectComment(obj.m_sDfltProjectComment)
+, m_sFileNameIn(obj.m_sFileNameIn)
+, m_sFfileNameOut(obj.m_sFfileNameOut)
+, m_printInSameLineHelper(qDebug())
+, m_bPrintInSameLine(true)
+{
+    m_BDfltMAC.resize(8);
+    memcpy(m_BDfltMAC.data(),obj.m_BDfltMAC.data(),8);
+
+    m_pBlockTypeList.swap(obj.m_pBlockTypeList);
+    m_pOutDir.swap(obj.m_pOutDir);
+}
+
+
+//*************************************************************************************************************
+
 int FiffAnonymizer::anonymizeFile()
 {
     printIfVerbose(" ");
