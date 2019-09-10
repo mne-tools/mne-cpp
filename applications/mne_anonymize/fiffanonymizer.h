@@ -103,6 +103,7 @@ public:
      */
     FiffAnonymizer();
     FiffAnonymizer(const FiffAnonymizer& obj);
+    FiffAnonymizer(FiffAnonymizer &&obj);
 
     //move constructor
     int anonymizeFile();
