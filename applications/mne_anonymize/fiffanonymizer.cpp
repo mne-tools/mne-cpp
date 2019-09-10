@@ -116,6 +116,9 @@ FiffAnonymizer::FiffAnonymizer()
 , m_printInSameLineHelper(qDebug())
 , m_bPrintInSameLine(true)
 {
+    //MAC addresses have 6 bytes. We use 2 more here to complete 2 int32 reads.
+    //check->sometimes MAC address is stored in the 0-5 bytes some other times it
+    //is stored in the 2-7 bytes. Check why!!!
     m_BDfltMAC.resize(8);
     m_BDfltMAC[0] = 0x00;
     m_BDfltMAC[1] = 0x00;
