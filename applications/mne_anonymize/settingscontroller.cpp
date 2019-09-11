@@ -315,11 +315,10 @@ void SettingsController::generateAnonymizerInstances()
     {
         for(int i=0; i< m_slInFiles.size(); ++i)
         {
-            FiffAnonymizer anonymizerApp(m_anonymizer);
-            anonymizerApp.setFileIn(m_slInFiles.at(i));
-            anonymizerApp.setFileOut(m_slOutFiles.at(i));
-
-            m_appList.append(anonymizerApp);
+            QSharedPointer<FiffAnonymizer> pAppAux(new FiffAnonymizer(m_anonymizer));
+            pAppAux->setFileIn(m_slInFiles.at(i));
+            pAppAux->setFileOut(m_slOutFiles.at(i));
+            m_pAppList.append(QSharedPointer<FiffAnonymizer>(pAppAux));
         }
     } else {
         m_anonymizer.setFileIn(m_slInFiles.first());
@@ -334,7 +333,7 @@ void SettingsController::execute()
 {
     if(m_bMultipleInFiles)
     {
-        QFuture<void> future = QtConcurrent::map(m_appList, &FiffAnonymizer::anonymizeFile);
+        QFuture<void> future = QtConcurrent::map(m_pAppList, &FiffAnonymizer::anonymizeFile);
         future.waitForFinished();
     } else {
         m_anonymizer.anonymizeFile();
@@ -344,3 +343,14 @@ void SettingsController::execute()
 
 //*************************************************************************************************************
 
+SettingsController::~SettingsController()
+{
+    qDeleteAll(m_slInFiles.begin(),m_slInFiles.end());
+    m_slInFiles.clear();
+    qDeleteAll(m_slOutFiles.begin(),m_slOutFiles.end());
+    m_slOutFiles.clear();
+    qDeleteAll(m_pAppList.begin(),m_pAppList.end());
+    m_pAppList.clear();
+
+    //m_pQCoreApp is managed by main. no leak. Leave it alone.
+}
