@@ -160,6 +160,7 @@ void SettingsController::parseInputs()
 
     parseInputAndOutputFiles();
 
+    //check if this is needed TODO
     if(m_parser.isSet("v") || m_parser.isSet("verbose"))
     {
         m_anonymizer.setVerboseMode(true);
@@ -270,17 +271,10 @@ void SettingsController::parseInputAndOutputFiles()
 
     if(m_bMultipleInFiles)
     {
-        //        QStringList opts;
-        //        opts << "out" << "measurement_date" << "measurement_date_offset" << "subject_birthday" << "subject_birthday_offset";
-        //        for(QString opi:opts)
-        //        {
-        //            if(m_parser.isSet(opi))
-        //            {
-        //                qDebug() << "Error. Multiple Input files. You cannot specify the option " << opi;
-        //                m_parser.showHelp();
-        //            }
-        //        }
-
+        if(m_parser.isSet("out"))
+        {
+            qDebug() << "Warning. Multiple input files selected. Output filename option will be overriden to default.";
+        }
         for(QString fi:m_slInFiles)
         {
             QFileInfo fInfo(fi);
@@ -304,6 +298,7 @@ void SettingsController::parseInputAndOutputFiles()
     {
         qDebug() << "Error. something went wrong while parsing the input files.";
     }
+
 }
 
 
