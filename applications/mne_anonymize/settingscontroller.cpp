@@ -320,8 +320,7 @@ void SettingsController::generateAnonymizerInstances()
     {
         for(int i=0; i< m_slInFiles.size(); ++i)
         {
-            //generate copy of m_anonymizer --> need a copy constructor
-            FiffAnonymizer anonymizerApp;
+            FiffAnonymizer anonymizerApp(m_anonymizer);
             anonymizerApp.setFileIn(m_slInFiles.at(i));
             anonymizerApp.setFileOut(m_slOutFiles.at(i));
 
