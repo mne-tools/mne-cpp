@@ -273,7 +273,7 @@ void SettingsController::parseInputAndOutputFiles()
     {
         if(m_parser.isSet("out"))
         {
-            qDebug() << "Warning. Multiple input files selected. Output filename option will be overriden to default.";
+            qDebug() << "Warning. Multiple input files selected. Output filename option will be ignored.";
         }
         for(QString fi:m_slInFiles)
         {
@@ -288,7 +288,7 @@ void SettingsController::parseInputAndOutputFiles()
         {
             fileOutName = m_parser.value("out");
         } else {
-            QFileInfo fInfo(m_slInFiles.at(0));
+            QFileInfo fInfo(m_slInFiles.first());
             fileOutName = QDir(fInfo.absolutePath()).filePath(
                         fInfo.baseName() + "_anonymized." + fInfo.completeSuffix());
         }
