@@ -42,6 +42,7 @@
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
 
 #include <connectivity/connectivity.h>
+#include <connectivity/metrics/abstractmetric.h>
 #include <rtprocessing/rtconnectivity.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
@@ -99,6 +100,9 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_iBlockSize(1)
 , m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create(this->getName()))
 {
+    AbstractMetric::m_bStorageModeIsActive = true;
+    AbstractMetric::m_iNumberBinStart = 0;
+    AbstractMetric::m_iNumberBinAmount = 100;
 }
 
 
@@ -185,10 +189,10 @@ void NeuronalConnectivity::unload()
 
 bool NeuronalConnectivity::start()
 {
-    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning()) {
-        QThread::wait();
-    }
+//    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+//    if(this->isRunning()) {
+//        QThread::wait();
+//    }
 
     m_bIsRunning = true;
 
@@ -263,6 +267,7 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
             for(int j = 0; j < pRTSE->getValue()[i]->times.cols(); ++j) {
                 if(pRTSE->getValue()[i]->times(j) >= 0) {
                     iZeroIdx = j;
+                    //iZeroIdx = j + m_pFiffInfo->sfreq * 0.01; //Cut stimulus artifact, e.g. for median nerve stimulation.
                     break;
                 }
             }
@@ -354,7 +359,6 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             //Pop data from buffer
             if(m_connectivitySettings.size() > m_iNumberAverages) {
                 m_pRtConnectivity->restart();
-                int size = m_connectivitySettings.size();
                 m_connectivitySettings.removeFirst(m_connectivitySettings.size()-m_iNumberAverages);
             }
 
@@ -463,7 +467,7 @@ void NeuronalConnectivity::generateNodeVertices()
     }
 
     QString sCoilType = "grad";
-    QString sChType = "mag";
+    QString sChType = "meg";
 
     QStringList exclude;
     exclude << m_pFiffInfo->bads << m_pFiffInfo->ch_names.filter("EOG");
@@ -471,7 +475,7 @@ void NeuronalConnectivity::generateNodeVertices()
     if(sChType.contains("EEG", Qt::CaseInsensitive)) {
         m_vecPicks = m_pFiffInfo->pick_types(false,true,false,QStringList(),exclude);
     } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
-        // Only pick every second gradiometer. If it is a bad channel try the second one in the triplet. Works only for Neuromag data
+        // Only pick every second gradiometer which are not marked as bad.
         RowVectorXi picksTmp = m_pFiffInfo->pick_types(QString("grad"),false,false);
         m_vecPicks.resize(0);
 
@@ -517,10 +521,12 @@ void NeuronalConnectivity::run()
                 //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
                 m_currentConnectivityResult.setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
                 m_currentConnectivityResult.normalize();
+
                 m_pRTCEOutput->data()->setValue(m_currentConnectivityResult);
             } else {
                 qDebug()<<"NeuronalConnectivity::run - Network is empty";
             }
+
         }
 
         ++skip_count;
@@ -601,7 +607,7 @@ void NeuronalConnectivity::onFrequencyBandChanged(float fFreqLow, float fFreqHig
     //QMutexLocker locker(&m_mutex);
     if(!m_currentConnectivityResult.isEmpty()) {
         m_currentConnectivityResult.setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
-        m_currentConnectivityResult.normalize();
+        //m_currentConnectivityResult.normalize();
         m_pCircularNetworkBuffer->push(m_currentConnectivityResult);
     }
 

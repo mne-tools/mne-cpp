@@ -44,7 +44,7 @@
 
 #include <disp/viewers/quickcontrolview.h>
 
-#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
 #include <disp3D/viewers/sourceestimateview.h>
 
 
@@ -154,7 +154,8 @@ void RealTimeSourceEstimateWidget::getData()
                 m_pRtItem->setThresholds(QVector3D(0.0,5,10));
                 m_pRtItem->setColormapType("Hot");
                 m_pRtItem->setVisualizationType("Annotation based");
-                m_pRtItem->setNumberAverages(1);
+                m_pRtItem->setNumberAverages(17);
+                m_pRtItem->setAlpha(1.0);
                 m_pRtItem->setStreamingState(true);
                 m_pRtItem->setSFreq(m_pRTSE->getFiffInfo()->sfreq);
             } else {

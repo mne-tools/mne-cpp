@@ -114,7 +114,7 @@ namespace DISP3DLIB
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneEstimateTreeItem;
+class MneDataTreeItem;
 class NetworkTreeItem;
 class EcdDataTreeItem;
 class FsSurfaceTreeItem;
@@ -233,12 +233,12 @@ public:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    MneEstimateTreeItem* addSourceData(const QString& sSubject,
-                                       const QString& sMeasurementSetName,
-                                       const MNELIB::MNESourceEstimate& tSourceEstimate,
-                                       const MNELIB::MNEForwardSolution& tForwardSolution,
-                                       const FSLIB::SurfaceSet& tSurfSet,
-                                       const FSLIB::AnnotationSet& tAnnotSet);
+    MneDataTreeItem* addSourceData(const QString& sSubject,
+                                   const QString& sMeasurementSetName,
+                                   const MNELIB::MNESourceEstimate& tSourceEstimate,
+                                   const MNELIB::MNEForwardSolution& tForwardSolution,
+                                   const FSLIB::SurfaceSet& tSurfSet,
+                                   const FSLIB::AnnotationSet& tAnnotSet);
 
     //=========================================================================================================
     /**

@@ -54,6 +54,7 @@
 #include <QCheckBox>
 #include <QDoubleSpinBox>
 #include <QSpinBox>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -164,23 +165,23 @@ void ArtifactSettingsView::redrawGUI()
             kind = m_fiffChInfoList.at(i).kind;
             unit = m_fiffChInfoList.at(i).unit;
 
-            if(kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T_M && !channelTypes.contains("GRAD")) {
-                channelTypes << "GRAD";
+            if(kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T_M && !channelTypes.contains("grad")) {
+                channelTypes << "grad";
             }
-            if(kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T && !channelTypes.contains("MAG")) {
-                channelTypes << "MAG";
+            if(kind == FIFFV_MEG_CH && unit == FIFF_UNIT_T && !channelTypes.contains("mag")) {
+                channelTypes << "mag";
             }
-            if(kind == FIFFV_EEG_CH && !channelTypes.contains("EEG")) {
-                channelTypes << "EEG";
+            if(kind == FIFFV_EEG_CH && !channelTypes.contains("eeg", Qt::CaseInsensitive)) {
+                channelTypes << "eeg";
             }
-            if(kind == FIFFV_EOG_CH && !channelTypes.contains("EOG")) {
-                channelTypes << "EOG";
+            if(kind == FIFFV_EOG_CH && !channelTypes.contains("eog", Qt::CaseInsensitive)) {
+                channelTypes << "eog";
             }
-            if(kind == FIFFV_EMG_CH && !channelTypes.contains("EMG")) {
-                channelTypes << "EMG";
+            if(kind == FIFFV_EMG_CH && !channelTypes.contains("emg", Qt::CaseInsensitive)) {
+                channelTypes << "emg";
             }
-            if(kind == FIFFV_ECG_CH && !channelTypes.contains("ECG")) {
-                channelTypes << "ECG";
+            if(kind == FIFFV_ECG_CH && !channelTypes.contains("ecg", Qt::CaseInsensitive)) {
+                channelTypes << "ecg";
             }
         }
 
@@ -270,19 +271,19 @@ void ArtifactSettingsView::loadSettings(const QString& settingsPath)
         m_mapThresholds["Active"] = 0.0;
     }
 
-    m_mapThresholdsFirst["GRAD"] = 1.0;
-    m_mapThresholdsFirst["MAG"] = 1.0;
-    m_mapThresholdsFirst["EEG"] = 1.0;
-    m_mapThresholdsFirst["ECG"] = 1.0;
-    m_mapThresholdsFirst["EMG"] = 1.0;
-    m_mapThresholdsFirst["EOG"] = 1.0;
+    m_mapThresholdsFirst["grad"] = 1.0;
+    m_mapThresholdsFirst["mag"] = 1.0;
+    m_mapThresholdsFirst["eeg"] = 1.0;
+    m_mapThresholdsFirst["ecg"] = 1.0;
+    m_mapThresholdsFirst["emg"] = 1.0;
+    m_mapThresholdsFirst["eog"] = 1.0;
 
-    m_mapThresholdsSecond["GRAD"] = -1;
-    m_mapThresholdsSecond["MAG"] = -1;
-    m_mapThresholdsSecond["EEG"] = -1;
-    m_mapThresholdsSecond["ECG"] = -1;
-    m_mapThresholdsSecond["EMG"] = -1;
-    m_mapThresholdsSecond["EOG"] = -1;
+    m_mapThresholdsSecond["grad"] = -1;
+    m_mapThresholdsSecond["mag"] = -1;
+    m_mapThresholdsSecond["eeg"] = -1;
+    m_mapThresholdsSecond["ecg"] = -1;
+    m_mapThresholdsSecond["emg"] = -1;
+    m_mapThresholdsSecond["eog"] = -1;
 
     settings.beginGroup(settingsPath + QString("/artifactThresholdsFirst"));
     QStringList keys = settings.childKeys();
@@ -326,23 +327,23 @@ void ArtifactSettingsView::onChangeArtifactThreshold()
             m_mapThresholdsFirst[i.key()] = i.value()->value();
             m_mapThresholdsSecond[i.key()] = m_mapChThresholdsSpinBoxes[i.key()]->value();
 
-            if(i.key().contains("GRAD")) {
-                m_mapThresholds["GRAD"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
+            if(i.key().contains("grad", Qt::CaseInsensitive)) {
+                m_mapThresholds["grad"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
             }
-            if(i.key().contains("MAG")) {
-                m_mapThresholds["MAG"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
+            if(i.key().contains("mag", Qt::CaseInsensitive)) {
+                m_mapThresholds["mag"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
             }
-            if(i.key().contains("EEG")) {
-                m_mapThresholds["EEG"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
+            if(i.key().contains("eeg", Qt::CaseInsensitive)) {
+                m_mapThresholds["eeg"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
             }
-            if(i.key().contains("ECG")) {
-                m_mapThresholds["ECG"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
+            if(i.key().contains("ecg", Qt::CaseInsensitive)) {
+                m_mapThresholds["ecg"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
             }
-            if(i.key().contains("EOG")) {
-                m_mapThresholds["EOG"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
+            if(i.key().contains("eog", Qt::CaseInsensitive)) {
+                m_mapThresholds["eog"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
             }
-            if(i.key().contains("EMG")) {
-                m_mapThresholds["EMG"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
+            if(i.key().contains("emg", Qt::CaseInsensitive)) {
+                m_mapThresholds["emg"] = i.value()->value() * pow(10, m_mapChThresholdsSpinBoxes[i.key()]->value());
             }
         }
     }

@@ -163,6 +163,15 @@ public:
     */
     QColor getSignalColor();
 
+    //=========================================================================================================
+    /**
+    * Set the new upper item index color. This is used to only plot the background for the upper, visible item in the QTableView.
+    * This is a rather ugly hack in order to cope with QOpenGLWidget's/QtableView's problem when setting a background color.
+    *
+    * @param [in] iUpperItem  The new upper item index color.
+    */
+    void setUpperItemIndex(int iUpperItemIndex);
+
 private:
     //=========================================================================================================
     /**
@@ -254,6 +263,7 @@ private:
     double              m_dMaxValue;        /**< Maximum value of the data to plot. */
     double              m_dScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
     int                 m_iActiveRow;       /**< The current row which the mouse is moved over. */
+    int                 m_iUpperItemIndex;  /**< The current upper item index visible in the QTableView. */
 
     QPen        m_penMarker;                /**< Pen for drawing the data marker. */
     QPen        m_penGrid;                  /**< Pen for drawing the data grid. */

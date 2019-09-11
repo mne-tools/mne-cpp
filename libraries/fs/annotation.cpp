@@ -314,7 +314,10 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
 
 //*************************************************************************************************************
 
-bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListLabelRGBAs) const
+bool Annotation::toLabels(const Surface &p_surf,
+                          QList<Label> &p_qListLabels,
+                          QList<RowVector4i> &p_qListLabelRGBAs,
+                          const QStringList& lLabelPicks) const
 {
     if(this->m_iHemi != p_surf.hemi())
     {
@@ -379,13 +382,18 @@ bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QL
         name = QString("%1-%2").arg(label_names[i]).arg(this->m_iHemi == 0 ? "lh" : "rh");
 
         // put it all together
-        //t_tris
-        p_qListLabels.append(Label(vertices, pos, values, this->m_iHemi, name, label_id));
-
-        // store the color
-        p_qListLabelRGBAs.append(label_rgba);
+        if(lLabelPicks.isEmpty()) {
+            //t_tris
+            p_qListLabels.append(Label(vertices, pos, values, this->m_iHemi, name, label_id));
+            // store the color
+            p_qListLabelRGBAs.append(label_rgba);
+        } else if (lLabelPicks.indexOf(name) != -1) {
+            //t_tris
+            p_qListLabels.append(Label(vertices, pos, values, this->m_iHemi, name, label_id));
+            // store the color
+            p_qListLabelRGBAs.append(label_rgba);
+        }
     }
-
 
 //    for label_id, label_name, label_rgba in
 //            zip(label_ids, label_names, label_rgbas):

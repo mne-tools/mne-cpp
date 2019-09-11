@@ -90,7 +90,7 @@ bool RtClient::getConnectionStatus()
 bool RtClient::stop()
 {
     m_bIsRunning = false;
-    QThread::wait();
+    //QThread::wait();
 
     return true;
 }

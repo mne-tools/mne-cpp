@@ -45,10 +45,11 @@
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
+#include <connectivity/metrics/abstractmetric.h>
 
 #include <disp3D/engine/model/items/network/networktreeitem.h>
 #include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
-#include <disp3D/engine/model/items/sourcedata/mneestimatetreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -113,6 +114,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    AbstractMetric::m_bStorageModeIsActive = false;
+//    AbstractMetric::m_iNumberBinStart = 8;
+//    AbstractMetric::m_iNumberBinAmount = 4;
+
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Comparison Example");
     parser.addHelpOption();
@@ -121,7 +126,7 @@ int main(int argc, char *argv[])
     QCommandLineOption sourceLocOption("doSourceLoc", "Do source localization (for source level usage only).", "doSourceLoc", "true");
     QCommandLineOption clustOption("doClust", "Do clustering of source space (for source level usage only).", "doClust", "true");
     QCommandLineOption sourceLocMethodOption("sourceLocMethod", "Inverse estimation <method> (for source level usage only), i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
-    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "3.0");
+    QCommandLineOption snrOption("snr", "The SNR <value> used for computation (for source level usage only).", "value", "1.0");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption coilTypeOption("coilType", "The coil <type> (for sensor level usage only), i.e. 'grad' or 'mag'.", "type", "grad");
     QCommandLineOption chTypeOption("chType", "The channel <type> (for sensor level usage only), i.e. 'eeg' or 'meg'.", "type", "meg");
@@ -133,7 +138,6 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
     parser.addOption(subjectPathOption);
@@ -219,13 +223,15 @@ int main(int argc, char *argv[])
                      events);
 
     // Read the epochs and reject bad epochs. Note, that SSPs are automatically applied to the data if MNE::setup_compensators was called beforehand.
+    QMap<QString,double> mapReject;
+    mapReject.insert("eog", 300e-06);
+
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
                                                          events,
                                                          fTMin,
                                                          fTMax,
                                                          iEvent,
-                                                         150*pow(10.0,-06),
-                                                         "eog");
+                                                         mapReject);
     data.dropRejected();
     QPair<QVariant, QVariant> pair(QVariant(fTMin), QVariant("0.0"));
     data.applyBaselineCorrection(pair);
@@ -235,11 +241,11 @@ int main(int argc, char *argv[])
                                      data.first()->epoch.cols()-1);
     MNESourceEstimate sourceEstimateEvoked;
 
+    QStringList exclude;
+    exclude << raw.info.bads << raw.info.ch_names.filter("EOG");
+
     if(!bDoSourceLoc) {
         // Pick relevant channels
-        QStringList exclude;
-        exclude << raw.info.bads << raw.info.ch_names.filter("EOG");
-
         if(sChType.contains("EEG", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(false,true,false,QStringList(),exclude);
         } else if(sCoilType.contains("grad", Qt::CaseInsensitive)) {
@@ -275,7 +281,7 @@ int main(int argc, char *argv[])
     } else {
         //Create source level data
         QFile t_fileFwd(sFwd);
-        t_Fwd = MNEForwardSolution(t_fileFwd);
+        t_Fwd = MNEForwardSolution(t_fileFwd, false, true);
 
         // Load data
         MNESourceEstimate sourceEstimate;
@@ -305,14 +311,15 @@ int main(int argc, char *argv[])
 
         // Compute inverse solution
         MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-        minimumNorm.doInverseSetup(1,false);
+        minimumNorm.doInverseSetup(1,true);
 
-        picks = raw.info.pick_types(QString("all"),true,false,QStringList(),QStringList() << raw.info.bads << "EOG61");
+        picks = raw.info.pick_types(QString("all"),true,false,QStringList(),exclude);
         data.pick_channels(picks);
         for(int i = 0; i < data.size(); i++) {
             sourceEstimate = minimumNorm.calculateInverse(data.at(i)->epoch,
                                                           0.0f,
-                                                          1.0/raw.info.sfreq);
+                                                          1.0/raw.info.sfreq,
+                                                          true);
 
             if(sourceEstimate.isEmpty()) {
                 printf("Source estimate is empty");
@@ -322,7 +329,7 @@ int main(int argc, char *argv[])
         }
 
         MinimumNorm minimumNormEvoked(inverse_operator, lambda2, method);
-        sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked);
+        sourceEstimateEvoked = minimumNormEvoked.calculateInverse(evoked, false);
 
         // Generate network nodes
         conSettings.setNodePositions(t_clusteredFwd, tSurfSetInflated);
@@ -388,12 +395,12 @@ int main(int argc, char *argv[])
                                                       raw.info.bads);
     } else {
         //Add source loc data and init some visualization values
-        if(MneEstimateTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
-                                                                                         evoked.comment,
-                                                                                         sourceEstimateEvoked,
-                                                                                         t_clusteredFwd,
-                                                                                         tSurfSetInflated,
-                                                                                         tAnnotSet)) {
+        if(MneDataTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
+                                                                                     evoked.comment,
+                                                                                     sourceEstimateEvoked,
+                                                                                     t_clusteredFwd,
+                                                                                     tSurfSetInflated,
+                                                                                     tAnnotSet)) {
             pRTDataItem->setLoopState(true);
             pRTDataItem->setTimeInterval(17);
             pRTDataItem->setNumberAverages(1);

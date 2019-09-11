@@ -112,11 +112,10 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
-###not sure about below:
-#RESOURCES += \
-#    brainamp.qrc
-
-#DISTFILES +=
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../../lib
+}
 
 DISTFILES += \
     natus.json

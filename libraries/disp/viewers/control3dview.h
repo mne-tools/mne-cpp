@@ -67,7 +67,7 @@ namespace Ui {
     class Control3DViewWidget;
 }
 
-class QItemDelegate;
+class QStyledItemDelegate;
 class QStandardItemModel;
 
 
@@ -132,7 +132,7 @@ public:
     *
     * @param[in] pItemDelegate   The delegate.
     */
-    void setDelegate(QItemDelegate* pItemDelegate);
+    void setDelegate(QStyledItemDelegate* pItemDelegate);
 
     //=========================================================================================================
     /**

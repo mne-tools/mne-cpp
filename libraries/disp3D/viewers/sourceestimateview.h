@@ -83,7 +83,7 @@ namespace DISP3DLIB
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneEstimateTreeItem;
+class MneDataTreeItem;
 
 
 //=============================================================================================================
@@ -127,7 +127,7 @@ public:
     *
     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
     */
-    MneEstimateTreeItem* addData(const QString& sSubject,
+    MneDataTreeItem* addData(const QString& sSubject,
                              const QString& sMeasurementSetName,
                              const MNELIB::MNESourceEstimate& tSourceEstimate,
                              const MNELIB::MNEForwardSolution& tForwardSolution,
