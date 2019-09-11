@@ -104,6 +104,7 @@ public:
     * Constructs a SettingsController object.
     */
     SettingsController(QCoreApplication* qtApp);
+    ~SettingsController();
     void generateAnonymizerInstances();
     void execute();
 
@@ -118,7 +119,7 @@ private:
     QStringList m_slInFiles;
     QStringList m_slOutFiles;
     bool m_bMultipleInFiles;
-    QList<FiffAnonymizer> m_appList;
+    QList<QSharedPointer<FiffAnonymizer> > m_pAppList;
 
     QCoreApplication * m_pQCoreApp;
     QCommandLineParser m_parser;
