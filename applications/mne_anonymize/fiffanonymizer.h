@@ -107,7 +107,6 @@ public:
     FiffAnonymizer(const FiffAnonymizer& obj);
     FiffAnonymizer(FiffAnonymizer &&obj);
 
-    //move constructor
     int anonymizeFile();
     void setFileIn(const QString sFilePathIn);
     void setFileOut(const QString sFilePathOut);
