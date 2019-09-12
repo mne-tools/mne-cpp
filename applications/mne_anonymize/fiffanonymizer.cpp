@@ -155,6 +155,7 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
 , m_dateMeasurmentDate(obj.m_dateMeasurmentDate)
 , m_date_IdDate(obj.m_date_IdDate)
+, m_BDfltMAC(obj.m_BDfltMAC)
 , m_iDfltSubjectId(obj.m_iDfltSubjectId)
 , m_sDfltSubjectFirstName(obj.m_sDfltSubjectFirstName)
 , m_sDfltSubjectMidName(obj.m_sDfltSubjectMidName)
@@ -436,7 +437,7 @@ void FiffAnonymizer::dir2tag(FiffTag::SPtr pTag)
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::writeDirectory(FiffStream* stream,
+void FiffAnonymizer::writeDirectory(QPointer<FiffStream> stream,
                                     fiff_long_t pos)
 {
     if(pos>=0)
@@ -464,7 +465,7 @@ void FiffAnonymizer::writeDirectory(FiffStream* stream,
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::updatePointer(FiffStream* stream,
+void FiffAnonymizer::updatePointer(QPointer<FiffStream> stream,
                                    fiff_int_t tagKind,
                                    fiff_long_t newPos)
 {
