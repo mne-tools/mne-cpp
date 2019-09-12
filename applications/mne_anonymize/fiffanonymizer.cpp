@@ -89,6 +89,9 @@ FiffAnonymizer::FiffAnonymizer()
 , m_bQuietMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
+, m_bInputFileDeleted(false)
+, m_bInOutFileNamesEqual(false)
+, m_bOutputFileRenamed(false)
 , m_sDfltString("mne_anonymize")
 , m_dateDfltDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0)))
 , m_iMeasurementDayOffset(0)
@@ -112,7 +115,7 @@ FiffAnonymizer::FiffAnonymizer()
 , m_sDfltProjectPersons(m_sDfltString)
 , m_sDfltProjectComment(m_sDfltString)
 , m_sFileNameIn("")
-, m_sFfileNameOut("")
+, m_sFileNameOut("")
 , m_printInSameLineHelper(qDebug())
 , m_bPrintInSameLine(true)
 {
@@ -147,6 +150,9 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_bQuietMode(obj.m_bQuietMode)
 , m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
 , m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
+, m_bInputFileDeleted(obj.m_bInputFileDeleted)
+, m_bInOutFileNamesEqual(obj.m_bInOutFileNamesEqual)
+, m_bOutputFileRenamed(obj.m_bOutputFileRenamed)
 , m_sDfltString(obj.m_sDfltString)
 , m_dateDfltDate(obj.m_dateDfltDate)
 , m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
@@ -171,7 +177,7 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_sDfltProjectPersons(obj.m_sDfltProjectPersons)
 , m_sDfltProjectComment(obj.m_sDfltProjectComment)
 , m_sFileNameIn(obj.m_sFileNameIn)
-, m_sFfileNameOut(obj.m_sFfileNameOut)
+, m_sFileNameOut(obj.m_sFileNameOut)
 , m_printInSameLineHelper(qDebug())
 , m_bPrintInSameLine(true)
 {
@@ -204,6 +210,9 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_bQuietMode(obj.m_bQuietMode)
 , m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
 , m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
+, m_bInputFileDeleted(obj.m_bInputFileDeleted)
+, m_bInOutFileNamesEqual(obj.m_bInOutFileNamesEqual)
+, m_bOutputFileRenamed(obj.m_bOutputFileRenamed)
 , m_sDfltString(obj.m_sDfltString)
 , m_dateDfltDate(obj.m_dateDfltDate)
 , m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
@@ -228,7 +237,7 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_sDfltProjectPersons(obj.m_sDfltProjectPersons)
 , m_sDfltProjectComment(obj.m_sDfltProjectComment)
 , m_sFileNameIn(obj.m_sFileNameIn)
-, m_sFfileNameOut(obj.m_sFfileNameOut)
+, m_sFileNameOut(obj.m_sFileNameOut)
 , m_printInSameLineHelper(qDebug())
 , m_bPrintInSameLine(true)
 {
@@ -335,12 +344,16 @@ int FiffAnonymizer::anonymizeFile()
         qCritical() << "FiffAnonymizer::run - Problem closeing the output file: " << m_fFileOut.fileName();
     }
 
-    //delete file
     if(checkDeleteInputFile())
     {
-        m_fFileIn.remove();
-        printIfVerbose("Input file deleted.");
+        deleteInputFile();
     }
+
+    if(checkRenameOutputFile())
+    {
+        renameOutputFile();
+    }
+
     printIfVerbose(" ");
     printIfVerbose("----------------------------------------------------------------------------");
     printIfVerbose(" ");
@@ -486,10 +499,10 @@ void FiffAnonymizer::updatePointer(QPointer<FiffStream> stream,
 bool FiffAnonymizer::checkDeleteInputFile()
 {
 
-    if(m_bDeleteInputFileAfter)
+    if(m_bDeleteInputFileAfter) //false by default
     {
         qDebug() << "You have requested to delete the input file: " + m_fFileIn.fileName();
-        if(m_bDeleteInputFileConfirmation)
+        if(m_bDeleteInputFileConfirmation) //true by default
         {
             QTextStream consoleOut(stdout);
             QTextStream consoleIn(stdin);
@@ -500,7 +513,11 @@ bool FiffAnonymizer::checkDeleteInputFile()
             if(confirmation == "Y") {
                 return true;
             }
+        } else
+        {
+            return true;
         }
+
     }
     return false;
 }
@@ -658,17 +675,40 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setFileIn(const QString& sFilePathIn)
+void FiffAnonymizer::setFileIn(const QString sFilePathIn)
 {
-    m_fFileIn.setFileName(sFilePathIn);
+    QString inFileName;
+    if(!m_fFileOut.fileName().isEmpty())
+    {
+        m_fFileIn.setFileName(sFilePathIn);
+        setFileOut(sFilePathIn);
+    }
 }
 
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setFileOut(const QString& sFilePathOut)
+void FiffAnonymizer::setFileOut(const QString sFilePathOut)
 {
-    m_fFileOut.setFileName(sFilePathOut);
+    QString outFileName;
+    if(!m_fFileIn.fileName().isEmpty())
+    {
+        if(m_fFileIn.fileName().compare(sFilePathOut,Qt::CaseInsensitive) == 0)
+        {
+            m_bInOutFileNamesEqual = true;
+            QFileInfo outFileInfo(sFilePathOut);
+            outFileInfo.makeAbsolute();
+            outFileName = outFileInfo.absolutePath() + generateRandomFileName();
+        } else
+        {
+            m_bInOutFileNamesEqual = false;
+            outFileName = sFilePathOut;
+        }
+    } else
+    {
+        outFileName = sFilePathOut;
+    }
+    m_fFileOut.setFileName(outFileName);
 }
 
 //*************************************************************************************************************
@@ -776,3 +816,76 @@ void FiffAnonymizer::setDeleteInputFileAfterConfirmation(bool dc)
 
 
 //*************************************************************************************************************
+
+QString FiffAnonymizer::generateRandomFileName()
+{
+    const QString charPool("abcdefghijklmnopqrstuvwxyz");
+    const int randomFileNameLength(8);
+    QString randomFileName("mne_anonymize_");
+    for(int i=0;i<randomFileNameLength;++i)
+    {
+        int p=qrand() % charPool.length();
+        randomFileName.append(charPool.at(p));
+    }
+    return randomFileName.append(".fif");
+}
+
+
+//*************************************************************************************************************
+
+void FiffAnonymizer::deleteInputFile()
+{
+    m_bInputFileDeleted = m_fFileIn.remove();
+    printIfVerbose("Input file deleted.");
+}
+
+
+//*************************************************************************************************************
+
+//if both files in and out have the same name, Anonymizer class would already know and a temporary
+//random filename will be in use, during the anonymizing process, for the outputfile.
+//When this fucn is called Anonymizer will check if this needs to be reverted:
+// -if the infile has been deleted already there is no conflict->outfile name = infile name.
+// -if the infile has not been deleted but the user has never been asked. They is asked.
+// -if the infile has not been deleted but the user was already asked, it means they answered NO.
+//  Thus, a warning is shown.
+bool FiffAnonymizer::checkRenameOutputFile()
+{
+    if(m_bInOutFileNamesEqual)
+    {
+        if(m_bDeleteInputFileAfter)
+        {
+            if(m_bInputFileDeleted)
+            {
+                return true;
+            }
+        } else
+        {
+            m_bDeleteInputFileAfter = true;
+            if(checkDeleteInputFile())
+            {
+                deleteInputFile();
+                return true;
+            } else {
+
+                qCritical() << " ";
+                qCritical() << "You have requested to save the output file with the same name as the input file.";
+                qCritical() << "This cannot be done without deleting or modifying the input file.";
+                qCritical() << "The output file is: " << m_sFileNameOut;
+                qCritical() << " ";
+            }
+        }
+    }
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+void FiffAnonymizer::renameOutputFile()
+{
+    m_fFileOut.rename(m_sFileNameIn);
+    m_bOutputFileRenamed = true;
+    printIfVerbose("Output file named: " + m_sFileNameOut + " --> renamed as: " + m_sFileNameIn);
+}
+
