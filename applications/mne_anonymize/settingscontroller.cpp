@@ -347,12 +347,7 @@ void SettingsController::execute()
 
 SettingsController::~SettingsController()
 {
-    qDeleteAll(m_slInFiles.begin(),m_slInFiles.end());
-    m_slInFiles.clear();
-    qDeleteAll(m_slOutFiles.begin(),m_slOutFiles.end());
-    m_slOutFiles.clear();
     qDeleteAll(m_pAppList.begin(),m_pAppList.end());
     m_pAppList.clear();
-
     //m_pQCoreApp is managed by main. no leak. Leave it alone.
 }
