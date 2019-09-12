@@ -91,7 +91,7 @@ SettingsController::SettingsController(QCoreApplication* qtApp)
 
 SettingsController::~SettingsController()
 {
-    qDeleteAll(m_pAppList.begin(),m_pAppList.end());
+    //qDeleteAll(m_pAppList.begin(),m_pAppList.end());
     m_pAppList.clear();
     //m_pQCoreApp is managed by main. no leak. Leave it alone.
 }
