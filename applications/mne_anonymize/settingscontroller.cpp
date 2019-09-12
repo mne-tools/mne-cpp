@@ -318,7 +318,9 @@ void SettingsController::generateAnonymizerInstances()
             QSharedPointer<FiffAnonymizer> pAppAux(new FiffAnonymizer(m_anonymizer));
             pAppAux->setFileIn(m_slInFiles.at(i));
             pAppAux->setFileOut(m_slOutFiles.at(i));
-            m_pAppList.append(QSharedPointer<FiffAnonymizer>(pAppAux));
+            //m_pAppList.append(QSharedPointer<FiffAnonymizer>(pAppAux));
+            //note that QList will copy & append.
+            m_pAppList.append(pAppAux);
         }
     } else {
         m_anonymizer.setFileIn(m_slInFiles.first());
