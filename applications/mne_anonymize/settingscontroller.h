@@ -105,19 +105,19 @@ public:
     */
     SettingsController(QCoreApplication* qtApp);
     ~SettingsController();
-    void generateAnonymizerInstances();
     void execute();
 
 private:
     void initParser();
     void parseInputs();
     void parseInputAndOutputFiles();
+    void generateAnonymizerInstances();
     //we at least create one app
     //if we later see we have more than one file we can create
     //more apps and deploy concurrent execution (one app per thread).
     FiffAnonymizer m_anonymizer;
-    QStringList m_slInFiles;
-    QStringList m_slOutFiles;
+    QStringList m_SLInFiles;
+    QStringList m_SLOutFiles;
     bool m_bMultipleInFiles;
     QList<QSharedPointer<FiffAnonymizer> > m_pAppList;
 
