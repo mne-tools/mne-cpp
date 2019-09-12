@@ -174,18 +174,19 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_printInSameLineHelper(qDebug())
 , m_bPrintInSameLine(true)
 {
-    m_BDfltMAC.resize(8);
-    memcpy(m_BDfltMAC.data(),obj.m_BDfltMAC.data(),8);
 
-    m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>);
-    m_pBlockTypeList->resize(obj.m_pBlockTypeList->size());
-    memcpy(m_pBlockTypeList->data(),obj.m_pBlockTypeList.data(),
-           static_cast<size_t>(obj.m_pBlockTypeList->size()));
+//    m_BDfltMAC.resize(8);
+//    memcpy(m_BDfltMAC.data(),obj.m_BDfltMAC.data(),8);
+
+    m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>(*obj.m_pBlockTypeList));
+//    m_pBlockTypeList->resize(obj.m_pBlockTypeList->size());
+//    memcpy(m_pBlockTypeList->data(),obj.m_pBlockTypeList.data(),
+//           static_cast<size_t>(obj.m_pBlockTypeList->size()));
 
     m_pOutDir = QSharedPointer<QVector<FiffDirEntry> >(new QVector<FiffDirEntry>);
-    m_pOutDir->resize(obj.m_pOutDir->size());
-    memcpy(m_pOutDir->data(),obj.m_pOutDir->data(),
-           static_cast<size_t>(obj.m_pOutDir->size()));
+//    m_pOutDir->resize(obj.m_pOutDir->size());
+//    memcpy(m_pOutDir->data(),obj.m_pOutDir->data(),
+//           static_cast<size_t>(obj.m_pOutDir->size()));
 }
 
 
@@ -210,6 +211,7 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
 , m_dateMeasurmentDate(obj.m_dateMeasurmentDate)
 , m_date_IdDate(obj.m_date_IdDate)
+, m_BDfltMAC(obj.m_BDfltMAC)
 , m_iDfltSubjectId(obj.m_iDfltSubjectId)
 , m_sDfltSubjectFirstName(obj.m_sDfltSubjectFirstName)
 , m_sDfltSubjectMidName(obj.m_sDfltSubjectMidName)
@@ -229,8 +231,8 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_printInSameLineHelper(qDebug())
 , m_bPrintInSameLine(true)
 {
-    m_BDfltMAC.resize(8);
-    memcpy(m_BDfltMAC.data(),obj.m_BDfltMAC.data(),8);
+//    m_BDfltMAC.resize(8);
+//    memcpy(m_BDfltMAC.data(),obj.m_BDfltMAC.data(),8);
 
     m_pBlockTypeList.swap(obj.m_pBlockTypeList);
     m_pOutDir.swap(obj.m_pOutDir);
