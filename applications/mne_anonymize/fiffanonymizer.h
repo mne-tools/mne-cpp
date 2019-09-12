@@ -58,6 +58,8 @@
 #include <QSharedPointer>
 #include <QCoreApplication>
 #include <QFile>
+#include <QDir>
+#include <QFileInfo>
 #include <QStack>
 #include <QDateTime>
 #include <QDebug>
@@ -107,8 +109,8 @@ public:
 
     //move constructor
     int anonymizeFile();
-    void setFileIn(const QString &sFilePathIn);
-    void setFileOut(const QString &sFilePathOut);
+    void setFileIn(const QString sFilePathIn);
+    void setFileOut(const QString sFilePathOut);
     void setVerboseMode(bool v);
     bool getVerboseMode();
     void setBruteMode(bool b);
@@ -137,14 +139,21 @@ private:
     void dir2tag(FIFFLIB::FiffTag::SPtr pTag);
     void writeDirectory(QPointer<FIFFLIB::FiffStream> stream, FIFFLIB::fiff_long_t pos=-1);
     void updatePointer(QPointer<FIFFLIB::FiffStream> stream, FIFFLIB::fiff_int_t tagKind, FIFFLIB::fiff_long_t newPos);
-    bool checkDeleteInputFile();
     void printIfVerbose(const QString str,bool sameLine=false);
+    QString generateRandomFileName();
+    void deleteInputFile();
+    bool checkDeleteInputFile();
+    bool checkRenameOutputFile();
+    void renameOutputFile();
 
     bool m_bVerboseMode;
     bool m_bBruteMode;
     bool m_bQuietMode;
     bool m_bDeleteInputFileAfter;
     bool m_bDeleteInputFileConfirmation;
+    bool m_bInputFileDeleted;
+    bool m_bInOutFileNamesEqual;
+    bool m_bOutputFileRenamed;
 
     QString m_sDfltString;
     QDateTime m_dateDfltDate;
@@ -174,7 +183,7 @@ private:
     QString m_sDfltProjectComment;
 
     QString m_sFileNameIn;
-    QString m_sFfileNameOut;
+    QString m_sFileNameOut;
 
     QFile m_fFileIn;
     QFile m_fFileOut;
