@@ -77,19 +77,23 @@ using namespace MNEANONYMIZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-//SettingsController::SettingsController()
-//{
-
-//}
-
 SettingsController::SettingsController(QCoreApplication* qtApp)
 : m_bMultipleInFiles(false)
 , m_pQCoreApp(qtApp)
 {
     initParser();
     parseInputs();
-    generateAnonymizerInstances();
     execute();
+}
+
+
+//*************************************************************************************************************
+
+SettingsController::~SettingsController()
+{
+    qDeleteAll(m_pAppList.begin(),m_pAppList.end());
+    m_pAppList.clear();
+    //m_pQCoreApp is managed by main. no leak. Leave it alone.
 }
 
 
@@ -252,17 +256,17 @@ void SettingsController::parseInputAndOutputFiles()
                 if(fi.isFile() && fi.isReadable())
                 {
                     fi.makeAbsolute();
-                    m_slInFiles.append(fi.fileName());
+                    m_SLInFiles.append(fi.fileName());
                 }
             }
         }
     }
 
-    if(m_slInFiles.size() == 0)
+    if(m_SLInFiles.size() == 0)
     {
         qDebug() << "Error. no valid input files. OMG!!";
         m_parser.showHelp();
-    } else if(m_slInFiles.size() == 1)
+    } else if(m_SLInFiles.size() == 1)
     {
         m_bMultipleInFiles = false;
     } else {
@@ -275,26 +279,29 @@ void SettingsController::parseInputAndOutputFiles()
         {
             qDebug() << "Warning. Multiple input files selected. Output filename option will be ignored.";
         }
-        for(QString fi:m_slInFiles)
+        for(QString fi:m_SLInFiles)
         {
             QFileInfo fInfo(fi);
             QString fout = QDir(fInfo.absolutePath()).filePath(
                         fInfo.baseName() + "_anonymized." + fInfo.completeSuffix());
-            m_slOutFiles.append(fout);
+            m_SLOutFiles.append(fout);
         }
     } else {
         QString fileOutName;
         if(m_parser.isSet("out"))
         {
-            fileOutName = m_parser.value("out");
+            QFileInfo fInfo(m_parser.value("out"));
+            fInfo.makeAbsolute();
+            fileOutName = fInfo.fileName();
         } else {
-            QFileInfo fInfo(m_slInFiles.first());
+            QFileInfo fInfo(m_SLInFiles.first());
             fileOutName = QDir(fInfo.absolutePath()).filePath(
                         fInfo.baseName() + "_anonymized." + fInfo.completeSuffix());
         }
+        m_SLOutFiles.append(fileOutName);
     }
 
-    if(m_slInFiles.size() != m_slOutFiles.size())
+    if(m_SLInFiles.size() != m_SLOutFiles.size())
     {
         qDebug() << "Error. something went wrong while parsing the input files.";
     }
@@ -306,25 +313,25 @@ void SettingsController::parseInputAndOutputFiles()
 
 void SettingsController::generateAnonymizerInstances()
 {
-    if(m_slInFiles.isEmpty() || m_slOutFiles.isEmpty()) {
+    if(m_SLInFiles.isEmpty() || m_SLOutFiles.isEmpty()) {
         qDebug() << "SettingsController::generateAnonymizerInstances - No input and/or output file names specified.";
         return;
     }
 
     if(m_bMultipleInFiles)
     {
-        for(int i=0; i< m_slInFiles.size(); ++i)
+        for(int i=0; i< m_SLInFiles.size(); ++i)
         {
             QSharedPointer<FiffAnonymizer> pAppAux(new FiffAnonymizer(m_anonymizer));
-            pAppAux->setFileIn(m_slInFiles.at(i));
-            pAppAux->setFileOut(m_slOutFiles.at(i));
+            pAppAux->setFileIn(m_SLInFiles.at(i));
+            pAppAux->setFileOut(m_SLOutFiles.at(i));
             //m_pAppList.append(QSharedPointer<FiffAnonymizer>(pAppAux));
             //note that QList will copy & append.
             m_pAppList.append(pAppAux);
         }
     } else {
-        m_anonymizer.setFileIn(m_slInFiles.first());
-        m_anonymizer.setFileOut(m_slOutFiles.first());
+        m_anonymizer.setFileIn(m_SLInFiles.first());
+        m_anonymizer.setFileOut(m_SLOutFiles.first());
     }
 }
 
@@ -333,6 +340,7 @@ void SettingsController::generateAnonymizerInstances()
 
 void SettingsController::execute()
 {
+    generateAnonymizerInstances();
     if(m_bMultipleInFiles)
     {
         QFuture<void> future = QtConcurrent::map(m_pAppList, &FiffAnonymizer::anonymizeFile);
@@ -345,9 +353,6 @@ void SettingsController::execute()
 
 //*************************************************************************************************************
 
-SettingsController::~SettingsController()
-{
-    qDeleteAll(m_pAppList.begin(),m_pAppList.end());
-    m_pAppList.clear();
-    //m_pQCoreApp is managed by main. no leak. Leave it alone.
-}
+
+
+
