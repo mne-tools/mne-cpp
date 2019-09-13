@@ -112,6 +112,8 @@ private:
     void parseInputs();
     void parseInputAndOutputFiles();
     void generateAnonymizerInstances();
+
+
     //we at least create one app
     //if we later see we have more than one file we can create
     //more apps and deploy concurrent execution (one app per thread).
@@ -120,7 +122,7 @@ private:
     QStringList m_SLOutFiles;
     bool m_bMultipleInFiles;
     QList<QSharedPointer<FiffAnonymizer> > m_pAppList;
-
+    QList<QSharedPointer<QFuture<void> > > promisesList;
     QCoreApplication * m_pQCoreApp;
     QCommandLineParser m_parser;
 
