@@ -450,7 +450,7 @@ void FiffAnonymizer::dir2tag(FiffTag::SPtr pTag)
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::writeDirectory(QPointer<FiffStream> stream,
+void FiffAnonymizer::writeDirectory(FiffStream* stream,
                                     fiff_long_t pos)
 {
     if(pos>=0)
@@ -478,7 +478,7 @@ void FiffAnonymizer::writeDirectory(QPointer<FiffStream> stream,
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::updatePointer(QPointer<FiffStream> stream,
+void FiffAnonymizer::updatePointer(FiffStream* stream,
                                    fiff_int_t tagKind,
                                    fiff_long_t newPos)
 {
