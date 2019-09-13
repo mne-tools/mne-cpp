@@ -343,8 +343,18 @@ void SettingsController::execute()
     generateAnonymizerInstances();
     if(m_bMultipleInFiles)
     {
-        QFuture<void> future = QtConcurrent::map(m_pAppList, &FiffAnonymizer::anonymizeFile);
-        future.waitForFinished();
+        for(int th_i=0; th_i<m_pAppList.size(); ++th_i)
+        {
+            QSharedPointer<QFuture<void> > promise( new QFuture<void>);
+            FiffAnonymizer localApp(*m_pAppList.at(th_i));
+            *promise = QtConcurrent::run(localApp,&FiffAnonymizer::anonymizeFile);
+            promisesList.append(promise);
+
+        }
+        for(int p_i=0;p_i<promisesList.size();++p_i)
+        {
+            promisesList.at(p_i)->waitForFinished();
+        }
     } else {
         m_anonymizer.anonymizeFile();
     }
@@ -352,7 +362,5 @@ void SettingsController::execute()
 
 
 //*************************************************************************************************************
-
-
 
 
