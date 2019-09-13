@@ -136,8 +136,8 @@ private:
     void addEntryToDir(FIFFLIB::FiffTag::SPtr pTag,qint64 filePos);
     void addFinalEntryToDir();
     void dir2tag(FIFFLIB::FiffTag::SPtr pTag);
-    void writeDirectory(QPointer<FIFFLIB::FiffStream> stream, FIFFLIB::fiff_long_t pos=-1);
-    void updatePointer(QPointer<FIFFLIB::FiffStream> stream, FIFFLIB::fiff_int_t tagKind, FIFFLIB::fiff_long_t newPos);
+    void writeDirectory(FIFFLIB::FiffStream* stream, FIFFLIB::fiff_long_t pos=-1);
+    void updatePointer(FIFFLIB::FiffStream* stream, FIFFLIB::fiff_int_t tagKind, FIFFLIB::fiff_long_t newPos);
     void printIfVerbose(const QString str,bool sameLine=false);
     QString generateRandomFileName();
     void deleteInputFile();
