@@ -287,6 +287,7 @@ int FiffAnonymizer::anonymizeFile()
     FiffTag::SPtr pOutTag = FiffTag::SPtr::create();
 
     inStream.read_tag(pInTag,0);
+    FiffTag::convert_tag_data(pInTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
 
     //info in a tag FIFF_COMMENT (206) depends on the type of block it is in. Therefore, in order to
     //anonymize it we not only have to know the kind of the current tag, but also which type of block
