@@ -314,6 +314,8 @@ int FiffAnonymizer::anonymizeFile()
     while(pInTag->next != -1)
     {
         inStream.read_tag(pInTag);
+        FiffTag::convert_tag_data(pInTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+
         updateBlockTypeList(pInTag);
         censorTag(pOutTag,pInTag);
         //the order of the tags in the output file is sequential. No jumps in the output file.
