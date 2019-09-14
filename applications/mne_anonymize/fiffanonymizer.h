@@ -143,7 +143,7 @@ private:
     void deleteInputFile();
     bool checkDeleteInputFile();
     bool checkRenameOutputFile();
-    void renameOutputFile();
+    void renameOutputFileAsInputFile();
 
     bool m_bVerboseMode;
     bool m_bBruteMode;
