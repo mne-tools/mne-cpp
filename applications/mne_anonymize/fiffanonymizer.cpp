@@ -352,7 +352,7 @@ int FiffAnonymizer::anonymizeFile()
 
     if(checkRenameOutputFile())
     {
-        renameOutputFile();
+        renameOutputFileAsInputFile();
     }
 
     printIfVerbose(" ");
@@ -883,7 +883,7 @@ bool FiffAnonymizer::checkRenameOutputFile()
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::renameOutputFile()
+void FiffAnonymizer::renameOutputFileAsInputFile()
 {
     m_fFileOut.rename(m_sFileNameIn);
     m_bOutputFileRenamed = true;
