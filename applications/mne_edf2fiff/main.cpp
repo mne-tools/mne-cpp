@@ -133,8 +133,8 @@ int main(int argc, char *argv[])
     FiffRawData fiffRaw = edfRaw.toFiffRawData();
 
     // set up the reading parameters
-    float timeslice_seconds = 10.0f; //read and write in 10 sec chunks
-    int timeslice_samples = static_cast<int>(ceil(timeslice_seconds * fiffRaw.info.sfreq));
+    float fTimesliceSeconds = 10.0f; //read and write in 10 sec chunks
+    int iTimesliceSamples = static_cast<int>(ceil(fTimesliceSeconds * fiffRaw.info.sfreq));
 
     RowVectorXd cals;
     FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, fiffRaw.info, cals);
@@ -144,20 +144,20 @@ int main(int argc, char *argv[])
     outfid->write_int(FIFF_FIRST_SAMPLE, &first);
 
     // read chunks, remember how many samples were already read
-    int samplesRead = 0;
+    int iSamplesRead = 0;
 
-    while(samplesRead < edfInfo.getSampleCount()) {
-        int nextChunkSize = std::min(timeslice_samples, edfInfo.getSampleCount() - samplesRead);
+    while(iSamplesRead < edfInfo.getSampleCount()) {
+        int iNextChunkSize = std::min(iTimesliceSamples, edfInfo.getSampleCount() - iSamplesRead);
         // EDF sample indexing starts at 0, simply use samplesRead as argument to read_raw_segment
-        MatrixXd data = edfRaw.read_raw_segment(samplesRead, samplesRead + nextChunkSize).cast<double>();
+        MatrixXd data = edfRaw.read_raw_segment(iSamplesRead, iSamplesRead + iNextChunkSize).cast<double>();
 
-        samplesRead += nextChunkSize;
+        iSamplesRead += iNextChunkSize;
 
         outfid->write_raw_buffer(data, cals);
     }
 
     outfid->finish_writing_raw();
-    printf("Writing finished\n");
+    qDebug() << "Writing finished !";
 
     return 0;
 }
