@@ -81,7 +81,7 @@ using namespace FIFFLIB;
 FiffAnonymizer::FiffAnonymizer()
 : version(1.0)
 , maxValidFiffVerion(1.3)
-, versionStr(QString::number(version))
+, versionStr(QString::number(version,'f',1))
 , name("MNE Anonymize")
 , description("Application that removes or modifies Personal Health Information or Personal Identifiable information.")
 , m_bVerboseMode(false)
