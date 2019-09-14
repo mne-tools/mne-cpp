@@ -105,8 +105,15 @@ void SettingsController::initParser()
     m_parser.addHelpOption();
     m_parser.addVersionOption();
 
-    QCommandLineOption verboseOpt(QStringList() << "v" << "verbose",
-                                  QCoreApplication::translate("main","Prints out more information."));
+    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Wildcards are allowed and several --in <infile> statements can be present."),
+                                 QCoreApplication::translate("main","infile"));
+    m_parser.addOption(inFileOpt);
+
+    QCommandLineOption outFileOpt("out",QCoreApplication::translate("main","Output file <outfile>. Only allowed when anonymizing one single file."),
+                                  QCoreApplication::translate("main","outfile"));
+    m_parser.addOption(outFileOpt);
+
+    QCommandLineOption verboseOpt("verbose",QCoreApplication::translate("main","Prints out more information."));
     m_parser.addOption(verboseOpt);
 
     QCommandLineOption quietOpt("quiet",QCoreApplication::translate("main","Show no output."));
@@ -120,18 +127,8 @@ void SettingsController::initParser()
                                               QCoreApplication::translate("main","Avoid confirming the deletion of the input fiff file."));
     m_parser.addOption(deleteInFileConfirmOpt);
 
-    QCommandLineOption bruteOpt("brute",
-                                QCoreApplication::translate("main","Anonymize weight, height XXX if present in the input fiff file."));
+    QCommandLineOption bruteOpt("brute",QCoreApplication::translate("main","Anonymize weight, height XXX if present in the input fiff file."));
     m_parser.addOption(bruteOpt);
-
-    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Wildcards are allowed and seveal -in <infile> statements can be present."),
-                                 QCoreApplication::translate("main","infile"));
-    m_parser.addOption(inFileOpt);
-
-    QCommandLineOption outFileOpt("out",QCoreApplication::translate("main","Output file <outfile>. Only allowed when anonymizing one single file."),
-                                  QCoreApplication::translate("main","outfile"));
-    m_parser.addOption(outFileOpt);
-
 
     QCommandLineOption measDateOpt("measurement_date",
                                    QCoreApplication::translate("main","Specify the measurement date. Only when anonymizing a single file. Format: YYYMMDD "),
@@ -165,7 +162,8 @@ void SettingsController::parseInputs()
     parseInputAndOutputFiles();
 
     //check if this is needed TODO
-    if(m_parser.isSet("v") || m_parser.isSet("verbose"))
+//    if(m_parser.isSet("v") || m_parser.isSet("verbose"))
+    if(m_parser.isSet("verbose"))
     {
         m_anonymizer.setVerboseMode(true);
     }
@@ -256,7 +254,7 @@ void SettingsController::parseInputAndOutputFiles()
                 if(fi.isFile() && fi.isReadable())
                 {
                     fi.makeAbsolute();
-                    m_SLInFiles.append(fi.fileName());
+                    m_SLInFiles.append(fi.absoluteFilePath());
                 }
             }
         }
