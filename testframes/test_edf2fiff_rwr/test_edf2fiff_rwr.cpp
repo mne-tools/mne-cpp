@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Converts the EDF file into a fif file and tests whether the raw values are identical.
+* @brief    Converts the EDF file into a Fiff file and tests whether the raw values are identical.
 *
 */
 
@@ -84,7 +84,8 @@ private slots:
     void cleanupTestCase();
 
 private:
-    float m_fTimesliceSeconds = 10.0f; //read and write in 10 sec chunks
+    const float m_fTimesliceSeconds = 10.0f; //read and write in 10 sec chunks
+    const float m_fEpsilon = 0.000000001f;
 
     // files:
     QFile* m_pFileIn;
@@ -133,7 +134,7 @@ void TestEDF2FIFFRWR::testEDF2FiffConversion()
     m_pFiffRaw = new FiffRawData(m_pEDFRaw->toFiffRawData());
 
     QVERIFY(m_pEDFRaw->getInfo().getMeasurementChannelInfos().size() == m_pFiffRaw->info.nchan);
-    QVERIFY(std::abs(m_pEDFRaw->getInfo().getFrequency() - m_pFiffRaw->info.sfreq) <= 0.000000001f);  // float-comparisons via '==' are unsafe
+    QVERIFY(std::abs(m_pEDFRaw->getInfo().getFrequency() - m_pFiffRaw->info.sfreq) <= m_fEpsilon);  // float-comparisons via '==' are unsafe
     QVERIFY(m_pEDFRaw->getInfo().getSampleCount() == m_pFiffRaw->last_samp - m_pFiffRaw->first_samp);
 }
 
@@ -143,7 +144,7 @@ void TestEDF2FIFFRWR::testEDF2FiffConversion()
 void TestEDF2FIFFRWR::testEDFReadAndFiffWrite()
 {
     // set up the reading parameters
-    int timeslice_samples = static_cast<int>(ceil(m_fTimesliceSeconds * m_pFiffRaw->info.sfreq));
+    int iTimesliceSamples = static_cast<int>(ceil(m_fTimesliceSeconds * m_pFiffRaw->info.sfreq));
 
     RowVectorXd cals;
     FiffStream::SPtr outfid = FiffStream::start_writing_raw(*m_pFileOut, m_pFiffRaw->info, cals);
@@ -153,12 +154,12 @@ void TestEDF2FIFFRWR::testEDFReadAndFiffWrite()
     outfid->write_int(FIFF_FIRST_SAMPLE, &first);
 
     // read chunks, remember how many samples were already read
-    int samplesRead = 0;
-    while(samplesRead < m_pEDFRaw->getInfo().getSampleCount()) {
-        int nextChunkSize = std::min(timeslice_samples, m_pEDFRaw->getInfo().getSampleCount() - samplesRead);
+    int iSamplesRead = 0;
+    while(iSamplesRead < m_pEDFRaw->getInfo().getSampleCount()) {
+        int iNextChunkSize = std::min(iTimesliceSamples, m_pEDFRaw->getInfo().getSampleCount() - iSamplesRead);
         // EDF sample indexing starts at 0, simply use samplesRead as argument to read_raw_segment
-        MatrixXd data = m_pEDFRaw->read_raw_segment(samplesRead, samplesRead + nextChunkSize).cast<double>();
-        samplesRead += nextChunkSize;
+        MatrixXd data = m_pEDFRaw->read_raw_segment(iSamplesRead, iSamplesRead + iNextChunkSize).cast<double>();
+        iSamplesRead += iNextChunkSize;
         outfid->write_raw_buffer(data, cals);
         // copy into vector for later comparison with written Fiff file
         m_vRawChunksFromOriginalEDF.append(data);
@@ -166,7 +167,7 @@ void TestEDF2FIFFRWR::testEDFReadAndFiffWrite()
 
     outfid->finish_writing_raw();
 
-    QVERIFY(samplesRead == m_pEDFRaw->getInfo().getSampleCount());
+    QVERIFY(iSamplesRead == m_pEDFRaw->getInfo().getSampleCount());
 }
 
 
@@ -180,34 +181,33 @@ void TestEDF2FIFFRWR::testFiffReadingAndValueEquality()
     FiffRawData writtenFiff(*m_pFileOut);
 
     // set up the reading parameters
-    int timeslice_samples = static_cast<int>(ceil(m_fTimesliceSeconds * writtenFiff.info.sfreq));
+    int iTimesliceSamples = static_cast<int>(ceil(m_fTimesliceSeconds * writtenFiff.info.sfreq));
     // read chunks, remember which is the current sample
-    int currentSample = writtenFiff.first_samp;
-    while(currentSample < writtenFiff.last_samp) {
+    int iCurrentSample = writtenFiff.first_samp;
+    while(iCurrentSample < writtenFiff.last_samp) {
         // timeslice_samples - 1 because FiffRawData.read_raw_segment has inclusive index arguments
-        int nextChunkSize = std::min(timeslice_samples - 1, writtenFiff.last_samp - currentSample);
+        int iNextChunkSize = std::min(iTimesliceSamples - 1, writtenFiff.last_samp - iCurrentSample);
         MatrixXd data, times;
-        writtenFiff.read_raw_segment(data, times, currentSample, currentSample + nextChunkSize);
-        currentSample += nextChunkSize;
+        writtenFiff.read_raw_segment(data, times, iCurrentSample, iCurrentSample + iNextChunkSize);
+        iCurrentSample += iNextChunkSize + 1;  // + 1 because chunkSize of inclusive index arguments (see above)
         // copy into vector for later comparison with original EDF file
         m_vRawChunksFromWrittenFIFF.append(data);
     }
 
+    // compare chunk vectors
     QVERIFY(m_vRawChunksFromOriginalEDF.size() == m_vRawChunksFromWrittenFIFF.size());
-    for(const MatrixXd& originalEDFChunk : m_vRawChunksFromOriginalEDF) {
-        for(const MatrixXd& writtenFiffChunk : m_vRawChunksFromWrittenFIFF) {
-            if(originalEDFChunk.cols() != writtenFiffChunk.cols() || originalEDFChunk.rows() != writtenFiffChunk.rows()) {
-                QFAIL("Found a chunk with mismatching dimensions ...");
-            }
-            for(int r = 6; r < originalEDFChunk.rows(); ++r) {
-                for(int c = 0; c < originalEDFChunk.cols(); ++c) {
-                    if(std::abs(originalEDFChunk(r, c) - writtenFiffChunk(r, c)) > static_cast<double>(0.000000001f)) {  // float-comparisons via '==' are unsafe
-                        qDebug() << "===============";
-                        qDebug() << r << " | " << c;
-                        qDebug() << originalEDFChunk(r, c);
-                        qDebug() << writtenFiffChunk(r, c);
-                        QFAIL("Found some non-identical raw values ...");
-                    }
+    for(int i = 0; i < m_vRawChunksFromOriginalEDF.size(); ++i) {
+        const MatrixXd originalEDFChunk = m_vRawChunksFromOriginalEDF[i];
+        const MatrixXd writtenFiffChunk = m_vRawChunksFromWrittenFIFF[i];
+
+        if(originalEDFChunk.cols() != writtenFiffChunk.cols() || originalEDFChunk.rows() != writtenFiffChunk.rows()) {
+            QFAIL("Found a chunk with mismatching dimensions ...");
+        }
+        // compare every single raw value
+        for(int r = 0; r < originalEDFChunk.rows(); ++r) {
+            for(int c = 0; c < originalEDFChunk.cols(); ++c) {
+                if(std::abs(originalEDFChunk(r, c) - writtenFiffChunk(r, c)) > static_cast<double>(m_fEpsilon)) {  // double-comparisons via '==' are unsafe
+                    QFAIL("Found some non-identical raw values ...");
                 }
             }
         }
