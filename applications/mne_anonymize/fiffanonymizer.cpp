@@ -274,7 +274,7 @@ int FiffAnonymizer::anonymizeFile()
     }
 
     FiffStream outStream(&m_fFileOut);
-    printIfVerbose("Input file: " + m_fFileOut.fileName());
+    printIfVerbose("Output file: " + m_fFileOut.fileName());
     if(outStream.device()->open(QIODevice::ReadWrite))
     {
         printIfVerbose(" opened correctly",m_bPrintInSameLine);
