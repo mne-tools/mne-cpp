@@ -676,40 +676,35 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setFileIn(const QString sFilePathIn)
+void FiffAnonymizer::setFileIn(const QString sFileIn)
 {
-    QString inFileName;
-    if(!m_fFileOut.fileName().isEmpty())
-    {
-        m_fFileIn.setFileName(sFilePathIn);
-        setFileOut(sFilePathIn);
-    }
-}
+    m_sFileNameIn = sFileIn;
+    m_fFileIn.setFileName(m_sFileNameIn);
+ }
 
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setFileOut(const QString sFilePathOut)
+void FiffAnonymizer::setFileOut(const QString sFileOut)
 {
-    QString outFileName;
-    if(!m_fFileIn.fileName().isEmpty())
+    if(m_fFileOut.fileName().isEmpty())
     {
-        if(m_fFileIn.fileName().compare(sFilePathOut,Qt::CaseInsensitive) == 0)
+        m_sFileNameOut = sFileOut;
+    } else
+    {
+        if(m_fFileIn.fileName().compare(sFileOut,Qt::CaseInsensitive) == 0)
         {
             m_bInOutFileNamesEqual = true;
-            QFileInfo outFileInfo(sFilePathOut);
+            QFileInfo outFileInfo(sFileOut);
             outFileInfo.makeAbsolute();
-            outFileName = outFileInfo.absolutePath() + generateRandomFileName();
+            m_sFileNameOut = outFileInfo.absolutePath() + generateRandomFileName();
         } else
         {
             m_bInOutFileNamesEqual = false;
-            outFileName = sFilePathOut;
+            m_sFileNameOut = sFileOut;
         }
-    } else
-    {
-        outFileName = sFilePathOut;
     }
-    m_fFileOut.setFileName(outFileName);
+    m_fFileOut.setFileName(m_sFileNameOut);
 }
 
 //*************************************************************************************************************
