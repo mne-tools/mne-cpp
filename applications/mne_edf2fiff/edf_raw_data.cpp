@@ -123,16 +123,16 @@ MatrixXf EDFRawData::read_raw_segment(int iStartSampleIdx, int iEndSampleIdx) co
 
     // again, extra channels are mostly insignificant compared to measurement channels, so we just filter them out later
     for(int iRecIdx = 0; iRecIdx < vRecords.size(); ++iRecIdx) {  // go through each record
-        int recordSampIdx = 0;  // this is the sample idx counter for the records
+        int iRecordSampIdx = 0;  // this is the sample idx counter for the records
         for(int iChanIdx = 0; iChanIdx < m_edfInfo.getNumberOfAllChannels(); ++iChanIdx) {  // go through all channels
             const EDFChannelInfo sig = m_edfInfo.getAllChannelInfos()[iChanIdx];
             QVector<int> rawPatch(sig.getNumberOfSamplesPerRecord());
-            for(int iTemporarySampIdx = recordSampIdx; iTemporarySampIdx < recordSampIdx + sig.getNumberOfSamplesPerRecord(); ++iTemporarySampIdx) {  // we need a temporary sample index in order to handle the channel-dependent offsets
+            for(int iTemporarySampIdx = iRecordSampIdx; iTemporarySampIdx < iRecordSampIdx + sig.getNumberOfSamplesPerRecord(); ++iTemporarySampIdx) {  // we need a temporary sample index in order to handle the channel-dependent offsets
                 // factor 2 because of 2 byte integer representation, this might be different for bdf files
                 // we need the unary AND operation with '0x00ff' on the right side in order to prevent sign flipping through unintential interpretation as 2's complement integer.
-                rawPatch[iTemporarySampIdx - recordSampIdx] = (vRecords[iRecIdx].at(iTemporarySampIdx * 2 + 1) << 8) | (vRecords[iRecIdx].at(iTemporarySampIdx * 2) & 0x00ff);
+                rawPatch[iTemporarySampIdx - iRecordSampIdx] = (vRecords[iRecIdx].at(iTemporarySampIdx * 2 + 1) << 8) | (vRecords[iRecIdx].at(iTemporarySampIdx * 2) & 0x00ff);
             }
-            recordSampIdx += sig.getNumberOfSamplesPerRecord();
+            iRecordSampIdx += sig.getNumberOfSamplesPerRecord();
             vRawPatches[iChanIdx] += rawPatch;  // append raw patch
         }
     }
