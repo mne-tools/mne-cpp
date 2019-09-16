@@ -156,20 +156,21 @@ private:
 
     QString m_sDfltString;
     QDateTime m_dateDfltDate;
-    int  m_iMeasurementDayOffset;
-    bool m_bUseMeasurementDayOffset;
-    int  m_iSubjectBirthdayOffset;
-    bool m_bUseSubjectBirthdayOffset;
 
     QDateTime m_dateMeasurmentDate;
-    QDateTime m_date_IdDate;
+    bool m_bUseMeasurementDayOffset;
+    int  m_iMeasurementDayOffset;
+
+    QDateTime m_dateSubjectBirthday;
+    bool m_bUseSubjectBirthdayOffset;
+    int  m_iSubjectBirthdayOffset;
+
     QByteArray m_BDfltMAC;
 
     int m_iDfltSubjectId;
     QString m_sDfltSubjectFirstName;
     QString m_sDfltSubjectMidName;
     QString m_sDfltSubjectLastName;
-    QDateTime m_dateSubjectBirthDay;
     int m_iDfltSubjectWeight;
     int m_iDfltSubjectHeight;
     QString m_sDfltSubjectComment;
