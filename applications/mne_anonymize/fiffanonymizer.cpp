@@ -79,49 +79,48 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer()
-: version(1.0)
-, maxValidFiffVerion(1.3)
-, versionStr(QString::number(version,'f',1))
-, name("MNE Anonymize")
-, description("Application that removes or modifies Personal Health Information or Personal Identifiable information.")
-, m_bVerboseMode(false)
-, m_bBruteMode(false)
-, m_bQuietMode(false)
-, m_bDeleteInputFileAfter(false)
-, m_bDeleteInputFileConfirmation(true)
-, m_bInputFileDeleted(false)
-, m_bInOutFileNamesEqual(false)
-, m_bOutputFileRenamed(false)
-, m_sDfltString("mne_anonymize")
-, m_dateDfltDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0)))
-, m_iMeasurementDayOffset(0)
-, m_bUseMeasurementDayOffset(false)
-, m_iSubjectBirthdayOffset(0)
-, m_bUseSubjectBirthdayOffset(false)
-, m_dateMeasurmentDate(m_dateDfltDate)
-, m_date_IdDate(m_dateDfltDate)
-, m_iDfltSubjectId(0)
-, m_sDfltSubjectFirstName(m_sDfltString)
-, m_sDfltSubjectMidName("x")
-, m_sDfltSubjectLastName(m_sDfltString)
-, m_dateSubjectBirthDay(m_dateDfltDate)
-, m_iDfltSubjectWeight(0)
-, m_iDfltSubjectHeight(0)
-, m_sDfltSubjectComment(m_sDfltString)
-, m_sDfltSubjectHisId(m_sDfltString)
-, m_iDfltProjectId(0)
-, m_sDfltProjectName(m_sDfltString)
-, m_sDfltProjectAim(m_sDfltString)
-, m_sDfltProjectPersons(m_sDfltString)
-, m_sDfltProjectComment(m_sDfltString)
-, m_sFileNameIn("")
-, m_sFileNameOut("")
-, m_printInSameLineHelper(qDebug())
-, m_bPrintInSameLine(true)
+    : version(1.0)
+    , maxValidFiffVerion(1.3)
+    , versionStr(QString::number(version,'f',1))
+    , name("MNE Anonymize")
+    , description("Application that removes or modifies Personal Health Information or Personal Identifiable information.")
+    , m_bVerboseMode(false)
+    , m_bBruteMode(false)
+    , m_bQuietMode(false)
+    , m_bDeleteInputFileAfter(false)
+    , m_bDeleteInputFileConfirmation(true)
+    , m_bInputFileDeleted(false)
+    , m_bInOutFileNamesEqual(false)
+    , m_bOutputFileRenamed(false)
+    , m_sDfltString("mne_anonymize")
+    , m_dateDfltDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0)))
+    , m_dateMeasurmentDate(m_dateDfltDate)
+    , m_bUseMeasurementDayOffset(false)
+    , m_iMeasurementDayOffset(0)
+    , m_dateSubjectBirthday(m_dateDfltDate)
+    , m_bUseSubjectBirthdayOffset(false)
+    , m_iSubjectBirthdayOffset(0)
+    , m_iDfltSubjectId(0)
+    , m_sDfltSubjectFirstName(m_sDfltString)
+    , m_sDfltSubjectMidName("x")
+    , m_sDfltSubjectLastName(m_sDfltString)
+    , m_iDfltSubjectWeight(0)
+    , m_iDfltSubjectHeight(0)
+    , m_sDfltSubjectComment(m_sDfltString)
+    , m_sDfltSubjectHisId(m_sDfltString)
+    , m_iDfltProjectId(0)
+    , m_sDfltProjectName(m_sDfltString)
+    , m_sDfltProjectAim(m_sDfltString)
+    , m_sDfltProjectPersons(m_sDfltString)
+    , m_sDfltProjectComment(m_sDfltString)
+    , m_sFileNameIn("")
+    , m_sFileNameOut("")
+    , m_printInSameLineHelper(qDebug())
+    , m_bPrintInSameLine(true)
 {
     //MAC addresses have 6 bytes. We use 2 more here to complete 2 int32 reads.
     //check->sometimes MAC address is stored in the 0-5 bytes some other times it
-    //is stored in the 2-7 bytes. Check why!!!
+    //is stored in the 2-7 bytes. To do -> Check why!!!
     m_BDfltMAC.resize(8);
     m_BDfltMAC[0] = 0x00;
     m_BDfltMAC[1] = 0x00;
@@ -140,109 +139,107 @@ FiffAnonymizer::FiffAnonymizer()
 //*************************************************************************************************************
 
 FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
-: version(obj.version)
-, maxValidFiffVerion(obj.maxValidFiffVerion)
-, versionStr(QString::number(obj.version))
-, name(obj.name)
-, description(obj.description)
-, m_bVerboseMode(obj.m_bVerboseMode)
-, m_bBruteMode(obj.m_bBruteMode)
-, m_bQuietMode(obj.m_bQuietMode)
-, m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
-, m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
-, m_bInputFileDeleted(obj.m_bInputFileDeleted)
-, m_bInOutFileNamesEqual(obj.m_bInOutFileNamesEqual)
-, m_bOutputFileRenamed(obj.m_bOutputFileRenamed)
-, m_sDfltString(obj.m_sDfltString)
-, m_dateDfltDate(obj.m_dateDfltDate)
-, m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
-, m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
-, m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
-, m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
-, m_dateMeasurmentDate(obj.m_dateMeasurmentDate)
-, m_date_IdDate(obj.m_date_IdDate)
-, m_BDfltMAC(obj.m_BDfltMAC)
-, m_iDfltSubjectId(obj.m_iDfltSubjectId)
-, m_sDfltSubjectFirstName(obj.m_sDfltSubjectFirstName)
-, m_sDfltSubjectMidName(obj.m_sDfltSubjectMidName)
-, m_sDfltSubjectLastName(obj.m_sDfltSubjectLastName)
-, m_dateSubjectBirthDay(obj.m_dateSubjectBirthDay)
-, m_iDfltSubjectWeight(obj.m_iDfltSubjectWeight)
-, m_iDfltSubjectHeight(obj.m_iDfltSubjectHeight)
-, m_sDfltSubjectComment(obj.m_sDfltSubjectComment)
-, m_sDfltSubjectHisId(obj.m_sDfltSubjectHisId)
-, m_iDfltProjectId(obj.m_iDfltProjectId)
-, m_sDfltProjectName(obj.m_sDfltProjectName)
-, m_sDfltProjectAim(obj.m_sDfltProjectAim)
-, m_sDfltProjectPersons(obj.m_sDfltProjectPersons)
-, m_sDfltProjectComment(obj.m_sDfltProjectComment)
-, m_sFileNameIn(obj.m_sFileNameIn)
-, m_sFileNameOut(obj.m_sFileNameOut)
-, m_printInSameLineHelper(qDebug())
-, m_bPrintInSameLine(true)
+    : version(obj.version)
+    , maxValidFiffVerion(obj.maxValidFiffVerion)
+    , versionStr(QString::number(obj.version))
+    , name(obj.name)
+    , description(obj.description)
+    , m_bVerboseMode(obj.m_bVerboseMode)
+    , m_bBruteMode(obj.m_bBruteMode)
+    , m_bQuietMode(obj.m_bQuietMode)
+    , m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
+    , m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
+    , m_bInputFileDeleted(obj.m_bInputFileDeleted)
+    , m_bInOutFileNamesEqual(obj.m_bInOutFileNamesEqual)
+    , m_bOutputFileRenamed(obj.m_bOutputFileRenamed)
+    , m_sDfltString(obj.m_sDfltString)
+    , m_dateDfltDate(obj.m_dateDfltDate)
+    , m_dateMeasurmentDate(obj.m_dateMeasurmentDate)
+    , m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
+    , m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
+    , m_dateSubjectBirthday(obj.m_dateSubjectBirthday)
+    , m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
+    , m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
+    , m_BDfltMAC(obj.m_BDfltMAC)
+    , m_iDfltSubjectId(obj.m_iDfltSubjectId)
+    , m_sDfltSubjectFirstName(obj.m_sDfltSubjectFirstName)
+    , m_sDfltSubjectMidName(obj.m_sDfltSubjectMidName)
+    , m_sDfltSubjectLastName(obj.m_sDfltSubjectLastName)
+    , m_iDfltSubjectWeight(obj.m_iDfltSubjectWeight)
+    , m_iDfltSubjectHeight(obj.m_iDfltSubjectHeight)
+    , m_sDfltSubjectComment(obj.m_sDfltSubjectComment)
+    , m_sDfltSubjectHisId(obj.m_sDfltSubjectHisId)
+    , m_iDfltProjectId(obj.m_iDfltProjectId)
+    , m_sDfltProjectName(obj.m_sDfltProjectName)
+    , m_sDfltProjectAim(obj.m_sDfltProjectAim)
+    , m_sDfltProjectPersons(obj.m_sDfltProjectPersons)
+    , m_sDfltProjectComment(obj.m_sDfltProjectComment)
+    , m_sFileNameIn(obj.m_sFileNameIn)
+    , m_sFileNameOut(obj.m_sFileNameOut)
+    , m_printInSameLineHelper(qDebug())
+    , m_bPrintInSameLine(true)
 {
 
-//    m_BDfltMAC.resize(8);
-//    memcpy(m_BDfltMAC.data(),obj.m_BDfltMAC.data(),8);
+    //    m_BDfltMAC.resize(8);
+    //    memcpy(m_BDfltMAC.data(),obj.m_BDfltMAC.data(),8);
 
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>(*obj.m_pBlockTypeList));
-//    m_pBlockTypeList->resize(obj.m_pBlockTypeList->size());
-//    memcpy(m_pBlockTypeList->data(),obj.m_pBlockTypeList.data(),
-//           static_cast<size_t>(obj.m_pBlockTypeList->size()));
+    //    m_pBlockTypeList->resize(obj.m_pBlockTypeList->size());
+    //    memcpy(m_pBlockTypeList->data(),obj.m_pBlockTypeList.data(),
+    //           static_cast<size_t>(obj.m_pBlockTypeList->size()));
 
     m_pOutDir = QSharedPointer<QVector<FiffDirEntry> >(new QVector<FiffDirEntry>);
-//    m_pOutDir->resize(obj.m_pOutDir->size());
-//    memcpy(m_pOutDir->data(),obj.m_pOutDir->data(),
-//           static_cast<size_t>(obj.m_pOutDir->size()));
+    //    m_pOutDir->resize(obj.m_pOutDir->size());
+    //    memcpy(m_pOutDir->data(),obj.m_pOutDir->data(),
+    //           static_cast<size_t>(obj.m_pOutDir->size()));
 }
 
 
 //*************************************************************************************************************
 
 FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
-: version(obj.version)
-, maxValidFiffVerion(obj.maxValidFiffVerion)
-, versionStr(QString::number(obj.version))
-, name(obj.name)
-, description(obj.description)
-, m_bVerboseMode(obj.m_bVerboseMode)
-, m_bBruteMode(obj.m_bBruteMode)
-, m_bQuietMode(obj.m_bQuietMode)
-, m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
-, m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
-, m_bInputFileDeleted(obj.m_bInputFileDeleted)
-, m_bInOutFileNamesEqual(obj.m_bInOutFileNamesEqual)
-, m_bOutputFileRenamed(obj.m_bOutputFileRenamed)
-, m_sDfltString(obj.m_sDfltString)
-, m_dateDfltDate(obj.m_dateDfltDate)
-, m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
-, m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
-, m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
-, m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
-, m_dateMeasurmentDate(obj.m_dateMeasurmentDate)
-, m_date_IdDate(obj.m_date_IdDate)
-, m_BDfltMAC(obj.m_BDfltMAC)
-, m_iDfltSubjectId(obj.m_iDfltSubjectId)
-, m_sDfltSubjectFirstName(obj.m_sDfltSubjectFirstName)
-, m_sDfltSubjectMidName(obj.m_sDfltSubjectMidName)
-, m_sDfltSubjectLastName(obj.m_sDfltSubjectLastName)
-, m_dateSubjectBirthDay(obj.m_dateSubjectBirthDay)
-, m_iDfltSubjectWeight(obj.m_iDfltSubjectWeight)
-, m_iDfltSubjectHeight(obj.m_iDfltSubjectHeight)
-, m_sDfltSubjectComment(obj.m_sDfltSubjectComment)
-, m_sDfltSubjectHisId(obj.m_sDfltSubjectHisId)
-, m_iDfltProjectId(obj.m_iDfltProjectId)
-, m_sDfltProjectName(obj.m_sDfltProjectName)
-, m_sDfltProjectAim(obj.m_sDfltProjectAim)
-, m_sDfltProjectPersons(obj.m_sDfltProjectPersons)
-, m_sDfltProjectComment(obj.m_sDfltProjectComment)
-, m_sFileNameIn(obj.m_sFileNameIn)
-, m_sFileNameOut(obj.m_sFileNameOut)
-, m_printInSameLineHelper(qDebug())
-, m_bPrintInSameLine(true)
+    : version(obj.version)
+    , maxValidFiffVerion(obj.maxValidFiffVerion)
+    , versionStr(QString::number(obj.version))
+    , name(obj.name)
+    , description(obj.description)
+    , m_bVerboseMode(obj.m_bVerboseMode)
+    , m_bBruteMode(obj.m_bBruteMode)
+    , m_bQuietMode(obj.m_bQuietMode)
+    , m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
+    , m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
+    , m_bInputFileDeleted(obj.m_bInputFileDeleted)
+    , m_bInOutFileNamesEqual(obj.m_bInOutFileNamesEqual)
+    , m_bOutputFileRenamed(obj.m_bOutputFileRenamed)
+    , m_sDfltString(obj.m_sDfltString)
+    , m_dateDfltDate(obj.m_dateDfltDate)
+    , m_dateMeasurmentDate(obj.m_dateMeasurmentDate)
+    , m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
+    , m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
+    , m_dateSubjectBirthday(obj.m_dateSubjectBirthday)
+    , m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
+    , m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
+    , m_BDfltMAC(obj.m_BDfltMAC)
+    , m_iDfltSubjectId(obj.m_iDfltSubjectId)
+    , m_sDfltSubjectFirstName(obj.m_sDfltSubjectFirstName)
+    , m_sDfltSubjectMidName(obj.m_sDfltSubjectMidName)
+    , m_sDfltSubjectLastName(obj.m_sDfltSubjectLastName)
+    , m_iDfltSubjectWeight(obj.m_iDfltSubjectWeight)
+    , m_iDfltSubjectHeight(obj.m_iDfltSubjectHeight)
+    , m_sDfltSubjectComment(obj.m_sDfltSubjectComment)
+    , m_sDfltSubjectHisId(obj.m_sDfltSubjectHisId)
+    , m_iDfltProjectId(obj.m_iDfltProjectId)
+    , m_sDfltProjectName(obj.m_sDfltProjectName)
+    , m_sDfltProjectAim(obj.m_sDfltProjectAim)
+    , m_sDfltProjectPersons(obj.m_sDfltProjectPersons)
+    , m_sDfltProjectComment(obj.m_sDfltProjectComment)
+    , m_sFileNameIn(obj.m_sFileNameIn)
+    , m_sFileNameOut(obj.m_sFileNameOut)
+    , m_printInSameLineHelper(qDebug())
+    , m_bPrintInSameLine(true)
 {
-//    m_BDfltMAC.resize(8);
-//    memcpy(m_BDfltMAC.data(),obj.m_BDfltMAC.data(),8);
+    //    m_BDfltMAC.resize(8);
+    //    memcpy(m_BDfltMAC.data(),obj.m_BDfltMAC.data(),8);
 
     m_pBlockTypeList.swap(obj.m_pBlockTypeList);
     m_pOutDir.swap(obj.m_pOutDir);
@@ -260,7 +257,7 @@ int FiffAnonymizer::anonymizeFile()
     printIfVerbose(description);
     printIfVerbose(" ");
     printIfVerbose("Version: " + versionStr);
-    printIfVerbose("Current date: " + m_date_IdDate.currentDateTime().toString("ddd MMMM d yyyy hh:mm:ss"));
+    printIfVerbose("Current date: " + QDateTime::currentDateTime().toString("ddd MMMM d yyyy hh:mm:ss"));
     printIfVerbose(" ");
 
     FiffStream inStream(&m_fFileIn);
@@ -287,7 +284,7 @@ int FiffAnonymizer::anonymizeFile()
     FiffTag::SPtr pOutTag = FiffTag::SPtr::create();
 
     inStream.read_tag(pInTag,0);
-    FiffTag::convert_tag_data(pInTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+    //    FiffTag::convert_tag_data(pInTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
 
     //info in a tag FIFF_COMMENT (206) depends on the type of block it is in. Therefore, in order to
     //anonymize it we not only have to know the kind of the current tag, but also which type of block
@@ -304,7 +301,7 @@ int FiffAnonymizer::anonymizeFile()
         printIfVerbose("***   Warning: This file may not be compatible with this application.");
         printIfVerbose("***");
     }
-    censorTag(pInTag,pOutTag);
+    censorTag(pOutTag,pInTag);
     pOutTag->next = 0;
 
     //we build the tag directory on the go
@@ -314,8 +311,6 @@ int FiffAnonymizer::anonymizeFile()
     while(pInTag->next != -1)
     {
         inStream.read_tag(pInTag);
-        FiffTag::convert_tag_data(pInTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
-
         updateBlockTypeList(pInTag);
         censorTag(pOutTag,pInTag);
         //the order of the tags in the output file is sequential. No jumps in the output file.
@@ -386,10 +381,10 @@ bool FiffAnonymizer::checkValidFiffFormatVersion(FiffTag::SPtr pTag)
     if(pTag->kind == FIFF_FILE_ID)
     {
         FiffId fileId = pTag->toFiffID();
-        int inMayorVersion = (fileId.version & 0xFF00) >> 16;
-        int inMinorVersion = (fileId.version & 0x00FF);
+        int inMayorVersion = (fileId.version & 0xFFFF0000) >> 16;
+        int inMinorVersion = (fileId.version & 0x0000FFFF);
         double inVersion = inMayorVersion + inMinorVersion/10.;
-        if(inVersion > version)
+        if(inVersion > maxValidFiffVerion)
             return false;
     }
     return true;
@@ -531,12 +526,12 @@ bool FiffAnonymizer::checkDeleteInputFile()
 int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
 {
     int sizeDiff(0);
-    outTag = QSharedPointer<FiffTag>(new FiffTag(inTag.data()));
+    //outTag = QSharedPointer<FiffTag>(new FiffTag(inTag.data()));
 
     //This is not copying the data and leaves the data ptr to the QByteArray dangling -> memory leak
-//    outTag->kind = inTag->kind;
-//    outTag->type = inTag->type;
-//    outTag->next = inTag->next;
+    outTag->kind = inTag->kind;
+    outTag->type = inTag->type;
+    outTag->next = inTag->next;
 
     switch (inTag->kind)
     {
@@ -550,50 +545,71 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     case FIFF_REF_BLOCK_ID:
     {
         FiffId inId = inTag->toFiffID();
-        const int fiffIdSize = 5;
+        QList<QByteArray> inMAC({QByteArray::fromHex(QString::number(inId.machid[0]).toUtf8()),
+                                 QByteArray::fromHex(QString::number(inId.machid[1]).toUtf8())});
+        QList<QByteArray> outMAC(m_BDfltMAC.split(3));
+        QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs).date());
+        QDateTime outMeasDate;
+
+        if(m_bUseMeasurementDayOffset)
+        {
+            outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
+        } else {
+            outMeasDate = m_dateMeasurmentDate;
+        }
+
+        const int fiffIdSize(sizeof(inId));//5
         fiff_int_t outData[fiffIdSize];
         outData[0] = inId.version;
-        outData[1] = 0; //inFileId.machid[0];
-        outData[2] = 0; //inFileId.machid[1];
-        outData[3] = inId.time.secs - 24 * 60 * 60 * m_iMeasurementDayOffset;
+        outData[1] = outMAC.at(0).toInt(); //inFileId.machid[0];
+        outData[2] = outMAC.at(1).toInt(); //inFileId.machid[1];
+        outData[3] = static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
         outData[4] = 0; //inId.time.usecs;
-        //FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+
+        outTag->resize(fiffIdSize*sizeof(fiff_int_t));
         memcpy(outTag->data(),reinterpret_cast<char*>(outData),fiffIdSize*sizeof(fiff_int_t));
+        printIfVerbose("MAC address changed: " + inMAC.at(0) + inMAC.at(1) + " -> "  + outMAC.at(0) + outMAC.at(1));
+        printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
         break;
     }
     case FIFF_MEAS_DATE:
     {
-        qint32 inMeasDate = *inTag->toInt();
-        qint32 newMeasDate = inMeasDate - 24 * 60 * 60 * m_iMeasurementDayOffset;
-        memcpy(outTag->data(),reinterpret_cast<char*>(&newMeasDate),1*sizeof(newMeasDate));
+        QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*inTag->toInt()).date());
+        QDateTime outMeasDate;
 
-        //        outTag->data()[0] = static_cast<char>((static_cast<uint>(newMeasDate) & 0xff000000) >> (8*3));
-        //        outTag->data()[1] = static_cast<char>((static_cast<uint>(newMeasDate) & 0x00ff0000) >> (8*2));
-        //        outTag->data()[2] = static_cast<char>((static_cast<uint>(newMeasDate) & 0x0000ff00) >>  8);
-        //        outTag->data()[3] = static_cast<char>((static_cast<uint>(newMeasDate) & 0x000000ff) );
+        if(m_bUseMeasurementDayOffset)
+        {
+            outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
+        } else {
+            outMeasDate = m_dateMeasurmentDate;
+        }
+
+        fiff_int_t outData[1];
+        outData[0]=static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
+        memcpy(outTag->data(),reinterpret_cast<char*>(outData),1);
+        printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
         break;
     }
     case FIFF_COMMENT:
     {
-        QString inStr = inTag->toString();
-        QString newStr("This is a new String");
-        //We do not need to clear since we resize later and then overwrite the data
-        //outTag->clear();
-        outTag->resize(newStr.toUtf8().size());
-        outTag->append(newStr);
-        printIfVerbose("Description of the measurement block changed: " +
-                       QString(inTag->data()) + " -> " + newStr);
+        if(m_pBlockTypeList->last()==FIFFB_MEAS_INFO)
+        {
+            QString inStr = inTag->toString();
+            QString newStr(m_sDfltString);
+            outTag->resize(newStr.toUtf8().size());
+            memcpy(outTag->data(),newStr.data(),newStr.toUtf8().size());
+            printIfVerbose("Description of the measurement block changed: " +
+                           QString(inTag->data()) + " -> " + newStr);
+        }
         break;
     }
     case FIFF_EXPERIMENTER:
     {
         QString inStr = inTag->toString();
-        QString newStr("This is a new String");
-        //We do not need to clear since we resize later and then overwrite the data
-        //outTag->clear();
+        QString newStr(m_sDfltString);
         outTag->resize(newStr.toUtf8().size());
-        outTag->append(newStr);
-        printIfVerbose("Description of the measurement block changed: " +
+        memcpy(outTag->data(),newStr.data(),newStr.toUtf8().size());
+        printIfVerbose("Experimenter changed: " +
                        QString(inTag->data()) + " -> " + newStr);
         break;
     }
@@ -615,6 +631,19 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_BIRTH_DAY:
     {
+        QDateTime inBirthday(QDate::fromJulianDay(*inTag->toInt()));
+        QDateTime outBirthday;
+
+        if(m_bUseSubjectBirthdayOffset)
+        {
+            outBirthday = inBirthday.addDays(-m_iMeasurementDayOffset);
+        } else {
+            outBirthday = m_dateSubjectBirthday;
+        }
+
+        fiff_int_t outData[1];
+        outData[0] = static_cast<int32_t> (outBirthday.toSecsSinceEpoch());
+        memcpy(outTag->data(),reinterpret_cast<char*>(outData),1);
         break;
     }
     case FIFF_SUBJ_WEIGHT:
@@ -665,7 +694,8 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     default:
     {
-        // outTag.data()=inTag.data();
+        outTag->resize(inTag->size());
+        memcpy(outTag->data(),inTag->data(),inTag->size());
     }
 
     }
@@ -682,7 +712,7 @@ void FiffAnonymizer::setFileIn(const QString sFileIn)
 {
     m_sFileNameIn = sFileIn;
     m_fFileIn.setFileName(m_sFileNameIn);
- }
+}
 
 
 //*************************************************************************************************************
@@ -749,7 +779,6 @@ void FiffAnonymizer::setQuietMode(bool q)
 void FiffAnonymizer::setMeasurementDay(QString d)
 {
     m_dateMeasurmentDate = QDateTime(QDate::fromString(d),QTime(1,1,0));
-    m_date_IdDate = m_dateMeasurmentDate;
 }
 
 
@@ -764,18 +793,9 @@ void FiffAnonymizer::setMeasurementDayOffset(int d)
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setMeasurementDayOffset(bool b)
-{
-    m_bUseMeasurementDayOffset = b;
-    m_iMeasurementDayOffset = b? m_iMeasurementDayOffset:0;
-}
-
-
-//*************************************************************************************************************
-
 void FiffAnonymizer::setSubjectBirthday(QString d)
 {
-    m_dateSubjectBirthDay = QDateTime(QDate::fromString(d),QTime(1, 1, 0));
+    m_dateSubjectBirthday = QDateTime(QDate::fromString(d),QTime(1, 1, 0));
 }
 
 
@@ -790,14 +810,6 @@ void FiffAnonymizer::setSubjectBirthdayOffset(int d)
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setSubjectBirthdayOffset(bool b)
-{
-    m_bUseSubjectBirthdayOffset = b;
-    m_iSubjectBirthdayOffset = b? m_iSubjectBirthdayOffset:0;
-}
-
-
-//*************************************************************************************************************
 
 void FiffAnonymizer::setDeleteInputFileAfter(bool d)
 {
