@@ -161,8 +161,6 @@ void SettingsController::parseInputs()
 
     parseInputAndOutputFiles();
 
-    //check if this is needed TODO
-//    if(m_parser.isSet("v") || m_parser.isSet("verbose"))
     if(m_parser.isSet("verbose"))
     {
         m_anonymizer.setVerboseMode(true);
@@ -347,7 +345,6 @@ void SettingsController::execute()
             FiffAnonymizer localApp(*m_pAppList.at(th_i));
             *promise = QtConcurrent::run(localApp,&FiffAnonymizer::anonymizeFile);
             promisesList.append(promise);
-
         }
         for(int p_i=0;p_i<promisesList.size();++p_i)
         {

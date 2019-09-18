@@ -142,6 +142,7 @@ private:
     QString generateRandomFileName();
     void deleteInputFile();
     bool checkDeleteInputFile();
+
     bool checkRenameOutputFile();
     void renameOutputFileAsInputFile();
 
