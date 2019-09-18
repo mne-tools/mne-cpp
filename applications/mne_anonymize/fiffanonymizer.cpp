@@ -107,7 +107,7 @@ FiffAnonymizer::FiffAnonymizer()
     , m_iDfltSubjectWeight(0)
     , m_iDfltSubjectHeight(0)
     , m_sDfltSubjectComment(m_sDfltString)
-    , m_sDfltSubjectHisId(m_sDfltString)
+    , m_iDfltSubjectHisId(0)
     , m_iDfltProjectId(0)
     , m_sDfltProjectName(m_sDfltString)
     , m_sDfltProjectAim(m_sDfltString)
@@ -168,7 +168,7 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
     , m_iDfltSubjectWeight(obj.m_iDfltSubjectWeight)
     , m_iDfltSubjectHeight(obj.m_iDfltSubjectHeight)
     , m_sDfltSubjectComment(obj.m_sDfltSubjectComment)
-    , m_sDfltSubjectHisId(obj.m_sDfltSubjectHisId)
+    , m_iDfltSubjectHisId(obj.m_iDfltSubjectHisId)
     , m_iDfltProjectId(obj.m_iDfltProjectId)
     , m_sDfltProjectName(obj.m_sDfltProjectName)
     , m_sDfltProjectAim(obj.m_sDfltProjectAim)
@@ -227,7 +227,7 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
     , m_iDfltSubjectWeight(obj.m_iDfltSubjectWeight)
     , m_iDfltSubjectHeight(obj.m_iDfltSubjectHeight)
     , m_sDfltSubjectComment(obj.m_sDfltSubjectComment)
-    , m_sDfltSubjectHisId(obj.m_sDfltSubjectHisId)
+    , m_iDfltSubjectHisId(obj.m_iDfltSubjectHisId)
     , m_iDfltProjectId(obj.m_iDfltProjectId)
     , m_sDfltProjectName(obj.m_sDfltProjectName)
     , m_sDfltProjectAim(obj.m_sDfltProjectAim)
@@ -658,6 +658,9 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_HIS_ID:
     {
+        QString inSubjectHisId(inTag->data());
+        memcpy(outTag->data(),reinterpret_cast<char*>(&m_iDfltSubjectHisId),sizeof(int));
+        printIfVerbose("Subject Hospital-ID changed:" + inSubjectHisId + " -> " + QString::number(m_iDfltSubjectId));
         break;
     }
     case FIFF_PROJ_ID:
@@ -895,5 +898,13 @@ void FiffAnonymizer::renameOutputFileAsInputFile()
     m_fFileOut.rename(m_sFileNameIn);
     m_bOutputFileRenamed = true;
     printIfVerbose("Output file named: " + m_sFileNameOut + " --> renamed as: " + m_sFileNameIn);
+}
+
+
+//*************************************************************************************************************
+
+void FiffAnonymizer::setSubjectHisId(int id)
+{
+    m_iDfltSubjectHisId = id;
 }
 
