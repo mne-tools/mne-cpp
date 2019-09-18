@@ -590,7 +590,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_COMMENT:
     {
-        if(m_pBlockTypeList->last()==FIFFB_MEAS_INFO)
+        if(m_pBlockTypeList->first()==FIFFB_MEAS_INFO)
         {
             QString inStr = inTag->toString();
             QString newStr(m_sDfltString);
