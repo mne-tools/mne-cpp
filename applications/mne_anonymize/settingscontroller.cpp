@@ -150,6 +150,12 @@ void SettingsController::initParser()
                                          QCoreApplication::translate("main","days"));
     m_parser.addOption(birthdayOffsetOpt);
 
+    QCommandLineOption SubjectIdOpt("his",QCoreApplication::translate("main","Specify the Subject's Id# within the Hospital system. Only allowed when anonymizing a single file. "),
+                                          QCoreApplication::translate("main","id#"));
+    m_parser.addOption(SubjectIdOpt);
+
+
+
 }
 
 
@@ -233,6 +239,18 @@ void SettingsController::parseInputs()
         QString bdoffset(m_parser.value("subject_birthday_offset"));
         m_anonymizer.setSubjectBirthdayOffset(bdoffset.toInt());
     }
+
+    if(m_parser.isSet("his"))
+    {
+        if(m_bMultipleInFiles)
+        {
+            qDebug() << "Error. Multiple Input files. You cannot specify the optio \"his\".";
+            m_parser.showHelp();
+        }
+        m_anonymizer.setSubjectHisId(m_parser.value("his").toInt());
+    }
+
+
 }
 
 
