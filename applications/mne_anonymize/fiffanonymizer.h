@@ -122,6 +122,7 @@ public:
     void setSubjectBirthdayOffset(bool b);
     void setDeleteInputFileAfter(bool d);
     void setDeleteInputFileAfterConfirmation(bool dc);
+    void setSubjectHisId(int id);
 
     const double version;
     const double maxValidFiffVerion;
@@ -175,7 +176,7 @@ private:
     int m_iDfltSubjectWeight;
     int m_iDfltSubjectHeight;
     QString m_sDfltSubjectComment;
-    QString m_sDfltSubjectHisId;
+    int m_iDfltSubjectHisId;
 
     int m_iDfltProjectId;
     QString m_sDfltProjectName;
