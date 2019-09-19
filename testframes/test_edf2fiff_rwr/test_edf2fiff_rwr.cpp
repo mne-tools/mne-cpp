@@ -89,7 +89,7 @@ private:
 
     // files:
     QFile* m_pFileIn;
-    QFile* m_pFileOut;
+    QFile* m_pFileOut;  // temporary outfile, to be deleted during cleanup
 
     // EDF / Fiff containers:
     EDFRawData* m_pEDFRaw;
@@ -113,11 +113,8 @@ TestEDF2FIFFRWR::TestEDF2FIFFRWR()
 
 void TestEDF2FIFFRWR::initTestCase()
 {
-    QString sEDFinFile = "C:\\Users\\Simon\\Desktop\\hiwi\\edf_files\\00000929_s005_t000.edf";
-    QString sFIFFoutFile = "C:\\Users\\Simon\\Desktop\\hiwi\\edf_files\\conversion_result.fif";
-
-    m_pFileIn = new QFile(sEDFinFile);
-    m_pFileOut = new QFile(sFIFFoutFile);
+    m_pFileIn = new QFile(QDir::currentPath() + "/mne-cpp-test-data/EEG/test_reduced.edf");
+    m_pFileOut = new QFile(QDir::currentPath() + "/mne-cpp-test-data/EEG/test_reduced_temporary.fif");
 
     // initialize EDF raw data
     m_pEDFRaw = new EDFRawData(m_pFileIn);
@@ -219,12 +216,18 @@ void TestEDF2FIFFRWR::testFiffReadingAndValueEquality()
 
 void TestEDF2FIFFRWR::cleanupTestCase()
 {
+    // destroy containers
     delete m_pFiffRaw;
     delete m_pEDFRaw;
 
+    // close files
     m_pFileOut->close();
     m_pFileIn->close();
 
+    // remove temporary outfile
+    m_pFileOut->remove();
+
+    // destroy filehandles
     delete m_pFileOut;
     delete m_pFileIn;
 }
