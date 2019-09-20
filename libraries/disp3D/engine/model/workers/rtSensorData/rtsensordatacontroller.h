@@ -251,7 +251,7 @@ protected:
     *
     * @param[in] matColorMatrix         The new interpolated data as RGB colors per vertex.
     */
-    void onNewSmoothedRtRawData(const Eigen::MatrixX3f &matColorMatrix);
+    void onNewSmoothedRtRawData(const Eigen::MatrixX4f &matColorMatrix);
 
     //=========================================================================================================
     /**
@@ -405,7 +405,7 @@ signals:
     *
     * @param[in] matColorMatrix          The new streamed interpolated raw data in form of RGB colors per vertex.
     */
-    void newRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrix);
+    void newRtSmoothedDataAvailable(const Eigen::MatrixX4f &matColorMatrix);
 };
 
 } // NAMESPACE

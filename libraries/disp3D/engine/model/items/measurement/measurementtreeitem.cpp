@@ -41,7 +41,7 @@
 #include "measurementtreeitem.h"
 #include "../hemisphere/hemispheretreeitem.h"
 #include "../sourcespace/sourcespacetreeitem.h"
-#include "../sourcedata/mneestimatetreeitem.h"
+#include "../sourcedata/mnedatatreeitem.h"
 #include "../sourcedata/ecddatatreeitem.h"
 #include "../network/networktreeitem.h"
 #include "../freesurfer/fssurfacetreeitem.h"
@@ -122,7 +122,7 @@ void MeasurementTreeItem::initItem()
 //*************************************************************************************************************
 
 QList<SourceSpaceTreeItem*> MeasurementTreeItem::addData(const MNESourceSpace& tSourceSpace,
-                                                  Qt3DCore::QEntity* p3DEntityParent)
+                                                         Qt3DCore::QEntity* p3DEntityParent)
 {
     //Generate child items based on surface set input parameters
     QList<SourceSpaceTreeItem*> pReturnItem;
@@ -164,38 +164,38 @@ QList<SourceSpaceTreeItem*> MeasurementTreeItem::addData(const MNESourceSpace& t
 
 //*************************************************************************************************************
 
-MneEstimateTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSourceEstimate,
-                                                  const MNEForwardSolution& tForwardSolution,
-                                                  const SurfaceSet& tSurfSet,
-                                                  const AnnotationSet& tAnnotSet,
-                                                  Qt3DCore::QEntity* p3DEntityParent,
-                                                  bool bUseGPU)
+MneDataTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSourceEstimate,
+                                              const MNEForwardSolution& tForwardSolution,
+                                              const SurfaceSet& tSurfSet,
+                                              const AnnotationSet& tAnnotSet,
+                                              Qt3DCore::QEntity* p3DEntityParent,
+                                              bool bUseGPU)
 {
     if(!tSourceEstimate.isEmpty()) {        
         //CPU for source data
-        if(m_pMneEstimateTreeItem) {
-            m_pMneEstimateTreeItem->addData(tSourceEstimate);
+        if(m_pMneDataTreeItem) {
+            m_pMneDataTreeItem->addData(tSourceEstimate);
         } else {
             //Add sensor data as child
             //If item does not exists yet, create it here!
-            m_pMneEstimateTreeItem = new MneEstimateTreeItem(Data3DTreeModelItemTypes::MNEEstimateItem,
+            m_pMneDataTreeItem = new MneDataTreeItem(Data3DTreeModelItemTypes::MNEDataItem,
                                                              "MNE data",
                                                              bUseGPU);
 
             QList<QStandardItem*> list;
-            list << m_pMneEstimateTreeItem;
-            list << new QStandardItem(m_pMneEstimateTreeItem->toolTip());
+            list << m_pMneDataTreeItem;
+            list << new QStandardItem(m_pMneDataTreeItem->toolTip());
             this->appendRow(list);
 
-            m_pMneEstimateTreeItem->initData(tForwardSolution,
+            m_pMneDataTreeItem->initData(tForwardSolution,
                                              tSurfSet,
                                              tAnnotSet,
                                              p3DEntityParent);
 
-            m_pMneEstimateTreeItem->addData(tSourceEstimate);
+            m_pMneDataTreeItem->addData(tSourceEstimate);
         }
 
-        return m_pMneEstimateTreeItem;
+        return m_pMneDataTreeItem;
     }
 
     return Q_NULLPTR;
@@ -352,7 +352,7 @@ NetworkTreeItem* MeasurementTreeItem::addData(const Network& tNetworkData,
         NetworkTreeItem* pReturnItem = Q_NULLPTR;
 
         QPair<float,float> freqs = tNetworkData.getFrequencyRange();
-        QString sItemName = QString("%1_%2_%3").arg(tNetworkData.getConnectivityMethod()).arg(QString::number(freqs.first)).arg(QString::number(freqs.second));
+        QString sItemName = QString("%1").arg(tNetworkData.getConnectivityMethod()).arg(QString::number(freqs.first)).arg(QString::number(freqs.second));
 
         //Add network estimation data as child
         QList<QStandardItem*> lItems = this->findChildren(sItemName);

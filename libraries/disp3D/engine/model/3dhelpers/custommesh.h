@@ -117,10 +117,10 @@ public:
     * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
     */
     CustomMesh(const Eigen::MatrixX3f& tMatVert,
-                const Eigen::MatrixX3f& tMatNorm,
-                const Eigen::MatrixXi& tMatTris,
-                const Eigen::MatrixX3f& tMatColors,
-                Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
+               const Eigen::MatrixX3f& tMatNorm,
+               const Eigen::MatrixXi& tMatTris,
+               const Eigen::MatrixX4f &tMatColors,
+               Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
 
     //=========================================================================================================
     /**
@@ -134,7 +134,7 @@ public:
     *
     * @param[in] tMatColors     New color information for the vertices.
     */
-    void setColor(const Eigen::MatrixX3f &tMatColors);
+    void setColor(const Eigen::MatrixX4f &tMatColors);
 
     //=========================================================================================================
     /**
@@ -173,7 +173,7 @@ public:
     void setMeshData(const Eigen::MatrixX3f& tMatVert,
                      const Eigen::MatrixX3f& tMatNorm,
                      const Eigen::MatrixXi& tMatTris,
-                     const Eigen::MatrixX3f& tMatColors,
+                     const Eigen::MatrixX4f &tMatColors,
                      Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType = Qt3DRender::QGeometryRenderer::Triangles);
 
     //=========================================================================================================

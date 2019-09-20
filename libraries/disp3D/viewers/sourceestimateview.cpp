@@ -41,7 +41,7 @@
 #include "sourceestimateview.h"
 
 #include "../engine/model/data3Dtreemodel.h"
-#include "../engine/model/items/sourcedata/mneestimatetreeitem.h"
+#include "../engine/model/items/sourcedata/mnedatatreeitem.h"
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
@@ -86,12 +86,12 @@ SourceEstimateView::~SourceEstimateView()
 
 //*************************************************************************************************************
 
-MneEstimateTreeItem* SourceEstimateView::addData(const QString& sSubject,
-                                                 const QString& sMeasurementSetName,
-                                                 const MNESourceEstimate& tSourceEstimate,
-                                                 const MNEForwardSolution& tForwardSolution,
-                                                 const SurfaceSet& tSurfSet,
-                                                 const AnnotationSet& tAnnotSet)
+MneDataTreeItem* SourceEstimateView::addData(const QString& sSubject,
+                                             const QString& sMeasurementSetName,
+                                             const MNESourceEstimate& tSourceEstimate,
+                                             const MNEForwardSolution& tForwardSolution,
+                                             const SurfaceSet& tSurfSet,
+                                             const AnnotationSet& tAnnotSet)
 {
     //Add network data
     return m_pData3DModel->addSourceData(sSubject,

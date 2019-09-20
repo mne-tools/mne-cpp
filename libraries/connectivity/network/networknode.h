@@ -117,7 +117,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the ingoing edges corresponding to the thresholded network.
+    * Returns all edges corresponding to the thresholded network.
     *
     * @return   Returns the list with all ingoing edges.
     */

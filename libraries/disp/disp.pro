@@ -40,12 +40,12 @@ TEMPLATE = lib
 QT  += core widgets svg concurrent
 
 qtHaveModule(printsupport): QT += printsupport
-qtHaveModule(opengl): QT += opengl
 qtHaveModule(charts): QT += charts
 
 DEFINES += DISP_LIBRARY
 
 contains(MNECPP_CONFIG, dispOpenGL) {
+    qtHaveModule(opengl): QT += opengl
     DEFINES += USE_OPENGL
 }
 
@@ -124,6 +124,7 @@ SOURCES += \
     viewers/averagingsettingsview.cpp \
     viewers/projectsettingsview.cpp \
     viewers/control3dview.cpp \
+    viewers/tfsettingsview.cpp \
     viewers/artifactsettingsview.cpp \
     viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
@@ -169,6 +170,7 @@ HEADERS += \
     viewers/averagingsettingsview.h \
     viewers/projectsettingsview.h \
     viewers/control3dview.h \
+    viewers/tfsettingsview.h \
     viewers/artifactsettingsview.h \
     viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
@@ -226,6 +228,7 @@ FORMS += \
     viewers/formfiles/channeldatasettingsview.ui \
     viewers/formfiles/triggerdetectionview.ui \
     viewers/formfiles/quickcontrolview.ui \
+    viewers/formfiles/tfsettingsview.ui \
     viewers/formfiles/connectivitysettingsview.ui \
     viewers/formfiles/minimumnormsettingsview.ui \
     viewers/formfiles/averagingsettingsview.ui \

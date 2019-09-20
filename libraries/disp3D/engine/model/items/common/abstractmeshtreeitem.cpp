@@ -94,9 +94,12 @@ QPointer<CustomMesh> AbstractMeshTreeItem::getCustomMesh()
 
 //*************************************************************************************************************
 
-void AbstractMeshTreeItem::setVertColor(const QVariant& vertColor)
+void AbstractMeshTreeItem::setVertColor(const MatrixX4f& vertColor)
 {
-    this->setData(vertColor, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
+    QVariant data;
+    data.setValue(vertColor);
+
+    this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
 
 
@@ -183,7 +186,7 @@ void AbstractMeshTreeItem::setData(const QVariant& value, int role)
     switch(role) {
         case Data3DTreeModelItemRoles::SurfaceCurrentColorVert:
             if(m_pCustomMesh) {
-                m_pCustomMesh->setColor(value.value<MatrixX3f>());
+                m_pCustomMesh->setColor(value.value<MatrixX4f>());
             }
             break;
 
@@ -215,10 +218,10 @@ void AbstractMeshTreeItem::setMaterial(Qt3DRender::QMaterial* pMaterial)
 
 //*************************************************************************************************************
 
-void AbstractMeshTreeItem::setVertices(const MatrixX3f& tMatVert,
+void AbstractMeshTreeItem::setMeshData(const MatrixX3f& tMatVert,
                                        const MatrixX3f& tMatNorm,
                                        const MatrixXi& tMatTris,
-                                       const MatrixX3f& tMatColors,
+                                       const MatrixX4f& tMatColors,
                                        Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 {
     if(m_pCustomMesh) {
@@ -264,7 +267,7 @@ void AbstractMeshTreeItem::onSurfaceTriangleScaleChanged(const QVariant& fTriang
 void AbstractMeshTreeItem::onColorChanged(const QVariant& color)
 {
     QVariant data;
-    MatrixX3f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::NumberVertices).toInt(),
+    MatrixX4f matNewVertColor = createVertColor(this->data(Data3DTreeModelItemRoles::NumberVertices).toInt(),
                                                 color.value<QColor>());
 
     data.setValue(matNewVertColor);

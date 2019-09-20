@@ -251,12 +251,12 @@ QList<SourceSpaceTreeItem*> Data3DTreeModel::addForwardSolution(const QString& s
 
 //*************************************************************************************************************
 
-MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
-                                                    const QString& sMeasurementSetName,
-                                                    const MNESourceEstimate& tSourceEstimate,
-                                                    const MNELIB::MNEForwardSolution& tForwardSolution,
-                                                    const FSLIB::SurfaceSet& tSurfSet,
-                                                    const FSLIB::AnnotationSet& tAnnotSet)
+MneDataTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
+                                                const QString& sMeasurementSetName,
+                                                const MNESourceEstimate& tSourceEstimate,
+                                                const MNELIB::MNEForwardSolution& tForwardSolution,
+                                                const FSLIB::SurfaceSet& tSurfSet,
+                                                const FSLIB::AnnotationSet& tAnnotSet)
 {
     bool bUseGPU = false;
 
@@ -266,7 +266,7 @@ MneEstimateTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
 //        qDebug("Using compute shader version for 3D visualization.");
 //    }
 
-    MneEstimateTreeItem* pReturnItem = Q_NULLPTR;
+    MneDataTreeItem* pReturnItem = Q_NULLPTR;
 
     //Handle subject item
     SubjectTreeItem* pSubjectItem = addSubject(sSubject);
@@ -594,6 +594,9 @@ void Data3DTreeModel::initMetatypes()
 
     qRegisterMetaType<Eigen::MatrixX3f>();
     qRegisterMetaType<MatrixX3f>();
+
+    qRegisterMetaType<Eigen::MatrixX4f>();
+    qRegisterMetaType<MatrixX4f>();
 
     qRegisterMetaType<Eigen::VectorXf>();
     qRegisterMetaType<VectorXf>();

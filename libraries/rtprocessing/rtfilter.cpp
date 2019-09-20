@@ -102,7 +102,7 @@ MatrixXd RtFilter::filterChannelsConcurrently(const MatrixXd& matDataIn,
     }
 
     //Resize output matrix to match input matrix
-    MatrixXd matDataOut(matDataIn.rows(), matDataIn.cols());
+    MatrixXd matDataOut = matDataIn;
 
     //Generate QList structure which can be handled by the QConcurrent framework
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;

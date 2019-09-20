@@ -1375,12 +1375,12 @@ bool FiffStream::read_named_matrix(const FiffDirNode::SPtr& p_Node, fiff_int_t m
 
     if (mat.row_names.size() != mat.nrow)
     {
-        printf("FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match");
+        printf("FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match\n");
     }
 
     if (mat.col_names.size() != mat.ncol)
     {
-        printf("FiffStream::read_named_matrix - Number of columns in matrix data and column names do not match");
+        printf("FiffStream::read_named_matrix - Number of columns in matrix data and column names do not match\n");
     }
 
     return true;

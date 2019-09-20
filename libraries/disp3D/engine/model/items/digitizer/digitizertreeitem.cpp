@@ -118,6 +118,8 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
     //Set transforms
     if(!tDigitizer.isEmpty())
     {
+        QVector<QColor> vColorsEdges;
+
         QVector<QMatrix4x4> vTransforms;
         vTransforms.reserve(tDigitizer.size());
 
@@ -132,10 +134,13 @@ void DigitizerTreeItem::addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer, 
 
             tempTransform.translate(tempPos);
             vTransforms.push_back(tempTransform);
+
+            vColorsEdges.push_back(tSphereColor);
         }
 
         //Set instance Transform
         m_pSphereMesh->setTransforms(vTransforms);
+        m_pSphereMesh->setColors(vColorsEdges);
     }
 
     //Update alpha

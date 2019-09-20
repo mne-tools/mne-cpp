@@ -183,11 +183,14 @@ bool AnnotationSet::read(const QString& p_sLHFileName, const QString& p_sRHFileN
 
 //*************************************************************************************************************
 
-bool AnnotationSet::toLabels(const SurfaceSet &p_surfSet, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListLabelRGBAs) const
+bool AnnotationSet::toLabels(const SurfaceSet &p_surfSet,
+                             QList<Label> &p_qListLabels,
+                             QList<RowVector4i> &p_qListLabelRGBAs,
+                             const QStringList& lLabelPicks) const
 {
-    if(!m_qMapAnnots[0].toLabels(p_surfSet[0], p_qListLabels, p_qListLabelRGBAs))
+    if(!m_qMapAnnots[0].toLabels(p_surfSet[0], p_qListLabels, p_qListLabelRGBAs, lLabelPicks))
         return false;
-    else if(!m_qMapAnnots[1].toLabels(p_surfSet[1], p_qListLabels, p_qListLabelRGBAs))
+    else if(!m_qMapAnnots[1].toLabels(p_surfSet[1], p_qListLabels, p_qListLabelRGBAs, lLabelPicks))
         return false;
 
     return true;

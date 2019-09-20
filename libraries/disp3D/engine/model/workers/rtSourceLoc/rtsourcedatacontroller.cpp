@@ -96,31 +96,31 @@ RtSourceDataController::RtSourceDataController()
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::streamData);
 
        connect(this, &RtSourceDataController::rawDataChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::addData);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::addData, Qt::DirectConnection);
 
-       connect(this, &RtSourceDataController::numberVerticesChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setNumberVertices);
+       connect(this, &RtSourceDataController::surfaceColorChanged,
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setSurfaceColor);
 
        connect(this, &RtSourceDataController::newInterpolationMatrixLeftAvailable,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setInterpolationMatrixLeft);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setInterpolationMatrixLeft, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::newInterpolationMatrixRightAvailable,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setInterpolationMatrixRight);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setInterpolationMatrixRight, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::thresholdsChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setThresholds);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setThresholds, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::sFreqChanged,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setSFreq);
 
        connect(this, &RtSourceDataController::loopStateChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setLoopState);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setLoopState, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::numberAveragesChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setNumberAverages);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setNumberAverages, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::colormapTypeChanged,
-               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setColormapType);
+               m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setColormapType, Qt::DirectConnection);
 
        connect(this, &RtSourceDataController::streamSmoothedDataChanged,
                m_pRtSourceDataWorker.data(), &RtSourceDataWorker::setStreamSmoothedData);
@@ -150,7 +150,7 @@ RtSourceDataController::RtSourceDataController()
                m_pRtInterpolationLeftWorker.data(), &RtSourceInterpolationMatWorker::setAnnotationInfo);
 
        connect(this, &RtSourceDataController::visualizationTypeChanged,
-               m_pRtInterpolationLeftWorker.data(), &RtSourceInterpolationMatWorker::setVisualizationType);
+               m_pRtInterpolationLeftWorker.data(), &RtSourceInterpolationMatWorker::setVisualizationType, Qt::DirectConnection);
 
        m_rtInterpolationLeftWorkerThread.start();
 
@@ -177,7 +177,7 @@ RtSourceDataController::RtSourceDataController()
                m_pRtInterpolationRightWorker.data(), &RtSourceInterpolationMatWorker::setAnnotationInfo);
 
        connect(this, &RtSourceDataController::visualizationTypeChanged,
-               m_pRtInterpolationRightWorker.data(), &RtSourceInterpolationMatWorker::setVisualizationType);
+               m_pRtInterpolationRightWorker.data(), &RtSourceInterpolationMatWorker::setVisualizationType, Qt::DirectConnection);
 
        m_rtInterpolationRightWorkerThread.start();
 }
@@ -272,9 +272,16 @@ void RtSourceDataController::setInterpolationInfo(const MatrixX3f &matVerticesLe
     emit interpolationInfoRightChanged(matVerticesRight,
                                        vecNeighborVerticesRight,
                                        vecMappedSubsetRight);
+}
 
-    emit numberVerticesChanged(matVerticesLeft.rows(),
-                               matVerticesRight.rows());
+
+//*************************************************************************************************************
+
+void RtSourceDataController::setSurfaceColor(const MatrixX4f &matColorLeft,
+                                             const MatrixX4f &matColorRight)
+{
+    emit surfaceColorChanged(matColorLeft,
+                             matColorRight);
 }
 
 
@@ -365,8 +372,8 @@ void RtSourceDataController::onNewRtRawData(const VectorXd &vecDataVectorLeftHem
 
 //*************************************************************************************************************
 
-void RtSourceDataController::onNewSmoothedRtRawData(const MatrixX3f &matColorMatrixLeftHemi,
-                                                    const MatrixX3f &matColorMatrixRightHemi)
+void RtSourceDataController::onNewSmoothedRtRawData(const MatrixX4f &matColorMatrixLeftHemi,
+                                                    const MatrixX4f &matColorMatrixRightHemi)
 {
     emit newRtSmoothedDataAvailable(matColorMatrixLeftHemi,
                                     matColorMatrixRightHemi);

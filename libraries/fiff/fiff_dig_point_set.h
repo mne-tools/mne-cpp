@@ -223,6 +223,15 @@ public:
     */
     FiffDigPointSet& operator<< (const FiffDigPoint* dig);
 
+    //=========================================================================================================
+    /**
+    * Apply a transforamtion matrix on the 3D position of the digitzed points.
+    *
+    * @param[in] coordTrans    FiffCoordTrans which is to be applied
+    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+    */
+    void applyTransform(const FiffCoordTrans& coordTrans, bool bApplyInverse = false);
+
 //    ToDo:
 //    //=========================================================================================================
 //    /**

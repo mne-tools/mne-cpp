@@ -73,7 +73,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TriggerControlPlugin;
+using namespace TRIGGERCONTROLPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 
@@ -241,7 +241,7 @@ bool TriggerControl::stop()
 
     // Stop threads
     QThread::terminate();
-    QThread::wait();
+    //QThread::wait();
 
     m_pDataSingleChannel->clear();
 

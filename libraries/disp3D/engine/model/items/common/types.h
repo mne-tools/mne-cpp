@@ -88,7 +88,7 @@ namespace Data3DTreeModelItemTypes
                     HemisphereItem = QStandardItem::UserType + 2,
                     SurfaceItem = QStandardItem::UserType + 3,
                     AnnotationItem = QStandardItem::UserType + 4,
-                    MNEEstimateItem = QStandardItem::UserType + 5,
+                    MNEDataItem = QStandardItem::UserType + 5,
                     SourceSpaceItem = QStandardItem::UserType + 6,
                     NetworkItem = QStandardItem::UserType + 7,
                     SubjectItem = QStandardItem::UserType + 8,
@@ -204,6 +204,11 @@ Q_DECLARE_METATYPE(Eigen::MatrixXd);
 #ifndef DISP3DLIB_metatype_matrixx3f
 #define DISP3DLIB_metatype_matrixx3f
 Q_DECLARE_METATYPE(Eigen::MatrixX3f);
+#endif
+
+#ifndef DISP3DLIB_metatype_matrixx4f
+#define DISP3DLIB_metatype_matrixx4f
+Q_DECLARE_METATYPE(Eigen::MatrixX4f);
 #endif
 
 #ifndef DISP3DLIB_metatype_vectorxf

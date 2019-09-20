@@ -108,8 +108,7 @@ public:
     * @param[in]  title     string to specify the title displayed on the histogram, defaults to "Spline Histogram"
     * @param[in]  parent    sets the behaviour of Spline as an object, defaults to no parent QWidget
     */
-    Spline(const QString& title = "Spline Histogram",
-           QWidget* parent = 0);
+    Spline(QWidget* parent = 0, const QString& title = "Spline Histogram");
 
     //=========================================================================================================
     /**
@@ -192,7 +191,7 @@ public:
     *
     * @param[in]  colorMap  qstring of the color gradient from user input
     */
-    void setColorMap (QString colorMap);
+    void setColorMap (const QString &colorMap);
 
     Eigen::VectorXi m_vecResultExponentValues; /**< Common exponent values for the entire histogram*/
     double          m_dMinAxisX;               /**< Display value of the smallest point of the series in x-axis */
