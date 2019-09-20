@@ -65,9 +65,12 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EDFRawData::EDFRawData(QIODevice* pDev, QObject *parent)
+EDFRawData::EDFRawData(QIODevice* pDev,
+                       float fScaleFactor,
+                       QObject *parent)
 : QObject(parent),
   m_pDev(pDev),
+  m_fScaleFactor(fScaleFactor),
   m_edfInfo(m_pDev)
 {
 
@@ -161,8 +164,8 @@ MatrixXf EDFRawData::read_raw_segment(int iStartSampleIdx, int iEndSampleIdx) co
         for(int iSampIdx = 0; iSampIdx < iNumSamples; ++iSampIdx) {  // by only letting sampIdx go so far, we automatically exclude unwanted samples in the end
             result(iMeasChanIdx, iSampIdx) = static_cast<float>(vRawPatches[iMeasChanIdx][iSampIdx] - chan.digitalMin()) / (chan.digitalMax() - chan.digitalMin()) * (chan.physicalMax() - chan.physicalMin()) + chan.physicalMin();
             if(chan.isMeasurementChannel()) {
-                // probably uV values, need to scale them down by 1e6
-                result(iMeasChanIdx, iSampIdx) = result(iMeasChanIdx, iSampIdx) / 1000000.0f;
+                // probably uV values, need to scale them with raw value scaling factor
+                result(iMeasChanIdx, iSampIdx) = result(iMeasChanIdx, iSampIdx) / m_fScaleFactor;
             }
         }
     }
@@ -208,7 +211,7 @@ FiffRawData EDFRawData::toFiffRawData() const
     // copy calibrations:
     RowVectorXd cals(fiffRawData.info.nchan);
     for(int i = 0; i < fiffRawData.info.chs.size(); ++i) {
-        cals[i] = fiffRawData.info.chs[i].cal;
+        cals[i] = static_cast<double>(fiffRawData.info.chs[i].cal);
     }
     fiffRawData.cals = cals;
 
