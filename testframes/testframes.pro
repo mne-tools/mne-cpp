@@ -59,7 +59,6 @@ SUBDIRS += \
     test_mne_msh_display_surface_set \
     test_mne_project_to_surface \
 
-
     qtHaveModule(charts) {
         SUBDIRS += \
             test_interpolation \
