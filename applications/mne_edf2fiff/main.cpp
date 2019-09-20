@@ -94,14 +94,17 @@ int main(int argc, char *argv[])
 
     QCommandLineOption inputOption("fileIn", "The input file. Needs to be specified.", "in", "");
     QCommandLineOption outputOption("fileOut", "The output file. If not specified, this will be the same filename as the input file.", "out", "");
+    QCommandLineOption scaleOption("scaleFactor", "The raw value scaling factor. Must be a float number. If not specified, this will be 1e6.", "in", "1e6");
 
     parser.addOption(inputOption);
     parser.addOption(outputOption);
+    parser.addOption(scaleOption);
 
     parser.process(a);
 
     QString sInputFile = parser.value(inputOption);
     QString sOutputFile = parser.value(outputOption);
+    QString sScaleFactor = parser.value(scaleOption);
 
     // check for correct usage:
     if(sInputFile.isEmpty()) {
@@ -109,6 +112,11 @@ int main(int argc, char *argv[])
     }
     if(!sInputFile.toUpper().endsWith(".EDF")) {
         qDebug() << "Not an EDF file: " << sInputFile;
+        return 0;
+    }
+
+    if(sScaleFactor.toFloat() == 0.0f) {
+        qDebug() << "Not a float number: " << sScaleFactor;
         return 0;
     }
 
@@ -124,7 +132,7 @@ int main(int argc, char *argv[])
     QFile t_fileOut(sOutputFile);
 
     // initialize raw data
-    EDFRawData edfRaw(&t_fileIn);
+    EDFRawData edfRaw(&t_fileIn, sScaleFactor.toFloat());
     // print basic info
     EDFInfo edfInfo = edfRaw.getInfo();
     // qDebug().noquote() << edfInfo.getAsString();
