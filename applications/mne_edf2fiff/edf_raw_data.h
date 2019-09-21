@@ -95,9 +95,10 @@ public:
     /**
     * @brief EDFRawData Constructor for EDFRawData
     * @param pDev Pointer to a QIODevice
+    * @param fScaleFactor Raw value scaling factor
     * @param parent Parent object
     */
-    EDFRawData(QIODevice* pDev, QObject *parent = nullptr);
+    EDFRawData(QIODevice* pDev, float fScaleFactor = 1e6, QObject *parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -142,8 +143,8 @@ public slots:
 
 private:
     QIODevice* m_pDev;      /** The device that is reflected by this EDFRawData object. */
-
-    EDFInfo m_edfInfo;         /** EDF info that holds all the relevant information. */
+    float m_fScaleFactor;   /** Raw value scaling factor. */
+    EDFInfo m_edfInfo;      /** EDF info that holds all the relevant information. */
 };
 
 } // NAMESPACE

@@ -65,9 +65,12 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EDFRawData::EDFRawData(QIODevice* pDev, QObject *parent)
+EDFRawData::EDFRawData(QIODevice* pDev,
+                       float fScaleFactor,
+                       QObject *parent)
 : QObject(parent),
   m_pDev(pDev),
+  m_fScaleFactor(fScaleFactor),
   m_edfInfo(m_pDev)
 {
 
@@ -123,16 +126,16 @@ MatrixXf EDFRawData::read_raw_segment(int iStartSampleIdx, int iEndSampleIdx) co
 
     // again, extra channels are mostly insignificant compared to measurement channels, so we just filter them out later
     for(int iRecIdx = 0; iRecIdx < vRecords.size(); ++iRecIdx) {  // go through each record
-        int recordSampIdx = 0;  // this is the sample idx counter for the records
+        int iRecordSampIdx = 0;  // this is the sample idx counter for the records
         for(int iChanIdx = 0; iChanIdx < m_edfInfo.getNumberOfAllChannels(); ++iChanIdx) {  // go through all channels
             const EDFChannelInfo sig = m_edfInfo.getAllChannelInfos()[iChanIdx];
             QVector<int> rawPatch(sig.getNumberOfSamplesPerRecord());
-            for(int iTemporarySampIdx = recordSampIdx; iTemporarySampIdx < recordSampIdx + sig.getNumberOfSamplesPerRecord(); ++iTemporarySampIdx) {  // we need a temporary sample index in order to handle the channel-dependent offsets
+            for(int iTemporarySampIdx = iRecordSampIdx; iTemporarySampIdx < iRecordSampIdx + sig.getNumberOfSamplesPerRecord(); ++iTemporarySampIdx) {  // we need a temporary sample index in order to handle the channel-dependent offsets
                 // factor 2 because of 2 byte integer representation, this might be different for bdf files
                 // we need the unary AND operation with '0x00ff' on the right side in order to prevent sign flipping through unintential interpretation as 2's complement integer.
-                rawPatch[iTemporarySampIdx - recordSampIdx] = (vRecords[iRecIdx].at(iTemporarySampIdx * 2 + 1) << 8) | (vRecords[iRecIdx].at(iTemporarySampIdx * 2) & 0x00ff);
+                rawPatch[iTemporarySampIdx - iRecordSampIdx] = (vRecords[iRecIdx].at(iTemporarySampIdx * 2 + 1) << 8) | (vRecords[iRecIdx].at(iTemporarySampIdx * 2) & 0x00ff);
             }
-            recordSampIdx += sig.getNumberOfSamplesPerRecord();
+            iRecordSampIdx += sig.getNumberOfSamplesPerRecord();
             vRawPatches[iChanIdx] += rawPatch;  // append raw patch
         }
     }
@@ -161,8 +164,8 @@ MatrixXf EDFRawData::read_raw_segment(int iStartSampleIdx, int iEndSampleIdx) co
         for(int iSampIdx = 0; iSampIdx < iNumSamples; ++iSampIdx) {  // by only letting sampIdx go so far, we automatically exclude unwanted samples in the end
             result(iMeasChanIdx, iSampIdx) = static_cast<float>(vRawPatches[iMeasChanIdx][iSampIdx] - chan.digitalMin()) / (chan.digitalMax() - chan.digitalMin()) * (chan.physicalMax() - chan.physicalMin()) + chan.physicalMin();
             if(chan.isMeasurementChannel()) {
-                // probably uV values, need to scale them down by 1e6
-                result(iMeasChanIdx, iSampIdx) = result(iMeasChanIdx, iSampIdx) / 1000000.0f;
+                // probably uV values, need to scale them with raw value scaling factor
+                result(iMeasChanIdx, iSampIdx) = result(iMeasChanIdx, iSampIdx) / m_fScaleFactor;
             }
         }
     }
@@ -208,7 +211,7 @@ FiffRawData EDFRawData::toFiffRawData() const
     // copy calibrations:
     RowVectorXd cals(fiffRawData.info.nchan);
     for(int i = 0; i < fiffRawData.info.chs.size(); ++i) {
-        cals[i] = fiffRawData.info.chs[i].cal;
+        cals[i] = static_cast<double>(fiffRawData.info.chs[i].cal);
     }
     fiffRawData.cals = cals;
 
