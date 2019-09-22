@@ -1,22 +1,13 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     testframes.pro
-# @author   Lars Debor <Lars.Debor@tu-ilmenau.de>;
-#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>;
-#           Felix Griesau <Felix.Griesau@tu-ilmenau.de>;
-#           Gabriel B Motta <gabrielbenmotta@gmail.com>;
-#           Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
-#           Lorenz Esch <lesch@mgh.harvard.edu>;
-#           Ricky Tjen <ricky270@student.sgu.ac.id>;
-#           Sugandha Sachdeva <sugandha.sachdeva@tu-ilmenau.de>
-# @version  dev
-# @date     July, 2012
+# @file     test_fiff_anonymize.pro
+# @author   Lorenz Esch <lorenzesch@hotmail.com>;
+# @version  1.0
+# @date     September, 2019
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Lars Debor, Christoph Dinh, Ruben Doerfel, Felix Griesau, Gabriel B Motta, 
-#                     Daniel Strohmeier, Lorenz Esch, Ricky Tjen, Sugandha Sachdeva. All rights reserved.
+# Copyright (C) 2019, Lorenz Esch. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -26,7 +17,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-#
+# 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -37,29 +28,80 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the unit tests.
+# @brief    Builds the mne_anonymize unit test
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    test_dipole_fit \
-    test_fiff_rwr \
-    test_fiff_mne_types_io \
-    test_mne_forward_solution \
-    test_fiff_cov \
-    test_fiff_digitizer \
-    test_mne_msh_display_surface_set \
+VERSION = $${MNE_CPP_VERSION}
 
-!contains(MNECPP_CONFIG, minimalVersion) {
-    qtHaveModule(charts) {
-        SUBDIRS += \
-            test_interpolation \
-            test_geometryinfo \
-            test_spectral_connectivity \
-            test_fiff_anonymize
+QT += testlib
+QT -= gui
+
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = test_fiff_anonymize
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fiff
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+SOURCES += \
+    test_fiff_anonymize.cpp
+
+HEADERS += \
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+contains(MNECPP_CONFIG, withCodeCov) {
+    LIBS += -lgcov
+    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
+}
+
+win32 {
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+}
+
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../lib
+}
+
+# Activate FFTW backend in Eigen
+contains(MNECPP_CONFIG, useFFTW) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
     }
 }
