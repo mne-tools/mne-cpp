@@ -50,6 +50,7 @@
 
 #include <QtTest>
 #include <QProcess>
+#include <QScopedPointer>
 
 
 //*************************************************************************************************************
@@ -100,8 +101,8 @@ void TestFiffAnonyimze::initTestCase()
     qInfo() << "TestFiffAnonyimze::initTestCase - Epsilon" << epsilon;
 
     // Init testing arguments
-    QString sFileIn("./mne-cpp-test-data/MEG/sample/sample_audvis_raw.fif");
-    QString sFileOut("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_anonymized.fif");
+    QString sFileIn("/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
+    QString sFileOut("/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
 
     qInfo() << "TestFiffAnonyimze::initTestCase - sFileIn" << sFileIn;
     qInfo() << "TestFiffAnonyimze::initTestCase - sFileOut" << sFileOut;
@@ -112,11 +113,9 @@ void TestFiffAnonyimze::initTestCase()
     arguments << "--out" << sFileOut;
 
     // Pass arguments to application and anaonyimze the fiff file
-    QProcess *myProcess = new QProcess();
+    QScopedPointer<QProcess> myProcess (new QProcess);
     myProcess->start(program, arguments);
-
-    connect(myProcess, SIGNAL(finished(int)),
-            myProcess, SLOT(deleteLater()));
+    myProcess->waitForFinished();
 }
 
 
