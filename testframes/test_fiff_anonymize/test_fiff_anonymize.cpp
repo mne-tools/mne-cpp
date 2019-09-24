@@ -62,17 +62,17 @@ using namespace FIFFLIB;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TestFiffAnonyimze
+* DECLARE CLASS TestFiffAnonymize
 *
-* @brief The TestFiffAnonyimze class provides fiff anonymizing verification tests
+* @brief The TestFiffAnonymize class provides fiff anonymizing verification tests
 *
 */
-class TestFiffAnonyimze: public QObject
+class TestFiffAnonymize: public QObject
 {
     Q_OBJECT
 
 public:
-    TestFiffAnonyimze();
+    TestFiffAnonymize();
 
 private slots:
     void initTestCase();
@@ -81,13 +81,12 @@ private slots:
 
 private:
     double epsilon;
-    MatrixXd second_in_times;
 };
 
 
 //*************************************************************************************************************
 
-TestFiffAnonyimze::TestFiffAnonyimze()
+TestFiffAnonymize::TestFiffAnonymize()
 : epsilon(0.000001)
 {
 }
@@ -96,16 +95,16 @@ TestFiffAnonyimze::TestFiffAnonyimze()
 
 //*************************************************************************************************************
 
-void TestFiffAnonyimze::initTestCase()
+void TestFiffAnonymize::initTestCase()
 {
-    qInfo() << "TestFiffAnonyimze::initTestCase - Epsilon" << epsilon;
+    qInfo() << "TestFiffAnonymize::initTestCase - Epsilon" << epsilon;
 
     // Init testing arguments
     QString sFileIn("/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
     QString sFileOut("/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
 
-    qInfo() << "TestFiffAnonyimze::initTestCase - sFileIn" << sFileIn;
-    qInfo() << "TestFiffAnonyimze::initTestCase - sFileOut" << sFileOut;
+    qInfo() << "TestFiffAnonymize::initTestCase - sFileIn" << sFileIn;
+    qInfo() << "TestFiffAnonymize::initTestCase - sFileOut" << sFileOut;
 
     QString program = "./mne_anonymize";
     QStringList arguments;
@@ -121,7 +120,7 @@ void TestFiffAnonyimze::initTestCase()
 
 //*************************************************************************************************************
 
-void TestFiffAnonyimze::compareData()
+void TestFiffAnonymize::compareData()
 {
     // Open ./mne-cpp-test-data/MEG/sample/sample_audvis_raw_anonymized.fif
 
@@ -130,7 +129,7 @@ void TestFiffAnonyimze::compareData()
 
 //*************************************************************************************************************
 
-void TestFiffAnonyimze::cleanupTestCase()
+void TestFiffAnonymize::cleanupTestCase()
 {
 }
 
@@ -140,5 +139,5 @@ void TestFiffAnonyimze::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_APPLESS_MAIN(TestFiffAnonyimze)
+QTEST_APPLESS_MAIN(TestFiffAnonymize)
 #include "test_fiff_anonymize.moc"
