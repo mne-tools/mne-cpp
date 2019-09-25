@@ -355,6 +355,8 @@ int FiffAnonymizer::anonymizeFile()
     printIfVerbose(" ");
     printIfVerbose("----------------------------------------------------------------------------");
     printIfVerbose(" ");
+    printIfVerbose(" "); //Note that this line will actually never be printed.
+
     return 0;
 }
 
