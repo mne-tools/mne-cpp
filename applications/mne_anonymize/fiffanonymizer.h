@@ -241,124 +241,168 @@ private:
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * Updates a stack (m_pBlockTyeList points to it) with the type of block the input stream is in.
+    * While reading an input file as a data stream, we will read tag by tag. Each tag can be inside a specific
+    * block, as defined in Fiff file standard docs. FIFF_COMMENT tag (#206) will need to be censored/anonymized
+    * only if it is contained inside a block of type "measurement info". Thus, we need to keep track of which
+    * are we in, while reading. We do this by checking the first element in this stack (see censorTag() in case
+    * FIFF_COMMENT.
+    * This is a refactoring method, designed to make anonymizeFile() more readable.
+    * @param [in] pointer to the tag being read. Normally the input Tag.
     */
     void updateBlockTypeList(FIFFLIB::FiffTag::SPtr pTag);
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * Acquisition sw stamps in the fiff file the version of the fiff standard used to code the fiff file. This
+    * anonymizer class has been developed according to a specific fiff version of this standard. If in the future,
+    * this standard were to change, it should be noted through this method.
+    * @param [in] pointer to the tag being read. Normally, the input Tag.
     */
     bool checkValidFiffFormatVersion(FIFFLIB::FiffTag::SPtr pTag);
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * For a specific input tag, check if that tag belongs to a set of tags where relevant information should be
+    * censored/anonymized. If so, perform such anonymization while copying the new tag into an output Tag.
+    * This is the core method of the class where the actual anonymization takes place.
+    * @param [in] pointer to the input tag being read from the input file.
+    * @param [in] pointer to the output tag being written to the output file.
     */
     int censorTag(FIFFLIB::FiffTag::SPtr pInTag,FIFFLIB::FiffTag::SPtr pOutTag);
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * Fiff standard defines a Tag Directory where a reference to all the tags in a file is stored. This directory
+    * itself a tag which is stored (usually) at the end of the file. The tag directory stores the memory address
+    * of every tag in the file (as an offset from the beging of the file). Thus, when altering the size of
+    * anonymized tags, it has to be reworked. The fiff standard does not mandate to have this directory but it
+    * seems convinient to build it. We do this on-the-fly, while reading each tag. And store all the info for the
+    * directory inside m_pOutDir vector.
+    * @param [in] pointer to the tag being read. Normally the input tag.
+    * @param [in] actual file position of the input file (relative to the begining of the file).
     */
     void addEntryToDir(FIFFLIB::FiffTag::SPtr pTag,qint64 filePos);
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * After finishing reading all the tags in the input file, we can add the final entry to the tag directory. This
+    * is a set of four -1 integer values which will mark the end of the tag directory.
     */
     void addFinalEntryToDir();
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * This method allows to transform between a vector and a regular tag structure. The vector will only contain
+    * the data inside the Tag Directory tag (remember a tag directory is a tag itself). This allows to use all the
+    * methods related to a tag (i.e. writeTag) while storing a newly updated tag directory into a fiff file.
+    * @param [in] a pointer to a tag where the tag directory information can be stored.
     */
     void dir2tag(FIFFLIB::FiffTag::SPtr pTag);
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * This stores the vector containing the tag directory. This vector was populated on-line while going through
+    * the anonymizeFile method. Once the reading is finished the data needs to be saved in the output file.
+    * @param [in] output file stream
+    * @param [in] position in the file where the data can be written. (optional).
     */
     void writeDirectory(FIFFLIB::FiffStream* stream, FIFFLIB::fiff_long_t pos=-1);
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * This function allows go through a the directory vector (m_pOutDir) and locate the position of any tag
+    * containing a pointer. Since the position of the pointer will have probably been updated, we can no go back
+    * and mend it.
+    * Fiff file format defines a set of pointers to addresses in the fiff file. These are defined as integer
+    * offset bytes since the begining of the file. As off fiff version 1.3 these pointers can be i. pointer to
+    * the tag directory, ii. pointer to free space in the file (free block list). iii. nil pointer at the end of
+    * the file (this one really contains no address info (duh!).
+    * @param [in] output stream
+    * @param [in] tag kind code to search for
+    * @param [in] new position to store in the data field of the pointer tag.
     */
     void updatePointer(FIFFLIB::FiffStream* stream, FIFFLIB::fiff_int_t tagKind, FIFFLIB::fiff_long_t newPos);
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * Helper function that prints messages to the command line only if the object has been set to a verbose mode.
+    * This wraps QDebug functionality inline. Specified here in header file. If the obj is not set to be in a
+    * verbose mode, it does nothing. Messages can be printed to a single line (followed by an eol character) or
+    * can be printed in the same line as previous one. Note that to achieve this, messages will be "retained" one
+    * call, in order to check if next call requests to print in the same line.
+    * @param [in] String to print.
+    * @param [in] bool value to indicate if the message should be printed to the same line as the previous message.
     */
     void printIfVerbose(const QString str,bool sameLine=false);
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * If the user wants the name of the input file and the output file to be the same, well... it is not possible
+    * in this universe other than masking this behaviour with an auxiliary output filename to be used during the
+    * anonymizing process. Eventually, once the reading has finished correctly, the input file can be deleted and
+    * the output file can then be called as the original input file. This function helps with this process.
     */
     QString generateRandomFileName();
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * The user might request throught the flag "--delete_input_file_after" to have the input file deleted. If the
+    * necessary control measures allow for it, then this function will delete the input file and set the control
+    * member bool variable m_bInputFileDeleted to true.
     */
     void deleteInputFile();
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * This function checks if the user has requested to have the input file deleted and if the deletion has been
+    * confirmed by the user througha  command line prompt. This command line promt can be bypassed through the
+    * m_bDeleteInputFileConfirmation flag, which is accessed through the setDeleteInputFileAfterConfirmation public
+    * method.
     */
     bool checkDeleteInputFile();
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * This method is responsible to perform a complete check to see if the output filename should be changed.
+    * If the outpuf file has a random name, because the user requested this name to be equal to the input filename.
+    * And if the output filename has already been deleted, then it should return a true value. If the input file
+    * has not been deleted, this method will prompt the user to delete it. The user might still answer no to this
+    * confirmation.
     */
     bool checkRenameOutputFile();
 
     //=========================================================================================================
     /**
-    *
-    * @param [in]
+    * This method will rename the output file as the input file. It will be called only after all the necessary
+    * verification steps have been tested through the checkRenameOutputFile method.
+    * It sets the control member bool flag m_bOutputFileRenamed to true and if verbose mode is on, prints a
+    * description message.
     */
     void renameOutputFileAsInputFile();
 
-    bool m_bVerboseMode;                /**< */
-    bool m_bBruteMode;                  /**< */
-    bool m_bQuietMode;                  /**< */
-    bool m_bDeleteInputFileAfter;       /**< */
-    bool m_bDeleteInputFileConfirmation;/**< */
-    bool m_bInputFileDeleted;           /**< */
-    bool m_bInOutFileNamesEqual;        /**< */
-    bool m_bOutputFileRenamed;          /**< */
-                                        /**< */
-    QString m_sDfltString;              /**< */
-    QDateTime m_dateDfltDate;           /**< */
-                                        /**< */
-    QDateTime m_dateMeasurmentDate;     /**< */
-    bool m_bUseMeasurementDayOffset;    /**< */
-    int  m_iMeasurementDayOffset;       /**< */
-                                        /**< */
+    bool m_bVerboseMode;                /**< Describes the verbosity mode of the object */
+    bool m_bBruteMode;                  /**< Describes the level of anonymization to perform */
+    bool m_bQuietMode;                  /**< Describes if the user wants no message to be printed to the command line */
+    bool m_bDeleteInputFileAfter;       /**< Describes users request to delete the input file after anonymization */
+    bool m_bDeleteInputFileConfirmation;/**< Describes users request to avoid confirmation prompt for input file deletion*/
+    bool m_bInputFileDeleted;           /**< Describes if the input file has been deleted */
+    bool m_bInOutFileNamesEqual;        /**< Describes users request to have both input and output files with the same name*/
+    bool m_bOutputFileRenamed;          /**< Describes if the output file has been renamed to match the name the input file had */
+
+    QString m_sDfltString;              /**< Default string to be used as substitution of other strings in a fiff file */
+    QDateTime m_dateDfltDate;           /**< Default date to be used as substitution of dates found in a fiff file */
+
+    QDateTime m_dateMeasurmentDate;     /**< Specific date requested by the user to be used as substitution of the meas. Initialized with m_dateDfltDate, modifiable through api */
+    bool m_bUseMeasurementDayOffset;    /**< Describes users request to modify meas date by subtracting a specific number of days (defined in m_iMeasurementDateOffset)*/
+    int  m_iMeasurementDayOffset;       /**< The number of days to subtract from the meas. date if the user requests so */
+
     QDateTime m_dateSubjectBirthday;    /**< */
     bool m_bUseSubjectBirthdayOffset;   /**< */
     int  m_iSubjectBirthdayOffset;      /**< */
-                                        /**< */
+
     QByteArray m_BDfltMAC;              /**< */
-                                        /**< */
+
     int m_iDfltSubjectId;               /**< */
     QString m_sDfltSubjectFirstName;    /**< */
     QString m_sDfltSubjectMidName;      /**< */
@@ -367,19 +411,19 @@ private:
     int m_iDfltSubjectHeight;           /**< */
     QString m_sDfltSubjectComment;      /**< */
     int m_iDfltSubjectHisId;            /**< */
-                                        /**< */
+
     int m_iDfltProjectId;               /**< */
     QString m_sDfltProjectName;         /**< */
     QString m_sDfltProjectAim;          /**< */
     QString m_sDfltProjectPersons;      /**< */
     QString m_sDfltProjectComment;      /**< */
-                                        /**< */
+
     QString m_sFileNameIn;              /**< */
     QString m_sFileNameOut;             /**< */
-                                        /**< */
+
     QFile m_fFileIn;                    /**< */
     QFile m_fFileOut;                   /**< */
-                                        /**< */
+
     QDebug m_printInSameLineHelper;     /**< */
     const bool m_bPrintInSameLine;      /**< */
 
@@ -396,10 +440,7 @@ private:
 //=============================================================================================================
 
 //=========================================================================================================
-/**
-* Helper function to allow for delayed QDebug on the same line as previous QDebug.
-* @param [in]
-*/
+
 inline void FiffAnonymizer::printIfVerbose(const QString str, bool sameLine)
 {
     if(m_bVerboseMode)
