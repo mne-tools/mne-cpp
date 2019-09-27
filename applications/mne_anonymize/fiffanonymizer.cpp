@@ -711,16 +711,18 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setFileIn(const QString sFileIn)
+void FiffAnonymizer::setFileIn(const QString &sFileIn)
 {
     m_sFileNameIn = sFileIn;
-    m_fFileIn.setFileName(m_sFileNameIn);
+    m_fFileIn.setFileName(sFileIn);
+    qDebug() << "testing if shit happens: " << m_fFileIn.exists();
 }
+
 
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setFileOut(const QString sFileOut)
+void FiffAnonymizer::setFileOut(const QString &sFileOut)
 {
     if(m_fFileOut.fileName().isEmpty())
     {
