@@ -100,8 +100,8 @@ void TestFiffAnonymize::initTestCase()
     qInfo() << "TestFiffAnonymize::initTestCase - Epsilon" << epsilon;
 
     // Init testing arguments
-    QString sFileIn("/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QString sFileOut("/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
+    QString sFileIn("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
+    QString sFileOut("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
 
     qInfo() << "TestFiffAnonymize::initTestCase - sFileIn" << sFileIn;
     qInfo() << "TestFiffAnonymize::initTestCase - sFileOut" << sFileOut;
