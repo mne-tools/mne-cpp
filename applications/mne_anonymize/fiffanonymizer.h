@@ -136,14 +136,14 @@ public:
     * Specifies the input file to anonymize. This file will help to set a input Fiffstream object.
     * @param [in] String containing the input file name including its path.
     */
-    void setFileIn(const QString sFilePathIn);
+    void setFileIn(const QString &sFilePathIn);
 
     //=========================================================================================================
     /**
     * Specifies the output file to anonymize. This file will help to set a output Fiffstream object.
     * @param [in] String containing the output file name including its path.
     */
-    void setFileOut(const QString sFilePathOut);
+    void setFileOut(const QString &sFilePathOut);
 
     //=========================================================================================================
     /**
