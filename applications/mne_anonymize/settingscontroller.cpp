@@ -263,13 +263,20 @@ void SettingsController::parseInputAndOutputFiles()
         QStringList inFilesAux(m_parser.values("in"));
         for(QString f: inFilesAux)
         {
-            QDir d;
-            d.setNameFilters({f});
-            for(QFileInfo fi: d.entryInfoList())
+            QFileInfo inFileInfo(QDir::toNativeSeparators(f));
+            inFileInfo.makeAbsolute();
+            if(inFileInfo.isDir())
             {
+                qDebug() << "Error. " << f << " is a folder.";
+            }
+            QStringList filter;
+            filter << inFileInfo.fileName();
+            QDirIterator it(inFileInfo.absoluteDir().absolutePath(),filter,QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+            while(it.hasNext())
+            {
+                QFileInfo fi(it.next());
                 if(fi.isFile() && fi.isReadable())
                 {
-                    fi.makeAbsolute();
                     m_SLInFiles.append(fi.absoluteFilePath());
                 }
             }
