@@ -137,15 +137,14 @@ void FsSurfaceTreeItem::initItem()
 void FsSurfaceTreeItem::addData(const Surface& tSurface)
 {
     //Create color from curvature information with default gyri and sulcus colors
-    MatrixX3f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
-
+    MatrixX4f matCurvatureColor = createCurvatureVertColor(tSurface.curv());
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(tSurface.rr(),
-                                tSurface.nn(),
-                                tSurface.tris(),
-                                matCurvatureColor,
-                                Qt3DRender::QGeometryRenderer::Triangles);
+                               tSurface.nn(),
+                               tSurface.tris(),
+                               matCurvatureColor,
+                               Qt3DRender::QGeometryRenderer::Triangles);
     this->setPosition(QVector3D(-tSurface.offset()(0), -tSurface.offset()(1), -tSurface.offset()(2)));
 
     //Add data which is held by this FsSurfaceTreeItem
@@ -199,11 +198,38 @@ void FsSurfaceTreeItem::onAnnotationVisibilityChanged(bool isVisible)
 
 //*************************************************************************************************************
 
+MatrixX4f FsSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature,
+                                                      const QColor& colSulci,
+                                                      const QColor& colGyri)
+{
+    MatrixX4f colors(curvature.rows(), 4);
+
+    for(int i = 0; i < colors.rows(); ++i) {
+        //Color (this is the default color and will be used until the updateVertColor function was called)
+        if(curvature(i) >= 0) {
+            colors(i,0) = colSulci.redF();
+            colors(i,1) = colSulci.greenF();
+            colors(i,2) = colSulci.blueF();
+            colors(i,3) = colSulci.alphaF();
+        } else {
+            colors(i,0) = colGyri.redF();
+            colors(i,1) = colGyri.greenF();
+            colors(i,2) = colGyri.blueF();
+            colors(i,3) = colSulci.alphaF();
+        }
+    }
+
+    return colors;
+}
+
+
+//*************************************************************************************************************
+
 void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
 {
     if(m_pItemSurfColSulci && m_pItemSurfColGyri) {
         QVariant data;
-        MatrixX3f matNewVertColor;
+        MatrixX4f matNewVertColor;
 
         if(m_sColorInfoOrigin.contains("Color from curvature")) {
             //Create color from curvature information with default gyri and sulcus colors
@@ -223,7 +249,7 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
             //Find the FsAnnotationTreeItem
             for(int i = 0; i < this->QStandardItem::parent()->rowCount(); ++i) {
                 if(this->QStandardItem::parent()->child(i,0)->type() == Data3DTreeModelItemTypes::AnnotationItem) {
-                    matNewVertColor = this->QStandardItem::parent()->child(i,0)->data(Data3DTreeModelItemRoles::AnnotColors).value<MatrixX3f>();
+                    matNewVertColor = this->QStandardItem::parent()->child(i,0)->data(Data3DTreeModelItemRoles::AnnotColors).value<MatrixX4f>();
 
                     //Set renderable 3D entity mesh and color data
                     data.setValue(matNewVertColor);
@@ -237,25 +263,3 @@ void FsSurfaceTreeItem::onColorInfoOriginOrCurvColorChanged()
     }
 }
 
-
-//*************************************************************************************************************
-
-MatrixX3f FsSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature, const QColor& colSulci, const QColor& colGyri) const
-{
-    MatrixX3f colors(curvature.rows(), 3);
-
-    for(int i = 0; i < colors.rows(); ++i) {
-        //Color (this is the default color and will be used until the updateVertColor function was called)
-        if(curvature[i] >= 0) {
-            colors(i,0) = colSulci.redF();
-            colors(i,1) = colSulci.greenF();
-            colors(i,2) = colSulci.blueF();
-        } else {
-            colors(i,0) = colGyri.redF();
-            colors(i,1) = colGyri.greenF();
-            colors(i,2) = colGyri.blueF();
-        }
-    }
-
-    return colors;
-}

@@ -144,7 +144,7 @@ void GpuInterpolationItem::initData(const MatrixX3f &matVertices,
 
     //Set custom mesh data
     //generate mesh base color
-    MatrixX3f matVertColor = createVertColor(matVertices.rows(), QColor(0,0,0));
+    MatrixX4f matVertColor = createVertColor(matVertices.rows(), QColor(0,0,0));
 
     //Set renderable 3D entity mesh and color data
     m_pCustomMesh->setMeshData(matVertices,

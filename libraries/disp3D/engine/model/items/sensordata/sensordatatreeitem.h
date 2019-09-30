@@ -71,6 +71,10 @@ namespace MNELIB{
     class MNEBemSurface;
 }
 
+namespace Qt3DCore {
+    class QTransform;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -237,6 +241,40 @@ public:
     */
     virtual void setBadChannels(const FIFFLIB::FiffInfo& info);
 
+    //=========================================================================================================
+    /**
+    * Sets the entity's transformation. This will clear the old transformation.
+    *
+    * @param[in] transform     The new entity's transform.
+    */
+    virtual void setTransform(const Qt3DCore::QTransform &transform);
+
+    //=========================================================================================================
+    /**
+    * Sets the entity's transformation. This will clear the old transformation.
+    *
+    * @param[in] transform     The new entity's transform.
+    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+    */
+    virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
+
+    //=========================================================================================================
+    /**
+    * Applies a transformation o ntop of the present one.
+    *
+    * @param[in] transform     The new entity's transform.
+    */
+    virtual void applyTransform(const Qt3DCore::QTransform& transform);
+
+    //=========================================================================================================
+    /**
+    * Applies a transformation o ntop of the present one.
+    *
+    * @param[in] transform     The new entity's transform.
+    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+    */
+    virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
+
 protected:
     //=========================================================================================================
     /**
@@ -267,7 +305,7 @@ protected:
     *
     * @param[in] sourceColorSamples         The color values for the streamed data.
     */
-    virtual void onNewRtSmoothedDataAvailable(const Eigen::MatrixX3f &matColorMatrix);
+    virtual void onNewRtSmoothedDataAvailable(const Eigen::MatrixX4f &matColorMatrix);
 
     //=========================================================================================================
     /**

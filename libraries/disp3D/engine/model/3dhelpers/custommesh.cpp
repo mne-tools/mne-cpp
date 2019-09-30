@@ -87,7 +87,7 @@ CustomMesh::CustomMesh()
 CustomMesh::CustomMesh(const MatrixX3f& tMatVert,
                        const MatrixX3f& tMatNorm,
                        const MatrixXi& tMatTris,
-                       const MatrixX3f& tMatColors,
+                       const MatrixX4f& tMatColors,
                        Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 : Qt3DRender::QGeometryRenderer()
 , m_iNumVert(tMatVert.rows())
@@ -142,9 +142,9 @@ void CustomMesh::init()
     m_pColorAttribute = new Qt3DRender::QAttribute();
     m_pColorAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
     m_pColorAttribute->setDataType(Qt3DRender::QAttribute::Float);
-    m_pColorAttribute->setDataSize(3);
+    m_pColorAttribute->setDataSize(4);
     m_pColorAttribute->setByteOffset(0);
-    m_pColorAttribute->setByteStride(3 * sizeof(float));
+    m_pColorAttribute->setByteStride(4 * sizeof(float));
     m_pColorAttribute->setName(Qt3DRender::QAttribute::defaultColorAttributeName());
     m_pColorAttribute->setBuffer(m_pColorDataBuffer);
 
@@ -173,10 +173,10 @@ CustomMesh::~CustomMesh()
 
 //*************************************************************************************************************
 
-void CustomMesh::setColor(const Eigen::MatrixX3f& tMatColors)
+void CustomMesh::setColor(const Eigen::MatrixX4f& tMatColors)
 {
     QByteArray colorBufferData;
-    colorBufferData.resize(tMatColors.rows() * 3 * (int)sizeof(float));
+    colorBufferData.resize(tMatColors.rows() * 4 * (int)sizeof(float));
     float *rawColorArray = reinterpret_cast<float *>(colorBufferData.data());
 
     int idxColor = 0;
@@ -185,6 +185,7 @@ void CustomMesh::setColor(const Eigen::MatrixX3f& tMatColors)
         rawColorArray[idxColor++] = tMatColors(i,0);
         rawColorArray[idxColor++] = tMatColors(i,1);
         rawColorArray[idxColor++] = tMatColors(i,2);
+        rawColorArray[idxColor++] = tMatColors(i,3);
     }
 
     //Update color
@@ -274,7 +275,7 @@ void CustomMesh::setIndex(const Eigen::MatrixXi& tMatTris)
 void CustomMesh::setMeshData(const MatrixX3f& tMatVert,
                              const MatrixX3f& tMatNorm,
                              const MatrixXi& tMatTris,
-                             const MatrixX3f& tMatColors,
+                             const MatrixX4f& tMatColors,
                              Qt3DRender::QGeometryRenderer::PrimitiveType primitiveType)
 {
     m_iNumVert = tMatVert.rows();

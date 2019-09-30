@@ -96,7 +96,7 @@ void FsAnnotationTreeItem::addData(const Surface& tSurface, const Annotation& tA
 {
     //Create color from annotation data if annotation is not empty
     if(!tAnnotation.isEmpty()) {
-        MatrixX3f matAnnotColors(tAnnotation.getVertices().rows(), 3);
+        MatrixX4f matAnnotColors(tAnnotation.getVertices().rows(), 4);
 
         QList<FSLIB::Label> qListLabels;
         QList<RowVector4i> qListLabelRGBAs;
@@ -117,6 +117,7 @@ void FsAnnotationTreeItem::addData(const Surface& tSurface, const Annotation& tA
                     matAnnotColors(label.vertices(j),0) = patchColor.redF();
                     matAnnotColors(label.vertices(j),1) = patchColor.greenF();
                     matAnnotColors(label.vertices(j),2) = patchColor.blueF();
+                    matAnnotColors(label.vertices(j),3) = patchColor.alphaF();
                 }
             }
         }

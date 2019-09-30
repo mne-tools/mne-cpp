@@ -92,6 +92,11 @@ UI_DIR = $${PWD}
 
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../../lib
+}
+
 # Activate FFTW backend in Eigen
 contains(MNECPP_CONFIG, useFFTW) {
     DEFINES += EIGEN_FFTW_DEFAULT

@@ -75,7 +75,7 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
 {
     if (vec.size() % 3 != 0)
     {
-        printf("Input must be a row or a column vector with 3N components");
+        printf("Input must be a row or a column vector with 3N components\n");
         return NULL;
     }
 

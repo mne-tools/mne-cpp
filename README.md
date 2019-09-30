@@ -8,15 +8,21 @@
 |---------------|---------------------|-----------------------|-----------------------|---------------|------------|
 | [![AppVeyor](https://ci.appveyor.com/api/projects/status/b63nawx8mnmmr9rv?svg=true)](https://ci.appveyor.com/project/chdinh/mne-cpp) | [![Travis](https://api.travis-ci.org/mne-tools/mne-cpp.png?branch=master)](https://travis-ci.org/mne-tools/mne-cpp) | [![CodeCov](https://codecov.io/gh/mne-tools/mne-cpp/branch/master/graph/badge.svg)](https://codecov.io/gh/mne-tools/mne-cpp) | [![Coverity](https://scan.coverity.com/projects/8955/badge.svg)](https://scan.coverity.com/projects/mne-tools-mne-cpp) | [![Gitter](https://badges.gitter.im/mne-tools/mne-cpp.svg)](https://gitter.im/mne-tools/mne-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.439390.svg)](https://doi.org/10.5281/zenodo.439390) |
 
-Cross-platform medical (real-time) applications for EEG and MEG data analysis.
+MNE-CPP: A Framework for Electrophysiology.
 
 For more information please visit http://www.mne-cpp.org.
 
 
-Get and build the latest code
------------------------------
+Get and build from source
+-------------------------
 
 To get the latest code and build it follow this [guide](http://wiki.mne-cpp.org/index.php/Step_by_Step_Setup_Guide). 
+
+
+Get pre-built binaries
+----------------------
+
+Pre-built binaries for Windows, Mac and Linux are available [here](https://www.mne-cpp.org/index.php/download/). 
 
 
 Get involved
@@ -58,7 +64,7 @@ License
 
 MNE-CPP is available under the **BSD-3-Clause** open source license:
 
-Copyright (C) 2010-2018, <a href="https://www.mne-cpp.org/index.php/team/" target="_blank">Authors</a> of MNE-CPP.
+Copyright (C) 2010-2019, <a href="https://www.mne-cpp.org/index.php/team/" target="_blank">Authors</a> of MNE-CPP.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

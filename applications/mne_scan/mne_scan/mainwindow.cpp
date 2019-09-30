@@ -116,7 +116,7 @@ MainWindow::MainWindow(QWidget *parent)
     setMinimumSize(400, 400);
     resize(1280, 800);
 
-    setUnifiedTitleAndToolBarOnMac(true);
+    setUnifiedTitleAndToolBarOnMac(false);
 
     m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
 

@@ -85,9 +85,9 @@ class NetworkNode;
 
 struct VisualizationInfo {
     QString sMethod = "Map";                                    /**< The color method: Map (uses sColormap parameter) or Color (uses colNodes and colEdges).*/
-    QString sColormap = "Jet";                                  /**< The colormap.*/
-    Eigen::Vector4i colNodes = Eigen::Vector4i(255, 0, 0, 1);   /**< The node color.*/
-    Eigen::Vector4i colEdges = Eigen::Vector4i(255, 0, 0, 1);   /**< The edge color.*/
+    QString sColormap = "Viridis";                                 /**< The colormap.*/
+    Eigen::Vector4i colNodes = Eigen::Vector4i(255, 0, 0, 255); /**< The node color.*/
+    Eigen::Vector4i colEdges = Eigen::Vector4i(255, 0, 0, 255); /**< The edge color.*/
 };
 
 //=============================================================================================================
@@ -118,17 +118,25 @@ public:
     /**
     * Returns the full connectivity matrix for this network structure.
     *
+    * @param[in] bGetMirroredVersion    Flag whether to return the mirrored version of the connectivity matrix, if the network
+    *                                   is a non-directional one. Otherwise returns zeros for the lower part of the matrix.
+    *                                   Default is set to true.
+    *
     * @return    The full connectivity matrix generated from the current network information.
     */
-    Eigen::MatrixXd getFullConnectivityMatrix() const;
+    Eigen::MatrixXd getFullConnectivityMatrix(bool bGetMirroredVersion = true) const;
 
     //=========================================================================================================
     /**
     * Returns the thresholded connectivity matrix for this network structure.
     *
+    * @param[in] bGetMirroredVersion    Flag whether to return the mirrored version of the connectivity matrix, if the network
+    *                                   is a non-directional one. Otherwise returns zeros for the lower part of the matrix.
+    *                                   Default is set to true.
+    *
     * @return    The thresholded connectivity matrix generated from the current network information.
     */
-    Eigen::MatrixXd getThresholdedConnectivityMatrix() const;
+    Eigen::MatrixXd getThresholdedConnectivityMatrix(bool bGetMirroredVersion = true) const;
 
     //=========================================================================================================
     /**
@@ -367,19 +375,35 @@ public:
 
     //=========================================================================================================
     /**
-    * Get the currently set number of samples.
+    * Get the currently set number of frequency bins.
     *
     * @return The currently set number of samples.
     */
-    int getNumberSamples() const;
+    int getUsedFreqBins() const;
 
     //=========================================================================================================
     /**
-    * Set the new number of samples.
+    * Set the new number of used frequency bins.
     *
-    * @param[in] iNumberSamples        The new number of samples.
+    * @param[in] iNumberFreqBins        The new number of used frequency bins.
     */
-    void setNumberSamples(int iNumberSamples);
+    void setUsedFreqBins(int iNumberFreqBins);
+
+    //=========================================================================================================
+    /**
+    * Set the new FFT size.
+    *
+    * @param[in] iFFTSize        The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).
+    */
+    void setFFTSize(int iFFTSize);
+
+    //=========================================================================================================
+    /**
+    * Returns the current FFT size.
+    *
+    * @return   The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).
+    */
+    int getFFTSize();
 
 protected:
     QList<QSharedPointer<NetworkEdge> >     m_lFullEdges;               /**< List with all edges of the network.*/
@@ -397,7 +421,8 @@ protected:
 
     double                                  m_dThreshold;               /**< The current value which was used to threshold the edge weigths.*/
     float                                   m_fSFreq;                   /**< The sampling frequency used to collect the data which this network is based on.*/
-    int                                     m_iNumberSamples;           /**< The number of colelcted data samples, e.g., in time to generate this network  data with.*/
+    int                                     m_iNumberFreqBins;          /**< The number of used frequency bins.*/
+    int                                     m_iFFTSize;                 /**< The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).*/
 
     VisualizationInfo                       m_visualizationInfo;        /**< The current visualization info used to plot the network later on.*/
 };

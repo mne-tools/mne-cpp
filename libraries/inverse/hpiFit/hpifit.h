@@ -125,25 +125,25 @@ public:
     /**
     * Perform one single HPI fit.
     *
-    * @param[in] t_mat           Data to estimate the HPI positions from
-    * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
-    * @param[out] transDevHead   The final dev head transformation matrix
-    * @param[in] vFreqs          The frequencies for each coil.
-    * @param[out] vGof           The goodness of fit in mm for each fitted HPI coil.
-    * @param[out] fittedPointSet The final fitted positions in form of a digitizer set.
-    * @param[in] p_pFiffInfo     Associated Fiff Information.
-    * @param[in] bDoDebug        Print debug info to cmd line and write debug info to file.
-    * @param[in] sHPIResourceDir The path to the debug file which is to be written.
+    * @param[in]    t_mat           Data to estimate the HPI positions from
+    * @param[in]    t_matProjectors The projectors to apply. Bad channels are still included.
+    * @param[out]   transDevHead    The final dev head transformation matrix
+    * @param[in]    vFreqs          The frequencies for each coil.
+    * @param[out]   vGof            The goodness of fit in mm for each fitted HPI coil.
+    * @param[out]   fittedPointSet  The final fitted positions in form of a digitizer set.
+    * @param[in]    p_pFiffInfo     Associated Fiff Information.
+    * @param[in]    bDoDebug        Print debug info to cmd line and write debug info to file.
+    * @param[in]    sHPIResourceDir The path to the debug file which is to be written.
     */
     static void fitHPI(const Eigen::MatrixXd& t_mat,
-                        const Eigen::MatrixXd& t_matProjectors,
-                        FIFFLIB::FiffCoordTrans &transDevHead,
-                        const QVector<int>& vFreqs,
-                        QVector<double> &vGof,
-                        FIFFLIB::FiffDigPointSet& fittedPointSet,
-                        QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                        bool bDoDebug = false,
-                        const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
+                       const Eigen::MatrixXd& t_matProjectors,
+                       FIFFLIB::FiffCoordTrans &transDevHead,
+                       const QVector<int>& vFreqs,
+                       QVector<double> &vGof,
+                       FIFFLIB::FiffDigPointSet& fittedPointSet,
+                       QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                       bool bDoDebug = false,
+                       const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
 
 protected:
     //=========================================================================================================

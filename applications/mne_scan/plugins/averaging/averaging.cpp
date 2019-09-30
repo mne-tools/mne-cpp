@@ -111,9 +111,9 @@ void Averaging::unload()
 
 bool Averaging::start()
 {
-    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning())
-        QThread::wait();
+//    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+//    if(this->isRunning())
+//        QThread::wait();
 
     m_qMutex.lock();
     m_bIsRunning = true;
@@ -293,6 +293,10 @@ void Averaging::onChangePreStim(qint32 mseconds)
 {
     QMutexLocker locker(&m_qMutex);
 
+    if(!m_pFiffInfo) {
+        return;
+    }
+
     int iPreStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
 
     if(m_pAveragingOutput) {
@@ -310,6 +314,10 @@ void Averaging::onChangePreStim(qint32 mseconds)
 void Averaging::onChangePostStim(qint32 mseconds)
 {
     QMutexLocker locker(&m_qMutex);
+
+    if(!m_pFiffInfo) {
+        return;
+    }
 
     int iPostStimSamples = ((float)(mseconds)/1000)*m_pFiffInfo->sfreq;
 
@@ -336,6 +344,11 @@ void Averaging::onChangeArtifactThreshold(const QMap<QString,double>& mapThresho
 void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
 {
     QMutexLocker locker(&m_qMutex);
+
+    if(!m_pFiffInfo) {
+        return;
+    }
+
     int iBaselineFromSamples = ((float)(fromMSeconds)/1000)*m_pFiffInfo->sfreq;
 
     if(m_pRtAve) {
@@ -349,6 +362,11 @@ void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
 void Averaging::onChangeBaselineTo(qint32 toMSeconds)
 {
     QMutexLocker locker(&m_qMutex);
+
+    if(!m_pFiffInfo) {
+        return;
+    }
+
     int iBaselineToSamples = ((float)(toMSeconds)/1000)*m_pFiffInfo->sfreq;
 
     if(m_pRtAve) {

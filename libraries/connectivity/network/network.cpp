@@ -91,7 +91,8 @@ Network::Network(const QString& sConnectivityMethod,
 , m_minMaxThresholdedWeights(QPair<double,double>(std::numeric_limits<double>::max(),0.0))
 , m_dThreshold(dThreshold)
 , m_fSFreq(0.0f)
-, m_iNumberSamples(0)
+, m_iFFTSize(128)
+, m_iNumberFreqBins(0)
 {
     qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
     qRegisterMetaType<CONNECTIVITYLIB::Network::SPtr>("CONNECTIVITYLIB::Network::SPtr");
@@ -102,7 +103,7 @@ Network::Network(const QString& sConnectivityMethod,
 
 //*************************************************************************************************************
 
-MatrixXd Network::getFullConnectivityMatrix() const
+MatrixXd Network::getFullConnectivityMatrix(bool bGetMirroredVersion) const
 {
     MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
     matDist.setZero();
@@ -113,6 +114,10 @@ MatrixXd Network::getFullConnectivityMatrix() const
 
         if(row < matDist.rows() && col < matDist.cols()) {
             matDist(row,col) = m_lFullEdges.at(i)->getWeight();
+
+            if(bGetMirroredVersion) {
+                matDist(col,row) = m_lFullEdges.at(i)->getWeight();
+            }
         }
     }
 
@@ -123,7 +128,7 @@ MatrixXd Network::getFullConnectivityMatrix() const
 
 //*************************************************************************************************************
 
-MatrixXd Network::getThresholdedConnectivityMatrix() const
+MatrixXd Network::getThresholdedConnectivityMatrix(bool bGetMirroredVersion) const
 {
     MatrixXd matDist(m_lNodes.size(), m_lNodes.size());
     matDist.setZero();
@@ -134,6 +139,10 @@ MatrixXd Network::getThresholdedConnectivityMatrix() const
 
         if(row < matDist.rows() && col < matDist.cols()) {
             matDist(row,col) = m_lThresholdedEdges.at(i)->getWeight();
+
+            if(bGetMirroredVersion) {
+                matDist(col,row) = m_lThresholdedEdges.at(i)->getWeight();
+            }
         }
     }
 
@@ -391,16 +400,16 @@ void Network::setFrequencyRange(float fLowerFreq, float fUpperFreq)
     }
 
     if(fUpperFreq > m_fSFreq/2.0f) {
-        qDebug() << "Network::setFrequencyRange - Upper frequency is bigger than nyquist frequency. You might check the set sampling frequency. Returning.";
+        qDebug() << "Network::setFrequencyRange - Upper frequency is bigger than nyquist frequency. Returning.";
         return;
     }
 
-    if(m_iNumberSamples <= 0) {
+    if(m_iNumberFreqBins <= 0) {
         qDebug() << "Network::setFrequencyRange - Number of samples has not been set. Returning.";
         return;
     }
 
-    double dScaleFactor = m_iNumberSamples/m_fSFreq;
+    double dScaleFactor = m_iFFTSize/(m_fSFreq/2);
 
     m_minMaxFrequency.first = fLowerFreq;
     m_minMaxFrequency.second = fUpperFreq;
@@ -528,15 +537,32 @@ void Network::setSamplingFrequency(float fSFreq)
 
 //*************************************************************************************************************
 
-int Network::getNumberSamples() const
+int Network::getUsedFreqBins() const
 {
-    return m_iNumberSamples;
+    return m_iNumberFreqBins;
 }
 
 
 //*************************************************************************************************************
 
-void Network::setNumberSamples(int iNumberSamples)
+void Network::setUsedFreqBins(int iNumberFreqBins)
 {
-    m_iNumberSamples = iNumberSamples;
+    m_iNumberFreqBins = iNumberFreqBins;
 }
+
+
+//*************************************************************************************************************
+
+void Network::setFFTSize(int iFFTSize)
+{
+    m_iFFTSize = iFFTSize;
+}
+
+
+//*************************************************************************************************************
+
+int Network::getFFTSize()
+{
+    return m_iFFTSize;
+}
+
