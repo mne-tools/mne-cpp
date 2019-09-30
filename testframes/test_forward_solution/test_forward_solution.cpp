@@ -108,60 +108,46 @@ void TestForwardSolution::initTestCase()
 
 void TestForwardSolution::computeForward()
 {
-    //*********************************************************************************************************
     // Forward Solution Settings
-    //*********************************************************************************************************
+    qInfo(">>>>>>>>>>>>>>>>>>>>>>>>> Forward Solution Settings >>>>>>>>>>>>>>>>>>>>>>>>>");
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Forward Solution Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
-
-    //Following is equivalent to: --meg --accurate --src ./MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif
+    //Following is equivalent to:
+    //mne_forward_solution
+    // --meg
+    // --accurate
+    // --src ./MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif
     // --meas ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif
     // --mri ./MNE-sample-data/subjects/sample/mri/brain-neuromag/sets/COR.fif
     // --bem ./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif
-    // --mindist 5 --fwd ./MNE-sample-data/Result/sample_audvis-meg-oct-6-fwd.fif
+    // --mindist 5
+    // --fwd ./MNE-sample-data/Result/sample_audvis-meg-oct-6-fwd.fif
+
     ComputeFwdSettings settings;
 
     settings.include_meg = true;
     settings.accurate = true;
-    settings.srcname = QDir::currentPath()+QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
-    settings.measname = QDir::currentPath()+QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
-    settings.mriname = QDir::currentPath()+QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/mri/brain-neuromag/sets/COR.fif";
+    settings.srcname = "./MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
+    settings.measname = "./MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    settings.mriname = "./MNE-sample-data/subjects/sample/mri/brain-neuromag/sets/COR.fif";
     settings.mri_head_ident = false;
     settings.transname.clear();
-    settings.bemname = QDir::currentPath()+QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
+    settings.bemname = "./MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
     settings.mindist = 5.0f/1000.0f;
-    settings.solname = QDir::currentPath()+"./mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif";
+    settings.solname = "./mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif";
 
     settings.checkIntegrity();
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Forward Solution Settings Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    qInfo("<<<<<<<<<<<<<<<<<<<<<<<<< Forward Solution Settings Finished <<<<<<<<<<<<<<<<<<<<<<<<<");
 
-
-    //*********************************************************************************************************
-    // Compute Forward Solution
-    //*********************************************************************************************************
-
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    // Compute and Write Forward Solution
+    qInfo(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>");
 
     ComputeFwd cmpFwd(&settings);
     cmpFwd.calculateFwd();
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    qInfo("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<");
 
-    //*********************************************************************************************************
-    // Write Forward Solution
-    //*********************************************************************************************************
-
-
-    //*********************************************************************************************************
-    // Load reference Dipole Set
-    //*********************************************************************************************************
-
-
-    //*********************************************************************************************************
-    // Compare Fit
-    //*********************************************************************************************************
-
+    // Compare fwd solutions
     compareForward();
 }
 
@@ -170,42 +156,35 @@ void TestForwardSolution::computeForward()
 
 void TestForwardSolution::compareForward()
 {
-    //*********************************************************************************************************
-    // Write Read Forward Solution
-    //*********************************************************************************************************
+    qInfo(">>>>>>>>>>>>>>>>>>>>>>>>> Compare Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>");
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    // Read computed forward solution
+    QString fwdFileNameComp("./mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif");
+    QFile fileForwardSolutionComp(fwdFileNameComp);
+    MNEForwardSolution fwdComp(fileForwardSolutionComp);
 
-    QString refFwdFileName(QDir::currentPath()+"./mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif");
+    // Read reference forward solution
+    QString fwdFileNameRef("./mne-cpp-test-data/Result/ref-sample_audvis-meg-oct-6-fwd.fif");
+    QFile fileForwardSolutionRef(fwdFileNameRef);
+    MNEForwardSolution fwdRef(fileForwardSolutionRef);
 
-    //Load data
-    QFile t_fileForwardSolution(refFwdFileName);
-    MNEForwardSolution t_Fwd(t_fileForwardSolution);
+    // Compare fwd solutions
 
-//    QVERIFY( m_refECDSet.size() == m_ECDSet.size() );
+    FiffInfoBase info;                  /**< light weighted measurement info */
+    fiff_int_t source_ori;              /**< Source orientation: fixed or free */
+    bool surf_ori;                      /**< If surface oriented */
+    fiff_int_t coord_frame;             /**< Coil coordinate system definition */
+    fiff_int_t nsource;                 /**< Number of source dipoles */
+    fiff_int_t nchan;                   /**< Number of channels */
+    FiffNamedMatrix::SDPtr sol;         /**< Forward solution */
+    FiffNamedMatrix::SDPtr sol_grad;    /**< ToDo... */
+    FiffCoordTrans mri_head_t;          /**< MRI head coordinate transformation */
+    MNESourceSpace src;                 /**< Geometric description of the source spaces (hemispheres) */
+    MatrixX3f source_rr;                /**< Source locations */
+    MatrixX3f source_nn;                /**< Source normals (number depends on fixed or free orientation) */
 
-//    for (int i = 0; i < m_refECDSet.size(); ++i)
-//    {
-//        printf("Compare orig Dipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
-//                1000*m_ECDSet[i].time,1000*m_ECDSet[i].time,
-//                1000*m_ECDSet[i].rd[0],1000*m_ECDSet[i].rd[1],1000*m_ECDSet[i].rd[2],
-//                1e9*m_ECDSet[i].Q.norm(),1e9*m_ECDSet[i].Q[0],1e9*m_ECDSet[i].Q[1],1e9*m_ECDSet[i].Q[2],100.0*m_ECDSet[i].good);
-//        printf("         ref Dipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
-//                1000*m_refECDSet[i].time,1000*m_refECDSet[i].time,
-//                1000*m_refECDSet[i].rd[0],1000*m_refECDSet[i].rd[1],1000*m_refECDSet[i].rd[2],
-//                1e9*m_refECDSet[i].Q.norm(),1e9*m_refECDSet[i].Q[0],1e9*m_refECDSet[i].Q[1],1e9*m_refECDSet[i].Q[2],100.0*m_refECDSet[i].good);
 
-//        QVERIFY( m_ECDSet[i].valid == m_refECDSet[i].valid );
-//        QVERIFY( m_ECDSet[i].time - m_refECDSet[i].time < epsilon );
-//        QVERIFY( m_ECDSet[i].rd == m_refECDSet[i].rd );
-//        QVERIFY( m_ECDSet[i].Q == m_refECDSet[i].Q );
-//        QVERIFY( m_ECDSet[i].good - m_refECDSet[i].good < epsilon );
-//        QVERIFY( m_ECDSet[i].khi2 - m_refECDSet[i].khi2 < epsilon );
-//        QVERIFY( m_ECDSet[i].nfree == m_refECDSet[i].nfree );
-//        QVERIFY( m_ECDSet[i].neval == m_refECDSet[i].neval );
-//    }
-
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    qInfo("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
 
 
