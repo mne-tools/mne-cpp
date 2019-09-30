@@ -38,46 +38,34 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-contains(MNECPP_CONFIG, buildBasicMneScanVersion) {
-    message(Building basic MNE Scan version!)
-    #Sensors
-    SUBDIRS += \
-        babymeg \
-        fiffsimulator \
+#Sensors
+SUBDIRS += \
+    ecgsimulator \
+    fiffsimulator \
+    neuromag \
+    babymeg \
+    triggercontrol \
+    # gusbamp \
+    # eegosports \
+    # brainamp \
+    # tmsi \
+    natus
 
-    #Algorithms
-    SUBDIRS += \
-} else {
-    #Sensors
-    SUBDIRS += \
-        ecgsimulator \
-        fiffsimulator \
-        neuromag \
-        babymeg \
-        triggercontrol \
-        # gusbamp \
-        # eegosports \
-        # brainamp \
-        # tmsi \
-        natus
+contains(MNECPP_CONFIG, useLSL) { SUBDIRS += lsladapter }
 
-    contains(MNECPP_CONFIG, useLSL) { SUBDIRS += lsladapter }
-
-    #Algorithms
-    SUBDIRS += \
-        dummytoolbox \
-        epidetect \
-        mne \
-        rapmusictoolbox \
-        averaging \
-        covariance \
-        noise \
-        # bci \
-        rtsss \
-        rthpi \
-        noisereduction \
-        ssvepbci \
-        neuronalconnectivity \
-        reference
-}
-
+#Algorithms
+SUBDIRS += \
+    dummytoolbox \
+    epidetect \
+    mne \
+    rapmusictoolbox \
+    averaging \
+    covariance \
+    noise \
+    # bci \
+    rtsss \
+    rthpi \
+    noisereduction \
+    ssvepbci \
+    neuronalconnectivity \
+    reference
