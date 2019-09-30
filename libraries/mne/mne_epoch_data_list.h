@@ -67,9 +67,10 @@ namespace MNELIB
 {
 
 struct ArtifactRejectionData {
-    bool bRejected;
+    bool bRejected = false;
     Eigen::RowVectorXd data;
     double dThreshold;
+    QString sChName;
 };
 
 //=============================================================================================================
@@ -106,10 +107,9 @@ public:
     * @param[in] tmin           The start time relative to the event in samples.
     * @param[in] tmax           The end time relative to the event in samples.
     * @param[in] event          The event kind.
-    * @param[in] dEOGThreshold  The threshold value to use to reject epochs based on the EOG channel.
-    *                           No filtering is performed on the EOG channel. Default is set to no rejection.
-    *                           The mean is subtracted from the EOG channel data before checking the threshold.
-    * @param[in] sChType        The channel data type to scan for. EEG, MEG or EOG (default is EOG).
+    * @param[in] dThreshold     The threshold value to use to reject epochs. Default is set to 0.0.
+    * @param[in] sChType        The channel data type to scan for. EEG, MEG or EOG. Default is none.
+    * @param[in] lExcludeChs    List of channel names to exclude.
     * @param[in] picks          Which channels to pick.
     */
     static MNEEpochDataList readEpochs(const FIFFLIB::FiffRawData& raw,
@@ -117,8 +117,8 @@ public:
                                        float tmin,
                                        float tmax,
                                        qint32 event,
-                                       double dEOGThreshold = 0.0,
-                                       const QString& sChType = QString("eog"),
+                                       const QMap<QString,double>& mapReject,
+                                       const QStringList &lExcludeChs = QStringList(),
                                        const Eigen::RowVectorXi& picks = Eigen::RowVectorXi());
 
     //=========================================================================================================
@@ -165,19 +165,16 @@ public:
     *
     * @param[in] data           The data matrix.
     * @param[in] pFiffInfo      The fiff info.
-    * @param[in] dThreshold     The thresholded value.
-    * @param[in] sCheckType     The detection type. Threshold or variance based (default is Threshold).
-    * @param[in] sChType        The channel data type to scan for. EEG, MEG or EOG (default is EOG).
+    * @param[in] mapReject      The channel data types to scan for. EEG, MEG or EOG.
+    * @param[in] lExcludeChs    List of channel names to exclude.
     *
     * @return   Whether a threshold artifact was detected.
     */
     static bool checkForArtifact(const Eigen::MatrixXd& data,
                                  const FIFFLIB::FiffInfo& pFiffInfo,
-                                 double dThreshold,
-                                 const QString& sCheckType = QString("threshold"),
-                                 const QString& sChType = QString("eog"));
+                                 const QMap<QString,double>& mapReject,
+                                 const QStringList &lExcludeChs = QStringList());
 
-    static void checkChVariance(ArtifactRejectionData& inputData);
     static void checkChThreshold(ArtifactRejectionData& inputData);
 };
 

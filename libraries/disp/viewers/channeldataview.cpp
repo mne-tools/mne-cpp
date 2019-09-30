@@ -57,8 +57,12 @@
 #include <QTableView>
 #include <QMenu>
 #include <QSvgGenerator>
-#include <QGLWidget>
 #include <QSettings>
+#include <QScrollBar>
+
+#if defined(USE_OPENGL)
+    #include <QOpenGLWidget>
+#endif
 
 
 //*************************************************************************************************************
@@ -90,12 +94,7 @@ ChannelDataView::ChannelDataView(const QString& sSettingsPath,
     m_pTableView = new QTableView;
 
 #if defined(USE_OPENGL)
-    // Use QGLWidget for rendering the table view.
-    // Unfortunatley, QOpenGLWidget is not able to change the background color, which is a must for this ChanalDataViewer.
-    QGLFormat currentFormat = QGLFormat(QGL::SampleBuffers);
-    currentFormat.setSamples(10);
-    QGLWidget* pGLWidget = new QGLWidget(currentFormat);
-    m_pTableView->setViewport(pGLWidget);
+    m_pTableView->setViewport(new QOpenGLWidget);
 #endif
 
     // Install event filter for tracking mouse movements
@@ -172,8 +171,8 @@ void ChannelDataView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     m_pTableView->resizeColumnsToContents();
     m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
-//    connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
-//            this, &ChannelDataView::visibleRowsChanged);
+    connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
+            this, &ChannelDataView::visibleRowsChanged);
 }
 
 
@@ -213,10 +212,14 @@ void ChannelDataView::setBackgroundColor(const QColor& backgroundColor)
 {
     m_backgroundColor = backgroundColor;
 
-    QPalette pal;
-    pal.setColor(QPalette::Window, m_backgroundColor);
-    m_pTableView->viewport()->setPalette(pal);
-    m_pTableView->viewport()->setBackgroundRole(QPalette::Window);
+    if(m_pModel) {
+        m_pModel->setBackgroundColor(m_backgroundColor);
+    }
+
+//    QPalette pal;
+//    pal.setColor(QPalette::Window, m_backgroundColor);
+//    m_pTableView->viewport()->setPalette(pal);
+//    m_pTableView->viewport()->setBackgroundRole(QPalette::Window);
 }
 
 
@@ -281,7 +284,7 @@ void ChannelDataView::hideBadChannels()
     }
 
     //Update the visible channel list which are to be filtered
-    //visibleRowsChanged(0);
+    //visibleRowsChanged();
 }
 
 
@@ -312,7 +315,7 @@ void ChannelDataView::showSelectedChannelsOnly(const QStringList &selectedChanne
     }
 
     //Update the visible channel list which are to be filtered
-    //visibleRowsChanged(0);
+    //visibleRowsChanged();
 }
 
 
@@ -554,7 +557,7 @@ void ChannelDataView::applySelection()
     }
 
     //Update the visible channel list which are to be filtered
-    //visibleRowsChanged(0);
+    //visibleRowsChanged();
 
     //m_pModel->selectRows(m_qListCurrentSelection);
 }
@@ -569,7 +572,7 @@ void ChannelDataView::hideSelection()
     }
 
     //Update the visible channel list which are to be filtered
-    //visibleRowsChanged(0);
+    //visibleRowsChanged();
 }
 
 
@@ -589,16 +592,17 @@ void ChannelDataView::resetSelection()
     }
 
     //Update the visible channel list which are to be filtered
-    //visibleRowsChanged(0);
+    //visibleRowsChanged();
 }
 
 
 //*************************************************************************************************************
 
-void ChannelDataView::visibleRowsChanged(int value)
+void ChannelDataView::visibleRowsChanged()
 {
-    Q_UNUSED(value);
-    //std::cout <<"Visible channels: "<< m_pTableView->rowAt(0) << "-" << m_pTableView->rowAt(m_pTableView->height())<<std::endl;
+    if(!m_pTableView || !m_pModel || !m_pDelegate) {
+        return;
+    }
 
     int from = m_pTableView->rowAt(0);
     if(from != 0)
@@ -611,14 +615,18 @@ void ChannelDataView::visibleRowsChanged(int value)
     if(from > to)
         to = m_pModel->rowCount()-1;
 
-    QStringList channelNames;
+//    //Update visible rows in order to only filter the visible rows
+//    QStringList channelNames;
 
-    for(int i = from; i<=to; i++) {
-        channelNames << m_pModel->data(m_pModel->index(i, 0), Qt::DisplayRole).toString();
-        //std::cout << m_pModel->data(m_pModel->index(i, 0), Qt::DisplayRole).toString().toStdString() << std::endl;
-    }
+//    for(int i = from; i<=to; i++) {
+//        channelNames << m_pModel->data(m_pModel->index(i, 0), Qt::DisplayRole).toString();
+//    }
 
-    m_pModel->createFilterChannelList(channelNames);
+//    m_pModel->createFilterChannelList(channelNames);
+
+    m_pDelegate->setUpperItemIndex(from+1);
+
+    //qDebug() <<"ChannelDataView::visibleRowsChanged - from "<< from << " to" << to;
 }
 
 

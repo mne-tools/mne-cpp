@@ -14,7 +14,13 @@ env:
 # 1.0.0
     - secure: YXurlzTjVZYR8t3W9K7rcFLCnpR7DerHQ15hgojGrCthKlkLuMy7maDrVx4Xq+KFuNmFzEZavla+GKdx5E+EhmZtaSx5OFfejfI1ya5WNTjwQgL5niQV4HoTCKNHZhwIovIEYkyLSaIPZbfccfXBRFegMrBQpVsSSBQoKZiUFfk=
     - secure: bQ7qDeGFDGiYIpudj50F+AXQkwi6HqBPmnrBEJ8DxAkYOy2evBxvACigUM+kx78LM1idOl+njye5HAtlLN8ZiQKikt9YSUXlxbX5es/wk0ABUZ/icWgsbiPU+ThHTNeP4mu33HW8o/vuoKARbaSjkOWn5RejGoiJKNDdnkgJTHw=
-
+# Azure Server
+    - secure: XwHew+l/Q6MTk9YElFBPgtuN/b6Ga8H9ka7rdR58y4huCQryNjYn2fH9E6+FRXuww/JDnX1/oAmYK2gp65rK07r2OX2YacXH2vi+29EmKUM/CB+E5x4nyTFbIV2OBH1llmLs//D4/EOzIVf5aTHl8Y47atihG1swWLXtVARS5CY=
+# Azure SAS
+    - secure: X+sDXtfcqT4DHDb/W8+7Rj/EyGLnpcN3FsPN0fsdM+uYEF80dd9j5/Ybd14294MeP1DNphW8mpFwjNkX6f9JKPNdPKEjFqgzrXm3q878tIGI3NgY7jQm+TLKZXyAXB5C1GDrj4hzh0PO1t0XzfcGAtnv1yyO4CdxDdvsmljbLyQ=
+# Git
+    - secure: QZZXsNkC3AlVThkLftcIOUmf2xPYiVjBXO2L5HEhdzI52qJslxFX21R+b4R/zSgsI1jzSGWiswc8XgW4mfhsAiNSRXlSXf4MPHvgiZHyVrFFHhUO9AQLVEd+CVW1IJtPWxRcbg5VcmW+OCk5bWzGhubGiS4sOp4SdGfneQ0Ymp4=
+    
 matrix:
   fast_finish: true
   include:

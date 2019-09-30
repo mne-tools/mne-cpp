@@ -113,23 +113,10 @@
    <item row="0" column="0" colspan="2">
     <layout class="QGridLayout" name="m_gridLayout_buttons">
      <item row="0" column="0">
-      <widget class="QPushButton" name="m_pushButton_hideAll">
-       <property name="text">
-        <string>Hide/Show - Quick Control</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
       <widget class="QPushButton" name="m_pushButton_close">
        <property name="maximumSize">
         <size>
-         <width>40</width>
+         <width>16777215</width>
          <height>16777215</height>
         </size>
        </property>

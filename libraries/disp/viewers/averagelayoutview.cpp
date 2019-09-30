@@ -59,7 +59,9 @@
 #include <QSvgGenerator>
 #include <QDebug>
 #include <QGraphicsItem>
-#include <QOpenGLWidget>
+#if defined(USE_OPENGL)
+    #include <QOpenGLWidget>
+#endif
 
 
 //*************************************************************************************************************

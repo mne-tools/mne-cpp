@@ -89,7 +89,7 @@ namespace CONNECTIVITYLIB {
 * @brief This class provides basic functionalities for all implemented metrics.
 */
 class CONNECTIVITYSHARED_EXPORT AbstractMetric
-{    
+{
 
 public:
     typedef QSharedPointer<AbstractMetric> SPtr;            /**< Shared pointer type for AbstractMetric. */
@@ -100,6 +100,10 @@ public:
     * Constructs a AbstractMetric object.
     */
     explicit AbstractMetric();
+
+    static bool     m_bStorageModeIsActive;
+    static int      m_iNumberBinStart;
+    static int      m_iNumberBinAmount;
 
 protected:
 

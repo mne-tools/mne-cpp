@@ -452,6 +452,8 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 
     if(bIsBad) {
         painter.setOpacity(0.20);
+    } else {
+        painter.setOpacity(0.75);
     }
 
     switch(kind) {
@@ -512,10 +514,10 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 
     //restrictions for paint performance
     float fWinMaxVal = ((float)this->height()-2)/2.0f;
-    qint32 iDownSampling = (m_pEvokedSetModel->getNumSamples() * 4 / (this->width()-2));
-    if(iDownSampling < 1) {
-        iDownSampling = 1;
-    }
+//    qint32 iDownSampling = (m_pEvokedSetModel->getNumSamples() * 4 / (this->width()-2));
+//    if(iDownSampling < 1) {
+//        iDownSampling = 1;
+//    }
 
     QPointF qSamplePosition;
 

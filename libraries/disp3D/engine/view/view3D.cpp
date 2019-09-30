@@ -129,7 +129,7 @@ void View3D::initLight()
     //Setup light positions, intensities and color
     QList<QVector3D> lLightPositions;
     const QColor lightColor(255,255,255);
-    const float lightIntensity = 0.2f;
+    const float lightIntensity = 0.4f;
 
     lLightPositions << QVector3D(-0.5,0,0) << QVector3D(0.5,0,0); /*<< QVector3D(0,0,-0.5)
                     << QVector3D(0.5,0,0) << QVector3D(0,0,0.5)

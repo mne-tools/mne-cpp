@@ -75,6 +75,7 @@ ChannelDataDelegate::ChannelDataDelegate(QObject *parent)
 , m_dMaxValue(0.0)
 , m_dScaleY(0.0)
 , m_iActiveRow(0)
+, m_iUpperItemIndex(0)
 {
 
 }
@@ -277,18 +278,29 @@ void ChannelDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
             painter->restore();
             break;
         }
-        case 1: { //data plot
-            //draw special background when channel is marked as bad
-            QVariant v = index.model()->data(index,Qt::BackgroundRole);
-            bool bIsBadChannel = false;
 
-            if((v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) ||
-               (v.canConvert<QBrush>() && (option.state & QStyle::State_Selected))) {
-                QPointF oldBO = painter->brushOrigin();
+        case 1: { //data plot
+            QBrush backgroundBrush = index.model()->data(index, Qt::BackgroundRole).value<QBrush>();
+            bool bIsBadChannel = index.model()->data(index.model()->index(index.row(), 2), Qt::DisplayRole).toBool();
+
+            // Plot background based on user chosen color
+            // This is a rather ugly hack in order to cope with QOpenGLWidget's/QtableView's problem when setting a background color
+            if (index.row() == m_iUpperItemIndex) {
+                painter->save();
                 painter->setBrushOrigin(option.rect.topLeft());
-                painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
-                painter->setBrushOrigin(oldBO);
-                bIsBadChannel = true;
+                QRect rect = option.rect;
+                rect.setHeight(2000);
+                painter->fillRect(rect, backgroundBrush);
+                painter->restore();
+            }
+
+            // Draw special background when channel is marked as bad
+            if(bIsBadChannel) {
+                painter->save();
+                QBrush brush(QColor(254,74,93,40));
+                painter->setBrushOrigin(option.rect.topLeft());
+                painter->fillRect(option.rect, brush);
+                painter->restore();
             }
 
 //            //Highlight selected channels
@@ -305,10 +317,8 @@ void ChannelDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
 
             const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
 
-            if(data.second > 0)
-            {
-                QPainterPath path(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
-
+            if(data.second > 0) {
+                QPainterPath path(QPointF(option.rect.x(),option.rect.y()));
 
                 //Plot marker
 //                createMarkerPath(option, path);
@@ -428,7 +438,6 @@ void ChannelDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
             break;
         }
     }
-
 }
 
 
@@ -479,6 +488,14 @@ void ChannelDataDelegate::setSignalColor(const QColor& signalColor)
 QColor ChannelDataDelegate::getSignalColor()
 {
     return m_penNormal.color();
+}
+
+
+//*************************************************************************************************************
+
+void ChannelDataDelegate::setUpperItemIndex(int iUpperItemIndex)
+{
+    m_iUpperItemIndex = iUpperItemIndex;
 }
 
 
@@ -689,6 +706,7 @@ void ChannelDataDelegate::createTriggerPath(QPainter *painter,
                                              RowVectorPair &data) const
 {
     Q_UNUSED(data)
+    Q_UNUSED(path)
 
     const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
 
@@ -701,7 +719,6 @@ void ChannelDataDelegate::createTriggerPath(QPainter *painter,
     float dDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
 
     int currentSampleIndex = t_pModel->getCurrentSampleIndex();
-
 
     //Newly detected triggers
     for(int u = 0; u < detectedTriggers.size(); ++u) {
