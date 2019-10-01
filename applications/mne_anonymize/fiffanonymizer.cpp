@@ -546,30 +546,33 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     case FIFF_REF_BLOCK_ID:
     {
         FiffId inId = inTag->toFiffID();
-
-//        QList<QByteArray> inMAC({QByteArray::fromHex(QString::number(inId.machid[0]).toUtf8()),
-//                                 QByteArray::fromHex(QString::number(inId.machid[1]).toUtf8())});
-//        QList<QByteArray> outMAC(m_BDfltMAC.split(3));
         QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs).date());
         QDateTime outMeasDate;
-        
         if(m_bUseMeasurementDayOffset)
         {
             outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
         } else {
             outMeasDate = m_dateMeasurmentDate;
         }
-        const int fiffIdSize(sizeof(inId));//5
+
+        FiffId outId(inId);
+        outId.machid[0] = 0;
+        outId.machid[1] = 0;
+        outId.time.secs = static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
+        outId.time.usecs = 0;
+
+        const int fiffIdSize(sizeof(inId)/sizeof(fiff_int_t));
         fiff_int_t outData[fiffIdSize];
-        outData[0] = inId.version;
-        outData[1] = -1; //inFileId.machid[0];
-        outData[2] = -1; //inFileId.machid[1];
-        outData[3] = static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
-        outData[4] = 0; //inId.time.usecs;
+        outData[0] = outId.version;
+        outData[1] = outId.machid[0];
+        outData[2] = outId.machid[1];
+        outData[3] = outId.time.secs;
+        outData[4] = outId.time.usecs;
 
         outTag->resize(fiffIdSize*sizeof(fiff_int_t));
         memcpy(outTag->data(),reinterpret_cast<char*>(outData),fiffIdSize*sizeof(fiff_int_t));
-        //printIfVerbose("MAC address changed: " + inMAC.at(0) + inMAC.at(1) + " -> "  + outMAC.at(0) + outMAC.at(1));
+        qDebug() << "MAC address changed: " + inId.toMachidString() + " -> "  + outId.toMachidString();
+        //printIfVerbose("MAC address changed: " + inId.toMachidString() + " -> "  + outId.toMachidString());
         printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
         break;
     }
