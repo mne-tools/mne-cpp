@@ -181,3 +181,39 @@ void FiffId::print() const
         printf ("%d %d ",this->time.secs,this->time.usecs);
     }
 }
+
+
+//*************************************************************************************************************
+
+QString FiffId::toMachidString() const
+{
+    QString strOut = QString("%1%2").arg(machid[0],8,16,QChar('0')).arg(machid[1],8,16,QChar('0'));
+
+//    to do...
+//    macid is 6 bytes of data->12 chars.
+//    here macid is stored in two integers --> 8 bytes --> 16 chars.
+//    some versions of sinuhe store the significant chars at the beginning of the 16 chars.
+//    other versions sotre the at the end. I don't know on what it depends on.
+//    clue 1: version 1.3 stores it at the beginning. (padding with 4 '0' chars at the end).
+//    clue 2: version 1.2 stores it at the ending chars. (padding with 4 '0' chars at the beginning of the 16).
+//    I've no idea if this behaviour is solid...
+//    int thresholdMayorVersion(1);
+//    int thresholdMinorVersion(2);
+
+//    int thresholdVersionInt(static_cast<int>(thresholdMayorVersion*pow(2.,16))+thresholdMinorVersion);
+//    if(version > thresholdVersionInt) //if this.version > 65538
+//    {
+//        strOut.chop(4);
+//    } else
+//    {
+//        strOut.right(strOut.size()-4);
+//    }
+
+    int step=2;
+    for(int i=step;i < strOut.size(); i+=step+1)
+    {
+        strOut.insert(i,QChar(':'));
+    }
+
+    return strOut.toUpper();
+}
