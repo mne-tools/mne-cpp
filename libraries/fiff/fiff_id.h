@@ -146,6 +146,13 @@ public:
     inline static qint32 storageSize();
 
     friend bool operator== (const FiffId &f1, const FiffId &f2);
+    
+    //=========================================================================================================
+    /**
+    * Print mac address in a fashionable manner.
+    */
+    QString toMachidString() const;
+
 public:
     fiff_int_t version;     /**< File version */
     fiff_int_t machid[2];   /**< Unique machine ID */
