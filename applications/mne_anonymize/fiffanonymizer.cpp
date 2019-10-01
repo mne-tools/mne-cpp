@@ -130,7 +130,7 @@ FiffAnonymizer::FiffAnonymizer()
     m_BDfltMAC[5] = 0x00;
     m_BDfltMAC[6] = 0x00;
     m_BDfltMAC[7] = 0x00;
-    
+
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>);
     m_pOutDir = QSharedPointer<QVector<FiffDirEntry> >(new QVector<FiffDirEntry>);
 }
@@ -313,6 +313,7 @@ int FiffAnonymizer::anonymizeFile()
         inStream.read_tag(pInTag);
         updateBlockTypeList(pInTag);
         censorTag(pOutTag,pInTag);
+
         //the order of the tags in the output file is sequential. No jumps in the output file.
         if(pOutTag->next > 0)
         {
@@ -545,9 +546,10 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     case FIFF_REF_BLOCK_ID:
     {
         FiffId inId = inTag->toFiffID();
-        QList<QByteArray> inMAC({QByteArray::fromHex(QString::number(inId.machid[0]).toUtf8()),
-                                 QByteArray::fromHex(QString::number(inId.machid[1]).toUtf8())});
-        QList<QByteArray> outMAC(m_BDfltMAC.split(3));
+
+//        QList<QByteArray> inMAC({QByteArray::fromHex(QString::number(inId.machid[0]).toUtf8()),
+//                                 QByteArray::fromHex(QString::number(inId.machid[1]).toUtf8())});
+//        QList<QByteArray> outMAC(m_BDfltMAC.split(3));
         QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs).date());
         QDateTime outMeasDate;
         
@@ -557,18 +559,17 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         } else {
             outMeasDate = m_dateMeasurmentDate;
         }
-        
         const int fiffIdSize(sizeof(inId));//5
         fiff_int_t outData[fiffIdSize];
         outData[0] = inId.version;
-        outData[1] = outMAC.at(0).toInt(); //inFileId.machid[0];
-        outData[2] = outMAC.at(1).toInt(); //inFileId.machid[1];
+        outData[1] = -1; //inFileId.machid[0];
+        outData[2] = -1; //inFileId.machid[1];
         outData[3] = static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
         outData[4] = 0; //inId.time.usecs;
-        
+
         outTag->resize(fiffIdSize*sizeof(fiff_int_t));
         memcpy(outTag->data(),reinterpret_cast<char*>(outData),fiffIdSize*sizeof(fiff_int_t));
-        printIfVerbose("MAC address changed: " + inMAC.at(0) + inMAC.at(1) + " -> "  + outMAC.at(0) + outMAC.at(1));
+        //printIfVerbose("MAC address changed: " + inMAC.at(0) + inMAC.at(1) + " -> "  + outMAC.at(0) + outMAC.at(1));
         printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
         break;
     }
@@ -631,7 +632,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_BIRTH_DAY:
     {
-        QDateTime inBirthday(QDate::fromJulianDay(*inTag->toInt()));
+        QDateTime inBirthday(QDate::fromJulianDay(*inTag->toJulian()));
         QDateTime outBirthday;
         
         if(m_bUseSubjectBirthdayOffset)
