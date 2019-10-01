@@ -164,25 +164,12 @@ void TestForwardSolution::compareForward()
     MNEForwardSolution fwdComp(fileForwardSolutionComp);
 
     // Read reference forward solution
-    QString fwdFileNameRef("./mne-cpp-test-data/Result/ref-sample_audvis-meg-oct-6-fwd.fif");
-    QFile fileForwardSolutionRef(fwdFileNameRef);
+    QString fwdFileRef("./mne-cpp-test-data/Result/ref-sample_audvis-meg-oct-6-fwd.fif");
+    QFile fileForwardSolutionRef(fwdFileRef);
     MNEForwardSolution fwdRef(fileForwardSolutionRef);
 
     // Compare fwd solutions
-
-    FiffInfoBase info;                  /**< light weighted measurement info */
-    fiff_int_t source_ori;              /**< Source orientation: fixed or free */
-    bool surf_ori;                      /**< If surface oriented */
-    fiff_int_t coord_frame;             /**< Coil coordinate system definition */
-    fiff_int_t nsource;                 /**< Number of source dipoles */
-    fiff_int_t nchan;                   /**< Number of channels */
-    FiffNamedMatrix::SDPtr sol;         /**< Forward solution */
-    FiffNamedMatrix::SDPtr sol_grad;    /**< ToDo... */
-    FiffCoordTrans mri_head_t;          /**< MRI head coordinate transformation */
-    MNESourceSpace src;                 /**< Geometric description of the source spaces (hemispheres) */
-    MatrixX3f source_rr;                /**< Source locations */
-    MatrixX3f source_nn;                /**< Source normals (number depends on fixed or free orientation) */
-
+    Q_VERIFY(fwdRef == fwdComp);
 
     qInfo("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
