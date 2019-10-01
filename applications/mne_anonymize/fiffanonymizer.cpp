@@ -616,23 +616,46 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_ID:
     {
+        qint32 inSubjID(*inTag->toInt());
+        qint32 newSubjID(m_iDfltSubjectId);
+        memcpy(outTag->data(),&newSubjID, sizeof(qint32));
+        printIfVerbose("Subject's SubjectID changed: " +
+                       QString::number(inSubjID) + " -> " + QString::number(newSubjID));
         break;
     }
     case FIFF_SUBJ_FIRST_NAME:
     {
+        QString inStr = inTag->toString();
+        QString newStr(m_sDfltSubjectFirstName);
+        outTag->resize(newStr.toUtf8().size());
+        memcpy(outTag->data(),newStr.data(),newStr.toUtf8().size());
+        printIfVerbose("Experimenter changed: " +
+                       QString(inTag->data()) + " -> " + newStr);
         break;
     }
     case FIFF_SUBJ_MIDDLE_NAME:
     {
+        QString inStr = inTag->toString();
+        QString newStr(m_sDfltSubjectMidName);
+        outTag->resize(newStr.toUtf8().size());
+        memcpy(outTag->data(),newStr.data(),newStr.toUtf8().size());
+        printIfVerbose("Experimenter changed: " +
+                       QString(inTag->data()) + " -> " + newStr);
         break;
     }
     case FIFF_SUBJ_LAST_NAME:
     {
+        QString inStr = inTag->toString();
+        QString newStr(m_sDfltSubjectLastName);
+        outTag->resize(newStr.toUtf8().size());
+        memcpy(outTag->data(),newStr.data(),newStr.toUtf8().size());
+        printIfVerbose("Experimenter changed: " +
+                       QString(inTag->data()) + " -> " + newStr);
         break;
     }
     case FIFF_SUBJ_BIRTH_DAY:
     {
-        QDateTime inBirthday(QDate::fromJulianDay(*inTag->toJulian()));
+        QDateTime inBirthday(QDate::toJulianDay(*inTag->toJulian));
         QDateTime outBirthday;
         
         if(m_bUseSubjectBirthdayOffset)
