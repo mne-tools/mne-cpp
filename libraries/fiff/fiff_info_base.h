@@ -197,7 +197,13 @@ public:
     *
     * @return the selector matrix (row vector)
     */
-    RowVectorXi pick_types(bool meg, bool eeg = false, bool stim = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+    RowVectorXi pick_types(bool meg,
+                           bool eeg = false,
+                           bool stim = false,
+                           const QStringList& include = defaultQStringList,
+                           const QStringList& exclude = defaultQStringList) const;
+
+    friend bool operator== (const FiffInfoBase &f1, const FiffInfoBase &f2);
 
 public:
     QString filename;           /**< Filename when the info is read of a fiff file. */
