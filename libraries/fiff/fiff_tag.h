@@ -281,11 +281,20 @@ public:
 
     //=========================================================================================================
     /**
-     * to Float
-     * Fast access; Data are deleted if tag gets deleted, and wise versa
-     *
-     * @return type cast of the tag data pointer
-     */
+    * to Julian
+    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    *
+    * @return type cast of the tag data pointer
+    */
+    inline qint64* toJulian() const;
+
+    //=========================================================================================================
+    /**
+    * to Float
+    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    *
+    * @return type cast of the tag data pointer
+    */
     inline float* toFloat() const;
 
     //=========================================================================================================
@@ -590,6 +599,19 @@ inline qint32* FiffTag::toInt() const
     }
     else
         return (qint32*)this->data();
+}
+
+
+//*************************************************************************************************************
+
+inline qint64* FiffTag::toJulian() const
+{
+    if(this->isMatrix() || this->getType() != FIFFT_JULIAN) {
+        printf("Expected a julian tag : %d (found data type %d instead)\n",this->kind,this->getType());
+        return NULL;
+    }
+    else
+        return (qint64*)this->data();
 }
 
 
