@@ -339,7 +339,7 @@ int FiffAnonymizer::anonymizeFile()
     {
         printIfVerbose("Input file finished. All tags have been correctly anonymized.");
     } else {
-        qCritical() << "FiffAnonymizer::run - Problem closeing the output file: " << m_fFileOut.fileName();
+        qCritical() << "FiffAnonymizer::run - Problem closing the output file: " << m_fFileOut.fileName();
     }
     
     if(checkDeleteInputFile())
@@ -715,9 +715,7 @@ void FiffAnonymizer::setFileIn(const QString &sFileIn)
 {
     m_sFileNameIn = sFileIn;
     m_fFileIn.setFileName(sFileIn);
-    qDebug() << "testing if shit happens: " << m_fFileIn.exists();
 }
-
 
 
 //*************************************************************************************************************
@@ -743,6 +741,7 @@ void FiffAnonymizer::setFileOut(const QString &sFileOut)
     }
     m_fFileOut.setFileName(m_sFileNameOut);
 }
+
 
 //*************************************************************************************************************
 
@@ -834,10 +833,10 @@ void FiffAnonymizer::setDeleteInputFileAfterConfirmation(bool dc)
 
 QString FiffAnonymizer::generateRandomFileName()
 {
-    const QString charPool("abcdefghijklmnopqrstuvwxyz");
-    const int randomFileNameLength(8);
     QString randomFileName("mne_anonymize_");
-    for(int i=0;i<randomFileNameLength;++i)
+    const QString charPool("abcdefghijklmnopqrstuvwxyz1234567890");
+    const int randomLength(8);
+    for(int i=0;i<randomLength;++i)
     {
         int p=qrand() % charPool.length();
         randomFileName.append(charPool.at(p));
