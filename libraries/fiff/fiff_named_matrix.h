@@ -173,6 +173,15 @@ public:
     */
     friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatrix &p_FiffNamedMatrix);
 
+    /**
+    * Overloaded == operator to compare an object to this instance.
+    *
+    * @param[in] object    The object whisch should be compared to.
+    *
+    * @return true if equal, false otherwise
+    */
+    friend bool operator== (const FiffNamedMatrix &a, const FiffNamedMatrix &b);
+
 public:
     fiff_int_t nrow;        /**< Number of rows */
     fiff_int_t  ncol;       /**< Number of columns */
@@ -296,6 +305,18 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatri
     }
 
     return out;
+}
+
+
+//*************************************************************************************************************
+
+inline bool operator== (const FiffNamedMatrix &a, const FiffNamedMatrix &b)
+{
+    return (a.nrow == b.nrow &&
+            a.ncol == b.ncol &&
+            a.row_names == b.row_names &&
+            a.col_names == b.col_names &&
+            a.data == b.data);
 }
 
 } // NAMESPACE

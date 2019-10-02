@@ -95,3 +95,4 @@ FiffChInfo::~FiffChInfo()
 {
 
 }
+

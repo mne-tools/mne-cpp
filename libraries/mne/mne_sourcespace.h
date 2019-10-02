@@ -295,6 +295,15 @@ public:
     */
     const MNEHemisphere& operator[] (QString idt) const;
 
+    /**
+    * Overloaded == operator to compare an object to this instance.
+    *
+    * @param[in] object    The object whisch should be compared to.
+    *
+    * @return true if equal, false otherwise
+    */
+    friend bool operator== (const MNESourceSpace &a, const MNESourceSpace &b);
+
 private:
 
     //=========================================================================================================
@@ -343,6 +352,14 @@ inline bool MNESourceSpace::isEmpty() const
 inline qint32 MNESourceSpace::size() const
 {
     return m_qListHemispheres.size();
+}
+
+
+//*************************************************************************************************************
+
+inline bool operator== (const MNESourceSpace &a, const MNESourceSpace &b)
+{
+    //return (a.m_qListHemispheres == b.m_qListHemispheres);
 }
 
 } // NAMESPACE

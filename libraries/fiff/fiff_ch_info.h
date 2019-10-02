@@ -119,6 +119,16 @@ public:
     */
     inline static qint32 storageSize();
 
+    //=========================================================================================================
+    /**
+    * Overloaded == operator to compare an object to this instance.
+    *
+    * @param[in] object    The object whisch should be compared to.
+    *
+    * @return true if equal, false otherwise
+    */
+    friend bool operator== (const FiffChInfo &a, const FiffChInfo &b);
+
 public:
     fiff_int_t    scanNo;       /**< Scanning order number 1*/
     fiff_int_t    logNo;        /**< Logical channel # 1*/
@@ -162,6 +172,25 @@ inline qint32 FiffChInfo::storageSize()
 {
     return 96;
 }
+
+
+//*************************************************************************************************************
+
+inline bool operator== (const FiffChInfo &a, const FiffChInfo &b)
+{
+    return (a.scanNo == b.scanNo &&
+            a.logNo == b.logNo &&
+            a.kind == b.kind &&
+            a.range == b.range &&
+            a.cal == b.cal &&
+            a.chpos == b.chpos &&
+            a.unit == b.unit &&
+            a.unit_mul == b.unit_mul &&
+            a.coil_trans == b.coil_trans &&
+            a.eeg_loc == b.eeg_loc &&
+            a.coord_frame == b.coord_frame);
+}
+
 
 } // NAMESPACE
 

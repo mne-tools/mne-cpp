@@ -184,6 +184,17 @@ inline qint32 FiffId::storageSize()
     return 20;
 }
 
+
+//*************************************************************************************************************
+
+inline bool operator== (const FiffId &a, const FiffId &b)
+{
+    return (a.version == b.version &&
+            a.machid == b.machid &&
+            a.time.secs == b.time.secs &&
+            a.time.usecs == b.time.usecs);
+}
+
 } // NAMESPACE
 
 #endif // FIFF_ID_H
