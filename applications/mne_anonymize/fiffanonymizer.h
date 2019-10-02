@@ -410,7 +410,7 @@ private:
     int m_iDfltSubjectWeight;           /**< */
     int m_iDfltSubjectHeight;           /**< */
     QString m_sDfltSubjectComment;      /**< */
-    int m_iDfltSubjectHisId;            /**< */
+    QString m_sDfltSubjectHisId;        /**< */
 
     int m_iDfltProjectId;               /**< */
     QString m_sDfltProjectName;         /**< */
@@ -445,13 +445,14 @@ inline void FiffAnonymizer::printIfVerbose(const QString str, bool sameLine)
 {
     if(m_bVerboseMode)
     {
-        QDebug * dbg;
-        if(!sameLine)
-        {
-            m_printInSameLineHelper = qDebug();
-        }
-        dbg = &m_printInSameLineHelper;
-        *dbg << str;
+//        QDebug * dbg;
+//        if(!sameLine)
+//        {
+//            m_printInSameLineHelper = qDebug();
+//        }
+//        dbg = &m_printInSameLineHelper;
+//        *dbg << str;
+        qDebug() << str;
     }
 }
 
