@@ -534,6 +534,24 @@ private:
 
 //    std::complex<double>* m_pComplexDoubleData;
 
+// ### OLD STRUCT ###
+//typedef struct _fiffTagRec {
+//    fiff_int_t  kind;		/**< Tag number.
+//                 *   This defines the meaning of the item */
+//    fiff_int_t  type;		/**< Data type.
+//                 *   This defines the reperentation of the data. */
+//    fiff_int_t  size;		/**< Size of the data.
+//                 *   The size is given in bytes and defines the
+//                 *   total size of the data. */
+//    fiff_int_t  next;		/**< Pointer to the next object.
+//                 *   Zero if the object follows
+//                 *   sequentially in file.
+//                 *   Negative at the end of file */
+//    fiff_data_t *data;		/**< Pointer to the data.
+//                 *   This point to the data read or to be written. */
+//} *fiffTag,fiffTagRec;   /**< FIFF data tag */
+
+
 };
 
 //*************************************************************************************************************
