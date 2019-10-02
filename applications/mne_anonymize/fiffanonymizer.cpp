@@ -107,7 +107,7 @@ FiffAnonymizer::FiffAnonymizer()
 , m_iDfltSubjectWeight(0)
 , m_iDfltSubjectHeight(0)
 , m_sDfltSubjectComment(m_sDfltString)
-, m_iDfltSubjectHisId(0)
+, m_sDfltSubjectHisId("mne_anonymize")
 , m_iDfltProjectId(0)
 , m_sDfltProjectName(m_sDfltString)
 , m_sDfltProjectAim(m_sDfltString)
@@ -168,7 +168,7 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_iDfltSubjectWeight(obj.m_iDfltSubjectWeight)
 , m_iDfltSubjectHeight(obj.m_iDfltSubjectHeight)
 , m_sDfltSubjectComment(obj.m_sDfltSubjectComment)
-, m_iDfltSubjectHisId(obj.m_iDfltSubjectHisId)
+, m_sDfltSubjectHisId(obj.m_sDfltSubjectHisId)
 , m_iDfltProjectId(obj.m_iDfltProjectId)
 , m_sDfltProjectName(obj.m_sDfltProjectName)
 , m_sDfltProjectAim(obj.m_sDfltProjectAim)
@@ -227,7 +227,7 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_iDfltSubjectWeight(obj.m_iDfltSubjectWeight)
 , m_iDfltSubjectHeight(obj.m_iDfltSubjectHeight)
 , m_sDfltSubjectComment(obj.m_sDfltSubjectComment)
-, m_iDfltSubjectHisId(obj.m_iDfltSubjectHisId)
+, m_sDfltSubjectHisId(obj.m_sDfltSubjectHisId)
 , m_iDfltProjectId(obj.m_iDfltProjectId)
 , m_sDfltProjectName(obj.m_sDfltProjectName)
 , m_sDfltProjectAim(obj.m_sDfltProjectAim)
@@ -251,7 +251,7 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 int FiffAnonymizer::anonymizeFile()
 {
     printIfVerbose(" ");
-    printIfVerbose("----------------------------------------------------------------------------");
+    printIfVerbose("-------------------------------------------------------------------------------------------");
     printIfVerbose(" ");
     printIfVerbose(name);
     printIfVerbose(description);
@@ -306,6 +306,7 @@ int FiffAnonymizer::anonymizeFile()
 
     //we build the tag directory on the go
     addEntryToDir(pOutTag,outStream.device()->pos());
+    FiffTag::convert_tag_data(pOutTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
     outStream.write_tag(pOutTag);
 
     while(pInTag->next != -1)
@@ -320,6 +321,7 @@ int FiffAnonymizer::anonymizeFile()
             pOutTag->next = 0;
         }
         addEntryToDir(pOutTag,outStream.device()->pos());
+        FiffTag::convert_tag_data(pOutTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
         outStream.write_tag(pOutTag);
     }
 
@@ -388,7 +390,9 @@ bool FiffAnonymizer::checkValidFiffFormatVersion(FiffTag::SPtr pTag)
         int inMinorVersion = (static_cast<uint32_t>(fileId.version) & 0x0000FFFF);
         double inVersion = inMayorVersion + inMinorVersion/10.;
         if(inVersion > maxValidFiffVerion)
+        {
             return false;
+        }
     }
     return true;
 }
@@ -546,7 +550,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     case FIFF_REF_BLOCK_ID:
     {
         FiffId inId = inTag->toFiffID();
-        QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs).date());
+        QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs);
         QDateTime outMeasDate;
         if(m_bUseMeasurementDayOffset)
         {
@@ -571,26 +575,24 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
 
         outTag->resize(fiffIdSize*sizeof(fiff_int_t));
         memcpy(outTag->data(),reinterpret_cast<char*>(outData),fiffIdSize*sizeof(fiff_int_t));
-        //qDebug() << "MAC address changed: " + inId.toMachidString() + " -> "  + outId.toMachidString();
         printIfVerbose("MAC address changed: " + inId.toMachidString() + " -> "  + outId.toMachidString());
         printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
         break;
     }
     case FIFF_MEAS_DATE:
     {
-        QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*inTag->toInt()).date());
+        QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*inTag->toInt()));
         QDateTime outMeasDate;
-
         if(m_bUseMeasurementDayOffset)
         {
-            outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
+            outMeasDate = QDateTime(inMeasDate.date()).addDays(-m_iMeasurementDayOffset);
         } else {
             outMeasDate = m_dateMeasurmentDate;
         }
 
         fiff_int_t outData[1];
         outData[0]=static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
-        memcpy(outTag->data(),reinterpret_cast<char*>(outData),1);
+        memcpy(outTag->data(),reinterpret_cast<char*>(outData),sizeof(fiff_int_t));
         printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
         break;
     }
@@ -600,8 +602,8 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         {
             QString inStr = inTag->toString();
             QString newStr(m_sDfltString);
-            outTag->resize(newStr.toUtf8().size());
-            memcpy(outTag->data(),newStr.data(),static_cast<size_t>(newStr.toUtf8().size()));
+            outTag->resize(newStr.size());
+            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
             printIfVerbose("Description of the measurement block changed: " +
                            QString(inTag->data()) + " -> " + newStr);
         }
@@ -611,10 +613,9 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         QString inStr = inTag->toString();
         QString newStr(m_sDfltString);
-        outTag->resize(newStr.toUtf8().size());
-        memcpy(outTag->data(),newStr.data(),static_cast<size_t>(newStr.toUtf8().size()));
-        printIfVerbose("Experimenter changed: " +
-                       QString(inTag->data()) + " -> " + newStr);
+        outTag->resize(newStr.size());
+        memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
+        printIfVerbose("Experimenter changed: " + QString(inTag->data()) + " -> " + newStr);
         break;
     }
     case FIFF_SUBJ_ID:
@@ -630,8 +631,8 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         QString inStr(inTag->toString());
         QString newStr(m_sDfltSubjectFirstName);
-        outTag->resize(newStr.toUtf8().size());
-        memcpy(outTag->data(),newStr.data(),static_cast<size_t>(newStr.toUtf8().size()));
+        outTag->resize(newStr.size());
+        memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Experimenter changed: " +
                        QString(inTag->data()) + " -> " + newStr);
         break;
@@ -640,8 +641,8 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         QString inStr(inTag->toString());
         QString newStr(m_sDfltSubjectMidName);
-        outTag->resize(newStr.toUtf8().size());
-        memcpy(outTag->data(),newStr.data(),static_cast<size_t>(newStr.toUtf8().size()));
+        outTag->resize(newStr.size());
+        memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Experimenter changed: " +
                        QString(inTag->data()) + " -> " + newStr);
         break;
@@ -650,8 +651,8 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         QString inStr(inTag->toString());
         QString newStr(m_sDfltSubjectLastName);
-        outTag->resize(newStr.toUtf8().size());
-        memcpy(outTag->data(),newStr.data(),static_cast<size_t>(newStr.toUtf8().size()));
+        outTag->resize(newStr.size());
+        memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Experimenter changed: " +
                        QString(inTag->data()) + " -> " + newStr);
         break;
@@ -670,7 +671,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
 
         fiff_int_t outData[1];
         outData[0] = static_cast<int32_t> (outBirthday.toSecsSinceEpoch());
-        memcpy(outTag->data(),reinterpret_cast<char*>(outData),1);
+        memcpy(outTag->data(),reinterpret_cast<char*>(outData),sizeof(fiff_int_t));
         break;
     }
     case FIFF_SUBJ_WEIGHT:
@@ -679,7 +680,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         float outWeight(m_iDfltSubjectWeight);
         memcpy(outTag->data(),&outWeight,sizeof(float));
         printIfVerbose("Subject's weight changed from: " +
-                       QString::number(static_cast<int>(inWeight)) + " -> " + QString::number(static_cast<int>(outWeight)));
+                       QString::number(static_cast<double>(inWeight)) + " -> " + QString::number(static_cast<double>(outWeight)));
         break;
     }
     case FIFF_SUBJ_HEIGHT:
@@ -688,15 +689,15 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         float outHeight(m_iDfltSubjectHeight);
         memcpy(outTag->data(),&outHeight,sizeof(float));
         printIfVerbose("Subject's Height changed from: " +
-                       QString::number(static_cast<int>(inHeight)) + " -> " + QString::number(static_cast<int>(outHeight)));
+                       QString::number(static_cast<double>(inHeight)) + " -> " + QString::number(static_cast<double>(outHeight)));
         break;
     }
     case FIFF_SUBJ_COMMENT:
     {
         QString inStr(inTag->toString());
         QString newStr(m_sDfltSubjectComment);
-        outTag->resize(newStr.toUtf8().size());
-        memcpy(outTag->data(),newStr.data(),static_cast<size_t>(newStr.toUtf8().size()));
+        outTag->resize(newStr.size());
+        memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Subject Comment changed: " +
                        QString(inTag->data()) + " -> " + newStr);
         break;
@@ -704,15 +705,17 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     case FIFF_SUBJ_HIS_ID:
     {
         QString inSubjectHisId(inTag->data());
-        memcpy(outTag->data(),reinterpret_cast<char*>(&m_iDfltSubjectHisId),sizeof(int));
-        printIfVerbose("Subject Hospital-ID changed:" + inSubjectHisId + " -> " + QString::number(m_iDfltSubjectId));
+        QString newSubjectHisId(m_sDfltSubjectHisId);
+        outTag->resize(newSubjectHisId.size());
+        memcpy(outTag->data(),newSubjectHisId.toUtf8(),static_cast<size_t>(newSubjectHisId.size()));
+        printIfVerbose("Subject Hospital-ID changed:" + inSubjectHisId + " -> " + newSubjectHisId);
         break;
     }
     case FIFF_PROJ_ID:
     {
         qint32 inProjID(*inTag->toInt());
         qint32 newProjID(m_iDfltProjectId);
-        memcpy(outTag->data(),&newProjID, sizeof(qint32));
+        memcpy(outTag->data(),&newProjID,sizeof(qint32));
         printIfVerbose("ProjectID changed: " +
                        QString::number(inProjID) + " -> " + QString::number(newProjID));
         break;
@@ -721,8 +724,8 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         QString inStr(inTag->toString());
         QString newStr(m_sDfltProjectName);
-        outTag->resize(newStr.toUtf8().size());
-        memcpy(outTag->data(),newStr.data(),static_cast<size_t>(newStr.toUtf8().size()));
+        outTag->resize(newStr.size());
+        memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Project name changed: " +
                        QString(inTag->data()) + " -> " + newStr);
         break;
@@ -731,8 +734,8 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         QString inStr(inTag->toString());
         QString newStr(m_sDfltProjectAim);
-        outTag->resize(newStr.toUtf8().size());
-        memcpy(outTag->data(),newStr.data(),static_cast<size_t>(newStr.toUtf8().size()));
+        outTag->resize(newStr.size());
+        memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Project Aim changed: " +
                        QString(inTag->data()) + " -> " + newStr);
         break;
@@ -741,8 +744,8 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         QString inStr(inTag->toString());
         QString newStr(m_sDfltProjectPersons);
-        outTag->resize(newStr.toUtf8().size());
-        memcpy(outTag->data(),newStr.data(),static_cast<size_t>(newStr.toUtf8().size()));
+        outTag->resize(newStr.size());
+        memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Project Persons changed: " +
                        QString(inTag->data()) + " -> " + newStr);
         break;
@@ -751,20 +754,23 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         QString inStr(inTag->toString());
         QString newStr(m_sDfltProjectComment);
-        outTag->resize(newStr.toUtf8().size());
-        memcpy(outTag->data(),newStr.data(),static_cast<size_t>(newStr.toUtf8().size()));
+        outTag->resize(newStr.size());
+        memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Project comment changed: " +
                        QString(inTag->data()) + " -> " + newStr);
         break;
     }
     case FIFF_MRI_PIXEL_DATA:
     {
-        //        disp(' ');
-        //        disp('WARNING. The input fif file contains MRI data.');
-        //        disp('Beware that a subject''s face can be reconstructed from it');
-        //        disp('This software can not anonymize MRI data, at the moment.');
-        //        disp('Contanct the authors for more information.');
-        //        disp(' ');
+        if(!m_bQuietMode)
+        {
+            qDebug() << " ";
+            qDebug() << "WARNING. The input fif file contains MRI data.";
+            qDebug() << "Beware that a subject''s face can be reconstructed from it";
+            qDebug() << "This software can not anonymize MRI data, at the moment.";
+            qDebug() << "Contanct the authors for more information.";
+            qDebug() << " ";
+        }
         break;
     }
     default:
@@ -980,6 +986,6 @@ void FiffAnonymizer::renameOutputFileAsInputFile()
 
 void FiffAnonymizer::setSubjectHisId(int id)
 {
-    m_iDfltSubjectHisId = id;
+    m_sDfltSubjectHisId = id;
 }
 
