@@ -352,6 +352,12 @@ int FiffAnonymizer::anonymizeFile()
         renameOutputFileAsInputFile();
     }
 
+//    disp(['Fiff_anonymizer finished correctly: ' opts.inputFile ' -> ' opts.outputFile]);
+    if(!m_bQuietMode)
+    {
+        qDebug() << "MNE Fiff Anonymize finished correctly: " + QFileInfo(m_fFileIn).fileName() + " -> " + QFileInfo(m_fFileOut).fileName();
+    }
+
     printIfVerbose(" ");
     printIfVerbose("----------------------------------------------------------------------------");
     printIfVerbose(" ");
@@ -673,11 +679,14 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_WEIGHT:
     {
-        float inWeight(*inTag->toFloat());
-        float outWeight(m_iDfltSubjectWeight);
-        memcpy(outTag->data(),&outWeight,sizeof(float));
-        printIfVerbose("Subject's weight changed from: " +
-                       QString::number(static_cast<double>(inWeight)) + " -> " + QString::number(static_cast<double>(outWeight)));
+        if(m_bBruteMode)
+        {
+            float inWeight(*inTag->toFloat());
+            float outWeight(m_iDfltSubjectWeight);
+            memcpy(outTag->data(),&outWeight,sizeof(float));
+            printIfVerbose("Subject's weight changed from: " +
+                           QString::number(static_cast<double>(inWeight)) + " -> " + QString::number(static_cast<double>(outWeight)));
+        }
         break;
     }
     case FIFF_SUBJ_HEIGHT:
