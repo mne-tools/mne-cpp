@@ -45,6 +45,20 @@
 #include "compute_fwd_settings.h"
 
 
+#include <fiff/c/fiff_coord_trans_old.h>
+#include "../fwd_coil_set.h"
+#include <mne/c/mne_ctf_comp_data_set.h>
+#include "../fwd_eeg_sphere_model_set.h"
+#include "../fwd_bem_model.h"
+#include <mne/c/mne_named_matrix.h>
+#include <mne/c/mne_nearest.h>
+#include <mne/c/mne_source_space_old.h>
+
+#include <fiff/c/fiff_sparse_matrix.h>
+
+#include <fiff/fiff_types.h>
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -60,6 +74,10 @@
 
 #include <QSharedPointer>
 #include <QString>
+
+#include <QCoreApplication>
+#include <QFile>
+#include <QDir>
 
 
 //*************************************************************************************************************
@@ -101,7 +119,45 @@ public:
     virtual ~ComputeFwd();
 
     //ToDo split this function into init (with settings as parameter) and the actual fit function
-    void calculateFwd() const;
+    void calculateFwd();
+
+    // TODO: This only temporary until we have the fwd dlibrary refactored. This is only done in order to provide easy testing in test_forward_solution.
+    bool                res = false;
+    MNELIB::MneSourceSpaceOld*  *spaces = NULL;  /* The source spaces */
+    int                 nspace  = 0;
+    int                 nsource = 0;     /* Number of source space points */
+
+    FIFFLIB::FiffCoordTransOld* mri_head_t = NULL;   /* MRI <-> head coordinate transformation */
+    FIFFLIB::FiffCoordTransOld* meg_head_t = NULL;   /* MEG <-> head coordinate transformation */
+
+    FIFFLIB::fiffChInfo     megchs   = NULL; /* The MEG channel information */
+    int            nmeg     = 0;
+    FIFFLIB::fiffChInfo     eegchs   = NULL; /* The EEG channel information */
+    int            neeg     = 0;
+    FIFFLIB::fiffChInfo     compchs = NULL;
+    int            ncomp    = 0;
+
+    FwdCoilSet*             megcoils = NULL;     /* The coil descriptions */
+    FwdCoilSet*             compcoils = NULL;    /* MEG compensation coils */
+    MNELIB::MneCTFCompDataSet*      comp_data  = NULL;
+    FwdCoilSet*             eegels = NULL;
+    FwdEegSphereModelSet*   eeg_models = NULL;
+
+    MNELIB::MneNamedMatrix* meg_forward      = NULL;    /* Result of the MEG forward calculation */
+    MNELIB::MneNamedMatrix* eeg_forward      = NULL;    /* Result of the EEG forward calculation */
+    MNELIB::MneNamedMatrix* meg_forward_grad = NULL;    /* Result of the MEG forward gradient calculation */
+    MNELIB::MneNamedMatrix* eeg_forward_grad = NULL;    /* Result of the EEG forward gradient calculation */
+    int            k;
+    FIFFLIB::fiffId         mri_id  = NULL;
+    FIFFLIB::fiffId         meas_id = NULL;
+    FILE           *out = NULL;     /* Output filtered points here */
+
+    FwdCoilSet*       templates = NULL;
+    FwdEegSphereModel* eeg_model = NULL;
+    FwdBemModel*       bem_model = NULL;
+
+    QString qPath;
+    QFile file;
 
 private:
     ComputeFwdSettings* settings;
