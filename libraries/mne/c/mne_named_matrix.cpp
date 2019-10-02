@@ -171,7 +171,11 @@ MneNamedMatrix::~MneNamedMatrix()
 
 //*************************************************************************************************************
 
-MneNamedMatrix *MneNamedMatrix::build_named_matrix(int nrow, int ncol, const QStringList& rowlist, const QStringList& collist, float **data)
+MneNamedMatrix *MneNamedMatrix::build_named_matrix(int nrow,
+                                                   int ncol,
+                                                   const QStringList& rowlist,
+                                                   const QStringList& collist,
+                                                   float **data)
 {
     MneNamedMatrix* mat = new MneNamedMatrix;
     mat->nrow    = nrow;
