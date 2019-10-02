@@ -356,7 +356,7 @@ int FiffAnonymizer::anonymizeFile()
     printIfVerbose(" ");
     printIfVerbose("----------------------------------------------------------------------------");
     printIfVerbose(" ");
-    printIfVerbose(" "); //Note that this line will actually never be printed.
+    printIfVerbose(" ");
 
     return 0;
 }
@@ -571,8 +571,8 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
 
         outTag->resize(fiffIdSize*sizeof(fiff_int_t));
         memcpy(outTag->data(),reinterpret_cast<char*>(outData),fiffIdSize*sizeof(fiff_int_t));
-        qDebug() << "MAC address changed: " + inId.toMachidString() + " -> "  + outId.toMachidString();
-        //printIfVerbose("MAC address changed: " + inId.toMachidString() + " -> "  + outId.toMachidString());
+        //qDebug() << "MAC address changed: " + inId.toMachidString() + " -> "  + outId.toMachidString();
+        printIfVerbose("MAC address changed: " + inId.toMachidString() + " -> "  + outId.toMachidString());
         printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
         break;
     }
