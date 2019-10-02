@@ -334,7 +334,8 @@ private:
     * @param [in] String to print.
     * @param [in] bool value to indicate if the message should be printed to the same line as the previous message.
     */
-    void printIfVerbose(const QString str,bool sameLine=false);
+    //void printIfVerbose(const QString str,bool sameLine=false);
+    void printIfVerbose(const QString str);
 
     //=========================================================================================================
     /**
@@ -441,7 +442,8 @@ private:
 
 //=========================================================================================================
 
-inline void FiffAnonymizer::printIfVerbose(const QString str, bool sameLine)
+//inline void FiffAnonymizer::printIfVerbose(const QString str, bool sameLine)
+inline void FiffAnonymizer::printIfVerbose(const QString str)
 {
     if(m_bVerboseMode)
     {
