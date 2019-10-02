@@ -84,6 +84,7 @@ namespace FIFFLIB
 */
 class FIFFSHARED_EXPORT FiffInfoBase
 {
+
 public:
     typedef QSharedPointer<FiffInfoBase> SPtr;              /**< Shared pointer type for FiffInfoBase. */
     typedef QSharedPointer<const FiffInfoBase> ConstSPtr;   /**< Const shared pointer type for FiffInfoBase. */
@@ -203,7 +204,14 @@ public:
                            const QStringList& include = defaultQStringList,
                            const QStringList& exclude = defaultQStringList) const;
 
-    friend bool operator== (const FiffInfoBase &f1, const FiffInfoBase &f2);
+    /**
+    * Overloaded == operator to compare an object to this instance.
+    *
+    * @param[in] object    The object whisch should be compared to.
+    *
+    * @return true if equal, false otherwise
+    */
+    friend bool operator== (const FiffInfoBase &a, const FiffInfoBase &b);
 
 public:
     QString filename;           /**< Filename when the info is read of a fiff file. */
@@ -225,6 +233,22 @@ inline bool FiffInfoBase::isEmpty() const
 {
     return this->nchan <= 0;
 }
+
+
+//*************************************************************************************************************
+
+inline bool operator== (const FiffInfoBase &a, const FiffInfoBase &b)
+{
+    return (a.filename == b.filename &&
+            a.bads == b.bads &&
+            a.meas_id == b.meas_id &&
+            a.nchan == b.nchan &&
+            a.chs == b.chs &&
+            a.ch_names == b.ch_names &&
+            a.dev_head_t == b.dev_head_t &&
+            a.ctf_head_t == b.ctf_head_t);
+}
+
 
 } // NAMESPACE
 

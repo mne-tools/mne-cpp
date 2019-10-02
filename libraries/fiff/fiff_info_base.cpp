@@ -209,21 +209,6 @@ RowVectorXi FiffInfoBase::pick_types(bool meg, bool eeg, bool stim, const QStrin
 
 //*************************************************************************************************************
 
-bool FiffInfoBase::operator == (const FiffInfoBase &f1, const FiffInfoBase &f2)
-{
-    return (f1.filename == f2.filename &&
-            f1.bads == f2.bads &&
-            f1.meas_id == f2.meas_id &&
-            f1.nchan == f2.nchan &&
-            f1.chs == f2.chs &&
-            f1.ch_names == f2.ch_names &&
-            f1.dev_head_t == f2.dev_head_t &&
-            f1.ctf_head_t == f2.ctf_head_t);
-}
-
-
-//*************************************************************************************************************
-
 RowVectorXi FiffInfoBase::pick_channels(const QStringList& ch_names, const QStringList& include, const QStringList& exclude)
 {
     RowVectorXi sel = RowVectorXi::Zero(ch_names.size());

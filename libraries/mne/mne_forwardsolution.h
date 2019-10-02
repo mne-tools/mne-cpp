@@ -489,6 +489,15 @@ public:
     */
     friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution);
 
+    /**
+    * Overloaded == operator to compare an object to this instance.
+    *
+    * @param[in] object    The object whisch should be compared to.
+    *
+    * @return true if equal, false otherwise
+    */
+    friend bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b);
+
     //=========================================================================================================
     /**
     * Returns the positions of the specified sources based on their beloning labels
@@ -571,6 +580,25 @@ inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolut
     out << "\n sol_grad:\n\t" << *p_MNEForwardSolution.sol_grad.data() << std::endl;
 
     return out;
+}
+
+
+//*************************************************************************************************************
+
+inline bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b)
+{
+    return (a.info == b.info &&
+            a.source_ori == b.source_ori &&
+            a.surf_ori == b.surf_ori &&
+            a.coord_frame == b.coord_frame &&
+            a.nsource == b.nsource &&
+            a.nchan == b.nchan &&
+            a.sol == b.sol &&
+            a.sol_grad == b.sol_grad &&
+            a.mri_head_t == b.mri_head_t &&
+            //a.src == b.src &&
+            a.source_rr == b.source_rr &&
+            a.source_nn == b.source_nn);
 }
 
 } // NAMESPACE

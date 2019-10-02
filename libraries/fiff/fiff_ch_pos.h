@@ -107,6 +107,16 @@ public:
     */
     inline static qint32 storageSize();
 
+    //=========================================================================================================
+    /**
+    * Overloaded == operator to compare an object to this instance.
+    *
+    * @param[in] object    The object whisch should be compared to.
+    *
+    * @return true if equal, false otherwise
+    */
+    friend bool operator== (const FiffChPos &a, const FiffChPos &b);
+
 public:
     fiff_int_t   coil_type; /**< What kind of coil. */
     Eigen::Vector3f r0;     /**< Coil coordinate system origin */
@@ -137,6 +147,18 @@ inline qint32 FiffChPos::storageSize()
 {
     return 52;
 }
+
+//*************************************************************************************************************
+
+inline bool operator== (const FiffChPos &a, const FiffChPos &b)
+{
+    return (a.coil_type == b.coil_type &&
+            a.r0 == b.r0 &&
+            a.ex == b.ex &&
+            a.ey == b.ey &&
+            a.ez == b.ez);
+}
+
 
 } // NAMESPACE
 
