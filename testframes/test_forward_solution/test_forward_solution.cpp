@@ -158,18 +158,18 @@ void TestForwardSolution::compareForward()
 {
     qInfo(">>>>>>>>>>>>>>>>>>>>>>>>> Compare Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>");
 
+    // Read reference forward solution
+    QString fwdFileRef("./mne-cpp-test-data/Result/ref_sample_audvis-meg-oct-6-fwd.fif");
+    QFile fileForwardSolutionRef(fwdFileRef);
+    MNEForwardSolution fwdRef(fileForwardSolutionRef);
+
     // Read computed forward solution
     QString fwdFileNameComp("./mne-cpp-test-data/Result/sample_audvis-meg-oct-6-fwd.fif");
     QFile fileForwardSolutionComp(fwdFileNameComp);
     MNEForwardSolution fwdComp(fileForwardSolutionComp);
 
-    // Read reference forward solution
-    QString fwdFileRef("./mne-cpp-test-data/Result/ref-sample_audvis-meg-oct-6-fwd.fif");
-    QFile fileForwardSolutionRef(fwdFileRef);
-    MNEForwardSolution fwdRef(fileForwardSolutionRef);
-
     // Compare fwd solutions
-    Q_VERIFY(fwdRef == fwdComp);
+    QVERIFY(fwdRef == fwdComp);
 
     qInfo("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
