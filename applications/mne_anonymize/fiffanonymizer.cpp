@@ -261,20 +261,18 @@ int FiffAnonymizer::anonymizeFile()
     printIfVerbose(" ");
 
     FiffStream inStream(&m_fFileIn);
-    printIfVerbose("Input file: " + m_fFileIn.fileName());
     if(inStream.open(QIODevice::ReadOnly))
     {
-        printIfVerbose(" opened correctly.",m_bPrintInSameLine);
+        printIfVerbose("Input file opened correctly: " + m_fFileIn.fileName());
     } else {
         qCritical() << "FiffAnonymizer::run - Problem opening the input file: " << m_fFileIn.fileName();
         return 1;
     }
 
     FiffStream outStream(&m_fFileOut);
-    printIfVerbose("Output file: " + m_fFileOut.fileName());
     if(outStream.device()->open(QIODevice::ReadWrite))
     {
-        printIfVerbose(" opened correctly",m_bPrintInSameLine);
+        printIfVerbose("Output file opened correctly: " + m_fFileOut.fileName());
     } else {
         qCritical() << "FiffAnonymizer::run - Problem opening the output file: " << m_fFileOut.fileName();
         return 1;
@@ -284,7 +282,6 @@ int FiffAnonymizer::anonymizeFile()
     FiffTag::SPtr pOutTag = FiffTag::SPtr::create();
 
     inStream.read_tag(pInTag,0);
-    //    FiffTag::convert_tag_data(pInTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
 
     //info in a tag FIFF_COMMENT (206) depends on the type of block it is in. Therefore, in order to
     //anonymize it we not only have to know the kind of the current tag, but also which type of block
