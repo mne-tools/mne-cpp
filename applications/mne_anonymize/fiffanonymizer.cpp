@@ -302,7 +302,7 @@ int FiffAnonymizer::anonymizeFile()
         printIfVerbose("***");
     }
     censorTag(pOutTag,pInTag);
-    pOutTag->next = 0;
+    pOutTag->next = FIFFV_NEXT_SEQ;
     
     //we build the tag directory on the go
     addEntryToDir(pOutTag,outStream.device()->pos());
@@ -658,7 +658,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_BIRTH_DAY:
     {
-        QDateTime inBirthday(QDate::fromJulianDay(*inTag->toInt()));
+        QDateTime inBirthday(QDate::fromJulianDay(*inTag->toJulian()));
         QDateTime outBirthday;
         
         if(m_bUseSubjectBirthdayOffset)
