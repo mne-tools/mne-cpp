@@ -190,12 +190,6 @@ public:
 
     //ToDo write(IODevice &)
 
-    //=========================================================================================================
-    /**
-    * Qt 3d geometry information. Data are generated within first call.
-    */
-    //QGeometryData* getGeometryData(float p_fScaling = 1.0f);
-
 public:
     fiff_int_t type;            /**< Type of the source space: 1 = "surf" or 2 = "vol". ToDo not used yet. */
     fiff_int_t id;              /**< Id information */
