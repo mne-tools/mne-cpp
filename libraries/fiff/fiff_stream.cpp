@@ -315,7 +315,7 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
     //
     //   Read or create the directory tree
     //
-    printf("\nCreating tag directory for %s...", t_sFileName.toUtf8().constData());
+    //printf("\nCreating tag directory for %s...", t_sFileName.toUtf8().constData());
 
     m_dir.clear();
     qint32 dirpos = *t_pTag->toInt();
