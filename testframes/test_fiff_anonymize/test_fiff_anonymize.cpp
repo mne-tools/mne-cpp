@@ -123,6 +123,11 @@ void TestFiffAnonymize::initTestCase()
 void TestFiffAnonymize::compareData()
 {
     // Open ./mne-cpp-test-data/MEG/sample/sample_audvis_raw_anonymized.fif
+    QString inFileName("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_anonymized.fif");
+    QFile inFile(inFileName);
+    QByteArray inData(inFile.readAll());
+    quint16 crc = qChecksum(inData.data(),static_cast<uint>(inData.size()));
+    qDebug() << crc;
 
     // ToDo: Implement function which reads sensitive tags and checks if they were anaonymized. Use Q_VERIFY().
 }
