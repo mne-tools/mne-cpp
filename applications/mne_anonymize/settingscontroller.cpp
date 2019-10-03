@@ -153,9 +153,6 @@ void SettingsController::initParser()
     QCommandLineOption SubjectIdOpt("his",QCoreApplication::translate("main","Specify the Subject's Id# within the Hospital system. Only allowed when anonymizing a single file. "),
                                           QCoreApplication::translate("main","id#"));
     m_parser.addOption(SubjectIdOpt);
-
-
-
 }
 
 
