@@ -179,19 +179,11 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_printInSameLineHelper(qDebug())
 , m_bPrintInSameLine(true)
 {
-
     //    m_BDfltMAC.resize(8);
     //    memcpy(m_BDfltMAC.data(),obj.m_BDfltMAC.data(),8);
 
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>(*obj.m_pBlockTypeList));
-    //    m_pBlockTypeList->resize(obj.m_pBlockTypeList->size());
-    //    memcpy(m_pBlockTypeList->data(),obj.m_pBlockTypeList.data(),
-    //           static_cast<size_t>(obj.m_pBlockTypeList->size()));
-
     m_pOutDir = QSharedPointer<QVector<FiffDirEntry> >(new QVector<FiffDirEntry>);
-    //    m_pOutDir->resize(obj.m_pOutDir->size());
-    //    memcpy(m_pOutDir->data(),obj.m_pOutDir->data(),
-    //           static_cast<size_t>(obj.m_pOutDir->size()));
 }
 
 
@@ -261,8 +253,7 @@ int FiffAnonymizer::anonymizeFile()
     printIfVerbose(" ");
 
     FiffStream inStream(&m_fFileIn);
-    if(inStream.open(QIODevice::ReadOnly))
-    {
+    if(inStream.open(QIODevice::ReadOnly)) {
         printIfVerbose("Input file opened correctly: " + m_fFileIn.fileName());
     } else {
         qCritical() << "FiffAnonymizer::run - Problem opening the input file: " << m_fFileIn.fileName();
@@ -270,8 +261,7 @@ int FiffAnonymizer::anonymizeFile()
     }
 
     FiffStream outStream(&m_fFileOut);
-    if(outStream.device()->open(QIODevice::ReadWrite))
-    {
+    if(outStream.device()->open(QIODevice::WriteOnly)) {
         printIfVerbose("Output file opened correctly: " + m_fFileOut.fileName());
     } else {
         qCritical() << "FiffAnonymizer::run - Problem opening the output file: " << m_fFileOut.fileName();
@@ -290,8 +280,7 @@ int FiffAnonymizer::anonymizeFile()
     updateBlockTypeList(pInTag);
 
     printIfVerbose("Reading info in the file.");
-    if(checkValidFiffFormatVersion(pInTag))
-    {
+    if(checkValidFiffFormatVersion(pInTag)) {
         printIfVerbose("Input file compatible with this version of mne_fiffAnonymizer.");
     } else {
         printIfVerbose("***");
@@ -304,16 +293,16 @@ int FiffAnonymizer::anonymizeFile()
     //we build the tag directory on the go
     addEntryToDir(pOutTag,outStream.device()->pos());
     FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
-    outStream.write_tag(pOutTag);
+    outStream.write_tag(pOutTag, 0);
 
     // Set FIFF_DIR_POINTER tag to -1
     inStream.read_tag(pInTag);
     if (pInTag->kind != FIFF_DIR_POINTER) {
-        qCritical() << "FiffAnonymizer::run - Fiff::open: file does have a directory pointer: " << m_fFileOut.fileName();
+        qCritical() << "FiffAnonymizer::run - File does have a directory pointer: " << m_fFileOut.fileName();
         return 1;
     }
 
-    pOutTag->kind = pInTag->kind;
+    pOutTag->kind = FIFF_DIR_POINTER;
     pOutTag->type = pInTag->type;
     pOutTag->next = FIFFV_NEXT_SEQ;
     qint32 iFiffDirPos = -1;
@@ -323,8 +312,23 @@ int FiffAnonymizer::anonymizeFile()
     FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
     outStream.write_tag(pOutTag);
 
-    while(pInTag->next != -1)
-    {
+    // Set FIFF_FREE_LIST tag to -1
+    inStream.read_tag(pInTag);
+    if (pInTag->kind != FIFF_FREE_LIST) {
+        qCritical() << "FiffAnonymizer::run - File does have a free list pointer: " << m_fFileOut.fileName();
+        return 1;
+    }
+
+    pOutTag->kind = FIFF_FREE_LIST;
+    pOutTag->type = pInTag->type;
+    pOutTag->next = FIFFV_NEXT_SEQ;
+    pOutTag->resize(sizeof(iFiffDirPos));
+    memcpy(pOutTag->data(),&iFiffDirPos,sizeof(iFiffDirPos));
+    addEntryToDir(pOutTag,outStream.device()->pos());
+    FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
+    outStream.write_tag(pOutTag);
+
+    while(pInTag->next != -1) {
         inStream.read_tag(pInTag);
 
         updateBlockTypeList(pInTag);
@@ -340,8 +344,7 @@ int FiffAnonymizer::anonymizeFile()
         outStream.write_tag(pOutTag);
     }
 
-    if(inStream.close())
-    {
+    if(inStream.close()) {
         printIfVerbose("Input file closed. All tags have been correctly anonymized.");
     } else {
         qCritical() << "FiffAnonymizer::run - Problem closing the input file: " << m_fFileIn.fileName();
@@ -353,26 +356,22 @@ int FiffAnonymizer::anonymizeFile()
 //    updatePointer(&outStream,FIFF_DIR_POINTER,posOfDirectory);
     updatePointer(&outStream,FIFF_FREE_LIST,-1);
 
-    if(outStream.close())
-    {
+    if(outStream.close()) {
         printIfVerbose("Output file closed. All tags have been correctly anonymized.");
     } else {
         qCritical() << "FiffAnonymizer::run - Problem closing the output file: " << m_fFileOut.fileName();
     }
 
-    if(checkDeleteInputFile())
-    {
+    if(checkDeleteInputFile()) {
         deleteInputFile();
     }
 
-    if(checkRenameOutputFile())
-    {
+    if(checkRenameOutputFile()) {
         renameOutputFileAsInputFile();
     }
 
 //    disp(['Fiff_anonymizer finished correctly: ' opts.inputFile ' -> ' opts.outputFile]);
-    if(!m_bQuietMode)
-    {
+    if(!m_bQuietMode) {
         qDebug() << "MNE Fiff Anonymize finished correctly: " + QFileInfo(m_fFileIn).fileName() + " -> " + QFileInfo(m_fFileOut).fileName();
     }
 
@@ -389,12 +388,10 @@ int FiffAnonymizer::anonymizeFile()
 
 void FiffAnonymizer::updateBlockTypeList(FiffTag::SPtr pTag)
 {
-    if(pTag->kind == FIFF_BLOCK_START)
-    {
+    if(pTag->kind == FIFF_BLOCK_START) {
         m_pBlockTypeList->push(*pTag->toInt());
     }
-    if(pTag->kind == FIFF_BLOCK_END)
-    {
+    if(pTag->kind == FIFF_BLOCK_END) {
         m_pBlockTypeList->pop();
     }
 }
@@ -404,14 +401,12 @@ void FiffAnonymizer::updateBlockTypeList(FiffTag::SPtr pTag)
 
 bool FiffAnonymizer::checkValidFiffFormatVersion(FiffTag::SPtr pTag)
 {
-    if(pTag->kind == FIFF_FILE_ID)
-    {
+    if(pTag->kind == FIFF_FILE_ID) {
         FiffId fileId = pTag->toFiffID();
         int inMayorVersion = (static_cast<uint32_t>(fileId.version) & 0xFFFF0000) >> 16;
         int inMinorVersion = (static_cast<uint32_t>(fileId.version) & 0x0000FFFF);
         double inVersion = inMayorVersion + inMinorVersion/10.;
-        if(inVersion > maxValidFiffVerion)
-        {
+        if(inVersion > maxValidFiffVerion) {
             return false;
         }
     }
@@ -456,11 +451,9 @@ void FiffAnonymizer::dir2tag(FiffTag::SPtr pTag)
     pTag->resize(m_pOutDir->size() * 4  * 4);
     pTag->clear();
 
-    if(m_pOutDir->size() > 0)
-    {
+    if(m_pOutDir->size() > 0) {
         QByteArray pInt8(sizeof(fiff_int_t),0);
-        for(int i=0;i<m_pOutDir->size();++i)
-        {
+        for(int i=0;i<m_pOutDir->size();++i) {
             memcpy(&pInt8,reinterpret_cast<char*>(m_pOutDir->at(i).kind),sizeof(fiff_int_t));
             pTag->append(pInt8);
             memcpy(&pInt8,reinterpret_cast<char*>(m_pOutDir->at(i).type),sizeof(fiff_int_t));
@@ -492,8 +485,7 @@ void FiffAnonymizer::writeDirectory(FiffStream* stream,
     *stream << static_cast<quint32>
                (static_cast<unsigned long long>(m_pOutDir->size())*sizeof(FiffDirEntry));
     *stream << static_cast<quint32>(-1);
-    for(int i=0;i<m_pOutDir->size();++i)
-    {
+    for(int i=0;i<m_pOutDir->size();++i) {
         *stream << static_cast<quint32>(m_pOutDir->at(i).kind);
         *stream << static_cast<quint32>(m_pOutDir->at(i).type);
         *stream << static_cast<quint32>(m_pOutDir->at(i).size);
@@ -524,12 +516,9 @@ void FiffAnonymizer::updatePointer(FiffStream* stream,
 
 bool FiffAnonymizer::checkDeleteInputFile()
 {
-
-    if(m_bDeleteInputFileAfter) //false by default
-    {
+    if(m_bDeleteInputFileAfter) { //false by default
         qDebug() << "You have requested to delete the input file: " + m_fFileIn.fileName();
-        if(m_bDeleteInputFileConfirmation) //true by default
-        {
+        if(m_bDeleteInputFileConfirmation) { //true by default
             QTextStream consoleOut(stdout);
             QTextStream consoleIn(stdin);
             QString confirmation;
@@ -539,12 +528,11 @@ bool FiffAnonymizer::checkDeleteInputFile()
             if(confirmation == "Y") {
                 return true;
             }
-        } else
-        {
+        } else {
             return true;
         }
-
     }
+
     return false;
 }
 
@@ -559,8 +547,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     outTag->type = inTag->type;
     outTag->next = inTag->next;
 
-    switch (inTag->kind)
-    {
+    switch (inTag->kind) {
     //all these 'kinds' of tags contain a fileID struct, which contains info related to
     //measurement date
     case FIFF_FILE_ID:
@@ -573,8 +560,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         FiffId inId = inTag->toFiffID();
         QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs);
         QDateTime outMeasDate;
-        if(m_bUseMeasurementDayOffset)
-        {
+        if(m_bUseMeasurementDayOffset) {
             outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
         } else {
             outMeasDate = m_dateMeasurmentDate;
@@ -604,8 +590,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*inTag->toInt()));
         QDateTime outMeasDate;
-        if(m_bUseMeasurementDayOffset)
-        {
+        if(m_bUseMeasurementDayOffset) {
             outMeasDate = QDateTime(inMeasDate.date()).addDays(-m_iMeasurementDayOffset);
         } else {
             outMeasDate = m_dateMeasurmentDate;
@@ -619,9 +604,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_COMMENT:
     {
-        if(m_pBlockTypeList->first()==FIFFB_MEAS_INFO)
-        {
-            QString inStr = inTag->toString();
+        if(m_pBlockTypeList->first()==FIFFB_MEAS_INFO) {
             QString newStr(m_sDfltString);
             outTag->resize(newStr.size());
             memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -632,7 +615,6 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_EXPERIMENTER:
     {
-        QString inStr = inTag->toString();
         QString newStr(m_sDfltString);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -650,7 +632,6 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_FIRST_NAME:
     {
-        QString inStr(inTag->toString());
         QString newStr(m_sDfltSubjectFirstName);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -660,7 +641,6 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_MIDDLE_NAME:
     {
-        QString inStr(inTag->toString());
         QString newStr(m_sDfltSubjectMidName);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -670,7 +650,6 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_LAST_NAME:
     {
-        QString inStr(inTag->toString());
         QString newStr(m_sDfltSubjectLastName);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -681,10 +660,12 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     case FIFF_SUBJ_BIRTH_DAY:
     {
         QDateTime inBirthday(QDate::fromJulianDay(*inTag->toJulian()));
+
+        qDebug() << "*inTag->toJulian()" << *inTag->toJulian();
+
         QDateTime outBirthday;
 
-        if(m_bUseSubjectBirthdayOffset)
-        {
+        if(m_bUseSubjectBirthdayOffset) {
             outBirthday = inBirthday.addDays(-m_iMeasurementDayOffset);
         } else {
             outBirthday = m_dateSubjectBirthday;
@@ -693,12 +674,13 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         fiff_int_t outData[1];
         outData[0] = static_cast<int32_t> (outBirthday.toSecsSinceEpoch());
         memcpy(outTag->data(),reinterpret_cast<char*>(outData),sizeof(fiff_int_t));
+        printIfVerbose("Subject birthday date changed: " + inBirthday.toString() + " -> " + outBirthday.toString());
+
         break;
     }
     case FIFF_SUBJ_WEIGHT:
     {
-        if(m_bBruteMode)
-        {
+        if(m_bBruteMode) {
             float inWeight(*inTag->toFloat());
             float outWeight(m_iDfltSubjectWeight);
             memcpy(outTag->data(),&outWeight,sizeof(float));
@@ -718,7 +700,6 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_COMMENT:
     {
-        QString inStr(inTag->toString());
         QString newStr(m_sDfltSubjectComment);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -746,7 +727,6 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_PROJ_NAME:
     {
-        QString inStr(inTag->toString());
         QString newStr(m_sDfltProjectName);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -756,7 +736,6 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_PROJ_AIM:
     {
-        QString inStr(inTag->toString());
         QString newStr(m_sDfltProjectAim);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -766,7 +745,6 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_PROJ_PERSONS:
     {
-        QString inStr(inTag->toString());
         QString newStr(m_sDfltProjectPersons);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -776,7 +754,6 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_PROJ_COMMENT:
     {
-        QString inStr(inTag->toString());
         QString newStr(m_sDfltProjectComment);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -786,8 +763,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_MRI_PIXEL_DATA:
     {
-        if(!m_bQuietMode)
-        {
+        if(!m_bQuietMode) {
             qDebug() << " ";
             qDebug() << "WARNING. The input fif file contains MRI data.";
             qDebug() << "Beware that a subject''s face can be reconstructed from it";
