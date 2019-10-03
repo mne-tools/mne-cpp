@@ -316,9 +316,9 @@ int FiffAnonymizer::anonymizeFile()
     pOutTag->kind = pInTag->kind;
     pOutTag->type = pInTag->type;
     pOutTag->next = FIFFV_NEXT_SEQ;
-    qint32 newProjID = -1;
-    pOutTag->resize(sizeof(newProjID));
-    memcpy(pOutTag->data(),&newProjID,sizeof(newProjID));
+    qint32 iFiffDirPos = -1;
+    pOutTag->resize(sizeof(iFiffDirPos));
+    memcpy(pOutTag->data(),&iFiffDirPos,sizeof(iFiffDirPos));
     addEntryToDir(pOutTag,outStream.device()->pos());
     FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
     outStream.write_tag(pOutTag);
