@@ -103,7 +103,7 @@ typedef double               fiff_double_t;
 typedef quint16              fiff_dau_pack13_t;
 typedef quint16              fiff_dau_pack14_t;
 typedef qint16               fiff_dau_pack16_t;
-typedef qint64               fiff_julian_t;
+typedef qint32               fiff_julian_t;
 typedef char                 fiff_data_t; //unsig char instead of void -> avoid void in C++ cause of its undefined behaviour using delete -> this can happen during lots of casting
 
 
