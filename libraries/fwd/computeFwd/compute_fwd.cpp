@@ -2223,8 +2223,14 @@ void ComputeFwd::calculateFwd()
                                               settings->compute_grad ? &meg_forward_grad : NULL)) == FAIL)
             goto out;
     if (neeg > 0)
-        if ((FwdBemModel::compute_forward_eeg(spaces,nspace,eegels,
-                                              settings->fixed_ori,bem_model,eeg_model,settings->use_threads,&eeg_forward,
+        if ((FwdBemModel::compute_forward_eeg(spaces,
+                                              nspace,
+                                              eegels,
+                                              settings->fixed_ori,
+                                              bem_model,
+                                              eeg_model,
+                                              settings->use_threads,
+                                              &eeg_forward,
                                               settings->compute_grad ? &eeg_forward_grad : NULL)) == FAIL)
             goto out;
     /*
@@ -2237,18 +2243,22 @@ void ComputeFwd::calculateFwd()
     */
     printf("\nwriting %s...",settings->solname.toUtf8().constData());
     if (!write_solution(settings->solname,               /* Destination file */
-                       spaces,                          /* The source spaces */
-                       nspace,
-                       settings->mriname,mri_id,        /* MRI file and data obtained from there */
-                       mri_head_t,
-                       settings->measname,meas_id,      /* MEG file and data obtained from there */
-                       meg_head_t,
-                       megchs, nmeg,
-                       eegchs, neeg,
-                       settings->fixed_ori,             /* Fixed orientation dipoles? */
-                       settings->coord_frame,           /* Coordinate frame */
-                       meg_forward, eeg_forward,
-                       meg_forward_grad, eeg_forward_grad))
+                        spaces,                          /* The source spaces */
+                        nspace,
+                        settings->mriname,mri_id,        /* MRI file and data obtained from there */
+                        mri_head_t,
+                        settings->measname,meas_id,      /* MEG file and data obtained from there */
+                        meg_head_t,
+                        megchs,
+                        nmeg,
+                        eegchs,
+                        neeg,
+                        settings->fixed_ori,             /* Fixed orientation dipoles? */
+                        settings->coord_frame,           /* Coordinate frame */
+                        meg_forward,
+                        eeg_forward,
+                        meg_forward_grad,
+                        eeg_forward_grad))
         goto out;
     if (!mne_attach_env(settings->solname,settings->command))
         goto out;

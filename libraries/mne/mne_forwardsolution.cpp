@@ -1228,7 +1228,13 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info,
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed, bool surf_ori, const QStringList& include, const QStringList& exclude, bool bExcludeBads)
+bool MNEForwardSolution::read(QIODevice& p_IODevice,
+                              MNEForwardSolution& fwd,
+                              bool force_fixed,
+                              bool surf_ori,
+                              const QStringList& include,
+                              const QStringList& exclude,
+                              bool bExcludeBads)
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
 

@@ -113,8 +113,7 @@ void ComputeFwdSettings::initMembers()
     eeg_sphere_rad = 0.09f;   
     scale_eeg_pos = false;    
     use_equiv_eeg = true;     
-    use_threads = true;       
-
+    use_threads = true;
 }
 
 
