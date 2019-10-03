@@ -533,6 +533,7 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
 
     case FIFFT_INT :
     case FIFFT_UINT :
+    case FIFFT_JULIAN :
         np = tag->size()/sizeof(fiff_int_t);
         for (ithis = (fiff_int_t *)tag->data(), k = 0; k < np; k++, ithis++)
             IOUtils::swap_intp(ithis);
@@ -540,7 +541,6 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
 
     case FIFFT_LONG :
     case FIFFT_ULONG :
-    case FIFFT_JULIAN :
         np = tag->size()/sizeof(fiff_long_t);
         for (lthis = (fiff_long_t *)tag->data(), k = 0; k < np; k++, lthis++)
             IOUtils::swap_longp(lthis);
