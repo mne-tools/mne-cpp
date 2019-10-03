@@ -448,19 +448,19 @@ public:
 
     //=========================================================================================================
     /**
-     * fiff_setup_read_raw
-     *
-     * ### MNE toolbox root function ###
-     *
-     * Read information about raw data file
-     *
-     * @param[in] p_IODevice        An fiff IO device like a fiff QFile or QTCPSocket
-     * @param[out] data              The raw data information - contains the opened fiff file
-     * @param[in] allow_maxshield    Accept unprocessed MaxShield data
-     *
-     * @return true if succeeded, false otherwise
-     */
-    static bool setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool allow_maxshield = false);
+    * fiff_setup_read_raw
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Read information about raw data file
+    *
+    * @param[in] p_IODevice         An fiff IO device like a fiff QFile or QTCPSocket
+    * @param[out] data              The raw data information - contains the opened fiff file
+    * @param[in] allow_maxshield    Accept unprocessed MaxShield data
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool allow_maxshield = true);
 
     //=========================================================================================================
     /**
