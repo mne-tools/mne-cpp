@@ -121,6 +121,6 @@ int main(int argc, char* argv[])
         MNEANONYMIZE::SettingsController controller(reinterpret_cast<QCoreApplication *>(&qtApp));
     }
 
-    return qtApp->exec();
+    return 0;
 }
 

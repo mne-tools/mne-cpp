@@ -303,41 +303,59 @@ int FiffAnonymizer::anonymizeFile()
 
     //we build the tag directory on the go
     addEntryToDir(pOutTag,outStream.device()->pos());
-    FiffTag::convert_tag_data(pOutTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+    FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
+    outStream.write_tag(pOutTag);
+
+    // Set FIFF_DIR_POINTER tag to -1
+    inStream.read_tag(pInTag);
+    if (pInTag->kind != FIFF_DIR_POINTER) {
+        qCritical() << "FiffAnonymizer::run - Fiff::open: file does have a directory pointer: " << m_fFileOut.fileName();
+        return 1;
+    }
+
+    pOutTag->kind = pInTag->kind;
+    pOutTag->type = pInTag->type;
+    pOutTag->next = FIFFV_NEXT_SEQ;
+    qint32 newProjID = -1;
+    pOutTag->resize(sizeof(newProjID));
+    memcpy(pOutTag->data(),&newProjID,sizeof(newProjID));
+    addEntryToDir(pOutTag,outStream.device()->pos());
+    FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
     outStream.write_tag(pOutTag);
 
     while(pInTag->next != -1)
     {
         inStream.read_tag(pInTag);
+
         updateBlockTypeList(pInTag);
         censorTag(pOutTag,pInTag);
 
         //the order of the tags in the output file is sequential. No jumps in the output file.
         if(pOutTag->next > 0)
         {
-            pOutTag->next = 0;
+            pOutTag->next = FIFFV_NEXT_SEQ;
         }
         addEntryToDir(pOutTag,outStream.device()->pos());
-        FiffTag::convert_tag_data(pOutTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+        FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
         outStream.write_tag(pOutTag);
     }
 
     if(inStream.close())
     {
-        printIfVerbose("Input file finished. All tags have been correctly anonymized.");
+        printIfVerbose("Input file closed. All tags have been correctly anonymized.");
     } else {
-        qCritical() << "FiffAnonymizer::run - Problem closeing the input file: " << m_fFileIn.fileName();
+        qCritical() << "FiffAnonymizer::run - Problem closing the input file: " << m_fFileIn.fileName();
     }
 
     addFinalEntryToDir();
-    fiff_long_t posOfDirectory(outStream.device()->pos());
-    writeDirectory(&outStream);
-    updatePointer(&outStream,FIFF_DIR_POINTER,posOfDirectory);
+//    fiff_long_t posOfDirectory(outStream.device()->pos());
+//    writeDirectory(&outStream);
+//    updatePointer(&outStream,FIFF_DIR_POINTER,posOfDirectory);
     updatePointer(&outStream,FIFF_FREE_LIST,-1);
 
     if(outStream.close())
     {
-        printIfVerbose("Input file finished. All tags have been correctly anonymized.");
+        printIfVerbose("Output file closed. All tags have been correctly anonymized.");
     } else {
         qCritical() << "FiffAnonymizer::run - Problem closing the output file: " << m_fFileOut.fileName();
     }
