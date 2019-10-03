@@ -1717,6 +1717,8 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
 //                if(raw[i])
 //                    delete raw[i];
             raw = meas->dir_tree_find(FIFFB_SMSH_RAW_DATA);
+            printf("Maxshield data found\n");
+
             if (raw.size() == 0)
             {
                 printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
