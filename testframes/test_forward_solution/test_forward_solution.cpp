@@ -144,7 +144,7 @@ void TestForwardSolution::computeForward()
     //settingsMEGEEG.mriname = "./mne-cpp-test-data/subjects/sample/mri/brain-neuromag/sets/COR.fif";
     settingsMEGEEG.transname.clear();
     //settingsMEGEEG.bemname = "./mne-cpp-test-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
-    settingsMEGEEG.bemname = "sample-1280-1280-1280-bem.fif";
+    settingsMEGEEG.bemname = "sample-5120-5120-5120-bem.fif";
     //settingsMEGEEG.bemname = "./mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
     settingsMEGEEG.mindist = 5.0f/1000.0f;
     settingsMEGEEG.solname = "./mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
