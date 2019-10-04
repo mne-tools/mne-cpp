@@ -231,7 +231,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
             m_parser.showHelp();
         }
 
-        m_anonymizer.setSubjectHisId(m_parser.value("his").toInt());
+        m_anonymizer.setSubjectHisId(m_parser.value("his"));
     }
 }
 
