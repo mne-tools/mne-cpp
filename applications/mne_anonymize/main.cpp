@@ -111,8 +111,11 @@ int main(int argc, char* argv[])
 {
     QScopedPointer<QCoreApplication> qtApp(createApplication(argc, argv));
 
-    qtApp->setApplicationName("MNE Anonymize");
-    qtApp->setApplicationVersion("1.0");
+    QString nameStr("MNE Anonymize");
+    QString versionStr("1.0");
+
+    qtApp->setApplicationName(nameStr);
+    qtApp->setApplicationVersion(versionStr);
 
     if (qobject_cast<QApplication *>(qtApp.data())) {
         // to do -> develop GUI version...
@@ -122,7 +125,7 @@ int main(int argc, char* argv[])
     } else {
         // start non-GUI version...
         //MNEANONYMIZE::SettingsController controller(reinterpret_cast<QCoreApplication *>(&qtApp));
-        MNEANONYMIZE::SettingsController controller(qtApp->arguments());
+        MNEANONYMIZE::SettingsController controller(qtApp->arguments(),nameStr,versionStr);
     }
 
     return 0;
