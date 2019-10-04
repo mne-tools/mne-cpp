@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     test_fiff_anonymize.pro
+# @file     test_mne_anonymize.pro
 # @author   Lorenz Esch <lorenzesch@hotmail.com>;
 # @version  1.0
 # @date     September, 2019
@@ -44,7 +44,7 @@ QT -= gui
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = test_fiff_anonymize
+TARGET = test_mne_anonymize
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -63,7 +63,7 @@ else {
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-    test_fiff_anonymize.cpp \
+    test_mne_anonymize.cpp \
     ../../applications/mne_anonymize/settingscontroller.cpp \
     ../../applications/mne_anonymize/fiffanonymizer.cpp \
 
