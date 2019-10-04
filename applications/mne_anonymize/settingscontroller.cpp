@@ -77,8 +77,13 @@ using namespace MNEANONYMIZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SettingsController::SettingsController(const QStringList &arguments)
-: m_bMultipleInFiles(false)
+SettingsController::SettingsController(const QStringList &arguments,
+                                       const QString name,
+                                       const QString ver)
+: m_sAppName(name)
+, m_sAppVer(ver)
+, m_bShowHeaderFlag(false)
+, m_bMultipleInFiles(false)
 {
     initParser();
     parseInputs(arguments);
@@ -100,11 +105,11 @@ void SettingsController::initParser()
 {
 
     m_parser.setApplicationDescription(QCoreApplication::translate("main",
-                                                                   m_anonymizer.description.toUtf8()));
+                                                                   "Application that removes or modifies Personal Health Information or Personal Identifiable information from a FIFF file."));
     m_parser.addHelpOption();
     m_parser.addVersionOption();
 
-    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Wildcards are allowed and several --in <infile> statements can be present."),
+    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Wildcards (like '*' or '?') are allowed and several --in <infile> statements can be present."),
                                  QCoreApplication::translate("main","infile"));
     m_parser.addOption(inFileOpt);
 
@@ -112,44 +117,44 @@ void SettingsController::initParser()
                                   QCoreApplication::translate("main","outfile"));
     m_parser.addOption(outFileOpt);
 
-    QCommandLineOption verboseOpt("verbose",QCoreApplication::translate("main","Prints out more information."));
+    QCommandLineOption verboseOpt("verbose",QCoreApplication::translate("main","Prints out more information, about each specific anonymized field. Only allowed when anonymizing one single file."));
     m_parser.addOption(verboseOpt);
 
     QCommandLineOption quietOpt("quiet",QCoreApplication::translate("main","Show no output."));
     m_parser.addOption(quietOpt);
 
     QCommandLineOption deleteInFileOpt("delete_input_file_after",
-                                       QCoreApplication::translate("main","Delete input fiff file after anonymization."));
+                                       QCoreApplication::translate("main","Delete input fiff file after anonymization. A confirmation message will be prompted to the user. Default: false"));
     m_parser.addOption(deleteInFileOpt);
 
     QCommandLineOption deleteInFileConfirmOpt("avoid_delete_confirmation",
-                                              QCoreApplication::translate("main","Avoid confirming the deletion of the input fiff file."));
+                                              QCoreApplication::translate("main","Avoid confirming the deletion of the input fiff file. Default: false"));
     m_parser.addOption(deleteInFileConfirmOpt);
 
-    QCommandLineOption bruteOpt("brute",QCoreApplication::translate("main","Anonymize weight, height XXX if present in the input fiff file."));
+    QCommandLineOption bruteOpt("brute",QCoreApplication::translate("main","Apart from anonymizing other more usual fields in the Fiff file, if present in the input fiff file, anonymize also Subject's weight and height, and Project's ID, Name, Aim and Comment."));
     m_parser.addOption(bruteOpt);
 
     QCommandLineOption measDateOpt("measurement_date",
-                                   QCoreApplication::translate("main","Specify the measurement date. Only when anonymizing a single file. Format: YYYMMDD "),
+                                   QCoreApplication::translate("main","Specify the measurement date. Only when anonymizing a single file. Format: YYYMMDD Default: 20000101"),
                                    QCoreApplication::translate("main","days"));
     m_parser.addOption(measDateOpt);
 
     QCommandLineOption measDateOffsetOpt("measurement_date_offset",
-                                         QCoreApplication::translate("main","Specify number of days to subtract to the measurement <date>. Only allowed when anonymizing a single file."),
+                                         QCoreApplication::translate("main","Specify number of days to subtract to the measurement <date>. Only allowed when anonymizing a single file. Default: 0"),
                                          QCoreApplication::translate("main","date"));
     m_parser.addOption(measDateOffsetOpt);
 
     QCommandLineOption birthdayOpt("subject_birthday",
-                                   QCoreApplication::translate("main","Specify the subject's birthday <date>. Only allowed when anonymizing a single file. Format: YYYMMDD "),
+                                   QCoreApplication::translate("main","Specify the subject's birthday <date>. Only allowed when anonymizing a single file. Format: YYYMMDD Default: 20000101"),
                                    QCoreApplication::translate("main","date"));
     m_parser.addOption(birthdayOpt);
 
     QCommandLineOption birthdayOffsetOpt("subject_birthday_offset",
-                                         QCoreApplication::translate("main","Specify number of <days> to subtract to the subject's birthday. Only allowed when anonymizing a single file. "),
+                                         QCoreApplication::translate("main","Specify number of <days> to subtract to the subject's birthday. Only allowed when anonymizing a single file. Default: 0"),
                                          QCoreApplication::translate("main","days"));
     m_parser.addOption(birthdayOffsetOpt);
 
-    QCommandLineOption SubjectIdOpt("his",QCoreApplication::translate("main","Specify the Subject's Id# within the Hospital system. Only allowed when anonymizing a single file. "),
+    QCommandLineOption SubjectIdOpt("his",QCoreApplication::translate("main","Specify the Subject's Id# within the Hospital system. Only allowed when anonymizing a single file. Default: mne_anonymize"),
                                           QCoreApplication::translate("main","id#"));
     m_parser.addOption(SubjectIdOpt);
 }
@@ -164,6 +169,11 @@ void SettingsController::parseInputs(const QStringList& arguments)
     parseInputAndOutputFiles();
 
     if(m_parser.isSet("verbose")) {
+        if(m_bMultipleInFiles) {
+            qDebug() << "Error. Multiple Input files. You cannot specify the verbose option.";
+            m_parser.showHelp();
+        }
+        m_bShowHeaderFlag=true;
         m_anonymizer.setVerboseMode(true);
     }
 
@@ -188,7 +198,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("measurement_date")) {
         if(m_bMultipleInFiles) {
-            qDebug() << "Error. Multiple Input files. You cannot specify the option \"measurement_date\".";
+            qDebug() << "Error. Multiple Input files. You cannot specify the option measurement_date.";
             m_parser.showHelp();
         }
 
@@ -198,7 +208,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("measurement_date_offset")) {
         if(m_bMultipleInFiles) {
-            qDebug() << "Error. Multiple Input files. You cannot specify the option \"measurement_date_offset\".";
+            qDebug() << "Error. Multiple Input files. You cannot specify the option measurement_date_offset.";
             m_parser.showHelp();
         }
 
@@ -349,6 +359,21 @@ void SettingsController::execute()
             promisesList.at(p_i)->waitForFinished();
         }
     } else {
+        printHeaderIfVerbose();
         m_anonymizer.anonymizeFile();
+    }
+}
+
+//*************************************************************************************************************
+
+void SettingsController::printHeaderIfVerbose()
+{
+    if(m_bShowHeaderFlag)
+    {
+        qDebug() << " ";
+        qDebug() << "-------------------------------------------------------------------------------------------";
+        qDebug() << " ";
+        qDebug() << m_sAppName;
+        qDebug() << "Version: " + m_sAppVer;
     }
 }
