@@ -231,11 +231,7 @@ public:
     void setSubjectHisId(QString id);
 
     //PUBLIC MEMBERS. note "const" type qualifier. Left public for convenience.
-    const double version;               /**< Version of this FiffAnonymizer application --> mne_fiffanonymize application will be based on it*/
     const double maxValidFiffVerion;    /**< Maximum version of the Fiff file standard compatible with this application.*/
-    const QString versionStr;           /**< version translated to a string.*/
-    const QString name;                 /**< Name of this application. Typically MNE_ANONYMIZE.*/
-    const QString description;          /**< Application description*/
 
 private:
 
@@ -382,55 +378,48 @@ private:
     */
     void renameOutputFileAsInputFile();
 
-    bool m_bVerboseMode;                /**< Describes the verbosity mode of the object */
-    bool m_bBruteMode;                  /**< Describes the level of anonymization to perform */
-    bool m_bQuietMode;                  /**< Describes if the user wants no message to be printed to the command line */
-    bool m_bDeleteInputFileAfter;       /**< Describes users request to delete the input file after anonymization */
-    bool m_bDeleteInputFileConfirmation;/**< Describes users request to avoid confirmation prompt for input file deletion*/
-    bool m_bInputFileDeleted;           /**< Describes if the input file has been deleted */
-    bool m_bInOutFileNamesEqual;        /**< Describes users request to have both input and output files with the same name*/
-    bool m_bOutputFileRenamed;          /**< Describes if the output file has been renamed to match the name the input file had */
+    //App anonymization values
+    QString m_sDfltString;              /**< String to be used as substitution of other strings in a fiff file */
+    QDateTime m_dateDfltDate;           /**< Date to be used as substitution of dates found in a fiff file */
+    QDateTime m_dateMeasurmentDate;     /**< Date to substitute the measuremnt date appearing in the file.*/
+    bool m_bUseMeasurementDayOffset;    /**< Flags to use Measurement-date days offset.*/
+    int  m_iMeasurementDayOffset;       /**< Number of days to subtract from the measurement date.*/
+    QDateTime m_dateSubjectBirthday;    /**< Subject's birthday substitutor.*/
+    bool m_bUseSubjectBirthdayOffset;   /**< Flags use of Subject's birthday offset.*/
+    int  m_iSubjectBirthdayOffset;      /**< Subjects's birthday offset.*/
+    FIFFLIB::fiff_int_t m_BDfltMAC[2];  /**< MAC addresss substitutor.*/
+    int m_iDfltSubjectId;               /**< Subject's id substitutor.*/
+    QString m_sDfltSubjectFirstName;    /**< Subject's first name substitutor.*/
+    QString m_sDfltSubjectMidName;      /**< Subject's middle name substitutor.*/
+    QString m_sDfltSubjectLastName;     /**< Subject's last name substitutor.*/
+    int m_iDfltSubjectWeight;           /**< Subject's weight substitutor.*/
+    int m_iDfltSubjectHeight;           /**< Subject's height substitutor.*/
+    QString m_sDfltSubjectComment;      /**< Subject's comment substitutor.*/
+    QString m_sDfltSubjectHisId;        /**< Subject's HIS ID substitutor.*/
+    int m_iDfltProjectId;               /**< Project's id# substitutor.*/
+    QString m_sDfltProjectName;         /**< Project's name substitutor.*/
+    QString m_sDfltProjectAim;          /**< Project's aim substitutor.*/
+    QString m_sDfltProjectPersons;      /**< Project's Persons substitutor.*/
+    QString m_sDfltProjectComment;      /**< Project's comment substitutor.*/
 
-    QString m_sDfltString;              /**< Default string to be used as substitution of other strings in a fiff file */
-    QDateTime m_dateDfltDate;           /**< Default date to be used as substitution of dates found in a fiff file */
+    //APP SET POINT. applications behaviour options
+    bool m_bVerboseMode;                /**< Verbosity mode enabler.*/
+    bool m_bBruteMode;                  /**< Advanced anonymization. Anonymize also weight, height and some other fields.*/
+    bool m_bQuietMode;                  /**< Quite mode enabler.*/
+    bool m_bDeleteInputFileAfter;       /**< User's request to delete the input file after anonymization.*/
+    bool m_bDeleteInputFileConfirmation;/**< User's request to avoid confirmation prompt for input file deletion.*/
+    bool m_bInputFileDeleted;           /**< Flags if the input file has been deleted. */
+    bool m_bInOutFileNamesEqual;        /**< Flags user's request to have both input and output files with the same name.*/
+    bool m_bOutputFileRenamed;          /**< Flags if the output file has been renamed to match the name the input file had. */
+    QString m_sFileNameIn;              /**< Input file.*/
+    QString m_sFileNameOut;             /**< Output file.*/
 
-    QDateTime m_dateMeasurmentDate;     /**< Specific date requested by the user to be used as substitution of the meas. Initialized with m_dateDfltDate, modifiable through api */
-    bool m_bUseMeasurementDayOffset;    /**< Describes users request to modify meas date by subtracting a specific number of days (defined in m_iMeasurementDateOffset)*/
-    int  m_iMeasurementDayOffset;       /**< The number of days to subtract from the meas. date if the user requests so */
+    //app members
+    QFile m_fFileIn;                    /**< QFile input file.*/
+    QFile m_fFileOut;                   /**< QFile output file.*/
 
-    QDateTime m_dateSubjectBirthday;    /**< */
-    bool m_bUseSubjectBirthdayOffset;   /**< */
-    int  m_iSubjectBirthdayOffset;      /**< */
-
-    QByteArray m_BDfltMAC;              /**< */
-
-    int m_iDfltSubjectId;               /**< */
-    QString m_sDfltSubjectFirstName;    /**< */
-    QString m_sDfltSubjectMidName;      /**< */
-    QString m_sDfltSubjectLastName;     /**< */
-    int m_iDfltSubjectWeight;           /**< */
-    int m_iDfltSubjectHeight;           /**< */
-    QString m_sDfltSubjectComment;      /**< */
-    QString m_sDfltSubjectHisId;        /**< */
-
-    int m_iDfltProjectId;               /**< */
-    QString m_sDfltProjectName;         /**< */
-    QString m_sDfltProjectAim;          /**< */
-    QString m_sDfltProjectPersons;      /**< */
-    QString m_sDfltProjectComment;      /**< */
-
-    QString m_sFileNameIn;              /**< */
-    QString m_sFileNameOut;             /**< */
-
-    QFile m_fFileIn;                    /**< */
-    QFile m_fFileOut;                   /**< */
-
-    QDebug m_printInSameLineHelper;     /**< */
-    const bool m_bPrintInSameLine;      /**< */
-
-    QSharedPointer<QStack<int32_t> > m_pBlockTypeList;  /**< */
-    QSharedPointer<QVector<FIFFLIB::FiffDirEntry> > m_pOutDir; /**< */
-
+    QSharedPointer<QStack<int32_t> > m_pBlockTypeList;  /**< Pointer to Stack storing info related to the blocks of tags in the file.*/
+    QSharedPointer<QVector<FIFFLIB::FiffDirEntry> > m_pOutDir; /**< Pointer to the Tag directory in the output file.*/
 };
 
 
@@ -442,18 +431,10 @@ private:
 
 //=========================================================================================================
 
-//inline void FiffAnonymizer::printIfVerbose(const QString str, bool sameLine)
 inline void FiffAnonymizer::printIfVerbose(const QString str)
 {
     if(m_bVerboseMode)
     {
-//        QDebug * dbg;
-//        if(!sameLine)
-//        {
-//            m_printInSameLineHelper = qDebug();
-//        }
-//        dbg = &m_printInSameLineHelper;
-//        *dbg << str;
         qDebug() << str;
     }
 }
