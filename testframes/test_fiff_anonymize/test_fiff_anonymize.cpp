@@ -38,9 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-
-#include <iostream>
+#include "../applications/mne_anonymize/fiffanonymizer.h"
+#include "../applications/mne_anonymize/settingscontroller.h"
 
 
 //*************************************************************************************************************
@@ -59,6 +58,8 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace MNEANONYMIZE;
+
 
 //=============================================================================================================
 /**
@@ -92,29 +93,26 @@ TestFiffAnonymize::TestFiffAnonymize()
 }
 
 
-
 //*************************************************************************************************************
 
 void TestFiffAnonymize::initTestCase()
 {
-    qInfo() << "TestFiffAnonymize::initTestCase - Epsilon" << epsilon;
-
     // Init testing arguments
-    QString sFileIn("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QString sFileOut("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
+    QString sFileIn(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
+    QString sFileOut(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
 
     qInfo() << "TestFiffAnonymize::initTestCase - sFileIn" << sFileIn;
     qInfo() << "TestFiffAnonymize::initTestCase - sFileOut" << sFileOut;
 
-    QString program = "./mne_anonymize";
     QStringList arguments;
+    arguments << "./mne_anonymize";
     arguments << "--in" << sFileIn;
     arguments << "--out" << sFileOut;
+    arguments << "--verbose";
 
-    // Pass arguments to application and anaonyimze the fiff file
-    QScopedPointer<QProcess> myProcess (new QProcess);
-    myProcess->start(program, arguments);
-    myProcess->waitForFinished();
+    qInfo() << "TestFiffAnonymize::initTestCase - arguments" << arguments;
+
+    MNEANONYMIZE::SettingsController controller(arguments);
 }
 
 
@@ -122,14 +120,22 @@ void TestFiffAnonymize::initTestCase()
 
 void TestFiffAnonymize::compareData()
 {
-    // Open ./mne-cpp-test-data/MEG/sample/sample_audvis_raw_anonymized.fif
-    QString inFileName("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_anonymized.fif");
-    QFile inFile(inFileName);
-    QByteArray inData(inFile.readAll());
-    quint16 crc = qChecksum(inData.data(),static_cast<uint>(inData.size()));
-    qDebug() << crc;
+    // Open anonymized file
+    QFile inFile(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
 
-    // ToDo: Implement function which reads sensitive tags and checks if they were anaonymized. Use Q_VERIFY().
+    if(inFile.open(QIODevice::ReadOnly)) {
+        qInfo() << "TestFiffAnonymize::compareData - Anonymized file opened correctly " << inFile.fileName();
+    } else {
+        QFAIL("Anonymized file could not be loaded.");
+    }
+
+    // Create crc checksum and compare to reference
+    QByteArray inData(inFile.readAll());
+
+    quint16 crc = qChecksum(inData.data(),static_cast<uint>(inData.size()));
+    qInfo() << "TestFiffAnonymize::compareData - crc for anonymized file" << crc;
+
+    QVERIFY(17542 == crc);
 }
 
 //*************************************************************************************************************
