@@ -110,7 +110,7 @@ public:
     *
     * @param [in] arguments     The input arguments in form of a QStringList.
     */
-    SettingsController(const QStringList& arguments);
+    SettingsController(const QStringList& arguments, const QString name, const QString ver);
 
     //=========================================================================================================
     /**
@@ -155,13 +155,24 @@ private:
     */
     void generateAnonymizerInstances();
 
+    //=========================================================================================================
+    /**
+    * Prints a header message if the Verbose option has been set, a header will be printed during execution, right before the
+    * file anonymizationFile signal is sent.
+    */
+    void printHeaderIfVerbose();
+
     //we at least create one app as a member var here in the stack
     //if we later see we have more than one file we'll create more in the heap.
     //So that we can deploy a concurrent execution (one app per thread).
     FiffAnonymizer m_anonymizer;        /**< local instance of Fiffanonyzer, in which perform configurations.*/
-    QStringList m_SLInFiles;            /**< list of input file names (absolute paths).*/
-    QStringList m_SLOutFiles;           /**< list of output file names (absolute paths).*/
-    bool m_bMultipleInFiles;            /**< multpiple files concurrent execution flag.*/
+    QString m_sAppName;                 /**< Application name.*/
+    QString m_sAppVer;                  /**< Application version number.*/
+    QStringList m_SLInFiles;            /**< List of input file names (absolute paths).*/
+    QStringList m_SLOutFiles;           /**< List of output file names (absolute paths).*/
+    bool m_bShowHeaderFlag;                 /**< Show header when executing.*/
+    bool m_bMultipleInFiles;            /**< Multpiple files concurrent execution flag.*/
+
     QList<QSharedPointer<FiffAnonymizer> > m_pAppList; /**< list of addresses to FiffAnonyizer objects. */
     QList<QSharedPointer<QFuture<void> > > promisesList; /**< List of synchronizing waits for each concurrent execution.*/
     QCommandLineParser m_parser;        /**< parser object to work with member pointer to QCoreApp and parse input command line options.*/
