@@ -111,6 +111,9 @@ int main(int argc, char* argv[])
 {
     QScopedPointer<QCoreApplication> qtApp(createApplication(argc, argv));
 
+    qtApp->setApplicationName("MNE Anonymize");
+    qtApp->setApplicationVersion("1.0");
+
     if (qobject_cast<QApplication *>(qtApp.data())) {
         // to do -> develop GUI version...
         //create reader object and parse data
@@ -118,7 +121,8 @@ int main(int argc, char* argv[])
         //w.show();
     } else {
         // start non-GUI version...
-        MNEANONYMIZE::SettingsController controller(reinterpret_cast<QCoreApplication *>(&qtApp));
+        //MNEANONYMIZE::SettingsController controller(reinterpret_cast<QCoreApplication *>(&qtApp));
+        MNEANONYMIZE::SettingsController controller(qtApp->arguments());
     }
 
     return 0;
