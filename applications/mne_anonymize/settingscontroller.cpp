@@ -77,12 +77,11 @@ using namespace MNEANONYMIZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SettingsController::SettingsController(QCoreApplication* qtApp)
+SettingsController::SettingsController(const QStringList &arguments)
 : m_bMultipleInFiles(false)
-, m_pQCoreApp(qtApp)
 {
     initParser();
-    parseInputs();
+    parseInputs(arguments);
     execute();
 }
 
@@ -91,9 +90,7 @@ SettingsController::SettingsController(QCoreApplication* qtApp)
 
 SettingsController::~SettingsController()
 {
-    //qDeleteAll(m_pAppList.begin(),m_pAppList.end());
     m_pAppList.clear();
-    //m_pQCoreApp is managed by main. no leak. Leave it alone.
 }
 
 
@@ -101,7 +98,9 @@ SettingsController::~SettingsController()
 
 void SettingsController::initParser()
 {
-    m_parser.setApplicationDescription(m_anonymizer.description);
+
+    m_parser.setApplicationDescription(QCoreApplication::translate("main",
+                                                                   m_anonymizer.description.toUtf8()));
     m_parser.addHelpOption();
     m_parser.addVersionOption();
 
@@ -158,78 +157,67 @@ void SettingsController::initParser()
 
 //*************************************************************************************************************
 
-void SettingsController::parseInputs()
+void SettingsController::parseInputs(const QStringList& arguments)
 {
-    m_parser.process(*m_pQCoreApp);
+    m_parser.process(arguments);
 
     parseInputAndOutputFiles();
 
-    if(m_parser.isSet("verbose"))
-    {
+    if(m_parser.isSet("verbose")) {
         m_anonymizer.setVerboseMode(true);
     }
 
-    if(m_parser.isSet("brute"))
-    {
+    if(m_parser.isSet("brute")) {
         m_anonymizer.setBruteMode(true);
     }
 
-    if(m_parser.isSet("quiet"))
-    {
-        if(m_anonymizer.getVerboseMode())
-        {
+    if(m_parser.isSet("quiet")) {
+        if(m_anonymizer.getVerboseMode()) {
             m_anonymizer.setVerboseMode(false);
         }
         m_anonymizer.setQuietMode(true);
     }
 
-    if(m_parser.isSet("delete_input_file_after"))
-    {
+    if(m_parser.isSet("delete_input_file_after")) {
         m_anonymizer.setDeleteInputFileAfter(true);
     }
 
-    if(m_parser.isSet("avoid_delete_confirmation"))
-    {
+    if(m_parser.isSet("avoid_delete_confirmation")) {
         m_anonymizer.setDeleteInputFileAfterConfirmation(false);
     }
 
-    if(m_parser.isSet("measurement_date"))
-    {
-        if(m_bMultipleInFiles)
-        {
+    if(m_parser.isSet("measurement_date")) {
+        if(m_bMultipleInFiles) {
             qDebug() << "Error. Multiple Input files. You cannot specify the option \"measurement_date\".";
             m_parser.showHelp();
         }
+
         QString d(m_parser.value("measurement_date"));
         m_anonymizer.setMeasurementDay(d);
     }
 
-    if(m_parser.isSet("measurement_date_offset"))
-    {
-        if(m_bMultipleInFiles)
-        {
+    if(m_parser.isSet("measurement_date_offset")) {
+        if(m_bMultipleInFiles) {
             qDebug() << "Error. Multiple Input files. You cannot specify the option \"measurement_date_offset\".";
             m_parser.showHelp();
         }
+
         QString doffset(m_parser.value("measurement_date_offset"));
         m_anonymizer.setMeasurementDayOffset(doffset.toInt());
     }
 
-    if(m_parser.isSet("subject_birthday"))
-    {
-        if(m_bMultipleInFiles)
-        {
+    if(m_parser.isSet("subject_birthday")) {
+        if(m_bMultipleInFiles) {
             qDebug() << "Error. Multiple Input files. You cannot specify the option \"subject_birthday\".";
             m_parser.showHelp();
         }
+
         QString birthday(m_parser.value("subject_birthday"));
         m_anonymizer.setSubjectBirthday(birthday);
     }
 
-    if(m_parser.isSet("subject_birthday_offset"))
-    {
-        if(m_bMultipleInFiles)
-        {
+    if(m_parser.isSet("subject_birthday_offset")) {
+        if(m_bMultipleInFiles) {
             qDebug() << "Error. Multiple Input files. You cannot specify the option \"subject_birthday_offset\".";
             m_parser.showHelp();
         }
@@ -237,17 +225,14 @@ void SettingsController::parseInputs()
         m_anonymizer.setSubjectBirthdayOffset(bdoffset.toInt());
     }
 
-    if(m_parser.isSet("his"))
-    {
-        if(m_bMultipleInFiles)
-        {
+    if(m_parser.isSet("his")) {
+        if(m_bMultipleInFiles) {
             qDebug() << "Error. Multiple Input files. You cannot specify the optio \"his\".";
             m_parser.showHelp();
         }
+
         m_anonymizer.setSubjectHisId(m_parser.value("his").toInt());
     }
-
-
 }
 
 
@@ -255,50 +240,46 @@ void SettingsController::parseInputs()
 
 void SettingsController::parseInputAndOutputFiles()
 {
-    if(m_parser.isSet("in"))
-    {
+    if(m_parser.isSet("in")) {
         QStringList inFilesAux(m_parser.values("in"));
-        for(QString f: inFilesAux)
-        {
+
+        for(QString f: inFilesAux) {
             QFileInfo inFileInfo(QDir::toNativeSeparators(f));
             inFileInfo.makeAbsolute();
-            if(inFileInfo.isDir())
-            {
+
+            if(inFileInfo.isDir()) {
                 qDebug() << "Error. " << f << " is a folder.";
             }
+
             QStringList filter;
             filter << inFileInfo.fileName();
             QDirIterator it(inFileInfo.absoluteDir().absolutePath(),filter,QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot);
-            while(it.hasNext())
-            {
+
+            while(it.hasNext()) {
                 QFileInfo fi(it.next());
-                if(fi.isFile() && fi.isReadable())
-                {
+
+                if(fi.isFile() && fi.isReadable()) {
                     m_SLInFiles.append(fi.absoluteFilePath());
                 }
             }
         }
     }
 
-    if(m_SLInFiles.size() == 0)
-    {
-        qDebug() << "Error. no valid input files. OMG!!";
+    if(m_SLInFiles.size() == 0) {
+        qDebug() << "Error. No valid input files.";
         m_parser.showHelp();
-    } else if(m_SLInFiles.size() == 1)
-    {
+    } else if(m_SLInFiles.size() == 1) {
         m_bMultipleInFiles = false;
     } else {
         m_bMultipleInFiles = true;
     }
 
-    if(m_bMultipleInFiles)
-    {
-        if(m_parser.isSet("out"))
-        {
+    if(m_bMultipleInFiles) {
+        if(m_parser.isSet("out")) {
             qDebug() << "Warning. Multiple input files selected. Output filename option will be ignored.";
         }
-        for(QString fi:m_SLInFiles)
-        {
+
+        for(QString fi:m_SLInFiles) {
             QFileInfo fInfo(fi);
             QString fout = QDir(fInfo.absolutePath()).filePath(
                         fInfo.baseName() + "_anonymized." + fInfo.completeSuffix());
@@ -306,24 +287,23 @@ void SettingsController::parseInputAndOutputFiles()
         }
     } else {
         QString fileOutName;
-        if(m_parser.isSet("out"))
-        {
+
+        if(m_parser.isSet("out")) {
             QFileInfo fInfo(m_parser.value("out"));
             fInfo.makeAbsolute();
-            fileOutName = fInfo.fileName();
+            fileOutName = fInfo.absoluteFilePath();
         } else {
             QFileInfo fInfo(m_SLInFiles.first());
             fileOutName = QDir(fInfo.absolutePath()).filePath(
                         fInfo.baseName() + "_anonymized." + fInfo.completeSuffix());
         }
+
         m_SLOutFiles.append(fileOutName);
     }
 
-    if(m_SLInFiles.size() != m_SLOutFiles.size())
-    {
+    if(m_SLInFiles.size() != m_SLOutFiles.size()) {
         qDebug() << "Error. something went wrong while parsing the input files.";
     }
-
 }
 
 
@@ -336,10 +316,8 @@ void SettingsController::generateAnonymizerInstances()
         return;
     }
 
-    if(m_bMultipleInFiles)
-    {
-        for(int i=0; i< m_SLInFiles.size(); ++i)
-        {
+    if(m_bMultipleInFiles) {
+        for(int i=0; i< m_SLInFiles.size(); ++i) {
             QSharedPointer<FiffAnonymizer> pAppAux(new FiffAnonymizer(m_anonymizer));
             pAppAux->setFileIn(m_SLInFiles.at(i));
             pAppAux->setFileOut(m_SLOutFiles.at(i));
@@ -359,25 +337,18 @@ void SettingsController::generateAnonymizerInstances()
 void SettingsController::execute()
 {
     generateAnonymizerInstances();
-    if(m_bMultipleInFiles)
-    {
-        for(int th_i=0; th_i<m_pAppList.size(); ++th_i)
-        {
+    if(m_bMultipleInFiles) {
+        for(int th_i=0; th_i<m_pAppList.size(); ++th_i) {
             QSharedPointer<QFuture<void> > promise( new QFuture<void>);
             FiffAnonymizer localApp(*m_pAppList.at(th_i));
             *promise = QtConcurrent::run(localApp,&FiffAnonymizer::anonymizeFile);
             promisesList.append(promise);
         }
-        for(int p_i=0;p_i<promisesList.size();++p_i)
-        {
+
+        for(int p_i=0;p_i<promisesList.size();++p_i) {
             promisesList.at(p_i)->waitForFinished();
         }
     } else {
         m_anonymizer.anonymizeFile();
     }
 }
-
-
-//*************************************************************************************************************
-
-
