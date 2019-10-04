@@ -38,7 +38,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += testlib
+QT += testlib concurrent
 QT -= gui
 
 CONFIG   += console
@@ -63,9 +63,13 @@ else {
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-    test_fiff_anonymize.cpp
+    test_fiff_anonymize.cpp \
+    ../../applications/mne_anonymize/settingscontroller.cpp \
+    ../../applications/mne_anonymize/fiffanonymizer.cpp \
 
-HEADERS += \
+HEADERS  += \
+    ../../applications/mne_anonymize/settingscontroller.h \
+    ../../applications/mne_anonymize/fiffanonymizer.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
