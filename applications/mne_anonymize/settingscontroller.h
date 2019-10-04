@@ -78,6 +78,7 @@
 //=============================================================================================================
 
 /** @brief Contains classes for mne_anonymize application */
+
 namespace MNEANONYMIZE
 {
 
@@ -106,9 +107,10 @@ public:
     //=========================================================================================================
     /**
     * Constructs a SettingsController object.
-    * @param [in] pointer to a QCoreApplication where to signal parse inputs.
+    *
+    * @param [in] arguments     The input arguments in form of a QStringList.
     */
-    SettingsController(QCoreApplication* qtApp);
+    SettingsController(const QStringList& arguments);
 
     //=========================================================================================================
     /**
@@ -135,7 +137,7 @@ private:
     * Processes the input parser and configures the state of the FiffAnonymizer instance according to
     * the options selected. Including input and output files treatment, execution modes and anonymizing options.
     */
-    void parseInputs();
+    void parseInputs(const QStringList& arguments);
 
     //=========================================================================================================
     /**
@@ -153,7 +155,6 @@ private:
     */
     void generateAnonymizerInstances();
 
-
     //we at least create one app as a member var here in the stack
     //if we later see we have more than one file we'll create more in the heap.
     //So that we can deploy a concurrent execution (one app per thread).
@@ -163,7 +164,6 @@ private:
     bool m_bMultipleInFiles;            /**< multpiple files concurrent execution flag.*/
     QList<QSharedPointer<FiffAnonymizer> > m_pAppList; /**< list of addresses to FiffAnonyizer objects. */
     QList<QSharedPointer<QFuture<void> > > promisesList; /**< List of synchronizing waits for each concurrent execution.*/
-    QCoreApplication * m_pQCoreApp;     /**< pointer to QCoreApplication being executed.*/
     QCommandLineParser m_parser;        /**< parser object to work with member pointer to QCoreApp and parse input command line options.*/
 
 };
