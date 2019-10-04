@@ -228,7 +228,7 @@ public:
     * will be changed to match the one specified with this method.
     * @param [in] Integer with the subject's id.
     */
-    void setSubjectHisId(int id);
+    void setSubjectHisId(QString id);
 
     //PUBLIC MEMBERS. note "const" type qualifier. Left public for convenience.
     const double version;               /**< Version of this FiffAnonymizer application --> mne_fiffanonymize application will be based on it*/
