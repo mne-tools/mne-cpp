@@ -138,6 +138,7 @@ void TestMneAnonymize::compareData()
     QVERIFY(17542 == crc);
 }
 
+
 //*************************************************************************************************************
 
 void TestMneAnonymize::cleanupTestCase()
