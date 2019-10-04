@@ -112,7 +112,7 @@ void TestForwardSolution::initTestCase()
 void TestForwardSolution::computeForward()
 {
     // Compute and Write Forward Solution
-    qInfo(">>>>>>>>>>>>>>>>>>>>>>>>> Compute MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>");
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>");
 
     // Read reference forward solution
     QString fwdMEGEEGFileRef("./mne-cpp-test-data/Result/ref_sample_audvis-meg-eeg-oct-6-fwd.fif");
@@ -144,7 +144,7 @@ void TestForwardSolution::computeForward()
     //settingsMEGEEG.mriname = "./mne-cpp-test-data/subjects/sample/mri/brain-neuromag/sets/COR.fif";
     settingsMEGEEG.transname.clear();
     //settingsMEGEEG.bemname = "./mne-cpp-test-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
-    settingsMEGEEG.bemname = "sample-5120-5120-5120-bem.fif";
+    settingsMEGEEG.bemname = "sample-1280-1280-1280-bem.fif";
     //settingsMEGEEG.bemname = "./mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
     settingsMEGEEG.mindist = 5.0f/1000.0f;
     settingsMEGEEG.solname = "./mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
@@ -154,7 +154,7 @@ void TestForwardSolution::computeForward()
     m_pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(&settingsMEGEEG));
     m_pFwdMEGEEGComputed->calculateFwd();
 
-    qInfo("<<<<<<<<<<<<<<<<<<<<<<<<< Compute MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<");
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<");
 
     compareForwardMEGEEG();
 }
@@ -164,7 +164,7 @@ void TestForwardSolution::computeForward()
 
 void TestForwardSolution::compareForwardMEGEEG()
 {
-    qInfo(">>>>>>>>>>>>>>>>>>>>>>>>> Compare MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>");
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>");
 
     // Access public members of the old mne-c fwd computation.
     // This is just temporary until we can use the new refactored fwd object to easily compare via == operator. See QVERIFY below.
@@ -211,7 +211,7 @@ void TestForwardSolution::compareForwardMEGEEG()
     // This is normally done when reading the combined fwd solutions. Wait until everything is refactored.
     // QVERIFY(m_pFwdMEGEEGComputed == m_pFwdMEGEEGRef);
 
-    qInfo("<<<<<<<<<<<<<<<<<<<<<<<<< Compare MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
 
 
