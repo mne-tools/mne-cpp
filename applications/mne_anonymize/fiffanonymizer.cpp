@@ -256,7 +256,7 @@ int FiffAnonymizer::anonymizeFile()
     if(inStream.open(QIODevice::ReadOnly)) {
         printIfVerbose("Input file opened correctly: " + m_fFileIn.fileName());
     } else {
-        qCritical() << "FiffAnonymizer::run - Problem opening the input file: " << m_fFileIn.fileName();
+        qCritical() << "Problem opening the input file: " << m_fFileIn.fileName();
         return 1;
     }
 
@@ -264,7 +264,7 @@ int FiffAnonymizer::anonymizeFile()
     if(outStream.device()->open(QIODevice::WriteOnly)) {
         printIfVerbose("Output file opened correctly: " + m_fFileOut.fileName());
     } else {
-        qCritical() << "FiffAnonymizer::run - Problem opening the output file: " << m_fFileOut.fileName();
+        qCritical() << "Problem opening the output file: " << m_fFileOut.fileName();
         return 1;
     }
 
@@ -298,7 +298,7 @@ int FiffAnonymizer::anonymizeFile()
     // Set FIFF_DIR_POINTER tag to -1
     inStream.read_tag(pInTag);
     if (pInTag->kind != FIFF_DIR_POINTER) {
-        qCritical() << "FiffAnonymizer::run - File does have a directory pointer: " << m_fFileOut.fileName();
+        qCritical() << "File does have a directory pointer: " << m_fFileOut.fileName();
         return 1;
     }
 
@@ -315,7 +315,7 @@ int FiffAnonymizer::anonymizeFile()
     // Set FIFF_FREE_LIST tag to -1
     inStream.read_tag(pInTag);
     if (pInTag->kind != FIFF_FREE_LIST) {
-        qCritical() << "FiffAnonymizer::run - File does have a free list pointer: " << m_fFileOut.fileName();
+        qCritical() << "File does have a free list pointer: " << m_fFileOut.fileName();
         return 1;
     }
 
@@ -347,7 +347,7 @@ int FiffAnonymizer::anonymizeFile()
     if(inStream.close()) {
         printIfVerbose("Input file closed. All tags have been correctly anonymized.");
     } else {
-        qCritical() << "FiffAnonymizer::run - Problem closing the input file: " << m_fFileIn.fileName();
+        qCritical() << "Problem closing the input file: " << m_fFileIn.fileName();
     }
 
     addFinalEntryToDir();
@@ -359,7 +359,7 @@ int FiffAnonymizer::anonymizeFile()
     if(outStream.close()) {
         printIfVerbose("Output file closed. All tags have been correctly anonymized.");
     } else {
-        qCritical() << "FiffAnonymizer::run - Problem closing the output file: " << m_fFileOut.fileName();
+        qCritical() << "Problem closing the output file: " << m_fFileOut.fileName();
     }
 
     if(checkDeleteInputFile()) {
