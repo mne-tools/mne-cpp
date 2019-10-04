@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     test_fiff_anonymize.cpp
+* @file     test_mne_anonymize.cpp
 * @author   Lorenz Esch <lorenzesch@hotmail.com>;
 * @version  1.0
 * @date     September, 2019
@@ -63,17 +63,17 @@ using namespace MNEANONYMIZE;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TestFiffAnonymize
+* DECLARE CLASS TestMneAnonymize
 *
-* @brief The TestFiffAnonymize class provides fiff anonymizing verification tests
+* @brief The TestMneAnonymize class provides fiff anonymizing verification tests
 *
 */
-class TestFiffAnonymize: public QObject
+class TestMneAnonymize: public QObject
 {
     Q_OBJECT
 
 public:
-    TestFiffAnonymize();
+    TestMneAnonymize();
 
 private slots:
     void initTestCase();
@@ -87,7 +87,7 @@ private:
 
 //*************************************************************************************************************
 
-TestFiffAnonymize::TestFiffAnonymize()
+TestMneAnonymize::TestMneAnonymize()
 : epsilon(0.000001)
 {
 }
@@ -95,14 +95,14 @@ TestFiffAnonymize::TestFiffAnonymize()
 
 //*************************************************************************************************************
 
-void TestFiffAnonymize::initTestCase()
+void TestMneAnonymize::initTestCase()
 {
     // Init testing arguments
     QString sFileIn(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
     QString sFileOut(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
 
-    qInfo() << "TestFiffAnonymize::initTestCase - sFileIn" << sFileIn;
-    qInfo() << "TestFiffAnonymize::initTestCase - sFileOut" << sFileOut;
+    qInfo() << "TestMneAnonymize::initTestCase - sFileIn" << sFileIn;
+    qInfo() << "TestMneAnonymize::initTestCase - sFileOut" << sFileOut;
 
     QStringList arguments;
     arguments << "./mne_anonymize";
@@ -110,7 +110,7 @@ void TestFiffAnonymize::initTestCase()
     arguments << "--out" << sFileOut;
     arguments << "--verbose";
 
-    qInfo() << "TestFiffAnonymize::initTestCase - arguments" << arguments;
+    qInfo() << "TestMneAnonymize::initTestCase - arguments" << arguments;
 
     MNEANONYMIZE::SettingsController controller(arguments);
 }
@@ -118,13 +118,13 @@ void TestFiffAnonymize::initTestCase()
 
 //*************************************************************************************************************
 
-void TestFiffAnonymize::compareData()
+void TestMneAnonymize::compareData()
 {
     // Open anonymized file
     QFile inFile(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
 
     if(inFile.open(QIODevice::ReadOnly)) {
-        qInfo() << "TestFiffAnonymize::compareData - Anonymized file opened correctly " << inFile.fileName();
+        qInfo() << "TestMneAnonymize::compareData - Anonymized file opened correctly " << inFile.fileName();
     } else {
         QFAIL("Anonymized file could not be loaded.");
     }
@@ -133,14 +133,14 @@ void TestFiffAnonymize::compareData()
     QByteArray inData(inFile.readAll());
 
     quint16 crc = qChecksum(inData.data(),static_cast<uint>(inData.size()));
-    qInfo() << "TestFiffAnonymize::compareData - crc for anonymized file" << crc;
+    qInfo() << "TestMneAnonymize::compareData - crc for anonymized file" << crc;
 
     QVERIFY(17542 == crc);
 }
 
 //*************************************************************************************************************
 
-void TestFiffAnonymize::cleanupTestCase()
+void TestMneAnonymize::cleanupTestCase()
 {
 }
 
@@ -150,5 +150,5 @@ void TestFiffAnonymize::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_APPLESS_MAIN(TestFiffAnonymize)
-#include "test_fiff_anonymize.moc"
+QTEST_APPLESS_MAIN(TestMneAnonymize)
+#include "test_mne_anonymize.moc"
