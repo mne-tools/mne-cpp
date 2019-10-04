@@ -977,7 +977,7 @@ void FiffAnonymizer::renameOutputFileAsInputFile()
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setSubjectHisId(int id)
+void FiffAnonymizer::setSubjectHisId(QString id)
 {
     m_sDfltSubjectHisId = id;
 }
