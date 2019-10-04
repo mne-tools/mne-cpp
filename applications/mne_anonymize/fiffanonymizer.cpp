@@ -354,7 +354,7 @@ int FiffAnonymizer::anonymizeFile()
 //    fiff_long_t posOfDirectory(outStream.device()->pos());
 //    writeDirectory(&outStream);
 //    updatePointer(&outStream,FIFF_DIR_POINTER,posOfDirectory);
-    updatePointer(&outStream,FIFF_FREE_LIST,-1);
+//    updatePointer(&outStream,FIFF_FREE_LIST,-1);
 
     if(outStream.close()) {
         printIfVerbose("Output file closed. All tags have been correctly anonymized.");
@@ -370,7 +370,6 @@ int FiffAnonymizer::anonymizeFile()
         renameOutputFileAsInputFile();
     }
 
-//    disp(['Fiff_anonymizer finished correctly: ' opts.inputFile ' -> ' opts.outputFile]);
     if(!m_bQuietMode) {
         qDebug() << "MNE Fiff Anonymize finished correctly: " + QFileInfo(m_fFileIn).fileName() + " -> " + QFileInfo(m_fFileOut).fileName();
     }
@@ -391,6 +390,7 @@ void FiffAnonymizer::updateBlockTypeList(FiffTag::SPtr pTag)
     if(pTag->kind == FIFF_BLOCK_START) {
         m_pBlockTypeList->push(*pTag->toInt());
     }
+
     if(pTag->kind == FIFF_BLOCK_END) {
         m_pBlockTypeList->pop();
     }
@@ -405,7 +405,8 @@ bool FiffAnonymizer::checkValidFiffFormatVersion(FiffTag::SPtr pTag)
         FiffId fileId = pTag->toFiffID();
         int inMayorVersion = (static_cast<uint32_t>(fileId.version) & 0xFFFF0000) >> 16;
         int inMinorVersion = (static_cast<uint32_t>(fileId.version) & 0x0000FFFF);
-        double inVersion = inMayorVersion + inMinorVersion/10.;
+        double inVersion = inMayorVersion + inMinorVersion/10.0;
+
         if(inVersion > maxValidFiffVerion) {
             return false;
         }
@@ -518,6 +519,7 @@ bool FiffAnonymizer::checkDeleteInputFile()
 {
     if(m_bDeleteInputFileAfter) { //false by default
         qDebug() << "You have requested to delete the input file: " + m_fFileIn.fileName();
+
         if(m_bDeleteInputFileConfirmation) { //true by default
             QTextStream consoleOut(stdout);
             QTextStream consoleIn(stdin);
@@ -800,23 +802,20 @@ void FiffAnonymizer::setFileIn(const QString &sFileIn)
 
 void FiffAnonymizer::setFileOut(const QString &sFileOut)
 {
-    if(m_fFileOut.fileName().isEmpty())
-    {
+    if(m_fFileOut.fileName().isEmpty()) {
         m_sFileNameOut = sFileOut;
-    } else
-    {
-        if(m_fFileIn.fileName().compare(sFileOut,Qt::CaseInsensitive) == 0)
-        {
+    } else {
+        if(m_fFileIn.fileName().compare(sFileOut,Qt::CaseInsensitive) == 0) {
             m_bInOutFileNamesEqual = true;
             QFileInfo outFileInfo(sFileOut);
             outFileInfo.makeAbsolute();
             m_sFileNameOut = outFileInfo.absolutePath() + generateRandomFileName();
-        } else
-        {
+        } else {
             m_bInOutFileNamesEqual = false;
             m_sFileNameOut = sFileOut;
         }
     }
+
     m_fFileOut.setFileName(m_sFileNameOut);
 }
 
@@ -848,8 +847,7 @@ void FiffAnonymizer::setBruteMode(bool b)
 
 void FiffAnonymizer::setQuietMode(bool q)
 {
-    if(q)
-    {
+    if(q) {
         m_bVerboseMode = false;
     }
     m_bQuietMode = q;
@@ -943,31 +941,26 @@ void FiffAnonymizer::deleteInputFile()
 //  Thus, a warning is shown.
 bool FiffAnonymizer::checkRenameOutputFile()
 {
-    if(m_bInOutFileNamesEqual)
-    {
-        if(m_bDeleteInputFileAfter)
-        {
-            if(m_bInputFileDeleted)
-            {
+    if(m_bInOutFileNamesEqual) {
+        if(m_bDeleteInputFileAfter) {
+            if(m_bInputFileDeleted) {
                 return true;
             }
-        } else
-        {
+        } else {
             m_bDeleteInputFileAfter = true;
-            if(checkDeleteInputFile())
-            {
+            if(checkDeleteInputFile()) {
                 deleteInputFile();
                 return true;
             } else {
-
-                qCritical() << " ";
-                qCritical() << "You have requested to save the output file with the same name as the input file.";
-                qCritical() << "This cannot be done without deleting or modifying the input file.";
-                qCritical() << "The output file is: " << m_sFileNameOut;
-                qCritical() << " ";
+                qWarning() << " ";
+                qWarning() << "You have requested to save the output file with the same name as the input file.";
+                qWarning() << "This cannot be done without deleting or modifying the input file.";
+                qWarning() << "The output file is: " << m_sFileNameOut;
+                qWarning() << " ";
             }
         }
     }
+
     return false;
 }
 
