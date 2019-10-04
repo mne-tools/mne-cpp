@@ -6,9 +6,9 @@ set -e
 git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
 
 # Temporary fix to run test_forward_solution on the large sample-5120-5120-5120-bem-sol.fif file.
-wget https://www.dropbox.com/s/464j97jbaef7q3n/sample-5120-5120-5120-bem-sol.fif?dl=0
+wget https://www.dropbox.com/s/464j97jbaef7q3n/sample-5120-5120-5120-bem-sol.fif?dl=1
 
-wget https://www.dropbox.com/s/tkrl3p1kifbzjo1/sample-5120-5120-5120-bem.fif?dl=0
+wget https://www.dropbox.com/s/tkrl3p1kifbzjo1/sample-5120-5120-5120-bem.fif?dl=1
 
 # Set Environment variable
 MNECPP_ROOT=$(pwd)
