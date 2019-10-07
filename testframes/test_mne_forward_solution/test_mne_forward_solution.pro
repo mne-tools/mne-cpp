@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     test_forward_solution.pro
+# @file     test_mne_forward_solution.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -45,7 +45,7 @@ QT -= gui
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = test_forward_solution
+TARGET = test_mne_forward_solution
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -70,7 +70,7 @@ else {
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-    test_forward_solution.cpp
+    test_mne_forward_solution.cpp
 
 HEADERS += \
 
