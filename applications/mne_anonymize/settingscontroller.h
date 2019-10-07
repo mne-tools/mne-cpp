@@ -110,7 +110,9 @@ public:
     *
     * @param [in] arguments     The input arguments in form of a QStringList.
     */
-    SettingsController(const QStringList& arguments, const QString name, const QString ver);
+    SettingsController(const QStringList& arguments,
+                       const QString& name,
+                       const QString& ver);
 
     //=========================================================================================================
     /**
