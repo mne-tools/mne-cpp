@@ -98,8 +98,8 @@ TestMneAnonymize::TestMneAnonymize()
 void TestMneAnonymize::initTestCase()
 {
     // Init testing arguments
-    QString sFileIn(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QString sFileOut(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
+    QString sFileIn("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
+    QString sFileOut("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
 
     qInfo() << "TestMneAnonymize::initTestCase - sFileIn" << sFileIn;
     qInfo() << "TestMneAnonymize::initTestCase - sFileOut" << sFileOut;
@@ -121,7 +121,7 @@ void TestMneAnonymize::initTestCase()
 void TestMneAnonymize::compareData()
 {
     // Open anonymized file
-    QFile inFile(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
+    QFile inFile("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
 
     if(inFile.open(QIODevice::ReadOnly)) {
         qInfo() << "TestMneAnonymize::compareData - Anonymized file opened correctly " << inFile.fileName();
