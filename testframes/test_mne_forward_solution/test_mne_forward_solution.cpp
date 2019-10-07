@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     test_forward_solution.cpp
+* @file     test_mne_forward_solution.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -63,17 +63,17 @@ using namespace MNELIB;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TestForwardSolution
+* DECLARE CLASS TestMneForwardSolution
 *
-* @brief The TestForwardSolution class provides dipole fit tests
+* @brief The TestMneForwardSolution class provides dipole fit tests
 *
 */
-class TestForwardSolution : public QObject
+class TestMneForwardSolution : public QObject
 {
     Q_OBJECT
 
 public:
-    TestForwardSolution();
+    TestMneForwardSolution();
 
 private slots:
     void initTestCase();
@@ -93,15 +93,15 @@ private:
 
 //*************************************************************************************************************
 
-TestForwardSolution::TestForwardSolution()
-: epsilon(0.000001)
+TestMneForwardSolution::TestMneForwardSolution()
+: epsilon(0.0001)
 {
 }
 
 
 //*************************************************************************************************************
 
-void TestForwardSolution::initTestCase()
+void TestMneForwardSolution::initTestCase()
 {
 
 }
@@ -109,14 +109,13 @@ void TestForwardSolution::initTestCase()
 
 //*************************************************************************************************************
 
-void TestForwardSolution::computeForward()
+void TestMneForwardSolution::computeForward()
 {
     // Compute and Write Forward Solution
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>");
 
     // Read reference forward solution
-    QString fwdMEGEEGFileRef("./mne-cpp-test-data/Result/ref_sample_audvis-meg-eeg-oct-6-fwd.fif");
-    //QString fwdMEGEEGFileRef("./mne-cpp-test-data/MEG/sample/sample_audvis_trunc-meg-eeg-oct-6-fwd.fif"); // Use this in conjunction with sample-1280-1280-1280-bem.fif
+    QString fwdMEGEEGFileRef("./mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile fileFwdMEGEEGRef(fwdMEGEEGFileRef);
     m_pFwdMEGEEGRef = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRef));
 
@@ -128,7 +127,7 @@ void TestForwardSolution::computeForward()
     // --src ./mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif
     // --meas ./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif
     // --mri ./mne-cpp-test-data/MEG/sample/all-trans.fif
-    // --bem ./mne-cpp-test-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif
+    // --bem ./mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif
     // --mindist 5
     // --fwd ./mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif
 
@@ -140,12 +139,8 @@ void TestForwardSolution::computeForward()
     settingsMEGEEG.srcname = "./mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
     settingsMEGEEG.measname = "./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif";
     settingsMEGEEG.mriname = "./mne-cpp-test-data/MEG/sample/all-trans.fif";
-    //settingsMEGEEG.mriname = "./mne-cpp-test-data/MEG/sample/sample_audvis_trunc-trans.fif";
-    //settingsMEGEEG.mriname = "./mne-cpp-test-data/subjects/sample/mri/brain-neuromag/sets/COR.fif";
     settingsMEGEEG.transname.clear();
-    //settingsMEGEEG.bemname = "./mne-cpp-test-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
-    settingsMEGEEG.bemname = "sample-5120-5120-5120-bem.fif";
-    //settingsMEGEEG.bemname = "./mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
+    settingsMEGEEG.bemname = "./mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
     settingsMEGEEG.mindist = 5.0f/1000.0f;
     settingsMEGEEG.solname = "./mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
@@ -162,13 +157,14 @@ void TestForwardSolution::computeForward()
 
 //*************************************************************************************************************
 
-void TestForwardSolution::compareForwardMEGEEG()
+void TestMneForwardSolution::compareForwardMEGEEG()
 {
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>");
 
     // Access public members of the old mne-c fwd computation.
     // This is just temporary until we can use the new refactored fwd object to easily compare via == operator. See QVERIFY below.
     // Read/write is always not supported yet since we currently have two MNESourceSpace classes: MNESourceSpace and MNESourceSpaceOld
+    qDebug() << "";
     qDebug() << "m_pFwdMEGEEGComputed->meg_forward->nrow" << m_pFwdMEGEEGComputed->meg_forward->nrow;
     qDebug() << "m_pFwdMEGEEGRef->sol->nrow" << m_pFwdMEGEEGRef->sol->nrow;
     qDebug() << "";
@@ -198,6 +194,7 @@ void TestForwardSolution::compareForwardMEGEEG()
 
     qDebug() << "sumComputed" << sumComputed;
     qDebug() << "sumRef" << sumRef;
+    qDebug() << "sumComputed-sumRef" << sumComputed-sumRef;
     qDebug() << "";
 
     // Please note that the solution matrix is transposed once it is read from the data file
@@ -217,7 +214,7 @@ void TestForwardSolution::compareForwardMEGEEG()
 
 //*************************************************************************************************************
 
-void TestForwardSolution::cleanupTestCase()
+void TestMneForwardSolution::cleanupTestCase()
 {
 }
 
@@ -227,5 +224,5 @@ void TestForwardSolution::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_APPLESS_MAIN(TestForwardSolution)
-#include "test_forward_solution.moc"
+QTEST_APPLESS_MAIN(TestMneForwardSolution)
+#include "test_mne_forward_solution.moc"
