@@ -112,7 +112,7 @@ void TestMneAnonymize::initTestCase()
 
     qInfo() << "TestMneAnonymize::initTestCase - arguments" << arguments;
 
-    MNEANONYMIZE::SettingsController controller(arguments);
+    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
 }
 
 

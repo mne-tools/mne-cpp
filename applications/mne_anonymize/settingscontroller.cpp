@@ -77,9 +77,9 @@ using namespace MNEANONYMIZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SettingsController::SettingsController(const QStringList &arguments,
-                                       const QString name,
-                                       const QString ver)
+SettingsController::SettingsController(const QStringList& arguments,
+                                       const QString& name,
+                                       const QString& ver)
 : m_sAppName(name)
 , m_sAppVer(ver)
 , m_bShowHeaderFlag(false)

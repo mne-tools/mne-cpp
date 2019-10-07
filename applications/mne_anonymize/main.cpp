@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
     } else {
         // start non-GUI version...
         //MNEANONYMIZE::SettingsController controller(reinterpret_cast<QCoreApplication *>(&qtApp));
-        MNEANONYMIZE::SettingsController controller(qtApp->arguments(),nameStr,versionStr);
+        MNEANONYMIZE::SettingsController controller(qtApp->arguments(), nameStr, versionStr);
     }
 
     return 0;
