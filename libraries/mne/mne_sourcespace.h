@@ -298,7 +298,7 @@ public:
     /**
     * Overloaded == operator to compare an object to this instance.
     *
-    * @param[in] object    The object whisch should be compared to.
+    * @param[in] object    The object which should be compared to.
     *
     * @return true if equal, false otherwise
     */
