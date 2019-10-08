@@ -220,7 +220,8 @@ int FiffAnonymizer::anonymizeFile()
     printIfVerbose(" ");
 
     FiffStream inStream(&m_fFileIn);
-    if(inStream.open(QIODevice::ReadOnly)) {
+    if(inStream.open(QIODevice::ReadOnly))
+    {
         printIfVerbose("Input file opened correctly: " + m_fFileIn.fileName());
     } else {
         qCritical() << "Problem opening the input file: " << m_fFileIn.fileName();
