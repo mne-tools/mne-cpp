@@ -91,9 +91,7 @@ private slots:
 
 private:
     double epsilon;
-    void searchForTag(FIFFLIB::FiffStream &outStream,
-                     FIFFLIB::fiff_int_t ThisKind,
-                     FiffTag::SPtr inTag);
+    void verifyTags(FIFFLIB::FiffStream &outStream);
     void verifyCRC(const QString file,
                    const quint16 validatedCRC);
 };
@@ -246,15 +244,6 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
 
     MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
 
-    QFile fFileIn(sFileIn);
-    FIFFLIB::FiffStream inStream(&fFileIn);
-    if(inStream.open(QIODevice::ReadOnly))
-    {
-        qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - Input file opened correctly " << sFileIn;
-    } else {
-        QFAIL("Input file could not be loaded.");
-    }
-
     QFile fFileOut(sFileOut);
     FIFFLIB::FiffStream outStream(&fFileOut);
     if(outStream.open(QIODevice::ReadOnly))
@@ -264,8 +253,7 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
         QFAIL("Output file could not be loaded.");
     }
 
-    FiffTag::SPtr pTag = FiffTag::SPtr::create();
-    searchForTag(inStream,FIFF_FILE_ID,pTag);
+    verifyTags(inStream);
 
 
 
@@ -330,15 +318,265 @@ void TestMneAnonymize::verifyCRC(const QString file,
 
 //*************************************************************************************************************
 
-void TestMneAnonymize::searchForTag(FIFFLIB::FiffStream &stream,
-                                   FIFFLIB::fiff_int_t thisKind,
-                                   FiffTag::SPtr pTag)
+void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream &stream)
 {
+    FiffTag::SPtr pTag = FiffTag::SPtr::create();
+
     stream.device()->seek(0);
+
     do
     {
         stream.read_tag(pTag);
-    }while(pTag->kind != thisKind);
+
+        switch (pTag->kind) {
+        //all these 'kinds' of tags contain a fileID struct, which contains info related to
+        //measurement date
+        case FIFF_FILE_ID:
+        case FIFF_BLOCK_ID:
+        case FIFF_PARENT_FILE_ID:
+        case FIFF_PARENT_BLOCK_ID:
+        case FIFF_REF_FILE_ID:
+        case FIFF_REF_BLOCK_ID:
+        {
+//            FiffId inId = inTag->toFiffID();
+//            QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs);
+//            QDateTime outMeasDate;
+//            if(m_bUseMeasurementDayOffset) {
+//                outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
+//            } else {
+//                outMeasDate = m_dateMeasurmentDate;
+//            }
+
+//            FiffId outId(inId);
+//            outId.machid[0] = m_BDfltMAC[0];
+//            outId.machid[1] = m_BDfltMAC[1];
+//            outId.time.secs = static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
+//            outId.time.usecs = 0;
+
+//            const int fiffIdSize(sizeof(inId)/sizeof(fiff_int_t));
+//            fiff_int_t outData[fiffIdSize];
+//            outData[0] = outId.version;
+//            outData[1] = outId.machid[0];
+//            outData[2] = outId.machid[1];
+//            outData[3] = outId.time.secs;
+//            outData[4] = outId.time.usecs;
+
+//            outTag->resize(fiffIdSize*sizeof(fiff_int_t));
+//            memcpy(outTag->data(),reinterpret_cast<char*>(outData),fiffIdSize*sizeof(fiff_int_t));
+//            printIfVerbose("MAC address changed: " + inId.toMachidString() + " -> "  + outId.toMachidString());
+//            printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
+//            break;
+        }
+        case FIFF_MEAS_DATE:
+        {
+//            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*inTag->toInt()));
+//            QDateTime outMeasDate;
+//            if(m_bUseMeasurementDayOffset) {
+//                outMeasDate = QDateTime(inMeasDate.date()).addDays(-m_iMeasurementDayOffset);
+//            } else {
+//                outMeasDate = m_dateMeasurmentDate;
+//            }
+
+//            fiff_int_t outData[1];
+//            outData[0]=static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
+//            memcpy(outTag->data(),reinterpret_cast<char*>(outData),sizeof(fiff_int_t));
+//            printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
+//            break;
+        }
+        case FIFF_COMMENT:
+        {
+//            if(m_pBlockTypeList->first()==FIFFB_MEAS_INFO) {
+//                QString newStr(m_sDfltString);
+//                outTag->resize(newStr.size());
+//                memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
+//                printIfVerbose("Description of the measurement block changed: " +
+//                               QString(inTag->data()) + " -> " + newStr);
+//            }
+//            break;
+        }
+        case FIFF_EXPERIMENTER:
+        {
+//            QString newStr(m_sDfltString);
+//            outTag->resize(newStr.size());
+//            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
+//            printIfVerbose("Experimenter changed: " + QString(inTag->data()) + " -> " + newStr);
+//            break;
+        }
+        case FIFF_SUBJ_ID:
+        {
+//            qint32 inSubjID(*inTag->toInt());
+//            qint32 newSubjID(m_iDfltSubjectId);
+//            memcpy(outTag->data(),&newSubjID, sizeof(qint32));
+//            printIfVerbose("Subject's SubjectID changed: " +
+//                           QString::number(inSubjID) + " -> " + QString::number(newSubjID));
+//            break;
+        }
+        case FIFF_SUBJ_FIRST_NAME:
+        {
+//            QString newStr(m_sDfltSubjectFirstName);
+//            outTag->resize(newStr.size());
+//            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
+//            printIfVerbose("Experimenter changed: " +
+//                           QString(inTag->data()) + " -> " + newStr);
+//            break;
+        }
+        case FIFF_SUBJ_MIDDLE_NAME:
+        {
+//            QString newStr(m_sDfltSubjectMidName);
+//            outTag->resize(newStr.size());
+//            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
+//            printIfVerbose("Experimenter changed: " +
+//                           QString(inTag->data()) + " -> " + newStr);
+//            break;
+        }
+        case FIFF_SUBJ_LAST_NAME:
+        {
+//            QString newStr(m_sDfltSubjectLastName);
+//            outTag->resize(newStr.size());
+//            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
+//            printIfVerbose("Experimenter changed: " +
+//                           QString(inTag->data()) + " -> " + newStr);
+//            break;
+        }
+        case FIFF_SUBJ_BIRTH_DAY:
+        {
+//            QDateTime inBirthday(QDate::fromJulianDay(*inTag->toJulian()));
+
+//            qDebug() << "*inTag->toJulian()" << *inTag->toJulian();
+
+//            QDateTime outBirthday;
+
+//            if(m_bUseSubjectBirthdayOffset) {
+//                outBirthday = inBirthday.addDays(-m_iMeasurementDayOffset);
+//            } else {
+//                outBirthday = m_dateSubjectBirthday;
+//            }
+
+//            fiff_int_t outData[1];
+//            outData[0] = static_cast<int32_t> (outBirthday.toSecsSinceEpoch());
+//            memcpy(outTag->data(),reinterpret_cast<char*>(outData),sizeof(fiff_int_t));
+//            printIfVerbose("Subject birthday date changed: " + inBirthday.toString() + " -> " + outBirthday.toString());
+
+//            break;
+        }
+        case FIFF_SUBJ_WEIGHT:
+        {
+//            if(m_bBruteMode)
+//            {
+//                float inWeight(*inTag->toFloat());
+//                float outWeight(m_iDfltSubjectWeight);
+//                memcpy(outTag->data(),&outWeight,sizeof(float));
+//                printIfVerbose("Subject's weight changed from: " +
+//                               QString::number(static_cast<double>(inWeight)) + " -> " + QString::number(static_cast<double>(outWeight)));
+//            }
+//            break;
+//        }
+//        case FIFF_SUBJ_HEIGHT:
+//        {
+//            if(m_bBruteMode)
+//            {
+//                float inHeight(*inTag->toFloat());
+//                float outHeight(m_iDfltSubjectHeight);
+//                memcpy(outTag->data(),&outHeight,sizeof(float));
+//                printIfVerbose("Subject's Height changed from: " +
+//                               QString::number(static_cast<double>(inHeight)) + " -> " + QString::number(static_cast<double>(outHeight)));
+//            }
+//            break;
+        }
+        case FIFF_SUBJ_COMMENT:
+        {
+//            QString newStr(m_sDfltSubjectComment);
+//            outTag->resize(newStr.size());
+//            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
+//            printIfVerbose("Subject Comment changed: " +
+//                           QString(inTag->data()) + " -> " + newStr);
+//            break;
+        }
+        case FIFF_SUBJ_HIS_ID:
+        {
+//            QString inSubjectHisId(inTag->data());
+//            QString newSubjectHisId(m_sDfltSubjectHisId);
+//            outTag->resize(newSubjectHisId.size());
+//            memcpy(outTag->data(),newSubjectHisId.toUtf8(),static_cast<size_t>(newSubjectHisId.size()));
+//            printIfVerbose("Subject Hospital-ID changed:" + inSubjectHisId + " -> " + newSubjectHisId);
+//            break;
+        }
+        case FIFF_PROJ_ID:
+        {
+//            if(m_bBruteMode)
+//            {
+//                qint32 inProjID(*inTag->toInt());
+//                qint32 newProjID(m_iDfltProjectId);
+//                memcpy(outTag->data(),&newProjID,sizeof(qint32));
+//                printIfVerbose("ProjectID changed: " +
+//                               QString::number(inProjID) + " -> " + QString::number(newProjID));
+//            }
+//            break;
+        }
+        case FIFF_PROJ_NAME:
+        {
+//            if(m_bBruteMode)
+//            {
+//                    QString newStr(m_sDfltProjectName);
+//                    outTag->resize(newStr.size());
+//                    memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
+//                    printIfVerbose("Project name changed: " +
+//                                   QString(inTag->data()) + " -> " + newStr);
+//            }
+//            break;
+        }
+        case FIFF_PROJ_AIM:
+        {
+//            if(m_bBruteMode)
+//            {
+//                QString newStr(m_sDfltProjectAim);
+//                outTag->resize(newStr.size());
+//                memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
+//                printIfVerbose("Project Aim changed: " +
+//                               QString(inTag->data()) + " -> " + newStr);
+//            }
+//            break;
+        }
+        case FIFF_PROJ_PERSONS:
+        {
+//            QString newStr(m_sDfltProjectPersons);
+//            outTag->resize(newStr.size());
+//            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
+//            printIfVerbose("Project Persons changed: " +
+//                           QString(inTag->data()) + " -> " + newStr);
+//            break;
+        }
+        case FIFF_PROJ_COMMENT:
+        {
+//            if(m_bBruteMode)
+//            {
+//                QString newStr(m_sDfltProjectComment);
+//                outTag->resize(newStr.size());
+//                memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
+//                printIfVerbose("Project comment changed: " +
+//                               QString(inTag->data()) + " -> " + newStr);
+//            }
+//            break;
+        }
+        case FIFF_MRI_PIXEL_DATA:
+        {
+//            if(!m_bQuietMode) {
+//                qDebug() << " ";
+//                qDebug() << "WARNING. The input fif file contains MRI data.";
+//                qDebug() << "Beware that a subject''s face can be reconstructed from it";
+//                qDebug() << "This software can not anonymize MRI data, at the moment.";
+//                qDebug() << "Contanct the authors for more information.";
+//                qDebug() << " ";
+//            }
+//            break;
+        }
+        default:
+        {
+        }
+
+        }
+
+    }while(pTag->next != -1);
 }
 
 
