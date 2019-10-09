@@ -64,6 +64,11 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fwd
 }
 
+contains(MNECPP_CONFIG, withCodeCov) {
+    QMAKE_CXXFLAGS += --coverage
+    QMAKE_LFLAGS += --coverage
+}
+
 # OpenMP
 win32 {
     QMAKE_CXXFLAGS  +=  -openmp
