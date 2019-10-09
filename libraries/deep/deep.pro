@@ -68,6 +68,11 @@ else {
             -lCntk.Core-2.0
 }
 
+contains(MNECPP_CONFIG, withCodeCov) {
+    QMAKE_CXXFLAGS += --coverage
+    QMAKE_LFLAGS += --coverage
+}
+
 # OpenMP
 win32 {
     QMAKE_CXXFLAGS  +=  -openmp

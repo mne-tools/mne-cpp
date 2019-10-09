@@ -110,6 +110,11 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
+contains(MNECPP_CONFIG, withCodeCov) {
+    QMAKE_CXXFLAGS += --coverage
+    QMAKE_LFLAGS += --coverage
+}
+
 # Deploy library
 win32 {
     EXTRA_ARGS =

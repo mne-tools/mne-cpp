@@ -89,8 +89,8 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 contains(MNECPP_CONFIG, withCodeCov) {
-    LIBS += -lgcov
-    QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
+    QMAKE_CXXFLAGS += --coverage
+    QMAKE_LFLAGS += --coverage
 }
 
 win32 {
