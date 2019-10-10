@@ -127,6 +127,8 @@ public:
     */
     void execute();
 
+    //=========================================================================================================
+
 private:
     //=========================================================================================================
     /**
@@ -164,6 +166,8 @@ private:
     */
     void printHeaderIfVerbose();
 
+    //=========================================================================================================
+
     //we at least create one app as a member var here in the stack
     //if we later see we have more than one file we'll create more in the heap.
     //So that we can deploy a concurrent execution (one app per thread).
@@ -187,6 +191,14 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+/**
+* Finds all files in a folder matching a filename pattern (compatible with wildcard [*,?]).
+* @details This is a helper function. Given a filename with some pattern. It lists all possible filenames matching the pattern.
+* @param [in] Reference to a QString containing the input filename search pattern.
+* @param [out] QStringList with all possible filenames compatible with the search pattern.
+* It outputs a QStringList with all the possible files in the folder matching the search pattern.
+*/
+inline static QStringList listFilesMatchingPatternName(const QString &fileName);
 
 } // namespace MNEANONYMIZE
 
