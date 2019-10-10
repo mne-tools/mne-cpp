@@ -79,6 +79,7 @@ private slots:
     //test app behaviour
     void initTestCase();
     void testDefaultOutput();
+    void testDefaultWildcard();
     void testDeleteInputFile();
     void testInOutSameName();
     void testInOutSameNameAndDeleteInFile();
@@ -91,7 +92,7 @@ private slots:
 
 private:
     double epsilon;
-    void verifyTags(FIFFLIB::FiffStream &outStream);
+    void verifyTags(FIFFLIB::FiffStream::SPtr &outStream);
     void verifyCRC(const QString file,
                    const quint16 validatedCRC);
 };
@@ -129,12 +130,47 @@ void TestMneAnonymize::testDefaultOutput()
 
     qInfo() << "TestMneAnonymize::initTestCase - arguments" << arguments;
 
+    if(QFile::exists(sFileOut))
+    {
+        QFile::remove(sFileOut);
+    }
+
+    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
+    QVERIFY(QFile::exists(sFileOut));
+    //verify tags of the file
+    QFile::remove(sFileOut);
+}
+
+
+//*************************************************************************************************************
+
+void TestMneAnonymize::testDefaultWildcard()
+{
+    // Init testing arguments
+    QString sFileIn("./mne-cpp-test-data/MEG/sample/*.fif");
+    QString sFileOut("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
+
+    qInfo() << "TestMneAnonymize::initTestCase - sFileIn" << sFileIn;
+
+    QStringList arguments;
+    arguments << "./mne_anonymize";
+    arguments << "--in" << sFileIn;
+
+    qInfo() << "TestMneAnonymize::initTestCase - arguments" << arguments;
+
     MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
 
-    verifyCRC(sFileOut,17542);
-
-
+    QStringList listOfFiles = SettingsController::listFilesMatchingPatternName(sFileIn);
+    for(QString fin: listOfFiles)
+    {
+        QString fout(fin.replace(fin.size()-4,4,"_anonymized.fif"));
+        QVERIFY(QFile::exists(fout));
+        //for each file verify tags.
+        QFile::remove(fout);
+    }
 }
+
+
 
 //*************************************************************************************************************
 
@@ -193,7 +229,7 @@ void TestMneAnonymize::testInOutSameName()
 
     QVERIFY( QFile::exists(sFileOutTest));
 
-    verifyCRC(sFileOutTest,17542);
+//    verifyCRC(sFileOutTest,17542);
 }
 
 
@@ -224,7 +260,7 @@ void TestMneAnonymize::testInOutSameNameAndDeleteInFile()
 
     QVERIFY( QFile::exists(sFileOutTest));
 
-    verifyCRC(sFileOutTest,17542);
+//    verifyCRC(sFileOutTest,17542);
 }
 
 
@@ -318,15 +354,15 @@ void TestMneAnonymize::verifyCRC(const QString file,
 
 //*************************************************************************************************************
 
-void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream &stream)
+void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 {
     FiffTag::SPtr pTag = FiffTag::SPtr::create();
 
-    stream.device()->seek(0);
+    stream->device()->seek(0);
 
     do
     {
-        stream.read_tag(pTag);
+        stream->read_tag(pTag);
 
         switch (pTag->kind) {
         //all these 'kinds' of tags contain a fileID struct, which contains info related to
