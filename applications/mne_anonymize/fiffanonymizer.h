@@ -233,6 +233,48 @@ public:
     //PUBLIC MEMBERS. note "const" type qualifier. Left public for convenience.
     const double maxValidFiffVerion;    /**< Maximum version of the Fiff file standard compatible with this application.*/
 
+    //=========================================================================================================
+    /**
+    * Public Getter functions for retrieving default vaules from FiffAnonymizer.
+    *
+    *
+    */
+    QString get_sDfltString();              /**< Get value of string to be used as substitution of other strings in a fiff file */
+    QDateTime get_dateDfltDate();           /**< Get value of Date to be used as substitution of dates found in a fiff file */
+    QDateTime get_dateMeasurmentDate();     /**< DGet value of Date to substitute the measuremnt date appearing in the file.*/
+    bool get_bUseMeasurementDayOffset();    /**< Get value of Flags to use Measurement-date days offset.*/
+    int  get_iMeasurementDayOffset();       /**< Get value of Number of days to subtract from the measurement date.*/
+    QDateTime get_dateSubjectBirthday();    /**< Get value of Subject's birthday substitutor.*/
+    bool get_bUseSubjectBirthdayOffset();   /**< Get value of Flags use of Subject's birthday offset.*/
+    int  get_iSubjectBirthdayOffset();      /**< Get value of Subjects's birthday offset.*/
+    void get_BDfltMAC(FIFFLIB::fiff_int_t* &mac);     /**< Get value of MAC addresss substitutor.*/
+    int get_iDfltSubjectId();               /**< Get value of Subject's id substitutor.*/
+    QString get_sDfltSubjectFirstName();    /**< Get value of Subject's first name substitutor.*/
+    QString get_sDfltSubjectMidName();      /**< Get value of Subject's middle name substitutor.*/
+    QString get_sDfltSubjectLastName();     /**< Get value of Subject's last name substitutor.*/
+    int get_iDfltSubjectWeight();           /**< Get value of Subject's weight substitutor.*/
+    int get_iDfltSubjectHeight();           /**< Get value of Subject's height substitutor.*/
+    QString get_sDfltSubjectComment();      /**< Get value of Subject's comment substitutor.*/
+    QString get_sDfltSubjectHisId();        /**< Get value of Subject's HIS ID substitutor.*/
+    int get_iDfltProjectId();               /**< Get value of Project's id# substitutor.*/
+    QString get_sDfltProjectName();         /**< Get value of Project's name substitutor.*/
+    QString get_sDfltProjectAim();          /**< Get value of Project's aim substitutor.*/
+    QString get_sDfltProjectPersons();      /**< Get value of Project's Persons substitutor.*/
+    QString get_sDfltProjectComment();      /**< Get value of Project's comment substitutor.*/
+
+    //APP SET POINT. applications behaviour options
+    bool get_bVerboseMode();                    /**< Get Default Verbosity mode enabler.*/
+    bool get_bBruteMode();                      /**< Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.*/
+    bool get_bQuietMode();                      /**< value of Quite mode enabler.*/
+    bool get_bDeleteInputFileAfter();           /**< value of User's request to delete the input file after anonymization.*/
+    bool get_bDeleteInputFileConfirmation();    /**< value of User's request to avoid confirmation prompt for input file deletion.*/
+    bool get_bInputFileDeleted();               /**< value of Flags if the input file has been deleted. */
+    bool get_bInOutFileNamesEqual();            /**< value of Flags user's request to have both input and output files with the same name.*/
+    bool get_bOutputFileRenamed();              /**< value ofFlags if the output file has been renamed to match the name the input file had. */
+    QString get_sFileNameIn();                  /**< Get name of Input file.*/
+    QString get_sFileNameOut();                 /**< Get name of Output file.*/
+
+
 private:
 
     //=========================================================================================================
