@@ -68,7 +68,7 @@ using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
-//========================================================= ====================================================
+//=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
@@ -208,6 +208,142 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 
     m_pBlockTypeList.swap(obj.m_pBlockTypeList);
     m_pOutDir.swap(obj.m_pOutDir);
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE GETTER METHODS
+//=============================================================================================================
+
+QString FiffAnonymizer::get_sDfltString()              /**< Get value of string to be used as substitution of other strings in a fiff file */
+{
+    return m_sDfltString;
+}
+QDateTime FiffAnonymizer::get_dateDfltDate()           /**< Get value of Date to be used as substitution of dates found in a fiff file */
+{
+    return m_dateDfltDate;
+}
+QDateTime FiffAnonymizer::get_dateMeasurmentDate()     /**< DGet value of Date to substitute the measuremnt date appearing in the file.*/
+{
+    return m_dateMeasurmentDate;
+}
+bool FiffAnonymizer::get_bUseMeasurementDayOffset()    /**< Get value of Flags to use Measurement-date days offset.*/
+{
+    return m_bUseMeasurementDayOffset;
+}
+int  FiffAnonymizer::get_iMeasurementDayOffset()       /**< Get value of Number of days to subtract from the measurement date.*/
+{
+    return m_iMeasurementDayOffset;
+}
+QDateTime FiffAnonymizer::get_dateSubjectBirthday()    /**< Get value of Subject's birthday substitutor.*/
+{
+    return m_dateSubjectBirthday;
+}
+bool FiffAnonymizer::get_bUseSubjectBirthdayOffset()   /**< Get value of Flags use of Subject's birthday offset.*/
+{
+    return m_bUseSubjectBirthdayOffset;
+}
+int  FiffAnonymizer::get_iSubjectBirthdayOffset()      /**< Get value of Subjects's birthday offset.*/
+{
+    return m_iSubjectBirthdayOffset;
+}
+void FiffAnonymizer::get_BDfltMAC(fiff_int_t* &mac)             /**< Get MAC addresss substitutor value.*/
+{
+ mac[0] = m_BDfltMAC[0];
+ mac[1] = m_BDfltMAC[1];
+}
+int FiffAnonymizer::get_iDfltSubjectId()               /**< Get value of Subject's id substitutor.*/
+{
+    return m_iDfltSubjectId;
+}
+QString FiffAnonymizer::get_sDfltSubjectFirstName()    /**< Get value of Subject's first name substitutor.*/
+{
+    return m_sDfltSubjectFirstName;
+}
+QString FiffAnonymizer::get_sDfltSubjectMidName()      /**< Get value of Subject's middle name substitutor.*/
+{
+    return m_sDfltSubjectMidName;
+}
+QString FiffAnonymizer::get_sDfltSubjectLastName()     /**< Get value of Subject's last name substitutor.*/
+{
+    return m_sDfltSubjectLastName;
+}
+int FiffAnonymizer::get_iDfltSubjectWeight()           /**< Get value of Subject's weight substitutor.*/
+{
+    return m_iDfltSubjectWeight;
+}
+int FiffAnonymizer::get_iDfltSubjectHeight()           /**< Get value of Subject's height substitutor.*/
+{
+    return m_iDfltSubjectHeight;
+}
+QString FiffAnonymizer::get_sDfltSubjectComment()      /**< Get value of Subject's comment substitutor.*/
+{
+    return m_sDfltSubjectComment;
+}
+QString FiffAnonymizer::get_sDfltSubjectHisId()        /**< Get value of Subject's HIS ID substitutor.*/
+{
+    return m_sDfltSubjectHisId;
+}
+int FiffAnonymizer::get_iDfltProjectId()               /**< Get value of Project's id# substitutor.*/
+{
+    return m_iDfltProjectId;
+}
+QString FiffAnonymizer::get_sDfltProjectName()         /**< Get value of Project's name substitutor.*/
+{
+    return m_sDfltProjectName;
+}
+QString FiffAnonymizer::get_sDfltProjectAim()          /**< Get value of Project's aim substitutor.*/
+{
+    return m_sDfltProjectAim;
+}
+QString FiffAnonymizer::get_sDfltProjectPersons()      /**< Get value of Project's Persons substitutor.*/
+{
+    return m_sDfltProjectPersons;
+}
+QString FiffAnonymizer::get_sDfltProjectComment()      /**< Get value of Project's comment substitutor.*/
+{
+    return m_sDfltProjectComment;
+}
+bool FiffAnonymizer::get_bVerboseMode()                    /**< Get Default Verbosity mode enabler.*/
+{
+    return m_bVerboseMode;
+}
+bool FiffAnonymizer::get_bBruteMode()                      /**< Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.*/
+{
+    return m_bBruteMode;
+}
+bool FiffAnonymizer::get_bQuietMode()                      /**< value of Quite mode enabler.*/
+{
+    return m_bQuietMode;
+}
+bool FiffAnonymizer::get_bDeleteInputFileAfter()           /**< value of User's request to delete the input file after anonymization.*/
+{
+    return m_bDeleteInputFileAfter;
+}
+bool FiffAnonymizer::get_bDeleteInputFileConfirmation()  /**< value of User's request to avoid confirmation prompt for input file deletion.*/
+{
+    return m_bDeleteInputFileConfirmation;
+}
+bool FiffAnonymizer::get_bInputFileDeleted()             /**< value of Flags if the input file has been deleted. */
+{
+    return m_bInputFileDeleted;
+}
+bool FiffAnonymizer::get_bInOutFileNamesEqual()          /**< value of Flags user's request to have both input and output files with the same name.*/
+{
+    return m_bInOutFileNamesEqual;
+}
+bool FiffAnonymizer::get_bOutputFileRenamed()            /**< value ofFlags if the output file has been renamed to match the name the input file had. */
+{
+    return m_bOutputFileRenamed;
+}
+QString FiffAnonymizer::get_sFileNameIn()                /**< name of Input file.*/
+{
+    return m_sFileNameIn;
+}
+QString FiffAnonymizer::get_sFileNameOut()             /**< name of Output file.*/
+{
+    return m_sFileNameOut;
 }
 
 
