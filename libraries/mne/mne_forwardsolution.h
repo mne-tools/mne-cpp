@@ -599,12 +599,12 @@ inline bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b
             a.coord_frame == b.coord_frame &&
             a.nsource == b.nsource &&
             a.nchan == b.nchan &&
-            a.sol == b.sol &&
-            a.sol_grad == b.sol_grad &&
+            *a.sol == *b.sol &&
+            *a.sol_grad == *b.sol_grad &&
             a.mri_head_t == b.mri_head_t &&
             //a.src == b.src &&
-            a.source_rr == b.source_rr &&
-            a.source_nn == b.source_nn);
+            a.source_rr.isApprox(b.source_rr) &&
+            a.source_nn.isApprox(b.source_nn));
 }
 
 } // NAMESPACE

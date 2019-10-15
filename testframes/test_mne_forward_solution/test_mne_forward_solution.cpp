@@ -78,14 +78,13 @@ public:
 private slots:
     void initTestCase();
     void computeForward();
+    void compareForward();
     void cleanupTestCase();
 
 private:
-    void compareForwardMEGEEG();
-
     double epsilon;
 
-    QSharedPointer<ComputeFwd> m_pFwdMEGEEGComputed;
+    QSharedPointer<MNEForwardSolution> m_pFwdMEGEEGRead;
     QSharedPointer<MNEForwardSolution> m_pFwdMEGEEGRef;
 
 };
@@ -112,7 +111,7 @@ void TestMneForwardSolution::initTestCase()
 void TestMneForwardSolution::computeForward()
 {
     // Compute and Write Forward Solution
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>");
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute/Write/Read MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     // Read reference forward solution
     QString fwdMEGEEGFileRef("./mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
@@ -146,42 +145,28 @@ void TestMneForwardSolution::computeForward()
 
     settingsMEGEEG.checkIntegrity();
 
-    m_pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(&settingsMEGEEG));
-    m_pFwdMEGEEGComputed->calculateFwd();
+    QSharedPointer<ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(&settingsMEGEEG));
+    pFwdMEGEEGComputed->calculateFwd();
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<");
+    // Read newly created fwd
+    QFile fileFwdMEGEEGRead(settingsMEGEEG.solname);
+    m_pFwdMEGEEGRead = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRead));
 
-    compareForwardMEGEEG();
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute/Write/Read MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
 
 
 //*************************************************************************************************************
 
-void TestMneForwardSolution::compareForwardMEGEEG()
+void TestMneForwardSolution::compareForward()
 {
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>");
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    // Access public members of the old mne-c fwd computation.
-    // This is just temporary until we can use the new refactored fwd object to easily compare via == operator. See QVERIFY below.
-    // Read/write is always not supported yet since we currently have two MNESourceSpace classes: MNESourceSpace and MNESourceSpaceOld
-    qDebug() << "";
-    qDebug() << "m_pFwdMEGEEGComputed->meg_forward->nrow" << m_pFwdMEGEEGComputed->meg_forward->nrow;
-    qDebug() << "m_pFwdMEGEEGRef->sol->nrow" << m_pFwdMEGEEGRef->sol->nrow;
-    qDebug() << "";
-    qDebug() << "m_pFwdMEGEEGComputed->meg_forward->ncol + m_pFwdMEGEEGComputed->eeg_forward->ncol" << m_pFwdMEGEEGComputed->meg_forward->ncol + m_pFwdMEGEEGComputed->eeg_forward->ncol;
-    qDebug() << "m_pFwdMEGEEGRef->sol->ncol" << m_pFwdMEGEEGRef->sol->ncol;
-    qDebug() << "";
-
-    // Summ up the solution matrix elements to compare them with the references
+    // Sum up the solution matrix elements to compare them with the reference
     double sumComputed = 0;
-    for(int i = 0; i < m_pFwdMEGEEGComputed->meg_forward->nrow; ++i) {
-        for(int j = 0; j < m_pFwdMEGEEGComputed->meg_forward->ncol; ++j) {
-            sumComputed += m_pFwdMEGEEGComputed->meg_forward->data[i][j];
-        }
-    }
-    for(int i = 0; i < m_pFwdMEGEEGComputed->eeg_forward->nrow; ++i) {
-        for(int j = 0; j < m_pFwdMEGEEGComputed->eeg_forward->ncol; ++j) {
-            sumComputed += m_pFwdMEGEEGComputed->eeg_forward->data[i][j];
+    for(int i = 0; i < m_pFwdMEGEEGRead->sol->nrow; ++i) {
+        for(int j = 0; j < m_pFwdMEGEEGRead->sol->ncol; ++j) {
+            sumComputed += m_pFwdMEGEEGRead->sol->data(i,j);
         }
     }
 
@@ -198,15 +183,29 @@ void TestMneForwardSolution::compareForwardMEGEEG()
     qDebug() << "";
 
     // Please note that the solution matrix is transposed once it is read from the data file
-    QVERIFY(m_pFwdMEGEEGComputed->meg_forward->nrow == m_pFwdMEGEEGRef->sol->ncol);
-    QVERIFY(m_pFwdMEGEEGComputed->meg_forward->ncol + m_pFwdMEGEEGComputed->eeg_forward->ncol  == m_pFwdMEGEEGRef->sol->nrow);
+    QVERIFY(m_pFwdMEGEEGRead->sol->ncol == m_pFwdMEGEEGRef->sol->ncol);
+    QVERIFY(m_pFwdMEGEEGRead->sol->nrow == m_pFwdMEGEEGRef->sol->nrow);
 
     //Compare the actual fwd solution matrix results
     QVERIFY(sumComputed-sumRef <= epsilon);
+    QVERIFY(m_pFwdMEGEEGRead->sol.isApprox(m_pFwdMEGEEGRef->sol));
 
     // This is rather hard to test since we need to combien the two forward solutions.
     // This is normally done when reading the combined fwd solutions. Wait until everything is refactored.
-    // QVERIFY(m_pFwdMEGEEGComputed == m_pFwdMEGEEGRef);
+    //QVERIFY(*m_pFwdMEGEEGRead == *m_pFwdMEGEEGRef);
+
+    QVERIFY(m_pFwdMEGEEGRead->info == m_pFwdMEGEEGRef->info);
+    QVERIFY(m_pFwdMEGEEGRead->source_ori == m_pFwdMEGEEGRef->source_ori);
+    QVERIFY(m_pFwdMEGEEGRead->surf_ori == m_pFwdMEGEEGRef->surf_ori);
+    QVERIFY(m_pFwdMEGEEGRead->coord_frame == m_pFwdMEGEEGRef->coord_frame);
+    QVERIFY(m_pFwdMEGEEGRead->nsource == m_pFwdMEGEEGRef->nsource);
+    QVERIFY(m_pFwdMEGEEGRead->nchan == m_pFwdMEGEEGRef->nchan);
+    QVERIFY(*m_pFwdMEGEEGRead->sol == *m_pFwdMEGEEGRef->sol);
+//    QVERIFY(*m_pFwdMEGEEGRead->sol_grad == *m_pFwdMEGEEGRef->sol_grad);
+//    QVERIFY(m_pFwdMEGEEGRead->mri_head_t == m_pFwdMEGEEGRef->mri_head_t);
+    //m_pFwdMEGEEGRead->src == m_pFwdMEGEEGRef->src);
+    QVERIFY(m_pFwdMEGEEGRead->source_rr == m_pFwdMEGEEGRef->source_rr);
+    QVERIFY(m_pFwdMEGEEGRead->source_nn == m_pFwdMEGEEGRef->source_nn);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
