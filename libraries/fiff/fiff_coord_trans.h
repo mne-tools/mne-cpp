@@ -285,8 +285,8 @@ inline bool operator== (const FiffCoordTrans &a, const FiffCoordTrans &b)
 {
     return (a.from == b.from &&
             a.to == b.to &&
-            a.trans == b.trans &&
-            a.invtrans == b.invtrans);
+            a.trans.isApprox(b.trans),
+            a.invtrans.isApprox(b.invtrans));
 }
 
 

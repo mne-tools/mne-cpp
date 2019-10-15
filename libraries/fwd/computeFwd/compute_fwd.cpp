@@ -1893,45 +1893,45 @@ ComputeFwd::~ComputeFwd()
 
 //*************************************************************************************************************
 
-void ComputeFwd::calculateFwd()
+void ComputeFwd::calculateFwd() const
 {
     // TODO: This only temporary until we have the fwd dlibrary refactored. This is only done in order to provide easy testing in test_forward_solution.
-//    bool                res = false;
-//    MneSourceSpaceOld*  *spaces = NULL;  /* The source spaces */
-//    int                 nspace  = 0;
-//    int                 nsource = 0;     /* Number of source space points */
+    bool                res = false;
+    MneSourceSpaceOld*  *spaces = NULL;  /* The source spaces */
+    int                 nspace  = 0;
+    int                 nsource = 0;     /* Number of source space points */
 
-//    FiffCoordTransOld* mri_head_t = NULL;   /* MRI <-> head coordinate transformation */
-//    FiffCoordTransOld* meg_head_t = NULL;   /* MEG <-> head coordinate transformation */
+    FiffCoordTransOld* mri_head_t = NULL;   /* MRI <-> head coordinate transformation */
+    FiffCoordTransOld* meg_head_t = NULL;   /* MEG <-> head coordinate transformation */
 
-//    fiffChInfo     megchs   = NULL; /* The MEG channel information */
-//    int            nmeg     = 0;
-//    fiffChInfo     eegchs   = NULL; /* The EEG channel information */
-//    int            neeg     = 0;
-//    fiffChInfo     compchs = NULL;
-//    int            ncomp    = 0;
+    fiffChInfo     megchs   = NULL; /* The MEG channel information */
+    int            nmeg     = 0;
+    fiffChInfo     eegchs   = NULL; /* The EEG channel information */
+    int            neeg     = 0;
+    fiffChInfo     compchs = NULL;
+    int            ncomp    = 0;
 
-//    FwdCoilSet*             megcoils = NULL;     /* The coil descriptions */
-//    FwdCoilSet*             compcoils = NULL;    /* MEG compensation coils */
-//    MneCTFCompDataSet*      comp_data  = NULL;
-//    FwdCoilSet*             eegels = NULL;
-//    FwdEegSphereModelSet*   eeg_models = NULL;
+    FwdCoilSet*             megcoils = NULL;     /* The coil descriptions */
+    FwdCoilSet*             compcoils = NULL;    /* MEG compensation coils */
+    MneCTFCompDataSet*      comp_data  = NULL;
+    FwdCoilSet*             eegels = NULL;
+    FwdEegSphereModelSet*   eeg_models = NULL;
 
-//    MneNamedMatrix* meg_forward      = NULL;    /* Result of the MEG forward calculation */
-//    MneNamedMatrix* eeg_forward      = NULL;    /* Result of the EEG forward calculation */
-//    MneNamedMatrix* meg_forward_grad = NULL;    /* Result of the MEG forward gradient calculation */
-//    MneNamedMatrix* eeg_forward_grad = NULL;    /* Result of the EEG forward gradient calculation */
-//    int            k;
-//    fiffId         mri_id  = NULL;
-//    fiffId         meas_id = NULL;
-//    FILE           *out = NULL;     /* Output filtered points here */
+    MneNamedMatrix* meg_forward      = NULL;    /* Result of the MEG forward calculation */
+    MneNamedMatrix* eeg_forward      = NULL;    /* Result of the EEG forward calculation */
+    MneNamedMatrix* meg_forward_grad = NULL;    /* Result of the MEG forward gradient calculation */
+    MneNamedMatrix* eeg_forward_grad = NULL;    /* Result of the EEG forward gradient calculation */
+    int            k;
+    fiffId         mri_id  = NULL;
+    fiffId         meas_id = NULL;
+    FILE           *out = NULL;     /* Output filtered points here */
 
-//    FwdCoilSet*       templates = NULL;
-//    FwdEegSphereModel* eeg_model = NULL;
-//    FwdBemModel*       bem_model = NULL;
+    FwdCoilSet*       templates = NULL;
+    FwdEegSphereModel* eeg_model = NULL;
+    FwdBemModel*       bem_model = NULL;
 
-//    QString qPath;
-//    QFile file;
+    QString qPath;
+    QFile file;
 
 
     /*
@@ -2267,35 +2267,33 @@ void ComputeFwd::calculateFwd()
     printf("\nFinished.\n");
 
 out : {
+        //        if (out)
+        //            fclose(out);
+        for (k = 0; k < nspace; k++)
+            if(spaces[k])
+                delete spaces[k];
+        if(mri_head_t)
+            delete mri_head_t;
+        if(meg_head_t)
+            delete meg_head_t;
+        FREE_41(megchs);
+        FREE_41(eegchs);
+        if(megcoils)
+            delete megcoils;
+        if(eegels)
+            delete eegels;
 
-        // TODO: This only temporary until we have the fwd dlibrary refactored. This is only done in order to provide easy testing in test_forward_solution.
-//        //        if (out)
-//        //            fclose(out);
-//        for (k = 0; k < nspace; k++)
-//            if(spaces[k])
-//                delete spaces[k];
-//        if(mri_head_t)
-//            delete mri_head_t;
-//        if(meg_head_t)
-//            delete meg_head_t;
-//        FREE_41(megchs);
-//        FREE_41(eegchs);
-//        if(megcoils)
-//            delete megcoils;
-//        if(eegels)
-//            delete eegels;
+        if(meg_forward)
+            delete meg_forward;
+        if(eeg_forward)
+            delete eeg_forward;
+        if(meg_forward_grad)
+            delete meg_forward_grad;
+        if(eeg_forward_grad)
+            delete eeg_forward_grad;
 
-//        if(meg_forward)
-//            delete meg_forward;
-//        if(eeg_forward)
-//            delete eeg_forward;
-//        if(meg_forward_grad)
-//            delete meg_forward_grad;
-//        if(eeg_forward_grad)
-//            delete eeg_forward_grad;
-
-//        if (!res)
-//            qCritical("err_print_error();");//err_print_error();
+        if (!res)
+            qCritical("err_print_error();");//err_print_error();
     }
 }
 
