@@ -162,38 +162,8 @@ void TestMneForwardSolution::compareForward()
 {
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    // Sum up the solution matrix elements to compare them with the reference
-    double sumComputed = 0;
-    for(int i = 0; i < m_pFwdMEGEEGRead->sol->nrow; ++i) {
-        for(int j = 0; j < m_pFwdMEGEEGRead->sol->ncol; ++j) {
-            sumComputed += m_pFwdMEGEEGRead->sol->data(i,j);
-        }
-    }
-
-    double sumRef = 0;
-    for(int i = 0; i < m_pFwdMEGEEGRef->sol->nrow; ++i) {
-        for(int j = 0; j < m_pFwdMEGEEGRef->sol->ncol; ++j) {
-            sumRef += m_pFwdMEGEEGRef->sol->data(i,j);
-        }
-    }
-
-    qDebug() << "sumComputed" << sumComputed;
-    qDebug() << "sumRef" << sumRef;
-    qDebug() << "sumComputed-sumRef" << sumComputed-sumRef;
-    qDebug() << "";
-
-    // Please note that the solution matrix is transposed once it is read from the data file
-    QVERIFY(m_pFwdMEGEEGRead->sol->ncol == m_pFwdMEGEEGRef->sol->ncol);
-    QVERIFY(m_pFwdMEGEEGRead->sol->nrow == m_pFwdMEGEEGRef->sol->nrow);
-
-    //Compare the actual fwd solution matrix results
-    QVERIFY(sumComputed-sumRef <= epsilon);
-    QVERIFY(m_pFwdMEGEEGRead->sol->data.isApprox(m_pFwdMEGEEGRef->sol->data, epsilon));
-
-    // This is rather hard to test since we need to combien the two forward solutions.
-    // This is normally done when reading the combined fwd solutions. Wait until everything is refactored.
-    //QVERIFY(*m_pFwdMEGEEGRead == *m_pFwdMEGEEGRef);
-
+    // The following is equal to QVERIFY(*m_pFwdMEGEEGRead == *m_pFwdMEGEEGRef);
+    // This just gives more inforamtion on what might be wrong if failing
     QVERIFY(m_pFwdMEGEEGRead->info == m_pFwdMEGEEGRef->info);
     QVERIFY(m_pFwdMEGEEGRead->source_ori == m_pFwdMEGEEGRef->source_ori);
     QVERIFY(m_pFwdMEGEEGRead->surf_ori == m_pFwdMEGEEGRef->surf_ori);
@@ -201,8 +171,8 @@ void TestMneForwardSolution::compareForward()
     QVERIFY(m_pFwdMEGEEGRead->nsource == m_pFwdMEGEEGRef->nsource);
     QVERIFY(m_pFwdMEGEEGRead->nchan == m_pFwdMEGEEGRef->nchan);
     QVERIFY(*m_pFwdMEGEEGRead->sol == *m_pFwdMEGEEGRef->sol);
-//    QVERIFY(*m_pFwdMEGEEGRead->sol_grad == *m_pFwdMEGEEGRef->sol_grad);
-//    QVERIFY(m_pFwdMEGEEGRead->mri_head_t == m_pFwdMEGEEGRef->mri_head_t);
+    QVERIFY(*m_pFwdMEGEEGRead->sol_grad == *m_pFwdMEGEEGRef->sol_grad);
+    QVERIFY(m_pFwdMEGEEGRead->mri_head_t == m_pFwdMEGEEGRef->mri_head_t);
     //m_pFwdMEGEEGRead->src == m_pFwdMEGEEGRef->src);
     QVERIFY(m_pFwdMEGEEGRead->source_rr == m_pFwdMEGEEGRef->source_rr);
     QVERIFY(m_pFwdMEGEEGRead->source_nn == m_pFwdMEGEEGRef->source_nn);
