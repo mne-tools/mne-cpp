@@ -235,44 +235,193 @@ public:
 
     //=========================================================================================================
     /**
-    * Public Getter functions for retrieving default vaules from FiffAnonymizer.
-    *
-    *
+    * Returns the default string value to be used as substitution of other strings in the fiff file.
+    * @returns [out] value of m_sDefaultString
     */
-    QString get_sDfltString();              /**< Get value of string to be used as substitution of other strings in a fiff file */
-    QDateTime get_dateDfltDate();           /**< Get value of Date to be used as substitution of dates found in a fiff file */
-    QDateTime get_dateMeasurmentDate();     /**< DGet value of Date to substitute the measuremnt date appearing in the file.*/
-    bool get_bUseMeasurementDayOffset();    /**< Get value of Flags to use Measurement-date days offset.*/
-    int  get_iMeasurementDayOffset();       /**< Get value of Number of days to subtract from the measurement date.*/
-    QDateTime get_dateSubjectBirthday();    /**< Get value of Subject's birthday substitutor.*/
-    bool get_bUseSubjectBirthdayOffset();   /**< Get value of Flags use of Subject's birthday offset.*/
-    int  get_iSubjectBirthdayOffset();      /**< Get value of Subjects's birthday offset.*/
-    void get_BDfltMAC(FIFFLIB::fiff_int_t* &mac);     /**< Get value of MAC addresss substitutor.*/
-    int get_iDfltSubjectId();               /**< Get value of Subject's id substitutor.*/
-    QString get_sDfltSubjectFirstName();    /**< Get value of Subject's first name substitutor.*/
-    QString get_sDfltSubjectMidName();      /**< Get value of Subject's middle name substitutor.*/
-    QString get_sDfltSubjectLastName();     /**< Get value of Subject's last name substitutor.*/
-    int get_iDfltSubjectWeight();           /**< Get value of Subject's weight substitutor.*/
-    int get_iDfltSubjectHeight();           /**< Get value of Subject's height substitutor.*/
-    QString get_sDfltSubjectComment();      /**< Get value of Subject's comment substitutor.*/
-    QString get_sDfltSubjectHisId();        /**< Get value of Subject's HIS ID substitutor.*/
-    int get_iDfltProjectId();               /**< Get value of Project's id# substitutor.*/
-    QString get_sDfltProjectName();         /**< Get value of Project's name substitutor.*/
-    QString get_sDfltProjectAim();          /**< Get value of Project's aim substitutor.*/
-    QString get_sDfltProjectPersons();      /**< Get value of Project's Persons substitutor.*/
-    QString get_sDfltProjectComment();      /**< Get value of Project's comment substitutor.*/
+    QString getDefaultString();
+
+    //=========================================================================================================
+    /**
+    * Get value of Date to be used as substitution of dates found in a fiff file.
+    */
+    QDateTime getDefaultDate();
+
+    //=========================================================================================================
+    /**
+    * Get value of Date to substitute the measuremnt date appearing in the file.
+    */
+    QDateTime getMeasurementDate();
+
+    //=========================================================================================================
+    /**
+    * Get value of Flags to use Measurement-date days offset.
+    */
+    bool getUseMeasurementDayOffset();
+
+    //=========================================================================================================
+    /**
+    * Get value of Number of days to subtract from the measurement date.
+    */
+    int  getIntMeasurementDayOffset();
+
+    //=========================================================================================================
+    /**
+    * Get value of Subject's birthday substitutor.
+    */
+    QDateTime getSubjectBirthday();
+
+    //=========================================================================================================
+    /**
+    * Get value of Flags use of Subject's birthday offset.
+    */
+    bool getUseSubjectBirthdayOffset();
+
+    //=========================================================================================================
+    /**
+    * Get value of Subjects's birthday offset.
+    */
+    int  getIntSubjectBirthdayOffset();
+
+    //=========================================================================================================
+    /**
+    * Get value of MAC addresss substitutor.
+    */
+    void getDefaultMAC(FIFFLIB::fiff_int_t (&mac)[]);
+
+    //=========================================================================================================
+    /**
+    * Get value of Subject's id substitutor.
+    */
+    int getDefaultSubjectId();
+
+    //=========================================================================================================
+    /**
+    * Get value of Subject's first name substitutor.
+    */
+    QString getDefaultSubjectFirstName();
+
+    //=========================================================================================================
+    /**
+    * Get value of Subject's middle name substitutor.
+    */
+    QString getDefaultSubjectMidName();
+
+    //=========================================================================================================
+    /**
+    * Get value of Subject's last name substitutor.
+    */
+    QString getDefaultSubjectLastName();
+
+    //=========================================================================================================
+    /**
+    * Get value of Subject's weight substitutor.
+    */
+    int getDefaultSubjectWeight();
+
+    //=========================================================================================================
+    /**
+    * Get value of Subject's height substitutor.
+    */
+    int getDefaultSubjectHeight();
+
+    //=========================================================================================================
+    /**
+    * Get value of Subject's comment substitutor.
+    */
+    QString getDefaultSubjectComment();
+
+    //=========================================================================================================
+    /**
+    * Get value of Subject's HIS ID substitutor.
+    */
+    QString getDefaultSubjectHisId();
+
+    //=========================================================================================================
+    /**
+    * Get value of Project's id# substitutor.
+    */
+    int getDefaultProjectId();
+
+    //=========================================================================================================
+    /**
+    * Get value of Project's name substitutor.
+    */
+    QString getDefaultProjectName();
+
+    //=========================================================================================================
+    /**
+    * Get value of Project's aim substitutor.
+    */
+    QString getDefaultProjectAim();
+
+    //=========================================================================================================
+    /**
+    * Get value of Project's Persons substitutor.
+    */
+    QString getDefaultProjectPersons();
+
+    //=========================================================================================================
+    /**
+    * Get value of Project's comment substitutor.
+    */
+    QString getDefaultProjectComment();
+
 
     //APP SET POINT. applications behaviour options
-    bool get_bVerboseMode();                    /**< Get Default Verbosity mode enabler.*/
-    bool get_bBruteMode();                      /**< Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.*/
-    bool get_bQuietMode();                      /**< value of Quite mode enabler.*/
-    bool get_bDeleteInputFileAfter();           /**< value of User's request to delete the input file after anonymization.*/
-    bool get_bDeleteInputFileConfirmation();    /**< value of User's request to avoid confirmation prompt for input file deletion.*/
-    bool get_bInputFileDeleted();               /**< value of Flags if the input file has been deleted. */
-    bool get_bInOutFileNamesEqual();            /**< value of Flags user's request to have both input and output files with the same name.*/
-    bool get_bOutputFileRenamed();              /**< value ofFlags if the output file has been renamed to match the name the input file had. */
-    QString get_sFileNameIn();                  /**< Get name of Input file.*/
-    QString get_sFileNameOut();                 /**< Get name of Output file.*/
+    //
+    //=========================================================================================================
+    /**
+    * Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.
+    */
+    bool getBruteMode();
+
+    //=========================================================================================================
+    /**
+    * Value of Quite mode enabler.
+    */
+    bool getQuietMode();
+
+    //=========================================================================================================
+    /**
+    * value of User's request to delete the input file after anonymization.
+    */
+    bool getDeleteInputFileAfter();
+
+    //=========================================================================================================
+    /**
+    * Value of User's request to avoid confirmation prompt for input file deletion.
+    */
+    bool getDeleteInputFileConfirmation();
+
+    //=========================================================================================================
+    /**
+    * value of Flags if the input file has been deleted.
+    */
+    bool getInputFileDeleted();
+
+    //=========================================================================================================
+    /**
+    * Value of user's request to have both input and output files with the same name.
+    */
+    bool getInOutFileNamesEqual();
+
+    //=========================================================================================================
+    /**
+    * Value ofFlags if the output file has been renamed to match the name the input file had.
+    */
+    bool getOutputFileRenamed();
+
+    //=========================================================================================================
+    /**
+    * Get name of Input file.
+    */
+    QString getFileNameIn();
+
+    //=========================================================================================================
+    /**
+    * Get name of Output file.
+    */
+    QString getsFileNameOut();
 
 
 private:
@@ -421,40 +570,40 @@ private:
     void renameOutputFileAsInputFile();
 
     //App anonymization values
-    QString m_sDfltString;              /**< String to be used as substitution of other strings in a fiff file */
-    QDateTime m_dateDfltDate;           /**< Date to be used as substitution of dates found in a fiff file */
-    QDateTime m_dateMeasurmentDate;     /**< Date to substitute the measuremnt date appearing in the file.*/
-    bool m_bUseMeasurementDayOffset;    /**< Flags to use Measurement-date days offset.*/
-    int  m_iMeasurementDayOffset;       /**< Number of days to subtract from the measurement date.*/
-    QDateTime m_dateSubjectBirthday;    /**< Subject's birthday substitutor.*/
-    bool m_bUseSubjectBirthdayOffset;   /**< Flags use of Subject's birthday offset.*/
-    int  m_iSubjectBirthdayOffset;      /**< Subjects's birthday offset.*/
-    FIFFLIB::fiff_int_t m_BDfltMAC[2];  /**< MAC addresss substitutor.*/
-    int m_iDfltSubjectId;               /**< Subject's id substitutor.*/
-    QString m_sDfltSubjectFirstName;    /**< Subject's first name substitutor.*/
-    QString m_sDfltSubjectMidName;      /**< Subject's middle name substitutor.*/
-    QString m_sDfltSubjectLastName;     /**< Subject's last name substitutor.*/
-    int m_iDfltSubjectWeight;           /**< Subject's weight substitutor.*/
-    int m_iDfltSubjectHeight;           /**< Subject's height substitutor.*/
-    QString m_sDfltSubjectComment;      /**< Subject's comment substitutor.*/
-    QString m_sDfltSubjectHisId;        /**< Subject's HIS ID substitutor.*/
-    int m_iDfltProjectId;               /**< Project's id# substitutor.*/
-    QString m_sDfltProjectName;         /**< Project's name substitutor.*/
-    QString m_sDfltProjectAim;          /**< Project's aim substitutor.*/
-    QString m_sDfltProjectPersons;      /**< Project's Persons substitutor.*/
-    QString m_sDfltProjectComment;      /**< Project's comment substitutor.*/
+    QString m_sDefaultString;                   /**< String to be used as substitution of other strings in a fiff file */
+    QDateTime m_dateDefaultDate;                /**< Date to be used as substitution of dates found in a fiff file */
+    QDateTime m_dateDefaultMeasurmentDate;      /**< Date to substitute the measuremnt date appearing in the file.*/
+    bool m_bUseMeasurementDayOffset;            /**< Flags to use Measurement-date days offset.*/
+    int  m_iMeasurementDayOffset;               /**< Number of days to subtract from the measurement date.*/
+    QDateTime m_dateSubjectBirthday;            /**< Subject's birthday substitutor.*/
+    bool m_bUseSubjectBirthdayOffset;           /**< Flags use of Subject's birthday offset.*/
+    int  m_iSubjectBirthdayOffset;              /**< Subjects's birthday offset.*/
+    FIFFLIB::fiff_int_t m_BDfltMAC[2];          /**< MAC addresss substitutor.*/
+    int m_iDfltSubjectId;                       /**< Subject's id substitutor.*/
+    QString m_sDefaultSubjectFirstName;         /**< Subject's first name substitutor.*/
+    QString m_sDefaultSubjectMidName;           /**< Subject's middle name substitutor.*/
+    QString m_sDefaultSubjectLastName;          /**< Subject's last name substitutor.*/
+    int m_iDefaultSubjectWeight;                /**< Subject's weight substitutor.*/
+    int m_iDefaultSubjectHeight;                /**< Subject's height substitutor.*/
+    QString m_sDefaultSubjectComment;           /**< Subject's comment substitutor.*/
+    QString m_sDefaultSubjectHisId;             /**< Subject's HIS ID substitutor.*/
+    int m_iDefaultProjectId;                    /**< Project's id# substitutor.*/
+    QString m_sDefaultProjectName;              /**< Project's name substitutor.*/
+    QString m_sDefaultProjectAim;               /**< Project's aim substitutor.*/
+    QString m_sDefaultProjectPersons;           /**< Project's Persons substitutor.*/
+    QString m_sDefaultProjectComment;           /**< Project's comment substitutor.*/
 
     //APP SET POINT. applications behaviour options
-    bool m_bVerboseMode;                /**< Verbosity mode enabler.*/
-    bool m_bBruteMode;                  /**< Advanced anonymization. Anonymize also weight, height and some other fields.*/
-    bool m_bQuietMode;                  /**< Quite mode enabler.*/
-    bool m_bDeleteInputFileAfter;       /**< User's request to delete the input file after anonymization.*/
-    bool m_bDeleteInputFileConfirmation;/**< User's request to avoid confirmation prompt for input file deletion.*/
-    bool m_bInputFileDeleted;           /**< Flags if the input file has been deleted. */
-    bool m_bInOutFileNamesEqual;        /**< Flags user's request to have both input and output files with the same name.*/
-    bool m_bOutputFileRenamed;          /**< Flags if the output file has been renamed to match the name the input file had. */
-    QString m_sFileNameIn;              /**< Input file.*/
-    QString m_sFileNameOut;             /**< Output file.*/
+    bool m_bVerboseMode;                        /**< Verbosity mode enabler.*/
+    bool m_bBruteMode;                          /**< Advanced anonymization. Anonymize also weight, height and some other fields.*/
+    bool m_bQuietMode;                          /**< Quite mode enabler.*/
+    bool m_bDeleteInputFileAfter;               /**< User's request to delete the input file after anonymization.*/
+    bool m_bDeleteInputFileConfirmation;        /**< User's request to avoid confirmation prompt for input file deletion.*/
+    bool m_bInputFileDeleted;                   /**< Flags if the input file has been deleted. */
+    bool m_bInOutFileNamesEqual;                /**< Flags user's request to have both input and output files with the same name.*/
+    bool m_bOutputFileRenamed;                  /**< Flags if the output file has been renamed to match the name the input file had. */
+    QString m_sFileNameIn;                      /**< Input file.*/
+    QString m_sFileNameOut;                     /**< Output file.*/
 
     //app members
     QFile m_fFileIn;                    /**< QFile input file.*/
