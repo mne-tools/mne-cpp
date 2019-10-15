@@ -241,7 +241,7 @@ inline bool operator== (const FiffInfoBase &a, const FiffInfoBase &b)
 {
     return (a.filename == b.filename &&
             a.bads == b.bads &&
-            a.meas_id == b.meas_id &&
+            //a.meas_id == b.meas_id &&
             a.nchan == b.nchan &&
             a.chs == b.chs &&
             a.ch_names == b.ch_names &&
