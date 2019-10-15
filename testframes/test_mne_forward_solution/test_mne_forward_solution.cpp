@@ -188,7 +188,7 @@ void TestMneForwardSolution::compareForward()
 
     //Compare the actual fwd solution matrix results
     QVERIFY(sumComputed-sumRef <= epsilon);
-    QVERIFY(m_pFwdMEGEEGRead->sol.isApprox(m_pFwdMEGEEGRef->sol));
+    QVERIFY(m_pFwdMEGEEGRead->sol->data.isApprox(m_pFwdMEGEEGRef->sol->data, epsilon));
 
     // This is rather hard to test since we need to combien the two forward solutions.
     // This is normally done when reading the combined fwd solutions. Wait until everything is refactored.

@@ -153,10 +153,10 @@ inline qint32 FiffChPos::storageSize()
 inline bool operator== (const FiffChPos &a, const FiffChPos &b)
 {
     return (a.coil_type == b.coil_type &&
-            a.r0.isApprox(b.r0) &&
-            a.ex.isApprox(b.ex) &&
-            a.ey.isApprox(b.ey) &&
-            a.ez.isApprox(b.ez));
+            a.r0.isApprox(b.r0, 0.0001f) &&
+            a.ex.isApprox(b.ex, 0.0001f) &&
+            a.ey.isApprox(b.ey, 0.0001f) &&
+            a.ez.isApprox(b.ez, 0.0001f));
 }
 
 
