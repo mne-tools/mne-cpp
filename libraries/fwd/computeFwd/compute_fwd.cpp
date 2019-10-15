@@ -753,8 +753,8 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
     /*
     * Write data
     */
-    for(k = 0; k < datasize; ++k)
-        *t_pStream << mat->data+k;
+    for(k = 0; k < mat->nz; ++k)
+        *t_pStream << mat->data[k];
 
 //    /*
 //    * Write data with swapping
@@ -775,8 +775,8 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
     /*
     * Write indexes
     */
-    for(k = 0; k < idxsize; ++k)
-        *t_pStream << mat->inds+k;
+    for(k = 0; k < mat->nz; ++k)
+        *t_pStream << mat->inds[k];
 
 //    /*
 //    * Write indexes with swapping
@@ -795,8 +795,8 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
 
     if (mat->coding == FIFFTS_MC_CCS) {
 
-        for(k = 0; k < ptrsize; ++k)
-            *t_pStream << mat->ptrs+k;
+        for(k = 0; k < mat->n+1; ++k)
+            *t_pStream << mat->ptrs[k];
 
 //#ifdef INTEL_X86_ARCH
 //        for (k = 0; k < mat->n+1; k++)
@@ -812,8 +812,8 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
     }
     else {      /* Row-compressed format */
 
-        for(k = 0; k < ptrsize; ++k)
-            *t_pStream << mat->ptrs+k;
+        for(k = 0; k < mat->m+1; ++k)
+            *t_pStream << mat->ptrs[k];
 
 //#ifdef INTEL_X86_ARCH
 //        for (k = 0; k < mat->m+1; k++)
