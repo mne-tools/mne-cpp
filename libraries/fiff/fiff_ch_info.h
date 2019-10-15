@@ -186,8 +186,8 @@ inline bool operator== (const FiffChInfo &a, const FiffChInfo &b)
             a.chpos == b.chpos &&
             a.unit == b.unit &&
             a.unit_mul == b.unit_mul &&
-            a.coil_trans.isApprox(b.coil_trans),
-            a.eeg_loc.isApprox(b.eeg_loc),
+            a.coil_trans.isApprox(b.coil_trans, 0.0001f),
+            a.eeg_loc.isApprox(b.eeg_loc, 0.0001f),
             a.coord_frame == b.coord_frame);
 }
 

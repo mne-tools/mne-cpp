@@ -603,8 +603,8 @@ inline bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b
             *a.sol_grad == *b.sol_grad &&
             a.mri_head_t == b.mri_head_t &&
             //a.src == b.src &&
-            a.source_rr.isApprox(b.source_rr) &&
-            a.source_nn.isApprox(b.source_nn));
+            a.source_rr.isApprox(b.source_rr, 0.0001f) &&
+            a.source_nn.isApprox(b.source_nn, 0.0001f));
 }
 
 } // NAMESPACE
