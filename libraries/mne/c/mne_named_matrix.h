@@ -118,7 +118,6 @@ public:
     */
     ~MneNamedMatrix();
 
-
     //=========================================================================================================
     /**
     * Build a named matrix from the ingredients
@@ -159,16 +158,14 @@ public:
     *
     * @return   The read named matrix.
     */
-    MneNamedMatrix* pick_from_named_matrix( const QStringList& pickrowlist, int picknrow, const QStringList& pickcollist, int pickncol) const;
-
+    MneNamedMatrix* pick_from_named_matrix(const QStringList& pickrowlist, int picknrow, const QStringList& pickcollist, int pickncol) const;
 
 public:
-    int   nrow;         /* Number of rows */
-    int   ncol;         /* Number of columns */
+    int   nrow;             /* Number of rows */
+    int   ncol;             /* Number of columns */
     QStringList rowlist;    /* Name list for the rows (may be NULL) */
     QStringList collist;    /* Name list for the columns (may be NULL) */
-    float **data;       /* The data itself (dense) */
-
+    float **data;           /* The data itself (dense) */
 
 // ### OLD STRUCT ###
 //typedef struct {        /* Matrix specification with a channel list */
