@@ -238,6 +238,15 @@ public:
     */
     inline static qint32 storageSize();
 
+    /**
+    * Overloaded == operator to compare an object to this instance.
+    *
+    * @param[in] object    The object which should be compared to.
+    *
+    * @return true if equal, false otherwise
+    */
+    friend bool operator== (const FiffCoordTrans &a, const FiffCoordTrans &b);
+
 public:
     fiff_int_t  from;   /**< Source coordinate system. */
     fiff_int_t  to;     /**< Destination coordinate system. */
@@ -268,6 +277,18 @@ inline qint32 FiffCoordTrans::storageSize()
 {
     return 104;
 }
+
+
+//*************************************************************************************************************
+
+inline bool operator== (const FiffCoordTrans &a, const FiffCoordTrans &b)
+{
+    return (a.from == b.from &&
+            a.to == b.to &&
+            a.trans.isApprox(b.trans, 0.0001f),
+            a.invtrans.isApprox(b.invtrans, 0.0001f));
+}
+
 
 } // NAMESPACE
 

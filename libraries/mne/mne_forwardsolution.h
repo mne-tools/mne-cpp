@@ -448,7 +448,13 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    static bool read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList, bool bExcludeBads = true);
+    static bool read(QIODevice& p_IODevice,
+                     MNEForwardSolution& fwd,
+                     bool force_fixed = false,
+                     bool surf_ori = false,
+                     const QStringList& include = defaultQStringList,
+                     const QStringList& exclude = defaultQStringList,
+                     bool bExcludeBads = true);
 
     //ToDo readFromStream
 
@@ -488,6 +494,15 @@ public:
     * @return the stream with the attached fiff projector
     */
     friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution);
+
+    /**
+    * Overloaded == operator to compare an object to this instance.
+    *
+    * @param[in] object    The object which should be compared to.
+    *
+    * @return true if equal, false otherwise
+    */
+    friend bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b);
 
     //=========================================================================================================
     /**
@@ -571,6 +586,25 @@ inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolut
     out << "\n sol_grad:\n\t" << *p_MNEForwardSolution.sol_grad.data() << std::endl;
 
     return out;
+}
+
+
+//*************************************************************************************************************
+
+inline bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b)
+{
+    return (a.info == b.info &&
+            a.source_ori == b.source_ori &&
+            a.surf_ori == b.surf_ori &&
+            a.coord_frame == b.coord_frame &&
+            a.nsource == b.nsource &&
+            a.nchan == b.nchan &&
+            *a.sol == *b.sol &&
+            *a.sol_grad == *b.sol_grad &&
+            a.mri_head_t == b.mri_head_t &&
+            //a.src == b.src &&
+            a.source_rr.isApprox(b.source_rr, 0.0001f) &&
+            a.source_nn.isApprox(b.source_nn, 0.0001f));
 }
 
 } // NAMESPACE

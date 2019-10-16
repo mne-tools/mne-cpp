@@ -144,6 +144,7 @@ public:
     */
     inline static qint32 storageSize();
 
+    friend bool operator== (const FiffId &f1, const FiffId &f2);
 public:
     fiff_int_t version;     /**< File version */
     fiff_int_t machid[2];   /**< Unique machine ID */
@@ -181,6 +182,17 @@ inline bool FiffId::isEmpty() const
 inline qint32 FiffId::storageSize()
 {
     return 20;
+}
+
+
+//*************************************************************************************************************
+
+inline bool operator== (const FiffId &a, const FiffId &b)
+{
+    return (a.version == b.version &&
+            a.machid == b.machid &&
+            a.time.secs == b.time.secs &&
+            a.time.usecs == b.time.usecs);
 }
 
 } // NAMESPACE
