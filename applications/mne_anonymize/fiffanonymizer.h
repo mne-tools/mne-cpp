@@ -572,7 +572,7 @@ private:
     //App anonymization values
     QString m_sDefaultString;                   /**< String to be used as substitution of other strings in a fiff file */
     QDateTime m_dateDefaultDate;                /**< Date to be used as substitution of dates found in a fiff file */
-    QDateTime m_dateDefaultMeasurmentDate;      /**< Date to substitute the measuremnt date appearing in the file.*/
+    QDateTime m_dateMeasurmentDate;      /**< Date to substitute the measuremnt date appearing in the file.*/
     bool m_bUseMeasurementDayOffset;            /**< Flags to use Measurement-date days offset.*/
     int  m_iMeasurementDayOffset;               /**< Number of days to subtract from the measurement date.*/
     QDateTime m_dateSubjectBirthday;            /**< Subject's birthday substitutor.*/
@@ -580,18 +580,18 @@ private:
     int  m_iSubjectBirthdayOffset;              /**< Subjects's birthday offset.*/
     FIFFLIB::fiff_int_t m_BDfltMAC[2];          /**< MAC addresss substitutor.*/
     int m_iDfltSubjectId;                       /**< Subject's id substitutor.*/
-    QString m_sDefaultSubjectFirstName;         /**< Subject's first name substitutor.*/
-    QString m_sDefaultSubjectMidName;           /**< Subject's middle name substitutor.*/
-    QString m_sDefaultSubjectLastName;          /**< Subject's last name substitutor.*/
-    int m_iDefaultSubjectWeight;                /**< Subject's weight substitutor.*/
-    int m_iDefaultSubjectHeight;                /**< Subject's height substitutor.*/
-    QString m_sDefaultSubjectComment;           /**< Subject's comment substitutor.*/
-    QString m_sDefaultSubjectHisId;             /**< Subject's HIS ID substitutor.*/
-    int m_iDefaultProjectId;                    /**< Project's id# substitutor.*/
-    QString m_sDefaultProjectName;              /**< Project's name substitutor.*/
-    QString m_sDefaultProjectAim;               /**< Project's aim substitutor.*/
-    QString m_sDefaultProjectPersons;           /**< Project's Persons substitutor.*/
-    QString m_sDefaultProjectComment;           /**< Project's comment substitutor.*/
+    QString m_sSubjectFirstName;         /**< Subject's first name substitutor.*/
+    QString m_sSubjectMidName;           /**< Subject's middle name substitutor.*/
+    QString m_sSubjectLastName;          /**< Subject's last name substitutor.*/
+    int m_iSubjectWeight;                /**< Subject's weight substitutor.*/
+    int m_iSubjectHeight;                /**< Subject's height substitutor.*/
+    QString m_sSubjectComment;           /**< Subject's comment substitutor.*/
+    QString m_sSubjectHisId;             /**< Subject's HIS ID substitutor.*/
+    int m_iProjectId;                    /**< Project's id# substitutor.*/
+    QString m_sProjectName;              /**< Project's name substitutor.*/
+    QString m_sProjectAim;               /**< Project's aim substitutor.*/
+    QString m_sProjectPersons;           /**< Project's Persons substitutor.*/
+    QString m_sProjectComment;           /**< Project's comment substitutor.*/
 
     //APP SET POINT. applications behaviour options
     bool m_bVerboseMode;                        /**< Verbosity mode enabler.*/
