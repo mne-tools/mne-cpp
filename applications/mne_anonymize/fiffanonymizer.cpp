@@ -82,25 +82,25 @@ FiffAnonymizer::FiffAnonymizer()
 : maxValidFiffVerion(1.3)
 , m_sDefaultString("mne_anonymize")
 , m_dateDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0)))
-, m_dateDefaultMeasurmentDate(m_dateDefaultDate)
+, m_dateMeasurmentDate(m_dateDefaultDate)
 , m_bUseMeasurementDayOffset(false)
 , m_iMeasurementDayOffset(0)
 , m_dateSubjectBirthday(m_dateDefaultDate)
 , m_bUseSubjectBirthdayOffset(false)
 , m_iSubjectBirthdayOffset(0)
 , m_iDfltSubjectId(0)
-, m_sDefaultSubjectFirstName(m_sDefaultString)
-, m_sDefaultSubjectMidName("x")
-, m_sDefaultSubjectLastName(m_sDefaultString)
-, m_iDefaultSubjectWeight(0)
-, m_iDefaultSubjectHeight(0)
-, m_sDefaultSubjectComment(m_sDefaultString)
-, m_sDefaultSubjectHisId("mne_anonymize")
-, m_iDefaultProjectId(0)
-, m_sDefaultProjectName(m_sDefaultString)
-, m_sDefaultProjectAim(m_sDefaultString)
-, m_sDefaultProjectPersons(m_sDefaultString)
-, m_sDefaultProjectComment(m_sDefaultString)
+, m_sSubjectFirstName(m_sDefaultString)
+, m_sSubjectMidName("x")
+, m_sSubjectLastName(m_sDefaultString)
+, m_iSubjectWeight(0)
+, m_iSubjectHeight(0)
+, m_sSubjectComment(m_sDefaultString)
+, m_sSubjectHisId("mne_anonymize")
+, m_iProjectId(0)
+, m_sProjectName(m_sDefaultString)
+, m_sProjectAim(m_sDefaultString)
+, m_sProjectPersons(m_sDefaultString)
+, m_sProjectComment(m_sDefaultString)
 , m_bVerboseMode(false)
 , m_bBruteMode(false)
 , m_bQuietMode(false)
@@ -129,25 +129,25 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 : maxValidFiffVerion(obj.maxValidFiffVerion)
 , m_sDefaultString(obj.m_sDefaultString)
 , m_dateDefaultDate(obj.m_dateDefaultDate)
-, m_dateDefaultMeasurmentDate(obj.m_dateDefaultMeasurmentDate)
+, m_dateMeasurmentDate(obj.m_dateMeasurmentDate)
 , m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
 , m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
 , m_dateSubjectBirthday(obj.m_dateSubjectBirthday)
 , m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
 , m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
 , m_iDfltSubjectId(obj.m_iDfltSubjectId)
-, m_sDefaultSubjectFirstName(obj.m_sDefaultSubjectFirstName)
-, m_sDefaultSubjectMidName(obj.m_sDefaultSubjectMidName)
-, m_sDefaultSubjectLastName(obj.m_sDefaultSubjectLastName)
-, m_iDefaultSubjectWeight(obj.m_iDefaultSubjectWeight)
-, m_iDefaultSubjectHeight(obj.m_iDefaultSubjectHeight)
-, m_sDefaultSubjectComment(obj.m_sDefaultSubjectComment)
-, m_sDefaultSubjectHisId(obj.m_sDefaultSubjectHisId)
-, m_iDefaultProjectId(obj.m_iDefaultProjectId)
-, m_sDefaultProjectName(obj.m_sDefaultProjectName)
-, m_sDefaultProjectAim(obj.m_sDefaultProjectAim)
-, m_sDefaultProjectPersons(obj.m_sDefaultProjectPersons)
-, m_sDefaultProjectComment(obj.m_sDefaultProjectComment)
+, m_sSubjectFirstName(obj.m_sSubjectFirstName)
+, m_sSubjectMidName(obj.m_sSubjectMidName)
+, m_sSubjectLastName(obj.m_sSubjectLastName)
+, m_iSubjectWeight(obj.m_iSubjectWeight)
+, m_iSubjectHeight(obj.m_iSubjectHeight)
+, m_sSubjectComment(obj.m_sSubjectComment)
+, m_sSubjectHisId(obj.m_sSubjectHisId)
+, m_iProjectId(obj.m_iProjectId)
+, m_sProjectName(obj.m_sProjectName)
+, m_sProjectAim(obj.m_sProjectAim)
+, m_sProjectPersons(obj.m_sProjectPersons)
+, m_sProjectComment(obj.m_sProjectComment)
 , m_bVerboseMode(obj.m_bVerboseMode)
 , m_bBruteMode(obj.m_bBruteMode)
 , m_bQuietMode(obj.m_bQuietMode)
@@ -173,25 +173,25 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 : maxValidFiffVerion(obj.maxValidFiffVerion)
 , m_sDefaultString(obj.m_sDefaultString)
 , m_dateDefaultDate(obj.m_dateDefaultDate)
-, m_dateDefaultMeasurmentDate(obj.m_dateDefaultMeasurmentDate)
+, m_dateMeasurmentDate(obj.m_dateMeasurmentDate)
 , m_bUseMeasurementDayOffset(obj.m_bUseMeasurementDayOffset)
 , m_iMeasurementDayOffset(obj.m_iMeasurementDayOffset)
 , m_dateSubjectBirthday(obj.m_dateSubjectBirthday)
 , m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
 , m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
 , m_iDfltSubjectId(obj.m_iDfltSubjectId)
-, m_sDefaultSubjectFirstName(obj.m_sDefaultSubjectFirstName)
-, m_sDefaultSubjectMidName(obj.m_sDefaultSubjectMidName)
-, m_sDefaultSubjectLastName(obj.m_sDefaultSubjectLastName)
-, m_iDefaultSubjectWeight(obj.m_iDefaultSubjectWeight)
-, m_iDefaultSubjectHeight(obj.m_iDefaultSubjectHeight)
-, m_sDefaultSubjectComment(obj.m_sDefaultSubjectComment)
-, m_sDefaultSubjectHisId(obj.m_sDefaultSubjectHisId)
-, m_iDefaultProjectId(obj.m_iDefaultProjectId)
-, m_sDefaultProjectName(obj.m_sDefaultProjectName)
-, m_sDefaultProjectAim(obj.m_sDefaultProjectAim)
-, m_sDefaultProjectPersons(obj.m_sDefaultProjectPersons)
-, m_sDefaultProjectComment(obj.m_sDefaultProjectComment)
+, m_sSubjectFirstName(obj.m_sSubjectFirstName)
+, m_sSubjectMidName(obj.m_sSubjectMidName)
+, m_sSubjectLastName(obj.m_sSubjectLastName)
+, m_iSubjectWeight(obj.m_iSubjectWeight)
+, m_iSubjectHeight(obj.m_iSubjectHeight)
+, m_sSubjectComment(obj.m_sSubjectComment)
+, m_sSubjectHisId(obj.m_sSubjectHisId)
+, m_iProjectId(obj.m_iProjectId)
+, m_sProjectName(obj.m_sProjectName)
+, m_sProjectAim(obj.m_sProjectAim)
+, m_sProjectPersons(obj.m_sProjectPersons)
+, m_sProjectComment(obj.m_sProjectComment)
 , m_bVerboseMode(obj.m_bVerboseMode)
 , m_bBruteMode(obj.m_bBruteMode)
 , m_bQuietMode(obj.m_bQuietMode)
@@ -232,7 +232,7 @@ QDateTime FiffAnonymizer::getDefaultDate()
 
 QDateTime FiffAnonymizer::getMeasurementDate()
 {
-    return m_dateDefaultMeasurmentDate;
+    return m_dateMeasurmentDate;
 }
 
 //*************************************************************************************************************
@@ -289,84 +289,84 @@ int FiffAnonymizer::getDefaultSubjectId()
 
 QString FiffAnonymizer::getDefaultSubjectFirstName()
 {
-    return m_sDefaultSubjectFirstName;
+    return m_sSubjectFirstName;
 }
 
 //*************************************************************************************************************
 
 QString FiffAnonymizer::getDefaultSubjectMidName()
 {
-    return m_sDefaultSubjectMidName;
+    return m_sSubjectMidName;
 }
 
 //*************************************************************************************************************
 
 QString FiffAnonymizer::getDefaultSubjectLastName()
 {
-    return m_sDefaultSubjectLastName;
+    return m_sSubjectLastName;
 }
 
 //*************************************************************************************************************
 
 int FiffAnonymizer::getDefaultSubjectWeight()
 {
-    return m_iDefaultSubjectWeight;
+    return m_iSubjectWeight;
 }
 
 //*************************************************************************************************************
 
 int FiffAnonymizer::getDefaultSubjectHeight()
 {
-    return m_iDefaultSubjectHeight;
+    return m_iSubjectHeight;
 }
 
 //*************************************************************************************************************
 
 QString FiffAnonymizer::getDefaultSubjectComment()
 {
-    return m_sDefaultSubjectComment;
+    return m_sSubjectComment;
 }
 
 //*************************************************************************************************************
 
 QString FiffAnonymizer::getDefaultSubjectHisId()
 {
-    return m_sDefaultSubjectHisId;
+    return m_sSubjectHisId;
 }
 
 //*************************************************************************************************************
 
 int FiffAnonymizer::getDefaultProjectId()
 {
-    return m_iDefaultProjectId;
+    return m_iProjectId;
 }
 
 //*************************************************************************************************************
 
 QString FiffAnonymizer::getDefaultProjectName()
 {
-    return m_sDefaultProjectName;
+    return m_sProjectName;
 }
 
 //*************************************************************************************************************
 
 QString FiffAnonymizer::getDefaultProjectAim()
 {
-    return m_sDefaultProjectAim;
+    return m_sProjectAim;
 }
 
 //*************************************************************************************************************
 
 QString FiffAnonymizer::getDefaultProjectPersons()
 {
-    return m_sDefaultProjectPersons;
+    return m_sProjectPersons;
 }
 
 //*************************************************************************************************************
 
 QString FiffAnonymizer::getDefaultProjectComment()
 {
-    return m_sDefaultProjectComment;
+    return m_sProjectComment;
 }
 
 //*************************************************************************************************************
@@ -754,7 +754,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         if(m_bUseMeasurementDayOffset) {
             outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
         } else {
-            outMeasDate = m_dateDefaultMeasurmentDate;
+            outMeasDate = m_dateMeasurmentDate;
         }
 
         FiffId outId(inId);
@@ -784,7 +784,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         if(m_bUseMeasurementDayOffset) {
             outMeasDate = QDateTime(inMeasDate.date()).addDays(-m_iMeasurementDayOffset);
         } else {
-            outMeasDate = m_dateDefaultMeasurmentDate;
+            outMeasDate = m_dateMeasurmentDate;
         }
 
         fiff_int_t outData[1];
@@ -823,7 +823,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_FIRST_NAME:
     {
-        QString newStr(m_sDefaultSubjectFirstName);
+        QString newStr(m_sSubjectFirstName);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Experimenter changed: " +
@@ -832,7 +832,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_MIDDLE_NAME:
     {
-        QString newStr(m_sDefaultSubjectMidName);
+        QString newStr(m_sSubjectMidName);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Experimenter changed: " +
@@ -841,7 +841,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_LAST_NAME:
     {
-        QString newStr(m_sDefaultSubjectLastName);
+        QString newStr(m_sSubjectLastName);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Experimenter changed: " +
@@ -874,7 +874,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         if(m_bBruteMode)
         {
             float inWeight(*inTag->toFloat());
-            float outWeight(m_iDefaultSubjectWeight);
+            float outWeight(m_iSubjectWeight);
             memcpy(outTag->data(),&outWeight,sizeof(float));
             printIfVerbose("Subject's weight changed from: " +
                            QString::number(static_cast<double>(inWeight)) + " -> " + QString::number(static_cast<double>(outWeight)));
@@ -886,7 +886,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         if(m_bBruteMode)
         {
             float inHeight(*inTag->toFloat());
-            float outHeight(m_iDefaultSubjectHeight);
+            float outHeight(m_iSubjectHeight);
             memcpy(outTag->data(),&outHeight,sizeof(float));
             printIfVerbose("Subject's Height changed from: " +
                            QString::number(static_cast<double>(inHeight)) + " -> " + QString::number(static_cast<double>(outHeight)));
@@ -895,7 +895,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_COMMENT:
     {
-        QString newStr(m_sDefaultSubjectComment);
+        QString newStr(m_sSubjectComment);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Subject Comment changed: " +
@@ -905,7 +905,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     case FIFF_SUBJ_HIS_ID:
     {
         QString inSubjectHisId(inTag->data());
-        QString newSubjectHisId(m_sDefaultSubjectHisId);
+        QString newSubjectHisId(m_sSubjectHisId);
         outTag->resize(newSubjectHisId.size());
         memcpy(outTag->data(),newSubjectHisId.toUtf8(),static_cast<size_t>(newSubjectHisId.size()));
         printIfVerbose("Subject Hospital-ID changed:" + inSubjectHisId + " -> " + newSubjectHisId);
@@ -916,7 +916,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         if(m_bBruteMode)
         {
             qint32 inProjID(*inTag->toInt());
-            qint32 newProjID(m_iDefaultProjectId);
+            qint32 newProjID(m_iProjectId);
             memcpy(outTag->data(),&newProjID,sizeof(qint32));
             printIfVerbose("ProjectID changed: " +
                            QString::number(inProjID) + " -> " + QString::number(newProjID));
@@ -927,7 +927,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         if(m_bBruteMode)
         {
-                QString newStr(m_sDefaultProjectName);
+                QString newStr(m_sProjectName);
                 outTag->resize(newStr.size());
                 memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
                 printIfVerbose("Project name changed: " +
@@ -939,7 +939,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         if(m_bBruteMode)
         {
-            QString newStr(m_sDefaultProjectAim);
+            QString newStr(m_sProjectAim);
             outTag->resize(newStr.size());
             memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
             printIfVerbose("Project Aim changed: " +
@@ -949,7 +949,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_PROJ_PERSONS:
     {
-        QString newStr(m_sDefaultProjectPersons);
+        QString newStr(m_sProjectPersons);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
         printIfVerbose("Project Persons changed: " +
@@ -960,7 +960,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         if(m_bBruteMode)
         {
-            QString newStr(m_sDefaultProjectComment);
+            QString newStr(m_sProjectComment);
             outTag->resize(newStr.size());
             memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
             printIfVerbose("Project comment changed: " +
@@ -1063,7 +1063,7 @@ void FiffAnonymizer::setQuietMode(bool q)
 
 void FiffAnonymizer::setMeasurementDay(QString d)
 {
-    m_dateDefaultMeasurmentDate = QDateTime(QDate::fromString(d),QTime(1,1,0));
+    m_dateMeasurmentDate = QDateTime(QDate::fromString(d),QTime(1,1,0));
 }
 
 
@@ -1184,6 +1184,6 @@ void FiffAnonymizer::renameOutputFileAsInputFile()
 
 void FiffAnonymizer::setSubjectHisId(QString id)
 {
-    m_sDefaultSubjectHisId = id;
+    m_sSubjectHisId = id;
 }
 
