@@ -359,7 +359,7 @@ inline qint32 MNESourceSpace::size() const
 
 inline bool operator== (const MNESourceSpace &a, const MNESourceSpace &b)
 {
-    //return (a.m_qListHemispheres == b.m_qListHemispheres);
+    return (a.m_qListHemispheres == b.m_qListHemispheres);
 }
 
 } // NAMESPACE
