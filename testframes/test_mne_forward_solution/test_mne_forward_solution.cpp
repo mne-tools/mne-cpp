@@ -163,7 +163,7 @@ void TestMneForwardSolution::compareForward()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     // The following is equal to QVERIFY(*m_pFwdMEGEEGRead == *m_pFwdMEGEEGRef);
-    // This just gives more inforamtion on what might be wrong if failing
+    // This just gives more information on what might be wrong if failing
     QVERIFY(m_pFwdMEGEEGRead->info == m_pFwdMEGEEGRef->info);
     QVERIFY(m_pFwdMEGEEGRead->source_ori == m_pFwdMEGEEGRef->source_ori);
     QVERIFY(m_pFwdMEGEEGRead->surf_ori == m_pFwdMEGEEGRef->surf_ori);
@@ -173,7 +173,7 @@ void TestMneForwardSolution::compareForward()
     QVERIFY(*m_pFwdMEGEEGRead->sol == *m_pFwdMEGEEGRef->sol);
     QVERIFY(*m_pFwdMEGEEGRead->sol_grad == *m_pFwdMEGEEGRef->sol_grad);
     QVERIFY(m_pFwdMEGEEGRead->mri_head_t == m_pFwdMEGEEGRef->mri_head_t);
-    //m_pFwdMEGEEGRead->src == m_pFwdMEGEEGRef->src);
+    QVERIFY(m_pFwdMEGEEGRead->src == m_pFwdMEGEEGRef->src);
     QVERIFY(m_pFwdMEGEEGRead->source_rr == m_pFwdMEGEEGRef->source_rr);
     QVERIFY(m_pFwdMEGEEGRead->source_nn == m_pFwdMEGEEGRef->source_nn);
 
