@@ -356,6 +356,8 @@ void TestMneAnonymize::verifyCRC(const QString file,
 
 void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 {
+    QSharedPointer<FiffAnonymizer> objAnon = QSharedPointer<FiffAnonymizer>(new FiffAnonymizer);
+
     FiffTag::SPtr pTag = FiffTag::SPtr::create();
 
     stream->device()->seek(0);
@@ -374,14 +376,15 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         case FIFF_REF_FILE_ID:
         case FIFF_REF_BLOCK_ID:
         {
-//            FiffId inId = inTag->toFiffID();
-//            QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs);
-//            QDateTime outMeasDate;
-//            if(m_bUseMeasurementDayOffset) {
-//                outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
-//            } else {
-//                outMeasDate = m_dateMeasurmentDate;
-//            }
+              FiffId inId = pTag->toFiffID();
+              QDateTime anonMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs);
+              QDateTime defaultMeasDate = objAnon->getDefaultDate();
+
+            if(objAnon->getUseMeasurementDayOffset()) {
+               QVERIFY(anonMeasDate == defaultMeasDate.addDays(-(objAnon->getIntMeasurementDayOffset())));
+            } else {
+               QVERIFY(anonMeasDate == defaultMeasDate);
+            }
 
 //            FiffId outId(inId);
 //            outId.machid[0] = m_BDfltMAC[0];
