@@ -160,7 +160,7 @@ void TestMneAnonymize::testDefaultWildcard()
 
     MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
 
-    QStringList listOfFiles = SettingsController::listFilesMatchingPatternName(sFileIn);
+    QStringList listOfFiles = MNEANONYMIZE::listFilesMatchingPatternName(sFileIn);
     for(QString fin: listOfFiles)
     {
         QString fout(fin.replace(fin.size()-4,4,"_anonymized.fif"));
@@ -389,7 +389,7 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 //            FiffId outId(inId);
 //            outId.machid[0] = m_BDfltMAC[0];
 //            outId.machid[1] = m_BDfltMAC[1];
-//            outId.time.secs = static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
+//            outId.time.secs = static_cast<int32_t>(defaultMeasDate.toSecsSinceEpoch());
 //            outId.time.usecs = 0;
 
 //            const int fiffIdSize(sizeof(inId)/sizeof(fiff_int_t));
