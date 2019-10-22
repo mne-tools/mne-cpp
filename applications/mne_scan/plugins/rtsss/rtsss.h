@@ -70,7 +70,7 @@
 // DEFINE NAMESPACE RTSSSPlugin
 //=============================================================================================================
 
-namespace RtSssPlugin
+namespace RTSSSPLUGIN
 {
 
 

@@ -125,6 +125,15 @@ public:
     */
     void write(QString p_sFileName) const;
 
+    /**
+    * Overloaded == operator to compare an object to this instance.
+    *
+    * @param[in] object    The object which should be compared to.
+    *
+    * @return true if equal, false otherwise
+    */
+    friend bool operator== (const MNEClusterInfo &a, const MNEClusterInfo &b);
+
 public:
     QList<QString>      clusterLabelNames;  /**< Label name of the cluster. Entries can be non unique, since some Label consist of more than one cluster.*/
     QList<qint32>       clusterLabelIds;    /**< Id (Label/ROI id) of the cluster. Entries can be non unique, since some Label/ROI consist of more than one cluster.*/
@@ -153,6 +162,55 @@ inline qint32 MNEClusterInfo::numClust() const
     return this->clusterVertnos.size();
 }
 
+
+//*************************************************************************************************************
+
+inline bool operator== (const MNEClusterInfo &a, const MNEClusterInfo &b)
+{
+    if(a.centroidSource_rr.size() == b.centroidSource_rr.size()) {
+        for(int i = 0; i < a.centroidSource_rr.size(); ++i) {
+            if(!a.centroidSource_rr.at(i).isApprox(b.centroidSource_rr.at(i), 0.0001f)) {
+                return false;
+            }
+        }
+    } else {
+        return false;
+    }
+
+    if(a.clusterVertnos.size() == b.clusterVertnos.size()) {
+        for(int i = 0; i < a.clusterVertnos.size(); ++i) {
+            if(!a.clusterVertnos.at(i).isApprox(b.clusterVertnos.at(i))) {
+                return false;
+            }
+        }
+    } else {
+        return false;
+    }
+
+    if(a.clusterSource_rr.size() == b.clusterSource_rr.size()) {
+        for(int i = 0; i < a.clusterSource_rr.size(); ++i) {
+            if(!a.clusterSource_rr.at(i).isApprox(b.clusterSource_rr.at(i), 0.0001f)) {
+                return false;
+            }
+        }
+    } else {
+        return false;
+    }
+
+    if(a.clusterDistances.size() == b.clusterDistances.size()) {
+        for(int i = 0; i < a.clusterDistances.size(); ++i) {
+            if(!a.clusterDistances.at(i).isApprox(b.clusterDistances.at(i))) {
+                return false;
+            }
+        }
+    } else {
+        return false;
+    }
+
+    return (a.clusterLabelNames == b.clusterLabelNames &&
+            a.clusterLabelIds == b.clusterLabelIds &&
+            a.centroidVertno == b.centroidVertno);
+}
 } // NAMESPACE
 
 #endif // MNE_CLUSTER_INFO_H

@@ -301,8 +301,14 @@ void mne_scale_vector_40(double scale,float *v,int   nn)
 #endif
 }
 
+#include <Eigen/Core>
+using namespace Eigen;
 
-float **mne_mat_mat_mult_40 (float **m1,float **m2,int d1,int d2,int d3)
+float **mne_mat_mat_mult_40 (float **m1,
+                             float **m2,
+                             int d1,
+                             int d2,
+                             int d3)
 /* Matrix multiplication
       * result(d1 x d3) = m1(d1 x d2) * m2(d2 x d3) */
 
@@ -321,13 +327,37 @@ float **mne_mat_mat_mult_40 (float **m1,float **m2,int d1,int d2,int d3)
     int j,k,p;
     float sum;
 
-    for (j = 0; j < d1; j++)
-        for (k = 0; k < d3; k++) {
-            sum = 0.0;
-            for (p = 0; p < d2; p++)
-                sum = sum + m1[j][p]*m2[p][k];
-            result[j][k] = sum;
+    // TODO: Hack to include faster Eigen processing. This should eventually be replaced dwith pure Eigen logic.
+    MatrixXf a(d1,d2);
+    MatrixXf b(d2,d3);
+
+    for (j = 0; j < d1; j++) {
+        for (k = 0; k < d2; k++) {
+            a(j,k) = m1[j][k];
         }
+    }
+
+    for (j = 0; j < d2; j++) {
+        for (k = 0; k < d3; k++) {
+            b(j,k) = m2[j][k];
+        }
+    }
+
+    MatrixXf resultMat = a * b;
+
+    for (j = 0; j < d1; j++) {
+        for (k = 0; k < d3; k++) {
+            result[j][k] = resultMat(j,k);
+        }
+    }
+
+//    for (j = 0; j < d1; j++)
+//        for (k = 0; k < d3; k++) {
+//            sum = 0.0;
+//            for (p = 0; p < d2; p++)
+//                sum = sum + m1[j][p]*m2[p][k];
+//            result[j][k] = sum;
+//        }
     return (result);
 #endif
 }
@@ -2548,7 +2578,11 @@ int FwdBemModel::fwd_bem_specify_coils(FwdBemModel *m, FwdCoilSet *coils)
 
     csol->ncoil     = coils->ncoil;
     csol->np        = m->nsol;
-    csol->solution  = mne_mat_mat_mult_40(sol,m->solution,coils->ncoil,m->nsol,m->nsol);//TODO: Suspicion, that this is slow - use Eigen
+    csol->solution  = mne_mat_mat_mult_40(sol,
+                                          m->solution,
+                                          coils->ncoil,
+                                          m->nsol,
+                                          m->nsol);//TODO: Suspicion, that this is slow - use Eigen
 
     FREE_CMATRIX_40(sol);
     return OK;
@@ -3095,7 +3129,17 @@ bad : {
 
 //*************************************************************************************************************
 
-int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, FwdCoilSet *coils, FwdCoilSet *comp_coils, MneCTFCompDataSet *comp_data, bool fixed_ori, FwdBemModel *bem_model, Vector3f *r0, bool use_threads, MneNamedMatrix **resp, MneNamedMatrix **resp_grad)
+int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
+                                     int nspace,
+                                     FwdCoilSet *coils,
+                                     FwdCoilSet *comp_coils,
+                                     MneCTFCompDataSet *comp_data,
+                                     bool fixed_ori,
+                                     FwdBemModel *bem_model,
+                                     Vector3f *r0,
+                                     bool use_threads,
+                                     MneNamedMatrix **resp,
+                                     MneNamedMatrix **resp_grad)
 /*
 * Compute the MEG forward solution
 * Use either the sphere model or BEM in the calculations
@@ -3290,9 +3334,17 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces, int nspace, Fwd
         delete comp;
 
 
-    *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,nmeg,emptyList,names,res);
+    *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,
+                                               nmeg,
+                                               emptyList,
+                                               names,
+                                               res);
     if (resp_grad && res_grad)
-        *resp_grad = MneNamedMatrix::build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,nmeg,emptyList,names,res_grad);
+        *resp_grad = MneNamedMatrix::build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,
+                                                        nmeg,
+                                                        emptyList,
+                                                        names,
+                                                        res_grad);
     return OK;
 
 bad : {

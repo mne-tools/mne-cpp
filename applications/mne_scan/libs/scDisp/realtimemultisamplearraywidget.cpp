@@ -215,11 +215,6 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //Init quick control widget
         QStringList slFlags = m_pRTMSA->getDisplayFlags();
-        #ifdef BUILD_BASIC_MNESCAN_VERSION
-            std::cout<<"BUILD_BASIC_MNESCAN_VERSION Defined"<<std::endl;
-            slFlags.clear();
-            slFlags << "projections" << "view" << "scaling";
-        #endif
 
         // Quick control scaling
         if(slFlags.contains("scaling")) {

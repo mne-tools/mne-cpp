@@ -60,7 +60,7 @@ RtSssAlgo rsss;
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RtSssPlugin;
+using namespace RTSSSPLUGIN;
 using namespace FIFFLIB;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;

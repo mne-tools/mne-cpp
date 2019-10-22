@@ -190,11 +190,14 @@ public:
 
     //ToDo write(IODevice &)
 
-    //=========================================================================================================
     /**
-    * Qt 3d geometry information. Data are generated within first call.
+    * Overloaded == operator to compare an object to this instance.
+    *
+    * @param[in] object    The object which should be compared to.
+    *
+    * @return true if equal, false otherwise
     */
-    //QGeometryData* getGeometryData(float p_fScaling = 1.0f);
+    friend bool operator== (const MNEHemisphere &a, const MNEHemisphere &b);
 
 public:
     fiff_int_t type;            /**< Type of the source space: 1 = "surf" or 2 = "vol". ToDo not used yet. */
@@ -241,6 +244,51 @@ private:
 inline bool MNEHemisphere::isClustered() const
 {
     return !cluster_info.isEmpty();
+}
+
+
+//*************************************************************************************************************
+
+inline bool operator== (const MNEHemisphere &a, const MNEHemisphere &b)
+{
+    if(a.pinfo.size() == b.pinfo.size()) {
+        for(int i = 0; i < a.pinfo.size(); ++i) {
+            if(!a.pinfo.at(i).isApprox(b.pinfo.at(i), 0.0001f)) {
+                return false;
+            }
+        }
+    } else {
+        return false;
+    }
+
+    return (a.type == b.type &&
+            a.id == b.id &&
+            a.np == b.np &&
+            a.ntri == b.ntri &&
+            a.coord_frame == b.coord_frame &&
+            a.rr.isApprox(b.rr, 0.0001f) &&
+            a.nn.isApprox(b.nn, 0.0001f) &&
+            a.tris.isApprox(b.tris) &&
+            a.nuse == b.nuse &&
+            a.inuse.isApprox(b.inuse) &&
+            a.vertno.isApprox(b.vertno) &&
+            a.nuse_tri == b.nuse_tri &&
+            a.use_tris.isApprox(b.use_tris) &&
+            a.nearest.isApprox(b.nearest) &&
+            a.nearest_dist.isApprox(b.nearest_dist, 0.0001) &&
+            a.patch_inds.isApprox(b.patch_inds) &&
+            //a.dist_limit == b.dist_limit && //TODO: We still not sure if dist_limit can also be a matrix. This needs to be debugged
+            a.dist.isApprox(b.dist, 0.0001) &&
+            a.tri_cent.isApprox(b.tri_cent, 0.0001) &&
+            a.tri_nn.isApprox(b.tri_nn, 0.0001) &&
+            a.tri_area.isApprox(b.tri_area, 0.0001) &&
+            a.use_tri_cent.isApprox(b.use_tri_cent, 0.0001) &&
+            a.use_tri_nn.isApprox(b.use_tri_nn, 0.0001) &&
+            a.use_tri_area.isApprox(b.use_tri_area, 0.0001) &&
+            a.neighbor_tri == b.neighbor_tri &&
+            a.neighbor_vert == b.neighbor_vert &&
+            a.cluster_info == b.cluster_info &&
+            a.m_TriCoords.isApprox(b.m_TriCoords, 0.0001f));
 }
 
 } // NAMESPACE

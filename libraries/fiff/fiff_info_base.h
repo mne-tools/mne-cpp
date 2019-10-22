@@ -78,12 +78,13 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
-* Light measurement info -> ToDo transform this to FiffInfo base class for FiffInfo
+* Light measurement info
 *
 * @brief light measurement info
 */
 class FIFFSHARED_EXPORT FiffInfoBase
 {
+
 public:
     typedef QSharedPointer<FiffInfoBase> SPtr;              /**< Shared pointer type for FiffInfoBase. */
     typedef QSharedPointer<const FiffInfoBase> ConstSPtr;   /**< Const shared pointer type for FiffInfoBase. */
@@ -197,12 +198,25 @@ public:
     *
     * @return the selector matrix (row vector)
     */
-    RowVectorXi pick_types(bool meg, bool eeg = false, bool stim = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+    RowVectorXi pick_types(bool meg,
+                           bool eeg = false,
+                           bool stim = false,
+                           const QStringList& include = defaultQStringList,
+                           const QStringList& exclude = defaultQStringList) const;
 
-public: //Public because it's a mne struct
+    /**
+    * Overloaded == operator to compare an object to this instance.
+    *
+    * @param[in] object    The object which should be compared to.
+    *
+    * @return true if equal, false otherwise
+    */
+    friend bool operator== (const FiffInfoBase &a, const FiffInfoBase &b);
+
+public:
     QString filename;           /**< Filename when the info is read of a fiff file. */
     QStringList bads;           /**< List of bad channels. */
-    FiffId meas_id;       /**< Measurement ID. */
+    FiffId meas_id;             /**< Measurement ID. */
     fiff_int_t  nchan;          /**< Number of channels. */
     QList<FiffChInfo> chs;      /**< List of all channel info descriptors. */
     QStringList ch_names;       /**< List of all channel names. */
@@ -219,6 +233,22 @@ inline bool FiffInfoBase::isEmpty() const
 {
     return this->nchan <= 0;
 }
+
+
+//*************************************************************************************************************
+
+inline bool operator== (const FiffInfoBase &a, const FiffInfoBase &b)
+{
+    return (a.filename == b.filename &&
+            a.bads == b.bads &&
+            //a.meas_id == b.meas_id &&
+            a.nchan == b.nchan &&
+            a.chs == b.chs &&
+            a.ch_names == b.ch_names &&
+            a.dev_head_t == b.dev_head_t &&
+            a.ctf_head_t == b.ctf_head_t);
+}
+
 
 } // NAMESPACE
 
