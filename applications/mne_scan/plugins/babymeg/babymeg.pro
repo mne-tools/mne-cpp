@@ -141,11 +141,6 @@ unix:!macx {
     # === Unix ===
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
-
-contains(MNECPP_CONFIG, buildBasicMneScanVersion) {
-    DEFINES += BUILD_BASIC_MNESCAN_VERSION
-}
-
 # Activate FFTW backend in Eigen
 contains(MNECPP_CONFIG, useFFTW) {
     DEFINES += EIGEN_FFTW_DEFAULT
