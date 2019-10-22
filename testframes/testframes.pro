@@ -42,7 +42,7 @@ SUBDIRS += \
     test_dipole_fit \
     test_fiff_rwr \
     test_fiff_mne_types_io \
-    test_forward_solution \
+    test_mne_forward_solution \
     test_fiff_cov \
     test_fiff_digitizer \
     test_mne_msh_display_surface_set \

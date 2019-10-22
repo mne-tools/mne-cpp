@@ -58,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RapMusicToolboxPlugin;
+using namespace RAPMUSICTOOLBOXPLUGIN;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;
 

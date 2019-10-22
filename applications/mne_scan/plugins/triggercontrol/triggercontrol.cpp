@@ -73,7 +73,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TriggerControlPlugin;
+using namespace TRIGGERCONTROLPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 
