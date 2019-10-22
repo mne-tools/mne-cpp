@@ -195,6 +195,7 @@ RowVectorXi FiffInfoBase::pick_types(const QString meg, bool eeg, bool stim, con
     return sel;
 }
 
+
 //*************************************************************************************************************
 
 RowVectorXi FiffInfoBase::pick_types(bool meg, bool eeg, bool stim, const QStringList& include, const QStringList& exclude) const

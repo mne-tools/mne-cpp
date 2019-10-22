@@ -45,6 +45,20 @@
 #include "compute_fwd_settings.h"
 
 
+#include <fiff/c/fiff_coord_trans_old.h>
+#include "../fwd_coil_set.h"
+#include <mne/c/mne_ctf_comp_data_set.h>
+#include "../fwd_eeg_sphere_model_set.h"
+#include "../fwd_bem_model.h"
+#include <mne/c/mne_named_matrix.h>
+#include <mne/c/mne_nearest.h>
+#include <mne/c/mne_source_space_old.h>
+
+#include <fiff/c/fiff_sparse_matrix.h>
+
+#include <fiff/fiff_types.h>
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -60,6 +74,10 @@
 
 #include <QSharedPointer>
 #include <QString>
+
+#include <QCoreApplication>
+#include <QFile>
+#include <QDir>
 
 
 //*************************************************************************************************************
@@ -102,6 +120,9 @@ public:
 
     //ToDo split this function into init (with settings as parameter) and the actual fit function
     void calculateFwd() const;
+
+    QString qPath;
+    QFile file;
 
 private:
     ComputeFwdSettings* settings;

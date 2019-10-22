@@ -997,7 +997,8 @@ FiffCov MNEForwardSolution::compute_orient_prior(float loose)
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::pick_channels(const QStringList& include, const QStringList& exclude) const
+MNEForwardSolution MNEForwardSolution::pick_channels(const QStringList& include,
+                                                     const QStringList& exclude) const
 {
     MNEForwardSolution fwd(*this);
 
@@ -1227,7 +1228,13 @@ void MNEForwardSolution::prepare_forward(const FiffInfo &p_info,
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed, bool surf_ori, const QStringList& include, const QStringList& exclude, bool bExcludeBads)
+bool MNEForwardSolution::read(QIODevice& p_IODevice,
+                              MNEForwardSolution& fwd,
+                              bool force_fixed,
+                              bool surf_ori,
+                              const QStringList& include,
+                              const QStringList& exclude,
+                              bool bExcludeBads)
 {
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
 
@@ -1715,7 +1722,9 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
 
 //*************************************************************************************************************
 
-bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Node, MNEForwardSolution& one)
+bool MNEForwardSolution::read_one(FiffStream::SPtr& p_pStream,
+                                  const FiffDirNode::SPtr& p_Node,
+                                  MNEForwardSolution& one)
 {
     //
     //   Read all interesting stuff for one forward solution

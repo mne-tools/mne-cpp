@@ -753,8 +753,8 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
     /*
     * Write data
     */
-    for(k = 0; k < datasize; ++k)
-        *t_pStream << mat->data+k;
+    for(k = 0; k < mat->nz; ++k)
+        *t_pStream << mat->data[k];
 
 //    /*
 //    * Write data with swapping
@@ -775,8 +775,8 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
     /*
     * Write indexes
     */
-    for(k = 0; k < idxsize; ++k)
-        *t_pStream << mat->inds+k;
+    for(k = 0; k < mat->nz; ++k)
+        *t_pStream << mat->inds[k];
 
 //    /*
 //    * Write indexes with swapping
@@ -795,8 +795,8 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
 
     if (mat->coding == FIFFTS_MC_CCS) {
 
-        for(k = 0; k < ptrsize; ++k)
-            *t_pStream << mat->ptrs+k;
+        for(k = 0; k < mat->n+1; ++k)
+            *t_pStream << mat->ptrs[k];
 
 //#ifdef INTEL_X86_ARCH
 //        for (k = 0; k < mat->n+1; k++)
@@ -812,8 +812,8 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
     }
     else {      /* Row-compressed format */
 
-        for(k = 0; k < ptrsize; ++k)
-            *t_pStream << mat->ptrs+k;
+        for(k = 0; k < mat->m+1; ++k)
+            *t_pStream << mat->ptrs[k];
 
 //#ifdef INTEL_X86_ARCH
 //        for (k = 0; k < mat->m+1; k++)
@@ -1895,6 +1895,7 @@ ComputeFwd::~ComputeFwd()
 
 void ComputeFwd::calculateFwd() const
 {
+    // TODO: This only temporary until we have the fwd dlibrary refactored. This is only done in order to provide easy testing in test_forward_solution.
     bool                res = false;
     MneSourceSpaceOld*  *spaces = NULL;  /* The source spaces */
     int                 nspace  = 0;
@@ -2209,13 +2210,27 @@ void ComputeFwd::calculateFwd() const
     if (!bem_model)
         settings->use_threads = false;
     if (nmeg > 0)
-        if ((FwdBemModel::compute_forward_meg(spaces,nspace,megcoils,compcoils,comp_data,
-                                              settings->fixed_ori,bem_model,&settings->r0,settings->use_threads,&meg_forward,
+        if ((FwdBemModel::compute_forward_meg(spaces,
+                                              nspace,
+                                              megcoils,
+                                              compcoils,
+                                              comp_data,
+                                              settings->fixed_ori,
+                                              bem_model,
+                                              &settings->r0,
+                                              settings->use_threads,
+                                              &meg_forward,
                                               settings->compute_grad ? &meg_forward_grad : NULL)) == FAIL)
             goto out;
     if (neeg > 0)
-        if ((FwdBemModel::compute_forward_eeg(spaces,nspace,eegels,
-                                              settings->fixed_ori,bem_model,eeg_model,settings->use_threads,&eeg_forward,
+        if ((FwdBemModel::compute_forward_eeg(spaces,
+                                              nspace,
+                                              eegels,
+                                              settings->fixed_ori,
+                                              bem_model,
+                                              eeg_model,
+                                              settings->use_threads,
+                                              &eeg_forward,
                                               settings->compute_grad ? &eeg_forward_grad : NULL)) == FAIL)
             goto out;
     /*
@@ -2228,18 +2243,22 @@ void ComputeFwd::calculateFwd() const
     */
     printf("\nwriting %s...",settings->solname.toUtf8().constData());
     if (!write_solution(settings->solname,               /* Destination file */
-                       spaces,                          /* The source spaces */
-                       nspace,
-                       settings->mriname,mri_id,        /* MRI file and data obtained from there */
-                       mri_head_t,
-                       settings->measname,meas_id,      /* MEG file and data obtained from there */
-                       meg_head_t,
-                       megchs, nmeg,
-                       eegchs, neeg,
-                       settings->fixed_ori,             /* Fixed orientation dipoles? */
-                       settings->coord_frame,           /* Coordinate frame */
-                       meg_forward, eeg_forward,
-                       meg_forward_grad, eeg_forward_grad))
+                        spaces,                          /* The source spaces */
+                        nspace,
+                        settings->mriname,mri_id,        /* MRI file and data obtained from there */
+                        mri_head_t,
+                        settings->measname,meas_id,      /* MEG file and data obtained from there */
+                        meg_head_t,
+                        megchs,
+                        nmeg,
+                        eegchs,
+                        neeg,
+                        settings->fixed_ori,             /* Fixed orientation dipoles? */
+                        settings->coord_frame,           /* Coordinate frame */
+                        meg_forward,
+                        eeg_forward,
+                        meg_forward_grad,
+                        eeg_forward_grad))
         goto out;
     if (!mne_attach_env(settings->solname,settings->command))
         goto out;

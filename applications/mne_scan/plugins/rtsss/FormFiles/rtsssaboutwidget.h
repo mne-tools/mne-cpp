@@ -42,7 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include "../ui_dummyabout.h"
 #include "../ui_rtsssabout.h"
 
 
@@ -56,11 +55,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtSssPlugin
+// DEFINE NAMESPACE RTSSSPLUGIN
 //=============================================================================================================
 
-//namespace DummyToolboxPlugin
-namespace RtSssPlugin
+namespace RTSSSPLUGIN
 {
 
 
@@ -82,7 +80,6 @@ public:
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new RtSssAboutWidget becomes a window. If parent is another widget, RtSssAboutWidget becomes a child window inside parent. RtSssAboutWidget is deleted when its parent is deleted.
     */
-//    DummyAboutWidget(QWidget *parent = 0);
     RtSssAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================

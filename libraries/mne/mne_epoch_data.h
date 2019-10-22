@@ -140,7 +140,11 @@ public:
     */
     bool operator== (const MNEEpochData& MED_other) const
     {
-        return (this->tmin == MED_other.tmin && this->tmax == MED_other.tmax);
+        return (this->epoch == MED_other.epoch &&
+                this->event == MED_other.event&&
+                this->tmin == MED_other.tmin&&
+                this->tmax == MED_other.tmax&&
+                this->bReject == MED_other.bReject);
     }
 
 public:
