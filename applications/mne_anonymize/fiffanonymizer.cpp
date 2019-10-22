@@ -272,7 +272,7 @@ int  FiffAnonymizer::getIntSubjectBirthdayOffset()
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::getDefaultMAC(fiff_int_t (&mac)[])
+void FiffAnonymizer::getDefaultMAC(fiff_int_t (&mac)[2])
 {
     mac[0] = m_BDfltMAC[0];
     mac[1] = m_BDfltMAC[1];
