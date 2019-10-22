@@ -286,7 +286,7 @@ public:
     /**
     * Get value of MAC addresss substitutor.
     */
-    void getDefaultMAC(FIFFLIB::fiff_int_t (&mac)[]);
+    void getDefaultMAC(FIFFLIB::fiff_int_t (&mac)[2]);
 
     //=========================================================================================================
     /**
