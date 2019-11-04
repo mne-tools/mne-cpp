@@ -92,7 +92,8 @@ private slots:
 
 private:
     double epsilon;
-    void verifyTags(FIFFLIB::FiffStream::SPtr &outStream);
+    void verifyTags(FIFFLIB::FiffStream::SPtr &outStream,
+                    bool SubjBirthdayOffset=false);
     void verifyCRC(const QString file,
                    const quint16 validatedCRC);
 };
@@ -316,6 +317,17 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
 
     MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
 
+    QFile fFileOut(sFileOut);
+    FIFFLIB::FiffStream::SPtr outStream(&fFileOut);
+    if(outStream->open(QIODevice::ReadOnly))
+    {
+        qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - output file opened correctly " << sFileIn;
+    } else {
+        QFAIL("Output file could not be loaded.");
+    }
+
+    verifyTags(outStream, true);
+
 }
 
 
@@ -354,7 +366,8 @@ void TestMneAnonymize::verifyCRC(const QString file,
 
 //*************************************************************************************************************
 
-void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
+void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
+                                  bool SubjBirthdayOffset)
 {
     //Using defined shared pointer FiffAnonymnizer class
     //FiffAnonymizer::SPtr objAnon = FiffAnonymizer::SPtr::create();
@@ -488,8 +501,12 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         {
             QDateTime defaultDate(QDate(2000,1,1), QTime(1, 1, 0));
             QDateTime inBirthday(QDate::fromJulianDay(*pTag->toJulian()));
-
-            QVERIFY(defaultDate == inBirthday);
+            QDateTime offSetBirtday(defaultDate.date().addDays(-35));
+            if(SubjBirthdayOffset) {
+                QVERIFY(defaultDate == offSetBirtday);
+            } else {
+                QVERIFY(defaultDate == inBirthday);
+            }
 
 //            qDebug() << "*inTag->toJulian()" << *inTag->toJulian();
 
