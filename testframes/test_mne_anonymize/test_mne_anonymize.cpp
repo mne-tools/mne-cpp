@@ -419,14 +419,16 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         case FIFF_COMMENT:
         {
            QString defaultComment("mne_anonymize");
-           QVERIFY(pTag.data()->toString() == defaultComment);
+           QString anonFileComment(pTag.data()->toString());
+           QVERIFY(anonFileComment == defaultComment);
 
             break;
         }
         case FIFF_EXPERIMENTER:
         {
             QString defaultComment("mne_anonymize");
-            QVERIFY(pTag.data()->toString() == defaultComment);
+            QString anonFileComment(pTag.data()->toString());
+            QVERIFY(anonFileComment == defaultComment);
 //            QString newStr(m_sDfltString);
 //            outTag->resize(newStr.size());
 //            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -435,6 +437,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         }
         case FIFF_SUBJ_ID:
         {
+            fiff_int_t intAnonFile(*pTag.data()->toInt());
+            QVERIFY(intAnonFile == 0);
 //            qint32 inSubjID(*inTag->toInt());
 //            qint32 newSubjID(m_iDfltSubjectId);
 //            memcpy(outTag->data(),&newSubjID, sizeof(qint32));
@@ -445,7 +449,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         case FIFF_SUBJ_FIRST_NAME:
         {
             QString defaultComment("mne_anonymize");
-            QVERIFY(pTag.data()->toString() == defaultComment);
+            QString anonFileComment(pTag.data()->toString());
+            QVERIFY(anonFileComment == defaultComment);
 
 //            QString newStr(m_sDfltSubjectFirstName);
 //            outTag->resize(newStr.size());
@@ -457,7 +462,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         case FIFF_SUBJ_MIDDLE_NAME:
         {
             QString defaultComment("mne_anonymize");
-            QVERIFY(pTag.data()->toString() == defaultComment);
+            QString anonFileComment(pTag.data()->toString());
+            QVERIFY(anonFileComment == defaultComment);
 
 //            QString newStr(m_sDfltSubjectMidName);
 //            outTag->resize(newStr.size());
@@ -469,7 +475,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         case FIFF_SUBJ_LAST_NAME:
         {
             QString defaultComment("mne_anonymize");
-            QVERIFY(pTag.data()->toString() == defaultComment);
+            QString anonFileComment(pTag.data()->toString());
+            QVERIFY(anonFileComment == defaultComment);
 //            QString newStr(m_sDfltSubjectLastName);
 //            outTag->resize(newStr.size());
 //            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -503,7 +510,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         }
         case FIFF_SUBJ_WEIGHT:
         {
-            QVERIFY(*pTag.data()->toInt() == 0);
+            fiff_int_t intAnonFile(*pTag.data()->toInt());
+            QVERIFY(intAnonFile == 0);
 //            if(m_bBruteMode)
 //            {
 //                float inWeight(*inTag->toFloat());
@@ -516,7 +524,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         }
         case FIFF_SUBJ_HEIGHT:
         {
-            QVERIFY(*pTag.data()->toInt() == 0);
+            fiff_int_t intAnonFile(*pTag.data()->toInt());
+            QVERIFY(intAnonFile == 0);
 //            if(m_bBruteMode)
 //            {
 //                float inHeight(*inTag->toFloat());
@@ -530,7 +539,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         case FIFF_SUBJ_COMMENT:
         {
             QString defaultComment("mne_anonymize");
-            QVERIFY(pTag.data()->toString() == defaultComment);
+            QString anonFileComment(pTag.data()->toString());
+            QVERIFY(anonFileComment == defaultComment);
 //            QString newStr(m_sDfltSubjectComment);
 //            outTag->resize(newStr.size());
 //            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -541,7 +551,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         case FIFF_SUBJ_HIS_ID:
         {
             QString defaultComment("mne_anonymize");
-            QVERIFY(pTag.data()->toString() == defaultComment);
+            QString anonFileComment(pTag.data()->toString());
+            QVERIFY(anonFileComment == defaultComment);
 //            QString inSubjectHisId(inTag->data());
 //            QString newSubjectHisId(m_sDfltSubjectHisId);
 //            outTag->resize(newSubjectHisId.size());
@@ -551,7 +562,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         }
         case FIFF_PROJ_ID:
         {
-            QVERIFY(*pTag.data()->toInt() == 0);
+            fiff_int_t intAnonFile(*pTag.data()->toInt());
+            QVERIFY(intAnonFile == 0);
 //            if(m_bBruteMode)
 //            {
 //                qint32 inProjID(*inTag->toInt());
@@ -565,7 +577,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         case FIFF_PROJ_NAME:
         {
             QString defaultComment("mne_anonymize");
-            QVERIFY(pTag.data()->toString() == defaultComment);
+            QString anonFileComment(pTag.data()->toString());
+            QVERIFY(anonFileComment == defaultComment);
 //            if(m_bBruteMode)
 //            {
 //                    QString newStr(m_sDfltProjectName);
@@ -579,7 +592,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         case FIFF_PROJ_AIM:
         {
             QString defaultComment("mne_anonymize");
-            QVERIFY(pTag.data()->toString() == defaultComment);
+            QString anonFileComment(pTag.data()->toString());
+            QVERIFY(anonFileComment == defaultComment);
 //            if(m_bBruteMode)
 //            {
 //                QString newStr(m_sDfltProjectAim);
@@ -593,7 +607,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         case FIFF_PROJ_PERSONS:
         {
             QString defaultComment("mne_anonymize");
-            QVERIFY(pTag.data()->toString() == defaultComment);
+            QString anonFileComment(pTag.data()->toString());
+            QVERIFY(anonFileComment == defaultComment);
 
 //            QString newStr(m_sDfltProjectPersons);
 //            outTag->resize(newStr.size());
@@ -605,7 +620,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         case FIFF_PROJ_COMMENT:
         {
             QString defaultComment("mne_anonymize");
-            QVERIFY(pTag.data()->toString() == defaultComment);
+            QString anonFileComment(pTag.data()->toString());
+            QVERIFY(anonFileComment == defaultComment);
 //            if(m_bBruteMode)
 //            {
 //                QString newStr(m_sDfltProjectComment);
