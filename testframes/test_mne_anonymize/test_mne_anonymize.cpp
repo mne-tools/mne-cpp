@@ -281,15 +281,15 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
     MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
 
     QFile fFileOut(sFileOut);
-    FIFFLIB::FiffStream outStream(&fFileOut);
-    if(outStream.open(QIODevice::ReadOnly))
+    FIFFLIB::FiffStream::SPtr outStream(&fFileOut);
+    if(outStream->open(QIODevice::ReadOnly))
     {
         qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - output file opened correctly " << sFileIn;
     } else {
         QFAIL("Output file could not be loaded.");
     }
 
-    verifyTags(inStream);
+    verifyTags(outStream);
 
 
 
@@ -357,7 +357,7 @@ void TestMneAnonymize::verifyCRC(const QString file,
 void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 {
     //Using defined shared pointer FiffAnonymnizer class
-    FiffAnonymizer::SPtr objAnon = FiffAnonymizer::SPtr::create();
+    //FiffAnonymizer::SPtr objAnon = FiffAnonymizer::SPtr::create();
 
     FiffTag::SPtr pTag = FiffTag::SPtr::create();
 
@@ -379,20 +379,14 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         {
             FiffId inId = pTag->toFiffID();
             QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs));
-            QDateTime defaultMeasDate(objAnon->getDefaultDate());
+            QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0));
 
-            if(objAnon->getUseMeasurementDayOffset()) {
-               QVERIFY(inMeasDate == defaultMeasDate.addDays(-(objAnon->getIntMeasurementDayOffset())));
-            } else {
-               QVERIFY(inMeasDate == defaultMeasDate);
-            }
+            QVERIFY(inMeasDate == defaultMeasDate);
 
-              FiffId outId(inId);
-              objAnon->getDefaultMAC(outId.machid);
-              QVERIFY(outId.machid[0] == inId.machid[0]);
-              QVERIFY(outId.machid[1] == inId.machid[1]);
-//            QVERIFY(outId.time.secs == static_cast<int32_t>(defaultMeasDate.toSecsSinceEpoch()));
-//            QVERIFY(outId.time.usecs == 0);
+              QVERIFY(inId.machid[0] == 0);
+              QVERIFY(inId.machid[1] == 0);
+              QVERIFY(inId.time.secs == static_cast<int32_t>(defaultMeasDate.toSecsSinceEpoch()));
+              QVERIFY(inId.time.usecs == 0);
 
 //            const int fiffIdSize(sizeof(inId)/sizeof(fiff_int_t));
 //            fiff_int_t outData[fiffIdSize];
@@ -411,13 +405,10 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         case FIFF_MEAS_DATE:
         {
             QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*pTag->toInt()));
-            QDateTime defaultMeasDate(objAnon->getMeasurementDate());
+            QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0));
 
-            if(objAnon->getUseMeasurementDayOffset()) {
-               QVERIFY(inMeasDate == defaultMeasDate.addDays(-(objAnon->getIntMeasurementDayOffset())));
-            } else {
-               QVERIFY(inMeasDate == defaultMeasDate);
-            }
+            QVERIFY(inMeasDate == defaultMeasDate);
+
 
 //            fiff_int_t outData[1];
 //            outData[0]=static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
@@ -427,22 +418,20 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
         }
         case FIFF_COMMENT:
         {
-//            if(m_pBlockTypeList->first()==FIFFB_MEAS_INFO) {
-//                QString newStr(m_sDfltString);
-//                outTag->resize(newStr.size());
-//                memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-//                printIfVerbose("Description of the measurement block changed: " +
-//                               QString(inTag->data()) + " -> " + newStr);
-//            }
-//            break;
+           QString defaultComment("mne_anonymize");
+           QVERIFY(pTag.data()->toString() == defaultComment);
+
+            break;
         }
         case FIFF_EXPERIMENTER:
         {
+            QString defaultComment("mne_anonymize");
+            QVERIFY(pTag.data()->toString() == defaultComment);
 //            QString newStr(m_sDfltString);
 //            outTag->resize(newStr.size());
 //            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
 //            printIfVerbose("Experimenter changed: " + QString(inTag->data()) + " -> " + newStr);
-//            break;
+           break;
         }
         case FIFF_SUBJ_ID:
         {
@@ -451,38 +440,49 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 //            memcpy(outTag->data(),&newSubjID, sizeof(qint32));
 //            printIfVerbose("Subject's SubjectID changed: " +
 //                           QString::number(inSubjID) + " -> " + QString::number(newSubjID));
-//            break;
+            break;
         }
         case FIFF_SUBJ_FIRST_NAME:
         {
+            QString defaultComment("mne_anonymize");
+            QVERIFY(pTag.data()->toString() == defaultComment);
+
 //            QString newStr(m_sDfltSubjectFirstName);
 //            outTag->resize(newStr.size());
 //            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
 //            printIfVerbose("Experimenter changed: " +
 //                           QString(inTag->data()) + " -> " + newStr);
-//            break;
+            break;
         }
         case FIFF_SUBJ_MIDDLE_NAME:
         {
+            QString defaultComment("mne_anonymize");
+            QVERIFY(pTag.data()->toString() == defaultComment);
+
 //            QString newStr(m_sDfltSubjectMidName);
 //            outTag->resize(newStr.size());
 //            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
 //            printIfVerbose("Experimenter changed: " +
 //                           QString(inTag->data()) + " -> " + newStr);
-//            break;
+            break;
         }
         case FIFF_SUBJ_LAST_NAME:
         {
+            QString defaultComment("mne_anonymize");
+            QVERIFY(pTag.data()->toString() == defaultComment);
 //            QString newStr(m_sDfltSubjectLastName);
 //            outTag->resize(newStr.size());
 //            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
 //            printIfVerbose("Experimenter changed: " +
 //                           QString(inTag->data()) + " -> " + newStr);
-//            break;
+            break;
         }
         case FIFF_SUBJ_BIRTH_DAY:
         {
-//            QDateTime inBirthday(QDate::fromJulianDay(*inTag->toJulian()));
+            QDateTime defaultDate(QDate(2000,1,1), QTime(1, 1, 0));
+            QDateTime inBirthday(QDate::fromJulianDay(*pTag->toJulian()));
+
+            QVERIFY(defaultDate == inBirthday);
 
 //            qDebug() << "*inTag->toJulian()" << *inTag->toJulian();
 
@@ -499,10 +499,11 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 //            memcpy(outTag->data(),reinterpret_cast<char*>(outData),sizeof(fiff_int_t));
 //            printIfVerbose("Subject birthday date changed: " + inBirthday.toString() + " -> " + outBirthday.toString());
 
-//            break;
+            break;
         }
         case FIFF_SUBJ_WEIGHT:
         {
+            QVERIFY(*pTag.data()->toInt() == 0);
 //            if(m_bBruteMode)
 //            {
 //                float inWeight(*inTag->toFloat());
@@ -511,10 +512,11 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 //                printIfVerbose("Subject's weight changed from: " +
 //                               QString::number(static_cast<double>(inWeight)) + " -> " + QString::number(static_cast<double>(outWeight)));
 //            }
-//            break;
-//        }
-//        case FIFF_SUBJ_HEIGHT:
-//        {
+            break;
+        }
+        case FIFF_SUBJ_HEIGHT:
+        {
+            QVERIFY(*pTag.data()->toInt() == 0);
 //            if(m_bBruteMode)
 //            {
 //                float inHeight(*inTag->toFloat());
@@ -523,28 +525,33 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 //                printIfVerbose("Subject's Height changed from: " +
 //                               QString::number(static_cast<double>(inHeight)) + " -> " + QString::number(static_cast<double>(outHeight)));
 //            }
-//            break;
+            break;
         }
         case FIFF_SUBJ_COMMENT:
         {
+            QString defaultComment("mne_anonymize");
+            QVERIFY(pTag.data()->toString() == defaultComment);
 //            QString newStr(m_sDfltSubjectComment);
 //            outTag->resize(newStr.size());
 //            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
 //            printIfVerbose("Subject Comment changed: " +
 //                           QString(inTag->data()) + " -> " + newStr);
-//            break;
+            break;
         }
         case FIFF_SUBJ_HIS_ID:
         {
+            QString defaultComment("mne_anonymize");
+            QVERIFY(pTag.data()->toString() == defaultComment);
 //            QString inSubjectHisId(inTag->data());
 //            QString newSubjectHisId(m_sDfltSubjectHisId);
 //            outTag->resize(newSubjectHisId.size());
 //            memcpy(outTag->data(),newSubjectHisId.toUtf8(),static_cast<size_t>(newSubjectHisId.size()));
 //            printIfVerbose("Subject Hospital-ID changed:" + inSubjectHisId + " -> " + newSubjectHisId);
-//            break;
+            break;
         }
         case FIFF_PROJ_ID:
         {
+            QVERIFY(*pTag.data()->toInt() == 0);
 //            if(m_bBruteMode)
 //            {
 //                qint32 inProjID(*inTag->toInt());
@@ -553,10 +560,12 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 //                printIfVerbose("ProjectID changed: " +
 //                               QString::number(inProjID) + " -> " + QString::number(newProjID));
 //            }
-//            break;
+            break;
         }
         case FIFF_PROJ_NAME:
         {
+            QString defaultComment("mne_anonymize");
+            QVERIFY(pTag.data()->toString() == defaultComment);
 //            if(m_bBruteMode)
 //            {
 //                    QString newStr(m_sDfltProjectName);
@@ -565,10 +574,12 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 //                    printIfVerbose("Project name changed: " +
 //                                   QString(inTag->data()) + " -> " + newStr);
 //            }
-//            break;
+            break;
         }
         case FIFF_PROJ_AIM:
         {
+            QString defaultComment("mne_anonymize");
+            QVERIFY(pTag.data()->toString() == defaultComment);
 //            if(m_bBruteMode)
 //            {
 //                QString newStr(m_sDfltProjectAim);
@@ -577,19 +588,24 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 //                printIfVerbose("Project Aim changed: " +
 //                               QString(inTag->data()) + " -> " + newStr);
 //            }
-//            break;
+            break;
         }
         case FIFF_PROJ_PERSONS:
         {
+            QString defaultComment("mne_anonymize");
+            QVERIFY(pTag.data()->toString() == defaultComment);
+
 //            QString newStr(m_sDfltProjectPersons);
 //            outTag->resize(newStr.size());
 //            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
 //            printIfVerbose("Project Persons changed: " +
 //                           QString(inTag->data()) + " -> " + newStr);
-//            break;
+            break;
         }
         case FIFF_PROJ_COMMENT:
         {
+            QString defaultComment("mne_anonymize");
+            QVERIFY(pTag.data()->toString() == defaultComment);
 //            if(m_bBruteMode)
 //            {
 //                QString newStr(m_sDfltProjectComment);
@@ -598,10 +614,10 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 //                printIfVerbose("Project comment changed: " +
 //                               QString(inTag->data()) + " -> " + newStr);
 //            }
-//            break;
+            break;
         }
-        case FIFF_MRI_PIXEL_DATA:
-        {
+//        case FIFF_MRI_PIXEL_DATA:
+//        {
 //            if(!m_bQuietMode) {
 //                qDebug() << " ";
 //                qDebug() << "WARNING. The input fif file contains MRI data.";
@@ -611,7 +627,7 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream)
 //                qDebug() << " ";
 //            }
 //            break;
-        }
+//        }
         default:
         {
         }
