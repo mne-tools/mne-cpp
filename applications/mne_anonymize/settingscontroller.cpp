@@ -253,19 +253,28 @@ void SettingsController::parseInputAndOutputFiles()
     if(m_parser.isSet("in")) {
         QStringList inFilesAux(m_parser.values("in"));
 
+        qDebug() << inFilesAux.count();
+
         for(QString f: inFilesAux) {
             m_SLInFiles.append(listFilesMatchingPatternName(f));
         }
     }
 
-    if(m_SLInFiles.size() == 0) {
+    if(m_SLInFiles.count() == 0) {
         qDebug() << "Error. No valid input files.";
         m_parser.showHelp();
-    } else if(m_SLInFiles.size() == 1) {
+    } else if(m_SLInFiles.count() == 1) {
         m_bMultipleInFiles = false;
     } else {
         m_bMultipleInFiles = true;
     }
+
+    QString boolMultiStr(QVariant(m_bMultipleInFiles).toString());
+    QString countFilesStr(QVariant(m_SLInFiles.count()).toString());
+
+    qDebug() << "Total number of Input Files: " + countFilesStr;
+    qDebug() << "Value of Multi files: " + boolMultiStr;
+
 
     if(m_bMultipleInFiles) {
         if(m_parser.isSet("out")) {
