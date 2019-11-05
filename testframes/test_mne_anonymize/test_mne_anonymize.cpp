@@ -88,12 +88,16 @@ private slots:
     void testDefaultAnonymizationOfTags();
 
     void compareBirthdayOffsetOption();
+    void compareMeasureDateOffsetOption();
     void cleanupTestCase();
 
 private:
     double epsilon;
+    QSharedPointer<QStack<int32_t> > m_pBlockTypeList;
     void verifyTags(FIFFLIB::FiffStream::SPtr &outStream,
-                    bool SubjBirthdayOffset=false);
+                    bool SubjBirthdayOffset=false,
+                    bool MeasDateOffset=false,
+                    bool BruteMode=false);
     void verifyCRC(const QString file,
                    const quint16 validatedCRC);
 };
@@ -311,6 +315,7 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
     QStringList arguments;
     arguments << "./mne_anonymize";
     arguments << "--in" << sFileIn;
+    arguments << "subject_birthday_offset 35";
     arguments << "--verbose";
 
     qInfo() << "TestMneAnonymize::initTestCase - arguments" << arguments;
@@ -330,6 +335,39 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
 
 }
 
+//*************************************************************************************************************
+
+void TestMneAnonymize::compareMeasureDateOffsetOption()
+{
+    // Init testing arguments
+    QString sFileIn("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
+    QString sFileOut("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
+
+    qInfo() << "TestMneAnonymize::initTestCase - sFileIn" << sFileIn;
+    qInfo() << "TestMneAnonymize::initTestCase - sFileOut" << sFileOut;
+
+    QStringList arguments;
+    arguments << "./mne_anonymize";
+    arguments << "--in" << sFileIn;
+    arguments << "--measurement_date_offset 35";
+    arguments << "--verbose";
+
+    qInfo() << "TestMneAnonymize::initTestCase - arguments" << arguments;
+
+    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
+
+    QFile fFileOut(sFileOut);
+    FIFFLIB::FiffStream::SPtr outStream(&fFileOut);
+    if(outStream->open(QIODevice::ReadOnly))
+    {
+        qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - output file opened correctly " << sFileIn;
+    } else {
+        QFAIL("Output file could not be loaded.");
+    }
+
+    verifyTags(outStream, false, true);
+
+}
 
 //*************************************************************************************************************
 
@@ -367,10 +405,10 @@ void TestMneAnonymize::verifyCRC(const QString file,
 //*************************************************************************************************************
 
 void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
-                                  bool SubjBirthdayOffset)
+                                  bool SubjBirthdayOffset,
+                                  bool MeasDateOffset,
+                                  bool BruteMode)
 {
-    //Using defined shared pointer FiffAnonymnizer class
-    //FiffAnonymizer::SPtr objAnon = FiffAnonymizer::SPtr::create();
 
     FiffTag::SPtr pTag = FiffTag::SPtr::create();
 
@@ -393,108 +431,82 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
             FiffId inId = pTag->toFiffID();
             QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs));
             QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0));
+            QDateTime offSetMeasDate(defaultMeasDate.date().addDays(-35));
+            if(MeasDateOffset){
+                QVERIFY(inMeasDate == offSetMeasDate);
+            } else {
+                QVERIFY(inMeasDate == defaultMeasDate);
+            }
 
-            QVERIFY(inMeasDate == defaultMeasDate);
 
               QVERIFY(inId.machid[0] == 0);
               QVERIFY(inId.machid[1] == 0);
               QVERIFY(inId.time.secs == static_cast<int32_t>(defaultMeasDate.toSecsSinceEpoch()));
               QVERIFY(inId.time.usecs == 0);
 
-//            const int fiffIdSize(sizeof(inId)/sizeof(fiff_int_t));
-//            fiff_int_t outData[fiffIdSize];
-//            outData[0] = outId.version;
-//            outData[1] = outId.machid[0];
-//            outData[2] = outId.machid[1];
-//            outData[3] = outId.time.secs;
-//            outData[4] = outId.time.usecs;
-
-//            outTag->resize(fiffIdSize*sizeof(fiff_int_t));
-//            memcpy(outTag->data(),reinterpret_cast<char*>(outData),fiffIdSize*sizeof(fiff_int_t));
-//            printIfVerbose("MAC address changed: " + inId.toMachidString() + " -> "  + outId.toMachidString());
-//            printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
             break;
         }
         case FIFF_MEAS_DATE:
         {
+
             QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*pTag->toInt()));
             QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0));
+            QDateTime offSetMeasDate(defaultMeasDate.date().addDays(-35));
+            if(MeasDateOffset){
+                QVERIFY(inMeasDate == offSetMeasDate);
+            } else {
+                QVERIFY(inMeasDate == defaultMeasDate);
+            }
 
-            QVERIFY(inMeasDate == defaultMeasDate);
-
-
-//            fiff_int_t outData[1];
-//            outData[0]=static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
-//            memcpy(outTag->data(),reinterpret_cast<char*>(outData),sizeof(fiff_int_t));
-//            printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
             break;
         }
         case FIFF_COMMENT:
         {
-           QString defaultComment("mne_anonymize");
-           QString anonFileComment(pTag.data()->toString());
-           QVERIFY(anonFileComment == defaultComment);
+            if(m_pBlockTypeList->first()==FIFFB_MEAS_INFO) {
+                QString defaultComment("mne_anonymize");
+                QString anonFileComment(pTag->data());
+                QVERIFY(anonFileComment == defaultComment);
+            }
 
             break;
         }
         case FIFF_EXPERIMENTER:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag.data()->toString());
+            QString anonFileComment(pTag->data());
             QVERIFY(anonFileComment == defaultComment);
-//            QString newStr(m_sDfltString);
-//            outTag->resize(newStr.size());
-//            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-//            printIfVerbose("Experimenter changed: " + QString(inTag->data()) + " -> " + newStr);
+
            break;
         }
         case FIFF_SUBJ_ID:
         {
-            fiff_int_t intAnonFile(*pTag.data()->toInt());
+            fiff_int_t intAnonFile(*pTag->toInt());
             QVERIFY(intAnonFile == 0);
-//            qint32 inSubjID(*inTag->toInt());
-//            qint32 newSubjID(m_iDfltSubjectId);
-//            memcpy(outTag->data(),&newSubjID, sizeof(qint32));
-//            printIfVerbose("Subject's SubjectID changed: " +
-//                           QString::number(inSubjID) + " -> " + QString::number(newSubjID));
+
             break;
         }
         case FIFF_SUBJ_FIRST_NAME:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag.data()->toString());
+            QString anonFileComment(pTag->data());
             QVERIFY(anonFileComment == defaultComment);
 
-//            QString newStr(m_sDfltSubjectFirstName);
-//            outTag->resize(newStr.size());
-//            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-//            printIfVerbose("Experimenter changed: " +
-//                           QString(inTag->data()) + " -> " + newStr);
             break;
         }
         case FIFF_SUBJ_MIDDLE_NAME:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag.data()->toString());
+            QString anonFileComment(pTag->data());
             QVERIFY(anonFileComment == defaultComment);
 
-//            QString newStr(m_sDfltSubjectMidName);
-//            outTag->resize(newStr.size());
-//            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-//            printIfVerbose("Experimenter changed: " +
-//                           QString(inTag->data()) + " -> " + newStr);
             break;
         }
         case FIFF_SUBJ_LAST_NAME:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag.data()->toString());
+            QString anonFileComment(pTag->data());
             QVERIFY(anonFileComment == defaultComment);
-//            QString newStr(m_sDfltSubjectLastName);
-//            outTag->resize(newStr.size());
-//            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-//            printIfVerbose("Experimenter changed: " +
-//                           QString(inTag->data()) + " -> " + newStr);
+
             break;
         }
         case FIFF_SUBJ_BIRTH_DAY:
@@ -508,145 +520,91 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
                 QVERIFY(defaultDate == inBirthday);
             }
 
-//            qDebug() << "*inTag->toJulian()" << *inTag->toJulian();
-
-//            QDateTime outBirthday;
-
-//            if(m_bUseSubjectBirthdayOffset) {
-//                outBirthday = inBirthday.addDays(-m_iMeasurementDayOffset);
-//            } else {
-//                outBirthday = m_dateSubjectBirthday;
-//            }
-
-//            fiff_int_t outData[1];
-//            outData[0] = static_cast<int32_t> (outBirthday.toSecsSinceEpoch());
-//            memcpy(outTag->data(),reinterpret_cast<char*>(outData),sizeof(fiff_int_t));
-//            printIfVerbose("Subject birthday date changed: " + inBirthday.toString() + " -> " + outBirthday.toString());
 
             break;
         }
         case FIFF_SUBJ_WEIGHT:
         {
-            fiff_int_t intAnonFile(*pTag.data()->toInt());
-            QVERIFY(intAnonFile == 0);
-//            if(m_bBruteMode)
-//            {
-//                float inWeight(*inTag->toFloat());
-//                float outWeight(m_iDfltSubjectWeight);
-//                memcpy(outTag->data(),&outWeight,sizeof(float));
-//                printIfVerbose("Subject's weight changed from: " +
-//                               QString::number(static_cast<double>(inWeight)) + " -> " + QString::number(static_cast<double>(outWeight)));
-//            }
+
+            if(BruteMode)
+            {
+                fiff_int_t intAnonFile(*pTag.data()->toInt());
+                QVERIFY(intAnonFile == 0);
+            }
             break;
         }
         case FIFF_SUBJ_HEIGHT:
         {
-            fiff_int_t intAnonFile(*pTag.data()->toInt());
-            QVERIFY(intAnonFile == 0);
-//            if(m_bBruteMode)
-//            {
-//                float inHeight(*inTag->toFloat());
-//                float outHeight(m_iDfltSubjectHeight);
-//                memcpy(outTag->data(),&outHeight,sizeof(float));
-//                printIfVerbose("Subject's Height changed from: " +
-//                               QString::number(static_cast<double>(inHeight)) + " -> " + QString::number(static_cast<double>(outHeight)));
-//            }
+            if(BruteMode)
+            {
+                fiff_int_t intAnonFile(*pTag.data()->toInt());
+                QVERIFY(intAnonFile == 0);
+            }
             break;
         }
         case FIFF_SUBJ_COMMENT:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag.data()->toString());
+            QString anonFileComment(pTag->data());
             QVERIFY(anonFileComment == defaultComment);
-//            QString newStr(m_sDfltSubjectComment);
-//            outTag->resize(newStr.size());
-//            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-//            printIfVerbose("Subject Comment changed: " +
-//                           QString(inTag->data()) + " -> " + newStr);
+
             break;
         }
         case FIFF_SUBJ_HIS_ID:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag.data()->toString());
+            QString anonFileComment(pTag->data());
             QVERIFY(anonFileComment == defaultComment);
-//            QString inSubjectHisId(inTag->data());
-//            QString newSubjectHisId(m_sDfltSubjectHisId);
-//            outTag->resize(newSubjectHisId.size());
-//            memcpy(outTag->data(),newSubjectHisId.toUtf8(),static_cast<size_t>(newSubjectHisId.size()));
-//            printIfVerbose("Subject Hospital-ID changed:" + inSubjectHisId + " -> " + newSubjectHisId);
             break;
         }
         case FIFF_PROJ_ID:
         {
-            fiff_int_t intAnonFile(*pTag.data()->toInt());
-            QVERIFY(intAnonFile == 0);
-//            if(m_bBruteMode)
-//            {
-//                qint32 inProjID(*inTag->toInt());
-//                qint32 newProjID(m_iDfltProjectId);
-//                memcpy(outTag->data(),&newProjID,sizeof(qint32));
-//                printIfVerbose("ProjectID changed: " +
-//                               QString::number(inProjID) + " -> " + QString::number(newProjID));
-//            }
+
+            if(BruteMode)
+            {
+                fiff_int_t intAnonFile(*pTag.data()->toInt());
+                QVERIFY(intAnonFile == 0);
+            }
             break;
         }
         case FIFF_PROJ_NAME:
         {
-            QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag.data()->toString());
-            QVERIFY(anonFileComment == defaultComment);
-//            if(m_bBruteMode)
-//            {
-//                    QString newStr(m_sDfltProjectName);
-//                    outTag->resize(newStr.size());
-//                    memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-//                    printIfVerbose("Project name changed: " +
-//                                   QString(inTag->data()) + " -> " + newStr);
-//            }
+
+            if(BruteMode)
+            {
+                QString defaultComment("mne_anonymize");
+                QString anonFileComment(pTag->data());
+                QVERIFY(anonFileComment == defaultComment);
+            }
             break;
         }
         case FIFF_PROJ_AIM:
         {
-            QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag.data()->toString());
-            QVERIFY(anonFileComment == defaultComment);
-//            if(m_bBruteMode)
-//            {
-//                QString newStr(m_sDfltProjectAim);
-//                outTag->resize(newStr.size());
-//                memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-//                printIfVerbose("Project Aim changed: " +
-//                               QString(inTag->data()) + " -> " + newStr);
-//            }
+
+            if(BruteMode)
+            {
+                QString defaultComment("mne_anonymize");
+                QString anonFileComment(pTag->data());
+                QVERIFY(anonFileComment == defaultComment);
+            }
             break;
         }
         case FIFF_PROJ_PERSONS:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag.data()->toString());
+            QString anonFileComment(pTag->data());
             QVERIFY(anonFileComment == defaultComment);
 
-//            QString newStr(m_sDfltProjectPersons);
-//            outTag->resize(newStr.size());
-//            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-//            printIfVerbose("Project Persons changed: " +
-//                           QString(inTag->data()) + " -> " + newStr);
             break;
         }
         case FIFF_PROJ_COMMENT:
         {
-            QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag.data()->toString());
-            QVERIFY(anonFileComment == defaultComment);
-//            if(m_bBruteMode)
-//            {
-//                QString newStr(m_sDfltProjectComment);
-//                outTag->resize(newStr.size());
-//                memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-//                printIfVerbose("Project comment changed: " +
-//                               QString(inTag->data()) + " -> " + newStr);
-//            }
+            if(BruteMode)
+            {
+                QString defaultComment("mne_anonymize");
+                QString anonFileComment(pTag.data()->toString());
+                QVERIFY(anonFileComment == defaultComment);
+            }
             break;
         }
 //        case FIFF_MRI_PIXEL_DATA:
