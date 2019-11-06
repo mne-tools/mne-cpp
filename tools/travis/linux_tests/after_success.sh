@@ -97,15 +97,5 @@ do
     echo "<< Finished $test"
 done
 
-#./bin/test_codecov
-#cd ./testframes/test_codecov
-#gcov ./test_codecov.cpp -r
-#cd $MNECPP_ROOT
-
-#./bin/test_fiff_rwr
-#cd ./testframes/test_fiff_rwr
-#gcov ./test_fiff_rwr.cpp -r
-#cd $MNECPP_ROOT
-
 # Report code coverage; instead of "bash <(curl -s https://codecov.io/bash)" use python "codecov"
 codecov
