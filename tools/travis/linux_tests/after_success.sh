@@ -66,7 +66,9 @@ do
 	export GCOV_PREFIX_STRIP=6
 
 	# run the gcov command on all *.cpp files, preserve paths and give common path base and save to log
-	(cd ${GCOV_DIR} && rm -f ../gcoverage.${test}.log && find . -name "*.cpp" -exec gcov -p -s ${GCOV_DIR} {} \; | tee -a ../gcoverage.${test}.log)
+	(cd ${GCOV_DIR} && rm -f ../gcoverage.${test}.log && find . -name "*.cpp" -exec gcov -p -s ${GCOV_DIR} {} \; > /dev/null)
+
+#	(cd ${GCOV_DIR} && rm -f ../gcoverage.${test}.log && find . -name "*.cpp" -exec gcov -p -s ${GCOV_DIR} {} \; | tee -a ../gcoverage.${test}.log)
 
 	# grep/sed the gcov log output for quick summary of all # non header files with some code executed
 	# .. cat the log file and ...
@@ -83,7 +85,7 @@ do
 
 	echo "**** ${test_base}/${test} ****"
 
-	(cd ${GCOV_DIR}/.. && cat gcoverage.${test}.log) | grep -v ".*Removing.*" | grep -v "^Creating .*" | grep -v "^$" | sed 'N;s/\n/ had /' | grep -v ".*No executable.*" | grep -v "^.*0.00\%" | grep -v "^.*\.h.*" | sed 's;^File ;;' | sort | uniq
+	#(cd ${GCOV_DIR}/.. && cat gcoverage.${test}.log) | grep -v ".*Removing.*" | grep -v "^Creating .*" | grep -v "^$" | sed 'N;s/\n/ had /' | grep -v ".*No executable.*" | grep -v "^.*0.00\%" | grep -v "^.*\.h.*" | sed 's;^File ;;' | sort | uniq
 
     #./collect.sh
     cd $MNECPP_ROOT
