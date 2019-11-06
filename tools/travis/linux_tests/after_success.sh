@@ -14,9 +14,14 @@ tests=( test_codecov test_fiff_rwr test_dipole_fit test_fiff_mne_types_io test_f
 for test in ${tests[*]};
 do
     echo ">> Starting $test"	
-    cd "./testframes/$test"
 
-	# run this script from under each ./mne-cppp/testframes(<test name>/. subdir
+	# run the test binary from the ./bin subdir (test binary is same name as subdir)
+	# after test run, have *.gcda file under test_dir AND multiple *.gcda files 
+	# under every built library that the test called
+	./bin/$test
+
+	# run this script from under each ./mne-cpp/testframes(<test name>/. subdir
+    cd "./testframes/$test"
 
 	# test=$1
 	test_dir=${PWD}
@@ -34,15 +39,6 @@ do
 	#(cd ${test_dir} && m -f *.gcno *.gcda *.moc)
 	#(cd ${test_dir} && make -j4)
 	# after compilation, have *.o, *.moc, *.gcno under test_dir
-
-	# exit 0
-
-	# run the test binary from the ./bin subdir (test binary is same name as subdir)
-	(cd ${sandbox_base}/bin && ./${test})
-	# after test run, have *.gcda file under test_dir AND multiple *.gcda files 
-	# under every built library that the test called
-
-	# exit 0
 
 	# create the subdir to hold files for gcov run of this tests unique paths thru the source code
 	gcov_test_dir=gcoverage_${test}
