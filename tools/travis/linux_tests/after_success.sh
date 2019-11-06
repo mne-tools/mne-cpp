@@ -88,6 +88,7 @@ do
 	#(cd ${GCOV_DIR}/.. && cat gcoverage.${test}.log) | grep -v ".*Removing.*" | grep -v "^Creating .*" | grep -v "^$" | sed 'N;s/\n/ had /' | grep -v ".*No executable.*" | grep -v "^.*0.00\%" | grep -v "^.*\.h.*" | sed 's;^File ;;' | sort | uniq
 
     #./collect.sh
+	codecov
     cd $MNECPP_ROOT
 
     # Run Annotated Code
@@ -100,4 +101,4 @@ do
 done
 
 # Report code coverage; instead of "bash <(curl -s https://codecov.io/bash)" use python "codecov"
-codecov
+#codecov
