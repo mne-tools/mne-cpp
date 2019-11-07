@@ -15,7 +15,8 @@ for test in ${tests[*]};
 do
     echo ">> Starting $test"	
 	./bin/$test
-	find . -name "*.cpp" -exec gcov -p -s ${PWD} {} \;
+	find . -name "*.cpp" -exec gcov {} \; > /dev/null
+	#find . -name "*.cpp" -exec gcov -p -s ${PWD} {} \; > /dev/null
 	codecov
 	#codecov > /dev/null
     echo "<< Finished $test"
