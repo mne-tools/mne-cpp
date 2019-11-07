@@ -16,16 +16,13 @@ do
     echo ">> Starting $test"	
 	./bin/$test
 
-	#Find all .cpp files, cd to their folder and run gcov
-	find ./libraries -type f -name "*.cpp" -execdir gcov {} \;
-	#find . -name "*.cpp" -exec gcov {} \; > /dev/null
-	#find . -name "*.cpp" -exec gcov -p -s ${PWD} {} \; > /dev/null
+	# Find all .cpp files, cd to their folder and run gcov
+	find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
 
+	# Report code coverage; instead of "bash <(curl -s https://codecov.io/bash) use python codecov
+	# Do this for every test run since codecov is able to process different uploads and will merge them as soon as the Travis job is done
 	codecov
 	#codecov > /dev/null
 	
     echo "<< Finished $test"
 done
-
-# Report code coverage; instead of "bash <(curl -s https://codecov.io/bash)" use python "codecov"
-#codecov
