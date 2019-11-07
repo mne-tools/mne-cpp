@@ -16,13 +16,8 @@ do
     echo ">> Starting $test"	
 	./bin/$test
 
-	for i in $(find ./libraries -name "*.cpp" -type f)
-	do (
-		cd $(dirname $(realpath $i));
-		gcov $i > /dev/null
-	)
-	cd $MNECPP_ROOT
-
+	#Find all .cpp files, cd to their folder and run gcov
+	find ./libraries -type f -name "*.cpp" -execdir gcov {} \;
 	#find . -name "*.cpp" -exec gcov {} \; > /dev/null
 	#find . -name "*.cpp" -exec gcov -p -s ${PWD} {} \; > /dev/null
 
