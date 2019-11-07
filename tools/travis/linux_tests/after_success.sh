@@ -15,10 +15,20 @@ for test in ${tests[*]};
 do
     echo ">> Starting $test"	
 	./bin/$test
-	find . -name "*.cpp" -exec gcov {} \; > /dev/null
+
+	for i in $(find ./libraries -name "*.cpp" -type f)
+	do (
+		cd $(dirname $(realpath $i));
+		gcov $i > /dev/null
+	)
+	cd $MNECPP_ROOT
+
+	#find . -name "*.cpp" -exec gcov {} \; > /dev/null
 	#find . -name "*.cpp" -exec gcov -p -s ${PWD} {} \; > /dev/null
+
 	codecov
 	#codecov > /dev/null
+	
     echo "<< Finished $test"
 done
 
