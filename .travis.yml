@@ -69,4 +69,5 @@ after_success: . tools/travis/$BUILD/after_success.sh
 notifications:
   email:
     - christoph.dinh@mne-cpp.org
-    - lorenz.esch@mne-cpp.org
+    - lorenz.esch@tu-ilmenau.de
+    - juangp@gmail.com
