@@ -24,5 +24,5 @@ comment:
   behavior: default
   require_changes: no
   
- ignore:
+ignore:
   - "include/.*"  # ignore folders and all its contents
