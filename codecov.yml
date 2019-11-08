@@ -25,4 +25,4 @@ comment:
   require_changes: no
   
  ignore:
-  - "/include"  # ignore folders and all its contents
+  - "include/.*"  # ignore folders and all its contents
