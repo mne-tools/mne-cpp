@@ -19,8 +19,8 @@
 *.qm
 
 # Bin folder with exceptions
-/lib/   
-/bin/              
+/lib/
+/bin/
 
 # Applications folder
 /applications/mne_analyze/extensions/deepcntknets/bio
