@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     channeldataview.h
+* @file     rtfiffrawview.h
 * @author   Lorenz Esch <lesc@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the ChannelDataView Class.
+* @brief    Declaration of the RtFiffRawView Class.
 *
 */
 
-#ifndef CHANNELDATAVIEW_H
-#define CHANNELDATAVIEW_H
+#ifndef RTFIFFRAWVIEW_H
+#define RTFIFFRAWVIEW_H
 
 
 //*************************************************************************************************************
@@ -95,43 +95,43 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ChannelDataModel;
-class ChannelDataDelegate;
+class RtFiffRawViewModel;
+class RtFiffRawViewDelegate;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ChannelDataView
+* DECLARE CLASS RtFiffRawView
 *
-* @brief The ChannelDataView class provides a channel view display
+* @brief The RtFiffRawView class provides a real-time channel view display
 */
-class DISPSHARED_EXPORT ChannelDataView : public QWidget
+class DISPSHARED_EXPORT RtFiffRawView : public QWidget
 {    
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<ChannelDataView> SPtr;              /**< Shared pointer type for ChannelDataView. */
-    typedef QSharedPointer<const ChannelDataView> ConstSPtr;   /**< Const shared pointer type for ChannelDataView. */
+    typedef QSharedPointer<RtFiffRawView> SPtr;              /**< Shared pointer type for RtFiffRawView. */
+    typedef QSharedPointer<const RtFiffRawView> ConstSPtr;   /**< Const shared pointer type for RtFiffRawView. */
 
     //=========================================================================================================
     /**
-    * Constructs a ChannelDataView which is a child of parent.
+    * Constructs a RtFiffRawView which is a child of parent.
     *
     * @param [in] parent    The parent of widget.
     */
-    ChannelDataView(const QString& sSettingsPath = "",
+    RtFiffRawView(const QString& sSettingsPath = "",
                     QWidget* parent = 0,
                     Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the ChannelDataView.
+    * Destroys the RtFiffRawView.
     */
-    ~ChannelDataView();
+    ~RtFiffRawView();
 
     //=========================================================================================================
     /**
-    * Initilaizes the ChannelDataView based on a FiffInfo.
+    * Initilaizes the RtFiffRawView based on a FiffInfo.
     *
     * @param [in] info    The FiffInfo.
     */
@@ -427,8 +427,8 @@ protected:
     void markChBad();
 
     QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt */
-    QPointer<DISPLIB::ChannelDataDelegate>      m_pDelegate;                    /**< The channel data delegate */
-    QPointer<DISPLIB::ChannelDataModel>         m_pModel;                       /**< The channel data model */
+    QPointer<DISPLIB::RtFiffRawViewDelegate>      m_pDelegate;                    /**< The channel data delegate */
+    QPointer<DISPLIB::RtFiffRawViewModel>         m_pModel;                       /**< The channel data model */
 
     QMap<qint32,float>                          m_qMapChScaling;                /**< Channel scaling values. */
 
@@ -469,4 +469,4 @@ signals:
 
 } // NAMESPACE
 
-#endif // CHANNELDATAVIEW_H
+#endif // RTFIFFRAWVIEW_H

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     channeldatamodel.cpp
+* @file     rtfiffrawviewmodel.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the ChannelDataModel Class.
+* @brief    Definition of the RtFiffRawViewModel Class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "channeldatamodel.h"
+#include "rtfiffrawviewmodel.h"
 
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_info.h>
@@ -83,7 +83,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelDataModel::ChannelDataModel(QObject *parent)
+RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_bSpharaActivated(false)
 , m_bProjActivated(false)
@@ -113,7 +113,7 @@ ChannelDataModel::ChannelDataModel(QObject *parent)
 
 //*************************************************************************************************************
 //virtual functions
-int ChannelDataModel::rowCount(const QModelIndex & /*parent*/) const
+int RtFiffRawViewModel::rowCount(const QModelIndex & /*parent*/) const
 {
     if(!m_pFiffInfo->chs.isEmpty()) {
         return m_pFiffInfo->chs.size();
@@ -130,7 +130,7 @@ int ChannelDataModel::rowCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-int ChannelDataModel::columnCount(const QModelIndex & /*parent*/) const
+int RtFiffRawViewModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 3;
 }
@@ -138,7 +138,7 @@ int ChannelDataModel::columnCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-QVariant ChannelDataModel::data(const QModelIndex &index, int role) const
+QVariant RtFiffRawViewModel::data(const QModelIndex &index, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
@@ -204,7 +204,7 @@ QVariant ChannelDataModel::data(const QModelIndex &index, int role) const
 
 //*************************************************************************************************************
 
-QVariant ChannelDataModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant RtFiffRawViewModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
@@ -237,7 +237,7 @@ QVariant ChannelDataModel::headerData(int section, Qt::Orientation orientation, 
 
 //*************************************************************************************************************
 
-void ChannelDataModel::initSphara()
+void RtFiffRawViewModel::initSphara()
 {
     //Load SPHARA matrices for babymeg and vectorview
     IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QCoreApplication::applicationDirPath() + QString("/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
@@ -291,14 +291,14 @@ void ChannelDataModel::initSphara()
     //Create Sphara operator for the first time
     updateSpharaOptions("BabyMEG", 270, 105);
 
-    qDebug()<<"ChannelDataModel::initSphara - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
-    qDebug()<<"ChannelDataModel::initSphara - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterLoaded.rows()<<m_matSpharaBabyMEGOuterLoaded.cols();
+    qDebug()<<"RtFiffRawViewModel::initSphara - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
+    qDebug()<<"RtFiffRawViewModel::initSphara - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterLoaded.rows()<<m_matSpharaBabyMEGOuterLoaded.cols();
 }
 
 
 //*************************************************************************************************************
 
-void ChannelDataModel::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &p_pFiffInfo)
+void RtFiffRawViewModel::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &p_pFiffInfo)
 {
     if(p_pFiffInfo) {
         RowVectorXi sel;// = RowVectorXi(0,0);
@@ -376,7 +376,7 @@ void ChannelDataModel::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &p_pFiffInf
 
 //*************************************************************************************************************
 
-void ChannelDataModel::setSamplingInfo(float sps, int T, bool bSetZero)
+void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
 {
     beginResetModel();
 
@@ -407,7 +407,7 @@ void ChannelDataModel::setSamplingInfo(float sps, int T, bool bSetZero)
 
 //*************************************************************************************************************
 
-MatrixXd ChannelDataModel::getLastBlock()
+MatrixXd RtFiffRawViewModel::getLastBlock()
 {
     if(!m_filterData.isEmpty() && m_bPerformFiltering) {
         return m_matDataFiltered.block(0, m_iCurrentSample-m_iCurrentBlockSize, m_matDataFiltered.rows(), m_iCurrentBlockSize);
@@ -419,7 +419,7 @@ MatrixXd ChannelDataModel::getLastBlock()
 
 //*************************************************************************************************************
 
-void ChannelDataModel::addData(const QList<MatrixXd> &data)
+void RtFiffRawViewModel::addData(const QList<MatrixXd> &data)
 {
     //SSP
     bool doProj = m_bProjActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matProj.cols() ? true : false;
@@ -574,7 +574,7 @@ void ChannelDataModel::addData(const QList<MatrixXd> &data)
 
 //*************************************************************************************************************
 
-fiff_int_t ChannelDataModel::getKind(qint32 row) const
+fiff_int_t RtFiffRawViewModel::getKind(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
@@ -587,7 +587,7 @@ fiff_int_t ChannelDataModel::getKind(qint32 row) const
 
 //*************************************************************************************************************
 
-fiff_int_t ChannelDataModel::getUnit(qint32 row) const
+fiff_int_t RtFiffRawViewModel::getUnit(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
@@ -600,7 +600,7 @@ fiff_int_t ChannelDataModel::getUnit(qint32 row) const
 
 //*************************************************************************************************************
 
-fiff_int_t ChannelDataModel::getCoil(qint32 row) const
+fiff_int_t RtFiffRawViewModel::getCoil(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
@@ -613,7 +613,7 @@ fiff_int_t ChannelDataModel::getCoil(qint32 row) const
 
 //*************************************************************************************************************
 
-void ChannelDataModel::selectRows(const QList<qint32> &selection)
+void RtFiffRawViewModel::selectRows(const QList<qint32> &selection)
 {
     beginResetModel();
 
@@ -635,7 +635,7 @@ void ChannelDataModel::selectRows(const QList<qint32> &selection)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::hideRows(const QList<qint32> &selection)
+void RtFiffRawViewModel::hideRows(const QList<qint32> &selection)
 {
     beginResetModel();
 
@@ -653,7 +653,7 @@ void ChannelDataModel::hideRows(const QList<qint32> &selection)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::resetSelection()
+void RtFiffRawViewModel::resetSelection()
 {
     beginResetModel();
 
@@ -669,7 +669,7 @@ void ChannelDataModel::resetSelection()
 
 //*************************************************************************************************************
 
-void ChannelDataModel::toggleFreeze(const QModelIndex &)
+void RtFiffRawViewModel::toggleFreeze(const QModelIndex &)
 {
     m_bIsFreezed = !m_bIsFreezed;
 
@@ -693,7 +693,7 @@ void ChannelDataModel::toggleFreeze(const QModelIndex &)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
+void RtFiffRawViewModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 {
     beginResetModel();
     m_qMapChScaling = p_qMapChScaling;
@@ -703,7 +703,7 @@ void ChannelDataModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
+void RtFiffRawViewModel::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
 {
     //  Update the SSP projector
     if(m_pFiffInfo) {
@@ -720,7 +720,7 @@ void ChannelDataModel::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
 
         this->m_pFiffInfo->make_projector(m_matProj);
 
-        qDebug() << "ChannelDataModel::updateProjection - New projection calculated.";
+        qDebug() << "RtFiffRawViewModel::updateProjection - New projection calculated.";
 
         //set columns of matrix to zero depending on bad channels indexes
         for(qint32 j = 0; j < m_vecBadIdcs.cols(); ++j) {
@@ -764,7 +764,7 @@ void ChannelDataModel::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::updateCompensator(int to)
+void RtFiffRawViewModel::updateCompensator(int to)
 {
     //  Update the compensator
     if(m_pFiffInfo) {
@@ -819,7 +819,7 @@ void ChannelDataModel::updateCompensator(int to)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::updateSpharaActivation(bool state)
+void RtFiffRawViewModel::updateSpharaActivation(bool state)
 {
     m_bSpharaActivated = state;
 }
@@ -827,10 +827,10 @@ void ChannelDataModel::updateSpharaActivation(bool state)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
+void RtFiffRawViewModel::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
 {
     if(m_pFiffInfo) {
-        qDebug()<<"ChannelDataModel::updateSpharaOptions - Creating SPHARA operator for"<<sSytemType;
+        qDebug()<<"RtFiffRawViewModel::updateSpharaOptions - Creating SPHARA operator for"<<sSytemType;
 
         MatrixXd matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
         MatrixXd matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
@@ -907,7 +907,7 @@ void ChannelDataModel::updateSpharaOptions(const QString& sSytemType, int nBaseF
 
 //*************************************************************************************************************
 
-void ChannelDataModel::setFilter(QList<FilterData> filterData)
+void RtFiffRawViewModel::setFilter(QList<FilterData> filterData)
 {
     m_filterData = filterData;
 
@@ -930,7 +930,7 @@ void ChannelDataModel::setFilter(QList<FilterData> filterData)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::setFilterActive(bool state)
+void RtFiffRawViewModel::setFilterActive(bool state)
 {
     m_bPerformFiltering = state;
 }
@@ -938,7 +938,7 @@ void ChannelDataModel::setFilterActive(bool state)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::setBackgroundColor(const QColor& color)
+void RtFiffRawViewModel::setBackgroundColor(const QColor& color)
 {
     m_colBackground = color;
 }
@@ -946,7 +946,7 @@ void ChannelDataModel::setBackgroundColor(const QColor& color)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::setFilterChannelType(QString channelType)
+void RtFiffRawViewModel::setFilterChannelType(QString channelType)
 {
     m_sFilterChannelType = channelType;
     m_filterChannelList = m_visibleChannelList;
@@ -986,7 +986,7 @@ void ChannelDataModel::setFilterChannelType(QString channelType)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::createFilterChannelList(QStringList channelNames)
+void RtFiffRawViewModel::createFilterChannelList(QStringList channelNames)
 {
     m_filterChannelList.clear();
     m_visibleChannelList = channelNames;
@@ -1028,7 +1028,7 @@ void ChannelDataModel::createFilterChannelList(QStringList channelNames)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::markChBad(QModelIndex ch, bool status)
+void RtFiffRawViewModel::markChBad(QModelIndex ch, bool status)
 {
     QList<FiffChInfo> chInfolist = m_pFiffInfo->chs;
 
@@ -1056,7 +1056,7 @@ void ChannelDataModel::markChBad(QModelIndex ch, bool status)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold)
+void RtFiffRawViewModel::triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold)
 {
     m_qMapTriggerColor = colorMap;
     m_bTriggerDetectionActive = active;    
@@ -1084,7 +1084,7 @@ void ChannelDataModel::triggerInfoChanged(const QMap<double, QColor>& colorMap, 
 
 //*************************************************************************************************************
 
-void ChannelDataModel::distanceTimeSpacerChanged(int value)
+void RtFiffRawViewModel::distanceTimeSpacerChanged(int value)
 {
     if(value <= 0) {
         m_iDistanceTimerSpacer = 1000;
@@ -1096,7 +1096,7 @@ void ChannelDataModel::distanceTimeSpacerChanged(int value)
 
 //*************************************************************************************************************
 
-void ChannelDataModel::resetTriggerCounter()
+void RtFiffRawViewModel::resetTriggerCounter()
 {
     m_iDetectedTriggers = 0;
 }
@@ -1104,7 +1104,7 @@ void ChannelDataModel::resetTriggerCounter()
 
 //*************************************************************************************************************
 
-void ChannelDataModel::markChBad(QModelIndexList chlist, bool status)
+void RtFiffRawViewModel::markChBad(QModelIndexList chlist, bool status)
 {
     QList<FiffChInfo> chInfolist = m_pFiffInfo->chs;
 
@@ -1141,9 +1141,9 @@ void doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &c
 
 //*************************************************************************************************************
 
-void ChannelDataModel::filterChannelsConcurrently()
+void RtFiffRawViewModel::filterChannelsConcurrently()
 {
-    //std::cout<<"START ChannelDataModel::filterChannelsConcurrently"<<std::endl;
+    //std::cout<<"START RtFiffRawViewModel::filterChannelsConcurrently"<<std::endl;
 
     if(m_filterData.isEmpty() || !m_bPerformFiltering) {
         return;
@@ -1207,15 +1207,15 @@ void ChannelDataModel::filterChannelsConcurrently()
         m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
     }
 
-    //std::cout<<"END ChannelDataModel::filterChannelsConcurrently"<<std::endl;
+    //std::cout<<"END RtFiffRawViewModel::filterChannelsConcurrently"<<std::endl;
 }
 
 
 //*************************************************************************************************************
 
-void ChannelDataModel::filterChannelsConcurrently(const MatrixXd &data, int iDataIndex)
+void RtFiffRawViewModel::filterChannelsConcurrently(const MatrixXd &data, int iDataIndex)
 {
-    //std::cout<<"START ChannelDataModel::filterChannelsConcurrently"<<std::endl;
+    //std::cout<<"START RtFiffRawViewModel::filterChannelsConcurrently"<<std::endl;
 
     if(iDataIndex >= m_matDataFiltered.cols() || data.cols() < m_iMaxFilterLength) {
         return;
@@ -1324,13 +1324,13 @@ void ChannelDataModel::filterChannelsConcurrently(const MatrixXd &data, int iDat
         m_matDataFiltered.row(notFilterChannelIndex.at(i)).segment(iDataIndex,data.row(notFilterChannelIndex.at(i)).cols()) = data.row(notFilterChannelIndex.at(i));
     }
 
-    //std::cout<<"END ChannelDataModel::filterChannelsConcurrently"<<std::endl;
+    //std::cout<<"END RtFiffRawViewModel::filterChannelsConcurrently"<<std::endl;
 }
 
 
 //*************************************************************************************************************
 
-void ChannelDataModel::clearModel()
+void RtFiffRawViewModel::clearModel()
 {
     beginResetModel();
 

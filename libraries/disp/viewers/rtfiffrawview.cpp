@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     channeldataview.cpp
+* @file     rtfiffrawview.cpp
 * @author   Lorenz Esch <lesc@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the ChannelDataView Class.
+* @brief    Definition of the RtFiffRawView Class.
 *
 */
 
@@ -38,10 +38,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "channeldataview.h"
+#include "rtfiffrawview.h"
 
-#include "helpers/channeldatadelegate.h"
-#include "helpers/channeldatamodel.h"
+#include "helpers/rtfiffrawviewdelegate.h"
+#include "helpers/rtfiffrawviewmodel.h"
 
 #include <utils/filterTools/filterdata.h>
 #include <fiff/fiff_info.h>
@@ -80,7 +80,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelDataView::ChannelDataView(const QString& sSettingsPath,
+RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
                                  QWidget *parent,
                                  Qt::WindowFlags f)
 : QWidget(parent, f)
@@ -113,7 +113,7 @@ ChannelDataView::ChannelDataView(const QString& sSettingsPath,
 
 //*************************************************************************************************************
 
-ChannelDataView::~ChannelDataView()
+RtFiffRawView::~RtFiffRawView()
 {
     saveSettings(m_sSettingsPath);
 }
@@ -121,17 +121,17 @@ ChannelDataView::~ChannelDataView()
 
 //*************************************************************************************************************
 
-void ChannelDataView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
+void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
 {
     m_pFiffInfo = info;
     m_fSamplingRate = m_pFiffInfo->sfreq;
 
     //Init the model
-    m_pModel = new ChannelDataModel(this);
+    m_pModel = new RtFiffRawViewModel(this);
     m_pModel->setFiffInfo(m_pFiffInfo);
     m_pModel->setSamplingInfo(m_fSamplingRate, m_iT, true);
-    connect(m_pModel.data(), &ChannelDataModel::triggerDetected,
-            this, &ChannelDataView::triggerDetected);
+    connect(m_pModel.data(), &RtFiffRawViewModel::triggerDetected,
+            this, &RtFiffRawView::triggerDetected);
 
     //Init bad channel list
     m_qListBadChannels.clear();
@@ -142,11 +142,11 @@ void ChannelDataView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     }
 
     //Init the delegate
-    m_pDelegate = new ChannelDataDelegate(this);
+    m_pDelegate = new RtFiffRawViewDelegate(this);
     m_pDelegate->initPainterPaths(m_pModel);
 
-    connect(this, &ChannelDataView::markerMoved,
-            m_pDelegate.data(), &ChannelDataDelegate::markerMoved);
+    connect(this, &RtFiffRawView::markerMoved,
+            m_pDelegate.data(), &RtFiffRawViewDelegate::markerMoved);
 
     //Init the view
     m_pTableView->setModel(m_pModel);
@@ -154,10 +154,10 @@ void ChannelDataView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     connect(m_pTableView.data(), &QTableView::doubleClicked,
-            m_pModel.data(), &ChannelDataModel::toggleFreeze);
+            m_pModel.data(), &RtFiffRawViewModel::toggleFreeze);
 
     connect(m_pTableView.data(), &QTableView::customContextMenuRequested,
-            this, &ChannelDataView::channelContextMenu);
+            this, &RtFiffRawView::channelContextMenu);
 
     //set some size settings for m_pTableView
     m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -172,13 +172,13 @@ void ChannelDataView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
     connect(m_pTableView->verticalScrollBar(), &QScrollBar::valueChanged,
-            this, &ChannelDataView::visibleRowsChanged);
+            this, &RtFiffRawView::visibleRowsChanged);
 }
 
 
 //*************************************************************************************************************
 
-void ChannelDataView::addData(const QList<Eigen::MatrixXd> &data)
+void RtFiffRawView::addData(const QList<Eigen::MatrixXd> &data)
 {
     m_pModel->addData(data);
 }
@@ -186,7 +186,7 @@ void ChannelDataView::addData(const QList<Eigen::MatrixXd> &data)
 
 //*************************************************************************************************************
 
-MatrixXd ChannelDataView::getLastBlock()
+MatrixXd RtFiffRawView::getLastBlock()
 {
     return m_pModel->getLastBlock();
 }
@@ -194,7 +194,7 @@ MatrixXd ChannelDataView::getLastBlock()
 
 //*************************************************************************************************************
 
-bool ChannelDataView::eventFilter(QObject *object, QEvent *event)
+bool RtFiffRawView::eventFilter(QObject *object, QEvent *event)
 {
     if (object == m_pTableView->viewport() && event->type() == QEvent::MouseMove) {
         QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
@@ -208,7 +208,7 @@ bool ChannelDataView::eventFilter(QObject *object, QEvent *event)
 
 //*************************************************************************************************************
 
-void ChannelDataView::setBackgroundColor(const QColor& backgroundColor)
+void RtFiffRawView::setBackgroundColor(const QColor& backgroundColor)
 {
     m_backgroundColor = backgroundColor;
 
@@ -225,7 +225,7 @@ void ChannelDataView::setBackgroundColor(const QColor& backgroundColor)
 
 //*************************************************************************************************************
 
-QColor ChannelDataView::getBackgroundColor()
+QColor RtFiffRawView::getBackgroundColor()
 {
     return m_backgroundColor;
 }
@@ -233,7 +233,7 @@ QColor ChannelDataView::getBackgroundColor()
 
 //*************************************************************************************************************
 
-QMap<qint32, float> ChannelDataView::getScalingMap()
+QMap<qint32, float> RtFiffRawView::getScalingMap()
 {
     return m_qMapChScaling;
 }
@@ -241,7 +241,7 @@ QMap<qint32, float> ChannelDataView::getScalingMap()
 
 //*************************************************************************************************************
 
-void ChannelDataView::setScalingMap(const QMap<qint32, float>& scaleMap)
+void RtFiffRawView::setScalingMap(const QMap<qint32, float>& scaleMap)
 {
     m_qMapChScaling = scaleMap;
     m_pModel->setScaling(scaleMap);
@@ -250,7 +250,7 @@ void ChannelDataView::setScalingMap(const QMap<qint32, float>& scaleMap)
 
 //*************************************************************************************************************
 
-void ChannelDataView::setSignalColor(const QColor& signalColor)
+void RtFiffRawView::setSignalColor(const QColor& signalColor)
 {
     m_pDelegate->setSignalColor(signalColor);
 }
@@ -258,7 +258,7 @@ void ChannelDataView::setSignalColor(const QColor& signalColor)
 
 //*************************************************************************************************************
 
-QColor ChannelDataView::getSignalColor()
+QColor RtFiffRawView::getSignalColor()
 {
     return m_pDelegate->getSignalColor();
 }
@@ -266,7 +266,7 @@ QColor ChannelDataView::getSignalColor()
 
 //*************************************************************************************************************
 
-void ChannelDataView::hideBadChannels()
+void RtFiffRawView::hideBadChannels()
 {
     if(m_bHideBadChannels) {
         m_bHideBadChannels = false;
@@ -290,7 +290,7 @@ void ChannelDataView::hideBadChannels()
 
 //*************************************************************************************************************
 
-bool ChannelDataView::getBadChannelHideStatus()
+bool RtFiffRawView::getBadChannelHideStatus()
 {
     return m_bHideBadChannels;
 }
@@ -298,7 +298,7 @@ bool ChannelDataView::getBadChannelHideStatus()
 
 //*************************************************************************************************************
 
-void ChannelDataView::showSelectedChannelsOnly(const QStringList &selectedChannels)
+void RtFiffRawView::showSelectedChannelsOnly(const QStringList &selectedChannels)
 {
     m_slSelectedChannels = selectedChannels;
 
@@ -321,7 +321,7 @@ void ChannelDataView::showSelectedChannelsOnly(const QStringList &selectedChanne
 
 //*************************************************************************************************************
 
-void ChannelDataView::setZoom(double zoomFac)
+void RtFiffRawView::setZoom(double zoomFac)
 {
     m_fZoomFactor = zoomFac;
 
@@ -331,7 +331,7 @@ void ChannelDataView::setZoom(double zoomFac)
 
 //*************************************************************************************************************
 
-double ChannelDataView::getZoom()
+double RtFiffRawView::getZoom()
 {
     return m_fZoomFactor;
 }
@@ -339,7 +339,7 @@ double ChannelDataView::getZoom()
 
 //*************************************************************************************************************
 
-void ChannelDataView::setWindowSize(int T)
+void RtFiffRawView::setWindowSize(int T)
 {
     m_iT = T;
 
@@ -349,7 +349,7 @@ void ChannelDataView::setWindowSize(int T)
 
 //*************************************************************************************************************
 
-int ChannelDataView::getWindowSize()
+int RtFiffRawView::getWindowSize()
 {
     return m_iT;
 }
@@ -357,7 +357,7 @@ int ChannelDataView::getWindowSize()
 
 //*************************************************************************************************************
 
-void ChannelDataView::takeScreenshot(const QString& fileName)
+void RtFiffRawView::takeScreenshot(const QString& fileName)
 {
     if(fileName.contains(".svg", Qt::CaseInsensitive)) {
         // Generate screenshot
@@ -377,7 +377,7 @@ void ChannelDataView::takeScreenshot(const QString& fileName)
 
 //*************************************************************************************************************
 
-void ChannelDataView::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
+void RtFiffRawView::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
 {
     m_pModel->updateProjection(projs);
 }
@@ -385,7 +385,7 @@ void ChannelDataView::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
 
 //*************************************************************************************************************
 
-void ChannelDataView::updateCompensator(int to)
+void RtFiffRawView::updateCompensator(int to)
 {
     m_pModel->updateCompensator(to);
 }
@@ -393,7 +393,7 @@ void ChannelDataView::updateCompensator(int to)
 
 //*************************************************************************************************************
 
-void ChannelDataView::updateSpharaActivation(bool state)
+void RtFiffRawView::updateSpharaActivation(bool state)
 {
     m_pModel->updateSpharaActivation(state);
 }
@@ -401,7 +401,7 @@ void ChannelDataView::updateSpharaActivation(bool state)
 
 //*************************************************************************************************************
 
-void ChannelDataView::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
+void RtFiffRawView::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
 {
     m_pModel->updateSpharaOptions(sSytemType, nBaseFctsFirst, nBaseFctsSecond);
 }
@@ -409,7 +409,7 @@ void ChannelDataView::updateSpharaOptions(const QString& sSytemType, int nBaseFc
 
 //*************************************************************************************************************
 
-void ChannelDataView::setFilter(const FilterData& filterData)
+void RtFiffRawView::setFilter(const FilterData& filterData)
 {
     m_pModel->setFilter(QList<FilterData>() << filterData);
 }
@@ -417,7 +417,7 @@ void ChannelDataView::setFilter(const FilterData& filterData)
 
 //*************************************************************************************************************
 
-void ChannelDataView::setFilterActive(bool state)
+void RtFiffRawView::setFilterActive(bool state)
 {
     m_pModel->setFilterActive(state);
 }
@@ -425,7 +425,7 @@ void ChannelDataView::setFilterActive(bool state)
 
 //*************************************************************************************************************
 
-void ChannelDataView::setFilterChannelType(const QString &channelType)
+void RtFiffRawView::setFilterChannelType(const QString &channelType)
 {
     m_pModel->setFilterChannelType(channelType);
 }
@@ -433,7 +433,7 @@ void ChannelDataView::setFilterChannelType(const QString &channelType)
 
 //*************************************************************************************************************
 
-void ChannelDataView::triggerInfoChanged(const QMap<double, QColor>& colorMap,
+void RtFiffRawView::triggerInfoChanged(const QMap<double, QColor>& colorMap,
                                          bool active,
                                          const QString &triggerCh,
                                          double threshold)
@@ -444,7 +444,7 @@ void ChannelDataView::triggerInfoChanged(const QMap<double, QColor>& colorMap,
 
 //*************************************************************************************************************
 
-void ChannelDataView::setDistanceTimeSpacer(int value)
+void RtFiffRawView::setDistanceTimeSpacer(int value)
 {
     m_iDistanceTimeSpacer = value;
     m_pModel->distanceTimeSpacerChanged(value);
@@ -453,7 +453,7 @@ void ChannelDataView::setDistanceTimeSpacer(int value)
 
 //*************************************************************************************************************
 
-int ChannelDataView::getDistanceTimeSpacer()
+int RtFiffRawView::getDistanceTimeSpacer()
 {
     return m_iDistanceTimeSpacer;
 }
@@ -461,7 +461,7 @@ int ChannelDataView::getDistanceTimeSpacer()
 
 //*************************************************************************************************************
 
-void ChannelDataView::resetTriggerCounter()
+void RtFiffRawView::resetTriggerCounter()
 {
     m_pModel->resetTriggerCounter();
 }
@@ -469,7 +469,7 @@ void ChannelDataView::resetTriggerCounter()
 
 //*************************************************************************************************************
 
-void ChannelDataView::saveSettings(const QString& settingsPath)
+void RtFiffRawView::saveSettings(const QString& settingsPath)
 {
     if(settingsPath.isEmpty()) {
         return;
@@ -481,7 +481,7 @@ void ChannelDataView::saveSettings(const QString& settingsPath)
 
 //*************************************************************************************************************
 
-void ChannelDataView::loadSettings(const QString& settingsPath)
+void RtFiffRawView::loadSettings(const QString& settingsPath)
 {
     if(settingsPath.isEmpty()) {
         return;
@@ -493,7 +493,7 @@ void ChannelDataView::loadSettings(const QString& settingsPath)
 
 //*************************************************************************************************************
 
-void ChannelDataView::channelContextMenu(QPoint pos)
+void RtFiffRawView::channelContextMenu(QPoint pos)
 {
     //obtain index where index was clicked
     QModelIndex index = m_pTableView->indexAt(pos);
@@ -508,11 +508,11 @@ void ChannelDataView::channelContextMenu(QPoint pos)
     if(!m_qListBadChannels.contains(index.row())) {
         QAction* doMarkChBad = menu->addAction(tr("Mark as bad"));
         connect(doMarkChBad, &QAction::triggered,
-                this, &ChannelDataView::markChBad);
+                this, &RtFiffRawView::markChBad);
     } else {
         QAction* doMarkChGood = menu->addAction(tr("Mark as good"));
         connect(doMarkChGood, &QAction::triggered,
-                this, &ChannelDataView::markChBad);
+                this, &RtFiffRawView::markChBad);
     }
 
     // non C++11 alternative
@@ -523,19 +523,19 @@ void ChannelDataView::channelContextMenu(QPoint pos)
 
     QAction* doSelection = menu->addAction(tr("Apply selection"));
     connect(doSelection, &QAction::triggered,
-            this, &ChannelDataView::applySelection);
+            this, &RtFiffRawView::applySelection);
 
     //select channels
     QAction* hideSelection = menu->addAction(tr("Hide selection"));
     connect(hideSelection, &QAction::triggered, this,
-            &ChannelDataView::hideSelection);
+            &RtFiffRawView::hideSelection);
 
     //undo selection
     QAction* resetAppliedSelection = menu->addAction(tr("Reset selection"));
     connect(resetAppliedSelection, &QAction::triggered,
-            m_pModel.data(), &ChannelDataModel::resetSelection);
+            m_pModel.data(), &RtFiffRawViewModel::resetSelection);
     connect(resetAppliedSelection, &QAction::triggered,
-            this, &ChannelDataView::resetSelection);
+            this, &RtFiffRawView::resetSelection);
 
     //show context menu
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
@@ -544,7 +544,7 @@ void ChannelDataView::channelContextMenu(QPoint pos)
 
 //*************************************************************************************************************
 
-void ChannelDataView::applySelection()
+void RtFiffRawView::applySelection()
 {
     //Hide non selected channels/rows in the data views
     for(int i = 0; i<m_pModel->rowCount(); i++) {
@@ -565,7 +565,7 @@ void ChannelDataView::applySelection()
 
 //*************************************************************************************************************
 
-void ChannelDataView::hideSelection()
+void RtFiffRawView::hideSelection()
 {
     for(int i=0; i<m_qListCurrentSelection.size(); i++) {
         m_pTableView->hideRow(m_qListCurrentSelection.at(i));
@@ -578,7 +578,7 @@ void ChannelDataView::hideSelection()
 
 //*************************************************************************************************************
 
-void ChannelDataView::resetSelection()
+void RtFiffRawView::resetSelection()
 {
     // non C++11 alternative
     for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i) {
@@ -598,7 +598,7 @@ void ChannelDataView::resetSelection()
 
 //*************************************************************************************************************
 
-void ChannelDataView::visibleRowsChanged()
+void RtFiffRawView::visibleRowsChanged()
 {
     if(!m_pTableView || !m_pModel || !m_pDelegate) {
         return;
@@ -626,13 +626,13 @@ void ChannelDataView::visibleRowsChanged()
 
     m_pDelegate->setUpperItemIndex(from+1);
 
-    //qDebug() <<"ChannelDataView::visibleRowsChanged - from "<< from << " to" << to;
+    //qDebug() <<"RtFiffRawView::visibleRowsChanged - from "<< from << " to" << to;
 }
 
 
 //*************************************************************************************************************
 
-void ChannelDataView::markChBad()
+void RtFiffRawView::markChBad()
 {
     QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
 

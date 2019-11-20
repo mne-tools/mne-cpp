@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     channeldatasettingsview.h
+* @file     fiffrawviewsettings.h
 * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the ChannelDataSettingsView Class.
+* @brief    Declaration of the FiffRawViewSettings Class.
 *
 */
 
-#ifndef CHANNELDATASETTINGSVIEW_H
-#define CHANNELDATASETTINGSVIEW_H
+#ifndef FIFFRAWVIEWSETTINGS_H
+#define FIFFRAWVIEWSETTINGS_H
 
 
 //*************************************************************************************************************
@@ -72,7 +72,7 @@
 //=============================================================================================================
 
 namespace Ui {
-    class ChannelDataSettingsViewWidget;
+    class FiffRawViewSettingsWidget;
 }
 
 
@@ -93,33 +93,33 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ChannelDataSettingsView
+* DECLARE CLASS FiffRawViewSettings
 *
-* @brief The ChannelDataSettingsView class provides a view to select different channel data view dependent settings
+* @brief The FiffRawViewSettings class provides a view to select different channel data view dependent settings
 */
-class DISPSHARED_EXPORT ChannelDataSettingsView : public QWidget
+class DISPSHARED_EXPORT FiffRawViewSettings : public QWidget
 {
     Q_OBJECT
 
 public:    
-    typedef QSharedPointer<ChannelDataSettingsView> SPtr;              /**< Shared pointer type for ChannelDataSettingsView. */
-    typedef QSharedPointer<const ChannelDataSettingsView> ConstSPtr;   /**< Const shared pointer type for ChannelDataSettingsView. */
+    typedef QSharedPointer<FiffRawViewSettings> SPtr;              /**< Shared pointer type for FiffRawViewSettings. */
+    typedef QSharedPointer<const FiffRawViewSettings> ConstSPtr;   /**< Const shared pointer type for FiffRawViewSettings. */
 
     //=========================================================================================================
     /**
-    * Constructs a ChannelDataSettingsView which is a child of parent.
+    * Constructs a FiffRawViewSettings which is a child of parent.
     *
     * @param [in] parent        parent of widget
     */
-    ChannelDataSettingsView(const QString& sSettingsPath = "",
+    FiffRawViewSettings(const QString& sSettingsPath = "",
                             QWidget *parent = 0,
                             Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the ChannelDataSettingsView.
+    * Destroys the FiffRawViewSettings.
     */
-    ~ChannelDataSettingsView();
+    ~FiffRawViewSettings();
 
     //=========================================================================================================
     /**
@@ -259,7 +259,7 @@ protected:
     */
     void onMakeScreenshot();
 
-    Ui::ChannelDataSettingsViewWidget* ui;
+    Ui::FiffRawViewSettingsWidget* ui;
 
     QColor      m_colCurrentSignalColor;        /**< Current color of the signal. */
     QColor      m_colCurrentBackgroundColor;    /**< Current color of the background. */
@@ -308,4 +308,4 @@ signals:
 
 } // NAMESPACE
 
-#endif // CHANNELDATASETTINGSVIEW_H
+#endif // FIFFRAWVIEWSETTINGS_H
