@@ -52,7 +52,7 @@
 #include <disp/viewers/projectorsview.h>
 #include <disp/viewers/compensatorview.h>
 #include <disp/viewers/modalityselectionview.h>
-#include <disp/viewers/channeldatasettingsview.h>
+#include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/averageselectionview.h>
 #include <disp/viewers/averagingsettingsview.h>
 
@@ -345,17 +345,17 @@ void RealTimeEvokedSetWidget::init()
         }
 
         // Quick control channel data settings
-        ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView(QString("RTESW/%1").arg(t_sRTESName));
+        FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("RTESW/%1").arg(t_sRTESName));
         pChannelDataSettingsView->setWidgetList(QStringList() << "screenshot" << "backgroundColor");
         m_pQuickControlView->addGroupBoxWithTabs(pChannelDataSettingsView, "Other", "View");
 
-        connect(pChannelDataSettingsView, &ChannelDataSettingsView::backgroundColorChanged,
+        connect(pChannelDataSettingsView, &FiffRawViewSettings::backgroundColorChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::setBackgroundColor);
 
-        connect(pChannelDataSettingsView, &ChannelDataSettingsView::backgroundColorChanged,
+        connect(pChannelDataSettingsView, &FiffRawViewSettings::backgroundColorChanged,
                 m_pButterflyView.data(), &ButterflyView::setBackgroundColor);
 
-        connect(pChannelDataSettingsView, &ChannelDataSettingsView::makeScreenshot,
+        connect(pChannelDataSettingsView, &FiffRawViewSettings::makeScreenshot,
                 this, &RealTimeEvokedSetWidget::onMakeScreenshot);
 
         m_pAverageLayoutView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());

@@ -73,7 +73,7 @@
 namespace DISPLIB {
     class ChannelSelectionView;
     class ChannelInfoModel;
-    class ChannelDataView;
+    class RtFiffRawView;
     class QuickControlView;
     class ChannelDataViewNew;
 }
@@ -176,7 +176,7 @@ private:
     QSharedPointer<DISPLIB::QuickControlView>               m_pQuickControlView;            /**< quick control widget. */
     QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;            /**< channel info model. */
     QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;        /**< ChannelSelectionView. */
-    QPointer<DISPLIB::ChannelDataView>                      m_pChannelDataView;             /**< the QTableView being part of the model/view framework of Qt. */
+    QPointer<DISPLIB::RtFiffRawView>                      m_pChannelDataView;             /**< the QTableView being part of the model/view framework of Qt. */
 
 
     QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/

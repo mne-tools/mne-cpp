@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     channeldatadelegate.h
+* @file     rtfiffrawviewdelegate.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the ChannelDataDelegate Class.
+* @brief    Declaration of the RtFiffRawViewDelegate Class.
 *
 */
 
-#ifndef CHANNELDATADELEGATE_H
-#define CHANNELDATADELEGATE_H
+#ifndef RTFIFFRAWVIEWDELEGATE_H
+#define RTFIFFRAWVIEWDELEGATE_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -90,16 +91,16 @@ typedef QPair<const double*,qint32> RowVectorPair;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ChannelDataDelegate
+* DECLARE CLASS RtFiffRawViewDelegate
 *
-* @brief The ChannelDataDelegate class represents a RTMSA delegate which creates the plot paths
+* @brief The RtFiffRawViewDelegate class represents a RTMSA delegate which creates the plot paths
 */
-class DISPSHARED_EXPORT ChannelDataDelegate : public QAbstractItemDelegate
+class DISPSHARED_EXPORT RtFiffRawViewDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<ChannelDataDelegate> SPtr;              /**< Shared pointer type for ChannelDataDelegate. */
-    typedef QSharedPointer<const ChannelDataDelegate> ConstSPtr;   /**< Const shared pointer type for ChannelDataDelegate. */
+    typedef QSharedPointer<RtFiffRawViewDelegate> SPtr;              /**< Shared pointer type for RtFiffRawViewDelegate. */
+    typedef QSharedPointer<const RtFiffRawViewDelegate> ConstSPtr;   /**< Const shared pointer type for RtFiffRawViewDelegate. */
 
     //=========================================================================================================
     /**
@@ -107,7 +108,7 @@ public:
     *
     * @param[in] parent     Parent of the delegate
     */
-    ChannelDataDelegate(QObject *parent = 0);
+    RtFiffRawViewDelegate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -283,4 +284,4 @@ private:
 
 } // NAMESPACE
 
-#endif // CHANNELDATADELEGATE_H
+#endif // RTFIFFRAWVIEWDELEGATE_H

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     channeldatasettingsview.cpp
+* @file     fiffrawviewsettings.cpp
 * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the ChannelDataSettingsView Class.
+* @brief    Definition of the FiffRawViewSettings Class.
 *
 */
 
@@ -38,9 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "channeldatasettingsview.h"
+#include "fiffrawviewsettings.h"
 
-#include "ui_channeldatasettingsview.h"
+#include "ui_fiffrawviewsettings.h"
 
 
 //*************************************************************************************************************
@@ -72,11 +72,11 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelDataSettingsView::ChannelDataSettingsView(const QString &sSettingsPath,
-                                                 QWidget *parent,
-                                                 Qt::WindowFlags f)
+FiffRawViewSettings::FiffRawViewSettings(const QString &sSettingsPath,
+                                         QWidget *parent,
+                                         Qt::WindowFlags f)
 : QWidget(parent, f)
-, ui(new Ui::ChannelDataSettingsViewWidget)
+, ui(new Ui::FiffRawViewSettingsWidget)
 , m_sSettingsPath(sSettingsPath)
 {
     ui->setupUi(this);
@@ -91,7 +91,7 @@ ChannelDataSettingsView::ChannelDataSettingsView(const QString &sSettingsPath,
 
 //*************************************************************************************************************
 
-ChannelDataSettingsView::~ChannelDataSettingsView()
+FiffRawViewSettings::~FiffRawViewSettings()
 {
     saveSettings(m_sSettingsPath);
 }
@@ -99,12 +99,12 @@ ChannelDataSettingsView::~ChannelDataSettingsView()
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::setWidgetList(const QStringList& lVisibleWidgets)
+void FiffRawViewSettings::setWidgetList(const QStringList& lVisibleWidgets)
 {
     if(lVisibleWidgets.contains("numberChannels", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Number of visible channels
         connect(ui->m_doubleSpinBox_numberVisibleChannels, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this, &ChannelDataSettingsView::zoomChanged);
+                this, &FiffRawViewSettings::zoomChanged);
     } else {
         ui->m_doubleSpinBox_numberVisibleChannels->hide();
         ui->label_numberChannels->hide();
@@ -113,7 +113,7 @@ void ChannelDataSettingsView::setWidgetList(const QStringList& lVisibleWidgets)
     if(lVisibleWidgets.contains("windowSize", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Window size
         connect(ui->m_spinBox_windowSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                this, &ChannelDataSettingsView::timeWindowChanged);
+                this, &FiffRawViewSettings::timeWindowChanged);
     } else {
         ui->m_spinBox_windowSize->hide();
         ui->label_windowSize->hide();
@@ -122,7 +122,7 @@ void ChannelDataSettingsView::setWidgetList(const QStringList& lVisibleWidgets)
     if(lVisibleWidgets.contains("distanceSpacers", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Distance for timer spacer
         connect(ui->m_comboBox_distaceTimeSpacer, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-                this, &ChannelDataSettingsView::onDistanceTimeSpacerChanged);
+                this, &FiffRawViewSettings::onDistanceTimeSpacerChanged);
     } else {
         ui->m_comboBox_distaceTimeSpacer->hide();
         ui->label_timeSpacers->hide();
@@ -131,7 +131,7 @@ void ChannelDataSettingsView::setWidgetList(const QStringList& lVisibleWidgets)
     if(lVisibleWidgets.contains("backgroundColor", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Background Colors
         connect(ui->m_pushButton_backgroundColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-                this, &ChannelDataSettingsView::onViewColorButtonClicked);
+                this, &FiffRawViewSettings::onViewColorButtonClicked);
     } else {
         ui->m_pushButton_backgroundColor->hide();
         ui->label_backgroundColor->hide();
@@ -140,7 +140,7 @@ void ChannelDataSettingsView::setWidgetList(const QStringList& lVisibleWidgets)
     if(lVisibleWidgets.contains("signalColor", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Signal Colors
         connect(ui->m_pushButton_signalColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-                this, &ChannelDataSettingsView::onViewColorButtonClicked);
+                this, &FiffRawViewSettings::onViewColorButtonClicked);
     } else {
         ui->m_pushButton_signalColor->hide();
         ui->label_signalColor->hide();
@@ -149,7 +149,7 @@ void ChannelDataSettingsView::setWidgetList(const QStringList& lVisibleWidgets)
     if(lVisibleWidgets.contains("screenshot", Qt::CaseInsensitive) || lVisibleWidgets.isEmpty()) {
         //Signal Colors
         connect(ui->m_pushButton_makeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-                this, &ChannelDataSettingsView::onMakeScreenshot);
+                this, &FiffRawViewSettings::onMakeScreenshot);
     } else {
         ui->m_pushButton_makeScreenshot->hide();
         ui->m_comboBox_imageType->hide();
@@ -161,7 +161,7 @@ void ChannelDataSettingsView::setWidgetList(const QStringList& lVisibleWidgets)
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::setWindowSize(int windowSize)
+void FiffRawViewSettings::setWindowSize(int windowSize)
 {
     ui->m_spinBox_windowSize->setValue(windowSize);
 
@@ -171,7 +171,7 @@ void ChannelDataSettingsView::setWindowSize(int windowSize)
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::setZoom(double zoomFactor)
+void FiffRawViewSettings::setZoom(double zoomFactor)
 {
     ui->m_doubleSpinBox_numberVisibleChannels->setValue(zoomFactor);
 
@@ -181,7 +181,7 @@ void ChannelDataSettingsView::setZoom(double zoomFactor)
 
 //*************************************************************************************************************
 
-int ChannelDataSettingsView::getDistanceTimeSpacer()
+int FiffRawViewSettings::getDistanceTimeSpacer()
 {
     return ui->m_comboBox_distaceTimeSpacer->currentText().toInt();
 }
@@ -189,7 +189,7 @@ int ChannelDataSettingsView::getDistanceTimeSpacer()
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::setDistanceTimeSpacer(int value)
+void FiffRawViewSettings::setDistanceTimeSpacer(int value)
 {
     ui->m_comboBox_distaceTimeSpacer->setCurrentText(QString::number(value));
 }
@@ -197,7 +197,7 @@ void ChannelDataSettingsView::setDistanceTimeSpacer(int value)
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::setBackgroundColor(const QColor& backgroundColor)
+void FiffRawViewSettings::setBackgroundColor(const QColor& backgroundColor)
 {
     ui->m_pushButton_backgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(backgroundColor.red()).arg(backgroundColor.green()).arg(backgroundColor.blue()));
 
@@ -207,7 +207,7 @@ void ChannelDataSettingsView::setBackgroundColor(const QColor& backgroundColor)
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::setSignalColor(const QColor& signalColor)
+void FiffRawViewSettings::setSignalColor(const QColor& signalColor)
 {
     ui->m_pushButton_signalColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(signalColor.red()).arg(signalColor.green()).arg(signalColor.blue()));
 
@@ -217,7 +217,7 @@ void ChannelDataSettingsView::setSignalColor(const QColor& signalColor)
 
 //*************************************************************************************************************
 
-const QColor& ChannelDataSettingsView::getSignalColor()
+const QColor& FiffRawViewSettings::getSignalColor()
 {
     return m_colCurrentSignalColor;
 }
@@ -225,7 +225,7 @@ const QColor& ChannelDataSettingsView::getSignalColor()
 
 //*************************************************************************************************************
 
-const QColor& ChannelDataSettingsView::getBackgroundColor()
+const QColor& FiffRawViewSettings::getBackgroundColor()
 {
     return m_colCurrentBackgroundColor;
 }
@@ -233,7 +233,7 @@ const QColor& ChannelDataSettingsView::getBackgroundColor()
 
 //*************************************************************************************************************
 
-double ChannelDataSettingsView::getZoom()
+double FiffRawViewSettings::getZoom()
 {
     return ui->m_doubleSpinBox_numberVisibleChannels->value();
 }
@@ -241,7 +241,7 @@ double ChannelDataSettingsView::getZoom()
 
 //*************************************************************************************************************
 
-int ChannelDataSettingsView::getWindowSize()
+int FiffRawViewSettings::getWindowSize()
 {
     return ui->m_spinBox_windowSize->value();
 }
@@ -249,7 +249,7 @@ int ChannelDataSettingsView::getWindowSize()
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::saveSettings(const QString& settingsPath)
+void FiffRawViewSettings::saveSettings(const QString& settingsPath)
 {
     if(settingsPath.isEmpty()) {
         return;
@@ -267,7 +267,7 @@ void ChannelDataSettingsView::saveSettings(const QString& settingsPath)
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::loadSettings(const QString& settingsPath)
+void FiffRawViewSettings::loadSettings(const QString& settingsPath)
 {
     if(settingsPath.isEmpty()) {
         return;
@@ -286,7 +286,7 @@ void ChannelDataSettingsView::loadSettings(const QString& settingsPath)
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::onDistanceTimeSpacerChanged(qint32 value)
+void FiffRawViewSettings::onDistanceTimeSpacerChanged(qint32 value)
 {
     switch(value) {
         case 0:
@@ -314,7 +314,7 @@ void ChannelDataSettingsView::onDistanceTimeSpacerChanged(qint32 value)
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::onViewColorButtonClicked()
+void FiffRawViewSettings::onViewColorButtonClicked()
 {
     QColorDialog* pDialog = new QColorDialog(this);
 
@@ -351,7 +351,7 @@ void ChannelDataSettingsView::onViewColorButtonClicked()
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::onTimeWindowChanged(int value)
+void FiffRawViewSettings::onTimeWindowChanged(int value)
 {
     emit timeWindowChanged(value);
 
@@ -361,7 +361,7 @@ void ChannelDataSettingsView::onTimeWindowChanged(int value)
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::onZoomChanged(double value)
+void FiffRawViewSettings::onZoomChanged(double value)
 {
     emit zoomChanged(value);
 
@@ -371,7 +371,7 @@ void ChannelDataSettingsView::onZoomChanged(double value)
 
 //*************************************************************************************************************
 
-void ChannelDataSettingsView::onMakeScreenshot()
+void FiffRawViewSettings::onMakeScreenshot()
 {
     emit makeScreenshot(ui->m_comboBox_imageType->currentText());
 }

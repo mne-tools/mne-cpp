@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     channeldatadelegate.cpp
+* @file     rtfiffrawviewdelegate.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the ChannelDataDelegate Class.
+* @brief    Definition of the RtFiffRawViewDelegate Class.
 *
 */
 
@@ -38,9 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "channeldatadelegate.h"
+#include "rtfiffrawviewdelegate.h"
 
-#include "channeldatamodel.h"
+#include "rtfiffrawviewmodel.h"
 
 
 //*************************************************************************************************************
@@ -70,7 +70,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelDataDelegate::ChannelDataDelegate(QObject *parent)
+RtFiffRawViewDelegate::RtFiffRawViewDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
 , m_dMaxValue(0.0)
 , m_dScaleY(0.0)
@@ -83,7 +83,7 @@ ChannelDataDelegate::ChannelDataDelegate(QObject *parent)
 
 //*************************************************************************************************************
 
-void ChannelDataDelegate::initPainterPaths(const QAbstractTableModel *model)
+void RtFiffRawViewDelegate::initPainterPaths(const QAbstractTableModel *model)
 {
     for(int i = 0; i<model->rowCount(); i++)
         m_painterPaths.append(QPainterPath());
@@ -123,7 +123,7 @@ void createPaths(const QModelIndex &index,
                  const QVector<float> &data,
                  const QVector<float> &lastData)
 {
-    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
+    const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = t_pModel->getKind(index.row());
@@ -263,7 +263,7 @@ void createPaths(const QModelIndex &index,
 
 //*************************************************************************************************************
 
-void ChannelDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void RtFiffRawViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     float t_fPlotHeight = option.rect.height();
     painter->setRenderHint(QPainter::Antialiasing, true);
@@ -315,7 +315,7 @@ void ChannelDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
             QVariant variant = index.model()->data(index,Qt::DisplayRole);
             RowVectorPair data = variant.value<RowVectorPair>();
 
-            const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
+            const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
             if(data.second > 0) {
                 QPainterPath path(QPointF(option.rect.x(),option.rect.y()));
@@ -443,7 +443,7 @@ void ChannelDataDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
 
 //*************************************************************************************************************
 
-QSize ChannelDataDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+QSize RtFiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QSize size;
 
@@ -453,7 +453,7 @@ QSize ChannelDataDelegate::sizeHint(const QStyleOptionViewItem &option, const QM
         break;
     case 1:
         QList< QVector<float> > data = index.model()->data(index).value< QList<QVector<float> > >();
-//        qint32 nsamples = (static_cast<const ChannelDataModel*>(index.model()))->lastSample()-(static_cast<const ChannelDataModel*>(index.model()))->firstSample();
+//        qint32 nsamples = (static_cast<const RtFiffRawViewModel*>(index.model()))->lastSample()-(static_cast<const RtFiffRawViewModel*>(index.model()))->firstSample();
 
 //        size = QSize(nsamples*m_dDx,m_dPlotHeight);
         Q_UNUSED(option);
@@ -467,7 +467,7 @@ QSize ChannelDataDelegate::sizeHint(const QStyleOptionViewItem &option, const QM
 
 //*************************************************************************************************************
 
-void ChannelDataDelegate::markerMoved(QPoint position, int activeRow)
+void RtFiffRawViewDelegate::markerMoved(QPoint position, int activeRow)
 {
     m_markerPosition = position;
     m_iActiveRow = activeRow;
@@ -476,7 +476,7 @@ void ChannelDataDelegate::markerMoved(QPoint position, int activeRow)
 
 //*************************************************************************************************************
 
-void ChannelDataDelegate::setSignalColor(const QColor& signalColor)
+void RtFiffRawViewDelegate::setSignalColor(const QColor& signalColor)
 {
     m_penNormal.setColor(signalColor);
     m_penNormalBad.setColor(signalColor);
@@ -485,7 +485,7 @@ void ChannelDataDelegate::setSignalColor(const QColor& signalColor)
 
 //*************************************************************************************************************
 
-QColor ChannelDataDelegate::getSignalColor()
+QColor RtFiffRawViewDelegate::getSignalColor()
 {
     return m_penNormal.color();
 }
@@ -493,7 +493,7 @@ QColor ChannelDataDelegate::getSignalColor()
 
 //*************************************************************************************************************
 
-void ChannelDataDelegate::setUpperItemIndex(int iUpperItemIndex)
+void RtFiffRawViewDelegate::setUpperItemIndex(int iUpperItemIndex)
 {
     m_iUpperItemIndex = iUpperItemIndex;
 }
@@ -501,14 +501,14 @@ void ChannelDataDelegate::setUpperItemIndex(int iUpperItemIndex)
 
 //*************************************************************************************************************
 
-void ChannelDataDelegate::createPlotPath(const QModelIndex &index,
+void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
                                                       const QStyleOptionViewItem &option,
                                                       QPainterPath& path,
                                                       QPointF &ellipsePos,
                                                       QString &amplitude,
                                                       RowVectorPair &data) const
 {
-    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
+    const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = t_pModel->getKind(index.row());
@@ -626,9 +626,9 @@ void ChannelDataDelegate::createPlotPath(const QModelIndex &index,
 
 //*************************************************************************************************************
 
-void ChannelDataDelegate::createCurrentPositionMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const
+void RtFiffRawViewDelegate::createCurrentPositionMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const
 {
-    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
+    const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
     float currentSampleIndex = option.rect.x()+t_pModel->getCurrentSampleIndex();
     float dDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
@@ -644,11 +644,11 @@ void ChannelDataDelegate::createCurrentPositionMarkerPath(const QModelIndex &ind
 
 //*************************************************************************************************************
 
-void ChannelDataDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
+void RtFiffRawViewDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
 {
     Q_UNUSED(data)
 
-    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
+    const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
     if(t_pModel->numVLines() > 0)
     {
@@ -670,11 +670,11 @@ void ChannelDataDelegate::createGridPath(const QModelIndex &index, const QStyleO
 
 //*************************************************************************************************************
 
-void ChannelDataDelegate::createTimeSpacersPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
+void RtFiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const
 {
     Q_UNUSED(data)
 
-    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
+    const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
     if(t_pModel->getNumberOfTimeSpacers() > 0)
     {
@@ -699,7 +699,7 @@ void ChannelDataDelegate::createTimeSpacersPath(const QModelIndex &index, const 
 
 //*************************************************************************************************************
 
-void ChannelDataDelegate::createTriggerPath(QPainter *painter,
+void RtFiffRawViewDelegate::createTriggerPath(QPainter *painter,
                                              const QModelIndex &index,
                                              const QStyleOptionViewItem &option,
                                              QPainterPath& path,
@@ -708,7 +708,7 @@ void ChannelDataDelegate::createTriggerPath(QPainter *painter,
     Q_UNUSED(data)
     Q_UNUSED(path)
 
-    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
+    const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
     QList<QPair<int,double> > detectedTriggers = t_pModel->getDetectedTriggers();
     QList<QPair<int,double> > detectedTriggersOld = t_pModel->getDetectedTriggersOld();
@@ -765,11 +765,11 @@ void ChannelDataDelegate::createTriggerPath(QPainter *painter,
 
 //*************************************************************************************************************
 
-void ChannelDataDelegate::createTriggerThresholdPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data, QPointF &textPosition) const
+void RtFiffRawViewDelegate::createTriggerThresholdPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data, QPointF &textPosition) const
 {
     Q_UNUSED(data)
 
-    const ChannelDataModel* t_pModel = static_cast<const ChannelDataModel*>(index.model());
+    const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = t_pModel->getKind(index.row());
@@ -796,7 +796,7 @@ void ChannelDataDelegate::createTriggerThresholdPath(const QModelIndex &index, c
 
 //*************************************************************************************************************
 
-void ChannelDataDelegate::createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const
+void RtFiffRawViewDelegate::createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const
 {
     //horizontal lines
     float distance = m_markerPosition.x();

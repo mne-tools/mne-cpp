@@ -45,13 +45,13 @@
 #include <disp/viewers/filterdesignview.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/channelinfomodel.h>
-#include <disp/viewers/channeldataview.h>
+#include <disp/viewers/rtfiffrawview.h>
 #include <disp/viewers/scalingview.h>
 #include <disp/viewers/projectorsview.h>
 #include <disp/viewers/filtersettingsview.h>
 #include <disp/viewers/compensatorview.h>
 #include <disp/viewers/spharasettingsview.h>
-#include <disp/viewers/channeldatasettingsview.h>
+#include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/triggerdetectionview.h>
 
 #include <scMeas/realtimemultisamplearray.h>
@@ -121,7 +121,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
     m_pActionQuickControl->setVisible(true);
 
     //Create table view and set layout
-    m_pChannelDataView = new ChannelDataView(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
+    m_pChannelDataView = new RtFiffRawView(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
                                              this);
     m_pChannelDataView->hide();
 
@@ -206,9 +206,9 @@ void RealTimeMultiSampleArrayWidget::init()
                 m_pChannelSelectionView.data(), &ChannelSelectionView::setCurrentlyMappedFiffChannels);
 
         connect(m_pChannelSelectionView.data(), &ChannelSelectionView::showSelectedChannelsOnly,
-                m_pChannelDataView.data(), &ChannelDataView::showSelectedChannelsOnly);
+                m_pChannelDataView.data(), &RtFiffRawView::showSelectedChannelsOnly);
 
-        connect(m_pChannelDataView.data(), &ChannelDataView::channelMarkingChanged,
+        connect(m_pChannelDataView.data(), &RtFiffRawView::channelMarkingChanged,
                 m_pChannelSelectionView.data(), &ChannelSelectionView::updateBadChannels);
 
         m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
@@ -223,7 +223,7 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
 
             connect(pScalingView, &ScalingView::scalingChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::setScalingMap);
+                    m_pChannelDataView.data(), &RtFiffRawView::setScalingMap);
 
             m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
         }
@@ -234,7 +234,7 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pQuickControlView->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
 
             connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::updateProjection);
+                    m_pChannelDataView.data(), &RtFiffRawView::updateProjection);
 
             pProjectorsView->setProjectors(m_pFiffInfo->projs);
         }
@@ -245,7 +245,7 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pQuickControlView->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
 
             connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::updateCompensator);
+                    m_pChannelDataView.data(), &RtFiffRawView::updateCompensator);
 
             pCompensatorView->setCompensators(m_pFiffInfo->comps);
         }
@@ -256,13 +256,13 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pQuickControlView->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter");
 
             connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::setFilterChannelType);
+                    m_pChannelDataView.data(), &RtFiffRawView::setFilterChannelType);
 
             connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::setFilter);
+                    m_pChannelDataView.data(), &RtFiffRawView::setFilter);
 
             connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::setFilterActive);
+                    m_pChannelDataView.data(), &RtFiffRawView::setFilterActive);
 
             m_pChannelDataView->setFilterActive(pFilterSettingsView->getFilterActive());
             m_pChannelDataView->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
@@ -277,34 +277,34 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pQuickControlView->addGroupBoxWithTabs(pSpharaSettingsView, "Noise", "SPHARA");
 
             connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::updateSpharaActivation);
+                    m_pChannelDataView.data(), &RtFiffRawView::updateSpharaActivation);
 
             connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::updateSpharaOptions);
+                    m_pChannelDataView.data(), &RtFiffRawView::updateSpharaOptions);
         }
 
         // Quick control channel data settings
         if(slFlags.contains("view")) {
-            ChannelDataSettingsView* pChannelDataSettingsView = new ChannelDataSettingsView(QString("RTMSAW/%1").arg(sRTMSAWName));
+            FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("RTMSAW/%1").arg(sRTMSAWName));
             pChannelDataSettingsView->setWidgetList();
             m_pQuickControlView->addGroupBoxWithTabs(pChannelDataSettingsView, "Other", "View");
 
-            connect(pChannelDataSettingsView, &ChannelDataSettingsView::signalColorChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::setSignalColor);
+            connect(pChannelDataSettingsView, &FiffRawViewSettings::signalColorChanged,
+                    m_pChannelDataView.data(), &RtFiffRawView::setSignalColor);
 
-            connect(pChannelDataSettingsView, &ChannelDataSettingsView::backgroundColorChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::setBackgroundColor);
+            connect(pChannelDataSettingsView, &FiffRawViewSettings::backgroundColorChanged,
+                    m_pChannelDataView.data(), &RtFiffRawView::setBackgroundColor);
 
-            connect(pChannelDataSettingsView, &ChannelDataSettingsView::zoomChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::setZoom);
+            connect(pChannelDataSettingsView, &FiffRawViewSettings::zoomChanged,
+                    m_pChannelDataView.data(), &RtFiffRawView::setZoom);
 
-            connect(pChannelDataSettingsView, &ChannelDataSettingsView::timeWindowChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::setWindowSize);
+            connect(pChannelDataSettingsView, &FiffRawViewSettings::timeWindowChanged,
+                    m_pChannelDataView.data(), &RtFiffRawView::setWindowSize);
 
-            connect(pChannelDataSettingsView, &ChannelDataSettingsView::distanceTimeSpacerChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::setDistanceTimeSpacer);
+            connect(pChannelDataSettingsView, &FiffRawViewSettings::distanceTimeSpacerChanged,
+                    m_pChannelDataView.data(), &RtFiffRawView::setDistanceTimeSpacer);
 
-            connect(pChannelDataSettingsView, &ChannelDataSettingsView::makeScreenshot,
+            connect(pChannelDataSettingsView, &FiffRawViewSettings::makeScreenshot,
                     this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
 
             m_pChannelDataView->setZoom(pChannelDataSettingsView->getZoom());
@@ -320,12 +320,12 @@ void RealTimeMultiSampleArrayWidget::init()
             m_pQuickControlView->addGroupBoxWithTabs(pTriggerDetectionView, "Other", "Triggers");
 
             connect(pTriggerDetectionView, &TriggerDetectionView::triggerInfoChanged,
-                    m_pChannelDataView.data(), &ChannelDataView::triggerInfoChanged);
+                    m_pChannelDataView.data(), &RtFiffRawView::triggerInfoChanged);
 
             connect(pTriggerDetectionView, &TriggerDetectionView::resetTriggerCounter,
-                    m_pChannelDataView.data(), &ChannelDataView::resetTriggerCounter);
+                    m_pChannelDataView.data(), &RtFiffRawView::resetTriggerCounter);
 
-            connect(m_pChannelDataView.data(), &ChannelDataView::triggerDetected,
+            connect(m_pChannelDataView.data(), &RtFiffRawView::triggerDetected,
                     pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
 
             pTriggerDetectionView->init(m_pFiffInfo);

@@ -107,7 +107,6 @@ SOURCES += \
     viewers/spectrumview.cpp \
     viewers/modalityselectionview.cpp \
     viewers/butterflyview.cpp \
-    viewers/channeldataview.cpp \
     viewers/channelselectionview.cpp \
     viewers/spectrumsettingsview.cpp \
     viewers/scalingview.cpp \
@@ -115,7 +114,7 @@ SOURCES += \
     viewers/compensatorview.cpp \
     viewers/filtersettingsview.cpp \
     viewers/spharasettingsview.cpp \
-    viewers/channeldatasettingsview.cpp \
+    viewers/fiffrawviewsettings.cpp \
     viewers/averageselectionview.cpp \
     viewers/triggerdetectionview.cpp \
     viewers/quickcontrolview.cpp \
@@ -126,6 +125,9 @@ SOURCES += \
     viewers/control3dview.cpp \
     viewers/tfsettingsview.cpp \
     viewers/artifactsettingsview.cpp \
+    viewers/rtfiffrawview.cpp \
+    viewers/helpers/rtfiffrawviewmodel.cpp \
+    viewers/helpers/rtfiffrawviewdelegate.cpp \
     viewers/helpers/evokedsetmodel.cpp \
     viewers/helpers/layoutscene.cpp \
     viewers/helpers/averagescene.cpp \
@@ -138,8 +140,6 @@ SOURCES += \
     viewers/helpers/draggableframelesswidget.cpp \
     viewers/helpers/frequencyspectrumdelegate.cpp \
     viewers/helpers/frequencyspectrummodel.cpp \
-    viewers/helpers/channeldatamodel.cpp \
-    viewers/helpers/channeldatadelegate.cpp \
 
 HEADERS += \
     disp_global.h \
@@ -153,7 +153,6 @@ HEADERS += \
     viewers/spectrumview.h \
     viewers/modalityselectionview.h \
     viewers/butterflyview.h \
-    viewers/channeldataview.h \
     viewers/channelselectionview.h \
     viewers/spectrumsettingsview.h \
     viewers/scalingview.h \
@@ -161,7 +160,7 @@ HEADERS += \
     viewers/compensatorview.h \
     viewers/filtersettingsview.h \
     viewers/spharasettingsview.h \
-    viewers/channeldatasettingsview.h \
+    viewers/fiffrawviewsettings.h \
     viewers/averageselectionview.h \
     viewers/triggerdetectionview.h \
     viewers/quickcontrolview.h \
@@ -172,6 +171,9 @@ HEADERS += \
     viewers/control3dview.h \
     viewers/tfsettingsview.h \
     viewers/artifactsettingsview.h \
+    viewers/rtfiffrawview.h \
+    viewers/helpers/rtfiffrawviewdelegate.h \
+    viewers/helpers/rtfiffrawviewmodel.h \
     viewers/helpers/evokedsetmodel.h \
     viewers/helpers/layoutscene.h \
     viewers/helpers/averagescene.h \
@@ -184,8 +186,6 @@ HEADERS += \
     viewers/helpers/draggableframelesswidget.h \
     viewers/helpers/frequencyspectrumdelegate.h \
     viewers/helpers/frequencyspectrummodel.h \
-    viewers/helpers/channeldatamodel.h \
-    viewers/helpers/channeldatadelegate.h \
 
 qtHaveModule(charts) {
     SOURCES += \
@@ -225,7 +225,7 @@ FORMS += \
     viewers/formfiles/filterdesignview.ui \
     viewers/formfiles/channelselectionview.ui \
     viewers/formfiles/spharasettingsview.ui \
-    viewers/formfiles/channeldatasettingsview.ui \
+    viewers/formfiles/fiffrawviewsettings.ui \
     viewers/formfiles/triggerdetectionview.ui \
     viewers/formfiles/quickcontrolview.ui \
     viewers/formfiles/tfsettingsview.ui \

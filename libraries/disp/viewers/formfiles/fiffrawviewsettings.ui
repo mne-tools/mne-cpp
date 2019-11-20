@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ChannelDataSettingsViewWidget</class>
- <widget class="QWidget" name="ChannelDataSettingsViewWidget">
+ <class>FiffRawViewSettingsWidget</class>
+ <widget class="QWidget" name="FiffRawViewSettingsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>286</width>
-    <height>179</height>
+    <width>317</width>
+    <height>202</height>
    </rect>
   </property>
   <property name="sizePolicy">
