@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     channeldatamodel.h
+* @file     rtfiffrawviewmodel.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the ChannelDataModel Class.
+* @brief    Declaration of the RtFiffRawViewModel Class.
 *
 */
 
-#ifndef CHANNELDATAMODEL_H
-#define CHANNELDATAMODEL_H
+#ifndef RTFIFFRAWVIEWMODEL_H
+#define RTFIFFRAWVIEWMODEL_H
 
 
 //*************************************************************************************************************
@@ -108,16 +108,16 @@ typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> Matr
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ChannelDataModel
+* DECLARE CLASS RtFiffRawViewModel
 *
-* @brief The ChannelDataModel class implements the data access model for a real-time multi sample array data stream
+* @brief The RtFiffRawViewModel class implements the data access model for a real-time multi sample array data stream
 */
-class DISPSHARED_EXPORT ChannelDataModel : public QAbstractTableModel
+class DISPSHARED_EXPORT RtFiffRawViewModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<ChannelDataModel> SPtr;              /**< Shared pointer type for ChannelDataModel. */
-    typedef QSharedPointer<const ChannelDataModel> ConstSPtr;   /**< Const shared pointer type for ChannelDataModel. */
+    typedef QSharedPointer<RtFiffRawViewModel> SPtr;              /**< Shared pointer type for RtFiffRawViewModel. */
+    typedef QSharedPointer<const RtFiffRawViewModel> ConstSPtr;   /**< Const shared pointer type for RtFiffRawViewModel. */
 
     //=========================================================================================================
     /**
@@ -125,7 +125,7 @@ public:
     *
     * @param[in] parent     parent of the table model
     */
-    ChannelDataModel(QObject *parent = 0);
+    RtFiffRawViewModel(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -647,7 +647,7 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 ChannelDataModel::getMaxSamples() const
+inline qint32 RtFiffRawViewModel::getMaxSamples() const
 {
     return m_iMaxSamples;
 }
@@ -655,7 +655,7 @@ inline qint32 ChannelDataModel::getMaxSamples() const
 
 //*************************************************************************************************************
 
-inline qint32 ChannelDataModel::getCurrentSampleIndex() const
+inline qint32 RtFiffRawViewModel::getCurrentSampleIndex() const
 {
     if(m_bIsFreezed) {
         return m_iCurrentSampleFreeze;
@@ -671,7 +671,7 @@ inline qint32 ChannelDataModel::getCurrentSampleIndex() const
 
 //*************************************************************************************************************
 
-inline double ChannelDataModel::getLastBlockFirstValue(int row) const
+inline double RtFiffRawViewModel::getLastBlockFirstValue(int row) const
 {
     if(row>m_vecLastBlockFirstValuesFiltered.rows() || row>m_vecLastBlockFirstValuesRaw.rows())
         return 0;
@@ -685,7 +685,7 @@ inline double ChannelDataModel::getLastBlockFirstValue(int row) const
 
 //*************************************************************************************************************
 
-inline const QMap<qint32,qint32>& ChannelDataModel::getIdxSelMap() const
+inline const QMap<qint32,qint32>& RtFiffRawViewModel::getIdxSelMap() const
 {
     return m_qMapIdxRowSelection;
 }
@@ -693,7 +693,7 @@ inline const QMap<qint32,qint32>& ChannelDataModel::getIdxSelMap() const
 
 //*************************************************************************************************************
 
-inline qint32 ChannelDataModel::numVLines() const
+inline qint32 RtFiffRawViewModel::numVLines() const
 {
     return (m_iT - 1);
 }
@@ -701,7 +701,7 @@ inline qint32 ChannelDataModel::numVLines() const
 
 //*************************************************************************************************************
 
-inline bool ChannelDataModel::isFreezed() const
+inline bool RtFiffRawViewModel::isFreezed() const
 {
     return m_bIsFreezed;
 }
@@ -709,7 +709,7 @@ inline bool ChannelDataModel::isFreezed() const
 
 //*************************************************************************************************************
 
-inline const QMap< qint32,float >& ChannelDataModel::getScaling() const
+inline const QMap< qint32,float >& RtFiffRawViewModel::getScaling() const
 {
     return m_qMapChScaling;
 }
@@ -717,7 +717,7 @@ inline const QMap< qint32,float >& ChannelDataModel::getScaling() const
 
 //*************************************************************************************************************
 
-inline QMap<double, QColor> ChannelDataModel::getTriggerColor() const
+inline QMap<double, QColor> RtFiffRawViewModel::getTriggerColor() const
 {
     if(m_bTriggerDetectionActive) {
         return m_qMapTriggerColor;
@@ -730,7 +730,7 @@ inline QMap<double, QColor> ChannelDataModel::getTriggerColor() const
 
 //*************************************************************************************************************
 
-inline QList<QPair<int,double> >  ChannelDataModel::getDetectedTriggers() const
+inline QList<QPair<int,double> >  RtFiffRawViewModel::getDetectedTriggers() const
 {
     QList<QPair<int,double> > triggerIndices;
 
@@ -747,7 +747,7 @@ inline QList<QPair<int,double> >  ChannelDataModel::getDetectedTriggers() const
 
 //*************************************************************************************************************
 
-inline QList<QPair<int,double> > ChannelDataModel::getDetectedTriggersOld() const
+inline QList<QPair<int,double> > RtFiffRawViewModel::getDetectedTriggersOld() const
 {
     QList<QPair<int,double> > triggerIndices;
 
@@ -764,7 +764,7 @@ inline QList<QPair<int,double> > ChannelDataModel::getDetectedTriggersOld() cons
 
 //*************************************************************************************************************
 
-inline int ChannelDataModel::getNumberOfTimeSpacers() const
+inline int RtFiffRawViewModel::getNumberOfTimeSpacers() const
 {
     //qDebug()<<((m_iT*1000)/m_iDistanceTimerSpacer)-1;
     return ((1000)/m_iDistanceTimerSpacer)-1;
@@ -773,7 +773,7 @@ inline int ChannelDataModel::getNumberOfTimeSpacers() const
 
 //*************************************************************************************************************
 
-inline double ChannelDataModel::getTriggerThreshold() const
+inline double RtFiffRawViewModel::getTriggerThreshold() const
 {
     return m_dTriggerThreshold;
 }
@@ -781,7 +781,7 @@ inline double ChannelDataModel::getTriggerThreshold() const
 
 //*************************************************************************************************************
 
-inline QString ChannelDataModel::getTriggerName() const
+inline QString RtFiffRawViewModel::getTriggerName() const
 {
     return m_sCurrentTriggerCh;
 }
@@ -789,7 +789,7 @@ inline QString ChannelDataModel::getTriggerName() const
 
 //*************************************************************************************************************
 
-inline int ChannelDataModel::getCurrentTriggerIndex() const
+inline int RtFiffRawViewModel::getCurrentTriggerIndex() const
 {
     return m_iCurrentTriggerChIndex;
 }
@@ -797,7 +797,7 @@ inline int ChannelDataModel::getCurrentTriggerIndex() const
 
 //*************************************************************************************************************
 
-inline bool ChannelDataModel::triggerDetectionActive() const
+inline bool RtFiffRawViewModel::triggerDetectionActive() const
 {
     return m_bTriggerDetectionActive;
 }
@@ -805,7 +805,7 @@ inline bool ChannelDataModel::triggerDetectionActive() const
 
 //*************************************************************************************************************
 
-inline int ChannelDataModel::getCurrentOverlapAddDelay() const
+inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
 {
     if(!m_filterData.isEmpty())
         return m_iMaxFilterLength/2;
@@ -821,4 +821,4 @@ inline int ChannelDataModel::getCurrentOverlapAddDelay() const
 Q_DECLARE_METATYPE(DISPLIB::RowVectorPair);
 #endif
 
-#endif // CHANNELDATAMODEL_H
+#endif // RTFIFFRAWVIEWMODEL_H
