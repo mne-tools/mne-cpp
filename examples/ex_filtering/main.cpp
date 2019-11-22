@@ -142,30 +142,40 @@ int main(int argc, char *argv[])
 
     QString filter_name =  "example_cosine";
     FilterData::FilterType type = FilterData::BPF;
-    int order = 80;     // when using designMethod Cosine the order isn't used.
+    int order = 80;                                                 // when using designMethod Cosine the order isn't used.
     double centerfreq = 0.5;
     double bandwidth = 0.1;
     double parkswidth = 0.1;
-    double sFreq = raw.info.sfreq;
-    qint32 fftlength=4096;
-    FilterData::DesignMethod designMethod = FilterData::Cosine;
+    double sFreq = raw.info.sfreq;                                  //  get Sample freq from Data
+    qint32 fftLength = quantum + 2*order;                                    //  set fft_length to size of data junks
+    FilterData::DesignMethod designMethod = FilterData::Cosine;     //  using designMethod Cosine
 
-    FilterData filter = FilterData(filter_name, type, centerfreq, bandwidth, parkswidth, sFreq, fftlength, designMethod);
+    FilterData filter = FilterData(filter_name, type, order, centerfreq, bandwidth, parkswidth, sFreq, fftLength, designMethod);
 
-    QList<FilterData> filter_list;
-    filter_list << filter;
+    QList<FilterData> filterList;
+    filterList << filter;
 
-    int filterlength = fftlength;
-
-    //create Channel index Vector for Filtering
-    // size = number of channels; value + index of channel number
-    QVector<int> channel_list(raw.info.nchan);
-    for (int i = 0; i < raw.info.nchan; i++){
-        channel_list[i] = i;
-    }
-
+    int filterLength = quantum;
     RtFilter rtFilter;
-    rtFilter.filterChannelsConcurrently(data,filterlength,channel_list,filter_list);
+    MatrixXd dataFiltered;
+
+    // create Channel index Vector for Filtering
+    // size = number of channels; value = index of channel number
+
+//    std::cout << "Order_main " << order <<std::endl;
+//    std::cout << "Quantum  " << quantum <<std::endl;
+//    std::cout << "FFT_Length " << fftLength <<std::endl;
+//    std::cout << "m_dCoeffA " << filter.m_dCoeffA.cols() <<std::endl;
+//    std::cout << "m_iFFTlength " << filter.m_iFFTlength <<std::endl;
+
+//    QVector<int> channelList(raw.info.nchan);
+//    for (int i = 0; i < raw.info.nchan; i++){
+//        channelList[i] = i;
+//    }
+
+    QVector<int> channelList(1);
+    channelList[0] = 0;
+
 
     for(first = from; first < to; first+=quantum) {
         last = first+quantum-1;
@@ -178,7 +188,13 @@ int main(int argc, char *argv[])
             return -1;
         }
 
-        // You can add your own miracle here
+        //Filtering
+        printf("Filtering...");
+        dataFiltered = rtFilter.filterChannelsConcurrently(data, fftLength, channelList, filterList);
+        printf("[done]\n");
+
+
+        //Writing
         printf("Writing...");
         if(first_buffer) {
            if(first > 0) {
@@ -187,7 +203,7 @@ int main(int argc, char *argv[])
            first_buffer = false;
         }
 
-        outfid->write_raw_buffer(data,cals);
+        outfid->write_raw_buffer(dataFiltered,cals);
         printf("[done]\n");
     }
 
