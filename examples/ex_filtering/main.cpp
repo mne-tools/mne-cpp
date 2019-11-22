@@ -38,19 +38,21 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
+#include <vector>
+#include <math.h>
+
+#include <fiff/fiff.h>
+#include <utils/filterTools/filterdata.h>
+#include <rtprocessing/rtfilter.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen
+// Qt INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QApplication>
+#include <QtCore/QCoreApplication>
+#include <QFile>
 #include <QCommandLineParser>
 
 
@@ -59,6 +61,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FIFFLIB;
+using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -76,20 +81,119 @@
 */
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Example name");
+    parser.setApplicationDescription("Read Write Raw Example");
     parser.addHelpOption();
 
-    QCommandLineOption parameterOption("parameter", "The first parameter description.");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/test_output.fif");
 
-    parser.addOption(parameterOption);
+    parser.addOption(inputOption);
+    parser.addOption(outputOption);
 
     parser.process(a);
 
-    // Add exampel code here
+    // Init data loading and writing
+    QFile t_fileIn(parser.value(inputOption));
+    QFile t_fileOut(parser.value(outputOption));
 
-    return a.exec();
+    FiffRawData raw(t_fileIn);
+
+    // Set up pick list: MEG + STI 014 - bad channels
+    bool want_meg   = true;
+    bool want_eeg   = true;
+    bool want_stim  = true;
+    QStringList include;
+    include << "STI 014";
+
+    MatrixXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+    if(picks.cols() == 0) {
+        include.clear();
+        include << "STI101" << "STI201" << "STI301";
+        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+        if(picks.cols() == 0) {
+            printf("channel list may need modification\n");
+            return -1;
+        }
+    }
+
+    RowVectorXd cals;
+    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, raw.info, cals/*, picks*/);
+
+    // Set up the reading parameters
+    fiff_int_t from = raw.first_samp;
+    fiff_int_t to = raw.last_samp;
+    //fiff_int_t to = raw.first_samp + raw.info.sfreq * 6;
+    float quantum_sec = 10.0f;//read and write in 10 sec junks
+    fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);
+
+    // To read the whole file at once set quantum = to - from + 1;
+    // Read and write the data
+    bool first_buffer = true;
+
+    fiff_int_t first, last;
+    MatrixXd data;
+    MatrixXd times;
+
+    // initialize filter settings
+
+    QString filter_name =  "example_cosine";
+    FilterData::FilterType type = FilterData::BPF;
+    int order = 80;     // when using designMethod Cosine the order isn't used.
+    double centerfreq = 0.5;
+    double bandwidth = 0.1;
+    double parkswidth = 0.1;
+    double sFreq = raw.info.sfreq;
+    qint32 fftlength=4096;
+    FilterData::DesignMethod designMethod = FilterData::Cosine;
+
+    FilterData filter = FilterData(filter_name, type, centerfreq, bandwidth, parkswidth, sFreq, fftlength, designMethod);
+
+    QList<FilterData> filter_list;
+    filter_list << filter;
+
+    int filterlength = fftlength;
+
+    //create Channel index Vector for Filtering
+    // size = number of channels; value + index of channel number
+    QVector<int> channel_list(raw.info.nchan);
+    for (int i = 0; i < raw.info.nchan; i++){
+        channel_list[i] = i;
+    }
+
+    RtFilter rtFilter;
+    rtFilter.filterChannelsConcurrently(data,filterlength,channel_list,filter_list);
+
+    for(first = from; first < to; first+=quantum) {
+        last = first+quantum-1;
+        if (last > to) {
+            last = to;
+        }
+
+        if(!raw.read_raw_segment(data,times,first,last/*,picks*/)) {
+            printf("error during read_raw_segment\n");
+            return -1;
+        }
+
+        // You can add your own miracle here
+        printf("Writing...");
+        if(first_buffer) {
+           if(first > 0) {
+               outfid->write_int(FIFF_FIRST_SAMPLE, &first);
+           }
+           first_buffer = false;
+        }
+
+        outfid->write_raw_buffer(data,cals);
+        printf("[done]\n");
+    }
+
+    outfid->finish_writing_raw();
+
+    printf("Finished\n");
+
+    return 0;
 }
