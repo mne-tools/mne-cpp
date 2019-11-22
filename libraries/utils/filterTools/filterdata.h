@@ -136,7 +136,15 @@ public:
     * @param [in] fftlength length of the fft (multiple integer of 2^x)
     * @param [in] designMethod specifies the design method to use. Choose between Cosind and Tschebyscheff
     */
-    FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength=4096, DesignMethod designMethod = Cosine);
+    FilterData(QString unique_name,
+               FilterType type,
+               int order,
+               double centerfreq,
+               double bandwidth,
+               double parkswidth,
+               double sFreq,
+               qint32 fftlength=4096,
+               DesignMethod designMethod = Cosine);
 
     /**
      * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
