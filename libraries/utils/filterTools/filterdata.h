@@ -125,7 +125,7 @@ public:
     FilterData();
 
     /**
-    * Constructs a FilterData object
+    * Constructs a FilterData object 
     * @param [in] unique_name defines the name of the generated filter
     * @param [in] type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
     * @param [in] order represents the order of the filter, the higher the higher is the stopband attenuation
@@ -135,7 +135,10 @@ public:
     * @param [in] sFreq sampling frequency
     * @param [in] fftlength length of the fft (multiple integer of 2^x)
     * @param [in] designMethod specifies the design method to use. Choose between Cosind and Tschebyscheff
-    */
+    *
+    *             centerfreq, bandwidth and parkswidth are normed to sFreq
+    **/
+
     FilterData(QString unique_name,
                FilterType type,
                int order,
@@ -175,7 +178,10 @@ public:
     *
     * @return the filtered data in form of a RoVecotrXd
     */
-    RowVectorXd applyFFTFilter(const RowVectorXd& data, bool keepOverhead = false, CompensateEdgeEffects compensateEdgeEffects = MirrorData) const;
+    RowVectorXd applyFFTFilter(const RowVectorXd& data,
+                               bool keepOverhead = false,
+                               CompensateEdgeEffects compensateEdgeEffects = MirrorData)
+                               const;
 
     /**
      * @brief getStringForDesignMethod returns the current design method as a string
