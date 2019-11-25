@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Ruben Doerrfel <ruben.doerfel@tu-ilmenau.de>;
+* @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     11, 2019
@@ -29,7 +29,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Example for filtering of data provided by fiff file.
+* @brief     Example for filtering of data with realtime filtering. This example is combined with
+*            ex_read_write_raw for reading and writing fiff files. So the result of the filtering can be seen
+*            in MNE-Browse
 *
 */
 
@@ -45,6 +47,8 @@
 #include <fiff/fiff.h>
 #include <utils/filterTools/filterdata.h>
 #include <rtprocessing/rtfilter.h>
+
+#include <utils/ioutils.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -142,40 +146,32 @@ int main(int argc, char *argv[])
 
     QString filter_name =  "example_cosine";
     FilterData::FilterType type = FilterData::BPF;
-    int order = 80;                                                 // when using designMethod Cosine the order isn't used.
-    double centerfreq = 0.5;
-    double bandwidth = 0.1;
-    double parkswidth = 0.1;
+    int order = 1024;                                               //  when using designMethod Cosine the order isn't used.
     double sFreq = raw.info.sfreq;                                  //  get Sample freq from Data
-    qint32 fftLength = quantum + 2*order;                                    //  set fft_length to size of data junks
-    FilterData::DesignMethod designMethod = FilterData::Cosine;     //  using designMethod Cosine
+    double centerfreq = 10/sFreq;                                   //  normed sample freq.
+    double bandwidth = 10/sFreq;
+    double parkswidth = 1/sFreq;
+    qint32 fftLength = quantum + 2*order;                           //  set fft_length to size of data junks + 2*Filterlength
+    FilterData::DesignMethod designMethod = FilterData::Cosine;     //  using cosine filter
 
+    // create filterobject and save results in list QList so that 'rtfilter' can handle filter properties
     FilterData filter = FilterData(filter_name, type, order, centerfreq, bandwidth, parkswidth, sFreq, fftLength, designMethod);
-
     QList<FilterData> filterList;
     filterList << filter;
 
-    int filterLength = quantum;
     RtFilter rtFilter;
-    MatrixXd dataFiltered;
+    MatrixXd dataFiltered;                                          //  output matrix of filteriung
 
     // create Channel index Vector for Filtering
     // size = number of channels; value = index of channel number
 
-//    std::cout << "Order_main " << order <<std::endl;
-//    std::cout << "Quantum  " << quantum <<std::endl;
-//    std::cout << "FFT_Length " << fftLength <<std::endl;
-//    std::cout << "m_dCoeffA " << filter.m_dCoeffA.cols() <<std::endl;
-//    std::cout << "m_iFFTlength " << filter.m_iFFTlength <<std::endl;
+    QVector<int> channelList(raw.info.nchan);
+    for (int i = 0; i < raw.info.nchan; i++){
+        channelList[i] = i;
+    }
 
-//    QVector<int> channelList(raw.info.nchan);
-//    for (int i = 0; i < raw.info.nchan; i++){
-//        channelList[i] = i;
-//    }
-
-    QVector<int> channelList(1);
-    channelList[0] = 0;
-
+//    QVector<int> channelList(1);
+//    channelList[0] = 0;
 
     for(first = from; first < to; first+=quantum) {
         last = first+quantum-1;
@@ -190,9 +186,12 @@ int main(int argc, char *argv[])
 
         //Filtering
         printf("Filtering...");
-        dataFiltered = rtFilter.filterChannelsConcurrently(data, fftLength, channelList, filterList);
+        dataFiltered = rtFilter.filterChannelsConcurrently(data, order, channelList, filterList);
         printf("[done]\n");
 
+        //  Save ata before and after filtering into .csv files for intermediate result
+        IOUtils::write_eigen_matrix(data,"data.csv");
+        IOUtils::write_eigen_matrix(dataFiltered,"dataFiltered.csv");
 
         //Writing
         printf("Writing...");
