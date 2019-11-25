@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Modified https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh 
+# Modified https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh
 set -e
 
-# Do not run on pull requests
-if [ $TRAVIS_PULL_REQUEST != "false" ]; then
-  echo -e "\033[33;1mINFO: Skipping Coverity Analysis: branch is a pull request.\033[0m"
-  exit 0
-fi
+# # Do not run on pull requests
+# if [ $TRAVIS_PULL_REQUEST != "false" ]; then
+#   echo -e "\033[33;1mINFO: Skipping Coverity Analysis: branch is a pull request.\033[0m"
+#   exit 0
+# fi
 
 # Defines
 COVERITY_SCAN_PROJECT_NAME="mne-tools/mne-cpp"
@@ -39,7 +39,7 @@ else
   echo -e "\033[33;1mCoverity Scan NOT configured to run on branch ${TRAVIS_BRANCH}\033[0m"
   exit 1
 fi
-
+echo -e "echo 1"
 # Verify upload is permitted
 AUTH_RES=`curl -s --form project="$COVERITY_SCAN_PROJECT_NAME" --form token="$COVERITY_SCAN_TOKEN" $SCAN_URL/api/upload_permitted`
 if [ "$AUTH_RES" = "Access denied" ]; then
@@ -55,7 +55,7 @@ else
     exit 0
   fi
 fi
-
+echo -e "echo 2"
 if [ ! -d $TOOL_BASE ]; then
   # Download Coverity Scan Analysis Tool
   if [ ! -e $TOOL_ARCHIVE ]; then
@@ -73,7 +73,7 @@ fi
 
 TOOL_DIR=`find $TOOL_BASE -type d -name 'cov-analysis*'`
 export PATH=$TOOL_DIR/bin:$PATH
-
+echo -e "echo 3"
 # Build
 echo -e "\033[33;1mRunning Coverity Scan Analysis Tool...\033[0m"
 COV_BUILD_OPTIONS=""
@@ -100,7 +100,7 @@ response=$(curl \
   --form description="Travis CI build" \
   $UPLOAD_URL)
 status_code=$(echo "$response" | sed -n '$p')
-
+echo -e "echo 4"
 echo -e "\033[33;1mDEBUG:$status_code\033[0m"
 
 # If status is unequal to 2xx HTML status output failed
