@@ -54,11 +54,11 @@ matrix:
       compiler: gcc
       env: BUILD=coverity
   #allow_failures:
-    - os: linux
-      dist: trusty
-      sudo: required
-      compiler: gcc
-      env: BUILD=coverity
+  #  - os: linux
+  #    dist: trusty
+  #    sudo: required
+  #    compiler: gcc
+  #    env: BUILD=coverity
 
 before_install: . tools/travis/$BUILD/before_install.sh
 install: . tools/travis/$BUILD/install.sh
