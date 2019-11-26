@@ -121,6 +121,34 @@ public:
                                                const QVector<int>& lFilterChannelList,
                                                const QList<UTILSLIB::FilterData> &lFilterData);
 
+    /**
+    * Calculates the filtered version of the raw input data AND creates filter
+    *
+    * @param [in] matDataIn - data which is to be filtered
+    * @param [in] iMaxFilterLength - maximum filterlength, sames as filter order (FIR)
+    * @param [in] type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
+    * @param [in] order represents the order of the filter, the higher the higher is the stopband attenuation
+    * @param [in] centerfreq determines the center of the frequency
+    * @param [in] bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband
+    * @param [in] parkswidth determines the width of the filter slopes (steepness)
+    * @param [in] sFreq sampling frequency
+    * @param [in] fftlength length of the fft (multiple integer of 2^x) - Default = 4096
+    * @param [in] designMethod specifies the design method to use. Choose between Cosind and Tschebyscheff; Defaul = Cosine
+    * @param [in] iFilterChannelList - used channel as index in QVector
+    * @param [out] matDataOut - data which is to be filtered
+    *
+    */
+
+    Eigen::MatrixXd filterData(const Eigen::MatrixXd& matDataIn,
+                               UTILSLIB::FilterData::FilterType type,
+                               int order,
+                               double centerfreq,
+                               double bandwidth,
+                               double parkswidth,
+                               double sFreq,
+                               qint32 fftlength=4096,
+                               UTILSLIB::FilterData::DesignMethod designMethod = UTILSLIB::FilterData::Cosine);
+
 protected:
     Eigen::MatrixXd                 m_matOverlap;                   /**< Last overlap block */
     Eigen::MatrixXd                 m_matDelay;                     /**< Last delay block */
