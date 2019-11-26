@@ -109,7 +109,7 @@ void TestFiffCov::initTestCase()
     qDebug() << "Epsilon" << epsilon;
 
     //Read the results produced with MNE-CPP
-    QFile t_fileIn(QCoreApplication::applicationDirPath()+"/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QFile t_fileIn(QCoreApplication::applicationDirPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif");
     covLoaded = FiffCov(t_fileIn);
 
     //Read the result data produced with mne_matlab

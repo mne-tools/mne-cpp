@@ -90,8 +90,8 @@ private:
 
 TestFiffMneTypesIO::TestFiffMneTypesIO()
 : epsilon(0.000001)
-, rawName(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw_short.fif")
-, evokedName(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif")
+, rawName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif")
+, evokedName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif")
 {
 }
 
