@@ -3,11 +3,11 @@
 # Modified https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh
 set -e
 
-# # Do not run on pull requests
-# if [ $TRAVIS_PULL_REQUEST != "false" ]; then
-#   echo -e "\033[33;1mINFO: Skipping Coverity Analysis: branch is a pull request.\033[0m"
-#   exit 0
-# fi
+# Do not run on pull requests
+if [ $TRAVIS_PULL_REQUEST != "false" ]; then
+  echo -e "\033[33;1mINFO: Skipping Coverity Analysis: branch is a pull request.\033[0m"
+  exit 0
+fi
 
 # Defines
 COVERITY_SCAN_PROJECT_NAME="mne-tools/mne-cpp"
