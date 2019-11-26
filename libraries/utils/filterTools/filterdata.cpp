@@ -288,15 +288,12 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
         fftw_make_planner_thread_safe();
     #endif
 
-    if(data.cols()<m_dCoeffA.cols() && compensateEdgeEffects==MirrorData) {
+    if(data.cols()<m_dCoeffA.cols()/2 && compensateEdgeEffects==MirrorData) {
         qDebug()<<QString("Error in FilterData: Number of filter taps(%1) bigger then data size(%2). Not enough data to perform mirroring!").arg(m_dCoeffA.cols()).arg(data.cols());
         return data;
     }
 
-//    std::cout<<"m_iFFTlength: "<<m_iFFTlength<<std::endl;
-//    std::cout<<"2*m_dCoeffA.cols() + data.cols(): "<<2*m_dCoeffA.cols() + data.cols()<<std::endl;
-
-    if(2*m_dCoeffA.cols() + data.cols()>m_iFFTlength) {
+    if(m_dCoeffA.cols() + data.cols()>m_iFFTlength) {
         qDebug()<<"Error in FilterData: Number of mirroring/zeropadding size plus data size is bigger then fft length!";
         return data;
     }
@@ -306,9 +303,9 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
 
     switch(compensateEdgeEffects) {
         case MirrorData:
-            t_dataZeroPad.head(m_dCoeffA.cols()) = data.head(m_dCoeffA.cols()).reverse();   //front
-            t_dataZeroPad.segment(m_dCoeffA.cols(), data.cols()) = data;                    //middle
-            t_dataZeroPad.tail(m_dCoeffA.cols()) = data.tail(m_dCoeffA.cols()).reverse();   //back
+            t_dataZeroPad.head(m_dCoeffA.cols()/2) = data.head(m_dCoeffA.cols()/2).reverse();   //front
+            t_dataZeroPad.segment(m_dCoeffA.cols()/2, data.cols()) = data;                    //middle
+            t_dataZeroPad.tail(m_dCoeffA.cols()/2) = data.tail(m_dCoeffA.cols()/2).reverse();   //back
             break;
 
         case ZeroPad:
