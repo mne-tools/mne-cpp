@@ -26,6 +26,7 @@ jobs:
       run: |        
         qmake -r MNECPP_CONFIG+=noTests
         make -j2 
+        
   Minimal:
     runs-on: ubuntu-16.04
 
@@ -60,12 +61,12 @@ jobs:
         qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
         make -j2
     - name: Install Codecov
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
         sudo pip install codecov        
         echo $CODECOV_TOKEN       
     - name: Run Tests and upload to Codecov
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
         echo $CODECOV_TOKEN
         git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
