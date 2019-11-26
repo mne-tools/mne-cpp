@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "rtfilter.h"
-
+#include <Eigen/Dense>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -153,5 +153,51 @@ MatrixXd RtFilter::filterChannelsConcurrently(const MatrixXd& matDataIn,
 
     m_matDelay = matDataIn.block(0, matDataIn.cols()-iMaxFilterLength/2, matDataIn.rows(), iMaxFilterLength/2);
 
+    return matDataOut;
+}
+
+MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
+                              FilterData::FilterType type,
+                              int order,
+                              double centerfreq,
+                              double bandwidth,
+                              double parkswidth,
+                              double sFreq,
+                              const QVector<int>& lFilterChannelList,
+                              FilterData::DesignMethod designMethod,
+                              qint32 fftLength)
+{
+    // create output matrix with size of inputmatrix
+    MatrixXd matDataOut(matDataIn.rows(),matDataIn.cols());
+    MatrixXd slice;
+    MatrixXd sliceFiltered;
+    // create filter
+    FilterData filter = FilterData("rt_filter", type, order, centerfreq, bandwidth, parkswidth, sFreq, fftLength, designMethod);
+    QList<FilterData> filterList;
+    filterList << filter;
+
+    // slice input data in to data junks with proper length for fft
+    // zeropad the last one if it is shorter use zeropad to get fft_length
+
+    if(matDataIn.cols() > fftLength) {
+        int from = 0;
+        int to = fftLength - 1;
+        int iSize = fftLength;
+        int numSlices = ceil(matDataIn.cols()/fftLength);      //calulate number of data slices
+        for (int i = 0; i<numSlices; i++) {
+            if(i == numSlices-1) {
+                iSize = matDataIn.cols() - (fftLength * (numSlices-1));
+            }
+            slice = matDataIn.block(0,from,lFilterChannelList.length(),iSize);
+            // Filtering
+            sliceFiltered = filterChannelsConcurrently(slice,order,lFilterChannelList,filterList);
+            matDataOut.block(0,from,lFilterChannelList.length(),iSize) = sliceFiltered;
+            from =+ fftLength;
+            }
+        }
+    else{
+        matDataOut = filterChannelsConcurrently(matDataIn,order,lFilterChannelList,filterList);
+    }
+    // slice matDataOut back to original size
     return matDataOut;
 }
