@@ -14,65 +14,103 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Install Qt
-      run: |
-        sudo apt-get install build-essential libgl1-mesa-dev -y
-        pip3 install setuptools wheel
-        pip3 install aqtinstall --pre
-        python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop --module qtcharts
-        echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
-    - name: Configure and compile MNE-CPP
-      run: |        
-        qmake -r MNECPP_CONFIG+=noTests
-        make -j2 
-        
-  Minimal:
-    runs-on: ubuntu-16.04
+      - name: Create file
+        run: fallocate -l 5MB gentoo_root
+      - uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: gentoo_root
+          asset_name: gentoo_root
+          tag: ${{ github.ref }}
+
+  ReleaseWin:
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Install Qt
-      run: |
-        sudo apt-get install build-essential libgl1-mesa-dev -y
-        pip3 install setuptools wheel
-        pip3 install aqtinstall --pre
-        python3 -m aqt install --outputdir $HOME/Qt 5.3 linux desktop
-        echo "::add-path::$HOME/Qt/5.3/gcc_64/bin"
-    - name: Configure and compile MNE-CPP
-      run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=minimalVersion
-        make -j2
-        
-  Tests:
-    runs-on: ubuntu-16.04
+      - name: Create file
+        run: fallocate -l 5MB gentoo_rootwin
+      - uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: gentoo_rootwin
+          asset_name: gentoo_rootwin
+          tag: ${{ github.ref }}
 
-    steps:
-    - uses: actions/checkout@v1
-    - name: Install Codecov
-      run: |
-        sudo pip install codecov 
-    - name: Install Qt
-      run: |
-        sudo apt-get install build-essential libgl1-mesa-dev -y
-        pip3 install setuptools wheel
-        pip3 install aqtinstall --pre
-        python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop --module qtcharts
-        echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
-    - name: Configure and compile MNE-CPP
-      run: |
-        qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
-        make -j2
-    - name: Run Tests and upload to Codecov
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      run: |
-        git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
-        for test in ./bin/test_*;
-        do
-          # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
-          # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
-          ./$test
-          find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null          
-          codecov
-        done
+# name: Linux
+
+# on:
+#   pull_request:
+#     branches:
+#     - master
+#   push:
+#     branches:
+#     - master
+#     - github_actions
+
+# jobs:
+#   Release:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - uses: actions/checkout@v1
+#     - name: Install Qt
+#       run: |
+#         sudo apt-get install build-essential libgl1-mesa-dev -y
+#         pip3 install setuptools wheel
+#         pip3 install aqtinstall --pre
+#         python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop --module qtcharts
+#         echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
+#     - name: Configure and compile MNE-CPP
+#       run: |        
+#         qmake -r MNECPP_CONFIG+=noTests
+#         make -j2 
+        
+#   Minimal:
+#     runs-on: ubuntu-16.04
+
+#     steps:
+#     - uses: actions/checkout@v1
+#     - name: Install Qt
+#       run: |
+#         sudo apt-get install build-essential libgl1-mesa-dev -y
+#         pip3 install setuptools wheel
+#         pip3 install aqtinstall --pre
+#         python3 -m aqt install --outputdir $HOME/Qt 5.3 linux desktop
+#         echo "::add-path::$HOME/Qt/5.3/gcc_64/bin"
+#     - name: Configure and compile MNE-CPP
+#       run: |
+#         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=minimalVersion
+#         make -j2
+        
+#   Tests:
+#     runs-on: ubuntu-16.04
+
+#     steps:
+#     - uses: actions/checkout@v1
+#     - name: Install Codecov
+#       run: |
+#         sudo pip install codecov 
+#     - name: Install Qt
+#       run: |
+#         sudo apt-get install build-essential libgl1-mesa-dev -y
+#         pip3 install setuptools wheel
+#         pip3 install aqtinstall --pre
+#         python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop --module qtcharts
+#         echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
+#     - name: Configure and compile MNE-CPP
+#       run: |
+#         qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
+#         make -j2
+#     - name: Run Tests and upload to Codecov
+#       env:
+#         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+#       run: |
+#         git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
+#         for test in ./bin/test_*;
+#         do
+#           # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
+#           # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
+#           ./$test
+#           find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null          
+#           codecov
+#         done
