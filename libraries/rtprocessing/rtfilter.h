@@ -146,8 +146,9 @@ public:
                                double bandwidth,
                                double parkswidth,
                                double sFreq,
-                               qint32 fftlength=4096,
-                               UTILSLIB::FilterData::DesignMethod designMethod = UTILSLIB::FilterData::Cosine);
+                               const QVector<int>& lFilterChannelList,
+                               UTILSLIB::FilterData::DesignMethod designMethod = UTILSLIB::FilterData::Cosine,
+                               qint32 fftLength=4096);
 
 protected:
     Eigen::MatrixXd                 m_matOverlap;                   /**< Last overlap block */
