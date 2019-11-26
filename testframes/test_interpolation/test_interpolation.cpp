@@ -105,10 +105,10 @@ TestInterpolation::TestInterpolation()
 void TestInterpolation::initTestCase()
 {
     //acquire real data
-    QFile t_filesensorSurfaceVV(QDir::currentPath()+"/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif");
+    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath()+"/MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
     realSurface = t_sensorSurfaceVV[0];
-    QFile t_fileEvoked(QDir::currentPath()+"/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
+    QFile t_fileEvoked(QCoreApplication::applicationDirPath()+"/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     fiff_int_t setno = 0;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
     evoked = FiffEvoked(t_fileEvoked, setno, baseline);
