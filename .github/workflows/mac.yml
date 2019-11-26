@@ -43,7 +43,7 @@ jobs:
         echo "::add-path::$HOME/Qt/5.10.1/clang_64/bin"
     - name: Configure and compile MNE-CPP
       run: |        
-        qmake -r MNECPP_CONFIG+=noTests
+        qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
         make -j2  
     - name: Run Tests
       run: |
