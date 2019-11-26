@@ -148,12 +148,11 @@ int main(int argc, char *argv[])
     FilterData::FilterType type = FilterData::BPF;
     int order = 1024;                                               //  when using designMethod Cosine the order isn't used.
     double sFreq = raw.info.sfreq;                                  //  get Sample freq from Data
-    double centerfreq = 10/sFreq;                                   //  normed sample freq.
-    double bandwidth = 10/sFreq;
-    double parkswidth = 1/sFreq;
-    qint32 fftLength = quantum + 2*order;                           //  set fft_length to size of data junks + 2*Filterlength
+    double centerfreq = 10/(sFreq/2.0);                                   //  normed nyquist freq.
+    double bandwidth = 10/(sFreq/2.0);
+    double parkswidth = 1/(sFreq/2.0);
+    qint32 fftLength = quantum + order;                           //  set fft_length to size of data junks + 2*Filterlength
     FilterData::DesignMethod designMethod = FilterData::Cosine;     //  using cosine filter
-
     // create filterobject and save results in list QList so that 'rtfilter' can handle filter properties
     FilterData filter = FilterData(filter_name, type, order, centerfreq, bandwidth, parkswidth, sFreq, fftLength, designMethod);
     QList<FilterData> filterList;
@@ -169,6 +168,8 @@ int main(int argc, char *argv[])
     for (int i = 0; i < raw.info.nchan; i++){
         channelList[i] = i;
     }
+
+    // For testpurpose one Channel would be enough, otherwise running would take too long
 
 //    QVector<int> channelList(1);
 //    channelList[0] = 0;
