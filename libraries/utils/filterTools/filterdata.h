@@ -167,7 +167,7 @@ public:
     *
     * @return the filtered data in form of a RoVecotrXd
     */
-    RowVectorXd applyConvFilter(const RowVectorXd& data, bool keepOverhead = false, CompensateEdgeEffects compensateEdgeEffects = MirrorData) const;
+    RowVectorXd applyConvFilter(const RowVectorXd& data, bool keepOverhead = false, CompensateEdgeEffects compensateEdgeEffects = ZeroPad) const;
 
     /**
     * Applies the current filter to the input data using multiplication in frequency domain. Pro: Fast, good filter parameters Con: Smears in error from future samples. Uses future samples (nor real time capable)
