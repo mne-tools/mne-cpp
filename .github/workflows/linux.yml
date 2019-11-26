@@ -70,17 +70,11 @@ jobs:
       run: |
         echo $CODECOV_TOKEN
         git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
-        tests=( test_codecov test_fiff_rwr test_dipole_fit test_fiff_mne_types_io test_fiff_cov test_fiff_digitizer test_mne_msh_display_surface_set test_geometryinfo test_interpolation test_spectral_connectivity test_mne_forward_solution)
-        for test in ${tests[*]};
+        for test in ./bin/test_*;
         do
-          ./bin/$test
-          # Find all .cpp files, cd to their folder and run gcov
-          find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
-          # Report code coverage; instead of "bash <(curl -s https://codecov.io/bash) use python codecov
-          # Do this for every test run since codecov is able to process different uploads and will merge them as soon as the Travis job is done
+          # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
+          # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
+          ./$test
+          find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null          
           codecov
         done
-#     - name: Run and upload Codecov
-#       uses: codecov/codecov-action@v1.0.4
-#       with:
-#         token: ${{ secrets.CODECOV_TOKEN }}
