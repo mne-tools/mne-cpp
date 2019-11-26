@@ -206,7 +206,7 @@ void TestDipoleFit::dipoleFitAdvanced()
     settings.tmax = 0.25f;
     settings.tstep = 0.01f;
 
-    testFile.setFileName(".mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif"); QVERIFY( testFile.exists() );
+    testFile.setFileName("./mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif"); QVERIFY( testFile.exists() );
     settings.bemname = testFile.fileName();
 
     settings.bmin = 1000000.0f;
