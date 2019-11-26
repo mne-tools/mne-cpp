@@ -38,7 +38,6 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    test_codecov \
     test_dipole_fit \
     test_fiff_rwr \
     test_fiff_mne_types_io \
