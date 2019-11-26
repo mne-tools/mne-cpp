@@ -1,0 +1,82 @@
+name: Linux
+
+on:
+  pull_request:
+    branches:
+    - master
+  push:
+    branches:
+    - master
+    - github_actions
+
+jobs:
+  Release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Qt
+      run: |
+        sudo apt-get install build-essential libgl1-mesa-dev -y
+        pip3 install setuptools wheel
+        pip3 install aqtinstall --pre
+        python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop --module qtcharts
+        echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
+    - name: Configure and compile MNE-CPP
+      run: |        
+        qmake -r MNECPP_CONFIG+=noTests
+        make -j2 
+  Minimal:
+    runs-on: ubuntu-16.04
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Qt
+      run: |
+        sudo apt-get install build-essential libgl1-mesa-dev -y
+        pip3 install setuptools wheel
+        pip3 install aqtinstall --pre
+        python3 -m aqt install --outputdir $HOME/Qt 5.3 linux desktop
+        echo "::add-path::$HOME/Qt/5.3/gcc_64/bin"
+    - name: Configure and compile MNE-CPP
+      run: |
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=minimalVersion
+        make -j2
+        
+  Tests:
+    runs-on: ubuntu-16.04
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Qt
+      run: |
+        sudo apt-get install build-essential libgl1-mesa-dev -y
+        pip3 install setuptools wheel
+        pip3 install aqtinstall --pre
+        python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop --module qtcharts
+        echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
+    - name: Configure and compile MNE-CPP
+      run: |
+        qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
+        make -j2
+    - name: Install Codecov
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: sudo pip install codecov        
+    - name: Run Tests
+      run: |
+        git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
+        tests=( test_codecov test_fiff_rwr test_dipole_fit test_fiff_mne_types_io test_fiff_cov test_fiff_digitizer test_mne_msh_display_surface_set test_geometryinfo test_interpolation test_spectral_connectivity test_mne_forward_solution)
+        for test in ${tests[*]};
+        do
+          ./bin/$test
+          # Find all .cpp files, cd to their folder and run gcov
+          find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
+          # Report code coverage; instead of "bash <(curl -s https://codecov.io/bash) use python codecov
+          # Do this for every test run since codecov is able to process different uploads and will merge them as soon as the Travis job is done
+          codecov
+        done
+#     - name: Run and upload Codecov
+#       uses: codecov/codecov-action@v1.0.4
+#       with:
+#         token: ${{ secrets.CODECOV_TOKEN }}
