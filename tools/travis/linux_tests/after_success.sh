@@ -3,7 +3,7 @@
 set -e
 
 # Clone MNE-CPP test data
-git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
+git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
 
 # Set Environment variable
 MNECPP_ROOT=$(pwd)
@@ -13,7 +13,7 @@ tests=( test_codecov test_fiff_rwr test_dipole_fit test_fiff_mne_types_io test_f
 
 for test in ${tests[*]};
 do
-    echo ">> Starting $test"	
+    echo ">> Starting $test"
 	./bin/$test
 
 	# Find all .cpp files, cd to their folder and run gcov
@@ -23,6 +23,6 @@ do
 	# Do this for every test run since codecov is able to process different uploads and will merge them as soon as the Travis job is done
 	codecov
 	#codecov > /dev/null
-	
+
     echo "<< Finished $test"
 done
