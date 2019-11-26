@@ -49,6 +49,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Install Codecov
+      run: |
+        sudo pip install codecov 
     - name: Install Qt
       run: |
         sudo apt-get install build-essential libgl1-mesa-dev -y
@@ -60,15 +63,10 @@ jobs:
       run: |
         qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
         make -j2
-    - name: Install Codecov
-      run: |
-        sudo pip install codecov        
-        echo $CODECOV_TOKEN       
     - name: Run Tests and upload to Codecov
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
-        echo $CODECOV_TOKEN
         git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
         for test in ./bin/test_*;
         do
