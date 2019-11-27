@@ -14,31 +14,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v1
       - name: Create file
         run: |
           fallocate -l 5MB gentoo_root
+          # Delete current tag
+          git push origin :refs/tags/dev
+          # Create new tag
           git tag -a dev -m "Dev Build"
-          git push origin --delete dev
-          git push origin
+          # Send the new tag
+          git push --force origin refs/tags/dev:refs/tags/dev
       - uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: gentoo_root
           asset_name: gentoo_root
-          tag: ${{ github.ref }}
+          tag: devs
 
-  ReleaseWin:
-    runs-on: ubuntu-latest
+  # ReleaseWin:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Create file
-        run: fallocate -l 5MB gentoo_rootwin
-      - uses: svenstaro/upload-release-action@v1-release
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: gentoo_rootwin
-          asset_name: gentoo_rootwin
-          tag: ${{ github.ref }}
+  #   steps:
+  #     - name: Create file
+  #       run: fallocate -l 5MB gentoo_rootwin
+  #     - uses: svenstaro/upload-release-action@v1-release
+  #       with:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }}
+  #         file: gentoo_rootwin
+  #         asset_name: gentoo_rootwin
+  #         tag: devs
 
 # name: Linux
 
