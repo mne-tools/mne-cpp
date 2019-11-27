@@ -4,3 +4,66 @@ on:
   push:
     branches:
     - master
+    - github_actions
+
+jobs:
+  Release:
+    runs-on: windows-2016
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Qt
+      run: | 
+        pip3 install setuptools wheel
+        pip3 install aqtinstall --pre
+        python -m aqt install --outputdir $HOME\Qt 5.10.1 windows desktop win64_msvc2017_64 --module qtcharts
+        echo "::add-path::$HOME\Qt\5.10.1\msvc2017_64\bin"
+    - name: Install jom
+      run: |
+        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"        
+        echo "::add-path::$HOME\jom"
+    - name: Configure and compile MNE-CPP
+      run: |        
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        qmake -r MNECPP_CONFIG+=noTests
+        jom -j2
+    - name: Setup Github credentials
+      uses: fusion-engineering/setup-git-credentials@v2
+      with:
+        credentials: ${{secrets.GIT_CREDENTIALS}}    
+    - name: Package binaries
+      run: |
+        call 7z a mne-cpp-windows-x86_64.zip ./bin
+    - name: Update dev_build_win tag and release
+      env:
+        GITHUB_USER: LorenzE
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.email lorenzesch@hotmail.com
+        git config --global user.name $GITHUB_USER
+        # Delete current tag locally if existent
+        if [ $(git tag -l "dev_build_win") ]; then
+          git tag -d dev_build_win
+        fi
+        # Delete current release remotley. This gets rid of the left over draft release. This must be done before deleting the remote tag
+        #if [ $(hub release show -f %t dev_build_win) == "dev_build_win" ]; then
+        hub release delete dev_build_win
+        #fi        
+        # Delete current tag remotley
+        git push origin :refs/tags/dev_build_win
+        # Create new tag once again
+        git tag -a dev_build_win -m "Dev Build Windows"
+        # Send the new tag
+        git push --force origin refs/tags/dev_build_win:refs/tags/dev_build_win
+    - name: Deploy binaries with dev_build_win release at Github
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-windows-x86_64.zip
+        asset_name: mne-cpp-windows-x86_64.zip
+        tag: dev_build_win
+
+

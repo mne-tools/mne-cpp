@@ -49,7 +49,7 @@ jobs:
         # Delete current tag remotley
         git push origin :refs/tags/dev_build_mac
         # Create new tag once again
-        git tag -a dev_build_mac -m "Dev Build Linux"
+        git tag -a dev_build_mac -m "Dev Build MacOS"
         # Send the new tag
         git push --force origin refs/tags/dev_build_mac:refs/tags/dev_build_mac
     - name: Deploy MNE Scan binaries with dev_build_mac release at Github
