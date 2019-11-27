@@ -1,0 +1,42 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  Release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install Qt Dev Tools, Doxygen and Graphviz
+      run: |
+        sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
+    - name: Run Doxygen
+      run: |        
+        cd doc
+        doxygen mne-cpp_doxyfile
+        tar cfvz docu_doxygen.tar.gz /html
+    - name: Setup Github credentials
+      uses: fusion-engineering/setup-git-credentials@v2
+      with:
+        credentials: ${{secrets.GIT_CREDENTIALS}}
+    - name: Update gh-pages
+      run: |
+      	# Upload docu to gh-pages
+        git clone -b gh-pages --single-branch --no-checkout --depth 1 https://github.com/mne-tools/mne-cpp gh-pages
+        cd gh-pages
+
+        # Remove all files first
+        git rm * -r
+        git commit --amend -a -m 'Update docu'
+
+        touch .nojekyll
+        
+        cp -r ../html/* .
+
+        git add *
+        git add .nojekyll
+        git commit --amend -a -m 'Update docu'
+        git push -f --all

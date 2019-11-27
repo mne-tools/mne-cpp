@@ -44,7 +44,7 @@ jobs:
         fi
         # Delete current release remotley. This gets rid of the left over draft release. This must be done before deleting the remote tag
         #if [ $(hub release show -f %t dev_build_mac) == "dev_build_mac" ]; then
-        hub release delete dev_build_linux
+        hub release delete dev_build_mac
         #fi        
         # Delete current tag remotley
         git push origin :refs/tags/dev_build_mac

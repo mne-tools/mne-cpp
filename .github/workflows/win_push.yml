@@ -36,7 +36,7 @@ jobs:
         credentials: ${{secrets.GIT_CREDENTIALS}}    
     - name: Package binaries
       run: |
-        call 7z a mne-cpp-windows-x86_64.zip ./bin
+        7z a mne-cpp-windows-x86_64.zip ./bin
     - name: Update dev_build_win tag and release
       env:
         GITHUB_USER: LorenzE
