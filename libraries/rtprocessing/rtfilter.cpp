@@ -51,6 +51,12 @@ using namespace Eigen;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
 
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -158,15 +164,21 @@ MatrixXd RtFilter::filterChannelsConcurrently(const MatrixXd& matDataIn,
 
 MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
                               FilterData::FilterType type,
-                              int order,
                               double centerfreq,
                               double bandwidth,
                               double parkswidth,
                               double sFreq,
                               const QVector<int>& lFilterChannelList,
-                              FilterData::DesignMethod designMethod,
-                              qint32 fftLength)
+                              int order,
+                              qint32 fftLength,
+                              FilterData::DesignMethod designMethod)
 {
+
+    // Check for size of data
+    if (matDataIn.cols()<order){
+        qDebug() << QString("Error in rtfilter: Filterlength bigger then datalength");
+    }
+
     // create output matrix with size of inputmatrix
     MatrixXd matDataOut(matDataIn.rows(),matDataIn.cols());
     MatrixXd slice;
@@ -178,20 +190,25 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
 
     // slice input data in to data junks with proper length for fft
     // zeropad the last one if it is shorter use zeropad to get fft_length
-
-    if(matDataIn.cols() > fftLength) {
-        int from = 0;
-        int iSize = fftLength-order;                            //
-        int numSlices = ceil(matDataIn.cols()/fftLength);       //calulate number of data slices
+    int iSize = fftLength-order;
+    if(matDataIn.cols() > iSize) {
+        int from = 0;                           //
+        int numSlices = ceil(float(matDataIn.cols())/float(iSize));       //calulate number of data slices
+        printf("numSlices..%u\n",numSlices);
+        printf("DataLength..%u\n",matDataIn.cols());
         for (int i = 0; i<numSlices; i++) {
             if(i == numSlices-1) {
-                iSize = matDataIn.cols() - (fftLength * (numSlices-1));
+                //catch the last one that might be shorter then original size
+                iSize = matDataIn.cols() - (iSize * (numSlices -1));
+                printf("iSize..%u\n",iSize);
             }
             slice = matDataIn.block(0,from,lFilterChannelList.length(),iSize);
-            // Filtering
+            //printf("iSize..%u\n",iSize);
+            //printf("Slize..%u\n",slice.cols());
             sliceFiltered = filterChannelsConcurrently(slice,order,lFilterChannelList,filterList);
-            matDataOut.block(0,from,lFilterChannelList.length(),iSize) = sliceFiltered;
-            from =+ iSize;
+            matDataOut.block(0,from,lFilterChannelList.length(),iSize-1) = sliceFiltered;
+            //printf("FilteredSlice..%u\n",sliceFiltered.cols());
+            from += iSize;
             }
         }
     else{
