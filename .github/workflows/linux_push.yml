@@ -17,37 +17,36 @@ jobs:
       uses: geertvdc/setup-hub@master
     - name: Install Qt
       run: |
-        # sudo apt-get install build-essential libgl1-mesa-dev -y
-        # pip3 install setuptools wheel
-        # pip3 install aqtinstall --pre
-        # python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop --module qtcharts
-        # echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
+        sudo apt-get install build-essential libgl1-mesa-dev -y
+        pip3 install setuptools wheel
+        pip3 install aqtinstall --pre
+        python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop --module qtcharts
+        echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
     - name: Configure and compile MNE-CPP
       run: |        
-        # qmake -r MNECPP_CONFIG+=noTests
-        # make -j2 
+        qmake -r MNECPP_CONFIG+=noTests
+        make -j2 
     - name: Package binaries
       run: |
-        # # Downloading linuxdeployqt from continious release
-        # wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-        # sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-        # #creating a directory for linuxdeployqt to create results 
-        # sudo mkdir -p -m777 mne-cpp
-        # # Install non-QT packages, just paranoia.
-        # #sudo apt-get install -qq libicu52 libxcb-xinerama0
-        # #setting linuxdeployqt to variable
-        # linuxdeployqt=linuxdeployqt-continuous-x86_64.AppImage
-        # #archive file name created
-        # archive_name="mne-cpp-linux-x86_64-dev-build.tar.gz"
-        # #copying built data to folder for easy packaging 	
-        # cp -r ./bin ./lib mne-cpp/
-        # #dropping into folder to easily package all results from linuxdeployqt
-        # cd mne-cpp
-        # #linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
-        # ../$linuxdeployqt bin/mne_scan -verbose2
-        # #creating archive of everything in current directory
-        # tar cfvz ../$archive_name ./*
-        fallocate -l 10MB mne-cpp-linux-x86_64-dev-build.tar.gz        
+        # Downloading linuxdeployqt from continious release
+        wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+        sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+        #creating a directory for linuxdeployqt to create results 
+        sudo mkdir -p -m777 mne-cpp
+        # Install non-QT packages, just paranoia.
+        #sudo apt-get install -qq libicu52 libxcb-xinerama0
+        #setting linuxdeployqt to variable
+        linuxdeployqt=linuxdeployqt-continuous-x86_64.AppImage
+        #archive file name created
+        archive_name="mne-cpp-linux-x86_64-dev-build.tar.gz"
+        #copying built data to folder for easy packaging 	
+        cp -r ./bin ./lib mne-cpp/
+        #dropping into folder to easily package all results from linuxdeployqt
+        cd mne-cpp
+        #linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
+        ../$linuxdeployqt bin/mne_scan -verbose2
+        #creating archive of everything in current directory
+        tar cfvz ../$archive_name ./*   
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
@@ -58,7 +57,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name LorenzE
+        git config --global user.name $GITHUB_USER
         # Delete current tag locally if existent
         if [ $(git tag -l "dev_build_linux") ]; then
           git tag -d dev_build_linux

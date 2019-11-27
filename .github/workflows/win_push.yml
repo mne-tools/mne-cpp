@@ -1,6 +1,6 @@
-# name: Windows
+name: Windows
 
-# on:
-#   push:
-#     branches:
-#     - master
+on:
+  push:
+    branches:
+    - master
