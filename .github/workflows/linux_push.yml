@@ -47,14 +47,7 @@ jobs:
         #dropping into folder to easily package all results from linuxdeployqt
         cd mne-cpp
         #linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
-        pwd
-        ls -l
-        cd bin 
-        pwd
-        ls -l
-        cd ..
-        pwd
-        ../$linuxdeployqt bin/mne_scan
+        ../$linuxdeployqt bin/mne_scan -verbose2
         #creating archive of everything in current directory
         tar cfvz ../$archive_name ./*
     - uses: fusion-engineering/setup-git-credentials@v2
