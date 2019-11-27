@@ -1,69 +1,9 @@
 name: Linux
 
-on:
-  pull_request:
-    branches:
-    - master
-
-jobs:
-  Release:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v1
-      - uses: fusion-engineering/setup-git-credentials@v2
-        with:
-          credentials: ${{secrets.GIT_CREDENTIALS}}
-      - name: Create file
-        run: |
-          git config --global user.email lorenzesch@hotmail.com
-          git config --global user.name LorenzE
-          fallocate -l 5MB gentoo_root
-          # Delete current tag locally if existent
-          if [ $(git tag -l "dev") ]; then
-            git tag -d dev
-          fi
-          # Delete current tag remotley
-          git push origin :refs/tags/dev
-          # Create new tag once again
-          git tag -a dev -m "Dev Build"
-          # Send the new tag
-          git push --force origin refs/tags/dev:refs/tags/dev
-      - uses: svenstaro/upload-release-action@v1-release
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: gentoo_root
-          asset_name: gentoo_root
-          tag: dev
-
-on:
-  push:
-    branches:
-    - master
-    - github_actions
-  # ReleaseWin:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Create file
-  #       run: fallocate -l 5MB gentoo_rootwin
-  #     - uses: svenstaro/upload-release-action@v1-release
-  #       with:
-  #         repo_token: ${{ secrets.GITHUB_TOKEN }}
-  #         file: gentoo_rootwin
-  #         asset_name: gentoo_rootwin
-  #         tag: devs
-
-# name: Linux
-
 # on:
 #   pull_request:
 #     branches:
 #     - master
-#   push:
-#     branches:
-#     - master
-#     - github_actions
 
 # jobs:
 #   Release:
@@ -101,7 +41,7 @@ on:
 #         make -j2
         
 #   Tests:
-#     runs-on: ubuntu-16.04
+#     runs-on: ubuntu-latest
 
 #     steps:
 #     - uses: actions/checkout@v1
@@ -132,3 +72,71 @@ on:
 #           find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null          
 #           codecov
 #         done
+
+on:
+  push:
+    branches:
+    - master
+    - github_actions
+
+jobs:
+  Release:
+      runs-on: ubuntu-latest
+
+      steps:
+      - uses: actions/checkout@v1
+      - name: Install Qt
+        run: |
+          sudo apt-get install build-essential libgl1-mesa-dev -y
+          pip3 install setuptools wheel
+          pip3 install aqtinstall --pre
+          python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop --module qtcharts
+          echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
+      - name: Configure and compile MNE-CPP
+        run: |        
+          qmake -r MNECPP_CONFIG+=noTests
+          make -j2 
+      - name: Package binaries
+        run: |
+          # Downloading linuxdeployqt from continious release
+          wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+          sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+          #creating a directory for linuxdeployqt to create results 
+          mkdir -p -m777 mne-cpp
+          # Install non-QT packages, just paranoia.
+          apt-get install -qq libicu52 libxcb-xinerama0
+          #setting linuxdeployqt to variable
+          linuxdeployqt=linuxdeployqt-continuous-x86_64.AppImage
+          #archive file name created
+          archive_name="mne-cpp-linux-x86_64-dev-build.tar.gz"
+          #copying built data to folder for easy packaging 	
+          cp -r ./bin ./lib mne-cpp/
+          #dropping into folder to easily package all results from linuxdeployqt
+          cd mne-cpp
+          #linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
+          ../$linuxdeployqt bin/mne_scan
+          #creating archive of everything in current directory
+          tar cfvz ../$archive_name ./*
+      - uses: fusion-engineering/setup-git-credentials@v2
+        with:
+          credentials: ${{secrets.GIT_CREDENTIALS}}
+      - name: Update tag and release
+        run: |
+          git config --global user.email lorenzesch@hotmail.com
+          git config --global user.name LorenzE
+          # Delete current tag locally if existent
+          if [ $(git tag -l "dev") ]; then
+            git tag -d dev
+          fi
+          # Delete current tag remotley
+          git push origin :refs/tags/dev
+          # Create new tag once again
+          git tag -a dev -m "Dev Build"
+          # Send the new tag
+          git push --force origin refs/tags/dev:refs/tags/dev
+      - uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: mne-cpp-linux-x86_64-dev-build.tar.gz
+          asset_name: mne-cpp-linux-x86_64-dev-build.tar.gz
+          tag: dev
