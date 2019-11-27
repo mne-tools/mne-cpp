@@ -1,4 +1,4 @@
-name: LinuxPR
+name: Linux
 
 on:
   pull_request:
