@@ -16,7 +16,7 @@ for test in test_*;
 do
     echo ">> Starting $test"
 	./$test
-
+  cd ..
 	# Find all .cpp files, cd to their folder and run gcov
 	find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
 
@@ -24,6 +24,6 @@ do
 	# Do this for every test run since codecov is able to process different uploads and will merge them as soon as the Travis job is done
 	codecov
 	#codecov > /dev/null
-
+  cd bin
     echo "<< Finished $test"
 done
