@@ -89,9 +89,9 @@ jobs:
       run: |        
         cd doc
         doxygen mne-cpp_doxyfile
-        tar cfvz docu_doxygen.tar.gz html     
-    - name:  Upload artifact to Github actions log screen
+        tar cfvz docu_doxygen.tar.gz html
+    - name: Upload artifact to Github actions log screen
       uses: actions/upload-artifact@v1
       with:
         name: docu_doxygen.tar.gz
-        path: .
+        path: doc/

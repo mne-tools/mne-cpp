@@ -98,7 +98,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: docu_doxygen.tar.gz
-        path: .
+        path: doc/
     # - name: Setup Github credentials
     #   uses: fusion-engineering/setup-git-credentials@v2
     #   with:
