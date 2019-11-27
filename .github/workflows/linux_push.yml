@@ -79,3 +79,44 @@ jobs:
         file: mne-cpp-linux-x86_64-dev-build.tar.gz
         asset_name: mne-cpp-linux-x86_64-dev-build.tar.gz
         tag: dev_build_linux
+
+  Documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Qt Dev Tools, Doxygen and Graphviz
+      run: |
+        sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
+    - name: Run Doxygen and package result
+      run: |        
+        cd doc
+        doxygen mne-cpp_doxyfile
+        tar cfvz docu_doxygen.tar.gz html
+    - name: Upload artifact to Github actions log screen
+      uses: actions/upload-artifact@v1
+      with:
+        name: docu_doxygen.tar.gz
+        path: .
+    # - name: Setup Github credentials
+    #   uses: fusion-engineering/setup-git-credentials@v2
+    #   with:
+    #     credentials: ${{secrets.GIT_CREDENTIALS}}
+    # - name: Update documentation at Github pages
+    #   run: |
+    #     git clone -b gh-pages --single-branch --no-checkout --depth 1 https://github.com/mne-tools/mne-cpp gh-pages
+    #     cd gh-pages
+
+    #     # Remove all files first
+    #     git rm * -r
+    #     git commit --amend -a -m 'Update docu'
+
+    #     touch .nojekyll
+        
+    #     cp -r ../html/* .
+
+    #     git add *
+    #     git add .nojekyll
+    #     git commit --amend -a -m 'Update docu'
+    #     git push -f --all
