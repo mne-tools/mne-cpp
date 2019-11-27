@@ -98,7 +98,7 @@ TestGeometryInfo::TestGeometryInfo() {
 //*************************************************************************************************************
 void TestGeometryInfo::initTestCase() {
     //acquire real surface data
-    QFile t_filesensorSurfaceVV("./mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif");
+    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
     realSurface = t_sensorSurfaceVV[0];
 
@@ -138,7 +138,7 @@ void TestGeometryInfo::initTestCase() {
 
 void TestGeometryInfo::testBadChannelFiltering() {
     //acquire real sensor positions
-    QFile t_fileEvoked("./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
+    QFile t_fileEvoked(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
     fiff_int_t setno = 0;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
@@ -210,5 +210,5 @@ void TestGeometryInfo::cleanupTestCase() {
 // MAIN
 //=============================================================================================================
 
-QTEST_APPLESS_MAIN(TestGeometryInfo)
+QTEST_GUILESS_MAIN(TestGeometryInfo)
 #include "test_geometryinfo.moc"
