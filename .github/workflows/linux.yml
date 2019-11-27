@@ -15,6 +15,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+      - uses: octokit/request-action@v1.x
+        with:
+          route: DELETE /repos/LorenzE/mne-cpp/releases/tag/dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: fusion-engineering/setup-git-credentials@v2
         with:
           credentials: ${{secrets.GIT_CREDENTIALS}}
