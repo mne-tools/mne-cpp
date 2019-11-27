@@ -4,10 +4,6 @@ on:
   pull_request:
     branches:
     - master
-  push:
-    branches:
-    - master
-    - github_actions
 
 jobs:
   Release:
@@ -40,6 +36,11 @@ jobs:
           asset_name: gentoo_root
           tag: dev
 
+on:
+  push:
+    branches:
+    - master
+    - github_actions
   # ReleaseWin:
   #   runs-on: ubuntu-latest
 
