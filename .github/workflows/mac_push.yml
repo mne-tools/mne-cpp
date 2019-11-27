@@ -1,6 +1,72 @@
-name: MacOS
+# name: MacOS
 
-on:
-  push:
-    branches:
-    - master
+# on:
+#   push:
+#     branches:
+#     - master
+    
+# jobs:
+#   Release:
+#     runs-on: macos-latest
+
+#     steps:
+#     - name: Clone repository
+#       uses: actions/checkout@v1
+#     - name: Install hub
+#       uses: geertvdc/setup-hub@master
+#       env:
+#         GITHUB_USER: ${{ secrets.GITHUB_USER }}
+#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#     - name: Install 7Zip
+#       run: brew install p7zip
+#     - name: Install Qt
+#       run: |
+#         pip3 install setuptools wheel
+#         pip3 install aqtinstall --pre
+#         python3 -m aqt install --outputdir $HOME/Qt 5.10.1 mac desktop --module qtcharts
+#         echo "::add-path::$HOME/Qt/5.10.1/clang_64/bin"
+#     - name: Configure and compile MNE-CPP
+#       run: |        
+#         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples
+#         make -j2
+#         - name: Setup git credentials
+#       uses: fusion-engineering/setup-git-credentials@v2
+#       with:
+#         credentials: ${{secrets.GIT_CREDENTIALS}}
+#     - name: Update dev_build_mac tag and release
+#       run: |
+#         git config --global user.email lorenzesch@hotmail.com
+#         git config --global user.name LorenzE
+#         # Delete current tag locally if existent
+#         if [ $(git tag -l "dev_build_mac") ]; then
+#           git tag -d dev_build_mac
+#         fi
+#         # Delete current release remotley. This gets rid of the left over draft release. This must be done before deleting the remote tag
+#         hub release delete dev_build_mac
+#         # Delete current tag remotley
+#         git push origin :refs/tags/dev_build_mac
+#         # Create new tag once again
+#         git tag -a dev_build_mac -m "Dev Build Linux"
+#         # Send the new tag
+#         git push --force origin refs/tags/dev_build_mac:refs/tags/dev_build_mac
+#     - name: Deploy MNE Scan binaries with dev_build_mac release at Github
+#       uses: svenstaro/upload-release-action@v1-release
+#       with:
+#         repo_token: ${{ secrets.GITHUB_TOKEN }}
+#         file: bin/mne_scan.dmg
+#         asset_name: mne_scan.dmg
+#         tag: dev_build_mac
+#     - name: Deploy MNE Browse binaries with dev_build_mac release at Github
+#       uses: svenstaro/upload-release-action@v1-release
+#       with:
+#         repo_token: ${{ secrets.GITHUB_TOKEN }}
+#         file: bin/mne_browse.dmg
+#         asset_name: mne_browse.dmg
+#         tag: dev_build_mac
+#     - name: Deploy MNE Analyze binaries with dev_build_mac release at Github
+#       uses: svenstaro/upload-release-action@v1-release
+#       with:
+#         repo_token: ${{ secrets.GITHUB_TOKEN }}
+#         file: bin/mne_analyze.dmg
+#         asset_name: mne_analyze.dmg
+#         tag: dev_build_mac
