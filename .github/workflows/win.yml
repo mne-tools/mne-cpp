@@ -58,9 +58,3 @@ jobs:
         cd bin
         git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
         Get-ChildItem -Filter test_*.exe | ForEach {&$_.Fullname}
-
-on:
-  push:
-    branches:
-    - master
-    - github_actions

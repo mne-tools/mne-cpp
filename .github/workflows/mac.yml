@@ -51,9 +51,3 @@ jobs:
         do
           ./$test
         done
-        
-on:
-  push:
-    branches:
-    - master
-    - github_actions
