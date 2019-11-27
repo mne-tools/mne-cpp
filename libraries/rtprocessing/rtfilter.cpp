@@ -208,7 +208,7 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
             sliceFiltered = filterChannelsConcurrently(slice,order,lFilterChannelList,filterList);
             matDataOut.block(0,from,lFilterChannelList.length(),iSize-1) = sliceFiltered;
             //printf("FilteredSlice..%u\n",sliceFiltered.cols());
-            from += iSize;
+            from += iSize-1;
             }
         }
     else{
