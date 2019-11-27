@@ -82,15 +82,15 @@ on:
 jobs:
   Release:
       runs-on: ubuntu-latest
-      
+
       steps:
       - uses: octokit/request-action@v1.x
         id: get_latest_release
         with:
-          route: GET /repos/:owner/:repo/releases/latest
+          route: DELETE /repos/:owner/:repo/releases/tag/dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: "echo latest release: ${{ steps.get_latest_release.outputs.data }}"
+      #- run: "echo latest release: ${{ steps.get_latest_release.outputs.data }}"
       # steps:
       # - uses: actions/checkout@v1
       # - name: Install Qt
