@@ -56,5 +56,5 @@ jobs:
     - name: Run tests
       run: |  
         cd bin
-        git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
+        git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
         Get-ChildItem -Filter test_*.exe | ForEach {&$_.Fullname}
