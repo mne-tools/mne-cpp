@@ -1,0 +1,6 @@
+name: MacOS
+
+on:
+  push:
+    branches:
+    - master

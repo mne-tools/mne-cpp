@@ -1,0 +1,53 @@
+name: MacOS
+
+on:
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  Release:
+    runs-on: macos-latest
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install 7Zip
+      run: brew install p7zip
+    - name: Install Qt
+      run: |
+        pip3 install setuptools wheel
+        pip3 install aqtinstall --pre
+        python3 -m aqt install --outputdir $HOME/Qt 5.10.1 mac desktop --module qtcharts
+        echo "::add-path::$HOME/Qt/5.10.1/clang_64/bin"
+    - name: Configure and compile MNE-CPP
+      run: |        
+        qmake -r MNECPP_CONFIG+=noTests
+        make -j2
+        
+  Tests:
+    runs-on: macos-latest
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install 7Zip
+      run: brew install p7zip
+    - name: Install Qt
+      run: |
+        pip3 install setuptools wheel
+        pip3 install aqtinstall --pre
+        python3 -m aqt install --outputdir $HOME/Qt 5.10.1 mac desktop --module qtcharts
+        echo "::add-path::$HOME/Qt/5.10.1/clang_64/bin"
+    - name: Configure and compile MNE-CPP
+      run: |        
+        qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
+        make -j2  
+    - name: Run tests
+      run: |
+        export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$PWD/lib
+        git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data        
+        for test in ./bin/test_*;
+        do
+          ./$test
+        done

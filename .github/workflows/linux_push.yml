@@ -1,4 +1,4 @@
-name: LinuxPush
+name: Linux
 
 on:
   push:
