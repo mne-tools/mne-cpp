@@ -75,3 +75,23 @@ jobs:
           find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null          
           codecov
         done
+
+  Documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Qt Dev Tools, Doxygen and Graphviz
+      run: |
+        sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
+    - name: Run Doxygen and package result
+      run: |        
+        cd doc
+        doxygen mne-cpp_doxyfile
+        tar cfvz docu_doxygen.tar.gz html     
+    - name:  Upload artifact to Github actions log screen
+      uses: actions/upload-artifact@v1
+      with:
+        name: docu_doxygen.tar.gz
+        path: .
