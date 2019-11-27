@@ -114,7 +114,7 @@ void TestMneForwardSolution::computeForward()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute/Write/Read MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     // Read reference forward solution
-    QString fwdMEGEEGFileRef("./mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QString fwdMEGEEGFileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile fileFwdMEGEEGRef(fwdMEGEEGFileRef);
     m_pFwdMEGEEGRef = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRef));
 
@@ -135,13 +135,13 @@ void TestMneForwardSolution::computeForward()
     settingsMEGEEG.include_meg = true;
     settingsMEGEEG.include_eeg = true;
     settingsMEGEEG.accurate = true;
-    settingsMEGEEG.srcname = "./mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
-    settingsMEGEEG.measname = "./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif";
-    settingsMEGEEG.mriname = "./mne-cpp-test-data/MEG/sample/all-trans.fif";
+    settingsMEGEEG.srcname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
+    settingsMEGEEG.measname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif";
+    settingsMEGEEG.mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
     settingsMEGEEG.transname.clear();
-    settingsMEGEEG.bemname = "./mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
+    settingsMEGEEG.bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
     settingsMEGEEG.mindist = 5.0f/1000.0f;
-    settingsMEGEEG.solname = "./mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
+    settingsMEGEEG.solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
     settingsMEGEEG.checkIntegrity();
 
@@ -193,5 +193,5 @@ void TestMneForwardSolution::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_APPLESS_MAIN(TestMneForwardSolution)
+QTEST_GUILESS_MAIN(TestMneForwardSolution)
 #include "test_mne_forward_solution.moc"

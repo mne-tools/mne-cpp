@@ -107,14 +107,13 @@ TestFiffCov::TestFiffCov()
 void TestFiffCov::initTestCase()
 {
     qDebug() << "Epsilon" << epsilon;
-
     //Read the results produced with MNE-CPP
-    QFile t_fileIn("./mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif");
+    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif");
     covLoaded = FiffCov(t_fileIn);
 
     //Read the result data produced with mne_matlab
     MatrixXd data;
-    IOUtils::read_eigen_matrix(data, "./mne-cpp-test-data/Result/ref_data_sample_audvis-cov.dat");
+    IOUtils::read_eigen_matrix(data, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_data_sample_audvis-cov.dat");
     covResult.data = data;
 
     covResult.kind = 1;
@@ -185,5 +184,5 @@ void TestFiffCov::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_APPLESS_MAIN(TestFiffCov)
+QTEST_GUILESS_MAIN(TestFiffCov)
 #include "test_fiff_cov.moc"

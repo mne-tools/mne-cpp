@@ -111,8 +111,8 @@ void TestFiffRWR::initTestCase()
 {
     qDebug() << "Epsilon" << epsilon;
 
-    QFile t_fileIn("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QFile t_fileOut("./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_test_rwr_out.fif");
+    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
+    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_test_rwr_out.fif");
 
     //
     //   Make sure test folder exists
@@ -331,5 +331,5 @@ void TestFiffRWR::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_APPLESS_MAIN(TestFiffRWR)
+QTEST_GUILESS_MAIN(TestFiffRWR)
 #include "test_fiff_rwr.moc"
