@@ -23,9 +23,11 @@ jobs:
           git config --global user.email lorenzesch@hotmail.com
           git config --global user.name LorenzE
           fallocate -l 5MB gentoo_root
-          # Delete current tag
+          # Delete current tag  locally
+          git tag -d dev
+          # Delete current tag remotley
           git push origin :refs/tags/dev
-          # Create new tag
+          # Create new tag once again
           git tag -a dev -m "Dev Build"
           # Send the new tag
           git push --force origin refs/tags/dev:refs/tags/dev
