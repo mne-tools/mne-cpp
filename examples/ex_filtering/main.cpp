@@ -31,7 +31,7 @@
 *
 * @brief     Example for filtering of data with realtime filtering. This example is combined with
 *            ex_read_write_raw for reading and writing fiff files. So the result of the filtering can be seen
-*            in MNE-Browse
+*            in MNE-Browse.
 *
 */
 
@@ -132,12 +132,10 @@ int main(int argc, char *argv[])
     // Set up the reading parameters
     fiff_int_t from = raw.first_samp;
     fiff_int_t to = raw.last_samp;
-    //fiff_int_t to = raw.first_samp + raw.info.sfreq * 6;
-//    float quantum_sec = 10.0f;//read and write in 10 sec junks
-//    fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);
 
     // To read the whole file at once set quantum = to - from + 1;
     fiff_int_t quantum = to - from + 1;
+
     // Read and write the data
     bool first_buffer = true;
 
@@ -154,14 +152,6 @@ int main(int argc, char *argv[])
     double bandwidth = 10/(sFreq/2.0);
     double parkswidth = 1/(sFreq/2.0);
 
-//    int order = 1024;                                                     //  when using designMethod Cosine the order isn't used.
-//    qint32 fftLength = quantum + order;                                   //  set fft_length to size of data junks + 2*Filterlength
-//    FilterData::DesignMethod designMethod = FilterData::Cosine;           //  using cosine filter
-
-//    // create filterobject and save results in list QList so that 'rtfilter' can handle filter properties
-//    FilterData filter = FilterData(filter_name, type, order, centerfreq, bandwidth, parkswidth, sFreq, fftLength, designMethod);
-//    QList<FilterData> filterList;
-//    filterList << filter;
 
     RtFilter rtFilter;
     MatrixXd dataFiltered;                                          //  output matrix of filteriung
@@ -173,11 +163,6 @@ int main(int argc, char *argv[])
     for (int i = 0; i < raw.info.nchan; i++){
         channelList[i] = i;
     }
-
-    // For testpurpose one Channel would be enough, otherwise running would take too long
-
-//    QVector<int> channelList(1);
-//    channelList[0] = 0;
 
     for(first = from; first < to; first+=quantum) {
         last = first+quantum-1;
@@ -192,15 +177,14 @@ int main(int argc, char *argv[])
 
         //Filtering
         printf("Filtering...");
-//        dataFiltered = rtFilter.filterChannelsConcurrently(data, order, channelList, filterList);
         timer.start();
         dataFiltered = rtFilter.filterData(data,type,centerfreq,bandwidth,parkswidth,sFreq,channelList);
         qDebug() << "The slow operation took" << timer.elapsed() << "milliseconds";
         printf("[done]\n");
 
-        //  Save ata before and after filtering into .csv files for intermediate result
-        IOUtils::write_eigen_matrix(data,"data.csv");
-        IOUtils::write_eigen_matrix(dataFiltered,"dataFiltered.csv");
+//        //  Save ata before and after filtering into .csv files for intermediate result
+//        IOUtils::write_eigen_matrix(data,"data.csv");
+//        IOUtils::write_eigen_matrix(dataFiltered,"dataFiltered.csv");
 
         //Writing
         printf("Writing...");
