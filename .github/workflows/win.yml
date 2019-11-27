@@ -1,62 +1,66 @@
-# name: Windows
+name: Windows
 
-# on:
-#   pull_request:
-#     branches:
-#     - master
-#   push:
-#     branches:
-#     - master
-#     - github_actions
+on:
+  pull_request:
+    branches:
+    - master
 
-# jobs:
-#   Release:
-#     runs-on: windows-2016
+jobs:
+  Release:
+    runs-on: windows-2016
 
-#     steps:
-#     - uses: actions/checkout@v1
-#     - name: Install Qt
-#       run: | 
-#         pip3 install setuptools wheel
-#         pip3 install aqtinstall --pre
-#         python -m aqt install --outputdir $HOME\Qt 5.10.1 windows desktop win64_msvc2017_64 --module qtcharts
-#         echo "::add-path::$HOME\Qt\5.10.1\msvc2017_64\bin"
-#     - name: Install jom
-#       run: |
-#         Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
-#         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"        
-#         echo "::add-path::$HOME\jom"
-#     - name: Configure and compile MNE-CPP
-#       run: |        
-#         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
-#         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-#         qmake -r MNECPP_CONFIG+=noTests
-#         jom -j2
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Qt
+      run: | 
+        pip3 install setuptools wheel
+        pip3 install aqtinstall --pre
+        python -m aqt install --outputdir $HOME\Qt 5.10.1 windows desktop win64_msvc2017_64 --module qtcharts
+        echo "::add-path::$HOME\Qt\5.10.1\msvc2017_64\bin"
+    - name: Install jom
+      run: |
+        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"        
+        echo "::add-path::$HOME\jom"
+    - name: Configure and compile MNE-CPP
+      run: |        
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        qmake -r MNECPP_CONFIG+=noTests
+        jom -j2
 
-#   Tests:
-#     runs-on: windows-2016
+  Tests:
+    runs-on: windows-2016
 
-#     steps:
-#     - uses: actions/checkout@v1
-#     - name: Install Qt
-#       run: | 
-#         pip3 install setuptools wheel
-#         pip3 install aqtinstall --pre
-#         python -m aqt install --outputdir $HOME\Qt 5.10.1 windows desktop win64_msvc2017_64 --module qtcharts
-#         echo "::add-path::$HOME\Qt\5.10.1\msvc2017_64\bin"
-#     - name: Install jom
-#       run: |
-#         Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
-#         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"        
-#         echo "::add-path::$HOME\jom"
-#     - name: Configure and compile MNE-CPP
-#       run: |           
-#         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
-#         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-#         qmake -r MNECPP_CONFIG+=noTests
-#         jom -j2
-#     - name: Run Tests
-#       run: |  
-#         cd bin
-#         git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
-#         Get-ChildItem -Filter test_*.exe | ForEach {&$_.Fullname}
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Qt
+      run: | 
+        pip3 install setuptools wheel
+        pip3 install aqtinstall --pre
+        python -m aqt install --outputdir $HOME\Qt 5.10.1 windows desktop win64_msvc2017_64 --module qtcharts
+        echo "::add-path::$HOME\Qt\5.10.1\msvc2017_64\bin"
+    - name: Install jom
+      run: |
+        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"        
+        echo "::add-path::$HOME\jom"
+    - name: Configure and compile MNE-CPP
+      run: |           
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        qmake -r MNECPP_CONFIG+=noTests
+        jom -j2
+    - name: Run tests
+      run: |  
+        cd bin
+        git clone https://github.com/mne-tools/mne-cpp-test-data.git mne-cpp-test-data
+        Get-ChildItem -Filter test_*.exe | ForEach {&$_.Fullname}
+
+on:
+  push:
+    branches:
+    - master
+    - github_actions
