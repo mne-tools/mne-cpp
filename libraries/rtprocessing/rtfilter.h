@@ -116,6 +116,7 @@ public:
     * @param [out] matDataOut - data which is to be filtered
     *
     */
+
     Eigen::MatrixXd filterChannelsConcurrently(const Eigen::MatrixXd& matDataIn,
                                                int iMaxFilterLength,
                                                const QVector<int>& lFilterChannelList,
@@ -141,14 +142,14 @@ public:
 
     Eigen::MatrixXd filterData(const Eigen::MatrixXd& matDataIn,
                                UTILSLIB::FilterData::FilterType type,
-                               int order,
                                double centerfreq,
                                double bandwidth,
                                double parkswidth,
                                double sFreq,
                                const QVector<int>& lFilterChannelList,
-                               UTILSLIB::FilterData::DesignMethod designMethod = UTILSLIB::FilterData::Cosine,
-                               qint32 fftLength=4096);
+                               int order = 1024,
+                               qint32 fftLength=4096,
+                               UTILSLIB::FilterData::DesignMethod designMethod = UTILSLIB::FilterData::Cosine);
 
 protected:
     Eigen::MatrixXd                 m_matOverlap;                   /**< Last overlap block */
