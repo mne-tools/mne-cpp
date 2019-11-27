@@ -15,8 +15,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+      - uses: fusion-engineering/setup-git-credentials@v2
+        with:
+          credentials: ${{secrets.GIT_CREDENTIALS}}
       - name: Create file
         run: |
+          git config --global user.email lorenzesch@hotmail.com
+          git config --global user.name LorenzE
           fallocate -l 5MB gentoo_root
           # Delete current tag
           git push origin :refs/tags/dev
