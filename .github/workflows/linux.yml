@@ -23,7 +23,7 @@ jobs:
           git config --global user.email lorenzesch@hotmail.com
           git config --global user.name LorenzE
           fallocate -l 5MB gentoo_root
-          # Delete current tag  locally if existent
+          # Delete current tag locally if existent
           if [ $(git tag -l "dev") ]; then
             git tag -d dev
           fi
