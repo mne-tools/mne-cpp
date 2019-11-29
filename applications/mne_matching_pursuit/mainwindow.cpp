@@ -1329,16 +1329,11 @@ void MainWindow::on_btt_Calc_clicked()
 
     if(ui->chb_Iterations->isChecked() && !ui->chb_ResEnergy->isChecked())
         criterion = Iterations;
-    else if(ui->chb_Iterations->isChecked() && ui->chb_ResEnergy->isChecked())
+    if(ui->chb_Iterations->isChecked() && ui->chb_ResEnergy->isChecked())
         criterion = Both;
-    else if(ui->chb_ResEnergy->isChecked() && !ui->chb_Iterations->isChecked())
+    if(ui->chb_ResEnergy->isChecked() && !ui->chb_Iterations->isChecked())
         criterion = SignalEnergy;
-    else
-    {
-        QMessageBox::warning(this, tr("Error"),
-        tr("Criteria not selected, "));
-        criterion = Iterations;
-    }
+
 
     if(ui->btt_Calc->text()== "calculate")
     {
