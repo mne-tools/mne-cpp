@@ -46,6 +46,7 @@
 
 #include <QCoreApplication>
 
+#include <QMessageBox>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -102,6 +103,18 @@ View3DAnalyze::View3DAnalyze(int surface_type)
         m_p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
         m_BrainView->setModel(m_p3DDataModel);
         m_p3DDataModel->addSurfaceSet("Subject01", "Set", SurfaceSet("sample", 2, "white", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects"));
+        break;
+    default:
+    //
+    // other surface_type
+    //
+        QMessageBox::warning(this, tr("Error"),
+        tr("Surface type not recognized, defaulting to 'pial'"));
+
+        m_BrainView = new View3D();
+        m_p3DDataModel = Data3DTreeModel::SPtr(new Data3DTreeModel());
+        m_BrainView->setModel(m_p3DDataModel);
+        m_p3DDataModel->addSurfaceSet("Subject01", "Set", SurfaceSet("sample", 2, "orig", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects"));
         break;
     }
     //A container is created to contain the QWindow that comes from BrainView, then a minimum size is set
