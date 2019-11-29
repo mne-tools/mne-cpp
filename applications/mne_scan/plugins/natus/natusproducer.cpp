@@ -51,7 +51,6 @@
 #include <QDebug>
 #include <QDataStream>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -144,7 +143,7 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
         }
     }
 
-    delete cData;
+    delete[] cData;
 
     if(m_iMatDataSampleIterator+matData.cols() <= m_matData.cols()) {
         m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), matData.cols()) = matData.cast<double>();
