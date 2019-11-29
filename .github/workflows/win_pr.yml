@@ -24,7 +24,8 @@ jobs:
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"        
         echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP
-      run: |        
+      run: |
+        # Setup VS compiler   
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noTests
@@ -48,7 +49,8 @@ jobs:
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"        
         echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP
-      run: |           
+      run: |      
+        # Setup VS compiler     
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noTests
