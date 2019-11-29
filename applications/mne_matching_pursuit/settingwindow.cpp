@@ -57,7 +57,7 @@ settingwindow::settingwindow(QWidget *parent) :    QWidget(parent),    ui(new Ui
 
     set_values();
 
-    cb_item = NULL;
+    cb_item = nullptr;
 }
 
 //*****************************************************************************************************************
