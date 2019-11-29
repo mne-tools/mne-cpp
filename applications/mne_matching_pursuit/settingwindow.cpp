@@ -56,6 +56,8 @@ settingwindow::settingwindow(QWidget *parent) :    QWidget(parent),    ui(new Ui
     connect(this->cb_model, SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(cb_selection_changed(const QModelIndex&, const QModelIndex&)));
 
     set_values();
+
+    cb_item = NULL;
 }
 
 //*****************************************************************************************************************
