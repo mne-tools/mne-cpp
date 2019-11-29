@@ -94,11 +94,12 @@ jobs:
         cd doc
         doxygen mne-cpp_doxyfile
         tar cfvz docu_doxygen.tar.gz html
-    - name: Upload artifact to Github actions log screen
-      uses: actions/upload-artifact@v1
-      with:
-        name: docu_doxygen.tar.gz
-        path: doc/
+    # This produces very big files. Uncomment for now.
+    # - name: Upload artifact to Github actions log screen
+    #   uses: actions/upload-artifact@v1
+    #   with:
+    #     name: docu_doxygen.tar.gz
+    #     path: doc/
     # - name: Setup Github credentials
     #   uses: fusion-engineering/setup-git-credentials@v2
     #   with:
@@ -119,4 +120,11 @@ jobs:
     #     git add *
     #     git add .nojekyll
     #     git commit --amend -a -m 'Update docu'
-    #     git push -f --all
+    #     git push -f --all        
+    # - name: Deploy qch docu data base with dev_build_linux release at Github
+    #   uses: svenstaro/upload-release-action@v1-release
+    #   with:
+    #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+    #     file: doc/qt-creator_doc/mne-cpp.qch
+    #     asset_name: mne-cpp.qch
+    #     tag: dev_build_linux
