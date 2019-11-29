@@ -352,6 +352,7 @@ bool ShmemSocket::connect_client ()
     if (connect_disconnect(sock,id) == FAIL)
     {
         m_iShmemSock = -1;
+        close(sock);
         umask(old_umask);
         return false;
     }
