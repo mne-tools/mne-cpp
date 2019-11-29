@@ -56,6 +56,7 @@
 #include <QApplication>
 #include <QModelIndex>
 #include <QMessageBox>
+#include <QScopedPointer>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -1373,8 +1374,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
         xmlWriter.writeAttribute("atom_count", QString::number(atomCount));
         xmlWriter.writeAttribute("source_dict", partDictName);
 
-        ChirpAtom *cAtom = new ChirpAtom();
-        GaborAtom *gAtom = new GaborAtom();
+        QScopedPointer<ChirpAtom> cAtom(new ChirpAtom());
+        QScopedPointer<GaborAtom> gAtom(new GaborAtom());
 
         if(ui->chb_CombAllPara->isChecked())
         {
@@ -1512,8 +1513,6 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 i++;
             }
         }
-        delete cAtom;
-        delete gAtom;
 
         xmlWriter.writeEndElement();    //build_Atoms
         xmlWriter.writeEndElement();    //COUNT
