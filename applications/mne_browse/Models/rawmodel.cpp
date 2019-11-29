@@ -1107,11 +1107,8 @@ void RawModel::updateOperatorsConcurrently(int windowIndex)
     m_listTmpChData.clear();
 
     //get the rows which are to be filtered out of the m_data matrix. Note that this is done windows wise, hence jumps in the filtered signal might be visible
-    for(qint32 i=0; i < listFilteredChs.size(); ++i) {
-        if(m_bReloadBefore)
-            m_listTmpChData.append(QPair<int,RowVectorXd>(listFilteredChs[i],m_data[windowIndex]->dataRawOrig().row(listFilteredChs[i])));
-        else
-            m_listTmpChData.append(QPair<int,RowVectorXd>(listFilteredChs[i],m_data[windowIndex]->dataRawOrig().row(listFilteredChs[i])));
+    for(qint32 i=0; i < listFilteredChs.size(); ++i) {  
+        m_listTmpChData.append(QPair<int,RowVectorXd>(listFilteredChs[i],m_data[windowIndex]->dataRawOrig().row(listFilteredChs[i])));
     }
 
     qDebug() << "RawModel: Starting of concurrent PROCESSING operation of" << listFilteredChs.size() << "items in m_data block"<<windowIndex;
