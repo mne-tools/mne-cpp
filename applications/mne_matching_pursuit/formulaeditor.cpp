@@ -131,6 +131,7 @@ Formulaeditor::Formulaeditor(QWidget *parent) :    QWidget(parent),    ui(new Ui
 
     callAtomPaintWindow->update();
     //update();
+    m_dFktValue = 0;
 }
 
 //*************************************************************************************************************************************
