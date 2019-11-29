@@ -45,9 +45,9 @@ jobs:
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name $GITHUB_USER
         # Delete current tag locally if existent
-        if [ $(git tag -l "dev_build_win") ]; then
+        if (git tag -l = "dev_build_win"){
           git tag -d dev_build_win
-        fi
+        }
         # Delete current release remotley. This gets rid of the left over draft release. This must be done before deleting the remote tag
         #if [ $(hub release show -f %t dev_build_win) == "dev_build_win" ]; then
         hub release delete dev_build_win
