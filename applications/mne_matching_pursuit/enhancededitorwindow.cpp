@@ -725,256 +725,262 @@ void Enhancededitorwindow::on_pushButton_clicked()
     QString save_path_xml = QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1_xml.pdict").arg(ui->tb_atom_name->text());
     QFile xml_file(save_path_xml);
 
-    xml_file.open(QIODevice::WriteOnly);
-
-    QXmlStreamWriter xmlWriter(&xml_file);
-    xmlWriter.setAutoFormatting(true);
-    xmlWriter.writeStartDocument();
-
-    xmlWriter.writeStartElement("COUNT");
-    xmlWriter.writeAttribute("of_atoms", QString::number(ui->sb_Atomcount->value()));
-    xmlWriter.writeStartElement("built_Atoms");
-
-    xmlWriter.writeAttribute("formula", ui->cb_AtomFormula->currentText());
-    xmlWriter.writeAttribute("sample_count", QString::number(ui->sb_SampleCount->value()));
-    xmlWriter.writeAttribute("atom_count", QString::number(ui->sb_Atomcount->value()));
-    xmlWriter.writeAttribute("source_dict", ui->tb_atom_name->text());
-
-    if (dict.open (QIODevice::WriteOnly| QIODevice::Append))
+    if(xml_file.open(QIODevice::WriteOnly))
     {
-        QTextStream stream( &dict );
-        stream << QString("atomcount = %1 ").arg(_atom_count) << "\n";
-        if(ui->chb_allCombined->isChecked())
+        QXmlStreamWriter xmlWriter(&xml_file);
+        xmlWriter.setAutoFormatting(true);
+        xmlWriter.writeStartDocument();
+
+        xmlWriter.writeStartElement("COUNT");
+        xmlWriter.writeAttribute("of_atoms", QString::number(ui->sb_Atomcount->value()));
+        xmlWriter.writeStartElement("built_Atoms");
+
+        xmlWriter.writeAttribute("formula", ui->cb_AtomFormula->currentText());
+        xmlWriter.writeAttribute("sample_count", QString::number(ui->sb_SampleCount->value()));
+        xmlWriter.writeAttribute("atom_count", QString::number(ui->sb_Atomcount->value()));
+        xmlWriter.writeAttribute("source_dict", ui->tb_atom_name->text());
+
+        if (dict.open (QIODevice::WriteOnly| QIODevice::Append))
         {
-            qint32 atomIndex = 0;
-            qint32 max_a = 1;
-            qint32 max_b = 1;
-            qint32 max_c = 1;
-            qint32 max_d = 1;
-            qint32 max_e = 1;
-            qint32 max_f = 1;
-            qint32 max_g = 1;
-            qint32 max_h = 1;
-
-            if(value_a_list.length() != 0) max_a = value_a_list.length();
-            if(value_b_list.length() != 0) max_b = value_b_list.length();
-            if(value_c_list.length() != 0) max_c = value_c_list.length();
-            if(value_d_list.length() != 0) max_d = value_d_list.length();
-            if(value_e_list.length() != 0) max_e = value_e_list.length();
-            if(value_f_list.length() != 0) max_f = value_f_list.length();
-            if(value_g_list.length() != 0) max_g = value_g_list.length();
-            if(value_h_list.length() != 0) max_h = value_h_list.length();
-
-            qint32 count_h = 0;
-            while(count_h < max_h)
+            QTextStream stream( &dict );
+            stream << QString("atomcount = %1 ").arg(_atom_count) << "\n";
+            if(ui->chb_allCombined->isChecked())
             {
-                qint32 count_g = 0;
-                while(count_g < max_g)
+                qint32 atomIndex = 0;
+                qint32 max_a = 1;
+                qint32 max_b = 1;
+                qint32 max_c = 1;
+                qint32 max_d = 1;
+                qint32 max_e = 1;
+                qint32 max_f = 1;
+                qint32 max_g = 1;
+                qint32 max_h = 1;
+
+                if(value_a_list.length() != 0) max_a = value_a_list.length();
+                if(value_b_list.length() != 0) max_b = value_b_list.length();
+                if(value_c_list.length() != 0) max_c = value_c_list.length();
+                if(value_d_list.length() != 0) max_d = value_d_list.length();
+                if(value_e_list.length() != 0) max_e = value_e_list.length();
+                if(value_f_list.length() != 0) max_f = value_f_list.length();
+                if(value_g_list.length() != 0) max_g = value_g_list.length();
+                if(value_h_list.length() != 0) max_h = value_h_list.length();
+
+                qint32 count_h = 0;
+                while(count_h < max_h)
                 {
-                    qint32 count_f = 0;
-                    while(count_f < max_f)
+                    qint32 count_g = 0;
+                    while(count_g < max_g)
                     {
-                        qint32 count_e = 0;
-                        while(count_e < max_e)
+                        qint32 count_f = 0;
+                        while(count_f < max_f)
                         {
-                            qint32 count_d = 0;
-                            while(count_d < max_d)
+                            qint32 count_e = 0;
+                            while(count_e < max_e)
                             {
-                                qint32 count_c = 0;
-                                while(count_c < max_c)
+                                qint32 count_d = 0;
+                                while(count_d < max_d)
                                 {
-                                    qint32 count_b = 0;
-                                    while(count_b < max_b)
+                                    qint32 count_c = 0;
+                                    while(count_c < max_c)
                                     {
-                                        qint32 count_a = 0;
-                                        while(count_a < max_a)
+                                        qint32 count_b = 0;
+                                        while(count_b < max_b)
                                         {
-                                            qreal temp_a = ui->dsb_StartValueA->value();
-                                            qreal temp_b = ui->dsb_StartValueB->value();
-                                            qreal temp_c = ui->dsb_StartValueC->value();
-                                            qreal temp_d = ui->dsb_StartValueD->value();
-                                            qreal temp_e = ui->dsb_StartValueE->value();
-                                            qreal temp_f = ui->dsb_StartValueF->value();
-                                            qreal temp_g = ui->dsb_StartValueG->value();
-                                            qreal temp_h = ui->dsb_StartValueH->value();
-                                            if(value_a_list.length() > 0) temp_a = value_a_list.at(count_a);
-                                            if(value_b_list.length() > 0) temp_b = value_b_list.at(count_b);
-                                            if(value_c_list.length() > 0) temp_c = value_c_list.at(count_c);
-                                            if(value_d_list.length() > 0) temp_d = value_d_list.at(count_d);
-                                            if(value_e_list.length() > 0) temp_e = value_e_list.at(count_e);
-                                            if(value_f_list.length() > 0) temp_f = value_f_list.at(count_f);
-                                            if(value_g_list.length() > 0) temp_g = value_g_list.at(count_g);
-                                            if(value_h_list.length() > 0) temp_h = value_h_list.at(count_h);
-
-
-                                            Formulaeditor formula_parser;
-
-                                            formula_parser.set_funct_const(0, temp_a);
-                                            formula_parser.set_funct_const(1, temp_b);
-                                            formula_parser.set_funct_const(2, temp_c);
-                                            formula_parser.set_funct_const(3, temp_d);
-                                            formula_parser.set_funct_const(4, temp_e);
-                                            formula_parser.set_funct_const(5, temp_f);
-                                            formula_parser.set_funct_const(6, temp_g);
-                                            formula_parser.set_funct_const(7, temp_h);
-
-                                            results_list.clear();
-                                            VectorXd formel_vec = VectorXd::Zero(_sample_count);
-                                            qreal norm = 0;
-                                            for(qint32 i = 0; i < _sample_count; i++)
+                                            qint32 count_a = 0;
+                                            while(count_a < max_a)
                                             {
-                                                formel_vec[i] = formula_parser.calculation(ui->cb_AtomFormula->currentText(), i);
+                                                qreal temp_a = ui->dsb_StartValueA->value();
+                                                qreal temp_b = ui->dsb_StartValueB->value();
+                                                qreal temp_c = ui->dsb_StartValueC->value();
+                                                qreal temp_d = ui->dsb_StartValueD->value();
+                                                qreal temp_e = ui->dsb_StartValueE->value();
+                                                qreal temp_f = ui->dsb_StartValueF->value();
+                                                qreal temp_g = ui->dsb_StartValueG->value();
+                                                qreal temp_h = ui->dsb_StartValueH->value();
+                                                if(value_a_list.length() > 0) temp_a = value_a_list.at(count_a);
+                                                if(value_b_list.length() > 0) temp_b = value_b_list.at(count_b);
+                                                if(value_c_list.length() > 0) temp_c = value_c_list.at(count_c);
+                                                if(value_d_list.length() > 0) temp_d = value_d_list.at(count_d);
+                                                if(value_e_list.length() > 0) temp_e = value_e_list.at(count_e);
+                                                if(value_f_list.length() > 0) temp_f = value_f_list.at(count_f);
+                                                if(value_g_list.length() > 0) temp_g = value_g_list.at(count_g);
+                                                if(value_h_list.length() > 0) temp_h = value_h_list.at(count_h);
 
-                                                //normalization
-                                                norm = formel_vec.norm();
-                                                if(norm != 0) formel_vec /= norm;
 
-                                                results_list.append(QString::number(formel_vec[i]));
+                                                Formulaeditor formula_parser;
+
+                                                formula_parser.set_funct_const(0, temp_a);
+                                                formula_parser.set_funct_const(1, temp_b);
+                                                formula_parser.set_funct_const(2, temp_c);
+                                                formula_parser.set_funct_const(3, temp_d);
+                                                formula_parser.set_funct_const(4, temp_e);
+                                                formula_parser.set_funct_const(5, temp_f);
+                                                formula_parser.set_funct_const(6, temp_g);
+                                                formula_parser.set_funct_const(7, temp_h);
+
+                                                results_list.clear();
+                                                VectorXd formel_vec = VectorXd::Zero(_sample_count);
+                                                qreal norm = 0;
+                                                for(qint32 i = 0; i < _sample_count; i++)
+                                                {
+                                                    formel_vec[i] = formula_parser.calculation(ui->cb_AtomFormula->currentText(), i);
+
+                                                    //normalization
+                                                    norm = formel_vec.norm();
+                                                    if(norm != 0) formel_vec /= norm;
+
+                                                    results_list.append(QString::number(formel_vec[i]));
+                                                }
+                                                stream << QString("%1_ATOM_%2 \n %3: a: %4 b: %5 c: %6 d: %7 e: %8 f: %9 g: %10 h: %11")
+                                                          .arg(ui->tb_atom_name->text())
+                                                          .arg(atomIndex)
+                                                          .arg(ui->cb_AtomFormula->currentText())
+                                                          .arg(temp_a)
+                                                          .arg(temp_b)
+                                                          .arg(temp_c)
+                                                          .arg(temp_d)
+                                                          .arg(temp_e)
+                                                          .arg(temp_f)
+                                                          .arg(temp_g)
+                                                          .arg(temp_h) << "\n";
+
+                                                for (QStringList::Iterator it = results_list.begin(); it != results_list.end(); it++)
+                                                     stream << *it << "\n";
+
+                                                xmlWriter.writeStartElement("ATOM");
+                                                xmlWriter.writeAttribute("ID", QString::number(atomIndex));
+                                                xmlWriter.writeAttribute("a", QString::number(temp_a));
+                                                xmlWriter.writeAttribute("b", QString::number(temp_b));
+                                                xmlWriter.writeAttribute("c", QString::number(temp_c));
+                                                xmlWriter.writeAttribute("d", QString::number(temp_d));
+                                                xmlWriter.writeAttribute("e", QString::number(temp_e));
+                                                xmlWriter.writeAttribute("f", QString::number(temp_f));
+                                                xmlWriter.writeAttribute("g", QString::number(temp_g));
+                                                xmlWriter.writeAttribute("h", QString::number(temp_h));
+
+                                                xmlWriter.writeStartElement("samples");
+                                                QString samples_to_xml;
+                                                for (qint32 it = 0; it < results_list.length(); it++)
+                                                {
+                                                    samples_to_xml.append(results_list.at(it));
+                                                    samples_to_xml.append(":");
+                                                }
+                                                xmlWriter.writeAttribute("samples", samples_to_xml);
+                                                xmlWriter.writeEndElement();
+
+                                                xmlWriter.writeEndElement();
+
+
+                                               atomIndex++;
+                                               count_a++;
                                             }
-                                            stream << QString("%1_ATOM_%2 \n %3: a: %4 b: %5 c: %6 d: %7 e: %8 f: %9 g: %10 h: %11")
-                                                      .arg(ui->tb_atom_name->text())
-                                                      .arg(atomIndex)
-                                                      .arg(ui->cb_AtomFormula->currentText())
-                                                      .arg(temp_a)
-                                                      .arg(temp_b)
-                                                      .arg(temp_c)
-                                                      .arg(temp_d)
-                                                      .arg(temp_e)
-                                                      .arg(temp_f)
-                                                      .arg(temp_g)
-                                                      .arg(temp_h) << "\n";
-
-                                            for (QStringList::Iterator it = results_list.begin(); it != results_list.end(); it++)
-                                                 stream << *it << "\n";
-
-                                            xmlWriter.writeStartElement("ATOM");
-                                            xmlWriter.writeAttribute("ID", QString::number(atomIndex));
-                                            xmlWriter.writeAttribute("a", QString::number(temp_a));
-                                            xmlWriter.writeAttribute("b", QString::number(temp_b));
-                                            xmlWriter.writeAttribute("c", QString::number(temp_c));
-                                            xmlWriter.writeAttribute("d", QString::number(temp_d));
-                                            xmlWriter.writeAttribute("e", QString::number(temp_e));
-                                            xmlWriter.writeAttribute("f", QString::number(temp_f));
-                                            xmlWriter.writeAttribute("g", QString::number(temp_g));
-                                            xmlWriter.writeAttribute("h", QString::number(temp_h));
-
-                                            xmlWriter.writeStartElement("samples");
-                                            QString samples_to_xml;
-                                            for (qint32 it = 0; it < results_list.length(); it++)
-                                            {
-                                                samples_to_xml.append(results_list.at(it));
-                                                samples_to_xml.append(":");
-                                            }
-                                            xmlWriter.writeAttribute("samples", samples_to_xml);
-                                            xmlWriter.writeEndElement();
-
-                                            xmlWriter.writeEndElement();
-
-
-                                           atomIndex++;
-                                           count_a++;
+                                            count_b++;
                                         }
-                                        count_b++;
+                                        count_c++;
                                     }
-                                    count_c++;
+                                    count_d++;
                                 }
-                                count_d++;
+                                count_e++;
                             }
-                            count_e++;
+                            count_f++;
                         }
-                        count_f++;
+                        count_g++;
                     }
-                    count_g++;
+                    count_h++;
                 }
-                count_h++;
             }
-        }
-        else // not all params combined
-        {
-            qint32 atom_index = 0;
-            while (atom_index < _atom_count)
+            else // not all params combined
             {
-                qreal temp_a = ui->dsb_StartValueA->value();
-                qreal temp_b = ui->dsb_StartValueB->value();
-                qreal temp_c = ui->dsb_StartValueC->value();
-                qreal temp_d = ui->dsb_StartValueD->value();
-                qreal temp_e = ui->dsb_StartValueE->value();
-                qreal temp_f = ui->dsb_StartValueF->value();
-                qreal temp_g = ui->dsb_StartValueG->value();
-                qreal temp_h = ui->dsb_StartValueH->value();
-                if(value_a_list.length() > 0 && atom_index < value_a_list.length()) temp_a = value_a_list.at(atom_index);
-                if(value_b_list.length() > 0 && atom_index < value_b_list.length()) temp_b = value_b_list.at(atom_index);
-                if(value_c_list.length() > 0 && atom_index < value_c_list.length()) temp_c = value_c_list.at(atom_index);
-                if(value_d_list.length() > 0 && atom_index < value_d_list.length()) temp_d = value_d_list.at(atom_index);
-                if(value_e_list.length() > 0 && atom_index < value_e_list.length()) temp_e = value_e_list.at(atom_index);
-                if(value_f_list.length() > 0 && atom_index < value_f_list.length()) temp_f = value_f_list.at(atom_index);
-                if(value_g_list.length() > 0 && atom_index < value_g_list.length()) temp_g = value_g_list.at(atom_index);
-                if(value_h_list.length() > 0 && atom_index < value_h_list.length()) temp_h = value_h_list.at(atom_index);
+                qint32 atom_index = 0;
+                while (atom_index < _atom_count)
+                {
+                    qreal temp_a = ui->dsb_StartValueA->value();
+                    qreal temp_b = ui->dsb_StartValueB->value();
+                    qreal temp_c = ui->dsb_StartValueC->value();
+                    qreal temp_d = ui->dsb_StartValueD->value();
+                    qreal temp_e = ui->dsb_StartValueE->value();
+                    qreal temp_f = ui->dsb_StartValueF->value();
+                    qreal temp_g = ui->dsb_StartValueG->value();
+                    qreal temp_h = ui->dsb_StartValueH->value();
+                    if(value_a_list.length() > 0 && atom_index < value_a_list.length()) temp_a = value_a_list.at(atom_index);
+                    if(value_b_list.length() > 0 && atom_index < value_b_list.length()) temp_b = value_b_list.at(atom_index);
+                    if(value_c_list.length() > 0 && atom_index < value_c_list.length()) temp_c = value_c_list.at(atom_index);
+                    if(value_d_list.length() > 0 && atom_index < value_d_list.length()) temp_d = value_d_list.at(atom_index);
+                    if(value_e_list.length() > 0 && atom_index < value_e_list.length()) temp_e = value_e_list.at(atom_index);
+                    if(value_f_list.length() > 0 && atom_index < value_f_list.length()) temp_f = value_f_list.at(atom_index);
+                    if(value_g_list.length() > 0 && atom_index < value_g_list.length()) temp_g = value_g_list.at(atom_index);
+                    if(value_h_list.length() > 0 && atom_index < value_h_list.length()) temp_h = value_h_list.at(atom_index);
 
-                Formulaeditor formula_parser;
-                formula_parser.set_funct_const(0, temp_a);
-                formula_parser.set_funct_const(1, temp_b);
-                formula_parser.set_funct_const(2, temp_c);
-                formula_parser.set_funct_const(3, temp_d);
-                formula_parser.set_funct_const(4, temp_e);
-                formula_parser.set_funct_const(5, temp_f);
-                formula_parser.set_funct_const(6, temp_g);
-                formula_parser.set_funct_const(7, temp_h);
+                    Formulaeditor formula_parser;
+                    formula_parser.set_funct_const(0, temp_a);
+                    formula_parser.set_funct_const(1, temp_b);
+                    formula_parser.set_funct_const(2, temp_c);
+                    formula_parser.set_funct_const(3, temp_d);
+                    formula_parser.set_funct_const(4, temp_e);
+                    formula_parser.set_funct_const(5, temp_f);
+                    formula_parser.set_funct_const(6, temp_g);
+                    formula_parser.set_funct_const(7, temp_h);
 
-                results_list.clear();
-                for(qint32 i = 0; i < _sample_count; i++)
-                    results_list.append(QString::number(formula_parser.calculation(ui->cb_AtomFormula->currentText(), i)));
+                    results_list.clear();
+                    for(qint32 i = 0; i < _sample_count; i++)
+                        results_list.append(QString::number(formula_parser.calculation(ui->cb_AtomFormula->currentText(), i)));
 
-                stream << QString("%1_ATOM_%2 \n %3: a: %4 b: %5 c: %6 d: %7 e: %8 f: %9 g: %10 h: %11")
-                          .arg(ui->tb_atom_name->text())
-                          .arg(atom_index)
-                          .arg(ui->cb_AtomFormula->currentText())
-                          .arg(temp_a)
-                          .arg(temp_b)
-                          .arg(temp_c)
-                          .arg(temp_d)
-                          .arg(temp_e)
-                          .arg(temp_f)
-                          .arg(temp_g)
-                          .arg(temp_h) << "\n";
+                    stream << QString("%1_ATOM_%2 \n %3: a: %4 b: %5 c: %6 d: %7 e: %8 f: %9 g: %10 h: %11")
+                              .arg(ui->tb_atom_name->text())
+                              .arg(atom_index)
+                              .arg(ui->cb_AtomFormula->currentText())
+                              .arg(temp_a)
+                              .arg(temp_b)
+                              .arg(temp_c)
+                              .arg(temp_d)
+                              .arg(temp_e)
+                              .arg(temp_f)
+                              .arg(temp_g)
+                              .arg(temp_h) << "\n";
 
-               for (QStringList::Iterator it = results_list.begin(); it != results_list.end(); it++)
-                    stream << *it << "\n";
+                   for (QStringList::Iterator it = results_list.begin(); it != results_list.end(); it++)
+                        stream << *it << "\n";
 
-               xmlWriter.writeStartElement("ATOM");
-               xmlWriter.writeAttribute("ID", QString::number(atom_index));
-               xmlWriter.writeAttribute("a", QString::number(temp_a));
-               xmlWriter.writeAttribute("b", QString::number(temp_b));
-               xmlWriter.writeAttribute("c", QString::number(temp_c));
-               xmlWriter.writeAttribute("d", QString::number(temp_d));
-               xmlWriter.writeAttribute("e", QString::number(temp_e));
-               xmlWriter.writeAttribute("f", QString::number(temp_f));
-               xmlWriter.writeAttribute("g", QString::number(temp_g));
-               xmlWriter.writeAttribute("h", QString::number(temp_h));
+                   xmlWriter.writeStartElement("ATOM");
+                   xmlWriter.writeAttribute("ID", QString::number(atom_index));
+                   xmlWriter.writeAttribute("a", QString::number(temp_a));
+                   xmlWriter.writeAttribute("b", QString::number(temp_b));
+                   xmlWriter.writeAttribute("c", QString::number(temp_c));
+                   xmlWriter.writeAttribute("d", QString::number(temp_d));
+                   xmlWriter.writeAttribute("e", QString::number(temp_e));
+                   xmlWriter.writeAttribute("f", QString::number(temp_f));
+                   xmlWriter.writeAttribute("g", QString::number(temp_g));
+                   xmlWriter.writeAttribute("h", QString::number(temp_h));
 
-               xmlWriter.writeStartElement("samples");
-               QString samples_to_xml;
-               for (qint32 it = 0; it < results_list.length(); it++)
-               {
-                   samples_to_xml.append(results_list.at(it));
-                   samples_to_xml.append(":");
-               }
-               xmlWriter.writeAttribute("samples", samples_to_xml);
-               xmlWriter.writeEndElement();
+                   xmlWriter.writeStartElement("samples");
+                   QString samples_to_xml;
+                   for (qint32 it = 0; it < results_list.length(); it++)
+                   {
+                       samples_to_xml.append(results_list.at(it));
+                       samples_to_xml.append(":");
+                   }
+                   xmlWriter.writeAttribute("samples", samples_to_xml);
+                   xmlWriter.writeEndElement();
 
-               xmlWriter.writeEndElement();
+                   xmlWriter.writeEndElement();
 
 
-               atom_index++;
+                   atom_index++;
+                }
             }
+            dict.close();
         }
-        dict.close();
+        xmlWriter.writeEndElement();
+        xmlWriter.writeEndElement();
+        xmlWriter.writeEndDocument();
+
+        xml_file.close();
+
+        emit dict_saved();
     }
-    xmlWriter.writeEndElement();
-    xmlWriter.writeEndElement();
-    xmlWriter.writeEndDocument();
-
-    xml_file.close();    
-
-    emit dict_saved();
+    else
+    {
+        QMessageBox::warning(this, tr("Error"),
+        tr(".xml file not found"));
+    }
 }
