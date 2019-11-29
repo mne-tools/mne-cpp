@@ -709,69 +709,76 @@ void MainWindow::read_fiff_file_new(QString file_name)
 bool MainWindow::read_matlab_file(QString fileName)
 {
     QFile file(fileName);
-    file.open(QIODevice::ReadOnly);
-
-    QTextStream stream(&file);
-    bool isFloat;
-
-    _matlab_channels = stream.readAll().split('\n', QString::SkipEmptyParts);
-
-    for(qint32 k = 0; k < _matlab_channels.length(); k++)
+    if(file.open(QIODevice::ReadOnly))
     {
-        qint32 row_number = 0;
-        QStringList signal_samples = _matlab_channels.at(k).split(',', QString::SkipEmptyParts);
 
-        if(k==0)
+        QTextStream stream(&file);
+        bool isFloat;
+
+        _matlab_channels = stream.readAll().split('\n', QString::SkipEmptyParts);
+
+        for(qint32 k = 0; k < _matlab_channels.length(); k++)
         {
-            _first_sample = 0;
-            _last_sample = signal_samples.length() - 1;
-            _from = _first_sample;
+            qint32 row_number = 0;
+            QStringList signal_samples = _matlab_channels.at(k).split(',', QString::SkipEmptyParts);
 
-            if(_from + 511 <= _last_sample)
-                _to = _from + 511;
-            else
-                _to = _last_sample;
-
-            _signal_matrix = MatrixXd::Zero(_to - _from + 1, _matlab_channels.length());
-        }
-
-        for(qint32 i = _from; i <= _to; i++)
-        {
-            qreal value = signal_samples.at(i).toFloat(&isFloat);
-            if(!isFloat)
+            if(k==0)
             {
-                _signal_matrix = MatrixXd::Zero(0, 0);
-                QMessageBox::critical(this, "error", QString("error reading matlab file. Could not read line %1 from file %2.").arg(i).arg(fileName));
-                //reset ui
-                ui->tbv_Results->clear();
-                ui->tbv_Results->clearContents();
-                ui->tbv_Results->setRowCount(0);
-                ui->tbv_Results->setColumnCount(0);
-                ui->btt_Calc->setDisabled(true);
-                //reset progressbar text color to black
-                pal.setColor(QPalette::Text, Qt::black);
-                ui->progressBarCalc->setPalette(pal);
-                ui->progressBarCalc->setFormat("residual energy: 100%            iterations: 0");
-                //reset infolabels
-                ui->lb_signal_energy->setHidden(true);
-                ui->lb_signal_energy_text->setHidden(true);
-                ui->lb_approx_energy->setHidden(true);
-                ui->lb_approx_energy_text->setHidden(true);
-                ui->lb_residual_energy->setHidden(true);
-                ui->lb_residual_energy_text->setHidden(true);
+                _first_sample = 0;
+                _last_sample = signal_samples.length() - 1;
+                _from = _first_sample;
 
-                is_white = false;
+                if(_from + 511 <= _last_sample)
+                    _to = _from + 511;
+                else
+                    _to = _last_sample;
 
-                is_saved = false;
-                has_warning = false;
-                return false;
+                _signal_matrix = MatrixXd::Zero(_to - _from + 1, _matlab_channels.length());
             }
-            _signal_matrix(row_number, k) = value;
-            row_number++;
-        }
-    }
-    file.close();
 
+            for(qint32 i = _from; i <= _to; i++)
+            {
+                qreal value = signal_samples.at(i).toFloat(&isFloat);
+                if(!isFloat)
+                {
+                    _signal_matrix = MatrixXd::Zero(0, 0);
+                    QMessageBox::critical(this, "error", QString("error reading matlab file. Could not read line %1 from file %2.").arg(i).arg(fileName));
+                    //reset ui
+                    ui->tbv_Results->clear();
+                    ui->tbv_Results->clearContents();
+                    ui->tbv_Results->setRowCount(0);
+                    ui->tbv_Results->setColumnCount(0);
+                    ui->btt_Calc->setDisabled(true);
+                    //reset progressbar text color to black
+                    pal.setColor(QPalette::Text, Qt::black);
+                    ui->progressBarCalc->setPalette(pal);
+                    ui->progressBarCalc->setFormat("residual energy: 100%            iterations: 0");
+                    //reset infolabels
+                    ui->lb_signal_energy->setHidden(true);
+                    ui->lb_signal_energy_text->setHidden(true);
+                    ui->lb_approx_energy->setHidden(true);
+                    ui->lb_approx_energy_text->setHidden(true);
+                    ui->lb_residual_energy->setHidden(true);
+                    ui->lb_residual_energy_text->setHidden(true);
+
+                    is_white = false;
+
+                    is_saved = false;
+                    has_warning = false;
+                    return false;
+                }
+                _signal_matrix(row_number, k) = value;
+                row_number++;
+            }
+        }
+        file.close();
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Error"),
+        tr("Unable to open matlab file."));
+        return false;
+    }
     _sample_rate = 1;
     ui->dsb_sample_rate->setValue(_sample_rate);
 
