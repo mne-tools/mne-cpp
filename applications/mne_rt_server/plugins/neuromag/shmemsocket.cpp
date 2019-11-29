@@ -315,7 +315,7 @@ bool ShmemSocket::connect_client ()
     int id = m_iShmemId;
 
     struct  sockaddr_un clntaddr;   /* address of client */
-    char    client_path[200];       /* This our path */
+    char    client_path[108];       /* This our path */
     int     sock = -1;              /* This is the UNIX domain socket */
 
     sprintf (client_path,"%s%d",SOCKET_PATHCLNT,id);
