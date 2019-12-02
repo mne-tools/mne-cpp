@@ -45,7 +45,6 @@ SUBDIRS += \
     ex_cancel_noise \
     ex_evoked_grad_amp \
     ex_fiff_io \
-    ex_filtering \
     ex_find_evoked \
     ex_inverse_mne \
     ex_make_inverse_operator \
@@ -70,6 +69,7 @@ SUBDIRS += \
             ex_disp \
             ex_disp_3D \
             ex_fs_surface \
+            ex_filtering \
             ex_histogram \
             ex_inverse_mne_raw \
             ex_inverse_pwl_rap_music \
