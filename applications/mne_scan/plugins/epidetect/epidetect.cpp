@@ -80,6 +80,7 @@ Epidetect::Epidetect()
     m_iListLength = 20;
     m_iFuzzyEnStep = 12;
     m_iChWeight = 15;
+    m_dMuGes = 0;
 }
 
 
