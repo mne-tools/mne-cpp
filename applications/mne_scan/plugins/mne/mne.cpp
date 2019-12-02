@@ -107,6 +107,7 @@ MNE::MNE()
 , m_sAvrType("3")
 , m_pMinimumNormSettingsView(MinimumNormSettingsView::SPtr::create())
 , m_sMethod("dSPM")
+, m_iTimePointSps(-1)
 {
 
 }
