@@ -57,7 +57,6 @@
 #include <sys/socket.h> //AF_UNIX
 #include <sys/shm.h>    //shmdt
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -187,21 +186,11 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
 
             if (interesting_data(mess.kind))
             {
-                if(p_pTag->size() >= mess.size)
-                {
-                    memcpy(p_pTag->data(),shmBlock->data,mess.size);
-                    data_ok = 1;
-                    #ifdef DEBUG
-                    printf("client # %d read shmem buffer # %d\n", m_iShmemId, mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
-                    #endif
-                } else
-                {
-                    memcpy(p_pTag->data(),shmBlock->data,p_pTag->size());
-                    data_ok = 1;
-                    #ifdef DEBUG
-                    printf("client # %d read shmem buffer # %d\n", m_iShmemId, mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
-                    #endif
-                }
+                memcpy(p_pTag->data(),shmBlock->data,mess.size);
+                data_ok = 1;
+            #ifdef DEBUG
+                printf("client # %d read shmem buffer # %d\n", m_iShmemId, mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
+            #endif
             }
             /*
             * Indicate that this client has processed the data
@@ -383,6 +372,7 @@ int ShmemSocket::disconnect_client ()
     int result = connect_disconnect(sock,-id);
     if (result != FAIL)
     {
+        qWarning("connect_disconnect did not close socket. attempting to close socket again.");
         this->close_socket();
     }
     return (result);
