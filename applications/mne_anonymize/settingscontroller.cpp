@@ -108,11 +108,11 @@ void SettingsController::initParser()
     m_parser.addHelpOption();
     m_parser.addVersionOption();
 
-    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Wildcards (like '*' or '?') are allowed and several --in <infile> statements can be present."),
+    QCommandLineOption inFileOpt(QStringList() << "i" << "in",QCoreApplication::translate("main","File to anonymize. Wildcards (like '*' or '?') are allowed and several --in <infile> statements can be present. -i can be used as well"),
                                  QCoreApplication::translate("main","infile"));
     m_parser.addOption(inFileOpt);
 
-    QCommandLineOption outFileOpt("out",QCoreApplication::translate("main","Output file <outfile>. Only allowed when anonymizing one single file."),
+    QCommandLineOption outFileOpt(QStringList() << "o" << "out",QCoreApplication::translate("main","Output file <outfile>. Only allowed when anonymizing one single file. -o or --out"),
                                   QCoreApplication::translate("main","outfile"));
     m_parser.addOption(outFileOpt);
 
@@ -249,15 +249,23 @@ void SettingsController::parseInputs(const QStringList& arguments)
 
 void SettingsController::parseInputAndOutputFiles()
 {
+    QStringList inFilesAux{};
     if(m_parser.isSet("in")) {
-        QStringList inFilesAux(m_parser.values("in"));
+//        QStringList inFilesAux(m_parser.values("in");
+        for(QString f: m_parser.values("in")) {
+            inFilesAux.append(f);
+        }
+        }
 
-        qDebug() << inFilesAux.count();
+        qDebug() << "Count of items in Qlist: " + qvariant_cast<QString>(inFilesAux.count());
+        qDebug() << "Each input item";
+        for(QString f: inFilesAux){
+        qDebug() << "Filename: " + f;
+        }
 
         for(QString f: inFilesAux) {
             m_SLInFiles.append(listFilesMatchingPatternName(f));
         }
-    }
 
     if(m_SLInFiles.count() == 0) {
         qDebug() << "Error. No valid input files.";
@@ -318,7 +326,7 @@ void SettingsController::generateAnonymizerInstances()
     }
 
     if(m_bMultipleInFiles) {
-        for(int i=0; i< m_SLInFiles.size(); ++i) {
+        for(int i=0; i<= m_SLInFiles.size(); ++i) {
             QSharedPointer<FiffAnonymizer> pAppAux(new FiffAnonymizer(m_anonymizer));
             pAppAux->setFileIn(m_SLInFiles.at(i));
             pAppAux->setFileOut(m_SLOutFiles.at(i));
