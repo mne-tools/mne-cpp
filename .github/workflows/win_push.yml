@@ -7,36 +7,39 @@ on:
     - github_actions
 
 jobs:
-  Release2019:
-    runs-on: windows-latest
+  # Test windows-latest runner (only includes VS2019)
+  # Release2019:
+  #   runs-on: windows-latest
 
-    steps:
-    - name: Clone repository
-      uses: actions/checkout@v1
-    - name: Install Qt
-      run: | 
-        pip3 install setuptools wheel
-        pip3 install aqtinstall --pre
-        python -m aqt install --outputdir $HOME\Qt 5.10.1 windows desktop win64_msvc2017_64 --module qtcharts
-        echo "::add-path::$HOME\Qt\5.10.1\msvc2017_64\bin"
-    - name: Install jom
-      run: |
-        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"        
-        echo "::add-path::$HOME\jom"
-    - name: Configure and compile MNE-CPP
-      run: |        
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        qmake -r MNECPP_CONFIG+=noTests
-        jom -j2
+  #   steps:
+  #   - name: Clone repository
+  #     uses: actions/checkout@v1
+  #   - name: Install Qt
+  #     run: | 
+  #       pip3 install setuptools wheel
+  #       pip3 install aqtinstall --pre
+  #       python -m aqt install --outputdir $HOME\Qt 5.10.1 windows desktop win64_msvc2017_64 --module qtcharts
+  #       echo "::add-path::$HOME\Qt\5.10.1\msvc2017_64\bin"
+  #   - name: Install jom
+  #     run: |
+  #       Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+  #       expand-archive -path "jom.zip" -destinationpath "$HOME\jom"        
+  #       echo "::add-path::$HOME\jom"
+  #   - name: Configure and compile MNE-CPP
+  #     run: |        
+  #       cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+  #       Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+  #       qmake -r MNECPP_CONFIG+=noTests
+  #       jom -j2
 
   Release:
     runs-on: windows-2016
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v1      
+    - name: Install hub
+      uses: geertvdc/setup-hub@v1.0.0
     - name: Install Qt
       run: | 
         pip3 install setuptools wheel

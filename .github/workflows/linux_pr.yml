@@ -84,6 +84,7 @@ jobs:
       uses: actions/checkout@v1
     - name: Install Qt Dev Tools, Doxygen and Graphviz
       run: |
+        sudo apt-get update -qq
         sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
     - name: Run Doxygen and package result
       run: |        
