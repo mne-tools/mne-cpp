@@ -88,7 +88,8 @@ CalcMetric::CalcMetric()
     m_bSetNewFuzzyEn = false;
     m_bSetNewKurtosis = false;
     m_bHistoryReady=false;
-
+    m_iChannelCount = 0;
+    m_iDataLength = 0;
 }
 
 
