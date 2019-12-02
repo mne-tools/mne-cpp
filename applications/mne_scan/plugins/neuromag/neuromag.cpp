@@ -97,6 +97,8 @@ Neuromag::Neuromag()
 , m_iActiveConnectorId(0)
 , m_bWriteToFile(false)
 , m_iRecordingMSeconds(5*60*1000)
+, m_iBlinkStatus(-1)
+, m_iSplitCount(0)
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
     m_pActionSetupProject->setStatusTip(tr("Setup Project"));
