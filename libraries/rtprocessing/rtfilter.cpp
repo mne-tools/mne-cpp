@@ -188,11 +188,11 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
     QList<FilterData> filterList;
     filterList << filter;
 
-    // slice input data in to data junks with proper length for fft
+    // slice input data into data junks with proper length for fft
     int iSize = fftLength-order;
     if(matDataIn.cols() > iSize) {
         int from = 0;                           //
-        int numSlices = ceil(float(matDataIn.cols())/float(iSize));       //calulate number of data slices
+        int numSlices = ceil(float(matDataIn.cols())/float(iSize));       //calculate number of data slices
         for (int i = 0; i<numSlices; i++) {
             if(i == numSlices-1) {
                 //catch the last one that might be shorter then original size
@@ -207,6 +207,5 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
     else{
         matDataOut = filterChannelsConcurrently(matDataIn,order,lFilterChannelList,filterList);
     }
-    // slice matDataOut back to original size
     return matDataOut;
 }
