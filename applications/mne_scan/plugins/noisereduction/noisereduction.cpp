@@ -97,6 +97,7 @@ NoiseReduction::NoiseReduction()
 , m_sCurrentSystem("VectorView")
 , m_pRTMSA(RealTimeMultiSampleArray::SPtr(new RealTimeMultiSampleArray()))
 , m_pRtFilter(RTPROCESSINGLIB::RtFilter::SPtr::create())
+, m_iMaxFilterLength(1)
 {
     if(m_sCurrentSystem == "BabyMEG") {
         m_iNBaseFctsFirst = 270;
