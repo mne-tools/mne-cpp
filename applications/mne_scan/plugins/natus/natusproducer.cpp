@@ -50,6 +50,7 @@
 
 #include <QDebug>
 #include <QDataStream>
+#include <QScopedArrayPointer>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -128,10 +129,11 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
 
     // Read actual data
     int iDataSize = int(fNumberSamples * fNumberChannels);
-    char *cData = new char[iDataSize*sizeof(float)];
-    stream.readRawData(cData, iDataSize*sizeof(float));
+    QScopedArrayPointer<char> cData(new char[iDataSize*sizeof(float)]);
+    //char *cData = new char[iDataSize*sizeof(float)];
+    stream.readRawData(cData.data(), iDataSize*sizeof(float));
 
-    float* fData = reinterpret_cast<float*>(cData);
+    float* fData = reinterpret_cast<float*>(cData.data());
 
     //Get data
     Eigen::MatrixXf matData;
@@ -143,7 +145,6 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
         }
     }
 
-    delete[] cData;
 
     if(m_iMatDataSampleIterator+matData.cols() <= m_matData.cols()) {
         m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), matData.cols()) = matData.cast<double>();
