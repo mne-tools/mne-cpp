@@ -144,21 +144,19 @@ int main(int argc, char *argv[])
     MatrixXd times;
 
     // initialize filter settings
-
     QString filter_name =  "example_cosine";
     FilterData::FilterType type = FilterData::BPF;
-    double sFreq = raw.info.sfreq;                                          //  get Sample freq from Data
-    double centerfreq = 10/(sFreq/2.0);                                     //  normed nyquist freq.
+    double sFreq = raw.info.sfreq;                                          // get Sample freq from Data
+    double centerfreq = 10/(sFreq/2.0);                                     // normed nyquist freq.
     double bandwidth = 10/(sFreq/2.0);
     double parkswidth = 1/(sFreq/2.0);
 
 
-    RtFilter rtFilter;
-    MatrixXd dataFiltered;                                          //  output matrix of filteriung
+    RtFilter rtFilter;                                                      // filter object
+    MatrixXd dataFiltered;                                                  // filter output
 
-    // create Channel index Vector for Filtering
-    // size = number of channels; value = index of channel number
-
+    // channel selection - in this case use every channel
+    // size = number of channels; value = index channel number
     QVector<int> channelList(raw.info.nchan);
     for (int i = 0; i < raw.info.nchan; i++){
         channelList[i] = i;
@@ -177,14 +175,8 @@ int main(int argc, char *argv[])
 
         //Filtering
         printf("Filtering...");
-        timer.start();
         dataFiltered = rtFilter.filterData(data,type,centerfreq,bandwidth,parkswidth,sFreq,channelList);
-        qDebug() << "The slow operation took" << timer.elapsed() << "milliseconds";
         printf("[done]\n");
-
-//        //  Save ata before and after filtering into .csv files for intermediate result
-//        IOUtils::write_eigen_matrix(data,"data.csv");
-//        IOUtils::write_eigen_matrix(dataFiltered,"dataFiltered.csv");
 
         //Writing
         printf("Writing...");
