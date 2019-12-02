@@ -70,21 +70,20 @@
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-
-//=============================================================================================================
-
-
 /**
  * @brief Creates a QApplication or a QCoreApplication according tu user's preference for a command line or a
  *  GUI application.
- * @details  Handles input arguments and searches for a "--no-gui" option. If found, this will create a
+ *
+ * @details Handles input arguments and searches for a "--no-gui" option. If found, this will create a
  *  QCoreApplication so that main can execute the appplication as a command line one. If not found, it creates a
- * or a QApplication depending on
  *  QApplication so that main can execute a GUI.
+ *
  * @see QT Documentation
  * @see https://doc.qt.io/qt-5/qapplication.html#details
+ *
  * @param [in] argc (argument count) number of arguments on the command line.
  * @param [in] argv (argument vector) an array of pointers to arrays of characters.
+ *
  * @return Pointer to a QApplication or a QCoreApplication.
  */
 QCoreApplication* createApplication(int &argc, char *argv[])
@@ -105,6 +104,7 @@ QCoreApplication* createApplication(int &argc, char *argv[])
 *
 * @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
 * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+*
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
 int main(int argc, char* argv[])
