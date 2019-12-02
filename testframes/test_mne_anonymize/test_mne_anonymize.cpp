@@ -286,7 +286,7 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
     MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
 
     QFile fFileOut(sFileOut);
-    FIFFLIB::FiffStream::SPtr outStream(&fFileOut);
+    FiffStream::SPtr outStream(new FiffStream(&fFileOut));
     if(outStream->open(QIODevice::ReadOnly))
     {
         qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - output file opened correctly " << sFileIn;
@@ -323,7 +323,7 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
     MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
 
     QFile fFileOut(sFileOut);
-    FIFFLIB::FiffStream::SPtr outStream(&fFileOut);
+    FiffStream::SPtr outStream(new FiffStream(&fFileOut));
     if(outStream->open(QIODevice::ReadOnly))
     {
         qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - output file opened correctly " << sFileIn;
@@ -357,7 +357,7 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
     MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
 
     QFile fFileOut(sFileOut);
-    FIFFLIB::FiffStream::SPtr outStream(&fFileOut);
+    FiffStream::SPtr outStream(new FiffStream(&fFileOut));
     if(outStream->open(QIODevice::ReadOnly))
     {
         qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - output file opened correctly " << sFileIn;
@@ -404,7 +404,7 @@ void TestMneAnonymize::verifyCRC(const QString file,
 
 //*************************************************************************************************************
 
-void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
+void TestMneAnonymize::verifyTags(FiffStream::SPtr &stream,
                                   bool SubjBirthdayOffset,
                                   bool MeasDateOffset,
                                   bool BruteMode)

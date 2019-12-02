@@ -109,6 +109,7 @@ public:
     //=========================================================================================================
     /**
     * Copy constructor for FiffAnonymizer object.
+    *
     * @param [in] A FiffAnonyzer object.
     */
     FiffAnonymizer(const FiffAnonymizer& obj);
@@ -116,6 +117,7 @@ public:
     //=========================================================================================================
     /**
     * Move contructor
+    *
     * @param [in] a FiffAnonymizer object.
     */
     FiffAnonymizer(FiffAnonymizer &&obj);
@@ -123,6 +125,7 @@ public:
     //=========================================================================================================
     /**
     * Calls the anonymizer routine.
+    *
     * @details This method is the main method in the class. It goes through the input file and tag by tag
     *   analyses if there might be some relevant information to anonymize and eventually does so.
     *   Finally the method would test if the input file should be deleted or renamed according to the
@@ -134,6 +137,7 @@ public:
     // PUBLIC INTERFACE
     /**
     * Specifies the input file to anonymize. This file will help to set a input Fiffstream object.
+    *
     * @param [in] String containing the input file name including its path.
     */
     void setFileIn(const QString &sFilePathIn);
@@ -141,6 +145,7 @@ public:
     //=========================================================================================================
     /**
     * Specifies the output file to anonymize. This file will help to set a output Fiffstream object.
+    *
     * @param [in] String containing the output file name including its path.
     */
     void setFileOut(const QString &sFilePathOut);
@@ -150,6 +155,7 @@ public:
     * Sets the state of the FiffAnonymizer object's desired verbose mode. If set to TRUE, different messages will be
     * printed on screen during the anonymizing process. If set to false only a single line confirmation message will be
     * printed on each execution.
+    *
     * @param [in] Bool argument. [Default=FALSE]
     */
     void setVerboseMode(bool v);
@@ -172,6 +178,7 @@ public:
     * Sets the state of the FiffAnonymizer object's desired anonymization mode. If set to TRUE, apart from the default information
     * additional information will also be anonymized, like Subject's weight, height, or different project information.
     * printed on screen during the anonymizing process. [Default=FALSE].
+    *
     * @param [in] Bool argument.
     */
     void setBruteMode(bool b);
@@ -186,6 +193,7 @@ public:
     //=========================================================================================================
     /**
     * If found in the fiff file, the specified number of days will be subtracted from the measurement date information contained in each fif file.
+    *
     * @param [in] Integer with the number of dates to subtract from the measurement date.
     */
     void setMeasurementDayOffset(int d);
@@ -193,6 +201,7 @@ public:
     //=========================================================================================================
     /**
     * If found in the fiff file, subject's birthday information will be overwritten in the file in order to match the date specified with this function.
+    *
     * @param [in] String containing the desired measurement date.
     */
     void setSubjectBirthday(QString d);
@@ -200,6 +209,7 @@ public:
     //=========================================================================================================
     /**
     * If found in the fiff file, the specified number of days will be subtracted from the subject's birthday date information contained in each fif file.
+    *
     * @param [in] Integer with the number of dates to subtract from the subject's birthday date.
     */
     void setSubjectBirthdayOffset(int d);
@@ -209,6 +219,7 @@ public:
     * Sets fiffanonymizer to delete the input file after anonymization finishes. This is intended to avoid duplication of disk space usage.
     * If set to true, by its own, a confirmation message will be prompted to the user. Used with the --delete_input_file_after option.
     * It can be used with the option "avoid_delete_confirmation" so that no confirmation is prompt to the user.
+    *
     * @param [in] Bool argument. [Default=FALSE]
     */
     void setDeleteInputFileAfter(bool d);
@@ -218,6 +229,7 @@ public:
     * Method to avoid the need to prompt the user for confirmation of deletion of the input file after anonymization has finished.
     * As the deletion flag has to manually be set to true and this confirmation flag has to manually be set to false, the chances of
     * a user disadvertently deleted a relevant input file are (hopefully) minimized.
+    *
     * @param [in] Bool argument. [Default=TRUE]
     */
     void setDeleteInputFileAfterConfirmation(bool dc);
@@ -226,6 +238,7 @@ public:
     /**
     * Specifies a flag so that the user can specifiy the value of the subject's id tag. If found in the fiff file, the value
     * will be changed to match the one specified with this method.
+    *
     * @param [in] Integer with the subject's id.
     */
     void setSubjectHisId(QString id);
@@ -236,6 +249,7 @@ public:
     //=========================================================================================================
     /**
     * Returns the default string value to be used as substitution of other strings in the fiff file.
+    *
     * @returns [out] value of m_sDefaultString
     */
     QString getDefaultString();
@@ -366,10 +380,6 @@ public:
     */
     QString getDefaultProjectComment();
 
-
-    //APP SET POINT. applications behaviour options
-    //
-    //=========================================================================================================
     /**
     * Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.
     */
@@ -423,9 +433,7 @@ public:
     */
     QString getsFileNameOut();
 
-
 private:
-
     //=========================================================================================================
     /**
     * Updates a stack (m_pBlockTyeList points to it) with the type of block the input stream is in.
@@ -435,6 +443,7 @@ private:
     * are we in, while reading. We do this by checking the first element in this stack (see censorTag() in case
     * FIFF_COMMENT.
     * This is a refactoring method, designed to make anonymizeFile() more readable.
+    *
     * @param [in] pointer to the tag being read. Normally the input Tag.
     */
     void updateBlockTypeList(FIFFLIB::FiffTag::SPtr pTag);
@@ -444,6 +453,7 @@ private:
     * Acquisition sw stamps in the fiff file the version of the fiff standard used to code the fiff file. This
     * anonymizer class has been developed according to a specific fiff version of this standard. If in the future,
     * this standard were to change, it should be noted through this method.
+    *
     * @param [in] pointer to the tag being read. Normally, the input Tag.
     */
     bool checkValidFiffFormatVersion(FIFFLIB::FiffTag::SPtr pTag);
@@ -453,6 +463,7 @@ private:
     * For a specific input tag, check if that tag belongs to a set of tags where relevant information should be
     * censored/anonymized. If so, perform such anonymization while copying the new tag into an output Tag.
     * This is the core method of the class where the actual anonymization takes place.
+    *
     * @param [in] pointer to the input tag being read from the input file.
     * @param [in] pointer to the output tag being written to the output file.
     */
@@ -466,6 +477,7 @@ private:
     * anonymized tags, it has to be reworked. The fiff standard does not mandate to have this directory but it
     * seems convinient to build it. We do this on-the-fly, while reading each tag. And store all the info for the
     * directory inside m_pOutDir vector.
+    *
     * @param [in] pointer to the tag being read. Normally the input tag.
     * @param [in] actual file position of the input file (relative to the begining of the file).
     */
@@ -491,6 +503,7 @@ private:
     /**
     * This stores the vector containing the tag directory. This vector was populated on-line while going through
     * the anonymizeFile method. Once the reading is finished the data needs to be saved in the output file.
+    *
     * @param [in] output file stream
     * @param [in] position in the file where the data can be written. (optional).
     */
@@ -505,6 +518,7 @@ private:
     * offset bytes since the begining of the file. As off fiff version 1.3 these pointers can be i. pointer to
     * the tag directory, ii. pointer to free space in the file (free block list). iii. nil pointer at the end of
     * the file (this one really contains no address info (duh!).
+    *
     * @param [in] output stream
     * @param [in] tag kind code to search for
     * @param [in] new position to store in the data field of the pointer tag.
@@ -518,6 +532,7 @@ private:
     * verbose mode, it does nothing. Messages can be printed to a single line (followed by an eol character) or
     * can be printed in the same line as previous one. Note that to achieve this, messages will be "retained" one
     * call, in order to check if next call requests to print in the same line.
+    *
     * @param [in] String to print.
     * @param [in] bool value to indicate if the message should be printed to the same line as the previous message.
     */
@@ -570,28 +585,28 @@ private:
     void renameOutputFileAsInputFile();
 
     //App anonymization values
-    QString m_sDefaultString;                   /**< String to be used as substitution of other strings in a fiff file */
-    QDateTime m_dateDefaultDate;                /**< Date to be used as substitution of dates found in a fiff file */
-    QDateTime m_dateMeasurmentDate;      /**< Date to substitute the measuremnt date appearing in the file.*/
-    bool m_bUseMeasurementDayOffset;            /**< Flags to use Measurement-date days offset.*/
-    int  m_iMeasurementDayOffset;               /**< Number of days to subtract from the measurement date.*/
-    QDateTime m_dateSubjectBirthday;            /**< Subject's birthday substitutor.*/
-    bool m_bUseSubjectBirthdayOffset;           /**< Flags use of Subject's birthday offset.*/
-    int  m_iSubjectBirthdayOffset;              /**< Subjects's birthday offset.*/
-    FIFFLIB::fiff_int_t m_BDfltMAC[2];          /**< MAC addresss substitutor.*/
-    int m_iDfltSubjectId;                       /**< Subject's id substitutor.*/
-    QString m_sSubjectFirstName;         /**< Subject's first name substitutor.*/
-    QString m_sSubjectMidName;           /**< Subject's middle name substitutor.*/
-    QString m_sSubjectLastName;          /**< Subject's last name substitutor.*/
-    int m_iSubjectWeight;                /**< Subject's weight substitutor.*/
-    int m_iSubjectHeight;                /**< Subject's height substitutor.*/
-    QString m_sSubjectComment;           /**< Subject's comment substitutor.*/
-    QString m_sSubjectHisId;             /**< Subject's HIS ID substitutor.*/
-    int m_iProjectId;                    /**< Project's id# substitutor.*/
-    QString m_sProjectName;              /**< Project's name substitutor.*/
-    QString m_sProjectAim;               /**< Project's aim substitutor.*/
-    QString m_sProjectPersons;           /**< Project's Persons substitutor.*/
-    QString m_sProjectComment;           /**< Project's comment substitutor.*/
+    QString m_sDefaultString;           /**< String to be used as substitution of other strings in a fiff file */
+    QDateTime m_dateDefaultDate;        /**< Date to be used as substitution of dates found in a fiff file */
+    QDateTime m_dateMeasurmentDate;     /**< Date to substitute the measuremnt date appearing in the file.*/
+    bool m_bUseMeasurementDayOffset;    /**< Flags to use Measurement-date days offset.*/
+    int  m_iMeasurementDayOffset;       /**< Number of days to subtract from the measurement date.*/
+    QDateTime m_dateSubjectBirthday;    /**< Subject's birthday substitutor.*/
+    bool m_bUseSubjectBirthdayOffset;   /**< Flags use of Subject's birthday offset.*/
+    int  m_iSubjectBirthdayOffset;      /**< Subjects's birthday offset.*/
+    FIFFLIB::fiff_int_t m_BDfltMAC[2];  /**< MAC addresss substitutor.*/
+    int m_iDfltSubjectId;               /**< Subject's id substitutor.*/
+    QString m_sSubjectFirstName;        /**< Subject's first name substitutor.*/
+    QString m_sSubjectMidName;          /**< Subject's middle name substitutor.*/
+    QString m_sSubjectLastName;         /**< Subject's last name substitutor.*/
+    int m_iSubjectWeight;               /**< Subject's weight substitutor.*/
+    int m_iSubjectHeight;               /**< Subject's height substitutor.*/
+    QString m_sSubjectComment;          /**< Subject's comment substitutor.*/
+    QString m_sSubjectHisId;            /**< Subject's HIS ID substitutor.*/
+    int m_iProjectId;                   /**< Project's id# substitutor.*/
+    QString m_sProjectName;             /**< Project's name substitutor.*/
+    QString m_sProjectAim;              /**< Project's aim substitutor.*/
+    QString m_sProjectPersons;          /**< Project's Persons substitutor.*/
+    QString m_sProjectComment;          /**< Project's comment substitutor.*/
 
     //APP SET POINT. applications behaviour options
     bool m_bVerboseMode;                        /**< Verbosity mode enabler.*/
@@ -609,10 +624,9 @@ private:
     QFile m_fFileIn;                    /**< QFile input file.*/
     QFile m_fFileOut;                   /**< QFile output file.*/
 
-    QSharedPointer<QStack<int32_t> > m_pBlockTypeList;  /**< Pointer to Stack storing info related to the blocks of tags in the file.*/
-    QSharedPointer<QVector<FIFFLIB::FiffDirEntry> > m_pOutDir; /**< Pointer to the Tag directory in the output file.*/
+    QSharedPointer<QStack<int32_t> > m_pBlockTypeList;          /**< Pointer to Stack storing info related to the blocks of tags in the file.*/
+    QSharedPointer<QVector<FIFFLIB::FiffDirEntry> > m_pOutDir;  /**< Pointer to the Tag directory in the output file.*/
 };
-
 
 
 //*************************************************************************************************************
@@ -620,12 +634,9 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-//=========================================================================================================
-
 inline void FiffAnonymizer::printIfVerbose(const QString str)
 {
-    if(m_bVerboseMode)
-    {
+    if(m_bVerboseMode) {
         qDebug() << str;
     }
 }

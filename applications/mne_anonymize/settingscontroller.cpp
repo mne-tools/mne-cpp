@@ -359,8 +359,7 @@ void SettingsController::execute()
 
 void SettingsController::printHeaderIfVerbose()
 {
-    if(m_bShowHeaderFlag)
-    {
+    if(m_bShowHeaderFlag) {
         qDebug() << " ";
         qDebug() << "-------------------------------------------------------------------------------------------";
         qDebug() << " ";
@@ -369,30 +368,3 @@ void SettingsController::printHeaderIfVerbose()
     }
 }
 
-
-//*************************************************************************************************************
-
-QStringList MNEANONYMIZE::listFilesMatchingPatternName(const QString &fileName)
-{
-    QStringList listOfFilteredFiles;
-    QFileInfo fiFileIn(QDir::toNativeSeparators(fileName));
-    fiFileIn.makeAbsolute();
-    if(fiFileIn.isDir())
-    {
-        qDebug() << "Error. Input file is infact a directory: " << fileName;
-    }
-
-    QStringList filter;
-    filter << fiFileIn.fileName();
-    QDirIterator iteratorFileIn(fiFileIn.absoluteDir().absolutePath(),filter,QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot);
-    while(iteratorFileIn.hasNext())
-    {
-        QFileInfo fi(iteratorFileIn.next());
-        if(fi.isFile())
-        {
-            listOfFilteredFiles.append(fi.absoluteFilePath());
-        }
-    }
-
-    return listOfFilteredFiles;
-}

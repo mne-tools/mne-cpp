@@ -198,7 +198,30 @@ private:
 * @param [out] QStringList with all possible filenames compatible with the search pattern.
 * It outputs a QStringList with all the possible files in the folder matching the search pattern.
 */
-inline static QStringList listFilesMatchingPatternName(const QString &fileName);
+inline static QStringList listFilesMatchingPatternName(const QString &fileName)
+{
+    QStringList listOfFilteredFiles;
+    QFileInfo fiFileIn(QDir::toNativeSeparators(fileName));
+    fiFileIn.makeAbsolute();
+    if(fiFileIn.isDir())
+    {
+        qDebug() << "Error. Input file is infact a directory: " << fileName;
+    }
+
+    QStringList filter;
+    filter << fiFileIn.fileName();
+    QDirIterator iteratorFileIn(fiFileIn.absoluteDir().absolutePath(),filter,QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+    while(iteratorFileIn.hasNext())
+    {
+        QFileInfo fi(iteratorFileIn.next());
+        if(fi.isFile())
+        {
+            listOfFilteredFiles.append(fi.absoluteFilePath());
+        }
+    }
+
+    return listOfFilteredFiles;
+}
 
 } // namespace MNEANONYMIZE
 
