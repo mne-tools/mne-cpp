@@ -547,14 +547,11 @@ void SsvepBciConfigurationWidget::stopMeasurement()
 
     QFile file(m_pSsvepBci->getSsvepBciResourcePath()+"/AccuracyResults.txt");
 
-    if(file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append))
-    {
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
         QTextStream out(&file);   // serialize the data into the file
         out << endl << dateTime.toString(Qt::TextDate) + "\t" + ui->m_lineEdit_subjectName->text() + ":" << endl << "Wrong commands:" << m_iWrongCommands  << "\tCorrect commands:" << m_iCorrectCommands << endl;   // serialize a string
         file.close();
-    }
-    else
-    {
+    } else {
         QMessageBox::warning(this, tr("Error"),
         tr("Unable to open 'AccuracyResults.txt' Data not saved to file."));
     }

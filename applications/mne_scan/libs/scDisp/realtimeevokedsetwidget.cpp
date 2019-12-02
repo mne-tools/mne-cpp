@@ -169,7 +169,12 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     this->setLayout(m_pRTESetLayout);
 
     //Initialize leftover scalars to default values
-    m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
+    if(!m_pRTESet->getValue()->evoked.isEmpty()){
+        m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
+    } else {
+        m_iMaxFilterTapSize = 0;
+    }
+
     m_bHideBadChannels = false;
 }
 
