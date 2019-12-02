@@ -187,11 +187,21 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
 
             if (interesting_data(mess.kind))
             {
-                memcpy(p_pTag->data(),shmBlock->data,mess.size);
-                data_ok = 1;
-            #ifdef DEBUG
-                printf("client # %d read shmem buffer # %d\n", m_iShmemId, mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
-            #endif
+                if(p_pTag->size() >= mess.size)
+                {
+                    memcpy(p_pTag->data(),shmBlock->data,mess.size);
+                    data_ok = 1;
+                    #ifdef DEBUG
+                    printf("client # %d read shmem buffer # %d\n", m_iShmemId, mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
+                    #endif
+                } else
+                {
+                    memcpy(p_pTag->data(),shmBlock->data,p_pTag->size());
+                    data_ok = 1;
+                    #ifdef DEBUG
+                    printf("client # %d read shmem buffer # %d\n", m_iShmemId, mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
+                    #endif
+                }
             }
             /*
             * Indicate that this client has processed the data
