@@ -85,6 +85,8 @@ NatusProducer::NatusProducer(int iBlockSize, int iChannelSize, QObject *parent)
             this, &NatusProducer::readPendingDatagrams);
 
     m_matData.resize(iChannelSize, iBlockSize);
+    m_fSampleFreq = 0;
+    m_fChannelSize = 0;
 }
 
 
