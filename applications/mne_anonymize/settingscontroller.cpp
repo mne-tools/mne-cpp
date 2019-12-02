@@ -103,7 +103,6 @@ SettingsController::~SettingsController()
 
 void SettingsController::initParser()
 {
-
     m_parser.setApplicationDescription(QCoreApplication::translate("main",
                                                                    "Application that removes or modifies Personal Health Information or Personal Identifiable information from a FIFF file."));
     m_parser.addHelpOption();
