@@ -71,7 +71,7 @@ contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
     DEFINES += STATICLIB
 } else {
-    CONFIG += dll
+    CONFIG += shared
 }
 
 SOURCES += \

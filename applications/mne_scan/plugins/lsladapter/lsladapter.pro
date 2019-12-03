@@ -48,19 +48,25 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${MNE_LIBRARY_DIR}
 
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += shared
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
 win32 {
     LIBS += -LC:/LSL/lib/ \
             -lliblsl64
 }
-
 unix:!macx {
     LIBS += -L/usr/local/LSL/lib \
             -llsl64
 }
-
-
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
@@ -85,8 +91,6 @@ else {
             -lscDisp \
             -lscShared
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
         lsladapter.cpp \
