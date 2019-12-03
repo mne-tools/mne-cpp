@@ -187,7 +187,8 @@ int main(int argc, char *argv[])
     double dSnr = parser.value(snrOption).toDouble();
     int iEvent = parser.value(evokedIndexOption).toInt();
 
-    bool bDoSourceLoc, bDoClust = false;
+    bool bDoSourceLoc = false;
+    bool bDoClust = false;
     if(parser.value(sourceLocOption) == "false" || parser.value(sourceLocOption) == "0") {
         bDoSourceLoc = false;
     } else if(parser.value(sourceLocOption) == "true" || parser.value(sourceLocOption) == "1") {
