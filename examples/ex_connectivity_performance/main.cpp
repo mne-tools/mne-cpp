@@ -141,6 +141,8 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 */
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(disp3d);
+
     qInstallMessageHandler(customMessageHandler);
 
 //    printf("globalInstance()->maxThreadCount(): %d\n",QThreadPool::globalInstance()->maxThreadCount());

@@ -101,6 +101,8 @@ using namespace DISP3DLIB;
 */
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(disp3d);
+
     QApplication a(argc, argv);
 
     // Command Line Parser

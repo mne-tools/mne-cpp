@@ -46,6 +46,15 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+DESTDIR = $${MNE_LIBRARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += dll
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
@@ -63,8 +72,6 @@ else {
             -lscMeas \
             -lscDisp
 }
-
-DESTDIR = $${MNE_LIBRARY_DIR}
 
 SOURCES += \
     Management/pluginmanager.cpp \

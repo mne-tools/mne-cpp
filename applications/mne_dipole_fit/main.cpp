@@ -88,6 +88,8 @@ using namespace MNELIB;
 */
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(disp3d);
+
     QApplication app(argc, argv);
 
     DipoleFitSettings settings(&argc,argv);
