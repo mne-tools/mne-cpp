@@ -154,7 +154,7 @@ public:
     *
     * @return the setup widget.
     */
-    virtual QWidget* setupWidget() const = 0; //setup();
+    virtual QWidget* setupWidget() = 0; //setup();
 
     //=========================================================================================================
     /**
