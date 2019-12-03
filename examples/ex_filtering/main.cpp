@@ -85,8 +85,6 @@ using namespace RTPROCESSINGLIB;
 */
 int main(int argc, char *argv[])
 {
-    QElapsedTimer timer;
-
     QCoreApplication a(argc, argv);
 
     // Command Line Parser
@@ -150,7 +148,6 @@ int main(int argc, char *argv[])
     double centerfreq = 10/(sFreq/2.0);                                     // normed nyquist freq.
     double bandwidth = 10/(sFreq/2.0);
     double parkswidth = 1/(sFreq/2.0);
-
 
     RtFilter rtFilter;                                                      // filter object
     MatrixXd dataFiltered;                                                  // filter output
