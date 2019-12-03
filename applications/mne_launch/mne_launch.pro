@@ -44,6 +44,7 @@ CONFIG += c++11
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
+    DEFINES += STATICLIB
 }
 
 CONFIG(debug, debug|release) {
