@@ -222,8 +222,9 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
         ui->lb_figure_of_merit->setHidden(true);
     }
 
-    adaptive_Mp = nullptr;
-    fixDict_Mp = nullptr;
+    adaptive_Mp = Q_NULLPTR;
+    fixDict_Mp = Q_NULLPTR;
+    mp_Thread = Q_NULLPTR;
 }
 
 //*************************************************************************************************************************************
