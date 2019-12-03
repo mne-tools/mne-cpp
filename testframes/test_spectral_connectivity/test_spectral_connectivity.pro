@@ -40,7 +40,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += testlib
+QT += testlib network concurrent
 QT -= gui
 
 CONFIG   += console
@@ -50,6 +50,13 @@ TARGET = test_spectral_connectivity
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+    DEFINES += STATICLIB
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
@@ -68,8 +75,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Connectivity \
 }
 
-DESTDIR =  $${MNE_BINARY_DIR}
-
 SOURCES += \
     test_spectral_connectivity.cpp
 
@@ -81,6 +86,13 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_CXXFLAGS += --coverage
     QMAKE_LFLAGS += --coverage
+}
+
+win32:!contains(MNECPP_CONFIG, static) {
+    EXTRA_ARGS =
+    DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
+    QMAKE_POST_LINK += $${DEPLOY_CMD}
+
 }
 
 unix:!macx {

@@ -39,7 +39,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += testlib
+QT += testlib network
 QT -= gui
 
 CONFIG   += console
@@ -49,6 +49,13 @@ TARGET = test_fiff_mne_types_io
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+    DEFINES += STATICLIB
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
@@ -63,8 +70,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fiff
 }
 
-DESTDIR =  $${MNE_BINARY_DIR}
-
 SOURCES += \
     test_fiff_mne_types_io.cpp
 
@@ -78,7 +83,7 @@ contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_LFLAGS += --coverage
 }
 
-win32 {
+win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}    
