@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
     }
 
     iTime = timer.elapsed();
-    printf("Prepare data %d\n", iTime);
+    qDebug() << "Prepare data " << iTime;
     timer.restart();
 
     qWarning() << "matInputData[256][40000].first().rows()" << matInputData[256][40000].rows();
