@@ -52,7 +52,7 @@ contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
     DEFINES += STATICLIB
 } else {
-    CONFIG += dll
+    CONFIG += shared
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}

@@ -55,7 +55,7 @@ contains(MNECPP_CONFIG, static) {
     LIBS += -L$${MNE_BINARY_DIR}/mne_rt_server_plugins
     QTPLUGIN += FiffSimulator \
 } else {
-    CONFIG += dll
+    CONFIG += shared
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
