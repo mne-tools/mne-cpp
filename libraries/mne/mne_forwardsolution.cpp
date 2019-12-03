@@ -1429,9 +1429,10 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
     for(qint32 k = 0; k < t_SourceSpace.size(); ++k)
         nuse += t_SourceSpace[k].nuse;
 
-    if (nuse != fwd.nsource)
-        throw("Source spaces do not match the forward solution.\n");
-
+    if (nuse != fwd.nsource){
+        qDebug() << "Source spaces do not match the forward solution.\n";
+        return false;
+    {
     printf("\tSource spaces transformed to the forward solution coordinate frame\n");
     fwd.src = t_SourceSpace; //not new MNESourceSpace(t_SourceSpace); for sake of speed
     //
