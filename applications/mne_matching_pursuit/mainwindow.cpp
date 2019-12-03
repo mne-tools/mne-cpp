@@ -3021,7 +3021,7 @@ bool MainWindow::sort_energy_adaptive(const QList<GaborAtom> atom_1, const QList
 
 //*****************************************************************************************************************
 
-bool MainWindow::sort_energy_fix(const FixDictAtom atom_1, const FixDictAtom atom_2)
+bool MainWindow::sort_energy_fix(const FixDictAtom &atom_1, const FixDictAtom &atom_2)
 {
     return (atom_1.energy > atom_2.energy);
 }
