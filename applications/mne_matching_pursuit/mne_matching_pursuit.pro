@@ -39,10 +39,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += gui
-QT += widgets  
-QT += network core widgets concurrent
-QT += xml
+QT += gui widgets network core widgets concurrent xml
 
 CONFIG += console
 
@@ -115,7 +112,7 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
 # Deploy dependencies
-win32 {
+win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}

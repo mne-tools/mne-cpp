@@ -363,18 +363,27 @@ void ConnectorManager::loadConnectors(const QString& dir)
     clearConnectorActivation();
 
 #ifdef STATICLIB
-    QObject *pConnector = new FIFFSIMULATORRTSERVERPLUGIN::FiffSimulator;
-    IConnector* t_pIConnector = qobject_cast<IConnector*>(pConnector);
-    t_pIConnector->setStatus(false);
+    Q_UNUSED(dir);
 
-    //Add the curent plugin meta data
-    QJsonObject t_qJsonObjectMetaData = this->metaData().value("MetaData").toObject();
-    t_pIConnector->setMetaData(t_qJsonObjectMetaData);
-    QJsonDocument t_jsonDocumentOrigin(t_qJsonObjectMetaData);
-    t_pIConnector->getCommandManager().insert(t_jsonDocumentOrigin);
-    t_pIConnector->connectCommandManager();
+    // In case of a static build we have to load plugins manually.
+    // Neuromag is commented out since this plugin is only built on MEG acq computers.
+    QList<QObject*> lObjects;
+    lObjects << new FIFFSIMULATORRTSERVERPLUGIN::FiffSimulator;
+    //lObjects << new NEUROMAGRTSERVERPLUGIN::Neuromag;
 
-    s_vecConnectors.push_back(t_pIConnector);
+    for(int i = 0; i < lObjects.size(); ++i) {
+        IConnector* t_pIConnector = qobject_cast<IConnector*>(lObjects.at(i));
+        t_pIConnector->setStatus(false);
+
+        //Add the curent plugin meta data
+        QJsonObject t_qJsonObjectMetaData = this->metaData().value("MetaData").toObject();
+        t_pIConnector->setMetaData(t_qJsonObjectMetaData);
+        QJsonDocument t_jsonDocumentOrigin(t_qJsonObjectMetaData);
+        t_pIConnector->getCommandManager().insert(t_jsonDocumentOrigin);
+        t_pIConnector->connectCommandManager();
+
+        s_vecConnectors.push_back(t_pIConnector);
+    }
 
 //    QObject *pConnector = new NEUROMAGRTSERVERPLUGIN::Neuromag;
 //    IConnector* t_pIConnector = qobject_cast<IConnector*>(pConnector);
