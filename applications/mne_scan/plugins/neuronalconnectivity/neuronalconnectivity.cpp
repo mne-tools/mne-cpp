@@ -99,11 +99,12 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_fFreqBandHigh(13.0f)
 , m_iBlockSize(1)
 , m_pConnectivitySettingsView(ConnectivitySettingsView::SPtr::create(this->getName()))
+, m_pActionShowYourWidget(Q_NULLPTR)
+, m_iNumberBadChannels(0)
 {
     AbstractMetric::m_bStorageModeIsActive = true;
     AbstractMetric::m_iNumberBinStart = 0;
     AbstractMetric::m_iNumberBinAmount = 100;
-    m_pActionShowYourWidget = Q_NULLPTR;
 }
 
 
