@@ -51,6 +51,7 @@ DESTDIR = $${MNE_BINARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
+    DEFINES += STATICLIB
     #LIBS += -L$${MNE_BINARY_DIR}/mne_rt_server_plugins
     #LIBS += -L$${MNE_LIBRARY_DIR}
     #QTPLUGIN += FiffSimulator \
@@ -101,7 +102,7 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Deploy dependencies
-win32 {
+win32: !contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
@@ -129,8 +130,8 @@ macx {
     QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
 
-# Activate FFTW backend in Eigen
-contains(MNECPP_CONFIG, useFFTW) {
+# Activate FFTW backend in Eigen for non-static builds only
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     DEFINES += EIGEN_FFTW_DEFAULT
     INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
     LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
