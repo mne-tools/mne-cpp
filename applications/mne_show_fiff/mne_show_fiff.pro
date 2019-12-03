@@ -43,9 +43,9 @@ VERSION = $${MNE_CPP_VERSION}
 
 CONFIG   += console
 
-contains(MNECPP_CONFIG, static) {
-    CONFIG += static
-}
+#contains(MNECPP_CONFIG, static) {
+#    CONFIG += static
+#}
 
 TARGET = mne_show_fiff
 

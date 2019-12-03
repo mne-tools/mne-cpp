@@ -40,7 +40,7 @@ defineReplace(macDeployArgs) {
 
     deploy_libs_to_copy = -libpath=$${mne_library_dir}
     !isEmpty(extra_args) {
-      deploy_libs_to_copy += $${extra_args}
+        deploy_libs_to_copy += $${extra_args}
     }
     return($$deploy_cmd $$deploy_target $$deploy_libs_to_copy)
 }
@@ -54,7 +54,7 @@ defineReplace(winDeployLibArgs) {
     extra_args = $$5
 
     contains(extra_args, static) {
-        return("")
+        return ("")
     }
 
     isEmpty(target_ext) {

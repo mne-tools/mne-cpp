@@ -37,33 +37,38 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
+QT += network
+QT -= gui
+
 CONFIG += plugin
 
 DEFINES += FIFFSIMULATOR_LIBRARY
 
-QT += network
-QT -= gui
-
 TARGET = FiffSimulator
-
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${MNE_LIBRARY_DIR}
+#DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
+DESTDIR = $${MNE_LIBRARY_DIR}
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += dll
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Communicationd
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Communication
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
 
 SOURCES += \
         fiffsimulator.cpp \
@@ -74,7 +79,6 @@ HEADERS += \
         fiffsimulator_global.h \
         fiffproducer.h \
         ../../mne_rt_server/IConnector.h #IConnector is a Q_OBJECT and the resulting moc file needs to be known -> that's why inclution is important!
-
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
