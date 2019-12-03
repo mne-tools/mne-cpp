@@ -53,10 +53,6 @@ defineReplace(winDeployLibArgs) {
     mne_library_dir = $$4
     extra_args = $$5
 
-    contains(extra_args, static) {
-        return ("")
-    }
-
     isEmpty(target_ext) {
         target_ext = .dll
     }
