@@ -52,9 +52,8 @@ DESTDIR = $${MNE_BINARY_DIR}
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
     DEFINES += STATICLIB
-    #LIBS += -L$${MNE_BINARY_DIR}/mne_rt_server_plugins
-    #LIBS += -L$${MNE_LIBRARY_DIR}
-    #QTPLUGIN += FiffSimulator \
+    LIBS += -L$${MNE_BINARY_DIR}/mne_rt_server_plugins
+    QTPLUGIN += FiffSimulator \
 } else {
     CONFIG += dll
 }
