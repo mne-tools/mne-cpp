@@ -157,6 +157,9 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
     if ((unsigned long) mess.size > (size_t) 0)
     {
         p_pTag->resize(mess.size);
+    } else {
+        p_pTag->resize(0);
+        qWarning("Received empty message");
     }
 
 //    qDebug() << mess.loc << " " << mess.size << " " << mess.shmem_buf << " " << mess.shmem_loc;
@@ -186,19 +189,11 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
 
             if (interesting_data(mess.kind))
             {
-                if (qstrlen(p_pTag->data()) >= mess.size){
-                    memcpy(p_pTag->data(),shmBlock->data,mess.size);
-                    data_ok = 1;
-                #ifdef DEBUG
-                    printf("client # %d read shmem buffer # %d\n", m_iShmemId, mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
-                #endif
-                } else {
-                    memcpy(p_pTag->data(),shmBlock->data,qstrlen(p_pTag->data()));
-                    data_ok = 1;
-                #ifdef DEBUG
-                    printf("client # %d read shmem buffer # %d\n", m_iShmemId, mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
-                #endif
-                }
+                memcpy(p_pTag->data(),shmBlock->data,mess.size);
+                data_ok = 1;
+            #ifdef DEBUG
+                printf("client # %d read shmem buffer # %d\n", m_iShmemId, mess.shmem_buf);//dacq_log("client # %d read shmem buffer # %d\n", id,mess.shmem_buf);
+            #endif
             }
             /*
             * Indicate that this client has processed the data
