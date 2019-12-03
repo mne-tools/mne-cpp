@@ -67,7 +67,10 @@ using namespace RTSERVER;
 // MAIN
 //=============================================================================================================
 
-//Q_IMPORT_PLUGIN(FiffSimulator)
+#ifdef STATICLIB
+Q_IMPORT_PLUGIN(FiffSimulator)
+//Q_IMPORT_PLUGIN(Neuromag)
+#endif
 
 //=============================================================================================================
 /**

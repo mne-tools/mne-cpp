@@ -47,6 +47,7 @@ TARGET = mne_sample_data_downloader
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
+    DEFINES += STATICLIB
 }
 
 CONFIG(debug, debug|release) {

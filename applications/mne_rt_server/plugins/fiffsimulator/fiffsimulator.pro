@@ -49,8 +49,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-#DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
-DESTDIR = $${MNE_LIBRARY_DIR}
+DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib

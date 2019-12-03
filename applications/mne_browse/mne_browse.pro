@@ -56,6 +56,7 @@ CONFIG += console
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
+    DEFINES += STATICLIB
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}

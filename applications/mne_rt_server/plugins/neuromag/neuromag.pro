@@ -67,6 +67,13 @@ else {
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
 
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += dll
+}
+
 SOURCES += \
         neuromag.cpp \
         dacqserver.cpp \

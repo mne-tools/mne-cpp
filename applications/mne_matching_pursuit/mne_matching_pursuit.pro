@@ -48,6 +48,7 @@ CONFIG += console
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
+    DEFINES += STATICLIB
 }
 
 TARGET = mne_matching_pursuit
