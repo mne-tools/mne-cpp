@@ -49,7 +49,9 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(SCDISP_LIBRARY)
+#if defined(STATICLIB)
+#  define SCDISPSHARED_EXPORT
+#elif defined(CONNECTIVITY_LIBRARY)
 #  define SCDISPSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define SCDISPSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */

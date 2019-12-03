@@ -160,6 +160,8 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 */
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(disp3d);
+
     QApplication app(argc, argv);
 
     //Store application info to use QSettings
