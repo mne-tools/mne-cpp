@@ -48,6 +48,15 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += shared
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
@@ -73,8 +82,6 @@ else {
             -lscDisp \
             -lscShared
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
     covariance.cpp \
