@@ -187,8 +187,8 @@ macx {
     QMAKE_CLEAN += -r $${deploy_app} $${dmg_file}
 }
 
-# Activate FFTW backend in Eigen
-contains(MNECPP_CONFIG, useFFTW) {
+# Activate FFTW backend in Eigen for non-static builds only
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     DEFINES += EIGEN_FFTW_DEFAULT
     INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
     LIBS += -L$$shell_path($${FFTW_DIR_LIBS})

@@ -225,15 +225,15 @@ contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_LFLAGS += --coverage
 }
 
-# Deploy library
-win32 {
+# Deploy library in non-static builds only
+win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${MNECPP_CONFIG})
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 
-# Activate FFTW backend in Eigen
-contains(MNECPP_CONFIG, useFFTW) {
+# Activate FFTW backend in Eigen for non-static builds only
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     DEFINES += EIGEN_FFTW_DEFAULT
     INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
     LIBS += -L$$shell_path($${FFTW_DIR_LIBS})

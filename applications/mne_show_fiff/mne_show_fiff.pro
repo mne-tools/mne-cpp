@@ -37,15 +37,17 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
+QT += network
 QT -= gui
 
 VERSION = $${MNE_CPP_VERSION}
 
 CONFIG   += console
 
-#contains(MNECPP_CONFIG, static) {
-#    CONFIG += static
-#}
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+    DEFINES += STATICLIB
+}
 
 TARGET = mne_show_fiff
 
@@ -59,8 +61,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
@@ -119,8 +120,8 @@ macx {
     QMAKE_CLEAN += -r $$member(DEPLOY_CMD, 1)
 }
 
-# Activate FFTW backend in Eigen
-contains(MNECPP_CONFIG, useFFTW) {
+# Activate FFTW backend in Eigen for non-static builds only
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static):!contains(MNECPP_CONFIG, static) {
     DEFINES += EIGEN_FFTW_DEFAULT
     INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
     LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
