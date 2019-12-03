@@ -42,14 +42,20 @@ QT -= gui
 
 CONFIG   += console
 
-contains(MNECPP_CONFIG, static) {
-    CONFIG += static
-}
-
 TARGET = mne_rt_server
-
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
+}
+
+DESTDIR = $${MNE_BINARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+    #LIBS += -L$${MNE_BINARY_DIR}/mne_rt_server_plugins
+    #LIBS += -L$${MNE_LIBRARY_DIR}
+    #QTPLUGIN += FiffSimulator \
+} else {
+    CONFIG += dll
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
@@ -57,14 +63,11 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Communicationd
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Communication
 }
-
-DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
     main.cpp \
@@ -74,7 +77,6 @@ SOURCES += \
     fiffstreamthread.cpp \
     commandserver.cpp \
     commandthread.cpp
-
 
 HEADERS += \
 # has to be moved to connectors
