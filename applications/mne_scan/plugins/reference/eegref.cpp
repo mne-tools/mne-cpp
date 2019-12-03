@@ -97,7 +97,11 @@ MatrixXd EEGRef::applyCAR(MatrixXd &matIER, FIFFLIB::FiffInfo::SPtr &pFiffInfo)
     }
 
     //detrmine centering matrix
-    matCenter = matCenter - (1/double(numTrueCh))*matOnes;
+    if (numTrueCh != 0){
+        matCenter = matCenter - (1/double(numTrueCh))*matOnes;
+    } else {
+        qDebug() << "Unable to determine centering matrix";
+    }
 
     // determine EEG CAR data matrix
     MatrixXd matCAR = matCenter*matIER;
