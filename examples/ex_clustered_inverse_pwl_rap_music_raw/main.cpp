@@ -452,7 +452,7 @@ int main(int argc, char *argv[])
 
     for(qint32 i = 0; i < vecSel.size(); ++i)
     {
-        qint32 val = QRandomGenerator::global()->bounded(1,count);
+        qint32 val = QRandomGenerator::global()->bounded(0,count);
         vecSel(i) = val;
     }
 
