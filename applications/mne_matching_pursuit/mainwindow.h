@@ -841,7 +841,7 @@ private:
     *
     * @return   sort_energie_fix    ???
     */
-    static bool sort_energy_fix(const FixDictAtom atom_1, const FixDictAtom atom_2);
+    static bool sort_energy_fix(const FixDictAtom &atom_1, const FixDictAtom &atom_2);
 
     //==========================================================================================================
 };
