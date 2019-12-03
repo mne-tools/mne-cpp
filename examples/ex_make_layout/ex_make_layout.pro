@@ -39,7 +39,8 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT       -= gui
+QT += network
+QT -= gui
 
 CONFIG   += console
 CONFIG   -= app_bundle
@@ -48,6 +49,13 @@ TARGET = ex_make_layout
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+    DEFINES += STATICLIB
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
@@ -60,8 +68,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fiff
 }
 
-DESTDIR =  $${MNE_BINARY_DIR}
-
 SOURCES += main.cpp
 
 HEADERS += \
@@ -69,7 +75,7 @@ HEADERS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-win32 {
+win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}

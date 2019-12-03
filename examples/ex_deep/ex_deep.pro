@@ -39,7 +39,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += widgets charts
+QT += widgets charts opengl
 
 CONFIG   += console
 
@@ -47,6 +47,13 @@ TARGET = ex_deep
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
+}
+
+DESTDIR = $${MNE_BINARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+    DEFINES += STATICLIB
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
@@ -74,8 +81,6 @@ else {
             -lCntk.Core-2.0
 }
 
-DESTDIR = $${MNE_BINARY_DIR}
-
 SOURCES += main.cpp
 
 HEADERS  +=
@@ -96,7 +101,7 @@ INCLUDEPATH += $${CNTK_INCLUDE_DIR}
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD
 
-win32 {
+win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
