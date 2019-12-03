@@ -207,7 +207,7 @@ void ScreenKeyboard::paint(QPaintDevice *device)
     if(m_bDisplaySpeller & m_bUpdatePhraseDisplay){
 
         // scaling the letter size to the biggest sign - in this case: "DEL"
-        float factor = width / painter.fontMetrics().width("DEL");
+        float factor = (float)(width) / (float)(painter.fontMetrics().width("DEL"));
         if ((factor < 1) || (factor > 1.25))
         {
             QFont f = painter.font();
