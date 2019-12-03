@@ -42,6 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "fiffsimulator_global.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,7 +76,7 @@ class FiffSimulator;
 *
 * @brief The FiffProducer class provides a data producer for a given sampling rate.
 */
-class FiffProducer : public QThread
+class FIFFSIMULATORSHARED_EXPORT FiffProducer : public QThread
 {
 public:
 
