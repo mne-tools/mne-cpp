@@ -102,11 +102,13 @@ NoiseReduction::NoiseReduction()
     if(m_sCurrentSystem == "BabyMEG") {
         m_iNBaseFctsFirst = 270;
         m_iNBaseFctsSecond = 105;
-    }
-
-    if(m_sCurrentSystem == "VectorView") {
+    } else if(m_sCurrentSystem == "VectorView") {
         m_iNBaseFctsFirst = 102;
         m_iNBaseFctsSecond = 102;
+    } else {
+        m_iNBaseFctsFirst = 0;
+        m_iNBaseFctsSecond = 0;
+        qDebug() << "Current system type not recognized.";
     }
 }
 
