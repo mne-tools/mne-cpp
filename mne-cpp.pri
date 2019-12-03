@@ -53,6 +53,10 @@ defineReplace(winDeployLibArgs) {
     mne_library_dir = $$4
     extra_args = $$5
 
+    contains(extra_args, static) {
+        return("")
+    }
+
     isEmpty(target_ext) {
         target_ext = .dll
     }
@@ -131,7 +135,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To build MNE Scan to support LSL data streams: qmake MNECPP_CONFIG+=useLSL
 
 # Default flags
-MNECPP_CONFIG += dispOpenGL
+MNECPP_CONFIG += dispOpenGL static
 
 #Build minimalVersion for qt versions < 5.10.0
 !minQtVersion(5, 10, 0) {

@@ -39,8 +39,7 @@ include(../../mne-cpp.pri)
 TEMPLATE = lib
 
 QT -= gui
-QT += xml core
-QT += concurrent # Check with HP-UX
+QT += xml core concurrent
 
 DEFINES += UTILS_LIBRARY
 
@@ -55,8 +54,7 @@ DESTDIR = $${MNE_LIBRARY_DIR}
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
     DEFINES += STATICLIB
-}
-else {
+} else {
     CONFIG += dll
 }
 
@@ -136,7 +134,7 @@ contains(MNECPP_CONFIG, withCodeCov) {
 # Deploy library
 win32 {
     EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${MNECPP_CONFIG})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 

@@ -49,6 +49,15 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+DESTDIR = $${MNE_LIBRARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += dll
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
@@ -61,16 +70,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-}
-
-DESTDIR = $${MNE_LIBRARY_DIR}
-
-contains(MNECPP_CONFIG, static) {
-    CONFIG += staticlib
-    DEFINES += STATICLIB
-}
-else {
-    CONFIG += dll
 }
 
 SOURCES += \
@@ -129,7 +128,7 @@ contains(MNECPP_CONFIG, withCodeCov) {
 # Deploy library
 win32 {
     EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${MNECPP_CONFIG})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 

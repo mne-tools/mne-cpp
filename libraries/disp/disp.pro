@@ -37,22 +37,31 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT  += core widgets svg concurrent
+QT += core widgets svg concurrent
 
 qtHaveModule(printsupport): QT += printsupport
 qtHaveModule(charts): QT += charts
 
 DEFINES += DISP_LIBRARY
 
+TARGET = Disp
+TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
 contains(MNECPP_CONFIG, dispOpenGL) {
     qtHaveModule(opengl): QT += opengl
     DEFINES += USE_OPENGL
 }
 
-TARGET = Disp
-TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
+DESTDIR = $${MNE_LIBRARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += dll
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
@@ -63,8 +72,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
@@ -79,21 +87,10 @@ else {
     CONFIG(debug, debug|release) {
         LIBS += -lMNE$${MNE_LIB_VERSION}Deepd \
                 -lCntk.Core-2.0
-    }
-    else {
+    } else {
         LIBS += -lMNE$${MNE_LIB_VERSION}Deep \
                 -lCntk.Core-2.0
     }
-}
-
-DESTDIR = $${MNE_LIBRARY_DIR}
-
-contains(MNECPP_CONFIG, static) {
-    CONFIG += staticlib
-    DEFINES += STATICLIB
-}
-else {
-    CONFIG += dll
 }
 
 SOURCES += \
@@ -281,7 +278,7 @@ contains(MNECPP_CONFIG, withCodeCov) {
 # Deploy library
 win32 {
     EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${MNECPP_CONFIG})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 
