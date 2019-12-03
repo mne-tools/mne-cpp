@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     disp.pro
+# @file     inverse.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -37,8 +37,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
-QT       += concurrent
+QT -= gui
+QT += concurrent
 
 DEFINES += INVERSE_LIBRARY
 
@@ -48,6 +48,15 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+DESTDIR = $${MNE_LIBRARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += dll
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
@@ -55,38 +64,12 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fwdd
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Fwd
-}
-
-contains(MNECPP_CONFIG, withCodeCov) {
-    QMAKE_CXXFLAGS += --coverage
-    QMAKE_LFLAGS += --coverage
-}
-
-# OpenMP
-win32 {
-    QMAKE_CXXFLAGS  +=  -openmp
-    #QMAKE_LFLAGS    +=  -openmp
-}
-unix:!macx {
-    QMAKE_CXXFLAGS  +=  -fopenmp
-    QMAKE_LFLAGS    +=  -fopenmp
-}
-
-DESTDIR = $${MNE_LIBRARY_DIR}
-
-contains(MNECPP_CONFIG, static) {
-    CONFIG += staticlib
-    DEFINES += STATICLIB
-}
-else {
-    CONFIG += dll
 }
 
 SOURCES += \
@@ -148,10 +131,25 @@ INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
+contains(MNECPP_CONFIG, withCodeCov) {
+    QMAKE_CXXFLAGS += --coverage
+    QMAKE_LFLAGS += --coverage
+}
+
+# OpenMP
+win32 {
+    QMAKE_CXXFLAGS  +=  -openmp
+    #QMAKE_LFLAGS    +=  -openmp
+}
+unix:!macx {
+    QMAKE_CXXFLAGS  +=  -fopenmp
+    QMAKE_LFLAGS    +=  -fopenmp
+}
+
 # Deploy library
 win32 {
     EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${MNECPP_CONFIG})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 

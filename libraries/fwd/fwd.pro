@@ -37,8 +37,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += concurrent
-QT       -= gui
+QT += concurrent
+QT -= gui
 
 DEFINES += FWD_LIBRARY
 
@@ -48,43 +48,26 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+DESTDIR = $${MNE_LIBRARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += dll
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne
-}
-
-contains(MNECPP_CONFIG, withCodeCov) {
-    QMAKE_CXXFLAGS += --coverage
-    QMAKE_LFLAGS += --coverage
-}
-
-# OpenMP
-win32 {
-    QMAKE_CXXFLAGS  +=  -openmp
-    #QMAKE_LFLAGS    +=  -openmp
-}
-unix:!macx {
-    QMAKE_CXXFLAGS  +=  -fopenmp
-    QMAKE_LFLAGS    +=  -fopenmp
-}
-
-DESTDIR = $${MNE_LIBRARY_DIR}
-
-contains(MNECPP_CONFIG, static) {
-    CONFIG += staticlib
-    DEFINES += STATICLIB
-}
-else {
-    CONFIG += dll
 }
 
 SOURCES += \
@@ -138,10 +121,25 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 DISTFILES += \
     dipoleFit/dipolefit_helpers_bak.txt
 
+contains(MNECPP_CONFIG, withCodeCov) {
+    QMAKE_CXXFLAGS += --coverage
+    QMAKE_LFLAGS += --coverage
+}
+
+# OpenMP
+win32 {
+    QMAKE_CXXFLAGS  +=  -openmp
+    #QMAKE_LFLAGS    +=  -openmp
+}
+unix:!macx {
+    QMAKE_CXXFLAGS  +=  -fopenmp
+    QMAKE_LFLAGS    +=  -fopenmp
+}
+
 # Deploy library
 win32 {
     EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${MNECPP_CONFIG})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 
