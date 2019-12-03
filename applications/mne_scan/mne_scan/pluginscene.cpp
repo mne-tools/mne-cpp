@@ -123,6 +123,10 @@ bool PluginScene::insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::IPlugin:
     {
         QString name = pActionPluginItem->text();
         qint32 idx = m_pPluginGui->m_pPluginManager->findByName(name);
+        if(idx < 0) {
+            qDebug() << "Unable to find index";
+            return false;
+        }
         SCSHAREDLIB::IPlugin* pPlugin = m_pPluginGui->m_pPluginManager->getPlugins()[idx];
 
         if(m_pPluginGui->m_pPluginSceneManager->addPlugin(pPlugin, pAddedPlugin))
