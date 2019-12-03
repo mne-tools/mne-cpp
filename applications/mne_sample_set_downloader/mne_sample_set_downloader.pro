@@ -39,9 +39,9 @@ VERSION = $${MNE_CPP_VERSION}
 
 TEMPLATE = app
 
-QT       += core gui widgets network
+QT += core gui widgets network
 
-DEFINES  += QT_NO_SSL
+DEFINES += QT_NO_SSL
 
 TARGET = mne_sample_data_downloader
 
@@ -73,7 +73,7 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
 # Deploy dependencies
-win32 {
+win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
