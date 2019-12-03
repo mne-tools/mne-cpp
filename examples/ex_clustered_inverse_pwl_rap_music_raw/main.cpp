@@ -74,6 +74,7 @@
 #include <QElapsedTimer>
 #include <QCommandLineParser>
 #include <QVector3D>
+#include <QRandomGenerator>
 
 //#define BENCHMARK
 
@@ -448,11 +449,10 @@ int main(int argc, char *argv[])
     // Calculate the average
     // Option 1 - Random selection
     VectorXi vecSel(2);    
-    srand (time(NULL)); // initialize random seed
 
     for(qint32 i = 0; i < vecSel.size(); ++i)
     {
-        qint32 val = rand() % count;
+        qint32 val = QRandomGenerator::global()->bounded(1,count);
         vecSel(i) = val;
     }
 
