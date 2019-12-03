@@ -37,7 +37,6 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-#QT       -= gui
 QT += widgets
 
 DEFINES += DEEP_LIBRARY
@@ -46,6 +45,15 @@ TARGET = Deep
 TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
+}
+
+DESTDIR = $${MNE_LIBRARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += dll
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
@@ -58,39 +66,13 @@ CONFIG(debug, debug|release) {
             -lCntk.Eval-2.0 \
             -lCntk.Core-2.0
 
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lCntk.Eval-2.0 \
             -lCntk.Core-2.0
-}
-
-contains(MNECPP_CONFIG, withCodeCov) {
-    QMAKE_CXXFLAGS += --coverage
-    QMAKE_LFLAGS += --coverage
-}
-
-# OpenMP
-win32 {
-    QMAKE_CXXFLAGS  +=  -openmp
-    #QMAKE_LFLAGS    +=  -openmp
-}
-unix:!macx {
-    QMAKE_CXXFLAGS  +=  -fopenmp
-    QMAKE_LFLAGS    +=  -fopenmp
-}
-
-DESTDIR = $${MNE_LIBRARY_DIR}
-
-contains(MNECPP_CONFIG, static) {
-    CONFIG += staticlib
-    DEFINES += STATICLIB
-}
-else {
-    CONFIG += dll
 }
 
 SOURCES += \
@@ -115,6 +97,21 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/deep
 INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+contains(MNECPP_CONFIG, withCodeCov) {
+    QMAKE_CXXFLAGS += --coverage
+    QMAKE_LFLAGS += --coverage
+}
+
+# OpenMP
+win32 {
+    QMAKE_CXXFLAGS  +=  -openmp
+    #QMAKE_LFLAGS    +=  -openmp
+}
+unix:!macx {
+    QMAKE_CXXFLAGS  +=  -fopenmp
+    QMAKE_LFLAGS    +=  -fopenmp
+}
 
 # Activate FFTW backend in Eigen
 contains(MNECPP_CONFIG, useFFTW) {

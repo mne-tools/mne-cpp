@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
+QT -= gui
 
 DEFINES += FS_LIBRARY
 
@@ -47,22 +47,20 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-LIBS += -L$${MNE_LIBRARY_DIR}
-CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd
-}
-else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils
-}
-
 DESTDIR = $${MNE_LIBRARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
     DEFINES += STATICLIB
-}
-else {
+} else {
     CONFIG += dll
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd
+} else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils
 }
 
 SOURCES += \
@@ -91,8 +89,6 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/fs
 
 INSTALLS += header_files
 
-INSTALLS += fs
-
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
 contains(MNECPP_CONFIG, withCodeCov) {
@@ -103,7 +99,7 @@ contains(MNECPP_CONFIG, withCodeCov) {
 # Deploy library
 win32 {
     EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
+    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${MNECPP_CONFIG})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 }
 
