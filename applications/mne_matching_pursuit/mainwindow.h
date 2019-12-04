@@ -797,7 +797,7 @@ private:
     *
     * @return       QString                 display text
     */
-    QString create_display_text(FixDictAtom *global_best_matching);
+    QString create_display_text(const FixDictAtom& global_best_matching);
 
     //==========================================================================================================
     /**
