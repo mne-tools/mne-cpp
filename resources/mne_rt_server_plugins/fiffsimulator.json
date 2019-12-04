@@ -1,0 +1,43 @@
+{
+    "encoding": "UTF-8",
+    "device": "FiffSimulator",
+    "description": "Fiff file simulator",
+    "commands": {
+        "bufsize": {
+            "description": "Sets the buffer size of the FiffStreamClient raw data buffer.",
+            "parameters": {
+                "samples": {
+                    "description": "samples",
+                    "type": "uint"
+                }
+            }
+        },
+        "getbufsize": {
+            "description": "Returns the current buffer size of the FiffStreamClient raw data buffer.",
+            "parameters": {}
+        },
+        "accel": {
+            "description": "Sets the acceleration factor to simulate different sampling rates.",
+            "parameters": {
+                "factor": {
+                    "description": "acceleration factor",
+                    "type": "float"
+                }
+            }
+        },
+        "getaccel": {
+            "description": "Returns the acceleration factor.",
+            "parameters": {}
+        },
+
+        "simfile": {
+            "description": "The fiff file which should be used as simulation file.",
+            "parameters": {
+                "file": {
+                    "description": "file",
+                    "type": "QString"
+                }
+            }
+        }
+    }
+}

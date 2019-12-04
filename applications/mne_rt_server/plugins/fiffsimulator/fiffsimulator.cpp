@@ -116,7 +116,6 @@ FiffSimulator::~FiffSimulator()
 void FiffSimulator::comBufsize(Command p_command)
 {
     //ToDO JSON
-
     quint32 t_uiBuffSize = p_command.pValues()[0].toUInt();
 
     if(t_uiBuffSize > 0)
@@ -140,8 +139,9 @@ void FiffSimulator::comBufsize(Command p_command)
 
         m_commandManager[Commands::BUFSIZE].reply(str);
     }
-    else
+    else {
         m_commandManager[Commands::BUFSIZE].reply("Buffer size not set\r\n");
+    }
 }
 
 
