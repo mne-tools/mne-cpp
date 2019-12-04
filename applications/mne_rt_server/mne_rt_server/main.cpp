@@ -67,11 +67,6 @@ using namespace RTSERVER;
 // MAIN
 //=============================================================================================================
 
-#ifdef STATICLIB
-Q_IMPORT_PLUGIN(FiffSimulator)
-//Q_IMPORT_PLUGIN(Neuromag)
-#endif
-
 //=============================================================================================================
 /**
 * The function main marks the entry point of the program.

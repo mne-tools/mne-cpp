@@ -43,7 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <ssvepbci_global.h>
+#include "ssvepbci_global.h"
 #include "ssvepbciscreen.h"
 #include "FormFiles/ssvepbcisetupstimuluswidget.h"
 #include "ssvepbci.h"

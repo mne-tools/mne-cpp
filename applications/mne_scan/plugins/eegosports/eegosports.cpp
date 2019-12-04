@@ -48,7 +48,7 @@
 #include <utils/layoutloader.h>
 #include <utils/layoutmaker.h>
 
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 #include <fiff/fiff.h>
 
@@ -154,7 +154,7 @@ QSharedPointer<IPlugin> EEGoSports::clone() const
 
 void EEGoSports::init()
 {
-    m_pRMTSA_EEGoSports = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "EEGoSports", "EEG output data");
+    m_pRMTSA_EEGoSports = PluginOutputData<RealTimeMultiSampleArray>::create(this, "EEGoSports", "EEG output data");
 
     m_outputConnectors.append(m_pRMTSA_EEGoSports);
 

@@ -50,7 +50,7 @@
 
 #include <scShared/Interfaces/ISensor.h>
 #include <utils/generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 #include <utils/layoutloader.h>
 
@@ -229,7 +229,7 @@ protected:
     bool dirExists(const std::string& dirName_in);
 
 private:
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_TMSI;      /**< The RealTimeSampleArray to provide the EEG data.*/
+    PluginOutputData<RealTimeMultiSampleArray>::SPtr m_pRMTSA_TMSI;      /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<TMSIManualAnnotationWidget> m_tmsiManualAnnotationWidget;/**< Widget for manually annotation the trigger during session.*/
     QSharedPointer<TMSIImpedanceWidget> m_pTmsiImpedanceWidget;             /**< Widget for checking the impedances*/
     QSharedPointer<TMSISetupProjectWidget> m_pTmsiSetupProjectWidget;       /**< Widget for checking the impedances*/

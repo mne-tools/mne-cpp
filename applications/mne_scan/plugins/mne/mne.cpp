@@ -282,7 +282,7 @@ void MNE::calcFiffInfo()
 
         m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfo);
 
-        //qDebug() << "MNE::calcFiffInfo - m_pFiffInfo" << m_pFiffInfo->ch_names;
+        qDebug() << "MNE::calcFiffInfo - m_pFiffInfo" << m_pFiffInfo->ch_names;
     }
 }
 
@@ -416,7 +416,7 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 
         if(m_bProcessData) {
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
-                // Check for artifacts                
+                // Check for artifacts
                 QMap<QString,double> mapReject;
                 mapReject.insert("eog", 150e-06);
 

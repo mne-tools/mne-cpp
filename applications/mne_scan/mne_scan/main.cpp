@@ -79,11 +79,6 @@ using namespace Eigen;
 // global var
 //=============================================================================================================
 
-#ifdef STATICLIB
-Q_IMPORT_PLUGIN(FiffSimulator)
-//Q_IMPORT_PLUGIN(Neuromag)
-#endif
-
 QSharedPointer<MainWindow> mainWin;
 
 //=============================================================================================================
@@ -166,6 +161,18 @@ int main(int argc, char *argv[])
 {
     #ifdef STATICLIB
     Q_INIT_RESOURCE(disp3d);
+    Q_INIT_RESOURCE(mne);
+    Q_INIT_RESOURCE(averaging);
+    Q_INIT_RESOURCE(babymeg);
+    Q_INIT_RESOURCE(covariance);
+    Q_INIT_RESOURCE(ecgsimulator);
+    Q_INIT_RESOURCE(fiffsimulator);
+    Q_INIT_RESOURCE(neuromag);
+    Q_INIT_RESOURCE(noisereduction);
+    Q_INIT_RESOURCE(rapmusictoolbox);
+    Q_INIT_RESOURCE(reference);
+    Q_INIT_RESOURCE(ssvepbci);
+    Q_INIT_RESOURCE(scDisp);
     #endif
 
     QApplication app(argc, argv);

@@ -1130,7 +1130,7 @@ void RtFiffRawViewModel::markChBad(QModelIndexList chlist, bool status)
 
 //*************************************************************************************************************
 
-void doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
+void RtFiffRawViewModel::doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
 {
     for(int i = 0; i < channelDataTime.first.size(); ++i) {
         //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true, FilterData::ZeroPad);

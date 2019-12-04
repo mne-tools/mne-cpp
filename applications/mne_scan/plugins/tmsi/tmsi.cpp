@@ -117,7 +117,7 @@ QSharedPointer<IPlugin> TMSI::clone() const
 
 void TMSI::init()
 {
-    m_pRMTSA_TMSI = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "TMSI", "EEG output data");
+    m_pRMTSA_TMSI = PluginOutputData<RealTimeMultiSampleArray>::create(this, "TMSI", "EEG output data");
 
     m_outputConnectors.append(m_pRMTSA_TMSI);
 

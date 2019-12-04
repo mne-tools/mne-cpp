@@ -46,8 +46,32 @@
 #include "../Interfaces/IIO.h"
 
 #ifdef STATICLIB
+#include <../plugins/ecgsimulator/ecgsimulator.h>
 #include <../plugins/fiffsimulator/fiffsimulator.h>
 #include <../plugins/neuromag/neuromag.h>
+#include <../plugins/babymeg/babymeg.h>
+#include <../plugins/triggercontrol/triggercontrol.h>
+#include <../plugins/natus/natus.h>
+//#include <../plugins/gusbamp/gusbamp.h>
+//#include <../plugins/eegosports/eegosports.h>
+//#include <../plugins/brainamp/brainamp.h>
+//#include <../plugins/tmsi/tmsi.h>
+//#include <../plugins/lsladapter/lsladapter.h>
+#include <../plugins/dummytoolbox/dummytoolbox.h>
+#include <../plugins/epidetect/epidetect.h>
+#include <../plugins/mne/mne.h>
+#include <../plugins/rapmusictoolbox/rapmusictoolbox.h>
+#include <../plugins/averaging/averaging.h>
+#include <../plugins/covariance/covariance.h>
+#include <../plugins/noise/noiseestimate.h>
+#include <../plugins/bci/bci.h>
+#include <../plugins/rtsss/rtsss.h>
+#include <../plugins/rthpi/rthpi.h>
+#include <../plugins/noisereduction/noisereduction.h>
+#include <../plugins/rthpi/rthpi.h>
+#include <../plugins/ssvepbci/ssvepbci.h>
+#include <../plugins/neuronalconnectivity/neuronalconnectivity.h>
+#include <../plugins/reference/reference.h>
 #endif
 
 
@@ -96,8 +120,31 @@ void PluginManager::loadPlugins(const QString& dir)
 
     // In case of a static build we have to load plugins manually.
     QList<QObject*> lObjects;
+    lObjects << new ECGSIMULATORPLUGIN::ECGSimulator;
     lObjects << new FIFFSIMULATORPLUGIN::FiffSimulator;
-    //lObjects << new NEUROMAGRTSERVERPLUGIN::Neuromag;
+    lObjects << new NEUROMAGPLUGIN::Neuromag;
+    lObjects << new BABYMEGPLUGIN::BabyMEG;
+    lObjects << new TRIGGERCONTROLPLUGIN::TriggerControl;
+    lObjects << new NATUSPLUGIN::Natus;
+    //lObjects << new GUSBAMPPLUGIN::GUSBAmp;
+    //lObjects << new EEGOSPORTSPLUGIN::EEGoSports;
+    //lObjects << new BRAINAMPPLUGIN::BrainAMP;
+    //lObjects << new TMSIPLUGIN::TMSI;
+    //lObjects << new LSLADAPTERPLUGIN::LSLAdapter;
+    lObjects << new DUMMYTOOLBOXPLUGIN::DummyToolbox;
+    lObjects << new EPIDETECTPLUGIN::Epidetect;
+    lObjects << new MNEPLUGIN::MNE;
+    lObjects << new RAPMUSICTOOLBOXPLUGIN::RapMusicToolbox;
+    lObjects << new AVERAGINGPLUGIN::Averaging;
+    lObjects << new COVARIANCEPLUGIN::Covariance;
+    lObjects << new NOISEESTIMATEPLUGIN::NoiseEstimate;
+    lObjects << new BCIPLUGIN::BCI;
+    lObjects << new RTSSSPLUGIN::RtSss;
+    lObjects << new RTHPIPLUGIN::RtHpi;
+    lObjects << new NOISEREDUCTIONPLUGIN::NoiseReduction;
+    lObjects << new SSVEPBCIPLUGIN::SsvepBci;
+    lObjects << new NEURONALCONNECTIVITYPLUGIN::NeuronalConnectivity;
+    lObjects << new REFERENCEPLUGIN::Reference;
 
     for(int i = 0; i < lObjects.size(); ++i) {
         // IPlugin
