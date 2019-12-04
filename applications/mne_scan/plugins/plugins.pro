@@ -40,32 +40,32 @@ TEMPLATE = subdirs
 
 #Sensors
 SUBDIRS += \
-    ecgsimulator \
+#    ecgsimulator \
     fiffsimulator \
-    neuromag \
-    babymeg \
-    triggercontrol \
-    # gusbamp \
-    # eegosports \
-    # brainamp \
-    # tmsi \
-    natus
+#    neuromag \
+#    babymeg \
+#    triggercontrol \
+#    # gusbamp \
+#    # eegosports \
+#    # brainamp \
+#    # tmsi \
+#    natus
 
 contains(MNECPP_CONFIG, useLSL) { SUBDIRS += lsladapter }
 
 #Algorithms
 SUBDIRS += \
-    dummytoolbox \
-    epidetect \
-    mne \
-    rapmusictoolbox \
-    averaging \
-    covariance \
-    noise \
-    # bci \
-    rtsss \
-    rthpi \
-    noisereduction \
-    ssvepbci \
-    neuronalconnectivity \
-    reference
+#    dummytoolbox \
+#    epidetect \
+#    mne \
+#    rapmusictoolbox \
+#    averaging \
+#    covariance \
+#    noise \
+#    # bci \
+#    rtsss \
+#    rthpi \
+#    noisereduction \
+#    ssvepbci \
+#    neuronalconnectivity \
+#    reference

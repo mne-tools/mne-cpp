@@ -371,18 +371,33 @@ void ConnectorManager::loadConnectors(const QString& dir)
     lObjects << new FIFFSIMULATORRTSERVERPLUGIN::FiffSimulator;
     //lObjects << new NEUROMAGRTSERVERPLUGIN::Neuromag;
 
+    QStringList lJSONFiles;
+    lJSONFiles << QCoreApplication::applicationDirPath() + "/resources/mne_rt_server_plugins/fiffsimulator.json";
+    //lJSONFiles << QCoreApplication::applicationDirPath() + "/resources/mne_rt_server_plugins/neuromag.json";
+
     for(int i = 0; i < lObjects.size(); ++i) {
         IConnector* t_pIConnector = qobject_cast<IConnector*>(lObjects[i]);
         t_pIConnector->setStatus(false);
 
-        //Add the curent plugin meta data
-        QJsonObject t_qJsonObjectMetaData = this->metaData().value("MetaData").toObject();
-        t_pIConnector->setMetaData(t_qJsonObjectMetaData);
-        QJsonDocument t_jsonDocumentOrigin(t_qJsonObjectMetaData);
-        t_pIConnector->getCommandManager().insert(t_jsonDocumentOrigin);
-        t_pIConnector->connectCommandManager();
+        //Add the curent plugin meta data. When building staically we need to data directly from the json file.
+        if(i < lJSONFiles.size()) {
+            QFile file (lJSONFiles.at(i));
+            if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                QString sMetaData = file.readAll();
+                file.close();
+                QJsonObject t_qJsonObjectMetaData = QJsonDocument::fromJson(sMetaData.toUtf8()).object();
+                t_pIConnector->setMetaData(t_qJsonObjectMetaData);
+                QJsonDocument t_jsonDocumentOrigin(t_qJsonObjectMetaData);
+                t_pIConnector->getCommandManager().insert(t_jsonDocumentOrigin);
+                t_pIConnector->connectCommandManager();
 
-        s_vecConnectors.push_back(t_pIConnector);
+                s_vecConnectors.push_back(t_pIConnector);
+            } else {
+                qWarning() << "ConnectorManager::loadConnectors - Plugin not loaded. Could not open meta data json file for plugin.";
+            }
+        } else {
+            qWarning() << "ConnectorManager::loadConnectors - Plugin not loaded. Path to meta data json file was not specified.";
+        }
     }
 #else
     QDir ConnectorsDir(dir);

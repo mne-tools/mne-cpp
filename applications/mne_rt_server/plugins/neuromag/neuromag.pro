@@ -70,6 +70,7 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
     DEFINES += STATICLIB
+    RESOURCE_FILES += $${ROOT_DIR}/resources/mne_rt_server_plugins/neuromag.json
 } else {
     CONFIG += shared
 }
@@ -93,6 +94,12 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 OTHER_FILES += neuromag.json
+
+RESOURCE_FILES += $${ROOT_DIR}/resources/mne_rt_server_plugins/neuromag.json \
+
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
