@@ -157,8 +157,9 @@ void Command::reply(const QString &p_sReply)
 {
     CommandManager* t_commandManager = static_cast<CommandManager*> (this->parent());
 
-    if(t_commandManager)
+    if(t_commandManager) {
         emit t_commandManager->response(p_sReply, *this);
+    }
 }
 
 
@@ -167,8 +168,10 @@ void Command::reply(const QString &p_sReply)
 void Command::send()
 {
     CommandManager* t_commandManager = static_cast<CommandManager*> (this->parent());
-    if(t_commandManager)
+
+    if(t_commandManager) {
         emit t_commandManager->triggered(*this);
+    }
 }
 
 

@@ -54,6 +54,7 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_rt_server_plugins
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
     DEFINES += STATICLIB
+    RESOURCE_FILES += $${ROOT_DIR}/resources/mne_rt_server_plugins/fiffsimulator.json
 } else {
     CONFIG += shared
 }
@@ -84,7 +85,7 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 OTHER_FILES += fiffsimulator.json \
 
-RESOURCE_FILES += $${ROOT_DIR}/resources/mne_rt_server_plugins/FiffSimulation.cfg
+RESOURCE_FILES += $${ROOT_DIR}/resources/mne_rt_server_plugins/FiffSimulation.cfg \
 
 # Copy resource files from repository to bin resource folder
 COPY_CMD = $$copyResources($${RESOURCE_FILES})
