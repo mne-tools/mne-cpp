@@ -1558,8 +1558,8 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     else if(adaptive_atom_res_list.isEmpty())
     {
         FixDictAtom temp_atom = fix_dict_atom_res_list.last();
-        fix_dict_atom_res_list.last().display_text = create_display_text(&fix_dict_atom_res_list.last());
-        temp_atom.display_text =  create_display_text(&fix_dict_atom_res_list.last());
+        fix_dict_atom_res_list.last().display_text = create_display_text(fix_dict_atom_res_list.last());
+        temp_atom.display_text =  create_display_text(fix_dict_atom_res_list.last());
 
         QFont font;
         QFontMetrics fm(font);
@@ -2040,83 +2040,83 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, truncation_criterion
 
 //*************************************************************************************************************
 
-QString MainWindow::create_display_text(FixDictAtom *global_best_matching)
+QString MainWindow::create_display_text(const FixDictAtom& global_best_matching)
 {
     QSettings settings;
     QString display_text;
 
     if(!settings.value("show_phys_params", false).toBool())
     {
-        if(global_best_matching->type == GABORATOM)
+        if(global_best_matching.type == GABORATOM)
         {
             display_text = QString("Gaboratom: scale: %0, translation: %1, modulation: %2, phase: %3")
-                    .arg(QString::number(global_best_matching->gabor_atom.scale, 'f', 2))
-                    .arg(QString::number(global_best_matching->translation, 'f', 2))
-                    .arg(QString::number(global_best_matching->gabor_atom.modulation, 'f', 2))
-                    .arg(QString::number(global_best_matching->gabor_atom.phase, 'f', 2));
+                    .arg(QString::number(global_best_matching.gabor_atom.scale, 'f', 2))
+                    .arg(QString::number(global_best_matching.translation, 'f', 2))
+                    .arg(QString::number(global_best_matching.gabor_atom.modulation, 'f', 2))
+                    .arg(QString::number(global_best_matching.gabor_atom.phase, 'f', 2));
         }
-        else if(global_best_matching->type == CHIRPATOM)
+        else if(global_best_matching.type == CHIRPATOM)
         {
             display_text = QString("Chripatom: scale: %0, translation: %1, modulation: %2, phase: %3, chirp: %4")
-                    .arg(QString::number(global_best_matching->chirp_atom.scale, 'f', 2))
-                    .arg(QString::number(global_best_matching->translation, 'f', 2))
-                    .arg(QString::number(global_best_matching->chirp_atom.modulation, 'f', 2))
-                    .arg(QString::number(global_best_matching->chirp_atom.phase, 'f', 2))
-                    .arg(QString::number(global_best_matching->chirp_atom.chirp, 'f', 2));
+                    .arg(QString::number(global_best_matching.chirp_atom.scale, 'f', 2))
+                    .arg(QString::number(global_best_matching.translation, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.modulation, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.phase, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.chirp, 'f', 2));
         }
-        else if(global_best_matching->type == FORMULAATOM)
+        else if(global_best_matching.type == FORMULAATOM)
         {
             display_text = QString("%0:  transl: %1 a: %2, b: %3 c: %4, d: %5, e: %6, f: %7, g: %8, h: %9")
-                    .arg(global_best_matching->atom_formula)
-                    .arg(QString::number(global_best_matching->translation,    'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.a, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.b, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.c, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.d, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.e, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.f, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.g, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.h, 'f', 2));
+                    .arg(global_best_matching.atom_formula)
+                    .arg(QString::number(global_best_matching.translation,    'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.a, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.b, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.c, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.d, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.e, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.f, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.g, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.h, 'f', 2));
         }
     }
     else
     {
-        if(global_best_matching->type == GABORATOM)
+        if(global_best_matching.type == GABORATOM)
         {
-            qreal phase = global_best_matching->gabor_atom.phase;
-            if(global_best_matching->gabor_atom.phase > 2*PI) phase -= 2*PI;
+            qreal phase = global_best_matching.gabor_atom.phase;
+            if(global_best_matching.gabor_atom.phase > 2*PI) phase -= 2*PI;
 
             display_text = QString("Gaboratom: scale: %0 sec, translation: %1 sec, modulation: %2 Hz, phase: %3 rad")
-                    .arg(QString::number(global_best_matching->gabor_atom.scale / _sample_rate, 'f', 2))
-                    .arg(QString::number((global_best_matching->translation + _from) / _sample_rate + _offset_time, 'f', 2))
-                    .arg(QString::number(global_best_matching->gabor_atom.modulation * _sample_rate / global_best_matching->sample_count, 'f', 2))
+                    .arg(QString::number(global_best_matching.gabor_atom.scale / _sample_rate, 'f', 2))
+                    .arg(QString::number((global_best_matching.translation + _from) / _sample_rate + _offset_time, 'f', 2))
+                    .arg(QString::number(global_best_matching.gabor_atom.modulation * _sample_rate / global_best_matching.sample_count, 'f', 2))
                     .arg(QString::number(phase, 'f', 2));
         }
-        else if(global_best_matching->type == CHIRPATOM)
+        else if(global_best_matching.type == CHIRPATOM)
         {
-            qreal phase = global_best_matching->chirp_atom.phase;
-            if(global_best_matching->chirp_atom.phase > 2*PI) phase -= 2*PI;
+            qreal phase = global_best_matching.chirp_atom.phase;
+            if(global_best_matching.chirp_atom.phase > 2*PI) phase -= 2*PI;
 
             display_text = QString("Chripatom: scale: %0 sec, translation: %1 sec, modulation: %2 Hz, phase: %3 rad, chirp: %4")
-                    .arg(QString::number(global_best_matching->chirp_atom.scale  / _sample_rate, 'f', 2))
-                    .arg(QString::number((global_best_matching->translation + _from) / _sample_rate + _offset_time, 'f', 2))
-                    .arg(QString::number(global_best_matching->chirp_atom.modulation * _sample_rate / global_best_matching->sample_count, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.scale  / _sample_rate, 'f', 2))
+                    .arg(QString::number((global_best_matching.translation + _from) / _sample_rate + _offset_time, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.modulation * _sample_rate / global_best_matching.sample_count, 'f', 2))
                     .arg(QString::number(phase, 'f', 2))
-                    .arg(QString::number(global_best_matching->chirp_atom.chirp, 'f', 2));
+                    .arg(QString::number(global_best_matching.chirp_atom.chirp, 'f', 2));
         }
-        else if(global_best_matching->type == FORMULAATOM)
+        else if(global_best_matching.type == FORMULAATOM)
         {
             display_text = QString("%0:  transl: %1 a: %2, b: %3 c: %4, d: %5, e: %6, f: %7, g: %8, h: %9")
-                    .arg(global_best_matching->atom_formula)
-                    .arg(QString::number((global_best_matching->translation + _from) / _sample_rate + _offset_time, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.a, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.b, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.c, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.d, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.e, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.f, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.g, 'f', 2))
-                    .arg(QString::number(global_best_matching->formula_atom.h, 'f', 2));
+                    .arg(global_best_matching.atom_formula)
+                    .arg(QString::number((global_best_matching.translation + _from) / _sample_rate + _offset_time, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.a, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.b, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.c, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.d, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.e, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.f, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.g, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.h, 'f', 2));
         }
     }
 
