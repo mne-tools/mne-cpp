@@ -150,7 +150,7 @@ public:
     */
     void setInterpolationInfo(const Eigen::MatrixX3f &matVertices,
                               const QVector<QVector<int> > &vecNeighborVertices,
-                              const QVector<qint32> &vecMappedSubset);
+                              const QVector<int> &vecMappedSubset);
 
     //=========================================================================================================
     /**
@@ -197,7 +197,7 @@ protected:
         QList<int>                      vertNos;
         QMap<qint32, qint32>            mapLabelIdSources;              /**< The mapped label ID to sources. */
 
-        QVector<qint32>                 vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+        QVector<int>                 vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
         QVector<QVector<int> >          vecNeighborVertices;            /**< The neighbor vertex information. */
 
         double (*interpolationFunction) (double);                   /**< Function that computes interpolation coefficients using the distance values. */

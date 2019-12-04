@@ -128,11 +128,11 @@ public:
     *
     * @return                                  The distance matrix created
     */
-    static QSharedPointer<Eigen::SparseMatrix<float> > createInterpolationMat(const QVector<qint32> &vecProjectedSensors,
+    static QSharedPointer<Eigen::SparseMatrix<float> > createInterpolationMat(const QVector<int> &vecProjectedSensors,
                                                                               const QSharedPointer<Eigen::MatrixXd> matDistanceTable,
                                                                               double (*interpolationFunction) (double),
                                                                               const double dCancelDist = FLOAT_INFINITY,
-                                                                              const QVector<qint32> &vecExcludeIndex = QVector<qint32>());
+                                                                              const QVector<int> &vecExcludeIndex = QVector<int>());
 
     //=========================================================================================================
     /**

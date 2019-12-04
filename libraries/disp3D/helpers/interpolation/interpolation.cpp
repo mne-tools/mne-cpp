@@ -82,11 +82,11 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const QVector<qint32> &vecProjectedSensors,
+QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const QVector<int> &vecProjectedSensors,
                                                                            const QSharedPointer<MatrixXd> matDistanceTable,
                                                                            double (*interpolationFunction) (double),
                                                                            const double dCancelDist,
-                                                                           const QVector<qint32> &vecExcludeIndex)
+                                                                           const QVector<int> &vecExcludeIndex)
 {
 
     if(matDistanceTable->rows() == 0 && matDistanceTable->cols() == 0) {

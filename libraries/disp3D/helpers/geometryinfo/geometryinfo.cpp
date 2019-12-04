@@ -91,7 +91,7 @@ using namespace FIFFLIB;
 
 QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f &matVertices,
                                             const QVector<QVector<int> > &vecNeighborVertices,
-                                            QVector<qint32> &vecVertSubset,
+                                            QVector<int> &vecVertSubset,
                                             double dCancelDist)
 {
     // create matrix and check for empty subset:
@@ -155,10 +155,10 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f &matVertices,
 
 //*************************************************************************************************************
 
-QVector<qint32> GeometryInfo::projectSensors(const MatrixX3f &matVertices,
+QVector<int> GeometryInfo::projectSensors(const MatrixX3f &matVertices,
                                              const QVector<Vector3f> &vecSensorPositions)
 {
-    QVector<qint32> vecOutputArray;
+    QVector<int> vecOutputArray;
 
     qint32 iCores = QThread::idealThreadCount();
     if (iCores <= 0)
@@ -178,7 +178,7 @@ QVector<qint32> GeometryInfo::projectSensors(const MatrixX3f &matVertices,
         return vecOutputArray;
     }
     // split input array + thread start
-    QVector<QFuture<QVector<qint32> > > vecThreads(iCores - 1);
+    QVector<QFuture<QVector<int> > > vecThreads(iCores - 1);
     qint32 iBeginOffset = iSubArraySize;
     qint32 iEndOffset = iBeginOffset + iSubArraySize;
     for(qint32 i = 0; i < vecThreads.size(); ++i)
@@ -208,7 +208,7 @@ QVector<qint32> GeometryInfo::projectSensors(const MatrixX3f &matVertices,
                                           vecSensorPositions.constBegin() + iSubArraySize));
 
     //wait for threads to finish
-    for (QFuture<QVector<qint32> >& f : vecThreads) {
+    for (QFuture<QVector<int> >& f : vecThreads) {
         f.waitForFinished();
     }
 
@@ -224,12 +224,12 @@ QVector<qint32> GeometryInfo::projectSensors(const MatrixX3f &matVertices,
 
 //*************************************************************************************************************
 
-QVector<qint32> GeometryInfo::nearestNeighbor(const MatrixX3f &matVertices,
+QVector<int> GeometryInfo::nearestNeighbor(const MatrixX3f &matVertices,
                                               QVector<Vector3f>::const_iterator itSensorBegin,
                                               QVector<Vector3f>::const_iterator itSensorEnd)
 {
     ///lin search sensor positions
-    QVector<qint32> vecMappedSensors;
+    QVector<int> vecMappedSensors;
     vecMappedSensors.reserve(std::distance(itSensorBegin, itSensorEnd));
 
     for(auto sensor = itSensorBegin; sensor != itSensorEnd; ++sensor)
@@ -259,7 +259,7 @@ QVector<qint32> GeometryInfo::nearestNeighbor(const MatrixX3f &matVertices,
 void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatrix,
                                      const MatrixX3f &matVertices,
                                      const QVector<QVector<int> > &vecNeighborVertices,
-                                     const QVector<qint32> &vecVertSubset,
+                                     const QVector<int> &vecVertSubset,
                                      qint32 iBegin,
                                      qint32 iEnd,
                                      double dCancelDistance) {
@@ -321,11 +321,11 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatri
 
 //*************************************************************************************************************
 
-QVector<qint32> GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
+QVector<int> GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
                                                 const FIFFLIB::FiffInfo& fiffInfo,
                                                 qint32 iSensorType) {
     // use pointer to avoid copying of FiffChInfo objects
-    QVector<qint32> vecBadColumns;
+    QVector<int> vecBadColumns;
     QVector<const FiffChInfo*> vecSensors;
     for(const FiffChInfo& s : fiffInfo.chs){
         //Only take EEG with V as unit or MEG magnetometers with T as unit

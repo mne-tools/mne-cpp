@@ -171,8 +171,8 @@ protected:
         QSharedPointer<Eigen::MatrixXd>                 matDistanceMatrix;              /**< Distance matrix that holds distances from sensors positions to the near vertices in meters. */
         Eigen::MatrixX3f                                matVertices;                    /**< Holds all vertex information. */
 
-        QVector<qint32>                                 vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
-        QVector<qint32>                                 vecExcludeIndex;                /**< The indices to be excluded from vecProjectedSensors, e.g., bad channels. */
+        QVector<int>                                 vecMappedSubset;                /**< Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to. */
+        QVector<int>                                 vecExcludeIndex;                /**< The indices to be excluded from vecProjectedSensors, e.g., bad channels. */
         QVector<QVector<int> >                          vecNeighborVertices;            /**< The neighbor vertex information. */
 
         FIFFLIB::FiffInfo                               fiffInfo;                       /**< Contains all information about the sensors. */

@@ -323,7 +323,7 @@ signals:
     */
     void interpolationInfoLeftChanged(const Eigen::MatrixX3f &matVerticesLeft,
                                       const QVector<QVector<int> > &vecNeighborVerticesLeft,
-                                      const QVector<qint32> &vecMappedSubsetLeft);
+                                      const QVector<int> &vecMappedSubsetLeft);
 
     //=========================================================================================================
     /**
@@ -335,7 +335,7 @@ signals:
     */
     void interpolationInfoRightChanged(const Eigen::MatrixX3f &matVerticesRight,
                                        const QVector<QVector<int> > &vecNeighborVerticesRight,
-                                       const QVector<qint32> &vecMappedSubsetRight);
+                                       const QVector<int> &vecMappedSubsetRight);
 
     //=========================================================================================================
     /**

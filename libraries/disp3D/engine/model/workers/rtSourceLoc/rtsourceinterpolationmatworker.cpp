@@ -155,7 +155,7 @@ void RtSourceInterpolationMatWorker::setCancelDistance(double dCancelDist)
 
 void RtSourceInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f &matVertices,
                                                           const QVector<QVector<int> > &vecNeighborVertices,
-                                                          const QVector<qint32> &vecMappedSubset)
+                                                          const QVector<int> &vecMappedSubset)
 {
     if(matVertices.rows() == 0) {
         qDebug() << "RtSourceInterpolationMatWorker::setInterpolationInfo - Surface data is empty. Returning ...";
