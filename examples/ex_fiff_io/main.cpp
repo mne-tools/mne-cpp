@@ -103,13 +103,19 @@ int main(int argc, char *argv[])
 
     std::cout << p_fiffIO << std::endl;
 
+    bool readSuccessful = false;
+
     //Read raw data samples
     MatrixXd data,times;
-    p_fiffIO.m_qlistRaw[0]->read_raw_segment_times(data,times,100,102);
+    readSuccessful= p_fiffIO.m_qlistRaw[0]->read_raw_segment_times(data,times,100,102);
 
-    //Write some raw data
-    QFile t_fileToWrite(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_write/sample_out.fif");
-    p_fiffIO.write(t_fileToWrite,FIFFB_RAW_DATA,-1);
+    if (readSuccessful){
+        //Write some raw data
+        QFile t_fileToWrite(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_write/sample_out.fif");
+        p_fiffIO.write(t_fileToWrite,FIFFB_RAW_DATA,-1);
+    } else {
+        qDebug() << "Could not read raw segment.";
+    }
 
     return a.exec();
 }
