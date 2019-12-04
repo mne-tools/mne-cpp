@@ -50,10 +50,12 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(COVARIANCE_LIBRARY)
-#  define COVARIANCESHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(STATICLIB)
+#  define COVARIANCESHARED_EXPORT
+#elif defined(COVARIANCE_LIBRARY)
+#  define COVARIANCESHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define COVARIANCESHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define COVARIANCESHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 #endif // COVARIANCE_GLOBAL_H

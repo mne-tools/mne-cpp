@@ -37,7 +37,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core widgets xml
+QT += network core widgets xml svg charts opengl
 
 qtHaveModule(3dextras) {
     QT += 3dextras
@@ -45,6 +45,9 @@ qtHaveModule(3dextras) {
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
+    DEFINES += STATICLIB
+    LIBS += -L$${MNE_BINARY_DIR}/mne_scan_plugins
+    QTPLUGIN += fiffsimulator \
 }
 
 TARGET = mne_scan
@@ -60,6 +63,7 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Communicationd \
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
@@ -75,6 +79,7 @@ else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Communication \
             -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Fwd \
             -lMNE$${MNE_LIB_VERSION}Inverse \
@@ -131,7 +136,7 @@ macx {
 }
 
 # Deploy dependencies
-win32 {
+win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}

@@ -45,6 +45,11 @@
 #include "../Interfaces/IAlgorithm.h"
 #include "../Interfaces/IIO.h"
 
+#ifdef STATICLIB
+#include <../plugins/fiffsimulator/fiffsimulator.h>
+#include <../plugins/neuromag/neuromag.h>
+#endif
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,6 +91,51 @@ PluginManager::~PluginManager()
 
 void PluginManager::loadPlugins(const QString& dir)
 {
+#ifdef STATICLIB
+    Q_UNUSED(dir);
+
+    // In case of a static build we have to load plugins manually.
+    QList<QObject*> lObjects;
+    lObjects << new FIFFSIMULATORPLUGIN::FiffSimulator;
+    //lObjects << new NEUROMAGRTSERVERPLUGIN::Neuromag;
+
+    for(int i = 0; i < lObjects.size(); ++i) {
+        // IPlugin
+        if(lObjects[i]) {
+            // plugins are always disabled when they are first loaded
+            m_qVecPlugins.push_back(qobject_cast<IPlugin*>(lObjects[i]));
+
+            IPlugin::PluginType pluginType = qobject_cast<IPlugin*>(lObjects[i])->getType();
+
+            // ISensor
+            if(pluginType == IPlugin::_ISensor) {
+                ISensor* pSensor = qobject_cast<ISensor*>(lObjects[i]);
+                if(pSensor) {
+                    m_qVecSensorPlugins.push_back(pSensor);
+                    qDebug() << "Sensor " << pSensor->getName() << " loaded.";
+                }
+            }
+            // IAlgorithm
+            else if(pluginType == IPlugin::_IAlgorithm) {
+                IAlgorithm* pAlgorithm = qobject_cast<IAlgorithm*>(lObjects[i]);
+                if(pAlgorithm) {
+                    m_qVecAlgorithmPlugins.push_back(pAlgorithm);
+                    qDebug() << "RTAlgorithm " << pAlgorithm->getName() << " loaded.";
+                }
+            }
+            // IIO
+            else if(pluginType == IPlugin::_IIO) {
+                IIO* pIO = qobject_cast<IIO*>(lObjects[i]);
+                if(pIO) {
+                    m_qVecIOPlugins.push_back(pIO);
+                    qDebug() << "RTVisualization " << pIO->getName() << " loaded.";
+                }
+            }
+        } else {
+            qDebug() << "Plugin could not be instantiated!";
+        }
+    }
+#else
     QDir PluginsDir(dir);
 
     foreach(QString file, PluginsDir.entryList(QDir::Files))
@@ -140,7 +190,7 @@ void PluginManager::loadPlugins(const QString& dir)
 //        else
 //            qDebug() << "Plugin " << file << " could not be instantiated!";
     }
-
+#endif
 }
 
 

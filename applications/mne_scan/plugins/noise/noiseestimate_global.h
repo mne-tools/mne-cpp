@@ -51,10 +51,12 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(NOISE_ESTIMATE_LIBRARY)
-#  define NOISE_ESTIMATESHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(STATICLIB)
+#  define NOISE_ESTIMATESHARED_EXPORT
+#elif defined(NOISE_ESTIMATE_LIBRARY)
+#  define NOISE_ESTIMATESHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define NOISE_ESTIMATESHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define NOISE_ESTIMATESHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 #endif // NOISEESTIMATE_GLOBAL_H

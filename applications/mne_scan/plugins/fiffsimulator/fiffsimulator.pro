@@ -41,8 +41,7 @@ CONFIG += plugin
 
 DEFINES += FIFFSIMULATOR_LIBRARY
 
-QT += widgets
-QT += network
+QT += widgets network
 
 TARGET = fiffsimulator
 CONFIG(debug, debug|release) {
@@ -57,7 +56,6 @@ contains(MNECPP_CONFIG, static) {
 } else {
     CONFIG += shared
 }
-
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {

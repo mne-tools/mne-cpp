@@ -37,8 +37,7 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT += widgets svg
-
+QT += widgets svg network
 DEFINES += SCSHARED_LIBRARY
 
 TARGET = scShared
@@ -51,6 +50,8 @@ DESTDIR = $${MNE_LIBRARY_DIR}
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
     DEFINES += STATICLIB
+    LIBS += -L$${MNE_BINARY_DIR}/mne_scan_plugins
+    QTPLUGIN += fiffsimulator \
 } else {
     CONFIG += shared
 }

@@ -51,10 +51,12 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(TRIGGERCONTROL_LIBRARY)
-#  define TRIGGERCONTROLSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(STATICLIB)
+#  define TRIGGERCONTROLSHARED_EXPORT
+#elif defined(TRIGGERCONTROL_LIBRARY)
+#  define TRIGGERCONTROLSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define TRIGGERCONTROLSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define TRIGGERCONTROLSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 #endif // TRIGGERCONTROL_GLOBAL_H

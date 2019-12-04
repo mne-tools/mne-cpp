@@ -372,7 +372,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
     //lObjects << new NEUROMAGRTSERVERPLUGIN::Neuromag;
 
     for(int i = 0; i < lObjects.size(); ++i) {
-        IConnector* t_pIConnector = qobject_cast<IConnector*>(lObjects.at(i));
+        IConnector* t_pIConnector = qobject_cast<IConnector*>(lObjects[i]);
         t_pIConnector->setStatus(false);
 
         //Add the curent plugin meta data
@@ -384,19 +384,6 @@ void ConnectorManager::loadConnectors(const QString& dir)
 
         s_vecConnectors.push_back(t_pIConnector);
     }
-
-//    QObject *pConnector = new NEUROMAGRTSERVERPLUGIN::Neuromag;
-//    IConnector* t_pIConnector = qobject_cast<IConnector*>(pConnector);
-//    t_pIConnector->setStatus(false);
-
-//    //Add the curent plugin meta data
-//    QJsonObject t_qJsonObjectMetaData = this->metaData().value("MetaData").toObject();
-//    t_pIConnector->setMetaData(t_qJsonObjectMetaData);
-//    QJsonDocument t_jsonDocumentOrigin(t_qJsonObjectMetaData);
-//    t_pIConnector->getCommandManager().insert(t_jsonDocumentOrigin);
-//    t_pIConnector->connectCommandManager();
-
-//    s_vecConnectors.push_back(t_pIConnector);
 #else
     QDir ConnectorsDir(dir);
 
@@ -431,6 +418,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
         else
             printf("failed!\n");
     }
+#endif
 
     //
     // search config for default connector
@@ -483,7 +471,6 @@ void ConnectorManager::loadConnectors(const QString& dir)
         if(!activated)
             s_vecConnectors[0]->setStatus(true);
     }
-#endif
 
     //print
     printf("Connector list\n");
