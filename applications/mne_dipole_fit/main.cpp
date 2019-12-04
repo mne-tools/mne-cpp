@@ -88,7 +88,9 @@ using namespace MNELIB;
 */
 int main(int argc, char *argv[])
 {
+    #ifdef STATICLIB
     Q_INIT_RESOURCE(disp3d);
+    #endif
 
     QApplication app(argc, argv);
 
