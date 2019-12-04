@@ -117,10 +117,13 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
     QString sFileName = m_sCurrentDir + "/" + QString::number(m_iNumberChannels) + "_" + QString::number(m_iNumberSamples) + "_" + QString::number(m_iNumberTrials) + ".log";
 
     QFile outFile(sFileName);
-    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
 
-    QTextStream textStream(&outFile);
-    textStream << txt << endl;
+    if (outFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
+        QTextStream textStream(&outFile);
+        textStream << txt << endl;
+    } else {
+        qDebug() << "Unable to read data from file";
+    }
 }
 
 
