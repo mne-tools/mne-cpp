@@ -99,7 +99,9 @@ using namespace INVERSELIB;
 */
 int main(int argc, char *argv[])
 {
+    #ifdef STATICLIB
     Q_INIT_RESOURCE(disp3d);
+    #endif
 
     QApplication a(argc, argv);
 

@@ -107,8 +107,10 @@ using namespace UTILSLIB;
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
 int main(int argc, char *argv[])
-{
+{    
+    #ifdef STATICLIB
     Q_INIT_RESOURCE(disp3d);
+    #endif
 
     QApplication a(argc, argv);
 
