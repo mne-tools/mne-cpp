@@ -135,7 +135,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
 
     //VERTICAL
     //Draw vertical lines
-    double length = numberCoeff / (m_iNumberVerticalLines+1);
+    double length = (double)(numberCoeff) / (double)(m_iNumberVerticalLines+1);
     for(int i = 1; i<=m_iNumberVerticalLines; i++)
         addLine(i*length - m_iDiagramMarginsHoriz,
                 -m_iDiagramMarginsVert,
