@@ -87,7 +87,10 @@ void MNEClusterInfo::clear()
 void MNEClusterInfo::write(QString p_sFileName) const
 {
     QFile file("./"+p_sFileName);
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qDebug("Unable to open file.");
+        return;
+    }
     QTextStream out(&file);
     out << "MNE Cluster Info\n";
 
