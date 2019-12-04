@@ -85,6 +85,7 @@ RtSourceDataWorker::RtSourceDataWorker()
 , m_dSFreq(1000.0)
 , m_bStreamSmoothedData(true)
 , m_iCurrentSample(0)
+, m_iSampleCtr(0)
 {
     VisualizationInfo leftHemiInfo;
     VisualizationInfo rightHemiInfo;
