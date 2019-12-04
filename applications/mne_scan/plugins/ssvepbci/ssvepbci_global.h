@@ -52,10 +52,12 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(SSVEPBCI_LIBRARY)
-#  define SSVEPBCISHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(STATICLIB)
+#  define SSVEPBCISHARED_EXPORT
+#elif defined(SSVEPBCI_LIBRARY)
+#  define SSVEPBCISHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define SSVEPBCISHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define SSVEPBCISHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 #endif // SSVEPBCI_GLOBAL_H

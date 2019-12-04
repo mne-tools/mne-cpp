@@ -193,18 +193,22 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
 
 qint32 RtCmdClient::requestBufsize()
 {
+    qDebug() << "requestBufsize 1";
     //Send
     m_commandManager["getbufsize"].send();
 
+    qDebug() << "requestBufsize 2";
     //Receive
     m_qMutex.lock();
     QByteArray t_sJsonCommands = m_sAvailableData.toUtf8();
     m_qMutex.unlock();
 
+    qDebug() << "requestBufsize 3";
     //Parse
     QJsonParseError error;
     QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(t_sJsonCommands, &error);
 
+    qDebug() << "requestBufsize 4";
     if (error.error == QJsonParseError::NoError)
     {
 //        qDebug() << t_jsonDocumentOrigin;//"Received Commands" << m_commandManager.commandMap().keys();

@@ -50,10 +50,13 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(RAPMUSICTOOLBOX_LIBRARY)
-#  define RAPMUSICTOOLBOXSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(STATICLIB)
+#  define RAPMUSICTOOLBOXSHARED_EXPORT
+#elif defined(RAPMUSICTOOLBOX_LIBRARY)
+#  define RAPMUSICTOOLBOXSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define RAPMUSICTOOLBOXSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define RAPMUSICTOOLBOXSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
 
 #endif // RAPMUSICTOOLBOX_GLOBAL_H

@@ -50,10 +50,12 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(NEURONALCONNECTIVITY_LIBRARY)
-#  define NEURONALCONNECTIVITYSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(STATICLIB)
+#  define NEURONALCONNECTIVITYSHARED_EXPORT
+#elif defined(NEURONALCONNECTIVITY_LIBRARY)
+#  define NEURONALCONNECTIVITYSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define NEURONALCONNECTIVITYSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define NEURONALCONNECTIVITYSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 #endif // CONNECTIVITY_GLOBAL_H

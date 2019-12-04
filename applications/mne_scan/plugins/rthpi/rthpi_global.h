@@ -50,10 +50,12 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(RTHPI_LIBRARY)
-#  define RTHPISHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(STATICLIB)
+#  define RTHPISHARED_EXPORT
+#elif defined(RTHPI_LIBRARY)
+#  define RTHPISHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define RTHPISHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define RTHPISHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 #endif // RTHPI_GLOBAL_H

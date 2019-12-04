@@ -50,10 +50,12 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(RTSSS_LIBRARY)
-#  define RTSSSSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(STATICLIB)
+#  define RTSSSSHARED_EXPORT
+#elif defined(RTSSS_LIBRARY)
+#  define RTSSSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define RTSSSSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define RTSSSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 #endif // RTSSS_GLOBAL_H
