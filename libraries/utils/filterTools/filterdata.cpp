@@ -47,7 +47,7 @@
 #include "parksmcclellan.h"
 #include "cosinefilter.h"
 
-
+#include <utils/ioutils.h>
 //*************************************************************************************************************
 //=============================================================================================================
 // STL INCLUDES
@@ -189,6 +189,8 @@ void FilterData::designFilter()
             m_dCoeffA.resize(m_iFilterOrder);
             m_dCoeffA.head(m_iFilterOrder/2) = filtercos.m_dCoeffA.tail(m_iFilterOrder/2);
             m_dCoeffA.tail(m_iFilterOrder/2) = filtercos.m_dCoeffA.head(m_iFilterOrder/2);
+
+            IOUtils::write_eigen_matrix(m_dCoeffA,"m_dCoeffA.csv");
 
             //Now generate the fft version of the shortened impulse response
             fftTransformCoeffs();
