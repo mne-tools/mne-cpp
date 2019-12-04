@@ -117,7 +117,7 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f &matVertices,
     }
 
     // start threads with their respective parts of the final subset
-    qint32 iSubArraySize = ceil(vecVertSubset.size() / iCores);
+    qint32 iSubArraySize = int(ceil(double(vecVertSubset.size()) / double(iCores)));
     QVector<QFuture<void> > vecThreads(iCores - 1);
     qint32 iBegin = 0;
     qint32 iEnd = iSubArraySize;
