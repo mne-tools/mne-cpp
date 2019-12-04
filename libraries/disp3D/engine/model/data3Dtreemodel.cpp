@@ -578,8 +578,6 @@ void Data3DTreeModel::initMetatypes()
     qRegisterMetaType<QVector<Vector3f> >();
     qRegisterMetaType<QVector<Eigen::Vector3f> >();
 
-    qRegisterMetaType<QVector<qint32> >();
-
     qRegisterMetaType<QList<FSLIB::Label> >();
     qRegisterMetaType<QList<Label> >();
 

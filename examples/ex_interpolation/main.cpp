@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 
     //projecting with MEG
     qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
-    QVector<qint32> mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0].rr, megSensors);
+    QVector<int> mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0].rr, megSensors);
     std::cout <<  "Projecting duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeProjecting <<" ms " << std::endl;
 
     //SCDC with cancel distance 0.03
