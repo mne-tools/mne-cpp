@@ -42,19 +42,19 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-#    ex_cancel_noise \
-#    ex_evoked_grad_amp \
-#    ex_fiff_io \
-#    ex_find_evoked \
-#    ex_inverse_mne \
-#    ex_make_inverse_operator \
-#    ex_make_layout \
-#    ex_read_bem \
-#    ex_read_epochs \
-#    ex_read_evoked \
-#    ex_read_fwd \
-#    ex_read_raw \
-#    ex_read_write_raw \
+    ex_cancel_noise \
+    ex_evoked_grad_amp \
+    ex_fiff_io \
+    ex_find_evoked \
+    ex_inverse_mne \
+    ex_make_inverse_operator \
+    ex_make_layout \
+    ex_read_bem \
+    ex_read_epochs \
+    ex_read_evoked \
+    ex_read_fwd \
+    ex_read_raw \
+    ex_read_write_raw \
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     qtHaveModule(charts) {
