@@ -46,7 +46,7 @@
 #include "gusbamp_global.h"
 #include <scShared/Interfaces/ISensor.h>
 #include <utils/generics/circularmatrixbuffer.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 #include <fiff/fiff.h>
 
 #include "FormFiles/gusbampsetupwidget.h"
@@ -201,7 +201,7 @@ protected:
     virtual void run();
 
 private:
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_GUSBAmp;               /**< The RealTimeSampleArray to provide the EEG data.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr    m_pRTMSA_GUSBAmp;               /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<GUSBAmpSetupProjectWidget>                                   m_pGUSBampSetupProjectWidget;   /**< Widget for setup the project file*/
 
     QSharedPointer<IOBUFFER::RawMatrixBuffer>     m_pRawMatrixBuffer_In;    /**< Holds incoming raw data.*/

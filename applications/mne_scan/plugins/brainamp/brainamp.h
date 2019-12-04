@@ -74,7 +74,7 @@
 //=============================================================================================================
 
 namespace SCMEASLIB {
-    class NewRealTimeMultiSampleArray;
+    class RealTimeMultiSampleArray;
 }
 
 namespace FIFFLIB {
@@ -229,7 +229,7 @@ protected:
     bool dirExists(const std::string& dirName_in);
 
 private:
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::NewRealTimeMultiSampleArray> >  m_pRMTSA_BrainAMP;              /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >  m_pRMTSA_BrainAMP;              /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<BrainAMPSetupProjectWidget>                                              m_pBrainAMPSetupProjectWidget;  /**< Widget for checking the impedances*/
 
     QSharedPointer<IOBUFFER::RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/

@@ -49,23 +49,30 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += shared
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lxMeasd \
-            -lxDispd \
+            -lscMeasd \
+            -lscDispd \
             -lscSharedd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lxMeas \
-            -lxDisp \
+            -lscMeas \
+            -lscDisp \
             -lscShared
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
         bci.cpp \
@@ -85,23 +92,12 @@ FORMS += \
         FormFiles/bciabout.ui \
         FormFiles/bcifeaturewindow.ui
 
-RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/mne_scan/plugins/bci/LDA_linear_boundary_Sensor.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/bci/Pinning_Scheme_Duke_128.txt \
-    $${MNE_DIR}/resources/mne_scan/plugins/bci/readme.txt \
+RESOURCE_FILES += $${ROOT_DIR}/resources/mne_scan/plugins/bci/LDA_linear_boundary_Sensor.txt \
+                  $${ROOT_DIR}/resources/mne_scan/plugins/bci/Pinning_Scheme_Duke_128.txt \
 
-# Copy resource files to bin resource folder
-for(FILE, RESOURCE_FILES) {
-    FILEDIR = $$dirname(FILE)
-    FILEDIR ~= s,/resources,/bin/resources,g
-    FILEDIR = $$shell_path($${FILEDIR})
-    TRGTDIR = $${FILEDIR}
-
-    QMAKE_POST_LINK += $$sprintf($${QMAKE_MKDIR_CMD}, "$${TRGTDIR}") $$escape_expand(\n\t)
-
-    FILE = $$shell_path($${FILE})
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${TRGTDIR}) $$escape_expand(\\n\\t)
-}
+# Copy resource files from repository to bin resource folder
+COPY_CMD = $$copyResources($${RESOURCE_FILES})
+QMAKE_POST_LINK += $${COPY_CMD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -123,3 +119,23 @@ OTHER_FILES += bci.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
+
+# Activate FFTW backend in Eigen for non-static builds only
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}

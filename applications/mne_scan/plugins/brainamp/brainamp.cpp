@@ -48,7 +48,7 @@
 #include <direct.h>
 
 #include <fiff/fiff.h>
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -150,7 +150,7 @@ QSharedPointer<IPlugin> BrainAMP::clone() const
 
 void BrainAMP::init()
 {
-    m_pRMTSA_BrainAMP = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "BrainAMP", "EEG output data");
+    m_pRMTSA_BrainAMP = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BrainAMP", "EEG output data");
 
     m_outputConnectors.append(m_pRMTSA_BrainAMP);
 
