@@ -363,7 +363,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
     clearConnectorActivation();
 
 #ifdef STATICLIB
-    Q_UNUSED(dir);
+    Q_UNUSED(dir)
 
     // In case of a static build we have to load plugins manually.
     // Neuromag is commented out since this plugin is only built on MEG acq computers.

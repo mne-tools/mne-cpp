@@ -90,7 +90,7 @@ private:
     FiffEvoked evoked;
     // random data (keep computation times short)
     MNEBemSurface smallSurface;
-    QVector<qint32> smallSubset;
+    QVector<int> smallSubset;
 };
 
 //*************************************************************************************************************
@@ -184,7 +184,7 @@ void TestInterpolation::testDimensionsForInterpolation()
 void TestInterpolation::testSumOfRow()
 {
     // projecting with MEG:
-    QVector<qint32> mappedSubSet = GeometryInfo::projectSensors(realSurface.rr,
+    QVector<int> mappedSubSet = GeometryInfo::projectSensors(realSurface.rr,
                                                                 megSensors);
 
     // SCDC with cancel distance 0.20 m:
@@ -228,7 +228,7 @@ void TestInterpolation::testEmptyInputsForWeightMatrix()
     QSharedPointer<MatrixXd> distTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, smallSubset, 0.03);
 
     // ---------- empty sensor indices ----------
-    QVector<qint32> emptySensors;
+    QVector<int> emptySensors;
     QVERIFY(Interpolation::createInterpolationMat(emptySensors,
                                                   distTable,
                                                   Interpolation::linear,

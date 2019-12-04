@@ -133,7 +133,7 @@ public:
     */
     static QSharedPointer<Eigen::MatrixXd> scdc(const Eigen::MatrixX3f &matVertices,
                                                 const QVector<QVector<int> > &vecNeighborVertices,
-                                                QVector<qint32> &pVecVertSubset,
+                                                QVector<int> &pVecVertSubset,
                                                 double dCancelDist = FLOAT_INFINITY);
 
     //=========================================================================================================
@@ -145,7 +145,7 @@ public:
     *
     * @return                           Output vector where the vector index position represents the id of the sensor and the int in each cell is the vertex it is mapped to
     */
-    static QVector<qint32> projectSensors(const Eigen::MatrixX3f &matVertices,
+    static QVector<int> projectSensors(const Eigen::MatrixX3f &matVertices,
                                           const QVector<Eigen::Vector3f> &vecSensorPositions);
 
     //=========================================================================================================
@@ -158,7 +158,7 @@ public:
     *
     * @return Vector of bad channel indices.
     */
-    static QVector<qint32> filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
+    static QVector<int> filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
                                              const FIFFLIB::FiffInfo& fiffInfo,
                                              qint32 iSensorType);
 
@@ -183,7 +183,7 @@ protected:
     *
     * @return                       A vector of nearest vertex IDs that corresponds to the subvector between the two iterators
     */
-    static QVector<qint32> nearestNeighbor(const Eigen::MatrixX3f &matVertices,
+    static QVector<int> nearestNeighbor(const Eigen::MatrixX3f &matVertices,
                                            QVector<Eigen::Vector3f>::const_iterator itSensorBegin,
                                            QVector<Eigen::Vector3f>::const_iterator itSensorEnd);
 
@@ -202,7 +202,7 @@ protected:
     static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> matOutputDistMatrix,
                                   const Eigen::MatrixX3f &matVertices,
                                   const QVector<QVector<int> > &vecNeighborVertices,
-                                  const QVector<qint32> &vecVertSubset,
+                                  const QVector<int> &vecVertSubset,
                                   qint32 iBegin,
                                   qint32 iEnd,
                                   double dCancelDistance);
