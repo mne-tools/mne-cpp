@@ -44,9 +44,18 @@ DEFINES += EEGOSPORTS_LIBRARY
 
 QT += core widgets svg
 
-TARGET = EEGoSports
+TARGET = eegosports
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
+}
+
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += shared
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
@@ -66,8 +75,6 @@ else {
             -lscDisp \
             -lscShared
 }
-
-DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
 SOURCES += \
         eegosports.cpp \
@@ -125,3 +132,23 @@ RESOURCES += \
     eegosports.qrc
 
 DISTFILES +=
+
+# Activate FFTW backend in Eigen for non-static builds only
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}

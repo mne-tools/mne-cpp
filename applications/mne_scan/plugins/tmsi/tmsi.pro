@@ -68,6 +68,15 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += staticlib
+    DEFINES += STATICLIB
+} else {
+    CONFIG += shared
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
@@ -86,8 +95,6 @@ else {
             -lscShared
 }
 
-DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
-
 SOURCES += \
         tmsi.cpp \
         tmsiproducer.cpp \
@@ -99,7 +106,7 @@ SOURCES += \
         tmsielectrodeitem.cpp \
         tmsiimpedanceview.cpp \
         tmsiimpedancescene.cpp \
-    FormFiles/tmsisetupprojectwidget.cpp
+        FormFiles/tmsisetupprojectwidget.cpp
 
 HEADERS += \
         tmsi.h\
@@ -113,7 +120,7 @@ HEADERS += \
         tmsielectrodeitem.h \
         tmsiimpedanceview.h \
         tmsiimpedancescene.h \
-    FormFiles/tmsisetupprojectwidget.h
+        FormFiles/tmsisetupprojectwidget.h
 
 FORMS += \
         FormFiles/tmsisetup.ui \
@@ -161,3 +168,23 @@ unix: QMAKE_CXXFLAGS += -Wno-attributes
 
 RESOURCES += \
     tmsi.qrc
+
+# Activate FFTW backend in Eigen for non-static builds only
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}

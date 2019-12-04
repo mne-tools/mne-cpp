@@ -37,7 +37,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core widgets xml svg charts opengl
+QT += network core widgets xml svg charts opengl serialport concurrent
 
 qtHaveModule(3dextras) {
     QT += 3dextras
@@ -47,7 +47,32 @@ contains(MNECPP_CONFIG, static) {
     CONFIG += static
     DEFINES += STATICLIB
     LIBS += -L$${MNE_BINARY_DIR}/mne_scan_plugins
-    QTPLUGIN += fiffsimulator \
+    QTPLUGIN += ecgsimulator
+    QTPLUGIN += fiffsimulator
+    QTPLUGIN += neuromag
+    QTPLUGIN += babymeg
+    QTPLUGIN += triggercontrol
+    QTPLUGIN += natus
+#    QTPLUGIN += gusbamp
+#    QTPLUGIN += eegosports
+#    QTPLUGIN += brainamp
+#    QTPLUGIN += tmsi
+#    QTPLUGIN += lsladapter
+    QTPLUGIN += dummytoolbox
+    QTPLUGIN += epidetect
+    QTPLUGIN += mne
+    QTPLUGIN += rapmusictoolbox
+    QTPLUGIN += averaging
+    QTPLUGIN += covariance
+    QTPLUGIN += noise
+    QTPLUGIN += bci
+    QTPLUGIN += rtsss
+    QTPLUGIN += rthpi
+    QTPLUGIN += noisereduction
+    QTPLUGIN += rthpi
+    QTPLUGIN += ssvepbci
+    QTPLUGIN += neuronalconnectivity
+    QTPLUGIN += reference
 }
 
 TARGET = mne_scan

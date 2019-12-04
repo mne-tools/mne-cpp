@@ -526,6 +526,8 @@ private:
     */
     void initSphara();
 
+    static void doFilterPerChannelRTMSA(QPair<QList<UTILSLIB::FilterData>,QPair<int,Eigen::RowVectorXd> > &channelDataTime);
+
     //=========================================================================================================
     /**
     * Calculates the filtered version of the channels in m_matDataRaw

@@ -47,7 +47,7 @@
 #include "../tmsiimpedancescene.h"
 #include "disp/helpers/colormap.h"
 
-#include <scMeas/newrealtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 //*************************************************************************************************************
 //=============================================================================================================

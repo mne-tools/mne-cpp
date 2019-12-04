@@ -44,7 +44,7 @@ DEFINES += SSVEPBCI_LIBRARY
 
 QT += core widgets concurrent gui
 
-TARGET = SSVEPBCI
+TARGET = ssvepbci
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -57,7 +57,6 @@ contains(MNECPP_CONFIG, static) {
 } else {
     CONFIG += shared
 }
-
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {

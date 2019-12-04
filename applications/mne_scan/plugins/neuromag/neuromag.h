@@ -288,7 +288,7 @@ protected:
     */
     void updateHPI(const Eigen::MatrixXf &matData);
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA_Neuromag;          /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA_Neuromag;          /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<COMMUNICATIONLIB::RtCmdClient>       m_pRtCmdClient;                 /**< The command client.*/
     QSharedPointer<NeuromagProducer>                    m_pNeuromagProducer;            /**< Holds the NeuromagnProducer.*/
