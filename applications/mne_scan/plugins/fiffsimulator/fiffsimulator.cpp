@@ -387,7 +387,9 @@ void FiffSimulator::connectCmdClient()
             //
             // Read Buffer Size
             //
+            qDebug() << "Read Buffer Size";
             m_iBufferSize = m_pRtCmdClient->requestBufsize();
+            qDebug() << "Read Buffer Size End";
 
             emit cmdConnectionChanged(m_bCmdClientIsConnected);
         }

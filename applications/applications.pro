@@ -50,7 +50,7 @@ SUBDIRS += \
 
         qtHaveModule(charts) {
         SUBDIRS += \
-            mne_analyze \
+            #mne_analyze \
             mne_dipole_fit \
             mne_launch \
             mne_scan

@@ -79,6 +79,10 @@ using namespace Eigen;
 // global var
 //=============================================================================================================
 
+#ifdef STATICLIB
+Q_IMPORT_PLUGIN(FiffSimulator)
+//Q_IMPORT_PLUGIN(Neuromag)
+#endif
 
 QSharedPointer<MainWindow> mainWin;
 
