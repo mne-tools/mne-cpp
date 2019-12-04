@@ -167,7 +167,7 @@ QVector<qint32> GeometryInfo::projectSensors(const MatrixX3f &matVertices,
         iCores = 2;
     }
 
-    const qint32 iSubArraySize = ceil(vecSensorPositions.size() / iCores);
+    const qint32 iSubArraySize = int(ceil(double(vecSensorPositions.size()) / double(iCores)));
 
     //small input size no threads needed
     if(iSubArraySize <= 1)
