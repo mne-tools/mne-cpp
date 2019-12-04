@@ -96,14 +96,13 @@ private:
 
     MatrixXd first_in_data;
     MatrixXd first_in_times;
-    MatrixXd dataFiltered;
-    MatrixXd refDataFiltered;
-
+    MatrixXd first_filtered;
 
     FiffRawData ref_in_raw;
 
     MatrixXd ref_in_data;
     MatrixXd ref_in_times;
+    MatrixXd ref_filtered;
 };
 
 
@@ -122,9 +121,9 @@ void TestFiffRFR::initTestCase()
 {
     qDebug() << "Epsilon" << epsilon;
 
-    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_short_raw.fif");
-    QFile t_fileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/ref_rtfilter_filterdata_raw.fif");
-    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_test_rwr_out.fif");
+    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
+    QFile t_fileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/ref_rtfilter_filterdata_raw.fif");      //Einlesen mne-cpp, schreiben mne-python
+    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");      //schreiben mne-cpp, einlesen mne-python
 
     //
     //   Make sure test folder exists
@@ -148,7 +147,7 @@ void TestFiffRFR::initTestCase()
     //
     //   Set up pick list: MEG + STI 014 - bad channels
     //
-    //
+
     bool want_meg   = true;
     bool want_eeg   = false;
     bool want_stim  = false;
@@ -180,7 +179,6 @@ void TestFiffRFR::initTestCase()
     fiff_int_t to = first_in_raw.last_samp;
     fiff_int_t quantum = to-from+1;
     RtFilter rtFilter;                                                      // filter object
-    MatrixXd dataFiltered;                                                  // filter output
 
     // channel selection - in this case use every channel
     // size = number of channels; value = index channel number
@@ -190,22 +188,20 @@ void TestFiffRFR::initTestCase()
     }
 
     // initialize filter settings
-    QString filter_name =  "example_cosine";
+    QString filter_name = "example_cosine";
     FilterData::FilterType type = FilterData::BPF;
-    double sFreq = first_in_raw.info.sfreq;                                          // get Sample freq from Data
-    double centerfreq = 10/(sFreq/2.0);                                     // normed nyquist freq.
+    double sFreq = first_in_raw.info.sfreq;                                 // get Sample freq from Data
+    double centerfreq = 10/(sFreq/2.0);                                     // normed to nyquist freq.
     double bandwidth = 10/(sFreq/2.0);
     double parkswidth = 1/(sFreq/2.0);
-
-    //
+    int order = 8192;
+    int fftlength = 16384;
     //
     //   Read and write all the data
     //
     bool first_buffer = true;
 
     fiff_int_t first, last;
-    MatrixXd data;
-    MatrixXd times;
 
     for(first = from; first < to; first+=quantum)
     {
@@ -222,7 +218,7 @@ void TestFiffRFR::initTestCase()
 
         //Filtering
         printf("Filtering...");
-        dataFiltered = rtFilter.filterData(data,type,centerfreq,bandwidth,parkswidth,sFreq,channelList);
+        first_filtered = rtFilter.filterData(first_in_data,type,centerfreq,bandwidth,parkswidth,sFreq,channelList,order, fftlength);
         printf("[done]\n");
 
         printf("Writing...");
@@ -232,7 +228,7 @@ void TestFiffRFR::initTestCase()
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
            first_buffer = false;
         }
-        outfid->write_raw_buffer(dataFiltered,cals);
+        outfid->write_raw_buffer(first_filtered,cals);
         printf("[done]\n");
     }
 
@@ -274,11 +270,15 @@ void TestFiffRFR::initTestCase()
             last = to;
         }
 
-        if (!ref_in_raw.read_raw_segment(ref_in_data,ref_in_times,first,last/*,picks*/))
+        if (!ref_in_raw.read_raw_segment(ref_filtered,ref_in_times,first,last/*,picks*/))
         {
                 printf("error during read_raw_segment\n");
         }
     }
+
+
+//    QString refFileName(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/ref_rtfilter_filterdata_raw.txt");
+//    IOUtils::read_eigen_matrix(ref_filtered, refFileName);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Read MNE-PYTHON Results Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
@@ -288,11 +288,12 @@ void TestFiffRFR::initTestCase()
 
 void TestFiffRFR::compareData()
 {
-    MatrixXd data_diff = first_in_data - ref_in_data;
+    MatrixXd data_diff = first_filtered - ref_filtered;
 //    std::cout << "\tCompare data:\n";
 //    std::cout << "\tFirst data\n" << first_in_data.block(0,0,4,4) << "\n";
 //    std::cout << "\tSecond data\n" << second_in_data.block(0,0,4,4) << "\n";
 
+    printf("diff: ..%f",data_diff.sum());
     QVERIFY( data_diff.sum() < epsilon );
 }
 
