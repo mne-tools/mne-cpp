@@ -48,6 +48,7 @@
 
 #include <utils/ioutils.h>
 
+#include <Eigen/Dense>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,6 +92,7 @@ private slots:
 
 private:
     double epsilon;
+    int order;
 
     FiffRawData first_in_raw;
 
@@ -103,6 +105,8 @@ private:
     MatrixXd ref_in_data;
     MatrixXd ref_in_times;
     MatrixXd ref_filtered;
+
+    MatrixXi picks;
 };
 
 
@@ -121,9 +125,9 @@ void TestFiffRFR::initTestCase()
 {
     qDebug() << "Epsilon" << epsilon;
 
-    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QFile t_fileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/ref_rtfilter_filterdata_raw.fif");      //Einlesen mne-cpp, schreiben mne-python
-    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");      //schreiben mne-cpp, einlesen mne-python
+    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    QFile t_fileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_rtfilter_filterdata_raw.fif");      //Write mne-cpp, Write mne-python
+    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");      //Write mne-cpp, Read mne-python
 
     //
     //   Make sure test folder exists
@@ -145,30 +149,22 @@ void TestFiffRFR::initTestCase()
     first_in_raw = FiffRawData(t_fileIn);
 
     //
-    //   Set up pick list: MEG + STI 014 - bad channels
+    //   Set up pick list: MEG - bad channels
     //
 
     bool want_meg   = true;
     bool want_eeg   = false;
     bool want_stim  = false;
-    QStringList include;
-    include << "STI 014";
 
-    MatrixXi picks = first_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, first_in_raw.info.bads); // prefer member function
-    if(picks.cols() == 0)
-    {
-        include.clear();
-        include << "STI101" << "STI201" << "STI301";
-        picks = first_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, first_in_raw.info.bads);// prefer member function
-        if(picks.cols() == 0)
-        {
-            printf("channel list may need modification\n");
-        }
-    }
+    QStringList bads = first_in_raw.info.bads;
+    QStringList add = {"MEG 2443", "EEG 053"};
+    bads << "MEG 2443" << "EEG 053";
+    QStringList include;
+
+    MatrixXi picks = first_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, bads); // prefer member function
     //
     RowVectorXd cals;
-
-    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut,first_in_raw.info, cals/*, picks*/);
+    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut,first_in_raw.info, cals,picks);
 
     //
     //   Set up the reading parameters
@@ -182,9 +178,9 @@ void TestFiffRFR::initTestCase()
 
     // channel selection - in this case use every channel
     // size = number of channels; value = index channel number
-    QVector<int> channelList(first_in_raw.info.nchan);
-    for (int i = 0; i < first_in_raw.info.nchan; i++){
-        channelList[i] = i;
+    QVector<int> channelList(picks.size());
+    for (int i = 0; i < picks.size(); i++){
+        channelList[i] = picks(i);
     }
 
     // initialize filter settings
@@ -194,8 +190,8 @@ void TestFiffRFR::initTestCase()
     double centerfreq = 10/(sFreq/2.0);                                     // normed to nyquist freq.
     double bandwidth = 10/(sFreq/2.0);
     double parkswidth = 1/(sFreq/2.0);
-    int order = 8192;
-    int fftlength = 16384;
+    order = 1024;
+    int fftlength = 4096;
     //
     //   Read and write all the data
     //
@@ -210,15 +206,14 @@ void TestFiffRFR::initTestCase()
         {
             last = to;
         }
-
-        if (!first_in_raw.read_raw_segment(first_in_data,first_in_times,first,last/*,picks*/))
+        if (!first_in_raw.read_raw_segment(first_in_data,first_in_times,first,last,picks))
         {
                 printf("error during read_raw_segment\n");
         }
 
         //Filtering
         printf("Filtering...");
-        first_filtered = rtFilter.filterData(first_in_data,type,centerfreq,bandwidth,parkswidth,sFreq,channelList,order, fftlength);
+        first_filtered = rtFilter.filterData(first_in_data,type,centerfreq,bandwidth,parkswidth,sFreq,channelList,order,fftlength);
         printf("[done]\n");
 
         printf("Writing...");
@@ -250,17 +245,7 @@ void TestFiffRFR::initTestCase()
     //
     //
 
-    picks = ref_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, ref_in_raw.info.bads); // prefer member function
-    if(picks.cols() == 0)
-    {
-        include.clear();
-        include << "STI101" << "STI201" << "STI301";
-        picks = ref_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, ref_in_raw.info.bads);// prefer member function
-        if(picks.cols() == 0)
-        {
-            printf("channel list may need modification\n");
-        }
-    }
+    picks = ref_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, bads); // prefer member function
 
     for(first = from; first < to; first+=quantum)
     {
@@ -270,15 +255,20 @@ void TestFiffRFR::initTestCase()
             last = to;
         }
 
-        if (!ref_in_raw.read_raw_segment(ref_filtered,ref_in_times,first,last/*,picks*/))
+        if (!ref_in_raw.read_raw_segment(ref_filtered,ref_in_times,first,last,picks))
         {
                 printf("error during read_raw_segment\n");
         }
     }
 
-
-//    QString refFileName(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/ref_rtfilter_filterdata_raw.txt");
-//    IOUtils::read_eigen_matrix(ref_filtered, refFileName);
+    /*
+     *
+     * Filter in Python is created with following function. It creates the filter coeff. with 8193 elements
+     * make sure to cut them to the length of the mne-cpp filter.
+     * Filter with function: mne.filter._overlap_add_filter(dataIn,filter_python,phase = 'linear')
+     * mne.filter.design_mne_c_filter(f_sfreq, f_l_freq, f_h_freq,f_l_trans_bandwidth, f_h_trans_bandwidth)
+     *
+     */
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Read MNE-PYTHON Results Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
@@ -288,15 +278,12 @@ void TestFiffRFR::initTestCase()
 
 void TestFiffRFR::compareData()
 {
-    MatrixXd data_diff = first_filtered - ref_filtered;
-//    std::cout << "\tCompare data:\n";
-//    std::cout << "\tFirst data\n" << first_in_data.block(0,0,4,4) << "\n";
-//    std::cout << "\tSecond data\n" << second_in_data.block(0,0,4,4) << "\n";
+    //make sure to only read data after 1/2 filter length
+    int length = first_filtered.cols()-int(order/2);
+    MatrixXd data_diff = first_filtered.block(0,int(order/2),first_filtered.rows(),length) - ref_filtered.block(0,int(order/2),ref_filtered.rows(),length);
 
-    printf("diff: ..%f",data_diff.sum());
     QVERIFY( data_diff.sum() < epsilon );
 }
-
 
 //*************************************************************************************************************
 
