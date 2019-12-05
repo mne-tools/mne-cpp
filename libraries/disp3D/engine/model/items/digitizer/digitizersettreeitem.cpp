@@ -241,7 +241,7 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     for(int i = 0; i < itemList.size(); ++i) {
         DigitizerTreeItem* item = dynamic_cast<DigitizerTreeItem*>(itemList.at(i));
 
-        if(item == NULL || item == nullptr || item == Q_NULLPTR){
+        if(item == Q_NULLPTR){
             qDebug() << "Dynamic cast returned null. Returning early.";
             return;
         }

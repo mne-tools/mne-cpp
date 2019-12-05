@@ -419,9 +419,8 @@ SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
 
     if(!itemList.isEmpty() && (itemList.first()->type() == Data3DTreeModelItemTypes::SensorSetItem)) {
         pReturnItem = dynamic_cast<SensorSetTreeItem*>(itemList.first());
-        if(pReturnItem == NULL || pReturnItem == nullptr || pReturnItem == Q_NULLPTR){
+        if(pReturnItem == Q_NULLPTR){
             qDebug()<<"Dynamic cast failed, returning null pointer";
-            pReturnItem = Q_NULLPTR;
         } else {
             pReturnItem->addData(sensor, lChInfo, "MEG", bads, m_pModelEntity);
         }
