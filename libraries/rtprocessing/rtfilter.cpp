@@ -149,17 +149,20 @@ MatrixXd RtFilter::filterChannelsConcurrently(const MatrixXd& matDataIn,
             m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(iMaxFilterLength);
         }
     }
+
     //Fill filtered data with raw data if the channel was not filtered
     for(int i = 0; i < notFilterChannelIndex.size(); ++i) {
         matDataOut.row(notFilterChannelIndex.at(i)) << m_matDelay.row(notFilterChannelIndex.at(i)), matDataIn.row(notFilterChannelIndex.at(i)).head(matDataIn.cols() - iMaxFilterLength/2);
-
         //matDataOut.row(notFilterChannelIndex.at(i)).segment(0, matDataIn.row(notFilterChannelIndex.at(i)).cols()) = matDataIn.row(notFilterChannelIndex.at(i));
+
     }
+
     if(matDataIn.cols() >= iMaxFilterLength/2) {
-            m_matDelay = matDataIn.block(0, matDataIn.cols()-iMaxFilterLength/2, matDataIn.rows(), iMaxFilterLength/2);
-        } else {
+        m_matDelay = matDataIn.block(0, matDataIn.cols()-iMaxFilterLength/2, matDataIn.rows(), iMaxFilterLength/2);
+    } else {
             qWarning() << "RtFilter::filterChannelsConcurrently - Half of filter length is larger than data size. Not filling m_matDelay for next step.";
-        }
+    }
+
     return matDataOut;
 }
 
@@ -199,14 +202,14 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
             if(i == numSlices-1) {
                 //catch the last one that might be shorter then original size
                 iSize = matDataIn.cols() - (iSize * (numSlices -1));
-                }
+            }
+
             slice = matDataIn.block(0,from,lFilterChannelList.length(),iSize);
             sliceFiltered = filterChannelsConcurrently(slice,order,lFilterChannelList,filterList);
             matDataOut.block(0,from,lFilterChannelList.length(),iSize) = sliceFiltered;
             from += iSize;
-            }
         }
-    else{
+    } else {
         matDataOut = filterChannelsConcurrently(matDataIn,order,lFilterChannelList,filterList);
     }
     return matDataOut;
