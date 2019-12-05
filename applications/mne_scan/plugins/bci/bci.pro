@@ -103,19 +103,18 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
-unix:!macx {
-    QMAKE_CXXFLAGS += -std=c++0x
-    QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
-    # suppress visibility warnings
-    QMAKE_CXXFLAGS += -Wno-attributes
-}
-macx {
-    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc+
-    CONFIG +=c++11
-}
-
 OTHER_FILES += bci.json
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes
+
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../../lib
+}
+
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
