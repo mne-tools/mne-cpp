@@ -476,7 +476,7 @@ void MNEBem::warp(const MatrixXf & sLm, const MatrixXf &dLm)
 
 //*************************************************************************************************************
 
-void MNEBem::transform(const FiffCoordTrans trans)
+void MNEBem::transform(const FiffCoordTrans& trans)
 {
     MatrixX3f vert;
     for (int i=0; i<this->m_qListBemSurface.size(); i++)
@@ -491,7 +491,7 @@ void MNEBem::transform(const FiffCoordTrans trans)
 
 //*************************************************************************************************************
 
-void MNEBem::invtransform(const FiffCoordTrans trans)
+void MNEBem::invtransform(const FiffCoordTrans& trans)
 {
     MatrixX3f vert;
     for (int i=0; i<this->m_qListBemSurface.size(); i++)
