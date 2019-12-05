@@ -460,7 +460,7 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
 
 //*************************************************************************************************************
 
-void HpiView::onNewFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult)
+void HpiView::onNewFittingResultAvailable(const RTPROCESSINGLIB::FittingResult& fitResult)
 {
     m_vGof = fitResult.errorDistances;
 
