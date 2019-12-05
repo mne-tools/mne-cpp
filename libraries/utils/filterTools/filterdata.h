@@ -129,14 +129,12 @@ public:
     * @param [in] unique_name defines the name of the generated filter
     * @param [in] type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
     * @param [in] order represents the order of the filter, the higher the higher is the stopband attenuation
-    * @param [in] centerfreq determines the center of the frequency
-    * @param [in] bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband
-    * @param [in] parkswidth determines the width of the filter slopes (steepness)
+    * @param [in] centerfreq determines the center of the frequency - normed to sFreq/2 (nyquist)
+    * @param [in] bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband - normed to sFreq/2 (nyquist)
+    * @param [in] parkswidth determines the width of the filter slopes (steepness) - normed to sFreq/2 (nyquist)
     * @param [in] sFreq sampling frequency
     * @param [in] fftlength length of the fft (multiple integer of 2^x)
     * @param [in] designMethod specifies the design method to use. Choose between Cosind and Tschebyscheff
-    *
-    *             centerfreq, bandwidth and parkswidth are normed to sFreq
     **/
 
     FilterData(QString unique_name,
