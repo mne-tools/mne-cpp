@@ -87,20 +87,15 @@ private slots:
     void initTestCase();
     void compareData();
     void compareTimes();
-    void compareInfo();
     void cleanupTestCase();
 
 private:
     double epsilon;
     int order;
 
-    FiffRawData first_in_raw;
-
     MatrixXd first_in_data;
     MatrixXd first_in_times;
     MatrixXd first_filtered;
-
-    FiffRawData ref_in_raw;
 
     MatrixXd ref_in_data;
     MatrixXd ref_in_times;
@@ -121,21 +116,18 @@ TestFiffRFR::TestFiffRFR()
 
 //*************************************************************************************************************
 
-void TestFiffRFR::initTestCase()
-{
+void TestFiffRFR::initTestCase() {
+
     qDebug() << "Epsilon" << epsilon;
 
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
     QFile t_fileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_rtfilter_filterdata_raw.fif");      //Write mne-cpp, Write mne-python
     QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");      //Write mne-cpp, Read mne-python
 
-    //
-    //   Make sure test folder exists
-    //
+    // Make sure test folder exists
 
     QFileInfo t_fileOutInfo(t_fileOut);
     QDir().mkdir(t_fileOutInfo.path());
-
 
     //*********************************************************************************************************
     // First Read, Filter & Write
@@ -143,33 +135,26 @@ void TestFiffRFR::initTestCase()
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read, Filter & Write >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    //
     //   Setup for reading the raw data
-    //
+    FiffRawData first_in_raw;
     first_in_raw = FiffRawData(t_fileIn);
 
-    //
     //   Set up pick list: MEG - bad channels
-    //
 
     bool want_meg   = true;
     bool want_eeg   = false;
     bool want_stim  = false;
 
     QStringList bads = first_in_raw.info.bads;
-    QStringList add = {"MEG 2443", "EEG 053"};
     bads << "MEG 2443" << "EEG 053";
     QStringList include;
 
     MatrixXi picks = first_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, bads); // prefer member function
-    //
     RowVectorXd cals;
     FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut,first_in_raw.info, cals,picks);
 
-    //
     //   Set up the reading parameters
     //   To read the whole file at once set
-    //
 
     fiff_int_t from = first_in_raw.first_samp;
     fiff_int_t to = first_in_raw.last_samp;
@@ -178,8 +163,9 @@ void TestFiffRFR::initTestCase()
 
     // channel selection - in this case use every channel
     // size = number of channels; value = index channel number
+
     QVector<int> channelList(picks.size());
-    for (int i = 0; i < picks.size(); i++){
+    for (int i = 0; i < picks.size(); i++) {
         channelList[i] = picks(i);
     }
 
@@ -192,23 +178,22 @@ void TestFiffRFR::initTestCase()
     double parkswidth = 1/(sFreq/2.0);
     order = 1024;
     int fftlength = 4096;
-    //
-    //   Read and write all the data
-    //
+
+    // Read and write all the data
+
     bool first_buffer = true;
 
     fiff_int_t first, last;
 
-    for(first = from; first < to; first+=quantum)
-    {
+    for(first = from; first < to; first+=quantum) {
         last = first+quantum-1;
-        if (last > to)
-        {
+
+        if (last > to) {
             last = to;
         }
-        if (!first_in_raw.read_raw_segment(first_in_data,first_in_times,first,last,picks))
-        {
-                printf("error during read_raw_segment\n");
+
+        if (!first_in_raw.read_raw_segment(first_in_data,first_in_times,first,last,picks)) {
+            printf("error during read_raw_segment\n");
         }
 
         //Filtering
@@ -217,8 +202,7 @@ void TestFiffRFR::initTestCase()
         printf("[done]\n");
 
         printf("Writing...");
-        if (first_buffer)
-        {
+        if (first_buffer) {
            if (first > 0)
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
            first_buffer = false;
@@ -229,8 +213,25 @@ void TestFiffRFR::initTestCase()
 
     outfid->finish_writing_raw();
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Read, Filter & Write Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    // Read filtered data from the filtered output file to check if read and write is working correctly
 
+    FiffRawData second_in_Raw;
+    second_in_Raw = FiffRawData(t_fileOut);
+
+    picks = second_in_Raw.info.pick_types(want_meg, want_eeg, want_stim, include, bads); // prefer member function
+
+    for(first = from; first < to; first+=quantum) {
+        last = first+quantum-1;
+
+        if (last > to) {
+            last = to;
+        }
+        if (!second_in_Raw.read_raw_segment(first_filtered,first_in_times,first,last,picks)) {
+            printf("error during read_raw_segment\n");
+        }
+    }
+
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Read, Filter & Write Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
     //*********************************************************************************************************
     // Read MNE-PYTHON Results As Reference
@@ -238,103 +239,56 @@ void TestFiffRFR::initTestCase()
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read MNE-PYTHON Results As Reference >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
+    FiffRawData ref_in_raw;
     ref_in_raw = FiffRawData(t_fileRef);
-
-    //
-    //   Set up pick list: MEG + STI 014 - bad channels
-    //
-    //
 
     picks = ref_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, bads); // prefer member function
 
-    for(first = from; first < to; first+=quantum)
-    {
+    for(first = from; first < to; first+=quantum) {
         last = first+quantum-1;
+
         if (last > to)
         {
             last = to;
         }
-
         if (!ref_in_raw.read_raw_segment(ref_filtered,ref_in_times,first,last,picks))
         {
-                printf("error during read_raw_segment\n");
+            printf("error during read_raw_segment\n");
         }
     }
-
     /*
-     *
-     * Filter in Python is created with following function. It creates the filter coeff. with 8193 elements
+     * Filter in Python is created with following function. It creates the filter coeff. with 8193 elements,
      * make sure to cut them to the length of the mne-cpp filter.
      * Filter with function: mne.filter._overlap_add_filter(dataIn,filter_python,phase = 'linear')
      * mne.filter.design_mne_c_filter(f_sfreq, f_l_freq, f_h_freq,f_l_trans_bandwidth, f_h_trans_bandwidth)
-     *
      */
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Read MNE-PYTHON Results Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
 
-
 //*************************************************************************************************************
 
-void TestFiffRFR::compareData()
-{
+void TestFiffRFR::compareData() {
+
     //make sure to only read data after 1/2 filter length
     int length = first_filtered.cols()-int(order/2);
     MatrixXd data_diff = first_filtered.block(0,int(order/2),first_filtered.rows(),length) - ref_filtered.block(0,int(order/2),ref_filtered.rows(),length);
-
     QVERIFY( data_diff.sum() < epsilon );
+
 }
 
 //*************************************************************************************************************
 
-void TestFiffRFR::compareTimes()
-{
+void TestFiffRFR::compareTimes() {
+
     MatrixXd times_diff = first_in_times - ref_in_times;
-//    std::cout << "\tCompare Times:\n";
-//    std::cout << "\tFirst times\n" << first_in_times.block(0,0,1,4) << "\n";
-//    std::cout << "\tSecond times\n" << second_in_times.block(0,0,1,4) << "\n";
-
     QVERIFY( times_diff.sum() < epsilon );
+
 }
-
-
-//*************************************************************************************************************
-
-void TestFiffRFR::compareInfo()
-{
-    //Sampling frequency
-    std::cout << "[1] Sampling Frequency Check\n";
-    QVERIFY( first_in_raw.info.sfreq == ref_in_raw.info.sfreq );
-
-    //Projection
-    std::cout << "[2] Projection Check\n";
-    QVERIFY( first_in_raw.info.projs.size() == ref_in_raw.info.projs.size() );
-
-    for( qint32 i = 0; i < first_in_raw.info.projs.size(); ++i )
-    {
-        std::cout << "Projector " << i << std::endl;
-        MatrixXd tmp = first_in_raw.info.projs[i].data->data - ref_in_raw.info.projs[i].data->data;
-        QVERIFY( tmp.sum() < epsilon );
-    }
-
-    //Compensators
-    std::cout << "[3] Compensator Check\n";
-    QVERIFY( first_in_raw.info.comps.size() == ref_in_raw.info.comps.size() );
-
-    for( qint32 i = 0; i < first_in_raw.info.comps.size(); ++i )
-    {
-        std::cout << "Compensator " << i << std::endl;
-        MatrixXd tmp = first_in_raw.info.comps[i].data->data - ref_in_raw.info.comps[i].data->data;
-        QVERIFY( tmp.sum() < epsilon );
-    }
-}
-
-//*************************************************************************************************************
 
 void TestFiffRFR::cleanupTestCase()
 {
 }
-
 
 //*************************************************************************************************************
 //=============================================================================================================
