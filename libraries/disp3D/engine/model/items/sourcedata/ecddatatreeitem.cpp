@@ -62,6 +62,7 @@
 #include <QQuaternion>
 #include <Qt3DExtras/QConeGeometry>
 #include <QMatrix4x4>
+#include <QRandomGenerator>
 
 
 //*************************************************************************************************************
@@ -170,7 +171,9 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
         vTransforms.push_back(m);
 
         //add random color;
-        vColors.push_back(QColor(rand()%255, rand()%255, rand()%255));
+        vColors.push_back(QColor(QRandomGenerator::global()->bounded(0 , 255),
+                                 QRandomGenerator::global()->bounded(0 , 255),
+                                 QRandomGenerator::global()->bounded(0 , 255)));
     }
     //Set instance Transform
     pDipolMesh->setTransforms(vTransforms);

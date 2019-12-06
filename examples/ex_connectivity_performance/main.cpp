@@ -117,10 +117,13 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
     QString sFileName = m_sCurrentDir + "/" + QString::number(m_iNumberChannels) + "_" + QString::number(m_iNumberSamples) + "_" + QString::number(m_iNumberTrials) + ".log";
 
     QFile outFile(sFileName);
-    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
 
-    QTextStream textStream(&outFile);
-    textStream << txt << endl;
+    if (outFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
+        QTextStream textStream(&outFile);
+        textStream << txt << endl;
+    } else {
+        qDebug() << "Unable to read data from file";
+    }
 }
 
 
@@ -174,7 +177,13 @@ int main(int argc, char *argv[])
     QFile t_fileRaw(sRaw);
     FiffRawData raw(t_fileRaw);
 
-    raw.read_raw_segment(matDataOrig, times, raw.first_samp, raw.first_samp+100001);
+    bool readSuccessful = false;
+
+    readSuccessful = raw.read_raw_segment(matDataOrig, times, raw.first_samp, raw.first_samp+100001);
+
+    if (!readSuccessful) {
+        qDebug() << "Could not read raw segment.";
+    }
 
     //Perform connectivity performance tests
     Connectivity connectivityObj;

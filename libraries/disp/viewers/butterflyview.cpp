@@ -294,6 +294,11 @@ void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels
             painter.setBrush(Qt::red);
             painter.setOpacity(0.1);
 
+            if(m_pEvokedSetModel->getNumSamples() == 0){
+                qDebug() << "Unable to get data. Returning early.";
+                return;
+            }
+
             float fDx = (float)(this->width()) / ((float)m_pEvokedSetModel->getNumSamples());
 
             float fromSamp = ((from)*m_pEvokedSetModel->getSamplingFrequency())+m_pEvokedSetModel->getNumPreStimSamples();
