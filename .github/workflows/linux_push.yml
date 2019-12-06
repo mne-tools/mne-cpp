@@ -16,7 +16,7 @@ jobs:
     - name: Install hub
       uses: geertvdc/setup-hub@v1.0.0
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2.1.0
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.10.1
         modules: qtcharts
