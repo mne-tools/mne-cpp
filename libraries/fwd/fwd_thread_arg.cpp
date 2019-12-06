@@ -197,6 +197,11 @@ FwdThreadArg *FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg* one,
 void FwdThreadArg::free_meg_multi_thread_duplicate(FwdThreadArg *one, bool bem_model)
 
 {
+    if (!one){
+        qDebug("Pointer passed is null. Returning early.");
+        return;
+    }
+
     FwdCompData* comp = (FwdCompData*)one->client;
 
     FREE_80(comp->work);
