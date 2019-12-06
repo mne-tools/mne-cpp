@@ -91,19 +91,19 @@ RtFilter::~RtFilter()
 
 //*************************************************************************************************************
 
-MatrixXd RtFilter::filterChannelsConcurrently(const MatrixXd& matDataIn,
-                                              int iMaxFilterLength,
-                                              const QVector<int>& lFilterChannelList,
-                                              const QList<FilterData>& lFilterData)
+MatrixXd RtFilter::filterDataBlock(const MatrixXd& matDataIn,
+                                   int iOrder,
+                                   const RowVectorXi &vecPicks,
+                                   const QList<FilterData>& lFilterData)
 {
     //Initialise the overlay matrix
-    if(m_matOverlap.cols() != iMaxFilterLength || m_matOverlap.rows() < matDataIn.rows()) {
-        m_matOverlap.resize(matDataIn.rows(), iMaxFilterLength);
+    if(m_matOverlap.cols() != iOrder || m_matOverlap.rows() < matDataIn.rows()) {
+        m_matOverlap.resize(matDataIn.rows(), iOrder);
         m_matOverlap.setZero();
     }
 
-    if(m_matDelay.cols() != iMaxFilterLength/2 || m_matOverlap.rows() < matDataIn.rows()) {
-        m_matDelay.resize(matDataIn.rows(), iMaxFilterLength/2);
+    if(m_matDelay.cols() != iOrder/2 || m_matOverlap.rows() < matDataIn.rows()) {
+        m_matDelay.resize(matDataIn.rows(), iOrder/2);
         m_matDelay.setZero();
     }
 
@@ -112,16 +112,10 @@ MatrixXd RtFilter::filterChannelsConcurrently(const MatrixXd& matDataIn,
 
     //Generate QList structure which can be handled by the QConcurrent framework
     QList<QPair<QList<FilterData>,QPair<int,RowVectorXd> > > timeData;
-    QList<int> notFilterChannelIndex;
 
-    //Only select channels specified in lFilterChannelList
-    for(qint32 i = 0; i < matDataIn.rows(); ++i) {
-        int pos = lFilterChannelList.indexOf(i);
-        if(pos != -1 && pos < matDataIn.rows()) {
-            timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(lFilterData,QPair<int,RowVectorXd>(pos,matDataIn.row(pos))));
-        } else {
-            notFilterChannelIndex.append(i);
-        }
+    //Only select channels specified in vecPicks
+    for(qint32 i = 0; i < vecPicks.cols(); ++i) {
+        timeData.append(QPair<QList<FilterData>,QPair<int,RowVectorXd> >(lFilterData,QPair<int,RowVectorXd>(vecPicks[i],matDataIn.row(vecPicks[i]))));
     }
 
     //Do the concurrent filtering
@@ -139,64 +133,73 @@ MatrixXd RtFilter::filterChannelsConcurrently(const MatrixXd& matDataIn,
             RowVectorXd tempData = timeData.at(r).second.second;
 
             //Perform the actual overlap add by adding the last filterlength data to the newly filtered one
-            tempData.head(iMaxFilterLength) += m_matOverlap.row(timeData.at(r).second.first);
+            tempData.head(iOrder) += m_matOverlap.row(timeData.at(r).second.first);
 
             //Write the newly calulated filtered data to the filter data matrix. Keep in mind that the current block also effect last part of the last block (begin at dataIndex-iFilterDelay).
             int start = 0;
-            matDataOut.row(timeData.at(r).second.first).segment(start,iFilteredNumberCols-iMaxFilterLength) = tempData.head(iFilteredNumberCols-iMaxFilterLength);
+            matDataOut.row(timeData.at(r).second.first).segment(start,iFilteredNumberCols-iOrder) = tempData.head(iFilteredNumberCols-iOrder);
 
             //Refresh the m_matOverlap with the new calculated filtered data.
-            m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(iMaxFilterLength);
+            m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(iOrder);
         }
     }
 
-    //Fill filtered data with raw data if the channel was not filtered
-    for(int i = 0; i < notFilterChannelIndex.size(); ++i) {
-        matDataOut.row(notFilterChannelIndex.at(i)) << m_matDelay.row(notFilterChannelIndex.at(i)), matDataIn.row(notFilterChannelIndex.at(i)).head(matDataIn.cols() - iMaxFilterLength/2);
-        //matDataOut.row(notFilterChannelIndex.at(i)).segment(0, matDataIn.row(notFilterChannelIndex.at(i)).cols()) = matDataIn.row(notFilterChannelIndex.at(i));
-
-    }
-
-    if(matDataIn.cols() >= iMaxFilterLength/2) {
-        m_matDelay = matDataIn.block(0, matDataIn.cols()-iMaxFilterLength/2, matDataIn.rows(), iMaxFilterLength/2);
+    if(matDataIn.cols() >= iOrder/2) {
+        m_matDelay = matDataIn.block(0, matDataIn.cols()-iOrder/2, matDataIn.rows(), iOrder/2);
     } else {
-            qWarning() << "RtFilter::filterChannelsConcurrently - Half of filter length is larger than data size. Not filling m_matDelay for next step.";
+            qWarning() << "RtFilter::filterDataBlock - Half of filter length is larger than data size. Not filling m_matDelay for next step.";
     }
 
     return matDataOut;
 }
 
+
+//*************************************************************************************************************
+
 MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
                               FilterData::FilterType type,
-                              double centerfreq,
+                              double dCenterfreq,
                               double bandwidth,
-                              double parkswidth,
-                              double sFreq,
-                              const QVector<int>& lFilterChannelList,
-                              int order,
-                              qint32 fftLength,
+                              double dTransition,
+                              double dSFreq,
+                              const RowVectorXi& vecPicks,
+                              int iOrder,
+                              qint32 iFftLength,
                               FilterData::DesignMethod designMethod)
 {
-
     // Check for size of data
-    if (matDataIn.cols()<order){
-        qDebug() << QString("Error in rtfilter: Filter length bigger then data length");
+    if (matDataIn.cols()<iOrder){
+        qDebug() << QString("RtFilter::filterData - Filter length bigger then data length.");
     }
+
+    // Normalize cut off frequencies to nyquist
+    dCenterfreq = dCenterfreq/(dSFreq/2.0);
+    bandwidth = bandwidth/(dSFreq/2.0);
+    dTransition = dTransition/(dSFreq/2.0);
 
     // create output matrix with size of inputmatrix
     MatrixXd matDataOut(matDataIn.rows(),matDataIn.cols());
-    MatrixXd slice;
     MatrixXd sliceFiltered;
+
     // create filter
-    FilterData filter = FilterData("rt_filter", type, order, centerfreq, bandwidth, parkswidth, sFreq, fftLength, designMethod);
+    FilterData filter = FilterData("rt_filter",
+                                   type,
+                                   iOrder,
+                                   dCenterfreq,
+                                   bandwidth,
+                                   dTransition,
+                                   dSFreq,
+                                   iFftLength,
+                                   designMethod);
     QList<FilterData> filterList;
     filterList << filter;
 
     // slice input data into data junks with proper length for fft
-    int iSize = fftLength-order;
+    int iSize = iFftLength-iOrder;
+
     if(matDataIn.cols() > iSize) {
-        int from = 0;                           //
-        int numSlices = ceil(float(matDataIn.cols())/float(iSize));//calculate number of data slices
+        int from = 0;
+        int numSlices = ceil(float(matDataIn.cols())/float(iSize)); //calculate number of data slices
 
         for (int i = 0; i<numSlices; i++) {
             if(i == numSlices-1) {
@@ -204,13 +207,19 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
                 iSize = matDataIn.cols() - (iSize * (numSlices -1));
             }
 
-            slice = matDataIn.block(0,from,lFilterChannelList.length(),iSize);
-            sliceFiltered = filterChannelsConcurrently(slice,order,lFilterChannelList,filterList);
-            matDataOut.block(0,from,lFilterChannelList.length(),iSize) = sliceFiltered;
+            sliceFiltered = filterDataBlock(matDataIn.block(0,from,vecPicks.cols(),iSize),
+                                                       iOrder,
+                                                       vecPicks,
+                                                       filterList);
+            matDataOut.block(0,from,vecPicks.cols(),iSize) = sliceFiltered;
             from += iSize;
         }
     } else {
-        matDataOut = filterChannelsConcurrently(matDataIn,order,lFilterChannelList,filterList);
+        matDataOut = filterDataBlock(matDataIn,
+                                                iOrder,
+                                                vecPicks,
+                                                filterList);
     }
+
     return matDataOut;
 }
