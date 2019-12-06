@@ -469,7 +469,7 @@ void NoiseReduction::setFilterChannelType(QString sType)
 
     //This version is for when all channels of a type are to be filtered (not only the visible ones).
     //Create channel filter list independent from channelNames
-    m_lFilterChannelList.clear();
+    m_lFilterChannelList.resize(0);
 
     for(int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
         if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
@@ -477,9 +477,11 @@ void NoiseReduction::setFilterChannelType(QString sType)
             m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH)/* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
 
             if(m_sFilterChannelType == "All") {
-                m_lFilterChannelList << i;
+                m_lFilterChannelList.resize(m_lFilterChannelList.cols() + 1);
+                m_lFilterChannelList[m_lFilterChannelList.cols() -1] = i;
             } else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
-                m_lFilterChannelList << i;
+                m_lFilterChannelList.resize(m_lFilterChannelList.cols() + 1);
+                m_lFilterChannelList[m_lFilterChannelList.cols() -1] = i;
             }
         }
     }
@@ -691,7 +693,7 @@ void NoiseReduction::run()
         if(m_bFilterActivated) {
             QList<FilterData> list;
             list << m_filterData;
-            t_mat = m_pRtFilter->filterChannelsConcurrently(t_mat,
+            t_mat = m_pRtFilter->filterDataBlock(t_mat,
                                                             m_iMaxFilterLength,
                                                             m_lFilterChannelList,
                                                             list);

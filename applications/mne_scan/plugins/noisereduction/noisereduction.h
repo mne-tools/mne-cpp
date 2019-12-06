@@ -278,7 +278,7 @@ private:
     Eigen::MatrixXd                 m_matSpharaBabyMEGOuterLoaded;              /**< The loaded babyMEG outer layer basis functions.*/
     Eigen::MatrixXd                 m_matSpharaEEGLoaded;                       /**< The loaded EEG basis functions.*/
 
-    QVector<int>                    m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
+    Eigen::RowVectorXi              m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
 
     QSharedPointer<FIFFLIB::FiffInfo>                               m_pFiffInfo;                /**< Fiff measurement info.*/
 

@@ -532,7 +532,7 @@ private:
     /**
     * Calculates the filtered version of the channels in m_matDataRaw
     */
-    void filterChannelsConcurrently();
+    void filterDataBlock();
 
     //=========================================================================================================
     /**
@@ -541,7 +541,7 @@ private:
     * @param [in] data          data which is to be filtered
     * @param [in] iDataIndex    current position in the global data matrix
     */
-    void filterChannelsConcurrently(const Eigen::MatrixXd &data, int iDataIndex);
+    void filterDataBlock(const Eigen::MatrixXd &data, int iDataIndex);
 
     //=========================================================================================================
     /**

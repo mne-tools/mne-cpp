@@ -516,7 +516,7 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd> &data)
 
         //Filter if neccessary else set filtered data matrix to zero
         if(!m_filterData.isEmpty() && m_bPerformFiltering) {
-            filterChannelsConcurrently(m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol), m_iCurrentSample);
+            filterDataBlock(m_matDataRaw.block(0, m_iCurrentSample, nRow, nCol), m_iCurrentSample);
 
             //Perform SPHARA on filtered data after actual filtering - SPHARA should be applied on the best possible data
             if(doSphara) {
@@ -924,7 +924,7 @@ void RtFiffRawViewModel::setFilter(QList<FilterData> filterData)
     m_bDrawFilterFront = false;
 
     //Filter all visible data channels at once
-    //filterChannelsConcurrently();
+    //filterDataBlock();
 }
 
 
@@ -980,7 +980,7 @@ void RtFiffRawViewModel::setFilterChannelType(QString channelType)
 //    m_bDrawFilterFront = false;
 
     //Filter all visible data channels at once
-    //filterChannelsConcurrently();
+    //filterDataBlock();
 }
 
 
@@ -1022,7 +1022,7 @@ void RtFiffRawViewModel::createFilterChannelList(QStringList channelNames)
 //        std::cout<<m_filterChannelList.at(i).toStdString()<<std::endl;
 
     //Filter all visible data channels at once
-    //filterChannelsConcurrently();
+    //filterDataBlock();
 }
 
 
@@ -1141,9 +1141,9 @@ void RtFiffRawViewModel::doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<i
 
 //*************************************************************************************************************
 
-void RtFiffRawViewModel::filterChannelsConcurrently()
+void RtFiffRawViewModel::filterDataBlock()
 {
-    //std::cout<<"START RtFiffRawViewModel::filterChannelsConcurrently"<<std::endl;
+    //std::cout<<"START RtFiffRawViewModel::filterDataBlock"<<std::endl;
 
     if(m_filterData.isEmpty() || !m_bPerformFiltering) {
         return;
@@ -1207,15 +1207,15 @@ void RtFiffRawViewModel::filterChannelsConcurrently()
         m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
     }
 
-    //std::cout<<"END RtFiffRawViewModel::filterChannelsConcurrently"<<std::endl;
+    //std::cout<<"END RtFiffRawViewModel::filterDataBlock"<<std::endl;
 }
 
 
 //*************************************************************************************************************
 
-void RtFiffRawViewModel::filterChannelsConcurrently(const MatrixXd &data, int iDataIndex)
+void RtFiffRawViewModel::filterDataBlock(const MatrixXd &data, int iDataIndex)
 {
-    //std::cout<<"START RtFiffRawViewModel::filterChannelsConcurrently"<<std::endl;
+    //std::cout<<"START RtFiffRawViewModel::filterDataBlock"<<std::endl;
 
     if(iDataIndex >= m_matDataFiltered.cols() || data.cols() < m_iMaxFilterLength) {
         return;
@@ -1324,7 +1324,7 @@ void RtFiffRawViewModel::filterChannelsConcurrently(const MatrixXd &data, int iD
         m_matDataFiltered.row(notFilterChannelIndex.at(i)).segment(iDataIndex,data.row(notFilterChannelIndex.at(i)).cols()) = data.row(notFilterChannelIndex.at(i));
     }
 
-    //std::cout<<"END RtFiffRawViewModel::filterChannelsConcurrently"<<std::endl;
+    //std::cout<<"END RtFiffRawViewModel::filterDataBlock"<<std::endl;
 }
 
 
