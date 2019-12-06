@@ -405,7 +405,7 @@ void EvokedSetModel::updateData()
     }
 
     if(!m_filterData.isEmpty() && m_bPerformFiltering) {
-        filterChannelsConcurrently();
+        filterDataBlock();
     }
 
     // Update average selection information map. Use old colors if existing.
@@ -901,7 +901,7 @@ void EvokedSetModel::setFilter(const FilterData& filterData)
     }
 
     //Filter all visible data channels at once
-    //filterChannelsConcurrently();
+    //filterDataBlock();
 }
 
 
@@ -945,7 +945,7 @@ void EvokedSetModel::setFilterChannelType(QString channelType)
 //    m_bDrawFilterFront = false;
 
     //Filter all visible data channels at once
-    //filterChannelsConcurrently();
+    //filterDataBlock();
 }
 
 
@@ -989,7 +989,7 @@ void EvokedSetModel::createFilterChannelList(QStringList channelNames)
 //        std::cout<<m_filterChannelList.at(i).toStdString()<<std::endl;
 
     //Filter all visible data channels at once
-    //filterChannelsConcurrently();
+    //filterDataBlock();
 }
 
 
@@ -1006,7 +1006,7 @@ void doFilterPerChannelRTESet(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &
 
 //*************************************************************************************************************
 
-void EvokedSetModel::filterChannelsConcurrently()
+void EvokedSetModel::filterDataBlock()
 {
     if(m_filterData.isEmpty() || !m_bPerformFiltering) {
         return;

@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
 
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/test_output.fif");
+    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_filt_raw.fif");
 
     parser.addOption(inputOption);
     parser.addOption(outputOption);
@@ -103,91 +103,55 @@ int main(int argc, char *argv[])
 
     FiffRawData raw(t_fileIn);
 
-    // Set up pick list: MEG + STI 014 - bad channels
-    bool want_meg   = true;
-    bool want_eeg   = true;
-    bool want_stim  = true;
-    QStringList include;
-    include << "STI 014";
-
-    MatrixXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
-    if(picks.cols() == 0) {
-        include.clear();
-        include << "STI101" << "STI201" << "STI301";
-        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
-        if(picks.cols() == 0) {
-            printf("channel list may need modification\n");
-            return -1;
-        }
-    }
-
     RowVectorXd cals;
-    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, raw.info, cals/*, picks*/);
+    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, raw.info, cals);
 
-    // Set up the reading parameters
+    // Set up the reading parameters to read the whole file at once
     fiff_int_t from = raw.first_samp;
     fiff_int_t to = raw.last_samp;
 
-    // To read the whole file at once set quantum = to - from + 1;
-    fiff_int_t quantum = to - from + 1;
+    // Initialize filter settings
+    QString filter_name =  "Cosine_BPF";
+    FilterData::FilterType type = FilterData::BPF;
+    double sFreq = raw.info.sfreq;
+    double dCenterfreq = 10;
+    double dBandwidth = 10;
+    double dTransition = 1;
 
-    // Read and write the data
-    bool first_buffer = true;
+    RtFilter rtFilter;
+    MatrixXd dataFiltered;
 
-    fiff_int_t first, last;
+    // Only filter MEG and EEG channels
+    RowVectorXi picks = raw.info.pick_types(true, true, false);
+
+    // Read, filter and write the data
     MatrixXd data;
     MatrixXd times;
 
-    // initialize filter settings
-    QString filter_name =  "example_cosine";
-    FilterData::FilterType type = FilterData::BPF;
-    double sFreq = raw.info.sfreq;                                          // get Sample freq from Data
-    double centerfreq = 10/(sFreq/2.0);                                     // normed nyquist freq.
-    double bandwidth = 10/(sFreq/2.0);
-    double parkswidth = 1/(sFreq/2.0);
-
-    RtFilter rtFilter;                                                      // filter object
-    MatrixXd dataFiltered;                                                  // filter output
-
-    // channel selection - in this case use every channel
-    // size = number of channels; value = index channel number
-    QVector<int> channelList(raw.info.nchan);
-    for (int i = 0; i < raw.info.nchan; i++){
-        channelList[i] = i;
+    // Reading
+    if(!raw.read_raw_segment(data, times, from, to)) {
+        printf("error during read_raw_segment\n");
+        return -1;
     }
 
-    for(first = from; first < to; first+=quantum) {
-        last = first+quantum-1;
-        if (last > to) {
-            last = to;
-        }
+    // Filtering
+    printf("Filtering...");
+    dataFiltered = rtFilter.filterData(data,
+                                       type,
+                                       dCenterfreq,
+                                       dBandwidth,
+                                       dTransition,
+                                       sFreq,
+                                       picks);
+    printf("[done]\n");
 
-        if(!raw.read_raw_segment(data,times,first,last/*,picks*/)) {
-            printf("error during read_raw_segment\n");
-            return -1;
-        }
-
-        //Filtering
-        printf("Filtering...");
-        dataFiltered = rtFilter.filterData(data,type,centerfreq,bandwidth,parkswidth,sFreq,channelList);
-        printf("[done]\n");
-
-        //Writing
-        printf("Writing...");
-        if(first_buffer) {
-           if(first > 0) {
-               outfid->write_int(FIFF_FIRST_SAMPLE, &first);
-           }
-           first_buffer = false;
-        }
-
-        outfid->write_raw_buffer(dataFiltered,cals);
-        printf("[done]\n");
-    }
+    // Writing
+    printf("Writing...");
+    outfid->write_int(FIFF_FIRST_SAMPLE, &from);
+    outfid->write_raw_buffer(dataFiltered,cals);
+    printf("[done]\n");
 
     outfid->finish_writing_raw();
-
-    printf("Finished\n");
 
     return 0;
 }

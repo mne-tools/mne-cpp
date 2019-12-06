@@ -430,7 +430,7 @@ private:
     /**
     * Calculates the filtered version of the channels in m_matData
     */
-    void filterChannelsConcurrently();
+    void filterDataBlock();
 
     QSharedPointer<FIFFLIB::FiffEvokedSet>  m_pEvokedSet;                   /**< The evoked set measurement. */
 
