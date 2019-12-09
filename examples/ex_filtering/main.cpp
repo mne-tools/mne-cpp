@@ -56,7 +56,6 @@
 #include <QtCore/QCoreApplication>
 #include <QFile>
 #include <QCommandLineParser>
-#include <QElapsedTimer>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,7 +82,6 @@ using namespace RTPROCESSINGLIB;
 */
 int main(int argc, char *argv[])
 {
-    QElapsedTimer timer;
     QCoreApplication a(argc, argv);
 
     // Command Line Parser
@@ -138,7 +136,6 @@ int main(int argc, char *argv[])
 
     // Filtering
     printf("Filtering...");
-    timer.start();
     dataFiltered = rtFilter.filterData(data,
                                        type,
                                        dCenterfreq,
@@ -146,7 +143,6 @@ int main(int argc, char *argv[])
                                        dTransition,
                                        sFreq,
                                        picks);
-    qDebug() << "The filter operation took" << timer.elapsed() << "milliseconds\n";
     printf("[done]\n");
 
     // Writing
