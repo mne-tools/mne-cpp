@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     test_rtfilter_filterdata.pro
+# @file     test_filtering.pro
 # @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the test_rtfilter_filterdata example.
+# @brief    This project file generates the makefile to build the test_filtering example.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@ QT -= gui
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = test_rtfilter_filterdata
+TARGET = test_filtering
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
