@@ -17,7 +17,7 @@ jobs:
       run: |
         tar --help
         wget -nv -O- \ https://github.com/github/hub/releases/download/v2.13.0/hub-darwin-amd64-2.13.0.tgz
-        tar -x -f hub-darwin-amd64-2.13.0.tgz $HOME/hub
+        tar xzvf hub-darwin-amd64-2.13.0.tgz $HOME/hub
         ls -l
         cd $HOME/hub
         ls -l
