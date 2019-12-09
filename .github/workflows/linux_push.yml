@@ -16,16 +16,16 @@ jobs:
     - name: Install hub
       uses: geertvdc/setup-hub@v1.0.0
     - name: Install Qt
-      # uses: jurplel/install-qt-action@v2
-      # with:
-      #   version: 5.10.1
-      #   modules: qtcharts
-      run: |
-        sudo apt-get install build-essential libgl1-mesa-dev -y
-        pip3 install setuptools wheel
-        pip3 install aqtinstall
-        python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop -m qtcharts
-        echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.10.1
+        modules: qtcharts qtwebengine
+      # run: |
+      #   sudo apt-get install build-essential libgl1-mesa-dev -y
+      #   pip3 install setuptools wheel
+      #   pip3 install aqtinstall
+      #   python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop -m qtcharts
+      #   echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
     - name: Configure and compile MNE-CPP
       run: |        
         qmake -r MNECPP_CONFIG+=noTests
