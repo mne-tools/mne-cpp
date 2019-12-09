@@ -15,14 +15,11 @@ jobs:
       uses: actions/checkout@v1
     - name: Install hub
       uses: geertvdc/setup-hub@v1.0.0
-    - name: Install 7Zip
-      run: brew install p7zip
     - name: Install Qt
-      run: |
-        pip3 install setuptools wheel
-        pip3 install aqtinstall --pre
-        python3 -m aqt install --outputdir $HOME/Qt 5.10.1 mac desktop --module qtcharts
-        echo "::add-path::$HOME/Qt/5.10.1/clang_64/bin"
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.10.1
+        modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |        
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples
