@@ -57,8 +57,17 @@ using namespace EPIDETECTPLUGIN;
 EpidetectWidget::EpidetectWidget(QWidget *parent)
 : QWidget(parent)
 , ui(new Ui::EpidetectToolbarWidget)
+, m_dRVal(0)
+, m_dMarginVal(0)
+, m_dThreshold1Val(0)
+, m_dThreshold2Val(0)
+, m_iDimVal(0)
+, m_iNVal(0)
+, m_iListLengthVal(0)
+, m_iFuzzyEnStepVal(0)
+, m_iChWeight(0)
 {
-
+    qDebug("EpidetectWidget called with only parent passed as parameter. Initilizing variables to zero");
 }
 
 
