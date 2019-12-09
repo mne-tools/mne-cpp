@@ -56,6 +56,8 @@ using namespace Eigen;
 BCIFeatureWindow::BCIFeatureWindow(BCI* pBCI, QWidget *parent)
 : QWidget(parent)
 ,  m_pBCI(pBCI)
+,  m_dFeatureMax(15)
+,  m_iScale(600)
 {
     ui.setupUi(this);
 
