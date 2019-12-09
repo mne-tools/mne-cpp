@@ -20,7 +20,6 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QDir>
-#include <QRandomGenerator>
 
 using namespace Eigen;
 using namespace FWDLIB;
@@ -389,8 +388,9 @@ void write_id_old(FiffStream::SPtr& t_pStream, fiff_int_t kind, fiffId id)
     if(t_id->version == -1)
     {
         /* initialize random seed: */
-        double rand_1 = double(QRandomGenerator::global()->bounded(0,100)) / 100;
-        double rand_2 = double(QRandomGenerator::global()->bounded(0,100)) / 100;
+        srand ( time(NULL) );
+        double rand_1 = (double)(rand() % 100);rand_1 /= 100;
+        double rand_2 = (double)(rand() % 100);rand_2 /= 100;
 
         time_t seconds;
         seconds = time (NULL);
