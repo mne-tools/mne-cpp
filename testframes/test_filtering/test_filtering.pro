@@ -76,7 +76,7 @@ else {
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
-    test_rtfilter_filterdata.cpp
+    test_filtering.cpp
 
 HEADERS += \
 

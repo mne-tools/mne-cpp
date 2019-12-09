@@ -119,7 +119,7 @@ public:
     */
     Eigen::MatrixXd filterDataBlock(const Eigen::MatrixXd& matDataIn,
                                                int iOrder,
-                                               const Eigen::RowVectorXi& lFilterChannelList,
+                                               const Eigen::RowVectorXi& vecPicks,
                                                const QList<UTILSLIB::FilterData> &lFilterData);
 
     /**
@@ -139,6 +139,7 @@ public:
     *
     * @return The filtered data in form of a matrix.
     */
+
     Eigen::MatrixXd filterData(const Eigen::MatrixXd& matDataIn,
                                UTILSLIB::FilterData::FilterType type,
                                double dCenterfreq,
