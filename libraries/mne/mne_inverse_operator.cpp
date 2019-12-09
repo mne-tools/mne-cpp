@@ -700,7 +700,7 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
 //*************************************************************************************************************
 
 MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &info,
-                                                             const MNEForwardSolution& forward,
+                                                             MNEForwardSolution forward,
                                                              const FiffCov &p_noise_cov,
                                                              float loose,
                                                              float depth,
