@@ -19,7 +19,7 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         version: 5.10.1
-        modules: qtcharts qtwebengine
+        modules: qtwebengine
       # run: |
       #   sudo apt-get install build-essential libgl1-mesa-dev -y
       #   pip3 install setuptools wheel
