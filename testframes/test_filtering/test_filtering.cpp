@@ -237,4 +237,4 @@ void TestFiffRFR::cleanupTestCase()
 //=============================================================================================================
 
 QTEST_GUILESS_MAIN(TestFiffRFR)
-#include "test_rtfilter_filterdata.moc"
+#include "test_filtering.moc"
