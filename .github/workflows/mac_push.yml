@@ -18,9 +18,9 @@ jobs:
         tar --help
         wget https://github.com/github/hub/releases/download/v2.13.0/hub-darwin-amd64-2.13.0.tgz
         ls -l
-        tar xzvf hub-darwin-amd64-2.13.0.tgz $HOME/
+        tar xzvf hub-darwin-amd64-2.13.0.tgz
         ls -l
-        cd $HOME/hub
+        cd hub-darwin-amd64-2.13.0
         ls -l
         echo "::add-path::$HOME/hub"
     - name: Install Qt
