@@ -105,7 +105,7 @@ TestFiffDigitizer::TestFiffDigitizer()
 void TestFiffDigitizer::initTestCase()
 {
     //Read the results produced with MNE-CPP
-    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
+    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
     digDataLoaded = FiffDigitizerData(t_fileIn);
 
     //Prepare reference result
