@@ -14,16 +14,10 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2.1.0
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.10.1
         modules: qtcharts
-      # run: |
-      #   sudo apt-get install build-essential libgl1-mesa-dev -y
-      #   pip3 install setuptools wheel
-      #   pip3 install aqtinstall --pre
-      #   python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop --module qtcharts
-      #   echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
     - name: Configure and compile MNE-CPP
       run: |
         qmake -query    
@@ -37,12 +31,10 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1
     - name: Install Qt
-      run: |
-        sudo apt-get install build-essential libgl1-mesa-dev -y
-        pip3 install setuptools wheel
-        pip3 install aqtinstall --pre
-        python3 -m aqt install --outputdir $HOME/Qt 5.3 linux desktop
-        echo "::add-path::$HOME/Qt/5.3/gcc_64/bin"
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.3
+        modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=minimalVersion
@@ -58,12 +50,10 @@ jobs:
       run: |
         sudo pip install codecov 
     - name: Install Qt
-      run: |
-        sudo apt-get install build-essential libgl1-mesa-dev -y
-        pip3 install setuptools wheel
-        pip3 install aqtinstall --pre
-        python3 -m aqt install --outputdir $HOME/Qt 5.10.1 linux desktop --module qtcharts
-        echo "::add-path::$HOME/Qt/5.10.1/gcc_64/bin"
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.10.1
+        modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
         qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples

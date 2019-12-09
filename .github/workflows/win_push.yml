@@ -14,12 +14,12 @@ jobs:
   #   steps:
   #   - name: Clone repository
   #     uses: actions/checkout@v1
-  #   - name: Install Qt
-  #     run: | 
-  #       pip3 install setuptools wheel
-  #       pip3 install aqtinstall --pre
-  #       python -m aqt install --outputdir $HOME\Qt 5.10.1 windows desktop win64_msvc2017_64 --module qtcharts
-  #       echo "::add-path::$HOME\Qt\5.10.1\msvc2017_64\bin"
+    # - name: Install Qt
+    #   uses: jurplel/install-qt-action@v2
+    #   with:
+    #     version: 5.10.1
+    #     arch: win64_msvc2017_64
+    #     modules: qtcharts
   #   - name: Install jom
   #     run: |
   #       Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
@@ -41,11 +41,11 @@ jobs:
     - name: Install hub
       uses: geertvdc/setup-hub@v1.0.0
     - name: Install Qt
-      run: | 
-        pip3 install setuptools wheel
-        pip3 install aqtinstall --pre
-        python -m aqt install --outputdir $HOME\Qt 5.10.1 windows desktop win64_msvc2017_64 --module qtcharts
-        echo "::add-path::$HOME\Qt\5.10.1\msvc2017_64\bin"
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.10.1
+        arch: win64_msvc2017_64
+        modules: qtcharts
     - name: Install jom
       run: |
         Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
