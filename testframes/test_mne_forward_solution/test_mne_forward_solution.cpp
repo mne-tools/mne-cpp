@@ -124,7 +124,7 @@ void TestMneForwardSolution::computeForward()
     // --eeg
     // --accurate
     // --src ./mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif
-    // --meas ./mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif
+    // --meas ./mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif
     // --mri ./mne-cpp-test-data/MEG/sample/all-trans.fif
     // --bem ./mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif
     // --mindist 5
@@ -136,7 +136,7 @@ void TestMneForwardSolution::computeForward()
     settingsMEGEEG.include_eeg = true;
     settingsMEGEEG.accurate = true;
     settingsMEGEEG.srcname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
-    settingsMEGEEG.measname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif";
+    settingsMEGEEG.measname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
     settingsMEGEEG.mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
     settingsMEGEEG.transname.clear();
     settingsMEGEEG.bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
