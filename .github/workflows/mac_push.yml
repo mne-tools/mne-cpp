@@ -18,11 +18,11 @@ jobs:
         tar --help
         wget https://github.com/github/hub/releases/download/v2.13.0/hub-darwin-amd64-2.13.0.tgz
         ls -l
-        tar xzvf hub-darwin-amd64-2.13.0.tgz
+        tar xzvf hub-darwin-amd64-2.13.0.tgz --directory $HOME
         ls -l
         cd hub-darwin-amd64-2.13.0
         ls -l
-        echo "::add-path::$HOME/hub"
+        echo "::add-path::$HOME/hub-darwin-amd64-2.13.0/bin"
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -30,6 +30,7 @@ jobs:
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |        
+        echo $PATH
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples
         make -j2
     - name: Setup Github credentials
