@@ -4,7 +4,6 @@ on:
   push:
     branches:
     - master
-    - github_actions
     
 jobs:
   Release:
@@ -14,6 +13,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1
     - name: Install hub
+      # geertvdc/setup-hub@v1.0.0 does not work for macos
       run: |
         tar --help
         wget https://github.com/github/hub/releases/download/v2.13.0/hub-darwin-amd64-2.13.0.tgz
