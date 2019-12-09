@@ -297,7 +297,7 @@ public:
     *
     * @return the assembled inverse operator
     */
-    static MNEInverseOperator make_inverse_operator(const FiffInfo &info, const MNEForwardSolution& forward, const FiffCov& p_noise_cov, float loose = 0.2f, float depth = 0.8f, bool fixed = false, bool limit_depth_chs = true);
+    static MNEInverseOperator make_inverse_operator(const FiffInfo &info, MNEForwardSolution forward, const FiffCov& p_noise_cov, float loose = 0.2f, float depth = 0.8f, bool fixed = false, bool limit_depth_chs = true);
 
     //=========================================================================================================
     /**
