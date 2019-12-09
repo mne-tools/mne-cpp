@@ -14,7 +14,12 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1
     - name: Install hub
-      uses: geertvdc/setup-hub@v1.0.0
+      run: |
+        wget -nv -O- \https://github.com/github/hub/releases/download/v2.13.0/hub-darwin-amd64-2.13.0.tgz | \ tar xz --strip-components=1 '$HOME/hub'
+        ls -l
+        cd $HOME/hub
+        ls -l
+        echo "::add-path::$HOME/hub"
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
