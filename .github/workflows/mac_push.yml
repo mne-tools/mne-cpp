@@ -20,7 +20,7 @@ jobs:
         ls -l
         tar xzvf hub-darwin-amd64-2.13.0.tgz --directory $HOME
         ls -l
-        cd hub-darwin-amd64-2.13.0
+        cd $HOME/hub-darwin-amd64-2.13.0
         ls -l
         echo "::add-path::$HOME/hub-darwin-amd64-2.13.0/bin"
     - name: Install Qt
