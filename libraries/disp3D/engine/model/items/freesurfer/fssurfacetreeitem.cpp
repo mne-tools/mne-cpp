@@ -215,7 +215,7 @@ MatrixX4f FsSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature,
             colors(i,0) = colGyri.redF();
             colors(i,1) = colGyri.greenF();
             colors(i,2) = colGyri.blueF();
-            colors(i,3) = colSulci.alphaF();
+            colors(i,3) = colGyri.alphaF();
         }
     }
 
