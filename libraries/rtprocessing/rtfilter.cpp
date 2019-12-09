@@ -40,6 +40,7 @@
 
 #include "rtfilter.h"
 #include <Eigen/Dense>
+#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -177,10 +178,9 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
     bandwidth = bandwidth/(dSFreq/2.0);
     dTransition = dTransition/(dSFreq/2.0);
 
-    // create output matrix with size of inputmatrix
-    MatrixXd matDataOut(matDataIn.rows(),matDataIn.cols());
+    // create output matrix with size of inputmatrix and temporal input matrix with size of pick
+    MatrixXd matDataOut = matDataIn;
     MatrixXd sliceFiltered;
-
     // create filter
     FilterData filter = FilterData("rt_filter",
                                    type,
@@ -191,6 +191,7 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
                                    dSFreq,
                                    iFftLength,
                                    designMethod);
+
     QList<FilterData> filterList;
     filterList << filter;
 
@@ -206,20 +207,18 @@ MatrixXd RtFilter::filterData(const MatrixXd& matDataIn,
                 //catch the last one that might be shorter then original size
                 iSize = matDataIn.cols() - (iSize * (numSlices -1));
             }
-
-            sliceFiltered = filterDataBlock(matDataIn.block(0,from,vecPicks.cols(),iSize),
-                                                       iOrder,
-                                                       vecPicks,
-                                                       filterList);
-            matDataOut.block(0,from,vecPicks.cols(),iSize) = sliceFiltered;
+            sliceFiltered = filterDataBlock(matDataIn.block(0,from,matDataIn.rows(),iSize),
+                                            iOrder,
+                                            vecPicks,
+                                            filterList);
+            matDataOut.block(0,from,matDataIn.rows(),iSize) = sliceFiltered;
             from += iSize;
         }
     } else {
         matDataOut = filterDataBlock(matDataIn,
-                                                iOrder,
-                                                vecPicks,
-                                                filterList);
+                                    iOrder,
+                                    vecPicks,
+                                    filterList);
     }
-
     return matDataOut;
 }

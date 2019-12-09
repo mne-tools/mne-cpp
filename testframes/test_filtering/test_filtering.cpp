@@ -138,12 +138,8 @@ void TestFiffRFR::initTestCase() {
     FiffRawData first_in_raw;
     first_in_raw = FiffRawData(t_fileIn);
 
-    // Set up pick list: MEG - bad channels
-    bool want_meg   = true;
-    bool want_eeg   = false;
-    bool want_stim  = false;
-
-    RowVectorXi picks = first_in_raw.info.pick_types(true, false, false, QStringList(), first_in_raw.info.bads);
+    // Only filter MEG channels
+    RowVectorXi picks = first_in_raw.info.pick_types(true, true, false);
     RowVectorXd cals;
     FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, first_in_raw.info, cals);
 
@@ -152,57 +148,34 @@ void TestFiffRFR::initTestCase() {
 
     fiff_int_t from = first_in_raw.first_samp;
     fiff_int_t to = first_in_raw.last_samp;
-    fiff_int_t quantum = to-from+1;
-    RtFilter rtFilter;
 
     // initialize filter settings
     QString filter_name = "example_cosine";
     FilterData::FilterType type = FilterData::BPF;
     double sFreq = first_in_raw.info.sfreq;
-    double centerfreq = 10;
-    double bandwidth = 10;
-    double parkswidth = 1;
+    double dCenterfreq = 10;
+    double dBandwidth = 10;
+    double dTransition = 1;
     order = 1024;
-    int fftlength = 4096;
 
-    // Read and write all the data
-    bool first_buffer = true;
+    RtFilter rtFilter;
+    MatrixXd dataFiltered;
 
-    fiff_int_t first, last;
-
-    for(first = from; first < to; first+=quantum) {
-        last = first+quantum-1;
-
-        if (last > to) {
-            last = to;
-        }
-
-        if (!first_in_raw.read_raw_segment(first_in_data,first_in_times,first,last)) {
-            printf("error during read_raw_segment\n");
-        }
-
-        //Filtering
-        printf("Filtering...");
-        first_filtered = rtFilter.filterData(first_in_data,
-                                             type,
-                                             centerfreq,
-                                             bandwidth,
-                                             parkswidth,
-                                             sFreq,
-                                             picks,
-                                             order,
-                                             fftlength);
-        printf("[done]\n");
-
-        printf("Writing...");
-        if (first_buffer) {
-           if (first > 0)
-               outfid->write_int(FIFF_FIRST_SAMPLE,&first);
-           first_buffer = false;
-        }
-        outfid->write_raw_buffer(first_filtered,cals);
-        printf("[done]\n");
+    // Reading
+    if(!first_in_raw.read_raw_segment(first_in_data, first_in_times, from, to)) {
+        printf("error during read_raw_segment\n");
     }
+
+    // Filtering
+    printf("Filtering...");
+    first_filtered = rtFilter.filterData(first_in_data, type, dCenterfreq, dBandwidth, dTransition, sFreq, picks);
+    printf("[done]\n");
+
+    // Writing
+    printf("Writing...");
+    outfid->write_int(FIFF_FIRST_SAMPLE, &from);
+    outfid->write_raw_buffer(first_filtered,cals);
+    printf("[done]\n");
 
     outfid->finish_writing_raw();
 
@@ -210,17 +183,9 @@ void TestFiffRFR::initTestCase() {
     FiffRawData second_in_Raw;
     second_in_Raw = FiffRawData(t_fileOut);
 
-    picks = second_in_Raw.info.pick_types(want_meg, want_eeg, want_stim, include, bads); // prefer member function
-
-    for(first = from; first < to; first+=quantum) {
-        last = first+quantum-1;
-
-        if (last > to) {
-            last = to;
-        }
-        if (!second_in_Raw.read_raw_segment(first_filtered,first_in_times,first,last,picks)) {
-            printf("error during read_raw_segment\n");
-        }
+    // Reading
+    if (!second_in_Raw.read_raw_segment(first_filtered,first_in_times,from,to,picks)) {
+        printf("error during read_raw_segment\n");
     }
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Read, Filter & Write Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
@@ -234,19 +199,9 @@ void TestFiffRFR::initTestCase() {
     FiffRawData ref_in_raw;
     ref_in_raw = FiffRawData(t_fileRef);
 
-    picks = ref_in_raw.info.pick_types(want_meg, want_eeg, want_stim, include, bads); // prefer member function
-
-    for(first = from; first < to; first+=quantum) {
-        last = first+quantum-1;
-
-        if (last > to)
-        {
-            last = to;
-        }
-        if (!ref_in_raw.read_raw_segment(ref_filtered,ref_in_times,first,last,picks))
-        {
-            printf("error during read_raw_segment\n");
-        }
+    // Reading
+    if (!ref_in_raw.read_raw_segment(ref_filtered,ref_in_times,from,to,picks)) {
+        printf("error during read_raw_segment\n");
     }
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Read MNE-PYTHON Results Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
