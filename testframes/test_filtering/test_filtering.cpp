@@ -111,8 +111,8 @@ TestFiffRFR::TestFiffRFR()
 
 //*************************************************************************************************************
 
-void TestFiffRFR::initTestCase() {
-
+void TestFiffRFR::initTestCase()
+{
     qDebug() << "Epsilon" << epsilon;
 
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
@@ -209,8 +209,8 @@ void TestFiffRFR::initTestCase() {
 
 //*************************************************************************************************************
 
-void TestFiffRFR::compareData() {
-
+void TestFiffRFR::compareData()
+{
     //make sure to only read data after 1/2 filter length
     int length = first_filtered.cols()-int(order/2);
     MatrixXd data_diff = first_filtered.block(0,int(order/2),first_filtered.rows(),length) - ref_filtered.block(0,int(order/2),ref_filtered.rows(),length);
@@ -220,8 +220,8 @@ void TestFiffRFR::compareData() {
 
 //*************************************************************************************************************
 
-void TestFiffRFR::compareTimes() {
-
+void TestFiffRFR::compareTimes()
+{
     MatrixXd times_diff = first_in_times - ref_in_times;
     QVERIFY( times_diff.sum() < epsilon );
 
