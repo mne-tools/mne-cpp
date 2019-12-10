@@ -29,9 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Example for filtering of data with realtime filtering. This example is combined with
-*            ex_read_write_raw for reading and writing fiff files. So the result of the filtering can be seen
-*            in MNE-Browse.
+* @brief     Example for filtering data with a user defined FIR filter and writing the result to a file.
 *
 */
 
