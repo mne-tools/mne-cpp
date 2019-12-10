@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - master
+    - github_actions
 
 jobs:
   Release:
@@ -12,8 +13,6 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v1  
-    - name: Install hub
-      uses: geertvdc/setup-hub@v1.0.0
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -35,38 +34,60 @@ jobs:
         # linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
         cd mne-cpp
         ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2
-        # creating archive of everything in current directory
-        tar cfvz ../mne-cpp-linux-x86_64-dev-build.tar.gz ./*   
+        # Creating archive of everything in current directory
+        tar cfvz ../mne-cpp-linux-x86_64.tar.gz ./*   
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
         credentials: ${{secrets.GIT_CREDENTIALS}}      
-    - name: Update dev_build_linux tag and release
-      env:
-        GITHUB_USER: LorenzE
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Update dev_build tag and release
       run: |
         git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name $GITHUB_USER
-        # Delete current tag locally if existent
-        if [ $(git tag -l "dev_build_linux") ]; then
-          git tag -d dev_build_linux
-        fi
-        # Delete current release remotley. This gets rid of the left over draft release. This must be done before deleting the remote tag
-        hub release delete dev_build_linux
-        # Delete current tag remotley
-        git push origin :refs/tags/dev_build_linux
-        # Create new tag once again
-        git tag -a dev_build_linux -m "Dev Build Linux"
-        # Send the new tag
-        git push --force origin refs/tags/dev_build_linux:refs/tags/dev_build_linux
-    - name: Deploy binaries with dev_build_linux release at Github
+        git config --global user.name LorenzE
+        git tag dev_build -f -a -m "Development Builds"
+        git push -f --tag
+    - name: Deploy binaries with dev_build release at Github
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: mne-cpp-linux-x86_64-dev-build.tar.gz
-        asset_name: mne-cpp-linux-x86_64-dev-build.tar.gz
-        tag: dev_build_linux
+        file: mne-cpp-linux-x86_64.tar.gz
+        asset_name: mne-cpp-linux-x86_64.tar.gz
+        tag: dev_build
+        overwrite: true
+        
+  Tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Codecov
+      run: |
+        sudo pip install codecov 
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.10.1
+        modules: qtcharts
+    - name: Configure and compile MNE-CPP
+      run: |
+        qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
+        make -j2
+    - name: Run tests and upload results to Codecov
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: |
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
+        git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+        for test in ./bin/test_*;
+        do
+          # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
+          # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
+          $test
+          find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
+          # Hide codecov output since it corrupts the log too much
+          codecov > /dev/null
+        done
 
   Documentation:
     runs-on: ubuntu-latest
@@ -86,11 +107,20 @@ jobs:
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}
+        credentials: ${{secrets.GIT_CREDENTIALS}}    
+    - name: Deploy qch docu data base with dev_build release at Github
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: doc/qt-creator_doc/mne-cpp.qch
+        asset_name: mne-cpp-doc-qtcreator
+        tag: dev_build
+        overwrite: true
     - name: Update documentation at Github pages
-      run: |
+      run: |    
+        cd doc
         git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name $GITHUB_USER
+        git config --global user.name LorenzE
         git clone -b gh-pages --single-branch --no-checkout --depth 1 https://github.com/mne-tools/mne-cpp gh-pages
         cd gh-pages
         # Remove all files first
@@ -103,11 +133,4 @@ jobs:
         git add *
         git add .nojekyll
         git commit --amend -a -m 'Update docu'
-        git push -f --all        
-    - name: Deploy qch docu data base with dev_build_linux release at Github
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: doc/qt-creator_doc/mne-cpp.qch
-        asset_name: mne-cpp-doc.qch
-        tag: dev_build_linux
+        git push -f --all    

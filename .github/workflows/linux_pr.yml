@@ -61,14 +61,16 @@ jobs:
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
         git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
         for test in ./bin/test_*;
         do
           # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
           # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
-          ./$test
-          find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null          
-          codecov
+          $test
+          find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
+          # Hide codecov output since it corrupts the log too much
+          codecov > /dev/null
         done
 
   Documentation:
@@ -86,9 +88,3 @@ jobs:
         cd doc
         doxygen mne-cpp_doxyfile
         tar cfvz docu_doxygen.tar.gz html
-    # This produces very big files. Uncomment for now.
-    # - name: Upload artifact to Github actions log screen
-    #   uses: actions/upload-artifact@v1
-    #   with:
-    #     name: docu_doxygen.tar.gz
-    #     path: doc/

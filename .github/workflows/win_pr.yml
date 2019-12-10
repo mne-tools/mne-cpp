@@ -19,10 +19,7 @@ jobs:
         arch: win64_msvc2017_64
         modules: qtcharts
     - name: Install jom
-      run: |
-        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"        
-        echo "::add-path::$HOME\jom"
+      run: choco install jom
     - name: Configure and compile MNE-CPP
       run: |
         # Setup VS compiler   
@@ -57,6 +54,6 @@ jobs:
         jom -j2
     - name: Run tests
       run: |  
-        cd bin
         git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+        cd bin
         Get-ChildItem -Filter test_*.exe | ForEach {&$_.Fullname}

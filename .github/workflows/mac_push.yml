@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - master
+    - github_actions
     
 jobs:
   Release:
@@ -12,17 +13,6 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v1
-    - name: Install hub
-      # geertvdc/setup-hub@v1.0.0 does not work for macos
-      run: |
-        tar --help
-        wget https://github.com/github/hub/releases/download/v2.13.0/hub-darwin-amd64-2.13.0.tgz
-        ls -l
-        tar xzvf hub-darwin-amd64-2.13.0.tgz --directory $HOME
-        ls -l
-        cd $HOME/hub-darwin-amd64-2.13.0
-        ls -l
-        echo "::add-path::$HOME/hub-darwin-amd64-2.13.0/bin"
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -33,49 +23,25 @@ jobs:
         echo $PATH
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples
         make -j2
+    - name: Package binaries
+      run: |
+        # creating archive of all macos deployed applications
+        tar cfvz mne-cpp-macos-x86_64.tar.gz bin/mne_scan.dmg bin/mne_browse.dmg bin/mne_analyze.dmg
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
         credentials: ${{secrets.GIT_CREDENTIALS}}  
-    - name: Update dev_build_mac tag and release
-      env:
-        GITHUB_USER: LorenzE
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Update dev_build tag and release
       run: |
         git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name $GITHUB_USER
-        # Delete current tag locally if existent
-        if [ $(git tag -l "dev_build_mac") ]; then
-          git tag -d dev_build_mac
-        fi
-        # Delete current release remotley. This gets rid of the left over draft release. This must be done before deleting the remote tag
-        #if [ $(hub release show -f %t dev_build_mac) == "dev_build_mac" ]; then
-        hub release delete dev_build_mac
-        #fi        
-        # Delete current tag remotley
-        git push origin :refs/tags/dev_build_mac
-        # Create new tag once again
-        git tag -a dev_build_mac -m "Dev Build MacOS"
-        # Send the new tag
-        git push --force origin refs/tags/dev_build_mac:refs/tags/dev_build_mac
-    - name: Deploy MNE Scan binaries with dev_build_mac release at Github
+        git config --global user.name LorenzE
+        git tag dev_build -f -a -m "Development Builds"
+        git push -f --tag        
+    - name: Deploy MNE Scan binaries with dev_build release at Github
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: bin/mne_scan.dmg
-        asset_name: mne_scan.dmg
-        tag: dev_build_mac
-    - name: Deploy MNE Browse binaries with dev_build_mac release at Github
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: bin/mne_browse.dmg
-        asset_name: mne_browse.dmg
-        tag: dev_build_mac
-    - name: Deploy MNE Analyze binaries with dev_build_mac release at Github
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: bin/mne_analyze.dmg
-        asset_name: mne_analyze.dmg
-        tag: dev_build_mac
+        file: mne-cpp-macos-x86_64.tar.gz
+        asset_name: mne-cpp-macos-x86_64.tar.gz
+        tag: dev_build
+        overwrite: true
