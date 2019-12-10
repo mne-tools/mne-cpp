@@ -48,6 +48,13 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+DESTDIR =  $${MNE_BINARY_DIR}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+    DEFINES += STATICLIB
+}
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
@@ -70,8 +77,6 @@ else {
             -lMNE$${MNE_LIB_VERSION}RtProcessing \
 }
 
-DESTDIR =  $${MNE_BINARY_DIR}
-
 SOURCES += \
         main.cpp \
 
@@ -80,7 +85,12 @@ HEADERS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-win32 {
+contains(MNECPP_CONFIG, withCodeCov) {
+    QMAKE_CXXFLAGS += --coverage
+    QMAKE_LFLAGS += --coverage
+}
+
+win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
     DEPLOY_CMD = $$winDeployAppArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${LIBS},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
@@ -91,7 +101,7 @@ unix:!macx {
 }
 
 # Activate FFTW backend in Eigen
-contains(MNECPP_CONFIG, useFFTW) {
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     DEFINES += EIGEN_FFTW_DEFAULT
     INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
     LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
