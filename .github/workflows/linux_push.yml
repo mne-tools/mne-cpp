@@ -28,22 +28,15 @@ jobs:
         # Downloading linuxdeployqt from continious release
         wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
         sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-        #creating a directory for linuxdeployqt to create results 
+        # Creating a directory for linuxdeployqt to create results 
         sudo mkdir -p -m777 mne-cpp
-        # Install non-QT packages, just paranoia.
-        #sudo apt-get install -qq libicu52 libxcb-xinerama0
-        #setting linuxdeployqt to variable
-        linuxdeployqt=linuxdeployqt-continuous-x86_64.AppImage
-        #archive file name created
-        archive_name="mne-cpp-linux-x86_64-dev-build.tar.gz"
-        #copying built data to folder for easy packaging 	
+        # Copying built data to folder for easy packaging 	
         cp -r ./bin ./lib mne-cpp/
-        #dropping into folder to easily package all results from linuxdeployqt
+        # linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
         cd mne-cpp
-        #linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
-        ../$linuxdeployqt bin/mne_scan -verbose2
-        #creating archive of everything in current directory
-        tar cfvz ../$archive_name ./*   
+        ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2
+        # creating archive of everything in current directory
+        tar cfvz ../mne-cpp-linux-x86_64-dev-build.tar.gz ./*   
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
@@ -60,9 +53,7 @@ jobs:
           git tag -d dev_build_linux
         fi
         # Delete current release remotley. This gets rid of the left over draft release. This must be done before deleting the remote tag
-        #if [ $(hub release show -f %t dev_build_linux) == "dev_build_linux" ]; then
         hub release delete dev_build_linux
-        #fi        
         # Delete current tag remotley
         git push origin :refs/tags/dev_build_linux
         # Create new tag once again
@@ -92,37 +83,31 @@ jobs:
         cd doc
         doxygen mne-cpp_doxyfile
         tar cfvz docu_doxygen.tar.gz html
-    # This produces very big files. Uncomment for now.
-    # - name: Upload artifact to Github actions log screen
-    #   uses: actions/upload-artifact@v1
-    #   with:
-    #     name: docu_doxygen.tar.gz
-    #     path: doc/
-    # - name: Setup Github credentials
-    #   uses: fusion-engineering/setup-git-credentials@v2
-    #   with:
-    #     credentials: ${{secrets.GIT_CREDENTIALS}}
-    # - name: Update documentation at Github pages
-    #   run: |
-    #     git clone -b gh-pages --single-branch --no-checkout --depth 1 https://github.com/mne-tools/mne-cpp gh-pages
-    #     cd gh-pages
-
-    #     # Remove all files first
-    #     git rm * -r
-    #     git commit --amend -a -m 'Update docu'
-
-    #     touch .nojekyll
-        
-    #     cp -r ../html/* .
-
-    #     git add *
-    #     git add .nojekyll
-    #     git commit --amend -a -m 'Update docu'
-    #     git push -f --all        
-    # - name: Deploy qch docu data base with dev_build_linux release at Github
-    #   uses: svenstaro/upload-release-action@v1-release
-    #   with:
-    #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-    #     file: doc/qt-creator_doc/mne-cpp.qch
-    #     asset_name: mne-cpp-doc.qch
-    #     tag: dev_build_linux
+    - name: Setup Github credentials
+      uses: fusion-engineering/setup-git-credentials@v2
+      with:
+        credentials: ${{secrets.GIT_CREDENTIALS}}
+    - name: Update documentation at Github pages
+      run: |
+        git config --global user.email lorenzesch@hotmail.com
+        git config --global user.name $GITHUB_USER
+        git clone -b gh-pages --single-branch --no-checkout --depth 1 https://github.com/mne-tools/mne-cpp gh-pages
+        cd gh-pages
+        # Remove all files first
+        git rm * -r
+        git commit --amend -a -m 'Update docu'
+        touch .nojekyll        
+        # Copy doxygen files
+        cp -r ../html/* .
+        # Add all new files, commit and push
+        git add *
+        git add .nojekyll
+        git commit --amend -a -m 'Update docu'
+        git push -f --all        
+    - name: Deploy qch docu data base with dev_build_linux release at Github
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: doc/qt-creator_doc/mne-cpp.qch
+        asset_name: mne-cpp-doc.qch
+        tag: dev_build_linux
