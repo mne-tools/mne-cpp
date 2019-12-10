@@ -2036,7 +2036,10 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice, const Fiff
         QFile t_qFile(info.filename);//ToDo this has to be adapted for TCPSocket
         FiffStream::SPtr t_pStream2(new FiffStream(&t_qFile));
 
-        t_pStream2->open();
+        if(!t_pStream2->open()){
+            qDebug() << "Failed to open file. Returning early";
+            return t_pStream;
+        }
 
         for(qint32 k = 0; k < blocks.size(); ++k)
         {

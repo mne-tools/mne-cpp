@@ -1331,13 +1331,16 @@ void MainWindow::on_btt_Calc_clicked()
 {
     truncation_criterion criterion;
 
-    if(ui->chb_Iterations->isChecked() && !ui->chb_ResEnergy->isChecked())
+    if(ui->chb_Iterations->isChecked() && !ui->chb_ResEnergy->isChecked()){
         criterion = Iterations;
-    if(ui->chb_Iterations->isChecked() && ui->chb_ResEnergy->isChecked())
+    } else if(ui->chb_Iterations->isChecked() && ui->chb_ResEnergy->isChecked()){
         criterion = Both;
-    if(ui->chb_ResEnergy->isChecked() && !ui->chb_Iterations->isChecked())
+    } else if(ui->chb_ResEnergy->isChecked() && !ui->chb_Iterations->isChecked()){
         criterion = SignalEnergy;
-
+    } else {
+        criterion = Both;
+        qDebug() << "Criterion not set. Defaulting to both.";
+    }
 
     if(ui->btt_Calc->text()== "calculate")
     {

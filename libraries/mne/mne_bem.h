@@ -247,7 +247,7 @@ public:
     *
     * @param[in]  trans     The Transformation Matrix
     */
-    void transform(const FiffCoordTrans trans);
+    void transform(const FiffCoordTrans& trans);
 
     //=========================================================================================================
     /**
@@ -255,7 +255,7 @@ public:
     *
     * @param[in]  trans     The Transformation Matrix
     */
-    void invtransform(const FiffCoordTrans trans);
+    void invtransform(const FiffCoordTrans& trans);
 
 protected:
     //=========================================================================================================

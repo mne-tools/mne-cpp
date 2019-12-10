@@ -168,6 +168,7 @@ RtCov::RtCov(qint32 iMaxSamples,
 , m_iMaxSamples(iMaxSamples)
 , m_pFiffInfo(pFiffInfo)
 , m_iSamples(0)
+, m_iNewMaxSamples(iMaxSamples)
 {
     RtCovWorker *worker = new RtCovWorker;
     worker->moveToThread(&m_workerThread);
