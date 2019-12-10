@@ -74,6 +74,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <Qt3DCore/QTransform>
+#include <QScopedPointer>
 
 
 //*************************************************************************************************************
@@ -421,10 +422,11 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
     FiffDigitizerData* t_digData = new FiffDigitizerData(t_fileDigData);
 
     QFile t_fileDigDataReference(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
-    FiffDigitizerData* t_digDataReference = new FiffDigitizerData(t_fileDigDataReference);
+    //FiffDigitizerData* t_digDataReference = new FiffDigitizerData(t_fileDigDataReference);
+    QScopedPointer<FiffDigitizerData> t_digDataReference(new FiffDigitizerData(t_fileDigDataReference));
 
     MneSurfaceOrVolume::align_fiducials(t_digData,
-                                        t_digDataReference,
+                                        t_digDataReference.data(),
                                         surface,
                                         10,
                                         1,
@@ -458,7 +460,7 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
 
 //*************************************************************************************************************
 
-void HpiView::onNewFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult)
+void HpiView::onNewFittingResultAvailable(const RTPROCESSINGLIB::FittingResult& fitResult)
 {
     m_vGof = fitResult.errorDistances;
 

@@ -146,6 +146,10 @@ FwdThreadArg *FwdThreadArg::create_eeg_multi_thread_duplicate(FwdThreadArg *one,
 
 void FwdThreadArg::free_eeg_multi_thread_duplicate(FwdThreadArg *one, bool bem_model)
 {
+    if (!one){
+        qDebug("Pointer passed is null. Returning early.");
+        return;
+    }
     if (bem_model) {
         FwdBemModel*    bem = (FwdBemModel*) one->client;
         FREE_80(bem->v0);
@@ -193,6 +197,11 @@ FwdThreadArg *FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg* one,
 void FwdThreadArg::free_meg_multi_thread_duplicate(FwdThreadArg *one, bool bem_model)
 
 {
+    if (!one){
+        qDebug("Pointer passed is null. Returning early.");
+        return;
+    }
+
     FwdCompData* comp = (FwdCompData*)one->client;
 
     FREE_80(comp->work);

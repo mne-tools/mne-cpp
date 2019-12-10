@@ -179,7 +179,7 @@ protected:
     *
     * @param[in] fitResult  The fit result coming from the rt HPI class.
     */
-    void onNewFittingResultAvailable(RTPROCESSINGLIB::FittingResult fitResult);
+    void onNewFittingResultAvailable(const RTPROCESSINGLIB::FittingResult& fitResult);
 
     //=========================================================================================================
     /**
