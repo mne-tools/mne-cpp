@@ -25,7 +25,7 @@ jobs:
         make -j2
     - name: Package binaries
       run: |
-        # creating archive of all macos deployed applications
+        # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-x86_64.tar.gz bin/mne_scan.dmg bin/mne_browse.dmg bin/mne_analyze.dmg
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
