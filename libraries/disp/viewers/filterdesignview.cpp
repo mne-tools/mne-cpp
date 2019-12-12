@@ -63,7 +63,7 @@
 #include <QSettings>
 #include <QApplication>
 #include <QDesktopWidget>
-
+#include <QKeyEvent>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -295,7 +295,7 @@ void FilterDesignView::loadSettings(const QString& settingsPath)
 
     QPoint pos = settings.value(settingsPath + QString("/FilterDesignViewPos"), QPoint(100,100)).toPoint();
 
-    QRect screenRect = QApplication::desktop()->screenGeometry();
+    QRect screenRect = QApplication::desktop()->geometry();
     if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
         move(QPoint(100,100));
     } else {
