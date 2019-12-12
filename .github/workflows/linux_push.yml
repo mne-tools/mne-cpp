@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - master
+    - github_actions
 
 jobs:
   Release:
@@ -81,7 +82,8 @@ jobs:
         for test in ./bin/test_*;
         do
           # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
-          # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
+          # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.          
+          echo "\n\nStarting\n$test"
           $test
           find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
           # Hide codecov output since it corrupts the log too much

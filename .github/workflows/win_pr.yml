@@ -56,4 +56,4 @@ jobs:
       run: |  
         git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
         cd bin
-        Get-ChildItem -Filter test_*.exe | ForEach {&$_.Fullname}
+        Get-ChildItem -Filter test_*.exe | ForEach {Write-Output "" "" Starting $_.Fullname; &$_.Fullname}
