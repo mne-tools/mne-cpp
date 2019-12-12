@@ -54,6 +54,7 @@
 #include <QGridLayout>
 #include <QHeaderView>
 #include <QTableView>
+#include <QMouseEvent>
 
 
 //*************************************************************************************************************
