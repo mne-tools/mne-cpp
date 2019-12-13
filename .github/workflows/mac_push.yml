@@ -19,7 +19,6 @@ jobs:
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |        
-        echo $PATH
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples
         make -j2
     - name: Package binaries

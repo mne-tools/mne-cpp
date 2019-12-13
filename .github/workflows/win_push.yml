@@ -39,7 +39,7 @@ jobs:
         git config --global user.name $env:GITHUB_USER
         git tag dev_build -f -a -m "Development Builds"
         git push -f --tag
-    - name: Deploy binaries with dev_build_win release at Github
+    - name: Deploy binaries with dev_build release at Github
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
