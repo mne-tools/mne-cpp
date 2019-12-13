@@ -4,9 +4,10 @@ on:
   push:
     branches:
     - master
+    - github_actions
 
 jobs:
-  Release:
+  ReleaseQtLatest:
     runs-on: windows-2016
 
     steps:
@@ -15,7 +16,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.10.1
+        version: 5.14.0
         arch: win64_msvc2017_64
         modules: qtcharts
     - name: Install jom

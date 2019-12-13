@@ -4,9 +4,10 @@ on:
   push:
     branches:
     - master
+    - github_actions
     
 jobs:
-  Release:
+  ReleaseQtLatest:
     runs-on: macos-latest
 
     steps:
@@ -15,7 +16,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.10.1
+        version: 5.14.0
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |        

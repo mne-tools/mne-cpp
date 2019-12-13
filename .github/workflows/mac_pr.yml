@@ -4,9 +4,28 @@ on:
   pull_request:
     branches:
     - master
+    - github_actions
 
 jobs:
-  Release:
+  ReleaseQtLatest:
+    runs-on: macos-latest
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install 7Zip
+      run: brew install p7zip
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.14.0
+        modules: qtcharts
+    - name: Configure and compile MNE-CPP
+      run: |        
+        qmake -r MNECPP_CONFIG+=noTests
+        make -j2
+
+  ReleaseQtMinimum:
     runs-on: macos-latest
 
     steps:

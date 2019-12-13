@@ -4,9 +4,27 @@ on:
   pull_request:
     branches:
     - master
+    - github_actions
 
 jobs:
-  Release:
+  ReleaseQtLatest:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.14.0
+        modules: qtcharts
+    - name: Configure and compile MNE-CPP
+      run: |
+        qmake -query    
+        qmake -r MNECPP_CONFIG+=noTests
+        make -j2 
+
+  ReleaseQtMinimum:
     runs-on: ubuntu-latest
 
     steps:
