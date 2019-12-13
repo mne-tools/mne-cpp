@@ -65,6 +65,7 @@
 #include <QSettings>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QKeyEvent>
 
 
 //*************************************************************************************************************

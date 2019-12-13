@@ -83,6 +83,7 @@
 #include <QGraphicsItem>
 #include <QDir>
 #include <QSettings>
+#include <QEvent>
 
 
 //*************************************************************************************************************

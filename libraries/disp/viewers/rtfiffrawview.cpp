@@ -59,6 +59,7 @@
 #include <QSvgGenerator>
 #include <QSettings>
 #include <QScrollBar>
+#include <QMouseEvent>
 
 #if defined(USE_OPENGL)
     #include <QOpenGLWidget>
