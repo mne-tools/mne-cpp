@@ -178,8 +178,7 @@ void AverageLayoutView::takeScreenshot(const QString& fileName)
 
     if(fileName.contains(".png", Qt::CaseInsensitive))
     {
-
-        QPixmap pixMap = m_pAverageLayoutView->grab();
+        QPixmap pixMap = QPixmap::grabWidget(m_pAverageLayoutView);
         pixMap.save(fileName);
     }
 }
