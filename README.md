@@ -16,13 +16,13 @@ For more information please visit http://www.mne-cpp.org.
 Get and build from source
 -------------------------
 
-To get the latest code and build it follow this [guide](http://wiki.mne-cpp.org/index.php/Step_by_Step_Setup_Guide). 
+To get the latest code and build it follow this [guide](http://wiki.mne-cpp.org/index.php/Step_by_Step_Setup_Guide).
 
 
 Get pre-built binaries
 ----------------------
 
-Pre-built binaries for Windows, Mac and Linux are available [here](https://www.mne-cpp.org/index.php/download/). 
+Pre-built binaries for Windows, Mac and Linux are available [here](https://www.mne-cpp.org/index.php/download/).
 
 
 Get involved
@@ -36,7 +36,7 @@ Requirements
 
 | **`Windows`** | **`Linux`** | **`macOS`** |
 |---------------|-------------|-------------|
-| [>= MSVC 2015](https://www.visualstudio.com/downloads/) | [>= GCC 4.9.1](https://gcc.gnu.org/releases.html) | [>= Clang 3.5](https://developer.apple.com/xcode/) |
+| [>= MSVC 2015](https://www.visualstudio.com/downloads/) | [>= GCC 5.3.1](https://gcc.gnu.org/releases.html) | [>= Clang 3.5](https://developer.apple.com/xcode/) |
 
 
 Dependencies
