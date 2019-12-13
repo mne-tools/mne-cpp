@@ -76,6 +76,7 @@ jobs:
     - name: Run tests and upload results to Codecov
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        QTEST_FUNCTION_TIMEOUT: 900000
       run: |
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
         git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data

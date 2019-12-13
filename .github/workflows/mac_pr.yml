@@ -40,6 +40,8 @@ jobs:
         qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
         make -j2  
     - name: Run tests
+      env:
+        QTEST_FUNCTION_TIMEOUT: 900000
       run: |
         export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$PWD/lib
         git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data

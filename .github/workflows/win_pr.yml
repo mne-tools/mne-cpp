@@ -53,6 +53,8 @@ jobs:
         qmake -r MNECPP_CONFIG+=noTests
         jom -j2
     - name: Run tests
+      env:
+        QTEST_FUNCTION_TIMEOUT: 900000
       run: |  
         git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
         cd bin
