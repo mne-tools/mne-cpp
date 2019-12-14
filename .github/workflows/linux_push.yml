@@ -24,8 +24,7 @@ jobs:
         make -j2 
     - name: Package binaries
       run: |
-        sudo apt-get update
-        # sudo apt-get install libxkbcommon-dev
+        # Install libxkbcommon so linuxdeployqt can find it
         sudo apt-get install libxkbcommon-x11-0
         # Downloading linuxdeployqt from continious release
         wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
