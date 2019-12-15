@@ -15,12 +15,12 @@ jobs:
       uses: actions/checkout@v1  
     - name: Install hub
       uses: geertvdc/setup-hub@master
-    # - name: Setup Github credentials
-    #   uses: fusion-engineering/setup-git-credentials@v2
-    #   with:
-    #     credentials: ${{secrets.GIT_CREDENTIALS}}      
-    - name: Update dev_build tag and release
-      run: truncate -s 5M ostechnix.txt
+    - name: Setup Github credentials
+      uses: fusion-engineering/setup-git-credentials@v2
+      with:
+        credentials: ${{secrets.GIT_CREDENTIALS}}      
+    #- name: Update dev_build tag and release
+    #  run: |
     #     # Delete release remotley via hub
     #     # Delete tag remotley
     #     # Force create new tag locally
@@ -29,39 +29,34 @@ jobs:
     #     git config --global user.name LorenzE
     #     git tag dev_build -f -a -m "Development Builds"
     #     git push -f --tag
-    # - name: Update dev_build tag and release
-    #   env:
-    #     GITHUB_USER: LorenzE
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   run: |
-    #     git config --global user.email lorenzesch@hotmail.com
-    #     git config --global user.name $GITHUB_USER
-    #     # Delete current dev_build release remotley. 
-    #     # Must be done before deleting the remote tag associated with the dev_build release. 
-    #     # This prevents a draft release to be left over after we delete the tag remotley. 
-    #     hub release delete dev_build
-    #     # Delete current tag remotley
-    #     git push origin :refs/tags/dev_build
-    #     # Create new tag once again
-    #     git tag dev_build -f -a -m "Development Builds"
-    #     # Send the new tag
-    #     git push -f --tag
-    - uses: ncipollo/release-action@v1
+    - name: Update dev_build tag and release
+      env:
+        GITHUB_USER: LorenzE
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.email lorenzesch@hotmail.com
+        git config --global user.name $GITHUB_USER
+        # Delete current dev_build release remotley. 
+        # Must be done before deleting the remote tag associated with the dev_build release. 
+        # This prevents a draft release to be left over after we delete the tag remotley. 
+        hub release delete dev_build
+        # Delete current tag remotley
+        git push origin :refs/tags/dev_build
+        # Change dev_build tag to point to newest commit
+        git tag dev_build -f -a -m "Development Builds"
+        # Send the new tag
+        git push -f --tag
+        # Create new dev_build release
+        hub release create -m "Development Builds" dev_build
+        truncate -s 5M ostechnix.txt
+    - name: Deploy binaries with dev_build release on Github
+      uses: svenstaro/upload-release-action@v1-release
       with:
-        allowUpdates: true
-        artifacts: "ostechnix.txt"
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: Development Build
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ostechnix.txt
+        asset_name: ostechnix.txt
         tag: dev_build
-        #commit: ${{ GITHUB_SHA }}
-    # - name: Deploy binaries with dev_build release on Github
-    #   uses: svenstaro/upload-release-action@v1-release
-    #   with:
-    #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-    #     file: ostechnix.txt
-    #     asset_name: ostechnix.txt
-    #     tag: dev_build
-    #     overwrite: true
+        overwrite: true
 
   DevBuildsLinux:
     runs-on: ubuntu-16.04
