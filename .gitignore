@@ -65,3 +65,4 @@ Makefile
 .project
 .settings
 .vscode
+mne-cpp.pro.user*
