@@ -1,0 +1,51 @@
+name: Windows
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  ReleaseQtLatest:
+    runs-on: windows-2016
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1      
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.14.0
+        arch: win64_msvc2017_64
+        modules: qtcharts
+    - name: Install jom
+      run: choco install jom
+    - name: Configure and compile MNE-CPP
+      run: |        
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        qmake -r MNECPP_CONFIG+=noTests
+        jom -j2
+    - name: Package binaries
+      run: |
+        7z a mne-cpp-windows-x86_64.zip ./bin
+    - name: Setup Github credentials
+      uses: fusion-engineering/setup-git-credentials@v2
+      with:
+        credentials: ${{secrets.GIT_CREDENTIALS}}    
+    - name: Update dev_build tag and release
+      run: |
+        git config --global user.email lorenzesch@hotmail.com
+        git config --global user.name $env:GITHUB_USER
+        git tag dev_build -f -a -m "Development Builds"
+        git push -f --tag
+    - name: Deploy binaries with dev_build release at Github
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-windows-x86_64.zip
+        asset_name: mne-cpp-windows-x86_64.zip
+        tag: dev_build
+        overwrite: true
+
+

@@ -1,0 +1,139 @@
+name: Linux
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  ReleaseQtLatest:
+    runs-on: ubuntu-16.04
+    
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1  
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.14.0
+        modules: qtcharts
+    - name: Configure and compile MNE-CPP
+      run: |        
+        qmake -r MNECPP_CONFIG+=noTests
+        make -j2 
+    - name: Package binaries
+      run: |
+        # Install libxkbcommon so linuxdeployqt can find it
+        sudo apt-get install libxkbcommon-x11-0
+        # Downloading linuxdeployqt from continious release
+        wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+        sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+        # Creating a directory for linuxdeployqt to create results 
+        sudo mkdir -p -m777 mne-cpp
+        # Copying built data to folder for easy packaging 	
+        cp -r ./bin ./lib mne-cpp/
+        # linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
+        cd mne-cpp
+        ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2
+        # Creating archive of everything in current directory
+        tar cfvz ../mne-cpp-linux-x86_64.tar.gz ./*   
+    - name: Setup Github credentials
+      uses: fusion-engineering/setup-git-credentials@v2
+      with:
+        credentials: ${{secrets.GIT_CREDENTIALS}}      
+    - name: Update dev_build tag and release
+      run: |
+        git config --global user.email lorenzesch@hotmail.com
+        git config --global user.name LorenzE
+        git tag dev_build -f -a -m "Development Builds"
+        git push -f --tag
+    - name: Deploy binaries with dev_build release at Github
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-linux-x86_64.tar.gz
+        asset_name: mne-cpp-linux-x86_64.tar.gz
+        tag: dev_build
+        overwrite: true
+        
+  Tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Codecov
+      run: |
+        sudo pip install codecov 
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.10.1
+        modules: qtcharts
+    - name: Configure and compile MNE-CPP
+      run: |
+        qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
+        make -j2
+    - name: Run tests and upload results to Codecov
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        QTEST_FUNCTION_TIMEOUT: 900000
+      run: |
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
+        git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+        for test in ./bin/test_*;
+        do
+          # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
+          # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.          
+          echo ">> Starting $test"
+          $test
+          find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
+          # Hide codecov output since it corrupts the log too much
+          codecov > /dev/null
+        done
+
+  Documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Qt Dev Tools, Doxygen and Graphviz
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
+    - name: Run Doxygen and package result
+      run: |        
+        cd doc
+        doxygen mne-cpp_doxyfile
+        tar cfvz docu_doxygen.tar.gz html
+    - name: Setup Github credentials
+      uses: fusion-engineering/setup-git-credentials@v2
+      with:
+        credentials: ${{secrets.GIT_CREDENTIALS}}    
+    - name: Deploy qch docu data base with dev_build release at Github
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: doc/qt-creator_doc/mne-cpp.qch
+        asset_name: mne-cpp-doc-qtcreator
+        tag: dev_build
+        overwrite: true
+    - name: Update documentation at Github pages
+      run: |    
+        cd doc
+        git config --global user.email lorenzesch@hotmail.com
+        git config --global user.name LorenzE
+        git clone -b gh-pages --single-branch --no-checkout --depth 1 https://github.com/mne-tools/mne-cpp gh-pages
+        cd gh-pages
+        # Remove all files first
+        git rm * -r
+        git commit --amend -a -m 'Update docu'
+        touch .nojekyll        
+        # Copy doxygen files
+        cp -r ../html/* .
+        # Add all new files, commit and push
+        git add *
+        git add .nojekyll
+        git commit --amend -a -m 'Update docu'
+        git push -f --all    
