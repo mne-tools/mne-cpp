@@ -1,0 +1,45 @@
+name: MacOS
+
+on:
+  push:
+    branches:
+    - master
+    
+jobs:
+  ReleaseQtLatest:
+    runs-on: macos-latest
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.14.0
+        modules: qtcharts
+    - name: Configure and compile MNE-CPP
+      run: |        
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples
+        make -j2
+    - name: Package binaries
+      run: |
+        # Creating archive of all macos deployed applications
+        tar cfvz mne-cpp-macos-x86_64.tar.gz bin/mne_scan.dmg bin/mne_browse.dmg bin/mne_analyze.dmg
+    - name: Setup Github credentials
+      uses: fusion-engineering/setup-git-credentials@v2
+      with:
+        credentials: ${{secrets.GIT_CREDENTIALS}}  
+    - name: Update dev_build tag and release
+      run: |
+        git config --global user.email lorenzesch@hotmail.com
+        git config --global user.name LorenzE
+        git tag dev_build -f -a -m "Development Builds"
+        git push -f --tag        
+    - name: Deploy MNE Scan binaries with dev_build release at Github
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-macos-x86_64.tar.gz
+        asset_name: mne-cpp-macos-x86_64.tar.gz
+        tag: dev_build
+        overwrite: true
