@@ -18,17 +18,7 @@ jobs:
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}      
-    #- name: Update dev_build tag and release
-    #  run: |
-    #     # Delete release remotley via hub
-    #     # Delete tag remotley
-    #     # Force create new tag locally
-    #     # Force push changes
-    #     git config --global user.email lorenzesch@hotmail.com
-    #     git config --global user.name LorenzE
-    #     git tag dev_build -f -a -m "Development Builds"
-    #     git push -f --tag
+        credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Update dev_build tag and release
       env:
         GITHUB_USER: LorenzE
@@ -48,15 +38,6 @@ jobs:
         git push -f --tag
         # Create new dev_build release
         hub release create -m "Development Builds" dev_build
-        truncate -s 5M ostechnix.txt
-    - name: Deploy binaries with dev_build release on Github
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ostechnix.txt
-        asset_name: ostechnix.txt
-        tag: dev_build
-        overwrite: true
 
   DevBuildsLinux:
     runs-on: ubuntu-16.04
