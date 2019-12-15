@@ -18,8 +18,7 @@ jobs:
         version: 5.14.0
         modules: qtcharts
     - name: Configure and compile MNE-CPP
-      run: |
-        qmake -query    
+      run: |    
         qmake -r MNECPP_CONFIG+=noTests
         make -j2 
 
@@ -36,7 +35,6 @@ jobs:
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
-        qmake -query    
         qmake -r MNECPP_CONFIG+=noTests
         make -j2 
         
