@@ -134,7 +134,7 @@ MNECPP_CONFIG += dispOpenGL
 
 #Build minimalVersion for qt versions < 5.10.0
 !minQtVersion(5, 10, 0) {
-    message("Building minimal version due to Qt version $${QT_VERSION}.")
+    message("Building minimal version of MNE-CPP due to Qt version $${QT_VERSION}.")
     MNECPP_CONFIG += minimalVersion
 }
 
