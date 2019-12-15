@@ -25,17 +25,7 @@ jobs:
       run: |
         # Creating archive of all macos deployed applications
         tar cfvz mne-cpp-macos-x86_64.tar.gz bin/mne_scan.dmg bin/mne_browse.dmg bin/mne_analyze.dmg
-    - name: Setup Github credentials
-      uses: fusion-engineering/setup-git-credentials@v2
-      with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}  
-    - name: Update dev_build tag and release
-      run: |
-        git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name LorenzE
-        git tag dev_build -f -a -m "Development Builds"
-        git push -f --tag        
-    - name: Deploy MNE Scan binaries with dev_build release at Github
+    - name: Deploy MNE Scan binaries with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}

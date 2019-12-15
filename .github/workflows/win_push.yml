@@ -29,17 +29,7 @@ jobs:
     - name: Package binaries
       run: |
         7z a mne-cpp-windows-x86_64.zip ./bin
-    - name: Setup Github credentials
-      uses: fusion-engineering/setup-git-credentials@v2
-      with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}    
-    - name: Update dev_build tag and release
-      run: |
-        git config --global user.email lorenzesch@hotmail.com
-        git config --global user.name $env:GITHUB_USER
-        git tag dev_build -f -a -m "Development Builds"
-        git push -f --tag
-    - name: Deploy binaries with dev_build release at Github
+    - name: Deploy binaries with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
