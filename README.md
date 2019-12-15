@@ -4,9 +4,9 @@
 
 -----------------
 
-| **`Windows`** | **`Linux / macOS`** | **`Dynamic Testing`** | **`Static Analysis`** | **`Support`** | **`Cite`** |
-|---------------|---------------------|-----------------------|-----------------------|---------------|------------|
-| [![AppVeyor](https://ci.appveyor.com/api/projects/status/b63nawx8mnmmr9rv?svg=true)](https://ci.appveyor.com/project/chdinh/mne-cpp) | [![Travis](https://api.travis-ci.org/mne-tools/mne-cpp.png?branch=master)](https://travis-ci.org/mne-tools/mne-cpp) | [![CodeCov](https://codecov.io/gh/mne-tools/mne-cpp/branch/master/graph/badge.svg)](https://codecov.io/gh/mne-tools/mne-cpp) | [![Coverity](https://scan.coverity.com/projects/8955/badge.svg)](https://scan.coverity.com/projects/mne-tools-mne-cpp) | [![Gitter](https://badges.gitter.im/mne-tools/mne-cpp.svg)](https://gitter.im/mne-tools/mne-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.439390.svg)](https://doi.org/10.5281/zenodo.439390) |
+| **`Windows`** | **`Linux`** | **`MacOS`** | **`Dynamic Testing`** | **`Static Analysis`** | **`Support`** |
+|---------------|-------------|-------------|-----------------------|-----------------------|---------------|
+| ![](https://github.com/mne-tools/mne-cpp/workflows/Windows/badge.svg) | ![](https://github.com/mne-tools/mne-cpp/workflows/Linux/badge.svg) | ![](https://github.com/mne-tools/mne-cpp/workflows/MacOS/badge.svg) | [![CodeCov](https://codecov.io/gh/mne-tools/mne-cpp/branch/master/graph/badge.svg)](https://codecov.io/gh/mne-tools/mne-cpp) | [![Coverity](https://scan.coverity.com/projects/8955/badge.svg)](https://scan.coverity.com/projects/mne-tools-mne-cpp) | [![Gitter](https://badges.gitter.im/mne-tools/mne-cpp.svg)](https://gitter.im/mne-tools/mne-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
 
 MNE-CPP: A Framework for Electrophysiology.
 
