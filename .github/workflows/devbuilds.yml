@@ -4,7 +4,6 @@ on:
   push:
     branches:
     - master
-    - github_actions
 
 jobs:
   UpdateDevTag:
@@ -39,23 +38,7 @@ jobs:
         # Create new dev_build release
         hub release create -m "Development Builds" dev_build
 
-  Minimal:
-    runs-on: ubuntu-16.04
-
-    steps:
-    - name: Clone repository
-      uses: actions/checkout@v1
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2
-      with:
-        version: 5.6
-        modules: qtcharts
-    - name: Configure and compile MNE-CPP
-      run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=minimalVersion
-        make -j2
-
-  DevBuildsLinux:
+  Linux:
     runs-on: ubuntu-16.04
     needs: UpdateDevTag
     
@@ -96,7 +79,7 @@ jobs:
         tag: dev_build
         overwrite: true
 
-  DevBuildsMacOS:
+  MacOS:
     runs-on: macos-latest
     needs: UpdateDevTag
 
@@ -125,7 +108,7 @@ jobs:
         tag: dev_build
         overwrite: true
 
-  DevBuildsWin:
+  Win:
     runs-on: windows-2016
     needs: UpdateDevTag
 
@@ -210,7 +193,6 @@ jobs:
       run: |        
         cd doc
         doxygen mne-cpp_doxyfile
-        tar cfvz docu_doxygen.tar.gz html
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
