@@ -1,4 +1,4 @@
-name: DevBuilds
+name: Linux|Win|MacOS
 
 on:
   push:
