@@ -4,9 +4,9 @@
 
 -----------------
 
-| **Cross Platform Builds`** | **`Dynamic Testing`** | **`Static Analysis`** | **`Support`** |
-|----------------------------|-----------------------|-----------------------|---------------|
-| ![](https://github.com/mne-tools/mne-cpp/workflows/Linux|Win|MacOS/badge.svg) | [![CodeCov](https://codecov.io/gh/mne-tools/mne-cpp/branch/master/graph/badge.svg)](https://codecov.io/gh/mne-tools/mne-cpp) | [![Coverity](https://scan.coverity.com/projects/8955/badge.svg)](https://scan.coverity.com/projects/mne-tools-mne-cpp) | [![Gitter](https://badges.gitter.im/mne-tools/mne-cpp.svg)](https://gitter.im/mne-tools/mne-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
+| **`Cross-Platform Builds`** | **`Dynamic Testing`** | **`Static Analysis`** | **`Support`** |
+|-----------------------------|-----------------------|-----------------------|---------------|
+| [![GithubActions](https://github.com/mne-tools/mne-cpp/workflows/Linux%7CWin%7CMacOS/badge.svg)](https://github.com/mne-tools/mne-cpp/actions) | [![CodeCov](https://codecov.io/gh/mne-tools/mne-cpp/branch/master/graph/badge.svg)](https://codecov.io/gh/mne-tools/mne-cpp) | [![Coverity](https://scan.coverity.com/projects/8955/badge.svg)](https://scan.coverity.com/projects/mne-tools-mne-cpp) | [![Gitter](https://badges.gitter.im/mne-tools/mne-cpp.svg)](https://gitter.im/mne-tools/mne-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
 
 MNE-CPP: A Framework for Electrophysiology.
 
