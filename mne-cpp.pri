@@ -128,16 +128,28 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To build MNE-CPP Deep library based CNTK: qmake MNECPP_CONFIG+=buildDeep
 ## To build MNE-CPP with FFTW support in Eigen (make sure to specify FFTW_DIRs below): qmake MNECPP_CONFIG+=useFFTW
 ## To build MNE-CPP Disp library and MNE Browse with OpenGL support (default is with OpenGL support): qmake MNECPP_CONFIG+=dispOpenGL
+## To build MNE-CPP agaisnt wasm: qmake MNECPP_CONFIG+=wasm
 
 # Default flags
 MNECPP_CONFIG += dispOpenGL
 
-#Build minimalVersion for qt versions < 5.10.0
+# At least version 5.2.1
+!minQtVersion(5, 2, 1) {
+    message("Cannot build MNE-CPP with Qt version $${QT_VERSION}.")
+    error("Use at least Qt 5.2.1. Please note that you may only be able to build the minimal MNE-CPP version.")
+}
+
+# Build minimalVersion for qt versions < 5.10.0
 !minQtVersion(5, 10, 0) {
     message("Building minimal version of MNE-CPP due to Qt version $${QT_VERSION}.")
     MNECPP_CONFIG += minimalVersion
 }
 
+# Build static verion if wasm flag was set
+contains(MNECPP_CONFIG, wasm) {
+    message("The wasm flag was detected. Building static version of MNE-CPP.")
+    MNECPP_CONFIG += static
+}
 
 ########################################### DIRECTORY DEFINITIONS #############################################
 
