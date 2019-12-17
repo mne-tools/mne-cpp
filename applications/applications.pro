@@ -49,12 +49,23 @@ SUBDIRS += \
         mne_sample_set_downloader
 
         qtHaveModule(charts) {
-        SUBDIRS += \
-            mne_analyze \
-            mne_dipole_fit \
-            mne_launch \
-            mne_scan
+            SUBDIRS += \
+                mne_analyze \
+                mne_dipole_fit \
+                mne_launch \
+                mne_scan
         } else {
             message("applications.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
         }
+}
+
+# Overwrite SUBDIRS if wasm flag was defined
+contains(MNECPP_CONFIG, wasm) {
+    SUBDIRS = mne_browse
+
+    qtHaveModule(charts) {
+        #SUBDIRS += mne_analyze # needs qt3D which is not yet wasm supported
+    } else {
+        message("applications.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
+    }
 }
