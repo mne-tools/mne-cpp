@@ -36,7 +36,7 @@ jobs:
         # Send the new tag
         git push -f --tag
         # Create new dev_build release
-        hub release create -m "Development Builds" dev_build
+        hub release create -m "Development Builds" dev_build --prerelease
 
   Linux:
     runs-on: ubuntu-16.04
