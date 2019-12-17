@@ -67,6 +67,32 @@ SUBDIRS += \
     }
 }
 
+# Overwrite SUBDIRS if wasm flag was defined
+contains(MNECPP_CONFIG, wasm) {
+    SUBDIRS = \
+        utils \
+        fs \
+        fiff \
+        mne \
+        fwd \
+        inverse \
+        communication \
+
+    # Libraries which are not supported in the minimalVersion
+    !contains(MNECPP_CONFIG, minimalVersion) {
+        SUBDIRS += \
+            rtprocessing \
+            connectivity \
+            disp \
+
+        qtHaveModule(charts) {
+            # SUBDIRS += disp3D # needs qt3D which is not yet wasm supported
+        } else {
+            message("libraries.pro - The Qt Charts module is missing. Please install to build the disp3D library.")
+        }
+    }
+}
+
 # Specify library dependencies
 utils.depends =
 fs.depends = utils
