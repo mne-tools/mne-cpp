@@ -1,0 +1,124 @@
+name: Coverity Scan
+on:
+  schedule:
+  - cron: '0 0 * * 1,3,5'
+
+jobs:
+  Release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v1
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: 5.10.1
+          modules: qtcharts
+      - name: Coverity scripts
+        run: |
+          COVERITY_SCAN_PROJECT_NAME="mne-tools/mne-cpp"
+          COVERITY_SCAN_NOTIFICATION_EMAIL="christoph.dinh@mne-cpp.org"
+          COVERITY_SCAN_BRANCH_PATTERN="master"
+          COVERITY_SCAN_BUILD_COMMAND_PREPEND="qmake -r MNECPP_CONFIG+=noTests"
+          COVERITY_SCAN_BUILD_COMMAND="make -j2"
+          COVERITY_SCAN_TOKEN=$COVTOKEN
+          PLATFORM=`uname`
+          TOOL_ARCHIVE=/tmp/cov-analysis-${PLATFORM}.tgz
+          TOOL_URL=https://scan.coverity.com/download/${PLATFORM}
+          TOOL_BASE=/tmp/coverity-scan-analysis
+          UPLOAD_URL="https://scan.coverity.com/builds"
+          SCAN_URL="https://scan.coverity.com"
+          wget -nv -O $TOOL_ARCHIVE $TOOL_URL --post-data "project=$COVERITY_SCAN_PROJECT_NAME&token=$COVERITY_SCAN_TOKEN"
+          mkdir -p $TOOL_BASE
+          pushd $TOOL_BASE
+          tar xzf $TOOL_ARCHIVE --warning=none
+          popd
+          TOOL_DIR=`find $TOOL_BASE -type d -name 'cov-analysis*'`
+          export PATH=$TOOL_DIR/bin:$PATH
+          echo -e "echo 3"
+          echo -e "\033[33;1mRunning Coverity Scan Analysis Tool...\033[0m"
+          COV_BUILD_OPTIONS=""
+          RESULTS_DIR="cov-int"
+          eval "${COVERITY_SCAN_BUILD_COMMAND_PREPEND}"
+          COVERITY_UNSUPPORTED=1 cov-build --dir $RESULTS_DIR $COV_BUILD_OPTIONS $COVERITY_SCAN_BUILD_COMMAND
+          cov-import-scm --dir $RESULTS_DIR --scm git --log $RESULTS_DIR/scm_log.txt 2>&1
+          RESULTS_ARCHIVE=analysis-results.tgz
+          tar czf $RESULTS_ARCHIVE $RESULTS_DIR
+          SHA=`git rev-parse --short HEAD`
+          response=$(curl \
+            --silent --write-out "\n%{http_code}\n" \
+            --form project=$COVERITY_SCAN_PROJECT_NAME \
+            --form token=$COVERITY_SCAN_TOKEN \
+            --form email=$COVERITY_SCAN_NOTIFICATION_EMAIL \
+            --form file=@$RESULTS_ARCHIVE \
+            --form version=$SHA \
+            --form description="Travis CI build" \
+            $UPLOAD_URL)
+          status_code=$(echo "$response" | sed -n '$p')
+        env:
+          COVTOKEN: ${{ secrets.POLARIS_TOKEN }}
+
+#      - name: Download Coverity Build Tool
+#        run: |
+#          wget -q https://scan.coverity.com/download/cxx/linux64 --post-data "token=$TOKEN&project=mne-tools/mne-cpp" -O cov-analysis-linux64.tar.gz
+#          mkdir cov-analysis-linux64
+#          tar xzf cov-analysis-linux64.tar.gz --strip 1 -C cov-analysis-linux64
+#        env:
+#          TOKEN: ${{ secrets.POLARIS_TOKEN }}
+
+#      - name: Fixed world writable dirs
+#        run: |
+#          chmod go-w $HOME
+#          sudo chmod -R go-w /usr/share
+#      - name: Run autoconf
+#        run: autoconf
+
+#      - name: Configure
+#        run: ./configure
+
+#      - name: Build with cov-build
+#        run: |
+#          export PATH=`pwd`/cov-analysis-linux64/bin:$PATH
+#          cov-build --dir cov-int make
+
+#    - name: Submit the result to Coverity Scan
+#      run: |
+#        tar czvf ruby.tgz cov-int
+#        curl \
+#          --form project=ruby \
+#          --form token=$TOKEN \
+#          --form email=mame@ruby-lang.org \
+#          --form file=@ruby.tgz \
+#          --form version=trunk \
+#          --form description="`./ruby -v`" \
+#            https://scan.coverity.com/builds?project=mne-tools-mne-cpp
+#        env:
+#          TOKEN: ${{ secrets.POLARIS_TOKEN }}
+########################################
+
+
+##################
+#    - name: Coverity scripts
+#      run: |
+#        . tools/cov/before_install.sh
+#        . tools/cov/install.sh
+#        . tools/cov/before_script.sh
+#        . tools/cov/script.sh
+#        . tools/cov/after_success.sh
+##################
+
+##########################
+#    - name: Configure and compile MNE-CPP
+#      run: |
+#        qmake -query
+#        qmake -r MNECPP_CONFIG+=noTests
+#        make -j2
+#    - name: Polaris
+#      uses: blackducksoftware/github-action@2.0.0
+#      with:
+#        args: '--polaris.url="${{ secrets.POLARIS_URL}}" --polaris.access.token="${{ secrets.POLARIS_TOKEN}}" --detect.tools="POLARIS"'
+#    - name: Synopsys Detect
+#      uses: blackducksoftware/github-action@2.0.0
+#      with:
+#        args: '--blackduck.url="${{ secrets.BLACKDUCK_URL}}" --blackduck.api.token="${{ secrets.BLACKDUCK_API_TOKEN}}" --detect.risk.report.pdf=true'
+###########################
