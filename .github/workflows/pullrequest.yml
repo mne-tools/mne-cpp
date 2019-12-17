@@ -26,28 +26,28 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         version: ${{ matrix.qt }}
-        modules: qtcharts    
+        modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
       uses: jurplel/install-qt-action@v2
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2017_64
-        modules: qtcharts      
-    - name: Install jom (Windows)      
+        modules: qtcharts
+    - name: Install jom (Windows)
       if: matrix.os == 'windows-2016'
       run: |
         Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
+        expand-archive -path "jom.zip" -destinationpath "$HOME/jom"
+        echo "::add-path::$HOME/jom"
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'macos-latest')
-      run: |    
+      run: |
         qmake -r MNECPP_CONFIG+=noTests
-        make -j2 
+        make -j2
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2016'
-      run: |    
+      run: |
         # Setup VS compiler   
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
@@ -82,26 +82,26 @@ jobs:
       with:
         version: 5.14.0
         arch: win64_msvc2017_64
-        modules: qtcharts   
-    - name: Install jom (Windows)      
+        modules: qtcharts
+    - name: Install jom (Windows) 
       if: matrix.os == 'windows-2016'
       run: |
         Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"        
-        echo "::add-path::$HOME\jom"
+        expand-archive -path "jom.zip" -destinationpath "$HOME/jom"
+        echo "::add-path::$HOME/jom"
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-latest'
-      run: |    
+      run: |
         qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
         make -j2
     - name: Configure and compile MNE-CPP (MacOS)
       if: matrix.os == 'macos-latest'
-      run: |    
+      run: |
         qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
-        make -j2 
+        make -j2
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2016'
-      run: |    
+      run: |
         # Setup VS compiler   
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
