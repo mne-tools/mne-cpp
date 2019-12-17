@@ -1,9 +1,11 @@
 name: PullRequest
 
 on:
-  pull_request:
+  #pull_request:
+  push:
     branches:
     - master
+    - github_actions
 
 jobs:
   Qt:
@@ -67,13 +69,13 @@ jobs:
       if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'macos-latest')
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.10.1
+        version: 5.14.0
         modules: qtcharts    
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.10.1
+        version: 5.14.0
         arch: win64_msvc2017_64
         modules: qtcharts   
     - name: Install jom
