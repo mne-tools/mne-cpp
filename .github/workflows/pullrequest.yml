@@ -1,11 +1,9 @@
 name: PullRequest
 
 on:
-  #pull_request:
-  push:
+  pull_request:
     branches:
     - master
-    - github_actions
 
 jobs:
   Qt:
