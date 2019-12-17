@@ -12,6 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy: 
+      fail-fast: false
       max-parallel: 6
       matrix:
         qt: [5.14.0, 5.10.1]
@@ -33,9 +34,12 @@ jobs:
         version: ${{ matrix.qt }}
         arch: win64_msvc2017_64
         modules: qtcharts      
-    - name: Install jom
+    - name: Install jom (Windows)      
       if: matrix.os == 'windows-2016'
-      run: choco install jom
+      run: |
+        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'macos-latest')
       run: |    
@@ -54,6 +58,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy: 
+      fail-fast: false
       max-parallel: 3
       matrix:
         os: [ubuntu-latest, macos-latest, windows-2016]
@@ -78,9 +83,12 @@ jobs:
         version: 5.14.0
         arch: win64_msvc2017_64
         modules: qtcharts   
-    - name: Install jom
+    - name: Install jom (Windows)      
       if: matrix.os == 'windows-2016'
-      run: choco install jom
+      run: |
+        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"        
+        echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: |    
