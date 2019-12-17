@@ -36,10 +36,10 @@ jobs:
         modules: qtcharts
     - name: Install jom (Windows)
       if: matrix.os == 'windows-2016'
-      run: |
+      run: |
         Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME/jom"
-        echo "::add-path::$HOME/jom"
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'macos-latest')
       run: |
@@ -85,10 +85,10 @@ jobs:
         modules: qtcharts
     - name: Install jom (Windows) 
       if: matrix.os == 'windows-2016'
-      run: |
+      run: |
         Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME/jom"
-        echo "::add-path::$HOME/jom"
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: |
