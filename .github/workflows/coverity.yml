@@ -56,4 +56,4 @@ jobs:
             $UPLOAD_URL)
           status_code=$(echo "$response" | sed -n '$p')
         env:
-          COVTOKEN: ${{ secrets.POLARIS_TOKEN }}
+          COVTOKEN: ${{ secrets.COVERITY_TOKEN }}
