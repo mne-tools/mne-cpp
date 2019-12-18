@@ -158,7 +158,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.10.1
+        version: 5.14.0
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
