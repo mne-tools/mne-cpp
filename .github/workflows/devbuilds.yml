@@ -217,7 +217,7 @@ jobs:
         cd gh-pages
         # Remove all files first
         git rm * -r
-        git commit --amend -a -m 'Update docu'
+        git commit --amend -a -m 'Update docu' --allow-empty
         touch .nojekyll        
         # Copy doxygen files
         cp -r ../html/* .
