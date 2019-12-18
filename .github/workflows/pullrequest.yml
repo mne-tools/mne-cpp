@@ -1,0 +1,176 @@
+name: PullRequest
+
+on:
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  Qt:
+    runs-on: ${{ matrix.os }}
+
+    strategy: 
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        qt: [5.14.0, 5.10.1]
+        os: [ubuntu-latest, macos-latest, windows-2016]
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Qt (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'macos-latest')
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: ${{ matrix.qt }}
+        modules: qtcharts
+    - name: Install Qt (Windows)
+      if: matrix.os == 'windows-2016'
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: ${{ matrix.qt }}
+        arch: win64_msvc2017_64
+        modules: qtcharts
+    - name: Install jom (Windows)
+      if: matrix.os == 'windows-2016'
+      run: |
+        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
+    - name: Configure and compile MNE-CPP (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'macos-latest')
+      run: |
+        qmake -r MNECPP_CONFIG+=noTests
+        make -j2
+    - name: Configure and compile MNE-CPP (Windows)
+      if: matrix.os == 'windows-2016'
+      run: |
+        # Setup VS compiler   
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        qmake -r MNECPP_CONFIG+=noTests
+        jom -j2
+                        
+  Tests:
+    runs-on: ${{ matrix.os }}
+
+    strategy: 
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-2016]
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Codecov
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo pip install codecov 
+    - name: Install Qt (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'macos-latest')
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.14.0
+        modules: qtcharts    
+    - name: Install Qt (Windows)
+      if: matrix.os == 'windows-2016'
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.14.0
+        arch: win64_msvc2017_64
+        modules: qtcharts
+    - name: Install jom (Windows) 
+      if: matrix.os == 'windows-2016'
+      run: |
+        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
+    - name: Configure and compile MNE-CPP (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
+        make -j2
+    - name: Configure and compile MNE-CPP (MacOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
+        make -j2
+    - name: Configure and compile MNE-CPP (Windows)
+      if: matrix.os == 'windows-2016'
+      run: |
+        # Setup VS compiler   
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
+        jom -j2
+    - name: Run tests and upload results to Codecov (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        QTEST_FUNCTION_TIMEOUT: 900000
+      run: |
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
+        git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+        for test in ./bin/test_*;
+        do
+          # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
+          # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.            
+          echo ">> Starting $test"
+          $test
+          find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
+          # Hide codecov output since it corrupts the log too much
+          codecov > /dev/null
+        done
+    - name: Run tests (MacOS)
+      if: matrix.os == 'macos-latest'
+      env:
+        QTEST_FUNCTION_TIMEOUT: 900000
+      run: |
+        export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$PWD/lib
+        git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+        for test in ./bin/test_*;
+        do            
+          echo ">> Starting $test"
+          $test
+        done
+    - name: Run tests (Windows)
+      if: matrix.os == 'windows-2016'
+      env:
+        QTEST_FUNCTION_TIMEOUT: 900000
+      run: |  
+        git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+        cd bin
+        Get-ChildItem -Filter test_*.exe | ForEach {Write-Output "" "" Starting $_.Fullname; &$_.Fullname}
+
+  MinimalVersion:
+    runs-on: ubuntu-16.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.6
+        modules: qtcharts
+    - name: Configure and compile MNE-CPP
+      run: |
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=minimalVersion
+        make -j2
+
+  Documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Install Qt Dev Tools, Doxygen and Graphviz
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
+    - name: Run Doxygen and package result
+      run: |        
+        cd doc
+        doxygen mne-cpp_doxyfile
