@@ -122,7 +122,6 @@ jobs:
         arch: win64_msvc2017_64
         modules: qtcharts
     - name: Install jom (Windows)
-      if: matrix.os == 'windows-2016'
       run: |
         Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
