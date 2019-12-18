@@ -1,10 +1,10 @@
-name: Coverity Scan
+name: Coverity
 on:
   schedule:
   - cron: '0 0 * * 1,3,5'
 
 jobs:
-  Release:
+  ScanLinux:
     runs-on: ubuntu-latest
     steps:
       - name: Clone repository
@@ -17,7 +17,7 @@ jobs:
       - name: Coverity scripts
         run: |
           COVERITY_SCAN_PROJECT_NAME="mne-tools/mne-cpp"
-          COVERITY_SCAN_NOTIFICATION_EMAIL="christoph.dinh@mne-cpp.org"
+          COVERITY_SCAN_NOTIFICATION_EMAIL="lorenzesch@hotmail.com,gbmotta@mgh.harvard.edu"
           COVERITY_SCAN_BRANCH_PATTERN="master"
           COVERITY_SCAN_BUILD_COMMAND_PREPEND="qmake -r MNECPP_CONFIG+=noTests"
           COVERITY_SCAN_BUILD_COMMAND="make -j2"
@@ -52,9 +52,8 @@ jobs:
             --form email=$COVERITY_SCAN_NOTIFICATION_EMAIL \
             --form file=@$RESULTS_ARCHIVE \
             --form version=$SHA \
-            --form description="Travis CI build" \
+            --form description="Github Actions build" \
             $UPLOAD_URL)
           status_code=$(echo "$response" | sed -n '$p')
         env:
           COVTOKEN: ${{ secrets.POLARIS_TOKEN }}
-
