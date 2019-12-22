@@ -66,6 +66,8 @@
 #endif
 #endif
 
+#define NATIVE_ENDIAN    FIFFV_LITTLE_ENDIAN
+
 #ifdef  INTEL_X86_ARCH
 #define NATIVE_ENDIAN    FIFFV_LITTLE_ENDIAN
 #endif

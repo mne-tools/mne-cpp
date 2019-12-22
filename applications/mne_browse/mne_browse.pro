@@ -54,6 +54,15 @@ CONFIG(debug, debug|release) {
 
 CONFIG += console
 
+contains(MNECPP_CONFIG, wasm) {
+    QMAKE_LFLAGS += -s ERROR_ON_UNDEFINED_SYMBOLS=1
+    QMAKE_LFLAGS += -s ASSERTIONS=1
+
+#    DEFINES += __EMSCRIPTEN__
+#    LIBS +=-lidbfs.js
+#    INCLUDEPATH += /home/lorenz/Git/emsdk/usptream/emscripten/src
+}
+
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
     DEFINES += STATICLIB
