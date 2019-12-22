@@ -51,6 +51,10 @@ CONFIG(debug, debug|release) {
 
 DESTDIR = $${MNE_LIBRARY_DIR}
 
+contains(MNECPP_CONFIG, wasm) {
+    DEFINES += WASMBUILD
+}
+
 contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
     DEFINES += STATICLIB
