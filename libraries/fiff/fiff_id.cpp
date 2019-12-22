@@ -136,26 +136,24 @@ void FiffId::clear()
 bool FiffId::get_machid(int *fixed_id)
 {
     QList<QString> possibleHardwareAdresses;
+
+#ifndef WASMBUILD
     QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
 
     fixed_id[0] = 0;
     fixed_id[1] = 0;
-
     if ( !ifaces.isEmpty() ) {
         for(int i = 0; i < ifaces.size(); ++i) {
             unsigned int flags = ifaces[i].flags();
             bool isLoopback = (bool)(flags & QNetworkInterface::IsLoopBack);
             bool isP2P = (bool)(flags & QNetworkInterface::IsPointToPoint);
             bool isRunning = (bool)(flags & QNetworkInterface::IsRunning);
-
             // If this interface isn't running, we don't care about it
             if ( !isRunning ) continue;
             // We only want valid interfaces that aren't loopback/virtual and not point to point
             if ( !ifaces[i].isValid() || isLoopback || isP2P ) continue;
-
             possibleHardwareAdresses << ifaces[i].hardwareAddress();
         }
-
         if (possibleHardwareAdresses.size() > 0) {
             // We take the first address as machine identifier
             QStringList hexPresentation = possibleHardwareAdresses[0].split(":");
@@ -166,6 +164,8 @@ bool FiffId::get_machid(int *fixed_id)
             }
         }
     }
+#endif
+
     return false;
 }
 
