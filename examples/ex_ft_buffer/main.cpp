@@ -63,6 +63,15 @@
 #include <QTcpSocket>
 #include <QHostAddress>
 #include <QTcpServer>
+#include <QTest>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FT INCLUDES
+//=============================================================================================================
+
+#include <FtBuffer.h>
+#include <MultiChannelFilter.h>
 
 
 //*************************************************************************************************************
@@ -97,7 +106,7 @@ int main(int argc, char *argv[])
     qDebug() << "============== FieldTrip Buffer Example ==============";
 
     //Create a parameter-less server
-    QTcpServer *ft_buff_server = new QTcpServer();
+    //QTcpServer *ft_buff_server = new QTcpServer();
 
     //Get local host -- equvalent to just setting to 127.0.0.1
     QHostAddress *addr = new QHostAddress(QHostAddress::LocalHost);
@@ -105,20 +114,54 @@ int main(int argc, char *argv[])
     //Set port -- buffer example is configured to port 1972 by default
     int port = 1972;
 
+    QTcpSocket *mysocket = new QTcpSocket();
 
+/*
+    qDebug() << "Attempting to connect to host on port" << port <<"on" << *addr;
+
+    mysocket->connectToHost(*addr, port);
+
+    qDebug() << "Connection state:" << mysocket->state();
+
+    while (mysocket->state() != QAbstractSocket::ConnectedState){
+        qDebug() << "Connecting, please wait.";
+        QTest::qSleep(500);
+    }
+    qDebug() << mysocket->state();
+*/
+/*
     if (ft_buff_server->listen(*addr, port)){
         qDebug() << "Listening to port" << port <<"on" << *addr;
         while(1){
-
+            if (ft_buff_server->hasPendingConnections()) {
+                qDebug() << "Connection found on port" << port;
+                QTcpSocket *ft_buff_socket = ft_buff_server->nextPendingConnection();
+                qDebug() << "Socket created.";
+            }
         }
 
     } else {
         qDebug() << "Something went wrong"; //Change this error message to something useful
     }
 
+*/
 
+    SimpleStorage chunkBuffer;
+    headerdef_t header_def;
+    FtBufferRequest request;
+    FtBufferResponse response;
+    //FtConnection ftCon;
 
+    request.prepGetHeader();
 
+    /*if (tcprequest(ftCon.getSocket(), request.out(), response.in()) < 0) {
+        qDebug() << "Error in communication - check buffer server";
+    }
+
+    if (!response.checkGetHeader(header_def, &chunkBuffer)) {
+        qDebug() << "Could not read header.";
+    }
+*/
 
 
     return a.exec();
