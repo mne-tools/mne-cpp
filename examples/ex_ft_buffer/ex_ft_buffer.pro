@@ -43,7 +43,7 @@ VERSION = $${MNE_CPP_VERSION}
 CONFIG   += console
 CONFIG   -= app_bundle
 
-QT += core gui widgets charts opengl concurrent network
+QT += core gui widgets charts opengl concurrent network testlib
 
 TARGET = ex_ft_buffer
 
@@ -85,6 +85,9 @@ HEADERS += \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $$MNE_BINARY_DIR/../examples/ex_ft_buffer/ftsrc/cpp
+INCLUDEPATH += $$MNE_BINARY_DIR/../examples/ex_ft_buffer/ftsrc/src
+
 
 win32:!contains(MNECPP_CONFIG, static) {
     EXTRA_ARGS =
