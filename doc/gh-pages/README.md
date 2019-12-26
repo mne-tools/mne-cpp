@@ -62,7 +62,7 @@ has_children: true
 
 For more in depth explanation of the navigation, view the [navigation documentation](https://pmarsceill.github.io/just-the-docs/docs/navigation-structure/) for the theme.
 
-**To add an image**, add the image to the `images` folder, and link to it using [markdown syntax](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet): `![hover text](address/to/image.png)` in your page's `.md` file. When linking these, keep in mind that the file names, and file extensions, are case sensitive. The link above would not work on an images named `Image.png` or `image.PNG`
+**To add an image**, add the image to the `images` folder, and link to it using [markdown syntax](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet): `![hover text](address/to/image.png)` in your page's `.md` file. When linking these, keep in mind that the file names, and file extensions, are case sensitive. The link above would not work on an image named `Image.png` or `image.PNG`
 
 **To add a document**, such as a pdf, and embed it in the page, add the document to the `docs` file, and use the following snippet of html in your page's `.md` file,
 
@@ -70,4 +70,4 @@ For more in depth explanation of the navigation, view the [navigation documentat
 <embed src="https://mne-tools.github.io/mne-cpp/docs/file-name.pdf" width="800px" height="500px" type="application/pdf" />
 ```
 
-, replacing `file-name.pdf` with the name of your document.
+replacing `file-name.pdf` with the name of your document.
