@@ -1,0 +1,41 @@
+name: Linux
+
+on:
+  push:
+    branches:
+    - doctest
+
+jobs:
+  Documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v1
+    - name: Setup Github credentials
+      uses: fusion-engineering/setup-git-credentials@v2
+      with:
+        credentials: ${{secrets.GIT_CREDENTIALS}}
+    - name: Install Qt Dev Tools, Doxygen and Graphviz
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
+    - name: Run Doxygen and update gh-pages
+      run: |
+        cd doc
+        git config --global user.email gbmotta@mgh.harvard.edu.com
+        git config --global user.name gabrielbmotta
+        git clone -b gh-pages --single-branch https://github.com/gabrielbmotta/mne-cpp.git
+        echo "gh-pages cloned"
+        cd mne-cpp
+        # Remove all files first
+        git rm _pages/doxygen/* -r
+        git commit --amend -a -m 'Update docu'
+        echo "Old files removed"
+        cd ..
+        doxygen mne-cpp_doxyfile
+        cd mne-cpp
+        git add _pages/doxygen/html
+        git commit --amend -a -m 'Update docu'
+        git push -f --all
+        echo "Changes new filspushed to gh-pages"
