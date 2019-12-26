@@ -46,5 +46,5 @@ jobs:
         echo "Committing..."
         git commit --amend -a -m 'Update docu'
         "Pushing..."
-        git push -f --all
+        git push origin gh-pages -f --all
         echo "Successfully pushed to gh-pages."
