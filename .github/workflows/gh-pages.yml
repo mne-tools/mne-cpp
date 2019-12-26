@@ -30,9 +30,12 @@ jobs:
         git commit --amend -a -m 'Update docu'
         echo "Old files removed"
         cd ..
-        cp -a ~/doc/. /mne-cpp/
+        echo "Copying files"
+        cp -a /doc/. /mne-cpp/
         cd mne-cpp
+        echo "Adding and commiting changes"
         git add .
         git commit --amend -a -m 'Update docu'
+        "Pushing changes"
         git push -f --all
-        echo "New files pushed to gh-pages"
+        echo "Successfully pushed to gh-pages"
