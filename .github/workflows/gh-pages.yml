@@ -39,7 +39,7 @@ jobs:
         pwd
         ls
         echo "Copying files"
-        cp -a /doc/. /mne-cpp/
+        cp -a doc/. /mne-cpp
         cd mne-cpp
         echo "Adding and commiting changes"
         git add .
