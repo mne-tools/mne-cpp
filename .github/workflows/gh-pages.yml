@@ -18,7 +18,6 @@ jobs:
         credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Clone doc into gh-pages branch
       run: |
-        cd doc
         git config --global user.email gbmotta@mgh.harvard.edu.com
         git config --global user.name gabrielbmotta
         echo "Cloning gh-pag branch"
@@ -27,13 +26,13 @@ jobs:
         cd mne-cpp
         # Remove all files first
         echo "Deleting all files"
-        git rm * -r
+        git rm -r .
         git commit --amend -a -m 'Update docu'
         echo "Old files removed"
         cd ..
-        doxygen mne-cpp_doxyfile
+        cp -a ~/doc/. /mne-cpp/
         cd mne-cpp
-        git add _pages/doxygen/html
+        git add .
         git commit --amend -a -m 'Update docu'
         git push -f --all
-        echo "Changes new filspushed to gh-pages"
+        echo "New files pushed to gh-pages"
