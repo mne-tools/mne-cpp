@@ -20,8 +20,7 @@ jobs:
       run: |
         git config --global user.email gbmotta@mgh.harvard.edu.com
         git config --global user.name gabrielbmotta
-        echo "Cloning gh-pag branch"
-        pwd
+        echo "Cloning gh-pages branch"
         git clone -b gh-pages --single-branch https://github.com/gabrielbmotta/mne-cpp.git
         echo "gh-pages cloned"
         cd mne-cpp
@@ -33,11 +32,7 @@ jobs:
         git rm * -r
         git commit --amend -a -m 'Update docu'
         echo "Old files removed."
-        pwd
-        ls
         cd ..
-        pwd
-        ls
         echo "Copying files..."
         cp -RT doc mne-cpp
         cd mne-cpp
@@ -45,6 +40,6 @@ jobs:
         git add .
         echo "Committing..."
         git commit --amend -a -m 'Update docu'
-        "Pushing..."
+        echo "Pushing..."
         git push origin gh-pages -f --all
         echo "Successfully pushed to gh-pages."
