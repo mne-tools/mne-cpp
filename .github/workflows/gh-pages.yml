@@ -32,18 +32,19 @@ jobs:
         git rm docs/* -r
         git rm * -r
         git commit --amend -a -m 'Update docu'
-        echo "Old files removed"
+        echo "Old files removed."
         pwd
         ls
         cd ..
         pwd
         ls
-        echo "Copying files"
+        echo "Copying files..."
         cp -RT doc mne-cpp
         cd mne-cpp
-        echo "Adding and commiting changes"
+        echo "Adding changes..."
         git add .
+        echo "Committing..."
         git commit --amend -a -m 'Update docu'
-        "Pushing changes"
+        "Pushing..."
         git push -f --all
-        echo "Successfully pushed to gh-pages"
+        echo "Successfully pushed to gh-pages."
