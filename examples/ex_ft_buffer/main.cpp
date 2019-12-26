@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     qDebug() << "============== FieldTrip Buffer Example ==============";
-
+    qDebug() << "Ensure the ft buffer source files are present and their respective 'make' files have been called.";
     //Create a parameter-less server
     //QTcpServer *ft_buff_server = new QTcpServer();
 
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     headerdef_t header_def;
     FtBufferRequest request;
     FtBufferResponse response;
-    //FtConnection ftCon;
+    FtConnection ftCon;
 
     request.prepGetHeader();
 
