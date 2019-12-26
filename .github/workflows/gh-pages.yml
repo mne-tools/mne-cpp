@@ -1,4 +1,4 @@
-name: Linux
+name: Update GitHub PAges
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     - website
 
 jobs:
-  Documentation:
+  gh-pages:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,10 +26,15 @@ jobs:
         cd mne-cpp
         # Remove all files first
         echo "Deleting all files"
-        git rm -r .
+        git rm pages/* -r
+        git rm images/* -r
+        git rm docs/* -r
+        git rm * -r
         git commit --amend -a -m 'Update docu'
         echo "Old files removed"
+        pwd
         cd ..
+        pwd
         echo "Copying files"
         cp -a /doc/. /mne-cpp/
         cd mne-cpp
