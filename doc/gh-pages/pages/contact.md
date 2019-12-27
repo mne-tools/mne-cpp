@@ -6,17 +6,31 @@ has_children: true
 ---
 
 <img align="left" src="../images/lorenz_esch.png">
-**Lorenz Esch**
+&nbsp &nbsp **Lorenz Esch**
 
-MNE-CPP: Core Developer
+&nbsp &nbsp &nbsp &nbsp MNE-CPP: Core Developer
 
-lorenz.esch@mne-cpp.org
+&nbsp &nbsp &nbsp &nbsp lorenz.esch@mne-cpp.org
+
+&nbsp
+
+&nbsp
+
+&nbsp
 
 ---
 
 <img align="left" src="../images/christoph_dinh.png">
-**Christoph Dinh**
+&nbsp &nbsp **Christoph Dinh**
 
-MNE-CPP: Core Developer
+&nbsp &nbsp &nbsp &nbsp MNE-CPP: Core Developer
 
-christoph.dinh@mne-cpp.org
+&nbsp &nbsp &nbsp &nbsp christoph.dinh@mne-cpp.org
+
+&nbsp
+
+&nbsp
+
+&nbsp
+
+---
