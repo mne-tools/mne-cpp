@@ -72,6 +72,7 @@
 
 #include <FtBuffer.h>
 #include <MultiChannelFilter.h>
+#include <buffer.h>
 
 
 //*************************************************************************************************************
@@ -153,6 +154,15 @@ int main(int argc, char *argv[])
     FtConnection ftCon;
 
     request.prepGetHeader();
+
+    if (tcprequest(ftCon.getSocket(), request.out(), response.in()) < 0) {
+        qDebug() << "Error in communication - check buffer server";
+    }
+
+    if (!response.checkGetHeader(header_def, &chunkBuffer)) {
+        qDebug() << "Could not read header.";
+    }
+
 
     /*if (tcprequest(ftCon.getSocket(), request.out(), response.in()) < 0) {
         qDebug() << "Error in communication - check buffer server";
