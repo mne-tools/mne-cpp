@@ -100,12 +100,88 @@ using namespace UTILSLIB;
 * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
 
+class FtBuffEx {
+    public:
+        void readHeader() {
+            //c++ wrapper classes for origin ftbuffer inplementation
+            //handles connections, requests, and storage of incoming data
+            SimpleStorage chunkBuffer;
+            headerdef_t header_def;
+            FtBufferRequest request;
+            FtBufferResponse response;
+
+
+            //set request command to GET_HDR, other member variables to approprit values
+            request.prepGetHeader();
+
+            //Attempt to establish TCP connection
+            if (tcprequest(ftCon.getSocket(), request.out(), response.in()) < 0) {
+                qDebug() << "Error in communication - check buffer server";
+                qDebug() << "Verify fieldtrip buffer is running";
+            }
+
+            //Attempt to revieve and read header
+            if (!response.checkGetHeader(header_def, &chunkBuffer)) {
+                qDebug() << "Could not read header.";
+            }
+
+            numChannels = header_def.nchans;
+            numSamples = header_def.nsamples;
+
+            //from viewer.cc, only here temporarily to make porting easier.
+            labels = (char **) calloc(numChannels, sizeof(char *));
+            colorTable = (int *) calloc(numChannels, sizeof(int));
+
+            const ft_chunk_t *cnc = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_CHANNEL_NAMES);
+            if (cnc == NULL) {
+                printf("No channel names found\n");
+                for (int n=0;n<numChannels;n++) {
+                    labels[n] = (char *) malloc(8);
+                    snprintf(labels[n],7,"#%i",n+1);
+                }
+            } else {
+                const char *s = (const char *) cnc->data;
+                for (int n=0;n<numChannels;n++) {
+                    int ln = strlen(s);
+                    if (ln==0) {
+                        labels[n] = (char *) malloc(8);
+                        snprintf(labels[n],7,"#%i",n+1);
+                    } else {
+                        labels[n] = strdup(s);
+                    }
+                    s+=ln+1;
+                }
+            }
+
+        }
+
+    private:
+        int numChannels = 0;
+        uint numSamples = 0;
+        FtConnection ftCon;
+
+        //TODO: remove this, it's from the viewer.cc GUI, only here to make porting code easier
+        char **labels;
+        int *colorTable;
+
+};
+
+
+
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
     qDebug() << "============== FieldTrip Buffer Example ==============";
     qDebug() << "Ensure the ft buffer source files are present and their respective 'make' files have been called.";
+
+    FtBuffEx fb;
+
+
+
+
+    /*
     //Create a parameter-less server
     //QTcpServer *ft_buff_server = new QTcpServer();
 
@@ -116,7 +192,7 @@ int main(int argc, char *argv[])
     int port = 1972;
 
     QTcpSocket *mysocket = new QTcpSocket();
-
+*/
 /*
     qDebug() << "Attempting to connect to host on port" << port <<"on" << *addr;
 
@@ -146,33 +222,7 @@ int main(int argc, char *argv[])
     }
 
 */
-
-    SimpleStorage chunkBuffer;
-    headerdef_t header_def;
-    FtBufferRequest request;
-    FtBufferResponse response;
-    FtConnection ftCon;
-
-    request.prepGetHeader();
-
-    if (tcprequest(ftCon.getSocket(), request.out(), response.in()) < 0) {
-        qDebug() << "Error in communication - check buffer server";
-    }
-
-    if (!response.checkGetHeader(header_def, &chunkBuffer)) {
-        qDebug() << "Could not read header.";
-    }
-
-
-    /*if (tcprequest(ftCon.getSocket(), request.out(), response.in()) < 0) {
-        qDebug() << "Error in communication - check buffer server";
-    }
-
-    if (!response.checkGetHeader(header_def, &chunkBuffer)) {
-        qDebug() << "Could not read header.";
-    }
-*/
-
+    //Parameters for incoming signal
 
     return a.exec();
 }
