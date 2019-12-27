@@ -84,6 +84,17 @@ using namespace Eigen;
 using namespace DISPLIB;
 using namespace UTILSLIB;
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINITIONS
+//=============================================================================================================
+
+
+#define HPFILTORD 2
+#define HPFREQ  4.0
+#define LPFILTORD 7
+#define LPFREQ 70.0
+#define HIDDEN  16
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -105,6 +116,8 @@ class FtBuffEx {
         void readHeader() {
             //c++ wrapper classes for origin ftbuffer inplementation
             //handles connections, requests, and storage of incoming data
+
+            qDebug() << "Creating request/response handlers...";
             SimpleStorage chunkBuffer;
             headerdef_t header_def;
             FtBufferRequest request;
@@ -112,17 +125,22 @@ class FtBuffEx {
 
 
             //set request command to GET_HDR, other member variables to approprit values
+            qDebug() << "Preparing header...";
             request.prepGetHeader();
 
+            qDebug() << "Attempting TCP connection...";
             //Attempt to establish TCP connection
             if (tcprequest(ftCon.getSocket(), request.out(), response.in()) < 0) {
                 qDebug() << "Error in communication - check buffer server";
-                qDebug() << "Verify fieldtrip buffer is running";
+                ftCon.disconnect();
+                numChannels = 0;
+                return;
             }
 
             //Attempt to revieve and read header
             if (!response.checkGetHeader(header_def, &chunkBuffer)) {
                 qDebug() << "Could not read header.";
+                return;
             }
 
             numChannels = header_def.nchans;
@@ -153,12 +171,30 @@ class FtBuffEx {
                 }
             }
 
+            if (hpFilter != NULL) {
+                delete hpFilter;
+                hpFilter = NULL;
+            }
+
+            if (lpFilter != NULL) {
+                delete lpFilter;
+                lpFilter = NULL;
+            }
+
+            hpFilter = new MultiChannelFilter<float,float>(numChannels, HPFILTORD);
+            hpFilter->setButterHP(HPFREQ/header_def.fsample);
+            lpFilter = new MultiChannelFilter<float,float>(numChannels, LPFILTORD);
+            lpFilter->setButterLP(LPFREQ/header_def.fsample);
+
         }
 
     private:
         int numChannels = 0;
         uint numSamples = 0;
         FtConnection ftCon;
+
+        MultiChannelFilter<float,float> *hpFilter = NULL;
+        MultiChannelFilter<float,float> *lpFilter = NULL;
 
         //TODO: remove this, it's from the viewer.cc GUI, only here to make porting code easier
         char **labels;
@@ -178,7 +214,7 @@ int main(int argc, char *argv[])
 
     FtBuffEx fb;
 
-
+    fb.readHeader();
 
 
     /*
