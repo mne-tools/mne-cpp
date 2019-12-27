@@ -3,7 +3,7 @@ name: Update GitHub Pages
 on:
   push:
     branches:
-    - master
+    - website
 
 jobs:
   gh-pages:
@@ -21,7 +21,7 @@ jobs:
         git config --global user.email gbmotta@mgh.harvard.edu.com
         git config --global user.name gabrielbmotta
         echo "Cloning gh-pages branch"
-        git clone -b gh-pages --single-branch https://github.com/mne-tools/mne-cpp.git
+        git clone -b gh-pages --single-branch https://github.com/gabrielbmotta/mne-cpp.git
         echo "gh-pages cloned"
         cd mne-cpp
         # Remove all files first
