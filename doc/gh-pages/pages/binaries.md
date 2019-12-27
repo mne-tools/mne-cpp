@@ -1,10 +1,10 @@
 ---
-title: Install
+title: Releases
 parent: Setup
 nav_order: 1
 ---
 
-Select the version and platform you'd like:
+Select the version and platform you'd like to download:
 
 ### Current:
 
