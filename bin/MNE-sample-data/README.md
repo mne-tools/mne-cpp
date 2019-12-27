@@ -1,2 +1,1 @@
-# MNE-CPP Test Data
-Small data set for MNE-CPP testframe tests.
+download the MNE sample data from https://osf.io/86qa2/download and extract them into this folder.
