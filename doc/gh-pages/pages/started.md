@@ -9,7 +9,7 @@ nav_order: 2
 
 1. Download the latest stable version of MNE-CPP.
 
-[Windows](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-windows-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-linux-x86_64.tar.gz){: .btn .btn-blue } [Mac](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-macos-x86_64.tar.gz){: .btn .btn-blue }
+&nbsp; &nbsp; &nbsp; &nbsp; [Windows](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-windows-x86_64.zip){: .btn .btn-blue } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-linux-x86_64.tar.gz){: .btn .btn-blue } [Mac](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-macos-x86_64.tar.gz){: .btn .btn-blue }
 
 2. Unzip the downloaded file
 
