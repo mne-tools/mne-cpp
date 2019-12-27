@@ -3,7 +3,7 @@ name: Update GitHub Pages
 on:
   push:
     branches:
-    - master
+    - website
 
 jobs:
   gh-pages:
@@ -26,9 +26,6 @@ jobs:
         cd mne-cpp
         # Remove all files first
         echo "Deleting all files"
-        git rm pages/* -r
-        git rm images/* -r
-        git rm docs/* -r
         git rm * -r
         git commit --amend -a -m 'Update docu'
         echo "Old files removed."
