@@ -2,7 +2,6 @@
 title: Contact
 parent: Community
 nav_order: 2
-has_children: true
 ---
 
 <img align="left" src="../images/lorenz_esch.png">

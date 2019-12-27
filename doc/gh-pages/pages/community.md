@@ -9,4 +9,6 @@ Currently we use [Github](https://github.com/mne-tools/mne-cpp) to host the sour
 
 We use [Slack](https://mne-cpp.slack.com/) for communication.
 
-MNE-CPP is a result of the collaboration of all of our [partners](partners.md)
+Please [contact us](contact.md) with any questions you may have.
+
+MNE-CPP is a result of collaboration with all of our [partners](partners.md).
