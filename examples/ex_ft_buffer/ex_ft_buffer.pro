@@ -99,13 +99,14 @@ SOURCES += \
         ftsrc/src/tcpserver.c \
         ftsrc/src/timestamp.c \
         ftsrc/src/util.c \
-
-HEADERS += \
+        ftsrc/ftbuffclient.cpp \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $$MNE_BINARY_DIR/../examples/ex_ft_buffer/ftsrc/cpp
 INCLUDEPATH += $$MNE_BINARY_DIR/../examples/ex_ft_buffer/ftsrc/src
+INCLUDEPATH += $$MNE_BINARY_DIR/../examples/ex_ft_buffer/ftsrc/
+
 
 
 win32:!contains(MNECPP_CONFIG, static) {
