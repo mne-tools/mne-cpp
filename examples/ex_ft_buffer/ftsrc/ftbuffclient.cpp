@@ -243,15 +243,25 @@ void FtBuffClient::idleCall() {
         return;
     }
 
-    if (newSamples == numSamples) return; // nothing new
+    if (newSamples == numSamples) {
+        qDebug() << "idleCall - No new data";
+        return; // nothing new
+    }
     if (newSamples < numSamples) {
         // oops ? do we have a new header?
-        if (!readHeader()) return;
-        if (numSamples == 0) return; // no data yet
+        if (!readHeader()) {
+            qDebug() << "idleCall - Unable to read header.";
+            return;
+        }
+        if (numSamples == 0) {
+            qDebug() << "idelCall - No Data";
+            return; // no data yet
+        }
         if (numSamples > 1024 || numChannels > 512) {
             // "lots" of data already in the buffer
             // -> don't do anything with that data
             //    continue next idleCall
+            qDebug() << "idleCall - Waiting for next function call";
             return;
         }
         // read data from the start of the buffer up to newSamples right away

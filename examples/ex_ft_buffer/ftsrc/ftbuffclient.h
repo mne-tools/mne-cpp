@@ -66,48 +66,91 @@
 #define LPFREQ 70.0
 #define HIDDEN  16
 
-
+/**
+* Implements a client for communication with a fieldtrip bufer.
+*
+* @brief Fieldtrip Buffer Client Implementation
+*/
 class FtBuffClient
 {
 
 public:
+    /**
+     * Default Constructor
+     */
     FtBuffClient();
+
+    //=========================================================================================================
+    /**
+     * @brief FtBuffClient - Constructor that set address for buffer
+     * @param addr [in] (address) - tells the client the address and port of the buffer.
+     */
     FtBuffClient(char* addr);
 
+    //=========================================================================================================
+    /**
+     * @brief getDataExample - Made to run with FT buffer examples: sine2ft and buffer.
+     */
     void getDataExample();
 
 private:
 
+    /**
+     * @brief readHeader - Attempts to get and read header from buffer. This gives us info about the data in the buffer.
+     * @return Returns whether header was succesffully retrieved and read.
+     */
     bool readHeader();
+
+    //=========================================================================================================
+    /**
+     * @brief idleCall - gets called repetedly to get new data from buffer.
+     */
     void idleCall();
 
+    //=========================================================================================================
     template<typename T>
     void convertToFloat(float *dest, const void *src, unsigned int nsamp, unsigned int nchans);
 
+    //=========================================================================================================
+    /**
+     * @brief stopConnection - stops connecton with buffer if one is currently open
+     */
     void stopConnection();
+
+    //=========================================================================================================
+    /**
+     * @brief startConnection - starts connection with buffer if one does not already exist
+     */
     void startConnection();
 
+    //=========================================================================================================
+    /**
+     * @brief isConnected - returns whether a connection is open with a buffer.
+     * @return true - connection open / false - no connection
+     */
     bool isConnected();
 
+    //=========================================================================================================
 
-    int numChannels = 0;
-    uint numSamples = 0;
+    int                 numChannels         = 0;
+    uint                numSamples          = 0;
 
-    FtConnection ftCon;
-    const char* addrField;
+    FtConnection        ftCon;
+    const char*         addrField;
 
+    SimpleStorage       rawStore, floatStore;
+
+    bool                useHighpass         = false;
+    bool                useLowpass          = false;
+
+    //TODO: remove this, it's from the viewer.cc GUI, only here to make porting code easier
+    char**              labels;
+    int*                colorTable;
 
     MultiChannelFilter<float,float> *hpFilter = NULL;
     MultiChannelFilter<float,float> *lpFilter = NULL;
 
-    SimpleStorage rawStore, floatStore;
 
-    bool useHighpass = false;
-    bool useLowpass = false;
-
-    //TODO: remove this, it's from the viewer.cc GUI, only here to make porting code easier
-    char **labels;
-    int *colorTable;
 
 };
 
