@@ -11,7 +11,6 @@ First time? [Click here](pages/started.md) to get MNE-CPP running on your machin
 
 Stable release coming soon.
 
-<html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
@@ -85,26 +84,23 @@ img {vertical-align: middle;}
 </head>
 <body>
 
-<h2>Automatic Slideshow</h2>
-<p>Change image every 2 seconds:</p>
-
 <div class="slideshow-container">
 
 <div class="mySlides fade">
   <div class="numbertext">1 / 3</div>
-  <img src="../images/image_film_1_500px.jpg" style="width:100%">
+  <img src="/images/image_film_1_500px.jpg" style="width:100%">
   <div class="text">Caption Text</div>
 </div>
 
 <div class="mySlides fade">
   <div class="numbertext">2 / 3</div>
-  <img src="../images/image_film_2_500px.jpg" style="width:100%">
+  <img src="/images/image_film_2_500px.jpg" style="width:100%">
   <div class="text">Caption Two</div>
 </div>
 
 <div class="mySlides fade">
   <div class="numbertext">3 / 3</div>
-  <img src="../images/image_film_3_500px.jpg" style="width:100%">
+  <img src="/images/image_film_3_500px.jpg" style="width:100%">
   <div class="text">Caption Three</div>
 </div>
 
@@ -135,9 +131,8 @@ function showSlides() {
   }
   slides[slideIndex-1].style.display = "block";  
   dots[slideIndex-1].className += " active";
-  setTimeout(showSlides, 2000); // Change image every 2 seconds
+  setTimeout(showSlides, 8000); // Change image every 2 seconds
 }
 </script>
 
 </body>
-</html>
