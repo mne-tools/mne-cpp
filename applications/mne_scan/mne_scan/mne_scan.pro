@@ -75,6 +75,7 @@ contains(MNECPP_CONFIG, static) {
     QTPLUGIN += ssvepbci
     QTPLUGIN += neuronalconnectivity
     QTPLUGIN += reference
+    QTPLUGIN += ftbuffer
 }
 
 TARGET = mne_scan
