@@ -39,9 +39,11 @@ else {
 }
 
 SOURCES += \
+    FormFiles/ftbuffergui.cpp \
     ftbuffer.cpp
 
 HEADERS += \
+    FormFiles/ftbuffergui.h \
     ftbuffer_global.h \
     ftbuffer.h
 
@@ -89,3 +91,6 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
                 -lfftw3_threads \
     }
 }
+
+FORMS += \
+    FormFiles/ftbuffergui.ui
