@@ -2,6 +2,7 @@
 #define FTBUFFER_H
 
 #include "ftbuffer_global.h"
+#include "FormFiles/ftbuffergui.h"
 
 #include <scShared/Interfaces/ISensor.h>
 #include <scShared/Interfaces/IAlgorithm.h>
