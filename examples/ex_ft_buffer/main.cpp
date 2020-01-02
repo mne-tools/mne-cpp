@@ -3,6 +3,7 @@
 * @file     main.cpp
 * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Stefan Klanke
 * @version  1.0
 * @date     December, 2019
 *
@@ -28,6 +29,12 @@
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *
+* Based on viewer.cc example from ftbuffer reference implementation, under the GNU GENERAL PUBLIC LICENSE Version 2:
+*
+* Copyright (C) 2010, Stefan Klanke
+* Donders Institute for Donders Institute for Brain, Cognition and Behaviour,
+* Centre for Cognitive Neuroimaging, Radboud University Nijmegen,
+* Kapittelweg 29, 6525 EN Nijmegen, The Netherlands
 *
 * @brief    Example of interfacing with the fieldtrip example buffer and sine2ft.
 *
@@ -99,6 +106,14 @@ using namespace UTILSLIB;
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+
+    qDebug() << "|==================| FieldTrip Buffer Example |==================|";
+    qDebug() << "Ensure the ft buffer source files are present and their respective 'make' files have been called.";
+    qDebug() << "Use the ftbuffer provided examples, sine2ft.cc and buffer.cc.";
+    qDebug() << "This example will request data from the buffer and output it to the terminal.";
+    qDebug() << "Please run the buffer and sinewave generator now.";
+
+    QTest::qSleep(3000);
 
     FtBuffClient exampleFBClient;
     exampleFBClient.getDataExample();
