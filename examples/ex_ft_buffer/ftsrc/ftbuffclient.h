@@ -132,16 +132,20 @@ private:
 
     //=========================================================================================================
 
-    int                 numChannels         = 0;
-    uint                numSamples          = 0;
+    void outputSamples(int size, const float* data);
+
+    //=========================================================================================================
+
+    int                 numChannels;
+    uint                numSamples;
 
     FtConnection        ftCon;
     const char*         addrField;
 
     SimpleStorage       rawStore, floatStore;
 
-    bool                useHighpass         = false;
-    bool                useLowpass          = false;
+    bool                useHighpass;
+    bool                useLowpass;
 
     //TODO: remove this, it's from the viewer.cc GUI, only here to make porting code easier
     char**              labels;
@@ -149,6 +153,18 @@ private:
 
     MultiChannelFilter<float,float> *hpFilter = NULL;
     MultiChannelFilter<float,float> *lpFilter = NULL;
+
+    float               *data;
+
+    //These are from the OnlineDataDisplay class that updates the viewer.cc data
+    int                 nChans;
+    int                 nSamp;
+
+    int                 numTotal, pos;
+    int                 yPos, ySpace;
+    float               yScale;
+    int                 height;
+    int                 skipped;
 
 
 
