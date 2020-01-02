@@ -2,6 +2,7 @@
 /**
 * @file     ftbuffclient.cpp
 * @author   Gabriel B. Motta <gbmotta@mgh.harvard.edu
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 *           Stefan Klanke
 * @version  1.0
 * @date     December, 2019
@@ -58,29 +59,40 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FtBuffClient::FtBuffClient() {
+FtBuffClient::FtBuffClient() :
+data(NULL),
+pos(0),
+numChannels(0),
+numSamples(0),
+useHighpass(false),
+useLowpass(false)
+{
     addrField = "localhost:1972";
 }
 
 //*************************************************************************************************************
 
-FtBuffClient::FtBuffClient(char* addr) {
-    addrField = addr;
+FtBuffClient::FtBuffClient(char* addr) :
+addrField(addr),
+data(NULL),
+pos(0),
+numChannels(0),
+numSamples(0),
+useHighpass(false),
+useLowpass(false)
+{
 }
 
 //*************************************************************************************************************
 
 void FtBuffClient::getDataExample() {
 
-    qDebug() << "================ FieldTrip Buffer Example ================";
-    qDebug() << "Ensure the ft buffer source files are present and their respective 'make' files have been called.";
-
     while(true) {
 
-        //Starts connection with ftCon on localhost:1972
+        //Starts connection with ftCon
         while(!this->isConnected()) {
             this->startConnection();
-            QTest::qSleep(1000);
+            QTest::qSleep(2000);
         }
 
         //Handle requests, responses, incoming data after connection is made
@@ -200,11 +212,11 @@ void FtBuffClient::stopConnection() {
 //Checks if there is no open connection, and if so, opens one
 void FtBuffClient::startConnection() {
     if (!ftCon.isOpen()) {
-        qDebug() << "Connecting...";
+        qDebug() << "Trying to connect...";
         if (ftCon.connect(addrField)){
             qDebug() << "Connected to" << addrField;
         } else {
-            qDebug() << "Unable to connect: Connection failed";
+            qDebug() << "Unable to connect: no buffer found on"<< addrField;
         }
     } else {
         qDebug() << "Unable to connect: Already connected";
@@ -216,13 +228,16 @@ void FtBuffClient::startConnection() {
 //gets called constantly and receives data
 void FtBuffClient::idleCall() {
 
+    //creates handlesrs for buffer messages and events
     datadef_t ddef;
     FtBufferRequest request;
     FtBufferResponse response;
     unsigned int newSamples, newEvents;
 
+    //Checks if connection is open
     if (!ftCon.isOpen()) return;
 
+    //If no header is read, wait before returning to avoid spamming the buffer
     if (numChannels == 0) {
         if (!readHeader()) {
             QTest::qSleep(50);
@@ -230,6 +245,7 @@ void FtBuffClient::idleCall() {
         }
     }
 
+    //Set params for waiting for data. 40ms of wait
     request.prepWaitData(numSamples, 0xFFFFFFFF, 40);
 
     if (tcprequest(ftCon.getSocket(), request.out(), response.in()) < 0) {
@@ -244,7 +260,7 @@ void FtBuffClient::idleCall() {
     }
 
     if (newSamples == numSamples) {
-        qDebug() << "idleCall - No new data";
+        //qDebug() << "idleCall - No new data";
         return; // nothing new
     }
     if (newSamples < numSamples) {
@@ -326,7 +342,14 @@ void FtBuffClient::idleCall() {
         lpFilter->process(ddef.nsamples, fdata, fdata); // in place
     }
 
+    outputSamples(ddef.nsamples, fdata);
+    //qDebug() << fdata[0];
+
+    //qDebug() << "idleCall - numSamples updated";
     numSamples = newSamples;
+    //qDebug() << "rawStore is of size" << rawStore.size();
+    //qDebug() << "floatStore is of size" << floatStore.size();
+
 }
 
 //*************************************************************************************************************
@@ -334,3 +357,26 @@ void FtBuffClient::idleCall() {
 bool FtBuffClient::isConnected() {
     return ftCon.isOpen();
 }
+
+//=========================================================================================================
+
+void FtBuffClient::outputSamples(int size, const float* sdata) {
+
+    /*
+    for (int j=0;j<size;j++) {
+        float *d = data + ((pos + j) % nSamp)*nChans;
+        const float *s = sdata + j*nChans;
+        for (int i=0;i<nChans;i++) d[i] = s[i];
+    }
+
+    pos=(pos + size) % nSamp;
+    numTotal += size;
+    */
+    for (int j = 0; j < size; j++) {
+        qDebug() << sdata[j];
+    }
+}
+
+
+
+
