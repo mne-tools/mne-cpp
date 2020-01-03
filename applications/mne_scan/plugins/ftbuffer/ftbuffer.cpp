@@ -37,7 +37,7 @@ inline bool FtBuffer::multiInstanceAllowed() const {
 }
 
 QWidget* FtBuffer::setupWidget() {
-    QWidget* setupWidget = new QWidget;
+    QWidget* setupWidget = new FtBufferGUI;
     return setupWidget;
 }
 
