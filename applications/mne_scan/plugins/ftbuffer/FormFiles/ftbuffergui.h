@@ -18,5 +18,4 @@ public:
 private:
     Ui::FtBufferGUI *ui;
 };
-
 #endif // FTBUFFERGUI_H
