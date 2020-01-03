@@ -1,3 +1,9 @@
+#--------------------------------------------------------------------------------------------------------------
+#
+# @file     ftbuffer.pro
+# @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
+#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @version  0.1
 # @date     January, 2020
 #
 # @section  LICENSE
