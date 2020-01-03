@@ -164,6 +164,7 @@ bool FtBuffClient::readHeader() {
         }
     }
 
+    //decide whether to highpass or lowpass
     if (hpFilter != NULL) {
         delete hpFilter;
         hpFilter = NULL;

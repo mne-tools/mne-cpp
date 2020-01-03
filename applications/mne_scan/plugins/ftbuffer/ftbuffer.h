@@ -7,7 +7,8 @@
 //=============================================================================================================
 
 #include "ftbuffer_global.h"
-#include "FormFiles/ftbuffergui.h"
+#include "FormFiles/ftbufferaboutwidget.h"
+#include "FormFiles/ftbuffersetupwidget.h"
 
 #include <scShared/Interfaces/ISensor.h>
 #include <scShared/Interfaces/IAlgorithm.h>

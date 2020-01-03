@@ -73,16 +73,20 @@ else {
 }
 
 SOURCES += \
-    FormFiles/ftbuffergui.cpp \
-    ftbuffer.cpp
+    ftbuffer.cpp \
+    FormFiles/ftbuffersetupwidget.cpp \
+    FormFiles/ftbufferaboutwidget.cpp
 
 HEADERS += \
-    FormFiles/ftbuffergui.h \
     ftbuffer_global.h \
-    ftbuffer.h
+    ftbuffer.h \
+    FormFiles/ftbuffersetupwidget.h \
+    FormFiles/ftbufferaboutwidget.h
 
 FORMS += \
-    FormFiles/ftbuffergui.ui \
+    FormFiles/ftbuffersetup.ui \
+    FormFiles/ftbufferabout.ui \
+    FormFiles/ftbufferyourtoolbarwidget.ui
 
 COPY_CMD = $$copyResources($${RESOURCE_FILES})
 QMAKE_POST_LINK += $${COPY_CMD}
