@@ -49,6 +49,7 @@
 #include <../plugins/neuromag/neuromag.h>
 #include <../plugins/babymeg/babymeg.h>
 #include <../plugins/natus/natus.h>
+#include <../plugins/ftbuffer/ftbuffer.h>
 //#include <../plugins/gusbamp/gusbamp.h>
 //#include <../plugins/eegosports/eegosports.h>
 //#include <../plugins/brainamp/brainamp.h>
@@ -105,6 +106,7 @@ void PluginManager::loadPlugins(const QString& dir)
     lObjects << new NEUROMAGPLUGIN::Neuromag;
     lObjects << new BABYMEGPLUGIN::BabyMEG;
     lObjects << new NATUSPLUGIN::Natus;
+    lObjects << new FTBUFFERPLUGIN::FtBuffer;
     //lObjects << new GUSBAMPPLUGIN::GUSBAmp;
     //lObjects << new EEGOSPORTSPLUGIN::EEGoSports;
     //lObjects << new BRAINAMPPLUGIN::BrainAMP;
