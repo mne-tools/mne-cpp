@@ -1,7 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ftbuffergui</class>
- <widget class="QWidget" name="ftbuffergui">
+ <author/>
+ <comment/>
+ <exportmacro/>
+ <class>FtBufferGUI</class>
+ <widget class="QWidget" name="FtBufferGUI">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,53 +15,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>160</y>
-     <width>83</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>PushButton</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_2">
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>100</y>
-     <width>83</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>PushButton</string>
-   </property>
-  </widget>
-  <widget class="QTextEdit" name="textEdit">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>110</y>
-     <width>104</width>
-     <height>70</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLCDNumber" name="lcdNumber">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>240</y>
-     <width>64</width>
-     <height>23</height>
-    </rect>
-   </property>
-  </widget>
  </widget>
- <resources/>
+ <pixmapfunction/>
  <connections/>
 </ui>
