@@ -35,7 +35,7 @@ CONFIG += plugin
 
 DEFINES += FTBUFFER_LIBRARY
 
-QT += widgets network
+QT += core widgets network
 
 TARGET = ftbuffer
 CONFIG(debug, debug|release) {
