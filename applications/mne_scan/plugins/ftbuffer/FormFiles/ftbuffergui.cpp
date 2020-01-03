@@ -1,14 +1,14 @@
 #include "ftbuffergui.h"
 #include "ui_ftbuffergui.h"
 
-ftbuffergui::ftbuffergui(QWidget *parent) :
+FtBufferGUI::FtBufferGUI(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ftbuffergui)
+    ui(new Ui::FtBufferGUI)
 {
     ui->setupUi(this);
 }
 
-ftbuffergui::~ftbuffergui()
+FtBufferGUI::~FtBufferGUI()
 {
     delete ui;
 }

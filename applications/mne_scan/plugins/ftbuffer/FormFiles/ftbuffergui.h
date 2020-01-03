@@ -4,19 +4,19 @@
 #include <QWidget>
 
 namespace Ui {
-class ftbuffergui;
+class FtBufferGUI;
 }
 
-class ftbuffergui : public QWidget
+class FtBufferGUI : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ftbuffergui(QWidget *parent = nullptr);
-    ~ftbuffergui();
+    explicit FtBufferGUI(QWidget *parent = nullptr);
+    ~FtBufferGUI();
 
 private:
-    Ui::ftbuffergui *ui;
+    Ui::FtBufferGUI *ui;
 };
 
 #endif // FTBUFFERGUI_H
