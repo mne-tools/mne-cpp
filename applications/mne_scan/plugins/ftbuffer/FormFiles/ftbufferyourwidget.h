@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox.h
+* @file     ftbufferyourwidget.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     January, 2016
+* @date     January, 2020
 *
 * @section  LICENSE
 *
@@ -29,19 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummyYourWidget class.
+* @brief    Contains the declaration of the FtBufferYourWidget class.
 *
 */
 
-#ifndef DUMMYYOURWIDGET_H
-#define DUMMYYOURWIDGET_H
+#ifndef FTBUFFERYOURWIDGET_H
+#define FTBUFFERYOURWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_dummyyourtoolbarwidget.h"
+#include "../ui_ftbufferyourtoolbarwidget.h"
 
 
 //*************************************************************************************************************
@@ -54,10 +54,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// DEFINE NAMESPACE ftbufferToolboxPlugin
 //=============================================================================================================
 
-namespace DUMMYTOOLBOXPLUGIN
+namespace FTBUFFERPLUGIN
 {
 
 
@@ -69,34 +69,34 @@ namespace DUMMYTOOLBOXPLUGIN
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummyYourWidget
+* DECLARE CLASS ftbufferYourWidget
 *
-* @brief The DummyToolbox class provides a dummy toolbar widget structure.
+* @brief The ftbufferToolbox class provides a ftbuffer toolbar widget structure.
 */
-class DummyYourWidget : public QWidget
+class FtBufferYourWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<DummyYourWidget> SPtr;         /**< Shared pointer type for DummyYourWidget. */
-    typedef QSharedPointer<DummyYourWidget> ConstSPtr;    /**< Const shared pointer type for DummyYourWidget. */
+    typedef QSharedPointer<FtBufferYourWidget> SPtr;         /**< Shared pointer type for ftbufferYourWidget. */
+    typedef QSharedPointer<FtBufferYourWidget> ConstSPtr;    /**< Const shared pointer type for ftbufferYourWidget. */
 
     //=========================================================================================================
     /**
-    * Constructs a DummyToolbox.
+    * Constructs a ftbufferToolbox.
     */
-    explicit DummyYourWidget(QWidget *parent = 0);
+    explicit FtBufferYourWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummyToolbox.
+    * Destroys the ftbufferToolbox.
     */
-    ~DummyYourWidget();
+    ~FtBufferYourWidget();
 
 private:
-    Ui::DummyYourToolbarWidget* ui;        /**< The UI class specified in the designer. */
+    Ui::FtBufferYourToolbarWidget* ui;        /**< The UI class specified in the designer. */
 };
 
 }   //namespace
 
-#endif // DUMMYYOURWIDGET_H
+#endif // FTBUFFERYOURWIDGET_H

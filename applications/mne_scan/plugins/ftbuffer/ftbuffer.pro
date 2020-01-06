@@ -75,13 +75,15 @@ else {
 SOURCES += \
     ftbuffer.cpp \
     FormFiles/ftbuffersetupwidget.cpp \
-    FormFiles/ftbufferaboutwidget.cpp
+    FormFiles/ftbufferaboutwidget.cpp \
+    FormFiles/ftbufferyourwidget.cpp
 
 HEADERS += \
     ftbuffer_global.h \
     ftbuffer.h \
     FormFiles/ftbuffersetupwidget.h \
-    FormFiles/ftbufferaboutwidget.h
+    FormFiles/ftbufferaboutwidget.h \
+    FormFiles/ftbufferyourwidget.h
 
 FORMS += \
     FormFiles/ftbuffersetup.ui \

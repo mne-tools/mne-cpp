@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox.cpp
+* @file     ftbuffertoolbox.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     January, 2020
 *
 * @section  LICENSE
 *
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the DummyYourWidget class.
+* @brief    Definition of the FtBufferYourWidget class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "dummyyourwidget.h"
+#include "ftbufferyourwidget.h"
 
 
 //*************************************************************************************************************
@@ -46,7 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DUMMYTOOLBOXPLUGIN;
+using namespace FTBUFFERPLUGIN;
 
 
 //*************************************************************************************************************
@@ -54,9 +54,9 @@ using namespace DUMMYTOOLBOXPLUGIN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DummyYourWidget::DummyYourWidget(QWidget *parent)
+FtBufferYourWidget::FtBufferYourWidget(QWidget *parent)
 : QWidget(parent)
-, ui(new Ui::DummyYourToolbarWidget)
+, ui(new Ui::FtBufferYourToolbarWidget)
 {
     ui->setupUi(this);
 }
@@ -64,7 +64,7 @@ DummyYourWidget::DummyYourWidget(QWidget *parent)
 
 //*************************************************************************************************************
 
-DummyYourWidget::~DummyYourWidget()
+FtBufferYourWidget::~FtBufferYourWidget()
 {
     delete ui;
 }

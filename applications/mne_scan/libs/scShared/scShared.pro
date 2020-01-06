@@ -68,6 +68,7 @@ contains(MNECPP_CONFIG, static) {
     QTPLUGIN += noisereduction
     QTPLUGIN += ssvepbci
     QTPLUGIN += neuronalconnectivity
+    QTPLUGIN += ftbuffer
 } else {
     CONFIG += shared
 }
