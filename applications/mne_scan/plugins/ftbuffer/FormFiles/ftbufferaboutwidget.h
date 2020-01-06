@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummyAboutWidget class.
+* @brief    Contains the declaration of the FtBufferAboutWidget class.
 *
 */
 
@@ -56,7 +56,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// DEFINE NAMESPACE FtBufferToolboxPlugin
 //=============================================================================================================
 
 namespace FTBUFFERPLUGIN
@@ -65,9 +65,9 @@ namespace FTBUFFERPLUGIN
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummyAboutWidget
+* DECLARE CLASS FtBufferAboutWidget
 *
-* @brief The DummyAboutWidget class provides the about dialog for the DummyToolbox.
+* @brief The FtBufferAboutWidget class provides the about dialog for the FtBufferToolbox.
 */
 class FtBufferAboutWidget : public QDialog
 {
@@ -77,25 +77,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummyAboutWidget dialog which is a child of parent.
+    * Constructs a FtBufferAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new FtBufferAboutWidget becomes a window. If parent is another widget, FtBufferAboutWidget becomes a child window inside parent. FtBufferAboutWidget is deleted when its parent is deleted.
     */
     FtBufferAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummyAboutWidget.
-    * All DummyAboutWidget's children are deleted first. The application exits if DummyAboutWidget is the main widget.
+    * Destroys the FtBufferAboutWidget.
+    * All FtBufferAboutWidget's children are deleted first. The application exits if FtBufferAboutWidget is the main widget.
     */
     ~FtBufferAboutWidget();
 
 private:
 
-    Ui::FtBufferAboutWidgetClass ui;		/**< Holds the user interface for the DummyAboutWidget.*/
+    Ui::FtBufferAboutWidgetClass ui;		/**< Holds the user interface for the FtBufferAboutWidget.*/
 
 };
 
 } // NAMESPACE
 
-#endif // DUMMYABOUTWIDGET_H
+#endif // FTBUFFERABOUTWIDGET_H
