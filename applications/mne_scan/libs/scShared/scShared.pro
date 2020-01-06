@@ -77,6 +77,7 @@ contains(MNECPP_CONFIG, static) {
     QTPLUGIN += ssvepbci
     QTPLUGIN += neuronalconnectivity
     QTPLUGIN += reference
+    QTPLUGIN += ftbuffer
 } else {
     CONFIG += shared
 }
