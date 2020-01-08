@@ -1,14 +1,14 @@
+//=============================================================================================================
 /**
-* @file     ftbuffer.h
-* @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     ftbuffclient.h
+* @author   Gabriel B. Motta <gbmotta@mgh.harvard.edu
+*           Stefan Klanke
 * @version  1.0
-* @date     February, 2020
+* @date     December, 2019
 *
 * @section  LICENSE
 *
-* Copyright (C) 2020, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2019, Stefan Klanke and Gabriel B. Motta. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -28,14 +28,19 @@
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *
+* Based on viewer.cc example from ftbuffer reference implementation, under the GNU GENERAL PUBLIC LICENSE Version 2:
 *
-* @brief    Contains the declaration of the FtBuffer class.
+* Copyright (C) 2010, Stefan Klanke
+* Donders Institute for Donders Institute for Brain, Cognition and Behaviour,
+* Centre for Cognitive Neuroimaging, Radboud University Nijmegen,
+* Kapittelweg 29, 6525 EN Nijmegen, The Netherlands
+*
+* @brief    FtBuffClient class declaration.
 *
 */
 
-#ifndef FTBUFFER_H
-#define FTBUFFER_H
-
+#ifndef FTBUFFCLIENT_H
+#define FTBUFFCLIENT_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -45,126 +50,133 @@
 #include <QtWidgets>
 #include <QtCore/QtPlugin>
 #include <QDebug>
-#include <QSharedPointer>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// Includes
 //=============================================================================================================
 
-#include "ftbuffer_global.h"
-#include "FormFiles/ftbufferaboutwidget.h"
-#include "FormFiles/ftbuffersetupwidget.h"
-#include "FormFiles/ftbufferyourwidget.h"
-
-#include <scShared/Interfaces/ISensor.h>
-#include <scShared/Interfaces/IAlgorithm.h>
-
-#include <ftsrc/ftbuffclient.h>
+#include <FtBuffer.h>
+#include <MultiChannelFilter.h>
+#include <buffer.h>
+#include <stdlib.h>
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FTBUFFERPLUGIN
+// DEFINITIONS
 //=============================================================================================================
 
-namespace FTBUFFERPLUGIN {
+#define HPFILTORD 2
+#define HPFREQ  4.0
+#define LPFILTORD 7
+#define LPFREQ 70.0
+#define HIDDEN  16
 
-
-class FTBUFFER_EXPORT FtBuffer : public SCSHAREDLIB::ISensor
+/**
+* Implements a client for communication with a fieldtrip bufer.
+*
+* @brief Fieldtrip Buffer Client Implementation
+*/
+class FtBuffClient
 {
-    Q_OBJECT
-
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "ftbuffer.json")
-
-    Q_INTERFACES(SCSHAREDLIB::ISensor)
 
 public:
-
-    FtBuffer();
-
-    ~FtBuffer();
-
-    //ISENSOR Functions
-    //=========================================================================================================
     /**
-    * Clone the plugin
-    */
-    virtual QSharedPointer<IPlugin> clone() const;
+     * Default Constructor
+     */
+    FtBuffClient();
 
     //=========================================================================================================
     /**
-    * Initializes the plugin.
-    */
-    virtual void init();
+     * @brief FtBuffClient - Constructor that set address for buffer
+     * @param addr [in] (address) - tells the client the address and port of the buffer.
+     */
+    FtBuffClient(char* addr);
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
-    virtual void unload();
-
-    //=========================================================================================================
-    /**
-    * Starts the ISensor.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return true if success, false otherwise
-    */
-    virtual bool start();
-
-    //=========================================================================================================
-    /**
-    * Stops the ISensor.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return true if success, false otherwise
-    */
-    virtual bool stop();
-
-    //=========================================================================================================
-    /**
-    * Returns the plugin type.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return type of the ISensor
-    */
-    virtual PluginType getType() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the plugin name.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the name of the ISensor.
-    */
-    virtual QString getName() const;
-
-
-    //=========================================================================================================
-    /**
-    * Returns the set up widget for configuration of ISensor.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the setup widget.
-    */
-    virtual QWidget* setupWidget();
-
-    //=========================================================================================================
-
-protected:
-    virtual void run();
-
-    void showYourWidget();
+     * @brief getDataExample - Made to run with FT buffer examples: sine2ft and buffer.
+     */
+    void getDataExample();
 
 private:
-    bool                                            m_bIsRunning;
 
-    QSharedPointer<FtBufferYourWidget>              m_pYourWidget;
-    QAction*                                        m_pActionShowYourWidget;
+    /**
+     * @brief readHeader - Attempts to get and read header from buffer. This gives us info about the data in the buffer.
+     * @return Returns whether header was succesffully retrieved and read.
+     */
+    bool readHeader();
 
-    FtBuffClient                                    m_FtBuffClient;
+    //=========================================================================================================
+    /**
+     * @brief idleCall - gets called repetedly to get new data from buffer.
+     */
+    void idleCall();
+
+    //=========================================================================================================
+    template<typename T>
+    void convertToFloat(float *dest, const void *src, unsigned int nsamp, unsigned int nchans);
+
+    //=========================================================================================================
+    /**
+     * @brief stopConnection - stops connecton with buffer if one is currently open
+     */
+    void stopConnection();
+
+    //=========================================================================================================
+    /**
+     * @brief startConnection - starts connection with buffer if one does not already exist
+     */
+    void startConnection();
+
+    //=========================================================================================================
+    /**
+     * @brief isConnected - returns whether a connection is open with a buffer.
+     * @return true - connection open / false - no connection
+     */
+    bool isConnected();
+
+    //=========================================================================================================
+
+    void outputSamples(int size, const float* data);
+
+    //=========================================================================================================
+
+    int                 numChannels;
+    uint                numSamples;
+
+    FtConnection        ftCon;
+    const char*         addrField;
+
+    SimpleStorage       rawStore, floatStore;
+
+    bool                useHighpass;
+    bool                useLowpass;
+
+    //TODO: remove this, it's from the viewer.cc GUI, only here to make porting code easier
+    char**              labels;
+    int*                colorTable;
+
+    MultiChannelFilter<float,float> *hpFilter = NULL;
+    MultiChannelFilter<float,float> *lpFilter = NULL;
+
+    float               *data;
+
+    //These are from the OnlineDataDisplay class that updates the viewer.cc data
+    int                 nChans;
+    int                 nSamp;
+
+    int                 numTotal, pos;
+    int                 yPos, ySpace;
+    float               yScale;
+    int                 height;
+    int                 skipped;
+
+
+
 };
 
-}//namespace end brace
-
-#endif // FTBUFFER_H
+#endif // FTBUFFCLIENT_H

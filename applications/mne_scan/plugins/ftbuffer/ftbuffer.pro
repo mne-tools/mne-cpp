@@ -41,7 +41,8 @@ CONFIG += plugin
 
 DEFINES += FTBUFFER_LIBRARY
 
-QT += core widgets network
+QT += core widgets network testlib
+
 
 TARGET = ftbuffer
 CONFIG(debug, debug|release) {
@@ -76,7 +77,27 @@ SOURCES += \
     ftbuffer.cpp \
     FormFiles/ftbuffersetupwidget.cpp \
     FormFiles/ftbufferaboutwidget.cpp \
-    FormFiles/ftbufferyourwidget.cpp
+    FormFiles/ftbufferyourwidget.cpp \
+        ftsrc/cpp/FtConnection.cc \
+        ftsrc/src/cleanup.c \
+        ftsrc/src/clientrequest.c \
+        ftsrc/src/compat_clock_gettime.c \
+        ftsrc/src/compat_fsync.c \
+        ftsrc/src/compat_gettimeofday.c \
+        ftsrc/src/dmarequest.c \
+        ftsrc/src/endianutil.c \
+        ftsrc/src/extern.c \
+        ftsrc/src/interface.c \
+        ftsrc/src/printstruct.c \
+        ftsrc/src/rdaserver.c \
+        ftsrc/src/socketserver.c \
+        ftsrc/src/swapbytes.c \
+        ftsrc/src/tcprequest.c \
+        ftsrc/src/tcpsocket.c \
+        ftsrc/src/tcpserver.c \
+        ftsrc/src/timestamp.c \
+        ftsrc/src/util.c \
+        ftsrc/ftbuffclient.cpp \
 
 HEADERS += \
     ftbuffer_global.h \
@@ -93,6 +114,9 @@ FORMS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
+INCLUDEPATH += $$MNE_BINARY_DIR/../applications/mne_scan/plugins/ftbuffer/ftsrc/cpp
+INCLUDEPATH += $$MNE_BINARY_DIR/../applications/mne_scan/plugins/ftbuffer/ftsrc/src
+INCLUDEPATH += $$MNE_BINARY_DIR/../applications/mne_scan/plugins/ftbuffer/ftsrc/
 
 OTHER_FILES += ftbuffer.json
 
