@@ -51,7 +51,7 @@ using namespace FTBUFFERPLUGIN;
 FtBuffer::FtBuffer() :
 m_bIsRunning(false)
 {
-
+    qDebug() << "Constructing FtBuffer Object";
     m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("FieldTrip Buffer Widget"),this);
     m_pActionShowYourWidget->setShortcut(tr("F12"));
     m_pActionShowYourWidget->setStatusTip(tr("FieldTrip Buffer Widget"));
@@ -67,16 +67,16 @@ FtBuffer::~FtBuffer() {
 
 
 QSharedPointer<IPlugin> FtBuffer::clone() const {
-    QSharedPointer<FtBuffer> pointer_FtBuffer(new FtBuffer);
-    return pointer_FtBuffer;
+    QSharedPointer<FtBuffer> pFtBufferClone(new FtBuffer);
+    return pFtBufferClone;
 }
 
-void FtBuffer::init() {}
+void FtBuffer::init() {qDebug() << "Running init()";}
 
 void FtBuffer::unload() {}
 
 bool FtBuffer::start() {
-
+    qDebug() << "Running start()";
     m_bIsRunning = true;
     QThread::start();
 
@@ -97,9 +97,6 @@ QString FtBuffer::getName() const {
     return "FtBuffer";
 }
 
-inline bool FtBuffer::multiInstanceAllowed() const {
-    return true;
-}
 
 QWidget* FtBuffer::setupWidget() {
     FtBufferSetupWidget* setupWidget = new FtBufferSetupWidget(this);
