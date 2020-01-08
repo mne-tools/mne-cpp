@@ -137,13 +137,6 @@ public:
     */
     virtual QString getName() const;
 
-    //=========================================================================================================
-    /**
-    * True if multi instantiation of plugin is allowed.
-    *
-    * @return true if multi instantiation of plugin is allowed.
-    */
-    virtual inline bool multiInstanceAllowed() const;
 
     //=========================================================================================================
     /**
