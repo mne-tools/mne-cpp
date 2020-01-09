@@ -45,18 +45,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="m_qGridLayout_main">
-     <item row="0" column="1" rowspan="2" colspan="2">
-      <widget class="QGroupBox" name="m_qGroupBox_Information">
-       <property name="title">
-        <string>Information</string>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Information">
-        <item row="0" column="0">
-         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
-        </item>
-       </layout>
-      </widget>
-     </item>
      <item row="2" column="1">
       <spacer name="m_qHorizontalSpacer_About">
        <property name="orientation">
@@ -69,6 +57,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item row="2" column="2">
+      <widget class="QPushButton" name="m_qPushButton_About">
+       <property name="text">
+        <string>About</string>
+       </property>
+      </widget>
      </item>
      <item row="1" column="0">
       <spacer name="m_qVerticalSpacer_LeftRow">
@@ -83,11 +78,16 @@
        </property>
       </spacer>
      </item>
-     <item row="2" column="2">
-      <widget class="QPushButton" name="m_qPushButton_About">
-       <property name="text">
-        <string>About</string>
+     <item row="0" column="1" rowspan="2" colspan="2">
+      <widget class="QGroupBox" name="m_qGroupBox_Information">
+       <property name="title">
+        <string>Information</string>
        </property>
+       <layout class="QGridLayout" name="m_qGridLayout_Information">
+        <item row="0" column="0">
+         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
+        </item>
+       </layout>
       </widget>
      </item>
      <item row="0" column="0">
@@ -125,6 +125,13 @@
          <widget class="QPushButton" name="m_qPushButton_Connect">
           <property name="text">
            <string>Connect</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QPushButton" name="m_qPushButton_Start">
+          <property name="text">
+           <string>Start</string>
           </property>
          </widget>
         </item>

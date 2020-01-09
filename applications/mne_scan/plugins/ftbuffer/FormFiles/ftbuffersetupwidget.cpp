@@ -107,3 +107,13 @@ void FtBufferSetupWidget::pressedConnect()
         }
     }
 }
+
+//*************************************************************************************************************
+
+void FtBufferSetupWidget::pressedStart()
+{
+    if (ui.m_qPushButton_Connect->text() != "Disconnect")
+        return;
+
+
+}

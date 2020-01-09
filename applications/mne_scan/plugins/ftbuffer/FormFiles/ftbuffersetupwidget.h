@@ -112,10 +112,19 @@ private slots:
 
     //=========================================================================================================
     /**
-    * Connects buffer client to address currently stored in client. To-do: add change address.
-    * @brief attempts to connect member buffer client to buffer
+    * Connects buffer client to address currently stored in client, or disconnects if already connected.
+    * Also changes button text to indicate whether clicking it will connect of disocnnect client.
+    * To-do: add change address.
+    * @brief attempts to connect/disconnect member buffer client to buffer
     */
     void pressedConnect();
+
+    //=========================================================================================================
+    /**
+    * Starts trying to receive data from buffer
+    * @brief start receiving data from buffer
+    */
+    void pressedStart();
 
 signals:
 
