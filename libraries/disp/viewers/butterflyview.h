@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include <QMap>
+#include <QWidget>
 #if defined(USE_OPENGL)
     #include <QOpenGLWidget>
 #endif
