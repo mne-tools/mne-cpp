@@ -55,13 +55,17 @@ CONFIG(debug, debug|release) {
 CONFIG += console
 
 contains(MNECPP_CONFIG, wasm) {
-    QMAKE_LFLAGS += -s ERROR_ON_UNDEFINED_SYMBOLS=1
-    QMAKE_LFLAGS += -s ASSERTIONS=1
+#    QMAKE_LFLAGS += -s ERROR_ON_UNDEFINED_SYMBOLS=1
+#    QMAKE_LFLAGS += -s ASSERTIONS=1
+#    QMAKE_LFLAGS += -s STRICT=0
+#    QMAKE_LFLAGS += -s FORCE_FILESYSTEM=1
 
-#    DEFINES += __EMSCRIPTEN__
-#    LIBS +=-lidbfs.js
-#    INCLUDEPATH += /home/lorenz/Git/emsdk/usptream/emscripten/src
+    DEFINES += __EMSCRIPTEN__
+    LIBS += -lidbfs.js
+    INCLUDEPATH += /home/lorenz/Git/emsdk/usptream/emscripten/src
 }
+
+DESTDIR = $${MNE_BINARY_DIR}
 
 contains(MNECPP_CONFIG, static) {
     CONFIG += static
@@ -74,17 +78,18 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Fwdd \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
             -lMNE$${MNE_LIB_VERSION}Dispd
-}
-else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+} else {
+    LIBS += -llibMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Fwd \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
             -lMNE$${MNE_LIB_VERSION}Disp
 }
-
-DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
     main.cpp \
@@ -162,7 +167,7 @@ unix:!macx {
     QMAKE_CXXFLAGS += -Wno-attributes
 }
 macx {
-    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc++
+    QMAKE_CXXFLAGS += -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc++
     CONFIG +=c++11
 }
 

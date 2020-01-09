@@ -131,7 +131,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To build MNE-CPP against wasm: qmake MNECPP_CONFIG+=wasm
 
 # Default flags
-MNECPP_CONFIG += dispOpenGL
+MNECPP_CONFIG += wasm
 
 # At least version 5.2.1
 !minQtVersion(5, 2, 1) {
