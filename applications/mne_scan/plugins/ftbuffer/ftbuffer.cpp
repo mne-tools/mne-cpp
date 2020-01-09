@@ -109,3 +109,9 @@ void FtBuffer::showYourWidget() {
     m_pYourWidget = FtBufferYourWidget::SPtr(new FtBufferYourWidget());
     m_pYourWidget->show();
 }
+
+void FtBuffer::connectToBuffer(QString addr){
+    this->m_FtBuffClient.setAddress(addr);
+    this->m_FtBuffClient.startConnection();
+}
+

@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Dummy Toolbox Configuration</string>
+      <string>Fieldtrip Buffer Client Configuration</string>
      </property>
     </widget>
    </item>
@@ -45,29 +45,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="m_qGridLayout_main">
-     <item row="0" column="0">
-      <widget class="QGroupBox" name="m_qGroupBox_yourGroupBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>100</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Your group box</string>
-       </property>
-       <property name="flat">
-        <bool>false</bool>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Properties"/>
-      </widget>
-     </item>
      <item row="0" column="1" rowspan="2" colspan="2">
       <widget class="QGroupBox" name="m_qGroupBox_Information">
        <property name="title">
@@ -111,6 +88,47 @@
        <property name="text">
         <string>About</string>
        </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QGroupBox" name="m_qGroupBox_yourGroupBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Connection Status</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+       <layout class="QGridLayout" name="m_qGridLayout_Properties">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>IP Address:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLineEdit" name="m_lineEditIP"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QPushButton" name="m_qPushButton_Connect">
+          <property name="text">
+           <string>Connect</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
