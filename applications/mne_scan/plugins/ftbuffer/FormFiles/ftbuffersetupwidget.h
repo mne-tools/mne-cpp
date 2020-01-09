@@ -110,7 +110,15 @@ private slots:
     */
     void showAboutDialog();
 
+    //=========================================================================================================
+    /**
+    * Connects buffer client to address currently stored in client. To-do: add change address.
+    * @brief attempts to connect member buffer client to buffer
+    */
     void pressedConnect();
+
+signals:
+
 
 private:
 

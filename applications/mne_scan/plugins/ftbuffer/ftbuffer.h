@@ -154,9 +154,17 @@ public:
     /**
     * Changes stored address and connects the member FtBuffClient to that address
     *
-    * @return connects buffer client to provided address
+    * @brief connects buffer client to provided address
     */
-    void connectToBuffer(QString addr);
+    bool connectToBuffer(QString addr);
+
+    //=========================================================================================================
+    /**
+    * Changes stored address and connects the member FtBuffClient to that address
+    *
+    * @brief connects buffer client to provided address
+    */
+    bool disconnectFromBuffer();
 
 
 protected:
