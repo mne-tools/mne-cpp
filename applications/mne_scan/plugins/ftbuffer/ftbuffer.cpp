@@ -79,6 +79,7 @@ void FtBuffer::init() {qDebug() << "Running init()";}
 void FtBuffer::unload() {}
 
 bool FtBuffer::start() {
+
     qDebug() << "Running start()";
     m_bIsRunning = true;
     QThread::start();
