@@ -217,7 +217,7 @@ void FtBuffClient::startConnection() {
         if (ftCon.connect(addrField)){
             qDebug() << "Connected to" << addrField;
         } else {
-            qDebug() << "Unable to connect: no buffer found on"<< addrField;
+            qDebug() << "Unable to connect: no buffer found on" << addrField;
         }
     } else {
         qDebug() << "Unable to connect: Already connected";
@@ -388,6 +388,11 @@ QString FtBuffClient::getAddress() {
 //=========================================================================================================
 
 void FtBuffClient::setAddress(QString newAddr) {
+    qDebug() << "pre-printable:" << newAddr;
+    qDebug() << "before setting addrField:" << addrField;
+    qDebug() << "printable:" << qPrintable(newAddr);
     addrField = qPrintable(newAddr); //converts QString to char*
+    qDebug() << "after setting:" << addrField;
+
 }
 
