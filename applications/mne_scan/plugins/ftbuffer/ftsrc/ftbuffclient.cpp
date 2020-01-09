@@ -198,29 +198,34 @@ void FtBuffClient::convertToFloat(float *dest, const void *src, unsigned int nsa
 //*************************************************************************************************************
 
 //Checks if there is an open connection, and if so, closes it
-void FtBuffClient::stopConnection() {
+bool FtBuffClient::stopConnection() {
     if (ftCon.isOpen()) {
         qDebug() << "Disconnecting...";
         ftCon.disconnect();
         qDebug() << "Disconnected.";
+        return true;
     } else {
         qDebug() << "Not currently connected";
+        return false;
     }
 }
 
 //*************************************************************************************************************
 
 //Checks if there is no open connection, and if so, opens one
-void FtBuffClient::startConnection() {
+bool FtBuffClient::startConnection() {
     if (!ftCon.isOpen()) {
         qDebug() << "Trying to connect...";
         if (ftCon.connect(addrField)){
             qDebug() << "Connected to" << addrField;
+            return true;
         } else {
             qDebug() << "Unable to connect: no buffer found on" << addrField;
+            return false;
         }
     } else {
         qDebug() << "Unable to connect: Already connected";
+        return false;
     }
 }
 
