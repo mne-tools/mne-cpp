@@ -379,5 +379,15 @@ void FtBuffClient::outputSamples(int size, const float* sdata) {
 }
 
 
+//=========================================================================================================
 
+QString FtBuffClient::getAddress() {
+    return QString(addrField); //converts char* to QString
+}
+
+//=========================================================================================================
+
+void FtBuffClient::setAddress(QString newAddr) {
+    addrField = qPrintable(newAddr); //converts QString to char*
+}
 

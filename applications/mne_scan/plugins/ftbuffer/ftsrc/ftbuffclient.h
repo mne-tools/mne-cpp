@@ -102,6 +102,30 @@ public:
      */
     void getDataExample();
 
+    //=========================================================================================================
+    /**
+     * @brief getAddress - returns address the client has stored.
+     */
+    QString getAddress();
+
+    //=========================================================================================================
+    /**
+     * @brief setAddress - sets the address stored by the client.
+     */
+    void setAddress(QString newAddr);
+
+    //=========================================================================================================
+    /**
+     * @brief stopConnection - stops connecton with buffer if one is currently open
+     */
+    void stopConnection();
+
+    //=========================================================================================================
+    /**
+     * @brief startConnection - starts connection with buffer if one does not already exist
+     */
+    void startConnection();
+
 private:
 
     /**
@@ -119,18 +143,6 @@ private:
     //=========================================================================================================
     template<typename T>
     void convertToFloat(float *dest, const void *src, unsigned int nsamp, unsigned int nchans);
-
-    //=========================================================================================================
-    /**
-     * @brief stopConnection - stops connecton with buffer if one is currently open
-     */
-    void stopConnection();
-
-    //=========================================================================================================
-    /**
-     * @brief startConnection - starts connection with buffer if one does not already exist
-     */
-    void startConnection();
 
     //=========================================================================================================
     /**

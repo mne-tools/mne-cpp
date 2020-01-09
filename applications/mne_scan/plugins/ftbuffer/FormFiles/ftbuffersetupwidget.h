@@ -110,6 +110,8 @@ private slots:
     */
     void showAboutDialog();
 
+    void pressedConnect();
+
 private:
 
     FtBuffer* m_pFtBuffer;	/**< Holds a pointer to corresponding FtBuffer.*/
