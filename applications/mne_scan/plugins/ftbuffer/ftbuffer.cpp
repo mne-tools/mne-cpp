@@ -111,7 +111,7 @@ void FtBuffer::showYourWidget() {
 }
 
 void FtBuffer::connectToBuffer(QString addr){
-    this->m_FtBuffClient.setAddress(addr);
+    //this->m_FtBuffClient.setAddress(addr);
     this->m_FtBuffClient.startConnection();
 }
 
