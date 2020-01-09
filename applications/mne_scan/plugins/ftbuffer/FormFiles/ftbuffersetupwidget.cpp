@@ -69,8 +69,10 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox, QWidget *parent)
 {
     ui.setupUi(this);
 
+    this->ui.m_lineEditIP->setText(toolbox->m_FtBuffClient.getAddress());
     //Always connect GUI elemts after ui.setpUi has been called
     connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+    connect(ui.m_qPushButton_Connect, SIGNAL(released()), this, SLOT(pressedConnect()));
 }
 
 
@@ -88,4 +90,11 @@ void FtBufferSetupWidget::showAboutDialog()
 {
     FtBufferAboutWidget aboutDialog(this);
     aboutDialog.exec();
+}
+
+//*************************************************************************************************************
+
+void FtBufferSetupWidget::pressedConnect()
+{
+    m_pFtBuffer->connectToBuffer(this->ui.m_lineEditIP->text());
 }

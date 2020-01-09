@@ -78,6 +78,7 @@ class FTBUFFER_EXPORT FtBuffer : public SCSHAREDLIB::ISensor
 
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
+    friend class FtBufferSetupWidget;
 public:
 
     FtBuffer();
@@ -150,6 +151,13 @@ public:
     virtual QWidget* setupWidget();
 
     //=========================================================================================================
+    /**
+    * Changes stored address and connects the member FtBuffClient to that address
+    *
+    * @return connects buffer client to provided address
+    */
+    void connectToBuffer(QString addr);
+
 
 protected:
     virtual void run();
@@ -163,6 +171,7 @@ private:
     QAction*                                        m_pActionShowYourWidget;
 
     FtBuffClient                                    m_FtBuffClient;
+
 };
 
 }//namespace end brace
