@@ -96,5 +96,6 @@ void FtBufferSetupWidget::showAboutDialog()
 
 void FtBufferSetupWidget::pressedConnect()
 {
+    qDebug() << "TEXTFIELD:" << this->ui.m_lineEditIP->text();
     m_pFtBuffer->connectToBuffer(this->ui.m_lineEditIP->text());
 }
