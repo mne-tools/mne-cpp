@@ -3,7 +3,7 @@ title: Overview
 has_children: false
 nav_order: 4
 ---
-
+# Overview
 
 Standalone MEG/EEG applications, especially for clinical use, e.g., acquisition, real-time processing or data browsing software, comprise more or less fixed procedures, which have the need of being straightforward to use and fast in processing required tasks.
 

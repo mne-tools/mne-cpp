@@ -11,4 +11,4 @@ We use [Slack](https://mne-cpp.slack.com/) for communication.
 
 Please [contact us](contact.md) with any questions you may have.
 
-MNE-CPP is a result of collaboration with all of our [partners](partners.md).
+MNE-CPP is a result of collaboration with all of our [partners](partners.md), as well as the various [projects](projects.md) that utilize it.
