@@ -1,5 +1,5 @@
 ---
-title: Project
+title: Projects
 parent: Community
 nav_order: 4
 ---
