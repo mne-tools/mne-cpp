@@ -118,13 +118,13 @@ public:
     /**
      * @brief stopConnection - stops connecton with buffer if one is currently open
      */
-    void stopConnection();
+    bool stopConnection();
 
     //=========================================================================================================
     /**
      * @brief startConnection - starts connection with buffer if one does not already exist
      */
-    void startConnection();
+    bool startConnection();
 
 private:
 

@@ -48,6 +48,7 @@
 using namespace SCSHAREDLIB;
 using namespace FTBUFFERPLUGIN;
 
+//*************************************************************************************************************
 FtBuffer::FtBuffer() :
 m_bIsRunning(false)
 {
@@ -59,6 +60,7 @@ m_bIsRunning(false)
     addPluginAction(m_pActionShowYourWidget);
 }
 
+//*************************************************************************************************************
 FtBuffer::~FtBuffer() {
     if(this->isRunning()){
         stop();
@@ -71,6 +73,7 @@ QSharedPointer<IPlugin> FtBuffer::clone() const {
     return pFtBufferClone;
 }
 
+//*************************************************************************************************************
 void FtBuffer::init() {qDebug() << "Running init()";}
 
 void FtBuffer::unload() {}
@@ -83,35 +86,45 @@ bool FtBuffer::start() {
     return true;
 }
 
+//*************************************************************************************************************
 bool FtBuffer::stop() {
 
     m_bIsRunning = false;
     return true;
 }
 
+//*************************************************************************************************************
 IPlugin::PluginType FtBuffer::getType() const {
     return _ISensor;
 }
 
+//*************************************************************************************************************
 QString FtBuffer::getName() const {
     return "FtBuffer";
 }
 
-
+//*************************************************************************************************************
 QWidget* FtBuffer::setupWidget() {
     FtBufferSetupWidget* setupWidget = new FtBufferSetupWidget(this);
     return setupWidget;
 }
 
+//*************************************************************************************************************
 void FtBuffer::run() {}
 
+//*************************************************************************************************************
 void FtBuffer::showYourWidget() {
     m_pYourWidget = FtBufferYourWidget::SPtr(new FtBufferYourWidget());
     m_pYourWidget->show();
 }
 
-void FtBuffer::connectToBuffer(QString addr){
+//*************************************************************************************************************
+bool FtBuffer::connectToBuffer(QString addr){
     //this->m_FtBuffClient.setAddress(addr);
-    this->m_FtBuffClient.startConnection();
+    return this->m_FtBuffClient.startConnection();
 }
 
+//*************************************************************************************************************
+bool FtBuffer::disconnectFromBuffer(){
+    return this->m_FtBuffClient.stopConnection();
+}
