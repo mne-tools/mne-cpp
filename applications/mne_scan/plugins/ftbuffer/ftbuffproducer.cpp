@@ -50,12 +50,20 @@ using namespace FTBUFFERPLUGIN;
 
 //*************************************************************************************************************
 
-FtBuffProducer::FtBuffProducer()
+FtBuffProducer::FtBuffProducer(FtBuffer* pFtBuffer) :
+m_pFtBuffer(pFtBuffer)
 {
-
 }
 
+//*************************************************************************************************************
 FtBuffProducer::~FtBuffProducer()
 {
+}
 
+//*************************************************************************************************************
+
+void FtBuffProducer::run()
+{
+    qDebug() << "FtBuffProducer::run()";
+    m_pFtBuffer->getData();
 }
