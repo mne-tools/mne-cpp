@@ -43,6 +43,8 @@
 
 #include "../../disp3D_global.h"
 
+#include "items/common/types.h"
+
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_bem.h>
 
