@@ -6,22 +6,25 @@ nav_order: 6
 
 # MNE-CPP with QtWasm
 
-### Setup Qt Wasm to work with MNE-CPP on Ubuntu 18.04.03 64bit:
+## Setup Qt Wasm to work with MNE-CPP on Ubuntu 18.04.03 64bit:
 
  * Get emscripten compiler. According to the official Qt Wasm guide, preferred emscripten version are:
-    Qt 5.12: 1.38.16
-    Qt 5.13: 1.38.27 (multithreading: 1.38.30)
-    Qt 5.14: it's complicated (1.38.27)
+
+   Qt 5.12: 1.38.16
+
+   Qt 5.13: 1.38.27 (multithreading: 1.38.30)
+
+   Qt 5.14: it's complicated (1.38.27)
 
 #### Some utils functions were not able to be linked against (undefined resource errors). It is possible that some mne-cpp functions are not compatible with emscripten 1.38.30. Some newer versions which are not officially tested with Qt Wasm, are able to be compiled succesfully, listed below:
 
-    Qt5.13.2 compiled with em++ 1.39.3 with thread support and dispOpenGL flag via cmd line qmake -> Produced a lot of overlaying  window glitches. **Not recommended**
+   Qt5.13.2 compiled with em++ 1.39.3 with thread support and dispOpenGL flag via cmd line qmake -> Produced a lot of overlaying  window glitches. **Not recommended**
 
-    Qt5.13.2 compiled with em++ 1.39.3 with thread support via cmd line qmake (not using QtCreator)
+   Qt5.13.2 compiled with em++ 1.39.3 with thread support via cmd line qmake (not using QtCreator)
 
-    Qt5.14.0 compiled with em++ 1.39.3 with thread support and dispOpenGL flag via cmd line qmake -> Produced a lot of overlaying  window glitches. **Not recommended**
+   Qt5.14.0 compiled with em++ 1.39.3 with thread support and dispOpenGL flag via cmd line qmake -> Produced a lot of overlaying  window glitches. **Not recommended**
 
-    Qt5.14.0 compiled with em++ 1.39.3 with thread support  via cmd line qmake (not using QtCreator)
+   Qt5.14.0 compiled with em++ 1.39.3 with thread support  via cmd line qmake (not using QtCreator)
 
 ```
 # Get the emsdk repo
@@ -83,7 +86,7 @@ source ./emsdk_env.sh
     * Qt Wasm should now be setup to work with the activated emscripten version
 
 
-### Building MNE-CPP against QtWasm:
+## Building MNE-CPP against QtWasm:
 
  * Navigate to mne-cpp/mne-cpp.pri and add the wasm flag. This will build mne-cpp statically and configure only wasm supported MNE-CPP code.
 
@@ -100,7 +103,6 @@ source ./emsdk_env.sh
      ```
      /emsdk/upstream/emscripten/em++
      /emsdk/upstream/emscripten/emcc
-
      ```
 
      * Add the Qt wasm version to Qt Versions tab by navigating to the
@@ -120,12 +122,11 @@ source ./emsdk_env.sh
      /home/lorenz/Qt/5.14.0/wasm_em1393_64_withThread/bin/qmake
      ../mne-cpp/mne-cpp.pro
      make -j8
-
      ```
 
  * This should create the applications featured under applications, e.g. MNE Browse, to be build to mne-cpp/bin
 
-### Running an application:
+## Running an application:
 
  * Navigate to mne-cpp bin and start a server
 
@@ -134,52 +135,54 @@ source ./emsdk_env.sh
   ```
 
  * Go to a suitable web browser (Chromium based and Mozilla browsers seem to work the best) and type:
-     http://localhost:8000/mne_browse.html
 
-### General notes:
+ ```
+     http://localhost:8000/mne_browse.html
+```
+
+## General notes:
 
  * CentOS7 at Martinos does not seem to have a high enough gcc version
      installed.
 
  * QtWebAssembly does not support concurrent and Qt3D modules.
-     https://forum.qt.io/topic/109166/wasm-support-for-qt3d/4
+     [https://forum.qt.io/topic/109166/wasm-support-for-qt3d/4](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading)
 
  * Mne-cpp Code needs to be build statically
 
- * Thread support forQtWasm can be acchieved  since Qt5.13. Thread supportis deactivated in pre-built binaries. **Enabling** the default Qt for WebAssembly build disables threads by default. To enable, build from source and configure with the **-feature-thread** flag. We’ve found that emscripten 1.38.30 works well for threaded builds. Aus https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading
+ * Thread support forQtWasm can be acchieved  since Qt5.13. Thread supportis deactivated in pre-built binaries. **Enabling** the default Qt for WebAssembly build disables threads by default. To enable, build from source and configure with the **-feature-thread** flag. We’ve found that emscripten 1.38.30 works well for threaded builds. Aus [https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading)
 
  * Data access for local files:
-     https://forum.qt.io/topic/104608/access-local-user-file-on-qt-for-web-assembly and
-     https://stackoverflow.com/questions/56886410/access-local-user-file-on-qt-for-web-assembly
+     [https://forum.qt.io/topic/104608/access-local-user-file-on-qt-for-web-assembly](https://forum.qt.io/topic/104608/access-local-user-file-on-qt-for-web-assembly) and
+     [https://stackoverflow.com/questions/56886410/access-local-user-file-on-qt-for-web-assembly](https://stackoverflow.com/questions/56886410/access-local-user-file-on-qt-for-web-assembly)
 
 
  * Emscripten installer only supports 64 bit versions. 32bit needs to be build from scratch.
 
- * If you get a idbc error see here https://bugreports.qt.io/browse/QTBUG-79872
+ * If you get a idbc error see here [https://bugreports.qt.io/browse/QTBUG-79872](https://bugreports.qt.io/browse/QTBUG-79872)
 
+ * Browser support information: [https://caniuse.com/#feat=wasm](https://caniuse.com/#feat=wasm)
 
- * Browser support information: https://caniuse.com/#feat=wasm
+ * Qt5.14.0 with threading support, emscripten version 1.38.27 and qtbase as well as qtcharts module leads to this error: [https://forum.qt.io/topic/108640/trying-to-configure-qt-for-windows-desktop-after-building-for-wasm](https://forum.qt.io/topic/108640/trying-to-configure-qt-for-windows-desktop-after-building-for-wasm). Qt5.13.2 does not seem to have this problem.
 
- * Qt5.14.0 with threading support, emscripten version 1.38.27 and qtbase as well as qtcharts module leads to this error: https://forum.qt.io/topic/108640/trying-to-configure-qt-for-windows-desktop-after-building-for-wasm. Qt5.13.2 does not seem to have this problem.
+## Wasm resources:
 
-### Wasm resources:
+https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly
 
-     https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly
+https://doc.qt.io/qt-5/wasm.html
 
-     https://doc.qt.io/qt-5/wasm.html
+https://medium.com/@jimmychen009/qt-quick-on-the-browser-30d5349c11ec
 
-     https://medium.com/@jimmychen009/qt-quick-on-the-browser-30d5349c11ec
+https://dev.to/captainsafia/why-the-heck-is-everyone-talking-about-webassembly-455a
 
-     https://dev.to/captainsafia/why-the-heck-is-everyone-talking-about-webassembly-455a
+https://wiki.qt.io/Qt_for_WebAssembly
 
-     https://wiki.qt.io/Qt_for_WebAssembly
+https://doc.qt.io/qt-5/qtwebassembly-platform-notes.html
 
-     https://doc.qt.io/qt-5/qtwebassembly-platform-notes.html
+https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading
 
-     https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading
+https://forum.qt.io/topic/107689/building-qt-apps-to-wasm/18
 
-     https://forum.qt.io/topic/107689/building-qt-apps-to-wasm/18
+https://doc-snapshots.qt.io/qtcreator-master/creator-setup-webassembly.html
 
-     https://doc-snapshots.qt.io/qtcreator-master/creator-setup-webassembly.html
-
-     https://github.com/msorvig/qt-webassembly-examples
+https://github.com/msorvig/qt-webassembly-examples
