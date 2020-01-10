@@ -1,7 +1,6 @@
-//=============================================================================================================
 /**
-* @file     ftbuffersetupwidget.cpp
-* @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+* @file     ftbuffproducer.h
+* @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -30,93 +29,53 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the FtBufferSetupWidget class.
+* @brief    Declaration of the FtBuffProducer class.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "ftbuffersetupwidget.h"
-
+#ifndef FTBUFFPRODUCER_H
+#define FTBUFFPRODUCER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FTBUFFERPLUGIN;
-
+#include <QThread>
+#include <QMutex>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE
 //=============================================================================================================
 
-FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox, QWidget *parent)
-: QWidget(parent)
-, m_pFtBuffer(toolbox)
-{
-    ui.setupUi(this);
-
-    this->ui.m_lineEditIP->setText(toolbox->m_FtBuffClient.getAddress());
-
-    //Always connect GUI elemts after ui.setpUi has been called
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog())); // About page
-    connect(ui.m_qPushButton_Connect, SIGNAL(released()), this, SLOT(pressedConnect())); // Connect/Disconnect button
-    connect(ui.m_qPushButton_Start, SIGNAL(released()), this, SLOT(pressedStart())); // Start button
-}
-
+namespace FTBUFFERPLUGIN {
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-FtBufferSetupWidget::~FtBufferSetupWidget()
+class FtBuffer;
+
+class FtBuffProducer : public QThread
 {
+    Q_OBJECT
 
-}
+    friend class FtBuffer;
 
+public:
+    FtBuffProducer();
 
-//*************************************************************************************************************
+    ~FtBuffProducer();
 
-void FtBufferSetupWidget::showAboutDialog()
-{
-    FtBufferAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}
+private:
 
-//*************************************************************************************************************
+    QMutex m_mutex;
 
-void FtBufferSetupWidget::pressedConnect()
-{
-    if(ui.m_qPushButton_Connect->text() == "Disconnect") {
-        if (m_pFtBuffer->disconnectFromBuffer()) {
-            ui.m_qPushButton_Connect->setText("Connect");
-        }
-    } else {
-        //qDebug() << "TEXTFIELD:" << this->ui.m_lineEditIP->text();
-        if (m_pFtBuffer->connectToBuffer(this->ui.m_lineEditIP->text())) {
-            ui.m_qPushButton_Connect->setText("Disconnect");
-        }
-    }
-}
+    FtBuffer* m_pFtBuffer;
+};
 
-//*************************************************************************************************************
+} // namespace
 
-void FtBufferSetupWidget::pressedStart()
-{
-    if (ui.m_qPushButton_Connect->text() != "Disconnect")
-        return;
-
-    m_pFtBuffer->start();
-
-}
+#endif // FTBUFFPRODUCER_H
