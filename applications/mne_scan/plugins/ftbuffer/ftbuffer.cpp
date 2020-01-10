@@ -101,6 +101,7 @@ bool FtBuffer::start() {
 bool FtBuffer::stop() {
 
     m_bIsRunning = false;
+    m_pFtBuffProducer->exit();
     return true;
 }
 
