@@ -583,6 +583,7 @@ void Data3DTreeModel::initMetatypes()
 {
     //Init metatypes
     qRegisterMetaType<QVector<QVector<int> > >();
+    qRegisterMetaType<QVector<int> >();
 
     qRegisterMetaType<QVector<Vector3f> >();
     qRegisterMetaType<QVector<Eigen::Vector3f> >();
