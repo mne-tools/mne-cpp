@@ -51,7 +51,8 @@ using namespace FTBUFFERPLUGIN;
 
 //*************************************************************************************************************
 FtBuffer::FtBuffer() :
-m_bIsRunning(false)
+m_bIsRunning(false),
+m_pFtBuffProducer(new FtBuffProducer(this))
 {
     qDebug() << "Constructing FtBuffer Object";
     m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("FieldTrip Buffer Widget"),this);
@@ -82,10 +83,12 @@ void FtBuffer::unload() {}
 bool FtBuffer::start() {
 
     qDebug() << "Running start()";
+
     m_bIsRunning = true;
+
     QThread::start();
 
-    qDebug() << "Running produrer start()";
+    qDebug() << "Running producer start()";
     m_pFtBuffProducer->start();
 
     //m_FtBuffClient
