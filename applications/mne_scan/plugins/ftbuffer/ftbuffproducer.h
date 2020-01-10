@@ -65,12 +65,22 @@ class FtBuffProducer : public QThread
     friend class FtBuffer;
 
 public:
+
+    /**
+    * creates instance of FtBuffProducer that holds a poiter to an instance of FtBuffer
+    *
+    */
     FtBuffProducer(FtBuffer* pFtBuffer);
 
     ~FtBuffProducer();
 
 protected:
 
+    /**
+    * runs getData(), though FtBuffer, which run getData() in FtBuffClient on a loop
+    *
+    * @brief runs seprate thread to continuously get data
+    */
     virtual void run();
 
 private:

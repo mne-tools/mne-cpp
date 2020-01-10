@@ -116,7 +116,7 @@ void FtBufferSetupWidget::pressedStart()
 {
     if (ui.m_qPushButton_Connect->text() != "Disconnect")
         return;
-
+    ui.m_qPushButton_Start->setText("Stop");
     m_pFtBuffer->start();
 
 }
