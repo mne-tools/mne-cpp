@@ -70,6 +70,12 @@
 
 namespace FTBUFFERPLUGIN {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATION
+//=============================================================================================================
+
+class FtBuffProducer;
 
 class FTBUFFER_EXPORT FtBuffer : public SCSHAREDLIB::ISensor
 {
@@ -80,6 +86,8 @@ class FTBUFFER_EXPORT FtBuffer : public SCSHAREDLIB::ISensor
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
     friend class FtBufferSetupWidget;
+    friend class FtBuffProducer;
+
 public:
 
     FtBuffer();
@@ -167,6 +175,14 @@ public:
     */
     bool disconnectFromBuffer();
 
+    //=========================================================================================================
+    /**
+    * runs idleCall() on a loop to continuously request buffer data
+    *
+    * @brief requests buffer data on a loop
+    */
+    void getData();
+
 
 protected:
     virtual void run();
@@ -176,6 +192,7 @@ protected:
 private:
     bool                                            m_bIsRunning;
 
+    QSharedPointer<FtBuffProducer>                  m_pFtBuffProducer;
     QSharedPointer<FtBufferYourWidget>              m_pYourWidget;
     QAction*                                        m_pActionShowYourWidget;
 

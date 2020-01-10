@@ -104,6 +104,12 @@ public:
 
     //=========================================================================================================
     /**
+     * @brief getData - tries to get data from buffer
+     */
+    void getData();
+
+    //=========================================================================================================
+    /**
      * @brief getAddress - returns address the client has stored.
      */
     QString getAddress();
@@ -112,7 +118,7 @@ public:
     /**
      * @brief setAddress - sets the address stored by the client.
      */
-    void setAddress(QString newAddr);
+//    void setAddress(QString newAddr);
 
     //=========================================================================================================
     /**
