@@ -4,7 +4,7 @@
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2020
+* @date     January, 2020
 *
 * @section  LICENSE
 *
@@ -83,6 +83,10 @@ bool FtBuffer::start() {
     qDebug() << "Running start()";
     m_bIsRunning = true;
     QThread::start();
+
+    //m_FtBuffClient
+
+    //while (true) { qDebug() << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; }
 
     return true;
 }
