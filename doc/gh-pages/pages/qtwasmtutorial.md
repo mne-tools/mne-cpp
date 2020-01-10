@@ -16,7 +16,7 @@ nav_order: 6
 
    Qt 5.14: it's complicated (1.38.27)
 
-#### Some utils functions were not able to be linked against (undefined resource errors). It is possible that some mne-cpp functions are not compatible with emscripten 1.38.30. Some newer versions which are not officially tested with Qt Wasm, are able to be compiled succesfully, listed below:
+ * Some utils functions were not able to be linked against (undefined resource errors). It is possible that some mne-cpp functions are not compatible with emscripten 1.38.30. Some newer versions which are not officially tested with Qt Wasm, are able to be compiled succesfully, listed below:
 
    Qt5.13.2 compiled with em++ 1.39.3 with thread support and dispOpenGL flag via cmd line qmake -> Produced a lot of overlaying  window glitches. **Not recommended**
 
