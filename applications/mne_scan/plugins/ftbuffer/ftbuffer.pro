@@ -78,6 +78,7 @@ SOURCES += \
     FormFiles/ftbuffersetupwidget.cpp \
     FormFiles/ftbufferaboutwidget.cpp \
     FormFiles/ftbufferyourwidget.cpp \
+    ftbuffproducer.cpp \
         ftsrc/cpp/FtConnection.cc \
         ftsrc/src/cleanup.c \
         ftsrc/src/clientrequest.c \
@@ -104,7 +105,8 @@ HEADERS += \
     ftbuffer.h \
     FormFiles/ftbuffersetupwidget.h \
     FormFiles/ftbufferaboutwidget.h \
-    FormFiles/ftbufferyourwidget.h
+    FormFiles/ftbufferyourwidget.h \
+    ftbuffproducer.h
 
 FORMS += \
     FormFiles/ftbuffersetup.ui \
