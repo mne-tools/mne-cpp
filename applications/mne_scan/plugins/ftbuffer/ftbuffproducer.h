@@ -65,9 +65,13 @@ class FtBuffProducer : public QThread
     friend class FtBuffer;
 
 public:
-    FtBuffProducer();
+    FtBuffProducer(FtBuffer* pFtBuffer);
 
     ~FtBuffProducer();
+
+protected:
+
+    virtual void run();
 
 private:
 

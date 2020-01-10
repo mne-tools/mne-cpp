@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "ftbuffer.h"
+#include "ftbuffproducer.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -84,8 +85,10 @@ bool FtBuffer::start() {
     m_bIsRunning = true;
     QThread::start();
 
-    //m_FtBuffClient
+    qDebug() << "Running produrer start()";
+    m_pFtBuffProducer->start();
 
+    //m_FtBuffClient
     //while (true) { qDebug() << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; }
 
     return true;
@@ -132,4 +135,17 @@ bool FtBuffer::connectToBuffer(QString addr){
 //*************************************************************************************************************
 bool FtBuffer::disconnectFromBuffer(){
     return this->m_FtBuffClient.stopConnection();
+}
+
+//*************************************************************************************************************
+
+void FtBuffer::getData() {
+    qDebug() << "FtBuffer::getData()";
+    int i = 0;
+    while(m_bIsRunning) {
+
+        qDebug() << "Loop" << i;
+        m_FtBuffClient.getData();
+        i++;
+    }
 }

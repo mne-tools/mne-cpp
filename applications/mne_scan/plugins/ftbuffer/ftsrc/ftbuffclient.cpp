@@ -392,12 +392,22 @@ QString FtBuffClient::getAddress() {
 
 //=========================================================================================================
 
-void FtBuffClient::setAddress(QString newAddr) {
+//void FtBuffClient::setAddress(QString newAddr) {
+    /*
     qDebug() << "pre-printable:" << newAddr;
     qDebug() << "before setting addrField:" << addrField;
     qDebug() << "printable:" << qPrintable(newAddr);
     addrField = qPrintable(newAddr); //converts QString to char*
     qDebug() << "after setting:" << addrField;
+    */
+    // This doesnt work bc addrField is a const and because the string
+    // data turns into garbage once the scope changes.
+    //
+//}
 
+//=========================================================================================================
+
+void FtBuffClient::getData() {
+    //startConnection();
+    idleCall();
 }
-
