@@ -168,7 +168,7 @@ public:
     *
     * @param p_IODevice fiff data file to write
     */
-    bool loadFiffData(QFile *qFile);
+    bool loadFiffData(QIODevice *qFile);
 
     //=========================================================================================================
     /**
