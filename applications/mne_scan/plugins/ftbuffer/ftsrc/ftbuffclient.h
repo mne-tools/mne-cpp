@@ -94,7 +94,7 @@ public:
      * @brief FtBuffClient - Constructor that set address for buffer
      * @param addr [in] (address) - tells the client the address and port of the buffer.
      */
-    FtBuffClient(const char* addr);
+    FtBuffClient(char* addr);
 
     //=========================================================================================================
     /**

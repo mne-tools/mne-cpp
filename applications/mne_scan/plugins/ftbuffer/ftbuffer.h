@@ -207,6 +207,8 @@ private:
     QSharedPointer<FtBufferYourWidget>              m_pYourWidget;
     QAction*                                        m_pActionShowYourWidget;
 
+    char*                                           m_pTempAddress;
+
     FtBuffClient*                                   m_pFtBuffClient;
 
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
