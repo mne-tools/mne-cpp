@@ -64,6 +64,8 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v1
+    - name: Clone mne-cpp test data
+      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
     - name: Install Codecov
       if: matrix.os == 'ubuntu-latest'
       run: |
@@ -105,14 +107,13 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
         jom -j2
-    - name: Run tests and upload results to Codecov (Linux)
+    - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-latest'
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
-        git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
         for test in ./bin/test_*;
         do
           # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
@@ -121,7 +122,7 @@ jobs:
           $test
           find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
           # Hide codecov output since it corrupts the log too much
-          codecov
+          codecov > /dev/null
         done
     - name: Run tests (MacOS)
       if: matrix.os == 'macos-latest'
@@ -129,9 +130,8 @@ jobs:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
         export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$PWD/lib
-        git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
         for test in ./bin/test_*;
-        do            
+        do
           echo ">> Starting $test"
           $test
         done
@@ -139,8 +139,7 @@ jobs:
       if: matrix.os == 'windows-2016'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
-      run: |  
-        git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+      run: |
         cd bin
         Get-ChildItem -Filter test_*.exe | ForEach {Write-Output "" "" Starting $_.Fullname; &$_.Fullname}
 
