@@ -72,7 +72,7 @@ useLowpass(false)
 
 //*************************************************************************************************************
 
-FtBuffClient::FtBuffClient(char* addr) :
+FtBuffClient::FtBuffClient(const char* addr) :
 addrField(addr),
 data(NULL),
 pos(0),
@@ -389,21 +389,6 @@ void FtBuffClient::outputSamples(int size, const float* sdata) {
 QString FtBuffClient::getAddress() {
     return QString(addrField); //converts char* to QString
 }
-
-//=========================================================================================================
-
-//void FtBuffClient::setAddress(QString newAddr) {
-    /*
-    qDebug() << "pre-printable:" << newAddr;
-    qDebug() << "before setting addrField:" << addrField;
-    qDebug() << "printable:" << qPrintable(newAddr);
-    addrField = qPrintable(newAddr); //converts QString to char*
-    qDebug() << "after setting:" << addrField;
-    */
-    // This doesnt work bc addrField is a const and because the string
-    // data turns into garbage once the scope changes.
-    //
-//}
 
 //=========================================================================================================
 

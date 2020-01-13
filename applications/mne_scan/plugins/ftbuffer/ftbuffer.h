@@ -54,14 +54,18 @@
 //=============================================================================================================
 
 #include "ftbuffer_global.h"
+
 #include "FormFiles/ftbufferaboutwidget.h"
 #include "FormFiles/ftbuffersetupwidget.h"
 #include "FormFiles/ftbufferyourwidget.h"
 
+#include <ftsrc/ftbuffclient.h>
+
 #include <scShared/Interfaces/ISensor.h>
 #include <scShared/Interfaces/IAlgorithm.h>
 
-#include <ftsrc/ftbuffclient.h>
+#include <scMeas/realtimemultisamplearray.h>
+//#include <utils/generics/circularmatrixbuffer.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -183,6 +187,8 @@ public:
     */
     void getData();
 
+    //void updateBufferAddress(QString address);
+
 
 protected:
     virtual void run();
@@ -191,12 +197,17 @@ protected:
 
 private:
     bool                                            m_bIsRunning;
+    QThread                                         m_pProducerThread;
+    QMutex                                          m_mutex;
 
     QSharedPointer<FtBuffProducer>                  m_pFtBuffProducer;
     QSharedPointer<FtBufferYourWidget>              m_pYourWidget;
     QAction*                                        m_pActionShowYourWidget;
 
-    FtBuffClient                                    m_FtBuffClient;
+    FtBuffClient*                                   m_pFtBuffClient;
+
+    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSA_BufferOutput;
 
 };
 
