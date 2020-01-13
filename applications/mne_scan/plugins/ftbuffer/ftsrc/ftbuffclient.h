@@ -94,7 +94,7 @@ public:
      * @brief FtBuffClient - Constructor that set address for buffer
      * @param addr [in] (address) - tells the client the address and port of the buffer.
      */
-    FtBuffClient(char* addr);
+    FtBuffClient(const char* addr);
 
     //=========================================================================================================
     /**
@@ -113,12 +113,6 @@ public:
      * @brief getAddress - returns address the client has stored.
      */
     QString getAddress();
-
-    //=========================================================================================================
-    /**
-     * @brief setAddress - sets the address stored by the client.
-     */
-//    void setAddress(QString newAddr);
 
     //=========================================================================================================
     /**

@@ -48,13 +48,18 @@
 
 using namespace SCSHAREDLIB;
 using namespace FTBUFFERPLUGIN;
+using namespace SCMEASLIB;
+//using namespace IOBUFFER;
 
 //*************************************************************************************************************
+
 FtBuffer::FtBuffer() :
 m_bIsRunning(false),
 m_pFtBuffProducer(new FtBuffProducer(this))
 {
     qDebug() << "Constructing FtBuffer Object";
+
+    m_pFtBuffClient = new FtBuffClient();
     m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("FieldTrip Buffer Widget"),this);
     m_pActionShowYourWidget->setShortcut(tr("F12"));
     m_pActionShowYourWidget->setStatusTip(tr("FieldTrip Buffer Widget"));
@@ -63,6 +68,7 @@ m_pFtBuffProducer(new FtBuffProducer(this))
 }
 
 //*************************************************************************************************************
+
 FtBuffer::~FtBuffer() {
     if(this->isRunning()){
         stop();
@@ -76,9 +82,12 @@ QSharedPointer<IPlugin> FtBuffer::clone() const {
 }
 
 //*************************************************************************************************************
+
 void FtBuffer::init() {qDebug() << "Running init()";}
 
-void FtBuffer::unload() {}
+void FtBuffer::unload() {
+    delete m_pFtBuffClient;
+}
 
 bool FtBuffer::start() {
 
@@ -88,8 +97,8 @@ bool FtBuffer::start() {
 
     QThread::start();
 
-    qDebug() << "Running producer start()";
-    m_pFtBuffProducer->start();
+    m_pFtBuffProducer->moveToThread(&m_pProducerThread);
+    m_pProducerThread.start();
 
     //m_FtBuffClient
     //while (true) { qDebug() << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; }
@@ -98,47 +107,63 @@ bool FtBuffer::start() {
 }
 
 //*************************************************************************************************************
+
 bool FtBuffer::stop() {
 
     m_bIsRunning = false;
-    m_pFtBuffProducer->exit();
     return true;
 }
 
 //*************************************************************************************************************
+
 IPlugin::PluginType FtBuffer::getType() const {
     return _ISensor;
 }
 
 //*************************************************************************************************************
+
 QString FtBuffer::getName() const {
     return "FtBuffer";
 }
 
 //*************************************************************************************************************
+
 QWidget* FtBuffer::setupWidget() {
     FtBufferSetupWidget* setupWidget = new FtBufferSetupWidget(this);
     return setupWidget;
 }
 
 //*************************************************************************************************************
-void FtBuffer::run() {}
+
+void FtBuffer::run() {
+    qDebug() << "run()";
+
+    while(m_bIsRunning)
+    {
+        //m_mutex.lock();
+        m_pFtBuffProducer->run();
+        //m_mutex.unlock();
+    }
+}
 
 //*************************************************************************************************************
+
 void FtBuffer::showYourWidget() {
     m_pYourWidget = FtBufferYourWidget::SPtr(new FtBufferYourWidget());
     m_pYourWidget->show();
 }
 
 //*************************************************************************************************************
+
 bool FtBuffer::connectToBuffer(QString addr){
     //this->m_FtBuffClient.setAddress(addr);
-    return this->m_FtBuffClient.startConnection();
+    //updateBufferAddress(addr);
+    return this->m_pFtBuffClient->startConnection();
 }
 
 //*************************************************************************************************************
 bool FtBuffer::disconnectFromBuffer(){
-    return this->m_FtBuffClient.stopConnection();
+    return this->m_pFtBuffClient->stopConnection();
 }
 
 //*************************************************************************************************************
@@ -149,7 +174,12 @@ void FtBuffer::getData() {
     while(m_bIsRunning) {
 
         qDebug() << "Loop" << i;
-        m_FtBuffClient.getData();
+        m_pFtBuffClient->getData();
         i++;
     }
 }
+
+//*************************************************************************************************************
+
+//void FtBuffer::updateBufferAddress(QString address) {}
+
