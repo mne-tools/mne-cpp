@@ -158,6 +158,13 @@ void FtBuffer::showYourWidget() {
 bool FtBuffer::connectToBuffer(QString addr){
     //this->m_FtBuffClient.setAddress(addr);
     //updateBufferAddress(addr);
+
+    m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
+    strcpy(m_pTempAddress, addr.toLocal8Bit().constData());
+
+    delete m_pFtBuffClient;
+
+    m_pFtBuffClient = new FtBuffClient(m_pTempAddress);
     return this->m_pFtBuffClient->startConnection();
 }
 

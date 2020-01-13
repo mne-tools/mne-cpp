@@ -72,7 +72,7 @@ useLowpass(false)
 
 //*************************************************************************************************************
 
-FtBuffClient::FtBuffClient(const char* addr) :
+FtBuffClient::FtBuffClient(char* addr) :
 addrField(addr),
 data(NULL),
 pos(0),
