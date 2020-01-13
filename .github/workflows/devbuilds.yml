@@ -213,7 +213,7 @@ jobs:
         cd doc
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE
-        git clone -b gh-pages https://github.com/mne-tools/mne-cpp gh-pages
+        git clone -b gh-pages https://github.com/mne-cpp/doxygen-api gh-pages
         cd gh-pages
         # Remove all files first
         git rm * -r
