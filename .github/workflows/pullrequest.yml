@@ -121,7 +121,7 @@ jobs:
           $test
           find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
           # Hide codecov output since it corrupts the log too much
-          codecov > /dev/null
+          codecov
         done
     - name: Run tests (MacOS)
       if: matrix.os == 'macos-latest'
