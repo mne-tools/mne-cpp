@@ -182,22 +182,22 @@ nav_order: 6
 
 ## Wasm resources:
 
-[https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly]
+[https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly](https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly)
 
-[https://doc.qt.io/qt-5/wasm.html]
+[https://doc.qt.io/qt-5/wasm.html](https://doc.qt.io/qt-5/wasm.html)
 
-[https://medium.com/@jimmychen009/qt-quick-on-the-browser-30d5349c11ec]
+[https://medium.com/@jimmychen009/qt-quick-on-the-browser-30d5349c11ec](https://medium.com/@jimmychen009/qt-quick-on-the-browser-30d5349c11ec)
 
-[https://dev.to/captainsafia/why-the-heck-is-everyone-talking-about-webassembly-455a]
+[https://dev.to/captainsafia/why-the-heck-is-everyone-talking-about-webassembly-455a](https://dev.to/captainsafia/why-the-heck-is-everyone-talking-about-webassembly-455a)
 
-[https://wiki.qt.io/Qt_for_WebAssembly]
+[https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly)
 
-[https://doc.qt.io/qt-5/qtwebassembly-platform-notes.html]
+[https://doc.qt.io/qt-5/qtwebassembly-platform-notes.html](https://doc.qt.io/qt-5/qtwebassembly-platform-notes.html)
 
-[https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading]
+[https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading)
 
-[https://forum.qt.io/topic/107689/building-qt-apps-to-wasm/18]
+[https://forum.qt.io/topic/107689/building-qt-apps-to-wasm/18](https://forum.qt.io/topic/107689/building-qt-apps-to-wasm/18)
 
-[https://doc-snapshots.qt.io/qtcreator-master/creator-setup-webassembly.html]
+[https://doc-snapshots.qt.io/qtcreator-master/creator-setup-webassembly.html](https://doc-snapshots.qt.io/qtcreator-master/creator-setup-webassembly.html)
 
-[https://github.com/msorvig/qt-webassembly-examples]
+[https://github.com/msorvig/qt-webassembly-examples](https://github.com/msorvig/qt-webassembly-examples)
