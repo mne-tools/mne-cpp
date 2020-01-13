@@ -91,6 +91,7 @@ class FTBUFFER_EXPORT FtBuffer : public SCSHAREDLIB::ISensor
 
     friend class FtBufferSetupWidget;
     friend class FtBuffProducer;
+    friend class FtBuffClient;
 
 public:
 
@@ -188,6 +189,8 @@ public:
     void getData();
 
     //void updateBufferAddress(QString address);
+
+    //void setUpFiffInfo();
 
 
 protected:
