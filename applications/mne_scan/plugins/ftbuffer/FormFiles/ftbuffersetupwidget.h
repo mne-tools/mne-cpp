@@ -119,12 +119,6 @@ private slots:
     */
     void pressedConnect();
 
-    //=========================================================================================================
-    /**
-    * Starts trying to receive data from buffer
-    * @brief start receiving data from buffer
-    */
-    void pressedStart();
 
 signals:
 
