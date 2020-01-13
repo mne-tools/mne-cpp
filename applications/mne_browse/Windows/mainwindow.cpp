@@ -42,6 +42,8 @@
 
 #include "mainwindow.h"
 
+#include <QBuffer>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -471,8 +473,51 @@ void MainWindow::setLogLevel(LogLevel lvl)
 
 //*************************************************************************************************************
 // SLOTS
+#ifdef WASMBUILD
+QByteArray array;
+#endif
+
 void MainWindow::openFile()
 {
+#ifdef WASMBUILD
+    auto fileContentReady = [&](const QString &fileName, const QByteArray &fileContent) {
+        if (!fileName.isEmpty()) {
+            m_qFileRaw.setFileName(fileName);
+
+            //Clear event model
+            m_pEventWindow->getEventModel()->clearModel();
+
+            array = fileContent;
+            QBuffer* buffer = new QBuffer(&array);
+            if(m_pDataWindow->getDataModel()->loadFiffData(buffer))
+                qDebug() << "Fiff data file" << fileName << "loaded.";
+            else
+                qDebug("ERROR loading fiff data file %s",fileName.toUtf8().data());
+
+            //set position of QScrollArea
+            m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
+            m_pDataWindow->initMVCSettings();
+
+            //Set fiffInfo in event model
+            m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_pFiffInfo);
+            m_pEventWindow->getEventModel()->setFirstLastSample(m_pDataWindow->getDataModel()->firstSample(),
+                                                                m_pDataWindow->getDataModel()->lastSample());
+
+            //resize columns to contents - needs to be done because the new data file can be shorter than the old one
+            m_pDataWindow->updateDataTableViews();
+            m_pDataWindow->getDataTableView()->resizeColumnsToContents();
+
+            //Update status bar
+            setWindowStatus();
+
+            //Hide not presented channel types and their spin boxes in the scale window
+            m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
+
+            m_qFileRaw.close();
+        }
+    };
+    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
+#else
     QString filename = QFileDialog::getOpenFileName(this,
                                                     QString("Open fiff data file"),
                                                     QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/"),
@@ -549,6 +594,7 @@ void MainWindow::openFile()
     m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_pFiffInfo);
 
     m_qFileRaw.close();
+#endif
 }
 
 

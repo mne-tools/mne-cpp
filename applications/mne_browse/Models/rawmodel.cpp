@@ -373,7 +373,7 @@ void RawModel::genStdFilterOps()
 
 //*************************************************************************************************************
 
-bool RawModel::loadFiffData(QFile* qFile)
+bool RawModel::loadFiffData(QIODevice* qFile)
 {
     beginResetModel();
     clearModel();
