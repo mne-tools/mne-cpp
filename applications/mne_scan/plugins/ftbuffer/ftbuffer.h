@@ -190,7 +190,9 @@ public:
 
     //void updateBufferAddress(QString address);
 
-    //void setUpFiffInfo();
+    void setUpFiffInfo();
+
+    bool isRunning();
 
 
 protected:
@@ -199,9 +201,11 @@ protected:
     void showYourWidget();
 
 private:
-    bool                                            m_bIsRunning;
-    QThread                                         m_pProducerThread;
-    QMutex                                          m_mutex;
+    bool                                            m_bIsRunning;                   /**< Whether ftbuffer is running. */
+    QThread                                         m_pProducerThread;              /**< Producer object that manages the data */
+    QMutex                                          m_mutex;                        /**< Guards shared data from beng accessed at the same time */
+
+    QSharedPointer<QList<Eigen::MatrixXd>>          m_pListReceivedSamples;         /**< List of samples recived from the buffer */
 
     QSharedPointer<FtBuffProducer>                  m_pFtBuffProducer;
     QSharedPointer<FtBufferYourWidget>              m_pYourWidget;
