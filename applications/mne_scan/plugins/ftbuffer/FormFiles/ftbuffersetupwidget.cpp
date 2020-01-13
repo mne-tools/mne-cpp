@@ -74,7 +74,6 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox, QWidget *parent)
     //Always connect GUI elemts after ui.setpUi has been called
     connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog())); // About page
     connect(ui.m_qPushButton_Connect, SIGNAL(released()), this, SLOT(pressedConnect())); // Connect/Disconnect button
-    connect(ui.m_qPushButton_Start, SIGNAL(released()), this, SLOT(pressedStart())); // Start button
 }
 
 
@@ -112,15 +111,3 @@ void FtBufferSetupWidget::pressedConnect()
 
 //*************************************************************************************************************
 
-void FtBufferSetupWidget::pressedStart()
-{
-    if (ui.m_qPushButton_Connect->text() != "Disconnect")
-        return;
-    if (ui.m_qPushButton_Start->text() != "Stop") {
-        ui.m_qPushButton_Start->setText("Stop");
-        m_pFtBuffer->start();
-    } else {
-        ui.m_qPushButton_Start->setText("Start");
-        m_pFtBuffer->stop();
-    }
-}
