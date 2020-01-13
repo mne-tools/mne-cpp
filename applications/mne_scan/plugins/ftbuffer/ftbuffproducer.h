@@ -58,7 +58,7 @@ namespace FTBUFFERPLUGIN {
 
 class FtBuffer;
 
-class FtBuffProducer : public QThread
+class FtBuffProducer : public QObject
 {
     Q_OBJECT
 
@@ -85,7 +85,6 @@ protected:
 
 private:
 
-    QMutex m_mutex;
 
     FtBuffer* m_pFtBuffer;
 };
