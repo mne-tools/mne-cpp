@@ -97,7 +97,7 @@ void FtBufferSetupWidget::showAboutDialog()
 
 void FtBufferSetupWidget::pressedConnect()
 {
-    if(ui.m_qPushButton_Connect->text() == "Disconnect") {
+    if(ui.m_qPushButton_Connect->text() == "Disconnect" && !m_pFtBuffer->isRunning()) {
         if (m_pFtBuffer->disconnectFromBuffer()) {
             ui.m_qPushButton_Connect->setText("Connect");
         }

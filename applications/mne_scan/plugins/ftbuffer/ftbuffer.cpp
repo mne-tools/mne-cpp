@@ -55,7 +55,9 @@ using namespace SCMEASLIB;
 
 FtBuffer::FtBuffer() :
 m_bIsRunning(false),
-m_pFtBuffProducer(new FtBuffProducer(this))
+m_pFtBuffProducer(new FtBuffProducer(this)),
+m_pFiffInfo(QSharedPointer<FiffInfo>::create()),
+m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
 {
     qDebug() << "Constructing FtBuffer Object";
 
@@ -87,6 +89,7 @@ void FtBuffer::init() {qDebug() << "Running init()";}
 
 void FtBuffer::unload() {
     delete m_pFtBuffClient;
+    delete m_pTempAddress;
 }
 
 bool FtBuffer::start() {
@@ -94,6 +97,20 @@ bool FtBuffer::start() {
     qDebug() << "Running start()";
 
     m_bIsRunning = true;
+
+    /////////////////////////HERE BE BUG//////////////////////////////////
+
+    //Setup fiff info before setting up the RMTSA because we need it to init the RTMSA
+    qDebug() << "Running setUpFiffInfo()";
+    setUpFiffInfo();
+
+    //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
+    qDebug() << "Running initFromFiffInfo";
+    m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
+    qDebug() << "Running setMultiArraySize";
+    m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
+
+    //////////////////////////////////////////////////////////////////////
 
     QThread::start();
 
@@ -111,6 +128,12 @@ bool FtBuffer::start() {
 bool FtBuffer::stop() {
 
     m_bIsRunning = false;
+
+    m_pRTMSA_BufferOutput->data()->clear();
+
+    m_pProducerThread.quit();
+    m_pProducerThread.wait();
+
     return true;
 }
 
@@ -192,7 +215,7 @@ void FtBuffer::getData() {
 
 //*************************************************************************************************************
 
-/*
+
 void FtBuffer::setUpFiffInfo()
 {
     //
@@ -203,10 +226,11 @@ void FtBuffer::setUpFiffInfo()
     //
     //Set number of channels, sampling frequency and high/-lowpass
     //
-    m_pFiffInfo->nchan = m_iNumberChannels;
-    m_pFiffInfo->sfreq = m_iSamplingFreq;
+    //CURRENTLY HARDWIRED TO FTBUFFER EXAMPLE DATA PARAMS FROM SINE2FT
+    m_pFiffInfo->nchan = 15;
+    m_pFiffInfo->sfreq = 256;
     m_pFiffInfo->highpass = 0.001f;
-    m_pFiffInfo->lowpass = m_iSamplingFreq/2;
+    m_pFiffInfo->lowpass = 256/2;
 
     //
     //Set up the channel info
@@ -301,4 +325,9 @@ void FtBuffer::setUpFiffInfo()
     m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
     m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
 }
-*/
+
+//*************************************************************************************************************
+
+bool FtBuffer::isRunning() {
+    return m_bIsRunning;
+}
