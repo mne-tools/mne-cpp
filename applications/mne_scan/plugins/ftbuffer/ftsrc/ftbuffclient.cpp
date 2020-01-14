@@ -66,9 +66,11 @@ numChannels(0),
 numSamples(0),
 useHighpass(false),
 useLowpass(false),
-m_bnewData(false)
+m_bnewData(false),
+m_iMatDataSampleIterator(1)
 {
     addrField = "localhost:1972";
+
 }
 
 //*************************************************************************************************************
@@ -81,7 +83,8 @@ numChannels(0),
 numSamples(0),
 useHighpass(false),
 useLowpass(false),
-m_bnewData(false)
+m_bnewData(false),
+m_iMatDataSampleIterator(1)
 {
 }
 
@@ -180,6 +183,8 @@ bool FtBuffClient::readHeader() {
     hpFilter->setButterHP(HPFREQ/header_def.fsample);
     lpFilter = new MultiChannelFilter<float,float>(numChannels, LPFILTORD);
     lpFilter->setButterLP(LPFREQ/header_def.fsample);
+
+    m_matData.resize(numChannels, 32);
     return true;
 }
 
@@ -366,6 +371,24 @@ void FtBuffClient::idleCall() {
                 matData(i,j) = fdata[count];
             count++;
         }
+    }
+
+    if(m_iMatDataSampleIterator+matData.cols() <= m_matData.cols()) {
+        m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), matData.cols()) = matData.cast<double>();
+
+        m_iMatDataSampleIterator += matData.cols();
+    } else {
+        m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), m_matData.cols()-m_iMatDataSampleIterator) = matData.block(0, 0, matData.rows(), m_matData.cols()-m_iMatDataSampleIterator).cast<double>();
+
+        m_iMatDataSampleIterator = 0;
+    }
+
+    //qDebug() << "m_iMatDataSampleIterator" << m_iMatDataSampleIterator;
+
+    if(m_iMatDataSampleIterator == m_matData.cols()) {
+        m_iMatDataSampleIterator = 0;
+        //qDebug()<<"Emit data";
+        matEmit = m_matData.cast<double>();
     }
 
     qDebug() << "@@@@ 4 @@@@";
