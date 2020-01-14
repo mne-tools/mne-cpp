@@ -198,6 +198,7 @@ private:
 * @param [out] QStringList with all possible filenames compatible with the search pattern.
 * It outputs a QStringList with all the possible files in the folder matching the search pattern.
 */
+
 inline static QStringList listFilesMatchingPatternName(const QString &fileName)
 {
     QStringList listOfFilteredFiles;

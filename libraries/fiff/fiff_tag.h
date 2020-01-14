@@ -286,15 +286,7 @@ public:
     *
     * @return type cast of the tag data pointer
     */
-<<<<<<< HEAD
-<<<<<<< HEAD
     inline qint32* toJulian() const;
-=======
-    inline qint64* toJulian() const;
->>>>>>> Add support for julian data type which is 64bit int.
-=======
-    inline qint32* toJulian() const;
->>>>>>> Change Julian back to 32 bit. Checked with mne-c
 
     //=========================================================================================================
     /**
@@ -630,30 +622,14 @@ inline qint32* FiffTag::toInt() const
 
 //*************************************************************************************************************
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 inline qint32* FiffTag::toJulian() const
-=======
-inline qint64* FiffTag::toJulian() const
->>>>>>> Add support for julian data type which is 64bit int.
-=======
-inline qint32* FiffTag::toJulian() const
->>>>>>> Change Julian back to 32 bit. Checked with mne-c
 {
     if(this->isMatrix() || this->getType() != FIFFT_JULIAN) {
         printf("Expected a julian tag : %d (found data type %d instead)\n",this->kind,this->getType());
         return NULL;
     }
     else
-<<<<<<< HEAD
-<<<<<<< HEAD
         return (qint32*)this->data();
-=======
-        return (qint64*)this->data();
->>>>>>> Add support for julian data type which is 64bit int.
-=======
-        return (qint32*)this->data();
->>>>>>> Change Julian back to 32 bit. Checked with mne-c
 }
 
 
