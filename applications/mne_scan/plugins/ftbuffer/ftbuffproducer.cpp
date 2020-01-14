@@ -1,6 +1,7 @@
 /**
 * @file     ftbuffproducer.cpp
 * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -64,6 +65,11 @@ FtBuffProducer::~FtBuffProducer()
 
 void FtBuffProducer::run()
 {
-    qDebug() << "FtBuffProducer::run()";
-    m_pFtBuffer->getData();
+    long i = 0;
+    while (m_pFtBuffer->isRunning()) {
+
+        qDebug() << "FtBuffProducer::run" << i;
+        i++;
+        QThread::usleep(1000);
+    }
 }
