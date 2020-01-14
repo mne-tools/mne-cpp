@@ -66,7 +66,7 @@ numChannels(0),
 numSamples(0),
 useHighpass(false),
 useLowpass(false),
-newData(false)
+m_bnewData(false)
 {
     addrField = "localhost:1972";
 }
@@ -81,7 +81,7 @@ numChannels(0),
 numSamples(0),
 useHighpass(false),
 useLowpass(false),
-newData(false)
+m_bnewData(false)
 {
 }
 
@@ -350,29 +350,37 @@ void FtBuffClient::idleCall() {
         lpFilter->process(ddef.nsamples, fdata, fdata); // in place
     }
 
+    qDebug() << "@@@@ 1 @@@@";
+
     Eigen::MatrixXf matData;
 
-    matData.resize(ddef.nchans, ddef.nsamples);
+    qDebug() << "@@@@ 2 @@@@";
+
+    matData.resize(numChannels, numSamples);
+
+    qDebug() << "@@@@ 3 @@@@";
 
     int count = 0;
-    for (int i = 0; i < ddef.nsamples; i++) {
-        for (int j = 0; j < ddef.nchans; j++) {
-                matData(i,j) = 1.0f;
+    for (int i = 0; i < int (numSamples); i++) {
+        for (int j = 0; j < int (numChannels); j++) {
+                matData(i,j) = fdata[count];
             count++;
         }
     }
 
-    outputSamples(ddef.nsamples, fdata);
+    qDebug() << "@@@@ 4 @@@@";
+    //outputSamples(ddef.nsamples, fdata);
     //qDebug() << fdata[0];
 
     //qDebug() << "idleCall - numSamples updated";
     numSamples = newSamples;
     //qDebug() << "rawStore is of size" << rawStore.size();
     //qDebug() << "floatStore is of size" << floatStore.size();
+    qDebug() << "@@@@ 5 @@@@";
+    matEmit = matData.cast<double>();
 
-    Eigen::MatrixXd matEmit = matData.cast<double>();
-
-    //emit newDataAvailable(matEmit);
+    qDebug() << "@@@@ 6 @@@@";
+    m_bnewData = true;
 
 }
 
@@ -413,4 +421,16 @@ QString FtBuffClient::getAddress() {
 void FtBuffClient::getData() {
     //startConnection();
     idleCall();
+}
+
+void FtBuffClient::reset(){
+    m_bnewData = false;
+}
+
+bool FtBuffClient::newData() {
+    return m_bnewData;
+}
+
+Eigen::MatrixXd FtBuffClient::dataMat() {
+    return matEmit;
 }

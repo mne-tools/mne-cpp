@@ -70,6 +70,9 @@ void FtBuffProducer::run()
 
         qDebug() << "FtBuffProducer::run" << i;
         i++;
-        QThread::usleep(1000);
+        emit newDataAvailable(m_pFtBuffer->getData());
+        qDebug() << "Pushing data";
+        m_pFtBuffer->pushData();
+        QThread::usleep(500);
     }
 }

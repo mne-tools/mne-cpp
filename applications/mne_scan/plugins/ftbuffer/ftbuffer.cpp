@@ -121,7 +121,7 @@ bool FtBuffer::start() {
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
     m_pProducerThread.start();
 
-    //connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
+    connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
 
     //m_FtBuffClient
     //while (true) { qDebug() << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; }
@@ -169,16 +169,11 @@ void FtBuffer::run() {
 
     while(m_bIsRunning) {
 
+        qDebug() << "This.";
         m_pFtBuffProducer->run();
+        qDebug() << "That.";
 
-        /*
-        m_mutex.lock();
-        if(!m_pListReceivedSamples->isEmpty()) {
-            MatrixXd matData = m_pListReceivedSamples->takeFirst();
-            m_pRTMSA_BufferOutput->data()->setValue(matData);
-        };
-        m_mutex.unlock();
-        */
+
     }
 }
 
@@ -220,9 +215,25 @@ Eigen::MatrixXd FtBuffer::getData() {
 
         qDebug() << "Loop" << i;
         m_pFtBuffClient->getData();
+
+        if (m_pFtBuffClient->newData()) {
+            m_pFtBuffClient->reset();
+            qDebug() << "Returning mat";
+            return m_pFtBuffClient->dataMat();
+        }
+
         i++;
     }
 
+}
+
+void FtBuffer::pushData(){
+    m_mutex.lock();
+    if(!m_pListReceivedSamples->isEmpty()) {
+        MatrixXd matData = m_pListReceivedSamples->takeFirst();
+        m_pRTMSA_BufferOutput->data()->setValue(matData);
+    };
+    m_mutex.unlock();
 }
 
 //*************************************************************************************************************
@@ -243,7 +254,7 @@ void FtBuffer::setUpFiffInfo()
     //Set number of channels, sampling frequency and high/-lowpass
     //
     //CURRENTLY HARDWIRED TO FTBUFFER EXAMPLE DATA PARAMS FROM SINE2FT
-    m_pFiffInfo->nchan = 15;
+    m_pFiffInfo->nchan = 16;
     m_pFiffInfo->sfreq = 256;
     m_pFiffInfo->highpass = 0.001f;
     m_pFiffInfo->lowpass = 256/2;
@@ -349,6 +360,7 @@ bool FtBuffer::isRunning() {
 }
 
 void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
+    qDebug() << "Appending matrix";
     m_mutex.lock();
     if(m_bIsRunning) {
         //qDebug()<<"Natus::onNewDataAvailable - appending data";

@@ -132,6 +132,11 @@ public:
      */
     bool startConnection();
 
+    void reset();
+
+    bool newData();
+
+    Eigen::MatrixXd dataMat();
 
 //protected:
 //signals:
@@ -199,7 +204,8 @@ private:
     int                 height;
     int                 skipped;
 
-    bool                newData;
+    bool                m_bnewData;
+    Eigen::MatrixXd     matEmit;
 
 
 

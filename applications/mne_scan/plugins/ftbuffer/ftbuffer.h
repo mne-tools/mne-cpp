@@ -195,6 +195,7 @@ public:
 
     bool isRunning();
 
+    void pushData();
 
 
 protected:
