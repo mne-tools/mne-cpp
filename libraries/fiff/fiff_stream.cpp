@@ -3240,18 +3240,18 @@ bool FiffStream::check_beginning(FiffTag::SPtr &p_pTag)
 
     if (p_pTag->kind != FIFF_FILE_ID)
     {
-        printf("Fiff::open: file does not start with a file id tag");//consider throw
+        printf("Fiff::open: file does not start with a file id tag\n");//consider throw
         return false;
     }
 
     if (p_pTag->type != FIFFT_ID_STRUCT)
     {
-        printf("Fiff::open: file does not start with a file id tag");//consider throw
+        printf("Fiff::open: file does not start with a file id tag\n");//consider throw
         return false;
     }
     if (p_pTag->size() != 20)
     {
-        printf("Fiff::open: file does not start with a file id tag");//consider throw
+        printf("Fiff::open: file does not start with a file id tag\n");//consider throw
         return false;
     }
     //do not rewind since the data is contained in the returned tag; -> done for TCP IP reasosn, no rewind possible there
