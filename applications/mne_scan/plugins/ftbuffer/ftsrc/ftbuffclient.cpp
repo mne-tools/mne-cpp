@@ -65,7 +65,8 @@ pos(0),
 numChannels(0),
 numSamples(0),
 useHighpass(false),
-useLowpass(false)
+useLowpass(false),
+newData(false)
 {
     addrField = "localhost:1972";
 }
@@ -79,7 +80,8 @@ pos(0),
 numChannels(0),
 numSamples(0),
 useHighpass(false),
-useLowpass(false)
+useLowpass(false),
+newData(false)
 {
 }
 
@@ -348,6 +350,18 @@ void FtBuffClient::idleCall() {
         lpFilter->process(ddef.nsamples, fdata, fdata); // in place
     }
 
+    Eigen::MatrixXf matData;
+
+    matData.resize(ddef.nchans, ddef.nsamples);
+
+    int count = 0;
+    for (int i = 0; i < ddef.nsamples; i++) {
+        for (int j = 0; j < ddef.nchans; j++) {
+                matData(i,j) = 1.0f;
+            count++;
+        }
+    }
+
     outputSamples(ddef.nsamples, fdata);
     //qDebug() << fdata[0];
 
@@ -355,6 +369,10 @@ void FtBuffClient::idleCall() {
     numSamples = newSamples;
     //qDebug() << "rawStore is of size" << rawStore.size();
     //qDebug() << "floatStore is of size" << floatStore.size();
+
+    Eigen::MatrixXd matEmit = matData.cast<double>();
+
+    //emit newDataAvailable(matEmit);
 
 }
 
