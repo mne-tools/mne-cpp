@@ -108,11 +108,11 @@ void SettingsController::initParser()
     m_parser.addHelpOption();
     m_parser.addVersionOption();
 
-    QCommandLineOption inFileOpt(QStringList() << "i" << "in",QCoreApplication::translate("main","File to anonymize. Wildcards (like '*' or '?') are allowed and several --in <infile> statements can be present. -i can be used as well"),
+    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Wildcards (like '*' or '?') are allowed and several --in <infile> statements can be present."),
                                  QCoreApplication::translate("main","infile"));
     m_parser.addOption(inFileOpt);
 
-    QCommandLineOption outFileOpt(QStringList() << "o" << "out",QCoreApplication::translate("main","Output file <outfile>. Only allowed when anonymizing one single file. -o or --out"),
+    QCommandLineOption outFileOpt("out",QCoreApplication::translate("main","Output file <outfile>. Only allowed when anonymizing one single file."),
                                   QCoreApplication::translate("main","outfile"));
     m_parser.addOption(outFileOpt);
 
@@ -326,7 +326,7 @@ void SettingsController::generateAnonymizerInstances()
     }
 
     if(m_bMultipleInFiles) {
-        for(int i=0; i<= m_SLInFiles.size(); ++i) {
+        for(int i=0; i< m_SLInFiles.size(); ++i) {
             QSharedPointer<FiffAnonymizer> pAppAux(new FiffAnonymizer(m_anonymizer));
             pAppAux->setFileIn(m_SLInFiles.at(i));
             pAppAux->setFileOut(m_SLOutFiles.at(i));
@@ -375,4 +375,3 @@ void SettingsController::printHeaderIfVerbose()
         qDebug() << "Version: " + m_sAppVer;
     }
 }
-

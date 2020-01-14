@@ -109,7 +109,10 @@ public:
     //=========================================================================================================
     /**
     * Copy constructor for FiffAnonymizer object.
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @param [in] A FiffAnonyzer object.
     */
     FiffAnonymizer(const FiffAnonymizer& obj);
@@ -117,7 +120,10 @@ public:
     //=========================================================================================================
     /**
     * Move contructor
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @param [in] a FiffAnonymizer object.
     */
     FiffAnonymizer(FiffAnonymizer &&obj);
@@ -125,7 +131,10 @@ public:
     //=========================================================================================================
     /**
     * Calls the anonymizer routine.
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @details This method is the main method in the class. It goes through the input file and tag by tag
     *   analyses if there might be some relevant information to anonymize and eventually does so.
     *   Finally the method would test if the input file should be deleted or renamed according to the
@@ -137,7 +146,10 @@ public:
     // PUBLIC INTERFACE
     /**
     * Specifies the input file to anonymize. This file will help to set a input Fiffstream object.
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @param [in] String containing the input file name including its path.
     */
     void setFileIn(const QString &sFilePathIn);
@@ -145,7 +157,10 @@ public:
     //=========================================================================================================
     /**
     * Specifies the output file to anonymize. This file will help to set a output Fiffstream object.
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @param [in] String containing the output file name including its path.
     */
     void setFileOut(const QString &sFilePathOut);
@@ -155,7 +170,10 @@ public:
     * Sets the state of the FiffAnonymizer object's desired verbose mode. If set to TRUE, different messages will be
     * printed on screen during the anonymizing process. If set to false only a single line confirmation message will be
     * printed on each execution.
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @param [in] Bool argument. [Default=FALSE]
     */
     void setVerboseMode(bool v);
@@ -178,7 +196,10 @@ public:
     * Sets the state of the FiffAnonymizer object's desired anonymization mode. If set to TRUE, apart from the default information
     * additional information will also be anonymized, like Subject's weight, height, or different project information.
     * printed on screen during the anonymizing process. [Default=FALSE].
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @param [in] Bool argument.
     */
     void setBruteMode(bool b);
@@ -193,7 +214,10 @@ public:
     //=========================================================================================================
     /**
     * If found in the fiff file, the specified number of days will be subtracted from the measurement date information contained in each fif file.
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @param [in] Integer with the number of dates to subtract from the measurement date.
     */
     void setMeasurementDayOffset(int d);
@@ -201,7 +225,10 @@ public:
     //=========================================================================================================
     /**
     * If found in the fiff file, subject's birthday information will be overwritten in the file in order to match the date specified with this function.
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @param [in] String containing the desired measurement date.
     */
     void setSubjectBirthday(QString d);
@@ -209,7 +236,10 @@ public:
     //=========================================================================================================
     /**
     * If found in the fiff file, the specified number of days will be subtracted from the subject's birthday date information contained in each fif file.
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @param [in] Integer with the number of dates to subtract from the subject's birthday date.
     */
     void setSubjectBirthdayOffset(int d);
@@ -219,7 +249,10 @@ public:
     * Sets fiffanonymizer to delete the input file after anonymization finishes. This is intended to avoid duplication of disk space usage.
     * If set to true, by its own, a confirmation message will be prompted to the user. Used with the --delete_input_file_after option.
     * It can be used with the option "avoid_delete_confirmation" so that no confirmation is prompt to the user.
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @param [in] Bool argument. [Default=FALSE]
     */
     void setDeleteInputFileAfter(bool d);
@@ -229,7 +262,10 @@ public:
     * Method to avoid the need to prompt the user for confirmation of deletion of the input file after anonymization has finished.
     * As the deletion flag has to manually be set to true and this confirmation flag has to manually be set to false, the chances of
     * a user disadvertently deleted a relevant input file are (hopefully) minimized.
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @param [in] Bool argument. [Default=TRUE]
     */
     void setDeleteInputFileAfterConfirmation(bool dc);
@@ -238,7 +274,10 @@ public:
     /**
     * Specifies a flag so that the user can specifiy the value of the subject's id tag. If found in the fiff file, the value
     * will be changed to match the one specified with this method.
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @param [in] Integer with the subject's id.
     */
     void setSubjectHisId(QString id);
@@ -249,7 +288,10 @@ public:
     //=========================================================================================================
     /**
     * Returns the default string value to be used as substitution of other strings in the fiff file.
+<<<<<<< HEAD
+=======
     *
+>>>>>>> 8647a980e7c06313239affb5afb7dfbdcf6ed717
     * @returns [out] value of m_sDefaultString
     */
     QString getDefaultString();
@@ -380,6 +422,7 @@ public:
     */
     QString getDefaultProjectComment();
 
+    //=========================================================================================================
     /**
     * Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.
     */

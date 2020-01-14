@@ -234,6 +234,7 @@ QDateTime FiffAnonymizer::getMeasurementDate()
     return m_dateMeasurmentDate;
 }
 
+
 //*************************************************************************************************************
 
 bool FiffAnonymizer::getUseMeasurementDayOffset()
@@ -353,6 +354,7 @@ int FiffAnonymizer::getDefaultProjectId()
 {
     return m_iProjectId;
 }
+
 
 //*************************************************************************************************************
 
@@ -1210,4 +1212,3 @@ void FiffAnonymizer::setSubjectHisId(QString id)
 {
     m_sSubjectHisId = id;
 }
-
