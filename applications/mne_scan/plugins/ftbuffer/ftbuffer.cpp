@@ -254,7 +254,7 @@ void FtBuffer::setUpFiffInfo()
     //Set number of channels, sampling frequency and high/-lowpass
     //
     //CURRENTLY HARDWIRED TO FTBUFFER EXAMPLE DATA PARAMS FROM SINE2FT
-    m_pFiffInfo->nchan = 16;
+    m_pFiffInfo->nchan = 1;
     m_pFiffInfo->sfreq = 256;
     m_pFiffInfo->highpass = 0.001f;
     m_pFiffInfo->lowpass = 256/2;
