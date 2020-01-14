@@ -1,7 +1,7 @@
 ---
 title: Projects
-parent: Community
-nav_order: 4
+parent: ../../Home
+nav_order: 2
 ---
 
 # Projects

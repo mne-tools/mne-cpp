@@ -1,7 +1,7 @@
 ---
 title: Overview
-has_children: false
-nav_order: 4
+parent: ../../Home
+nav_order: 1
 ---
 # Overview
 
@@ -18,7 +18,7 @@ Currently we are focusing on four key applications for online and offline proces
 
 ----------------
 
-![MNEScan](../images/icon_mne_scan_256x256.png)
+![MNEScan](../../images/icon_mne_scan_256x256.png)
 
 ## MNE Scan
 
@@ -26,7 +26,7 @@ MNE Scan (former MNE-X) is an open-source and cross platform application built w
 
 ----------------
 
-![MNEBrowse](../images/icon_browse_raw_256x256.png)
+![MNEBrowse](../../images/icon_browse_raw_256x256.png)
 
 ## MNE Browse
 
@@ -34,7 +34,7 @@ MNE Browse is a MEG/EEG data browser for pre-processing and visualization. Some 
 
 ----------------
 
-![MNEAnalyze](../images/icon_mne-analyze_256x256.png)
+![MNEAnalyze](../../images/icon_mne-analyze_256x256.png)
 
 ## MNE Analyze
 
@@ -42,7 +42,7 @@ MNE Analyze is currently undergoing development. When finished it will provide e
 
 ----------------
 
-![MNELib](../images/icon_mne-lib_256x256.png)
+![MNELib](../../images/icon_mne-lib_256x256.png)
 
 ## MNE Lib
 

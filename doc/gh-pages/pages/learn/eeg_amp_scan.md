@@ -15,17 +15,17 @@ EEGoSports, TMSI Refa, gUSBAmp, Natus and BrainAmp
 
 Every acquisition plugin provides the possibility of saving the acquired data stream to a FIFF file. For that purpose two icons can be seen in the status bar of an acquisition plugin:
 
-By clicking the database button, ![](../images/eeg_amp_scan1.png), all storage information of the FIFF file can be set. In addition, an electrode layout file (.elc) can be deposited to the stream. The settings are saved at once and the window can be closed.
+By clicking the database button, ![](../../images/eeg_amp_scan1.png), all storage information of the FIFF file can be set. In addition, an electrode layout file (.elc) can be deposited to the stream. The settings are saved at once and the window can be closed.
 
 
-![](../images/eeg_amp_scan2.jpg "GUI of the FIFF file storage settings")
+![](../../images/eeg_amp_scan2.jpg "GUI of the FIFF file storage settings")
 
-After the acquisition has been started, the record icon, ![](../images/eeg_amp_scan3.png), can be clicked which will initialize the recording. After that it will blink continuously in order to signalize its record status. By clicking on it again, the recording will stop and the FIFF file is saved to the desired location with all its settings.
+After the acquisition has been started, the record icon, ![](../../images/eeg_amp_scan3.png), can be clicked which will initialize the recording. After that it will blink continuously in order to signalize its record status. By clicking on it again, the recording will stop and the FIFF file is saved to the desired location with all its settings.
 
 ## Structure of an acquisition plugin
 
 The acquisition plugins of MNE Scan have similiar structure and therefore can be explained on the basis of the gUSBamp EEG driver example. The following flow sheet describes the structure of this acquisition plugin.
-![](../images/eeg_amp_scan4.png "Flow sheet of the gUSBamp acquisition plugin")
+![](../../images/eeg_amp_scan4.png "Flow sheet of the gUSBamp acquisition plugin")
 
 On the left side the border of MNE Scan can be seen, whereas on the right side the border to the actual device, in this case the gUSBamp amplifier, is depicted. In between, according to their hierarchical order, the three classes are shown as the interface between program and device:
 

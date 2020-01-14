@@ -19,7 +19,7 @@ The following steps will show you how to setup the online processing pipeline in
  * Algorithm Plugins - MNE
 5. Select the Connection tool in the plugin window. Connect the plugins as follows by left clicking on the start, holding and releasing above the target plugin.
 
-![](../images/source_loc_example1.PNG)
+![](../../images/source_loc_example1.PNG)
 
 6. Click on the MNE plugin and wait until the Start Clustering button is clickable again.
 7. Click on the Fiff Simulator plugin.
@@ -32,7 +32,7 @@ Now that you setup and are running the data acquisition/processing pipeline, we 
  * Choose the correct trigger channel. Since we are making use of the MNE-Sample-Data-Set choose STI014.
  * Once the averages are starting to come in you can take a look at the averaged data in form of a butterfly and 2D layout plot.
 
-![](../images/source_loc_example2.PNG)
+![](../../images/source_loc_example2.PNG)
 
 2. Click on the MNE plugin.
  * Select the 3D Control from the toolbar.
@@ -41,4 +41,4 @@ Now that you setup and are running the data acquisition/processing pipeline, we 
  * You should be prompted with the histogram based thresholding window. Use the right, middle and left mouse button to set the thresholds.
  *  The 3D view can be rotated using the middle and translated using the right mouse button.
 
-![](../images/source_loc_example3.PNG)
+![](../../images/source_loc_example3.PNG)
