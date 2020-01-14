@@ -145,11 +145,6 @@ public:
      */
     inline static qint32 storageSize();
 
-<<<<<<< HEAD
-    friend bool operator== (const FiffId &f1, const FiffId &f2);
-    
-=======
->>>>>>> add toMachidString member method to FiffId class
     //=========================================================================================================
     /**
     * Print mac address in a fashionable manner.
