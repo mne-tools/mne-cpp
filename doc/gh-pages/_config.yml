@@ -2,8 +2,6 @@ remote_theme: pmarsceill/just-the-docs
 aux_links:
   "MNE-CPP on GitHub":
     - "https://github.com/mne-tools/mne-cpp"
-  "API Documentation":
-    - "https://mne-cpp.github.io/doxygen-api/index.html"
 title: "MNE-CPP"
 logo: "images/index.svg"
 exclude:
