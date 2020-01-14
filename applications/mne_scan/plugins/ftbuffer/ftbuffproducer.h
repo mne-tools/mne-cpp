@@ -1,6 +1,7 @@
 /**
 * @file     ftbuffproducer.h
 * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -46,6 +47,13 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE
 //=============================================================================================================
 
@@ -58,6 +66,13 @@ namespace FTBUFFERPLUGIN {
 
 class FtBuffer;
 
+//=============================================================================================================
+
+/**
+* FtBuffProducer Class
+*
+* @brief FtBuffProucer deals with data aquisition in a separate thread from the main FtBuffer plugin.
+*/
 class FtBuffProducer : public QObject
 {
     Q_OBJECT
@@ -83,10 +98,16 @@ protected:
     */
     virtual void run();
 
+signals:
+
+    void newDataAvailable(const Eigen::MatrixXd &matData);
+
+
 private:
 
+    Eigen::MatrixXd                 m_matData;
 
-    FtBuffer* m_pFtBuffer;
+    FtBuffer*                       m_pFtBuffer;
 };
 
 } // namespace
