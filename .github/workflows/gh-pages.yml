@@ -3,7 +3,7 @@ name: Update GitHub Pages
 on:
   push:
     branches:
-    - master
+    - website
 
 jobs:
   gh-pages:
@@ -18,16 +18,16 @@ jobs:
         credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Clone doc/gh-pages into gh-pages branch
       run: |
-        git config --global user.email gbmotta@mgh.harvard.edu.com
-        git config --global user.name gabrielbmotta
+        git config --global user.email lorenzesch@hotmail.com
+        git config --global user.name LorenzE
         echo "Cloning gh-pages branch"
-        git clone -b gh-pages --single-branch https://github.com/mne-tools/mne-cpp.git
+        git clone -b gh-pages --single-branch https://github.com/LorenzE/mne-cpp.git
         echo "gh-pages cloned"
         cd mne-cpp
         # Remove all files first
         echo "Deleting all files"
         git rm * -r
-        git commit --amend -a -m 'Update docu'
+        git commit --amend -a -m 'Update docu' --allow-empty
         echo "Old files removed."
         cd ..
         echo "Copying files..."
