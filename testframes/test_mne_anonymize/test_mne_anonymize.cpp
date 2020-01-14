@@ -79,17 +79,17 @@ private slots:
     //test app behaviour
     void initTestCase();
     void testDefaultOutput();
-    void testDefaultWildcard();
-    void testDeleteInputFile();
-    void testInOutSameName();
-    void testInOutSameNameAndDeleteInFile();
+//    void testDefaultWildcard();
+//    void testDeleteInputFile();
+//    void testInOutSameName();
+//    void testInOutSameNameAndDeleteInFile();
 
-    //test anonymization
-    void testDefaultAnonymizationOfTags();
+//    //test anonymization
+//    void testDefaultAnonymizationOfTags();
 
-    void compareBirthdayOffsetOption();
-    void compareMeasureDateOffsetOption();
-    void cleanupTestCase();
+//    void compareBirthdayOffsetOption();
+//    void compareMeasureDateOffsetOption();
+//    void cleanupTestCase();
 
 private:
     double epsilon;
@@ -122,8 +122,8 @@ void TestMneAnonymize::initTestCase()
 void TestMneAnonymize::testDefaultOutput()
 {
     // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
+    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
 
     qInfo() << "TestMneAnonymize::testDefaultOutput - sFileIn" << sFileIn;
 
@@ -145,480 +145,476 @@ void TestMneAnonymize::testDefaultOutput()
 }
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-void TestMneAnonymize::testDefaultWildcard()
-{
-    // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/*.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
+//void TestMneAnonymize::testDefaultWildcard()
+//{
+//    // Init testing arguments
+//    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/*.fif");
+//    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
 
-    qInfo() << "TestMneAnonymize::testDefaultWildcard - sFileIn" << sFileIn;
+//    qInfo() << "TestMneAnonymize::testDefaultWildcard - sFileIn" << sFileIn;
 
-    QStringList arguments;
-    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
-    arguments << "--in" << sFileIn;
+//    QStringList arguments;
+//    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
+//    arguments << "--in" << sFileIn;
 
-    qInfo() << "TestMneAnonymize::testDefaultWildcard - arguments" << arguments;
+//    qInfo() << "TestMneAnonymize::testDefaultWildcard - arguments" << arguments;
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
+//    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
 
-    QStringList listOfFiles = MNEANONYMIZE::listFilesMatchingPatternName(sFileIn);
+//    QStringList listOfFiles = MNEANONYMIZE::listFilesMatchingPatternName(sFileIn);
 
-    for(QString fin: listOfFiles) {
-        QString fout(fin.replace(fin.size()-4,4,"_anonymized.fif"));
-        QVERIFY(QFile::exists(fout));
-        //for each file verify tags.
-        QFile::remove(fout);
-    }
-}
-
-
-
-//*************************************************************************************************************
-
-void TestMneAnonymize::testDeleteInputFile()
-{
-    // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QString sFileInTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing.fif");
-    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing_filename_output.fif");
-
-    qInfo() << "TestMneAnonymize::testDeleteInputFile - sFileIn" << sFileIn;
-
-    QFile::copy(sFileIn,sFileInTest);
-    QVERIFY(QFile::exists(sFileInTest));
-
-    QStringList arguments;
-    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
-    arguments << "--in" << sFileInTest;
-    arguments << "--out" << sFileOutTest;
-    arguments << "delete_input_file_after";
-    arguments << "avoid_delete_confirmation";
-
-    qInfo() << "TestMneAnonymize::testDeleteInputFile - arguments" << arguments;
-
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
-
-    QVERIFY(!QFile::exists(sFileInTest )); //delete input file, remember?
-    QVERIFY( QFile::exists(sFileOutTest));
-
-    verifyCRC(sFileOutTest,17542);
-}
+//    for(QString fin: listOfFiles) {
+//        QString fout(fin.replace(fin.size()-4,4,"_anonymized.fif"));
+//        QVERIFY(QFile::exists(fout));
+//        //for each file verify tags.
+//        QFile::remove(fout);
+//    }
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-void TestMneAnonymize::testInOutSameName()
-{
-    // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QString sFileInTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing.fif");
-    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing.fif");
+//void TestMneAnonymize::testDeleteInputFile()
+//{
+//    // Init testing arguments
+//    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+//    QString sFileInTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing.fif");
+//    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing_filename_output.fif");
 
-    qInfo() << "TestMneAnonymize::testInOutSameName - sFileIn" << sFileIn;
+//    qInfo() << "TestMneAnonymize::testDeleteInputFile - sFileIn" << sFileIn;
 
-    QFile::copy(sFileIn,sFileInTest);
-    QVERIFY(QFile::exists(sFileInTest));
+//    QFile::copy(sFileIn,sFileInTest);
+//    QVERIFY(QFile::exists(sFileInTest));
 
-    QStringList arguments;
-    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
-    arguments << "--in" << sFileInTest;
-    arguments << "--out" << sFileOutTest;
+//    QStringList arguments;
+//    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
+//    arguments << "--in" << sFileInTest;
+//    arguments << "--out" << sFileOutTest;
+//    arguments << "delete_input_file_after";
+//    arguments << "avoid_delete_confirmation";
 
-    qInfo() << "TestMneAnonymize::testInOutSameName - arguments" << arguments;
+//    qInfo() << "TestMneAnonymize::testDeleteInputFile - arguments" << arguments;
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
+//    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
 
-    QVERIFY( QFile::exists(sFileOutTest));
+//    QVERIFY(!QFile::exists(sFileInTest )); //delete input file, remember?
+//    QVERIFY( QFile::exists(sFileOutTest));
 
 //    verifyCRC(sFileOutTest,17542);
-}
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-void TestMneAnonymize::testInOutSameNameAndDeleteInFile()
-{
-    // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QString sFileInTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing.fif");
-    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing.fif");
+//void TestMneAnonymize::testInOutSameName()
+//{
+//    // Init testing arguments
+//    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+//    QString sFileInTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing.fif");
+//    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing.fif");
 
-    qInfo() << "TestMneAnonymize::testInOutSameNameAndDelete - sFileIn" << sFileIn;
+//    qInfo() << "TestMneAnonymize::testInOutSameName - sFileIn" << sFileIn;
 
-    QFile::copy(sFileIn,sFileInTest);
-    QVERIFY(QFile::exists(sFileInTest));
+//    QFile::copy(sFileIn,sFileInTest);
+//    QVERIFY(QFile::exists(sFileInTest));
 
-    QStringList arguments;
-    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
-    arguments << "--in" << sFileInTest;
-    arguments << "--out" << sFileOutTest;
-    arguments << "delete_input_file_after";
-    arguments << "avoid_delete_confirmation";
+//    QStringList arguments;
+//    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
+//    arguments << "--in" << sFileInTest;
+//    arguments << "--out" << sFileOutTest;
 
-    qInfo() << "TestMneAnonymize::testInOutSameNameAndDelete - arguments" << arguments;
+//    qInfo() << "TestMneAnonymize::testInOutSameName - arguments" << arguments;
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
+//    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
 
-    QVERIFY( QFile::exists(sFileOutTest));
+//    QVERIFY( QFile::exists(sFileOutTest));
 
-//    verifyCRC(sFileOutTest,17542);
-}
+////    verifyCRC(sFileOutTest,17542);
+//}
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-void TestMneAnonymize::testDefaultAnonymizationOfTags()
-{
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
-    qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - sFileIn" << sFileIn;
+//void TestMneAnonymize::testInOutSameNameAndDeleteInFile()
+//{
+//    // Init testing arguments
+//    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+//    QString sFileInTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing.fif");
+//    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing.fif");
 
-    QStringList arguments;
-    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
-    arguments << "--in" << sFileIn;
+//    qInfo() << "TestMneAnonymize::testInOutSameNameAndDelete - sFileIn" << sFileIn;
 
-    qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - arguments" << arguments;
+//    QFile::copy(sFileIn,sFileInTest);
+//    QVERIFY(QFile::exists(sFileInTest));
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
+//    QStringList arguments;
+//    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
+//    arguments << "--in" << sFileInTest;
+//    arguments << "--out" << sFileOutTest;
+//    arguments << "delete_input_file_after";
+//    arguments << "avoid_delete_confirmation";
 
-    QFile fFileOut(sFileOut);
-    FiffStream::SPtr outStream(new FiffStream(&fFileOut));
-    if(outStream->open(QIODevice::ReadOnly)) {
-        qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - output file opened correctly " << sFileIn;
-    } else {
-        QFAIL("Output file could not be loaded.");
-    }
+//    qInfo() << "TestMneAnonymize::testInOutSameNameAndDelete - arguments" << arguments;
 
-    verifyTags(outStream);
+//    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
 
+//    QVERIFY( QFile::exists(sFileOutTest));
 
+////    verifyCRC(sFileOutTest,17542);
+//}
 
-}
 
+////*************************************************************************************************************
 
-//*************************************************************************************************************
+//void TestMneAnonymize::testDefaultAnonymizationOfTags()
+//{
+//    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+//    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
+//    qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - sFileIn" << sFileIn;
 
-void TestMneAnonymize::compareBirthdayOffsetOption()
-{
-    // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
+//    QStringList arguments;
+//    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
+//    arguments << "--in" << sFileIn;
 
-    qInfo() << "TestMneAnonymize::compareBirthdayOffsetOption - sFileIn" << sFileIn;
-    qInfo() << "TestMneAnonymize::compareBirthdayOffsetOption - sFileOut" << sFileOut;
+//    qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - arguments" << arguments;
 
-    QStringList arguments;
-    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
-    arguments << "--in" << sFileIn;
-    arguments << "subject_birthday_offset 35";
-    arguments << "--verbose";
+//    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
 
-    qInfo() << "TestMneAnonymize::compareBirthdayOffsetOption - arguments" << arguments;
+//    QFile fFileOut(sFileOut);
+//    FiffStream::SPtr outStream(new FiffStream(&fFileOut));
+//    if(outStream->open(QIODevice::ReadOnly)) {
+//        qInfo() << "TestMneAnonymize::testDefaultAnonymizationOfTags - output file opened correctly " << sFileIn;
+//    } else {
+//        QFAIL("Output file could not be loaded.");
+//    }
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
+//    verifyTags(outStream);
+//}
 
-    QFile fFileOut(sFileOut);
-    FiffStream::SPtr outStream(new FiffStream(&fFileOut));
-    if(outStream->open(QIODevice::ReadOnly)) {
-        qInfo() << "TestMneAnonymize::compareBirthdayOffsetOption - output file opened correctly " << sFileIn;
-    } else {
-        QFAIL("Output file could not be loaded.");
-    }
 
-    verifyTags(outStream, "SubjBirthdayOffset");
+////*************************************************************************************************************
 
-}
+//void TestMneAnonymize::compareBirthdayOffsetOption()
+//{
+//    // Init testing arguments
+//    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+//    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
 
-//*************************************************************************************************************
+//    qInfo() << "TestMneAnonymize::compareBirthdayOffsetOption - sFileIn" << sFileIn;
+//    qInfo() << "TestMneAnonymize::compareBirthdayOffsetOption - sFileOut" << sFileOut;
 
-void TestMneAnonymize::compareMeasureDateOffsetOption()
-{
-    // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_raw_short_anonymized.fif");
+//    QStringList arguments;
+//    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
+//    arguments << "--in" << sFileIn;
+//    arguments << "subject_birthday_offset 35";
+//    arguments << "--verbose";
 
-    qInfo() << "TestMneAnonymize::compareMeasureDateOffsetOption - sFileIn" << sFileIn;
-    qInfo() << "TestMneAnonymize::compareMeasureDateOffsetOption - sFileOut" << sFileOut;
+//    qInfo() << "TestMneAnonymize::compareBirthdayOffsetOption - arguments" << arguments;
 
-    QStringList arguments;
-    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
-    arguments << "--in" << sFileIn;
-    arguments << "--measurement_date_offset 35";
-    arguments << "--verbose";
+//    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
 
-    qInfo() << "TestMneAnonymize::compareMeasureDateOffsetOption - arguments" << arguments;
+//    QFile fFileOut(sFileOut);
+//    FiffStream::SPtr outStream(new FiffStream(&fFileOut));
+//    if(outStream->open(QIODevice::ReadOnly)) {
+//        qInfo() << "TestMneAnonymize::compareBirthdayOffsetOption - output file opened correctly " << sFileIn;
+//    } else {
+//        QFAIL("Output file could not be loaded.");
+//    }
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
+//    verifyTags(outStream, "SubjBirthdayOffset");
+//}
 
-    QFile fFileOut(sFileOut);
 
-    FiffStream::SPtr outStream(new FiffStream(&fFileOut));
-    if(outStream->open(QIODevice::ReadOnly)) {
-        qInfo() << "TestMneAnonymize::compareMeasureDateOffsetOption - output file opened correctly " << sFileIn;
-    } else {
-        QFAIL("Output file could not be loaded.");
-    }
+////*************************************************************************************************************
 
-    verifyTags(outStream, "MeasDateOffset");
-
-}
+//void TestMneAnonymize::compareMeasureDateOffsetOption()
+//{
+//    // Init testing arguments
+//    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+//    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
 
-//*************************************************************************************************************
-
-void TestMneAnonymize::cleanupTestCase()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-void TestMneAnonymize::verifyCRC(const QString file,
-                                 const quint16 validatedCRC)
-{
-    QFile fFileIn(file);
-
-    if(fFileIn.open(QIODevice::ReadOnly)) {
-        qInfo() << "TestMneAnonymize::verifyCRC - Anonymized file opened correctly " << fFileIn.fileName();
-    } else {
-        QFAIL("Anonymized file could not be loaded.");
-    }
-
-    // Create crc checksum and compare to reference
-    QByteArray inData(fFileIn.readAll());
-    fFileIn.close();
-
-    quint16 crc = qChecksum(inData.data(),static_cast<uint>(inData.size()));
-    qInfo() << "TestMneAnonymize::verifyCRC - crc expected value: " << validatedCRC;
-    qInfo() << "TestMneAnonymize::verifyCRC - crc obtained value:" << crc;
-
-    QVERIFY(validatedCRC == crc);
-}
-
-
-//*************************************************************************************************************
-
-void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
-                                  QString testArg)
-{
-
-    FiffTag::SPtr pTag = FiffTag::SPtr::create();
-
-    stream->device()->seek(0);
-
-    while(pTag->next != -1) {
-        stream->read_tag(pTag);
-
-        switch (pTag->kind) {
-        //all these 'kinds' of tags contain a fileID struct, which contains info related to
-        //measurement date
-        case FIFF_FILE_ID:
-        case FIFF_BLOCK_ID:
-        case FIFF_PARENT_FILE_ID:
-        case FIFF_PARENT_BLOCK_ID:
-        case FIFF_REF_FILE_ID:
-        case FIFF_REF_BLOCK_ID:
-        {
-            FiffId inId = pTag->toFiffID();
-            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs));
-            QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0));
-            QDateTime offSetMeasDate(defaultMeasDate.date().addDays(-35));
-
-            if(testArg == "MeasDateOffset"){
-                QVERIFY(inMeasDate == offSetMeasDate);
-            } else {
-                QVERIFY(inMeasDate == defaultMeasDate);
-            }
-
-
-              QVERIFY(inId.machid[0] == 0);
-              QVERIFY(inId.machid[1] == 0);
-              QVERIFY(inId.time.secs == static_cast<int32_t>(defaultMeasDate.toSecsSinceEpoch()));
-              QVERIFY(inId.time.usecs == 0);
-
-            break;
-        }
-        case FIFF_MEAS_DATE:
-        {
-
-            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*pTag->toInt()));
-            QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0));
-            QDateTime offSetMeasDate(defaultMeasDate.date().addDays(-35));
-
-            if(testArg == "MeasDateOffset"){
-                QVERIFY(inMeasDate == offSetMeasDate);
-            } else {
-                QVERIFY(inMeasDate == defaultMeasDate);
-            }
-
-            break;
-        }
-        case FIFF_COMMENT:
-        {
-            if(m_pBlockTypeList->first()==FIFFB_MEAS_INFO) {
-                QString defaultComment("mne_anonymize");
-                QString anonFileComment(pTag->data());
-                QVERIFY(anonFileComment == defaultComment);
-            }
-
-            break;
-        }
-        case FIFF_EXPERIMENTER:
-        {
-            QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
-
-           break;
-        }
-        case FIFF_SUBJ_ID:
-        {
-            fiff_int_t intAnonFile(*pTag->toInt());
-            QVERIFY(intAnonFile == 0);
-
-            break;
-        }
-        case FIFF_SUBJ_FIRST_NAME:
-        {
-            QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
-
-            break;
-        }
-        case FIFF_SUBJ_MIDDLE_NAME:
-        {
-            QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
-
-            break;
-        }
-        case FIFF_SUBJ_LAST_NAME:
-        {
-            QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
-
-            break;
-        }
-        case FIFF_SUBJ_BIRTH_DAY:
-        {
-            QDateTime defaultDate(QDate(2000,1,1), QTime(1, 1, 0));
-            QDateTime inBirthday(QDate::fromJulianDay(*pTag->toJulian()));
-            QDateTime offSetBirtday(defaultDate.date().addDays(-35));
-
-            if(testArg == "SubjBirthdayOffset") {
-                QVERIFY(defaultDate == offSetBirtday);
-            } else {
-                QVERIFY(defaultDate == inBirthday);
-            }
-
-            break;
-        }
-        case FIFF_SUBJ_WEIGHT:
-        {
-
-            if(testArg == "BruteMode")
-            {
-                fiff_int_t intAnonFile(*pTag.data()->toInt());
-                QVERIFY(intAnonFile == 0);
-            }
-            break;
-        }
-        case FIFF_SUBJ_HEIGHT:
-        {
-            if(testArg == "BruteMode")
-            {
-                fiff_int_t intAnonFile(*pTag.data()->toInt());
-                QVERIFY(intAnonFile == 0);
-            }
-            break;
-        }
-        case FIFF_SUBJ_COMMENT:
-        {
-            QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
-
-            break;
-        }
-        case FIFF_SUBJ_HIS_ID:
-        {
-            QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
-            break;
-        }
-        case FIFF_PROJ_ID:
-        {
-
-            if(testArg == "BruteMode")
-            {
-                fiff_int_t intAnonFile(*pTag.data()->toInt());
-                QVERIFY(intAnonFile == 0);
-            }
-            break;
-        }
-        case FIFF_PROJ_NAME:
-        {
-
-            if(testArg == "BruteMode")
-            {
-                QString defaultComment("mne_anonymize");
-                QString anonFileComment(pTag->data());
-                QVERIFY(anonFileComment == defaultComment);
-            }
-            break;
-        }
-        case FIFF_PROJ_AIM:
-        {
-
-            if(testArg == "BruteMode")
-            {
-                QString defaultComment("mne_anonymize");
-                QString anonFileComment(pTag->data());
-                QVERIFY(anonFileComment == defaultComment);
-            }
-            break;
-        }
-        case FIFF_PROJ_PERSONS:
-        {
-            QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
-
-            break;
-        }
-        case FIFF_PROJ_COMMENT:
-        {
-            if(testArg == "BruteMode")
-            {
-                QString defaultComment("mne_anonymize");
-                QString anonFileComment(pTag.data()->toString());
-                QVERIFY(anonFileComment == defaultComment);
-            }
-            break;
-        }
-//        case FIFF_MRI_PIXEL_DATA:
+//    qInfo() << "TestMneAnonymize::compareMeasureDateOffsetOption - sFileIn" << sFileIn;
+//    qInfo() << "TestMneAnonymize::compareMeasureDateOffsetOption - sFileOut" << sFileOut;
+
+//    QStringList arguments;
+//    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
+//    arguments << "--in" << sFileIn;
+//    arguments << "--measurement_date_offset 35";
+//    arguments << "--verbose";
+
+//    qInfo() << "TestMneAnonymize::compareMeasureDateOffsetOption - arguments" << arguments;
+
+//    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "1.0");
+
+//    QFile fFileOut(sFileOut);
+
+//    FiffStream::SPtr outStream(new FiffStream(&fFileOut));
+//    if(outStream->open(QIODevice::ReadOnly)) {
+//        qInfo() << "TestMneAnonymize::compareMeasureDateOffsetOption - output file opened correctly " << sFileIn;
+//    } else {
+//        QFAIL("Output file could not be loaded.");
+//    }
+
+//    verifyTags(outStream, "MeasDateOffset");
+//}
+
+
+////*************************************************************************************************************
+
+//void TestMneAnonymize::cleanupTestCase()
+//{
+
+//}
+
+
+////*************************************************************************************************************
+
+//void TestMneAnonymize::verifyCRC(const QString file,
+//                                 const quint16 validatedCRC)
+//{
+//    QFile fFileIn(file);
+
+//    if(fFileIn.open(QIODevice::ReadOnly)) {
+//        qInfo() << "TestMneAnonymize::verifyCRC - Anonymized file opened correctly " << fFileIn.fileName();
+//    } else {
+//        QFAIL("Anonymized file could not be loaded.");
+//    }
+
+//    // Create crc checksum and compare to reference
+//    QByteArray inData(fFileIn.readAll());
+//    fFileIn.close();
+
+//    quint16 crc = qChecksum(inData.data(),static_cast<uint>(inData.size()));
+//    qInfo() << "TestMneAnonymize::verifyCRC - crc expected value: " << validatedCRC;
+//    qInfo() << "TestMneAnonymize::verifyCRC - crc obtained value:" << crc;
+
+//    QVERIFY(validatedCRC == crc);
+//}
+
+
+////*************************************************************************************************************
+
+//void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
+//                                  QString testArg)
+//{
+
+//    FiffTag::SPtr pTag = FiffTag::SPtr::create();
+
+//    stream->device()->seek(0);
+
+//    while(pTag->next != -1) {
+//        stream->read_tag(pTag);
+
+//        switch (pTag->kind) {
+//        //all these 'kinds' of tags contain a fileID struct, which contains info related to
+//        //measurement date
+//        case FIFF_FILE_ID:
+//        case FIFF_BLOCK_ID:
+//        case FIFF_PARENT_FILE_ID:
+//        case FIFF_PARENT_BLOCK_ID:
+//        case FIFF_REF_FILE_ID:
+//        case FIFF_REF_BLOCK_ID:
 //        {
-//            if(!m_bQuietMode) {
-//                qDebug() << " ";
-//                qDebug() << "WARNING. The input fif file contains MRI data.";
-//                qDebug() << "Beware that a subject''s face can be reconstructed from it";
-//                qDebug() << "This software can not anonymize MRI data, at the moment.";
-//                qDebug() << "Contanct the authors for more information.";
-//                qDebug() << " ";
+//            FiffId inId = pTag->toFiffID();
+//            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs));
+//            QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0));
+//            QDateTime offSetMeasDate(defaultMeasDate.date().addDays(-35));
+
+//            if(testArg == "MeasDateOffset"){
+//                QVERIFY(inMeasDate == offSetMeasDate);
+//            } else {
+//                QVERIFY(inMeasDate == defaultMeasDate);
+//            }
+
+
+//              QVERIFY(inId.machid[0] == 0);
+//              QVERIFY(inId.machid[1] == 0);
+//              QVERIFY(inId.time.secs == static_cast<int32_t>(defaultMeasDate.toSecsSinceEpoch()));
+//              QVERIFY(inId.time.usecs == 0);
+
+//            break;
+//        }
+//        case FIFF_MEAS_DATE:
+//        {
+
+//            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*pTag->toInt()));
+//            QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0));
+//            QDateTime offSetMeasDate(defaultMeasDate.date().addDays(-35));
+
+//            if(testArg == "MeasDateOffset"){
+//                QVERIFY(inMeasDate == offSetMeasDate);
+//            } else {
+//                QVERIFY(inMeasDate == defaultMeasDate);
+//            }
+
+//            break;
+//        }
+//        case FIFF_COMMENT:
+//        {
+//            if(m_pBlockTypeList->first()==FIFFB_MEAS_INFO) {
+//                QString defaultComment("mne_anonymize");
+//                QString anonFileComment(pTag->data());
+//                QVERIFY(anonFileComment == defaultComment);
+//            }
+
+//            break;
+//        }
+//        case FIFF_EXPERIMENTER:
+//        {
+//            QString defaultComment("mne_anonymize");
+//            QString anonFileComment(pTag->data());
+//            QVERIFY(anonFileComment == defaultComment);
+
+//           break;
+//        }
+//        case FIFF_SUBJ_ID:
+//        {
+//            fiff_int_t intAnonFile(*pTag->toInt());
+//            QVERIFY(intAnonFile == 0);
+
+//            break;
+//        }
+//        case FIFF_SUBJ_FIRST_NAME:
+//        {
+//            QString defaultComment("mne_anonymize");
+//            QString anonFileComment(pTag->data());
+//            QVERIFY(anonFileComment == defaultComment);
+
+//            break;
+//        }
+//        case FIFF_SUBJ_MIDDLE_NAME:
+//        {
+//            QString defaultComment("mne_anonymize");
+//            QString anonFileComment(pTag->data());
+//            QVERIFY(anonFileComment == defaultComment);
+
+//            break;
+//        }
+//        case FIFF_SUBJ_LAST_NAME:
+//        {
+//            QString defaultComment("mne_anonymize");
+//            QString anonFileComment(pTag->data());
+//            QVERIFY(anonFileComment == defaultComment);
+
+//            break;
+//        }
+//        case FIFF_SUBJ_BIRTH_DAY:
+//        {
+//            QDateTime defaultDate(QDate(2000,1,1), QTime(1, 1, 0));
+//            QDateTime inBirthday(QDate::fromJulianDay(*pTag->toJulian()));
+//            QDateTime offSetBirtday(defaultDate.date().addDays(-35));
+
+//            if(testArg == "SubjBirthdayOffset") {
+//                QVERIFY(defaultDate == offSetBirtday);
+//            } else {
+//                QVERIFY(defaultDate == inBirthday);
+//            }
+
+//            break;
+//        }
+//        case FIFF_SUBJ_WEIGHT:
+//        {
+
+//            if(testArg == "BruteMode")
+//            {
+//                fiff_int_t intAnonFile(*pTag.data()->toInt());
+//                QVERIFY(intAnonFile == 0);
 //            }
 //            break;
 //        }
-        default:{
-        }
-        }
-    }
-}
+//        case FIFF_SUBJ_HEIGHT:
+//        {
+//            if(testArg == "BruteMode")
+//            {
+//                fiff_int_t intAnonFile(*pTag.data()->toInt());
+//                QVERIFY(intAnonFile == 0);
+//            }
+//            break;
+//        }
+//        case FIFF_SUBJ_COMMENT:
+//        {
+//            QString defaultComment("mne_anonymize");
+//            QString anonFileComment(pTag->data());
+//            QVERIFY(anonFileComment == defaultComment);
+
+//            break;
+//        }
+//        case FIFF_SUBJ_HIS_ID:
+//        {
+//            QString defaultComment("mne_anonymize");
+//            QString anonFileComment(pTag->data());
+//            QVERIFY(anonFileComment == defaultComment);
+//            break;
+//        }
+//        case FIFF_PROJ_ID:
+//        {
+
+//            if(testArg == "BruteMode")
+//            {
+//                fiff_int_t intAnonFile(*pTag.data()->toInt());
+//                QVERIFY(intAnonFile == 0);
+//            }
+//            break;
+//        }
+//        case FIFF_PROJ_NAME:
+//        {
+
+//            if(testArg == "BruteMode")
+//            {
+//                QString defaultComment("mne_anonymize");
+//                QString anonFileComment(pTag->data());
+//                QVERIFY(anonFileComment == defaultComment);
+//            }
+//            break;
+//        }
+//        case FIFF_PROJ_AIM:
+//        {
+
+//            if(testArg == "BruteMode")
+//            {
+//                QString defaultComment("mne_anonymize");
+//                QString anonFileComment(pTag->data());
+//                QVERIFY(anonFileComment == defaultComment);
+//            }
+//            break;
+//        }
+//        case FIFF_PROJ_PERSONS:
+//        {
+//            QString defaultComment("mne_anonymize");
+//            QString anonFileComment(pTag->data());
+//            QVERIFY(anonFileComment == defaultComment);
+
+//            break;
+//        }
+//        case FIFF_PROJ_COMMENT:
+//        {
+//            if(testArg == "BruteMode")
+//            {
+//                QString defaultComment("mne_anonymize");
+//                QString anonFileComment(pTag.data()->toString());
+//                QVERIFY(anonFileComment == defaultComment);
+//            }
+//            break;
+//        }
+////        case FIFF_MRI_PIXEL_DATA:
+////        {
+////            if(!m_bQuietMode) {
+////                qDebug() << " ";
+////                qDebug() << "WARNING. The input fif file contains MRI data.";
+////                qDebug() << "Beware that a subject''s face can be reconstructed from it";
+////                qDebug() << "This software can not anonymize MRI data, at the moment.";
+////                qDebug() << "Contanct the authors for more information.";
+////                qDebug() << " ";
+////            }
+////            break;
+////        }
+//        default:{
+//        }
+//        }
+//    }
+//}
 
 
 //=============================================================================================================
