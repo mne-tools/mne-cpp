@@ -368,7 +368,7 @@ void FtBuffClient::idleCall() {
     int count = 0;
     for (int i = 0; i < int (numSamples); i++) {
         for (int j = 0; j < int (numChannels); j++) {
-                matData(i,j) = fdata[count];
+                matData(j,i) = fdata[count];
             count++;
         }
     }
