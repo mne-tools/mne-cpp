@@ -1,6 +1,7 @@
 /**
 * @file     ftbuffer.cpp
 * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -53,11 +54,12 @@ using namespace SCMEASLIB;
 
 //*************************************************************************************************************
 
-FtBuffer::FtBuffer() :
-m_bIsRunning(false),
-m_pFtBuffProducer(new FtBuffProducer(this)),
-m_pFiffInfo(QSharedPointer<FiffInfo>::create()),
-m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
+FtBuffer::FtBuffer()
+: m_bIsRunning(false)
+, m_pFtBuffProducer(new FtBuffProducer(this))
+, m_pListReceivedSamples(QSharedPointer<QList<Eigen::MatrixXd> >::create())
+, m_pFiffInfo(QSharedPointer<FiffInfo>::create())
+, m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
 {
     qDebug() << "Constructing FtBuffer Object";
 
@@ -85,7 +87,12 @@ QSharedPointer<IPlugin> FtBuffer::clone() const {
 
 //*************************************************************************************************************
 
-void FtBuffer::init() {qDebug() << "Running init()";}
+void FtBuffer::init() {
+    qDebug() << "Running init()";
+
+    m_outputConnectors.append(m_pRTMSA_BufferOutput);
+
+}
 
 void FtBuffer::unload() {
     delete m_pFtBuffClient;
@@ -98,8 +105,6 @@ bool FtBuffer::start() {
 
     m_bIsRunning = true;
 
-    /////////////////////////HERE BE BUG//////////////////////////////////
-
     //Setup fiff info before setting up the RMTSA because we need it to init the RTMSA
     qDebug() << "Running setUpFiffInfo()";
     setUpFiffInfo();
@@ -110,12 +115,13 @@ bool FtBuffer::start() {
     qDebug() << "Running setMultiArraySize";
     m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
 
-    //////////////////////////////////////////////////////////////////////
 
     QThread::start();
 
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
     m_pProducerThread.start();
+
+    //connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
 
     //m_FtBuffClient
     //while (true) { qDebug() << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; }
@@ -161,11 +167,18 @@ QWidget* FtBuffer::setupWidget() {
 void FtBuffer::run() {
     qDebug() << "run()";
 
-    while(m_bIsRunning)
-    {
-        //m_mutex.lock();
+    while(m_bIsRunning) {
+
         m_pFtBuffProducer->run();
-        //m_mutex.unlock();
+
+        /*
+        m_mutex.lock();
+        if(!m_pListReceivedSamples->isEmpty()) {
+            MatrixXd matData = m_pListReceivedSamples->takeFirst();
+            m_pRTMSA_BufferOutput->data()->setValue(matData);
+        };
+        m_mutex.unlock();
+        */
     }
 }
 
@@ -198,8 +211,10 @@ bool FtBuffer::disconnectFromBuffer(){
 
 //*************************************************************************************************************
 
-void FtBuffer::getData() {
+Eigen::MatrixXd FtBuffer::getData() {
     qDebug() << "FtBuffer::getData()";
+
+
     int i = 0;
     while(m_bIsRunning) {
 
@@ -207,6 +222,7 @@ void FtBuffer::getData() {
         m_pFtBuffClient->getData();
         i++;
     }
+
 }
 
 //*************************************************************************************************************
@@ -330,4 +346,14 @@ void FtBuffer::setUpFiffInfo()
 
 bool FtBuffer::isRunning() {
     return m_bIsRunning;
+}
+
+void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
+    m_mutex.lock();
+    if(m_bIsRunning) {
+        //qDebug()<<"Natus::onNewDataAvailable - appending data";
+        m_pListReceivedSamples->append(matData);
+    }
+    m_mutex.unlock();
+
 }

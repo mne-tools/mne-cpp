@@ -1,6 +1,7 @@
 /**
 * @file     ftbuffer.h
 * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
+*           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -186,7 +187,7 @@ public:
     *
     * @brief requests buffer data on a loop
     */
-    void getData();
+    Eigen::MatrixXd getData();
 
     //void updateBufferAddress(QString address);
 
@@ -195,13 +196,18 @@ public:
     bool isRunning();
 
 
+
 protected:
+
     virtual void run();
 
     void showYourWidget();
 
+    void onNewDataAvailable(const Eigen::MatrixXd &matData);
+
 private:
     bool                                            m_bIsRunning;                   /**< Whether ftbuffer is running. */
+
     QThread                                         m_pProducerThread;              /**< Producer object that manages the data */
     QMutex                                          m_mutex;                        /**< Guards shared data from beng accessed at the same time */
 
