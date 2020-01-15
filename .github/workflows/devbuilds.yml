@@ -194,7 +194,7 @@ jobs:
         sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
     - name: Run Doxygen and package result
       run: |        
-        cd doc
+        cd doc/doxygen
         doxygen mne-cpp_doxyfile
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
@@ -204,13 +204,13 @@ jobs:
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: doc/qt-creator_doc/mne-cpp.qch
+        file: doc/doxygen/qt-creator_doc/mne-cpp.qch
         asset_name: mne-cpp-doc-qtcreator
         tag: dev_build
         overwrite: true
     - name: Update documentation at Github pages
       run: |    
-        cd doc
+        cd doc/doxygen
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE
         git clone -b gh-pages https://github.com/mne-cpp/doxygen-api gh-pages
