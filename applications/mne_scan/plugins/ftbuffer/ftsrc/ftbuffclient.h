@@ -89,6 +89,7 @@
 */
 class FtBuffClient
 {
+
 public:
     /**
      * Default Constructor

@@ -89,6 +89,10 @@ public:
 
     ~FtBuffProducer();
 
+public slots:
+
+      void doWork();
+
 protected:
 
     /**
@@ -97,6 +101,8 @@ protected:
     * @brief runs seprate thread to continuously get data
     */
     virtual void run();
+
+
 
 signals:
 
