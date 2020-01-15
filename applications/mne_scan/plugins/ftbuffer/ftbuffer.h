@@ -197,6 +197,10 @@ public:
 
     void pushData();
 
+signals:
+
+    void workCommand();
+
 
 protected:
 

@@ -122,6 +122,7 @@ bool FtBuffer::start() {
     m_pProducerThread.start();
 
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
+    connect(this, &FtBuffer::workCommand, m_pFtBuffProducer.data(),&FtBuffProducer::doWork, Qt::DirectConnection);
 
     //m_FtBuffClient
     //while (true) { qDebug() << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; }
@@ -167,15 +168,13 @@ QWidget* FtBuffer::setupWidget() {
 //*************************************************************************************************************
 
 void FtBuffer::run() {
-    qDebug() << "run()";
+    qDebug() << "Ft Buffer run()";
+
+    emit workCommand();
 
     while(m_bIsRunning) {
-
-        qDebug() << "This.";
-        m_pFtBuffProducer->run();
-        qDebug() << "That.";
-
-
+        pushData();
+        QThread::usleep(100);
     }
 }
 
@@ -212,12 +211,12 @@ Eigen::MatrixXd FtBuffer::getData() {
     qDebug() << "FtBuffer::getData()";
 
 
-    int i = 0;
+    //int i = 0;
     while(m_bIsRunning) {
 
         //pushData();
 
-        qDebug() << "Loop" << i;
+        //qDebug() << "Loop" << i;
         m_pFtBuffClient->getData();
 
 
@@ -228,7 +227,7 @@ Eigen::MatrixXd FtBuffer::getData() {
             return m_pFtBuffClient->dataMat();
         }
 
-        i++;
+        //i++;
     }
 }
 

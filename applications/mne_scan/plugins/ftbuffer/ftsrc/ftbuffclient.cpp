@@ -184,7 +184,7 @@ bool FtBuffClient::readHeader() {
     lpFilter = new MultiChannelFilter<float,float>(numChannels, LPFILTORD);
     lpFilter->setButterLP(LPFREQ/header_def.fsample);
 
-    m_matData.resize(numChannels, 32);
+    //m_matData.resize(numChannels, 32);
     return true;
 }
 
@@ -311,6 +311,7 @@ void FtBuffClient::idleCall() {
         return;
     }
 
+
     floatStore.resize(sizeof(float) * ddef.nsamples * ddef.nchans);
 
     float *fdata = (float *) floatStore.data();
@@ -355,6 +356,7 @@ void FtBuffClient::idleCall() {
         lpFilter->process(ddef.nsamples, fdata, fdata); // in place
     }
 
+    m_matData.resize(numChannels, 32);
     qDebug() << "@@@@ 1 @@@@";
 
     Eigen::MatrixXf matData;
@@ -368,8 +370,15 @@ void FtBuffClient::idleCall() {
     int count = 0;
     for (int i = 0; i < int (numSamples); i++) {
         for (int j = 0; j < int (numChannels); j++) {
-                matData(j,i) = fdata[count];
+            matData(j,i) = fdata[count];
             count++;
+//            qDebug() << "######################";
+//            qDebug() << "";
+//            qDebug() << "";
+            qDebug() << matData.size();
+//            qDebug() << "";
+//            qDebug() << "";
+//            qDebug() << "######################";
         }
     }
 
@@ -389,6 +398,10 @@ void FtBuffClient::idleCall() {
         m_iMatDataSampleIterator = 0;
         //qDebug()<<"Emit data";
         matEmit = m_matData.cast<double>();
+        m_bnewData = true;
+        qDebug() << "";
+        qDebug() << matEmit.size();
+        qDebug() << "";
     }
 
     qDebug() << "@@@@ 4 @@@@";
@@ -399,11 +412,12 @@ void FtBuffClient::idleCall() {
     numSamples = newSamples;
     //qDebug() << "rawStore is of size" << rawStore.size();
     //qDebug() << "floatStore is of size" << floatStore.size();
-    qDebug() << "@@@@ 5 @@@@";
-    matEmit = matData.cast<double>();
 
-    qDebug() << "@@@@ 6 @@@@";
-    m_bnewData = true;
+
+
+    qDebug() << "@@@@ 5 @@@@";
+
+
 
 }
 
