@@ -133,6 +133,8 @@ bool FtBuffer::start() {
 
 bool FtBuffer::stop() {
 
+    qDebug() << "Running stop()";
+
     m_bIsRunning = false;
 
     m_pRTMSA_BufferOutput->data()->clear();
@@ -213,8 +215,12 @@ Eigen::MatrixXd FtBuffer::getData() {
     int i = 0;
     while(m_bIsRunning) {
 
+        //pushData();
+
         qDebug() << "Loop" << i;
         m_pFtBuffClient->getData();
+
+
 
         if (m_pFtBuffClient->newData()) {
             m_pFtBuffClient->reset();
@@ -224,16 +230,26 @@ Eigen::MatrixXd FtBuffer::getData() {
 
         i++;
     }
-
 }
 
 void FtBuffer::pushData(){
+    qDebug() << "=======================================";
+    qDebug() <<  "pushData()";
     m_mutex.lock();
+    qDebug() << "mutex locked";
     if(!m_pListReceivedSamples->isEmpty()) {
+        qDebug() << "In loop";
         MatrixXd matData = m_pListReceivedSamples->takeFirst();
+        qDebug() << "matData take first";
+        qDebug() << "";
+        qDebug() << matData.size();
+        qDebug() << "";
         m_pRTMSA_BufferOutput->data()->setValue(matData);
-    };
+        qDebug() << "value set";
+    }
     m_mutex.unlock();
+    qDebug() << "mutex unlocked";
+    qDebug() << "=======================================";
 }
 
 //*************************************************************************************************************
@@ -254,7 +270,7 @@ void FtBuffer::setUpFiffInfo()
     //Set number of channels, sampling frequency and high/-lowpass
     //
     //CURRENTLY HARDWIRED TO FTBUFFER EXAMPLE DATA PARAMS FROM SINE2FT
-    m_pFiffInfo->nchan = 1;
+    m_pFiffInfo->nchan = 16;
     m_pFiffInfo->sfreq = 256;
     m_pFiffInfo->highpass = 0.001f;
     m_pFiffInfo->lowpass = 256/2;
