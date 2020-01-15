@@ -159,7 +159,7 @@ jobs:
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=minimalVersion
         make -j2
 
-  Documentation:
+  Doxygen:
     runs-on: ubuntu-latest
 
     steps:

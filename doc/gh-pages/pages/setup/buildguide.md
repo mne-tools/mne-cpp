@@ -3,96 +3,58 @@ title: Build from Source
 parent: Setup
 nav_order: 2
 ---
-Building from Source Code
-==================================
+# Build from Source
 
-Getting Qt
-----------
+## Get a compiler
 
-Qt is our only external dependency.
+Make sure you have one of the following compilers installed:
 
-1. **Download the current Qt version**:
+| Windows | Linux | MacOS |
+|---------|-------|-------|
+| min. MSVC 2015 (We recommend the [MSVC 2017 Community Version](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=15&src=myvs) compiler) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html) | min. [Clang 3.5](https://developer.apple.com/xcode/)|
 
-    Go to the Qt download section and download the [Qt installer](https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5). Qt 5.10.0 or higher is needed in order to have full Qt3D support.
+## Get Qt
 
-    Windows users: Make sure NOT to download the WinRt or UWP version.
+### Download the Qt installer
 
-    Select the appropriate version based on your compiler and development platform.
+Qt is the only dependency you will need to install. Go to the Qt download section and download the [Qt installer](https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5). 
 
-    For example if you are using the Microsoft Visual Studio 2015 Compiler on a Windows 32bit system, select the "MSVC 2015 32-bit" version.
+### Install Qt
 
-2. **Install Qt**:
+Please note that Qt 5.10.0 or higher is needed in order to have full Qt3D support. Install the Qt version with the minimum of the following features (uncheck all other boxes) to a path without white spaces:
 
-    Install the Qt version with the minimum of the following features (uncheck all other boxes):
+- Qt/5.12.6/MSVC 2017 64-bit (Make sure to select the correct version based on your compiler)
+- Qt/5.12.6/QtCharts
 
-    - Qt/5.10.0/Pre-compiled Qt (i.e. Qt 5.10.0/MSVC 2015 32-bit)
-    - Qt/5.10.0/QtCharts
-    - Qt/Tools/QtCreator
+After the installation is finsihed make sure to add the Qt bin folder (e.g. `<QtFolder>\5.12.6\msvc2017_64\bin`) to your path variable. On Linux and MacOS you might also need to add the Qt lib folder (e.g. `<QtFolder>\5.12.6\msvc2017_64\lib`) to the `LD_LIBRARY_PATH` and `DYLD_LIBRARY_PATH`, respectivley.
 
-    You now have the latest Qt version installed on your local machine.
+## Get the source code
 
-3. **Add Qt to environment variables**:
+Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp) to your own GitHub account. For a detailed overview of how to fork a repository, we recommend checking out the [guide on the official GitHub website](https://help.github.com/en/github/getting-started-with-github/fork-a-repo). 
 
-    - Windows:
+Clone the fork to your local machine:
 
-        - Right-click Computer and click Properties.
-        - Click Advanced System Settings link in the left column.
-        - In the Advanced window and click the Environment Variables button.
-        - Add to the `PATH` variable `C:\Qt\5.10.0\msvc2015\bin` (the qt bin path may differ depending on your Qt installation).
+    $ git clone https://github.com/<YourGitUserName>/mne-cpp.git
 
-    - Linux:
+Setup a new remote pointing to MNE-CPP's main repository:
 
-        - Add Qt bin and lib directory to the environment variables (the qt paths may differ depending on your Qt installation).
-          by adding it to your `.bashrc` file under `/home/<username>/`:
+    $ git remote add upstream https://github.com/mne-tools/mne-cpp.git
 
-              $ export PATH=$PATH:~/Qt/Qt5.10.0/bin
-              $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/Qt/Qt5.10.0/lib
+Every time you want to update to the newest changes use:
 
-              Note: these command may differ depending on your shell (for example `$ setenv` in `.tchrc`)
+    $ git rebase upstream/master
 
-* In case you work on a Windows machine and do not have a compiler set up:
+## Compile the source code
 
-    - Go to the [Windows SDK download website](https://dev.windows.com/de-de/downloads/windows-8-1-sdk)
-    - Download and install the Windows SDK (during the installation, make sure to also select the Debugging Tools for Windows box).
-    - Open the QtCreator and select the debugger under `Tools/Options/Build & Run/Kits/[your Kit name goes here]/Debugger`.
+| **Please note:** If you are working on an operating system on a "non-western" system, i.e. Japan, you might encounter problems with unicode interpretation. Please do the  following: Go to Control Panel -> Language and Region -> Management tab -> Language Settings for non-Unicode Programs -> Set to English (U.S.) -> Reboot your system. |
 
-Get the MNE-CPP source code
----------------------------
-
-1. Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp) (mne-tools/mne-cpp) to your own GitHub account:
-
-  * Go to the GitHub website and sign into your GitHub account.
-  * Go to the MNE-CPP's GitHub website.
-  * Click on the upper right Fork button. This will copy the main repository to your own GitHub account. This is the code you can now work with, without breaking the project's main code.
-
-2. Clone the forked MNE-CPP repository to your local machine:
-
-  * Open the Git command line tool (Git CMD).
-  * Navigate to your folder where you want to clone the repository to (Use cd to navigate to a specific path on your hard drive). Please note that the folder path should not contain any whitespaces. For example, `C:/Git/` would be a good candidate to clone the repository to.
-  * Type in the following command to clone the repository:
-
-        $ git clone https://github.com/<YourGitUserName>/mne-cpp.git
-
-  * Every time you want to pull the newest changes made in the main MNE-CPP repository use the code below. Please make sure that you are on the local `master` branch when you do this:
-
-        $ git pull https://github.com/mne-tools/mne-cpp.git master
-
-Congrats, you now have the latest MNE-CPP source code on your remote and local machine. For a more detailed overview of how to make a pull request, we recommend checking out the [guide on the official Git website](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project).
-
-Compile the MNE-CPP source code
--------------------------------
-
-If you are working on an operating system on a "non-western" system, i.e. Japan, you might encounter problems with unicode interpretation. Please do the  following: Go to Control Panel -> Language and Region -> Management tab -> Language Settings for non-Unicode Programs -> Set to English (U.S.) -> Reboot your system.
-
-1. Go to your cloned repository folder and run the `mne-cpp/mne-cpp.pro` file with QtCreator.
-2. The first time you open the mne-cpp.pro file with QtCreator you will be prompted to configure the project with an installed Qt version. Select the appropriate Qt version, e.g. Qt MSVC 2015 32-bit and configure the project.
+1. Go to your cloned repository folder and run the `mne-cpp.pro` file with QtCreator.
+2. The first time you open the mne-cpp.pro file you will be prompted to configure the project with a pre-defined kit. Select the appropriate kit, e.g., `Desktop Qt 5.12.6 MSVC2017 64bit` and configure the project.
 3. In QtCreator select the Release mode in the lower left corner.
 4. In the Qt Creator's Projects window, right mouse click on the top level mne-cpp tree item and select Run qmake. Wait until progress bar in lower right corner turns green (this step may take some time).
 5. Right mouse click again and then hit Build (this step may take some time). Wait until progress bar in lower right corner turns green.
 6. After the build process is finished, go to the `mne-cpp/bin` folder. All applications and libraries should have been created throughout the build process.
 
-In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download ) and extract the files to `mne-cpp/bin/MNE-sample-data`
+## Test the build
 
-Want to Contribute?
--------------------
-[Click here](contribute.md) to find out how you can help.
+In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download) and extract the files to `mne-cpp/bin/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp3D. If the build was successfull the example should start and display a window including a 3D brain as well as a source localization result.
