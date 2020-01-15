@@ -106,7 +106,7 @@ HEADERS += \
     FormFiles/ftbuffersetupwidget.h \
     FormFiles/ftbufferaboutwidget.h \
     FormFiles/ftbufferyourwidget.h \
-    ftbuffproducer.h
+    ftbuffproducer.h \
 
 FORMS += \
     FormFiles/ftbuffersetup.ui \
