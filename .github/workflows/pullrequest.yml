@@ -171,5 +171,5 @@ jobs:
         sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
     - name: Run Doxygen and package result
       run: |        
-        cd doc
+        cd doc/doxygen
         doxygen mne-cpp_doxyfile
