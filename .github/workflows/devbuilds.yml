@@ -242,14 +242,14 @@ jobs:
       run: |
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE
-        git clone -b gh-pages --single-branch https://github.com/mne-tools/mne-cpp.git
-        cd mne-cpp
+        git clone -b master --single-branch https://github.com/mne-cpp/mne-cpp.github.io.git
+        cd mne-cpp.github.io
         # Remove all files first
         git rm * -r
         git commit --amend -a -m 'Update docu' --allow-empty
         cd ..
-        cp -RT doc/gh-pages mne-cpp
-        cd mne-cpp
+        cp -RT doc/gh-pages mne-cpp.github.io
+        cd mne-cpp.github.io
         git add .
         git commit --amend -a -m 'Update docu'
         git push -f --all

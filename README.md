@@ -18,7 +18,7 @@
 
 -----------------
 
-MNE-CPP is an open-source software framework which offers a variety of neuroscientific tools. It provide a cross-platform library which allows the processing of MEG/EEG data. MNE-CPP also includes standalone applications for the acquisition and processing of MEG/EEG data, both in real-time and offline. For more information and documentation please visit http://mne.tools/mne-cpp/.
+MNE-CPP is an open-source software framework which offers a variety of neuroscientific tools. It provide a cross-platform library which allows the processing of MEG/EEG data. MNE-CPP also includes standalone applications for the acquisition and processing of MEG/EEG data, both in real-time and offline. For more information and documentation please visit https://mne-cpp.github.io/.
 
 Build from source
 -----------------
