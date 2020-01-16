@@ -31,13 +31,12 @@ Please make use of qDebug() for debugging, qInfo() for user information and qWar
 
 ## Commit Policy
 
- 1. If you add new functions/classes, ensure everything is documented properly.
- 2. All code should follow the Coding Conventions & Style.
- 3. Write new unit tests for the bugs you fixed or functionality you added.
- 4. Commit often! In particular: Make atomic commits. This means that each commit should contain exactly one self-contained change - do not mix unrelated changes, and do not create inconsistent states. Never "hide" unrelated fixes in bigger commits.
- 5. Use task related flags in front of each commit. I.e. if your task has the task tag SC-1, put [SC-1] in front of the commit message.
- 6. Write descriptive commit messages. Make them self-contained, so people do not have to research the historical context to make sense of them.
- 7. And most importantly: use your brain :)
+ * If you add new functions/classes, ensure everything is documented properly.
+ * All code should follow the Coding Conventions & Style.
+ * Write new unit tests for the bugs you fixed or functionality you added.
+ * Commit often! In particular: Make atomic commits. This means that each commit should contain exactly one self-contained change - do not mix unrelated changes, and do not create inconsistent states. Never "hide" unrelated fixes in bigger commits.
+ * Write descriptive commit messages. Make them self-contained, so people do not have to research the historical context to make sense of them.
+ * And most importantly: use your brain :)
 
 ## Setup the MNE-CPP QtCreator wizard
 
@@ -47,3 +46,10 @@ The following steps will show you how to setup the MNE-CPP QtCreator wizard. Thi
  2. Copy the mnecpp folder to your QtCreator installation folder `\share\qtcreator\templates\wizards\`. Usually QtCreator is installed in your Qt distribution's `\Tools` folder, e.g., `C:\Qt\Tools\QtCreator\share\qtcreator\templates\wizards`.
  3. Restart QtCreator.
  4. Now you should be able to right click on the project where you want to add a new class and see the MNE-CPP category appear in the wizard.
+
+## Add MNE-CPP documentation to QtCreator
+
+You can display external documentation in the Help mode, which you can open via pressing the F1 key. To augment or replace the documentation that ships with Qt Creator and Qt:
+
+ * Download the .qch file `mne-cpp-doc-qtcreator.qch` file for the MNE-CPP version you use [here](https://github.com/mne-tools/mne-cpp/releases).
+ * To add the .qch file to Qt Creator, select Tools > Options > Help > Documentation > Add.

@@ -205,7 +205,7 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: doc/doxygen/qt-creator_doc/mne-cpp.qch
-        asset_name: mne-cpp-doc-qtcreator
+        asset_name: mne-cpp-doc-qtcreator.qch
         tag: dev_build
         overwrite: true
     - name: Update documentation at Github pages

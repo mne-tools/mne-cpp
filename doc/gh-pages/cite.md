@@ -15,5 +15,5 @@ Additionally if you use MNE Scan please cite:
 
 You should as well cite the related method papers, e.g., for RTC-MNE and RTC-MUSIC:
 
-| Dinh, C.; Strohmeier, D.; Luessi, M.; Güllmar, D.; Baumgarten, D.; Haueisen, J.; Hämäläinen, M.S.: Real-Time MEG Source Localization using Regional Clustering. Brain Topography (2015), [DOI 10.1007/s10548-015-0431-9](https://link.springer.com/article/10.1007/s10548-017-0586-7) |
+| Dinh, C.; Strohmeier, D.; Luessi, M.; Güllmar, D.; Baumgarten, D.; Haueisen, J.; Hämäläinen, M.S.: Real-Time MEG Source Localization using Regional Clustering. Brain Topography (2015), [DOI: 10.1007/s10548-015-0431-9](https://link.springer.com/article/10.1007/s10548-017-0586-7) |
 | Dinh, C.; Esch, L.; Rühle, J.; Bollmann, S.; Güllmar, D.; Baumgarten, D.; Hämäläinen, MS.; Haueisen, J.: Real-Time Clustered Multiple Signal Classification (RTC-MUSIC). Brain Topography (2017), [DOI: 10.1007/s10548-017-0586-7](https://link.springer.com/article/10.1007%2Fs10548-015-0431-9) |

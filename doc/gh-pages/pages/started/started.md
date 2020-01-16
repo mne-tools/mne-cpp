@@ -21,4 +21,4 @@ Then follow the [guides](../learn/learn.md) on how to use MNE-CPP.
 
 ---
 
-If you'd like to develop with and contribute to MNE-CPP you should [click here](../setup/buildguide.md) for our guide on how to do build from source. 
+If you'd like to develop with and contribute to MNE-CPP you can check out our guide on how to [build from source](../install/buildguide.md). 
