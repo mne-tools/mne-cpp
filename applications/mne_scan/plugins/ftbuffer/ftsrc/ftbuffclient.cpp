@@ -372,15 +372,9 @@ void FtBuffClient::idleCall() {
         for (int j = 0; j < int (numChannels); j++) {
             matData(j,i) = fdata[count];
             count++;
-//            qDebug() << "######################";
-//            qDebug() << "";
-//            qDebug() << "";
-            qDebug() << matData.size();
-//            qDebug() << "";
-//            qDebug() << "";
-//            qDebug() << "######################";
         }
     }
+    qDebug() << matData.size();
 
     if(m_iMatDataSampleIterator+matData.cols() <= m_matData.cols()) {
         m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), matData.cols()) = matData.cast<double>();

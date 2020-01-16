@@ -119,11 +119,11 @@ bool FtBuffer::start() {
     QThread::start();
 
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
-    m_pProducerThread.start();
 
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
     connect(this, &FtBuffer::workCommand, m_pFtBuffProducer.data(),&FtBuffProducer::doWork, Qt::DirectConnection);
 
+    m_pProducerThread.start();
     //m_FtBuffClient
     //while (true) { qDebug() << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; }
 
@@ -173,6 +173,7 @@ void FtBuffer::run() {
     emit workCommand();
 
     while(m_bIsRunning) {
+        qDebug() << "FtBuffer run() loop running";
         pushData();
         QThread::usleep(100);
     }
@@ -207,48 +208,43 @@ bool FtBuffer::disconnectFromBuffer(){
 
 //*************************************************************************************************************
 
-Eigen::MatrixXd FtBuffer::getData() {
-    qDebug() << "FtBuffer::getData()";
+//Eigen::MatrixXd FtBuffer::getData() {
+//    qDebug() << "FtBuffer::getData()";
 
 
-    //int i = 0;
-    while(m_bIsRunning) {
+//    //int i = 0;
+//    while(m_bIsRunning) {
 
-        //pushData();
+//        //pushData();
 
-        //qDebug() << "Loop" << i;
-        m_pFtBuffClient->getData();
+//        //qDebug() << "Loop" << i;
+//        m_pFtBuffClient->getData();
 
 
 
-        if (m_pFtBuffClient->newData()) {
-            m_pFtBuffClient->reset();
-            qDebug() << "Returning mat";
-            return m_pFtBuffClient->dataMat();
-        }
+//        if (m_pFtBuffClient->newData()) {
+//            m_pFtBuffClient->reset();
+//            qDebug() << "Returning mat";
+//            return m_pFtBuffClient->dataMat();
+//        }
 
-        //i++;
-    }
-}
+//        //i++;
+//    }
+//}
 
 void FtBuffer::pushData(){
-    qDebug() << "=======================================";
     qDebug() <<  "pushData()";
     m_mutex.lock();
     qDebug() << "mutex locked";
     if(!m_pListReceivedSamples->isEmpty()) {
         qDebug() << "In loop";
         MatrixXd matData = m_pListReceivedSamples->takeFirst();
-        qDebug() << "matData take first";
-        qDebug() << "";
         qDebug() << matData.size();
-        qDebug() << "";
         m_pRTMSA_BufferOutput->data()->setValue(matData);
         qDebug() << "value set";
     }
     m_mutex.unlock();
     qDebug() << "mutex unlocked";
-    qDebug() << "=======================================";
 }
 
 //*************************************************************************************************************
@@ -378,7 +374,7 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
     qDebug() << "Appending matrix";
     m_mutex.lock();
     if(m_bIsRunning) {
-        //qDebug()<<"Natus::onNewDataAvailable - appending data";
+
         m_pListReceivedSamples->append(matData);
     }
     m_mutex.unlock();

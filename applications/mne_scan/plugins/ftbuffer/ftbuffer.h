@@ -181,13 +181,13 @@ public:
     */
     bool disconnectFromBuffer();
 
-    //=========================================================================================================
-    /**
-    * runs idleCall() on a loop to continuously request buffer data
-    *
-    * @brief requests buffer data on a loop
-    */
-    Eigen::MatrixXd getData();
+//    //=========================================================================================================
+//    /**
+//    * runs idleCall() on a loop to continuously request buffer data
+//    *
+//    * @brief requests buffer data on a loop
+//    */
+//    Eigen::MatrixXd getData();
 
     //void updateBufferAddress(QString address);
 
