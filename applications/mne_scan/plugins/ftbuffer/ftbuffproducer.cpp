@@ -70,8 +70,13 @@ void FtBuffProducer::run()
 
         qDebug() << "FtBuffProducer::run" << i;
         i++;
-        emit newDataAvailable(m_pFtBuffer->getData());
-        QThread::usleep(500);
+        m_pFtBuffer->m_pFtBuffClient->getData();
+        if (m_pFtBuffer->m_pFtBuffClient->newData()){
+            m_pFtBuffer->m_pFtBuffClient->reset();
+            qDebug() << "Returning mat";
+            emit newDataAvailable(m_pFtBuffer->m_pFtBuffClient->dataMat());
+        }
+        QThread::usleep(50);
     }
 }
 
