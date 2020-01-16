@@ -3,7 +3,7 @@ title: Build from Source
 parent: Install
 nav_order: 2
 ---
-# Build from source
+# Build from Source
 
 ## Get a compiler
 
@@ -42,6 +42,7 @@ Setup a new remote pointing to MNE-CPP's main repository:
 
 Every time you want to update to the newest changes use:
 
+    $ git fetch --all
     $ git rebase upstream/master
 
 ## Compile the source code

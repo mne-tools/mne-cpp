@@ -1,9 +1,9 @@
 ---
-title: MNE CPP on Neuromag Linux
+title: MNE-CPP on Neuromag Linux
 parent: Develop
 nav_order: 4
 ---
-# MNE CPP on Neuromag Linux
+# MNE-CPP on Neuromag Linux
 
 #### Warning: You should know what you are doing and be familiar with the Neuromag system!
 

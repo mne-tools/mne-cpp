@@ -3,7 +3,7 @@ title: Contribution Guide
 parent: Contribute
 nav_order: 1
 ---
-# Contribution guide
+# Contribution Guide
 
 MNE-CPP is an open-source project and is made better by contributions from our users. To start contributing, make sure to first follow our [guide](../install/buildguide.md) to setup MNE-CPP for development. You can also view our overview on [deploying MNE-CPP](build_run_depl_pack.md), and our [convention and style guide](conv_style.md).
 

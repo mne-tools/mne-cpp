@@ -71,7 +71,7 @@ nav_order: 5
 
     * Call configure from new working directory in order to perform a shadow build.
 
-      With thread support (somehow this prevented quick and qml to be build, which are needed for mne_launch for example):
+      With thread support:
 
       ```
       ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix /home/lorenz/Qt/5.14.0/wasm_em1393_64_withThread
@@ -105,8 +105,7 @@ nav_order: 5
    ```
    mkdir mne-cpp-shadow
    cd mne-cpp-shadow
-   /home/lorenz/Qt/5.14.0/wasm_em1393_64_withThread/bin/qmake
-   ../mne-cpp/mne-cpp.pro
+   /home/lorenz/Qt/5.14.0/wasm_em1393_64_withThread/bin/qmake ../mne-cpp/mne-cpp.pro
    make -j8
    ```
 
@@ -114,7 +113,7 @@ nav_order: 5
 
 ## Running an application
 
- * Navigate to mne-cpp bin and start a server
+ * Navigate to mne-cpp/bin and start a server
 
    ```
    python3 -m http.server
