@@ -269,10 +269,10 @@ void FtBuffer::setUpFiffInfo()
     //Set number of channels, sampling frequency and high/-lowpass
     //
     //CURRENTLY HARDWIRED TO FTBUFFER EXAMPLE DATA PARAMS FROM SINE2FT
-    m_pFiffInfo->nchan = 16;
-    m_pFiffInfo->sfreq = 20;
+    m_pFiffInfo->nchan = m_iNumChannels;
+    m_pFiffInfo->sfreq = m_iSampFreq;
     m_pFiffInfo->highpass = 0.001f;
-    m_pFiffInfo->lowpass = 20/2;
+    m_pFiffInfo->lowpass = m_iSampFreq/2;
 
     //
     //Set up the channel info
@@ -384,4 +384,9 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
     }
     //m_mutex.unlock();
 
+}
+
+void FtBuffer::setParams(int freq, int chan) {
+    m_iSampFreq = freq;
+    m_iNumChannels = chan;
 }

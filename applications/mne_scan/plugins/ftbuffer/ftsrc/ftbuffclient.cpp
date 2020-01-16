@@ -368,8 +368,8 @@ void FtBuffClient::idleCall() {
     qDebug() << "@@@@ 3 @@@@";
 
     int count = 0;
-    for (int i = 0; i < int (32); i++) {
-        for (int j = 0; j < int (numChannels); j++) {
+    for (int i = 0; i < int (ddef.nsamples); i++) {
+        for (int j = 0; j < int (ddef.nchans); j++) {
             matData(j,i) = fdata[count]/5000;
             if (count % 32 == 0) qDebug() << "---Blockstart---" << count/32;
             qDebug() << fdata[count];
@@ -473,3 +473,4 @@ bool FtBuffClient::newData() {
 Eigen::MatrixXd FtBuffClient::dataMat() {
     return *matEmit;
 }
+
