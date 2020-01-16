@@ -71,11 +71,12 @@ void FtBuffProducer::run()
 
         qDebug() << "FtBuffProducer::run" << i;
         i++;
-        m_pFtBuffer->m_pFtBuffClient->getData();
-        if (m_pFtBuffer->m_pFtBuffClient->newData()){
-            m_pFtBuffer->m_pFtBuffClient->reset();
+        m_pFtBuffClient->getData();
+        if (m_pFtBuffClient->newData()){
             qDebug() << "Returning mat";
-            emit newDataAvailable(m_pFtBuffer->m_pFtBuffClient->dataMat());
+            emit newDataAvailable(m_pFtBuffClient->dataMat());
+            m_pFtBuffClient->reset();
+
         }
         //m_pFtBuffer->pushData();
         QThread::usleep(50);

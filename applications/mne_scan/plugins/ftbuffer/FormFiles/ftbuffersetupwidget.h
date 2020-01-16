@@ -46,6 +46,7 @@
 #include "../ui_ftbuffersetup.h"
 #include "ftbufferaboutwidget.h"
 #include "../ftbuffer.h"
+#include "../ftbuffproducer.h"
 
 
 //*************************************************************************************************************

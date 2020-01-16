@@ -121,7 +121,7 @@ bool FtBuffer::start() {
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
 
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
-    connect(this, &FtBuffer::workCommand, m_pFtBuffProducer.data(),&FtBuffProducer::doWork, Qt::DirectConnection);
+    connect(this, &FtBuffer::workCommand, m_pFtBuffProducer.data(),&FtBuffProducer::doWork);
 
     m_pProducerThread.start();
     //m_FtBuffClient
@@ -169,27 +169,28 @@ QWidget* FtBuffer::setupWidget() {
 
 void FtBuffer::run() {
     qDebug() << "Ft Buffer run()";
-
     emit workCommand();
+    while (m_bIsRunning) {
 
-    while(m_bIsRunning) {
-        //m_mutex.lock();
-        //if(m_bIsRunning){break;}
+    }
+//    while(m_bIsRunning) {
+//        m_mutex.lock();
+//        if(m_bIsRunning){break;}
 
 //        qDebug() << "FtBuffer run() loop running";
 //        pushData();
 //        QThread::usleep(100);
-    }
+//    }
 }
 
-////*************************************************************************************************************
+//*************************************************************************************************************
 
-//void FtBuffer::showYourWidget() {
-//    m_pYourWidget = FtBufferYourWidget::SPtr(new FtBufferYourWidget());
-//    m_pYourWidget->show();
-//}
+void FtBuffer::showYourWidget() {
+    m_pYourWidget = FtBufferYourWidget::SPtr(new FtBufferYourWidget());
+    m_pYourWidget->show();
+}
 
-////*************************************************************************************************************
+//*************************************************************************************************************
 
 //bool FtBuffer::connectToBuffer(QString addr){
 //    //this->m_FtBuffClient.setAddress(addr);
@@ -269,9 +270,9 @@ void FtBuffer::setUpFiffInfo()
     //
     //CURRENTLY HARDWIRED TO FTBUFFER EXAMPLE DATA PARAMS FROM SINE2FT
     m_pFiffInfo->nchan = 16;
-    m_pFiffInfo->sfreq = 256;
+    m_pFiffInfo->sfreq = 20;
     m_pFiffInfo->highpass = 0.001f;
-    m_pFiffInfo->lowpass = 256/2;
+    m_pFiffInfo->lowpass = 20/2;
 
     //
     //Set up the channel info

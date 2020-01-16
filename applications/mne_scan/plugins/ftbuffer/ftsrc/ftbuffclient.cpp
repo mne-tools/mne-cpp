@@ -184,7 +184,7 @@ bool FtBuffClient::readHeader() {
     lpFilter = new MultiChannelFilter<float,float>(numChannels, LPFILTORD);
     lpFilter->setButterLP(LPFREQ/header_def.fsample);
 
-    //m_matData.resize(numChannels, 32);
+    m_matData.resize(numChannels, 32);
     return true;
 }
 
@@ -356,27 +356,29 @@ void FtBuffClient::idleCall() {
         lpFilter->process(ddef.nsamples, fdata, fdata); // in place
     }
 
-    m_matData.resize(numChannels, 32);
+    //m_matData.resize(numChannels, 32);
     qDebug() << "@@@@ 1 @@@@";
 
     Eigen::MatrixXf matData;
 
     qDebug() << "@@@@ 2 @@@@";
 
-    matData.resize(numChannels, numSamples);
+    matData.resize(numChannels, 32);
 
     qDebug() << "@@@@ 3 @@@@";
 
     int count = 0;
-    for (int i = 0; i < int (numSamples); i++) {
+    for (int i = 0; i < int (32); i++) {
         for (int j = 0; j < int (numChannels); j++) {
-            matData(j,i) = fdata[count];
+            matData(j,i) = fdata[count]/5000;
+            if (count % 32 == 0) qDebug() << "---Blockstart---" << count/32;
+            qDebug() << fdata[count];
             count++;
         }
     }
-    qDebug() << matData.size();
+    qDebug() << "matData" << matData.size();
 
-    if(m_iMatDataSampleIterator+matData.cols() <= m_matData.cols()) {
+    /*if(m_iMatDataSampleIterator+matData.cols() <= m_matData.cols()) {
         m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), matData.cols()) = matData.cast<double>();
 
         m_iMatDataSampleIterator += matData.cols();
@@ -391,12 +393,16 @@ void FtBuffClient::idleCall() {
     if(m_iMatDataSampleIterator == m_matData.cols()) {
         m_iMatDataSampleIterator = 0;
         //qDebug()<<"Emit data";
-        matEmit = m_matData.cast<double>();
+        matEmit = new Eigen::MatrixXd(m_matData.cast<double>());
         m_bnewData = true;
         qDebug() << "";
-        qDebug() << matEmit.size();
+        qDebug() << matEmit->size();
         qDebug() << "";
     }
+    */
+
+    matEmit = new Eigen::MatrixXd(matData.cast<double>());
+    m_bnewData = true;
 
     qDebug() << "@@@@ 4 @@@@";
     //outputSamples(ddef.nsamples, fdata);
@@ -456,6 +462,8 @@ void FtBuffClient::getData() {
 
 void FtBuffClient::reset(){
     m_bnewData = false;
+    delete matEmit;
+    matEmit = Q_NULLPTR;
 }
 
 bool FtBuffClient::newData() {
@@ -463,5 +471,5 @@ bool FtBuffClient::newData() {
 }
 
 Eigen::MatrixXd FtBuffClient::dataMat() {
-    return matEmit;
+    return *matEmit;
 }

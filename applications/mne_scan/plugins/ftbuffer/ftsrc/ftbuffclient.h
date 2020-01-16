@@ -206,7 +206,7 @@ private:
     int                 skipped;
 
     bool                m_bnewData;
-    Eigen::MatrixXd     matEmit;
+    Eigen::MatrixXd*    matEmit;
     Eigen::MatrixXd     m_matData;
     int                 m_iMatDataSampleIterator;
 
