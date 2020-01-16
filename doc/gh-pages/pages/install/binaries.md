@@ -3,6 +3,7 @@ title: Releases
 parent: Install
 nav_order: 1
 ---
+# Releases
 
 Select the version and platform you'd like to download:
 
