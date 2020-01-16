@@ -54,6 +54,7 @@ using namespace FTBUFFERPLUGIN;
 FtBuffProducer::FtBuffProducer(FtBuffer* pFtBuffer) :
 m_pFtBuffer(pFtBuffer)
 {
+    m_pFtBuffClient = new FtBuffClient();
 }
 
 //*************************************************************************************************************
@@ -76,10 +77,35 @@ void FtBuffProducer::run()
             qDebug() << "Returning mat";
             emit newDataAvailable(m_pFtBuffer->m_pFtBuffClient->dataMat());
         }
+        //m_pFtBuffer->pushData();
         QThread::usleep(50);
     }
+    delete m_pFtBuffClient;
 }
 
 void FtBuffProducer::doWork() {
     run();
 }
+
+//*************************************************************************************************************
+
+bool FtBuffProducer::connectToBuffer(QString addr){
+    //this->m_FtBuffClient.setAddress(addr);
+    //updateBufferAddress(addr);
+
+    m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
+    strcpy(m_pTempAddress, addr.toLocal8Bit().constData());
+
+    delete m_pFtBuffClient;
+
+    m_pFtBuffClient = new FtBuffClient(m_pTempAddress);
+    return this->m_pFtBuffClient->startConnection();
+}
+
+//*************************************************************************************************************
+bool FtBuffProducer::disconnectFromBuffer(){
+    return this->m_pFtBuffClient->stopConnection();
+}
+
+//*************************************************************************************************************
+

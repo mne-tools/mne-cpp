@@ -54,6 +54,13 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <ftsrc/ftbuffclient.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE
 //=============================================================================================================
 
@@ -89,6 +96,22 @@ public:
 
     ~FtBuffProducer();
 
+    //=========================================================================================================
+    /**
+    * Changes stored address and connects the member FtBuffClient to that address
+    *
+    * @brief connects buffer client to provided address
+    */
+    bool connectToBuffer(QString addr);
+
+    //=========================================================================================================
+    /**
+    * Changes stored address and connects the member FtBuffClient to that address
+    *
+    * @brief connects buffer client to provided address
+    */
+    bool disconnectFromBuffer();
+
 public slots:
 
       void doWork();
@@ -114,6 +137,10 @@ private:
     Eigen::MatrixXd                 m_matData;
 
     FtBuffer*                       m_pFtBuffer;
+
+    char*                           m_pTempAddress;
+
+    FtBuffClient*                   m_pFtBuffClient;
 };
 
 } // namespace

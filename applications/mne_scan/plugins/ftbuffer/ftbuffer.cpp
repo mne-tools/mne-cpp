@@ -63,7 +63,7 @@ FtBuffer::FtBuffer()
 {
     qDebug() << "Constructing FtBuffer Object";
 
-    m_pFtBuffClient = new FtBuffClient();
+    //m_pFtBuffClient = new FtBuffClient();
     m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("FieldTrip Buffer Widget"),this);
     m_pActionShowYourWidget->setShortcut(tr("F12"));
     m_pActionShowYourWidget->setStatusTip(tr("FieldTrip Buffer Widget"));
@@ -95,7 +95,7 @@ void FtBuffer::init() {
 }
 
 void FtBuffer::unload() {
-    delete m_pFtBuffClient;
+    //delete m_pFtBuffClient;
     delete m_pTempAddress;
 }
 
@@ -173,40 +173,43 @@ void FtBuffer::run() {
     emit workCommand();
 
     while(m_bIsRunning) {
-        qDebug() << "FtBuffer run() loop running";
-        pushData();
-        QThread::usleep(100);
+        //m_mutex.lock();
+        //if(m_bIsRunning){break;}
+
+//        qDebug() << "FtBuffer run() loop running";
+//        pushData();
+//        QThread::usleep(100);
     }
 }
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-void FtBuffer::showYourWidget() {
-    m_pYourWidget = FtBufferYourWidget::SPtr(new FtBufferYourWidget());
-    m_pYourWidget->show();
-}
+//void FtBuffer::showYourWidget() {
+//    m_pYourWidget = FtBufferYourWidget::SPtr(new FtBufferYourWidget());
+//    m_pYourWidget->show();
+//}
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-bool FtBuffer::connectToBuffer(QString addr){
-    //this->m_FtBuffClient.setAddress(addr);
-    //updateBufferAddress(addr);
+//bool FtBuffer::connectToBuffer(QString addr){
+//    //this->m_FtBuffClient.setAddress(addr);
+//    //updateBufferAddress(addr);
 
-    m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
-    strcpy(m_pTempAddress, addr.toLocal8Bit().constData());
+//    m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
+//    strcpy(m_pTempAddress, addr.toLocal8Bit().constData());
 
-    delete m_pFtBuffClient;
+//    delete m_pFtBuffClient;
 
-    m_pFtBuffClient = new FtBuffClient(m_pTempAddress);
-    return this->m_pFtBuffClient->startConnection();
-}
+//    m_pFtBuffClient = new FtBuffClient(m_pTempAddress);
+//    return this->m_pFtBuffClient->startConnection();
+//}
 
-//*************************************************************************************************************
-bool FtBuffer::disconnectFromBuffer(){
-    return this->m_pFtBuffClient->stopConnection();
-}
+////*************************************************************************************************************
+//bool FtBuffer::disconnectFromBuffer(){
+//    return this->m_pFtBuffClient->stopConnection();
+//}
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
 //Eigen::MatrixXd FtBuffer::getData() {
 //    qDebug() << "FtBuffer::getData()";
@@ -372,11 +375,12 @@ bool FtBuffer::isRunning() {
 
 void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
     qDebug() << "Appending matrix";
-    m_mutex.lock();
+    //m_mutex.lock();
     if(m_bIsRunning) {
 
-        m_pListReceivedSamples->append(matData);
+        m_pRTMSA_BufferOutput->data()->setValue(matData);
+        //m_pListReceivedSamples->append(matData);
     }
-    m_mutex.unlock();
+    //m_mutex.unlock();
 
 }
