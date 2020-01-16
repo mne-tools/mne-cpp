@@ -69,7 +69,7 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox, QWidget *parent)
 {
     ui.setupUi(this);
 
-    this->ui.m_lineEditIP->setText(toolbox->m_pFtBuffClient->getAddress());
+    this->ui.m_lineEditIP->setText(toolbox->m_pFtBuffProducer->m_pFtBuffClient->getAddress());
 
     //Always connect GUI elemts after ui.setpUi has been called
     connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog())); // About page
@@ -98,12 +98,12 @@ void FtBufferSetupWidget::showAboutDialog()
 void FtBufferSetupWidget::pressedConnect()
 {
     if(ui.m_qPushButton_Connect->text() == "Disconnect" && !m_pFtBuffer->isRunning()) {
-        if (m_pFtBuffer->disconnectFromBuffer()) {
+        if (m_pFtBuffer->m_pFtBuffProducer->disconnectFromBuffer()) {
             ui.m_qPushButton_Connect->setText("Connect");
         }
     } else {
         //qDebug() << "TEXTFIELD:" << this->ui.m_lineEditIP->text();
-        if (m_pFtBuffer->connectToBuffer(this->ui.m_lineEditIP->text())) {
+        if (m_pFtBuffer->m_pFtBuffProducer->connectToBuffer(this->ui.m_lineEditIP->text())) {
             ui.m_qPushButton_Connect->setText("Disconnect");
         }
     }

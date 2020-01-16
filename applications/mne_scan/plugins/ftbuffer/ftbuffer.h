@@ -60,7 +60,8 @@
 #include "FormFiles/ftbuffersetupwidget.h"
 #include "FormFiles/ftbufferyourwidget.h"
 
-#include <ftsrc/ftbuffclient.h>
+//#include <ftsrc/ftbuffclient.h>
+#include "ftbuffproducer.h"
 
 #include <scShared/Interfaces/ISensor.h>
 #include <scShared/Interfaces/IAlgorithm.h>
@@ -224,7 +225,7 @@ private:
 
     char*                                           m_pTempAddress;
 
-    FtBuffClient*                                   m_pFtBuffClient;
+    //FtBuffClient*                                   m_pFtBuffClient;
 
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSA_BufferOutput;

@@ -85,6 +85,8 @@ class FtBuffProducer : public QObject
     Q_OBJECT
 
     friend class FtBuffer;
+    friend class FtBuffClient;
+    friend class FtBufferSetupWidget;
 
 public:
 
