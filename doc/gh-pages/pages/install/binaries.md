@@ -1,6 +1,6 @@
 ---
 title: Releases
-parent: Setup
+parent: Install
 nav_order: 1
 ---
 

@@ -1,9 +1,9 @@
 ---
 title: Build from Source
-parent: Setup
+parent: Install
 nav_order: 2
 ---
-# Build from Source
+# Build from source
 
 ## Get a compiler
 
@@ -46,7 +46,7 @@ Every time you want to update to the newest changes use:
 
 ## Compile the source code
 
-| **Please note:** If you are working on an operating system on a "non-western" system, i.e. Japan, you might encounter problems with unicode interpretation. Please do the  following: Go to Control Panel -> Language and Region -> Management tab -> Language Settings for non-Unicode Programs -> Set to English (U.S.) -> Reboot your system. |
+| **Please note:** If you are working on an operating system on a "non-western" system, i.e. Japan, you might encounter problems with unicode interpretation. Please do the  following: Go to Control Panel > Language and Region > Management tab > Language Settings for non-Unicode Programs > Set to English (U.S.) > Reboot your system. |
 
 1. Go to your cloned repository folder and run the `mne-cpp.pro` file with QtCreator.
 2. The first time you open the mne-cpp.pro file you will be prompted to configure the project with a pre-defined kit. Select the appropriate kit, e.g., `Desktop Qt 5.12.6 MSVC2017 64bit` and configure the project.
