@@ -198,6 +198,8 @@ public:
 
     void pushData();
 
+    void setParams(int freq, int chan);
+
 signals:
 
     void workCommand();
@@ -230,6 +232,8 @@ private:
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSA_BufferOutput;
 
+    int                                             m_iNumChannels;
+    int                                             m_iSampFreq;
 };
 
 }//namespace end brace
