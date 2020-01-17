@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     rapmusictoolbox.pro
+# @file     rtcmusic.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     March, 2014
@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the rapmusictoolbox plug-in.
+# @brief    This project file generates the makefile for the rtcmusic plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -38,12 +38,12 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += RAPMUSICTOOLBOX_LIBRARY
+DEFINES += RTCMUSIC_LIBRARY
 
 QT += core widgets concurrent
 #QT += concurrent
 
-TARGET = rapmusictoolbox
+TARGET = rtcmusic
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -85,26 +85,26 @@ else {
 }
 
 SOURCES += \
-        rapmusictoolbox.cpp \
-        FormFiles/rapmusictoolboxsetupwidget.cpp \
-        FormFiles/rapmusictoolboxaboutwidget.cpp
+        rtcmusic.cpp \
+        FormFiles/rtcmusicsetupwidget.cpp \
+        FormFiles/rtcmusicaboutwidget.cpp
 
 HEADERS += \
-        rapmusictoolbox.h\
-        rapmusictoolbox_global.h \
-        FormFiles/rapmusictoolboxsetupwidget.h \
-        FormFiles/rapmusictoolboxaboutwidget.h
+        rtcmusic.h\
+        rtcmusic_global.h \
+        FormFiles/rtcmusicsetupwidget.h \
+        FormFiles/rtcmusicaboutwidget.h
 
 FORMS += \
-        FormFiles/rapmusictoolboxsetup.ui \
-        FormFiles/rapmusictoolboxabout.ui
+        FormFiles/rtcmusicsetup.ui \
+        FormFiles/rtcmusicabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 RESOURCES += \
-    rapmusictoolbox.qrc
+    rtcmusic.qrc
 
 OTHER_FILES += raplab.json
 

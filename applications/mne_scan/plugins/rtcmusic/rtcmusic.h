@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rapmusictoolbox.h
+* @file     rtcmusic.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RapMusicToolbox class.
+* @brief    Contains the declaration of the RtcMusic class.
 *
 */
 
-#ifndef RAPMUSICTOOLBOX_H
-#define RAPMUSICTOOLBOX_H
+#ifndef RTCMUSIC_H
+#define RTCMUSIC_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rapmusictoolbox_global.h"
+#include "rtcmusic_global.h"
 #include <scShared/Interfaces/IAlgorithm.h>
 
 #include <utils/generics/circularmatrixbuffer.h>
@@ -70,10 +70,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RapMusicToolboxPlugin
+// DEFINE NAMESPACE RTCMUSICPLUGIN
 //=============================================================================================================
 
-namespace RAPMUSICTOOLBOXPLUGIN
+namespace RTCMUSICPLUGIN
 {
 
 
@@ -99,31 +99,31 @@ using namespace INVERSELIB;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RapMusicToolbox
+* DECLARE CLASS RtcMusic
 *
-* @brief The RapMusicToolbox class provides a dummy algorithm structure.
+* @brief The RtcMusic class provides a dummy algorithm structure.
 */
-class RAPMUSICTOOLBOXSHARED_EXPORT RapMusicToolbox : public IAlgorithm
+class RTCMUSICSHARED_EXPORT RtcMusic : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "rapmusictoolbox.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "rtcmusic.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
-    friend class RapMusicToolboxSetupWidget;
+    friend class RtcMusicSetupWidget;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a RapMusicToolbox.
+    * Constructs a RtcMusic.
     */
-    RapMusicToolbox();
+    RtcMusic();
     //=========================================================================================================
     /**
-    * Destroys the RapMusicToolbox.
+    * Destroys the RtcMusic.
     */
-    ~RapMusicToolbox();
+    ~RtcMusic();
 
     //=========================================================================================================
     /**
@@ -133,7 +133,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise the RapMusicToolbox.
+    * Initialise the RtcMusic.
     */
     virtual void init();
 
@@ -195,7 +195,7 @@ private:
     bool m_bReceiveData;    /**< If thread is ready to receive data */
     bool m_bProcessData;    /**< If data should be received for processing */
 
-    //RapMusicToolbox stuff
+    //RtcMusic stuff
     QFile                       m_qFileFwdSolution; /**< File to forward solution. */
     MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
     MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
@@ -221,4 +221,4 @@ private:
 
 } // NAMESPACE
 
-#endif // RAPMUSICTOOLBOX_H
+#endif // RTCMUSIC_H

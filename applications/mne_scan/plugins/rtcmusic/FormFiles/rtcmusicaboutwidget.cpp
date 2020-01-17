@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rapmusictoolbox_global.h
+* @file     rtcmusicaboutwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,34 +29,41 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the RapMusicToolbox library export/import macros.
+* @brief    Definition of the RtcMusicAboutWidget class.
 *
 */
 
-#ifndef RAPMUSICTOOLBOX_GLOBAL_H
-#define RAPMUSICTOOLBOX_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "rtcmusicaboutwidget.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+using namespace RTCMUSICPLUGIN;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-#if defined(STATICLIB)
-#  define RAPMUSICTOOLBOXSHARED_EXPORT
-#elif defined(RAPMUSICTOOLBOX_LIBRARY)
-#  define RAPMUSICTOOLBOXSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define RAPMUSICTOOLBOXSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+RtcMusicAboutWidget::RtcMusicAboutWidget(QWidget *parent)
+: QDialog(parent)
+{
+    ui.setupUi(this);
+}
 
 
-#endif // RAPMUSICTOOLBOX_GLOBAL_H
+//*************************************************************************************************************
+
+RtcMusicAboutWidget::~RtcMusicAboutWidget()
+{
+
+}

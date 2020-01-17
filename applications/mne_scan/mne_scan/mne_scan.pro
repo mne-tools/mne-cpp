@@ -61,7 +61,7 @@ contains(MNECPP_CONFIG, static) {
     QTPLUGIN += dummytoolbox
     QTPLUGIN += epidetect
     QTPLUGIN += mne
-    QTPLUGIN += rapmusictoolbox
+    QTPLUGIN += rtcmusic
     QTPLUGIN += averaging
     QTPLUGIN += covariance
     QTPLUGIN += noise

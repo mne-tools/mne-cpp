@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rapmusictoolboxsetupwidget.h
+* @file     rtcmusicsetupwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RapMusicToolboxSetupWidget class.
+* @brief    Contains the declaration of the RtcMusicSetupWidget class.
 *
 */
 
-#ifndef RAPMUSICTOOLBOXSETUPWIDGET_H
-#define RAPMUSICTOOLBOXSETUPWIDGET_H
+#ifndef RTCMUSICSETUPWIDGET_H
+#define RTCMUSICSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rapmusictoolboxsetup.h"
+#include "../ui_rtcmusicsetup.h"
 
 
 //*************************************************************************************************************
@@ -62,10 +62,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RapMusicToolboxPlugin
+// DEFINE NAMESPACE RTCMUSICPLUGIN
 //=============================================================================================================
 
-namespace RAPMUSICTOOLBOXPLUGIN
+namespace RTCMUSICPLUGIN
 {
 
 
@@ -74,7 +74,7 @@ namespace RAPMUSICTOOLBOXPLUGIN
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RapMusicToolbox;
+class RtcMusic;
 
 
 //=============================================================================================================
@@ -83,7 +83,7 @@ class RapMusicToolbox;
 *
 * @brief The DummySetupWidget class provides the DummyToolbox configuration window.
 */
-class RapMusicToolboxSetupWidget : public QWidget
+class RtcMusicSetupWidget : public QWidget
 {
     Q_OBJECT
 
@@ -91,19 +91,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RapMusicToolboxSetupWidget which is a child of parent.
+    * Constructs a RtcMusicSetupWidget which is a child of parent.
     *
-    * @param [in] toolbox a pointer to the corresponding RapMusicToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RapMusicToolboxSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * @param [in] toolbox a pointer to the corresponding RtcMusic.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RtcMusicSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
     */
-    RapMusicToolboxSetupWidget(RapMusicToolbox* toolbox, QWidget *parent = 0);
+    RtcMusicSetupWidget(RtcMusic* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RapMusicToolboxSetupWidget.
-    * All RapMusicToolboxSetupWidget's children are deleted first. The application exits if RapMusicToolboxSetupWidget is the main widget.
+    * Destroys the RtcMusicSetupWidget.
+    * All RtcMusicSetupWidget's children are deleted first. The application exits if RtcMusicSetupWidget is the main widget.
     */
-    ~RapMusicToolboxSetupWidget();
+    ~RtcMusicSetupWidget();
 
     //=========================================================================================================
     /**
@@ -150,11 +150,11 @@ private:
     void showSurfaceDirDialog();
 
 
-    RapMusicToolbox* m_pRapMusicToolbox;            /**< Holds a pointer to corresponding DummyToolbox.*/
+    RtcMusic* m_pRtcMusic;            /**< Holds a pointer to corresponding DummyToolbox.*/
 
-    Ui::RapMusicToolboxSetupWidgetClass ui;   /**< Holds the user interface for the DummySetupWidget.*/
+    Ui::RtcMusicSetupWidgetClass ui;   /**< Holds the user interface for the DummySetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // RAPMUSICTOOLBOXSETUPWIDGET_H
+#endif // RTCMUSICSETUPWIDGET_H

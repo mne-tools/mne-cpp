@@ -60,7 +60,7 @@
 #include <../plugins/dummytoolbox/dummytoolbox.h>
 #include <../plugins/epidetect/epidetect.h>
 #include <../plugins/mne/mne.h>
-#include <../plugins/rapmusictoolbox/rapmusictoolbox.h>
+#include <../plugins/rtcmusic/rtcmusic.h>
 #include <../plugins/averaging/averaging.h>
 #include <../plugins/covariance/covariance.h>
 #include <../plugins/noise/noiseestimate.h>
@@ -134,7 +134,7 @@ void PluginManager::loadPlugins(const QString& dir)
     lObjects << new DUMMYTOOLBOXPLUGIN::DummyToolbox;
     lObjects << new EPIDETECTPLUGIN::Epidetect;
     lObjects << new MNEPLUGIN::MNE;
-    lObjects << new RAPMUSICTOOLBOXPLUGIN::RapMusicToolbox;
+    lObjects << new RTCMUSICPLUGIN::RtcMusic;
     lObjects << new AVERAGINGPLUGIN::Averaging;
     lObjects << new COVARIANCEPLUGIN::Covariance;
     lObjects << new NOISEESTIMATEPLUGIN::NoiseEstimate;

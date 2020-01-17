@@ -57,7 +57,7 @@ SUBDIRS += \
     dummytoolbox \
     epidetect \
     mne \
-    rapmusictoolbox \
+    rtcmusic \
     averaging \
     covariance \
     noise \

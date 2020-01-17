@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rapmusictoolboxaboutwidget.h
+* @file     rtcmusicaboutwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     March, 2014
@@ -28,12 +28,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RapMusicToolboxAboutWidget class.
+* @brief    Contains the declaration of the RtcMusicAboutWidget class.
 *
 */
 
-#ifndef RAPMUSICTOOLBOXABOUTWIDGET_H
-#define RAPMUSICTOOLBOXABOUTWIDGET_H
+#ifndef RTCMUSICABOUTWIDGET_H
+#define RTCMUSICABOUTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rapmusictoolboxabout.h"
+#include "../ui_rtcmusicabout.h"
 
 
 //*************************************************************************************************************
@@ -54,20 +54,20 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RapMusicToolboxPlugin
+// DEFINE NAMESPACE RTCMUSICPLUGIN
 //=============================================================================================================
 
-namespace RAPMUSICTOOLBOXPLUGIN
+namespace RTCMUSICPLUGIN
 {
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RapMusicToolboxAboutWidget
+* DECLARE CLASS RtcMusicAboutWidget
 *
-* @brief The RapMusicToolboxAboutWidget class provides the about dialog for the RapMusicToolbox.
+* @brief The RtcMusicAboutWidget class provides the about dialog for the RtcMusic.
 */
-class RapMusicToolboxAboutWidget : public QDialog
+class RtcMusicAboutWidget : public QDialog
 {
     Q_OBJECT
 
@@ -75,25 +75,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RapMusicToolboxAboutWidget dialog which is a child of parent.
+    * Constructs a RtcMusicAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RapMusicToolboxAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RtcMusicAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
     */
-    RapMusicToolboxAboutWidget(QWidget *parent = 0);
+    RtcMusicAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RapMusicToolboxAboutWidget.
-    * All DummyAboutWidget's children are deleted first. The application exits if RapMusicToolboxAboutWidget is the main widget.
+    * Destroys the RtcMusicAboutWidget.
+    * All DummyAboutWidget's children are deleted first. The application exits if RtcMusicAboutWidget is the main widget.
     */
-    ~RapMusicToolboxAboutWidget();
+    ~RtcMusicAboutWidget();
 
 private:
 
-    Ui::RapMusicToolboxAboutWidgetClass ui;		/**< Holds the user interface for the RapMusicToolboxAboutWidget.*/
+    Ui::RtcMusicAboutWidgetClass ui;		/**< Holds the user interface for the RtcMusicAboutWidget.*/
 
 };
 
 } // NAMESPACE
 
-#endif // RAPMUSICTOOLBOXABOUTWIDGET_H
+#endif // RTCMUSICABOUTWIDGET_H
