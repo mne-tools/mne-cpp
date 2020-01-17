@@ -56,7 +56,7 @@ using namespace SCMEASLIB;
 
 FtBuffer::FtBuffer()
 : m_bIsRunning(false)
-, m_pFtBuffProducer(new FtBuffProducer(this))
+, m_pFtBuffProducer(QSharedPointer<FtBuffProducer>::create(this))
 , m_pListReceivedSamples(QSharedPointer<QList<Eigen::MatrixXd> >::create())
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
@@ -148,6 +148,14 @@ bool FtBuffer::stop() {
 
     m_pProducerThread.quit();
     m_pProducerThread.wait();
+
+
+    //Reset producer and sample received
+    m_pFtBuffProducer.clear();
+    m_pListReceivedSamples.clear();
+    m_pFtBuffProducer = QSharedPointer<FtBuffProducer>::create(this);
+    m_pListReceivedSamples = QSharedPointer<QList<Eigen::MatrixXd> >::create();
+
 
     return true;
 }
@@ -296,7 +304,7 @@ void FtBuffer::setUpFiffInfo()
 //        if(i <= m_pFiffInfo->nchan-2)
 //        {
             //Set channel name
-            sChType = QString("EEG ");
+            sChType = QString("CH. ");
             if(i<10) {
                 sChType.append("00");
             }
