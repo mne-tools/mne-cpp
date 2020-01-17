@@ -127,6 +127,8 @@ bool FtBuffer::start() {
     //m_FtBuffClient
     //while (true) { qDebug() << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; }
 
+    emit workCommand();
+
     return true;
 }
 
@@ -136,7 +138,11 @@ bool FtBuffer::stop() {
 
     qDebug() << "Running stop()";
 
+    m_mutex.lock();
     m_bIsRunning = false;
+    m_mutex.unlock();
+
+    //m_bIsRunning = false;
 
     m_pRTMSA_BufferOutput->data()->clear();
 
@@ -168,11 +174,11 @@ QWidget* FtBuffer::setupWidget() {
 //*************************************************************************************************************
 
 void FtBuffer::run() {
-    qDebug() << "Ft Buffer run()";
-    emit workCommand();
-    while (m_bIsRunning) {
+//    qDebug() << "Ft Buffer run()";
+//    emit workCommand();
+//    while (m_bIsRunning) {
 
-    }
+//    }
 //    while(m_bIsRunning) {
 //        m_mutex.lock();
 //        if(m_bIsRunning){break;}
@@ -376,13 +382,13 @@ bool FtBuffer::isRunning() {
 
 void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
     qDebug() << "Appending matrix";
-    //m_mutex.lock();
+    m_mutex.lock();
     if(m_bIsRunning) {
 
         m_pRTMSA_BufferOutput->data()->setValue(matData);
         //m_pListReceivedSamples->append(matData);
     }
-    //m_mutex.unlock();
+    m_mutex.unlock();
 
 }
 
