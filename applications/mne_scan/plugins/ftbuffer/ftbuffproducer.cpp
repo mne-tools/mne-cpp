@@ -60,6 +60,7 @@ m_pFtBuffer(pFtBuffer)
 //*************************************************************************************************************
 FtBuffProducer::~FtBuffProducer()
 {
+    delete m_pFtBuffClient;
 }
 
 //*************************************************************************************************************
@@ -67,11 +68,13 @@ FtBuffProducer::~FtBuffProducer()
 void FtBuffProducer::run()
 {
     long i = 0;
-    while (m_pFtBuffer->isRunning()) {
+    while (true) {
 
         qDebug() << "FtBuffProducer::run" << i;
         i++;
+
         m_pFtBuffClient->getData();
+
         if (m_pFtBuffClient->newData()){
             qDebug() << "Returning mat";
             emit newDataAvailable(m_pFtBuffClient->dataMat());
@@ -80,8 +83,13 @@ void FtBuffProducer::run()
         }
         //m_pFtBuffer->pushData();
         QThread::usleep(50);
+
+        m_pFtBuffer->m_mutex.lock();
+        if (!m_pFtBuffer->isRunning()){
+            break;
+        }
+        m_pFtBuffer->m_mutex.unlock();
     }
-    delete m_pFtBuffClient;
 }
 
 void FtBuffProducer::doWork() {
