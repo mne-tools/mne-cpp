@@ -59,7 +59,7 @@
 //#include <../plugins/lsladapter/lsladapter.h>
 #include <../plugins/dummytoolbox/dummytoolbox.h>
 #include <../plugins/epidetect/epidetect.h>
-#include <../plugins/mne/mne.h>
+#include <../plugins/rtcmne/rtcmne.h>
 #include <../plugins/rtcmusic/rtcmusic.h>
 #include <../plugins/averaging/averaging.h>
 #include <../plugins/covariance/covariance.h>
@@ -133,7 +133,7 @@ void PluginManager::loadPlugins(const QString& dir)
     //lObjects << new LSLADAPTERPLUGIN::LSLAdapter;
     lObjects << new DUMMYTOOLBOXPLUGIN::DummyToolbox;
     lObjects << new EPIDETECTPLUGIN::Epidetect;
-    lObjects << new MNEPLUGIN::MNE;
+    lObjects << new RTCMNEPLUGIN::RtcMne;
     lObjects << new RTCMUSICPLUGIN::RtcMusic;
     lObjects << new AVERAGINGPLUGIN::Averaging;
     lObjects << new COVARIANCEPLUGIN::Covariance;

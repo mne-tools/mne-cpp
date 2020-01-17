@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mnesetupwidget.cpp
+* @file     rtcmnesetupwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the MNESetupWidget class.
+* @brief    Definition of the RtcMneSetupWidget class.
 *
 */
 
@@ -38,10 +38,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mnesetupwidget.h"
-#include "mneaboutwidget.h"
+#include "rtcmnesetupwidget.h"
+#include "rtcmneaboutwidget.h"
 
-#include "../mne.h"
+#include "../rtcmne.h"
 
 #include <fs/annotationset.h>
 #include <fs/surfaceset.h>
@@ -63,7 +63,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEPLUGIN;
+using namespace RTCMNEPLUGIN;
 using namespace MNELIB;
 
 
@@ -72,7 +72,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNESetupWidget::MNESetupWidget(MNE* toolbox, QWidget *parent)
+RtcMneSetupWidget::RtcMneSetupWidget(RtcMne* toolbox, QWidget *parent)
 : QWidget(parent)
 , m_pMNE(toolbox)
 {
@@ -92,17 +92,17 @@ MNESetupWidget::MNESetupWidget(MNE* toolbox, QWidget *parent)
     else
         ui.m_qLabel_surfaceStat->setText("loaded");
 
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &MNESetupWidget::showAboutDialog);
-    connect(ui.m_qPushButton_FwdFileDialog, &QPushButton::released, this, &MNESetupWidget::showFwdFileDialog);
-    connect(ui.m_qPushButton_AtlasDirDialog, &QPushButton::released, this, &MNESetupWidget::showAtlasDirDialog);
-    connect(ui.m_qPushButton_SurfaceDirDialog, &QPushButton::released, this, &MNESetupWidget::showSurfaceDirDialog);
-    connect(ui.m_qPushButonStartClustering, &QPushButton::released, this, &MNESetupWidget::clusteringTriggered);
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &RtcMneSetupWidget::showAboutDialog);
+    connect(ui.m_qPushButton_FwdFileDialog, &QPushButton::released, this, &RtcMneSetupWidget::showFwdFileDialog);
+    connect(ui.m_qPushButton_AtlasDirDialog, &QPushButton::released, this, &RtcMneSetupWidget::showAtlasDirDialog);
+    connect(ui.m_qPushButton_SurfaceDirDialog, &QPushButton::released, this, &RtcMneSetupWidget::showSurfaceDirDialog);
+    connect(ui.m_qPushButonStartClustering, &QPushButton::released, this, &RtcMneSetupWidget::clusteringTriggered);
 }
 
 
 //*************************************************************************************************************
 
-MNESetupWidget::~MNESetupWidget()
+RtcMneSetupWidget::~RtcMneSetupWidget()
 {
 
 }
@@ -110,7 +110,7 @@ MNESetupWidget::~MNESetupWidget()
 
 //*************************************************************************************************************
 
-void MNESetupWidget::setClusteringState()
+void RtcMneSetupWidget::setClusteringState()
 {
     ui.m_qPushButonStartClustering->setEnabled(false);
     ui.m_qPushButonStartClustering->setText("Clustering...");
@@ -119,7 +119,7 @@ void MNESetupWidget::setClusteringState()
 
 //*************************************************************************************************************
 
-void MNESetupWidget::setSetupState()
+void RtcMneSetupWidget::setSetupState()
 {
     ui.m_qPushButonStartClustering->setEnabled(true);
     ui.m_qPushButonStartClustering->setText("Start Clustering");
@@ -128,25 +128,25 @@ void MNESetupWidget::setSetupState()
 
 //*************************************************************************************************************
 
-void MNESetupWidget::clusteringTriggered()
+void RtcMneSetupWidget::clusteringTriggered()
 {
     // start clustering
-    QFuture<void> future = QtConcurrent::run(m_pMNE, &MNE::doClustering);
+    QFuture<void> future = QtConcurrent::run(m_pMNE, &RtcMne::doClustering);
 }
 
 
 //*************************************************************************************************************
 
-void MNESetupWidget::showAboutDialog()
+void RtcMneSetupWidget::showAboutDialog()
 {
-    MNEAboutWidget aboutDialog(this);
+    RtcMneAboutWidget aboutDialog(this);
     aboutDialog.exec();
 }
 
 
 //*************************************************************************************************************
 
-void MNESetupWidget::showFwdFileDialog()
+void RtcMneSetupWidget::showFwdFileDialog()
 {
     QString t_sFileName = QFileDialog::getOpenFileName(this,
                                                     tr("Open Forward Solution"),
@@ -167,7 +167,7 @@ void MNESetupWidget::showFwdFileDialog()
 
 //*************************************************************************************************************
 
-void MNESetupWidget::showAtlasDirDialog()
+void RtcMneSetupWidget::showAtlasDirDialog()
 {
     QString t_sAtlasDir = QFileDialog::getExistingDirectory(this, tr("Open Atlas Directory"),
                                                             QString(),
@@ -198,7 +198,7 @@ void MNESetupWidget::showAtlasDirDialog()
 
 //*************************************************************************************************************
 
-void MNESetupWidget::showSurfaceDirDialog()
+void RtcMneSetupWidget::showSurfaceDirDialog()
 {
     QString t_sSurfaceDir = QFileDialog::getExistingDirectory(  this, tr("Open Surface Directory"),
                                                                 QString(),

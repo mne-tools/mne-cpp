@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mnesetupwidget.h
+* @file     rtcmneaboutwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the MNESetupWidget class.
+* @brief    Contains the declaration of the RtcMneAboutWidget class.
 *
 */
 
-#ifndef MNESETUPWIDGET_H
-#define MNESETUPWIDGET_H
+#ifndef RTCMNEABOUTWIDGET_H
+#define RTCMNEABOUTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_mnesetup.h"
+#include "../ui_rtcmneabout.h"
 
 
 //*************************************************************************************************************
@@ -55,35 +55,20 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE RTCMNEPLUGIN
 //=============================================================================================================
 
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEPLUGIN
-//=============================================================================================================
-
-namespace MNEPLUGIN
+namespace RTCMNEPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class MNE;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS RtcMneAboutWidget
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief The RtcMneAboutWidget class provides the about dialog for the MNE.
 */
-class MNESetupWidget : public QWidget
+class RtcMneAboutWidget : public QDialog
 {
     Q_OBJECT
 
@@ -91,70 +76,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a MNESetupWidget which is a child of parent.
+    * Constructs a RtcMneAboutWidget dialog which is a child of parent.
     *
-    * @param [in] toolbox a pointer to the corresponding MNEToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new MNESetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RtcMneAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
     */
-    MNESetupWidget(MNE* toolbox, QWidget *parent = 0);
+    RtcMneAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the MNESetupWidget.
-    * All MNESetupWidget's children are deleted first. The application exits if MNESetupWidget is the main widget.
+    * Destroys the RtcMneAboutWidget.
+    * All DummyAboutWidget's children are deleted first. The application exits if RtcMneAboutWidget is the main widget.
     */
-    ~MNESetupWidget();
-
-    //=========================================================================================================
-    /**
-    * Adapts the UI to clustering state
-    */
-    void setClusteringState();
-
-    //=========================================================================================================
-    /**
-    * Adapts the UI to setup state
-    */
-    void setSetupState();
+    ~RtcMneAboutWidget();
 
 private:
 
-    //=========================================================================================================
-    /**
-    * Triggers th cluster process
-    */
-    void clusteringTriggered();
+    Ui::RtcMneAboutWidgetClass ui;		/**< Holds the user interface for the RtcMneAboutWidget.*/
 
-    //=========================================================================================================
-    /**
-    * Shows the About Dialogs
-    */
-    void showAboutDialog();
-
-    //=========================================================================================================
-    /**
-    * Shows forward solution selection dialog
-    */
-    void showFwdFileDialog();
-
-    //=========================================================================================================
-    /**
-    * Shows atlas selection dialog
-    */
-    void showAtlasDirDialog();
-
-    //=========================================================================================================
-    /**
-    * Shows atlas selection dialog
-    */
-    void showSurfaceDirDialog();
-
-
-    MNE* m_pMNE;            /**< Holds a pointer to corresponding DummyToolbox.*/
-
-    Ui::MNESetupWidgetClass ui;   /**< Holds the user interface for the DummySetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // MNESETUPWIDGET_H
+#endif // RTCMNEABOUTWIDGET_H

@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne.pro
+# @file     rtcmne.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -43,7 +43,7 @@ DEFINES += MNE_LIBRARY
 
 QT += core widgets concurrent
 
-TARGET = mne
+TARGET = rtcmne
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -88,28 +88,28 @@ else {
 }
 
 SOURCES += \
-    mne.cpp \
-    FormFiles/mneaboutwidget.cpp \
-    FormFiles/mnesetupwidget.cpp
+    rtcmne.cpp \
+    FormFiles/rtcmneaboutwidget.cpp \
+    FormFiles/rtcmnesetupwidget.cpp
 
 HEADERS += \
-    mne.h\
-    mne_global.h \
-    FormFiles/mneaboutwidget.h \
-    FormFiles/mnesetupwidget.h
+    rtcmne.h\
+    rtcmne_global.h \
+    FormFiles/rtcmneaboutwidget.h \
+    FormFiles/rtcmnesetupwidget.h
 
 FORMS += \
-    FormFiles/mneabout.ui \
-    FormFiles/mnesetup.ui
+    FormFiles/rtcmneabout.ui \
+    FormFiles/rtcmnesetup.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
 RESOURCES += \
-    mne.qrc
+    rtcmne.qrc
 
-OTHER_FILES += mne.json
+OTHER_FILES += rtcmne.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD
