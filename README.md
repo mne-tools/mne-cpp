@@ -23,7 +23,7 @@ MNE-CPP is an open-source software framework which offers a variety of neuroscie
 Build from source
 -----------------
 
-To get and compile the latest source code please follow the [build guide](http://mne-tools.github.io/mne-cpp/pages/install/buildguide.html). The minimum requirements for building MNE-CPP are:
+To get and compile the latest source code please follow the [build guide](https://mne-cpp.github.io/pages/install/buildguide.html). The minimum requirements for building MNE-CPP are:
 
   * Compiler
     * Windows - [MSVC 2015](https://www.visualstudio.com/downloads/) or later
@@ -35,17 +35,17 @@ To get and compile the latest source code please follow the [build guide](http:/
 Releases
 --------
 
-Release binaries for Windows, Mac and Linux are available [here](http://mne-tools.github.io/mne-cpp/pages/setup/binaries.html).
+Release binaries for Windows, Mac and Linux are available [here](https://mne-cpp.github.io/pages/install/binaries.html).
 
 Get involved
 ------------
 
-If you want to contribute to MNE-CPP you can find all necessary information [here](http://mne-tools.github.io/mne-cpp/pages/contribute/contribute.html).
+If you want to contribute to MNE-CPP you can find all necessary information [here](https://mne-cpp.github.io/pages/contribute/contribute.html).
 
 Contact
 -------
 
-A list of contact persons can be found [here](http://mne-tools.github.io/mne-cpp/team.html).
+A list of contact persons can be found [here](https://mne-cpp.github.io/team.html).
 
 License
 -------
@@ -59,15 +59,15 @@ MNE-CPP is **BSD-licenced** (3 clause):
     modification, are permitted provided that the following conditions are met:
 
     1. Redistributions of source code must retain the above copyright notice, this
-      list of conditions and the following disclaimer.
+       list of conditions and the following disclaimer.
 
     2. Redistributions in binary form must reproduce the above copyright notice,
-      this list of conditions and the following disclaimer in the documentation
-      and/or other materials provided with the distribution.
+       this list of conditions and the following disclaimer in the documentation
+       and/or other materials provided with the distribution.
 
     3. Neither the name of the copyright holder nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
+       contributors may be used to endorse or promote products derived from
+       this software without specific prior written permission.
 
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
     AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
