@@ -133,16 +133,21 @@ public:
      */
     bool startConnection();
 
+    //=========================================================================================================
+    /**
+    * @brief reset - resets m_bnewData and m_pMatEmit to receive new data
+    */
     void reset();
 
+    //=========================================================================================================
+    /**
+    * @brief newData - returns whether new data has been received from the buffer
+    * @return returns m_bnewData
+    */
     bool newData();
 
+    //=========================================================================================================
     Eigen::MatrixXd dataMat();
-
-//protected:
-//signals:
-
-    //void newDataAvailable(const Eigen::MatrixXd &matData);
 
 private:
 
@@ -169,49 +174,21 @@ private:
      */
     bool isConnected();
 
-    //=========================================================================================================
 
-    void outputSamples(int size, const float* data);
+//*************************************************************************************************************
 
-    //=========================================================================================================
+    FtConnection                    m_ftCon_Connector;          /**< Manages connection to the buffer */
 
-    int                 numChannels;
-    uint                numSamples;
+    int                             m_iNumChannels;             /**< Number of data channels in the buffer */
+    uint                            m_uiNumSamples;             /**< How many samples are in the buffer */
 
-    FtConnection        ftCon;
-    const char*         addrField;
+    const char*                     m_pcAddrField;              /**< Address of where to connect to the buffer */
 
-    SimpleStorage       rawStore, floatStore;
+    bool                            m_bnewData;                 /**< flag to show new data has been received from buffer */
 
-    bool                useHighpass;
-    bool                useLowpass;
-
-    //TODO: remove this, it's from the viewer.cc GUI, only here to make porting code easier
-    char**              labels;
-    int*                colorTable;
-
-    MultiChannelFilter<float,float> *hpFilter = NULL;
-    MultiChannelFilter<float,float> *lpFilter = NULL;
-
-    float               *data;
-
-    //These are from the OnlineDataDisplay class that updates the viewer.cc data
-    int                 nChans;
-    int                 nSamp;
-
-    int                 numTotal, pos;
-    int                 yPos, ySpace;
-    float               yScale;
-    int                 height;
-    int                 skipped;
-
-    bool                m_bnewData;
-    Eigen::MatrixXd*    matEmit;
-    Eigen::MatrixXd     m_matData;
-    int                 m_iMatDataSampleIterator;
-
-
-
+    SimpleStorage                   m_ssRawStore;               /**< container to receie raw buffer data */
+    SimpleStorage                   m_ssFloatStore;             /**< container to store buffer data as float */
+    Eigen::MatrixXd*                m_pMatEmit;                 /**< container to format data to tansmit to FtBuffProducer */
 };
 
 #endif // FTBUFFCLIENT_H
