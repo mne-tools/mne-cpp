@@ -37,7 +37,6 @@
 #ifndef FTBUFFER_H
 #define FTBUFFER_H
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // QT Includes
@@ -60,14 +59,12 @@
 #include "FormFiles/ftbuffersetupwidget.h"
 #include "FormFiles/ftbufferyourwidget.h"
 
-//#include <ftsrc/ftbuffclient.h>
 #include "ftbuffproducer.h"
 
 #include <scShared/Interfaces/ISensor.h>
 #include <scShared/Interfaces/IAlgorithm.h>
 
 #include <scMeas/realtimemultisamplearray.h>
-//#include <utils/generics/circularmatrixbuffer.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,6 +80,13 @@ namespace FTBUFFERPLUGIN {
 
 class FtBuffProducer;
 
+//=============================================================================================================
+
+/**
+* Starts new thread for FtBuffProducer which collects data, then outputs that data.
+*
+* @brief Handles Ftbuffer data received from FtBuffProducer and outputs it.
+*/
 class FTBUFFER_EXPORT FtBuffer : public SCSHAREDLIB::ISensor
 {
     Q_OBJECT
@@ -156,7 +160,6 @@ public:
     */
     virtual QString getName() const;
 
-
     //=========================================================================================================
     /**
     * Returns the set up widget for configuration of ISensor.
@@ -168,72 +171,70 @@ public:
 
     //=========================================================================================================
     /**
-    * Changes stored address and connects the member FtBuffClient to that address
-    *
-    * @brief connects buffer client to provided address
+    * @brief setUpFiffInfo - Sets the parameters for the plugin output data stream
     */
-    bool connectToBuffer(QString addr);
+    void setUpFiffInfo();
 
     //=========================================================================================================
     /**
-    * Changes stored address and connects the member FtBuffClient to that address
-    *
-    * @brief connects buffer client to provided address
+    * @brief isRunning - True if buffer plugin is running, false if it's not
+    * @return Bool. True - running, False - not running
     */
-    bool disconnectFromBuffer();
-
-//    //=========================================================================================================
-//    /**
-//    * runs idleCall() on a loop to continuously request buffer data
-//    *
-//    * @brief requests buffer data on a loop
-//    */
-//    Eigen::MatrixXd getData();
-
-    //void updateBufferAddress(QString address);
-
-    void setUpFiffInfo();
-
     bool isRunning();
 
-    void pushData();
-
+    //=========================================================================================================
+    /**
+    * @brief setParams - sets the frequency and # of channels expected for the buffer client
+    * @param freq - sampling frequency
+    * @param chan - number of channels
+    */
     void setParams(int freq, int chan);
 
 signals:
 
+    //=========================================================================================================
+    /**
+    * @brief sends signal to FtBuffProducer to start data aquisition
+    */
     void workCommand();
-
 
 protected:
 
+    //=========================================================================================================
+    /**
+    * @brief run - gets extecuted after start(), currently does nothing
+    */
     virtual void run();
 
+    //=========================================================================================================
+    /**
+    * @brief showYourWidget - used in displaying the ftbuffer widget
+    */
     void showYourWidget();
 
+    //=========================================================================================================
+    /**
+    * @brief onNewDataAvailable - receives new data from producer, publishes to plugin output rtmsa
+    * @param matData - new data from FtBuffProducer
+    */
     void onNewDataAvailable(const Eigen::MatrixXd &matData);
 
 private:
-    bool                                            m_bIsRunning;                   /**< Whether ftbuffer is running. */
 
-    QThread                                         m_pProducerThread;              /**< Producer object that manages the data */
-    QMutex                                          m_mutex;                        /**< Guards shared data from beng accessed at the same time */
+    QSharedPointer<FtBuffProducer>                                                      m_pFtBuffProducer;              /**< Pointer to producer object that handles data from FtBuffClient*/
+    QThread                                                                             m_pProducerThread;              /**< Producer thread for the FtBuffProducer object */
+    QMutex                                                                              m_mutex;                        /**< Guards shared data from being accessed at the same time */
 
-    QSharedPointer<QList<Eigen::MatrixXd>>          m_pListReceivedSamples;         /**< List of samples recived from the buffer */
+    QSharedPointer<FIFFLIB::FiffInfo>                                                   m_pFiffInfo;                    /**< Fiff measurement info.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>>  m_pRTMSA_BufferOutput;          /**< The RealTimeSampleArray to provide the plugin output data.*/
 
-    QSharedPointer<FtBuffProducer>                  m_pFtBuffProducer;
-    QSharedPointer<FtBufferYourWidget>              m_pYourWidget;
-    QAction*                                        m_pActionShowYourWidget;
+    QSharedPointer<FtBufferYourWidget>                                                  m_pYourWidget;                  /**< Pointer used in the displaying of the widget */
+    QAction*                                                                            m_pActionShowYourWidget;        /**< Action used in the displaying of the widget */
 
-    char*                                           m_pTempAddress;
+    bool                                                                                m_bIsRunning;                   /**< Whether ftbuffer is running. */
 
-    //FtBuffClient*                                   m_pFtBuffClient;
-
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSA_BufferOutput;
-
-    int                                             m_iNumChannels;
-    int                                             m_iSampFreq;
+    int                                                                                 m_iNumChannels;                 /**< Parameter for how many channels expecet from buffer data */
+    int                                                                                 m_iSampFreq;                    /**< Parameter for sampling rate expected from buffer data */
 };
 
 }//namespace end brace
