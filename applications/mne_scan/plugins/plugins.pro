@@ -56,7 +56,7 @@ SUBDIRS += \
 SUBDIRS += \
     dummytoolbox \
     epidetect \
-    mne \
+    rtcmne \
     rtcmusic \
     averaging \
     covariance \

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mneaboutwidget.cpp
+* @file     rtcmne_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,41 +29,33 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the MNEAboutWidget class.
+* @brief    Contains the RtcMne library export/import macros.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "mneaboutwidget.h"
+#ifndef RTCMNE_GLOBAL_H
+#define RTCMNE_GLOBAL_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace MNEPLUGIN;
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-MNEAboutWidget::MNEAboutWidget(QWidget *parent)
-: QDialog(parent)
-{
-    ui.setupUi(this);
-}
+#if defined(STATICLIB)
+#  define RTCMNESHARED_EXPORT
+#elif defined(MNE_LIBRARY)
+#  define RTCMNESHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define RTCMNESHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-
-//*************************************************************************************************************
-
-MNEAboutWidget::~MNEAboutWidget()
-{
-
-}
+#endif // RTCMNE_GLOBAL_H

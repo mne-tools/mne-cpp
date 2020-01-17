@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_global.h
+* @file     rtcmneaboutwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,33 +29,41 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the MNE library export/import macros.
+* @brief    Definition of the RtcMneAboutWidget class.
 *
 */
 
-#ifndef MNE_GLOBAL_H
-#define MNE_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "rtcmneaboutwidget.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+using namespace RTCMNEPLUGIN;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-#if defined(STATICLIB)
-#  define MNESHARED_EXPORT
-#elif defined(MNE_LIBRARY)
-#  define MNESHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define MNESHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+RtcMneAboutWidget::RtcMneAboutWidget(QWidget *parent)
+: QDialog(parent)
+{
+    ui.setupUi(this);
+}
 
-#endif // MNE_GLOBAL_H
+
+//*************************************************************************************************************
+
+RtcMneAboutWidget::~RtcMneAboutWidget()
+{
+
+}

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne.cpp
+* @file     rtcmne.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the MNE class.
+* @brief    Definition of the RtcMne class.
 *
 */
 
@@ -38,9 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne.h"
+#include "rtcmne.h"
 
-#include "FormFiles/mnesetupwidget.h"
+#include "FormFiles/rtcmnesetupwidget.h"
 
 #include <disp/viewers/minimumnormsettingsview.h>
 
@@ -79,7 +79,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEPLUGIN;
+using namespace RTCMNEPLUGIN;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
@@ -94,7 +94,7 @@ using namespace IOBUFFER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNE::MNE()
+RtcMne::RtcMne()
 : m_bIsRunning(false)
 , m_bReceiveData(false)
 , m_bProcessData(false)
@@ -115,7 +115,7 @@ MNE::MNE()
 
 //*************************************************************************************************************
 
-MNE::~MNE()
+RtcMne::~RtcMne()
 {
     m_future.waitForFinished();
 
@@ -126,16 +126,16 @@ MNE::~MNE()
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> MNE::clone() const
+QSharedPointer<IPlugin> RtcMne::clone() const
 {
-    QSharedPointer<MNE> pMNEClone(new MNE());
-    return pMNEClone;
+    QSharedPointer<RtcMne> pRtcMneClone(new RtcMne());
+    return pRtcMneClone;
 }
 
 
 //*************************************************************************************************************
 
-void MNE::init()
+void RtcMne::init()
 {
     // Inits
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution, false, true));
@@ -145,17 +145,17 @@ void MNE::init()
     // Input
     m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify,
-            this, &MNE::updateRTMSA, Qt::DirectConnection);
+            this, &RtcMne::updateRTMSA, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
     m_pRTESInput = PluginInputData<RealTimeEvokedSet>::create(this, "MNE RTE In", "MNE real-time evoked input data");
     connect(m_pRTESInput.data(), &PluginInputConnector::notify,
-            this, &MNE::updateRTE, Qt::DirectConnection);
+            this, &RtcMne::updateRTE, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTESInput);
 
     m_pRTCInput = PluginInputData<RealTimeCov>::create(this, "MNE RTC In", "MNE real-time covariance input data");
     connect(m_pRTCInput.data(), &PluginInputConnector::notify,
-            this, &MNE::updateRTC, Qt::DirectConnection);
+            this, &RtcMne::updateRTC, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTCInput);
 
     // Output
@@ -165,16 +165,16 @@ void MNE::init()
 
     //Add control widgets to output data (will be used by QuickControlView in RealTimeSourceEstimateWidget)
     connect(m_pMinimumNormSettingsView.data(), &MinimumNormSettingsView::methodChanged,
-            this, &MNE::onMethodChanged);
+            this, &RtcMne::onMethodChanged);
     connect(m_pMinimumNormSettingsView.data(), &MinimumNormSettingsView::triggerTypeChanged,
-            this, &MNE::onTriggerTypeChanged);
+            this, &RtcMne::onTriggerTypeChanged);
     connect(m_pMinimumNormSettingsView.data(), &MinimumNormSettingsView::timePointChanged,
-            this, &MNE::onTimePointValueChanged);
+            this, &RtcMne::onTimePointValueChanged);
 
     m_pRTSEOutput->data()->addControlWidget(m_pMinimumNormSettingsView);
 
     // start clustering
-    QFuture<void> m_future = QtConcurrent::run(this, &MNE::doClustering);
+    QFuture<void> m_future = QtConcurrent::run(this, &RtcMne::doClustering);
 
     // Set the fwd, annotation and surface data
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
@@ -185,7 +185,7 @@ void MNE::init()
 
 //*************************************************************************************************************
 
-void MNE::unload()
+void RtcMne::unload()
 {
 
 }
@@ -193,17 +193,17 @@ void MNE::unload()
 
 //*************************************************************************************************************
 
-void MNE::calcFiffInfo()
+void RtcMne::calcFiffInfo()
 {
     QMutexLocker locker(&m_qMutex);
 
     if(m_qListCovChNames.size() > 0 && m_pFiffInfoInput && m_pFiffInfoForward)
     {
-        qDebug() << "MNE::calcFiffInfoFiff - Infos available";
+        qDebug() << "RtcMne::calcFiffInfoFiff - Infos available";
 
-//        qDebug() << "MNE::calcFiffInfo - m_qListCovChNames" << m_qListCovChNames;
-//        qDebug() << "MNE::calcFiffInfo - m_pFiffInfoForward->ch_names" << m_pFiffInfoForward->ch_names;
-//        qDebug() << "MNE::calcFiffInfo - m_pFiffInfoInput->ch_names" << m_pFiffInfoInput->ch_names;
+//        qDebug() << "RtcMne::calcFiffInfo - m_qListCovChNames" << m_qListCovChNames;
+//        qDebug() << "RtcMne::calcFiffInfo - m_pFiffInfoForward->ch_names" << m_pFiffInfoForward->ch_names;
+//        qDebug() << "RtcMne::calcFiffInfo - m_pFiffInfoInput->ch_names" << m_pFiffInfoInput->ch_names;
 
         // Align channel names of the forward solution to the incoming averaged (currently acquired) data
         // Find out whether the forward solution depends on only MEG, EEG or both MEG and EEG channels
@@ -248,7 +248,7 @@ void MNE::calcFiffInfo()
 
         //If both MEG and EEG channels are used
         if(forwardChannelsTypes.contains("MEG") && forwardChannelsTypes.contains("EEG")) {
-            //qDebug()<<"MNE::calcFiffInfo - MEG EEG fwd solution";
+            //qDebug()<<"RtcMne::calcFiffInfo - MEG EEG fwd solution";
             for(qint32 x = 0; x < m_pFiffInfoInput->chs.size(); ++x)
             {
                 if(m_pFiffInfoInput->chs[x].kind == FIFFV_MEG_CH || m_pFiffInfoInput->chs[x].kind == FIFFV_EEG_CH) {
@@ -275,21 +275,21 @@ void MNE::calcFiffInfo()
         }
         RowVectorXi sel = m_pFiffInfoInput->pick_channels(m_qListPickChannels);
 
-        //qDebug() << "MNE::calcFiffInfo - m_qListPickChannels.size()" << m_qListPickChannels.size();
-        //qDebug() << "MNE::calcFiffInfo - m_qListPickChannels" << m_qListPickChannels;
+        //qDebug() << "RtcMne::calcFiffInfo - m_qListPickChannels.size()" << m_qListPickChannels.size();
+        //qDebug() << "RtcMne::calcFiffInfo - m_qListPickChannels" << m_qListPickChannels;
 
         m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoInput->pick_info(sel)));
 
         m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfo);
 
-        qDebug() << "MNE::calcFiffInfo - m_pFiffInfo" << m_pFiffInfo->ch_names;
+        qDebug() << "RtcMne::calcFiffInfo - m_pFiffInfo" << m_pFiffInfo->ch_names;
     }
 }
 
 
 //*************************************************************************************************************
 
-void MNE::doClustering()
+void RtcMne::doClustering()
 {
     emit clusteringStarted();
 
@@ -307,7 +307,7 @@ void MNE::doClustering()
 
 //*************************************************************************************************************
 
-void MNE::finishedClustering()
+void RtcMne::finishedClustering()
 {
     m_qMutex.lock();
     m_bFinishedClustering = true;
@@ -320,7 +320,7 @@ void MNE::finishedClustering()
 
 //*************************************************************************************************************
 
-bool MNE::start()
+bool RtcMne::start()
 {
 //    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
 //    if(this->isRunning())
@@ -338,7 +338,7 @@ bool MNE::start()
 
 //*************************************************************************************************************
 
-bool MNE::stop()
+bool RtcMne::stop()
 {
     m_bIsRunning = false;
 
@@ -360,7 +360,7 @@ bool MNE::stop()
 
 //*************************************************************************************************************
 
-IPlugin::PluginType MNE::getType() const
+IPlugin::PluginType RtcMne::getType() const
 {
     return _IAlgorithm;
 }
@@ -368,7 +368,7 @@ IPlugin::PluginType MNE::getType() const
 
 //*************************************************************************************************************
 
-QString MNE::getName() const
+QString RtcMne::getName() const
 {
     return "RTC-MNE";
 }
@@ -376,17 +376,17 @@ QString MNE::getName() const
 
 //*************************************************************************************************************
 
-QWidget* MNE::setupWidget()
+QWidget* RtcMne::setupWidget()
 {
-    MNESetupWidget* setupWidget = new MNESetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    RtcMneSetupWidget* setupWidget = new RtcMneSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
     if(!m_bFinishedClustering)
         setupWidget->setClusteringState();
 
-    connect(this, &MNE::clusteringStarted,
-            setupWidget, &MNESetupWidget::setClusteringState);
-    connect(this, &MNE::clusteringFinished,
-            setupWidget, &MNESetupWidget::setSetupState);
+    connect(this, &RtcMne::clusteringStarted,
+            setupWidget, &RtcMneSetupWidget::setClusteringState);
+    connect(this, &RtcMne::clusteringFinished,
+            setupWidget, &RtcMneSetupWidget::setSetupState);
 
     return setupWidget;
 }
@@ -394,7 +394,7 @@ QWidget* MNE::setupWidget()
 
 //*************************************************************************************************************
 
-void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
@@ -427,7 +427,7 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
                 if(!bArtifactDetected) {
                     m_pMatrixDataBuffer->push(&pRTMSA->getMultiSampleArray()[i]);
                 } else {
-                    qDebug() << "MNE::updateRTMSA - Reject data block";
+                    qDebug() << "RtcMne::updateRTMSA - Reject data block";
                 }
 
             }
@@ -438,7 +438,7 @@ void MNE::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void MNE::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeCov> pRTC = pMeasurement.dynamicCast<RealTimeCov>();
 
@@ -448,7 +448,7 @@ void MNE::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
         if(!m_pRtInvOp && m_pFiffInfo && m_pClusteredFwd) {
             m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
             connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated,
-                    this, &MNE::updateInvOp);
+                    this, &RtcMne::updateInvOp);
         }
 
         //Fiff Information of the covariance
@@ -465,7 +465,7 @@ void MNE::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>();
 
@@ -500,7 +500,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
     if(m_bProcessData) {
         for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
             if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
-                //qDebug()<<"MNE::updateRTE - average found type" << m_sAvrType;
+                //qDebug()<<"RtcMne::updateRTE - average found type" << m_sAvrType;
                 m_qVecFiffEvoked.push_back(pFiffEvokedSet->evoked.at(i).pick_channels(m_qListPickChannels));
                 break;
             }
@@ -511,7 +511,7 @@ void MNE::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void MNE::updateInvOp(const MNEInverseOperator& invOp)
+void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -530,7 +530,7 @@ void MNE::updateInvOp(const MNEInverseOperator& invOp)
 
 //*************************************************************************************************************
 
-void MNE::onMethodChanged(const QString& method)
+void RtcMne::onMethodChanged(const QString& method)
 {
     m_sMethod = method;
 
@@ -550,7 +550,7 @@ void MNE::onMethodChanged(const QString& method)
 
 //*************************************************************************************************************
 
-void MNE::onTriggerTypeChanged(const QString& triggerType)
+void RtcMne::onTriggerTypeChanged(const QString& triggerType)
 {
     m_sAvrType = triggerType;
 }
@@ -558,7 +558,7 @@ void MNE::onTriggerTypeChanged(const QString& triggerType)
 
 //*************************************************************************************************************
 
-void MNE::onTimePointValueChanged(int iTimePointMs)
+void RtcMne::onTimePointValueChanged(int iTimePointMs)
 {
     QMutexLocker locker(&m_qMutex);
 
@@ -574,7 +574,7 @@ void MNE::onTimePointValueChanged(int iTimePointMs)
 
 //*************************************************************************************************************
 
-void MNE::run()
+void RtcMne::run()
 {
     // Start receiving data
     m_qMutex.lock();
@@ -593,8 +593,8 @@ void MNE::run()
         msleep(10);// Wait for fiff Info
     }
 
-//    qDebug() << "MNE::run - m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
-//    qDebug() << "MNE::run - m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
+//    qDebug() << "RtcMne::run - m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
+//    qDebug() << "RtcMne::run - m_pFiffInfo->ch_names" << m_pFiffInfo->ch_names;
 
     // Mode 1: End
 
@@ -637,8 +637,8 @@ void MNE::run()
 
 //    m_pRTSEOutput->data()->setFiffInfo(m_pFiffInfoInput);
 
-////    qDebug() << "MNE::run - m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
-////    qDebug() << "MNE::run - m_pFiffInfoInput->ch_names" << m_pFiffInfoInput->ch_names;
+////    qDebug() << "RtcMne::run - m_pClusteredFwd->info.ch_names" << m_pClusteredFwd->info.ch_names;
+////    qDebug() << "RtcMne::run - m_pFiffInfoInput->ch_names" << m_pFiffInfoInput->ch_names;
 
 //    // Mode 2: End
 
@@ -657,7 +657,7 @@ void MNE::run()
     while(m_bIsRunning) {
         //Process raw data from a RTMSA input
         if(m_pMatrixDataBuffer) {
-            //qDebug()<<"MNE::run - Processing RTMSA data";
+            //qDebug()<<"RtcMne::run - Processing RTMSA data";
 
             if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0)) {
                 rawSegment = m_pMatrixDataBuffer->pop();
@@ -698,14 +698,14 @@ void MNE::run()
         m_qMutex.unlock();
 
         if(t_evokedSize > 0) {
-            //qDebug() << "MNE::run - Processing RTE data - t_evokedSize" << t_evokedSize;
+            //qDebug() << "RtcMne::run - Processing RTE data - t_evokedSize" << t_evokedSize;
             if(m_pMinimumNorm && ((skip_count % m_iDownSample) == 0)) {
 
                 m_qMutex.lock();
                 m_currentEvoked = m_qVecFiffEvoked.takeFirst();
                 QElapsedTimer time;
                 time.start();
-                //qDebug()<<"MNE::run - t_fiffEvoked.data.rows()"<<t_fiffEvoked.data.rows();
+                //qDebug()<<"RtcMne::run - t_fiffEvoked.data.rows()"<<t_fiffEvoked.data.rows();
 
                 sourceEstimate = m_pMinimumNorm->calculateInverse(m_currentEvoked);
 
