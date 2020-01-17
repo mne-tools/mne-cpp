@@ -55,36 +55,22 @@
 #include <QTest>
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
 
-FtBuffClient::FtBuffClient() :
-data(NULL),
-pos(0),
-numChannels(0),
-numSamples(0),
-useHighpass(false),
-useLowpass(false),
-m_bnewData(false),
-m_iMatDataSampleIterator(1)
+FtBuffClient::FtBuffClient()
+: m_iNumChannels(0)
+, m_uiNumSamples(0)
+, m_bnewData(false)
+, m_pcAddrField("localhost:1972")
 {
-    addrField = "localhost:1972";
-
 }
 
 //*************************************************************************************************************
 
-FtBuffClient::FtBuffClient(char* addr) :
-addrField(addr),
-data(NULL),
-pos(0),
-numChannels(0),
-numSamples(0),
-useHighpass(false),
-useLowpass(false),
-m_bnewData(false),
-m_iMatDataSampleIterator(1)
+FtBuffClient::FtBuffClient(char* addr)
+: m_pcAddrField(addr)
+, m_iNumChannels(0)
+, m_uiNumSamples(0)
+, m_bnewData(false)
 {
 }
 
@@ -94,7 +80,7 @@ void FtBuffClient::getDataExample() {
 
     while(true) {
 
-        //Starts connection with ftCon
+        //Starts connection with m_ftCon_Connector
         while(!this->isConnected()) {
             this->startConnection();
             QTest::qSleep(2000);
@@ -125,10 +111,10 @@ bool FtBuffClient::readHeader() {
 
     qDebug() << "Attempting TCP connection...";
     //Attempt to establish TCP connection
-    if (tcprequest(ftCon.getSocket(), request.out(), response.in()) < 0) {
+    if (tcprequest(m_ftCon_Connector.getSocket(), request.out(), response.in()) < 0) {
         qDebug() << "Error in communication - check buffer server";
-        ftCon.disconnect();
-        numChannels = 0;
+        m_ftCon_Connector.disconnect();
+        m_iNumChannels = 0;
         return false;
     }
 
@@ -140,51 +126,9 @@ bool FtBuffClient::readHeader() {
     }
 
     //Updating channel and sample info
-    numChannels = header_def.nchans;
-    numSamples = header_def.nsamples;
+    m_iNumChannels = header_def.nchans;
+    m_uiNumSamples = header_def.nsamples;
 
-    //from viewer.cc, only here temporarily to make porting easier.
-    labels = (char **) calloc(numChannels, sizeof(char *));
-    colorTable = (int *) calloc(numChannels, sizeof(int));
-
-
-    const ft_chunk_t *cnc = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_CHANNEL_NAMES);
-    if (cnc == NULL) {
-        printf("No channel names found\n");
-        for (int n=0;n<numChannels;n++) {
-            labels[n] = (char *) malloc(8);
-            snprintf(labels[n],7,"#%i",n+1);
-        }
-    } else {
-        const char *s = (const char *) cnc->data;
-        for (int n=0;n<numChannels;n++) {
-            int ln = strlen(s);
-            if (ln==0) {
-                labels[n] = (char *) malloc(8);
-                snprintf(labels[n],7,"#%i",n+1);
-            } else {
-                labels[n] = strdup(s);
-            }
-            s+=ln+1;
-        }
-    }
-
-    //decide whether to highpass or lowpass
-    if (hpFilter != NULL) {
-        delete hpFilter;
-        hpFilter = NULL;
-    }
-    if (lpFilter != NULL) {
-        delete lpFilter;
-        lpFilter = NULL;
-    }
-
-    hpFilter = new MultiChannelFilter<float,float>(numChannels, HPFILTORD);
-    hpFilter->setButterHP(HPFREQ/header_def.fsample);
-    lpFilter = new MultiChannelFilter<float,float>(numChannels, LPFILTORD);
-    lpFilter->setButterLP(LPFREQ/header_def.fsample);
-
-    m_matData.resize(numChannels, 32);
     return true;
 }
 
@@ -204,11 +148,10 @@ void FtBuffClient::convertToFloat(float *dest, const void *src, unsigned int nsa
 
 //*************************************************************************************************************
 
-//Checks if there is an open connection, and if so, closes it
 bool FtBuffClient::stopConnection() {
-    if (ftCon.isOpen()) {
+    if (m_ftCon_Connector.isOpen()) {
         qDebug() << "Disconnecting...";
-        ftCon.disconnect();
+        m_ftCon_Connector.disconnect();
         qDebug() << "Disconnected.";
         return true;
     } else {
@@ -219,15 +162,14 @@ bool FtBuffClient::stopConnection() {
 
 //*************************************************************************************************************
 
-//Checks if there is no open connection, and if so, opens one
 bool FtBuffClient::startConnection() {
-    if (!ftCon.isOpen()) {
+    if (!m_ftCon_Connector.isOpen()) {
         qDebug() << "Trying to connect...";
-        if (ftCon.connect(addrField)){
-            qDebug() << "Connected to" << addrField;
+        if (m_ftCon_Connector.connect(m_pcAddrField)){
+            qDebug() << "Connected to" << m_pcAddrField;
             return true;
         } else {
-            qDebug() << "Unable to connect: no buffer found on" << addrField;
+            qDebug() << "Unable to connect: no buffer found on" << m_pcAddrField;
             return false;
         }
     } else {
@@ -238,7 +180,6 @@ bool FtBuffClient::startConnection() {
 
 //*************************************************************************************************************
 
-//gets called constantly and receives data
 void FtBuffClient::idleCall() {
 
     //creates handlesrs for buffer messages and events
@@ -248,10 +189,10 @@ void FtBuffClient::idleCall() {
     unsigned int newSamples, newEvents;
 
     //Checks if connection is open
-    if (!ftCon.isOpen()) return;
+    if (!m_ftCon_Connector.isOpen()) return;
 
     //If no header is read, wait before returning to avoid spamming the buffer
-    if (numChannels == 0) {
+    if (m_iNumChannels == 0) {
         if (!readHeader()) {
             QTest::qSleep(50);
             return;
@@ -259,34 +200,34 @@ void FtBuffClient::idleCall() {
     }
 
     //Set params for waiting for data. 40ms of wait
-    request.prepWaitData(numSamples, 0xFFFFFFFF, 40);
+    request.prepWaitData(m_uiNumSamples, 0xFFFFFFFF, 40);
 
-    if (tcprequest(ftCon.getSocket(), request.out(), response.in()) < 0) {
-        ftCon.disconnect();
+    if (tcprequest(m_ftCon_Connector.getSocket(), request.out(), response.in()) < 0) {
+        m_ftCon_Connector.disconnect();
         qDebug() << "Error in communication. Buffer server aborted??";
         return;
     }
     if (!response.checkWait(newSamples, newEvents)) {
-        ftCon.disconnect();
+        m_ftCon_Connector.disconnect();
         qDebug() << "Error in received packet - disconnecting...";
         return;
     }
 
-    if (newSamples == numSamples) {
+    if (newSamples == m_uiNumSamples) {
         //qDebug() << "idleCall - No new data";
         return; // nothing new
     }
-    if (newSamples < numSamples) {
+    if (newSamples < m_uiNumSamples) {
         // oops ? do we have a new header?
         if (!readHeader()) {
             qDebug() << "idleCall - Unable to read header.";
             return;
         }
-        if (numSamples == 0) {
+        if (m_uiNumSamples == 0) {
             qDebug() << "idelCall - No Data";
             return; // no data yet
         }
-        if (numSamples > 1024 || numChannels > 512) {
+        if (m_uiNumSamples > 1024 || m_iNumChannels > 512) {
             // "lots" of data already in the buffer
             // -> don't do anything with that data
             //    continue next idleCall
@@ -294,78 +235,63 @@ void FtBuffClient::idleCall() {
             return;
         }
         // read data from the start of the buffer up to newSamples right away
-        newSamples = numSamples;
-        numSamples = 0;
+        newSamples = m_uiNumSamples;
+        m_uiNumSamples = 0;
     }
 
-    request.prepGetData(numSamples, newSamples-1);
+    request.prepGetData(m_uiNumSamples, newSamples-1);
 
-    if (tcprequest(ftCon.getSocket(), request.out(), response.in()) < 0) {
-        ftCon.disconnect();
+    if (tcprequest(m_ftCon_Connector.getSocket(), request.out(), response.in()) < 0) {
+        m_ftCon_Connector.disconnect();
         qDebug() << "Error in communication. Buffer server aborted??";
         return;
     }
-    if (!response.checkGetData(ddef, &rawStore)) {
-        ftCon.disconnect();
+    if (!response.checkGetData(ddef, &m_ssRawStore)) {
+        m_ftCon_Connector.disconnect();
         qDebug() << "Error in received packet - disconnecting...";
         return;
     }
 
+    m_ssFloatStore.resize(sizeof(float) * ddef.nsamples * ddef.nchans);
 
-    floatStore.resize(sizeof(float) * ddef.nsamples * ddef.nchans);
-
-    float *fdata = (float *) floatStore.data();
+    float *fdata = (float *) m_ssFloatStore.data();
 
     switch(ddef.data_type) {
         case DATATYPE_UINT8:
-            convertToFloat<uint8_t>(fdata, rawStore.data(), ddef.nsamples, ddef.nchans);
+            convertToFloat<uint8_t>(fdata, m_ssRawStore.data(), ddef.nsamples, ddef.nchans);
             break;
         case DATATYPE_INT8:
-            convertToFloat<int8_t>(fdata, rawStore.data(), ddef.nsamples, ddef.nchans);
+            convertToFloat<int8_t>(fdata, m_ssRawStore.data(), ddef.nsamples, ddef.nchans);
             break;
         case DATATYPE_UINT16:
-            convertToFloat<uint16_t>(fdata, rawStore.data(), ddef.nsamples, ddef.nchans);
+            convertToFloat<uint16_t>(fdata, m_ssRawStore.data(), ddef.nsamples, ddef.nchans);
             break;
         case DATATYPE_INT16:
-            convertToFloat<int16_t>(fdata, rawStore.data(), ddef.nsamples, ddef.nchans);
+            convertToFloat<int16_t>(fdata, m_ssRawStore.data(), ddef.nsamples, ddef.nchans);
             break;
         case DATATYPE_UINT32:
-            convertToFloat<uint32_t>(fdata, rawStore.data(), ddef.nsamples, ddef.nchans);
+            convertToFloat<uint32_t>(fdata, m_ssRawStore.data(), ddef.nsamples, ddef.nchans);
             break;
         case DATATYPE_INT32:
-            convertToFloat<int32_t>(fdata, rawStore.data(), ddef.nsamples, ddef.nchans);
+            convertToFloat<int32_t>(fdata, m_ssRawStore.data(), ddef.nsamples, ddef.nchans);
             break;
         case DATATYPE_UINT64:
-            convertToFloat<uint64_t>(fdata, rawStore.data(), ddef.nsamples, ddef.nchans);
+            convertToFloat<uint64_t>(fdata, m_ssRawStore.data(), ddef.nsamples, ddef.nchans);
             break;
         case DATATYPE_INT64:
-            convertToFloat<int64_t>(fdata, rawStore.data(), ddef.nsamples, ddef.nchans);
+            convertToFloat<int64_t>(fdata, m_ssRawStore.data(), ddef.nsamples, ddef.nchans);
             break;
         case DATATYPE_FLOAT32:
-            convertToFloat<float>(fdata, rawStore.data(), ddef.nsamples, ddef.nchans);
+            convertToFloat<float>(fdata, m_ssRawStore.data(), ddef.nsamples, ddef.nchans);
             break;
         case DATATYPE_FLOAT64:
-            convertToFloat<double>(fdata, rawStore.data(), ddef.nsamples, ddef.nchans);
+            convertToFloat<double>(fdata, m_ssRawStore.data(), ddef.nsamples, ddef.nchans);
             break;
     }
-
-    if (useHighpass) {
-        hpFilter->process(ddef.nsamples, fdata, fdata); // in place
-    }
-    if (useLowpass) {
-        lpFilter->process(ddef.nsamples, fdata, fdata); // in place
-    }
-
-    //m_matData.resize(numChannels, 32);
-    qDebug() << "@@@@ 1 @@@@";
 
     Eigen::MatrixXf matData;
 
-    qDebug() << "@@@@ 2 @@@@";
-
-    matData.resize(numChannels, 32);
-
-    qDebug() << "@@@@ 3 @@@@";
+    matData.resize(m_iNumChannels, 32);
 
     int count = 0;
     for (int i = 0; i < int (ddef.nsamples); i++) {
@@ -378,99 +304,76 @@ void FtBuffClient::idleCall() {
     }
     qDebug() << "matData" << matData.size();
 
-    /*if(m_iMatDataSampleIterator+matData.cols() <= m_matData.cols()) {
-        m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), matData.cols()) = matData.cast<double>();
-
-        m_iMatDataSampleIterator += matData.cols();
-    } else {
-        m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), m_matData.cols()-m_iMatDataSampleIterator) = matData.block(0, 0, matData.rows(), m_matData.cols()-m_iMatDataSampleIterator).cast<double>();
-
-        m_iMatDataSampleIterator = 0;
-    }
-
-    //qDebug() << "m_iMatDataSampleIterator" << m_iMatDataSampleIterator;
-
-    if(m_iMatDataSampleIterator == m_matData.cols()) {
-        m_iMatDataSampleIterator = 0;
-        //qDebug()<<"Emit data";
-        matEmit = new Eigen::MatrixXd(m_matData.cast<double>());
-        m_bnewData = true;
-        qDebug() << "";
-        qDebug() << matEmit->size();
-        qDebug() << "";
-    }
-    */
-
-    matEmit = new Eigen::MatrixXd(matData.cast<double>());
+    m_pMatEmit = new Eigen::MatrixXd(matData.cast<double>());
     m_bnewData = true;
 
-    qDebug() << "@@@@ 4 @@@@";
-    //outputSamples(ddef.nsamples, fdata);
-    //qDebug() << fdata[0];
-
-    //qDebug() << "idleCall - numSamples updated";
-    numSamples = newSamples;
-    //qDebug() << "rawStore is of size" << rawStore.size();
-    //qDebug() << "floatStore is of size" << floatStore.size();
-
-
-
-    qDebug() << "@@@@ 5 @@@@";
-
-
+    m_uiNumSamples = newSamples;
 
 }
 
 //*************************************************************************************************************
 
 bool FtBuffClient::isConnected() {
-    return ftCon.isOpen();
+    return m_ftCon_Connector.isOpen();
 }
 
-//=========================================================================================================
-
-void FtBuffClient::outputSamples(int size, const float* sdata) {
-
-    /*
-    for (int j=0;j<size;j++) {
-        float *d = data + ((pos + j) % nSamp)*nChans;
-        const float *s = sdata + j*nChans;
-        for (int i=0;i<nChans;i++) d[i] = s[i];
-    }
-
-    pos=(pos + size) % nSamp;
-    numTotal += size;
-    */
-    for (int j = 0; j < size; j++) {
-        qDebug() << sdata[j];
-    }
-}
-
-
-//=========================================================================================================
+//*************************************************************************************************************
 
 QString FtBuffClient::getAddress() {
-    return QString(addrField); //converts char* to QString
+    return QString(m_pcAddrField); //converts char* to QString
 }
 
-//=========================================================================================================
+//*************************************************************************************************************
 
 void FtBuffClient::getData() {
     //startConnection();
     idleCall();
 }
 
+//*************************************************************************************************************
+
 void FtBuffClient::reset(){
     m_bnewData = false;
-    delete matEmit;
-    matEmit = Q_NULLPTR;
+    delete m_pMatEmit;
+    m_pMatEmit = Q_NULLPTR;
 }
+
+//*************************************************************************************************************
 
 bool FtBuffClient::newData() {
     return m_bnewData;
 }
 
+//*************************************************************************************************************
+
 Eigen::MatrixXd FtBuffClient::dataMat() {
-    return *matEmit;
+    return *m_pMatEmit;
 }
 
+//*************************************************************************************************************
+
+//
+// Old idleCall code
+//
+/*if(m_iMatDataSampleIterator+matData.cols() <= m_matData.cols()) {
+    m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), matData.cols()) = matData.cast<double>();
+
+    m_iMatDataSampleIterator += matData.cols();
+} else {
+    m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), m_matData.cols()-m_iMatDataSampleIterator) = matData.block(0, 0, matData.rows(), m_matData.cols()-m_iMatDataSampleIterator).cast<double>();
+
+    m_iMatDataSampleIterator = 0;
+}
+
+//qDebug() << "m_iMatDataSampleIterator" << m_iMatDataSampleIterator;
+
+if(m_iMatDataSampleIterator == m_matData.cols()) {
+    m_iMatDataSampleIterator = 0;
+    //qDebug()<<"Emit data";
+    matEmit = new Eigen::MatrixXd(m_matData.cast<double>());
+    m_bnewData = true;
+    qDebug() << "";
+    qDebug() << matEmit->size();
+    qDebug() << "";
+}
+*/
