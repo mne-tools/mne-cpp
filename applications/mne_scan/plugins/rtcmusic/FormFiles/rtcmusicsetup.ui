@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RapMusicToolboxSetupWidgetClass</class>
- <widget class="QWidget" name="RapMusicToolboxSetupWidgetClass">
+ <class>RtcMusicSetupWidgetClass</class>
+ <widget class="QWidget" name="RtcMusicSetupWidgetClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -88,7 +88,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="../rapmusictoolbox.qrc">:/images/rapmusic.png</pixmap>
+        <pixmap>:/images/rapmusic.png</pixmap>
        </property>
       </widget>
      </item>

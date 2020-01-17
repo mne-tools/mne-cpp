@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rapmusictoolbox.cpp
+* @file     rtcmusic.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Definition of the RapMusicToolbox class.
+* @brief    Definition of the RtcMusic class.
 *
 */
 
@@ -38,9 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rapmusictoolbox.h"
+#include "rtcmusic.h"
 
-#include "FormFiles/rapmusictoolboxsetupwidget.h"
+#include "FormFiles/rtcmusicsetupwidget.h"
 
 
 //*************************************************************************************************************
@@ -58,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RAPMUSICTOOLBOXPLUGIN;
+using namespace RTCMUSICPLUGIN;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;
 
@@ -68,7 +68,7 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RapMusicToolbox::RapMusicToolbox()
+RtcMusic::RtcMusic()
 : m_bIsRunning(false)
 , m_bReceiveData(false)
 , m_bProcessData(false)
@@ -85,7 +85,7 @@ RapMusicToolbox::RapMusicToolbox()
 
 //*************************************************************************************************************
 
-RapMusicToolbox::~RapMusicToolbox()
+RtcMusic::~RtcMusic()
 {
     if(this->isRunning())
         stop();
@@ -94,10 +94,10 @@ RapMusicToolbox::~RapMusicToolbox()
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> RapMusicToolbox::clone() const
+QSharedPointer<IPlugin> RtcMusic::clone() const
 {
-    QSharedPointer<RapMusicToolbox> pRapMusicToolboxClone(new RapMusicToolbox());
-    return pRapMusicToolboxClone;
+    QSharedPointer<RtcMusic> pRtcMusicClone(new RtcMusic());
+    return pRtcMusicClone;
 }
 
 
@@ -106,7 +106,7 @@ QSharedPointer<IPlugin> RapMusicToolbox::clone() const
 // Creating required display instances and set configurations
 //=============================================================================================================
 
-void RapMusicToolbox::init()
+void RtcMusic::init()
 {
     // Inits
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
@@ -115,7 +115,7 @@ void RapMusicToolbox::init()
 
     // Input
     m_pRTEInput = PluginInputData<RealTimeEvokedSet>::create(this, "RapMusic Toolbox RTE In", "RapMusic Toolbox real-time evoked input data");
-    connect(m_pRTEInput.data(), &PluginInputConnector::notify, this, &RapMusicToolbox::updateRTE, Qt::DirectConnection);
+    connect(m_pRTEInput.data(), &PluginInputConnector::notify, this, &RtcMusic::updateRTE, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTEInput);
 
     // Output
@@ -127,14 +127,14 @@ void RapMusicToolbox::init()
     m_pRTSEOutput->data()->setFwdSolution(m_pFwd);
 
     // start clustering
-    QFuture<void> future = QtConcurrent::run(this, &RapMusicToolbox::doClustering);
+    QFuture<void> future = QtConcurrent::run(this, &RtcMusic::doClustering);
 
 }
 
 
 //*************************************************************************************************************
 
-void RapMusicToolbox::unload()
+void RtcMusic::unload()
 {
 
 }
@@ -142,7 +142,7 @@ void RapMusicToolbox::unload()
 
 //*************************************************************************************************************
 
-void RapMusicToolbox::calcFiffInfo()
+void RtcMusic::calcFiffInfo()
 {
     QMutexLocker locker(&m_qMutex);
     if(m_pFiffInfoEvoked && m_pFiffInfoForward)
@@ -166,7 +166,7 @@ void RapMusicToolbox::calcFiffInfo()
 
 //*************************************************************************************************************
 
-void RapMusicToolbox::doClustering()
+void RtcMusic::doClustering()
 {
     emit clusteringStarted();
 
@@ -181,7 +181,7 @@ void RapMusicToolbox::doClustering()
 
 //*************************************************************************************************************
 
-void RapMusicToolbox::finishedClustering()
+void RtcMusic::finishedClustering()
 {
     m_qMutex.lock();
     m_bFinishedClustering = true;
@@ -194,7 +194,7 @@ void RapMusicToolbox::finishedClustering()
 
 //*************************************************************************************************************
 
-bool RapMusicToolbox::start()
+bool RtcMusic::start()
 {
 //    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
 //    if(this->isRunning())
@@ -213,7 +213,7 @@ bool RapMusicToolbox::start()
 
 //*************************************************************************************************************
 
-bool RapMusicToolbox::stop()
+bool RtcMusic::stop()
 {
 //    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
 //    if(this->isRunning())
@@ -238,7 +238,7 @@ bool RapMusicToolbox::stop()
 
 //*************************************************************************************************************
 
-IPlugin::PluginType RapMusicToolbox::getType() const
+IPlugin::PluginType RtcMusic::getType() const
 {
     return _IAlgorithm;
 }
@@ -246,7 +246,7 @@ IPlugin::PluginType RapMusicToolbox::getType() const
 
 //*************************************************************************************************************
 
-QString RapMusicToolbox::getName() const
+QString RtcMusic::getName() const
 {
     return "RTC-MUSIC";
 }
@@ -254,15 +254,15 @@ QString RapMusicToolbox::getName() const
 
 //*************************************************************************************************************
 
-QWidget* RapMusicToolbox::setupWidget()
+QWidget* RtcMusic::setupWidget()
 {
-    RapMusicToolboxSetupWidget* setupWidget = new RapMusicToolboxSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    RtcMusicSetupWidget* setupWidget = new RtcMusicSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
     if(!m_bFinishedClustering)
         setupWidget->setClusteringState();
 
-    connect(this, &RapMusicToolbox::clusteringStarted, setupWidget, &RapMusicToolboxSetupWidget::setClusteringState);
-    connect(this, &RapMusicToolbox::clusteringFinished, setupWidget, &RapMusicToolboxSetupWidget::setSetupState);
+    connect(this, &RtcMusic::clusteringStarted, setupWidget, &RtcMusicSetupWidget::setClusteringState);
+    connect(this, &RtcMusic::clusteringFinished, setupWidget, &RtcMusicSetupWidget::setSetupState);
 
     return setupWidget;
 }
@@ -270,7 +270,7 @@ QWidget* RapMusicToolbox::setupWidget()
 
 //*************************************************************************************************************
 
-void RapMusicToolbox::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtcMusic::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeEvokedSet> pRTE = pMeasurement.dynamicCast<RealTimeEvokedSet>();
 
@@ -290,7 +290,7 @@ void RapMusicToolbox::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void RapMusicToolbox::run()
+void RtcMusic::run()
 {
     qint32 numDipolePairs = 1;
 
