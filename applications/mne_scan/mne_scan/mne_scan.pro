@@ -210,7 +210,7 @@ macx {
     QMAKE_BUNDLE_DATA += plugins
     EXTRA_ARGS = -dmg
 
-    # 3 entries returned in DEPLOY_CzMD
+    # 3 entries returned in DEPLOY_CMD
     DEPLOY_CMD = $$macDeployArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
     QMAKE_POST_LINK += $${DEPLOY_CMD}
 
