@@ -64,7 +64,7 @@ contains(MNECPP_CONFIG, static) {
 #    QTPLUGIN += lsladapter
     QTPLUGIN += dummytoolbox
     QTPLUGIN += epidetect
-    QTPLUGIN += mne
+    QTPLUGIN += rtcmne
     QTPLUGIN += rtcmusic
     QTPLUGIN += averaging
     QTPLUGIN += covariance

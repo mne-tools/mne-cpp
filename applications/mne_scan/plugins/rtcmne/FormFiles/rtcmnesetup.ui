@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MNESetupWidgetClass</class>
- <widget class="QWidget" name="MNESetupWidgetClass">
+ <class>RtcMneSetupWidgetClass</class>
+ <widget class="QWidget" name="RtcMneSetupWidgetClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -88,7 +88,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="../mne.qrc">:/images/mne.png</pixmap>
+        <pixmap>:/images/mne.png</pixmap>
        </property>
       </widget>
      </item>
@@ -233,8 +233,6 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="../mne.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

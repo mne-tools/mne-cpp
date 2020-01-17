@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne.h
+* @file     rtcmne.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the MNE class.
+* @brief    Contains the declaration of the RtcMne class.
 *
 */
 
-#ifndef MNE_H
-#define MNE_H
+#ifndef RTCMNE_H
+#define RTCMNE_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_global.h"
+#include "rtcmne_global.h"
 
 #include <scShared/Interfaces/IAlgorithm.h>
 
@@ -105,46 +105,46 @@ namespace SCMEASLIB {
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEPLUGIN
+// DEFINE NAMESPACE RTCMNEPLUGIN
 //=============================================================================================================
 
-namespace MNEPLUGIN
+namespace RTCMNEPLUGIN
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNEPLUGIN FORWARD DECLARATIONS
+// RTCRTCMNEPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS MNE
+* DECLARE CLASS RtcMne
 *
-* @brief The MNE class provides a plugin for estimating distributed source localization in real-time.
+* @brief The RtcMne class provides a plugin for estimating distributed source localization in real-time.
 */
-class MNESHARED_EXPORT MNE : public SCSHAREDLIB::IAlgorithm
+class RTCMNESHARED_EXPORT RtcMne : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "mne.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "rtcmne.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(SCSHAREDLIB::IAlgorithm)
 
-    friend class MNESetupWidget;
+    friend class RtcMneSetupWidget;
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a MNE.
+    * Constructs a RtcMne.
     */
-    MNE();
+    RtcMne();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE.
+    * Destroys the RtcMne.
     */
-    ~MNE();
+    ~RtcMne();
 
     //=========================================================================================================
     /**
@@ -292,4 +292,4 @@ signals:
 
 } // NAMESPACE
 
-#endif // MNE_H
+#endif // RTCMNE_H
