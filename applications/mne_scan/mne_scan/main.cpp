@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(fiffsimulator);
     Q_INIT_RESOURCE(neuromag);
     Q_INIT_RESOURCE(noisereduction);
-    Q_INIT_RESOURCE(rapmusictoolbox);
+    Q_INIT_RESOURCE(rtcmusic);
     Q_INIT_RESOURCE(reference);
     Q_INIT_RESOURCE(ssvepbci);
     Q_INIT_RESOURCE(scDisp);
