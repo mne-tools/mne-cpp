@@ -50,24 +50,23 @@
 using namespace SCSHAREDLIB;
 using namespace FTBUFFERPLUGIN;
 using namespace SCMEASLIB;
-//using namespace IOBUFFER;
 
 //*************************************************************************************************************
 
 FtBuffer::FtBuffer()
 : m_bIsRunning(false)
 , m_pFtBuffProducer(QSharedPointer<FtBuffProducer>::create(this))
-, m_pListReceivedSamples(QSharedPointer<QList<Eigen::MatrixXd> >::create())
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
 {
     qDebug() << "Constructing FtBuffer Object";
 
-    //m_pFtBuffClient = new FtBuffClient();
     m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("FieldTrip Buffer Widget"),this);
     m_pActionShowYourWidget->setShortcut(tr("F12"));
     m_pActionShowYourWidget->setStatusTip(tr("FieldTrip Buffer Widget"));
+
     connect(m_pActionShowYourWidget, &QAction::triggered, this, &FtBuffer::showYourWidget);
+
     addPluginAction(m_pActionShowYourWidget);
 }
 
@@ -79,6 +78,7 @@ FtBuffer::~FtBuffer() {
     }
 }
 
+//*************************************************************************************************************
 
 QSharedPointer<IPlugin> FtBuffer::clone() const {
     QSharedPointer<FtBuffer> pFtBufferClone(new FtBuffer);
@@ -88,45 +88,37 @@ QSharedPointer<IPlugin> FtBuffer::clone() const {
 //*************************************************************************************************************
 
 void FtBuffer::init() {
-    qDebug() << "Running init()";
-
+    qDebug() << "Initializing FtBuffer plugin...";
     m_outputConnectors.append(m_pRTMSA_BufferOutput);
-
 }
 
-void FtBuffer::unload() {
-    //delete m_pFtBuffClient;
-    delete m_pTempAddress;
-}
+//*************************************************************************************************************
+
+void FtBuffer::unload() {}
+
+//*************************************************************************************************************
 
 bool FtBuffer::start() {
 
-    qDebug() << "Running start()";
-
+    qDebug() << "Starting FtBuffer...";
     m_bIsRunning = true;
 
     //Setup fiff info before setting up the RMTSA because we need it to init the RTMSA
-    qDebug() << "Running setUpFiffInfo()";
     setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    qDebug() << "Running initFromFiffInfo";
     m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
-    qDebug() << "Running setMultiArraySize";
     m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
-
 
     QThread::start();
 
+    // FtProducer in it's own thread and connect communications signals/slots
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
-
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
     connect(this, &FtBuffer::workCommand, m_pFtBuffProducer.data(),&FtBuffProducer::doWork);
-
     m_pProducerThread.start();
-    //m_FtBuffClient
-    //while (true) { qDebug() << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; }
 
+    qDebug() << "Producer thread created, sending work command...";
     emit workCommand();
 
     return true;
@@ -136,26 +128,22 @@ bool FtBuffer::start() {
 
 bool FtBuffer::stop() {
 
-    qDebug() << "Running stop()";
+    qDebug() << "Stopping...";
 
     m_mutex.lock();
     m_bIsRunning = false;
     m_mutex.unlock();
 
-    //m_bIsRunning = false;
-
     m_pRTMSA_BufferOutput->data()->clear();
 
+    //stops separate producer/client thread
     m_pProducerThread.quit();
     m_pProducerThread.wait();
 
 
-    //Reset producer and sample received
+    //Reset ftproducer and sample received list
     m_pFtBuffProducer.clear();
-    m_pListReceivedSamples.clear();
     m_pFtBuffProducer = QSharedPointer<FtBuffProducer>::create(this);
-    m_pListReceivedSamples = QSharedPointer<QList<Eigen::MatrixXd> >::create();
-
 
     return true;
 }
@@ -181,21 +169,7 @@ QWidget* FtBuffer::setupWidget() {
 
 //*************************************************************************************************************
 
-void FtBuffer::run() {
-//    qDebug() << "Ft Buffer run()";
-//    emit workCommand();
-//    while (m_bIsRunning) {
-
-//    }
-//    while(m_bIsRunning) {
-//        m_mutex.lock();
-//        if(m_bIsRunning){break;}
-
-//        qDebug() << "FtBuffer run() loop running";
-//        pushData();
-//        QThread::usleep(100);
-//    }
-}
+void FtBuffer::run() {}
 
 //*************************************************************************************************************
 
@@ -205,72 +179,6 @@ void FtBuffer::showYourWidget() {
 }
 
 //*************************************************************************************************************
-
-//bool FtBuffer::connectToBuffer(QString addr){
-//    //this->m_FtBuffClient.setAddress(addr);
-//    //updateBufferAddress(addr);
-
-//    m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
-//    strcpy(m_pTempAddress, addr.toLocal8Bit().constData());
-
-//    delete m_pFtBuffClient;
-
-//    m_pFtBuffClient = new FtBuffClient(m_pTempAddress);
-//    return this->m_pFtBuffClient->startConnection();
-//}
-
-////*************************************************************************************************************
-//bool FtBuffer::disconnectFromBuffer(){
-//    return this->m_pFtBuffClient->stopConnection();
-//}
-
-////*************************************************************************************************************
-
-//Eigen::MatrixXd FtBuffer::getData() {
-//    qDebug() << "FtBuffer::getData()";
-
-
-//    //int i = 0;
-//    while(m_bIsRunning) {
-
-//        //pushData();
-
-//        //qDebug() << "Loop" << i;
-//        m_pFtBuffClient->getData();
-
-
-
-//        if (m_pFtBuffClient->newData()) {
-//            m_pFtBuffClient->reset();
-//            qDebug() << "Returning mat";
-//            return m_pFtBuffClient->dataMat();
-//        }
-
-//        //i++;
-//    }
-//}
-
-void FtBuffer::pushData(){
-    qDebug() <<  "pushData()";
-    m_mutex.lock();
-    qDebug() << "mutex locked";
-    if(!m_pListReceivedSamples->isEmpty()) {
-        qDebug() << "In loop";
-        MatrixXd matData = m_pListReceivedSamples->takeFirst();
-        qDebug() << matData.size();
-        m_pRTMSA_BufferOutput->data()->setValue(matData);
-        qDebug() << "value set";
-    }
-    m_mutex.unlock();
-    qDebug() << "mutex unlocked";
-}
-
-//*************************************************************************************************************
-
-//void FtBuffer::updateBufferAddress(QString address) {}
-
-//*************************************************************************************************************
-
 
 void FtBuffer::setUpFiffInfo()
 {
@@ -388,19 +296,107 @@ bool FtBuffer::isRunning() {
     return m_bIsRunning;
 }
 
+//*************************************************************************************************************
+
 void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
     qDebug() << "Appending matrix";
     m_mutex.lock();
     if(m_bIsRunning) {
-
         m_pRTMSA_BufferOutput->data()->setValue(matData);
-        //m_pListReceivedSamples->append(matData);
     }
     m_mutex.unlock();
 
 }
 
+//*************************************************************************************************************
+
 void FtBuffer::setParams(int freq, int chan) {
     m_iSampFreq = freq;
     m_iNumChannels = chan;
 }
+
+//*************************************************************************************************************
+
+//void FtBuffer::updateBufferAddress(QString address) {}
+
+//*************************************************************************************************************
+
+//bool FtBuffer::connectToBuffer(QString addr){
+//    //this->m_FtBuffClient.setAddress(addr);
+//    //updateBufferAddress(addr);
+
+//    m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
+//    strcpy(m_pTempAddress, addr.toLocal8Bit().constData());
+
+//    delete m_pFtBuffClient;
+
+//    m_pFtBuffClient = new FtBuffClient(m_pTempAddress);
+//    return this->m_pFtBuffClient->startConnection();
+//}
+
+//*************************************************************************************************************
+
+//bool FtBuffer::disconnectFromBuffer(){
+//    return this->m_pFtBuffClient->stopConnection();
+//}
+
+//*************************************************************************************************************
+
+//Eigen::MatrixXd FtBuffer::getData() {
+//    qDebug() << "FtBuffer::getData()";
+
+
+//    //int i = 0;
+//    while(m_bIsRunning) {
+
+//        //pushData();
+
+//        //qDebug() << "Loop" << i;
+//        m_pFtBuffClient->getData();
+
+
+
+//        if (m_pFtBuffClient->newData()) {
+//            m_pFtBuffClient->reset();
+//            qDebug() << "Returning mat";
+//            return m_pFtBuffClient->dataMat();
+//        }
+
+//        //i++;
+//    }
+//}
+
+//*************************************************************************************************************
+
+//void FtBuffer::pushData(){
+//    qDebug() <<  "pushData()";
+//    m_mutex.lock();
+//    qDebug() << "mutex locked";
+//    if(!m_pListReceivedSamples->isEmpty()) {
+//        qDebug() << "In loop";
+//        MatrixXd matData = m_pListReceivedSamples->takeFirst();
+//        qDebug() << matData.size();
+//        m_pRTMSA_BufferOutput->data()->setValue(matData);
+//        qDebug() << "value set";
+//    }
+//    m_mutex.unlock();
+//    qDebug() << "mutex unlocked";
+//}
+
+//*************************************************************************************************************
+
+//void FtBuffer::run() {
+//    qDebug() << "Ft Buffer run()";
+//    emit workCommand();
+//    while (m_bIsRunning) {
+
+//    }
+//    while(m_bIsRunning) {
+//        m_mutex.lock();
+//        if(m_bIsRunning){break;}
+
+//        qDebug() << "FtBuffer run() loop running";
+//        pushData();
+//        QThread::usleep(100);
+//    }
+//}

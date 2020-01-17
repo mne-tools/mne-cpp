@@ -51,37 +51,32 @@ using namespace FTBUFFERPLUGIN;
 
 //*************************************************************************************************************
 
-FtBuffProducer::FtBuffProducer(FtBuffer* pFtBuffer) :
-m_pFtBuffer(pFtBuffer)
+FtBuffProducer::FtBuffProducer(FtBuffer* pFtBuffer)
+: m_pFtBuffer(pFtBuffer)
 {
     m_pFtBuffClient = new FtBuffClient();
 }
 
 //*************************************************************************************************************
-FtBuffProducer::~FtBuffProducer()
-{
+
+FtBuffProducer::~FtBuffProducer() {
     delete m_pFtBuffClient;
 }
 
 //*************************************************************************************************************
 
-void FtBuffProducer::run()
-{
-    long i = 0;
+void FtBuffProducer::run() {
+    qDebug() << "Running producer..";
+
     while (true) {
-
-        qDebug() << "FtBuffProducer::run" << i;
-        i++;
-
         m_pFtBuffClient->getData();
 
         if (m_pFtBuffClient->newData()){
             qDebug() << "Returning mat";
             emit newDataAvailable(m_pFtBuffClient->dataMat());
             m_pFtBuffClient->reset();
-
         }
-        //m_pFtBuffer->pushData();
+
         QThread::usleep(50);
 
         m_pFtBuffer->m_mutex.lock();
@@ -98,21 +93,19 @@ void FtBuffProducer::doWork() {
 
 //*************************************************************************************************************
 
-bool FtBuffProducer::connectToBuffer(QString addr){
-    //this->m_FtBuffClient.setAddress(addr);
-    //updateBufferAddress(addr);
-
+bool FtBuffProducer::connectToBuffer(QString addr) {
     m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
     strcpy(m_pTempAddress, addr.toLocal8Bit().constData());
 
     delete m_pFtBuffClient;
-
     m_pFtBuffClient = new FtBuffClient(m_pTempAddress);
+
     return this->m_pFtBuffClient->startConnection();
 }
 
 //*************************************************************************************************************
-bool FtBuffProducer::disconnectFromBuffer(){
+
+bool FtBuffProducer::disconnectFromBuffer() {
     return this->m_pFtBuffClient->stopConnection();
 }
 

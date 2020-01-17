@@ -76,10 +76,14 @@ class FtBuffer;
 //=============================================================================================================
 
 /**
-* FtBuffProducer Class
-*
-* @brief FtBuffProucer deals with data aquisition in a separate thread from the main FtBuffer plugin.
-*/
+ * FtBuffProducer
+ *
+ * Handles communication between FtBuffClient and FtBuffer.
+ * Meant to be run in a separate thread, all communication is done through slots and signals.
+ * Holds an instance of FtBuffClient as a member.
+ *
+ * @brief Handles communication and data transfer between FtBuffClient and FtBuffer
+ */
 class FtBuffProducer : public QObject
 {
     Q_OBJECT
@@ -90,12 +94,14 @@ class FtBuffProducer : public QObject
 
 public:
 
+    //=========================================================================================================
     /**
     * creates instance of FtBuffProducer that holds a poiter to an instance of FtBuffer
     *
     */
     FtBuffProducer(FtBuffer* pFtBuffer);
 
+    //=========================================================================================================
     ~FtBuffProducer();
 
     //=========================================================================================================
@@ -108,41 +114,44 @@ public:
 
     //=========================================================================================================
     /**
-    * Changes stored address and connects the member FtBuffClient to that address
-    *
-    * @brief connects buffer client to provided address
+    * @brief disconnects the member FtBuffClient from the buffer it is connected to
     */
     bool disconnectFromBuffer();
 
 public slots:
 
-      void doWork();
+    //=========================================================================================================
+    /**
+    * @brief doWork - runs run()
+    */
+    void doWork();
 
 protected:
 
+    //=========================================================================================================
     /**
-    * runs getData(), though FtBuffer, which run getData() in FtBuffClient on a loop
+    * runs getData() on a loop, emiting newDataAvailable with new data from FtuffClient
     *
-    * @brief runs seprate thread to continuously get data
+    * @brief loops continuously to aquire new data from FtBuffClient and send to FtBuffer
     */
     virtual void run();
 
-
-
 signals:
 
+    //=========================================================================================================
+    /**
+    * @brief newDataAvailable - Sends new buffer data
+    * @param matData - formated data from buffer
+    */
     void newDataAvailable(const Eigen::MatrixXd &matData);
-
 
 private:
 
-    Eigen::MatrixXd                 m_matData;
+    FtBuffer*                       m_pFtBuffer;                /**< Pointer to FtBuffer that created this object. Destination of collected data */
+    FtBuffClient*                   m_pFtBuffClient;            /**< FtBuffClient object that interfaces with buffer and gets buffer data */
 
-    FtBuffer*                       m_pFtBuffer;
-
-    char*                           m_pTempAddress;
-
-    FtBuffClient*                   m_pFtBuffClient;
+    Eigen::MatrixXd                 m_matData;                  /**< Aquired buffer data that will be sent to FtBuffProduer */
+    char*                           m_pTempAddress;             /**< Temporary storage for setting FtBuffClient address */
 };
 
 } // namespace
