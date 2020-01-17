@@ -14,13 +14,13 @@ jobs:
       max-parallel: 6
       matrix:
         qt: [5.14.0, 5.10.1]
-        os: [ubuntu-latest, macos-latest, windows-2016]
+        os: [ubuntu-16.04, macos-latest, windows-2016]
 
     steps:
     - name: Clone repository
       uses: actions/checkout@v1
     - name: Install Qt (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       uses: jurplel/install-qt-action@v2
       with:
         version: ${{ matrix.qt }}
@@ -39,7 +39,7 @@ jobs:
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
         echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       run: |
         qmake -r MNECPP_CONFIG+=noTests
         make -j2
@@ -59,7 +59,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-2016]
+        os: [ubuntu-16.04, macos-latest, windows-2016]
 
     steps:
     - name: Clone repository
@@ -67,11 +67,11 @@ jobs:
     - name: Clone mne-cpp test data
       run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
     - name: Install Codecov
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-16.04'
       run: |
         sudo pip install codecov 
     - name: Install Qt (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.0
@@ -90,7 +90,7 @@ jobs:
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
         echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP (Linux)
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-16.04'
       run: |
         qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
         make -j2
@@ -108,7 +108,7 @@ jobs:
         qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
         jom -j2
     - name: Run tests (Linux)
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-16.04'
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         QTEST_FUNCTION_TIMEOUT: 900000
