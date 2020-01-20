@@ -4,7 +4,7 @@
  * @file     main.cpp
  * @author   Daniel Knobl <Daniel.Knobl@tu-ilmenau.de>;
  *           Martin Henfling <Martin.Henfling@tu-ilmenau.de>
- * @version  1.0
+ * @version  dev
  * @date     July, 2014
  *
  * @section  LICENSE

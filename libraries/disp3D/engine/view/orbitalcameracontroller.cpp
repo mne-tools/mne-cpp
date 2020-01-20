@@ -2,7 +2,7 @@
 /**
  * @file     orbitalcameracontroller.cpp
  * @author   Lars Debor <Lars.Debor@tu-ilmenau.de>
- * @version  1.0
+ * @version  dev
  * @date     May, 2018
  *
  * @section  LICENSE

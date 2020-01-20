@@ -4,7 +4,7 @@
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Juan Garcia-Prieto <juangpc@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     March, 2014
  *
  * @section  LICENSE

@@ -11,7 +11,7 @@
 #           Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Ricky Tjen <ricky270@student.sgu.ac.id>;
 #           Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>
-# @version  1.0
+# @version  dev
 # @date     July, 2010
 #
 # @section  LICENSE

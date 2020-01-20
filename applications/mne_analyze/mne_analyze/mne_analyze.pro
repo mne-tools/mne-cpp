@@ -5,7 +5,7 @@
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Erik Hornberger <erik.hornberger@shi-g.com>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>
-# @version  1.0
+# @version  dev
 # @date     January, 2017
 #
 # @section  LICENSE

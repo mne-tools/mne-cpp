@@ -3,7 +3,7 @@
  * @file     settingswidget.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     November, 2013
  *
  * @section  LICENSE
@@ -88,7 +88,7 @@ SettingsWidget::SettingsWidget(QWidget *parent)
     fillPortsInfo();
 
    // initSettings();   --> eigentlich reicht es, wenn wir das hier weglassen, denn initial wurden die richtigen
-    //                      Parameter ja schon gesetzt. Eine Ã?nderung durch die comboboxen ruft weiterhin updatesettings auf
+    //                      Parameter ja schon gesetzt. Eine ï¿½?nderung durch die comboboxen ruft weiterhin updatesettings auf
 }
 
 

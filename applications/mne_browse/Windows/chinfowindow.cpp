@@ -3,7 +3,7 @@
  * @file     chinfowindow.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     November, 2014
  *
  * @section  LICENSE

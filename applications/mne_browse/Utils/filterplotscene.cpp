@@ -5,7 +5,7 @@
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     September, 2014
  *
  * @section  LICENSE

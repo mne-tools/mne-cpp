@@ -4,7 +4,7 @@
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
-# @version  1.0
+# @version  dev
 # @date     July, 2016
 #
 # @section  LICENSE

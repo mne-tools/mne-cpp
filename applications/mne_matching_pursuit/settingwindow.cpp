@@ -6,7 +6,7 @@
  *           Daniel Knobl <Daniel.Knobl@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Martin Henfling <Martin.Henfling@tu-ilmenau.de>
- * @version  1.0
+ * @version  dev
  * @date     July, 2014
  *
  * @section  LICENSE

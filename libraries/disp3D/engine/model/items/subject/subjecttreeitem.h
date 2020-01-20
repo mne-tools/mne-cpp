@@ -2,7 +2,7 @@
 /**
  * @file     subjecttreeitem.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     May, 2016
  *
  * @section  LICENSE

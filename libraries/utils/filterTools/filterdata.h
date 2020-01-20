@@ -4,7 +4,7 @@
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     February, 2014
  *
  * @section  LICENSE

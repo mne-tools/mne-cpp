@@ -5,7 +5,7 @@
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Louis Eichhorst <Louis.Eichhorst@tu-ilmenau.de>
-# @version  1.0
+# @version  dev
 # @date     August, 2016
 #
 # @section  LICENSE

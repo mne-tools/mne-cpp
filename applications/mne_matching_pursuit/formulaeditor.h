@@ -2,7 +2,7 @@
 /**
  * @file     formulaeditor.h
  * @author   Daniel Knobl <Daniel.Knobl@tu-ilmenau.de>
- * @version  1.0
+ * @version  dev
  * @date     July, 2014
  *
  * @section  LICENSE

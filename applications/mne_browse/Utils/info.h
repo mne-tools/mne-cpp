@@ -2,7 +2,7 @@
 /**
  * @file     info.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     January, 2014
  *
  * @section  LICENSE

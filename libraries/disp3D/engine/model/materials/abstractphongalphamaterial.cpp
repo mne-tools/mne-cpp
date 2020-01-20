@@ -3,7 +3,7 @@
  * @file     abstractphongalphamaterial.cpp
  * @author   Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     January, 2018
  *
  * @section  LICENSE

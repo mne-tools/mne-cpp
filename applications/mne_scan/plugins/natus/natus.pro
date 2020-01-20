@@ -2,7 +2,7 @@
 #
 # @file     natus.pro
 # @author   Lorenz Esch <lesch@mgh.harvard.edu>
-# @version  1.0
+# @version  dev
 # @date     June, 2018
 #
 # @section  LICENSE

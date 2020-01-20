@@ -3,7 +3,7 @@
 # @file     scShared.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>
-# @version  1.0
+# @version  dev
 # @date     March, 2012
 #
 # @section  LICENSE

@@ -3,7 +3,7 @@
  * @file     lsladaptersetup.h
  * @author   Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     February, 2019
  *
  * @section  LICENSE

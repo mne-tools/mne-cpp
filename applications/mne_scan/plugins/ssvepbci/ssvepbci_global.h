@@ -4,7 +4,7 @@
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     MAY, 2016
  *
  * @section  LICENSE

@@ -4,7 +4,7 @@
  * @author   Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     November, 2015
  *
  * @section  LICENSE

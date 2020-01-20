@@ -2,7 +2,7 @@
 /**
  * @file     realtimeevokedset.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     August, 2016
  *
  * @section  LICENSE

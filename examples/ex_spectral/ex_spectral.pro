@@ -3,7 +3,7 @@
 # @file     ex_spectral.pro
 # @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>
-# @version  1.0
+# @version  dev
 # @date     March, 2018
 #
 # @section  LICENSE

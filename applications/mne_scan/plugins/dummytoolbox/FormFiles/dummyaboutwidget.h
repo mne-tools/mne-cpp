@@ -3,7 +3,7 @@
  * @file     dummyaboutwidget.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
- * @version  1.0
+ * @version  dev
  * @date     February, 2013
  *
  * @section  LICENSE

@@ -3,7 +3,7 @@
  * @file     rtnoise.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     August, 2014
  *
  * @section  LICENSE

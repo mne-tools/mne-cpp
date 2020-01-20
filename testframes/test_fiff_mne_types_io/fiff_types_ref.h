@@ -2,7 +2,7 @@
 /**
  * @file     fiff_types_ref.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     December, 2015
  *
  * @section  LICENSE

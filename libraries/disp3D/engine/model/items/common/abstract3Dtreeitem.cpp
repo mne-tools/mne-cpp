@@ -3,7 +3,7 @@
  * @file     abstract3Dtreeitem.cpp
  * @author   Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     November, 2015
  *
  * @section  LICENSE

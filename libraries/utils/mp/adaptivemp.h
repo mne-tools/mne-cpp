@@ -2,7 +2,7 @@
 /**
  * @file     adaptivemp.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     July, 2014
  *
  * @section  LICENSE

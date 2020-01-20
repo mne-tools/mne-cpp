@@ -2,7 +2,7 @@
 /**
  * @file     epidetectsetupwidget.h
  * @author   Louis Eichhorst <Louis.Eichhorst@tu-ilmenau.de>
- * @version  1.0
+ * @version  dev
  * @date     January, 2017
  *
  * @section  LICENSE

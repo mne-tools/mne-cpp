@@ -10,7 +10,7 @@
 #           Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Ricky Tjen <ricky270@student.sgu.ac.id>;
 #           Sugandha Sachdeva <sugandha.sachdeva@tu-ilmenau.de>
-# @version  1.0
+# @version  dev
 # @date     July, 2012
 #
 # @section  LICENSE

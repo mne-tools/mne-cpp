@@ -3,7 +3,7 @@
  * @file     referenceaboutwidget.h
  * @author   Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     February, 2017
  *
  * @section  LICENSE

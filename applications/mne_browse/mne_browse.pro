@@ -4,7 +4,7 @@
 # @author   Robert Dicamillo <rd521@nmr.mgh.harvard.edu>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>
-# @version  1.0
+# @version  dev
 # @date     January, 2014
 #
 # @section  LICENSE
