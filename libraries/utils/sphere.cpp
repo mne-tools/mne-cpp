@@ -174,8 +174,8 @@ bool Sphere::fit_sphere_to_points(const MatrixXf &rr, float simplex_size, Vector
 //    int   np = rr.rows();
 
     /*
-    * Find the optimal sphere origin
-    */
+     * Find the optimal sphere origin
+     */
     fitUserRecNew user;
     float      ftol            = 1e-5f;
     int        max_eval        = 500;
@@ -227,8 +227,8 @@ bool Sphere::fit_sphere_to_points(const MatrixXf &rr, float simplex_size, Vector
 bool Sphere::report_func(int loop, const VectorXf &fitpar, double fval)
 {
     /*
-    * Report periodically
-    */
+     * Report periodically
+     */
     const VectorXf& r0 = fitpar;
 
     std::cout << "loop: " << loop << "; r0: " << 1000*r0[0] << ", r1: " << 1000*r0[1] << ", r2: " << 1000*r0[2] << "; fval: " << fval << std::endl;
@@ -252,8 +252,8 @@ void Sphere::calculate_cm_ave_dist(const MatrixXf &rr, VectorXf &cm, float &avep
 MatrixXf Sphere::make_initial_simplex(const VectorXf &pars, float size)
 {
     /*
-    * Make the initial tetrahedron
-    */
+     * Make the initial tetrahedron
+     */
     int npar = pars.size();
 
     MatrixXf simplex = MatrixXf::Zero(npar+1,npar);
@@ -273,9 +273,9 @@ MatrixXf Sphere::make_initial_simplex(const VectorXf &pars, float size)
 float Sphere::fit_eval(const VectorXf &fitpar, const void  *user_data)
 {
     /*
-    * Calculate the cost function value
-    * Optimize for the radius inside here
-    */
+     * Calculate the cost function value
+     * Optimize for the radius inside here
+     */
     const fitUserNew& user = (fitUserNew)user_data;
     const VectorXf& r0 = fitpar;
 

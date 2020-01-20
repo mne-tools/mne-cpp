@@ -166,21 +166,21 @@ bool MNESourceEstimate::read(QIODevice &p_IODevice, MNESourceEstimate& p_stc)
         printf("Reading source estimate...");
 
     // read start time in ms
-    *t_pStream >> p_stc.tmin;
+     *t_pStream >> p_stc.tmin;
     p_stc.tmin /= 1000;
     // read sampling rate in ms
-    *t_pStream >> p_stc.tstep;
+     *t_pStream >> p_stc.tstep;
     p_stc.tstep /= 1000;
     // read number of vertices
     quint32 t_nVertices;
-    *t_pStream >> t_nVertices;
+     *t_pStream >> t_nVertices;
     p_stc.vertices = VectorXi(t_nVertices);
     // read the vertex indices
     for(quint32 i = 0; i < t_nVertices; ++i)
         *t_pStream >> p_stc.vertices[i];
     // read the number of timepts
     quint32 t_nTimePts;
-    *t_pStream >> t_nTimePts;
+     *t_pStream >> t_nTimePts;
     //
     // read the data
     //
@@ -228,16 +228,16 @@ bool MNESourceEstimate::write(QIODevice &p_IODevice)
         printf("Write source estimate...");
 
     // write start time in ms
-    *t_pStream << (float)1000*this->tmin;
+     *t_pStream << (float)1000*this->tmin;
     // write sampling rate in ms
-    *t_pStream << (float)1000*this->tstep;
+     *t_pStream << (float)1000*this->tstep;
     // write number of vertices
-    *t_pStream << (quint32)this->vertices.size();
+     *t_pStream << (quint32)this->vertices.size();
     // write the vertex indices
     for(qint32 i = 0; i < this->vertices.size(); ++i)
         *t_pStream << (quint32)this->vertices[i];
     // write the number of timepts
-    *t_pStream << (quint32)this->data.cols();
+     *t_pStream << (quint32)this->data.cols();
     //
     // write the data
     //

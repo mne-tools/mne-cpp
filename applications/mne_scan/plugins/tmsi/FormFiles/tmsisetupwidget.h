@@ -83,83 +83,83 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a TMSISetupWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
-    */
+     * Constructs a TMSISetupWidget which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
+     * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
+     */
     TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the TMSISetupWidget.
-    * All TMSISetupWidget's children are deleted first. The application exits if TMSISetupWidget is the main widget.
-    */
+     * Destroys the TMSISetupWidget.
+     * All TMSISetupWidget's children are deleted first. The application exits if TMSISetupWidget is the main widget.
+     */
     ~TMSISetupWidget();
 
     //=========================================================================================================
     /**
-    * Initializes the Connector's GUI properties.
-    *
-    */
+     * Initializes the Connector's GUI properties.
+     *
+     */
     void initGui();
 
 private:
 
     //=========================================================================================================
     /**
-    * Sets the device sampling properties.
-    *
-    */
+     * Sets the device sampling properties.
+     *
+     */
     void setDeviceSamplingProperties();
 
     //=========================================================================================================
     /**
-    * Sets the preprocessing properties.
-    *
-    */
+     * Sets the preprocessing properties.
+     *
+     */
     void setPreprocessing();
 
     //=========================================================================================================
     /**
-    * Sets the postprocessing properties.
-    *
-    */
+     * Sets the postprocessing properties.
+     *
+     */
     void setPostprocessing();
 
     //=========================================================================================================
     /**
-    * Sets flag for writing to a file.
-    *
-    */
+     * Sets flag for writing to a file.
+     *
+     */
     void setWriteToFile();
 
     //=========================================================================================================
     /**
-    * Sets the triggering properties
-    *
-    */
+     * Sets the triggering properties
+     *
+     */
     void setTriggerProperties();
 
     //=========================================================================================================
     /**
-    * Sets whether the file is to be splitted or not
-    *
-    */
+     * Sets whether the file is to be splitted or not
+     *
+     */
     void setSplitFile(bool state);
 
     //=========================================================================================================
     /**
-    * Sets size for the splitted files
-    *
-    */
+     * Sets size for the splitted files
+     *
+     */
     void setSplitFileSize(qint32 value);
 
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
     TMSI*               m_pTMSI;                 /**< a pointer to corresponding TMSI.*/

@@ -109,80 +109,80 @@ class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Constructs a TriggerControl.
-    */
+     * Constructs a TriggerControl.
+     */
     TriggerControl();
 
     //=========================================================================================================
     /**
-    * Destroys the TriggerControl.
-    */
+     * Destroys the TriggerControl.
+     */
     ~TriggerControl();
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Starts the TriggerControl by starting the triggercontrol's thread.
-    */
+     * Starts the TriggerControl by starting the triggercontrol's thread.
+     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the TriggerControl by starting the triggercontrol's thread.
-    */
+     * Stops the TriggerControl by starting the triggercontrol's thread.
+     */
     virtual bool stop();
 
     //=========================================================================================================
     /**
-    * [...]
-    */
+     * [...]
+     */
     virtual IPlugin::PluginType getType() const;
 
     //=========================================================================================================
     /**
-    * [...]
-    */
+     * [...]
+     */
     virtual QString getName() const;
 
     //=========================================================================================================
     /**
-    * [...]
-    */    
+     * [...]
+     */    
     virtual QWidget* setupWidget();
 
     //=========================================================================================================
     /**
-    * [...]
-    */
+     * [...]
+     */
     void updateSingleChannel(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * [...]
-    */
+     * [...]
+     */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     void byteReceived();
 
 signals:
@@ -192,14 +192,14 @@ signals:
 protected:
     //=========================================================================================================
     /**
-    * Runs the run method
-    */
+     * Runs the run method
+     */
     virtual void run();
 
     //=========================================================================================================
     /**
-    * Sets or Unsets the HardWired channel from the terminal function (see manual)
-    */
+     * Sets or Unsets the HardWired channel from the terminal function (see manual)
+     */
 
     void sendByteTo(int value, int channel);
 

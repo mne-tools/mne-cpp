@@ -76,17 +76,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a NoiseReductionAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseReductionAboutWidget becomes a window. If parent is another widget, NoiseReductionAboutWidget becomes a child window inside parent. NoiseReductionAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a NoiseReductionAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseReductionAboutWidget becomes a window. If parent is another widget, NoiseReductionAboutWidget becomes a child window inside parent. NoiseReductionAboutWidget is deleted when its parent is deleted.
+     */
     NoiseReductionAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the NoiseReductionAboutWidget.
-    * All NoiseReductionAboutWidget's children are deleted first. The application exits if NoiseReductionAboutWidget is the main widget.
-    */
+     * Destroys the NoiseReductionAboutWidget.
+     * All NoiseReductionAboutWidget's children are deleted first. The application exits if NoiseReductionAboutWidget is the main widget.
+     */
     ~NoiseReductionAboutWidget();
 
 private:

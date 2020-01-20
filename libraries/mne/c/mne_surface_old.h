@@ -90,15 +90,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Surface
-    */
+     * Constructs the MNE Surface
+     */
     MneSurfaceOld();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Surface
-    * Refactored:  (.c)
-    */
+     * Destroys the MNE Surface
+     * Refactored:  (.c)
+     */
     ~MneSurfaceOld();
 
 public:

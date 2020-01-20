@@ -76,17 +76,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a TriggercontrolAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TriggercontrolAboutWidget becomes a window. If parent is another widget, TriggercontrolAboutWidget becomes a child window inside parent. TriggercontrolAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a TriggercontrolAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new TriggercontrolAboutWidget becomes a window. If parent is another widget, TriggercontrolAboutWidget becomes a child window inside parent. TriggercontrolAboutWidget is deleted when its parent is deleted.
+     */
     TriggerControlAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the TriggercontrolAboutWidget.
-    * All TriggercontrolAboutWidget's children are deleted first. The application exits if TriggercontrolAboutWidget is the main widget.
-    */
+     * Destroys the TriggercontrolAboutWidget.
+     * All TriggercontrolAboutWidget's children are deleted first. The application exits if TriggercontrolAboutWidget is the main widget.
+     */
     ~TriggerControlAboutWidget();
 
 private:

@@ -78,35 +78,35 @@ class InformationWindow : public QDockWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a InformationWindow dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new InformationWindow becomes a window. If parent is another widget, InformationWindow becomes a child window inside parent. InformationWindow is deleted when its parent is deleted.
-    */
+     * Constructs a InformationWindow dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new InformationWindow becomes a window. If parent is another widget, InformationWindow becomes a child window inside parent. InformationWindow is deleted when its parent is deleted.
+     */
     InformationWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the InformationWindow.
-    * All InformationWindow's children are deleted first. The application exits if InformationWindow is the main widget.
-    */
+     * Destroys the InformationWindow.
+     * All InformationWindow's children are deleted first. The application exits if InformationWindow is the main widget.
+     */
     ~InformationWindow();
 
     //=========================================================================================================
     /**
-    * Writes to MainWindow log.
-    *
-    * @param [in] logMsg message
-    * @param [in] lgknd message kind; Message is formated depending on its kind.
-    * @param [in] lglvl message level; Message is displayed depending on its level.
-    */
+     * Writes to MainWindow log.
+     *
+     * @param [in] logMsg message
+     * @param [in] lgknd message kind; Message is formated depending on its kind.
+     * @param [in] lglvl message level; Message is displayed depending on its level.
+     */
     void writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl);
 
     //=========================================================================================================
     /**
-    * Sets the log level
-    *
-    * @param [in] lvl message level; Message is displayed depending on its level.
-    */
+     * Sets the log level
+     *
+     * @param [in] lvl message level; Message is displayed depending on its level.
+     */
     void setLogLevel(LogLevel lvl);
 
 private:

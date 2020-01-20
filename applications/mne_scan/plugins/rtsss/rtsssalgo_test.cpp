@@ -1016,7 +1016,7 @@ QList<MatrixXd> RtSssAlgoTest::getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, Matrix
         NumCoil = EqnB.rows();
         NumExp = EqnB.cols();
         printf("%d samples,  %d channels \n",(qint32)EqnB.cols(), (qint32)EqnB.rows());
-    */
+     */
         //cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
     EqnRRInv = (EqnA.transpose() * EqnA).inverse();

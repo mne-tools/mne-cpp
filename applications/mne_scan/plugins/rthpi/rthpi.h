@@ -102,32 +102,32 @@ class RTHPISHARED_EXPORT RtHpi : public IAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Constructs a RtHpi.
-    */
+     * Constructs a RtHpi.
+     */
     RtHpi();
 
     //=========================================================================================================
     /**
-    * Destroys the RtHpi.
-    */
+     * Destroys the RtHpi.
+     */
     ~RtHpi();
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const;
 
     virtual bool start();
@@ -145,8 +145,8 @@ public:
 signals:
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
-    */
+     * Emitted when fiffInfo is available
+     */
     void fiffInfoAvailable();
 
 protected:
@@ -155,8 +155,8 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Initialises the output connector.
-    */
+     * Initialises the output connector.
+     */
     void initConnector();
 
     PluginInputData<RealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;      /**< The RealTimeMultiSampleArray of the RtHpi input.*/

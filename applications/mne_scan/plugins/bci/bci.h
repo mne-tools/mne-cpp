@@ -103,44 +103,44 @@ class BCISHARED_EXPORT BCI : public SCSHAREDLIB::IAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Constructs a BCI.
-    */
+     * Constructs a BCI.
+     */
     BCI();
 
     //=========================================================================================================
     /**
-    * Destroys the BCI.
-    */
+     * Destroys the BCI.
+     */
     virtual ~BCI();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Starts the BCI by starting the BCI's thread.
-    */
+     * Starts the BCI by starting the BCI's thread.
+     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the BCI by stopping the BCI's thread.
-    */
+     * Stops the BCI by stopping the BCI's thread.
+     */
     virtual bool stop();
 
     virtual IPlugin::PluginType getType() const;
@@ -150,111 +150,111 @@ public:
 
 protected:
     /**
-    * This update function gets called whenever the input buffer stream from the TMSI plugin is full and need to be emptied by this BCI plugin.
-    *
-    * @param [in] pMeasurement measurement object.
-    */
+     * This update function gets called whenever the input buffer stream from the TMSI plugin is full and need to be emptied by this BCI plugin.
+     *
+     * @param [in] pMeasurement measurement object.
+     */
     void updateSensor(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * This update function gets called whenever the input buffer stream from the Sourcelab plugin is full and need to be emptied by this BCI plugin.
-    *
-    * @param [in] pMeasurement measurement object.
-    */
+     * This update function gets called whenever the input buffer stream from the Sourcelab plugin is full and need to be emptied by this BCI plugin.
+     *
+     * @param [in] pMeasurement measurement object.
+     */
     void updateSource(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Calculates the filtered signal of chdata
-    *
-    * @param [in] rowdata QPair with number of the row and the data samples as a RowVectorXd.
-    */
+     * Calculates the filtered signal of chdata
+     *
+     * @param [in] rowdata QPair with number of the row and the data samples as a RowVectorXd.
+     */
     void applyMeanCorrectionConcurrently(QPair<int,RowVectorXd>& rowdata);
 
     //=========================================================================================================
     /**
-    * Calculates the filtered signal of chdata
-    *
-    * @param [in] chdata QPair with number of the row and the data samples as a RowVectorXd.
-    */
+     * Calculates the filtered signal of chdata
+     *
+     * @param [in] chdata QPair with number of the row and the data samples as a RowVectorXd.
+     */
     void applyFilterOperatorConcurrently(QPair<int,RowVectorXd> &chdata);
 
     //=========================================================================================================
     /**
-    * Calculates the features on sensor level
-    *
-    * @param [in] chdata QPair with number of the row and the data samples as a RowVectorXd.
-    * @param [out] QPair<int,QList<double>> calculated features.
-    */
+     * Calculates the features on sensor level
+     *
+     * @param [in] chdata QPair with number of the row and the data samples as a RowVectorXd.
+     * @param [out] QPair<int,QList<double>> calculated features.
+     */
     QPair< int,QList<double> > applyFeatureCalcConcurrentlyOnSensorLevel(const QPair<int,RowVectorXd> &chdata);
 
     //=========================================================================================================
     /**
-    * Classifies the features on sensor level
-    *
-    * @param [in] featData QList<double> holds the feature data point (i.e. 2 electrodes make this parameter have size of 2).
-    * @param [out] double calculated classification value.
-    */
+     * Classifies the features on sensor level
+     *
+     * @param [in] featData QList<double> holds the feature data point (i.e. 2 electrodes make this parameter have size of 2).
+     * @param [out] double calculated classification value.
+     */
     double applyClassificationCalcConcurrentlyOnSensorLevel(QList<double> &featData);
 
     //=========================================================================================================
     /**
-    * Calculates the function value of the decision function (boundary) for a given feature point
-    *
-    * @param [in] featData QList<double> holds the feature data point (i.e. 2 electrodes make this parameter have size of 2).
-    * @param [out] double function value.
-    */
+     * Calculates the function value of the decision function (boundary) for a given feature point
+     *
+     * @param [in] featData QList<double> holds the feature data point (i.e. 2 electrodes make this parameter have size of 2).
+     * @param [out] double function value.
+     */
     double classificationBoundaryValue(const QList<double> &featData);
 
     //=========================================================================================================
     /**
-    * Clears features
-    *
-    */
+     * Clears features
+     *
+     */
     void clearFeatures();
 
     //=========================================================================================================
     /**
-    * Clears all classification results
-    *
-    */
+     * Clears all classification results
+     *
+     */
     void clearClassifications();
 
     //=========================================================================================================
     /**
-    * Check for artefact in data
-    *
-    */
+     * Check for artefact in data
+     *
+     */
     bool hasThresholdArtefact(const QList<QPair<int, RowVectorXd> > &data);
 
     //=========================================================================================================
     /**
-    * Look for trigger in stim channel
-    *
-    */
+     * Look for trigger in stim channel
+     *
+     */
     bool lookForTrigger(const MatrixXd &data);
 
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
     //=========================================================================================================
     /**
-    * Do BCI stuff with data received from sensor level
-    *
-    */
+     * Do BCI stuff with data received from sensor level
+     *
+     */
     void BCIOnSensorLevel();
 
     //=========================================================================================================
     /**
-    * Do BCI stuff with data received from source level
-    *
-    */
+     * Do BCI stuff with data received from source level
+     *
+     */
     void BCIOnSourceLevel();
 
 signals:

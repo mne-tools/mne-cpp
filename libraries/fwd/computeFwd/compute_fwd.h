@@ -109,14 +109,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Default Constructor
-    */
+     * Default Constructor
+     */
     explicit ComputeFwd(ComputeFwdSettings* p_settings);
 
     //=========================================================================================================
     /**
-    * Destructs the Compute Forward solution class
-    */
+     * Destructs the Compute Forward solution class
+     */
     virtual ~ComputeFwd();
 
     //ToDo split this function into init (with settings as parameter) and the actual fit function

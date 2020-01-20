@@ -110,25 +110,25 @@ public:
 
     //=========================================================================================================
     /**
-    * dtor
-    */
+     * dtor
+     */
     virtual ~MNE()
     { }
 
     //=========================================================================================================
     /**
-    * mne_combine_xyz
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNEMath::combine_xyz static function
-    *
-    * Compute the three Cartesian components of a vector together
-    *
-    * @param[in] vec    Input row vector [ x1 y1 z1 ... x_n y_n z_n ]
-    *
-    * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
-    */
+     * mne_combine_xyz
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the MNEMath::combine_xyz static function
+     *
+     * Compute the three Cartesian components of a vector together
+     *
+     * @param[in] vec    Input row vector [ x1 y1 z1 ... x_n y_n z_n ]
+     *
+     * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
+     */
     inline static VectorXd* combine_xyz(const VectorXd& vec)
     {
         return MNEMath::combine_xyz(vec);
@@ -136,28 +136,28 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_block_diag - decoding part
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNEForwardSolution::extract_block_diag static function
-    */
+     * mne_block_diag - decoding part
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the MNEForwardSolution::extract_block_diag static function
+     */
     //    static inline MatrixXd extract_block_diag(MatrixXd& A, qint32 n);
 
     //=========================================================================================================
     /**
-    * mne_find_source_space_hemi
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNESourceSpace::find_source_space_hemi static function
-    *
-    * Returns the hemisphere id (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
-    *
-    * @param[in] p_Hemisphere   The hemisphere to investigate
-    *
-    * @return the deduced hemisphere id
-    */
+     * mne_find_source_space_hemi
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the MNESourceSpace::find_source_space_hemi static function
+     *
+     * Returns the hemisphere id (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
+     *
+     * @param[in] p_Hemisphere   The hemisphere to investigate
+     *
+     * @return the deduced hemisphere id
+     */
     inline static qint32 find_source_space_hemi(MNEHemisphere& p_Hemisphere)
     {
         return MNESourceSpace::find_source_space_hemi(p_Hemisphere);
@@ -165,18 +165,18 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_get_current_comp
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffInfo get_current_comp member function
-    *
-    * Get the current compensation in effect in the data
-    *
-    * @param[in] info   Fiff measurement info
-    *
-    * @return the current compensation
-    */
+     * mne_get_current_comp
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the FiffInfo get_current_comp member function
+     *
+     * Get the current compensation in effect in the data
+     *
+     * @param[in] info   Fiff measurement info
+     *
+     * @return the current compensation
+     */
     static inline qint32 get_current_comp(FiffInfo* info)
     {
         return info->get_current_comp();
@@ -185,23 +185,23 @@ public:
     //ToDo Why is make_block_diag part of MNEForwardSolution - restructure this
     //=========================================================================================================
     /**
-    * mne_block_diag - encoding part
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNEForwardSolution::make_block_diag static function
-    *
-    * Make a sparse block diagonal matrix
-    *
-    * Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising
-    * bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down
-    * the diagonal of the matrix.
-    *
-    * @param[in, out] A Matrix which should be diagonlized
-    * @param[in, out] n Columns of the submatrices
-    *
-    * @return A sparse block diagonal, diagonalized from the elements in "A".
-    */
+     * mne_block_diag - encoding part
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the MNEForwardSolution::make_block_diag static function
+     *
+     * Make a sparse block diagonal matrix
+     *
+     * Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising
+     * bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down
+     * the diagonal of the matrix.
+     *
+     * @param[in, out] A Matrix which should be diagonlized
+     * @param[in, out] n Columns of the submatrices
+     *
+     * @return A sparse block diagonal, diagonalized from the elements in "A".
+     */
     static inline SparseMatrix<double>* make_block_diag(const MatrixXd &A, qint32 n)
     {
         return MNEMath::make_block_diag(A, n);
@@ -209,22 +209,22 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_make_compensator
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffInfo make_compensator member function
-    *
-    * Create a compensation matrix to bring the data from one compensation state to another
-    *
-    * @param[in] info               measurement info as returned by the fif reading routines
-    * @param[in] from               compensation in the input data
-    * @param[in] to                 desired compensation in the output
-    * @param[out] ctf_comp          Compensation Matrix
-    * @param[in] exclude_comp_chs   exclude compensation channels from the output (optional)
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * mne_make_compensator
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the FiffInfo make_compensator member function
+     *
+     * Create a compensation matrix to bring the data from one compensation state to another
+     *
+     * @param[in] info               measurement info as returned by the fif reading routines
+     * @param[in] from               compensation in the input data
+     * @param[in] to                 desired compensation in the output
+     * @param[out] ctf_comp          Compensation Matrix
+     * @param[in] exclude_comp_chs   exclude compensation channels from the output (optional)
+     *
+     * @return true if succeeded, false otherwise
+     */
     inline static bool make_compensator(const FiffInfo& info, fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false)
     {
         return info.make_compensator(from, to, ctf_comp, exclude_comp_chs);
@@ -232,24 +232,24 @@ public:
 
     //=========================================================================================================
     /**
-    * make_projector
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffInfo::make_projector static function
-    * There exists also a member function which should be preferred:
-    * make_projector(MatrixXd& proj, MatrixXd& U = defaultUMatrix)
-    *
-    * Make an SSP operator
-    *
-    * @param[in] projs      A set of projection vectors
-    * @param[in] ch_names   A cell array of channel names
-    * @param[out] proj      The projection operator to apply to the data
-    * @param[in] bads       Bad channels to exclude
-    * @param[out] U         The orthogonal basis of the projection vectors (optional)
-    *
-    * @return nproj - How many items in the projector
-    */
+     * make_projector
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the FiffInfo::make_projector static function
+     * There exists also a member function which should be preferred:
+     * make_projector(MatrixXd& proj, MatrixXd& U = defaultUMatrix)
+     *
+     * Make an SSP operator
+     *
+     * @param[in] projs      A set of projection vectors
+     * @param[in] ch_names   A cell array of channel names
+     * @param[out] proj      The projection operator to apply to the data
+     * @param[in] bads       Bad channels to exclude
+     * @param[out] U         The orthogonal basis of the projection vectors (optional)
+     *
+     * @return nproj - How many items in the projector
+     */
     inline static fiff_int_t make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd)
     {
         return FiffProj::make_projector(projs, ch_names, proj, bads, U);
@@ -257,19 +257,19 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_make_projector_info
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffInfo make_projector_info(MatrixXd& proj) member function
-    *
-    * Make a SSP operator using the meas info
-    *
-    * @param[in] info       Fiff measurement info
-    * @param[out] proj      The projection operator to apply to the data
-    *
-    * @return nproj - How many items in the projector
-    */
+     * mne_make_projector_info
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the FiffInfo make_projector_info(MatrixXd& proj) member function
+     *
+     * Make a SSP operator using the meas info
+     *
+     * @param[in] info       Fiff measurement info
+     * @param[out] proj      The projection operator to apply to the data
+     *
+     * @return nproj - How many items in the projector
+     */
     static inline qint32 make_projector(FiffInfo& info, MatrixXd& proj)
     {
         return info.make_projector(proj);
@@ -277,16 +277,16 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_patch_info
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNESourceSpace::patch_info static function
-    *
-    * @param [in,out] p_Hemisphere  The source space.
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * mne_patch_info
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the MNESourceSpace::patch_info static function
+     *
+     * @param [in,out] p_Hemisphere  The source space.
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool patch_info(MNEHemisphere &p_Hemisphere)
     {
         return MNESourceSpace::patch_info(p_Hemisphere);
@@ -294,22 +294,22 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_prepare_inverse_operator
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNEInverseOperator prepare_inverse_operator member function
-    *
-    * Prepare for actually computing the inverse
-    *
-    * @param [in] orig      The inverse operator structure read from a file
-    * @param [in] nave      Number of averages (scales the noise covariance)
-    * @param [in] lambda2   The regularization factor
-    * @param [in] dSPM      Compute the noise-normalization factors for dSPM?
-    * @param [in] sLORETA   Compute the noise-normalization factors for sLORETA?
-    *
-    * @return the prepared inverse operator
-    */
+     * mne_prepare_inverse_operator
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the MNEInverseOperator prepare_inverse_operator member function
+     *
+     * Prepare for actually computing the inverse
+     *
+     * @param [in] orig      The inverse operator structure read from a file
+     * @param [in] nave      Number of averages (scales the noise covariance)
+     * @param [in] lambda2   The regularization factor
+     * @param [in] dSPM      Compute the noise-normalization factors for dSPM?
+     * @param [in] sLORETA   Compute the noise-normalization factors for sLORETA?
+     *
+     * @return the prepared inverse operator
+     */
     inline static MNEInverseOperator prepare_inverse_operator(MNEInverseOperator& orig, qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false)
     {
         return orig.prepare_inverse_operator(nave, lambda2, dSPM, sLORETA);
@@ -320,17 +320,17 @@ public:
 // ToDo Eventlist Class??
     //=========================================================================================================
     /**
-    * mne_read_events
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Read an event list from a fif file
-    *
-    * @param [in] p_IODevice   The I/O device to read from
-    * @param [out] eventlist    The read eventlist m x 3; with m events; colum: 1 - position in samples, 3 - eventcode
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * mne_read_events
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Read an event list from a fif file
+     *
+     * @param [in] p_IODevice   The I/O device to read from
+     * @param [out] eventlist    The read eventlist m x 3; with m events; colum: 1 - position in samples, 3 - eventcode
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool read_events(QIODevice &p_IODevice, MatrixXi& eventlist);
 
     static void setup_compensators(FiffRawData& raw,
@@ -339,21 +339,21 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_read_cov
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffStream read_cov member function
-    *
-    * Reads a covariance matrix from a fiff file
-    *
-    * @param [in] p_pStream     an open fiff file
-    * @param [in] p_Node        look for the matrix in here
-    * @param [in] cov_kind      what kind of a covariance matrix do we want?
-    * @param [out] p_covData    the read covariance matrix
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * mne_read_cov
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the FiffStream read_cov member function
+     *
+     * Reads a covariance matrix from a fiff file
+     *
+     * @param [in] p_pStream     an open fiff file
+     * @param [in] p_Node        look for the matrix in here
+     * @param [in] cov_kind      what kind of a covariance matrix do we want?
+     * @param [out] p_covData    the read covariance matrix
+     *
+     * @return true if succeeded, false otherwise
+     */
     inline static bool read_cov(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, FiffCov& p_covData)
     {
         return p_pStream->read_cov(p_Node, cov_kind, p_covData);
@@ -361,19 +361,19 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_read_inverse_operator
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNEInverseOperator::read_inverse_operator static function
-    *
-    * Reads the inverse operator decomposition from a fif file
-    *
-    * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket
-    * @param [out] inv          The read inverse operator
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * mne_read_inverse_operator
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the MNEInverseOperator::read_inverse_operator static function
+     *
+     * Reads the inverse operator decomposition from a fif file
+     *
+     * @param [in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket
+     * @param [out] inv          The read inverse operator
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool read_inverse_operator(QIODevice& p_pIODevice, MNEInverseOperator& inv)
     {
         return MNEInverseOperator::read_inverse_operator(p_pIODevice, inv);
@@ -381,23 +381,23 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_read_forward_solution
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNEForwardSolution::read_forward_solution static function
-    *
-    * Reads a forward solution from a fif file
-    *
-    * @param [in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
-    * @param [out] fwd A forward solution from a fif file
-    * @param [in] force_fixed   Force fixed source orientation mode? (optional)
-    * @param [in] surf_ori      Use surface based source coordinate system? (optional)
-    * @param [in] include       Include these channels (optional)
-    * @param [in] exclude       Exclude these channels (optional)
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * mne_read_forward_solution
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the MNEForwardSolution::read_forward_solution static function
+     *
+     * Reads a forward solution from a fif file
+     *
+     * @param [in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+     * @param [out] fwd A forward solution from a fif file
+     * @param [in] force_fixed   Force fixed source orientation mode? (optional)
+     * @param [in] surf_ori      Use surface based source coordinate system? (optional)
+     * @param [in] include       Include these channels (optional)
+     * @param [in] exclude       Exclude these channels (optional)
+     *
+     * @return true if succeeded, false otherwise
+     */
     static inline bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList)
     {
         return MNEForwardSolution::read(p_IODevice, fwd, force_fixed, surf_ori, include, exclude);
@@ -405,21 +405,21 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_read_forward_solution
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNESourceSpace::read_source_spaces static function
-    *
-    * Reads source spaces from a fif file
-    *
-    * @param [in] p_pStream         The open fiff file
-    * @param [in] add_geom          Add geometry information to the source spaces
-    *
-    * @param [out] p_SourceSpace    The read source spaces
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * mne_read_forward_solution
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the MNESourceSpace::read_source_spaces static function
+     *
+     * Reads source spaces from a fif file
+     *
+     * @param [in] p_pStream         The open fiff file
+     * @param [in] add_geom          Add geometry information to the source spaces
+     *
+     * @param [out] p_SourceSpace    The read source spaces
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool read_source_spaces(FiffStream::SPtr& p_pStream, bool add_geom, MNESourceSpace& p_SourceSpace)
     {
         return MNESourceSpace::readFromStream(p_pStream, add_geom, p_SourceSpace);
@@ -427,22 +427,22 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_read_bem_surface
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNESurface::read static function
-    *
-    * Reads a BEM surface from a fif stream
-    *
-    * @param [in] p_pStream         The open fiff file
-    * @param [in] add_geom          Add geometry information to the source spaces
-    * @param [in] p_Tree            Search for the source spaces here
-    *
-    * @param [out] p_Surfaces       The read bem surfaces
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * mne_read_bem_surface
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the MNESurface::read static function
+     *
+     * Reads a BEM surface from a fif stream
+     *
+     * @param [in] p_pStream         The open fiff file
+     * @param [in] add_geom          Add geometry information to the source spaces
+     * @param [in] p_Tree            Search for the source spaces here
+     *
+     * @param [out] p_Surfaces       The read bem surfaces
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool read_bem_surface(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirNode::SPtr& p_Tree, QList<MNESurface::SPtr>& p_Surfaces)
     {
         return MNESurface::read(p_pStream, add_geom, p_Tree, p_Surfaces);
@@ -451,21 +451,21 @@ public:
     //ToDo FiffChInfoList Class
     //=========================================================================================================
     /**
-    * mne_set_current_comp
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffInfo::set_current_comp static function
-    * Consider taking the member function of a FiffInfo set_current_comp(fiff_int_t value),
-    * when compensation should be applied to the channels of FiffInfo
-    *
-    * Set the current compensation value in the channel info structures
-    *
-    * @param[in] chs    fiff channel info list
-    * @param[in] value  compensation value
-    *
-    * @return the current compensation
-    */
+     * mne_set_current_comp
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the FiffInfo::set_current_comp static function
+     * Consider taking the member function of a FiffInfo set_current_comp(fiff_int_t value),
+     * when compensation should be applied to the channels of FiffInfo
+     *
+     * Set the current compensation value in the channel info structures
+     *
+     * @param[in] chs    fiff channel info list
+     * @param[in] value  compensation value
+     *
+     * @return the current compensation
+     */
     static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value)
     {
         return FiffInfo::set_current_comp(chs, value);
@@ -473,20 +473,20 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_transform_source_space_to
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the MNESourceSpace transform_source_space_to member function
-    *
-    * Transforms source space data to the desired coordinate system
-    *
-    * @param [in, out] p_pMNESourceSpace the source space which is should be transformed
-    * @param [in] dest destination check code
-    * @param [in] trans transformation information
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * mne_transform_source_space_to
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the MNESourceSpace transform_source_space_to member function
+     *
+     * Transforms source space data to the desired coordinate system
+     *
+     * @param [in, out] p_pMNESourceSpace the source space which is should be transformed
+     * @param [in] dest destination check code
+     * @param [in] trans transformation information
+     *
+     * @return true if succeeded, false otherwise
+     */
     static inline bool transform_source_space_to(MNESourceSpace& p_pMNESourceSpace, fiff_int_t dest, FiffCoordTrans& trans)
     {
         return p_pMNESourceSpace.transform_source_space_to(dest, trans);
@@ -494,17 +494,17 @@ public:
 
     //=========================================================================================================
     /**
-    * mne_transpose_named_matrix
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffNamedMatrix transpose_named_matrix member  function
-    *
-    * Transpose a named matrix (FiffNamedMatrix)
-    *
-    * @param[in, out] mat FiffNamedMatrix which shoul be transposed.
-    *
-    */
+     * mne_transpose_named_matrix
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the FiffNamedMatrix transpose_named_matrix member  function
+     *
+     * Transpose a named matrix (FiffNamedMatrix)
+     *
+     * @param[in, out] mat FiffNamedMatrix which shoul be transposed.
+     *
+     */
     static inline void transpose_named_matrix(FiffNamedMatrix& mat)
     {
         mat.transpose_named_matrix();

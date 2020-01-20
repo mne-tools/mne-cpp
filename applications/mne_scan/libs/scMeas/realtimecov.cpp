@@ -111,7 +111,7 @@ void RealTimeCov::setValue(const FiffCov& v)
 {
     m_qMutex.lock();
     //Store
-    *m_pFiffCov = v;
+     *m_pFiffCov = v;
     m_bInitialized = true;
     m_qMutex.unlock();
 

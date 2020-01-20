@@ -75,88 +75,88 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the IAlgorithm.
-    */
+     * Destroys the IAlgorithm.
+     */
     virtual ~IAlgorithm() {}
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
-    * Initializes the plugin.
-    */
+     * Initializes the plugin.
+     */
     virtual void init() = 0;
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload() = 0;
 
     //=========================================================================================================
     /**
-    * Starts the IAlgorithm.
-    * Pure virtual method inherited by IPlugin.
-    *
-    * @return true if success, false otherwise
-    */
+     * Starts the IAlgorithm.
+     * Pure virtual method inherited by IPlugin.
+     *
+     * @return true if success, false otherwise
+     */
     virtual bool start() = 0;
 
     //=========================================================================================================
     /**
-    * Stops the IAlgorithm.
-    * Pure virtual method inherited by IPlugin.
-    *
-    * @return true if success, false otherwise
-    */
+     * Stops the IAlgorithm.
+     * Pure virtual method inherited by IPlugin.
+     *
+     * @return true if success, false otherwise
+     */
     virtual bool stop() = 0;
 
     //=========================================================================================================
     /**
-    * Returns the plugin type.
-    * Pure virtual method inherited by IPlugin.
-    *
-    * @return type of the IAlgorithm
-    */
+     * Returns the plugin type.
+     * Pure virtual method inherited by IPlugin.
+     *
+     * @return type of the IAlgorithm
+     */
     virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the plugin name.
-    * Pure virtual method inherited by IPlugin.
-    *
-    * @return the name of the IAlgorithm.
-    */
+     * Returns the plugin name.
+     * Pure virtual method inherited by IPlugin.
+     *
+     * @return the name of the IAlgorithm.
+     */
     virtual QString getName() const = 0;
 
     //=========================================================================================================
     /**
-    * True if multi instantiation of plugin is allowed.
-    *
-    * @return true if multi instantiation of plugin is allowed.
-    */
+     * True if multi instantiation of plugin is allowed.
+     *
+     * @return true if multi instantiation of plugin is allowed.
+     */
     virtual inline bool multiInstanceAllowed() const;
 
     //=========================================================================================================
     /**
-    * Returns the set up widget for configuration of IAlgorithm.
-    * Pure virtual method inherited by IPlugin.
-    *
-    * @return the setup widget.
-    */
+     * Returns the set up widget for configuration of IAlgorithm.
+     * Pure virtual method inherited by IPlugin.
+     *
+     * @return the setup widget.
+     */
     virtual QWidget* setupWidget() = 0; //setup();
 
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread
+     */
     virtual void run() = 0;
 };
 

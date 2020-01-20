@@ -105,41 +105,41 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a TfSettingsView which is a child of parent.
-    *
-    * @param [in] parent        parent of widget.
-    */
+     * Constructs a TfSettingsView which is a child of parent.
+     *
+     * @param [in] parent        parent of widget.
+     */
     TfSettingsView(const QString& sSettingsPath = "",
                    QWidget *parent = 0,
                    Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the TfSettingsView.
-    */
+     * Destroys the TfSettingsView.
+     */
     ~TfSettingsView();
 
 protected:
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Slot called when the trial or row number changed.
-    */
+     * Slot called when the trial or row number changed.
+     */
     void onNumberTrialRowChanged();
 
     Ui::TfSettingsViewWidget* ui;
@@ -149,11 +149,11 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit signal whenever trial number changed.
-    *
-    * @param [in] iNumberTrial        The new trial number.
-    * @param [in] iNumberRow        The new row number.
-    */
+     * Emit signal whenever trial number changed.
+     *
+     * @param [in] iNumberTrial        The new trial number.
+     * @param [in] iNumberRow        The new row number.
+     */
     void numberTrialRowChanged(int iNumberTrial, int iNumberRow);
 
 };

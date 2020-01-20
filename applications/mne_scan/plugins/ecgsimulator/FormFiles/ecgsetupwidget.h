@@ -83,125 +83,125 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ECGSetupWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ECGSetupWidget becomes a window. If parent is another widget, ECGSetupWidget becomes a child window inside parent. ECGSetupWidget is deleted when its parent is deleted.
-    * @param [in] simulator a pointer to the corresponding ECGSimulator.
-    */
+     * Constructs a ECGSetupWidget which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new ECGSetupWidget becomes a window. If parent is another widget, ECGSetupWidget becomes a child window inside parent. ECGSetupWidget is deleted when its parent is deleted.
+     * @param [in] simulator a pointer to the corresponding ECGSimulator.
+     */
     ECGSetupWidget(ECGSimulator* simulator, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ECGSetupWidget.
-    * All ECGSetupWidget's children are deleted first. The application exits if ECGSetupWidget is the main widget.
-    */
+     * Destroys the ECGSetupWidget.
+     * All ECGSetupWidget's children are deleted first. The application exits if ECGSetupWidget is the main widget.
+     */
     ~ECGSetupWidget();
 
     //=========================================================================================================
     /**
-    * Initializes the sampling rate and the downsampling factor.
-    *
-    */
+     * Initializes the sampling rate and the downsampling factor.
+     *
+     */
     void initSamplingFactors();
 
     //=========================================================================================================
     /**
-    * Initializes each channel comboBox with given the channel file.
-    *
-    */
+     * Initializes each channel comboBox with given the channel file.
+     *
+     */
     void initSelectedChannelFile();
 
     //=========================================================================================================
     /**
-    * Initializes the channel check boxes for visibility and whether channels are enabled.
-    *
-    */
+     * Initializes the channel check boxes for visibility and whether channels are enabled.
+     *
+     */
     void initChannelStates();
 
 private:
 
     //=========================================================================================================
     /**
-    * Sets the SamplingRate.
-    *
-    */
+     * Sets the SamplingRate.
+     *
+     */
     void setSamplingRate(double value);
 
     //=========================================================================================================
     /**
-    * Sets the SamplingRate.
-    *
-    */
+     * Sets the SamplingRate.
+     *
+     */
     void setDownsamplingRate(int value);
 
     //=========================================================================================================
     /**
-    * Enables Channel I.
-    *
-    */
+     * Enables Channel I.
+     *
+     */
     void setEnabledChannel_I(bool state);
 
     //=========================================================================================================
     /**
-    * Enables Channel II.
-    *
-    */
+     * Enables Channel II.
+     *
+     */
     void setEnabledChannel_II(bool state);
 
     //=========================================================================================================
     /**
-    * Enables Channel III.
-    *
-    */
+     * Enables Channel III.
+     *
+     */
     void setEnabledChannel_III(bool state);
 
     //=========================================================================================================
     /**
-    * Sets visibility of Channel I.
-    *
-    */
+     * Sets visibility of Channel I.
+     *
+     */
     void setVisibleChannel_I(bool state);
 
     //=========================================================================================================
     /**
-    * Sets visibility of Channel II.
-    *
-    */
+     * Sets visibility of Channel II.
+     *
+     */
     void setVisibleChannel_II(bool state);
 
     //=========================================================================================================
     /**
-    * Sets visibility of Channel III.
-    *
-    */
+     * Sets visibility of Channel III.
+     *
+     */
     void setVisibleChannel_III(bool state);
 
     //=========================================================================================================
     /**
-    * Sets the selected file of Channel I.
-    *
-    */
+     * Sets the selected file of Channel I.
+     *
+     */
     void setFileOfChannel_I(qint32);
 
     //=========================================================================================================
     /**
-    * Sets the selected file of Channel II.
-    *
-    */
+     * Sets the selected file of Channel II.
+     *
+     */
     void setFileOfChannel_II(qint32);
 
     //=========================================================================================================
     /**
-    * Sets the selected file of Channel III.
-    *
-    */
+     * Sets the selected file of Channel III.
+     *
+     */
     void setFileOfChannel_III(qint32);
 
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
 

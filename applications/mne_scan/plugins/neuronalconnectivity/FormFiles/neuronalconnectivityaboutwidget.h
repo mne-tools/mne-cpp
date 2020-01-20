@@ -75,17 +75,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a NeuronalConnectivityAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NeuronalConnectivityAboutWidget becomes a window. If parent is another widget, NeuronalConnectivityAboutWidget becomes a child window inside parent. NeuronalConnectivityAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a NeuronalConnectivityAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new NeuronalConnectivityAboutWidget becomes a window. If parent is another widget, NeuronalConnectivityAboutWidget becomes a child window inside parent. NeuronalConnectivityAboutWidget is deleted when its parent is deleted.
+     */
     NeuronalConnectivityAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the NeuronalConnectivityAboutWidget.
-    * All NeuronalConnectivityAboutWidget's children are deleted first. The application exits if NeuronalConnectivityAboutWidget is the main widget.
-    */
+     * Destroys the NeuronalConnectivityAboutWidget.
+     * All NeuronalConnectivityAboutWidget's children are deleted first. The application exits if NeuronalConnectivityAboutWidget is the main widget.
+     */
     ~NeuronalConnectivityAboutWidget();
 
 private:

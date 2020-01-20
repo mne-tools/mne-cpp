@@ -101,71 +101,71 @@ class BABYMEGSHARED_EXPORT BabyMEGInfo : public QObject
 public:
     //=========================================================================================================
     /**
-    * Constructs a BabyMEGInfo class.
-    */
+     * Constructs a BabyMEGInfo class.
+     */
     BabyMEGInfo();
 
     //=========================================================================================================
     /**
-    * extract information from string with separate char ":"
-    *
-    * @param[in] cmdstr     QByteArray contains the header information.
-    *
-    * @return QStringList   returned information.
-    */
+     * extract information from string with separate char ":"
+     *
+     * @param[in] cmdstr     QByteArray contains the header information.
+     *
+     * @return QStringList   returned information.
+     */
     QStringList MGH_LM_Exact_Single_Channel_Info(QByteArray cmdstr);
 
     //=========================================================================================================
     /**
-    * extract information from string with separate char ":"
-    *
-    * @param[in] cmdstr         QByteArray contains the header information.
-    *
-    * @return QByteArray        returned information.
-    */
+     * extract information from string with separate char ":"
+     *
+     * @param[in] cmdstr         QByteArray contains the header information.
+     *
+     * @return QByteArray        returned information.
+     */
     QByteArray MGH_LM_Get_Field(QByteArray cmdstr);
     //=========================================================================================================
     /**
-    * extract channel information from string with separate char ":","|",";"
-    *
-    * @param[in] cmdstr     QByteArray contains the channel information.
-    */
+     * extract channel information from string with separate char ":","|",";"
+     *
+     * @param[in] cmdstr     QByteArray contains the channel information.
+     */
     void MGH_LM_Get_Channel_Info(QByteArray cmdstr);
     //=========================================================================================================
     /**
-    * Parse the information about header information
-    *
-    * @param[in] cmdstr     QByteArray contains the header information.
-    */
+     * Parse the information about header information
+     *
+     * @param[in] cmdstr     QByteArray contains the header information.
+     */
     void MGH_LM_Parse_Para(QByteArray cmdstr);
     //=========================================================================================================
     /**
-    * Send data package
-    *
-    * @param[in] DATA       QByteArray contains MEG data.
-    */
+     * Send data package
+     *
+     * @param[in] DATA       QByteArray contains MEG data.
+     */
     void MGH_LM_Send_DataPackage(QByteArray DATA);
     //=========================================================================================================
     /**
-    * Send command reply package
-    *
-    * @param[in] DATA       QByteArray contains MEG data.
-    */
+     * Send command reply package
+     *
+     * @param[in] DATA       QByteArray contains MEG data.
+     */
     void MGH_LM_Send_CMDPackage(QByteArray DATA);
 
     //=========================================================================================================
     /**
-    * Parse the information about header information
-    *
-    * @param[in] cmdstr     QByteArray contains the header information.
-    */
+     * Parse the information about header information
+     *
+     * @param[in] cmdstr     QByteArray contains the header information.
+     */
     void MGH_LM_Parse_Para_Infg(QByteArray cmdstr);
     //=========================================================================================================
     /**
-    * extract channel information from string with separate char ":","|",";"
-    *
-    * @param[in] cmdstr     QByteArray contains the channel information.
-    */
+     * extract channel information from string with separate char ":","|",";"
+     *
+     * @param[in] cmdstr     QByteArray contains the channel information.
+     */
     void MGH_LM_Get_Channel_Infg(QByteArray cmdstr);
 
     inline FIFFLIB::FiffInfo getFiffInfo() const;

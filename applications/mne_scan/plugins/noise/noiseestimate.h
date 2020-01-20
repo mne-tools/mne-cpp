@@ -122,32 +122,32 @@ class NOISE_ESTIMATESHARED_EXPORT NoiseEstimate : public IAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Constructs a RtHpi.
-    */
+     * Constructs a RtHpi.
+     */
     NoiseEstimate();
 
     //=========================================================================================================
     /**
-    * Destroys the RtHpi.
-    */
+     * Destroys the RtHpi.
+     */
     ~NoiseEstimate();
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const;
 
     virtual bool start();
@@ -162,20 +162,20 @@ public:
 
     //=========================================================================================================
     /**
-    * Add the spectrum result into a list
-    */
+     * Add the spectrum result into a list
+     */
     void appendNoiseSpectrum(Eigen::MatrixXd);
 
 signals:
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
-    */
+     * Emitted when fiffInfo is available
+     */
     void fiffInfoAvailable();
     //=========================================================================================================
     /**
-    * Emitted Noise parameters
-    */
+     * Emitted Noise parameters
+     */
     void SetNoisePara(qint32 nFFT, int fs);
 
 protected:
@@ -184,8 +184,8 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Initialises the output connector.
-    */
+     * Initialises the output connector.
+     */
     void initConnector();
 
     PluginInputData<RealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;     /**< The RealTimeMultiSampleArray of the noise plugin input.*/

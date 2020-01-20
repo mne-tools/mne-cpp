@@ -88,128 +88,128 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeSampleArray.
-    *
-    * @param[in] parent     the QObject parent of this measurement
-    */
+     * Constructs a RealTimeSampleArray.
+     *
+     * @param[in] parent     the QObject parent of this measurement
+     */
     RealTimeSampleArray(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeSampleArray.
-    */
+     * Destroys the RealTimeSampleArray.
+     */
     virtual ~RealTimeSampleArray();
 
     //=========================================================================================================
     /**
-    * Clears all the data stored in the buffer.
-    */
+     * Clears all the data stored in the buffer.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Sets the minimal value. If current value to set is smaller, current value is set to minimal value.
-    *
-    * @param [in] minValue minimal value.
-    */
+     * Sets the minimal value. If current value to set is smaller, current value is set to minimal value.
+     *
+     * @param [in] minValue minimal value.
+     */
     inline void setMinValue(double minValue);
 
     //=========================================================================================================
     /**
-    * Returns the minimal value.
-    *
-    * @return the minimal value.
-    */
+     * Returns the minimal value.
+     *
+     * @return the minimal value.
+     */
     inline double getMinValue() const;
 
     //=========================================================================================================
     /**
-    * Sets the maximal value. If value to set is bigger, current value is set to maximal value.
-    *
-    * @param [in] maxValue maximal value.
-    */
+     * Sets the maximal value. If value to set is bigger, current value is set to maximal value.
+     *
+     * @param [in] maxValue maximal value.
+     */
     inline void setMaxValue(double maxValue);
 
     //=========================================================================================================
     /**
-    * Returns the maximal value.
-    *
-    * @return the maximal value.
-    */
+     * Returns the maximal value.
+     *
+     * @return the maximal value.
+     */
     inline double getMaxValue() const;
 
     //=========================================================================================================
     /**
-    * Sets the sampling rate of the RealTimeSampleArray Measurement.
-    *
-    * @param [in] dSamplingRate the sampling rate of the RealTimeSampleArray.
-    */
+     * Sets the sampling rate of the RealTimeSampleArray Measurement.
+     *
+     * @param [in] dSamplingRate the sampling rate of the RealTimeSampleArray.
+     */
     inline void setSamplingRate(double dSamplingRate);
 
     //=========================================================================================================
     /**
-    * Returns the sampling rate of the RealTimeSampleArray Measurement.
-    *
-    * @return the sampling rate of the RealTimeSampleArray.
-    */
+     * Returns the sampling rate of the RealTimeSampleArray Measurement.
+     *
+     * @return the sampling rate of the RealTimeSampleArray.
+     */
     inline double getSamplingRate() const;
 
     //=========================================================================================================
     /**
-    * Sets the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
-    *
-    * @param [in] ucArraySize the number of values.
-    */
+     * Sets the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
+     *
+     * @param [in] ucArraySize the number of values.
+     */
     inline void setArraySize(unsigned char ucArraySize);
 
     //=========================================================================================================
     /**
-    * Returns the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
+     * Returns the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
+     *
+     * @return the number of values which are gathered before a notify() is called.
+     */
     inline unsigned char getArraySize() const;
 
     //=========================================================================================================
     /**
-    * Returns the gathered sample array vector.
-    *
-    * @return the current sample array vector.
-    */
+     * Returns the gathered sample array vector.
+     *
+     * @return the current sample array vector.
+     */
     inline const QVector<double>& getSampleArray();
 
     //=========================================================================================================
     /**
-    * Sets the unit of the RealTimeSampleArray data.
-    *
-    * @param [in] unit of the data.
-    */
+     * Sets the unit of the RealTimeSampleArray data.
+     *
+     * @param [in] unit of the data.
+     */
     inline void setUnit(const QString& unit);
 
     //=========================================================================================================
     /**
-    * Returns the unit of the RealTimeSampleArray measurement.
-    *
-    * @return the unit of the data of measurement.
-    */
+     * Returns the unit of the RealTimeSampleArray measurement.
+     *
+     * @return the unit of the data of measurement.
+     */
     inline const QString& getUnit() const;
 
     //=========================================================================================================
     /**
-    * Attaches a value to the sample array vector.
-    * This method is inherited by Measurement.
-    *
-    * @param [in] v the value which is attached to the sample array vector.
-    */
+     * Attaches a value to the sample array vector.
+     * This method is inherited by Measurement.
+     *
+     * @param [in] v the value which is attached to the sample array vector.
+     */
     virtual void setValue(double v);
 
     //=========================================================================================================
     /**
-    * Returns the current value set.
-    * This method is inherited by Measurement.
-    *
-    * @return the last attached value.
-    */
+     * Returns the current value set.
+     * This method is inherited by Measurement.
+     *
+     * @return the last attached value.
+     */
     virtual double getValue() const;
 
 private:

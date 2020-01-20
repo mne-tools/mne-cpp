@@ -98,15 +98,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a NetworkEdge object.
-    *
-    * @param[in]  iStartNodeID      The start node id of the edge.
-    * @param[in]  iEndNodeID        The end node id of the edge.
-    * @param[in]  matWeight         The edge weight.
-    * @param[in]  bIsActive         The active flag of this edge. Default is true.
-    * @param[in]  iStartWeightBin   The bin index to start avergaing from. Default is -1 which means an average over all weights.
-    * @param[in]  iEndWeightBin     The bin index to end avergaing to. Default is -1 which means an average over all weights.
-    */
+     * Constructs a NetworkEdge object.
+     *
+     * @param[in]  iStartNodeID      The start node id of the edge.
+     * @param[in]  iEndNodeID        The end node id of the edge.
+     * @param[in]  matWeight         The edge weight.
+     * @param[in]  bIsActive         The active flag of this edge. Default is true.
+     * @param[in]  iStartWeightBin   The bin index to start avergaing from. Default is -1 which means an average over all weights.
+     * @param[in]  iEndWeightBin     The bin index to end avergaing to. Default is -1 which means an average over all weights.
+     */
     explicit NetworkEdge(int iStartNodeID,
                          int iEndNodeID,
                          const Eigen::MatrixXd& matWeight,
@@ -116,80 +116,80 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the start node of this edge.
-    *
-    * @return The start node of the edge.
-    */
+     * Returns the start node of this edge.
+     *
+     * @return The start node of the edge.
+     */
     int getStartNodeID();
 
     //=========================================================================================================
     /**
-    * Returns the end node of this edge.
-    *
-    * @return The end node of the edge.
-    */
+     * Returns the end node of this edge.
+     *
+     * @return The end node of the edge.
+     */
     int getEndNodeID();
 
     //=========================================================================================================
     /**
-    * Sets the activity flag of this edge.
-    *
-    * @param[in]  bActiveFlag        The new activity flag of this edge.
-    */
+     * Sets the activity flag of this edge.
+     *
+     * @param[in]  bActiveFlag        The new activity flag of this edge.
+     */
     void setActive(bool bActiveFlag);
 
     //=========================================================================================================
     /**
-    * Returns the activity flag of this edge.
-    *
-    * @return The current activity flag of this edge.
-    */
+     * Returns the activity flag of this edge.
+     *
+     * @return The current activity flag of this edge.
+     */
     bool isActive();
 
     //=========================================================================================================
     /**
-    * Returns the edge weight. The weights are averaged between the specified bin indeces and their corresponding tapers.
-    *
-    * @return    The current edge weight.
-    */
+     * Returns the edge weight. The weights are averaged between the specified bin indeces and their corresponding tapers.
+     *
+     * @return    The current edge weight.
+     */
     double getWeight() const;
 
     //=========================================================================================================
     /**
-    * Returns the edge weight non-averaged in form of a matrix.
-    *
-    * @return    The current edge weight matrix.
-    */
+     * Returns the edge weight non-averaged in form of a matrix.
+     *
+     * @return    The current edge weight matrix.
+     */
     Eigen::MatrixXd getMatrixWeight() const;
 
     //=========================================================================================================
     /**
-    * Set the averaged edge weight.
-    *
-    * @param[in] dAveragedWeight        The new weight.
-    */
+     * Set the averaged edge weight.
+     *
+     * @param[in] dAveragedWeight        The new weight.
+     */
     void setWeight(double dAveragedWeight);
 
     //=========================================================================================================
     /**
-    * Calculates the edge weight based on the currently set min/max frequency bins.
-    */
+     * Calculates the edge weight based on the currently set min/max frequency bins.
+     */
     void calculateAveragedWeight();
 
     //=========================================================================================================
     /**
-    * Sets the frequency bins to average from/to.
-    *
-    * @param[in] minMaxFreqBins        The new lower/upper bin to average from/to.
-    */
+     * Sets the frequency bins to average from/to.
+     *
+     * @param[in] minMaxFreqBins        The new lower/upper bin to average from/to.
+     */
     void setFrequencyBins(const QPair<int, int> &minMaxFreqBins);
 
     //=========================================================================================================
     /**
-    * Returns the current frequency bins to average from/to.
-    *
-    * @return The current upper/lower bin to average from/to.
-    */
+     * Returns the current frequency bins to average from/to.
+     *
+     * @return The current upper/lower bin to average from/to.
+     */
     const QPair<int,int>& getFrequencyBins();
 
 protected:

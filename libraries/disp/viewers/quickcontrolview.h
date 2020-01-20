@@ -100,13 +100,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a QuickControlView which is a child of parent.
-    *
-    * @param [in] name          The name to be displayed on the minimize button.
-    * @param [in] flags         The window flags.
-    * @param [in] parent        The parent of widget.
-    * @param [in] bDraggable    Flag specifying whether this widget is draggable.
-    */
+     * Constructs a QuickControlView which is a child of parent.
+     *
+     * @param [in] name          The name to be displayed on the minimize button.
+     * @param [in] flags         The window flags.
+     * @param [in] parent        The parent of widget.
+     * @param [in] bDraggable    Flag specifying whether this widget is draggable.
+     */
     QuickControlView(const QString& sSettingsPath = "",
                      const QString& name = "",
                      Qt::WindowFlags flags = Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
@@ -115,124 +115,124 @@ public:
 
     //=========================================================================================================
     /**
-    * Destructs a QuickControlView
-    */
+     * Destructs a QuickControlView
+     */
     ~QuickControlView();
 
     //=========================================================================================================
     /**
-    * Add a new group box to this Widget.
-    * This function will store the shared pointer to a member list and deparent this list as soon as this class is destroyed.
-    * This way the memory management stays with the QSharedPointer.
-    *
-    * @param [in] pWidget           The widgets which will be put into the new group box.
-    */
+     * Add a new group box to this Widget.
+     * This function will store the shared pointer to a member list and deparent this list as soon as this class is destroyed.
+     * This way the memory management stays with the QSharedPointer.
+     *
+     * @param [in] pWidget           The widgets which will be put into the new group box.
+     */
     void addWidget(QSharedPointer<QWidget> pWidget);
 
     //=========================================================================================================
     /**
-    * Add a new group box to this Widget. Takes ownership of the passed widget.
-    *
-    * @param [in] pWidget           The widgets which will be put into the new group box.
-    */
+     * Add a new group box to this Widget. Takes ownership of the passed widget.
+     *
+     * @param [in] pWidget           The widgets which will be put into the new group box.
+     */
     void addWidget(QWidget* pWidget);
 
     //=========================================================================================================
     /**
-    * Add a new group box to this Widget. Takes ownership of the passed widget.
-    * This function will store the shared pointer to a member list and deparent this list as soon as this class is destroyed.
-    * This way the memory management stays with the QSharedPointer.
-    *
-    * @param [in] pWidget           The widgets which will be put into the new group box.
-    * @param [in] sGroupBoxName     The name of the new group box.
-    */
+     * Add a new group box to this Widget. Takes ownership of the passed widget.
+     * This function will store the shared pointer to a member list and deparent this list as soon as this class is destroyed.
+     * This way the memory management stays with the QSharedPointer.
+     *
+     * @param [in] pWidget           The widgets which will be put into the new group box.
+     * @param [in] sGroupBoxName     The name of the new group box.
+     */
     void addGroupBox(QSharedPointer<QWidget> pWidget,
                      const QString& sGroupBoxName);
 
     //=========================================================================================================
     /**
-    * Add a new group box to this Widget. Takes ownership of the passed widget.
-    *
-    * @param [in] pWidget           The widgets which will be put into the new group box.
-    * @param [in] sGroupBoxName     The name of the new group box.
-    */
+     * Add a new group box to this Widget. Takes ownership of the passed widget.
+     *
+     * @param [in] pWidget           The widgets which will be put into the new group box.
+     * @param [in] sGroupBoxName     The name of the new group box.
+     */
     void addGroupBox(QWidget* pWidget,
                      const QString& sGroupBoxName);
 
     //=========================================================================================================
     /**
-    * Add a new group box with tabs to this Widget. If the group box already exists, a new tab will be added to its QTabWidget.
-    * This function will store the shared pointer to a member list and deparent this list as soon as this class is destroyed.
-    * This way the memory management stays with the QSharedPointer.
-    *
-    * @param [in] pWidget           The widgets which will be put into the new group box.
-    * @param [in] sGroupBoxName     The name of the new group box.
-    * @param [in] sTabName          The name of the new tab.
-    */
+     * Add a new group box with tabs to this Widget. If the group box already exists, a new tab will be added to its QTabWidget.
+     * This function will store the shared pointer to a member list and deparent this list as soon as this class is destroyed.
+     * This way the memory management stays with the QSharedPointer.
+     *
+     * @param [in] pWidget           The widgets which will be put into the new group box.
+     * @param [in] sGroupBoxName     The name of the new group box.
+     * @param [in] sTabName          The name of the new tab.
+     */
     void addGroupBoxWithTabs(QSharedPointer<QWidget> pWidget,
                              const QString& sGroupBoxName,
                              const QString& sTabName);
 
     //=========================================================================================================
     /**
-    * Add a new group box with tabs to this Widget. If the group box already exists, a new tab will be added to its QTabWidget.
-    * Takes ownership of the passed widget.
-    *
-    * @param [in] pWidget           The widgets which will be put into the new group box.
-    * @param [in] sGroupBoxName     The name of the new group box.
-    * @param [in] sTabName          The name of the new tab.
-    */
+     * Add a new group box with tabs to this Widget. If the group box already exists, a new tab will be added to its QTabWidget.
+     * Takes ownership of the passed widget.
+     *
+     * @param [in] pWidget           The widgets which will be put into the new group box.
+     * @param [in] sGroupBoxName     The name of the new group box.
+     * @param [in] sTabName          The name of the new tab.
+     */
     void addGroupBoxWithTabs(QWidget* pWidget,
                              const QString& sGroupBoxName,
                              const QString& sTabName);
 
     //=========================================================================================================
     /**
-    * Sets the values of the opacity slider. Choose value between 0.0 and 1.0.
-    *
-    * @param [in] opactiy       the new opacity value
-    */
+     * Sets the values of the opacity slider. Choose value between 0.0 and 1.0.
+     *
+     * @param [in] opactiy       the new opacity value
+     */
     void setOpacityValue(int opactiy);
 
     //=========================================================================================================
     /**
-    * Get current opacity value. Value between 0.0 and 1.0.
-    *
-    * @return the current set opacity value of this window.
-    */
+     * Get current opacity value. Value between 0.0 and 1.0.
+     *
+     * @return the current set opacity value of this window.
+     */
     int getOpacityValue();
 
     //=========================================================================================================
     /**
-    * Sets the visibility of the hide/show and close button
-    *
-    * @param [in] bVisibility       the new visiblity state.
-    */
+     * Sets the visibility of the hide/show and close button
+     *
+     * @param [in] bVisibility       the new visiblity state.
+     */
     void setVisiblityHideOpacityClose(bool bVisibility);
 
 protected:
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Slot called when opacity slider was changed
-    *
-    * @param [in] value opacity value.
-    */
+     * Slot called when opacity slider was changed
+     *
+     * @param [in] value opacity value.
+     */
     void onOpacityChange(qint32 value);
 
 private:       

@@ -89,17 +89,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a BabyMEGAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new BabyMEGAboutWidget becomes a window. If parent is another widget, BabyMEGAboutWidget becomes a child window inside parent. BabyMEGAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a BabyMEGAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new BabyMEGAboutWidget becomes a window. If parent is another widget, BabyMEGAboutWidget becomes a child window inside parent. BabyMEGAboutWidget is deleted when its parent is deleted.
+     */
     BabyMEGAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the BabyMEGAboutWidget.
-    * All BabyMEGAboutWidget's children are deleted first. The application exits if BabyMEGAboutWidget is the main widget.
-    */
+     * Destroys the BabyMEGAboutWidget.
+     * All BabyMEGAboutWidget's children are deleted first. The application exits if BabyMEGAboutWidget is the main widget.
+     */
     ~BabyMEGAboutWidget();
 
 private:

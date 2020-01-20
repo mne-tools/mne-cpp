@@ -113,195 +113,195 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this entity.
-    */
+     * Default constructor.
+     *
+     * @param[in] parent         The parent of this entity.
+     */
     explicit Renderable3DEntity(Qt3DCore::QEntity* parent = 0);
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    */
+     * Default destructor.
+     */
     virtual ~Renderable3DEntity();
 
     //=========================================================================================================
     /**
-    * Manual garbage collection, since Qt3D is still a bit buggy when it come to memory handling.
-    */
+     * Manual garbage collection, since Qt3D is still a bit buggy when it come to memory handling.
+     */
     //void releaseNode(Qt3DCore::QNode *node);
 
     //=========================================================================================================
     /**
-    * Sets the entity's transformation. This will clear the old transformation.
-    *
-    * @param[in] transform     The new entity's transform.
-    */
+     * Sets the entity's transformation. This will clear the old transformation.
+     *
+     * @param[in] transform     The new entity's transform.
+     */
     virtual void setTransform(const Qt3DCore::QTransform &transform);
 
     //=========================================================================================================
     /**
-    * Sets the entity's transformation. This will clear the old transformation.
-    *
-    * @param[in] transform     The new entity's transform.
-    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
-    */
+     * Sets the entity's transformation. This will clear the old transformation.
+     *
+     * @param[in] transform     The new entity's transform.
+     * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+     */
     virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
 
     //=========================================================================================================
     /**
-    * Applies a transformation o ntop of the present one.
-    *
-    * @param[in] transform     The new entity's transform.
-    */
+     * Applies a transformation o ntop of the present one.
+     *
+     * @param[in] transform     The new entity's transform.
+     */
     virtual void applyTransform(const Qt3DCore::QTransform& transform);
 
     //=========================================================================================================
     /**
-    * Applies a transformation o ntop of the present one.
-    *
-    * @param[in] transform     The new entity's transform.
-    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
-    */
+     * Applies a transformation o ntop of the present one.
+     *
+     * @param[in] transform     The new entity's transform.
+     * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+     */
     virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
 
     //=========================================================================================================
     /**
-    * Returns the current scaling value.
-    *
-    * @return The scaling value.
-    */
+     * Returns the current scaling value.
+     *
+     * @return The scaling value.
+     */
     virtual float scaleValue() const;
 
     //=========================================================================================================
     /**
-    * Returns the current rotation around the x-axis.
-    *
-    * @return The x-axis rotation value.
-    */
+     * Returns the current rotation around the x-axis.
+     *
+     * @return The x-axis rotation value.
+     */
     virtual float rotX() const;
 
     //=========================================================================================================
     /**
-    * Returns the current rotation around the y-axis.
-    *
-    * @return The y-axis rotation value.
-    */
+     * Returns the current rotation around the y-axis.
+     *
+     * @return The y-axis rotation value.
+     */
     virtual float rotY() const;
 
     //=========================================================================================================
     /**
-    * Returns the current rotation around the z-axis.
-    *
-    * @return The z-axis rotation value.
-    */
+     * Returns the current rotation around the z-axis.
+     *
+     * @return The z-axis rotation value.
+     */
     virtual float rotZ() const;
 
     //=========================================================================================================
     /**
-    * Returns the current position/translation.
-    *
-    * @return The position/translation value.
-    */
+     * Returns the current position/translation.
+     *
+     * @return The position/translation value.
+     */
     virtual QVector3D position() const;
 
     //=========================================================================================================
     /**
-    * Sets the current rotation around the x-axis.
-    *
-    * @param[in] rotX     The x-axis rotation value.
-    */
+     * Sets the current rotation around the x-axis.
+     *
+     * @param[in] rotX     The x-axis rotation value.
+     */
     virtual void setRotX(float rotX);
 
     //=========================================================================================================
     /**
-    * Sets the current rotation around the y-axis.
-    *
-    * @param[in] rotY     The y-axis rotation value.
-    */
+     * Sets the current rotation around the y-axis.
+     *
+     * @param[in] rotY     The y-axis rotation value.
+     */
     virtual void setRotY(float rotY);
 
     //=========================================================================================================
     /**
-    * Sets the current rotation around the z-axis.
-    *
-    * @param[in] rotZ     The z-axis rotation value.
-    */
+     * Sets the current rotation around the z-axis.
+     *
+     * @param[in] rotZ     The z-axis rotation value.
+     */
     virtual void setRotZ(float rotZ);
 
     //=========================================================================================================
     /**
-    * Sets the current position/translation.
-    *
-    * @param[in] position     The position/translation value.
-    */
+     * Sets the current position/translation.
+     *
+     * @param[in] position     The position/translation value.
+     */
     virtual void setPosition(QVector3D position);
 
     //=========================================================================================================
     /**
-    * Call this function whenever you want to change the visibilty of the 3D rendered content.
-    *
-    * @param[in] state     The visiblity flag.
-    */
+     * Call this function whenever you want to change the visibilty of the 3D rendered content.
+     *
+     * @param[in] state     The visiblity flag.
+     */
     virtual void setVisible(bool state);
 
     //=========================================================================================================
     /**
-    * Sets the current scale.
-    *
-    * @param[in] scale     The new scaling value.
-    */
+     * Sets the current scale.
+     *
+     * @param[in] scale     The new scaling value.
+     */
     virtual void setScale(float scale);
 
     //=========================================================================================================
     /**
-    * Sets the value of a specific parameter of the materials for this entity.
-    *
-    * @param[in] data             The value to be set.
-    * @param[in] sParameterName   The parameters name.
-    */
+     * Sets the value of a specific parameter of the materials for this entity.
+     *
+     * @param[in] data             The value to be set.
+     * @param[in] sParameterName   The parameters name.
+     */
     virtual void setMaterialParameter(const QVariant &data,
                                       const QString &sParameterName);
 
     //=========================================================================================================
     /**
-    * Gets the value of a specific parameter of the materials for this entity.
-    *
-    * @param[in] sParameterName             The parameters name.
-    *
-    * @return   The data of the parameter.
-    */
+     * Gets the value of a specific parameter of the materials for this entity.
+     *
+     * @param[in] sParameterName             The parameters name.
+     *
+     * @return   The data of the parameter.
+     */
     virtual QVariant getMaterialParameter(const QString &sParameterName);
 
 protected: 
     //=========================================================================================================
     /**
-    * Sets the value of a specific parameter of the materials for this entity.
-    *
-    * @param[in] pObject            The QObject to be scanned for parameters.
-    * @param[in] data               The new data.
-    * @param[in] sParameterName     The parameters name.
-    */
+     * Sets the value of a specific parameter of the materials for this entity.
+     *
+     * @param[in] pObject            The QObject to be scanned for parameters.
+     * @param[in] data               The new data.
+     * @param[in] sParameterName     The parameters name.
+     */
     virtual void setMaterialParameterRecursive(QObject * pObject,
                                                const QVariant &data,
                                                const QString &sParameterName);
 
     //=========================================================================================================
     /**
-    * Gets the value of a specific parameter of the materials for this entity.
-    *
-    * @param[in] pObject            The QObject to be scanned for parameters.
-    * @param[in] sParameterName     The parameters name.
-    *
-    * @return   The data of the parameter.
-    */
+     * Gets the value of a specific parameter of the materials for this entity.
+     *
+     * @param[in] pObject            The QObject to be scanned for parameters.
+     * @param[in] sParameterName     The parameters name.
+     *
+     * @return   The data of the parameter.
+     */
     virtual QPair<bool, QVariant> getMaterialParameterRecursive(QObject * pObject,
                                                                 const QString &sParameterName);
 
     //=========================================================================================================
     /**
-    * Update the set transformation with the currently set translation and rotation values.
-    */
+     * Update the set transformation with the currently set translation and rotation values.
+     */
     virtual void updateTransform();
 
     QPointer<Qt3DCore::QTransform>              m_pTransform;            /**< The main transformation. */
@@ -315,42 +315,42 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the scaling changed.
-    *
-    * @param[in] scale     The scaling value.
-    */
+     * Emit this signal whenever the scaling changed.
+     *
+     * @param[in] scale     The scaling value.
+     */
     void scaleChanged(float scale);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the x-axis rotation changed.
-    *
-    * @param[in] rotX     The x-axis rotation value.
-    */
+     * Emit this signal whenever the x-axis rotation changed.
+     *
+     * @param[in] rotX     The x-axis rotation value.
+     */
     void rotXChanged(float rotX);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the y-axis rotation changed.
-    *
-    * @param[in] rotY     The y-axis rotation value.
-    */
+     * Emit this signal whenever the y-axis rotation changed.
+     *
+     * @param[in] rotY     The y-axis rotation value.
+     */
     void rotYChanged(float rotY);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the z-axis rotation changed.
-    *
-    * @param[in] rotZ     The z-axis rotation value.
-    */
+     * Emit this signal whenever the z-axis rotation changed.
+     *
+     * @param[in] rotZ     The z-axis rotation value.
+     */
     void rotZChanged(float rotZ);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the position/translation changed.
-    *
-    * @param[in] position     The position/translation value.
-    */
+     * Emit this signal whenever the position/translation changed.
+     *
+     * @param[in] position     The position/translation value.
+     */
     void positionChanged(QVector3D position);
 
 };

@@ -102,16 +102,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Forward Thread Argument
-    * Refactored: new_fwd_thread_arg (compute_forward.c)
-    */
+     * Constructs the Forward Thread Argument
+     * Refactored: new_fwd_thread_arg (compute_forward.c)
+     */
     FwdThreadArg();
 
     //=========================================================================================================
     /**
-    * Destroys the Forward Thread Argument
-    * Refactored: free_fwd_thread_arg (compute_forward.c)
-    */
+     * Destroys the Forward Thread Argument
+     * Refactored: free_fwd_thread_arg (compute_forward.c)
+     */
     ~FwdThreadArg();
 
 

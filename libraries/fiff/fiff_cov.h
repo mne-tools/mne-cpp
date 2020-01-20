@@ -99,107 +99,107 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the covariance data matrix.
-    */
+     * Constructs the covariance data matrix.
+     */
     FiffCov();
 
     //=========================================================================================================
     /**
-    * Constructs a covariance data matrix, by reading from a IO device.
-    *
-    * @param[in] p_IODevice     IO device to read from the evoked data set.
-    */
+     * Constructs a covariance data matrix, by reading from a IO device.
+     *
+     * @param[in] p_IODevice     IO device to read from the evoked data set.
+     */
     FiffCov(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffCov   Covariance data matrix which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffCov   Covariance data matrix which should be copied
+     */
     FiffCov(const FiffCov &p_FiffCov);
 
     //=========================================================================================================
     /**
-    * Destroys the covariance data matrix.
-    */
+     * Destroys the covariance data matrix.
+     */
     ~FiffCov();
 
     //=========================================================================================================
     /**
-    * Initializes the covariance data matrix.
-    */
+     * Initializes the covariance data matrix.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * True if FIFF covariance is empty.
-    *
-    * @return true if FIFF covariance is empty
-    */
+     * True if FIFF covariance is empty.
+     *
+     * @return true if FIFF covariance is empty
+     */
     inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
-    * python pick_channels_cov
-    *
-    * Pick channels from covariance matrix
-    *
-    * @param[in] p_include  List of channels to include (if empty, include all available). (optional)
-    * @param[in] p_exclude  Channels to exclude (if empty, do not exclude any). (optional)
-    *
-    * @return Covariance solution restricted to selected channels.
-    */
+     * python pick_channels_cov
+     *
+     * Pick channels from covariance matrix
+     *
+     * @param[in] p_include  List of channels to include (if empty, include all available). (optional)
+     * @param[in] p_exclude  Channels to exclude (if empty, do not exclude any). (optional)
+     *
+     * @return Covariance solution restricted to selected channels.
+     */
     FiffCov pick_channels(const QStringList &p_include = defaultQStringList, const QStringList &p_exclude = defaultQStringList);
 
     //=========================================================================================================
     /**
-    * Prepare noise covariance matrix. Before creating inverse operator.
-    *
-    * @param[in] p_info     measurement info
-    * @param[in] p_chNames  Channels which should be taken into account
-    *
-    * @return the prepared noise covariance matrix
-    */
+     * Prepare noise covariance matrix. Before creating inverse operator.
+     *
+     * @param[in] p_info     measurement info
+     * @param[in] p_chNames  Channels which should be taken into account
+     *
+     * @return the prepared noise covariance matrix
+     */
     FiffCov prepare_noise_cov(const FiffInfo& p_info, const QStringList& p_chNames) const;
 
     //=========================================================================================================
     /**
-    * Regularize noise covariance matrix
-    *
-    * This method works by adding a constant to the diagonal for each channel type separatly.
-    * Special care is taken to keep the rank of the data constant.
-    *
-    * @param[in] p_info     The measurement info (used to get channel types and bad channels).
-    * @param[in] p_fMag      Regularization factor for MEG magnetometers.
-    * @param[in] p_fGrad     Regularization factor for MEG gradiometers.
-    * @param[in] p_fEeg      Regularization factor for EEG.
-    * @param[in] p_bProj     Apply or not projections to keep rank of data.
-    * @param[in] p_exclude  List of channels to mark as bad. If None, bads channels are extracted from both info['bads'] and cov['bads'].
-    *
-    * @return the regularized covariance matrix
-    */
+     * Regularize noise covariance matrix
+     *
+     * This method works by adding a constant to the diagonal for each channel type separatly.
+     * Special care is taken to keep the rank of the data constant.
+     *
+     * @param[in] p_info     The measurement info (used to get channel types and bad channels).
+     * @param[in] p_fMag      Regularization factor for MEG magnetometers.
+     * @param[in] p_fGrad     Regularization factor for MEG gradiometers.
+     * @param[in] p_fEeg      Regularization factor for EEG.
+     * @param[in] p_bProj     Apply or not projections to keep rank of data.
+     * @param[in] p_exclude  List of channels to mark as bad. If None, bads channels are extracted from both info['bads'] and cov['bads'].
+     *
+     * @return the regularized covariance matrix
+     */
     FiffCov regularize(const FiffInfo& p_info, double p_fMag = 0.1, double p_fGrad = 0.1, double p_fEeg = 0.1, bool p_bProj = true, QStringList p_exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
-    * Assignment Operator
-    *
-    * @param[in] rhs     FiffCov which should be assigned.
-    *
-    * @return the copied covariance matrix
-    */
+     * Assignment Operator
+     *
+     * @param[in] rhs     FiffCov which should be assigned.
+     *
+     * @return the copied covariance matrix
+     */
     FiffCov& operator= (const FiffCov &rhs);
 
     //=========================================================================================================
     /**
-    * overloading the stream out operator<<
-    *
-    * @param[in] out           The stream to which the fiff covariance should be assigned to.
-    * @param[in] p_FiffCov     FiffCov which should be assigned to the stream.
-    *
-    * @return the stream with the attached fiff covariance matrix
-    */
+     * overloading the stream out operator<<
+     *
+     * @param[in] out           The stream to which the fiff covariance should be assigned to.
+     * @param[in] p_FiffCov     FiffCov which should be assigned to the stream.
+     *
+     * @return the stream with the attached fiff covariance matrix
+     */
     friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_FiffCov);
 
 public:

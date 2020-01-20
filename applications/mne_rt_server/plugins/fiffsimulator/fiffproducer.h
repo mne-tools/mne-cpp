@@ -83,29 +83,29 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FiffProducer.
-    */
+     * Constructs a FiffProducer.
+     */
     FiffProducer(FiffSimulator* simulator = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffProducer.
-    */
+     * Destroys the FiffProducer.
+     */
     ~FiffProducer();
 
     //=========================================================================================================
     /**
-    * Stops the FiffProducer by stopping the producer's thread.
-    */
+     * Stops the FiffProducer by stopping the producer's thread.
+     */
     virtual bool stop();
 
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
 private:

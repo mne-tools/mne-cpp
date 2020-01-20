@@ -90,24 +90,24 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FiffSimulatorSetupWidget which is a child of parent.
-    *
-    * @param [in] p_pFiffSimulator   a pointer to the corresponding FiffSimulator.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new FiffSimulatorSetupWidget becomes a window. If parent is another widget, FiffSimulatorSetupWidget becomes a child window inside parent. FiffSimulatorSetupWidget is deleted when its parent is deleted.
-    */
+     * Constructs a FiffSimulatorSetupWidget which is a child of parent.
+     *
+     * @param [in] p_pFiffSimulator   a pointer to the corresponding FiffSimulator.
+     * @param [in] parent        pointer to parent widget; If parent is 0, the new FiffSimulatorSetupWidget becomes a window. If parent is another widget, FiffSimulatorSetupWidget becomes a child window inside parent. FiffSimulatorSetupWidget is deleted when its parent is deleted.
+     */
     FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulator, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffSimulatorSetupWidget.
-    * All FiffSimulatorSetupWidget's children are deleted first. The application exits if FiffSimulatorSetupWidget is the main widget.
-    */
+     * Destroys the FiffSimulatorSetupWidget.
+     * All FiffSimulatorSetupWidget's children are deleted first. The application exits if FiffSimulatorSetupWidget is the main widget.
+     */
     ~FiffSimulatorSetupWidget();
 
     //=========================================================================================================
     /**
-    * Inits the setup widget
-    */
+     * Inits the setup widget
+     */
     void init();
 
 //slots
@@ -124,16 +124,16 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Set command connection status
-    *
-    * @param[in] p_bConnectionStatus    the connection status
-    */
+     * Set command connection status
+     *
+     * @param[in] p_bConnectionStatus    the connection status
+     */
     void cmdConnectionChanged(bool p_bConnectionStatus);
 
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    */
+     * Shows the About Dialog
+     */
     void showAboutDialog();
 
     FiffSimulator*   m_pFiffSimulator;      /**< a pointer to corresponding mne rt client.*/

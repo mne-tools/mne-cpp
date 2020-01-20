@@ -93,14 +93,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MneMshEyes.
-    */
+     * Constructs the MneMshEyes.
+     */
     MneMshEyes();
 
     //=========================================================================================================
     /**
-    * Destroys the MneMshEyes.
-    */
+     * Destroys the MneMshEyes.
+     */
     ~MneMshEyes();
 
 public:

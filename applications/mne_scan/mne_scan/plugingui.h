@@ -92,26 +92,26 @@ public:
 
     //=========================================================================================================
     /**
-    * Clear scene
-    */
+     * Clear scene
+     */
     void clearScene();
 
     //=========================================================================================================
     /**
-    * Loads a current plug in configuration from a given file
-    *
-    * @param [in] sPath         The path to the file.
-    * @param [in] sFileName     The file name to load the configuration from.
-    */
+     * Loads a current plug in configuration from a given file
+     *
+     * @param [in] sPath         The path to the file.
+     * @param [in] sFileName     The file name to load the configuration from.
+     */
     void loadConfig(const QString& sPath, const QString& sFileName);
 
     //=========================================================================================================
     /**
-    * Saves the current plug in configuration to a given file
-    *
-    * @param [in] sPath         The path to the file.
-    * @param [in] sFileName     The file name to store the configuration to.
-    */
+     * Saves the current plug in configuration to a given file
+     *
+     * @param [in] sPath         The path to the file.
+     * @param [in] sFileName     The file name to store the configuration to.
+     */
     void saveConfig(const QString& sPath, const QString& sFileName);
 
 

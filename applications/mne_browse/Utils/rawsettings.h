@@ -132,8 +132,8 @@ public:
 
     //=========================================================================================================
     /**
-    * write writes all the application settings values from the macros
-    */
+     * write writes all the application settings values from the macros
+     */
     void write();
 
 private:
@@ -141,8 +141,8 @@ private:
 
     //=========================================================================================================
     /**
-    * init inits all the application settings values
-    */
+     * init inits all the application settings values
+     */
     void init();
 };
 

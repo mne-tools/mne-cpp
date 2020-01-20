@@ -117,24 +117,24 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     explicit HPIFit();
 
     //=========================================================================================================
     /**
-    * Perform one single HPI fit.
-    *
-    * @param[in]    t_mat           Data to estimate the HPI positions from
-    * @param[in]    t_matProjectors The projectors to apply. Bad channels are still included.
-    * @param[out]   transDevHead    The final dev head transformation matrix
-    * @param[in]    vFreqs          The frequencies for each coil.
-    * @param[out]   vGof            The goodness of fit in mm for each fitted HPI coil.
-    * @param[out]   fittedPointSet  The final fitted positions in form of a digitizer set.
-    * @param[in]    p_pFiffInfo     Associated Fiff Information.
-    * @param[in]    bDoDebug        Print debug info to cmd line and write debug info to file.
-    * @param[in]    sHPIResourceDir The path to the debug file which is to be written.
-    */
+     * Perform one single HPI fit.
+     *
+     * @param[in]    t_mat           Data to estimate the HPI positions from
+     * @param[in]    t_matProjectors The projectors to apply. Bad channels are still included.
+     * @param[out]   transDevHead    The final dev head transformation matrix
+     * @param[in]    vFreqs          The frequencies for each coil.
+     * @param[out]   vGof            The goodness of fit in mm for each fitted HPI coil.
+     * @param[out]   fittedPointSet  The final fitted positions in form of a digitizer set.
+     * @param[in]    p_pFiffInfo     Associated Fiff Information.
+     * @param[in]    bDoDebug        Print debug info to cmd line and write debug info to file.
+     * @param[in]    sHPIResourceDir The path to the debug file which is to be written.
+     */
     static void fitHPI(const Eigen::MatrixXd& t_mat,
                        const Eigen::MatrixXd& t_matProjectors,
                        FIFFLIB::FiffCoordTrans &transDevHead,
@@ -148,27 +148,27 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Fits dipoles for the given coils and a given data set.
-    *
-    * @param[in] CoilParam       The coil parameters.
-    * @param[in] sensors         The sensor information.
-    * @param[in] data            The data which used to fit the coils.
-    * @param[in] numCoils        The number of coils.
-    * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
-    *
-    * @return Returns the coil parameters.
-    */
+     * Fits dipoles for the given coils and a given data set.
+     *
+     * @param[in] CoilParam       The coil parameters.
+     * @param[in] sensors         The sensor information.
+     * @param[in] data            The data which used to fit the coils.
+     * @param[in] numCoils        The number of coils.
+     * @param[in] t_matProjectors The projectors to apply. Bad channels are still included.
+     *
+     * @return Returns the coil parameters.
+     */
     static CoilParam dipfit(struct CoilParam coil, struct SensorInfo sensors, const Eigen::MatrixXd &data, int numCoils, const Eigen::MatrixXd &t_matProjectors);
 
     //=========================================================================================================
     /**
-    * Computes the transformation matrix between two sets of 3D points.
-    *
-    * @param[in] NH     The first set of input 3D points (row-wise order).
-    * @param[in] BT     The second set of input 3D points (row-wise order).
-    *
-    * @return Returns the transformation matrix.
-    */
+     * Computes the transformation matrix between two sets of 3D points.
+     *
+     * @param[in] NH     The first set of input 3D points (row-wise order).
+     * @param[in] BT     The second set of input 3D points (row-wise order).
+     *
+     * @return Returns the transformation matrix.
+     */
     static Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT);
 
     static QString         m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */

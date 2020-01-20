@@ -107,38 +107,38 @@ class ECGSIMULATORSHARED_EXPORT ECGSimulator : public ISensor
 public:
     //=========================================================================================================
     /**
-    * Constructs a ECGSimulator.
-    */
+     * Constructs a ECGSimulator.
+     */
     ECGSimulator();
 
     //=========================================================================================================
     /**
-    * Destroys the ECGSimulator.
-    */
+     * Destroys the ECGSimulator.
+     */
     virtual ~ECGSimulator();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Initialise the ECGSimulator.
-    */
+     * Initialise the ECGSimulator.
+     */
     void initChannels();
 
 
@@ -152,10 +152,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the ECGSimulator resource path.
-    *
-    * @return the ECGSimulator resource path.
-    */
+     * Returns the ECGSimulator resource path.
+     *
+     * @return the ECGSimulator resource path.
+     */
     QString getResourcePath() const {return m_qStringResourcePath;}
 
 protected:

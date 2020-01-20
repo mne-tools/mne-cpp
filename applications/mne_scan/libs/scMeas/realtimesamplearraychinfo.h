@@ -86,110 +86,110 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeSampleArrayChInfo.
-    */
+     * Constructs a RealTimeSampleArrayChInfo.
+     */
     RealTimeSampleArrayChInfo();
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeSampleArrayChInfo.
-    */
+     * Destroys the RealTimeSampleArrayChInfo.
+     */
     virtual ~RealTimeSampleArrayChInfo();
 
     //=========================================================================================================
     /**
-    * Sets the channel name
-    *
-    * @param[in] p_qStringChName    channel name
-    */
+     * Sets the channel name
+     *
+     * @param[in] p_qStringChName    channel name
+     */
     inline void setChannelName(QString p_qStringChName);
 
     //=========================================================================================================
     /**
-    * Returns the channel name
-    *
-    * @return the channel name.
-    */
+     * Returns the channel name
+     *
+     * @return the channel name.
+     */
     inline QString getChannelName() const;
 
     //=========================================================================================================
     /**
-    * Sets the channel kind
-    *
-    * @param[in] p_iKind    channel kind
-    */
+     * Sets the channel kind
+     *
+     * @param[in] p_iKind    channel kind
+     */
     inline void setKind(qint32 p_iKind);
 
     //=========================================================================================================
     /**
-    * Returns the channel kind
-    *
-    * @return the channel kind.
-    */
+     * Returns the channel kind
+     *
+     * @return the channel kind.
+     */
     inline qint32 getKind() const;
 
     //=========================================================================================================
     /**
-    * Sets the minimal value. If current value to set is smaller, current value is set to minimal value.
-    *
-    * @param[in] minValue minimal value.
-    */
+     * Sets the minimal value. If current value to set is smaller, current value is set to minimal value.
+     *
+     * @param[in] minValue minimal value.
+     */
     inline void setMinValue(double minValue);
 
     //=========================================================================================================
     /**
-    * Returns the minimal value.
-    *
-    * @return the minimal value.
-    */
+     * Returns the minimal value.
+     *
+     * @return the minimal value.
+     */
     inline double getMinValue() const;
 
     //=========================================================================================================
     /**
-    * Sets the maximal value. If value to set is bigger, current value is set to maximal value.
-    *
-    * @param [in] maxValue maximal value.
-    */
+     * Sets the maximal value. If value to set is bigger, current value is set to maximal value.
+     *
+     * @param [in] maxValue maximal value.
+     */
     inline void setMaxValue(double maxValue);
 
     //=========================================================================================================
     /**
-    * Returns the maximal value.
-    *
-    * @return the maximal value.
-    */
+     * Returns the maximal value.
+     *
+     * @return the maximal value.
+     */
     inline double getMaxValue() const;
 
     //=========================================================================================================
     /**
-    * Sets the unit of the RealTimeSampleArray data.
-    *
-    * @param [in] unit of the data.
-    */
+     * Sets the unit of the RealTimeSampleArray data.
+     *
+     * @param [in] unit of the data.
+     */
     inline void setUnit(fiff_int_t unit);
 
     //=========================================================================================================
     /**
-    * Returns the unit of the RealTimeSampleArray measurement.
-    *
-    * @return the unit of the data of measurement.
-    */
+     * Returns the unit of the RealTimeSampleArray measurement.
+     *
+     * @return the unit of the data of measurement.
+     */
     inline fiff_int_t getUnit() const;
 
     //=========================================================================================================
     /**
-    * Sets the coil of the RealTimeSampleArray sensor.
-    *
-    * @param [in] coil description of the sensor.
-    */
+     * Sets the coil of the RealTimeSampleArray sensor.
+     *
+     * @param [in] coil description of the sensor.
+     */
     inline void setCoil(fiff_int_t coil);
 
     //=========================================================================================================
     /**
-    * Returns the coil type of the RealTimeSampleArray sensor.
-    *
-    * @return the coil type of the sensor.
-    */
+     * Returns the coil type of the RealTimeSampleArray sensor.
+     *
+     * @return the coil type of the sensor.
+     */
     inline fiff_int_t getCoil() const;
 
 private:

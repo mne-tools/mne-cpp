@@ -88,17 +88,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FiffSimulatorAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FiffSimulatorAboutWidget becomes a window. If parent is another widget, FiffSimulatorAboutWidget becomes a child window inside parent. FiffSimulatorAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a FiffSimulatorAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new FiffSimulatorAboutWidget becomes a window. If parent is another widget, FiffSimulatorAboutWidget becomes a child window inside parent. FiffSimulatorAboutWidget is deleted when its parent is deleted.
+     */
     FiffSimulatorAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffSimulatorAboutWidget.
-    * All FiffSimulatorAboutWidget's children are deleted first. The application exits if FiffSimulatorAboutWidget is the main widget.
-    */
+     * Destroys the FiffSimulatorAboutWidget.
+     * All FiffSimulatorAboutWidget's children are deleted first. The application exits if FiffSimulatorAboutWidget is the main widget.
+     */
     ~FiffSimulatorAboutWidget();
 
 private:

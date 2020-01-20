@@ -123,23 +123,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the BEM Model
-    * Refactored: fwd_bem_new_model (fwd_bem_model.c)
-    *
-    */
+     * Constructs the BEM Model
+     * Refactored: fwd_bem_new_model (fwd_bem_model.c)
+     *
+     */
     explicit FwdBemModel();
 
     //=========================================================================================================
     /**
-    * Destroys the BEM Model
-    * Refactored: fwd_bem_free_model (fwd_bem_free_model.c)
-    */
+     * Destroys the BEM Model
+     * Refactored: fwd_bem_free_model (fwd_bem_free_model.c)
+     */
     virtual ~FwdBemModel();
 
     //=========================================================================================================
     /**
-    * Refactored: fwd_bem_free_solution (fwd_bem_model.c)
-    */
+     * Refactored: fwd_bem_free_solution (fwd_bem_model.c)
+     */
     void fwd_bem_free_solution();
 
 
@@ -178,8 +178,8 @@ public:
     static int get_int( FIFFLIB::FiffStream::SPtr& stream, const FIFFLIB::FiffDirNode::SPtr& node,int what,int *res);
 
     /*
-    * Return a pointer to a specific surface in a BEM
-    */
+     * Return a pointer to a specific surface in a BEM
+     */
     // Refactored: fwd_bem_find_surface (fwd_bem_model.c)
     MNELIB::MneSurfaceOld* fwd_bem_find_surface(int kind);
 

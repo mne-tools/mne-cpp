@@ -91,77 +91,77 @@ class TriggerControlSetupWidget : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a TriggerControlSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding TriggerControlToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TriggerControlSetupWidget becomes a window. If parent is another widget, TriggerControlSetupWidget becomes a child window inside parent. TriggerControlSetupWidget is deleted when its parent is deleted.
-    */
+     * Constructs a TriggerControlSetupWidget which is a child of parent.
+     *
+     * @param [in] toolbox a pointer to the corresponding TriggerControlToolbox.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new TriggerControlSetupWidget becomes a window. If parent is another widget, TriggerControlSetupWidget becomes a child window inside parent. TriggerControlSetupWidget is deleted when its parent is deleted.
+     */
     TriggerControlSetupWidget(TriggerControl* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the TriggerControlSetupWidget.
-    * All TriggerControlSetupWidget's children are deleted first. The application exits if TriggerControlSetupWidget is the main widget.
-    */
+     * Destroys the TriggerControlSetupWidget.
+     * All TriggerControlSetupWidget's children are deleted first. The application exits if TriggerControlSetupWidget is the main widget.
+     */
     ~TriggerControlSetupWidget();
 
 
 private slots:
     //=========================================================================================================
     /**
-    * Sets up a connection with the serial port
-    *
-    */
+     * Sets up a connection with the serial port
+     *
+     */
     void on_m_qPushButton_Connect_released();
     //=========================================================================================================
     /**
-    * Disconnects from the serial port
-    *
-    */
+     * Disconnects from the serial port
+     *
+     */
     void on_m_qPushButton_Disconnect_released();
     //=========================================================================================================
     /**
-    * Reads the digital output information from the terminal, encodes the output and sends it via the serial port
-    *
-    */
+     * Reads the digital output information from the terminal, encodes the output and sends it via the serial port
+     *
+     */
     void on_m_qPushButton_Send_released();
     //=========================================================================================================
     /**
-    * Reads the analog output information from the terminal, encodes the output and sends it via the serial port
-    */
+     * Reads the analog output information from the terminal, encodes the output and sends it via the serial port
+     */
     void on_m_qPushButton_Sendanalog_released();
     //=========================================================================================================
     /**
-    * Sends a retrieve request for digital information to the serial port
-    *
-    */
+     * Sends a retrieve request for digital information to the serial port
+     *
+     */
     void on_m_qPushButton_RetrieveDigitalInfo_released();
     //=========================================================================================================
     /**
-    * Sends a retrieve request for analog information to the serial port
-    *
-    */
+     * Sends a retrieve request for analog information to the serial port
+     *
+     */
     void on_m_qPushButton_RetrieveAnalogInfo_released();
     //=========================================================================================================
     /**
-    * Connects a selected channel to the TriggerControl stimulation channel
-    *
-    */
+     * Connects a selected channel to the TriggerControl stimulation channel
+     *
+     */
     void on_m_qPushButton_ConnectChannel_released();
 
 private:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
 
     //=========================================================================================================
     /**
-    * Shows the settings widget
-    */
+     * Shows the settings widget
+     */
     void showSettings();
 
 

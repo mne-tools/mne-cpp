@@ -99,33 +99,33 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a line series plot
-    *
-    * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
-    */
+     * Constructs a line series plot
+     *
+     * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
+     */
     LinePlot(QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Constructs a line series plot
-    *
-    * @param [in] y         The double data vector
-    * @param [in] title     Plot title
-    * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
-    */
+     * Constructs a line series plot
+     *
+     * @param [in] y         The double data vector
+     * @param [in] title     Plot title
+     * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
+     */
     LinePlot(const QVector<double>& y,
              const QString& title = "",
              QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Constructs a line series plot
-    *
-    * @param [in] x         X-Axis data to plot
-    * @param [in] y         Y-Axis data to plot
-    * @param [in] title     Plot title
-    * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
-    */
+     * Constructs a line series plot
+     *
+     * @param [in] x         X-Axis data to plot
+     * @param [in] y         Y-Axis data to plot
+     * @param [in] title     Plot title
+     * @param [in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
+     */
     LinePlot(const QVector<double>& x,
              const QVector<double>& y,
              const QString& title = "",
@@ -133,57 +133,57 @@ public:
 
     //=========================================================================================================
     /**
-    * Destructs the line series plot
-    */
+     * Destructs the line series plot
+     */
     virtual ~LinePlot();
 
     //=========================================================================================================
     /**
-    * Sets the scaled image view title.
-    *
-    * @param[in] p_sTitle   The title
-    */
+     * Sets the scaled image view title.
+     *
+     * @param[in] p_sTitle   The title
+     */
     void setTitle(const QString &p_sTitle);
 
     //=========================================================================================================
     /**
-    * Sets the label of the y axes
-    *
-    * @param [in] p_sXLabel   The x axes label
-    */
+     * Sets the label of the y axes
+     *
+     * @param [in] p_sXLabel   The x axes label
+     */
     void setXLabel(const QString &p_sXLabel);
 
     //=========================================================================================================
     /**
-    * Sets the label of the y axes
-    *
-    * @param [in] p_sXLabel   The y axes label
-    */
+     * Sets the label of the y axes
+     *
+     * @param [in] p_sXLabel   The y axes label
+     */
     void setYLabel(const QString &p_sYLabel);
 
     //=========================================================================================================
     /**
-    * Updates the plot using a given double vector without given X data.
-    *
-    * @param [in] y          The double data vector
-    */
+     * Updates the plot using a given double vector without given X data.
+     *
+     * @param [in] y          The double data vector
+     */
     void updateData(const QVector<double>& y);
 
     //=========================================================================================================
     /**
-    * Updates the plot using the given vectors.
-    *
-    * @param [in] x         X-Axis data to plot
-    * @param [in] y         Y-Axis data to plot
-    */
+     * Updates the plot using the given vectors.
+     *
+     * @param [in] x         X-Axis data to plot
+     * @param [in] y         Y-Axis data to plot
+     */
     void updateData(const QVector<double>& x,
                     const QVector<double>& y);
 
 private:
     //=========================================================================================================
     /**
-    * Updates the plot.
-    */
+     * Updates the plot.
+     */
     void update();
 
 private:

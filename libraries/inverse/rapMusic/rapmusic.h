@@ -134,35 +134,35 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor creates an empty RapMusic algorithm which still needs to be initialized.
-    */
+     * Default constructor creates an empty RapMusic algorithm which still needs to be initialized.
+     */
     RapMusic();
 
     //=========================================================================================================
     /**
-    * Constructor which initializes the RapMusic algorithm with the given model.
-    *
-    * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding grid matrix.
-    * @param[in] p_bSparsed     True when sparse matrices should be used.
-    * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with
-    *                           the strongest.
-    * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
-    */
+     * Constructor which initializes the RapMusic algorithm with the given model.
+     *
+     * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding grid matrix.
+     * @param[in] p_bSparsed     True when sparse matrices should be used.
+     * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with
+     *                           the strongest.
+     * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
+     */
     RapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
     virtual ~RapMusic();
 
     //=========================================================================================================
     /**
-    * Initializes the RAP MUSIC algorithm with the given model.
-    *
-    * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding Grid matrix.
-    * @param[in] p_bSparsed     True when sparse matrices should be used.
-    * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with
-    *                           the strongest.
-    * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
-    * @return   true if successful initialized, false otherwise.
-    */
+     * Initializes the RAP MUSIC algorithm with the given model.
+     *
+     * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding Grid matrix.
+     * @param[in] p_bSparsed     True when sparse matrices should be used.
+     * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with
+     *                           the strongest.
+     * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
+     * @return   true if successful initialized, false otherwise.
+     */
     bool init(MNEForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
 
     virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
@@ -177,68 +177,68 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the source estimate attributes.
-    *
-    * @param[in] p_iSampStcWin  Samples per source localization window (default - 1 = not set)
-    * @param[in] p_fStcOverlap  Percentage of localization window overlap
-    */
+     * Sets the source estimate attributes.
+     *
+     * @param[in] p_iSampStcWin  Samples per source localization window (default - 1 = not set)
+     * @param[in] p_fStcOverlap  Percentage of localization window overlap
+     */
     void setStcAttr(int p_iSampStcWin, float p_fStcOverlap);
 
 protected:
     //=========================================================================================================
     /**
-    * Computes the signal subspace Phi_s out of the measurement F.
-    *
-    * @param[in] p_pMatMeasurement  The current measured data to process (for best performance it should have
+     * Computes the signal subspace Phi_s out of the measurement F.
+     *
+     * @param[in] p_pMatMeasurement  The current measured data to process (for best performance it should have
                                     the dimension channels x samples with samples = number of channels)
-    * @param[out] p_pMatPhi_s   The calculated signal subspace.
-    * @return   The rank of the measurement F (named r lt. Mosher 1998, 1999)
-    */
+     * @param[out] p_pMatPhi_s   The calculated signal subspace.
+     * @return   The rank of the measurement F (named r lt. Mosher 1998, 1999)
+     */
     int calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT* &p_pMatPhi_s) const;
 
     //=========================================================================================================
     /**
-    * Computes the subspace correlation between the projected G_rho and the projected signal subspace Phi_s.
-    * For speed-up: we calculate the decomposition of the projected Phi_s before this function. So the argument
-    * for this function is U_B instead of Phi_s.
-    *
-    * @param[in] p_matProj_G    The projected Lead Field combination. This is a m x 6 matrix composed of the
-    *                           Lead Field combination of two Points for all m channels and 3 orthogonal
-    *                           components (x y z).
-    * @param[in] p_matU_B       The matrix U is the subspace projection of the orthogonal projected Phi_s
-    * @return   The maximal correlation c_1 of the subspace correlation of the current projected Lead Field
-    *           combination and the projected measurement.
-    */
+     * Computes the subspace correlation between the projected G_rho and the projected signal subspace Phi_s.
+     * For speed-up: we calculate the decomposition of the projected Phi_s before this function. So the argument
+     * for this function is U_B instead of Phi_s.
+     *
+     * @param[in] p_matProj_G    The projected Lead Field combination. This is a m x 6 matrix composed of the
+     *                           Lead Field combination of two Points for all m channels and 3 orthogonal
+     *                           components (x y z).
+     * @param[in] p_matU_B       The matrix U is the subspace projection of the orthogonal projected Phi_s
+     * @return   The maximal correlation c_1 of the subspace correlation of the current projected Lead Field
+     *           combination and the projected measurement.
+     */
     static double subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_pMatU_B);
 
     //=========================================================================================================
     /**
-    * Computes the subspace correlation between the projected G_rho and the projected signal subspace Phi_s, as
-    * well as the resulting direction.
-    * For speed-up: we calculate the decomposition of the projected Phi_s before this function. So the argument
-    * for this function is U_B instead of Phi_s.
-    *
-    * @param[in] p_matProj_G    The projected Lead Field combination. This is a m x 6 matrix composed of the
-    *                           Lead Field combination of two Points for all m channels and 3 orthogonal
-    *                           components (x y z).
-    * @param[in] p_matU_B    The matrix U is the subspace projection of the orthogonal projected Phi_s
-    * @param[out] p_vec_phi_k_1 Returns the orientation for a correlated dipole pair.
+     * Computes the subspace correlation between the projected G_rho and the projected signal subspace Phi_s, as
+     * well as the resulting direction.
+     * For speed-up: we calculate the decomposition of the projected Phi_s before this function. So the argument
+     * for this function is U_B instead of Phi_s.
+     *
+     * @param[in] p_matProj_G    The projected Lead Field combination. This is a m x 6 matrix composed of the
+     *                           Lead Field combination of two Points for all m channels and 3 orthogonal
+     *                           components (x y z).
+     * @param[in] p_matU_B    The matrix U is the subspace projection of the orthogonal projected Phi_s
+     * @param[out] p_vec_phi_k_1 Returns the orientation for a correlated dipole pair.
                                 (phi_x1, phi_y1, phi_z1, phi_x2, phi_y2, phi_z2)
-    * @return   The maximal correlation c_1 of the subspace correlation of the current projected Lead Field
-    *           combination and the projected measurement.
-    */
+     * @return   The maximal correlation c_1 of the subspace correlation of the current projected Lead Field
+     *           combination and the projected measurement.
+     */
     static double subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B, Vector6T& p_vec_phi_k_1);
 
     //=========================================================================================================
     /**
-    * Calculates the accumulated manifold vectors A_{k1}
-    *
-    * @param[in] p_matG_k_1 The Lead Field combination for the currently best correlated pair.
-    * @param[in] p_matPhi_k_1   Is equal to u_k_1 in the paper and it is the direction of the currently best
-    *                           correlated pair.
-    * @param[in] p_iIdxk_1  The current position in the manifold vector array A_k_1
-    * @param[out] p_matA_k_1    The array of the manifold vectors.
-    */
+     * Calculates the accumulated manifold vectors A_{k1}
+     *
+     * @param[in] p_matG_k_1 The Lead Field combination for the currently best correlated pair.
+     * @param[in] p_matPhi_k_1   Is equal to u_k_1 in the paper and it is the direction of the currently best
+     *                           correlated pair.
+     * @param[in] p_iIdxk_1  The current position in the manifold vector array A_k_1
+     * @param[out] p_matA_k_1    The array of the manifold vectors.
+     */
     static void calcA_k_1(  const MatrixX6T& p_matG_k_1,
                             const Vector6T& p_matPhi_k_1,
                             const int p_iIdxk_1,
@@ -246,69 +246,69 @@ protected:
 
     //=========================================================================================================
     /**
-    * Calculates the orthogonal projector Phi_A_k_1 like in the paper Mosher 1999 (13)
-    *
-    * @param[in] p_matA_k_1 The array of the manifold vectors.
-    * @param[out] p_matOrthProj The orthogonal projector.
-    */
+     * Calculates the orthogonal projector Phi_A_k_1 like in the paper Mosher 1999 (13)
+     *
+     * @param[in] p_matA_k_1 The array of the manifold vectors.
+     * @param[out] p_matOrthProj The orthogonal projector.
+     */
     void calcOrthProj(const MatrixXT& p_matA_k_1, MatrixXT& p_matOrthProj) const;
 
     //=========================================================================================================
     /**
-    * Pre-Calculates the gain matrix index combinations to search for a two dipole independent topography
-    * (IT = source).
-    *
-    * @param[in] p_iNumPoints   The number of Lead Field points -> for dimension check
-    * @param[in] p_iNumCombinations The number of pair index combinations.
-    * @param[out] p_ppPairIdxCombinations   The destination which contains pointer to pointer of index
-    *                                       combinations of Lead Field indices -> Number of pointers =
-    *                                       Combination (number of grid points over 2 = Num + 1 C 2)
-    */
+     * Pre-Calculates the gain matrix index combinations to search for a two dipole independent topography
+     * (IT = source).
+     *
+     * @param[in] p_iNumPoints   The number of Lead Field points -> for dimension check
+     * @param[in] p_iNumCombinations The number of pair index combinations.
+     * @param[out] p_ppPairIdxCombinations   The destination which contains pointer to pointer of index
+     *                                       combinations of Lead Field indices -> Number of pointers =
+     *                                       Combination (number of grid points over 2 = Num + 1 C 2)
+     */
     void calcPairCombinations(  const int p_iNumPoints,
                                 const int p_iNumCombinations,
                                 Pair** p_ppPairIdxCombinations) const;
 
     //=========================================================================================================
     /**
-    * Calculates the combination indices Idx1 and Idx2 of n points.\n
-    *   [  (0,0)   (0,1)   (0,2)  ...  (0,n-1)   (0,n)\n
-    *              (1,1)   (1,2)  ...  (1,n-1)   (1,n)\n
-    *                      (2,2)  ...  (2,n-1)   (2,n)\n
-    *\n
-    *                                  (n-1,n-1) (n-1,n)\n
-    *                                            (n,n)]
-    *
-    *
-    * @param[in] p_iPoints  The number of points n which are combined with each other.
-    * @param[in] p_iCurIdx  The current combination index (between 0 and nchoosek(n+1,2))
-    * @param[out] p_iIdx1   The resulting index 1.
-    * @param[out] p_iIdx2   The resulting index 2.
-    */
+     * Calculates the combination indices Idx1 and Idx2 of n points.\n
+     *   [  (0,0)   (0,1)   (0,2)  ...  (0,n-1)   (0,n)\n
+     *              (1,1)   (1,2)  ...  (1,n-1)   (1,n)\n
+     *                      (2,2)  ...  (2,n-1)   (2,n)\n
+     *\n
+     *                                  (n-1,n-1) (n-1,n)\n
+     *                                            (n,n)]
+     *
+     *
+     * @param[in] p_iPoints  The number of points n which are combined with each other.
+     * @param[in] p_iCurIdx  The current combination index (between 0 and nchoosek(n+1,2))
+     * @param[out] p_iIdx1   The resulting index 1.
+     * @param[out] p_iIdx2   The resulting index 2.
+     */
     static void getPointPair(const int p_iPoints, const int p_iCurIdx, int &p_iIdx1, int &p_iIdx2);
 
     //=========================================================================================================
     /**
-    * Returns a gain matrix pair for the given indices
-    *
-    * @param[in]    p_matGainMarix The Lead Field matrix.
-    * @param[out]   p_matGainMarix_Pair   Lead Field combination (dimension: m x 6)
-    * @param[in]    p_iIdx1 first Lead Field index point
-    * @param[in]    p_iIdx2 second Lead Field index point
-    */
+     * Returns a gain matrix pair for the given indices
+     *
+     * @param[in]    p_matGainMarix The Lead Field matrix.
+     * @param[out]   p_matGainMarix_Pair   Lead Field combination (dimension: m x 6)
+     * @param[in]    p_iIdx1 first Lead Field index point
+     * @param[in]    p_iIdx2 second Lead Field index point
+     */
     static void getGainMatrixPair(  const MatrixXT& p_matGainMarix,
                                     MatrixX6T& p_matGainMarix_Pair,
                                     int p_iIdx1, int p_iIdx2);
 
     //=========================================================================================================
     /**
-    * Adds a new correlated dipole pair to th RapDipoles. This function is called by the RAP MUSIC Algorithm.
-    *
-    * @param[in] p_iDipoleIdx1  Index (Lead Field grid index) of the first dipole.
-    * @param[in] p_iDipoleIdx2  Index (Lead Field grid index) of the second dipole.
-    * @param[in] p_vec_phi_k_1  Array of the dipole directories (phi_x1, phi_y1, phi_z1, phi_x2, phi_y2, phi_z2).
-    * @param[in] p_valCor       Correlation value of the dipole pair.
-    * @param[out] p_RapDipoles  the list of dipole pairs.
-    */
+     * Adds a new correlated dipole pair to th RapDipoles. This function is called by the RAP MUSIC Algorithm.
+     *
+     * @param[in] p_iDipoleIdx1  Index (Lead Field grid index) of the first dipole.
+     * @param[in] p_iDipoleIdx2  Index (Lead Field grid index) of the second dipole.
+     * @param[in] p_vec_phi_k_1  Array of the dipole directories (phi_x1, phi_y1, phi_z1, phi_x2, phi_y2, phi_z2).
+     * @param[in] p_valCor       Correlation value of the dipole pair.
+     * @param[out] p_RapDipoles  the list of dipole pairs.
+     */
     static void insertSource(  int p_iDipoleIdx1, int p_iDipoleIdx2,
                         const Vector6T &p_vec_phi_k_1,
                         double p_valCor,
@@ -337,24 +337,24 @@ protected:
 
     //=========================================================================================================
     /**
-    * Returns the rank r of a singular value matrix based on non-zero singular values
-    * (singular value > epsilon = 10^-5)
-    *
-    * @param[in] p_matSigma diagonal matrix which contains the Singular values (Dimension n x n)
-    * @return The rank r.
-    */
+     * Returns the rank r of a singular value matrix based on non-zero singular values
+     * (singular value > epsilon = 10^-5)
+     *
+     * @param[in] p_matSigma diagonal matrix which contains the Singular values (Dimension n x n)
+     * @return The rank r.
+     */
     static inline int getRank(const MatrixXT& p_matSigma);
 
     //=========================================================================================================
     /**
-    * lt. Mosher 1998 -> Only Retain those Components of U_A and U_B that correspond to nonzero singular values
-    * for U_A and U_B the number of columns corresponds to their ranks
-    *
-    * @param[in] p_Mat  The Matrix which should be reduced to its rank.
-    * @param[in] p_matSigma_src The singular values of the matrix
-    * @param[out] p_matFull_Rank    The corresponding full rank matrix.
-    * @param[in] type   Whether p_Mat is transposed, than rows and columns are changed.
-    */
+     * lt. Mosher 1998 -> Only Retain those Components of U_A and U_B that correspond to nonzero singular values
+     * for U_A and U_B the number of columns corresponds to their ranks
+     *
+     * @param[in] p_Mat  The Matrix which should be reduced to its rank.
+     * @param[in] p_matSigma_src The singular values of the matrix
+     * @param[out] p_matFull_Rank    The corresponding full rank matrix.
+     * @param[in] type   Whether p_Mat is transposed, than rows and columns are changed.
+     */
     static inline int useFullRank( const MatrixXT& p_Mat,
                             const MatrixXT& p_matSigma_src,
                             MatrixXT& p_matFull_Rank,
@@ -362,11 +362,11 @@ protected:
 
     //=========================================================================================================
     /**
-    * Performs F * F^Transposed, is used when n > m
-    *
-    * @param[in] p_matF The matrix which should be transformed.
-    * @return F * F^Transposed (we call it FFT ;))
-    */
+     * Performs F * F^Transposed, is used when n > m
+     *
+     * @param[in] p_matF The matrix which should be transformed.
+     * @return F * F^Transposed (we call it FFT ;))
+     */
     static inline MatrixXT makeSquareMat(const MatrixXT& p_matF);
 };
 

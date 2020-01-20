@@ -92,113 +92,113 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructors the light fiff measurement file information.
-    */
+     * Constructors the light fiff measurement file information.
+     */
     FiffInfoBase();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffInfoBase  light FIFF measurement information which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffInfoBase  light FIFF measurement information which should be copied
+     */
     FiffInfoBase(const FiffInfoBase& p_FiffInfoBase);
 
     //=========================================================================================================
     /**
-    * Destroys the light fiff measurement file information.
-    */
+     * Destroys the light fiff measurement file information.
+     */
     ~FiffInfoBase();
 
     //=========================================================================================================
     /**
-    * Initializes light FIFF measurement information.
-    */
+     * Initializes light FIFF measurement information.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Get channel type.
-    *
-    * @param[in] idx    Index of channel
-    *
-    * @return Type of channel ('grad', 'mag', 'eeg', 'stim', 'eog', 'emg', 'ecg')
-    */
+     * Get channel type.
+     *
+     * @param[in] idx    Index of channel
+     *
+     * @return Type of channel ('grad', 'mag', 'eeg', 'stim', 'eog', 'emg', 'ecg')
+     */
     QString channel_type(qint32 idx) const;
 
     //=========================================================================================================
     /**
-    * True if FIFF measurement file information is empty.
-    *
-    * @return true if FIFF measurement file information is empty
-    */
+     * True if FIFF measurement file information is empty.
+     *
+     * @return true if FIFF measurement file information is empty
+     */
     inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
-    * fiff_pick_channels
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Make a selector to pick desired channels from data
-    *
-    * @param[in] ch_names  - The channel name list to consult
-    * @param[in] include   - Channels to include (if empty, include all available)
-    * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
-    *
-    * @return the selector matrix (row Vector)
-    */
+     * fiff_pick_channels
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Make a selector to pick desired channels from data
+     *
+     * @param[in] ch_names  - The channel name list to consult
+     * @param[in] include   - Channels to include (if empty, include all available)
+     * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
+     *
+     * @return the selector matrix (row Vector)
+     */
     static RowVectorXi pick_channels(const QStringList& ch_names, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList);
 
     //=========================================================================================================
     /**
-    * fiff_pick_info
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Pick desired channels from measurement info
-    *
-    * @param[in] sel    List of channels to select
-    *
-    * @return Info modified according to sel
-    */
+     * fiff_pick_info
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Pick desired channels from measurement info
+     *
+     * @param[in] sel    List of channels to select
+     *
+     * @return Info modified according to sel
+     */
     FiffInfoBase pick_info(const RowVectorXi* sel = NULL) const;
 
     //=========================================================================================================
     /**
-    * fiff_pick_types (highy diversity in meg picking)
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Create a selector to pick desired channel types from data
-    *
-    * @param[in] meg        It can be "all", to select all or it can be "mag" or "grad" to select only gradiometers or magnetometers.
-    * @param[in] eeg        Include EEG channels
-    * @param[in] stim       Include stimulus channels
-    * @param[in] include    Additional channels to include (if empty, do not add any)
-    * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
-    *
-    * @return the selector matrix (row vector)
-    */
+     * fiff_pick_types (highy diversity in meg picking)
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Create a selector to pick desired channel types from data
+     *
+     * @param[in] meg        It can be "all", to select all or it can be "mag" or "grad" to select only gradiometers or magnetometers.
+     * @param[in] eeg        Include EEG channels
+     * @param[in] stim       Include stimulus channels
+     * @param[in] include    Additional channels to include (if empty, do not add any)
+     * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
+     *
+     * @return the selector matrix (row vector)
+     */
     RowVectorXi pick_types(const QString meg, bool eeg = false, bool stim = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
-    * fiff_pick_types
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Create a selector to pick desired channel types from data
-    * Use overloaded pick_types method to specify meg (grad, mag, ref_meg)type
-    *
-    * @param[in] meg        Include MEG channels
-    * @param[in] eeg        Include EEG channels
-    * @param[in] stim       Include stimulus channels
-    * @param[in] include    Additional channels to include (if empty, do not add any)
-    * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
-    *
-    * @return the selector matrix (row vector)
-    */
+     * fiff_pick_types
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Create a selector to pick desired channel types from data
+     * Use overloaded pick_types method to specify meg (grad, mag, ref_meg)type
+     *
+     * @param[in] meg        Include MEG channels
+     * @param[in] eeg        Include EEG channels
+     * @param[in] stim       Include stimulus channels
+     * @param[in] include    Additional channels to include (if empty, do not add any)
+     * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
+     *
+     * @return the selector matrix (row vector)
+     */
     RowVectorXi pick_types(bool meg,
                            bool eeg = false,
                            bool stim = false,
@@ -206,12 +206,12 @@ public:
                            const QStringList& exclude = defaultQStringList) const;
 
     /**
-    * Overloaded == operator to compare an object to this instance.
-    *
-    * @param[in] object    The object which should be compared to.
-    *
-    * @return true if equal, false otherwise
-    */
+     * Overloaded == operator to compare an object to this instance.
+     *
+     * @param[in] object    The object which should be compared to.
+     *
+     * @return true if equal, false otherwise
+     */
     friend bool operator== (const FiffInfoBase &a, const FiffInfoBase &b);
 
 public:

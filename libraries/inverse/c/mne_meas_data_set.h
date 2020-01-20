@@ -95,22 +95,22 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Meas Data Set
-    * Refactored: mne_new_meas_data_set (mne_read_data.c)
-    */
+     * Constructs the MNE Meas Data Set
+     * Refactored: mne_new_meas_data_set (mne_read_data.c)
+     */
     MneMeasDataSet();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Meas Data Set description
-    * Refactored: mne_free_meas_data_set (mne_read_data.c)
-    */
+     * Destroys the MNE Meas Data Set description
+     * Refactored: mne_free_meas_data_set (mne_read_data.c)
+     */
     ~MneMeasDataSet();
 
 public:
     /*
-    * These are unique to each data set
-    */
+     * These are unique to each data set
+     */
     QString         comment;       /* Comment associated with these data */
     float           **data;         /* The measured data */
     float           **data_proj;    /* Some programs maybe interested in keeping the data after SSP separately */

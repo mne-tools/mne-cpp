@@ -90,33 +90,33 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DisplayManager.
-    */
+     * Constructs a DisplayManager.
+     */
     DisplayManager(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DisplayManager.
-    */
+     * Destroys the DisplayManager.
+     */
     virtual ~DisplayManager();
 
     //=========================================================================================================
     /**
-    * Shows a widget containing all current measurement widgets.
-    *
-    * @param [in] outputConnectorList   output connector list
-    * @param [in] pT                    global timer
-    * @param [out] qListActions         a list of actions containing all measurent widget actions
-    * @param [out] qListWidgets         a list of widgets containing all measurent widget tool widgets
-    *
-    * @return a pointer to the widget containing all measurement widgets.
-    */
+     * Shows a widget containing all current measurement widgets.
+     *
+     * @param [in] outputConnectorList   output connector list
+     * @param [in] pT                    global timer
+     * @param [out] qListActions         a list of actions containing all measurent widget actions
+     * @param [out] qListWidgets         a list of widgets containing all measurent widget tool widgets
+     *
+     * @return a pointer to the widget containing all measurement widgets.
+     */
     QWidget* show(IPlugin::OutputConnectorList &outputConnectorList, QSharedPointer<QTime>& pT, QList< QAction* >& qListActions, QList< QWidget* >& qListWidgets);
 
     //=========================================================================================================
     /**
-    * Cleans all measurement widget hash's.
-    */
+     * Cleans all measurement widget hash's.
+     */
     void clean();
 
 private:

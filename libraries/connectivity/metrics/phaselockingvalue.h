@@ -105,34 +105,34 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a PhaseLockingValue object.
-    */
+     * Constructs a PhaseLockingValue object.
+     */
     explicit PhaseLockingValue();
 
     //=========================================================================================================
     /**
-    * Calculates the phase locking value between the rows of the data matrix.
-    *
-    * @param[in] connectivitySettings   The input data and parameters.
-    *
-    * @return                   The connectivity information in form of a network structure.
-    */
+     * Calculates the phase locking value between the rows of the data matrix.
+     *
+     * @param[in] connectivitySettings   The input data and parameters.
+     *
+     * @return                   The connectivity information in form of a network structure.
+     */
     static Network calculate(ConnectivitySettings &connectivitySettings);
 
 protected:
     //=========================================================================================================
     /**
-    * Computes the PLV values. This function gets called in parallel.
-    *
-    * @param[in] inputData                  The input data.
-    * @param[out]vecPairCsdSum              The sum of all CSD matrices for each trial.
-    * @param[out]vecPairCsdNormalizedSum    The sum of all normalized CSD matrices for each trial.
-    * @param[in] mutex                      The mutex used to safely access vecPairCsdSum.
-    * @param[in] iNRows                     The number of rows.
-    * @param[in] iNFreqs                    The number of frequenciy bins.
-    * @param[in] iNfft                      The FFT length.
-    * @param[in] tapers                     The taper information.
-    */
+     * Computes the PLV values. This function gets called in parallel.
+     *
+     * @param[in] inputData                  The input data.
+     * @param[out]vecPairCsdSum              The sum of all CSD matrices for each trial.
+     * @param[out]vecPairCsdNormalizedSum    The sum of all normalized CSD matrices for each trial.
+     * @param[in] mutex                      The mutex used to safely access vecPairCsdSum.
+     * @param[in] iNRows                     The number of rows.
+     * @param[in] iNFreqs                    The number of frequenciy bins.
+     * @param[in] iNfft                      The FFT length.
+     * @param[in] tapers                     The taper information.
+     */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
                         QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdNormalizedSum,
@@ -144,11 +144,11 @@ protected:
 
     //=========================================================================================================
     /**
-    * Reduces the PLV computation to a final result.
-    *
-    * @param[out] connectivitySettings   The input data.
-    * @param[in]  finalNetwork           The final network.
-    */
+     * Reduces the PLV computation to a final result.
+     *
+     * @param[out] connectivitySettings   The input data.
+     * @param[in]  finalNetwork           The final network.
+     */
     static void computePLV(ConnectivitySettings &connectivitySettings,
                            Network& finalNetwork);
 };

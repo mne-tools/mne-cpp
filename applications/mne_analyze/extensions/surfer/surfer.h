@@ -89,14 +89,14 @@ class SURFERSHARED_EXPORT Surfer : public ANSHAREDLIB::IExtension
 public:
     //=========================================================================================================
     /**
-    * Constructs a Surfer.
-    */
+     * Constructs a Surfer.
+     */
     Surfer();
 
     //=========================================================================================================
     /**
-    * Destroys the Surfer.
-    */
+     * Destroys the Surfer.
+     */
     ~Surfer();
 
     // IExtension functions

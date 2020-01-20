@@ -102,29 +102,29 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a MainWindow which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
-    */
+     * Constructs a MainWindow which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
+     */
     MainWindow(QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Destroys the MainWindow.
-    * All MainWindow's children are deleted first. The application exits if MainWindow is the main widget.
-    */
+     * Destroys the MainWindow.
+     * All MainWindow's children are deleted first. The application exits if MainWindow is the main widget.
+     */
     ~MainWindow();
 
     //=========================================================================================================
     /**
-    * Initializes the global settings
-    */
+     * Initializes the global settings
+     */
     void initGlobalSettings();
 
     //=========================================================================================================
     /**
-    * Initializes the global data base
-    */
+     * Initializes the global data base
+     */
     void initGlobalData();
 
 

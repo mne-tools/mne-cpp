@@ -107,10 +107,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ScalingView which is a child of parent.
-    *
-    * @param [in] parent        parent of widget
-    */
+     * Constructs a ScalingView which is a child of parent.
+     *
+     * @param [in] parent        parent of widget
+     */
     ScalingView(const QString& sSettingsPath = "",
                 const QList<FIFFLIB::FiffChInfo> &lChannelList = QList<FIFFLIB::FiffChInfo>(),
                 QWidget *parent = 0,
@@ -118,57 +118,57 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the ScalingView.
-    */
+     * Destroys the ScalingView.
+     */
     ~ScalingView();
 
     //=========================================================================================================
     /**
-    * Get the current scaling map
-    *
-    * @return The current scaling map.
-    */
+     * Get the current scaling map
+     *
+     * @return The current scaling map.
+     */
     QMap<qint32,float> getScaleMap() const;
 
     //=========================================================================================================
     /**
-    * Set the current scaling map. This also recreates the GUI.
-    */
+     * Set the current scaling map. This also recreates the GUI.
+     */
     void setScaleMap(const QMap<qint32, float> &qMapChScaling);
 
 protected:
     //=========================================================================================================
     /**
-    * Redraw the GUI.
-    */
+     * Redraw the GUI.
+     */
     void redrawGUI();
 
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Slot called when scaling spin boxes change
-    */
+     * Slot called when scaling spin boxes change
+     */
     void onUpdateSpinBoxScaling(double value);
 
     //=========================================================================================================
     /**
-    * Slot called when slider scaling change
-    */
+     * Slot called when slider scaling change
+     */
     void onUpdateSliderScaling(int value);
 
     QMap<qint32, float>                 m_qMapChScaling;                /**< Channel scaling values. */
@@ -182,8 +182,8 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the scaling sliders or spin boxes changed.
-    */
+     * Emit this signal whenever the scaling sliders or spin boxes changed.
+     */
     void scalingChanged(const QMap<qint32, float>& scalingMap);
 
 };

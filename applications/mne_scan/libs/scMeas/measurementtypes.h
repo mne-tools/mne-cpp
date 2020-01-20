@@ -73,14 +73,14 @@ class SCMEASSHARED_EXPORT MeasurementTypes : public QObject
 public:
     //=========================================================================================================
     /**
-    * Constructs a MeasurementTypes Object.
-    */
+     * Constructs a MeasurementTypes Object.
+     */
     explicit MeasurementTypes(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Call to register MeasurementTypes
-    */
+     * Call to register MeasurementTypes
+     */
     static void registerTypes();
     
 signals:

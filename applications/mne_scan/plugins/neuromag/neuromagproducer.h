@@ -101,54 +101,54 @@ class NeuromagProducer : public QThread
 public:
     //=========================================================================================================
     /**
-    * Constructs a NeuromagProducer.
-    *
-    * @param [in] p_pNeuromag   a pointer to the corresponding Neuromag.
-    */
+     * Constructs a NeuromagProducer.
+     *
+     * @param [in] p_pNeuromag   a pointer to the corresponding Neuromag.
+     */
     NeuromagProducer(Neuromag* p_pNeuromag);
 
     //=========================================================================================================
     /**
-    * Destroys the NeuromagProducer.
-    */
+     * Destroys the NeuromagProducer.
+     */
     ~NeuromagProducer();
 
     //=========================================================================================================
     /**
-    * Connects the data client.
-    *
-    * @param[in] p_sRtSeverIP   real-time server ip
-    */
+     * Connects the data client.
+     *
+     * @param[in] p_sRtSeverIP   real-time server ip
+     */
     void connectDataClient(QString p_sRtSeverIP);
 
     //=========================================================================================================
     /**
-    * Disconnects the data client.
-    */
+     * Disconnects the data client.
+     */
     void disconnectDataClient();
 
     //=========================================================================================================
     /**
-    * Stops the NeuromagProducer by stopping the producer's thread.
-    */
+     * Stops the NeuromagProducer by stopping the producer's thread.
+     */
     void stop();
 
 signals:
     //=========================================================================================================
     /**
-    * Emitted when data clients connection status changed
-    *
-    * @param[in] p_bStatus  connection status
-    */
+     * Emitted when data clients connection status changed
+     *
+     * @param[in] p_bStatus  connection status
+     */
     void dataConnectionChanged(bool p_bStatus);
 
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
 private:

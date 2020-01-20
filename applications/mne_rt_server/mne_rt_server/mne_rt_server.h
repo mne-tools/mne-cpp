@@ -98,20 +98,20 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the MNERTServer.
-    */
+     * Destroys the MNERTServer.
+     */
     ~MNERTServer();
 
     //=========================================================================================================
     /**
-    * Returns the command manager
-    */
+     * Returns the command manager
+     */
     inline CommandManager& getCommandManager();
 
     //=========================================================================================================
     /**
-    * Inits the mne_rt_server.
-    */
+     * Inits the mne_rt_server.
+     */
     void init();
 
 signals:
@@ -122,14 +122,14 @@ private:
     //SLOTS
     //=========================================================================================================
     /**
-    * Closes mne_rt_server
-    */
+     * Closes mne_rt_server
+     */
     void comClose();
 
     //=========================================================================================================
     /**
-    * Is called when signal help is executed.
-    */
+     * Is called when signal help is executed.
+     */
     void comHelp(Command p_command);
 
 

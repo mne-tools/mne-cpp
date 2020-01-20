@@ -100,22 +100,22 @@ class EventModel : public QAbstractTableModel
 public:
     //=========================================================================================================
     /**
-    * Constructors
-    */
+     * Constructors
+     */
     EventModel(QObject *parent);
     EventModel(QFile& qFile, QObject *parent);
 
     //=========================================================================================================
     /**
-    * Destructor
-    */
+     * Destructor
+     */
     virtual ~EventModel();
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    *
-    */
+     * Reimplemented virtual functions
+     *
+     */
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
@@ -127,95 +127,95 @@ public:
 
     //=========================================================================================================
     /**
-    * loadEventData loads fiff event data file
-    *
-    * @param p_IODevice fiff data event file to read from
-    */
+     * loadEventData loads fiff event data file
+     *
+     * @param p_IODevice fiff data event file to read from
+     */
     bool loadEventData(QFile& qFile);
 
     //=========================================================================================================
     /**
-    * saveEventData saves events to a fiff event data file
-    *
-    * @param p_IODevice fiff data event file to save to
-    */
+     * saveEventData saves events to a fiff event data file
+     *
+     * @param p_IODevice fiff data event file to save to
+     */
     bool saveEventData(QFile& qFile);
 
     //=========================================================================================================
     /**
-    * setFiffInfo sets the fiff info variabel
-    *
-    * @param fiffInfo fiff info variabel
-    */
+     * setFiffInfo sets the fiff info variabel
+     *
+     * @param fiffInfo fiff info variabel
+     */
     void setFiffInfo(FiffInfo::SPtr& pFiffInfo);
 
     //=========================================================================================================
     /**
-    * setFirstLastSample sets the first/last sample of the loaded fiff data file
-    *
-    * @param firstSample first sample value
-    * @param lastSample last sample value
-    */
+     * setFirstLastSample sets the first/last sample of the loaded fiff data file
+     *
+     * @param firstSample first sample value
+     * @param lastSample last sample value
+     */
     void setFirstLastSample(int firstSample, int lastSample);
 
     //=========================================================================================================
     /**
-    * setCurrentMarkerPos sets the current marker position
-    *
-    * @param markerPos marker position in samples
-    */
+     * setCurrentMarkerPos sets the current marker position
+     *
+     * @param markerPos marker position in samples
+     */
     void setCurrentMarkerPos(int markerPos);
 
     //=========================================================================================================
     /**
-    * getFiffInfo returns the fiffinfo
-    *
-    */
+     * getFiffInfo returns the fiffinfo
+     *
+     */
     FiffInfo::SPtr getFiffInfo() const;
 
     //=========================================================================================================
     /**
-    * getFirstLastSample returns the first/last sample in form of a QPair
-    *
-    */
+     * getFirstLastSample returns the first/last sample in form of a QPair
+     *
+     */
     QPair<int, int> getFirstLastSample() const;
 
     //=========================================================================================================
     /**
-    * setEventFilterType sets the event filter type
-    *
-    * @param eventType the event type which is to be filtered
-    */
+     * setEventFilterType sets the event filter type
+     *
+     * @param eventType the event type which is to be filtered
+     */
     void setEventFilterType(const QString eventType);
 
     //=========================================================================================================
     /**
-    * getEventTypeList returns the event type list
-    *
-    */
+     * getEventTypeList returns the event type list
+     *
+     */
     QStringList getEventTypeList() const;
 
     //=========================================================================================================
     /**
-    * getEventTypeColors returns the event type colors
-    *
-    */
+     * getEventTypeColors returns the event type colors
+     *
+     */
     const QMap<int, QColor> & getEventTypeColors();
 
     //=========================================================================================================
     /**
-    * clearModel clears all model's members
-    *
-    */
+     * clearModel clears all model's members
+     *
+     */
     void clearModel();
 
     //=========================================================================================================
     /**
-    * adds a new event type
-    *
-    * @param [in] eventType the type to be added
-    * @param [in] typeColor the type color to be added
-    */
+     * adds a new event type
+     *
+     * @param [in] eventType the type to be added
+     * @param [in] typeColor the type color to be added
+     */
     void addNewEventType(const QString &eventType, const QColor &typeColor);
 
     bool            m_bFileloaded;              /**< True when a Fiff event file is loaded. */
@@ -244,10 +244,10 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * updateEventTypes is emmited whenever the list of stored event type chnges
-    *
-    * @param currentFilterType the current set filter event type
-    */
+     * updateEventTypes is emmited whenever the list of stored event type chnges
+     *
+     * @param currentFilterType the current set filter event type
+     */
     void updateEventTypes(const QString& currentFilterType);
 };
 

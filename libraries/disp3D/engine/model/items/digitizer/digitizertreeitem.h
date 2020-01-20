@@ -103,24 +103,24 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] p3DEntityParent    The parent 3D entity.
-    * @param[in] iType              The type of the item. See types.h for declaration and definition.
-    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] p3DEntityParent    The parent 3D entity.
+     * @param[in] iType              The type of the item. See types.h for declaration and definition.
+     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit DigitizerTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
                                int iType = Data3DTreeModelItemTypes::DigitizerItem,
                                const QString& text = "Digitizer");
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surface and annotation data to this item.
-    *
-    * @param[in] tDigitizer         The digitizer data.
-    * @param[in] tSphereRadius      The radius of the visualized digitizer sphere.
-    * @param[in] tSphereColor       The color of the visualized digitizer.
-    */
+     * Adds FreeSurfer data based on surface and annotation data to this item.
+     *
+     * @param[in] tDigitizer         The digitizer data.
+     * @param[in] tSphereRadius      The radius of the visualized digitizer sphere.
+     * @param[in] tSphereColor       The color of the visualized digitizer.
+     */
     void addData(const QList<FIFFLIB::FiffDigPoint>& tDigitizer,
                                     const float tSphereRadius,
                                     const QColor &tSphereColor);
@@ -128,8 +128,8 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     void initItem();
 
     QPointer<GeometryMultiplier>    m_pSphereMesh;

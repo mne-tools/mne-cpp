@@ -82,62 +82,62 @@ class TMSIElectrodeItem : public QGraphicsItem
 public:
     //=========================================================================================================
     /**
-    * Constructs a TMSIElectrodeItem.
-    */
+     * Constructs a TMSIElectrodeItem.
+     */
     TMSIElectrodeItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor, int channelIndex);
 
     //=========================================================================================================
     /**
-    * Sets the color of the electrode item.
-    */
+     * Sets the color of the electrode item.
+     */
     void setColor(QColor electrodeColor);
 
     //=========================================================================================================
     /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
-    */
+     * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
+     */
     QRectF boundingRect() const;
 
     //=========================================================================================================
     /**
-    * Reimplemented paint function.
-    */
+     * Reimplemented paint function.
+     */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     //=========================================================================================================
     /**
-    * Returns the electrode name.
-    */
+     * Returns the electrode name.
+     */
     QString getElectrodeName();
 
     //=========================================================================================================
     /**
-    * Sets the impedance value.
-    */
+     * Sets the impedance value.
+     */
     void setImpedanceValue(double impedanceValue);
 
     //=========================================================================================================
     /**
-    * Returns the impedance value.
-    */
+     * Returns the impedance value.
+     */
     double getImpedanceValue();
 
     //=========================================================================================================
     /**
-    * Updates the electrodes position.
-    */
+     * Updates the electrodes position.
+     */
     void setPosition(QPointF newPosition);
 
     //=========================================================================================================
     /**
-    * Updates the electrodes position.
-    */
+     * Updates the electrodes position.
+     */
     QPointF getPosition();
 
     //=========================================================================================================
     /**
-    * Returns the device channel index of the electrode.
-    */
+     * Returns the device channel index of the electrode.
+     */
     int getChannelIndex();
 
 private:

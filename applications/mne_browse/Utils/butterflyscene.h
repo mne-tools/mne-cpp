@@ -85,24 +85,24 @@ class ButterflyScene : public LayoutScene
 public:
     //=========================================================================================================
     /**
-    * Constructs a ButterflyScene.
-    */
+     * Constructs a ButterflyScene.
+     */
     explicit ButterflyScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Sets the scale map to scaleMap.
-    *
-    * @param [in] scaleMap map with all channel types and their current scaling value.
-    */
+     * Sets the scale map to scaleMap.
+     *
+     * @param [in] scaleMap map with all channel types and their current scaling value.
+     */
     void setScaleMap(const QMap<QString,double> &scaleMap);
 
     //=========================================================================================================
     /**
-    * Repaints all items from the layout data in the scene.
-    *
-    *  @param [in] selectedChannelItems items which are to painted to the average scene
-    */
+     * Repaints all items from the layout data in the scene.
+     *
+     *  @param [in] selectedChannelItems items which are to painted to the average scene
+     */
     void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
 };

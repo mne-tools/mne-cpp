@@ -86,16 +86,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Construct a splash screen that will display the pixmap.
-    *
-    * @param [in] pixmap is the background of the splash screen.
-    * @param [in] f There should be no need to set the widget flags, f, except perhaps Qt::WindowStaysOnTopHint.
-    */
+     * Construct a splash screen that will display the pixmap.
+     *
+     * @param [in] pixmap is the background of the splash screen.
+     * @param [in] f There should be no need to set the widget flags, f, except perhaps Qt::WindowStaysOnTopHint.
+     */
     MainSplashScreen (const QPixmap & pixmap = QPixmap(), Qt::WindowFlags f = 0);
     //=========================================================================================================
     /**
-    * Destroys the MainSplashScreen.
-    */
+     * Destroys the MainSplashScreen.
+     */
     virtual ~MainSplashScreen ();
 
 };

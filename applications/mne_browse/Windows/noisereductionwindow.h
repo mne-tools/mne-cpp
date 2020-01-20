@@ -89,81 +89,81 @@ class NoiseReductionWindow : public QDockWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a NoiseReductionWindow which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseReductionWindow becomes a window. If parent is another widget, NoiseReductionWindow becomes a child window inside parent. NoiseReductionWindow is deleted when its parent is deleted.
-    */
+     * Constructs a NoiseReductionWindow which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseReductionWindow becomes a window. If parent is another widget, NoiseReductionWindow becomes a child window inside parent. NoiseReductionWindow is deleted when its parent is deleted.
+     */
     NoiseReductionWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructs a NoiseReductionWindow which is a child of parent.
-    *
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new NoiseReductionWindow becomes a window. If parent is another widget, NoiseReductionWindow becomes a child window inside parent. NoiseReductionWindow is deleted when its parent is deleted.
-    * @param [in] pFiffInfo     fiff info with the projectors and compensators.
-    */
+     * Constructs a NoiseReductionWindow which is a child of parent.
+     *
+     * @param [in] parent        pointer to parent widget; If parent is 0, the new NoiseReductionWindow becomes a window. If parent is another widget, NoiseReductionWindow becomes a child window inside parent. NoiseReductionWindow is deleted when its parent is deleted.
+     * @param [in] pFiffInfo     fiff info with the projectors and compensators.
+     */
     NoiseReductionWindow(QWidget *parent, FiffInfo* pFiffInfo);
 
     //=========================================================================================================
     /**
-    * Set new fiff info
-    */
+     * Set new fiff info
+     */
     void setFiffInfo(FiffInfo::SPtr& pFiffInfo);
 
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changes the projections.
-    */
+     * Emit this signal whenever the user changes the projections.
+     */
     void projSelectionChanged();
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changes the compensator.
-    */
+     * Emit this signal whenever the user changes the compensator.
+     */
     void compSelectionChanged(int to);
 
     //=========================================================================================================
     /**
-    * Signal mapper signal for compensator changes.
-    */
+     * Signal mapper signal for compensator changes.
+     */
     void compClicked(const QString &text);
 
 private:
     //=========================================================================================================
     /**
-    * Create the widgets used in the projector group
-    */
+     * Create the widgets used in the projector group
+     */
     void createProjectorGroup();
 
     //=========================================================================================================
     /**
-    * Create the widgets used in the compensator group
-    */
+     * Create the widgets used in the compensator group
+     */
     void createCompensatorGroup();
 
     //=========================================================================================================
     /**
-    * Slot called when user enables/disables all projectors
-    */
+     * Slot called when user enables/disables all projectors
+     */
     void enableDisableAllProj(bool status);
 
     //=========================================================================================================
     /**
-    * Slot called when the projector check state changes
-    */
+     * Slot called when the projector check state changes
+     */
     void checkProjStatusChanged(bool state);
 
     //=========================================================================================================
     /**
-    * Slot called when the compensator check state changes
-    */
+     * Slot called when the compensator check state changes
+     */
     void checkCompStatusChanged(const QString & compName);
 
     //=========================================================================================================
     /**
-    * Function to remove all children from a layout
-    */
+     * Function to remove all children from a layout
+     */
     void remove(QLayout* layout);
 
     Ui::NoiseReductionWindow *ui;                       /**< Pointer to the qt designer generated ui class.*/

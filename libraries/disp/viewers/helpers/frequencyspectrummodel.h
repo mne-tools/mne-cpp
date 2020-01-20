@@ -104,183 +104,183 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs an real-time multi sample array table model for the given parent.
-    *
-    * @param[in] parent     parent of the table model
-    */
+     * Constructs an real-time multi sample array table model for the given parent.
+     *
+     * @param[in] parent     parent of the table model
+     */
     FrequencySpectrumModel(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
-    *
-    * @param[in] parent     not used
-    *
-    * @return number of rows
-    */
+     * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
+     *
+     * @param[in] parent     not used
+     *
+     * @return number of rows
+     */
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
 
     //=========================================================================================================
     /**
-    * Returns the number of columns for the children of the given parent.
-    *
-    * @param[in] parent     not used
-    *
-    * @return number of columns
-    */
+     * Returns the number of columns for the children of the given parent.
+     *
+     * @param[in] parent     not used
+     *
+     * @return number of columns
+     */
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
-    * Returns the data stored under the given role for the item referred to by the index.
-    *
-    * @param[in] index      determines item location
-    * @param[in] role       role to return
-    *
-    * @return accessed data
-    */
+     * Returns the data stored under the given role for the item referred to by the index.
+     *
+     * @param[in] index      determines item location
+     * @param[in] role       role to return
+     *
+     * @return accessed data
+     */
     virtual QVariant data(const QModelIndex &index,
                           int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
-    * Returns the data for the given role and section in the header with the specified orientation.
-    *
-    * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
-    * @param[in] orientation    Qt::Horizontal or Qt::Vertical
-    * @param[in] role           role to show
-    *
-    * @return accessed eader data
-    */
+     * Returns the data for the given role and section in the header with the specified orientation.
+     *
+     * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
+     * @param[in] orientation    Qt::Horizontal or Qt::Vertical
+     * @param[in] role           role to show
+     *
+     * @return accessed eader data
+     */
     virtual QVariant headerData(int section, Qt::Orientation orientation,
                                 int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
-    * Sets corresponding fiff info
-    *
-    * @param [in] inf       The corresponding fiff information object
-    */
+     * Sets corresponding fiff info
+     *
+     * @param [in] inf       The corresponding fiff information object
+     */
     void setInfo(QSharedPointer<FIFFLIB::FiffInfo> &info);
 
     //=========================================================================================================
     /**
-    * Sets Scale type
-    *
-    * @param [in] ScaleType       The corresponding scale type
-    */
+     * Sets Scale type
+     *
+     * @param [in] ScaleType       The corresponding scale type
+     */
     void setScaleType(qint8 ScaleType);
 
     //=========================================================================================================
     /**
-    * Adds the frequency estimation
-    *
-    * @param[in] data   the frequency estimation
-    */
+     * Adds the frequency estimation
+     *
+     * @param[in] data   the frequency estimation
+     */
     void addData(const Eigen::MatrixXd &data);
 
     //=========================================================================================================
     /**
-    * Returns the fiff info
-    *
-    * @return the fiff info
-    */
+     * Returns the fiff info
+     *
+     * @return the fiff info
+     */
     inline QSharedPointer<FIFFLIB::FiffInfo> getInfo() const;
 
     //=========================================================================================================
     /**
-    * Returns the frequency scale of the x axis
-    *
-    * @return the frequency scale of the x axis
-    */
+     * Returns the frequency scale of the x axis
+     *
+     * @return the frequency scale of the x axis
+     */
     inline Eigen::RowVectorXd getFreqScale() const;
 
     //=========================================================================================================
     /**
-    * Returns the frequency scale scaled to boundaries of the x axis
-    *
-    * @return the frequency scale of the x axis
-    */
+     * Returns the frequency scale scaled to boundaries of the x axis
+     *
+     * @return the frequency scale of the x axis
+     */
     inline Eigen::RowVectorXd getFreqScaleBound() const;
 
     //=========================================================================================================
     /**
-    * Returns the number of stems
-    *
-    * @return the number of stems
-    */
+     * Returns the number of stems
+     *
+     * @return the number of stems
+     */
     inline qint32 getNumStems() const;
 
     //=========================================================================================================
     /**
-    * Returns a map which conatins the channel idx and its corresponding selection status
-    *
-    * @return the channel idx to selection status
-    */
+     * Returns a map which conatins the channel idx and its corresponding selection status
+     *
+     * @return the channel idx to selection status
+     */
     inline const QMap<qint32,qint32>& getIdxSelMap() const;
 
     //=========================================================================================================
     /**
-    * Selects the given list of channel indeces and unselect all other channels
-    *
-    * @param[in] selection      channel index list to select
-    */
+     * Selects the given list of channel indeces and unselect all other channels
+     *
+     * @param[in] selection      channel index list to select
+     */
     void selectRows(const QList<qint32> &selection);
 
     //=========================================================================================================
     /**
-    * Resets the current selection (selects all channels)
-    */
+     * Resets the current selection (selects all channels)
+     */
     void resetSelection();
 
     //=========================================================================================================
     /**
-    * Toggle freeze for all channels when a channel is double clicked
-    *
-    * @param [in] index     of the channel which has been double clicked
-    */
+     * Toggle freeze for all channels when a channel is double clicked
+     *
+     * @param [in] index     of the channel which has been double clicked
+     */
     void toggleFreeze(const QModelIndex &index);
 
     //=========================================================================================================
     /**
-    * Returns current freezing status
-    *
-    * @return the current freezing status
-    */
+     * Returns current freezing status
+     *
+     * @return the current freezing status
+     */
     inline bool isFreezed() const;
 
     //=========================================================================================================
     /**
-    * Set plotting boundaries
-    *
-    * @param[in] fLowerFrqBound     Lower frequency boudnary
-    * @param[in] fUpperFrqBound     Upper frequency boudnary
-    */
+     * Set plotting boundaries
+     *
+     * @param[in] fLowerFrqBound     Lower frequency boudnary
+     * @param[in] fUpperFrqBound     Upper frequency boudnary
+     */
     void setBoundaries(float fLowerFrqBound, float fUpperFrqBound);
 
     //=========================================================================================================
     /**
-    * Returns the lower frequency boundary
-    *
-    * @return the lower frequency boundary
-    */
+     * Returns the lower frequency boundary
+     *
+     * @return the lower frequency boundary
+     */
     inline qint32 getLowerFrqBound() const;
 
     //=========================================================================================================
     /**
-    * Returns the upper frequency boundary
-    *
-    * @return the upper frequency boundary
-    */
+     * Returns the upper frequency boundary
+     *
+     * @return the upper frequency boundary
+     */
     inline qint32 getUpperFrqBound() const;
 
 signals:
     //=========================================================================================================
     /**
-    * Emmited when new selcetion was made
-    *
-    * @param [in] selection     list of all selected channels
-    */
+     * Emmited when new selcetion was made
+     *
+     * @param [in] selection     list of all selected channels
+     */
     void newSelection(QList<qint32> selection);
 
 private:

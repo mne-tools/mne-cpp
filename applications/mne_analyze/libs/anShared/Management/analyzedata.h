@@ -95,14 +95,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Analyze Data.
-    */
+     * Constructs the Analyze Data.
+     */
     AnalyzeData(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the Analyze Data.
-    */
+     * Destroys the Analyze Data.
+     */
     virtual ~AnalyzeData();
 
 signals:

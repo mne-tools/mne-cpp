@@ -110,19 +110,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Atom_make_tf
-    *
-    * ### MP toolbox root function ###
-    *
-    * calculates time frequency representation of the atom
-    *
-    * @param[in] sample_count   number of samples in the atom
-    * @param[in] scale          scale of atom
-    * @param[in] translation    translation of atom
-    * @param[in] modulation     modulation of atom
-    *
-    * @return Matrix with t-f information
-    */
+     * Atom_make_tf
+     *
+     * ### MP toolbox root function ###
+     *
+     * calculates time frequency representation of the atom
+     *
+     * @param[in] sample_count   number of samples in the atom
+     * @param[in] scale          scale of atom
+     * @param[in] translation    translation of atom
+     * @param[in] modulation     modulation of atom
+     *
+     * @return Matrix with t-f information
+     */
     MatrixXd make_tf (qint32 sample_count, qreal scale, quint32 translation, qreal modulation);
 
 };
@@ -142,18 +142,18 @@ public:
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * FixDictAtom class inherited from Atom with additional functions
-    */
+     * Copy constructor.
+     *
+     * FixDictAtom class inherited from Atom with additional functions
+     */
     FixDictAtom();
     FixDictAtom(qint32 _id, qint32 _sample_count, QString _dict_source);
 
     //=========================================================================================================
     /**
-    * Copy deconstructor.
-    *
-    */
+     * Copy deconstructor.
+     *
+     */
     ~FixDictAtom();
     //=========================================================================================================
     QString atom_formula;
@@ -217,80 +217,80 @@ public:
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * GaborAtom class inherited from Atom with additional functions
-    */
+     * Copy constructor.
+     *
+     * GaborAtom class inherited from Atom with additional functions
+     */
     GaborAtom();
 
     //=========================================================================================================
     /**
-    * Copy deconstructor.
-    *
-    */
+     * Copy deconstructor.
+     *
+     */
     ~GaborAtom();
 
     //=========================================================================================================
     /**
-    * GaborAtom_gauss_function
-    *
-    * ### MP toolbox root function ###
-    *
-    * calculates gaussfunction for GaborAtoms
-    *
-    * @param[in] sampleCount    number of samples in the atom
-    * @param[in] scale          scale of atom
-    * @param[in] translation    translation of atom
-    *
-    * @return Vector with gaussfunction content
-    */
+     * GaborAtom_gauss_function
+     *
+     * ### MP toolbox root function ###
+     *
+     * calculates gaussfunction for GaborAtoms
+     *
+     * @param[in] sampleCount    number of samples in the atom
+     * @param[in] scale          scale of atom
+     * @param[in] translation    translation of atom
+     *
+     * @return Vector with gaussfunction content
+     */
     static VectorXd gauss_function (qint32 sample_count, qreal scale, quint32 translation);
 
     //=========================================================================================================
     /**
-    * GaborAtom_create_complex
-    *
-    * ### MP toolbox root function ###
-    *
-    * calculates complex gabor atoms for MP Algorithm
-    *
-    * @param[in] sampleCount    number of samples in the atom
-    * @param[in] scale          scale of atom
-    * @param[in] translation    translation of atom
-    * @param[in] modulation     modulation of atom
-    *
-    * @return complex Vector with GaborAtom
-    */
+     * GaborAtom_create_complex
+     *
+     * ### MP toolbox root function ###
+     *
+     * calculates complex gabor atoms for MP Algorithm
+     *
+     * @param[in] sampleCount    number of samples in the atom
+     * @param[in] scale          scale of atom
+     * @param[in] translation    translation of atom
+     * @param[in] modulation     modulation of atom
+     *
+     * @return complex Vector with GaborAtom
+     */
     VectorXcd create_complex(qint32 sample_count, qreal scale, quint32 translation, qreal modulation);
 
     //=========================================================================================================
     /**
-    * GaborAtom_create_complex
-    *
-    * ### MP toolbox root function ###
-    *
-    * calculates real gabor atoms for MP Algorithm
-    *
-    * @param[in] sampleCount    number of samples in the atom
-    * @param[in] scale          scale of atom
-    * @param[in] translation    translation of atom
-    * @param[in] modulation     modulation of atom
-    * @param[in] phase          phase of the complex atom
-    *
-    * @return real Vector with GaborAtom
-    */
+     * GaborAtom_create_complex
+     *
+     * ### MP toolbox root function ###
+     *
+     * calculates real gabor atoms for MP Algorithm
+     *
+     * @param[in] sampleCount    number of samples in the atom
+     * @param[in] scale          scale of atom
+     * @param[in] translation    translation of atom
+     * @param[in] modulation     modulation of atom
+     * @param[in] phase          phase of the complex atom
+     *
+     * @return real Vector with GaborAtom
+     */
     VectorXd create_real(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase);
 
     //=========================================================================================================
     /**
-    * adaptiveMP_calculate_atom
-    *
-    * ### MP toolbox communication function ###
-    *
-    * creates String of GaborAtoms
-    *
-    * @return GaborAtom as String
-    */
+     * adaptiveMP_calculate_atom
+     *
+     * ### MP toolbox communication function ###
+     *
+     * creates String of GaborAtoms
+     *
+     * @return GaborAtom as String
+     */
     QStringList create_string_values(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase);
 
 };

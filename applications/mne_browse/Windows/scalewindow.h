@@ -87,56 +87,56 @@ class ScaleWindow : public QDockWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a ScaleWindow dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ScaleWindow becomes a window. If parent is another widget, ScaleWindow becomes a child window inside parent. ScaleWindow is deleted when its parent is deleted.
-    */
+     * Constructs a ScaleWindow dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new ScaleWindow becomes a window. If parent is another widget, ScaleWindow becomes a child window inside parent. ScaleWindow is deleted when its parent is deleted.
+     */
     ScaleWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ScaleWindow.
-    * All ScaleWindow's children are deleted first. The application exits if ScaleWindow is the main widget.
-    */
+     * Destroys the ScaleWindow.
+     * All ScaleWindow's children are deleted first. The application exits if ScaleWindow is the main widget.
+     */
     ~ScaleWindow();
 
     //=========================================================================================================
     /**
-    * Initialises this window.
-    */
+     * Initialises this window.
+     */
     void init();
 
     //=========================================================================================================
     /**
-    * hideSpinBoxes hides all spin boxes and labels which are not present in the current fiff file.
-    *
-    * @param [in] currentFiffInfo the fiff info file used to hide the spin boxes for not loaded channel types
-    */
+     * hideSpinBoxes hides all spin boxes and labels which are not present in the current fiff file.
+     *
+     * @param [in] currentFiffInfo the fiff info file used to hide the spin boxes for not loaded channel types
+     */
     void hideSpinBoxes(FiffInfo::SPtr& pCurrentFiffInfo);
 
     //=========================================================================================================
     /**
-    * scaleAllChannels scales all channels by scaleValue.
-    *
-    * @param [in] scaleValue the scaling value used to scale the channels
-    */
+     * scaleAllChannels scales all channels by scaleValue.
+     *
+     * @param [in] scaleValue the scaling value used to scale the channels
+     */
     void scaleAllChannels(double scaleValue);
 
 signals:
     //=========================================================================================================
     /**
-    * scalingChannelValueChanged is emmited whenever a connected data spin box value changed
-    *
-    * @param [in] QMap<QString,double> map with all channel types and their current scaling value
-    */
+     * scalingChannelValueChanged is emmited whenever a connected data spin box value changed
+     *
+     * @param [in] QMap<QString,double> map with all channel types and their current scaling value
+     */
     void scalingChannelValueChanged(QMap<QString,double>);
 
     //=========================================================================================================
     /**
-    * scalingViewValueChanged is emmited whenever a connected view spin box value changed
-    *
-    * @param [in] int current scaling value for the views
-    */
+     * scalingViewValueChanged is emmited whenever a connected view spin box value changed
+     *
+     * @param [in] int current scaling value for the views
+     */
     void scalingViewValueChanged(int);
 
 private:
@@ -144,22 +144,22 @@ private:
 
     //=========================================================================================================
     /**
-    * Returns the current scaling map which generated out of the current spin box values
-    *
-    * @return the generated scale value map for each channel type
-    */
+     * Returns the current scaling map which generated out of the current spin box values
+     *
+     * @return the generated scale value map for each channel type
+     */
     QMap<QString,double> genereateScalingMap();
 
     //=========================================================================================================
     /**
-    * scaleChannelValueChanged is called whenever a data spin box value changed.
-    */
+     * scaleChannelValueChanged is called whenever a data spin box value changed.
+     */
     void scaleChannelValueChanged();
 
     //=========================================================================================================
     /**
-    * scaleViewValueChanged is called whenever a view spin box value changed.
-    */
+     * scaleViewValueChanged is called whenever a view spin box value changed.
+     */
     void scaleViewValueChanged();
 
 };

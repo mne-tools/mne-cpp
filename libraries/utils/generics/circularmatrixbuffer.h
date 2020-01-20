@@ -105,89 +105,89 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a CircularMatrixBuffer.
-    * length of buffer = uiMaxNumMatrizes*rows*cols
-    *
-    * @param [in] uiMaxNumMatrices  length of buffer.
-    * @param [in] uiRows            Number of rows.
-    * @param [in] uiCols            Number of columns.
-    */
+     * Constructs a CircularMatrixBuffer.
+     * length of buffer = uiMaxNumMatrizes*rows*cols
+     *
+     * @param [in] uiMaxNumMatrices  length of buffer.
+     * @param [in] uiRows            Number of rows.
+     * @param [in] uiCols            Number of columns.
+     */
     explicit CircularMatrixBuffer(unsigned int uiMaxNumMatrices, unsigned int uiRows, unsigned int uiCols);
 
     //=========================================================================================================
     /**
-    * Destroys the CircularBuffer.
-    */
+     * Destroys the CircularBuffer.
+     */
     ~CircularMatrixBuffer();
 
     //=========================================================================================================
     /**
-    * Adds a whole matrix at the end buffer.
-    *
-    * @param [in] pMatrix pointer to a Matrix which should be apend to the end.
-    */
+     * Adds a whole matrix at the end buffer.
+     *
+     * @param [in] pMatrix pointer to a Matrix which should be apend to the end.
+     */
     inline void push(const Matrix<_Tp, Dynamic, Dynamic>* pMatrix);
 
     //=========================================================================================================
     /**
-    * Returns the first matrix (first in first out).
-    *
-    * @return the first matrix
-    */
+     * Returns the first matrix (first in first out).
+     *
+     * @return the first matrix
+     */
     inline Matrix<_Tp, Dynamic, Dynamic> pop();
 
     //=========================================================================================================
     /**
-    * Clears the buffer.
-    */
+     * Clears the buffer.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Size of the buffer.
-    */
+     * Size of the buffer.
+     */
     inline quint32 size() const;
 
     //=========================================================================================================
     /**
-    * Rows of the stored matrices of the buffer.
-    */
+     * Rows of the stored matrices of the buffer.
+     */
     inline quint32 rows() const;
 
     //=========================================================================================================
     /**
-    * Cols of the stored matrices of the buffer.
-    */
+     * Cols of the stored matrices of the buffer.
+     */
     inline quint32 cols() const;
 
     //=========================================================================================================
     /**
-    * Pauses the buffer. Skpis any incoming matrices and only pops zero matrices.
-    */
+     * Pauses the buffer. Skpis any incoming matrices and only pops zero matrices.
+     */
     inline void pause(bool);
 
     //=========================================================================================================
     /**
-    * Releases the circular buffer from the acquire statement in the pop() function.
-    * @param [out] bool returns true if resources were freed so that the aquire statement in the pop function can release, otherwise false.
-    */
+     * Releases the circular buffer from the acquire statement in the pop() function.
+     * @param [out] bool returns true if resources were freed so that the aquire statement in the pop function can release, otherwise false.
+     */
     inline bool releaseFromPop();
 
     //=========================================================================================================
     /**
-    * Releases the circular buffer from the acquire statement in the push() function.
-    * @param [out] bool returns true if resources were freed so that the aquire statement in the push function can release, otherwise false.
-    */
+     * Releases the circular buffer from the acquire statement in the push() function.
+     * @param [out] bool returns true if resources were freed so that the aquire statement in the push function can release, otherwise false.
+     */
     inline bool releaseFromPush();
 
 private:
     //=========================================================================================================
     /**
-    * Returns the current circular index to the corresponding given index.
-    *
-    * @param [in] index which should be mapped.
-    * @return the mapped index.
-    */
+     * Returns the current circular index to the corresponding given index.
+     *
+     * @param [in] index which should be mapped.
+     * @return the mapped index.
+     */
     inline unsigned int mapIndex(int& index);
 
     unsigned int    m_uiMaxNumMatrices;         /**< Holds the maximal number of matrices.*/

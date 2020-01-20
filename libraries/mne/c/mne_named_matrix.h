@@ -99,66 +99,66 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Named Matrix
-    */
+     * Constructs the MNE Named Matrix
+     */
     MneNamedMatrix();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    * Refactored: mne_dup_named_matrix (mne_named_matrix.c)
-    *
-    * @param[in] p_MneNamedMatrix   MNE Named Matrix which should be copied
-    */
+     * Copy constructor.
+     * Refactored: mne_dup_named_matrix (mne_named_matrix.c)
+     *
+     * @param[in] p_MneNamedMatrix   MNE Named Matrix which should be copied
+     */
     MneNamedMatrix(const MneNamedMatrix& p_MneNamedMatrix);
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Named Matrix description
-    * Refactored: mne_free_named_matrix (mne_named_matrix.c)
-    */
+     * Destroys the MNE Named Matrix description
+     * Refactored: mne_free_named_matrix (mne_named_matrix.c)
+     */
     ~MneNamedMatrix();
 
     //=========================================================================================================
     /**
-    * Build a named matrix from the ingredients
-    * Refactored: mne_build_named_matrix (mne_named_matrix.c)
-    *
-    * @param[in] nrow       Number of rows
-    * @param[in] ncol       Number of columns
-    * @param[in] rowlist    List of row (channel) names
-    * @param[in] collist    List of column (channel) names
-    * @param[in] data       Data to store
-    *
-    * @return   The new named matrix.
-    */
+     * Build a named matrix from the ingredients
+     * Refactored: mne_build_named_matrix (mne_named_matrix.c)
+     *
+     * @param[in] nrow       Number of rows
+     * @param[in] ncol       Number of columns
+     * @param[in] rowlist    List of row (channel) names
+     * @param[in] collist    List of column (channel) names
+     * @param[in] data       Data to store
+     *
+     * @return   The new named matrix.
+     */
     static MneNamedMatrix* build_named_matrix(int  nrow, int  ncol, const QStringList& rowlist, const QStringList& collist, float **data);
 
     //=========================================================================================================
     /**
-    * Read a named matrix from the specified node
-    * Refactored: mne_read_named_matrix (mne_named_matrix.c)
-    *
-    * @param[in] stream     Stream to read from
-    * @param[in] node       Node to read from
-    * @param[in] kind       Block kind which should be read
-    *
-    * @return   The read named matrix.
-    */
+     * Read a named matrix from the specified node
+     * Refactored: mne_read_named_matrix (mne_named_matrix.c)
+     *
+     * @param[in] stream     Stream to read from
+     * @param[in] node       Node to read from
+     * @param[in] kind       Block kind which should be read
+     *
+     * @return   The read named matrix.
+     */
     static MneNamedMatrix* read_named_matrix(QSharedPointer<FIFFLIB::FiffStream>& stream,const QSharedPointer<FIFFLIB::FiffDirNode>& node,int kind);
 
     //=========================================================================================================
     /**
-    * Pick appropriate rows and columns and build a new matrix
-    * Refactored: mne_pick_from_named_matrix (mne_named_matrix.c)
-    *
-    * @param[in] pickrowlist    List of row names to pick
-    * @param[in] picknrow       Number of rows
-    * @param[in] pickcollist    List of column names to pick
-    * @param[in] pickncol       Number of columns
-    *
-    * @return   The read named matrix.
-    */
+     * Pick appropriate rows and columns and build a new matrix
+     * Refactored: mne_pick_from_named_matrix (mne_named_matrix.c)
+     *
+     * @param[in] pickrowlist    List of row names to pick
+     * @param[in] picknrow       Number of rows
+     * @param[in] pickcollist    List of column names to pick
+     * @param[in] pickncol       Number of columns
+     *
+     * @return   The read named matrix.
+     */
     MneNamedMatrix* pick_from_named_matrix(const QStringList& pickrowlist, int picknrow, const QStringList& pickcollist, int pickncol) const;
 
 public:

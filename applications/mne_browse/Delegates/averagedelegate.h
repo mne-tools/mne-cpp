@@ -74,19 +74,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    *
-    */
+     * Reimplemented virtual functions
+     *
+     */
     virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const;
 
 protected:
     //=========================================================================================================
     /**
-    * createPlotPath creates the QPointer path for the average data plot.
-    *
-    * @param[in] index QModelIndex for accessing associated data and model object.
-    * @param[in,out] path The QPointerPath to create for the data plot.
-    */
+     * createPlotPath creates the QPointer path for the average data plot.
+     *
+     * @param[in] index QModelIndex for accessing associated data and model object.
+     * @param[in,out] path The QPointerPath to create for the data plot.
+     */
     void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
 };
 

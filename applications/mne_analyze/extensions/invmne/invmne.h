@@ -92,14 +92,14 @@ class INVMNESHARED_EXPORT InvMNE : public ANSHAREDLIB::IExtension
 public:
     //=========================================================================================================
     /**
-    * Constructs a InvMNE.
-    */
+     * Constructs a InvMNE.
+     */
     InvMNE();
 
     //=========================================================================================================
     /**
-    * Destroys the InvMNE.
-    */
+     * Destroys the InvMNE.
+     */
     ~InvMNE();
 
     // IExtension functions
@@ -114,8 +114,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Called when calculation is requested
-    */
+     * Called when calculation is requested
+     */
     void calculate();
 
 protected:

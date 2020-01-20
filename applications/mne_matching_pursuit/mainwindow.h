@@ -156,389 +156,389 @@ public:
 private slots:
     //==========================================================================================================
     /**
-    * MainWindow_on_btt_Calc_clicked
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * starts calculation
-    *
-    * @return void
-    */
+     * MainWindow_on_btt_Calc_clicked
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * starts calculation
+     *
+     * @return void
+     */
     void on_btt_Calc_clicked();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_actionW_rterbucheditor_triggered
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * opens dictionary editor
-    *
-    * @return void
-    */
+     * MainWindow_on_actionW_rterbucheditor_triggered
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * opens dictionary editor
+     *
+     * @return void
+     */
     void on_actionW_rterbucheditor_triggered();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_actionAtomformeleditor_triggered
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * opens atom formular editor
-    *
-    * @return void
-    */
+     * MainWindow_on_actionAtomformeleditor_triggered
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * opens atom formular editor
+     *
+     * @return void
+     */
     void on_actionAtomformeleditor_triggered();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_actionErweiterter_W_rterbucheditor_triggered
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * opens advanced dictionary editor
-    *
-    * @return void
-    */
+     * MainWindow_on_actionErweiterter_W_rterbucheditor_triggered
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * opens advanced dictionary editor
+     *
+     * @return void
+     */
     void on_actionErweiterter_W_rterbucheditor_triggered();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_actionNeu_triggered
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * opens interface to select signal file
-    *
-    * @return void
-    */
+     * MainWindow_on_actionNeu_triggered
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * opens interface to select signal file
+     *
+     * @return void
+     */
     void on_actionNeu_triggered();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_btt_OpenSignal_clicked
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * opens interface to select signal file
-    *
-    * @return void
-    */
+     * MainWindow_on_btt_OpenSignal_clicked
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * opens interface to select signal file
+     *
+     * @return void
+     */
     void on_btt_OpenSignal_clicked();
 
     //==========================================================================================================
     /**
-    * MainWindow_cb_selection_changed
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * changes channel selection
-    *
-    * @param[in] QModelIndex    channel number
-    *
-    * @return void
-    */
+     * MainWindow_cb_selection_changed
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * changes channel selection
+     *
+     * @param[in] QModelIndex    channel number
+     *
+     * @return void
+     */
     void cb_selection_changed(const QModelIndex&, const QModelIndex&);
 
     //==========================================================================================================
     /**
-    * MainWindow_tbv_selection_changed
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * selects/deselects all calculated atoms
-    *
-    * @return void
-    */
+     * MainWindow_tbv_selection_changed
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * selects/deselects all calculated atoms
+     *
+     * @return void
+     */
     void tbv_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
     //==========================================================================================================
     /**
-    * MainWindow_recieve_result
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * receives calculated atoms and updates remaining energy, iterations and progressbar
-    *
-    * @param[in]    current_iteration   number of current iteration
-    * @param[in]    max_iterations      number of all iterations for current calculation
-    * @param[in]    current_energy      energy of decomposition
-    * @param[in]    max_energy          whole energy of given signal
-    * @param[in]    atom_res_list       list of calculated atoms
-    *
-    * @return void
-    */
+     * MainWindow_recieve_result
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * receives calculated atoms and updates remaining energy, iterations and progressbar
+     *
+     * @param[in]    current_iteration   number of current iteration
+     * @param[in]    max_iterations      number of all iterations for current calculation
+     * @param[in]    current_energy      energy of decomposition
+     * @param[in]    max_energy          whole energy of given signal
+     * @param[in]    atom_res_list       list of calculated atoms
+     *
+     * @return void
+     */
     void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, MatrixXd residuum,
                         adaptive_atom_list adaptive_atom_res_list, fix_dict_atom_list fix_dict_atom_res_list);
 
     //==========================================================================================================
     /**
-    * MainWindow_recieve_warnings
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * receives warnings and infos from fixDict and adaptive MP Algorithm to show in GUI
-    *
-    * @param[in]    warning_number     number of corresponding warning
-    *
-    * @return void
-    *
-    * warning_number and meaning:
-    *
-    * "1"   fixDict MP: dict excludes atoms to approximate the signal more closely. Calculation terminated.
-    * "2"   fixDict MP: No matching sample count between atoms and signal. This may lead to discontinuities.
-    * "10"  fixDict, adaptive MP: Algorithm canceled by user interaction. (click on btt cancel)
-    * "11"  adaptive MP: Max. Simplex Iteration limit achieved, result may not be optimal.   *
-    *
-    */
+     * MainWindow_recieve_warnings
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * receives warnings and infos from fixDict and adaptive MP Algorithm to show in GUI
+     *
+     * @param[in]    warning_number     number of corresponding warning
+     *
+     * @return void
+     *
+     * warning_number and meaning:
+     *
+     * "1"   fixDict MP: dict excludes atoms to approximate the signal more closely. Calculation terminated.
+     * "2"   fixDict MP: No matching sample count between atoms and signal. This may lead to discontinuities.
+     * "10"  fixDict, adaptive MP: Algorithm canceled by user interaction. (click on btt cancel)
+     * "11"  adaptive MP: Max. Simplex Iteration limit achieved, result may not be optimal.   *
+     *
+     */
     void recieve_warnings(qint32 warning_number);
 
     //==========================================================================================================
     /**
-    * MainWindow_calc_thread_finished
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * updates main window when calculation is finished
-    *
-    * @return void
-    */
+     * MainWindow_calc_thread_finished
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * updates main window when calculation is finished
+     *
+     * @return void
+     */
     void calc_thread_finished();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_actionCreate_treebased-dictionary_triggered
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * opens editor for creating treebased dictionary
-    *
-    * @return void
-    */
+     * MainWindow_on_actionCreate_treebased-dictionary_triggered
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * opens editor for creating treebased dictionary
+     *
+     * @return void
+     */
     void on_actionCreate_treebased_dictionary_triggered();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_dsb_from_editingFinished
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * reads start value out of "from" double spin box
-    *
-    * @return void
-    */
+     * MainWindow_on_dsb_from_editingFinished
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * reads start value out of "from" double spin box
+     *
+     * @return void
+     */
     void on_dsb_from_editingFinished();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_dsb_to_editingFinished
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * reads end value out of "to" double spin box
-    *
-    * @return void
-    */
+     * MainWindow_on_dsb_to_editingFinished
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * reads end value out of "to" double spin box
+     *
+     * @return void
+     */
     void on_dsb_to_editingFinished();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_dsb_to_valueChanged
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * reads end value
-    *
-    * @param    arg1    value from "to" double spin box
-    *
-    * @return void
-    */
+     * MainWindow_on_dsb_to_valueChanged
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * reads end value
+     *
+     * @param    arg1    value from "to" double spin box
+     *
+     * @return void
+     */
     void on_dsb_to_valueChanged(double arg1);
 
     //==========================================================================================================
     /**
-    * MainWindow_on_dsb_from_valueChanged
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * reads start value
-    *
-    * @param    arg1    value from "from" double spin box
-    *
-    * @return void
-    */
+     * MainWindow_on_dsb_from_valueChanged
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * reads start value
+     *
+     * @param    arg1    value from "from" double spin box
+     *
+     * @return void
+     */
     void on_dsb_from_valueChanged(double arg1);
 
     //==========================================================================================================
     /**
-    * MainWindow_on_sb_sample_count_editingFinished
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * reads in fiff file after editing sample lenght
-    *
-    * @return void
-    */
+     * MainWindow_on_sb_sample_count_editingFinished
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * reads in fiff file after editing sample lenght
+     *
+     * @return void
+     */
     void on_sb_sample_count_editingFinished();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_sb_sample_count_valueChanged
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * calculates new end value when sample length is changed
-    *
-    * @param    arg1    sample lenght (64 to 4097)
-    *
-    * @return void
-    */
+     * MainWindow_on_sb_sample_count_valueChanged
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * calculates new end value when sample length is changed
+     *
+     * @param    arg1    sample lenght (64 to 4097)
+     *
+     * @return void
+     */
     void on_sb_sample_count_valueChanged(int arg1);
 
     //==========================================================================================================
     /**
-    * MainWindow_on_cb_all_select_clicked
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * check button selects or deselects all founded atoms
-    *
-    * @return void
-    */
+     * MainWindow_on_cb_all_select_clicked
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * check button selects or deselects all founded atoms
+     *
+     * @return void
+     */
     void on_cb_all_select_clicked();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_time_out
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * stops calculation
-    *
-    * @return void
-    */
+     * MainWindow_on_time_out
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * stops calculation
+     *
+     * @return void
+     */
     void on_time_out();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_actionSettings_triggered
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * opens setting window
-    *
-    * @return void
-    */
+     * MainWindow_on_actionSettings_triggered
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * opens setting window
+     *
+     * @return void
+     */
     void on_actionSettings_triggered();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_dicts_saved
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * fills combobox with available dictionaries
-    *
-    * @return void
-    */
+     * MainWindow_on_dicts_saved
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * fills combobox with available dictionaries
+     *
+     * @return void
+     */
     void on_dicts_saved();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_actionSpeicher_unter_triggered
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * opens dialog window for saving approximation
-    *
-    * @return void
-    */
+     * MainWindow_on_actionSpeicher_unter_triggered
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * opens dialog window for saving approximation
+     *
+     * @return void
+     */
     void on_actionSpeicher_unter_triggered();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_actionSpeicher_triggered
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * saves approximation
-    *
-    * @return void
-    */
+     * MainWindow_on_actionSpeicher_triggered
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * saves approximation
+     *
+     * @return void
+     */
     void on_actionSpeicher_triggered();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_actionExport_triggered
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * saves calculated atoms as new dictionary
-    *
-    * @return void
-    */
+     * MainWindow_on_actionExport_triggered
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * saves calculated atoms as new dictionary
+     *
+     * @return void
+     */
     void on_actionExport_triggered();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_dsb_sample_rate_editingFinished
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * sends
-    *
-    * @return void
-    */
+     * MainWindow_on_dsb_sample_rate_editingFinished
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * sends
+     *
+     * @return void
+     */
     void on_dsb_sample_rate_editingFinished();
 
     //==========================================================================================================
     /**
-    * MainWindow_on_cb_Dicts_currentIndexChanged
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * ???
-    *
-    * @param
-    *
-    * @return void
-    */
+     * MainWindow_on_cb_Dicts_currentIndexChanged
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * ???
+     *
+     * @param
+     *
+     * @return void
+     */
     void on_cb_Dicts_currentIndexChanged(const QString &arg1);
 
     //==========================================================================================================
     /**
-    * MainWindow_on_rb_adaptivMP_clicked
-    *
-    * ### MP toolbox main window slots ###
-    *
-    * ???
-    *
-    * @return void
-    */
+     * MainWindow_on_rb_adaptivMP_clicked
+     *
+     * ### MP toolbox main window slots ###
+     *
+     * ???
+     *
+     * @return void
+     */
     void on_rb_adativMp_clicked();
 
     //==========================================================================================================
     /**
-    * MainWindow_activate_info_label
-    *
-    * ### MP toolbox main window slots ###
-    *
-    *
-    *
-    * @return void
-    */
+     * MainWindow_activate_info_label
+     *
+     * ### MP toolbox main window slots ###
+     *
+     *
+     *
+     * @return void
+     */
     void activate_info_label();
 
     //==========================================================================================================
     /**
-    * MainWindow_recieve_save_progress
-    *
-    * ### MP toolbox main window slots ###
-    *
-    *
-    *
-    * @return void
-    */
+     * MainWindow_recieve_save_progress
+     *
+     * ### MP toolbox main window slots ###
+     *
+     *
+     *
+     * @return void
+     */
     void recieve_save_progress(qint32 current_progress, qint32 finished);
 
     //==========================================================================================================
@@ -614,234 +614,234 @@ private:
 
     //==========================================================================================================
     /**
-    * MainWindow_fill_dict_combobox
-    *
-    * ### MP toolbox main window function ###
-    *
-    * fills combobox with available dictionaries
-    *
-    * @return void
-    */
+     * MainWindow_fill_dict_combobox
+     *
+     * ### MP toolbox main window function ###
+     *
+     * fills combobox with available dictionaries
+     *
+     * @return void
+     */
     void fill_dict_combobox();
 
     //==========================================================================================================
     /**
-    * MainWindow_fill_dict_combobox
-    *
-    * ### MP toolbox main window function ###
-    *
-    * save files
-    *
-    * @return void
-    */
+     * MainWindow_fill_dict_combobox
+     *
+     * ### MP toolbox main window function ###
+     *
+     * save files
+     *
+     * @return void
+     */
     void save_fif_file();
 
     //==========================================================================================================
     /**
-    * MainWindow_open_file
-    *
-    * ### MP toolbox main function ###
-    *
-    * opens files for read signals
-    *
-    * @return void
-    */
+     * MainWindow_open_file
+     *
+     * ### MP toolbox main function ###
+     *
+     * opens files for read signals
+     *
+     * @return void
+     */
     void open_file();
 
     //==========================================================================================================
     /**
-    * MainWindow_read_matlab_file
-    *
-    * ### MP toolbox main function ###
-    *
-    * reads matlab files
-    *
-    * @param[in] fileName   name of matlab file
-    *
-    * @return void
-    */
+     * MainWindow_read_matlab_file
+     *
+     * ### MP toolbox main function ###
+     *
+     * reads matlab files
+     *
+     * @param[in] fileName   name of matlab file
+     *
+     * @return void
+     */
     bool read_matlab_file(QString fileName);
 
     //==========================================================================================================
     /**
-    * MainWindow_read_matlab_file_new
-    *
-    * ### MP toolbox main function ###
-    *
-    * reads matlab files new
-    *
-    * @param[in] fileName   name of matlab file
-    *
-    * @return void
-    */
+     * MainWindow_read_matlab_file_new
+     *
+     * ### MP toolbox main function ###
+     *
+     * reads matlab files new
+     *
+     * @param[in] fileName   name of matlab file
+     *
+     * @return void
+     */
     void read_matlab_file_new();
 
     //==========================================================================================================
     /**
-    * MainWindow_calc_adaptive_mp
-    *
-    * ### MP toolbox main function ###
-    *
-    * calculates atoms with adaptive matching pursuit algorithm
-    *
-    * @param[in] signal         input signal
-    * @param[in] criterion      truncation criterion to end approximation
-    *
-    * @return void
-    */
+     * MainWindow_calc_adaptive_mp
+     *
+     * ### MP toolbox main function ###
+     *
+     * calculates atoms with adaptive matching pursuit algorithm
+     *
+     * @param[in] signal         input signal
+     * @param[in] criterion      truncation criterion to end approximation
+     *
+     * @return void
+     */
     void calc_adaptiv_mp(MatrixXd signal, truncation_criterion criterion);
 
     //==========================================================================================================
     /**
-    * MainWindow_read_fiff_file
-    *
-    * ### MP toolbox main function ###
-    *
-    * reads data from fiff files
-    *
-    * @param[in] fileName   name of fiff file
-    *
-    * @return gibt 0 zurück wenn erflogreich sonst ungleich 0
-    */
+     * MainWindow_read_fiff_file
+     *
+     * ### MP toolbox main function ###
+     *
+     * reads data from fiff files
+     *
+     * @param[in] fileName   name of fiff file
+     *
+     * @return gibt 0 zurück wenn erflogreich sonst ungleich 0
+     */
     bool read_fiff_file(QString fileName);
 
     //==========================================================================================================
     /**
-    * MainWindow_read_fiff_file
-    *
-    * ### MP toolbox main function ###
-    *
-    * reads data from fiff files
-    *
-    * @param[in] file_name   name of fiff file
-    */
+     * MainWindow_read_fiff_file
+     *
+     * ### MP toolbox main function ###
+     *
+     * reads data from fiff files
+     *
+     * @param[in] file_name   name of fiff file
+     */
     void read_fiff_file_new(QString file_name);
 
     //==========================================================================================================
     /**
-    * MainWindow_read_fiff_ave
-    *
-    * ### MP toolbox main function ###
-    *
-    * reads data from ave files
-    *
-    * @param[in] QString file name  name of average-file
-    *
-    * @return   bool
-    */
+     * MainWindow_read_fiff_ave
+     *
+     * ### MP toolbox main function ###
+     *
+     * reads data from ave files
+     *
+     * @param[in] QString file name  name of average-file
+     *
+     * @return   bool
+     */
     bool read_fiff_ave(QString file_name);
 
     //==========================================================================================================
     /**
-    * MainWindow_read_fiff_ave
-    *
-    * ### MP toolbox main function ###
-    *
-    * reads data from ave files
-    *
-    * @param[in] QString file name  name of average-file
-    *
-    * @return   bool
-    */
+     * MainWindow_read_fiff_ave
+     *
+     * ### MP toolbox main function ###
+     *
+     * reads data from ave files
+     *
+     * @param[in] QString file name  name of average-file
+     *
+     * @return   bool
+     */
     void read_fiff_ave_new();
 
     //==========================================================================================================
     /**
-    * MainWindow_fill channel_combobox
-    *
-    * ### MP toolbox main function ###
-    *
-    * fills combobox with channel indicies
-    *
-    * @return   void
-    */
+     * MainWindow_fill channel_combobox
+     *
+     * ### MP toolbox main function ###
+     *
+     * fills combobox with channel indicies
+     *
+     * @return   void
+     */
     void fill_channel_combobox();
 
 
     //==========================================================================================================
     /**
-    * MainWindow_save_paramters
-    *
-    * ### MP toolbox main function ###
-    *
-    * saves parameters
-    *
-    * @return   void
-    */
+     * MainWindow_save_paramters
+     *
+     * ### MP toolbox main function ###
+     *
+     * saves parameters
+     *
+     * @return   void
+     */
     void save_parameters();
 
     //==========================================================================================================
     /**
-    * MainWindow_calc_fix_mp
-    *
-    * ### MP toolbox main function ###
-    *
-    * calculates MP-Algorithm with fix dictionaries
-    *
-    * @param    path
-    * @param    signal      Matrix of input signal
-    * @param    criterion
-    *
-    * @return   void
-    */
+     * MainWindow_calc_fix_mp
+     *
+     * ### MP toolbox main function ###
+     *
+     * calculates MP-Algorithm with fix dictionaries
+     *
+     * @param    path
+     * @param    signal      Matrix of input signal
+     * @param    criterion
+     *
+     * @return   void
+     */
     void calc_fix_mp(QString path, MatrixXd signal, truncation_criterion criterion);
 
     //==========================================================================================================
     /**
-    * MainWindow_create_display_text
-    *
-    * ### MP toolbox main function ###
-    *
-    * creates the display texts of found atoms to show in the result list
-    *
-    * @param[in]    global_best_matching    best matching atom, which text should be created
-    *
-    * @return       QString                 display text
-    */
+     * MainWindow_create_display_text
+     *
+     * ### MP toolbox main function ###
+     *
+     * creates the display texts of found atoms to show in the result list
+     *
+     * @param[in]    global_best_matching    best matching atom, which text should be created
+     *
+     * @return       QString                 display text
+     */
     QString create_display_text(const FixDictAtom& global_best_matching);
 
     //==========================================================================================================
     /**
-    * MainWindow_closeEvent
-    *
-    * ### MP toolbox main function ###
-    *
-    * Qt close event
-    *
-    * @param    QCloseEvent
-    *
-    * @return   void
-    */
+     * MainWindow_closeEvent
+     *
+     * ### MP toolbox main function ###
+     *
+     * Qt close event
+     *
+     * @param    QCloseEvent
+     *
+     * @return   void
+     */
     void closeEvent(QCloseEvent * event);
 
     //==========================================================================================================
     /**
-    * MainWindow_sort_energie_adaptive
-    *
-    * ### MP toolbox main function ###
-    *
-    * sorts atoms from adaptive MP regarding to their energy
-    *
-    * @param    atom_1  first atom
-    * @param    atom_2  second atom
-    *
-    * @return   static bool     sort_energie_adaptive
-    */
+     * MainWindow_sort_energie_adaptive
+     *
+     * ### MP toolbox main function ###
+     *
+     * sorts atoms from adaptive MP regarding to their energy
+     *
+     * @param    atom_1  first atom
+     * @param    atom_2  second atom
+     *
+     * @return   static bool     sort_energie_adaptive
+     */
     static bool sort_energy_adaptive(const QList<GaborAtom> atom_1, const QList<GaborAtom> atom_2);
 
     //==========================================================================================================
     /**
-    * MainWindow_sort_energie_fix
-    *
-    * ### MP toolbox main function ###
-    *
-    * sorts atoms from fix dictionaries regarding to their energy
-    *
-    * @param    atom_1  first atom
-    * @param    atom_2  second atom
-    *
-    * @return   sort_energie_fix    ???
-    */
+     * MainWindow_sort_energie_fix
+     *
+     * ### MP toolbox main function ###
+     *
+     * sorts atoms from fix dictionaries regarding to their energy
+     *
+     * @param    atom_1  first atom
+     * @param    atom_2  second atom
+     *
+     * @return   sort_energie_fix    ???
+     */
     static bool sort_energy_fix(const FixDictAtom &atom_1, const FixDictAtom &atom_2);
 
     //==========================================================================================================
@@ -928,19 +928,19 @@ class ResiduumWindow : public QWidget
 public:
     //=========================================================================================================
     /**    
-    * ResiduumWindow_paint_residuum
-    *
-    * ### MP toolbox GUI function ###
-    *
-    * painting residuum after each iteration in butterfly plot
-    *
-    * @param[in] residuum_matrix    matrix of found residuums for each channel
-    * @param[in] windowSize         size (height,width) of window
-    * @param[in] maxPos             maximum value of residuum signal
-    * @param[in] maxNeg             minimum value of residuum signal
-    *
-    * @return void
-    */
+     * ResiduumWindow_paint_residuum
+     *
+     * ### MP toolbox GUI function ###
+     *
+     * painting residuum after each iteration in butterfly plot
+     *
+     * @param[in] residuum_matrix    matrix of found residuums for each channel
+     * @param[in] windowSize         size (height,width) of window
+     * @param[in] maxPos             maximum value of residuum signal
+     * @param[in] maxNeg             minimum value of residuum signal
+     *
+     * @return void
+     */
     void paint_residuum(MatrixXd residuum_matrix, QSize windowSize, qreal maxPos, qreal maxNeg);
 
     //=========================================================================================================
@@ -991,14 +991,14 @@ public:
 private slots:
     //==========================================================================================================
     /**
-    * MainWindow_save_fif_file
-    *
-    * ### MP toolbox main function ###
-    *
-    * saves fiff-files
-    *
-    * @return   void
-    */
+     * MainWindow_save_fif_file
+     *
+     * ### MP toolbox main function ###
+     *
+     * saves fiff-files
+     *
+     * @return   void
+     */
     void save_fif_file(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, MatrixXd original_signal, select_map select_channel_map, RowVectorXi picks, source_file_type file_type);
 
 signals:

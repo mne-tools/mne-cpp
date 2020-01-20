@@ -94,8 +94,8 @@ class IPlugin : public QThread
 public:
     //=========================================================================================================
     /**
-    * Plugin Type enumeration.
-    */
+     * Plugin Type enumeration.
+     */
     enum PluginType
     {
         _ISensor,       /**< Type for a sensor plugin. */
@@ -112,87 +112,87 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the IPlugin.
-    */
+     * Destroys the IPlugin.
+     */
     virtual ~IPlugin() {}
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
-    * Initializes the plugin.
-    */
+     * Initializes the plugin.
+     */
     virtual void init() = 0;
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
 
     //=========================================================================================================
     /**
-    * Starts the IPlugin.
-    * Pure virtual method.
-    *
-    * @return true if success, false otherwise
-    */
+     * Starts the IPlugin.
+     * Pure virtual method.
+     *
+     * @return true if success, false otherwise
+     */
     virtual bool start() = 0;
 
     //=========================================================================================================
     /**
-    * Stops the IPlugin.
-    * Pure virtual method.
-    *
-    * @return true if success, false otherwise
-    */
+     * Stops the IPlugin.
+     * Pure virtual method.
+     *
+     * @return true if success, false otherwise
+     */
     virtual bool stop() = 0;
 
     //=========================================================================================================
     /**
-    * A list of actions for the current plugin.
-    *
-    * @return a list of plugin actions
-    */
+     * A list of actions for the current plugin.
+     *
+     * @return a list of plugin actions
+     */
     inline QList< QAction* > getPluginActions();
 
     //=========================================================================================================
     /**
-    * Returns the plugin type.
-    * Pure virtual method.
-    *
-    * @return type of the IPlugin
-    */
+     * Returns the plugin type.
+     * Pure virtual method.
+     *
+     * @return type of the IPlugin
+     */
     virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the plugin name.
-    * Pure virtual method.
-    *
-    * @return the name of plugin.
-    */
+     * Returns the plugin name.
+     * Pure virtual method.
+     *
+     * @return the name of plugin.
+     */
     virtual QString getName() const = 0;
 
     //=========================================================================================================
     /**
-    * True if multi instantiation of plugin is allowed.
-    *
-    * @return true if multi instantiation of plugin is allowed.
-    */
+     * True if multi instantiation of plugin is allowed.
+     *
+     * @return true if multi instantiation of plugin is allowed.
+     */
     virtual inline bool multiInstanceAllowed() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the set up widget for configuration of the IPlugin.
-    * Pure virtual method.
-    *
-    * @return the setup widget.
-    */
+     * Returns the set up widget for configuration of the IPlugin.
+     * Pure virtual method.
+     *
+     * @return the setup widget.
+     */
     virtual QWidget* setupWidget() = 0; //setup()
 
 
@@ -203,18 +203,18 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread
+     */
     virtual void run() = 0;
 
     //=========================================================================================================
     /**
-    * Adds a plugin action to the current plugin.
-    *
-    * @param [in] pAction  pointer to the action to be added to the plugin
-    */
+     * Adds a plugin action to the current plugin.
+     *
+     * @param [in] pAction  pointer to the action to be added to the plugin
+     */
     inline void addPluginAction(QAction* pAction);
 
     InputConnectorList m_inputConnectors;    /**< Set of input connectors associated with this plug-in. */

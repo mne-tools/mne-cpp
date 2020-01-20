@@ -97,14 +97,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MneMorphMap.
-    */
+     * Constructs the MneMorphMap.
+     */
     MneMorphMap();
 
     //=========================================================================================================
     /**
-    * Destroys the MneMorphMap.
-    */
+     * Destroys the MneMorphMap.
+     */
     ~MneMorphMap();
 
 public:

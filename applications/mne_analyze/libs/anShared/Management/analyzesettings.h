@@ -89,14 +89,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Analyze Settings.
-    */
+     * Constructs the Analyze Settings.
+     */
     AnalyzeSettings(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the Analyze Settings.
-    */
+     * Destroys the Analyze Settings.
+     */
     virtual ~AnalyzeSettings();
 
     QString bemName() const;                    /*!< Returns the current BEM file name. @return the BEM file name.*/

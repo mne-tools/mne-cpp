@@ -100,66 +100,66 @@ class DISPSHARED_EXPORT DeepViewer : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs the DeepViewer which is a child of parent
-    *
-    * @param[in] embeddedControl    Whether the Deep Viewer Control should be embedded, i.e., generated within the Viewer
-    * @param[in] parent             The parent widget
-    */
+     * Constructs the DeepViewer which is a child of parent
+     *
+     * @param[in] embeddedControl    Whether the Deep Viewer Control should be embedded, i.e., generated within the Viewer
+     * @param[in] parent             The parent widget
+     */
     DeepViewer(bool embeddedControl = true, QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Returns the view
-    *
-    * @return the view
-    */
+     * Returns the view
+     *
+     * @return the view
+     */
     View* getView() const;
 
     //=========================================================================================================
     /**
-    * Returns the CNTK Network UI representation
-    *
-    * @return the view
-    */
+     * Returns the CNTK Network UI representation
+     *
+     * @return the view
+     */
     Network* getNetwork() const;
 
     //=========================================================================================================
     /**
-    * The CNTK model which should be represented by the viewer
-    *
-    * @param[in] model      The CNTK model which should be represented by the viewer
-    */
+     * The CNTK model which should be represented by the viewer
+     *
+     * @param[in] model      The CNTK model which should be represented by the viewer
+     */
     void setModel(const QSharedPointer<DEEPLIB::Deep>& model);
 
     //=========================================================================================================
     /**
-    * Updates the view according to the current model set
-    */
+     * Updates the view according to the current model set
+     */
     void updateModel();
 
 private:
     //=========================================================================================================
     /**
-    * Initializes the GraphicsScene and setups connections
-    */
+     * Initializes the GraphicsScene and setups connections
+     */
     void initScene();
 
     //=========================================================================================================
     /**
-    * Remove scene items
-    */
+     * Remove scene items
+     */
     void removeSceneItems();
 
     //=========================================================================================================
     /**
-    * Update scene items, i.e, attaches or removes items according to their weights
-    */
+     * Update scene items, i.e, attaches or removes items according to their weights
+     */
     void updateSceneItems();
 
     //=========================================================================================================
     /**
-    * Redraw scene - only the part which is within the view rectangle
-    */
+     * Redraw scene - only the part which is within the view rectangle
+     */
     void redrawScene();
 
 private:

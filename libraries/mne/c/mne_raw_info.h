@@ -94,16 +94,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Raw Info
-    * Refactored:  (.c)
-    */
+     * Constructs the MNE Raw Info
+     * Refactored:  (.c)
+     */
     MneRawInfo();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Raw Info
-    * Refactored: mne_free_raw_info (mne_raw_routines.c)
-    */
+     * Destroys the MNE Raw Info
+     * Refactored: mne_free_raw_info (mne_raw_routines.c)
+     */
     ~MneRawInfo();
 
 

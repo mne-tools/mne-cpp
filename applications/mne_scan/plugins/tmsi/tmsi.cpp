@@ -620,8 +620,8 @@ void TMSI::splitRecordingFile()
     nextFileName += QString("-%1_raw.fif").arg(m_iSplitCount);
 
     /*
-    * Write the link to the next file
-    */
+     * Write the link to the next file
+     */
     qint32 data;
     m_pOutfid->start_block(FIFFB_REF);
     data = FIFFV_ROLE_NEXT_FILE;

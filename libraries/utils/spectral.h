@@ -91,35 +91,35 @@ class UTILSSHARED_EXPORT Spectral
 public:
     //=========================================================================================================
     /**
-    * deleted default constructor (static class).
-    */
+     * deleted default constructor (static class).
+     */
     Spectral() = delete;
 
     //=========================================================================================================
     /**
-    * Calculates the full tapered spectra of a given input row data
-    *
-    * @param[in] vecData         input roww data (time domain), for which the spectrum is computed
-    * @param[in] matTaper        tapers used to compute the spectra
-    * @param[in] iNfft           FFT length
-    *
-    * @return tapered spectra of the input data
-    */
+     * Calculates the full tapered spectra of a given input row data
+     *
+     * @param[in] vecData         input roww data (time domain), for which the spectrum is computed
+     * @param[in] matTaper        tapers used to compute the spectra
+     * @param[in] iNfft           FFT length
+     *
+     * @return tapered spectra of the input data
+     */
     static Eigen::MatrixXcd computeTaperedSpectraRow(const Eigen::RowVectorXd &vecData,
                                                      const Eigen::MatrixXd &matTaper,
                                                      int iNfft);
 
     //=========================================================================================================
     /**
-    * Calculates the full tapered spectra of a given input matrix data. This function calculates each row in parallel.
-    *
-    * @param[in] matData         input matrix data (time domain), for which the spectrum is computed.
-    * @param[in] matTaper        tapers used to compute the spectra.
-    * @param[in] iNfft           FFT length.
-    * @param[in] bUseMultithread Whether to use multiple threads.
-    *
-    * @return tapered spectra of the input data
-    */
+     * Calculates the full tapered spectra of a given input matrix data. This function calculates each row in parallel.
+     *
+     * @param[in] matData         input matrix data (time domain), for which the spectrum is computed.
+     * @param[in] matTaper        tapers used to compute the spectra.
+     * @param[in] iNfft           FFT length.
+     * @param[in] bUseMultithread Whether to use multiple threads.
+     *
+     * @return tapered spectra of the input data
+     */
     static QVector<Eigen::MatrixXcd> computeTaperedSpectraMatrix(const Eigen::MatrixXd &matData,
                                                                  const Eigen::MatrixXd &matTaper,
                                                                  int iNfft,
@@ -127,35 +127,35 @@ public:
 
     //=========================================================================================================
     /**
-    * Computes the tapered spectra for a row vector. This function gets called in parallel.
-    *
-    * @param[in] inputData    The input data.
-    *
-    * @return                 The tapered spectra for one data row.
-    */
+     * Computes the tapered spectra for a row vector. This function gets called in parallel.
+     *
+     * @param[in] inputData    The input data.
+     *
+     * @return                 The tapered spectra for one data row.
+     */
     static Eigen::MatrixXcd compute(const TaperedSpectraInputData& inputData);
 
     //=========================================================================================================
     /**
-    * Reduces the taperedSpectra results to a final result. This function gets called in parallel.
-    *
-    * @param[out] finalData    The final data data.
-    * @param[in]  resultData   The resulting data from the computation step.
-    */
+     * Reduces the taperedSpectra results to a final result. This function gets called in parallel.
+     *
+     * @param[out] finalData    The final data data.
+     * @param[in]  resultData   The resulting data from the computation step.
+     */
     static void reduce(QVector<Eigen::MatrixXcd>& finalData,
                        const Eigen::MatrixXcd& resultData);
 
     //=========================================================================================================
     /**
-    * Calculates the power spectral density of given tapered spectrum
-    *
-    * @param[in] vecTapSpectrum    tapered spectrum, for which the PSD is calculated
-    * @param[in] vecTapWeights     taper weights
-    * @param[in] iNfft             FFT length
-    * @param[in] dSampFreq         sampling frequency of the input data
-    *
-    * @return power spectral density of a given tapered spectrum
-    */
+     * Calculates the power spectral density of given tapered spectrum
+     *
+     * @param[in] vecTapSpectrum    tapered spectrum, for which the PSD is calculated
+     * @param[in] vecTapWeights     taper weights
+     * @param[in] iNfft             FFT length
+     * @param[in] dSampFreq         sampling frequency of the input data
+     *
+     * @return power spectral density of a given tapered spectrum
+     */
     static Eigen::RowVectorXd psdFromTaperedSpectra(const Eigen::MatrixXcd &matTapSpectrum,
                                                     const Eigen::VectorXd &vecTapWeights,
                                                     int iNfft,
@@ -163,17 +163,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Calculates the cross-spectral density of the tapered spectra of seed and target
-    *
-    * @param[in] vecTapSpectrumSeed      tapered spectrum of the seed
-    * @param[in] vecTapSpectrumTarget    tapered spectrum of the target
-    * @param[in] vecTapWeightsSeed       taper weights of the seed
-    * @param[in] vecTapWeightsTarget     taper weights of the target
-    * @param[in] iNfft                   FFT length
-    * @param[in] dSampFreq               sampling frequency of the input data
-    *
-    * @return cross-spectral density of the tapered spectra of seed and target
-    */
+     * Calculates the cross-spectral density of the tapered spectra of seed and target
+     *
+     * @param[in] vecTapSpectrumSeed      tapered spectrum of the seed
+     * @param[in] vecTapSpectrumTarget    tapered spectrum of the target
+     * @param[in] vecTapWeightsSeed       taper weights of the seed
+     * @param[in] vecTapWeightsTarget     taper weights of the target
+     * @param[in] iNfft                   FFT length
+     * @param[in] dSampFreq               sampling frequency of the input data
+     *
+     * @return cross-spectral density of the tapered spectra of seed and target
+     */
     static Eigen::RowVectorXcd csdFromTaperedSpectra(const Eigen::MatrixXcd &vecTapSpectrumSeed,
                                                      const Eigen::MatrixXcd &vecTapSpectrumTarget,
                                                      const Eigen::VectorXd &vecTapWeightsSeed,
@@ -183,36 +183,36 @@ public:
 
     //=========================================================================================================
     /**
-    * Calculates the FFT frequencies
-    *
-    * @param[in] iNfft            FFT length
-    * @param[in] dSampFreq        sampling frequency of the input data
-    *
-    * @return FFT frequencies
-    */
+     * Calculates the FFT frequencies
+     *
+     * @param[in] iNfft            FFT length
+     * @param[in] dSampFreq        sampling frequency of the input data
+     *
+     * @return FFT frequencies
+     */
     static Eigen::VectorXd calculateFFTFreqs(int iNfft, double dSampFreq);
 
     //=========================================================================================================
     /**
-    * Calculates a hanning window of given length
-    *
-    * @param[in] iSignalLength    length of the hanning window
-    * @param[in] sWindowType      type of the window function used to compute tapered spectra
-    *
-    * @return Qpair of tapers and taper weights
-    */
+     * Calculates a hanning window of given length
+     *
+     * @param[in] iSignalLength    length of the hanning window
+     * @param[in] sWindowType      type of the window function used to compute tapered spectra
+     *
+     * @return Qpair of tapers and taper weights
+     */
     static QPair<Eigen::MatrixXd, Eigen::VectorXd> generateTapers(int iSignalLength,
                                                                   const QString &sWindowType = "hanning");
 
 private:
     //=========================================================================================================
     /**
-    * Calculates a hanning window of given length
-    *
-    * @param[in] iSignalLength     length of the hanning window
-    *
-    * @return hanning window
-    */
+     * Calculates a hanning window of given length
+     *
+     * @param[in] iSignalLength     length of the hanning window
+     *
+     * @return hanning window
+     */
     static Eigen::MatrixXd hanningWindow(int iSignalLength);
 
 };

@@ -112,31 +112,31 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a sensordatatreeitem object, calls initItem
-    *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
-    * @param[in] bUseGPU    Whether to use the GPU to visualize the data.
-    */
+     * Constructs a sensordatatreeitem object, calls initItem
+     *
+     * @param[in] iType      The type of the item. See types.h for declaration and definition.
+     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+     * @param[in] bUseGPU    Whether to use the GPU to visualize the data.
+     */
     explicit SensorDataTreeItem(int iType = Data3DTreeModelItemTypes::SensorDataItem,
                                 const QString& text = "Sensor Data",
                                 bool bUseGPU = false);
 
     //=========================================================================================================
     /**
-    * Destructor
-    */
+     * Destructor
+     */
     virtual ~SensorDataTreeItem();
 
     //=========================================================================================================
     /**
-    * Initializes the sensor data item with neccessary information for visualization computations.
-    * Constructs and initalizes the worker for this item.
-    *
-    * @param[in] tBemSurface               MNEBemSurface that holds the mesh that should be visualized.
-    * @param[in] tFiffInfo                 FiffInfo that holds the sensors information.
-    * @param[in] sSensorType               The sensor type that is later used for live interpolation.
-    * @param[in] p3DEntityParent           The Qt3D entity parent of the new item.
+     * Initializes the sensor data item with neccessary information for visualization computations.
+     * Constructs and initalizes the worker for this item.
+     *
+     * @param[in] tBemSurface               MNEBemSurface that holds the mesh that should be visualized.
+     * @param[in] tFiffInfo                 FiffInfo that holds the sensors information.
+     * @param[in] sSensorType               The sensor type that is later used for live interpolation.
+     * @param[in] p3DEntityParent           The Qt3D entity parent of the new item.
      */
     virtual void initData(const MNELIB::MNEBemSurface& tBemSurface,
                           const FIFFLIB::FiffInfo &tFiffInfo,
@@ -145,67 +145,67 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds a block actual rt data which is streamed by this item's worker thread item.
-    * In order for this function to worker, you must call initData(...) beforehand.
-    *
-    * @param[in] tSensorData                The matrix that holds rt measurement data.
-    */
+     * Adds a block actual rt data which is streamed by this item's worker thread item.
+     * In order for this function to worker, you must call initData(...) beforehand.
+     *
+     * @param[in] tSensorData                The matrix that holds rt measurement data.
+     */
     virtual void addData(const Eigen::MatrixXd& tSensorData);
 
     //=========================================================================================================
     /**      
-    * Returns true if this item is initialized.
-    *
-    * @return                               Returns true if this item is initialized.
-    */
+     * Returns true if this item is initialized.
+     *
+     * @return                               Returns true if this item is initialized.
+     */
     virtual inline bool isDataInit() const;
 
     //=========================================================================================================
     /**
-    * This function sets the loop flag.
-    *
-    * @param[in] bState                      Whether to loop the data or not.
-    */
+     * This function sets the loop flag.
+     *
+     * @param[in] bState                      Whether to loop the data or not.
+     */
     virtual void setLoopState(bool bState);
 
     //=========================================================================================================
     /**
-    * This function sets the data streaming.
-    *
-    * @param[in] bState                      Whether to stream the data to the display or not.
-    */
+     * This function sets the data streaming.
+     *
+     * @param[in] bState                      Whether to stream the data to the display or not.
+     */
     virtual void setStreamingState(bool bState);
 
     //=========================================================================================================
     /**
-    * This function sets the time interval for streaming.
-    *
-    * @param[in] iMSec                      The waiting time inbetween samples.
-    */
+     * This function sets the time interval for streaming.
+     *
+     * @param[in] iMSec                      The waiting time inbetween samples.
+     */
     virtual void setTimeInterval(int iMSec);
 
     //=========================================================================================================
     /**
-    * This function sets the number of averages.
-    *
-    * @param[in] iNumberAverages            The new number of averages.
-    */
+     * This function sets the number of averages.
+     *
+     * @param[in] iNumberAverages            The new number of averages.
+     */
     virtual void setNumberAverages(int iNumberAverages);
 
     //=========================================================================================================
     /**
-    * This function sets the colormap type.
-    *
-    * @param[in] sColortable                The new colormap ("Hot Negative 1" etc.).
-    */
+     * This function sets the colormap type.
+     *
+     * @param[in] sColortable                The new colormap ("Hot Negative 1" etc.).
+     */
     virtual void setColormapType(const QString& sColormap);
 
     //=========================================================================================================
     /**
-    * This function set the threshold values.
-    *
-    * @param[in] vecThresholds              The new threshold values used for normalizing the data.
-    */
+     * This function set the threshold values.
+     *
+     * @param[in] vecThresholds              The new threshold values used for normalizing the data.
+     */
     virtual void setThresholds(const QVector3D& vecThresholds);
     
     //=========================================================================================================
@@ -227,148 +227,148 @@ public:
 
     //=========================================================================================================
     /**
-    * Set the sampling frequency.
-    *
-    * @param[in] dSFreq                 The new sampling frequency.
-    */
+     * Set the sampling frequency.
+     *
+     * @param[in] dSFreq                 The new sampling frequency.
+     */
     virtual void setSFreq(const double dSFreq);
 
     //=========================================================================================================
     /**
-    * Update bad channels and recalculate interpolation matrix.
-    *
-    * @param[in] info                 The fiff info including the new bad channels.
-    */
+     * Update bad channels and recalculate interpolation matrix.
+     *
+     * @param[in] info                 The fiff info including the new bad channels.
+     */
     virtual void setBadChannels(const FIFFLIB::FiffInfo& info);
 
     //=========================================================================================================
     /**
-    * Sets the entity's transformation. This will clear the old transformation.
-    *
-    * @param[in] transform     The new entity's transform.
-    */
+     * Sets the entity's transformation. This will clear the old transformation.
+     *
+     * @param[in] transform     The new entity's transform.
+     */
     virtual void setTransform(const Qt3DCore::QTransform &transform);
 
     //=========================================================================================================
     /**
-    * Sets the entity's transformation. This will clear the old transformation.
-    *
-    * @param[in] transform     The new entity's transform.
-    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
-    */
+     * Sets the entity's transformation. This will clear the old transformation.
+     *
+     * @param[in] transform     The new entity's transform.
+     * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+     */
     virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
 
     //=========================================================================================================
     /**
-    * Applies a transformation o ntop of the present one.
-    *
-    * @param[in] transform     The new entity's transform.
-    */
+     * Applies a transformation o ntop of the present one.
+     *
+     * @param[in] transform     The new entity's transform.
+     */
     virtual void applyTransform(const Qt3DCore::QTransform& transform);
 
     //=========================================================================================================
     /**
-    * Applies a transformation o ntop of the present one.
-    *
-    * @param[in] transform     The new entity's transform.
-    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
-    */
+     * Applies a transformation o ntop of the present one.
+     *
+     * @param[in] transform     The new entity's transform.
+     * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+     */
     virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
 
 protected:
     //=========================================================================================================
     /**
-    * This adds all meta tree items and connects them fittingly
-    * Don't use this fucntion in the constructor of the abstract class.
-    */
+     * This adds all meta tree items and connects them fittingly
+     * Don't use this fucntion in the constructor of the abstract class.
+     */
     virtual void initItem() override;
 
     //=========================================================================================================
     /**
-    * Set the new interpolation matrix.
-    *
-    * @param[in] pMatInterpolationMatrixLeftHemi                 The new interpolation matrix.
-    */
+     * Set the new interpolation matrix.
+     *
+     * @param[in] pMatInterpolationMatrixLeftHemi                 The new interpolation matrix.
+     */
     virtual void onNewInterpolationMatrixAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever this item receives sensor values for each estimated source.
-    *
-    * @param[in] vecDataVector         The streamed raw data.
-    */
+     * This function gets called whenever this item receives sensor values for each estimated source.
+     *
+     * @param[in] vecDataVector         The streamed raw data.
+     */
     void virtual onNewRtRawDataAvailable(const Eigen::VectorXd &vecDataVector);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever this item receives new color values for each estimated source.
-    *
-    * @param[in] sourceColorSamples         The color values for the streamed data.
-    */
+     * This function gets called whenever this item receives new color values for each estimated source.
+     *
+     * @param[in] sourceColorSamples         The color values for the streamed data.
+     */
     virtual void onNewRtSmoothedDataAvailable(const Eigen::MatrixX4f &matColorMatrix);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the check/activation state of the rt data worker changed.
-    *
-    * @param[in] checkState                 The check state of the worker.
-    */
+     * This function gets called whenever the check/activation state of the rt data worker changed.
+     *
+     * @param[in] checkState                 The check state of the worker.
+     */
     virtual void onStreamingStateChanged(const Qt::CheckState& checkState);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the used colormap type changed.
-    *
-    * @param[in] sColormapType              The name of the new colormap type.
-    */
+     * This function gets called whenever the used colormap type changed.
+     *
+     * @param[in] sColormapType              The name of the new colormap type.
+     */
     virtual void onColormapTypeChanged(const QVariant& sColormapType);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the time interval in between the streamed samples changed.
-    *
-    * @param[in] iMSec                      The new time in milliseconds waited in between each streamed sample.
-    */
+     * This function gets called whenever the time interval in between the streamed samples changed.
+     *
+     * @param[in] iMSec                      The new time in milliseconds waited in between each streamed sample.
+     */
     virtual void onTimeIntervalChanged(const QVariant &iMSec);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the normaization value changed. The normalization value is used to normalize the estimated source activation.
-    *
-    * @param[in] vecThresholds              The new threshold values used for normalizing the data.
-    */
+     * This function gets called whenever the normaization value changed. The normalization value is used to normalize the estimated source activation.
+     *
+     * @param[in] vecThresholds              The new threshold values used for normalizing the data.
+     */
     virtual void onDataThresholdChanged(const QVariant &vecThresholds);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the check/activation state of the looped streaming state changed.
-    *
-    * @param[in] checkState                 The check state of the looped streaming state.
-    */
+     * This function gets called whenever the check/activation state of the looped streaming state changed.
+     *
+     * @param[in] checkState                 The check state of the looped streaming state.
+     */
     virtual void onLoopStateChanged(const Qt::CheckState& checkState);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the number of averages of the streamed samples changed.
-    *
-    * @param[in] iNumAvr                    The new number of averages.
-    */
+     * This function gets called whenever the number of averages of the streamed samples changed.
+     *
+     * @param[in] iNumAvr                    The new number of averages.
+     */
     virtual void onNumberAveragesChanged(const QVariant& iNumAvr);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the cancel distance of the interpolation changed.
-    *
-    * @param[in] dCancelDist     The new cancel distance.
-    */
+     * This function gets called whenever the cancel distance of the interpolation changed.
+     *
+     * @param[in] dCancelDist     The new cancel distance.
+     */
     virtual void onCancelDistanceChanged(const QVariant& dCancelDist);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the function of the interpolation changed.
-    *
-    * @param[in] sInterpolationFunction     The new function name.
-    */
+     * This function gets called whenever the function of the interpolation changed.
+     *
+     * @param[in] sInterpolationFunction     The new function name.
+     */
     virtual void onInterpolationFunctionChanged(const QVariant& sInterpolationFunction);
 
     bool                                m_bIsDataInit;                     /**< The init flag. */

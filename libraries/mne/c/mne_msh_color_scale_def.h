@@ -86,14 +86,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MneMshColorScaleDef.
-    */
+     * Constructs the MneMshColorScaleDef.
+     */
     MneMshColorScaleDef();
 
     //=========================================================================================================
     /**
-    * Destroys the MneMshColorScaleDef.
-    */
+     * Destroys the MneMshColorScaleDef.
+     */
     ~MneMshColorScaleDef();
 
 public:

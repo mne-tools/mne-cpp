@@ -98,28 +98,28 @@ class UTILSSHARED_EXPORT AdaptiveMp : public QThread
 public:
 
     /**
-    * adaptiveMP_adaptiveMP
-    *
-    * ### MP toolbox function ###
-    *
-    * Constructor
-    *
-    * constructs adaptiveMP class
-    *
-    */
+     * adaptiveMP_adaptiveMP
+     *
+     * ### MP toolbox function ###
+     *
+     * Constructor
+     *
+     * constructs adaptiveMP class
+     *
+     */
     AdaptiveMp();
 
     //=========================================================================================================
     /**
-    * adaptiveMP_adaptiveMP
-    *
-    * ### MP toolbox function ###
-    *
-    * Deconstructor
-    *
-    * deconstructs adaptiveMP class
-    *
-    */
+     * adaptiveMP_adaptiveMP
+     *
+     * ### MP toolbox function ###
+     *
+     * Deconstructor
+     *
+     * deconstructs adaptiveMP class
+     *
+     */
     ~AdaptiveMp();
 
     //=========================================================================================================
@@ -144,76 +144,76 @@ public:
 
     //=========================================================================================================
     /*
-    * adaptiveMP_matching_pursuit
-    *
-    * ### MP Algorithm ###
-    *
-    * running the MP Algorithm introduced by Mallat and Zhang
-    *
-    * @param[in] signal    Matrix containing single or mulitchannel signals
-    * @param[in] max_it    maximum number of iterations of MP Algorithm
-    * @param[in] epsilon   threshold for number of iterations of MP Algorithm
-    *
-    * @return result of MP Algorithm as QList of GaborAtoms
-    */
+     * adaptiveMP_matching_pursuit
+     *
+     * ### MP Algorithm ###
+     *
+     * running the MP Algorithm introduced by Mallat and Zhang
+     *
+     * @param[in] signal    Matrix containing single or mulitchannel signals
+     * @param[in] max_it    maximum number of iterations of MP Algorithm
+     * @param[in] epsilon   threshold for number of iterations of MP Algorithm
+     *
+     * @return result of MP Algorithm as QList of GaborAtoms
+     */
     //QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
 
     //=========================================================================================================
     /**
-    * adaptiveMP_modulation_function
-    *
-    * ### MP toolbox root function ###
-    *
-    * calculates a complex function for modulating signals in MP Algorithm
-    *
-    * @param[in] N    number of samples
-    * @param[in] k    factor of modulationfrequency
-    *
-    * @return complex modulationvector
-    */
+     * adaptiveMP_modulation_function
+     *
+     * ### MP toolbox root function ###
+     *
+     * calculates a complex function for modulating signals in MP Algorithm
+     *
+     * @param[in] N    number of samples
+     * @param[in] k    factor of modulationfrequency
+     *
+     * @return complex modulationvector
+     */
     VectorXcd modulation_function(qint32 N, qreal k);
 
     //=========================================================================================================
     /**
-    * adaptiveMP_calculate_atom
-    *
-    * ### MP toolbox root function ###
-    *
-    * calculates real gabor atoms for MP Algorithm
-    *
-    * @param[in] sampleCount    number of samples in the atom
-    * @param[in] scale          scale of atom
-    * @param[in] translation    translation of atom
-    * @param[in] modulation     modulation of atom
-    * @param[in] channel        number of signalchannels
-    * @param[in] residuum       the signalresiduun after each MP Algorithm iterationstep
-    * @param[in] returnValue    declare what kind of information should be returned
-    *
-    * @return depending on returnValue returning the real atom calculated or the manipulated parameters: scale, translation, modulation, phase, scalarproduct
-    */
+     * adaptiveMP_calculate_atom
+     *
+     * ### MP toolbox root function ###
+     *
+     * calculates real gabor atoms for MP Algorithm
+     *
+     * @param[in] sampleCount    number of samples in the atom
+     * @param[in] scale          scale of atom
+     * @param[in] translation    translation of atom
+     * @param[in] modulation     modulation of atom
+     * @param[in] channel        number of signalchannels
+     * @param[in] residuum       the signalresiduun after each MP Algorithm iterationstep
+     * @param[in] returnValue    declare what kind of information should be returned
+     *
+     * @return depending on returnValue returning the real atom calculated or the manipulated parameters: scale, translation, modulation, phase, scalarproduct
+     */
     static VectorXd calculate_atom(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value, bool fix_phase);
 
     //=========================================================================================================
     /**
-    * adaptiveMP_simplex_maximisation
-    *
-    * ### MP toolbox root function ###
-    *
-    * varies mp Algorithm parameters to find Optimum
-    *
-    * @param[in] simplex_it                 number of maximal iterations of simplex algorithm
-    * @param[in] simplex_reflection         simplex parameter reflection
-    * @param[in] simplex_expansion          simplex parameter expansion
-    * @param[in] simplex_contraction        simplex parameter contraction
-    * @param[in] simplex_full_contraction   simplex parameter full contraction
-    * @param[in] gabor_Atom                 atom to be optimised
-    * @param[in] max_scalar_product         figure of merit of the atom
-    * @param[in] sample_count               number of samples in the atom
-    * @param[in] fix_phase                  whether fix phase or varying
-    * @param[in] residuum                   the signalresiduun after each MP Algorithm iterationstep
-    *
-    * @return depending on returnValue returning the real atom calculated or the manipulated parameters: scale, translation, modulation, phase, scalarproduct
-    */
+     * adaptiveMP_simplex_maximisation
+     *
+     * ### MP toolbox root function ###
+     *
+     * varies mp Algorithm parameters to find Optimum
+     *
+     * @param[in] simplex_it                 number of maximal iterations of simplex algorithm
+     * @param[in] simplex_reflection         simplex parameter reflection
+     * @param[in] simplex_expansion          simplex parameter expansion
+     * @param[in] simplex_contraction        simplex parameter contraction
+     * @param[in] simplex_full_contraction   simplex parameter full contraction
+     * @param[in] gabor_Atom                 atom to be optimised
+     * @param[in] max_scalar_product         figure of merit of the atom
+     * @param[in] sample_count               number of samples in the atom
+     * @param[in] fix_phase                  whether fix phase or varying
+     * @param[in] residuum                   the signalresiduun after each MP Algorithm iterationstep
+     *
+     * @return depending on returnValue returning the real atom calculated or the manipulated parameters: scale, translation, modulation, phase, scalarproduct
+     */
     void simplex_maximisation(qint32 simplex_it, qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction,
                               GaborAtom *gabor_Atom, VectorXd max_scalar_product, qint32 sample_count, bool fix_phase, MatrixXd residuum, bool trial_separation, qint32 chn);
 

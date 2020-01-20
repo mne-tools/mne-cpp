@@ -72,74 +72,74 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a Measurement.
-    *
-    * @param[in] type       the QMetaType id of the Measurement.
-    * @param[in] parent     the parent object
-    */
+     * Constructs a Measurement.
+     *
+     * @param[in] type       the QMetaType id of the Measurement.
+     * @param[in] parent     the parent object
+     */
     explicit Measurement(int type = QMetaType::UnknownType, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructs the Measurement.
-    */
+     * Constructs the Measurement.
+     */
     virtual ~Measurement();
 
     //=========================================================================================================
     /**
-    * Returns the name of the Measurement.
-    *
-    * @return the name of the Measurement.
-    */
+     * Returns the name of the Measurement.
+     *
+     * @return the name of the Measurement.
+     */
     inline const QString& getName() const;
 
     //=========================================================================================================
     /**
-    * Sets the name of the Measurement.
-    *
-    * @param[in] name which should be set.
-    */
+     * Sets the name of the Measurement.
+     *
+     * @param[in] name which should be set.
+     */
     inline void setName(const QString& name);
 
     //=========================================================================================================
     /**
-    * Returns whether Measurement is visible.
-    *
-    * @return true if Measurement is visible, otherwise false.
-    */
+     * Returns whether Measurement is visible.
+     *
+     * @return true if Measurement is visible, otherwise false.
+     */
     inline bool isVisible() const;
 
     //=========================================================================================================
     /**
-    * Sets the visibility of the Measurement, whether Measurement is visible at the display or just data are send invisible.
-    *
-    * @param [in] visibility of the Measurement.
-    */
+     * Sets the visibility of the Measurement, whether Measurement is visible at the display or just data are send invisible.
+     *
+     * @param [in] visibility of the Measurement.
+     */
     inline void setVisibility(bool visibility);
 
     //=========================================================================================================
     /**
-    * Returns the type of the Measurement.
-    *
-    * @return the type of the Measurement.
-    */
+     * Returns the type of the Measurement.
+     *
+     * @return the type of the Measurement.
+     */
     inline int type() const;
 
     //=========================================================================================================
     /**
-    * Add a control widget to this measurement. Use this in order to obtain a connection of GUI elements between
-    * MNE Scan plugins and the corresponding real-time visualization widget.
-    *
-    * @param pWidget    The control widget, which should be added to the corresponding real-time visualization
-    */
+     * Add a control widget to this measurement. Use this in order to obtain a connection of GUI elements between
+     * MNE Scan plugins and the corresponding real-time visualization widget.
+     *
+     * @param pWidget    The control widget, which should be added to the corresponding real-time visualization
+     */
     inline void addControlWidget(QSharedPointer<QWidget> pWidget);
 
     //=========================================================================================================
     /**
-    * Returns a list containing the control widgets, which should be added to the corresponding real-time visualization.
-    *
-    * @return A list containting the control widgets
-    */
+     * Returns a list containing the control widgets, which should be added to the corresponding real-time visualization.
+     *
+     * @return A list containting the control widgets
+     */
     inline QList<QSharedPointer<QWidget> > getControlWidgets();
 
 signals:
@@ -148,10 +148,10 @@ signals:
 protected:
     //=========================================================================================================
     /**
-    * Sets the type of the Measurement. Use QMetaType::type("the type") to generate the type.
-    *
-    * @param[in] type   the QMetaType id of the Measurement.
-    */
+     * Sets the type of the Measurement. Use QMetaType::type("the type") to generate the type.
+     *
+     * @param[in] type   the QMetaType id of the Measurement.
+     */
     inline void setType(int type);
 
 private:

@@ -83,25 +83,25 @@ class TMSISetupProjectWidget : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a TMSISetupProjectWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupProjectWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
-    */
+     * Constructs a TMSISetupProjectWidget which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupProjectWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
+     * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
+     */
     explicit TMSISetupProjectWidget(TMSI* pTMSI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destructs a TMSISetupProjectWidget which is a child of parent.
-    *
-    */
+     * Destructs a TMSISetupProjectWidget which is a child of parent.
+     *
+     */
     ~TMSISetupProjectWidget();
 
     //=========================================================================================================
     /**
-    * Inits the GUI
-    *
-    */
+     * Inits the GUI
+     *
+     */
     void initGui();
 
 private:
@@ -111,44 +111,44 @@ private:
 
     //=========================================================================================================
     /**
-    * Sets the project dir
-    *
-    */
+     * Sets the project dir
+     *
+     */
     void addProject();
 
     //=========================================================================================================
     /**
-    * Sets the subject dir
-    *
-    */
+     * Sets the subject dir
+     *
+     */
     void addSubject();
 
     //=========================================================================================================
     /**
-    * Sets the dir where the output file is saved
-    *
-    */
+     * Sets the dir where the output file is saved
+     *
+     */
     void changeOutputFile();
 
     //=========================================================================================================
     /**
-    * Sets the dir where the eeg cap file is located
-    *
-    */
+     * Sets the dir where the eeg cap file is located
+     *
+     */
     void changeCap();
 
     //=========================================================================================================
     /**
-    * Generates new file path based onthe project and subject parameters
-    *
-    */
+     * Generates new file path based onthe project and subject parameters
+     *
+     */
     void generateFilePath(int index = 0);
 
     //=========================================================================================================
     /**
-    * Changes the EEG cap and file path variables in the EEGoSports class
-    *
-    */
+     * Changes the EEG cap and file path variables in the EEGoSports class
+     *
+     */
     void changeQLineEdits();
 };
 

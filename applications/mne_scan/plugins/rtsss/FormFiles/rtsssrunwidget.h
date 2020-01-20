@@ -90,34 +90,34 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtSssRunWidget which is a child of parent.
-    *
-    * @param [in] toolbox   a pointer to the corresponding RtSss.
-    * @param [in] parent    pointer to parent widget; If parent is 0, the new RtSssRunWidget becomes a window. If parent is another widget, DummyRunWidget becomes a child window inside parent. RtSssRunWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RtSssRunWidget which is a child of parent.
+     *
+     * @param [in] toolbox   a pointer to the corresponding RtSss.
+     * @param [in] parent    pointer to parent widget; If parent is 0, the new RtSssRunWidget becomes a window. If parent is another widget, DummyRunWidget becomes a child window inside parent. RtSssRunWidget is deleted when its parent is deleted.
+     */
     RtSssRunWidget(RtSss* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtSssRunWidget.
-    * All RtSssRunWidget's children are deleted first. The application exits if RtSssRunWidget is the main widget.
-    */
+     * Destroys the RtSssRunWidget.
+     * All RtSssRunWidget's children are deleted first. The application exits if RtSssRunWidget is the main widget.
+     */
     ~RtSssRunWidget();
 
     //=========================================================================================================
     /**
-    * Writes to SourceLab run log
-    *
-    * @param[in] p_sLogMsg     status message to append
-    */
+     * Writes to SourceLab run log
+     *
+     * @param[in] p_sLogMsg     status message to append
+     */
     void writeToLog(QString p_sLogMsg);
 
 private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
 private:

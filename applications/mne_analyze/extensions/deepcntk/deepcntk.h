@@ -98,14 +98,14 @@ class DEEPCNTKSHARED_EXPORT DeepCNTK : public ANSHAREDLIB::IExtension
 public:
     //=========================================================================================================
     /**
-    * Constructs a DeepCNTK.
-    */
+     * Constructs a DeepCNTK.
+     */
     DeepCNTK();
 
     //=========================================================================================================
     /**
-    * Destroys the DeepCNTK.
-    */
+     * Destroys the DeepCNTK.
+     */
     ~DeepCNTK();
 
     // IExtension functions
@@ -121,20 +121,20 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Called when the network configuration finished training
-    */
+     * Called when the network configuration finished training
+     */
     void trainingFinished();
 
     //=========================================================================================================
     /**
-    * Reset the current model
-    */
+     * Reset the current model
+     */
     void resetDeepViewer();
 
     //=========================================================================================================
     /**
-    * Update the current model
-    */
+     * Update the current model
+     */
     void updateDeepViewer();
 
 private:

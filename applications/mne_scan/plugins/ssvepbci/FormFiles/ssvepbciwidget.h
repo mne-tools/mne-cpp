@@ -76,33 +76,33 @@ class SsvepBciWidget : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a BCISetupWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new SsvepBciWidget becomes a window. If parent is another widget, BCISetupWidget becomes a child window inside parent. BCISetupWidget is deleted when its parent is deleted.
-    * @param [in] pBCI a pointer to the corresponding BCI.
-    */
+     * Constructs a BCISetupWidget which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new SsvepBciWidget becomes a window. If parent is another widget, BCISetupWidget becomes a child window inside parent. BCISetupWidget is deleted when its parent is deleted.
+     * @param [in] pBCI a pointer to the corresponding BCI.
+     */
     SsvepBciWidget(SsvepBci* pBCI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the BCISetupWidget.
-    * All SsvepBciWidget's children are deleted first. The application exits if SsvepBciWidget is the main widget.
-    */
+     * Destroys the BCISetupWidget.
+     * All SsvepBciWidget's children are deleted first. The application exits if SsvepBciWidget is the main widget.
+     */
     ~SsvepBciWidget();
 
     //=========================================================================================================
     /**
-    * Initializes the BCI's GUI properties.
-    *
-    */
+     * Initializes the BCI's GUI properties.
+     *
+     */
     void initGui();
 
 private:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
     SsvepBci*               m_pSsvepBCI;    /**< a pointer to corresponding BCI.*/

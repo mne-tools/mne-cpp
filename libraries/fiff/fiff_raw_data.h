@@ -99,44 +99,44 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     FiffRawData();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffRawData  FIFF raw measurement which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffRawData  FIFF raw measurement which should be copied
+     */
     FiffRawData(const FiffRawData &p_FiffRawData);
 
     //=========================================================================================================
     /**
-    * Constructs fiff raw data, by reading from a IO device.
-    *
-    * @param[in] p_IODevice     IO device to read the raw data from .
-    */
+     * Constructs fiff raw data, by reading from a IO device.
+     *
+     * @param[in] p_IODevice     IO device to read the raw data from .
+     */
     FiffRawData(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffInfo.
-    */
+     * Destroys the FiffInfo.
+     */
     ~FiffRawData();
 
     //=========================================================================================================
     /**
-    * Initializes the fiff raw measurement data.
-    */
+     * Initializes the fiff raw measurement data.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * True if fiff raw data are empty.
-    *
-    * @return true if fiff raw data are empty
-    */
+     * True if fiff raw data are empty.
+     *
+     * @return true if fiff raw data are empty
+     */
     inline bool isEmpty() const
     {
         return first_samp == -1 && info.isEmpty();
@@ -144,18 +144,18 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Definition of the fiff_read_raw_segment function
-    *
-    * Read a specific raw data segment
-    *
-    * @param[out] data      returns the data matrix (channels x samples)
-    * @param[out] times     returns the time values corresponding to the samples
-    * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
-    * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
-    * @param[in] sel        channel selection vector (optional)
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * ### MNE toolbox root function ###: Definition of the fiff_read_raw_segment function
+     *
+     * Read a specific raw data segment
+     *
+     * @param[out] data      returns the data matrix (channels x samples)
+     * @param[out] times     returns the time values corresponding to the samples
+     * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
+     * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
+     * @param[in] sel        channel selection vector (optional)
+     *
+     * @return true if succeeded, false otherwise
+     */
     bool read_raw_segment(MatrixXd& data,
                           MatrixXd& times,
                           fiff_int_t from = -1,
@@ -165,19 +165,19 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Definition of the fiff_read_raw_segment function
-    *
-    * Read a specific raw data segment
-    *
-    * @param[out] data      returns the data matrix (channels x samples)
-    * @param[out] times     returns the time values corresponding to the samples
-    * @param[out] multSegment used multiplication matrix (compensator,projection,calibration)
-    * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
-    * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
-    * @param[in] sel        channel selection vector (optional)
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * ### MNE toolbox root function ###: Definition of the fiff_read_raw_segment function
+     *
+     * Read a specific raw data segment
+     *
+     * @param[out] data      returns the data matrix (channels x samples)
+     * @param[out] times     returns the time values corresponding to the samples
+     * @param[out] multSegment used multiplication matrix (compensator,projection,calibration)
+     * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
+     * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
+     * @param[in] sel        channel selection vector (optional)
+     *
+     * @return true if succeeded, false otherwise
+     */
     bool read_raw_segment(MatrixXd& data,
                           MatrixXd& times,
                           SparseMatrix<double>& multSegment,
@@ -188,18 +188,18 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Definition of the fiff_read_raw_segment function
-    *
-    * Read a specific raw data segment
-    *
-    * @param[out] data      returns the data matrix (channels x samples)
-    * @param[out] times     returns the time values corresponding to the samples
-    * @param[in] from       starting time of the segment in seconds
-    * @param[in] to         end time of the segment in seconds
-    * @param[in] sel        optional channel selection vector
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * ### MNE toolbox root function ###: Definition of the fiff_read_raw_segment function
+     *
+     * Read a specific raw data segment
+     *
+     * @param[out] data      returns the data matrix (channels x samples)
+     * @param[out] times     returns the time values corresponding to the samples
+     * @param[in] from       starting time of the segment in seconds
+     * @param[in] to         end time of the segment in seconds
+     * @param[in] sel        optional channel selection vector
+     *
+     * @return true if succeeded, false otherwise
+     */
     bool read_raw_segment_times(MatrixXd& data,
                                 MatrixXd& times,
                                 float from,

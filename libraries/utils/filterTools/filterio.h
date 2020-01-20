@@ -99,30 +99,30 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FilterIO object.
-    */
+     * Constructs a FilterIO object.
+     */
     FilterIO();
 
     //=========================================================================================================
     /**
-    * Reads a given txt file and scans it for filter coefficients. Pls see sample file for file syntax.
-    *
-    * @param [in] path holds the file path of the txt file which is to be read.
-    * @param [out] filter holds the filter which the read parameters are to be saved to.
-    *
-    * @return true if reading was successful, false otherwise.
-    */
+     * Reads a given txt file and scans it for filter coefficients. Pls see sample file for file syntax.
+     *
+     * @param [in] path holds the file path of the txt file which is to be read.
+     * @param [out] filter holds the filter which the read parameters are to be saved to.
+     *
+     * @return true if reading was successful, false otherwise.
+     */
     static bool readFilter(QString path, FilterData &filter);
 
     //=========================================================================================================
     /**
-    * Writes a given filter to txt file .
-    *
-    * @param [in] path holds the file path of the txt file which is to be written to.
-    * @param [in] filter holds the filter which is to be written to file.
-    *
-    * @return true if reading was successful, false otherwise.
-    */
+     * Writes a given filter to txt file .
+     *
+     * @param [in] path holds the file path of the txt file which is to be written to.
+     * @param [in] filter holds the filter which is to be written to file.
+     *
+     * @return true if reading was successful, false otherwise.
+     */
     static bool writeFilter(const QString &path, const FilterData &filter);
 
 private:

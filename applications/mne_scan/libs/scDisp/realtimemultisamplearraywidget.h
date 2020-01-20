@@ -114,59 +114,59 @@ class SCDISPSHARED_EXPORT RealTimeMultiSampleArrayWidget : public MeasurementWid
 public:
     //=========================================================================================================
     /**
-    * Constructs a RealTimeMultiSampleArrayWidget which is a child of parent.
-    *
-    * @param [in] pRTMSA_New    pointer to real-time multi sample array measurement.
-    * @param [in] pTime         pointer to application time.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RealTimeMultiSampleArrayWidget which is a child of parent.
+     *
+     * @param [in] pRTMSA_New    pointer to real-time multi sample array measurement.
+     * @param [in] pTime         pointer to application time.
+     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+     */
     RealTimeMultiSampleArrayWidget(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> pRTMSA_New, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeMultiSampleArrayWidget.
-    */
+     * Destroys the RealTimeMultiSampleArrayWidget.
+     */
     ~RealTimeMultiSampleArrayWidget();
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    *
-    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
-    */
+     * Is called when new data are available.
+     *
+     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+     */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeMultiSampleArrayWidget.
-    */
+     * Initialise the RealTimeMultiSampleArrayWidget.
+     */
     virtual void init();
 
 private:
     //=========================================================================================================
     /**
-    * Shows sensor selection widget
-    */
+     * Shows sensor selection widget
+     */
     void showSensorSelectionWidget();
 
     //=========================================================================================================
     /**
-    * Shows quick control view
-    */
+     * Shows quick control view
+     */
     void showQuickControlView();
 
     //=========================================================================================================
     /**
-    * Call this slot whenever you want to make a screenshot current view.
-    *
-    * @param[in] imageType  The current iamge type: png, svg.
-    */
+     * Call this slot whenever you want to make a screenshot current view.
+     *
+     * @param[in] imageType  The current iamge type: png, svg.
+     */
     void onMakeScreenshot(const QString& imageType);
 
     //=========================================================================================================
     /**
-    * Toggle bad channel visibility
-    */
+     * Toggle bad channel visibility
+     */
     void onHideBadChannels();
 
 private:

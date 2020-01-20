@@ -114,235 +114,235 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtFiffRawView which is a child of parent.
-    *
-    * @param [in] parent    The parent of widget.
-    */
+     * Constructs a RtFiffRawView which is a child of parent.
+     *
+     * @param [in] parent    The parent of widget.
+     */
     RtFiffRawView(const QString& sSettingsPath = "",
                     QWidget* parent = 0,
                     Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the RtFiffRawView.
-    */
+     * Destroys the RtFiffRawView.
+     */
     ~RtFiffRawView();
 
     //=========================================================================================================
     /**
-    * Initilaizes the RtFiffRawView based on a FiffInfo.
-    *
-    * @param [in] info    The FiffInfo.
-    */
+     * Initilaizes the RtFiffRawView based on a FiffInfo.
+     *
+     * @param [in] info    The FiffInfo.
+     */
     void init(QSharedPointer<FIFFLIB::FiffInfo> &info);
 
     //=========================================================================================================
     /**
-    * Add data to the view.
-    *
-    * @param [in] data    The new data.
-    */
+     * Add data to the view.
+     *
+     * @param [in] data    The new data.
+     */
     void addData(const QList<Eigen::MatrixXd>& data);
 
     //=========================================================================================================
     /**
-    * Get the latest data block from the underlying model.
-    *
-    * @return    The last data block.
-    */
+     * Get the latest data block from the underlying model.
+     *
+     * @return    The last data block.
+     */
     Eigen::MatrixXd getLastBlock();
 
     //=========================================================================================================
     /**
-    * Is called when mouse wheel is used.
-    * Function is selecting the tool (freezing/annotation);
-    *
-    * @param object
-    * @param event
-    *
-    * @return
-    */
+     * Is called when mouse wheel is used.
+     * Function is selecting the tool (freezing/annotation);
+     *
+     * @param object
+     * @param event
+     *
+     * @return
+     */
     bool eventFilter(QObject *object, QEvent *event);
 
     //=========================================================================================================
     /**
-    * Broadcast the background color changes made in the QuickControl widget
-    *
-    * @param [in] backgroundColor  The new background color.
-    */
+     * Broadcast the background color changes made in the QuickControl widget
+     *
+     * @param [in] backgroundColor  The new background color.
+     */
     void setBackgroundColor(const QColor& backgroundColor);
 
     //=========================================================================================================
     /**
-    * Returns the current background color.
-    *
-    * @return  The current background color.
-    */
+     * Returns the current background color.
+     *
+     * @return  The current background color.
+     */
     QColor getBackgroundColor();
 
     //=========================================================================================================
     /**
-    * Get the current scaling map.
-    *
-    * @return    The current scaling map.
-    */
+     * Get the current scaling map.
+     *
+     * @return    The current scaling map.
+     */
     QMap<qint32, float> getScalingMap();
 
     //=========================================================================================================
     /**
-    * Broadcast channel scaling
-    *
-    * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
-    */
+     * Broadcast channel scaling
+     *
+     * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
+     */
     void setScalingMap(const QMap<qint32, float>& scaleMap);
 
     //=========================================================================================================
     /**
-    * Set the signal color.
-    *
-    * @param [in] signalColor  The new signal color.
-    */
+     * Set the signal color.
+     *
+     * @param [in] signalColor  The new signal color.
+     */
     void setSignalColor(const QColor& signalColor);
 
     //=========================================================================================================
     /**
-    * Returns the signal color.
-    *
-    * @return  The current signal color.
-    */
+     * Returns the signal color.
+     *
+     * @return  The current signal color.
+     */
     QColor getSignalColor();
 
     //=========================================================================================================
     /**
-    * Hides/shows all bad channels in the view
-    */
+     * Hides/shows all bad channels in the view
+     */
     void hideBadChannels();
 
     //=========================================================================================================
     /**
-    * Get whether the bad channels are currently hidden or not.
-    *
-    * @return    The current bad channel hidden status.
-    */
+     * Get whether the bad channels are currently hidden or not.
+     *
+     * @return    The current bad channel hidden status.
+     */
     bool getBadChannelHideStatus();
 
     //=========================================================================================================
     /**
-    * Only shows the channels defined in the QStringList selectedChannels
-    *
-    * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
-    */
+     * Only shows the channels defined in the QStringList selectedChannels
+     *
+     * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
+     */
     void showSelectedChannelsOnly(const QStringList& selectedChannels);
 
     //=========================================================================================================
     /**
-    * Sets new zoom factor
-    *
-    * @param [in] zoomFac  time window size;
-    */
+     * Sets new zoom factor
+     *
+     * @param [in] zoomFac  time window size;
+     */
     void setZoom(double zoomFac);
 
     //=========================================================================================================
     /**
-    * Get the current zoom.
-    *
-    * @return    The current zoom.
-    */
+     * Get the current zoom.
+     *
+     * @return    The current zoom.
+     */
     double getZoom();
 
     //=========================================================================================================
     /**
-    * Sets new time window size
-    *
-    * @param [in] T  time window size;
-    */
+     * Sets new time window size
+     *
+     * @param [in] T  time window size;
+     */
     void setWindowSize(int T);
 
     //=========================================================================================================
     /**
-    * Get the current window size.
-    *
-    * @return    The current window size.
-    */
+     * Get the current window size.
+     *
+     * @return    The current window size.
+     */
     int getWindowSize();
 
     //=========================================================================================================
     /**
-    * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
-    *
-    * @param [in] fileName     The file name and path where to store the screenshot.
-    */
+     * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
+     *
+     * @param [in] fileName     The file name and path where to store the screenshot.
+     */
     void takeScreenshot(const QString& fileName);
 
     //=========================================================================================================
     /**
-    * Update the SSP projection
-    *
-    * @param [in] projs    The new projectors.
-    */
+     * Update the SSP projection
+     *
+     * @param [in] projs    The new projectors.
+     */
     void updateProjection(const QList<FIFFLIB::FiffProj>& projs);
 
     //=========================================================================================================
     /**
-    * Update the compensator
-    *
-    * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
-    */
+     * Update the compensator
+     *
+     * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+     */
     void updateCompensator(int to);
 
     //=========================================================================================================
     /**
-    * Update the SPHARA operator
-    *
-    * @param[in] state            The current state of teh SPHARA tool
-    */
+     * Update the SPHARA operator
+     *
+     * @param[in] state            The current state of teh SPHARA tool
+     */
     void updateSpharaActivation(bool state);
 
     //=========================================================================================================
     /**
-    * Update the SPHARA operator
-    *
-    * @param[in] sSystemType            The current acquisition system type (VectorView, BabyMEG, EEG)
-    * @param[in] nBaseFctsFirst         The new number of basis function to use for the first SPHARA operator
-    * @param[in] nBaseFctsSecond        The new number of basis function to use for the second SPHARA operator
-    */
+     * Update the SPHARA operator
+     *
+     * @param[in] sSystemType            The current acquisition system type (VectorView, BabyMEG, EEG)
+     * @param[in] nBaseFctsFirst         The new number of basis function to use for the first SPHARA operator
+     * @param[in] nBaseFctsSecond        The new number of basis function to use for the second SPHARA operator
+     */
     void updateSpharaOptions(const QString& sSytemType,
                              int nBaseFctsFirst,
                              int nBaseFctsSecond);
 
     //=========================================================================================================
     /**
-    * Filter parameters changed
-    *
-    * @param[in] filterData   the currently active filter
-    */
+     * Filter parameters changed
+     *
+     * @param[in] filterData   the currently active filter
+     */
     void setFilter(const UTILSLIB::FilterData &filterData);
 
     //=========================================================================================================
     /**
-    * Filter avtivated
-    *
-    * @param[in] state    filter on/off flag
-    */
+     * Filter avtivated
+     *
+     * @param[in] state    filter on/off flag
+     */
     void setFilterActive(bool state);
 
     //=========================================================================================================
     /**
-    * Sets the type of channel which are to be filtered
-    *
-    * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
-    */
+     * Sets the type of channel which are to be filtered
+     *
+     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+     */
     void setFilterChannelType(const QString& channelType);
 
     //=========================================================================================================
     /**
-    * markChBad marks the selected channels as bad/good in m_chInfolist
-    *
-    * @param colorMap       color for each trigger channel
-    * @param activ          real time trigger detection active
-    * @param triggerCh      current trigger channel to scan
-    * @param threshold      threshold for the detection process
-    */
+     * markChBad marks the selected channels as bad/good in m_chInfolist
+     *
+     * @param colorMap       color for each trigger channel
+     * @param activ          real time trigger detection active
+     * @param triggerCh      current trigger channel to scan
+     * @param threshold      threshold for the detection process
+     */
     void triggerInfoChanged(const QMap<double, QColor>& colorMap,
                             bool active,
                             const QString& triggerCh,
@@ -350,79 +350,79 @@ public:
 
     //=========================================================================================================
     /**
-    * distanceTimeSpacerChanged changes the distance of the time spacers
-    *
-    * @param value the new distance for the time spacers
-    */
+     * distanceTimeSpacerChanged changes the distance of the time spacers
+     *
+     * @param value the new distance for the time spacers
+     */
     void setDistanceTimeSpacer(int value);
 
     //=========================================================================================================
     /**
-    * Returns teh current distance between time spacers.
-    *
-    * @return The current distance between the time spacers
-    */
+     * Returns teh current distance between time spacers.
+     *
+     * @return The current distance between the time spacers
+     */
     int getDistanceTimeSpacer();
 
     //=========================================================================================================
     /**
-    * resetTriggerCounter resets the trigger counter
-    */
+     * resetTriggerCounter resets the trigger counter
+     */
     void resetTriggerCounter();
 
 protected:
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Show channel context menu
-    *
-    * @param [in] pos   Position to popup the conext menu.
-    */
+     * Show channel context menu
+     *
+     * @param [in] pos   Position to popup the conext menu.
+     */
     void channelContextMenu(QPoint pos);
 
     //=========================================================================================================
     /**
-    * apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
-    */
+     * apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
+     */
     void applySelection();
 
     //=========================================================================================================
     /**
-    * hides the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
-    */
+     * hides the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
+     */
     void hideSelection();
 
     //=========================================================================================================
     /**
-    * reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
-    */
+     * reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda
+     */
     void resetSelection();
 
     //=========================================================================================================
     /**
-    * Gets called when the views in the viewport of the table view change
-    */
+     * Gets called when the views in the viewport of the table view change
+     */
     void visibleRowsChanged();
 
     //=========================================================================================================
     /**
-    * Gets called when the bad channels are about to be marked as bad or good
-    */
+     * Gets called when the bad channels are about to be marked as bad or good
+     */
     void markChBad();
 
     QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt */
@@ -448,18 +448,18 @@ protected:
 signals:    
     //=========================================================================================================
     /**
-    * position is emitted whenever user moves the mouse inside of the table view viewport
-    *
-    * @param position   the current mouse position
-    * @param activeRow  the current row which the mouse is moved over
-    */
+     * position is emitted whenever user moves the mouse inside of the table view viewport
+     *
+     * @param position   the current mouse position
+     * @param activeRow  the current row which the mouse is moved over
+     */
     void markerMoved(QPoint position,
                      int activeRow);
 
     //=========================================================================================================
     /**
-    * Emmited when trigger detection was performed
-    */
+     * Emmited when trigger detection was performed
+     */
     void triggerDetected(int numberDetectedTriggers,
                          const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 

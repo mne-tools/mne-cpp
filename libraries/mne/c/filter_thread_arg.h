@@ -89,16 +89,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Filter Thread Argument
-    * Refactored: new_filter_thread_arg (filter_source_space.c)
-    */
+     * Constructs the Filter Thread Argument
+     * Refactored: new_filter_thread_arg (filter_source_space.c)
+     */
     FilterThreadArg();
 
     //=========================================================================================================
     /**
-    * Destroys the Filter Thread Argument
-    * Refactored: free_filter_thread_arg (filter_source_space.c)
-    */
+     * Destroys the Filter Thread Argument
+     * Refactored: free_filter_thread_arg (filter_source_space.c)
+     */
     ~FilterThreadArg();
 
 public:

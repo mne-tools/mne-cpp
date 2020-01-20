@@ -77,17 +77,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ReferenceAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ReferenceAboutWidget becomes a window. If parent is another widget, ReferenceAboutWidget becomes a child window inside parent. ReferenceAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a ReferenceAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new ReferenceAboutWidget becomes a window. If parent is another widget, ReferenceAboutWidget becomes a child window inside parent. ReferenceAboutWidget is deleted when its parent is deleted.
+     */
     ReferenceAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ReferenceAboutWidget.
-    * All ReferenceAboutWidget's children are deleted first. The application exits if ReferenceAboutWidget is the main widget.
-    */
+     * Destroys the ReferenceAboutWidget.
+     * All ReferenceAboutWidget's children are deleted first. The application exits if ReferenceAboutWidget is the main widget.
+     */
     ~ReferenceAboutWidget();
 
 private:

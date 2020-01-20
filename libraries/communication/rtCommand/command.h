@@ -89,90 +89,90 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a Command
-    *
-    * @param[in] p_bIsJson      If is received/should be send as JSON (optional, default true)
-    * @param[in] parent         Parent QObject (optional)
-    */
+     * Constructs a Command
+     *
+     * @param[in] p_bIsJson      If is received/should be send as JSON (optional, default true)
+     * @param[in] parent         Parent QObject (optional)
+     */
     explicit Command(bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructor which parses a command stored in a json object
-    *
-    * @param[in] p_sCommand         Command
-    * @param[in] p_qCommandContent  Content encapsulated in a JsonObject
-    * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
-    * @param[in] parent             Parent QObject (optional)
-    */
+     * Constructor which parses a command stored in a json object
+     *
+     * @param[in] p_sCommand         Command
+     * @param[in] p_qCommandContent  Content encapsulated in a JsonObject
+     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
+     * @param[in] parent             Parent QObject (optional)
+     */
     explicit Command(const QString &p_sCommand, const QJsonObject &p_qCommandContent, bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructs a command without parameters
-    *
-    * @param[in] p_sCommand         Command
-    * @param[in] p_sDescription     Command description
-    * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
-    * @param[in] parent             Parent QObject (optional)
-    */
+     * Constructs a command without parameters
+     *
+     * @param[in] p_sCommand         Command
+     * @param[in] p_sDescription     Command description
+     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
+     * @param[in] parent             Parent QObject (optional)
+     */
     explicit Command(const QString &p_sCommand, const QString &p_sDescription, bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructor which assembles a command from single parts
-    *
-    * @param[in] p_sCommand         Command
-    * @param[in] p_sDescription     Command description
-    * @param[in] p_qListParamNames  Parameter names
-    * @param[in] p_qListParamValues Parameter values/types.
-    * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
-    * @param[in] parent             Parent QObject (optional)
-    */
+     * Constructor which assembles a command from single parts
+     *
+     * @param[in] p_sCommand         Command
+     * @param[in] p_sDescription     Command description
+     * @param[in] p_qListParamNames  Parameter names
+     * @param[in] p_qListParamValues Parameter values/types.
+     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
+     * @param[in] parent             Parent QObject (optional)
+     */
     explicit Command(const QString &p_sCommand, const QString &p_sDescription,
                      const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructor which assembles a command from single parts
-    *
-    * @param[in] p_sCommand                 Command
-    * @param[in] p_sDescription             Command description
-    * @param[in] p_qListParamNames          Parameter names
-    * @param[in] p_qListParamValues         Parameter values/types.
-    * @param[in] p_vecParameterDescriptions Parameter descriptions;
-    */
+     * Constructor which assembles a command from single parts
+     *
+     * @param[in] p_sCommand                 Command
+     * @param[in] p_sDescription             Command description
+     * @param[in] p_qListParamNames          Parameter names
+     * @param[in] p_qListParamValues         Parameter values/types.
+     * @param[in] p_vecParameterDescriptions Parameter descriptions;
+     */
     explicit Command(const QString &p_sCommand, const QString &p_sDescription,
                      const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, const QStringList &p_vecParameterDescriptions, bool p_bIsJson = true, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_Command      Command to be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_Command      Command to be copied
+     */
     Command(const Command &p_Command);
 
     //=========================================================================================================
     /**
-    * Destroys the command
-    */
+     * Destroys the command
+     */
     virtual ~Command();
 
     //=========================================================================================================
     /**
-    * Short command for this request
-    *
-    * @return Short command representation.
-    */
+     * Short command for this request
+     *
+     * @return Short command representation.
+     */
     inline QString command() const;
 
     //=========================================================================================================
     /**
-    * Returns the number of parameters.
-    *
-    * @return number of parameters.
-    */
+     * Returns the number of parameters.
+     *
+     * @return number of parameters.
+     */
     inline quint32 count() const;
 
     //=========================================================================================================
@@ -193,119 +193,119 @@ public:
 
     //=========================================================================================================
     /**
-    * If received command was Json fomratted or triggered command should be Json formatted.
-    *
-    * @return Json formatted.
-    */
+     * If received command was Json fomratted or triggered command should be Json formatted.
+     *
+     * @return Json formatted.
+     */
     inline bool& isJson();
 
     //=========================================================================================================
     /**
-    * Get parameter descriptions
-    *
-    * @return parameter descriptions
-    */
+     * Get parameter descriptions
+     *
+     * @return parameter descriptions
+     */
     inline QList<QString> pDescriptions() const;
 
     //=========================================================================================================
     /**
-    * Get parameter names
-    *
-    * @return parameter names
-    */
+     * Get parameter names
+     *
+     * @return parameter names
+     */
     inline QList<QString> pNames() const;
 
     //=========================================================================================================
     /**
-    * Returns parameter values
-    *
-    * @return parameter values
-    */
+     * Returns parameter values
+     *
+     * @return parameter values
+     */
     inline QList<QVariant>& pValues();
 
     //=========================================================================================================
     /**
-    * Inherited command reply channel.
-    *
-    * @param[in] p_sReply   command reply
-    */
+     * Inherited command reply channel.
+     *
+     * @param[in] p_sReply   command reply
+     */
     void reply(const QString &p_sReply);
 
     //=========================================================================================================
     /**
-    * Sender slot which emmits triggered signal
-    */
+     * Sender slot which emmits triggered signal
+     */
     void send();
 
     //=========================================================================================================
     /**
-    * Creates a JSON Command Object
-    *
-    * @return Command converted to a JSON Object.
-    */
+     * Creates a JSON Command Object
+     *
+     * @return Command converted to a JSON Object.
+     */
     QJsonObject toJsonObject() const;
 
     //=========================================================================================================
     /**
-    * Creates a StringList with three items. First item is the command, second the parameter list and thrid the description.
-    *
-    * @return Command as a StringList.
-    */
+     * Creates a StringList with three items. First item is the command, second the parameter list and thrid the description.
+     *
+     * @return Command as a StringList.
+     */
     QStringList toStringList() const;
 
     //=========================================================================================================
     /**
-    * Creates a string JSON formatted ready send command.
-    *
-    * @return Command as a JSON formatted string which contains parameter values too.
-    */
+     * Creates a string JSON formatted ready send command.
+     *
+     * @return Command as a JSON formatted string which contains parameter values too.
+     */
     QString toStringReadySend() const;
 
     //=========================================================================================================
     /**
-    * Assignment Operator
-    *
-    * @param[in] rhs     Command which should be assigned.
-    */
+     * Assignment Operator
+     *
+     * @param[in] rhs     Command which should be assigned.
+     */
     Command& operator= (const Command &rhs);
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access parameter values by name
-    *
-    * @param[in] key    the parameter name.
-    *
-    * @return Parameter value related to the parameter name.
-    */
+     * Subscript operator [] to access parameter values by name
+     *
+     * @param[in] key    the parameter name.
+     *
+     * @return Parameter value related to the parameter name.
+     */
     QVariant& operator[] (const QString &key);
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access parameter values by index
-    *
-    * @param[in] idx    the parameter index.
-    *
-    * @return Parameter value related to the parameter index.
-    */
+     * Subscript operator [] to access parameter values by index
+     *
+     * @param[in] idx    the parameter index.
+     *
+     * @return Parameter value related to the parameter index.
+     */
     QVariant& operator[] (qint32 idx);
 
     //=========================================================================================================
     /**
-    * Subscript operator []
-    *
-    * @param[in] key    the parameter name.
-    *
-    * @return Parameter value related to the parameter name.
-    */
+     * Subscript operator []
+     *
+     * @param[in] key    the parameter name.
+     *
+     * @return Parameter value related to the parameter name.
+     */
     const QVariant operator[] (const QString &key) const;
 
 signals:
     //=========================================================================================================
     /**
-    * Signal which is emitted when command patterns execute method is processed.
-    *
-    * @param[in] p_command  the executed command.
-    */
+     * Signal which is emitted when command patterns execute method is processed.
+     *
+     * @param[in] p_command  the executed command.
+     */
     void executed(Command p_command);
 
 public:

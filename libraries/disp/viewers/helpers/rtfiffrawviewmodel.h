@@ -121,432 +121,432 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs an real-time multi sample array table model for the given parent.
-    *
-    * @param[in] parent     parent of the table model
-    */
+     * Constructs an real-time multi sample array table model for the given parent.
+     *
+     * @param[in] parent     parent of the table model
+     */
     RtFiffRawViewModel(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
-    *
-    * @param[in] parent     not used
-    *
-    * @return number of rows
-    */
+     * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
+     *
+     * @param[in] parent     not used
+     *
+     * @return number of rows
+     */
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
 
     //=========================================================================================================
     /**
-    * Returns the number of columns for the children of the given parent.
-    *
-    * @param[in] parent     not used
-    *
-    * @return number of columns
-    */
+     * Returns the number of columns for the children of the given parent.
+     *
+     * @param[in] parent     not used
+     *
+     * @return number of columns
+     */
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
-    * Returns the data stored under the given role for the item referred to by the index.
-    *
-    * @param[in] index      determines item location
-    * @param[in] role       role to return
-    *
-    * @return accessed data
-    */
+     * Returns the data stored under the given role for the item referred to by the index.
+     *
+     * @param[in] index      determines item location
+     * @param[in] role       role to return
+     *
+     * @return accessed data
+     */
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
-    * Returns the data for the given role and section in the header with the specified orientation.
-    *
-    * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
-    * @param[in] orientation    Qt::Horizontal or Qt::Vertical
-    * @param[in] role           role to show
-    *
-    * @return accessed eader data
-    */
+     * Returns the data for the given role and section in the header with the specified orientation.
+     *
+     * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
+     * @param[in] orientation    Qt::Horizontal or Qt::Vertical
+     * @param[in] role           role to show
+     *
+     * @return accessed eader data
+     */
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
-    * Sets corresponding fiff information
-    *
-    * @param [in] p_pFiffInfo   The corresponding fiff information
-    */
+     * Sets corresponding fiff information
+     *
+     * @param [in] p_pFiffInfo   The corresponding fiff information
+     */
     void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo>& p_pFiffInfo);
 
     //=========================================================================================================
     /**
-    * Sets the sampling information and calculates the resulting downsampling factor between actual sps and desired sps
-    *
-    * @param[in] sps        Samples per second of incomming data
-    * @param[in] T          Time window length to display
-    * @param[in] bSetZero   If data should be set to zero. Default is false.
-    */
+     * Sets the sampling information and calculates the resulting downsampling factor between actual sps and desired sps
+     *
+     * @param[in] sps        Samples per second of incomming data
+     * @param[in] T          Time window length to display
+     * @param[in] bSetZero   If data should be set to zero. Default is false.
+     */
     void setSamplingInfo(float sps, int T, bool bSetZero = false);
 
     //=========================================================================================================
     /**
-    * Returns the last received data block.
-    *
-    * @return the last data block
-    */
+     * Returns the last received data block.
+     *
+     * @return the last data block
+     */
     Eigen::MatrixXd getLastBlock();
 
     //=========================================================================================================
     /**
-    * Adds multiple time points (QVector) for a channel set (VectorXd)
-    *
-    * @param[in] data       data to add (Time points of channel samples)
-    */
+     * Adds multiple time points (QVector) for a channel set (VectorXd)
+     *
+     * @param[in] data       data to add (Time points of channel samples)
+     */
     void addData(const QList<Eigen::MatrixXd> &data);
 
     //=========================================================================================================
     /**
-    * Returns the kind of a given channel number
-    *
-    * @param[in] row    row number which correspodns to a given channel
-    *
-    * @return kind of given channel number
-    */
+     * Returns the kind of a given channel number
+     *
+     * @param[in] row    row number which correspodns to a given channel
+     *
+     * @return kind of given channel number
+     */
     FIFFLIB::fiff_int_t getKind(qint32 row) const;
 
     //=========================================================================================================
     /**
-    * Returns the unit of a given channel number
-    *
-    * @param[in] row    row number which correspodns to a given channel
-    *
-    * @return unit of given channel number
-    */
+     * Returns the unit of a given channel number
+     *
+     * @param[in] row    row number which correspodns to a given channel
+     *
+     * @return unit of given channel number
+     */
     FIFFLIB::fiff_int_t getUnit(qint32 row) const;
 
     //=========================================================================================================
     /**
-    * Returns the coil type of a given channel number
-    *
-    * @param[in] row    row number which correspodns to a given channel
-    *
-    * @return coil type of given channel number
-    */
+     * Returns the coil type of a given channel number
+     *
+     * @param[in] row    row number which correspodns to a given channel
+     *
+     * @return coil type of given channel number
+     */
     FIFFLIB::fiff_int_t getCoil(qint32 row) const;
 
     //=========================================================================================================
     /**
-    * Returns the maximal number of samples of the downsampled data to display
-    *
-    * @return the maximal number of samples
-    */
+     * Returns the maximal number of samples of the downsampled data to display
+     *
+     * @return the maximal number of samples
+     */
     inline qint32 getMaxSamples() const;
 
     //=========================================================================================================
     /**
-    * Returns the current sample index which represents the index which the next incoming data will be stored at in the data
-    *
-    * @return the current sample index
-    */
+     * Returns the current sample index which represents the index which the next incoming data will be stored at in the data
+     *
+     * @return the current sample index
+     */
     inline qint32 getCurrentSampleIndex() const;
 
     //=========================================================================================================
     /**
-    * Returns the first value of the last complete data display block
-    *
-    * @param[in] row    row for which the first value is to be returned
-    *
-    * @return the first value of the last complete data display block
-    */
+     * Returns the first value of the last complete data display block
+     *
+     * @param[in] row    row for which the first value is to be returned
+     *
+     * @return the first value of the last complete data display block
+     */
     inline double getLastBlockFirstValue(int row) const;
 
     //=========================================================================================================
     /**
-    * Returns a map which conatins the channel idx and its corresponding selection status
-    *
-    * @return the channel idx to selection status
-    */
+     * Returns a map which conatins the channel idx and its corresponding selection status
+     *
+     * @return the channel idx to selection status
+     */
     inline const QMap<qint32,qint32>& getIdxSelMap() const;
 
     //=========================================================================================================
     /**
-    * Selects the given list of channel indeces and unselect all other channels
-    *
-    * @param[in] selection      channel index list to select
-    */
+     * Selects the given list of channel indeces and unselect all other channels
+     *
+     * @param[in] selection      channel index list to select
+     */
     void selectRows(const QList<qint32> &selection);
 
     //=========================================================================================================
     /**
-    * Hides the given list of channel
-    *
-    * @param[in] selection      channel index list to select
-    */
+     * Hides the given list of channel
+     *
+     * @param[in] selection      channel index list to select
+     */
     void hideRows(const QList<qint32> &selection);
 
     //=========================================================================================================
     /**
-    * Resets the current selection (selects all channels)
-    */
+     * Resets the current selection (selects all channels)
+     */
     void resetSelection();
 
     //=========================================================================================================
     /**
-    * Toggle freeze for all channels when a channel is double clicked
-    *
-    * @param [in] index     of the channel which has been double clicked
-    */
+     * Toggle freeze for all channels when a channel is double clicked
+     *
+     * @param [in] index     of the channel which has been double clicked
+     */
     void toggleFreeze(const QModelIndex &index);
 
     //=========================================================================================================
     /**
-    * Set scaling channel scaling
-    *
-    * @param[in] p_qMapChScaling    Map of scaling factors
-    */
+     * Set scaling channel scaling
+     *
+     * @param[in] p_qMapChScaling    Map of scaling factors
+     */
     void setScaling(const QMap< qint32,float >& p_qMapChScaling);
 
     //=========================================================================================================
     /**
-    * Update the SSP projection
-    *
-    * @param [in] projs    The new projectors.
-    */
+     * Update the SSP projection
+     *
+     * @param [in] projs    The new projectors.
+     */
     void updateProjection(const QList<FIFFLIB::FiffProj>& projs);
 
     //=========================================================================================================
     /**
-    * Update the compensator
-    *
-    * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
-    */
+     * Update the compensator
+     *
+     * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+     */
     void updateCompensator(int to);
 
     //=========================================================================================================
     /**
-    * Update the SPHARA operator
-    *
-    * @param[in] state            The current state of teh SPHARA tool
-    */
+     * Update the SPHARA operator
+     *
+     * @param[in] state            The current state of teh SPHARA tool
+     */
     void updateSpharaActivation(bool state);
 
     //=========================================================================================================
     /**
-    * Update the SPHARA operator
-    *
-    * @param[in] sSystemType            The current acquisition system type (VectorView, BabyMEG, EEG)
-    * @param[in] nBaseFctsFirst         The new number of basis function to use for the first SPHARA operator
-    * @param[in] nBaseFctsSecond        The new number of basis function to use for the second SPHARA operator
-    */
+     * Update the SPHARA operator
+     *
+     * @param[in] sSystemType            The current acquisition system type (VectorView, BabyMEG, EEG)
+     * @param[in] nBaseFctsFirst         The new number of basis function to use for the first SPHARA operator
+     * @param[in] nBaseFctsSecond        The new number of basis function to use for the second SPHARA operator
+     */
     void updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond);
 
     //=========================================================================================================
     /**
-    * Set new filter parameters
-    *
-    * @param[in] filterData    list of the new filter
-    */
+     * Set new filter parameters
+     *
+     * @param[in] filterData    list of the new filter
+     */
     void setFilter(QList<UTILSLIB::FilterData> filterData);
 
     //=========================================================================================================
     /**
-    * Set filter activation
-    *
-    * @param[in] state    filter on/off flag
-    */
+     * Set filter activation
+     *
+     * @param[in] state    filter on/off flag
+     */
     void setFilterActive(bool state);
 
     //=========================================================================================================
     /**
-    * Set the background color
-    *
-    * @param[in] color    The background color
-    */
+     * Set the background color
+     *
+     * @param[in] color    The background color
+     */
     void setBackgroundColor(const QColor& color);
 
     //=========================================================================================================
     /**
-    * Sets the type of channel which are to be filtered
-    *
-    * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
-    */
+     * Sets the type of channel which are to be filtered
+     *
+     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+     */
     void setFilterChannelType(QString channelType);
 
     //=========================================================================================================
     /**
-    * Create list of channels which are to be filtered based on channel names
-    *
-    * @param[in] channelNames    the channel names which are to be filtered
-    */
+     * Create list of channels which are to be filtered based on channel names
+     *
+     * @param[in] channelNames    the channel names which are to be filtered
+     */
     void createFilterChannelList(QStringList channelNames);
 
     //=========================================================================================================
     /**
-    * markChBad marks the selected channels as bad/good in m_chInfolist
-    *
-    * @param chlist index that is selected for marking
-    * @param status, status=1 -> mark as bad, status=0 -> mark as good
-    */
+     * markChBad marks the selected channels as bad/good in m_chInfolist
+     *
+     * @param chlist index that is selected for marking
+     * @param status, status=1 -> mark as bad, status=0 -> mark as good
+     */
     void markChBad(QModelIndex ch, bool status);
 
     //=========================================================================================================
     /**
-    * markChBad marks the selected channels as bad/good in m_chInfolist
-    *
-    * @param chlist is the list of indices that are selected for marking
-    * @param status, status=1 -> mark as bad, status=0 -> mark as good
-    */
+     * markChBad marks the selected channels as bad/good in m_chInfolist
+     *
+     * @param chlist is the list of indices that are selected for marking
+     * @param status, status=1 -> mark as bad, status=0 -> mark as good
+     */
     void markChBad(QModelIndexList chlist, bool status);
 
     //=========================================================================================================
     /**
-    * markChBad marks the selected channels as bad/good in m_chInfolist
-    *
-    * @param colorMap       color for each trigger channel
-    * @param activ          real time trigger detection active
-    * @param triggerCh      current trigger channel to scan
-    * @param threshold      threshold for the detection process
-    */
+     * markChBad marks the selected channels as bad/good in m_chInfolist
+     *
+     * @param colorMap       color for each trigger channel
+     * @param activ          real time trigger detection active
+     * @param triggerCh      current trigger channel to scan
+     * @param threshold      threshold for the detection process
+     */
     void triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold);
 
     //=========================================================================================================
     /**
-    * distanceTimeSpacerChanged changes the distance of the time spacers
-    *
-    * @param value the new distance for the time spacers
-    */
+     * distanceTimeSpacerChanged changes the distance of the time spacers
+     *
+     * @param value the new distance for the time spacers
+     */
     void distanceTimeSpacerChanged(int value);
 
     //=========================================================================================================
     /**
-    * resetTriggerCounter resets the trigger counter
-    */
+     * resetTriggerCounter resets the trigger counter
+     */
     void resetTriggerCounter();
 
     //=========================================================================================================
     /**
-    * Returns the number of vertical lines (one per second)
-    *
-    * @return number of vertical lines
-    */
+     * Returns the number of vertical lines (one per second)
+     *
+     * @return number of vertical lines
+     */
     inline qint32 numVLines() const;
 
     //=========================================================================================================
     /**
-    * Returns current freezing status
-    *
-    * @return the current freezing status
-    */
+     * Returns current freezing status
+     *
+     * @return the current freezing status
+     */
     inline bool isFreezed() const;
 
     //=========================================================================================================
     /**
-    * Returns current scaling
-    *
-    * @return the current scaling
-    */
+     * Returns current scaling
+     *
+     * @return the current scaling
+     */
     inline const QMap< qint32,float >& getScaling() const;
 
     //=========================================================================================================
     /**
-    * Returns current detected trigger flanks
-    *
-    * @return the current detected trigger flanks
-    */
+     * Returns current detected trigger flanks
+     *
+     * @return the current detected trigger flanks
+     */
     inline QList<QPair<int,double> > getDetectedTriggers() const;
 
     //=========================================================================================================
     /**
-    * Returns old detected trigger flanks
-    *
-    * @return the old detected trigger flanks
-    */
+     * Returns old detected trigger flanks
+     *
+     * @return the old detected trigger flanks
+     */
     inline QList<QPair<int, double> > getDetectedTriggersOld() const;
 
     //=========================================================================================================
     /**
-    * Returns current trigger color
-    *
-    * @return the current trigger color map fpr each detected type
-    */
+     * Returns current trigger color
+     *
+     * @return the current trigger color map fpr each detected type
+     */
     inline QMap<double, QColor> getTriggerColor() const;
 
     //=========================================================================================================
     /**
-    * Returns the current number for the time spacers
-    *
-    * @return the current number for the time spacers
-    */
+     * Returns the current number for the time spacers
+     *
+     * @return the current number for the time spacers
+     */
     inline int getNumberOfTimeSpacers() const;
 
     //=========================================================================================================
     /**
-    * Returns the current trigger threshold
-    *
-    * @return the current trigger threshold
-    */
+     * Returns the current trigger threshold
+     *
+     * @return the current trigger threshold
+     */
     inline double getTriggerThreshold() const;
 
     //=========================================================================================================
     /**
-    * Returns the current trigger name
-    *
-    * @return the current trigger name
-    */
+     * Returns the current trigger name
+     *
+     * @return the current trigger name
+     */
     inline QString getTriggerName() const;
 
     //=========================================================================================================
     /**
-    * Returns the current trigger channel index
-    *
-    * @return the current trigger channel index
-    */
+     * Returns the current trigger channel index
+     *
+     * @return the current trigger channel index
+     */
     inline int getCurrentTriggerIndex() const;
 
     //=========================================================================================================
     /**
-    * Returns whether trigger detection is active or not
-    *
-    * @return whether trigger detection is active or not
-    */
+     * Returns whether trigger detection is active or not
+     *
+     * @return whether trigger detection is active or not
+     */
     inline bool triggerDetectionActive() const;
 
     //=========================================================================================================
     /**
-    * Returns the current overlap add delay
-    *
-    * @return the current overlap add delay
-    */
+     * Returns the current overlap add delay
+     *
+     * @return the current overlap add delay
+     */
     inline int getCurrentOverlapAddDelay() const;
 
 private:
     //=========================================================================================================
     /**
-    * Init the SPHARA method.
-    */
+     * Init the SPHARA method.
+     */
     void initSphara();
 
     static void doFilterPerChannelRTMSA(QPair<QList<UTILSLIB::FilterData>,QPair<int,Eigen::RowVectorXd> > &channelDataTime);
 
     //=========================================================================================================
     /**
-    * Calculates the filtered version of the channels in m_matDataRaw
-    */
+     * Calculates the filtered version of the channels in m_matDataRaw
+     */
     void filterDataBlock();
 
     //=========================================================================================================
     /**
-    * Calculates the filtered version of the raw input data
-    *
-    * @param [in] data          data which is to be filtered
-    * @param [in] iDataIndex    current position in the global data matrix
-    */
+     * Calculates the filtered version of the raw input data
+     *
+     * @param [in] data          data which is to be filtered
+     * @param [in] iDataIndex    current position in the global data matrix
+     */
     void filterDataBlock(const Eigen::MatrixXd &data, int iDataIndex);
 
     //=========================================================================================================
     /**
-    * Clears the model
-    */
+     * Clears the model
+     */
     void clearModel();
 
     bool                                m_bProjActivated;                           /**< Projections activated */
@@ -622,24 +622,24 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * Emmited when new selcetion was made
-    *
-    * @param [in] selection     list of all selected channels
-    */
+     * Emmited when new selcetion was made
+     *
+     * @param [in] selection     list of all selected channels
+     */
     void newSelection(const QList<qint32>& selection);
 
     //=========================================================================================================
     /**
-    * Emmited when the window size/max number of samples changed
-    *
-    * @param [in] windowSize     number of samples in the window
-    */
+     * Emmited when the window size/max number of samples changed
+     *
+     * @param [in] windowSize     number of samples in the window
+     */
     void windowSizeChanged(int windowSize);
 
     //=========================================================================================================
     /**
-    * Emmited when trigger detection was performed
-    */
+     * Emmited when trigger detection was performed
+     */
     void triggerDetected(int numberDetectedTriggers, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 };
 

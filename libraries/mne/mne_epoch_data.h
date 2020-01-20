@@ -97,48 +97,48 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     MNEEpochData();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_MNEEpochData     MNE epoch data
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_MNEEpochData     MNE epoch data
+     */
     MNEEpochData(const MNEEpochData &p_MNEEpochData);
 
     //=========================================================================================================
     /**
-    * Destroys the MNE epoch data.
-    */
+     * Destroys the MNE epoch data.
+     */
     ~MNEEpochData();
 
     //=========================================================================================================
     /**
-    * Applies baseline correction to the evoked data.
-    *
-    * @param[in] baseline     time definition of the baseline in seconds [from, to]
-    */
+     * Applies baseline correction to the evoked data.
+     *
+     * @param[in] baseline     time definition of the baseline in seconds [from, to]
+     */
     void applyBaselineCorrection(QPair<QVariant,QVariant>& baseline);
 
         //=========================================================================================================
     /**
-    * Reduces the data to the selected rows.
-    *
-    * @param[in] sel     The selected rows to keep.
-    */
+     * Reduces the data to the selected rows.
+     *
+     * @param[in] sel     The selected rows to keep.
+     */
     void pick_channels(const Eigen::RowVectorXi& sel);
 
     //=========================================================================================================
     /**
-    * Comparison of two Epoch data
-    *
-    * @param[in] MED_other     Epoch data to compare with
-    *
-    * @return true if equal; false otherwise
-    */
+     * Comparison of two Epoch data
+     *
+     * @param[in] MED_other     Epoch data to compare with
+     *
+     * @return true if equal; false otherwise
+     */
     bool operator== (const MNEEpochData& MED_other) const
     {
         return (this->epoch == MED_other.epoch &&

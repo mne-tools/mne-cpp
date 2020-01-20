@@ -77,17 +77,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtHpiAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtHpiAboutWidget becomes a window. If parent is another widget, RtHpiAboutWidget becomes a child window inside parent. RtHpiAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RtHpiAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new RtHpiAboutWidget becomes a window. If parent is another widget, RtHpiAboutWidget becomes a child window inside parent. RtHpiAboutWidget is deleted when its parent is deleted.
+     */
     RtHpiAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtHpiAboutWidget.
-    * All RtHpiAboutWidget's children are deleted first. The application exits if RtHpiAboutWidget is the main widget.
-    */
+     * Destroys the RtHpiAboutWidget.
+     * All RtHpiAboutWidget's children are deleted first. The application exits if RtHpiAboutWidget is the main widget.
+     */
     ~RtHpiAboutWidget();
 
 private:

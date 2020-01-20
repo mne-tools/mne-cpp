@@ -92,15 +92,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Derivation Set
-    */
+     * Constructs the MNE Derivation Set
+     */
     MneDerivSet();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Derivation Set
-    * Refactored: mne_free_deriv_set (mne_derivations.c)
-    */
+     * Destroys the MNE Derivation Set
+     * Refactored: mne_free_deriv_set (mne_derivations.c)
+     */
     ~MneDerivSet();
 
 public:

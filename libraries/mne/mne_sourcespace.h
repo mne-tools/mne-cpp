@@ -120,217 +120,217 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
-    */
+     * Default constructor
+     */
     MNESourceSpace();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_MNESourceSpace   MNE forward solution
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_MNESourceSpace   MNE forward solution
+     */
     MNESourceSpace(const MNESourceSpace &p_MNESourceSpace);
 
     //=========================================================================================================
     /**
-    * Destroys the MNE forward solution
-    */
+     * Destroys the MNE forward solution
+     */
     ~MNESourceSpace();
 
     //=========================================================================================================
     /**
-    * Initializes MNE source space.
-    */
+     * Initializes MNE source space.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * True if MNE Source Space is empty.
-    *
-    * @return true if MNE Source Space is empty
-    */
+     * True if MNE Source Space is empty.
+     *
+     * @return true if MNE Source Space is empty
+     */
     inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Definition of the mne_find_source_space_hemi function
-    *
-    * Returns the hemisphere id ( FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
-    *
-    * @param[in] p_Hemisphere the hemisphere to investigate
-    *
-    * @return the deduced hemisphere id
-    */
+     * ### MNE toolbox root function ###: Definition of the mne_find_source_space_hemi function
+     *
+     * Returns the hemisphere id ( FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
+     *
+     * @param[in] p_Hemisphere the hemisphere to investigate
+     *
+     * @return the deduced hemisphere id
+     */
     static qint32 find_source_space_hemi(MNEHemisphere& p_Hemisphere);
 
     //=========================================================================================================
     /**
-    * Returns the Zero based (different to MATLAB) indices of the used vertices of both hemispheres
-    *
-    * @return the hemisphere vertices
-    */
+     * Returns the Zero based (different to MATLAB) indices of the used vertices of both hemispheres
+     *
+     * @return the hemisphere vertices
+     */
     QList<VectorXi> get_vertno() const;
 
     //=========================================================================================================
     /**
-    * Find vertex numbers and indices from label
-    *
-    * @param[in] label      Source space label
-    * @param[out] src_sel   array of int (idx.size() = vertno[0].size() + vertno[1].size())
-    *                       Indices of the selected vertices in sourse space
-    *
-    * @return vertno list of length 2 Vertex numbers for lh and rh
-    */
+     * Find vertex numbers and indices from label
+     *
+     * @param[in] label      Source space label
+     * @param[out] src_sel   array of int (idx.size() = vertno[0].size() + vertno[1].size())
+     *                       Indices of the selected vertices in sourse space
+     *
+     * @return vertno list of length 2 Vertex numbers for lh and rh
+     */
     QList<VectorXi> label_src_vertno_sel(const Label &p_label, VectorXi &src_sel) const;
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Definition of the mne_patch_info function
-    *
-    * Generate the patch information from the 'nearest' vector in a source space. For vertex in the source
-    * space it provides the list of neighboring vertices in the high resolution triangulation.
-    *
-    * @param [in,out] p_Hemisphere  The source space.
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * ### MNE toolbox root function ###: Definition of the mne_patch_info function
+     *
+     * Generate the patch information from the 'nearest' vector in a source space. For vertex in the source
+     * space it provides the list of neighboring vertices in the high resolution triangulation.
+     *
+     * @param [in,out] p_Hemisphere  The source space.
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool patch_info(MNEHemisphere &p_Hemisphere);//VectorXi& nearest, QList<VectorXi>& pinfo);@param [in] nearest   The nearest vector of the source space.@param [out] pinfo    The requested patch information.
 
     //=========================================================================================================
     /**
-    * Reduces a source space to selected regions
-    *
-    * @param[in] p_qListLabels  ROIs
-    *
-    * @return the reduced source space
-    */
+     * Reduces a source space to selected regions
+     *
+     * @param[in] p_qListLabels  ROIs
+     *
+     * @return the reduced source space
+     */
     MNESourceSpace pick_regions(const QList<Label> &p_qListLabels) const;
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Definition of the mne_read_source_spaces function
-    *
-    * Reads source spaces from a fif file
-    *
-    * @param [in,out] p_pStream         The opened fif file
-    * @param [in] add_geom          Add geometry information to the source spaces
-    * @param [out] p_SourceSpace    The read source spaces
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * ### MNE toolbox root function ###: Definition of the mne_read_source_spaces function
+     *
+     * Reads source spaces from a fif file
+     *
+     * @param [in,out] p_pStream         The opened fif file
+     * @param [in] add_geom          Add geometry information to the source spaces
+     * @param [out] p_SourceSpace    The read source spaces
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNESourceSpace& p_SourceSpace);
 
     //=========================================================================================================
     /**
-    * Returns the number of stored hemispheres 0, 1 or 2
-    *
-    * @return number of stored hemispheres
-    */
+     * Returns the number of stored hemispheres 0, 1 or 2
+     *
+     * @return number of stored hemispheres
+     */
     inline qint32 size() const;
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Definition of the mne_transform_source_space_to function
-    * Wrapper for the MNESourceSpace transform_source_space_to member function
-    *
-    * Note: In difference to mne-matlab this is not a static function. This is a method of the MNESourceSpace
-    *       class, that's why a tree object doesn't need to be handed to the function.
-    *
-    * Transforms source space data to the desired coordinate system
-    *
-    * @param [in] dest destination check code
-    * @param [in] trans transformation information
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * ### MNE toolbox root function ###: Definition of the mne_transform_source_space_to function
+     * Wrapper for the MNESourceSpace transform_source_space_to member function
+     *
+     * Note: In difference to mne-matlab this is not a static function. This is a method of the MNESourceSpace
+     *       class, that's why a tree object doesn't need to be handed to the function.
+     *
+     * Transforms source space data to the desired coordinate system
+     *
+     * @param [in] dest destination check code
+     * @param [in] trans transformation information
+     *
+     * @return true if succeeded, false otherwise
+     */
     bool transform_source_space_to(fiff_int_t dest, FiffCoordTrans& trans);
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Definition of the write_source_spaces_to_fid function
-    *
-    * Write the source spaces to a FIF stream
-    *
-    * @param[in] p_pStream  The stream to write to.
-    */
+     * ### MNE toolbox root function ###: Definition of the write_source_spaces_to_fid function
+     *
+     * Write the source spaces to a FIF stream
+     *
+     * @param[in] p_pStream  The stream to write to.
+     */
     void writeToStream(FiffStream* p_pStream);
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access parameter values by index
-    *
-    * @param[in] idx    the hemisphere index (0 or 1).
-    *
-    * @return Hemisphere related to the parameter index.
-    */
+     * Subscript operator [] to access parameter values by index
+     *
+     * @param[in] idx    the hemisphere index (0 or 1).
+     *
+     * @return Hemisphere related to the parameter index.
+     */
     MNEHemisphere& operator[] (qint32 idx);
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access parameter values by index
-    *
-    * @param[in] idx    the hemisphere index (0 or 1).
-    *
-    * @return Hemisphere related to the parameter index.
-    */
+     * Subscript operator [] to access parameter values by index
+     *
+     * @param[in] idx    the hemisphere index (0 or 1).
+     *
+     * @return Hemisphere related to the parameter index.
+     */
     const MNEHemisphere& operator[] (qint32 idx) const;
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access parameter values by index
-    *
-    * @param[in] idt    the hemisphere identifier ("lh" or "rh").
-    *
-    * @return Hemisphere related to the parameter identifier.
-    */
+     * Subscript operator [] to access parameter values by index
+     *
+     * @param[in] idt    the hemisphere identifier ("lh" or "rh").
+     *
+     * @return Hemisphere related to the parameter identifier.
+     */
     MNEHemisphere& operator[] (QString idt);
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access parameter values by index
-    *
-    * @param[in] idt    the hemisphere identifier ("lh" or "rh").
-    *
-    * @return Hemisphere related to the parameter identifier.
-    */
+     * Subscript operator [] to access parameter values by index
+     *
+     * @param[in] idt    the hemisphere identifier ("lh" or "rh").
+     *
+     * @return Hemisphere related to the parameter identifier.
+     */
     const MNEHemisphere& operator[] (QString idt) const;
 
     /**
-    * Overloaded == operator to compare an object to this instance.
-    *
-    * @param[in] object    The object which should be compared to.
-    *
-    * @return true if equal, false otherwise
-    */
+     * Overloaded == operator to compare an object to this instance.
+     *
+     * @param[in] object    The object which should be compared to.
+     *
+     * @return true if equal, false otherwise
+     */
     friend bool operator== (const MNESourceSpace &a, const MNESourceSpace &b);
 
 private:
 
     //=========================================================================================================
     /**
-    * Definition of the complete_source_space_info function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
-    *
-    * Completes triangulation info
-    *
-    * @param [in, out] p_pHemisphere   Hemisphere to be completed
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * Definition of the complete_source_space_info function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
+     *
+     * Completes triangulation info
+     *
+     * @param [in, out] p_pHemisphere   Hemisphere to be completed
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool complete_source_space_info(MNEHemisphere& p_Hemisphere);
 
     //=========================================================================================================
     /**
-    * Definition of the read_source_space function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
-    *
-    * Reads a single source space (hemisphere)
-    *
-    * @param [in] p_pStream         The opened fif file
-    * @param [in] p_Tree            Search for the source space here
-    * @param [out] p_pHemisphere    The read source space (hemisphere)
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * Definition of the read_source_space function in e.g. mne_read_source_spaces.m, mne_read_bem_surfaces.m
+     *
+     * Reads a single source space (hemisphere)
+     *
+     * @param [in] p_pStream         The opened fif file
+     * @param [in] p_Tree            Search for the source space here
+     * @param [out] p_pHemisphere    The read source space (hemisphere)
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool read_source_space(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Tree, MNEHemisphere& p_Hemisphere);
 
 private:

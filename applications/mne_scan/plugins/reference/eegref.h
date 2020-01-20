@@ -86,19 +86,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a EEGRef object.
-    */
+     * Constructs a EEGRef object.
+     */
     EEGRef();
 
     //=========================================================================================================
     /**
-    * transforms the EEG data matrix with indifferent electrode reference to an EEG data matrix with common average reference. Bad channels are set to zero.
-    *
-    * @param[in] matIER         EEG data matrix with indifferent electrode reference
-    * @param[in] pFiffInfo      pointer to the corresponding Fiff-Info of the EEG data stream
-    *
-    * @return EEG data matrix with common average reference
-    */
+     * transforms the EEG data matrix with indifferent electrode reference to an EEG data matrix with common average reference. Bad channels are set to zero.
+     *
+     * @param[in] matIER         EEG data matrix with indifferent electrode reference
+     * @param[in] pFiffInfo      pointer to the corresponding Fiff-Info of the EEG data stream
+     *
+     * @return EEG data matrix with common average reference
+     */
     static Eigen::MatrixXd applyCAR(Eigen::MatrixXd& matIER, FIFFLIB::FiffInfo::SPtr &pFiffInfo);
 
 };
