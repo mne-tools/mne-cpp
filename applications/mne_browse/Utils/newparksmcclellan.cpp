@@ -51,7 +51,7 @@ it is less than 3, as stated in the original Fortran code comments.
 If you find a problem with this code, please leave us a note on:
 http://www.iowahills.com/feedbackcomments.html
 
-*/
+ */
 
 #ifdef __cplusplus
 extern "C" {

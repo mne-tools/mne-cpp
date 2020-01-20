@@ -552,8 +552,8 @@ void fiff_write_float_matrix_old (  FiffStream::SPtr& t_pStream,    /* Destinati
                                     int          rows,
                                     int          cols)              /* Number of rows and columns */
 /*
-* Write out a 2D floating-point matrix
-*/
+ * Write out a 2D floating-point matrix
+ */
 {
     MatrixXf mat(rows,cols);
 
@@ -699,8 +699,8 @@ void fiff_write_int_matrix_old (    FiffStream::SPtr& t_pStream,
 
 int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, FiffSparseMatrix* mat)
 /*
-* Write a sparse matrix
-*/
+ * Write a sparse matrix
+ */
 {
     FiffTag::SPtr tag;
     int     k;
@@ -961,8 +961,8 @@ bad : {
 
 FiffSparseMatrix* mne_pick_lower_triangle_rcs(FiffSparseMatrix* mat)
 /*
-* Fill in upper triangle with the lower triangle values
-*/
+ * Fill in upper triangle with the lower triangle values
+ */
 {
     int             *nnz       = NULL;
     int             **colindex = NULL;
@@ -1027,8 +1027,8 @@ out : {
 
 static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* ss, int selected_only)
 /*
-* Write the vertex neighbors and other information for a volume source space
-*/
+ * Write the vertex neighbors and other information for a volume source space
+ */
 {
     int ntot,nvert;
     int *nneighbors = NULL;
@@ -1353,8 +1353,8 @@ bad : {
 
 QString mne_name_list_to_string_41(const QStringList& list)
 /*
-* Convert a string array to a colon-separated string
-*/
+ * Convert a string array to a colon-separated string
+ */
 {
     int nlist = list.size();
     QString res;
@@ -1374,8 +1374,8 @@ int mne_write_named_matrix( FiffStream::SPtr& t_pStream,
                             int  kind,
                             MneNamedMatrix* mat)
 /*
-* Write a block which contains information about one named matrix
-*/
+ * Write a block which contains information about one named matrix
+ */
 {
     QString names;
 
@@ -1406,8 +1406,8 @@ bad :
 
 bool fiff_put_dir (FiffStream::SPtr& t_pStream, const QList<FiffDirEntry::SPtr>& dir)
 /*
-* Put in new directory
-*/
+ * Put in new directory
+ */
 {
     int nent = dir.size();
     int k;
@@ -1702,8 +1702,8 @@ bad : {
 
 bool mne_attach_env(const QString& name, const QString& command)
 /*
-* Add the environment info for future reference
-*/
+ * Add the environment info for future reference
+ */
 {
     int  insert_blocks[]  = { FIFFB_MNE , FIFFB_MEAS, FIFFB_MRI, FIFFB_BEM, -1 };
     QString cwd = QDir::currentPath();

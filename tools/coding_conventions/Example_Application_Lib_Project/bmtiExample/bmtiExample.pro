@@ -1,7 +1,7 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     bmtiExample.pro
-# @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+# @author   Lorenz Esch <lesch@mgh.harvard.edu>
 # @version  1.0
 # @date     April, 2015
 #

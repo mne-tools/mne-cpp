@@ -1,15 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     ssvepbci.pro
-# @author   Viktor Klüber <viktor.klueber@tu-ilmenau.de>
-#           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Lorenz Esch <lesch@mgh.harvard.edu>;
+#           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
 # @version  1.0
 # @date     May, 2016
 #
 # @section  LICENSE
 #
-# Copyright (C) 2016, Lorenz Esch and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2016, Christoph Dinh, Lorenz Esch, Viktor Klueber. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:

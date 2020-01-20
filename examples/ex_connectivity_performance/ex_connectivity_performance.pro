@@ -1,14 +1,13 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     ex_connectivity_performance.pro
-# @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @author   Lorenz Esch <lesch@mgh.harvard.edu>
 # @version  1.0
 # @date     April, 2019
 #
 # @section  LICENSE
 #
-# Copyright (C) 2019, Lorenz Esch and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2019, Lorenz Esch. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:

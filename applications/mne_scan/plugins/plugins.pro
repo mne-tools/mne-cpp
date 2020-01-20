@@ -2,14 +2,17 @@
 #
 # @file     plugins.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+#           Lorenz Esch <lesch@mgh.harvard.edu>;
+#           Louis Eichhorst <Louis.Eichhorst@tu-ilmenau.de>;
+#           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
+#           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
 # @version  1.0
 # @date     February, 2013
 #
 # @section  LICENSE
 #
-# Copyright (C) 2013, Christoph Dinh, Limin Sun and Matti Hamalainen. All rights reserved.
+#
+#                      Copyright (C) 2013, Christoph Dinh, Lorenz Esch, Louis Eichhorst, Simon Heinke, Viktor Klueber. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:

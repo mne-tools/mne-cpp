@@ -1,37 +1,38 @@
 //=============================================================================================================
 /**
-* @file     mne_meas_data.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     January, 2017
-*
-* @section  LICENSE
-*
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    Definition of the MNE Meas Data (MneMeasData) Class.
-*
-*/
+ * @file     mne_meas_data.cpp
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @version  1.0
+ * @date     January, 2017
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Definition of the MNE Meas Data (MneMeasData) Class.
+ *
+ */
 
 
 //*************************************************************************************************************
@@ -285,8 +286,8 @@ void mne_ch_selection_free_9(mneChSelection s)
 
 void mne_string_to_name_list_9(const QString& s, QStringList& listp,int &nlistp)
 /*
-* Convert a colon-separated list into a string array
-*/
+ * Convert a colon-separated list into a string array
+ */
 {
     QStringList list;
 
@@ -301,8 +302,8 @@ void mne_string_to_name_list_9(const QString& s, QStringList& listp,int &nlistp)
 
 QString mne_name_list_to_string_9(const QStringList& list)
 /*
-* Convert a string array to a colon-separated string
-*/
+ * Convert a string array to a colon-separated string
+ */
 {
     int nlist = list.size();
     QString res;
@@ -319,8 +320,8 @@ QString mne_name_list_to_string_9(const QStringList& list)
 
 QString mne_channel_names_to_string_9(fiffChInfo chs, int nch)
 /*
-* Make a colon-separated string out of channel names
-*/
+ * Make a colon-separated string out of channel names
+ */
 {
     QStringList names;
     QString res;
@@ -398,8 +399,8 @@ static FiffDirNode::SPtr find_meas_info_9 (const FiffDirNode::SPtr& node)
 
 static FiffDirNode::SPtr find_evoked (const FiffDirNode::SPtr& node)
 /*
-* Find corresponding FIFFB_EVOKED node
-*/
+ * Find corresponding FIFFB_EVOKED node
+ */
 {
     FiffDirNode::SPtr empty_node;
     FiffDirNode::SPtr tmp_node = node;
@@ -526,10 +527,10 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
                             fiffChInfo *chp,                /* Channel descriptions */
                             FiffCoordTransOld* *trans)          /* Coordinate transformation (head <-> device) */
 /*
-* Find channel information from
-* nearest FIFFB_MEAS_INFO parent of
-* node.
-*/
+ * Find channel information from
+ * nearest FIFFB_MEAS_INFO parent of
+ * node.
+ */
 {
     fiffChInfo ch;
     fiffChInfo this_ch;
@@ -865,8 +866,8 @@ static int get_evoked_optional( FiffStream::SPtr& stream,
                                 int *nchan,	 /* Number of channels */
                                 fiffChInfo *chp)	 /* Channel descriptions */
 /*
-* The channel info may have been modified
-*/
+ * The channel info may have been modified
+ */
 {
     int res = FIFF_FAIL;
     fiffChInfo   new_ch = NULL;
@@ -953,8 +954,8 @@ static float **get_epochs ( FiffStream::SPtr& stream,       /* This is our file 
                             const FiffDirNode::SPtr& node,  /* The interesting node */
                             int nchan, int nsamp)            /* Number of channels and number of samples to be expected */
 /*
-* Get the evoked response epochs
-*/
+ * Get the evoked response epochs
+ */
 {
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
@@ -1050,8 +1051,8 @@ int mne_find_evoked_types_comments (    FiffStream::SPtr& stream,
                                         int         **aspect_typesp,
                                         QStringList* commentsp)
 /*
-* Find all data we are able to process
-*/
+ * Find all data we are able to process
+ */
 {
     QList<FiffDirNode::SPtr> evoked;
     QList<FiffDirNode::SPtr> meas;
@@ -1149,8 +1150,8 @@ static void remove_artefacts (float *resp,
                               int   *artefs,
                               int   nartef)
 /*
-* Apply the artefact removal
-*/
+ * Apply the artefact removal
+ */
 {
     int   start,end;
     int   j,k;
@@ -1213,8 +1214,8 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
                     fiffId         *idp,        /* Measurement id */
                     fiffTime       *meas_datep) /* Measurement date */
 /*
-* Load evoked-response data from a fif file
-*/
+ * Load evoked-response data from a fif file
+ */
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));

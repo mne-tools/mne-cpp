@@ -45,8 +45,8 @@ namespace COMMUNICATIONLIB
 
 //=============================================================================================================
 /**
-*
-*/
+ *
+ */
 class COMMUNICATIONSHARED_EXPORT CommandManager : public QObject, public IObserver
 {
     Q_OBJECT

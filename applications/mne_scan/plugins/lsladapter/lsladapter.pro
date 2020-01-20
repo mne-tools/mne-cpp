@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     lsladapter.pro
-# @author   Simon Heinke <simon.heinke@tu-ilmenau.de>
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+#           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
 # @version  1.0
 # @date     February, 2019
 #
 # @section  LICENSE
 #
-# Copyright (C) 2019, Simon Heinke and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2019, Lorenz Esch, Simon Heinke. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:

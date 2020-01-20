@@ -1,22 +1,23 @@
 //=============================================================================================================
 /**
-* @file     dipole.h
-* @author   Christoph Dinh <christoph.dinh@tu-ilmenau.de>;
-* @version  1.0
-* @date     March, 2011
-*
-* @section  LICENSE
-*
-* Copyright (C) 2013 Christoph Dinh. All rights reserved.
-*
-* No part of this program may be photocopied, reproduced,
-* or translated to another program language without the
-* prior written consent of the author.
-*
-*
-* @brief    ToDo Documentation...
-*
-*/
+ * @file     dipole.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @version  1.0
+ * @date     March, 2011
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2011, Lorenz Esch, Christoph Dinh. All rights reserved.
+ *
+ * No part of this program may be photocopied, reproduced,
+ * or translated to another program language without the
+ * prior written consent of the author.
+ *
+ *
+ * @brief    ToDo Documentation...
+ *
+ */
 
 #ifndef DIPOLE_H
 #define DIPOLE_H
@@ -70,9 +71,9 @@ class Dipole;
 
 //=============================================================================================================
 /**
-* Declares a DipolePair structure consisting of two correlated dipoles which are the result of the RAP MUSIC
-* searching algorithm.
-*/
+ * Declares a DipolePair structure consisting of two correlated dipoles which are the result of the RAP MUSIC
+ * searching algorithm.
+ */
 template<typename T>
 struct DipolePair
 {
@@ -90,10 +91,10 @@ struct DipolePair
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Dipoles
-*
-* @brief ToDo
-*/
+ * DECLARE CLASS Dipoles
+ *
+ * @brief ToDo
+ */
 template<class T>
 class Dipole
 {

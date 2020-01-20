@@ -1,37 +1,38 @@
 //=============================================================================================================
 /**
-* @file     mne_surface_or_volume.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     January, 2017
-*
-* @section  LICENSE
-*
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    Definition of the MNE Surface or Volume (MneSurfaceOrVolume) Class.
-*
-*/
+ * @file     mne_surface_or_volume.cpp
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @version  1.0
+ * @date     January, 2017
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Definition of the MNE Surface or Volume (MneSurfaceOrVolume) Class.
+ *
+ */
 
 
 //*************************************************************************************************************
@@ -1682,8 +1683,8 @@ void MneSurfaceOrVolume::activate_neighbors(MneSurfaceOld* s, int start, int *ac
 
 int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpaceOld* **spacesp, int *nspacep)
 /*
-* Read source spaces from a FIFF file
-*/
+ * Read source spaces from a FIFF file
+ */
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -2015,8 +2016,8 @@ bad : {
 
 void MneSurfaceOrVolume::mne_source_space_update_inuse(MneSourceSpaceOld* s, int *new_inuse)
 /*
-* Update the active vertices
-*/
+ * Update the active vertices
+ */
 {
     int k,p,nuse;
 
@@ -2048,8 +2049,8 @@ void MneSurfaceOrVolume::mne_source_space_update_inuse(MneSourceSpaceOld* s, int
 
 int MneSurfaceOrVolume::mne_is_left_hemi_source_space(MneSourceSpaceOld* s)
 /*
-* Left or right hemisphere?
-*/
+ * Left or right hemisphere?
+ */
 {
     int k;
     float xave;
@@ -2096,8 +2097,8 @@ int MneSurfaceOrVolume::mne_transform_source_space(MneSourceSpaceOld* ss, FiffCo
 
 int MneSurfaceOrVolume::mne_transform_source_spaces_to(int coord_frame, FiffCoordTransOld *t, MneSourceSpaceOld* *spaces, int nspace)
 /*
-* Facilitate the transformation of the source spaces
-*/
+ * Facilitate the transformation of the source spaces
+ */
 {
     MneSourceSpaceOld* s;
     int k;
@@ -2153,8 +2154,8 @@ void MneSurfaceOrVolume::enable_all_sources(MneSourceSpaceOld* s)
 
 int MneSurfaceOrVolume::restrict_sources_to_labels(MneSourceSpaceOld* *spaces, int nspace, const QStringList& labels, int nlabel)
 /*
-* Pick only sources within a label
-*/
+ * Pick only sources within a label
+ */
 {
     MneSourceSpaceOld* lh = NULL;
     MneSourceSpaceOld* rh = NULL;
@@ -2237,8 +2238,8 @@ bad : {
 
 int MneSurfaceOrVolume::mne_find_sources_in_label(char *label, MneSourceSpaceOld* s, int off, int **selp, int *nselp)	    /* How many selected? */
 /*
-* Find the source points within a label
-*/
+ * Find the source points within a label
+ */
 {
     FILE *in = NULL;
     int  res = FAIL;
@@ -2495,8 +2496,8 @@ void MneSurfaceOrVolume::mne_add_triangle_data(MneSourceSpaceOld* s)
 
 void MneSurfaceOrVolume::mne_compute_cm(float **rr, int np, float *cm)
 /*
-* Compute the center of mass of a set of points
-*/
+ * Compute the center of mass of a set of points
+ */
 {
     int q;
     cm[0] = cm[1] = cm[2] = 0.0;
@@ -3713,8 +3714,8 @@ int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
     }
     if (magic == CURVATURE_FILE_MAGIC_NUMBER) {	    /* A new-style curvature file */
         /*
-* How many and faces
-*/
+ * How many and faces
+ */
         if (mne_read_int(fp,&ncurv) != 0)
             goto bad;
         if (mne_read_int(fp,&nface) != 0)
@@ -3729,8 +3730,8 @@ int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
             goto bad;
         }
         /*
-* Read the curvature values
-*/
+ * Read the curvature values
+ */
         curvs = MALLOC_17(ncurv,float);
         curvmin = curvmax = 0.0;
         for (k = 0; k < ncurv; k++) {
@@ -3745,16 +3746,16 @@ int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
     else {			                    /* An old-style curvature file */
         ncurv = magic;
         /*
-* How many vertices
-*/
+ * How many vertices
+ */
         if (mne_read_int3(fp,&nface) != 0)
             goto bad;
 #ifdef DEBUG
         fprintf(stderr,"nvert = %d nface = %d\n",ncurv,nface);
 #endif
         /*
-* Read the curvature values
-*/
+ * Read the curvature values
+ */
         curvs = MALLOC_17(ncurv,float);
         curvmin = curvmax = 0.0;
         for (k = 0; k < ncurv; k++) {
@@ -4080,8 +4081,8 @@ MneVolGeom* MneSurfaceOrVolume::read_vol_geom(FILE *fp)
 
 int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
 /*
-* Read the strange 3-byte integer
-*/
+ * Read the strange 3-byte integer
+ */
 {
     unsigned int s = 0;
 
@@ -4102,8 +4103,8 @@ int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
 
 int MneSurfaceOrVolume::mne_read_int(FILE *in, qint32 *ival)
 /*
-* Read a 32-bit integer
-*/
+ * Read a 32-bit integer
+ */
 {
     qint32 s ;
     if (fread (&s,sizeof(qint32),1,in) != 1) {

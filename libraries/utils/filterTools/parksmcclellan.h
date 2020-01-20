@@ -1,63 +1,63 @@
 //=============================================================================================================
 /**
-* @file     parksmcclellan.h
-* @version  1.0
-*
-* ported to mne-cpp by Christoph Dinh and Florian Schlembach in February, 2014
-*
-*
-* October 19, 2013
-* From: http://www.iowahills.com/A7ExampleCodePage.html
-*
-* The original fortran code came from the Parks McClellan article on Wikipedia.
-* http://en.wikipedia.org/wiki/Parks%E2%80%93McClellan_filter_design_algorithm
-*
-* This code is quite different from the original. The original code had 69 goto statements,
-* which made it nearly impossible to follow. And of course, it was Fortran code, so many changes
-* had to be made regardless of style.
-*
-* Our first step was to get a C version of the code working with as few changes as possible.
-* Then, in our desire to see if the code could be made more understandable, we decided to
-* remove as many goto statements as possible. We checked our work by comparing the coefficients
-* between this code and our original translation on more than 1000 filters while varying all the parameters.
-*
-* Ultimately, we were able to reduce the goto count from 69 to 7, all of which are in the Remez
-* function. Of the 7 remaining, 3 of these are at the very bottom of the function, and go
-* back to the very top of the function. These could have been removed, but our goal was to
-* clarify the code, not restyle it, and since they are clear, we let them be.
-*
-* The other 4 goto statements are intertwined in a rather nasty way. We recommend you print out
-* the Remez code, tape the sheets end to end, and trace out the goto's. It wasn't apparent to
-* us that they can be removed without an extensive study of the code.
-*
-* For better or worse, we also removed any code that was obviously related to Hilbert transforms
-* and Differentiators. We did this because we aren't interested in these, and we also don't
-* believe this algorithm does a very good job with them (far too much ripple).
-*
-* We added the functions CalcCoefficients() and ErrTest() as a way to simplify things a bit.
-*
-* We also found 3 sections of code that never executed. Two of the sections were just a few lines
-* that the goto's always went around. The third section represented nearly half of the CalcCoefficients()
-* function. This statement always tested the same, which never allowed the code to execute.
-* if(GRID[1] < 0.01 && GRID[NGRID] > 0.49) KKK = 1;
-* This may be due to the 0.01 minimum width limit we set for the bands.
-*
-* Note our use of MIN_TEST_VAL. The original code wasn't guarding against division by zero.
-* Limiting the return values as we have also helped the algorithm's convergence behavior.
-*
-* In an effort to improve readability, we made a large number of variable name changes and also
-* deleted a large number of variables. We left many variable names in tact, in part as an aid when
-* comparing to the original code, and in part because a better name wasn't obvious.
-*
-* This code is essentially straight c, and should compile with few, if any changes. Take note
-* of the 4 commented lines at the bottom of CalcParkCoeff2. These lines replace the code from the
-* original Ouch() function. They warn of the possibility of convergence failure, but you will
-* find that the iteration count NITER, isn't always an indicator of convergence problems when
-* it is less than 3, as stated in the original Fortran code comments.
-*
-* If you find a problem with this code, please leave us a note on:
-* http://www.iowahills.com/feedbackcomments.html
-*/
+ * @file     parksmcclellan.h
+ * @version  1.0
+ *
+ * ported to mne-cpp by Christoph Dinh and Florian Schlembach in February, 2014
+ *
+ *
+ * October 19, 2013
+ * From: http://www.iowahills.com/A7ExampleCodePage.html
+ *
+ * The original fortran code came from the Parks McClellan article on Wikipedia.
+ * http://en.wikipedia.org/wiki/Parks%E2%80%93McClellan_filter_design_algorithm
+ *
+ * This code is quite different from the original. The original code had 69 goto statements,
+ * which made it nearly impossible to follow. And of course, it was Fortran code, so many changes
+ * had to be made regardless of style.
+ *
+ * Our first step was to get a C version of the code working with as few changes as possible.
+ * Then, in our desire to see if the code could be made more understandable, we decided to
+ * remove as many goto statements as possible. We checked our work by comparing the coefficients
+ * between this code and our original translation on more than 1000 filters while varying all the parameters.
+ *
+ * Ultimately, we were able to reduce the goto count from 69 to 7, all of which are in the Remez
+ * function. Of the 7 remaining, 3 of these are at the very bottom of the function, and go
+ * back to the very top of the function. These could have been removed, but our goal was to
+ * clarify the code, not restyle it, and since they are clear, we let them be.
+ *
+ * The other 4 goto statements are intertwined in a rather nasty way. We recommend you print out
+ * the Remez code, tape the sheets end to end, and trace out the goto's. It wasn't apparent to
+ * us that they can be removed without an extensive study of the code.
+ *
+ * For better or worse, we also removed any code that was obviously related to Hilbert transforms
+ * and Differentiators. We did this because we aren't interested in these, and we also don't
+ * believe this algorithm does a very good job with them (far too much ripple).
+ *
+ * We added the functions CalcCoefficients() and ErrTest() as a way to simplify things a bit.
+ *
+ * We also found 3 sections of code that never executed. Two of the sections were just a few lines
+ * that the goto's always went around. The third section represented nearly half of the CalcCoefficients()
+ * function. This statement always tested the same, which never allowed the code to execute.
+ * if(GRID[1] < 0.01 && GRID[NGRID] > 0.49) KKK = 1;
+ * This may be due to the 0.01 minimum width limit we set for the bands.
+ *
+ * Note our use of MIN_TEST_VAL. The original code wasn't guarding against division by zero.
+ * Limiting the return values as we have also helped the algorithm's convergence behavior.
+ *
+ * In an effort to improve readability, we made a large number of variable name changes and also
+ * deleted a large number of variables. We left many variable names in tact, in part as an aid when
+ * comparing to the original code, and in part because a better name wasn't obvious.
+ *
+ * This code is essentially straight c, and should compile with few, if any changes. Take note
+ * of the 4 commented lines at the bottom of CalcParkCoeff2. These lines replace the code from the
+ * original Ouch() function. They warn of the possibility of convergence failure, but you will
+ * find that the iteration count NITER, isn't always an indicator of convergence problems when
+ * it is less than 3, as stated in the original Fortran code comments.
+ *
+ * If you find a problem with this code, please leave us a note on:
+ * http://www.iowahills.com/feedbackcomments.html
+ */
 
 #ifndef PARKSMCCLELLAN_H
 #define PARKSMCCLELLAN_H
@@ -104,10 +104,10 @@ using namespace Eigen;
 
 
 /**
-* DECLARE CLASS ParksMcClellan
-*
-* @brief The ParksMcClellan class provides the ParksMcClellan filter desing algorithm.
-*/
+ * DECLARE CLASS ParksMcClellan
+ *
+ * @brief The ParksMcClellan class provides the ParksMcClellan filter desing algorithm.
+ */
 class UTILSSHARED_EXPORT ParksMcClellan : public QObject
 {
     Q_OBJECT

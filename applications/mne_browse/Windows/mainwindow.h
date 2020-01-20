@@ -1,68 +1,66 @@
 //=============================================================================================================
 /**
-* @file     mainwindow.h
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
-* @version  1.0
-* @date     January, 2014
-*
-* @section  LICENSE
-*
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    mne_browse is the QT equivalent of the already existing C-version of mne_browse_raw. It is pursued
-*           to reimplement the full feature set of mne_browse_raw and even extend these.
-*
-*           An excerpt of what mne_browse_raw does:
-*           "The raw data processor mne_browse_raw is designed for simple raw data viewing and processing operations.
-*           In addition, the program is capable of off-line averaging and estimation of covariance matrices.
-*           mne_browse_raw can be also used to view averaged data in the topographical layout. Finally, mne_browse_raw
-*           can communicate with mne_analyze described in Interactive analysis to calculate current estimates from raw data interactively."
-*           (from [1])
-*
-*           Contributing and extending mne_browse is strongly appreciated!
-*           Here are some infos how mne_browse is structured. The program is based on the model/view framework of QT. [2]
-*           Hence, the base is divided into the three main compenents and the corresponding classes:
-*           - View (included in MainWindow.cpp): The base of mne_browse, everything is instantiated from this class.
-*                                               The QTableView is connected to the Model and the Delegate.
-*           - Model (RawModel.cpp): The models task is to feed the View with data, the data structure is totally up to the Model.
-*                                   In our case, it is derived from QAbstractTableModel, so we are using a table-based data structure.
-*           - Delegate (RawDelegate.cpp): The QTableView "delegates" its connected delegate to paint each table cell. The delegate does in turn
-*                                         request the data with respect to the underlying QModelIndex (with a certain column and row index).
-*
-*           Furthermore, the RawSettings class restores the mne_browse settings that were stored after the last session to the corresponding OS environment.
-*           Thereby, it makes use of the QSettings class of QT, which stores and restores data locally in a designated place of the OS. [3]
-*
-*           For further information, see more detailed information in the respective classes' description.
-*
-*
-*
-*           [1] http://martinos.org/mne/stable/manual/browse.html
-*           [2] http://qt-project.org/doc/qt-5/model-view-programming.html
-*           [3] http://qt-project.org/doc/qt-5/QSettings.html
-*
-*/
+ * @file     mainwindow.h
+ * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @version  1.0
+ * @date     January, 2014
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2014, Christoph Dinh, Lorenz Esch. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    mne_browse is the QT equivalent of the already existing C-version of mne_browse_raw. It is pursued
+ *           to reimplement the full feature set of mne_browse_raw and even extend these.
+ *
+ *           An excerpt of what mne_browse_raw does:
+ *           "The raw data processor mne_browse_raw is designed for simple raw data viewing and processing operations.
+ *           In addition, the program is capable of off-line averaging and estimation of covariance matrices.
+ *           mne_browse_raw can be also used to view averaged data in the topographical layout. Finally, mne_browse_raw
+ *           can communicate with mne_analyze described in Interactive analysis to calculate current estimates from raw data interactively."
+ *           (from [1])
+ *
+ *           Contributing and extending mne_browse is strongly appreciated!
+ *           Here are some infos how mne_browse is structured. The program is based on the model/view framework of QT. [2]
+ *           Hence, the base is divided into the three main compenents and the corresponding classes:
+ *           - View (included in MainWindow.cpp): The base of mne_browse, everything is instantiated from this class.
+ *                                               The QTableView is connected to the Model and the Delegate.
+ *           - Model (RawModel.cpp): The models task is to feed the View with data, the data structure is totally up to the Model.
+ *                                   In our case, it is derived from QAbstractTableModel, so we are using a table-based data structure.
+ *           - Delegate (RawDelegate.cpp): The QTableView "delegates" its connected delegate to paint each table cell. The delegate does in turn
+ *                                         request the data with respect to the underlying QModelIndex (with a certain column and row index).
+ *
+ *           Furthermore, the RawSettings class restores the mne_browse settings that were stored after the last session to the corresponding OS environment.
+ *           Thereby, it makes use of the QSettings class of QT, which stores and restores data locally in a designated place of the OS. [3]
+ *
+ *           For further information, see more detailed information in the respective classes' description.
+ *
+ *
+ *
+ *           [1] http://martinos.org/mne/stable/manual/browse.html
+ *           [2] http://qt-project.org/doc/qt-5/model-view-programming.html
+ *           [3] http://qt-project.org/doc/qt-5/QSettings.html
+ *
+ */
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -155,8 +153,8 @@ class DataWindow;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS MainWindow
-*/
+ * DECLARE CLASS MainWindow
+ */
 class MainWindow : public QMainWindow
 {    
     friend class FilterWindow;

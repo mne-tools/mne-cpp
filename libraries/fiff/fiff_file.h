@@ -1,37 +1,38 @@
 //=============================================================================================================
 /**
-* @file     fiff_file.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     December, 2016
-*
-* @section  LICENSE
-*
-* Copyright (C) 2016, Christoph Dinh and Matti Hamalainen. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    Header file describing the numerical values used in fif files.
-*
-*/
+ * @file     fiff_file.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @version  1.0
+ * @date     December, 2016
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2016, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Header file describing the numerical values used in fif files.
+ *
+ */
 
 #ifndef FIFF_FILE_H
 #define FIFF_FILE_H
@@ -45,176 +46,176 @@ namespace FIFFLIB
 {
 
 /*
-* Tag numbers < 100 are only used during the acquisition
-* they will never appear in a fif file.
-*/
+ * Tag numbers < 100 are only used during the acquisition
+ * they will never appear in a fif file.
+ */
 
 /*
-*  Conventions with FIFF_ C macros (mjk 14.01.2000).
-*===========================================================================
-* In order to get some order into the FIFF_ macros, 
-* following macro types are proposed:
-*
-* FIFF_      Fiff tag object identification label.
-* FIFFB_     Fiff block tag value (block type indentification label).
-* FIFFV_     Enumerated value of data having definite meaning in some context.
-*            Would be nice if the context is also present like: 
-*            FIFFV_HPI_ACCEPT_PROGRAM and FIFFV_HPI_ACCEPT_USER.
-* FIFFC_     Independent constant value like FIFFC_MATRIX_MAX_DIM used in
-*            code (having meaning in 'programming context' but not as data).
-* FIFFT_     Fiff type descriptor.
-* FIFFTS_    Fiff type decriptor (FIFFT_) structure definition (see below).
-*
-*
-*
-*  Conventions on type codes: (mjk 14.01.2000)
-*===========================================================================
-* Fiff types are saved using 32 bit numeric indentifiers.
-* The fiff type codes are structured so that they contain two main parts:
-* the 'fundamental structure' and 'type details'. The fundamental structure
-* is coded in the MSB of the 4 byte code. Depending on this code the 
-* interpretation of 'type details' may vary.
-*
-* Current Fundamental structures:
-*----------------------------------------------------------------------
-* Only the MSB is significant. See FIFFTS_FS_MASK
-*
-*    FIFFFS_SCALAR  0x00000000   Scalar type / basic fixed size FIFF record.
-*    FIFFFS_RECORD  0x10000000   <reserved>
-*    FIFFFS_......  0x20000000   <reserved>
-*    FIFFFS_......  0x30000000   <reserved>
-*    FIFFFS_MATRIX  0x40000000   Multidimensional matrix.
-*
-* The lower four bits are reserved for future extensions.
-*
-* Scalar types (FS==0x00):
-*----------------------------------------------------------------------
-* These include the basic scalar types and 'standard' fixed size records
-* used in fiff files. 
-*
-* * It is required that the code is less than 0x0FFF (< 4096). !!!
-* * Fourth byte is currently reserved for future extensions.
-*
-* Current types in this class are:
-*
-*   FIFFT_VOID                  0       Nothing
-*   FIFFT_BYTE                  1       Unsigned? 8 bits
-*   FIFFT_SHORT                 2       Signed 16 bit integer.
-*   FIFFT_INT                   3       Signed 32 bit integer.
-*   FIFFT_FLOAT                 4       Single precision IEEE float (32 bits)
-*   FIFFT_DOUBLE                5       Double precision IEEE float (64 bits)
-*   FIFFT_JULIAN                6	 Julian day. (32 bits)
-*   FIFFT_USHORT                7       Unsigned short (16 bits)
-*   FIFFT_UINT                  8       Unsigned int (32 bits)
-*   FIFFT_ULONG                 9       Unsigned long (64 bits)
-*   FIFFT_STRING               10       Octet, ASCII coding.
-*   FIFFT_ASCII                10
-*   FIFFT_LONG                 11       Long integer (64 bit)
-*   FIFFT_DAU_PACK13           13       13 bit packed format used in HP DAUs.
-*   FIFFT_DAU_PACK14           14       14 bit packed format used in HP DAUs
-*   FIFFT_DAU_PACK16           16       Signed 16 bit integer. (?)
-*   FIFFT_COMPLEX_FLOAT        20       Complex number encoded with floats
-*   FIFFT_COMPLEX_DOUBLE       21       Complex number encoded with doubles
-*   FIFFT_OLD_PACK             23       Neuromag proprietary 16 bit packing.
-*
-* Following are structure types defined in fiff_types.h
-*
-*   FIFFT_CH_INFO_STRUCT        30      Basic info about a measurement chnnel.
-*   FIFFT_ID_STRUCT             31      Unique identifier.
-*   FIFFT_DIR_ENTRY_STRUCT      32      FIFF file directory entry.
-*   FIFFT_DIG_POINT_STRUCT      33      Digitization point.
-*   FIFFT_CH_POS_STRUCT         34      Channel position.
-*   FIFFT_COORD_TRANS_STRUCT    35      Coordinate transformation.
-*   FIFFT_DIG_STRING_STRUCT     36      Digitization string.
-*   FIFFT_STREAM_SEGMENT_STRUCT 37      Data stream segment.
-*   FIFFT_DATA_REF_STRUCT       38      Reference to external data.
-* 
-* Simple vector of any scalar type can be formed by simply 
-* concatenating into file. The number of of elements is deduced
-* from the size of the data block which should be a multiple of the
-* object size.
-*
-* Futher more, for each scalar type fiff_types.h defines a corresponding
-* C language type. Naming convention is fiff_xxx_t which correspons to 
-* type id FIFFT_xxx.
-* 
-*
-*
-* Matrix types (FS=0x40)
-*----------------------------------------------------------------------
-* 
-* FIFF Matrix type is in principle an arbitrary dimensional rectangular 
-* collection of fixed size elements. However for practical reasons the
-* maximum dimension is currenly restricted arbitrarily to 9
-* (see FIFFC_MATRIX_MAX_DIM) but this restriction may be relaxed in the future.
-*
-* Matrix type codes use following structure:
-*
-*  * Matrix type structure:   0xFFCCyyyy
-*  * Where                     
-*
-*      0xFF......    decribes the 'fundamental structure'.
-*                       FF = 40 denotes a multidimensional matrix.
-*      0x..XX....    describes to basic coding: dense, triangular, sparse etc.
-*      0x....yyyy    describes the element type.
-*
-* Current codings available are:
-*
-*  FIFFTS_MC_DENSE  0x00000000    Dense column oriented matrix
-*  FIFFTS_MC_CCS    0x00100000    Column compressed sparse matrix
-*  FIFFTS_MC_RCS    0x00200000    Row compressed sparse matrix
-* 
-*
-* Dense matrix structure 
-* ----------------------
-* 
-* A(1,1,...),A(2,1...) ... A(1,2,..) ... A(N,M,K...),K,M,N, ...,DIM
-*
-* where DIM is the dimensionality.
-*       N,M,K... are the dimensions.
-*       A(i,j,k...) are the elements.
-* 
-* Note: the 2-dimensional meg_matrix format (routines in fiff_matrix.c) 
-* read and write the matrix in  transposed form, i.e, the storing order 
-* in the FIFF-file is
-* A(1,1),A(1,2) ... A(1,M) ... A(M,M),N,M,DIM
-*
-*
-* Column compressed sparse matrix structure
-*------------------------------------------
-*
-* A(x0,y0,z0...),A(x1,y0,z0),...
-*   ...,x0,x2...,x{NZ-1}, y0,y1,...,y{M-1}, z0,z1...,z{K-1},...,NZ,K,M,N,...,DIM
-*
-* where DIM is the dimensionality.
-*       N,M,K... are the dimensions.
-*       NZ is the number of non zero elements.
-*       A(i,j,k...) are the elements.
-*       x0..x(NZ-1) is row index array (concatenated for all vectors)
-*       y0..y(M-1)  is column start index array for the second dimension.
-*       z1..z(K-1) is slice start index array for the third dimension.
-*         etc.
-* Index arrays are 0 based.
-*
-* Row compressed sparse matrix structure
-*---------------------------------------
-*
-* Similar to column compresses version except that dimensions 1 and 2 are
-* interchanged. Structurally exactly same as ccs_matrix of the transpose.
-*
-*/
+ *  Conventions with FIFF_ C macros (mjk 14.01.2000).
+ *===========================================================================
+ * In order to get some order into the FIFF_ macros, 
+ * following macro types are proposed:
+ *
+ * FIFF_      Fiff tag object identification label.
+ * FIFFB_     Fiff block tag value (block type indentification label).
+ * FIFFV_     Enumerated value of data having definite meaning in some context.
+ *            Would be nice if the context is also present like: 
+ *            FIFFV_HPI_ACCEPT_PROGRAM and FIFFV_HPI_ACCEPT_USER.
+ * FIFFC_     Independent constant value like FIFFC_MATRIX_MAX_DIM used in
+ *            code (having meaning in 'programming context' but not as data).
+ * FIFFT_     Fiff type descriptor.
+ * FIFFTS_    Fiff type decriptor (FIFFT_) structure definition (see below).
+ *
+ *
+ *
+ *  Conventions on type codes: (mjk 14.01.2000)
+ *===========================================================================
+ * Fiff types are saved using 32 bit numeric indentifiers.
+ * The fiff type codes are structured so that they contain two main parts:
+ * the 'fundamental structure' and 'type details'. The fundamental structure
+ * is coded in the MSB of the 4 byte code. Depending on this code the 
+ * interpretation of 'type details' may vary.
+ *
+ * Current Fundamental structures:
+ *----------------------------------------------------------------------
+ * Only the MSB is significant. See FIFFTS_FS_MASK
+ *
+ *    FIFFFS_SCALAR  0x00000000   Scalar type / basic fixed size FIFF record.
+ *    FIFFFS_RECORD  0x10000000   <reserved>
+ *    FIFFFS_......  0x20000000   <reserved>
+ *    FIFFFS_......  0x30000000   <reserved>
+ *    FIFFFS_MATRIX  0x40000000   Multidimensional matrix.
+ *
+ * The lower four bits are reserved for future extensions.
+ *
+ * Scalar types (FS==0x00):
+ *----------------------------------------------------------------------
+ * These include the basic scalar types and 'standard' fixed size records
+ * used in fiff files. 
+ *
+ * * It is required that the code is less than 0x0FFF (< 4096). !!!
+ * * Fourth byte is currently reserved for future extensions.
+ *
+ * Current types in this class are:
+ *
+ *   FIFFT_VOID                  0       Nothing
+ *   FIFFT_BYTE                  1       Unsigned? 8 bits
+ *   FIFFT_SHORT                 2       Signed 16 bit integer.
+ *   FIFFT_INT                   3       Signed 32 bit integer.
+ *   FIFFT_FLOAT                 4       Single precision IEEE float (32 bits)
+ *   FIFFT_DOUBLE                5       Double precision IEEE float (64 bits)
+ *   FIFFT_JULIAN                6	 Julian day. (32 bits)
+ *   FIFFT_USHORT                7       Unsigned short (16 bits)
+ *   FIFFT_UINT                  8       Unsigned int (32 bits)
+ *   FIFFT_ULONG                 9       Unsigned long (64 bits)
+ *   FIFFT_STRING               10       Octet, ASCII coding.
+ *   FIFFT_ASCII                10
+ *   FIFFT_LONG                 11       Long integer (64 bit)
+ *   FIFFT_DAU_PACK13           13       13 bit packed format used in HP DAUs.
+ *   FIFFT_DAU_PACK14           14       14 bit packed format used in HP DAUs
+ *   FIFFT_DAU_PACK16           16       Signed 16 bit integer. (?)
+ *   FIFFT_COMPLEX_FLOAT        20       Complex number encoded with floats
+ *   FIFFT_COMPLEX_DOUBLE       21       Complex number encoded with doubles
+ *   FIFFT_OLD_PACK             23       Neuromag proprietary 16 bit packing.
+ *
+ * Following are structure types defined in fiff_types.h
+ *
+ *   FIFFT_CH_INFO_STRUCT        30      Basic info about a measurement chnnel.
+ *   FIFFT_ID_STRUCT             31      Unique identifier.
+ *   FIFFT_DIR_ENTRY_STRUCT      32      FIFF file directory entry.
+ *   FIFFT_DIG_POINT_STRUCT      33      Digitization point.
+ *   FIFFT_CH_POS_STRUCT         34      Channel position.
+ *   FIFFT_COORD_TRANS_STRUCT    35      Coordinate transformation.
+ *   FIFFT_DIG_STRING_STRUCT     36      Digitization string.
+ *   FIFFT_STREAM_SEGMENT_STRUCT 37      Data stream segment.
+ *   FIFFT_DATA_REF_STRUCT       38      Reference to external data.
+ * 
+ * Simple vector of any scalar type can be formed by simply 
+ * concatenating into file. The number of of elements is deduced
+ * from the size of the data block which should be a multiple of the
+ * object size.
+ *
+ * Futher more, for each scalar type fiff_types.h defines a corresponding
+ * C language type. Naming convention is fiff_xxx_t which correspons to 
+ * type id FIFFT_xxx.
+ * 
+ *
+ *
+ * Matrix types (FS=0x40)
+ *----------------------------------------------------------------------
+ * 
+ * FIFF Matrix type is in principle an arbitrary dimensional rectangular 
+ * collection of fixed size elements. However for practical reasons the
+ * maximum dimension is currenly restricted arbitrarily to 9
+ * (see FIFFC_MATRIX_MAX_DIM) but this restriction may be relaxed in the future.
+ *
+ * Matrix type codes use following structure:
+ *
+ *  * Matrix type structure:   0xFFCCyyyy
+ *  * Where                     
+ *
+ *      0xFF......    decribes the 'fundamental structure'.
+ *                       FF = 40 denotes a multidimensional matrix.
+ *      0x..XX....    describes to basic coding: dense, triangular, sparse etc.
+ *      0x....yyyy    describes the element type.
+ *
+ * Current codings available are:
+ *
+ *  FIFFTS_MC_DENSE  0x00000000    Dense column oriented matrix
+ *  FIFFTS_MC_CCS    0x00100000    Column compressed sparse matrix
+ *  FIFFTS_MC_RCS    0x00200000    Row compressed sparse matrix
+ * 
+ *
+ * Dense matrix structure 
+ * ----------------------
+ * 
+ * A(1,1,...),A(2,1...) ... A(1,2,..) ... A(N,M,K...),K,M,N, ...,DIM
+ *
+ * where DIM is the dimensionality.
+ *       N,M,K... are the dimensions.
+ *       A(i,j,k...) are the elements.
+ * 
+ * Note: the 2-dimensional meg_matrix format (routines in fiff_matrix.c) 
+ * read and write the matrix in  transposed form, i.e, the storing order 
+ * in the FIFF-file is
+ * A(1,1),A(1,2) ... A(1,M) ... A(M,M),N,M,DIM
+ *
+ *
+ * Column compressed sparse matrix structure
+ *------------------------------------------
+ *
+ * A(x0,y0,z0...),A(x1,y0,z0),...
+ *   ...,x0,x2...,x{NZ-1}, y0,y1,...,y{M-1}, z0,z1...,z{K-1},...,NZ,K,M,N,...,DIM
+ *
+ * where DIM is the dimensionality.
+ *       N,M,K... are the dimensions.
+ *       NZ is the number of non zero elements.
+ *       A(i,j,k...) are the elements.
+ *       x0..x(NZ-1) is row index array (concatenated for all vectors)
+ *       y0..y(M-1)  is column start index array for the second dimension.
+ *       z1..z(K-1) is slice start index array for the third dimension.
+ *         etc.
+ * Index arrays are 0 based.
+ *
+ * Row compressed sparse matrix structure
+ *---------------------------------------
+ *
+ * Similar to column compresses version except that dimensions 1 and 2 are
+ * interchanged. Structurally exactly same as ccs_matrix of the transpose.
+ *
+ */
 
 /* Following definitions are needed only in programs that need to do
-* some 'intelligent' operations depending on arbitrary types.
-* They are rarely needed in user level code.
-*
-*  FIFFTS_FS_MASK     'fundamental structure' bit mask.
-*  FIFFTS_BASE_MASK   'Scalar value' (base value) bit mask.
-*  FIFFTS_MC_MASK     'Basic matrix coding' bit mask.
-*
-* Using type code structure constants directly is depreciated. Use 
-* functions to test type properties.
-*/
+ * some 'intelligent' operations depending on arbitrary types.
+ * They are rarely needed in user level code.
+ *
+ *  FIFFTS_FS_MASK     'fundamental structure' bit mask.
+ *  FIFFTS_BASE_MASK   'Scalar value' (base value) bit mask.
+ *  FIFFTS_MC_MASK     'Basic matrix coding' bit mask.
+ *
+ * Using type code structure constants directly is depreciated. Use 
+ * functions to test type properties.
+ */
 
 
 #define FIFFC_MAJOR_VERSION 1L
@@ -223,8 +224,8 @@ namespace FIFFLIB
 #define FIFFC_VERSION (FIFFC_MAJOR_VERSION<<16 | FIFFC_MINOR_VERSION)
 
 /*
-* Constants for types
-*/
+ * Constants for types
+ */
 
 #define FIFFT_VOID                  0
 #define FIFFT_BYTE                  1
@@ -255,8 +256,8 @@ namespace FIFFLIB
 #define FIFFT_STREAM_SEGMENT_STRUCT 37
 #define FIFFT_DATA_REF_STRUCT       38
 /*
-* These are for matrices of any of the above 
-*/
+ * These are for matrices of any of the above 
+ */
 #define FIFFC_MATRIX_MAX_DIM  9
 
 #define FIFFTS_FS_MASK        0xFF000000
@@ -308,7 +309,7 @@ namespace FIFFLIB
 #define FIFF_STREAM_SEGMENT     19  /**< A segment of data stream */
 /*
 define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere? 
-*/
+ */
 
 #define FIFFV_DACQ_SYSTEM_DAU     0
 #define FIFFV_DACQ_SYSTEM_VXI     1
@@ -320,8 +321,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #endif
 
 /*
-* Standard tags used in all blocks
-*/
+ * Standard tags used in all blocks
+ */
 
 #define FIFF_FILE_ID         100
 #define FIFF_DIR_POINTER     101
@@ -348,19 +349,19 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 
 
 /*
-* Megacq saves the parameters in these tags
-*/
+ * Megacq saves the parameters in these tags
+ */
 
 #define FIFF_DACQ_PARS        150
 #define FIFF_DACQ_STIM        151
 
 /*
-* Structured objects (blocks)
-*/
+ * Structured objects (blocks)
+ */
 
 /*
-* MEG/EEG
-*/
+ * MEG/EEG
+ */
 
 #define FIFFB_ROOT            999
 #define FIFFB_MEAS            100
@@ -389,8 +390,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 
 
 /*
-* MRI
-*/
+ * MRI
+ */
 
 #define FIFFB_MRI             200         /**< MRI/CT data. */
 #define FIFFB_MRI_SET         201         /**< MRI/CT volume */
@@ -401,8 +402,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFB_MRI_SEG_REGION  206         /**< One MRI segmentation region */
 
 /*
-* Forward and inverse modelling
-*/
+ * Forward and inverse modelling
+ */
 
 #define FIFFB_SPHERE          300   /**< Concentric sphere model related */
 #define FIFFB_BEM             310   /**< Boundary-element method */
@@ -414,19 +415,19 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFB_PROJ            FIFFB_XFIT_PROJ
 #define FIFFB_PROJ_ITEM       FIFFB_XFIT_PROJ_ITEM
 /*                            350...
-*                            370          Reserved for MNE estimates (MHa) 
-*/
+ *                            370          Reserved for MNE estimates (MHa) 
+ */
 
 #define FIFFB_BAD_CHANNELS    359         /**< Alias of FIFFB_MNE_BAD_CHANNELS */
 
 /*
-* Volume info
-*/
+ * Volume info
+ */
 #define FIFFB_VOL_INFO        400
 
 /*
-* Sparse matrix, cross-talk correction, and SSS blocks
-*/
+ * Sparse matrix, cross-talk correction, and SSS blocks
+ */
 #define FIFFB_DATA_CORRECTION     500     /**< Correction to data */
 #define FIFFB_CHANNEL_DECOUPLER   501     /**< Cross-talk correction  */
 #define FIFFB_SSS_INFO            502     /**< SSS processing info */
@@ -438,8 +439,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 
 
 /*
-* Different aspects of data
-*/
+ * Different aspects of data
+ */
 
 #define FIFFV_ASPECT_AVERAGE       100  /**< Normal average of epochs */
 #define FIFFV_ASPECT_STD_ERR       101  /**< Std. error of mean */
@@ -451,8 +452,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_ASPECT_DIPOLE_WAVE   200  /**< Dipole amplitude curve */
 
 /*
-* Tags used in data files
-*/
+ * Tags used in data files
+ */
 
 #define FIFF_NCHAN           200        /**< Number of channels */
 #define FIFF_SFREQ           201        /**< Sampling frequency (Hz) */
@@ -497,10 +498,10 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFC_HPI_MAX_NCOIL 1000          /**< Max value for FIFF_HPI_NCOIL */
 
 /*
-*
-* HPI fitting program tags
-*
-*/
+ *
+ * HPI fitting program tags
+ *
+ */
 #define FIFF_HPI_COIL_MOMENTS       240	  /**< Estimated moment vectors for the HPI coil magnetic dipoles */
 #define FIFF_HPI_FIT_GOODNESS       241	  /**< Three floats indicating the goodness of fit */
 #define FIFF_HPI_FIT_ACCEPT         242	  /**< Bitmask indicating acceptance (see below) */
@@ -590,57 +591,57 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_HAND_LEFT  2
 
 /*
-* Event list saving...
-*/
+ * Event list saving...
+ */
 #define FIFF_EVENT_CHANNELS    600	/**< Event channel numbers */
 #define FIFF_EVENT_LIST        601      /**< List of events (integers:
 					 * <sample before after> */
 /*
-* Event spec tags
-*/
+ * Event spec tags
+ */
 #define FIFF_EVENT_CHANNEL     602	/**< Event channel name */
 #define FIFF_EVENT_BITS        603      /**< Event bits array */
 
 /*
-* Event bitmask constants
-*/
+ * Event bitmask constants
+ */
 #define FIFFC_EVENT_FROMMASK   0
 #define FIFFC_EVENT_FROMBITS   1
 #define FIFFC_EVENT_TOMASK     2
 #define FIFFC_EVENT_TOBITS     3
 
 /*
-* Tags used in saving SQUID characteristics etc.
-*/
+ * Tags used in saving SQUID characteristics etc.
+ */
 #define FIFF_SQUID_BIAS        701
 #define FIFF_SQUID_OFFSET      702
 #define FIFF_SQUID_GATE        703
 
 /*
-* Tags for sparse matrices
-*/
+ * Tags for sparse matrices
+ */
 #define FIFF_DECOUPLER_MATRIX     800                        
 #define FIFF_SPARSE_CH_NAME_LIST  FIFF_PROJ_ITEM_CH_NAME_LIST
 
 /*
-* Processing history tags
-*/
+ * Processing history tags
+ */
 #define FIFFB_PROCESSING_HISTORY 900     /**< Processing history block */
 #define FIFFB_PROCESSING_RECORD  901     /**<  .. can contain several processing records */
 
 /**<
-* Aspect values used to save characteristic curves of SQUIDs.
-*/
+ * Aspect values used to save characteristic curves of SQUIDs.
+ */
 #define FIFFV_ASPECT_IFII_LOW  1100
 #define FIFFV_ASPECT_IFII_HIGH 1101
 #define FIFFV_ASPECT_GATE      1102
 /*
-* References
-*/
+ * References
+ */
 #define FIFF_REF_PATH           1101
 /*
-* MRI...
-*/
+ * MRI...
+ */
 #define FIFF_MRI_SOURCE_PATH               FIFF_REF_PATH
 #define FIFF_MRI_SOURCE_FORMAT             2002
 #define FIFF_MRI_PIXEL_ENCODING            2003
@@ -673,17 +674,17 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFF_MRI_SEG_REGION_ID             2200
 
 /*
-* FIFF_MRI_SOURCE_FORMAT can be one of the following
-*                        A missing FIFF_MRI_SOURCE_FORMAT tag
-*                        indicates that the data is actually in the 
-*                        fiff itself (= FIFF_MRI_FORMAT_FIFF)
-* 
-* If the source format is FIFF_MRI_FORMAT_FIFF 
-* the tags FIFF_MRI_PIXEL_ENCODING and FIFF_MRI_PIXEL_DATA_OFFSET 
-* are missing and should be found by the software loading the data
-* from the FIFF_MRI_PIXEL_DATA tag.
-* 
-*/
+ * FIFF_MRI_SOURCE_FORMAT can be one of the following
+ *                        A missing FIFF_MRI_SOURCE_FORMAT tag
+ *                        indicates that the data is actually in the 
+ *                        fiff itself (= FIFF_MRI_FORMAT_FIFF)
+ * 
+ * If the source format is FIFF_MRI_FORMAT_FIFF 
+ * the tags FIFF_MRI_PIXEL_ENCODING and FIFF_MRI_PIXEL_DATA_OFFSET 
+ * are missing and should be found by the software loading the data
+ * from the FIFF_MRI_PIXEL_DATA tag.
+ * 
+ */
 #define FIFFV_MRI_FORMAT_UNKNOWN           0
 #define FIFFV_MRI_FORMAT_MAGNETOM_SHORT    1
 #define FIFFV_MRI_FORMAT_MAGNETOM_LONG     2
@@ -697,8 +698,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_MRI_FORMAT_DICOM_3          10
 #define FIFFV_MRI_FORMAT_VISTA            11
 /*
-* FIFF_MRI_PIXEL_ENCODING is one of the following
-*/
+ * FIFF_MRI_PIXEL_ENCODING is one of the following
+ */
 #define FIFFV_MRI_PIXEL_UNKNOWN             0
 #define FIFFV_MRI_PIXEL_BYTE                1
 #define FIFFV_MRI_PIXEL_WORD                2
@@ -709,15 +710,15 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_MRI_PIXEL_BYTE_RLE_RGB_COLOR  7
 #define FIFFV_MRI_PIXEL_BIT_RLE             8
 /*
-* Forward and inverse modelling...
-*/
+ * Forward and inverse modelling...
+ */
 /*
-* Sphere model     (3000...)
-*/
+ * Sphere model     (3000...)
+ */
 #define FIFF_CONDUCTOR_MODEL_KIND 3000      /**< What kind of conductor model */
 /*
-* These are the models we support
-*/
+ * These are the models we support
+ */
 #define FIFFV_COND_MODEL_UNKNOWN     0      /**< Not known */
 #define FIFFV_COND_MODEL_SPHERE      1      /**< Spherically symmetric */
 #define FIFFV_COND_MODEL_BEM_HOMOG   2      /**< Homogeneous BEM model */
@@ -727,8 +728,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFF_SPHERE_COORD_FRAME     3002    /**< Which coordinate frame are we using? */
 #define FIFF_SPHERE_LAYERS          3003    /**< Array of layer structures */
 /*
-* Surfaces for BEM (3100...)
-*/
+ * Surfaces for BEM (3100...)
+ */
 #define FIFF_BEM_SURF_ID            3101    /**< int    surface number */
 #define FIFF_BEM_SURF_NAME          3102    /**< string surface name */
 #define FIFF_BEM_SURF_NNODE         3103    /**< int    # of nodes on a surface */
@@ -745,8 +746,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFF_BEM_COORD_FRAME        3112    /**< The coordinate frame of the model */
 #define FIFF_BEM_SIGMA              3113    /**< Conductivity of a compartment */
 /*
-* FIFF_BEM_SURF_ID can be one of the following
-*/
+ * FIFF_BEM_SURF_ID can be one of the following
+ */
 #define FIFFV_BEM_SURF_ID_UNKNOWN    -1
 #define FIFFV_BEM_SURF_ID_BRAIN       1
 #define FIFFV_BEM_SURF_ID_CSF         2
@@ -762,8 +763,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_BEM_SURF_UNIT_SPHERE   22
 #define FIFFV_BEM_SURF_ID_VV         23
 /*
-* FIFF_MRI_SEG_REGION_ID can be one of the following
-*/
+ * FIFF_MRI_SEG_REGION_ID can be one of the following
+ */
 #define FIFFV_SEG_REGION_ID_UNKNOWN  FIFF_BEM_SURF_ID_UNKNOWN         
 #define FIFFV_SEG_REGION_ID_BRAIN    FIFF_BEM_SURF_ID_BRAIN     
 #define FIFFV_SEG_REGION_ID_CSF      FIFF_BEM_SURF_ID_CSF       
@@ -775,18 +776,18 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_SEG_REGION_ID_LUNGS    FIFF_BEM_SURF_ID_LUNGS     
 #define FIFFV_SEG_REGION_ID_TORSO    FIFF_BEM_SURF_ID_TORSO     
 /*				                               
-* FIFF_BEM_APPROX		     
-*/				     
+ * FIFF_BEM_APPROX		     
+ */				     
 #define FIFFV_BEM_APPROX_CONST        1     /**< The constant potential approach */
 #define FIFFV_BEM_APPROX_LINEAR       2     /**< The linear potential approach */
 /*
-* Source descriptions (3200...)
-* The dipole is six floats (position and dipole moment)
-*/
+ * Source descriptions (3200...)
+ * The dipole is six floats (position and dipole moment)
+ */
 #define FIFF_SOURCE_DIPOLE        3201
 /*
-* These tags are used by xfit
-*/
+ * These tags are used by xfit
+ */
 #define FIFF_XFIT_LEAD_PRODUCTS               3401
 #define FIFF_XFIT_MAP_PRODUCTS                3402
 #define FIFF_XFIT_GRAD_MAP_PRODUCTS           3403
@@ -797,8 +798,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFF_XFIT_CONT_SURF_TYPE              3408   /**< Xfit contour surface type */
 
 /*
-* These relate to linear projection
-*/
+ * These relate to linear projection
+ */
 #define FIFF_PROJ_ITEM_KIND          3411
 #define FIFF_PROJ_ITEM_TIME          3412
 #define FIFF_PROJ_ITEM_DIPOLE        FIFF_SOURCE_DIPOLE
@@ -818,9 +819,9 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFF_XFIT_PROJ_ITEM_VECTORS  FIFF_PROJ_ITEM_VECTORS
 #define FIFF_XFIT_PROJ_ITEM_COMMENT  FIFF_PROJ_ITEM_COMMENT
 /*
-* The FIFF_PROJ_ITEM_KIND is an integer,
-* one of the following
-*/
+ * The FIFF_PROJ_ITEM_KIND is an integer,
+ * one of the following
+ */
 #define FIFFV_PROJ_ITEM_NONE        0
 #define FIFFV_PROJ_ITEM_FIELD       1
 #define FIFFV_PROJ_ITEM_DIP_FIX     2
@@ -839,14 +840,14 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFF_XPLOTTER_LAYOUT          3501     /**< xplotter layout tag */
 
 /*  FIFF_MNE_xxxx                     3502
-*                                     ...
-*  Reserved for MNE data             3799 
-*/
+ *                                     ...
+ *  Reserved for MNE data             3799 
+ */
 #define FIFF_CH_NAME_LIST             3507     /**< Alias of FIFF_MNE_CH_NAME_LIST */
 
 /*
-* These occur in the volume info files
-*/
+ * These occur in the volume info files
+ */
 #define FIFF_VOL_ID                  4001
 #define FIFF_VOL_NAME                4002
 #define FIFF_VOL_OWNER_ID            4003   /**< User id of the owner */
@@ -863,34 +864,34 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFF_VOL_BLOCK_SIZE          4014   /**< Block size in bytes */
 #define FIFF_VOL_DIRECTORY           4015   /**< Contents of the volume in a special format the data type will be FIFF_VOID */
 /*
-* Index
-*/
+ * Index
+ */
 #define FIFF_INDEX_KIND              5001
 #define FIFF_INDEX                   5002
 
 
 /*======================================================================
-* Enumerated types used as tag values.
-*
-*=====================================================================*/
+ * Enumerated types used as tag values.
+ *
+ *=====================================================================*/
 
 /*
-* Values for FIFF_REF_ROLE. The role of a reference
-*/
+ * Values for FIFF_REF_ROLE. The role of a reference
+ */
 #define FIFFV_ROLE_PREV_FILE   1
 #define FIFFV_ROLE_NEXT_FILE   2
 
 /*
-* Method by which a projection is defined (FIFF_PROJ_ITEM_DEFINITION).
-* If tag is not present, FIFF_PROJ_BY_COMPLEMENT should be assumed.
-*/
+ * Method by which a projection is defined (FIFF_PROJ_ITEM_DEFINITION).
+ * If tag is not present, FIFF_PROJ_BY_COMPLEMENT should be assumed.
+ */
 #define FIFFV_PROJ_BY_COMPLEMENT     0
 #define FIFFV_PROJ_BY_SPACE          1
 
 
 /*
-* Volume types used in FIFF_VOL_TYPE
-*/
+ * Volume types used in FIFF_VOL_TYPE
+ */
 
 #define FIFFV_VOL_TYPE_HD            1      /**< Hard disk */
 #define FIFFV_VOL_TYPE_MOD           2      /**< Magneto-optical disk */

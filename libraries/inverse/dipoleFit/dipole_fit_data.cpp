@@ -366,8 +366,8 @@ void mne_mat_vec_mult2_3(float **m,float *v,float *result, int d1,int d2)
 
 QString mne_name_list_to_string_3(const QStringList& list)
 /*
-* Convert a string array to a colon-separated string
-*/
+ * Convert a string array to a colon-separated string
+ */
 {
     int nlist = list.size();
     QString res;
@@ -385,8 +385,8 @@ QString mne_name_list_to_string_3(const QStringList& list)
 
 QString mne_channel_names_to_string_3(fiffChInfo chs, int nch)
 /*
-* Make a colon-separated string out of channel names
-*/
+ * Make a colon-separated string out of channel names
+ */
 {
     QStringList names;
     QString res;
@@ -443,10 +443,10 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
                                       int   stor_type,      /* Either FIFFTS_MC_CCS or FIFFTS_MC_RCS */
                                       float small)          /* How small elements should be ignored? */
 /*
-* Create the compressed row or column storage sparse matrix representation
-* including a vector containing the nonzero matrix element values,
-* the row or column pointer vector and the appropriate index vector(s).
-*/
+ * Create the compressed row or column storage sparse matrix representation
+ * including a vector containing the nonzero matrix element values,
+ * the row or column pointer vector and the appropriate index vector(s).
+ */
 {
     int j,k;
     int nz;
@@ -732,8 +732,8 @@ int mne_svd_3(float **mat,	/* The matrix */
 
 void mne_free_cov_3(MneCovMatrix* c)
 /*
-* Free a covariance matrix and all its data
-*/
+ * Free a covariance matrix and all its data
+ */
 {
     if (c == NULL)
         return;
@@ -1007,8 +1007,8 @@ int mne_decompose_eigen_3(double *mat,
 
 
 /*
-* Routines for handling the covariance matrices
-*/
+ * Routines for handling the covariance matrices
+ */
 
 
 
@@ -1037,8 +1037,8 @@ static int mne_lt_packed_index_3(int j, int k)
 
 
 /*
-* Handle the linear projection operators
-*/
+ * Handle the linear projection operators
+ */
 
 
 
@@ -1948,8 +1948,8 @@ out : {
 void mne_proj_op_report_data_3(FILE *out,const char *tag, MneProjOp* op, int list_data,
                              char **exclude, int nexclude)
 /*
-* Output info about the projection operator
-*/
+ * Output info about the projection operator
+ */
 {
     int j,k,p,q;
     MneProjItem* it;
@@ -2039,8 +2039,8 @@ void mne_proj_op_report_3(FILE *out,const char *tag, MneProjOp* op)
 
 int mne_pick_from_named_vector_3(mneNamedVector vec, const QStringList& names, int nnames, int require_all, float *res)
 /*
-* Pick the desired elements from the named vector
-*/
+ * Pick the desired elements from the named vector
+ */
 {
     int found;
     int k,p;
@@ -2077,8 +2077,8 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
                                      FiffStream::SPtr& stream,
                                      const FiffDirNode::SPtr& start)
 /*
-* Load all the linear projection data
-*/
+ * Load all the linear projection data
+ */
 {
     MneProjOp*  op     = NULL;
     QList<FiffDirNode::SPtr> proj;
@@ -2293,11 +2293,11 @@ static void clear_these(float *data, const QStringList& names, int nnames, const
 
 int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
 /*
-* Do the channel picking and SVD
-* Include a bad list at this phase
-* Input to the projection can include the bad channels
-* but they are not affected
-*/
+ * Do the channel picking and SVD
+ * Include a bad list at this phase
+ * Input to the projection can include the bad channels
+ * but they are not affected
+ */
 {
     int   k,p,q,r,nvec;
     float **vv_meg  = NULL;
@@ -2531,8 +2531,8 @@ bad : {
 
 int mne_proj_op_make_proj(MneProjOp* op)
 /*
-* Do the channel picking and SVD
-*/
+ * Do the channel picking and SVD
+ */
 {
     return mne_proj_op_make_proj_bad(op,NULL,0);
 }
@@ -2782,8 +2782,8 @@ static char *next_line_3(char *line, int n, FILE *in)
 
 int mne_read_bad_channels_3(const QString& name, QStringList& listp, int& nlistp)
 /*
-* Read bad channel names
-*/
+ * Read bad channel names
+ */
 {
     FILE *in = NULL;
     QStringList list;
@@ -2888,8 +2888,8 @@ int mne_read_bad_channel_list_3(const QString& name, QStringList& listp, int& nl
 
 MneCovMatrix* mne_read_cov(const QString& name,int kind)
 /*
-* Read a covariance matrix from a fiff
-*/
+ * Read a covariance matrix from a fiff
+ */
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -3298,8 +3298,8 @@ static int read_ch_info(const QString&  name,
                         int             *nchanp,
                         fiffId          *idp)
 /*
-* Read channel information from a measurement file
-*/
+ * Read channel information from a measurement file
+ */
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -3466,8 +3466,8 @@ bad : {
 
 void mne_revert_to_diag_cov(MneCovMatrix* c)
 /*
-* Pick the diagonal elements of the full covariance matrix
-*/
+ * Pick the diagonal elements of the full covariance matrix
+ */
 {
     int k,p;
     if (c->cov == NULL)
@@ -3501,8 +3501,8 @@ void mne_revert_to_diag_cov(MneCovMatrix* c)
 
 MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, const QStringList& new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)
 /*
-* Pick designated channels from a covariance matrix, optionally omit MEG/EEG correlations
-*/
+ * Pick designated channels from a covariance matrix, optionally omit MEG/EEG correlations
+ */
 {
     int j,k;
     int *pick = NULL;
@@ -3605,9 +3605,9 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, const QStringList& new_name
 
 int mne_proj_op_proj_dvector(MneProjOp* op, double *vec, int nch, int do_complement)
 /*
-* Apply projection operator to a vector (doubles)
-* Assume that all dimension checking etc. has been done before
-*/
+ * Apply projection operator to a vector (doubles)
+ * Assume that all dimension checking etc. has been done before
+ */
 {
     float *pvec;
     double w;
@@ -3690,8 +3690,8 @@ void mne_transpose_dsquare(double **mat, int n)
 
 int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
 /*
-* Apply the projection operator to a covariance matrix
-*/
+ * Apply the projection operator to a covariance matrix
+ */
 {
     double **dcov = NULL;
     int j,k,p;
