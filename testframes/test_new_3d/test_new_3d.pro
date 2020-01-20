@@ -2,7 +2,7 @@
 #
 # @file     test_new_3d.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
-# @version  1.0
+# @version  dev
 # @date     September, 2015
 #
 # @section  LICENSE

@@ -6,7 +6,7 @@
 #           Marco Klamke <marco.klamke@tu-ilmenau.de>;
 #           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
 #           Sugandha Sachdeva <sugandha.sachdeva@tu-ilmenau.de>
-# @version  1.0
+# @version  dev
 # @date     June, 2017
 #
 # @section  LICENSE

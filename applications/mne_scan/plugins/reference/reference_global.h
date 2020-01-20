@@ -3,7 +3,7 @@
  * @file     reference_global.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
- * @version  1.0
+ * @version  dev
  * @date     February, 2017
  *
  * @section  LICENSE

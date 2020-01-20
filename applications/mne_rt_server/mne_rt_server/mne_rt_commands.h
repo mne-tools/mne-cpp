@@ -3,7 +3,7 @@
  * @file     mne_rt_commands.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     July, 2012
  *
  * @section  LICENSE

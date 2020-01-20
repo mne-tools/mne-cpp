@@ -3,7 +3,7 @@
  * @file     averageselectionview.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     July, 2018
  *
  * @section  LICENSE

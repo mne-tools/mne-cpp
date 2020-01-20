@@ -6,7 +6,7 @@
  *           Felix Griesau <Felix.Griesau@tu-ilmenau.de>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
- * @version  1.0
+ * @version  dev
  * @date     May, 2017
  *
  * @section  LICENSE

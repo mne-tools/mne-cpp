@@ -3,7 +3,7 @@
  * @file     screenkeyboard.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
- * @version  1.0
+ * @version  dev
  * @date     July 2016
  *
  * @section  LICENSE

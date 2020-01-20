@@ -3,7 +3,7 @@
 # @file     ex_filtering.pro
 # @author   Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>
-# @version  1.0
+# @version  dev
 # @date     11, 2019
 #
 # @section  LICENSE

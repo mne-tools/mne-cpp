@@ -3,7 +3,7 @@
  * @file     brainampproducer.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
- * @version  1.0
+ * @version  dev
  * @date     October, 2016
  *
  * @section  LICENSE

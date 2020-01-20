@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     parksmcclellan.h
- * @version  1.0
+ * @version  dev
  *
  * ported to mne-cpp by Christoph Dinh and Florian Schlembach in February, 2014
  *

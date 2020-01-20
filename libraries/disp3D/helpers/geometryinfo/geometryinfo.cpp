@@ -3,7 +3,7 @@
  * @file     geometryinfo.cpp
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     May, 2017
  *
  * @section  LICENSE

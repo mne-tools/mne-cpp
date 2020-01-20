@@ -3,7 +3,7 @@
  * @file     fiff_dig_point_set.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     Jul, 2016
  *
  * @section  LICENSE

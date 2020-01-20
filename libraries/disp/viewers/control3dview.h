@@ -2,7 +2,7 @@
 /**
  * @file     control3dview.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     November, 2015
  *
  * @section  LICENSE

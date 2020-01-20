@@ -2,7 +2,7 @@
 /**
  * @file     eegref.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     January, 2017
  *
  * @section  LICENSE

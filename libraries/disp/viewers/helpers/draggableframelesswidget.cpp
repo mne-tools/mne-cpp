@@ -2,7 +2,7 @@
 /**
  * @file     draggableframelesswidget.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     April, 2018
  *
  * @section  LICENSE

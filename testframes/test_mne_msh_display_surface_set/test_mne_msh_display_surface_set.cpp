@@ -3,7 +3,7 @@
  * @file     test_mne_msh_display_surface_set.cpp
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     April, 2017
  *
  * @section  LICENSE
