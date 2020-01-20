@@ -107,74 +107,74 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a MeasurementWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new MeasurementWidget becomes a window. If parent is another widget, MeasurementWidget becomes a child window inside parent. MeasurementWidget is deleted when its parent is deleted.
-    */
+     * Constructs a MeasurementWidget which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new MeasurementWidget becomes a window. If parent is another widget, MeasurementWidget becomes a child window inside parent. MeasurementWidget is deleted when its parent is deleted.
+     */
     MeasurementWidget(QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the MeasurementWidget.
-    */
+     * Destroys the MeasurementWidget.
+     */
     virtual ~MeasurementWidget();
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    * Pure virtual method inherited by IObserver.
-    *
-    * @param [in] pSubject  pointer to Subject -> not used because its direct attached to the measurement.
-    */
+     * Is called when new data are available.
+     * Pure virtual method inherited by IObserver.
+     *
+     * @param [in] pSubject  pointer to Subject -> not used because its direct attached to the measurement.
+     */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement) = 0;
 
     //=========================================================================================================
     /**
-    * Initialise the MeasurementWidget.
-    * Pure virtual method.
-    */
+     * Initialise the MeasurementWidget.
+     * Pure virtual method.
+     */
     virtual void init() = 0;
 
     //=========================================================================================================
     /**
-    * A list of display actions for the current measurement widget.
-    *
-    * @return a list of display actions
-    */
+     * A list of display actions for the current measurement widget.
+     *
+     * @return a list of display actions
+     */
     inline QList< QAction* > getDisplayActions();
 
     //=========================================================================================================
     /**
-    * A list of display widgets for the current measurement widget.
-    *
-    * @return a list of display widgets
-    */
+     * A list of display widgets for the current measurement widget.
+     *
+     * @return a list of display widgets
+     */
     inline QList< QWidget* > getDisplayWidgets();
 
 protected:
     //=========================================================================================================
     /**
-    * Adds a display action to the current measurement widget.
-    *
-    * @param [in] pAction  pointer to the action to be added to the measurement widget
-    */
+     * Adds a display action to the current measurement widget.
+     *
+     * @param [in] pAction  pointer to the action to be added to the measurement widget
+     */
     inline void addDisplayAction(QAction* pAction);
 
     //=========================================================================================================
     /**
-    * Adds a display widgetto the current measurement widget, which is attached to the toolbar
-    *
-    * @param [in] pWidget  pointer to the widget to be added to the measurement widget
-    */
+     * Adds a display widgetto the current measurement widget, which is attached to the toolbar
+     *
+     * @param [in] pWidget  pointer to the widget to be added to the measurement widget
+     */
     inline void addDisplayWidget(QWidget* pWidget);
 
     //=========================================================================================================
     /**
-    * Adds control widgets to a QuickControlView based on their set objects names
-    *
-    * @param [in] pQuickControlView  The quick control view to add the control widgets to
-    * @param [in] lControlWidgets  The control widgets
-    */
+     * Adds control widgets to a QuickControlView based on their set objects names
+     *
+     * @param [in] pQuickControlView  The quick control view to add the control widgets to
+     * @param [in] lControlWidgets  The control widgets
+     */
     void addControlWidgets(QSharedPointer<DISPLIB::QuickControlView> pQuickControlView,
                            const QList<QSharedPointer<QWidget> >& lControlWidgets);
 

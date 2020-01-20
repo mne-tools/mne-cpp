@@ -1677,7 +1677,7 @@ int mne_simplex_minimize(float **p,		                              /* The initia
     int   loop  = 1;
 
     psum = ALLOC_FLOAT_3(ndim);
-    *neval = 0;
+     *neval = 0;
     for (j = 0; j < ndim; j++) {
         for (i = 0,sum = 0.0; i<mpts; i++)
             sum +=  p[i][j];
@@ -1927,7 +1927,7 @@ int fit_sphere_to_points(float **rr,
     r0[X_3] = init_simplex[0][X_3];
     r0[Y_3] = init_simplex[0][Y_3];
     r0[Z_3] = init_simplex[0][Z_3];
-    *R    = opt_rad(r0,&user);
+     *R    = opt_rad(r0,&user);
 
     res = OK;
     goto out;
@@ -2113,14 +2113,14 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
     if (proj.size() == 0 || proj[0]->isEmpty())   /* The caller must recognize an empty projection */
         goto out;
     /*
-    * Only the first projection block is recognized
-    */
+     * Only the first projection block is recognized
+     */
     items = proj[0]->dir_tree_find(FIFFB_PROJ_ITEM);
     if (items.size() == 0 || items[0]->isEmpty())   /* The caller must recognize an empty projection */
         goto out;
     /*
-    * Get a common number of channels
-    */
+     * Get a common number of channels
+     */
     node = proj[0];
     if(!node->find_tag(stream, FIFF_NCHAN, t_pTag))
         global_nchan = 0;
@@ -2365,8 +2365,8 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
         }
     }
     /*
-    * Replace bad channel entries with zeroes
-    */
+     * Replace bad channel entries with zeroes
+     */
     for (q = 0; q < nbad; q++)
         for (r = 0; r < op->nch; r++)
             if (QString::compare(op->names[r],bad[q]) == 0) {
@@ -2376,8 +2376,8 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
                     mat_eeg[p][r] = 0.0;
             }
     /*
-    * Scale the rows so that detection of linear dependence becomes easy
-    */
+     * Scale the rows so that detection of linear dependence becomes easy
+     */
     for (p = 0, nzero = 0; p < nvec_meg; p++) {
         size = sqrt(mne_dot_vectors_3(mat_meg[p],mat_meg[p],op->nch));
         if (size > 0) {
@@ -2407,8 +2407,8 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
         return OK;
     }
     /*
-    * Proceed to SVD
-    */
+     * Proceed to SVD
+     */
 #ifdef DEBUG
     fprintf(stdout,"Before SVD:\n");
 #endif
@@ -2441,8 +2441,8 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
             goto bad;
     }
     /*
-    * Check for linearly dependent vectors
-    */
+     * Check for linearly dependent vectors
+     */
     for (p = 0, op->nvec = 0; p < nvec_meg; p++, op->nvec++)
         if (sing_meg[p]/sing_meg[0] < USE_LIMIT)
             break;
@@ -2928,8 +2928,8 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
         goto out;
     }
     /*
-    * Locate the desired matrix
-    */
+     * Locate the desired matrix
+     */
     for (k = 0 ; k < nodes.size(); ++k) {
         if (!nodes[k]->find_tag(stream, FIFF_MNE_COV_KIND, t_pTag))
             continue;
@@ -2944,8 +2944,8 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
         goto out;
     }
     /*
-    * Read the data
-    */
+     * Read the data
+     */
     if (!nodes[k]->find_tag(stream, FIFF_MNE_COV_DIM, t_pTag))
         goto out;
     ncov = *t_pTag->toInt();
@@ -3052,8 +3052,8 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
     res->bads   = bads;
     res->nbad   = nbad;
     /*
-    * Count the non-zero eigenvalues
-    */
+     * Count the non-zero eigenvalues
+     */
     if (res->lambda) {
         res->nzero = 0;
         for (k = 0; k < res->ncov; k++, res->nzero++)
@@ -3150,8 +3150,8 @@ void mne_merge_channels(fiffChInfo chs1, int nch1,
         res[p++] = chs1[k];
     for (k = 0; k < nch2;k++)
         res[p++] = chs2[k];
-    *resp = res;
-    *nresp = nch1+nch2;
+     *resp = res;
+     *nresp = nch1+nch2;
     return;
 }
 
@@ -3223,12 +3223,12 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
 
-    *chp     = NULL;
+     *chp     = NULL;
     ch       = NULL;
-    *id      = NULL;
+     *id      = NULL;
     /*
-    * Find desired parents
-    */
+     * Find desired parents
+     */
     if (!(meas = find_meas_3(p_node))) {
         qCritical("Meas. block not found!");
         goto bad;
@@ -3239,8 +3239,8 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
         goto bad;
     }
     /*
-    * Is there a block id is in the FIFFB_MEAS node?
-    */
+     * Is there a block id is in the FIFFB_MEAS node?
+     */
     if (!meas->id.isEmpty()) {
         *id = MALLOC_3(1,fiffIdRec);
         (*id)->version = meas->id.version;
@@ -3249,8 +3249,8 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
         (*id)->time = meas->id.time;
     }
     /*
-    * Others from FIFFB_MEAS_INFO
-    */
+     * Others from FIFFB_MEAS_INFO
+     */
     for (k = 0; k < meas_info->nent(); k++) {
         kind = meas_info->dir[k]->kind;
         pos  = meas_info->dir[k]->pos;
@@ -3281,7 +3281,7 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
             break;
         }
     }
-    *chp = ch;
+     *chp = ch;
     return FIFF_OK;
 
 bad : {
@@ -3322,9 +3322,9 @@ static int read_ch_info(const QString&  name,
     node = meas[0];
     if (get_all_chs (stream,node,&id,&chs,&nchan) == FIFF_FAIL)
         goto bad;
-    *chsp   = chs;
-    *nchanp = nchan;
-    *idp = id;
+     *chsp   = chs;
+     *nchanp = nchan;
+     *idp = id;
     stream->close();
     return FIFF_OK;
 
@@ -3440,8 +3440,8 @@ int read_meg_eeg_ch_info(const QString& name,       /* Input file */
     mne_merge_channels(meg,nmeg,eeg,neeg,chsp,&nch);
     FREE_3(meg);
     FREE_3(eeg);
-    *nmegp = nmeg;
-    *neegp = neeg;
+     *nmegp = nmeg;
+     *neegp = neeg;
     FREE_3(id);
     return FIFF_OK;
 
@@ -3707,8 +3707,8 @@ int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
 
     dcov = ALLOC_DCMATRIX_3(c->ncov,c->ncov);
     /*
-    * Return the appropriate result
-    */
+     * Return the appropriate result
+     */
     if (c->cov_diag) {  /* Pick the diagonals */
         for (j = 0, p = 0; j < c->ncov; j++)
             for (k = 0; k < c->ncov; k++)
@@ -3724,8 +3724,8 @@ int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
     }
 
     /*
-    * Project from front and behind
-    */
+     * Project from front and behind
+     */
     for (k = 0; k < c->ncov; k++) {
         if (mne_proj_op_proj_dvector(op,dcov[k],c->ncov,do_complement) != OK)
             return FAIL;
@@ -3738,8 +3738,8 @@ int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
             return FAIL;
 
     /*
-    * Return the result
-    */
+     * Return the result
+     */
     if (c->cov_diag) {  /* Pick the diagonal elements */
         for (j = 0; j < c->ncov; j++) {
             c->cov_diag[j] = dcov[j][j];
@@ -4113,7 +4113,7 @@ int DipoleFitData::make_projection(const QList<QString> &projnames, fiffChInfo c
             delete all;
         all = NULL;
     }
-    *res = all;
+     *res = all;
     return OK;
 
 bad :
@@ -4810,8 +4810,8 @@ static int find_best_guess(float     *B,         /* The whitened data */
         printf("No reasonable initial guess found.");
         return FAIL;
     }
-    *bestp = best;
-    *goodp = good;
+     *bestp = best;
+     *goodp = good;
     return OK;
 }
 
@@ -4906,7 +4906,7 @@ static int fit_Q(DipoleFitData* fit,	     /* The fit data */
     if (!fwd)
         return FAIL;
 
-    *ncomp = fwd->sing[2]/fwd->sing[0] > limit ? 3 : 2;
+     *ncomp = fwd->sing[2]/fwd->sing[0] > limit ? 3 : 2;
 
     Q[0] = Q[1] = Q[2] = 0.0;
     for (c = 0, Bm2 = 0.0; c < *ncomp; c++) {
@@ -4919,7 +4919,7 @@ static int fit_Q(DipoleFitData* fit,	     /* The fit data */
    */
     for (c = 0; c < 3; c++)
         Q[c] = fwd->scales[c]*Q[c];
-    *res = mne_dot_vectors_3(B,B,fwd->nch) - Bm2;
+     *res = mne_dot_vectors_3(B,B,fwd->nch) - Bm2;
 
     delete fwd;
 
@@ -5033,7 +5033,7 @@ int simplex_minimize(float **p,		                              /* The initial si
     int   loop  = 1;
 
     psum = ALLOC_FLOAT_3(ndim);
-    *neval = 0;
+     *neval = 0;
     for (j = 0; j < ndim; j++) {
         for (i = 0,sum = 0.0; i<mpts; i++)
             sum +=  p[i][j];

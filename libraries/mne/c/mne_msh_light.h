@@ -93,26 +93,26 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MneMshLight.
-    */
+     * Constructs the MneMshLight.
+     */
     MneMshLight();
 
     //=========================================================================================================
     /**
-    * Copy Constructs of the MneMshLight.
-    */
+     * Copy Constructs of the MneMshLight.
+     */
     MneMshLight(const MneMshLight &p_mneMshLight);
 
     //=========================================================================================================
     /**
-    * Constructs the MneMshLight.
-    */
+     * Constructs the MneMshLight.
+     */
     MneMshLight(int state, float posX, float posY,float posZ,float diffX,float diffY,float diffZ);
 
     //=========================================================================================================
     /**
-    * Destroys the MneMshLight.
-    */
+     * Destroys the MneMshLight.
+     */
     ~MneMshLight();
 
 public:

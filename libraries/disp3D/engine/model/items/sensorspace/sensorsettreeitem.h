@@ -111,23 +111,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] iType      The type of the item. See types.h for declaration and definition.
+     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit SensorSetTreeItem(int iType = Data3DTreeModelItemTypes::BemItem, const QString& text = "");
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation sets to this item.
-    *
-    * @param[in] tSensor            The BEM data.
-    * @param[in] lChInfo            The channel information used to plot the MEG channels.
-    * @param[in] sDataType          The data type: EEG, MEG.
-    * @param[in] bads               The bad channel list.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    */
+     * Adds FreeSurfer data based on surfaces and annotation sets to this item.
+     *
+     * @param[in] tSensor            The BEM data.
+     * @param[in] lChInfo            The channel information used to plot the MEG channels.
+     * @param[in] sDataType          The data type: EEG, MEG.
+     * @param[in] bads               The bad channel list.
+     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+     */
     void addData(const MNELIB::MNEBem& tSensor,
                  const QList<FIFFLIB::FiffChInfo>& lChInfo,
                  const QString &sDataType,
@@ -136,43 +136,43 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the entity's transformation. This will clear the old transformation.
-    *
-    * @param[in] transform     The new entity's transform.
-    */
+     * Sets the entity's transformation. This will clear the old transformation.
+     *
+     * @param[in] transform     The new entity's transform.
+     */
     virtual void setTransform(const Qt3DCore::QTransform &transform);
 
     //=========================================================================================================
     /**
-    * Sets the entity's transformation. This will clear the old transformation.
-    *
-    * @param[in] transform     The new entity's transform.
-    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
-    */
+     * Sets the entity's transformation. This will clear the old transformation.
+     *
+     * @param[in] transform     The new entity's transform.
+     * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+     */
     virtual void setTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
 
     //=========================================================================================================
     /**
-    * Applies a transformation o ntop of the present one.
-    *
-    * @param[in] transform     The new entity's transform.
-    */
+     * Applies a transformation o ntop of the present one.
+     *
+     * @param[in] transform     The new entity's transform.
+     */
     virtual void applyTransform(const Qt3DCore::QTransform& transform);
 
     //=========================================================================================================
     /**
-    * Applies a transformation o ntop of the present one.
-    *
-    * @param[in] transform     The new entity's transform.
-    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
-    */
+     * Applies a transformation o ntop of the present one.
+     *
+     * @param[in] transform     The new entity's transform.
+     * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+     */
     virtual void applyTransform(const FIFFLIB::FiffCoordTrans& transform, bool bApplyInverse = false);
 
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     void initItem();
 
     QPointer<Renderable3DEntity>      m_pRenderable3DEntity;           /**< This item holds all renderable items. */

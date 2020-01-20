@@ -135,14 +135,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     explicit HPIFitData();
 
     //=========================================================================================================
     /**
-    * dipfit function is adapted from Fieldtrip Software. It has been heavily edited for use with MNE Scan Software.
-    */
+     * dipfit function is adapted from Fieldtrip Software. It has been heavily edited for use with MNE Scan Software.
+     */
     void doDipfitConcurrent();
 
     Eigen::RowVectorXd  coilPos;
@@ -154,43 +154,43 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * magnetic_dipole leadfield for a magnetic dipole in an infinite medium.
-    * The function has been compared with matlab magnetic_dipole and it gives same output.
-    */
+     * magnetic_dipole leadfield for a magnetic dipole in an infinite medium.
+     * The function has been compared with matlab magnetic_dipole and it gives same output.
+     */
     Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt, Eigen::MatrixXd ori);
 
     //=========================================================================================================
     /**
-    * compute_leadfield computes a forward solution for a dipole in a a volume
-    * conductor model. The forward solution is expressed as the leadfield
-    * matrix (Nchan*3), where each column corresponds with the potential or field
-    * distributions on all sensors for one of the x,y,z-orientations of the dipole.
-    * The function has been compared with matlab ft_compute_leadfield and it gives
-    * same output.
-    */
+     * compute_leadfield computes a forward solution for a dipole in a a volume
+     * conductor model. The forward solution is expressed as the leadfield
+     * matrix (Nchan*3), where each column corresponds with the potential or field
+     * distributions on all sensors for one of the x,y,z-orientations of the dipole.
+     * The function has been compared with matlab ft_compute_leadfield and it gives
+     * same output.
+     */
     Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos, const struct SensorInfo& sensors);
 
     //=========================================================================================================
     /**
-    * dipfitError computes the error between measured and model data
-    * and can be used for non-linear fitting of dipole position.
-    * The function has been compared with matlab dipfit_error and it gives
-    * same output
-    */
+     * dipfitError computes the error between measured and model data
+     * and can be used for non-linear fitting of dipole position.
+     * The function has been compared with matlab dipfit_error and it gives
+     * same output
+     */
     DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const struct SensorInfo& sensors, const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
     /**
-    * Compare function for sorting
-    */
+     * Compare function for sorting
+     */
     static bool compare(HPISortStruct a, HPISortStruct b);
 
     //=========================================================================================================
     /**
-    * fminsearch Multidimensional unconstrained nonlinear minimization (Nelder-Mead).
-    * X = fminsearch(X0, maxiter, maxfun, display, data, sensors) starts at X0 and
-    * attempts to find a local minimizer
-    */
+     * fminsearch Multidimensional unconstrained nonlinear minimization (Nelder-Mead).
+     * X = fminsearch(X0, maxiter, maxfun, display, data, sensors) starts at X0 and
+     * attempts to find a local minimizer
+     */
     Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
                                int maxiter,
                                int maxfun,

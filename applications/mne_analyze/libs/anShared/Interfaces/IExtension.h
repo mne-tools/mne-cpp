@@ -86,91 +86,91 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the extension.
-    */
+     * Destroys the extension.
+     */
     virtual ~IExtension() {}
 
     //=========================================================================================================
     /**
-    * Clone the extension
-    */
+     * Clone the extension
+     */
     virtual QSharedPointer<IExtension> clone() const = 0;
 
     //=========================================================================================================
     /**
-    * Initializes the extension.
-    */
+     * Initializes the extension.
+     */
     virtual void init() = 0;
 
     //=========================================================================================================
     /**
-    * Is called when extension unloaded.
-    */
+     * Is called when extension unloaded.
+     */
     virtual void unload() = 0;
 
     //=========================================================================================================
     /**
-    * Returns the plugin name.
-    * Pure virtual method.
-    *
-    * @return the name of plugin.
-    */
+     * Returns the plugin name.
+     * Pure virtual method.
+     *
+     * @return the name of plugin.
+     */
     virtual QString getName() const = 0;
 
     //=========================================================================================================
     /**
-    * Provides the menu, in case no menu is provided it returns a Q_NULLPTR
-    *
-    * @return the menu
-    */
+     * Provides the menu, in case no menu is provided it returns a Q_NULLPTR
+     *
+     * @return the menu
+     */
     virtual QMenu* getMenu() = 0;
 
     //=========================================================================================================
     /**
-    * Provides the control, in case no control is provided it returns a Q_NULLPTR
-    *
-    * @return the control
-    */
+     * Provides the control, in case no control is provided it returns a Q_NULLPTR
+     *
+     * @return the control
+     */
     virtual QDockWidget* getControl() = 0;
 
     //=========================================================================================================
     /**
-    * Provides the view, in case no view is provided it returns a Q_NULLPTR
-    *
-    * @return the view
-    */
+     * Provides the view, in case no view is provided it returns a Q_NULLPTR
+     *
+     * @return the view
+     */
     virtual QWidget* getView() = 0;
 
     //=========================================================================================================
     /**
-    * Sets the global data, which provides the central database
-    *
-    * @param [in] globalData  the global data
-    */
+     * Sets the global data, which provides the central database
+     *
+     * @param [in] globalData  the global data
+     */
     virtual inline void setGlobalData(QSharedPointer<AnalyzeData>& globalData);
 
     //=========================================================================================================
     /**
-    * Returns the global data base
-    *
-    * @return the global data
-    */
+     * Returns the global data base
+     *
+     * @return the global data
+     */
     virtual inline QSharedPointer<AnalyzeData>& globalData();
 
     //=========================================================================================================
     /**
-    * Sets the global settings, which provides the mne analyze settings
-    *
-    * @param [in] globalSettings  the global settings
-    */
+     * Sets the global settings, which provides the mne analyze settings
+     *
+     * @param [in] globalSettings  the global settings
+     */
     virtual inline void setGlobalSettings(QSharedPointer<AnalyzeSettings>& globalSettings);
 
     //=========================================================================================================
     /**
-    * Returns the global settings base
-    *
-    * @return the global settings
-    */
+     * Returns the global settings base
+     *
+     * @return the global settings
+     */
     virtual inline QSharedPointer<AnalyzeSettings>& globalSettings();
 
 private:

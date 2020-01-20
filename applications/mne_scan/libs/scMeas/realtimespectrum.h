@@ -92,79 +92,79 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeMultiSampleArrayNew.
-    */
+     * Constructs a RealTimeMultiSampleArrayNew.
+     */
     explicit RealTimeSpectrum(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeMultiSampleArrayNew.
-    */
+     * Destroys the RealTimeMultiSampleArrayNew.
+     */
     virtual ~RealTimeSpectrum();
 
     //=========================================================================================================
     /**
-    * Init channel infos using fiff info
-    *
-    * @param[in] p_pFiffInfo     Info to init from
-    */
+     * Init channel infos using fiff info
+     *
+     * @param[in] p_pFiffInfo     Info to init from
+     */
     void initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo);
 
     //=========================================================================================================
     /**
-    * Init Scale Type
-    *
-    * @param[in] ScaleType     Scale type to init from
-    */
+     * Init Scale Type
+     *
+     * @param[in] ScaleType     Scale type to init from
+     */
     void initScaleType(qint8 ScaleType);
 
     //=========================================================================================================
     /**
-    * Returns whether channel info is initialized
-    *
-    * @return true whether the channel info is available.
-    */
+     * Returns whether channel info is initialized
+     *
+     * @return true whether the channel info is available.
+     */
     inline bool isInit() const;
 
     //=========================================================================================================
     /**
-    * Returns the reference to the orig FiffInfo.
-    *
-    * @return the reference to the orig FiffInfo.
-    */
+     * Returns the reference to the orig FiffInfo.
+     *
+     * @return the reference to the orig FiffInfo.
+     */
     inline FiffInfo::SPtr& getFiffInfo();
 
     //=========================================================================================================
     /**
-    * Returns the scale type.
-    *
-    * @return the scale type.
-    */
+     * Returns the scale type.
+     *
+     * @return the scale type.
+     */
     inline qint8 getScaleType();
 
     //=========================================================================================================
     /**
-    * New data block to distribute
-    *
-    * @param [in] v the value which is should be distributed.
-    */
+     * New data block to distribute
+     *
+     * @param [in] v the value which is should be distributed.
+     */
     virtual void setValue(MatrixXd& v);
 
     //=========================================================================================================
     /**
-    * Returns the current value set.
-    * This method is inherited by Measurement.
-    *
-    * @return the last attached value.
-    */
+     * Returns the current value set.
+     * This method is inherited by Measurement.
+     *
+     * @return the last attached value.
+     */
     virtual MatrixXd getValue() const;
 
     //=========================================================================================================
     /**
-    * Returns whether RealTimeSpectrum contains values
-    *
-    * @return whether RealTimeSpectrum contains values.
-    */
+     * Returns whether RealTimeSpectrum contains values
+     *
+     * @return whether RealTimeSpectrum contains values.
+     */
     inline bool containsValues() const;
 
 private:

@@ -463,8 +463,8 @@ void FiffTag::convert_matrix_to_file_data(FiffTag::SPtr tag)
             IOUtils::swap_intp(dimp+k);
     }
     /*
-    * Now convert data...
-    */
+     * Now convert data...
+     */
     kind = fiff_type_base(tag->type);
     if (kind == FIFFT_INT) {
         for (data = (int *)(tag->data()), k = 0; k < np; k++)

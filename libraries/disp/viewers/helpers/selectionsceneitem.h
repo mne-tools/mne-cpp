@@ -88,8 +88,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a SelectionSceneItem.
-    */
+     * Constructs a SelectionSceneItem.
+     */
     SelectionSceneItem(QString channelName,
                        int channelNumber,
                        QPointF channelPosition,
@@ -100,14 +100,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
-    */
+     * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
+     */
     QRectF boundingRect() const;
 
     //=========================================================================================================
     /**
-    * Reimplemented paint function.
-    */
+     * Reimplemented paint function.
+     */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     QString     m_sChannelName;             /**< The channel's name.*/

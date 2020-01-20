@@ -87,22 +87,22 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
-    */
+     * Default constructor
+     */
     FiffRawDir();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffRawDir   Raw directory entry which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffRawDir   Raw directory entry which should be copied
+     */
     FiffRawDir(const FiffRawDir &p_FiffRawDir);
 
     //=========================================================================================================
     /**
-    * Destroys the raw Directory entry.
-    */
+     * Destroys the raw Directory entry.
+     */
     ~FiffRawDir();
 
 public:

@@ -132,39 +132,39 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] iType      The type of the item. See types.h for declaration and definition.
+     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit MeasurementTreeItem(int iType = Data3DTreeModelItemTypes::MeasurementItem,
                                  const QString& text = "Unknown measurement");
 
     //=========================================================================================================
     /**
-    * Adds source space data to this item.
-    *
-    * @param[in] tSourceSpace       The source space data.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
+     * Adds source space data to this item.
+     *
+     * @param[in] tSourceSpace       The source space data.
+     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+     *
+     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+     */
     QList<SourceSpaceTreeItem*> addData(const MNELIB::MNESourceSpace& tSourceSpace,
                                  Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
-    * Adds source estimated activation data (MNE, RTC-MUSIC) to this item.
-    *
-    * @param[in] tSourceEstimate    The MNESourceEstimate.
-    * @param[in] tForwardSolution   The MNEForwardSolution.
-    * @param[in] tSurfSet           The surface set holding the left and right hemisphere surfaces.
-    * @param[in] tAnnotSet          The annotation set holding the left and right hemisphere annotations.
-    * @param[in] p3DEntityParent    Pointer to the QEntity parent.
-    * @param[in] bUseGPU            Whether to use GPU support for visualizing real-time data.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
+     * Adds source estimated activation data (MNE, RTC-MUSIC) to this item.
+     *
+     * @param[in] tSourceEstimate    The MNESourceEstimate.
+     * @param[in] tForwardSolution   The MNEForwardSolution.
+     * @param[in] tSurfSet           The surface set holding the left and right hemisphere surfaces.
+     * @param[in] tAnnotSet          The annotation set holding the left and right hemisphere annotations.
+     * @param[in] p3DEntityParent    Pointer to the QEntity parent.
+     * @param[in] bUseGPU            Whether to use GPU support for visualizing real-time data.
+     *
+     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+     */
     MneDataTreeItem* addData(const MNELIB::MNESourceEstimate& tSourceEstimate,
                              const MNELIB::MNEForwardSolution& tForwardSolution,
                              const FSLIB::SurfaceSet &tSurfSet,
@@ -174,17 +174,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds interpolated activation data to the csh version of this item.
-    *
-    * @param[in] tSensorData            The SensorData.
-    * @param[in] bemSurface             Holds all Bem data used in this item.
-    * @param[in] fiffInfo               Holds all information needed about the sensors.
-    * @param[in] sSensorType            Name of the sensor type EEG or MEG.
-    * @param[in] p3DEntityParent        Pointer to the QEntity parent.
-    * @param[in] bUseGPU                Whether to use GPU support for visualizing real-time data.
-    *
-    * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
-    */
+     * Adds interpolated activation data to the csh version of this item.
+     *
+     * @param[in] tSensorData            The SensorData.
+     * @param[in] bemSurface             Holds all Bem data used in this item.
+     * @param[in] fiffInfo               Holds all information needed about the sensors.
+     * @param[in] sSensorType            Name of the sensor type EEG or MEG.
+     * @param[in] p3DEntityParent        Pointer to the QEntity parent.
+     * @param[in] bUseGPU                Whether to use GPU support for visualizing real-time data.
+     *
+     * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
+     */
     SensorDataTreeItem *addData(const Eigen::MatrixXd& tSensorData,
                                 const MNELIB::MNEBemSurface &bemSurface,
                                 const FIFFLIB::FiffInfo &fiffInfo,
@@ -194,53 +194,53 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds source estimated activation data (dipole fit) to this item.
-    *
-    * @param[in] tECDSet            The ECDSet dipole data.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
+     * Adds source estimated activation data (dipole fit) to this item.
+     *
+     * @param[in] tECDSet            The ECDSet dipole data.
+     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+     *
+     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+     */
     EcdDataTreeItem* addData(const INVERSELIB::ECDSet& tECDSet,
                              Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
-    * Adds digitizer data to this item.
-    *
-    * @param[in] digitizerkind      The kind of the digitizer data.
-    * @param[in] tDigitizer         The digitizer data.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
+     * Adds digitizer data to this item.
+     *
+     * @param[in] digitizerkind      The kind of the digitizer data.
+     * @param[in] tDigitizer         The digitizer data.
+     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+     *
+     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+     */
     DigitizerSetTreeItem* addData(const FIFFLIB::FiffDigPointSet& tDigitizer,
                                   Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
-    * Adds connectivity estimation data.
-    *
-    * @param[in] tNetworkData       The connectivity data.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
+     * Adds connectivity estimation data.
+     *
+     * @param[in] tNetworkData       The connectivity data.
+     *
+     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+     */
     NetworkTreeItem* addData(const CONNECTIVITYLIB::Network& tNetworkData,
                              Qt3DCore::QEntity* p3DEntityParent = 0);
 
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     void initItem();
 
     //=========================================================================================================
     /**
-    * Call this function whenever new colors for the activation data plotting are available: source level.
-    *
-    * @param[in] vertColors     The color values for each estimated source for left and right hemisphere.
-    */
+     * Call this function whenever new colors for the activation data plotting are available: source level.
+     *
+     * @param[in] vertColors     The color values for each estimated source for left and right hemisphere.
+     */
     void onSourceColorChanged(const QVariant& vertColors);
 
     QPointer<MneDataTreeItem>       m_pMneDataTreeItem;         /**< The rt source loc data item of this item. */

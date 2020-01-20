@@ -95,14 +95,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MneMshLightSet.
-    */
+     * Constructs the MneMshLightSet.
+     */
     MneMshLightSet();
 
     //=========================================================================================================
     /**
-    * Destroys the MneMshLightSet.
-    */
+     * Destroys the MneMshLightSet.
+     */
     ~MneMshLightSet();
 
 public:

@@ -86,51 +86,51 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ExtensionManager with the given parent.
-    *
-    * @param[in] parent pointer to parent Object. (It's normally the default value.)
-    */
+     * Constructs a ExtensionManager with the given parent.
+     *
+     * @param[in] parent pointer to parent Object. (It's normally the default value.)
+     */
     ExtensionManager(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ExtensionManager.
-    */
+     * Destroys the ExtensionManager.
+     */
     virtual ~ExtensionManager();
 
     //=========================================================================================================
     /**
-    * Loads extensions from given directory.
-    *
-    * @param [in] dir    the plugin directory.
-    */
+     * Loads extensions from given directory.
+     *
+     * @param [in] dir    the plugin directory.
+     */
     void loadExtension(const QString& dir);
 
     //=========================================================================================================
     /**
-    * Initializes the extensions.
-    *
-    * @param [in] settings      the global mne analyze settings
-    * @param [in] data          the global mne analyze data
-    */
+     * Initializes the extensions.
+     *
+     * @param [in] settings      the global mne analyze settings
+     * @param [in] data          the global mne analyze data
+     */
     void initExtensions(QSharedPointer<AnalyzeSettings>& settings, QSharedPointer<AnalyzeData>& data);
 
     //=========================================================================================================
     /**
-    * Finds index of extension by name.
-    *
-    * @param [in] name  the extension name.
-    *
-    * @return index of extension.
-    */
+     * Finds index of extension by name.
+     *
+     * @param [in] name  the extension name.
+     *
+     * @return index of extension.
+     */
     int findByName(const QString& name);
 
     //=========================================================================================================
     /**
-    * Returns vector containing all extensions.
-    *
-    * @return reference to vector containing all extensions.
-    */
+     * Returns vector containing all extensions.
+     *
+     * @return reference to vector containing all extensions.
+     */
     inline const QVector<IExtension*>& getExtensions();
 
 private:

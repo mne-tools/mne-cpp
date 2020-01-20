@@ -94,13 +94,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DraggableFramelessWidget which is a child of parent.
-    *
-    * @param [in] parent        The parent of the widget.
-    * @param [in] flags         The window flags.
-    * @param [in] bRoundEdges   Flag specifying whether to round the edges.
-    * @param [in] bDraggable    Flag specifying whether this widget is draggable.
-    */
+     * Constructs a DraggableFramelessWidget which is a child of parent.
+     *
+     * @param [in] parent        The parent of the widget.
+     * @param [in] flags         The window flags.
+     * @param [in] bRoundEdges   Flag specifying whether to round the edges.
+     * @param [in] bDraggable    Flag specifying whether this widget is draggable.
+     */
     DraggableFramelessWidget(QWidget *parent = 0,
                              Qt::WindowFlags flags = 0,
                              bool bRoundEdges = false,
@@ -108,51 +108,51 @@ public:
 
     //=========================================================================================================
     /**
-    * Destructs a DraggableFramelessWidget
-    */
+     * Destructs a DraggableFramelessWidget
+     */
     ~DraggableFramelessWidget();
 
     //=========================================================================================================
     /**
-    * Set the draggable flag of this widget.
-    *
-    * @param [in] bFlag  the flag to set.
-    */
+     * Set the draggable flag of this widget.
+     *
+     * @param [in] bFlag  the flag to set.
+     */
     void setDraggable(bool bFlag);
 
 protected:
     //=========================================================================================================
     /**
-    * Reimplmented mouseMoveEvent.
-    */
+     * Reimplmented mouseMoveEvent.
+     */
     void mouseMoveEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
-    * Reimplmented mouseMoveEvent.
-    */
+     * Reimplmented mouseMoveEvent.
+     */
     void mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
-    * Reimplmented mouseReleaseEvent.
-    */
+     * Reimplmented mouseReleaseEvent.
+     */
     void mouseReleaseEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
-    * Reimplmented mouseMoveEvent.
-    */
+     * Reimplmented mouseMoveEvent.
+     */
     void resizeEvent(QResizeEvent *event);
 
     //=========================================================================================================
     /**
-    * Calculates a rect with rounded edged.
-    *
-    * @param [in] rect the rect which is supposed to be rounded.
-    * @param [in] r the radius of round edges.
-    * @return the rounded rect in form of a QRegion
-    */
+     * Calculates a rect with rounded edged.
+     *
+     * @param [in] rect the rect which is supposed to be rounded.
+     * @param [in] r the radius of round edges.
+     * @return the rounded rect in form of a QRegion
+     */
     QRegion roundedRect(const QRect& rect, int r);
 
 private:

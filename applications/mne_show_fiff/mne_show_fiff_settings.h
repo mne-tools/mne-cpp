@@ -87,29 +87,29 @@ public:
 
     //=========================================================================================================
     /**
-    * Default Constructor
-    */
+     * Default Constructor
+     */
     explicit MneShowFiffSettings();
 
     //=========================================================================================================
     /**
-    * Constructs Show Fiff Settings
-    *
-    * @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-    * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-    */
+     * Constructs Show Fiff Settings
+     *
+     * @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+     * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+     */
     explicit MneShowFiffSettings(int *argc,char **argv);
 
     //=========================================================================================================
     /**
-    * Destructs the Show Fiff Settings
-    */
+     * Destructs the Show Fiff Settings
+     */
     virtual ~MneShowFiffSettings();
 
     //=========================================================================================================
     /**
-    * Check whether Show Fiff Settings are correctly set.
-    */
+     * Check whether Show Fiff Settings are correctly set.
+     */
     void checkIntegrity();
 
 public:

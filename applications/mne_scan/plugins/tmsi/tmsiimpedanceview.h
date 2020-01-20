@@ -74,27 +74,27 @@ class TMSIImpedanceView : public QGraphicsView
 public:
     //=========================================================================================================
     /**
-    * Constructs a TMSIImpedanceView.
-    */
+     * Constructs a TMSIImpedanceView.
+     */
     explicit TMSIImpedanceView(QWidget *parent = 0);
 
 private:
     //=========================================================================================================
     /**
-    * Reimplemented wheel event used for zoomin in and out of the scene.
-    */
+     * Reimplemented wheel event used for zoomin in and out of the scene.
+     */
     void wheelEvent(QWheelEvent* event);
 
     //=========================================================================================================
     /**
-    * Reimplemented resize event used scaling fitting the scene into the view after a resize occured.
-    */
+     * Reimplemented resize event used scaling fitting the scene into the view after a resize occured.
+     */
     void resizeEvent(QResizeEvent* event);
 
     //=========================================================================================================
     /**
-    * Reimplemented mouse press event handler.
-    */
+     * Reimplemented mouse press event handler.
+     */
     void mouseDoubleClickEvent(QMouseEvent* event);
 };
 

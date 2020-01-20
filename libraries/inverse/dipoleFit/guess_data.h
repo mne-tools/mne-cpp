@@ -92,9 +92,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Guess Data
-    * Refactored: new_guess_data (dipole_fit_setup.c)
-    */
+     * Constructs the Guess Data
+     * Refactored: new_guess_data (dipole_fit_setup.c)
+     */
     GuessData();
 
 //    //=========================================================================================================
@@ -107,42 +107,42 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Guess Data from given Data
-    * Refactored: make_guess_data (setup.c)
-    *
-    * @param[in] guessname
-    *
-    */
+     * Constructs the Guess Data from given Data
+     * Refactored: make_guess_data (setup.c)
+     *
+     * @param[in] guessname
+     *
+     */
     GuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, DipoleFitData* f);
 
     //=========================================================================================================
     /**
-    * Constructs the Guess Data from given Data
-    * Refactored: make_guess_data (dipole_fit_setup.c)
-    *
-    * @param[in] guessname
-    *
-    */
+     * Constructs the Guess Data from given Data
+     * Refactored: make_guess_data (dipole_fit_setup.c)
+     *
+     * @param[in] guessname
+     *
+     */
     GuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, DipoleFitData* f, char *guess_save_name);
 
 
 
     //=========================================================================================================
     /**
-    * Destroys the Guess Data description
-    * Refactored: free_guess_data (dipole_fit_setup.c)
-    */
+     * Destroys the Guess Data description
+     * Refactored: free_guess_data (dipole_fit_setup.c)
+     */
     ~GuessData();
 
     //=========================================================================================================
     /**
-    * Once the guess locations have been set up we can compute the fields
-    * Refactored: compute_guess_fields (dipole_fit_setup.c)
-    *
-    * @param[in] f      Dipole Fit Data to the Compute Guess Fields
-    *
-    * @return true when successful
-    */
+     * Once the guess locations have been set up we can compute the fields
+     * Refactored: compute_guess_fields (dipole_fit_setup.c)
+     *
+     * @param[in] f      Dipole Fit Data to the Compute Guess Fields
+     *
+     * @return true when successful
+     */
     bool compute_guess_fields(DipoleFitData* f);
 
 public:

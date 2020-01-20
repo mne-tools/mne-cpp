@@ -82,17 +82,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a NeuromagAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NeuromagAboutWidget becomes a window. If parent is another widget, NeuromagAboutWidget becomes a child window inside parent. NeuromagAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a NeuromagAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new NeuromagAboutWidget becomes a window. If parent is another widget, NeuromagAboutWidget becomes a child window inside parent. NeuromagAboutWidget is deleted when its parent is deleted.
+     */
     NeuromagAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the NeuromagAboutWidget.
-    * All NeuromagAboutWidget's children are deleted first. The application exits if NeuromagAboutWidget is the main widget.
-    */
+     * Destroys the NeuromagAboutWidget.
+     * All NeuromagAboutWidget's children are deleted first. The application exits if NeuromagAboutWidget is the main widget.
+     */
     ~NeuromagAboutWidget();
 
 private:

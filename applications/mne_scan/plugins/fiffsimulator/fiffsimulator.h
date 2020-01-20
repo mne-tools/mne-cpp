@@ -114,38 +114,38 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FiffSimulator.
-    */
+     * Constructs a FiffSimulator.
+     */
     FiffSimulator();
 
     //=========================================================================================================
     /**
-    * Destroys the FiffSimulator.
-    */
+     * Destroys the FiffSimulator.
+     */
     virtual ~FiffSimulator();
 
     //=========================================================================================================
     /**
-    * Clears the rt server
-    */
+     * Clears the rt server
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Initialise the FiffSimulator.
-    */
+     * Initialise the FiffSimulator.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     virtual bool start();
@@ -156,10 +156,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates the setup widget.
-    *
-    * @return Returns the setup widget.
-    */
+     * Creates the setup widget.
+     *
+     * @return Returns the setup widget.
+     */
     virtual QWidget* setupWidget();
 
 protected:
@@ -167,64 +167,64 @@ protected:
 
     //=========================================================================================================
     /**
-    * Initialises the output connector.
-    */
+     * Initialises the output connector.
+     */
     void initConnector();
 
     //=========================================================================================================
     /**
-    * Change connector
-    *
-    * @param[in] p_iNewConnectorId      new connector ID
-    */
+     * Change connector
+     *
+     * @param[in] p_iNewConnectorId      new connector ID
+     */
     void changeConnector(qint32 p_iNewConnectorId);
 
     //=========================================================================================================
     /**
-    * Connects the cmd client.
-    */
+     * Connects the cmd client.
+     */
     void connectCmdClient();
 
     //=========================================================================================================
     /**
-    * Disconnects the cmd client.
-    */
+     * Disconnects the cmd client.
+     */
     void disconnectCmdClient();
 
     //=========================================================================================================
     /**
-    * Request FiffInfo using cmd client and producer (data client)
-    */
+     * Request FiffInfo using cmd client and producer (data client)
+     */
     void requestInfo();
 
     //=========================================================================================================
     /**
-    * Set HPI fiff information.
-    */
+     * Set HPI fiff information.
+     */
     void showHPIDialog();
 
     //=========================================================================================================
     /**
-    * Sends the current data block to the HPI dialog.
-    *
-    * @param [in] matData   The new data block.
-    */
+     * Sends the current data block to the HPI dialog.
+     *
+     * @param [in] matData   The new data block.
+     */
     void updateHPI(const Eigen::MatrixXf &matData);    
 
     //=========================================================================================================
     /**
-    * Sends the current data block to the HPI dialog and performs a fit.
-    *
-    * @param [in] matData   The data block to which the HPI information is to be written.
-    */
+     * Sends the current data block to the HPI dialog and performs a fit.
+     *
+     * @param [in] matData   The data block to which the HPI information is to be written.
+     */
     void doContinousHPI(Eigen::MatrixXf& matData);
 
     //=========================================================================================================
     /**
-    * Toggles teh continous HPI flag.
-    *
-    * @param [in] bDoContinousHPI   Whether to do continous HPI.
-    */
+     * Toggles teh continous HPI flag.
+     *
+     * @param [in] bDoContinousHPI   Whether to do continous HPI.
+     */
     void onContinousHPIToggled(bool bDoContinousHPI);
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
@@ -256,16 +256,16 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emitted when command clients connection status changed
-    *
-    * @param[in] p_bStatus  connection status
-    */
+     * Emitted when command clients connection status changed
+     *
+     * @param[in] p_bStatus  connection status
+     */
     void cmdConnectionChanged(bool p_bStatus);
 
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
-    */
+     * Emitted when fiffInfo is available
+     */
     void fiffInfoAvailable();
 };
 

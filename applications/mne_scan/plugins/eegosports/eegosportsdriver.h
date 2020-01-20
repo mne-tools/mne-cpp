@@ -113,36 +113,36 @@ class EEGoSportsDriver
 public:
     //=========================================================================================================
     /**
-    * Constructs a EEGoSportsDriver.
-    *
-    * @param [in] pEEGoSportsProducer a pointer to the corresponding EEGoSportsProducer class.
-    */
+     * Constructs a EEGoSportsDriver.
+     *
+     * @param [in] pEEGoSportsProducer a pointer to the corresponding EEGoSportsProducer class.
+     */
     EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer);
 
     //=========================================================================================================
     /**
-    * Destroys the EEGoSportsDriver.
-    */
+     * Destroys the EEGoSportsDriver.
+     */
     ~EEGoSportsDriver();
 
     //=========================================================================================================
     /**
-    * Get sample from the device in form of a mtrix.
-    * @param [in] MatrixXf the block sample values in form of a matrix.
-    * @param [out] bool returns true if sample was successfully written to the input variable, false otherwise.
-    */
+     * Get sample from the device in form of a mtrix.
+     * @param [in] MatrixXf the block sample values in form of a matrix.
+     * @param [out] bool returns true if sample was successfully written to the input variable, false otherwise.
+     */
     bool getSampleMatrixValue(Eigen::MatrixXd& sampleMatrix);
 
     //=========================================================================================================
     /**
-    * Initialise device.
-    * @param [in] iNumberOfChannels number of channels specified by the user.
-    * @param [in] iSamplesPerBlock samples per block specified by the user.
-    * @param [in] iSamplingFrequency sampling frequency specified by the user.
-    * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
-    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-    * @param [in] bMeasureImpedance Flag for measuring impedances.
-    */
+     * Initialise device.
+     * @param [in] iNumberOfChannels number of channels specified by the user.
+     * @param [in] iSamplesPerBlock samples per block specified by the user.
+     * @param [in] iSamplingFrequency sampling frequency specified by the user.
+     * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
+     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
+     * @param [in] bMeasureImpedance Flag for measuring impedances.
+     */
     bool initDevice(int iNumberOfChannels,
                     int iSamplesPerBlock,
                     int iSamplingFrequency,
@@ -152,9 +152,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Uninitialise device.
-    * @param [out] bool returns true if device was successfully uninitialised, false otherwise.
-    */
+     * Uninitialise device.
+     * @param [out] bool returns true if device was successfully uninitialised, false otherwise.
+     */
     bool uninitDevice();
 
 private:

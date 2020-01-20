@@ -88,14 +88,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MneProjData.
-    */
+     * Constructs the MneProjData.
+     */
     MneProjData(MNELIB::MneSurfaceOld* s);
 
     //=========================================================================================================
     /**
-    * Destroys the MneProjData.
-    */
+     * Destroys the MneProjData.
+     */
     ~MneProjData();
 
 public:

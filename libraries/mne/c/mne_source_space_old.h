@@ -90,14 +90,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Source Space
-    */
+     * Constructs the MNE Source Space
+     */
     MneSourceSpaceOld(int np = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Source Space
-    */
+     * Destroys the MNE Source Space
+     */
     ~MneSourceSpaceOld();
 
 public:

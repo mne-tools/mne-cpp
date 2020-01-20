@@ -134,50 +134,50 @@ class TMSISHARED_EXPORT TMSI : public ISensor
 public:
     //=========================================================================================================
     /**
-    * Constructs a TMSI.
-    */
+     * Constructs a TMSI.
+     */
     TMSI();
 
     //=========================================================================================================
     /**
-    * Destroys the TMSI.
-    */
+     * Destroys the TMSI.
+     */
     virtual ~TMSI();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Sets up the fiff info with the current data chosen by the user. Note: Only works for ANT Neuro Waveguard Duke caps.
-    */
+     * Sets up the fiff info with the current data chosen by the user. Note: Only works for ANT Neuro Waveguard Duke caps.
+     */
     void setUpFiffInfo();
 
     //=========================================================================================================
     /**
-    * Starts the TMSI by starting the tmsi's thread.
-    */
+     * Starts the TMSI by starting the tmsi's thread.
+     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the TMSI by stopping the tmsi's thread.
-    */
+     * Stops the TMSI by stopping the tmsi's thread.
+     */
     virtual bool stop();
 
     virtual IPlugin::PluginType getType() const;
@@ -192,40 +192,40 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
     //=========================================================================================================
     /**
-    * Opens a widget to check the impedance values
-    */
+     * Opens a widget to check the impedance values
+     */
     void showImpedanceDialog();
 
     //=========================================================================================================
     /**
-    * Opens a dialog to setup the project to check the impedance values
-    */
+     * Opens a dialog to setup the project to check the impedance values
+     */
     void showSetupProjectDialog();
 
     //=========================================================================================================
     /**
-    * Starts data recording
-    */
+     * Starts data recording
+     */
     void showStartRecording();
 
     //=========================================================================================================
     /**
-    * Implements blinking recording button
-    */
+     * Implements blinking recording button
+     */
     void changeRecordingButton();
 
     //=========================================================================================================
     /**
-    * Checks if a dir exists
-    */
+     * Checks if a dir exists
+     */
     bool dirExists(const std::string& dirName_in);
 
 private:

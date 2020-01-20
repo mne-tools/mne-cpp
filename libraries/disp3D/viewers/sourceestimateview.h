@@ -102,31 +102,31 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
-    *
-    */
+     * Default constructor
+     *
+     */
     explicit SourceEstimateView(QWidget *parent = 0,
                                 Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
+     * Default destructor
+     */
     ~SourceEstimateView();
 
     //=========================================================================================================
     /**
-    * Add data to the view
-    *
-    * @param[in] sSubject               The name of the subject.
-    * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-    * @param[in] tSourceEstimate        The MNESourceEstimate.
-    * @param[in] tForwardSolution       The MNEForwardSolution.
-    * @param[in] tSurfSet               The surface set holding the left and right hemisphere surfaces.
-    * @param[in] tAnnotSet              The annotation set holding the left and right hemisphere annotations.
-    *
-    * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
+     * Add data to the view
+     *
+     * @param[in] sSubject               The name of the subject.
+     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param[in] tSourceEstimate        The MNESourceEstimate.
+     * @param[in] tForwardSolution       The MNEForwardSolution.
+     * @param[in] tSurfSet               The surface set holding the left and right hemisphere surfaces.
+     * @param[in] tAnnotSet              The annotation set holding the left and right hemisphere annotations.
+     *
+     * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+     */
     MneDataTreeItem* addData(const QString& sSubject,
                              const QString& sMeasurementSetName,
                              const MNELIB::MNESourceEstimate& tSourceEstimate,

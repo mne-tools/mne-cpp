@@ -92,34 +92,34 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ECGProducer.
-    *
-    * @param [in] simulator a pointer to the corresponding ECGSimulator.
-    * @param [in] buffer_I a pointer to the buffer to which the ECGProducer should write the generated data for ECG I.
-    * @param [in] buffer_II a pointer to the buffer to which the ECGProducer should write the generated data for ECG II.
-    * @param [in] buffer_III a pointer to the buffer to which the ECGProducer should write the generated data for ECG III.
-    */
+     * Constructs a ECGProducer.
+     *
+     * @param [in] simulator a pointer to the corresponding ECGSimulator.
+     * @param [in] buffer_I a pointer to the buffer to which the ECGProducer should write the generated data for ECG I.
+     * @param [in] buffer_II a pointer to the buffer to which the ECGProducer should write the generated data for ECG II.
+     * @param [in] buffer_III a pointer to the buffer to which the ECGProducer should write the generated data for ECG III.
+     */
     ECGProducer(ECGSimulator* simulator, dBuffer::SPtr& buffer_I, dBuffer::SPtr& buffer_II, dBuffer::SPtr& buffer_III);
 
     //=========================================================================================================
     /**
-    * Destroys the ECGProducer.
-    */
+     * Destroys the ECGProducer.
+     */
     ~ECGProducer();
 
     //=========================================================================================================
     /**
-    * Stops the ECGProducer by stopping the producer's thread.
-    */
+     * Stops the ECGProducer by stopping the producer's thread.
+     */
     void stop();
 
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
 private:

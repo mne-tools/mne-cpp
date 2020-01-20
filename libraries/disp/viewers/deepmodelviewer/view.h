@@ -86,10 +86,10 @@ class GraphicsView : public QGraphicsView
 public:
     //=========================================================================================================
     /**
-    * Constructs the GraphicsView
-    *
-    * @param [in] v     The View which this is the viewport of
-    */
+     * Constructs the GraphicsView
+     *
+     * @param [in] v     The View which this is the viewport of
+     */
     GraphicsView(View *v) : QGraphicsView(), m_pView(v) { }
 
 protected:
@@ -114,107 +114,107 @@ class View : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs the View Widget which is a child of parent
-    *
-    * @param [in] parent    The parent widget
-    */
+     * Constructs the View Widget which is a child of parent
+     *
+     * @param [in] parent    The parent widget
+     */
     explicit View(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Returns the GraphicsView viewport of this view
-    *
-    * @return GraphicsView viewport
-    */
+     * Returns the GraphicsView viewport of this view
+     *
+     * @return GraphicsView viewport
+     */
     QGraphicsView *getGraphicsView() const;
 
 public:
     //=========================================================================================================
     /**
-    * Zooms into the scene
-    *
-    * @param [in] level    The zooming level increment
-    */
+     * Zooms into the scene
+     *
+     * @param [in] level    The zooming level increment
+     */
     void zoomIn(int level = 1);
 
     //=========================================================================================================
     /**
-    * Zooms out of the scene
-    *
-    * @param [in] level    The zooming level decrement
-    */
+     * Zooms out of the scene
+     *
+     * @param [in] level    The zooming level decrement
+     */
     void zoomOut(int level = 1);
 
 #ifndef QT_NO_OPENGL
     //=========================================================================================================
     /**
-    * Sets if opengl shpuld be used
-    *
-    * @param [in] useOpengl     if OpenGL should be used
-    */
+     * Sets if opengl shpuld be used
+     *
+     * @param [in] useOpengl     if OpenGL should be used
+     */
     void enableOpenGL(bool useOpengl);
     //=========================================================================================================
     /**
-    * Returns if OpenGl is used
-    *
-    * @return if OpenGl is used
-    */
+     * Returns if OpenGl is used
+     *
+     * @return if OpenGl is used
+     */
     bool usesOpenGL() const { return m_bUseOpengl; }
 #endif
     //=========================================================================================================
     /**
-    * Sets if antialiasing shpuld be used
-    *
-    * @param [in] useAntialiasing   if antialiasing should be used
-    */
+     * Sets if antialiasing shpuld be used
+     *
+     * @param [in] useAntialiasing   if antialiasing should be used
+     */
     void enableAntialiasing(bool useAntialiasing);
     //=========================================================================================================
     /**
-    * Returns if Antialiasing is used
-    *
-    * @return if Antialiasing is used
-    */
+     * Returns if Antialiasing is used
+     *
+     * @return if Antialiasing is used
+     */
     bool usesAntialiasing() const { return m_bUseAntialiasing; }
 
     //=========================================================================================================
     /**
-    * Toggles the pointer mode: Select or Drag
-    *
-    * @param [in] selectMode    if select mode should be enabled, otherwise drag mode
-    */
+     * Toggles the pointer mode: Select or Drag
+     *
+     * @param [in] selectMode    if select mode should be enabled, otherwise drag mode
+     */
     void enableSelectMode(bool selectMode);
 
     //=========================================================================================================
     /**
-    * Invokes the printing Dialog for the view
-    */
+     * Invokes the printing Dialog for the view
+     */
     void print();
 
 private:
     //=========================================================================================================
     /**
-    * Resets the View
-    */
+     * Resets the View
+     */
     void resetView();
     //=========================================================================================================
     /**
-    * Enables the Reset button
-    */
+     * Enables the Reset button
+     */
     void setResetButtonEnabled();
     //=========================================================================================================
     /**
-    * Sets the rotation Matrix up
-    */
+     * Sets the rotation Matrix up
+     */
     void setupMatrix();
     //=========================================================================================================
     /**
-    * Rotates left
-    */
+     * Rotates left
+     */
     void rotateLeft();
     //=========================================================================================================
     /**
-    * Rotates right
-    */
+     * Rotates right
+     */
     void rotateRight();
 
 private:

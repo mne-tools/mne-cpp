@@ -91,15 +91,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Nearest
-    */
+     * Constructs the MNE Nearest
+     */
     MneNearest();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Nearest
-    * Refactored:  (.c)
-    */
+     * Destroys the MNE Nearest
+     * Refactored:  (.c)
+     */
     ~MneNearest();
 
 public:

@@ -103,16 +103,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs Deep which is a child of parent
-    *
-    * @param [in] parent    The parent QObject
-    */
+     * Constructs Deep which is a child of parent
+     *
+     * @param [in] parent    The parent QObject
+     */
     Deep(QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Destructs Deep
-    */
+     * Destructs Deep
+     */
     virtual ~Deep();
 
 //    //=========================================================================================================
@@ -141,123 +141,123 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the Input Dimensions
-    *
-    * @param [in] inputNodeName     input node name of which the dimension should be get from
-    *
-    * @return the Input dimensions
-    */
+     * Returns the Input Dimensions
+     *
+     * @param [in] inputNodeName     input node name of which the dimension should be get from
+     *
+     * @return the Input dimensions
+     */
     size_t inputDimensions(const std::wstring inputNodeName = L"features");
 
     //=========================================================================================================
     /**
-    * Returns the Output Dimensions
-    *
-    * @param [in] outputNodeName    output node name of which the dimension should be get from
-    *
-    * @return the Output dimensions
-    */
+     * Returns the Output Dimensions
+     *
+     * @param [in] outputNodeName    output node name of which the dimension should be get from
+     *
+     * @return the Output dimensions
+     */
     size_t outputDimensions(const std::wstring outputNodeName = L"labels");//out.z
 
     //=========================================================================================================
     /**
-    * Run the evaluation CNTK Model
-    *
-    * @param [in] model     Model to evaluate
-    * @param [in] input     The inputs (rows = samples, cols = feature inputs)
-    * @param [out] output   The ouptuts (rows = samples, cols = output results)
-    * @param [in] device    Device to use for evaluation
-    */
+     * Run the evaluation CNTK Model
+     *
+     * @param [in] model     Model to evaluate
+     * @param [in] input     The inputs (rows = samples, cols = feature inputs)
+     * @param [out] output   The ouptuts (rows = samples, cols = output results)
+     * @param [in] device    Device to use for evaluation
+     */
     static void runEvaluation(CNTK::FunctionPtr model, const CNTK::Variable& inputVar, const CNTK::ValuePtr& inputValue, const CNTK::Variable& outputVar, CNTK::ValuePtr& outputValue, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
-    * Returns the CNTK Model v2
-    *
-    * @return the CNTK Model
-    */
+     * Returns the CNTK Model v2
+     *
+     * @return the CNTK Model
+     */
     CNTK::FunctionPtr getModel();
 
     //=========================================================================================================
     /**
-    * Sets the CNTK Model v2
-    *
-    * @param [in] model     Model to set
-    */
+     * Sets the CNTK Model v2
+     *
+     * @param [in] model     Model to set
+     */
     void setModel(CNTK::FunctionPtr& model);
 
     //=========================================================================================================
     /**
-    * Loads CNTK Model v2
-    *
-    * @param [in] modelFileName     Model file name
-    * @param [in] device            Device to load the model to
-    *
-    * @return true when successfully loaded, false otherwise.
-    */
+     * Loads CNTK Model v2
+     *
+     * @param [in] modelFileName     Model file name
+     * @param [in] device            Device to load the model to
+     *
+     * @return true when successfully loaded, false otherwise.
+     */
     bool loadModel(const QString& modelFileName, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
-    * Save CNTK Model v2 function graph into a model file.
-    *
-    * @param [in] fileName     file name to save the model to
-    *
-    * @return true when successfully saved, false otherwise.
-    */
+     * Save CNTK Model v2 function graph into a model file.
+     *
+     * @param [in] fileName     file name to save the model to
+     *
+     * @return true when successfully saved, false otherwise.
+     */
     bool saveModel(const QString& fileName);
 
     //=========================================================================================================
     /**
-    * Evaluate the CNTK Model
-    *
-    * @param [in] input     The inputs (rows = samples, cols = feature inputs)
-    * @param [out] output   The ouptuts (rows = samples, cols = output results)
-    * @param [in] device    Device to use for evaluation
-    *
-    * @return true when successfully evaluated, false otherwise.
-    */
+     * Evaluate the CNTK Model
+     *
+     * @param [in] input     The inputs (rows = samples, cols = feature inputs)
+     * @param [out] output   The ouptuts (rows = samples, cols = output results)
+     * @param [in] device    Device to use for evaluation
+     *
+     * @return true when successfully evaluated, false otherwise.
+     */
     bool evalModel(const Eigen::MatrixXf& input, Eigen::MatrixXf& output, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
-    * Train the CNTK Model with one Minibatch
-    *
-    * @param [in] input             The inputs (rows = samples (batchsize), cols = feature inputs)
-    * @param [in] targets           The targets (rows = samples (batchsize), cols = output results)
-    * @param [out] loss             The training loss
-    * @param [out] error            The training error
-    * @param [in] minibatch_size    The size of one minibatch (Default 25)
-    * @param [in] device            Device to use for evaluation
-    *
-    * @return true when successfully evaluated, false otherwise.
-    */
+     * Train the CNTK Model with one Minibatch
+     *
+     * @param [in] input             The inputs (rows = samples (batchsize), cols = feature inputs)
+     * @param [in] targets           The targets (rows = samples (batchsize), cols = output results)
+     * @param [out] loss             The training loss
+     * @param [out] error            The training error
+     * @param [in] minibatch_size    The size of one minibatch (Default 25)
+     * @param [in] device            Device to use for evaluation
+     *
+     * @return true when successfully evaluated, false otherwise.
+     */
     bool trainModel(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, QVector<double>& loss, QVector<double>& error, int minibatch_size = 25, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
-    * Train the CNTK Model with one Minibatch
-    *
-    * @param [in] input     The inputs (rows = samples (batchsize), cols = feature inputs)
-    * @param [in] targets   The targets (rows = samples (batchsize), cols = output results)
-    * @param [out] loss     The training loss
-    * @param [out] error    The training error
-    * @param [in] device    Device to use for training
-    *
-    * @return true when successfully evaluated, false otherwise.
-    */
+     * Train the CNTK Model with one Minibatch
+     *
+     * @param [in] input     The inputs (rows = samples (batchsize), cols = feature inputs)
+     * @param [in] targets   The targets (rows = samples (batchsize), cols = output results)
+     * @param [out] loss     The training loss
+     * @param [out] error    The training error
+     * @param [in] device    Device to use for training
+     *
+     * @return true when successfully evaluated, false otherwise.
+     */
     bool trainMinibatch(const Eigen::MatrixXf& input, const Eigen::MatrixXf& targets, double& loss, double& error, const CNTK::DeviceDescriptor& device = CNTK::DeviceDescriptor::UseDefaultDevice());
 
     //=========================================================================================================
     /**
-    * Cancel the current training session
-    */
+     * Cancel the current training session
+     */
     void cancelTraining();
 
     //=========================================================================================================
     /**
-    * Print the model structure
-    */
+     * Print the model structure
+     */
     void print();
 
 signals:
@@ -266,46 +266,46 @@ signals:
 protected:
     //=========================================================================================================
     /**
-    * Print the ouput function info to stderr stream
-    *
-    * @param [in] model     Function to evaluate
-    */
+     * Print the ouput function info to stderr stream
+     *
+     * @param [in] model     Function to evaluate
+     */
     void outputFunctionInfo(CNTK::FunctionPtr model);
 
     //=========================================================================================================
     /**
-    * Searches for a varibale by name. Returns true when variable was found.
-    *
-    * @param [in] variableLists     List of variables to search for the variable by name
-    * @param [in] varName           Name of variable to find
-    * @param [out] var              The variable, if name was found
-    *
-    * @return true when variable was found, false otherwise.
-    */
+     * Searches for a varibale by name. Returns true when variable was found.
+     *
+     * @param [in] variableLists     List of variables to search for the variable by name
+     * @param [in] varName           Name of variable to find
+     * @param [out] var              The variable, if name was found
+     *
+     * @return true when variable was found, false otherwise.
+     */
     static bool getVariableByName(std::vector<CNTK::Variable> variableLists, std::wstring varName, CNTK::Variable& var);
 
     //=========================================================================================================
     /**
-    * Searches for an input variable by name. Returns true when found.
-    *
-    * @param [in] evalFunc          Model to search for the respective input variable.
-    * @param [in] varName           Name of variable to find
-    * @param [out] var              The variable, if name was found
-    *
-    * @return true when variable was found, false otherwise.
-    */
+     * Searches for an input variable by name. Returns true when found.
+     *
+     * @param [in] evalFunc          Model to search for the respective input variable.
+     * @param [in] varName           Name of variable to find
+     * @param [out] var              The variable, if name was found
+     *
+     * @return true when variable was found, false otherwise.
+     */
     inline static bool getInputVariableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
 
     //=========================================================================================================
     /**
-    * Searches for an output variable by name. Returns true when found.
-    *
-    * @param [in] evalFunc          Model to search for the respective input variable.
-    * @param [in] varName           Name of variable to find
-    * @param [out] var              The variable, if name was found
-    *
-    * @return true when variable was found, false otherwise.
-    */
+     * Searches for an output variable by name. Returns true when found.
+     *
+     * @param [in] evalFunc          Model to search for the respective input variable.
+     * @param [in] varName           Name of variable to find
+     * @param [out] var              The variable, if name was found
+     *
+     * @return true when variable was found, false otherwise.
+     */
     inline static bool getOutputVaraiableByName(CNTK::FunctionPtr model, std::wstring varName, CNTK::Variable& var);
 
 private:

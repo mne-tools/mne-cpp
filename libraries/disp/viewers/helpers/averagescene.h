@@ -91,54 +91,54 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a AverageScene.
-    */
+     * Constructs a AverageScene.
+     */
     explicit AverageScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Sets the scale map to scaleMap.
-    *
-    * @param [in] scaleMap map with all channel types and their current scaling value.
-    */
+     * Sets the scale map to scaleMap.
+     *
+     * @param [in] scaleMap map with all channel types and their current scaling value.
+     */
     void setScaleMap(const QMap<qint32, float> &scaleMap);
 
     //=========================================================================================================
     /**
-    * Repaints all items from the layout data in the scene.
-    *
-    *  @param [in] selectedChannelItems items which are to painted to the average scene
-    */
+     * Repaints all items from the layout data in the scene.
+     *
+     *  @param [in] selectedChannelItems items which are to painted to the average scene
+     */
     void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
     //=========================================================================================================
     /**
-    * Updates and repaints the scene
-    */
+     * Updates and repaints the scene
+     */
     void updateScene();
 
     //=========================================================================================================
     /**
-    * Set the activation per average map information
-    *
-    * @param [in] qMapActivationPerAverage     The average activation information.
-    */
+     * Set the activation per average map information
+     *
+     * @param [in] qMapActivationPerAverage     The average activation information.
+     */
     void setActivationPerAverage(const QSharedPointer<QMap<QString, bool> > qMapActivationPerAverage);
 
     //=========================================================================================================
     /**
-    * Set the color per average map information
-    *
-    * @param [in] qMapAverageColor     The average color information.
-    */
+     * Set the color per average map information
+     *
+     * @param [in] qMapAverageColor     The average color information.
+     */
     void setColorPerAverage(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
     //=========================================================================================================
     /**
-    * Set the signal color for all items in the scene
-    *
-    * @return   The color used for all the itmes' signal paths.
-    */
+     * Set the signal color for all items in the scene
+     *
+     * @return   The color used for all the itmes' signal paths.
+     */
     const QColor& getSignalColorForAllItems();
 
 private:

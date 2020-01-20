@@ -92,7 +92,7 @@ Annotation::Annotation(const QString& p_sFileName)
 {
     Annotation t_Annotation;
     Annotation::read(m_sFileName, t_Annotation);
-    *this = t_Annotation;
+     *this = t_Annotation;
 }
 
 

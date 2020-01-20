@@ -92,16 +92,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Raw Buffer Definition
-    * Refactored:  (.c)
-    */
+     * Constructs the MNE Raw Buffer Definition
+     * Refactored:  (.c)
+     */
     MneRawBufDef();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Raw Buffer Definition
-    * Refactored:  (.c)
-    */
+     * Destroys the MNE Raw Buffer Definition
+     * Refactored:  (.c)
+     */
     ~MneRawBufDef();
 
 

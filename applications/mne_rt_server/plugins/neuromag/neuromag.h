@@ -93,15 +93,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a Neuromag Connector.
-    */
+     * Constructs a Neuromag Connector.
+     */
     Neuromag();
 
     //=========================================================================================================
     /**
-    * Destroys the Neuromag Connector.
-    *
-    */
+     * Destroys the Neuromag Connector.
+     *
+     */
     virtual ~Neuromag();
 
     virtual void connectCommandManager();
@@ -124,24 +124,24 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Sets the buffer sample size
-    *
-    * @param[in] p_command  The buffer sample size command.
-    */
+     * Sets the buffer sample size
+     *
+     * @param[in] p_command  The buffer sample size command.
+     */
     void comBufsize(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
-    * Returns the buffer sample size
-    *
-    * @param[in] p_command  The buffer sample size command.
-    */
+     * Returns the buffer sample size
+     *
+     * @param[in] p_command  The buffer sample size command.
+     */
     void comGetBufsize(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
-    * Initialise the FiffSimulator.
-    */
+     * Initialise the FiffSimulator.
+     */
     void init();
 
     QMutex                          mutex;

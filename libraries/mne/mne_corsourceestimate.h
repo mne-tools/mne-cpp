@@ -99,75 +99,75 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
-    */
+     * Default constructor
+     */
     MNECorSourceEstimate();
 
     //=========================================================================================================
     /**
-    * Constructs a source estimation from given data
-    *
-    * @param[in] p_sol
-    * @param[in] p_vertices
-    * @param[in] p_tmin
-    * @param[in] p_tstep
-    */
+     * Constructs a source estimation from given data
+     *
+     * @param[in] p_sol
+     * @param[in] p_vertices
+     * @param[in] p_tmin
+     * @param[in] p_tstep
+     */
     MNECorSourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep);
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_SourceEstimate    Source estimate data which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_SourceEstimate    Source estimate data which should be copied
+     */
     MNECorSourceEstimate(const MNECorSourceEstimate& p_SourceEstimate);
 
     //=========================================================================================================
     /**
-    * Constructs a source estimation, by reading from a IO device.
-    *
-    * @param[in] p_IODevice     IO device to read from the source estimation.
-    *
-    */
+     * Constructs a source estimation, by reading from a IO device.
+     *
+     * @param[in] p_IODevice     IO device to read from the source estimation.
+     *
+     */
     MNECorSourceEstimate(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-    * Initializes source estimate.
-    */
+     * Initializes source estimate.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * mne_read_stc_file
-    *
-    * Reads a source estimate from a given file
-    *
-    * @param [in] p_IODevice    IO device to red the stc from.
-    * @param [out] p_stc        the read stc
-    *
-    * @return true if successful, false otherwise
-    */
+     * mne_read_stc_file
+     *
+     * Reads a source estimate from a given file
+     *
+     * @param [in] p_IODevice    IO device to red the stc from.
+     * @param [out] p_stc        the read stc
+     *
+     * @return true if successful, false otherwise
+     */
     static bool read(QIODevice &p_IODevice, MNECorSourceEstimate& p_stc);
 
     //=========================================================================================================
     /**
-    * mne_write_stc_file
-    *
-    * Writes a stc file
-    *
-    * @param [in] p_IODevice   IO device to write the stc to.
-    */
+     * mne_write_stc_file
+     *
+     * Writes a stc file
+     *
+     * @param [in] p_IODevice   IO device to write the stc to.
+     */
     bool write(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-    * Assignment Operator
-    *
-    * @param[in] rhs     SourceEstimate which should be assigned.
-    *
-    * @return the copied source estimate
-    */
+     * Assignment Operator
+     *
+     * @param[in] rhs     SourceEstimate which should be assigned.
+     *
+     * @return the copied source estimate
+     */
     MNECorSourceEstimate& operator= (const MNECorSourceEstimate &rhs);
 
 private:

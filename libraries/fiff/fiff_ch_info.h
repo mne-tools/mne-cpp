@@ -94,40 +94,40 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the channel info descriptor.
-    */
+     * Constructs the channel info descriptor.
+     */
     FiffChInfo();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffChInfo   Channel Info descriptor which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffChInfo   Channel Info descriptor which should be copied
+     */
     FiffChInfo(const FiffChInfo &p_FiffChInfo);
 
     //=========================================================================================================
     /**
-    * Destroys the channel info descriptor.
-    */
+     * Destroys the channel info descriptor.
+     */
     ~FiffChInfo();
 
     //=========================================================================================================
     /**
-    * Size of the old struct (fiffChInfoRec) 20*int + 16 = 20*4 + 16 = 96
-    *
-    * @return the size of the old struct fiffChInfoRec.
-    */
+     * Size of the old struct (fiffChInfoRec) 20*int + 16 = 20*4 + 16 = 96
+     *
+     * @return the size of the old struct fiffChInfoRec.
+     */
     inline static qint32 storageSize();
 
     //=========================================================================================================
     /**
-    * Overloaded == operator to compare an object to this instance.
-    *
-    * @param[in] object    The object which should be compared to.
-    *
-    * @return true if equal, false otherwise
-    */
+     * Overloaded == operator to compare an object to this instance.
+     *
+     * @param[in] object    The object which should be compared to.
+     *
+     * @return true if equal, false otherwise
+     */
     friend bool operator== (const FiffChInfo &a, const FiffChInfo &b);
 
 public:

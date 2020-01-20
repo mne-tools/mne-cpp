@@ -73,49 +73,49 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a Edge representing a weight
-    *
-    * @param [in] network       The network of which this edge is part of
-    * @param [in] sourceNode    The Source Node of this Edge
-    * @param [in] destNode      The Destination Node of this Edge
-    */
+     * Constructs a Edge representing a weight
+     *
+     * @param [in] network       The network of which this edge is part of
+     * @param [in] sourceNode    The Source Node of this Edge
+     * @param [in] destNode      The Destination Node of this Edge
+     */
     Edge(Network *network, Node *sourceNode, Node *destNode);
 
     //=========================================================================================================
     /**
-    * Returns the source node
-    *
-    * @return the source node
-    */
+     * Returns the source node
+     *
+     * @return the source node
+     */
     Node *sourceNode() const;
 
     //=========================================================================================================
     /**
-    * Returns the destination node
-    *
-    * @return the destination node
-    */
+     * Returns the destination node
+     *
+     * @return the destination node
+     */
     Node *destNode() const;
 
     //=========================================================================================================
     /**
-    * Recalculates the edge coordinates after one of its connected nodes was moved
-    */
+     * Recalculates the edge coordinates after one of its connected nodes was moved
+     */
     void adjust();
 
     //=========================================================================================================
     /**
-    * Sets the weight to the node
-    *
-    * @param [in] weight    The weight to set
-    */
+     * Sets the weight to the node
+     *
+     * @param [in] weight    The weight to set
+     */
     void setWeight(float weight);
     //=========================================================================================================
     /**
-    * Returns the weight of the node
-    *
-    * @return Node weight
-    */
+     * Returns the weight of the node
+     *
+     * @return Node weight
+     */
     inline float weight() const;
 
     enum { Type = UserType + 2 };
@@ -127,8 +127,8 @@ protected:
 
     //=========================================================================================================
     /**
-    * Updates the edge color based on the current weight
-    */
+     * Updates the edge color based on the current weight
+     */
     void updateColor();
 
 private:

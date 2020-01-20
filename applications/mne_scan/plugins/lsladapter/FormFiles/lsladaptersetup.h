@@ -83,26 +83,26 @@ class LSLAdapterSetup : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a LSLAdapterSetup which is a child of parent.
-    *
-    * @param [in] parent pointer to potential parent widget
-    */
+     * Constructs a LSLAdapterSetup which is a child of parent.
+     *
+     * @param [in] parent pointer to potential parent widget
+     */
     LSLAdapterSetup(int initialBlockSize, QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Destructor of LSLAdapterSetup: default
-    */
+     * Destructor of LSLAdapterSetup: default
+     */
     ~LSLAdapterSetup() = default;
 
 public slots:
     //=========================================================================================================
     /**
-    * This is called by the LSL Adapter, when it has finished scanning and filtering available LSL streams.
-    *
-    * @param [in] vStreamInfos A vector of available LSL streams
-    * @param [in] currentStream The current LSL stream.
-    */
+     * This is called by the LSL Adapter, when it has finished scanning and filtering available LSL streams.
+     *
+     * @param [in] vStreamInfos A vector of available LSL streams
+     * @param [in] currentStream The current LSL stream.
+     */
     void onLSLScanResults(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
 
 private slots:
@@ -116,8 +116,8 @@ private slots:
 private:
     //=========================================================================================================
     /**
-    * Helper method to update textfields.
-    */
+     * Helper method to update textfields.
+     */
     void updateTextFields();
 
     QMap<QListWidgetItem*, lsl::stream_info>    m_mItemToStreamInfo;
@@ -128,22 +128,22 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * This tells the LSL Adapter that the user wants to refresh the displayed list of available LSL streams.
-    */
+     * This tells the LSL Adapter that the user wants to refresh the displayed list of available LSL streams.
+     */
     void refreshAvailableStreams();
 
     //=========================================================================================================
     /**
-    * This tells the LSL Adapter that the user has changed the stream selection.
-    *
-    * @param [in] stream The newly selected LSL stream, represented by stream_info object.
-    */
+     * This tells the LSL Adapter that the user has changed the stream selection.
+     *
+     * @param [in] stream The newly selected LSL stream, represented by stream_info object.
+     */
     void streamSelectionChanged(const lsl::stream_info& stream);
 
     //=========================================================================================================
     /**
-    * This tells the LSL Adapter that the user has changed the desired output block size
-    */
+     * This tells the LSL Adapter that the user has changed the desired output block size
+     */
     void blockSizeChanged(const int newBlockSize);
 };
 

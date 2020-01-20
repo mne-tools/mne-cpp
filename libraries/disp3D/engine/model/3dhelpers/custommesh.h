@@ -102,20 +102,20 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     CustomMesh();
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tMatColors     The vertex colors. If empty a default value will be used.
-    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
-    */
+     * Default constructor.
+     *
+     * @param[in] tMatVert       Vertices in form of a matrix.
+     * @param[in] tMatNorm       Normals in form of a matrix.
+     * @param[in] tMatTris       Tris/Faces in form of a matrix.
+     * @param[in] tMatColors     The vertex colors. If empty a default value will be used.
+     * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
+     */
     CustomMesh(const Eigen::MatrixX3f& tMatVert,
                const Eigen::MatrixX3f& tMatNorm,
                const Eigen::MatrixXi& tMatTris,
@@ -124,52 +124,52 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
+     * Default destructor
+     */
     ~CustomMesh();
 
     //=========================================================================================================
     /**
-    * Set the vertices colors of the mesh.
-    *
-    * @param[in] tMatColors     New color information for the vertices.
-    */
+     * Set the vertices colors of the mesh.
+     *
+     * @param[in] tMatColors     New color information for the vertices.
+     */
     void setColor(const Eigen::MatrixX4f &tMatColors);
 
     //=========================================================================================================
     /**
-    * Set the normals the mesh.
-    *
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    */
+     * Set the normals the mesh.
+     *
+     * @param[in] tMatNorm       Normals in form of a matrix.
+     */
     void setNormals(const Eigen::MatrixX3f& tMatNorm);
 
     //=========================================================================================================
     /**
-    * Set the vertices the mesh.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    */
+     * Set the vertices the mesh.
+     *
+     * @param[in] tMatVert       Vertices in form of a matrix.
+     */
     void setVertex(const Eigen::MatrixX3f& tMatVert);
 
     //=========================================================================================================
     /**
-    * Set the triangles/index of the mesh.
-    *
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    */
+     * Set the triangles/index of the mesh.
+     *
+     * @param[in] tMatTris       Tris/Faces in form of a matrix.
+     */
     void setIndex(const Eigen::MatrixXi &tMatTris);
 
     //=========================================================================================================
     /**
-    * Set the needed information to create the mesh and then creates a new mesh.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tMatColors     The color info of all the vertices.
-    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
-    */
+     * Set the needed information to create the mesh and then creates a new mesh.
+     *
+     * @param[in] tMatVert       Vertices in form of a matrix.
+     * @param[in] tMatNorm       Normals in form of a matrix.
+     * @param[in] tMatTris       Tris/Faces in form of a matrix.
+     * @param[in] tMatColors     The color info of all the vertices.
+     * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
+     */
     void setMeshData(const Eigen::MatrixX3f& tMatVert,
                      const Eigen::MatrixX3f& tMatNorm,
                      const Eigen::MatrixXi& tMatTris,
@@ -178,17 +178,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Add new Attribute to the geometry.
-    *
-    * @param[in] pAttribute       New QAttribute.
-    */
+     * Add new Attribute to the geometry.
+     *
+     * @param[in] pAttribute       New QAttribute.
+     */
     void addAttribute(Qt3DRender::QAttribute *pAttribute);
 
 protected:
     //=========================================================================================================
     /**
-    * Init the custom mesh.
-    */
+     * Init the custom mesh.
+     */
     void init();
 
     QPointer<Qt3DRender::QBuffer>       m_pVertexDataBuffer;       /**< The vertex buffer. */

@@ -97,25 +97,25 @@ class DISP3DSHARED_EXPORT NetworkMaterial : public AbstractPhongAlphaMaterial
 public:
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
-    * @param[in] parent             The parent of this object.
-    */
+     * Default constructor.
+     *
+     * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
+     * @param[in] parent             The parent of this object.
+     */
     explicit NetworkMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = nullptr);
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    */
+     * Default destructor.
+     */
     ~NetworkMaterial() = default;
 
 private:
 
     //=========================================================================================================
     /**
-    * Adds the shader code to the material.
-    */
+     * Adds the shader code to the material.
+     */
     virtual void setShaderCode() override;
 
     QPointer<Qt3DRender::QShaderProgram>    m_pVertexES2Shader;         /**< Shader program for OpenGL version ES2.0. */

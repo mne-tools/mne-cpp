@@ -124,7 +124,7 @@ MNEInverseOperator::MNEInverseOperator(const FiffInfo &info,
                                        bool fixed,
                                        bool limit_depth_chs)
 {
-    *this = MNEInverseOperator::make_inverse_operator(info, forward, p_noise_cov, loose, depth, fixed, limit_depth_chs);
+     *this = MNEInverseOperator::make_inverse_operator(info, forward, p_noise_cov, loose, depth, fixed, limit_depth_chs);
     qRegisterMetaType<QSharedPointer<MNELIB::MNEInverseOperator> >("QSharedPointer<MNELIB::MNEInverseOperator>");
     qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }

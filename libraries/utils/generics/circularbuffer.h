@@ -85,77 +85,77 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a CircularBuffer.
-    *
-    * @param [in] uiMaxNumElements length of buffer.
-    */
+     * Constructs a CircularBuffer.
+     *
+     * @param [in] uiMaxNumElements length of buffer.
+     */
     explicit CircularBuffer(unsigned int uiMaxNumElements);
 
     //=========================================================================================================
     /**
-    * Destroys the CircularBuffer.
-    */
+     * Destroys the CircularBuffer.
+     */
     ~CircularBuffer();
 
     //=========================================================================================================
     /**
-    * Adds a whole array at the end buffer.
-    *
-    * @param [in] pArray pointer to an Array which should be apend to the end.
-    * @param [in] size number of elements containing the array.
-    */
+     * Adds a whole array at the end buffer.
+     *
+     * @param [in] pArray pointer to an Array which should be apend to the end.
+     * @param [in] size number of elements containing the array.
+     */
     inline void push(const _Tp* pArray, unsigned int size);
 
     //=========================================================================================================
     /**
-    * Adds an element at the end of the buffer.
-    *
-    * @param [in] newElement pointer to an Array which should be apend to the end.
-    */
+     * Adds an element at the end of the buffer.
+     *
+     * @param [in] newElement pointer to an Array which should be apend to the end.
+     */
     inline void push(const _Tp& newElement);
 
     //=========================================================================================================
     /**
-    * Returns the first element (first in first out).
-    *
-    * @return the first element
-    */
+     * Returns the first element (first in first out).
+     *
+     * @return the first element
+     */
     inline _Tp pop();
 
     //=========================================================================================================
     /**
-    * Clears the buffer.
-    */
+     * Clears the buffer.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Pauses the buffer. Skpis any incoming matrices and only pops zero matrices.
-    */
+     * Pauses the buffer. Skpis any incoming matrices and only pops zero matrices.
+     */
     inline void pause(bool);
 
     //=========================================================================================================
     /**
-    * Releases the circular buffer from the acquire statement in the pop() function.
-    * @param [out] bool returns true if resources were freed so that the aquire statement in the pop function can release, otherwise false.
-    */
+     * Releases the circular buffer from the acquire statement in the pop() function.
+     * @param [out] bool returns true if resources were freed so that the aquire statement in the pop function can release, otherwise false.
+     */
     inline bool releaseFromPop();
 
     //=========================================================================================================
     /**
-    * Releases the circular buffer from the acquire statement in the push() function.
-    * @param [out] bool returns true if resources were freed so that the aquire statement in the push function can release, otherwise false.
-    */
+     * Releases the circular buffer from the acquire statement in the push() function.
+     * @param [out] bool returns true if resources were freed so that the aquire statement in the push function can release, otherwise false.
+     */
     inline bool releaseFromPush();
 
 private:
     //=========================================================================================================
     /**
-    * Returns the current circular index to the corresponding given index.
-    *
-    * @param [in] index which should be mapped.
-    * @return the mapped index.
-    */
+     * Returns the current circular index to the corresponding given index.
+     *
+     * @param [in] index which should be mapped.
+     * @return the mapped index.
+     */
     inline unsigned int mapIndex(int& index);
     unsigned int    m_uiMaxNumElements;     /**< Holds the maximal number of buffer elements.*/
     _Tp*            m_pBuffer;              /**< Holds the circular buffer.*/

@@ -112,20 +112,20 @@ class LSLADAPTERSHARED_EXPORT LSLAdapter : public SCSHAREDLIB::ISensor
 public:
     //=========================================================================================================
     /**
-    * Constructs LSLAdapter.
-    */
+     * Constructs LSLAdapter.
+     */
     LSLAdapter();
 
     //=========================================================================================================
     /**
-    * Destroys LSL.
-    */
+     * Destroys LSL.
+     */
     virtual ~LSLAdapter();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     virtual void init();
@@ -136,8 +136,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the LSL adapter by stopping its producer
-    */
+     * Stops the LSL adapter by stopping its producer
+     */
     virtual bool stop();
 
     virtual QWidget* setupWidget();
@@ -149,62 +149,62 @@ public:
 public slots:
     //=========================================================================================================
     /**
-    * This is called by the UI, whenever the user wants to manually refresh the list of available LSL streams.
-    */
+     * This is called by the UI, whenever the user wants to manually refresh the list of available LSL streams.
+     */
     void onRefreshAvailableStreams();
 
     //=========================================================================================================
     /**
-    * This is called by the UI, whenever the user has changed the stream to connect to.
-    */
+     * This is called by the UI, whenever the user has changed the stream to connect to.
+     */
     void onStreamSelectionChanged(const lsl::stream_info& newStream);
 
     //=========================================================================================================
     /**
-    * This is called by the UI, whenever the user has changed the desired output block size.
-    */
+     * This is called by the UI, whenever the user has changed the desired output block size.
+     */
     void onBlockSizeChanged(const int newBlockSize);
 
 protected:
     //=========================================================================================================
     /**
-    * The LSLAdapter has an empty run method, as all of the work is done in the producer.
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The LSLAdapter has an empty run method, as all of the work is done in the producer.
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
 private slots:
     //=========================================================================================================
     /**
-    * This is called by the QFutureWatcher, indicating that the background scanning is complete.
-    */
+     * This is called by the QFutureWatcher, indicating that the background scanning is complete.
+     */
     void onLSLStreamScanReady();
 
 private:
     //=========================================================================================================
     /**
-    * Helper function for getting a list of LSL streams that fulfill the current filtering settings.
-    */
+     * Helper function for getting a list of LSL streams that fulfill the current filtering settings.
+     */
     static QVector<lsl::stream_info> scanAvailableLSLStreams();
 
     //=========================================================================================================
     /**
-    * Helper function that fills the FiffInfo member based on an LSL stream info.
-    */
+     * Helper function that fills the FiffInfo member based on an LSL stream info.
+     */
     void prepareFiffInfo(const lsl::stream_info& stream);
 
     //=========================================================================================================
     /**
-    * Helper function: apparently LSL does not have an '==' operator where one side is const, so this function compares the UIDs instead.
-    */
+     * Helper function: apparently LSL does not have an '==' operator where one side is const, so this function compares the UIDs instead.
+     */
     inline static bool contains(const QVector<lsl::stream_info>& v, const lsl::stream_info& s);
 
     //=========================================================================================================
     /**
-    * Helper function: simple validity check for stream infos (sometimes the resolved stream infos are empty)
-    */
+     * Helper function: simple validity check for stream infos (sometimes the resolved stream infos are empty)
+     */
     inline static bool isValid(const lsl::stream_info& s);
 
     // fiff info / data output
@@ -227,11 +227,11 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * This is emitted in order to tell the UI that the list of available LSL streams has been updated.
-    *
-    * @param [in] vStreamInfos Vector of available LSL streams
-    * @param [in] currentStream The LSL stream that the Adapter would currently connect to (upon start)
-    */
+     * This is emitted in order to tell the UI that the list of available LSL streams has been updated.
+     *
+     * @param [in] vStreamInfos Vector of available LSL streams
+     * @param [in] currentStream The LSL stream that the Adapter would currently connect to (upon start)
+     */
     void updatedAvailableLSLStreams(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
 };
 

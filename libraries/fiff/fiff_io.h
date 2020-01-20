@@ -93,109 +93,109 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FiffIO
-    *
-    */
+     * Constructs a FiffIO
+     *
+     */
     FiffIO();
 
     //=========================================================================================================
     /**
-    * Destroys the FiffIO.
-    */
+     * Destroys the FiffIO.
+     */
     ~FiffIO();
 
     //=========================================================================================================
     /**
-    * Constructs a FiffIO object by reading from a I/O device p_IODevice.
-    *
-    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
-    */
+     * Constructs a FiffIO object by reading from a I/O device p_IODevice.
+     *
+     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+     */
     FiffIO(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
-    * Constructs a FiffIO object that uses the I/O device p_IODevice.
-    *
-    * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
-    */
+     * Constructs a FiffIO object that uses the I/O device p_IODevice.
+     *
+     * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
+     */
     FiffIO(QList<QIODevice*>& p_qlistIODevices);
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffIO    FiffIO, which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffIO    FiffIO, which should be copied
+     */
     FiffIO(const FiffIO& p_FiffIO);
 
     //=========================================================================================================
 
     /**
-    * Setup a FiffStream
-    *
-    * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
-    * @param[in] info           Overall info for fiff IO device
-    * @param[out] dirTree       Node directory structure
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * Setup a FiffStream
+     *
+     * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] info           Overall info for fiff IO device
+     * @param[out] dirTree       Node directory structure
+     *
+     * @return true if succeeded, false otherwise
+     */
 
     static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirNode::SPtr& dirTree);
 
     //=========================================================================================================
     /**
-    * Read data from a p_IODevice.
-    *
-    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
-    */
+     * Read data from a p_IODevice.
+     *
+     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+     */
     bool read(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
-    * Read data from a QList of p_IODevices.
-    *
-    * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
-    */
+     * Read data from a QList of p_IODevices.
+     *
+     * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
+     */
     bool read(QList<QIODevice>& p_qlistIODevices);
 
     //=========================================================================================================
     /**
-    * Write data to a single p_IODevice.
-    *
-    * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
-    * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
-    * @param[in] idx                    index of type, -1 for all entities of this type
-    *
-    */
+     * Write data to a single p_IODevice.
+     *
+     * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
+     * @param[in] idx                    index of type, -1 for all entities of this type
+     *
+     */
     bool write(QIODevice& p_IODevice, const fiff_int_t type, const fiff_int_t idx) const;
 
     //=========================================================================================================
     /**
-    * Write whole data of a type to a fiff file.
-    *
-    * @param[in] filename    filename including the path but not the type, e.g. ./sample_date/sample_audvis.fif -> will be extended to ./sample_date/sample_audvis-type-1.fif
-    * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
-    * @param[in] idx                    index of type, -1 for all entities of this type
-    */
+     * Write whole data of a type to a fiff file.
+     *
+     * @param[in] filename    filename including the path but not the type, e.g. ./sample_date/sample_audvis.fif -> will be extended to ./sample_date/sample_audvis-type-1.fif
+     * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
+     * @param[in] idx                    index of type, -1 for all entities of this type
+     */
     bool write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) const;
 
     //=========================================================================================================
     /**
-    * Write raw data to a p_IODevice.
-    *
-    * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
-    * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
-    * @param[in] idx                    index of type, -1 for all entities of this type
-    *
-    */
+     * Write raw data to a p_IODevice.
+     *
+     * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
+     * @param[in] idx                    index of type, -1 for all entities of this type
+     *
+     */
     bool write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const;
 
     //=========================================================================================================
     /**
-    * Overloading ostream for printing member infos
-    *
-    * @param[in] p_fiffIO    the fiffIO, whose members shall be printed
-    */
+     * Overloading ostream for printing member infos
+     *
+     * @param[in] p_fiffIO    the fiffIO, whose members shall be printed
+     */
 
     friend std::ostream& operator<<(std::ostream& out, const FiffIO &p_fiffIO) {
         out << "\n\n---------------------- Fiff data read summary ---------------------- " << std::endl;

@@ -106,48 +106,48 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a SpectrumView which is a child of parent.
-    *
-    * @param [in] parent    parent of widget
-    */
+     * Constructs a SpectrumView which is a child of parent.
+     *
+     * @param [in] parent    parent of widget
+     */
     SpectrumView(QWidget* parent = 0,
                  Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Initializes the view based on the FiffInfo and scale type.
-    *
-    * @param [in] info          The FiffInfo.
-    * @param [in] iScaleType    The scale type.
-    */
+     * Initializes the view based on the FiffInfo and scale type.
+     *
+     * @param [in] info          The FiffInfo.
+     * @param [in] iScaleType    The scale type.
+     */
     void init(QSharedPointer<FIFFLIB::FiffInfo> &info,
               int iScaleType);
 
     //=========================================================================================================
     /**
-    * Adds data to the underlying model.
-    *
-    * @param [in] data          The new data.
-    */
+     * Adds data to the underlying model.
+     *
+     * @param [in] data          The new data.
+     */
     void addData(const Eigen::MatrixXd &data);
 
     //=========================================================================================================
     /**
-    * Sets the boundaries.
-    *
-    * @param [in] iLower    The lower boundary.
-    * @param [in] iUpper    The upper boundary.
-    */
+     * Sets the boundaries.
+     *
+     * @param [in] iLower    The lower boundary.
+     * @param [in] iUpper    The upper boundary.
+     */
     void setBoundaries(int iLower,
                        int iUpper);
 
     //=========================================================================================================
     /**
-    * The event filter
-    *
-    * @param [in] watched
-    * @param [in] event
-    */
+     * The event filter
+     *
+     * @param [in] watched
+     * @param [in] event
+     */
     virtual bool eventFilter(QObject* watched,
                              QEvent* event);
 
@@ -159,8 +159,8 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Signals for sending the mouse location to the delegate
-    */
+     * Signals for sending the mouse location to the delegate
+     */
     void sendMouseLoc(int row,
                       int x,
                       int y,

@@ -292,8 +292,8 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
         }
     }
     /*
-    * Maybe the derivations will help
-    */
+     * Maybe the derivations will help
+     */
     sel->nderiv = 0;
     if (data->deriv_matched) {
         QStringList deriv_names = data->deriv_matched->deriv_data->rowlist;
@@ -697,8 +697,8 @@ ECDSet DipoleFit::calculateFit() const
     }
 
     /*
-    * Proceed to computing the fits
-    */
+     * Proceed to computing the fits
+     */
     printf("\n---- Computing the forward solution for the guesses...\n\n");
     guess.reset(new GuessData( settings->guessname,
                                settings->guess_surfname,

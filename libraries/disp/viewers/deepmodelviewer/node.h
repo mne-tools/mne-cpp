@@ -85,26 +85,26 @@ class Node : public QGraphicsItem
 public:
     //=========================================================================================================
     /**
-    * Constructs a Node representing a Neuron
-    *
-    * @param [in] network   The network  of which this node is part of
-    */
+     * Constructs a Node representing a Neuron
+     *
+     * @param [in] network   The network  of which this node is part of
+     */
     Node(Network *network);
 
     //=========================================================================================================
     /**
-    * Adds a connected edge to the node
-    *
-    * @param [in] edge      A connected edge
-    */
+     * Adds a connected edge to the node
+     *
+     * @param [in] edge      A connected edge
+     */
     void addEdge(Edge *edge);
 
     //=========================================================================================================
     /**
-    * Returns a list of all connected edges
-    *
-    * @return A list of all connected edges
-    */
+     * Returns a list of all connected edges
+     *
+     * @return A list of all connected edges
+     */
     QList<Edge *> edges() const;
 
     enum { Type = UserType + 1 };
@@ -119,18 +119,18 @@ protected:
 
     //=========================================================================================================
     /**
-    * This event handler is reimplemented to receive mouse press events for the widget.
-    *
-    * @param [in] event     Mouse press events for the widget
-    */
+     * This event handler is reimplemented to receive mouse press events for the widget.
+     *
+     * @param [in] event     Mouse press events for the widget
+     */
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
     //=========================================================================================================
     /**
-    * This event handler is reimplemented to receive mouse release events for the widget.
-    *
-    * @param [in] event     Mouse release events for the widget
-    */
+     * This event handler is reimplemented to receive mouse release events for the widget.
+     *
+     * @param [in] event     Mouse release events for the widget
+     */
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:

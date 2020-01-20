@@ -101,68 +101,68 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
-    */
+     * Default constructor
+     */
     explicit View3D(/*QWidget *parent = 0*/);
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
+     * Default destructor
+     */
     ~View3D() = default;
 
     //=========================================================================================================
     /**
-    * Return the tree model which holds the subject information.
-    *
-    * @param[in] pModel     The tree model holding the 3d models.
-    */
+     * Return the tree model which holds the subject information.
+     *
+     * @param[in] pModel     The tree model holding the 3d models.
+     */
     void setModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
 
     //=========================================================================================================
     /**
-    * Set the background color of the scene.
-    *
-    * @param[in] colSceneColor          The new background color of the view.
-    */
+     * Set the background color of the scene.
+     *
+     * @param[in] colSceneColor          The new background color of the view.
+     */
     void setSceneColor(const QColor& colSceneColor);
 
     //=========================================================================================================
     /**
-    * Starts or stops to rotate all loaded 3D models.
-    */
+     * Starts or stops to rotate all loaded 3D models.
+     */
     void startStopModelRotation(bool checked);
 
     //=========================================================================================================
     /**
-    * Toggle the coord axis visibility.
-    */
+     * Toggle the coord axis visibility.
+     */
     void toggleCoordAxis(bool checked);
 
     //=========================================================================================================
     /**
-    * Show fullscreen.
-    */
+     * Show fullscreen.
+     */
     void showFullScreen(bool checked);
 
     //=========================================================================================================
     /**
-    * Change light color.
-    */
+     * Change light color.
+     */
     void setLightColor(const QColor &color);
 
     //=========================================================================================================
     /**
-    * Set light intensity.
-    */
+     * Set light intensity.
+     */
     void setLightIntensity(double value);
 
     //=========================================================================================================
     /**
-    * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
-    *
-    * @param [in] fileName     The file name and path where to store the screenshot.
-    */
+     * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
+     *
+     * @param [in] fileName     The file name and path where to store the screenshot.
+     */
     void takeScreenshot();
 
 protected:
@@ -171,30 +171,30 @@ protected:
 
     //=========================================================================================================
     /**
-    * Init the light for the 3D view
-    */
+     * Init the light for the 3D view
+     */
     void initLight();
 
     //=========================================================================================================
     /**
-    * Window function
-    */
+     * Window function
+     */
     void keyPressEvent(QKeyEvent* e) override;
 
     //=========================================================================================================
     /**
-    * Creates a coordiante system (x/Green, y/Red, z/Blue).
-    *
-    * @param[in] parent         The parent identity which will "hold" the coordinate system.
-    */
+     * Creates a coordiante system (x/Green, y/Red, z/Blue).
+     *
+     * @param[in] parent         The parent identity which will "hold" the coordinate system.
+     */
     void createCoordSystem(Qt3DCore::QEntity* parent);
 
     //=========================================================================================================
     /**
-    * Starts the automated rotation animation for all 3D models being childern.
-    *
-    * @param[in] pObject         The parent of the children to be rotated.
-    */
+     * Starts the automated rotation animation for all 3D models being childern.
+     *
+     * @param[in] pObject         The parent of the children to be rotated.
+     */
     void startModelRotationRecursive(QObject* pObject);
 
 

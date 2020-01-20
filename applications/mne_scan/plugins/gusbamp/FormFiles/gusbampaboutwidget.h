@@ -75,17 +75,17 @@ class GUSBAmpAboutWidget : public QDialog
 public:
     //=========================================================================================================
     /**
-    * Constructs a GUSBAmpAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new GUSBAmpAboutWidget becomes a window. If parent is another widget, GUSBAmpAboutWidget becomes a child window inside parent. GUSBAmpAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a GUSBAmpAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new GUSBAmpAboutWidget becomes a window. If parent is another widget, GUSBAmpAboutWidget becomes a child window inside parent. GUSBAmpAboutWidget is deleted when its parent is deleted.
+     */
     GUSBAmpAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the GUSBAmpAboutWidget.
-    * All GUSBAmpAboutWidget's children are deleted first. The application exits if GUSBAmpAboutWidget is the main widget.
-    */
+     * Destroys the GUSBAmpAboutWidget.
+     * All GUSBAmpAboutWidget's children are deleted first. The application exits if GUSBAmpAboutWidget is the main widget.
+     */
     ~GUSBAmpAboutWidget();
 
 private:

@@ -87,26 +87,26 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ReferenceSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding ReferenceToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ReferenceSetupWidget becomes a window. If parent is another widget, ReferenceSetupWidget becomes a child window inside parent. ReferenceSetupWidget is deleted when its parent is deleted.
-    */
+     * Constructs a ReferenceSetupWidget which is a child of parent.
+     *
+     * @param [in] toolbox a pointer to the corresponding ReferenceToolbox.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new ReferenceSetupWidget becomes a window. If parent is another widget, ReferenceSetupWidget becomes a child window inside parent. ReferenceSetupWidget is deleted when its parent is deleted.
+     */
     ReferenceSetupWidget(Reference* pRef, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ReferenceSetupWidget.
-    * All ReferenceSetupWidget's children are deleted first. The application exits if ReferenceSetupWidget is the main widget.
-    */
+     * Destroys the ReferenceSetupWidget.
+     * All ReferenceSetupWidget's children are deleted first. The application exits if ReferenceSetupWidget is the main widget.
+     */
     ~ReferenceSetupWidget();
 
 private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
 private:

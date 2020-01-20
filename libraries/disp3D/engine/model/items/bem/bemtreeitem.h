@@ -102,27 +102,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] iType      The type of the item. See types.h for declaration and definition.
+     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit BemTreeItem(int iType = Data3DTreeModelItemTypes::BemItem, const QString& text = "");
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
-    *
-    * @param[in] tBem               The BEM data.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    */
+     * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
+     *
+     * @param[in] tBem               The BEM data.
+     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+     */
     void addData(const MNELIB::MNEBem& tBem, Qt3DCore::QEntity* p3DEntityParent = 0);
 
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     void initItem();
 
 };

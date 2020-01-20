@@ -100,18 +100,18 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a NoiseEstimateSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding NoiseEstimate.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseEstimateSetupWidget becomes a window. If parent is another widget, RtHpiSetupWidget becomes a child window inside parent. RtHpiSetupWidget is deleted when its parent is deleted.
-    */
+     * Constructs a NoiseEstimateSetupWidget which is a child of parent.
+     *
+     * @param [in] toolbox a pointer to the corresponding NoiseEstimate.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseEstimateSetupWidget becomes a window. If parent is another widget, RtHpiSetupWidget becomes a child window inside parent. RtHpiSetupWidget is deleted when its parent is deleted.
+     */
     NoiseEstimateSetupWidget(NoiseEstimate* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the NoiseEstimateSetupWidget.
-    * All NoiseEstimateSetupWidget's children are deleted first. The application exits if NoiseEstimateSetupWidget is the main widget.
-    */
+     * Destroys the NoiseEstimateSetupWidget.
+     * All NoiseEstimateSetupWidget's children are deleted first. The application exits if NoiseEstimateSetupWidget is the main widget.
+     */
     ~NoiseEstimateSetupWidget();
 
     void init();

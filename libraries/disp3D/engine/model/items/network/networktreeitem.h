@@ -120,85 +120,85 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] p3DEntityParent    The parent 3D entity.
-    * @param[in] iType              The type of the item. See types.h for declaration and definition.
-    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] p3DEntityParent    The parent 3D entity.
+     * @param[in] iType              The type of the item. See types.h for declaration and definition.
+     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit NetworkTreeItem(Qt3DCore::QEntity *p3DEntityParent = 0,
                              int iType = Data3DTreeModelItemTypes::NetworkItem,
                              const QString& text = "Connectivity Data");
 
     //=========================================================================================================
     /**
-    * Adds actual rt connectivity data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
-    *
-    * @param[in] tNetworkData       The new connectivity data.
-    */
+     * Adds actual rt connectivity data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
+     *
+     * @param[in] tNetworkData       The new connectivity data.
+     */
     void addData(const CONNECTIVITYLIB::Network& tNetworkData);
 
     //=========================================================================================================
     /**
-    * This function set the threshold values.
-    *
-    * @param[in] vecThresholds     The new threshold values used for normalizing the data.
-    */
+     * This function set the threshold values.
+     *
+     * @param[in] vecThresholds     The new threshold values used for normalizing the data.
+     */
     void setThresholds(const QVector3D& vecThresholds);
 
 private:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     void initItem();
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the network threshold changes.
-    *
-    * @param[in] vecThresholds     The new threshold values used for threshold the network.
-    */
+     * This function gets called whenever the network threshold changes.
+     *
+     * @param[in] vecThresholds     The new threshold values used for threshold the network.
+     */
     void onNetworkThresholdChanged(const QVariant &vecThresholds);
 
     //=========================================================================================================
     /**
-    * Call this function whenever the surface color was changed.
-    *
-    * @param[in] color        The new surface color.
-    */
+     * Call this function whenever the surface color was changed.
+     *
+     * @param[in] color        The new surface color.
+     */
     virtual void onColorChanged(const QVariant& color);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the used colormap type changed.
-    *
-    * @param[in] sColormapType     The name of the new colormap type.
-    */
+     * This function gets called whenever the used colormap type changed.
+     *
+     * @param[in] sColormapType     The name of the new colormap type.
+     */
     void onColormapTypeChanged(const QVariant& sColormapType);
 
     //=========================================================================================================
     /**
-    * Call this function whenever you want to calculate the indices/tris for a network.
-    *
-    * @param[in] tNetworkData     The network data.
-    */
+     * Call this function whenever you want to calculate the indices/tris for a network.
+     *
+     * @param[in] tNetworkData     The network data.
+     */
     void plotNetwork(const CONNECTIVITYLIB::Network& tNetworkData);
 
     //=========================================================================================================
     /**
-    * Call this function whenever you want plot the network nodes.
-    *
-    * @param[in] tNetworkData     The network data.
-    */
+     * Call this function whenever you want plot the network nodes.
+     *
+     * @param[in] tNetworkData     The network data.
+     */
     void plotNodes(const CONNECTIVITYLIB::Network &tNetworkData);
 
     //=========================================================================================================
     /**
-    * Call this function whenever you want plot the network edges.
-    *
-    * @param[in] tNetworkData     The network data.
-    */
+     * Call this function whenever you want plot the network edges.
+     *
+     * @param[in] tNetworkData     The network data.
+     */
     void plotEdges(const CONNECTIVITYLIB::Network& tNetworkData);
 
     QPointer<MetaTreeItem>                          m_pItemNetworkThreshold;        /**< The item to access the threshold values. */

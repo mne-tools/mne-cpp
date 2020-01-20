@@ -99,20 +99,20 @@ class EPIDETECTSHARED_EXPORT Epidetect : public IAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Constructs a Epidetect.
-    */
+     * Constructs a Epidetect.
+     */
     Epidetect();
 
     //=========================================================================================================
     /**
-    * Destroys the Epidetect.
-    */
+     * Destroys the Epidetect.
+     */
     ~Epidetect();
 
     //=========================================================================================================
     /**
-    * IAlgorithm functions
-    */
+     * IAlgorithm functions
+     */
     virtual QSharedPointer<IPlugin> clone() const;
     virtual void init();
     virtual void unload();
@@ -124,17 +124,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Udates the pugin with new (incoming) data.
-    *
-    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
-    */
+     * Udates the pugin with new (incoming) data.
+     *
+     * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
+     */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
     /**
-    * IAlgorithm function
-    */
+     * IAlgorithm function
+     */
     virtual void run();
 
     void showWidget();
@@ -142,18 +142,18 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Removes all unused channels and creates a list of stim channel indices.
-    *
-    * @param[in] mat unprocessed data-set
-    * @param[out] QPair containing the data-set without all unwanted channels and a QList containing the channel indices.
-    */
+     * Removes all unused channels and creates a list of stim channel indices.
+     *
+     * @param[in] mat unprocessed data-set
+     * @param[out] QPair containing the data-set without all unwanted channels and a QList containing the channel indices.
+     */
     QPair<Eigen::MatrixXd, QList<int> > prepareData(Eigen::MatrixXd mat);
 
     //=========================================================================================================
     /**
-    * Updates all parameters if changed by the user via the GUI.
-    *
-    */
+     * Updates all parameters if changed by the user via the GUI.
+     *
+     */
     void updateValues();
 
     bool                                                               m_bIsRunning;        /**< Flag whether thread is running.*/
@@ -191,8 +191,8 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
-    */
+     * Emitted when fiffInfo is available
+     */
     void fiffInfoAvailable();
 };
 

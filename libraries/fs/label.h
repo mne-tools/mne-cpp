@@ -103,76 +103,76 @@ public:
     
     //=========================================================================================================
     /**
-    * Default constructor
-    */
+     * Default constructor
+     */
     Label();
 
     //=========================================================================================================
     /**
-    * Constructs a label
-    *
-    * @param[in] p_vertices     Vertices
-    * @param[in] p_pos          Positions
-    * @param[in] p_values       Values
-    * @param[in] p_hemi         Hemisphere (lh = 0; rh = 1)
-    * @param[in] p_name         label names
-    * @param[in] p_id           label id (optional, default = -1)
-    */
+     * Constructs a label
+     *
+     * @param[in] p_vertices     Vertices
+     * @param[in] p_pos          Positions
+     * @param[in] p_values       Values
+     * @param[in] p_hemi         Hemisphere (lh = 0; rh = 1)
+     * @param[in] p_name         label names
+     * @param[in] p_id           label id (optional, default = -1)
+     */
     Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id = -1);
     
     //=========================================================================================================
     /**
-    * Destroys the Label class.
-    */
+     * Destroys the Label class.
+     */
     ~Label();
 
     //=========================================================================================================
     /**
-    * Initializes the Label.
-    */
+     * Initializes the Label.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * True if Label is empty.
-    *
-    * @return true if Label is empty, false otherwise.
-    */
+     * True if Label is empty.
+     *
+     * @return true if Label is empty, false otherwise.
+     */
     inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
-    * Select tris for this label from a given surface file.
-    *
-    * @param[in] p_Surface      to generate the label tris from
-    *
-    * @return the generated tris.
-    */
+     * Select tris for this label from a given surface file.
+     *
+     * @param[in] p_Surface      to generate the label tris from
+     *
+     * @return the generated tris.
+     */
     MatrixX3i selectTris(const Surface & p_Surface);
 
     //=========================================================================================================
     /**
-    * Select tris for this label from a given tri matrix.
-    *
-    * @param[in] p_matTris      tris from which the selection should be made
-    *
-    * @return the generated tris.
-    */
+     * Select tris for this label from a given tri matrix.
+     *
+     * @param[in] p_matTris      tris from which the selection should be made
+     *
+     * @return the generated tris.
+     */
     MatrixX3i selectTris(const MatrixX3i &p_matTris);
 
     //=========================================================================================================
     /**
-    * mne_read_label_file
-    *
-    * Reads a Label from a FreeSurfer label file.
-    * This is based on the FreeSurfer read_label routine
-    * SUBJECTS_DIR environment variable is not consulted for the standard location
-    *
-    * @param[in] p_sFileName    label file name
-    * @param[in] p_Label        read label
-    *
-    * @return true if successful, false otherwise
-    */
+     * mne_read_label_file
+     *
+     * Reads a Label from a FreeSurfer label file.
+     * This is based on the FreeSurfer read_label routine
+     * SUBJECTS_DIR environment variable is not consulted for the standard location
+     *
+     * @param[in] p_sFileName    label file name
+     * @param[in] p_Label        read label
+     *
+     * @return true if successful, false otherwise
+     */
     static bool read(const QString& p_sFileName, Label &p_Label);
 
 public:

@@ -84,65 +84,65 @@ public:
 
     //=========================================================================================================
     /**
-    * Default Constructor
-    */
+     * Default Constructor
+     */
     FiffId();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffId   Universially unique identifier which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffId   Universially unique identifier which should be copied
+     */
     FiffId(const FiffId& p_FiffId);
 
     //=========================================================================================================
     /**
-    * Destroys the universially unique identifier.
-    */
+     * Destroys the universially unique identifier.
+     */
     ~FiffId();
 
     //=========================================================================================================
     /**
-    * Constructs a (hopefully) unique file id
-    * Refactored: fiff_new_file_id (fiff_id.c)
-    */
+     * Constructs a (hopefully) unique file id
+     * Refactored: fiff_new_file_id (fiff_id.c)
+     */
     static FiffId new_file_id();
 
     //=========================================================================================================
     /**
-    * Resets the File identifier.
-    */
+     * Resets the File identifier.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Returns the machine ID consisting of a two integer number
-    * Refactored: fiff_get_machid (fiff_get_machid.c)
-    */
+     * Returns the machine ID consisting of a two integer number
+     * Refactored: fiff_get_machid (fiff_get_machid.c)
+     */
     static bool get_machid(int *fixed_id);
 
     //=========================================================================================================
     /**
-    * Prints the id
-    * Refactored: print_id (fiff_dir_tree.c)
-    */
+     * Prints the id
+     * Refactored: print_id (fiff_dir_tree.c)
+     */
     void print() const;
 
     //=========================================================================================================
     /**
-    * True if FIFF id is empty.
-    *
-    * @return true if FIFF id is empty
-    */
+     * True if FIFF id is empty.
+     *
+     * @return true if FIFF id is empty
+     */
     inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
-    * Size of the old struct (fiffIdRec) 5*int = 5*4 = 20
-    *
-    * @return the size of the old struct fiffIdRec.
-    */
+     * Size of the old struct (fiffIdRec) 5*int = 5*4 = 20
+     *
+     * @return the size of the old struct fiffIdRec.
+     */
     inline static qint32 storageSize();
 
     friend bool operator== (const FiffId &f1, const FiffId &f2);

@@ -96,12 +96,12 @@ class NATUSSHARED_EXPORT NatusProducer : public QObject
 public:
     //=========================================================================================================
     /**
-    * Constructs a NatusProducer which is a child of parent.
-    *
-    * @param [in] iBlockSize The block size to init the data matrix with.
-    * @param [in] iChannelSize The channel size to init the data matrix with.
-    * @param [in] parent pointer to parent widget.
-    */
+     * Constructs a NatusProducer which is a child of parent.
+     *
+     * @param [in] iBlockSize The block size to init the data matrix with.
+     * @param [in] iChannelSize The channel size to init the data matrix with.
+     * @param [in] parent pointer to parent widget.
+     */
     explicit NatusProducer(int iBlockSize,
                            int iChannelSize,
                            QObject *parent = 0);
@@ -109,16 +109,16 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Called whenever a new datagram was received.
-    */
+     * Called whenever a new datagram was received.
+     */
     void readPendingDatagrams();
 
     //=========================================================================================================
     /**
-    * Parsed the received datagram.
-    *
-    * @param [in] datagram The received datagram.
-    */
+     * Parsed the received datagram.
+     *
+     * @param [in] datagram The received datagram.
+     */
     void processDatagram(const QNetworkDatagram &datagram);
 
     QSharedPointer<QUdpSocket>          m_pUdpSocket;                   /**< A pointer to the UDP socket.*/
@@ -131,10 +131,10 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever a new data matrix is available.
-    *
-    * @param [in] matData The newly parsed data.
-    */
+     * Emit this signal whenever a new data matrix is available.
+     *
+     * @param [in] matData The newly parsed data.
+     */
     void newDataAvailable(const Eigen::MatrixXd &matData);
 };
 

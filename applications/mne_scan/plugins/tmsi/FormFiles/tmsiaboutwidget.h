@@ -88,17 +88,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a TMSIAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIAboutWidget becomes a window. If parent is another widget, TMSIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a TMSIAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIAboutWidget becomes a window. If parent is another widget, TMSIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
+     */
     TMSIAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the TMSIAboutWidget.
-    * All TMSIAboutWidget's children are deleted first. The application exits if TMSIAboutWidget is the main widget.
-    */
+     * Destroys the TMSIAboutWidget.
+     * All TMSIAboutWidget's children are deleted first. The application exits if TMSIAboutWidget is the main widget.
+     */
     ~TMSIAboutWidget();
 
 private:

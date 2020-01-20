@@ -72,18 +72,18 @@ class AboutWindow : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a AboutWindow dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new AboutWindow becomes a window. If parent is another widget, AboutWindow becomes a child window inside parent. AboutWindow is deleted when its parent is deleted.
-    */
+     * Constructs a AboutWindow dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new AboutWindow becomes a window. If parent is another widget, AboutWindow becomes a child window inside parent. AboutWindow is deleted when its parent is deleted.
+     */
     AboutWindow(QWidget *parent = 0);
 
 
     //=========================================================================================================
     /**
-    * Destroys the AboutWindow.
-    * All AboutWindow's children are deleted first. The application exits if AboutWindow is the main widget.
-    */
+     * Destroys the AboutWindow.
+     * All AboutWindow's children are deleted first. The application exits if AboutWindow is the main widget.
+     */
     ~AboutWindow();
 
 private:

@@ -85,30 +85,30 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the FiffDigitizerData.
-    */
+     * Constructs the FiffDigitizerData.
+     */
     FiffDigitizerData();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffDigitizerData   Digitization point descriptor which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffDigitizerData   Digitization point descriptor which should be copied
+     */
     FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerData);
 
     //=========================================================================================================
     /**
-    * Default constructor
-    *
-    * @param[in] p_IODevice   Input device to read data from.
-    */
+     * Default constructor
+     *
+     * @param[in] p_IODevice   Input device to read data from.
+     */
     FiffDigitizerData(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-    * Destroys the digitization point description
-    */
+     * Destroys the digitization point description
+     */
     ~FiffDigitizerData();    
 
 public:

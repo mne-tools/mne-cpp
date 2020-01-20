@@ -100,8 +100,8 @@ MneProjItem::~MneProjItem()
 
 int MneProjItem::mne_proj_item_affect(MneProjItem *it, const QStringList& list, int nlist)
 /*
-    * Does this projection item affect this list of channels?
-    */
+     * Does this projection item affect this list of channels?
+     */
 {
     int k,p,q;
 

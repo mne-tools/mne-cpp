@@ -95,14 +95,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MneMshDisplaySurface.
-    */
+     * Constructs the MneMshDisplaySurface.
+     */
     MneMshDisplaySurface();
 
     //=========================================================================================================
     /**
-    * Destroys the MneMshDisplaySurface.
-    */
+     * Destroys the MneMshDisplaySurface.
+     */
     ~MneMshDisplaySurface();
 
 public:

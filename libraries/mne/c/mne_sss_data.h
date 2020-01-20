@@ -97,55 +97,55 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE SSS Data
-    */
+     * Constructs the MNE SSS Data
+     */
     MneSssData();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    * Refactored: mne_dup_sss_data (mne_sss_data.c)
-    *
-    * @param[in] p_MneSssData   MNE SSS Data which should be copied
-    */
+     * Copy constructor.
+     * Refactored: mne_dup_sss_data (mne_sss_data.c)
+     *
+     * @param[in] p_MneSssData   MNE SSS Data which should be copied
+     */
     MneSssData(const MneSssData& p_MneSssData);
 
     //=========================================================================================================
     /**
-    * Destroys the MNE SSS Data description
-    */
+     * Destroys the MNE SSS Data description
+     */
     ~MneSssData();
 
     //=========================================================================================================
     /**
-    * Read SSS data from anywhere in a file
-    * Refactored: mne_read_sss_data (mne_sss_data.c)
-    *
-    * @param[in] name       Name of the file to read the SSS data from
-    *
-    * @return   The read SSS data.
-    */
+     * Read SSS data from anywhere in a file
+     * Refactored: mne_read_sss_data (mne_sss_data.c)
+     *
+     * @param[in] name       Name of the file to read the SSS data from
+     *
+     * @return   The read SSS data.
+     */
     static MneSssData *read_sss_data(const QString& name);
 
     //=========================================================================================================
     /**
-    * Read the SSS data from the given node of an open fiff stream
-    * Refactored: mne_read_sss_data_from_node (mne_sss_data.c)
-    *
-    * @param[in] stream     The open fiff stream
-    * @param[in] start      The node/tree to read the SSS data from
-    *
-    * @return   The read SSS data.
-    */
+     * Read the SSS data from the given node of an open fiff stream
+     * Refactored: mne_read_sss_data_from_node (mne_sss_data.c)
+     *
+     * @param[in] stream     The open fiff stream
+     * @param[in] start      The node/tree to read the SSS data from
+     *
+     * @return   The read SSS data.
+     */
     static MneSssData* read_sss_data_from_node( QSharedPointer<FIFFLIB::FiffStream>& stream, const QSharedPointer<FIFFLIB::FiffDirNode>& start );
 
     //=========================================================================================================
     /**
-    * Output the SSS information for debugging purposes
-    * Refactored: mne_print_sss_data (mne_sss_data.c)
-    *
-    * @param[in] f      the file stream to print to;
-    */
+     * Output the SSS information for debugging purposes
+     * Refactored: mne_print_sss_data (mne_sss_data.c)
+     *
+     * @param[in] f      the file stream to print to;
+     */
     void print(FILE *f) const;
 
 public:

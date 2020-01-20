@@ -543,13 +543,13 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
 
-    *chp     = NULL;
+     *chp     = NULL;
     ch       = NULL;
-    *trans   = NULL;
-    *id      = NULL;
+     *trans   = NULL;
+     *id      = NULL;
     /*
-    * Find desired parents
-    */
+     * Find desired parents
+     */
     if (!(meas = find_meas_9(node))) {
         printf ("Meas. block not found!");
         goto bad;
@@ -559,8 +559,8 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
         goto bad;
     }
     /*
-    * Is there a block id is in the FIFFB_MEAS node?
-    */
+     * Is there a block id is in the FIFFB_MEAS node?
+     */
     if (!meas->id.isEmpty()) {
         *id = MALLOC_9(1,fiffIdRec);
         (*id)->version = meas->id.version;
@@ -569,10 +569,10 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
         (*id)->time = meas->id.time;
     }
     /*
-    * Others from FIFFB_MEAS_INFO
-    */
-    *lowpass = -1;
-    *highpass = -1;
+     * Others from FIFFB_MEAS_INFO
+     */
+     *lowpass = -1;
+     *highpass = -1;
     for (k = 0; k < meas_info->nent(); k++) {
         kind = meas_info->dir[k]->kind;
         pos  = meas_info->dir[k]->pos;
@@ -646,9 +646,9 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
         }
     }
     /*
-    * Search for the coordinate transformation from
-    * HPI_RESULT block if it was not previously found
-    */
+     * Search for the coordinate transformation from
+     * HPI_RESULT block if it was not previously found
+     */
 
     hpi = meas_info->dir_tree_find(FIFFB_HPI_RESULT);
 
@@ -679,7 +679,7 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
         printf ("Not all essential tags were found!");
         goto bad;
     }
-    *chp = ch;
+     *chp = ch;
     return (0);
 
 bad : {
@@ -703,7 +703,7 @@ static int find_between (   FiffStream::SPtr& stream,
     fiff_int_t kind_1, pos;
     int k;
 
-    *data = NULL;
+     *data = NULL;
     node = low_node;
     while (node != NULL) {
         for (k = 0; k < node->nent(); k++)
@@ -772,8 +772,8 @@ static int get_evoked_essentials (FiffStream::SPtr& stream,         /* This is o
     FiffDirNode::SPtr tmp_node = node;
 
     /*
-    * This is rather difficult...
-    */
+     * This is rather difficult...
+     */
     if (find_between (stream,tmp_node,tmp_node->parent,FIFF_NAVE,&tempb) == FIFF_FAIL)
         return res;
     if (tempb)
@@ -1066,12 +1066,12 @@ int mne_find_evoked_types_comments (    FiffStream::SPtr& stream,
     if (stream == NULL)
         return 0;
     /*
-    * First find all measurements
-    */
+     * First find all measurements
+     */
     meas = stream->dirtree()->dir_tree_find(FIFFB_MEAS);
     /*
-    * Process each measurement
-    */
+     * Process each measurement
+     */
     for (count = 0,p = 0; p < meas.size(); p++) {
         evoked = meas[p]->dir_tree_find(FIFFB_EVOKED);
         /*
@@ -1253,8 +1253,8 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
         goto out;
 
     /*
-    * Select correct data set
-    */
+     * Select correct data set
+     */
     evoked = mne_find_evoked(stream,(commentp == NULL) ? NULL : &comments);
     if (!evoked.size()) {
         printf ("No evoked response data available here");
@@ -1271,33 +1271,33 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
         goto out;
     }
     /*
-    * Get various things...
-    */
+     * Get various things...
+     */
     if (get_meas_info (stream,start,&id,&meas_date,&nchan,&sfreq,&highpass,&lowpass,&chs,&trans) == -1)
         goto out;
 
     /*
-    * sfreq is listed here again because
-    * there might be an individual one in the
-    * evoked-response data
-    */
+     * sfreq is listed here again because
+     * there might be an individual one in the
+     * evoked-response data
+     */
     if (get_evoked_essentials(stream,start,sfreq,
                               tmin,nsamp,nave,aspect_kind,
                               artefs,nartef) == -1)
         goto out;
     /*
-    * Some things may be redefined at a lower level
-    */
+     * Some things may be redefined at a lower level
+     */
     if (get_evoked_optional(stream,start,&nchan,&chs) == -1)
         goto out;
     /*
-    * Omit nonmagnetic channels
-    */
+     * Omit nonmagnetic channels
+     */
     if ((epochs = get_epochs(stream,start,nchan,nsamp)) == NULL)
         goto out;
     /*
-    * Change artefact limits to start from 0
-    */
+     * Change artefact limits to start from 0
+     */
     for (k = 0; k < nartef; k++) {
         qDebug() << "TODO: Artefact Vectors do not contain the right stuff!";
         artefs[2*k+1] = artefs[2*k+1] - sfreq*tmin;
@@ -1315,14 +1315,14 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
     if (chsp) {
         *chsp    = chs; chs = NULL;
     }
-    *tminp   = tmin;
-    *nchanp  = nchan;
-    *nsampp  = nsamp;
-    *sfreqp  = sfreq;
-    *epochsp = epochs; epochs = NULL;
+     *tminp   = tmin;
+     *nchanp  = nchan;
+     *nsampp  = nsamp;
+     *sfreqp  = sfreq;
+     *epochsp = epochs; epochs = NULL;
     /*
-    * Fill in the optional data
-    */
+     * Fill in the optional data
+     */
     if (commentp) {
         *commentp = comments[setno];
         comments[setno] = "";
@@ -1349,8 +1349,8 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
     }
     res = OK;
     /*
-    * FREE all allocated data on exit
-    */
+     * FREE all allocated data on exit
+     */
 out : {
         comments.clear();
         FREE_9(chs);
@@ -1781,8 +1781,8 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name, int set, M
     fiffTime       meas_date = NULL;
     QString        stim14_name;
     /*
-    * Desired channels
-    */
+     * Desired channels
+     */
     QStringList         names;
     int         nchan   = 0;
     /*

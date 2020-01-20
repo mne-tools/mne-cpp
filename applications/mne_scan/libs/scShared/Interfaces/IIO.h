@@ -89,89 +89,89 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the IIO.
-    */
+     * Destroys the IIO.
+     */
     virtual ~IIO() {}
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
-    * Initializes the plugin.
-    */
+     * Initializes the plugin.
+     */
     virtual void init() = 0;
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload() = 0;
 
     //=========================================================================================================
     /**
-    * Starts the IIO.
-    * Pure virtual method inherited by IPlugin.
-    *
-    * @return true if success, false otherwise
-    */
+     * Starts the IIO.
+     * Pure virtual method inherited by IPlugin.
+     *
+     * @return true if success, false otherwise
+     */
     virtual bool start() = 0;
 
     //=========================================================================================================
     /**
-    * Stops the IIO.
-    * Pure virtual method inherited by IPlugin.
-    *
-    * @return true if success, false otherwise
-    */
+     * Stops the IIO.
+     * Pure virtual method inherited by IPlugin.
+     *
+     * @return true if success, false otherwise
+     */
     virtual bool stop() = 0;
 
     //=========================================================================================================
     /**
-    * Returns the plugin type.
-    * Pure virtual method inherited by IPlugin.
-    *
-    * @return type of the IIO
-    */
+     * Returns the plugin type.
+     * Pure virtual method inherited by IPlugin.
+     *
+     * @return type of the IIO
+     */
     virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the plugin name.
-    * Pure virtual method inherited by IPlugin.
-    *
-    * @return the name of the IIO.
-    */
+     * Returns the plugin name.
+     * Pure virtual method inherited by IPlugin.
+     *
+     * @return the name of the IIO.
+     */
     virtual QString getName() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the set up widget for configuration of IIO.
-    * Pure virtual method inherited by IPlugin.
-    *
-    * @return the setup widget.
-    */
+     * Returns the set up widget for configuration of IIO.
+     * Pure virtual method inherited by IPlugin.
+     *
+     * @return the setup widget.
+     */
     virtual QWidget* setupWidget() = 0; //setup();
 
     //=========================================================================================================
     /**
-    * Sets the name of the RTRecord directory.
-    *
-    * @param [in] dirName name of the RTRecord directory
-    */
+     * Sets the name of the RTRecord directory.
+     *
+     * @param [in] dirName name of the RTRecord directory
+     */
     inline void setRTRecordDirName(const QString& dirName);
 
 protected:
 
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread
+     */
     virtual void run() = 0;
 
     QString                                 m_RTRecordDirName;  /**< the real-time record sub directory name. */

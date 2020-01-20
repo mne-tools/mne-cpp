@@ -98,20 +98,20 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     FiffNamedMatrix();
 
     //=========================================================================================================
     /**
-    * Constructs named matrix with given parameters. (No plausibility check is performed)
-    *
-    * @param[in] p_nrow         Number of rows
-    * @param[in] p_ncol         Number of cols
-    * @param[in] p_row_names    Row names
-    * @param[in] p_col_names    Column names
-    * @param[in] p_data         Data of the named matrix
-    */
+     * Constructs named matrix with given parameters. (No plausibility check is performed)
+     *
+     * @param[in] p_nrow         Number of rows
+     * @param[in] p_ncol         Number of cols
+     * @param[in] p_row_names    Row names
+     * @param[in] p_col_names    Column names
+     * @param[in] p_data         Data of the named matrix
+     */
     explicit FiffNamedMatrix(   fiff_int_t p_nrow,
                                 fiff_int_t p_ncol,
                                 const QStringList& p_row_names,
@@ -120,39 +120,39 @@ public:
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffNamedMatrix  Named matrix which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffNamedMatrix  Named matrix which should be copied
+     */
     FiffNamedMatrix(const FiffNamedMatrix& p_FiffNamedMatrix);
 
     //=========================================================================================================
     /**
-    * Destroys the named matrix.
-    */
+     * Destroys the named matrix.
+     */
     ~FiffNamedMatrix();
 
     //=========================================================================================================
     /**
-    * Initializes the named matrix.
-    */
+     * Initializes the named matrix.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Returns true if named matrix contains no data.
-    *
-    * @return true if named matrix is empty.
-    */
+     * Returns true if named matrix contains no data.
+     *
+     * @return true if named matrix is empty.
+     */
     inline bool isEmpty() const;
 
     //ToDo return the transposed matrix instead of applying it to its members
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Definition of the mne_transpose_named_matrix function
-    *
-    * Transpose a named matrix (FiffNamedMatrix)
-    */
+     * ### MNE toolbox root function ###: Definition of the mne_transpose_named_matrix function
+     *
+     * Transpose a named matrix (FiffNamedMatrix)
+     */
     void transpose_named_matrix();
 
 //    //=========================================================================================================
@@ -165,22 +165,22 @@ public:
 
     //=========================================================================================================
     /**
-    * overloading the stream out operator<<
-    *
-    * @param[in] out                The stream to which the fiff projector should be assigned to.
-    * @param[in] p_FiffNamedMatrix  Fiff named matrix which should be assigned to the stream.
-    *
-    * @return the stream with the attached fiff named matrix
-    */
+     * overloading the stream out operator<<
+     *
+     * @param[in] out                The stream to which the fiff projector should be assigned to.
+     * @param[in] p_FiffNamedMatrix  Fiff named matrix which should be assigned to the stream.
+     *
+     * @return the stream with the attached fiff named matrix
+     */
     friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatrix &p_FiffNamedMatrix);
 
     /**
-    * Overloaded == operator to compare an object to this instance.
-    *
-    * @param[in] object    The object which should be compared to.
-    *
-    * @return true if equal, false otherwise
-    */
+     * Overloaded == operator to compare an object to this instance.
+     *
+     * @param[in] object    The object which should be compared to.
+     *
+     * @return true if equal, false otherwise
+     */
     friend bool operator== (const FiffNamedMatrix &a, const FiffNamedMatrix &b);
 
 public:

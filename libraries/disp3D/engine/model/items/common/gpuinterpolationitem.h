@@ -109,85 +109,85 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] p3DEntityParent    The parent 3D entity.
-    * @param[in] iType              The type of the item. See types.h for declaration and definition.
-    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] p3DEntityParent    The parent 3D entity.
+     * @param[in] iType              The type of the item. See types.h for declaration and definition.
+     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit GpuInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = Q_NULLPTR,
                                   int iType = Data3DTreeModelItemTypes::GpuInterpolationItem,
                                   const QString& text = "3D Plot");
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    */
+     * Default destructor.
+     */
     ~GpuInterpolationItem();
 
     //=========================================================================================================
     /**
-    * Initialize interpolation data of this item.
-    *
-    * @param[in] matVertices       The surface vertices.
-    * @param[in] matNormals        The surface normals.
-    * @param[in] matTriangles      The surface triangles.
-    */
+     * Initialize interpolation data of this item.
+     *
+     * @param[in] matVertices       The surface vertices.
+     * @param[in] matNormals        The surface normals.
+     * @param[in] matTriangles      The surface triangles.
+     */
     virtual void initData(const Eigen::MatrixX3f &matVertices,
                           const Eigen::MatrixX3f &matNormals,
                           const Eigen::MatrixX3i &matTriangles);
 
     //=========================================================================================================
     /**
-    * Set the new Interpolation matrix for the interpolation.
-    *
-    * @param[in] pMatInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
-    */
+     * Set the new Interpolation matrix for the interpolation.
+     *
+     * @param[in] pMatInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
+     */
     virtual void setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 
     //=========================================================================================================
     /**
-    * Add a new vector with signal data form the sensors.
-    *
-    * @param[in] tSignalVec              Vector with one float value for each sensor.
-    */
+     * Add a new vector with signal data form the sensors.
+     *
+     * @param[in] tSignalVec              Vector with one float value for each sensor.
+     */
     virtual void addNewRtData(const Eigen::VectorXf &tSignalVec);
 
     //=========================================================================================================
     /**
-    * This function set the normalization value.
-    *
-    * @param[in] vecThresholds       The new threshold values used for normalizing the data.
-    */
+     * This function set the normalization value.
+     *
+     * @param[in] vecThresholds       The new threshold values used for normalizing the data.
+     */
     virtual void setThresholds(const QVector3D& tVecThresholds);
 
     //=========================================================================================================
     /**
-    * This function sets the colormap type
-    *
-    * @param[in] tColormapType           The new colormap name.
-    */
+     * This function sets the colormap type
+     *
+     * @param[in] tColormapType           The new colormap name.
+     */
     virtual void setColormapType(const QString& tColormapType);
 
 protected:
     //=========================================================================================================
     /**
-    * Build the content of the Interpolation matrix buffer.
-    *
-    * @param[in] pMatInterpolationMatrix    The Interpolation matrix.
-    *
-    * @return                          Interpolation matrix is byte array form.
-    */
+     * Build the content of the Interpolation matrix buffer.
+     *
+     * @param[in] pMatInterpolationMatrix    The Interpolation matrix.
+     *
+     * @return                          Interpolation matrix is byte array form.
+     */
     virtual QByteArray buildInterpolationMatrixBuffer(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 
     //=========================================================================================================
     /**
-    * Build buffer filled with 0.0f.
-    *
-    * @param[in] tSize         Number of zeros.
-    *
-    * @return              Buffer content.
-    */
+     * Build buffer filled with 0.0f.
+     *
+     * @param[in] tSize         Number of zeros.
+     *
+     * @return              Buffer content.
+     */
     virtual QByteArray buildZeroBuffer(const uint tSize);
 
     bool                                    m_bIsDataInit;                  /**< The data initialization flag. */

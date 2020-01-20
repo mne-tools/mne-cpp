@@ -87,36 +87,36 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the FiffSparseMatrix
-    */
+     * Constructs the FiffSparseMatrix
+     */
     FiffSparseMatrix();
 
     //=========================================================================================================
     /**
-    * Copies a FiffSparseMatrix
-    * Refactored: mne_dup_sparse_matrix (mne_sparse_matop.c)
-    *
-    * @param[in] mat     The Sparse Matrix which should be copied
-    */
+     * Copies a FiffSparseMatrix
+     * Refactored: mne_dup_sparse_matrix (mne_sparse_matop.c)
+     *
+     * @param[in] mat     The Sparse Matrix which should be copied
+     */
     FiffSparseMatrix(const FiffSparseMatrix& mat);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffSparseMatrix description
-    * Refactored: mne_free_sparse (mne_sparse_matop.c)
-    */
+     * Destroys the FiffSparseMatrix description
+     * Refactored: mne_free_sparse (mne_sparse_matop.c)
+     */
     ~FiffSparseMatrix();
 
 
     //============================= fiff_sparse.c =============================
     /*
-    * Interpret dimensions and nz from matrix data
-    */
+     * Interpret dimensions and nz from matrix data
+     */
     static FIFFLIB::fiff_int_t *fiff_get_matrix_sparse_dims(FIFFLIB::FiffTag::SPtr& tag);
 
     /*
-    * Conversion into the standard representation
-    */
+     * Conversion into the standard representation
+     */
     static FIFFLIB::FiffSparseMatrix* fiff_get_float_sparse_matrix(FIFFLIB::FiffTag::SPtr& tag);
 
 

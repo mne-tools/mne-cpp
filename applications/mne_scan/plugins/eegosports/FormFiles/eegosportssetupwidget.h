@@ -83,48 +83,48 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a EEGoSportsSetupWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupWidget becomes a window. If parent is another widget, EEGoSportsSetupWidget becomes a child window inside parent. EEGoSportsSetupWidget is deleted when its parent is deleted.
-    * @param [in] pEEGoSports a pointer to the corresponding ECGSimulator.
-    */
+     * Constructs a EEGoSportsSetupWidget which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupWidget becomes a window. If parent is another widget, EEGoSportsSetupWidget becomes a child window inside parent. EEGoSportsSetupWidget is deleted when its parent is deleted.
+     * @param [in] pEEGoSports a pointer to the corresponding ECGSimulator.
+     */
     EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the EEGoSportsSetupWidget.
-    * All EEGoSportsSetupWidget's children are deleted first. The application exits if EEGoSportsSetupWidget is the main widget.
-    */
+     * Destroys the EEGoSportsSetupWidget.
+     * All EEGoSportsSetupWidget's children are deleted first. The application exits if EEGoSportsSetupWidget is the main widget.
+     */
     ~EEGoSportsSetupWidget();
 
     //=========================================================================================================
     /**
-    * Initializes the Connector's GUI properties.
-    *
-    */
+     * Initializes the Connector's GUI properties.
+     *
+     */
     void initGui();
 
 private:
 
     //=========================================================================================================
     /**
-    * Sets the device sampling properties.
-    *
-    */
+     * Sets the device sampling properties.
+     *
+     */
     void setDeviceSamplingProperties();
 
     //=========================================================================================================
     /**
-    * Sets flag for writing to a file.
-    *
-    */
+     * Sets flag for writing to a file.
+     *
+     */
     void setWriteToFile();
 
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
     EEGoSports*               m_pEEGoSports;           /**< a pointer to corresponding EEGoSports.*/

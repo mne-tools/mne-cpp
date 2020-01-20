@@ -125,56 +125,56 @@ class EEGOSPORTSSHARED_EXPORT EEGoSports : public SCSHAREDLIB::ISensor
 public:
     //=========================================================================================================
     /**
-    * Constructs a EEGoSports.
-    */
+     * Constructs a EEGoSports.
+     */
     EEGoSports();
 
     //=========================================================================================================
     /**
-    * Destroys the EEGoSports.
-    */
+     * Destroys the EEGoSports.
+     */
     virtual ~EEGoSports();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Sets up the fiff info with the current data chosen by the user.
-    */
+     * Sets up the fiff info with the current data chosen by the user.
+     */
     void setUpFiffInfo();
 
     //=========================================================================================================
     /**
-    * Starts the EEGoSports by starting the thread.
-    */
+     * Starts the EEGoSports by starting the thread.
+     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the EEGoSports by stopping the thread.
-    */
+     * Stops the EEGoSports by stopping the thread.
+     */
     virtual bool stop();
 
     //=========================================================================================================
     /**
-    * Set/Add received samples to a QList.
-    */
+     * Set/Add received samples to a QList.
+     */
     void setSampleData(Eigen::MatrixXd &matRawBuffer);
 
     virtual IPlugin::PluginType getType() const;
@@ -185,48 +185,48 @@ public:
 protected slots:
     //=========================================================================================================
     /**
-    * Update cardinal points
-    *
-    * @param[in] sLPA  The channel name to take as the LPA.
-    * @param[in] dLPA  The amount (in m) to translate the LPA channel position on the z axis.
-    * @param[in] sRPA  The channel name to take as the RPA.
-    * @param[in] dRPA  The amount (in m) to translate the RPA channel position on the z axis.
-    * @param[in] sNasion  The channel name to take as the Nasion.
-    * @param[in] dNasion  The amount (in m) to translate the Nasion channel position on the z axis.
-    */
+     * Update cardinal points
+     *
+     * @param[in] sLPA  The channel name to take as the LPA.
+     * @param[in] dLPA  The amount (in m) to translate the LPA channel position on the z axis.
+     * @param[in] sRPA  The channel name to take as the RPA.
+     * @param[in] dRPA  The amount (in m) to translate the RPA channel position on the z axis.
+     * @param[in] sNasion  The channel name to take as the Nasion.
+     * @param[in] dNasion  The amount (in m) to translate the Nasion channel position on the z axis.
+     */
     void onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion);
 
 protected:
     //=========================================================================================================
     /**
-    * Opens a dialog to setup the project to check the impedance values
-    */
+     * Opens a dialog to setup the project to check the impedance values
+     */
     void showSetupProjectDialog();
 
     //=========================================================================================================
     /**
-    * Starts data recording
-    */
+     * Starts data recording
+     */
     void showStartRecording();
 
     //=========================================================================================================
     /**
-    * Implements blinking recording button
-    */
+     * Implements blinking recording button
+     */
     void changeRecordingButton();
 
     //=========================================================================================================
     /**
-    * Checks if a dir exists
-    */
+     * Checks if a dir exists
+     */
     bool dirExists(const std::string& dirName_in);
 
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
 private:

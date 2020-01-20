@@ -76,17 +76,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtSssAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtSssAboutWidget becomes a window. If parent is another widget, RtSssAboutWidget becomes a child window inside parent. RtSssAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RtSssAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new RtSssAboutWidget becomes a window. If parent is another widget, RtSssAboutWidget becomes a child window inside parent. RtSssAboutWidget is deleted when its parent is deleted.
+     */
     RtSssAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtSssAboutWidget.
-    * All RtSssAboutWidget's children are deleted first. The application exits if RtSssAboutWidget is the main widget.
-    */
+     * Destroys the RtSssAboutWidget.
+     * All RtSssAboutWidget's children are deleted first. The application exits if RtSssAboutWidget is the main widget.
+     */
     ~RtSssAboutWidget();
 
 private:

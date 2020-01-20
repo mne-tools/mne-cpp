@@ -103,53 +103,53 @@ class LSLADAPTERSHARED_EXPORT LSLAdapterProducer : public QObject
 public:
     //=========================================================================================================
     /**
-    * Constructs a LSLAdapterProducer which is a child of parent.
-    */
+     * Constructs a LSLAdapterProducer which is a child of parent.
+     */
     LSLAdapterProducer(QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > pRTMSA,
                        int iOutputBlockSize = 100,
                        QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Destructor
-    */
+     * Destructor
+     */
     ~LSLAdapterProducer();
 
     //=========================================================================================================
     /**
-    * Call this to provide the stream info for the producer.
-    */
+     * Call this to provide the stream info for the producer.
+     */
     void setStreamInfo(const lsl::stream_info& stream);
 
     //=========================================================================================================
     /**
-    * Stops the streaming.
-    */
+     * Stops the streaming.
+     */
     void stop();
 
     //=========================================================================================================
     /**
-    * Resets the producer.
-    */
+     * Resets the producer.
+     */
     void reset();
 
     //=========================================================================================================
     /**
-    * Whether or not the producer is running.
-    */
+     * Whether or not the producer is running.
+     */
     inline bool isRunning() const;
 
     //=========================================================================================================
     /**
-    * Setter for output block size.
-    */
+     * Setter for output block size.
+     */
     void setOutputBlockSize(const int iNewBlockSize);
 
 public slots:
     //=========================================================================================================
     /**
-    * The background thread of the LSLAdapter will run this function.
-    */
+     * The background thread of the LSLAdapter will run this function.
+     */
     void readStream();
 
 private:
@@ -169,8 +169,8 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * This tells the LSLAdapter that the stream was stopped.
-    */
+     * This tells the LSLAdapter that the stream was stopped.
+     */
     void finished();
 };
 

@@ -125,28 +125,28 @@ public:
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    *
-    */
+     * Reimplemented virtual functions
+     *
+     */
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
     //=========================================================================================================
     /**
-    * setModelView creates the QPointer path for the data plot.
-    *
-    * @param[in] model holds a pointer to the event model. This model needs to be set in order to access the event data for plotting.
-    * @param[in] eventView holds a pointer to the event view. This view needs to be set in order to access the selected event data for plotting.
-    * @param[in] rawView holds a pointer to the raw view. This view needs to be set in order to access the raw view for manual viewport updating.
-    */
+     * setModelView creates the QPointer path for the data plot.
+     *
+     * @param[in] model holds a pointer to the event model. This model needs to be set in order to access the event data for plotting.
+     * @param[in] eventView holds a pointer to the event view. This view needs to be set in order to access the selected event data for plotting.
+     * @param[in] rawView holds a pointer to the raw view. This view needs to be set in order to access the raw view for manual viewport updating.
+     */
     void setModelView(EventModel *eventModel, QTableView* eventView, QTableView *rawView);
 
     //=========================================================================================================
     /**
-    * setModelView creates the QPointer path for the data plot.
-    *
-    * @param[in] scaleMap map with all channel types and their current scaling value.
-    */
+     * setModelView creates the QPointer path for the data plot.
+     *
+     * @param[in] scaleMap map with all channel types and their current scaling value.
+     */
     void setScaleMap(const QMap<QString, double> &scaleMap);
 
     QMap<QString,double> m_scaleMap;        /**< Map with all channel types and their current scaling value.*/
@@ -165,29 +165,29 @@ public:
 private:
     //=========================================================================================================
     /**
-    * createPlotPath creates the QPointer path for the data plot.
-    *
-    * @param[in] index QModelIndex for accessing associated data and model object.
-    * @param[in,out] path The QPointerPath to create for the data plot.
-    */
+     * createPlotPath creates the QPointer path for the data plot.
+     *
+     * @param[in] index QModelIndex for accessing associated data and model object.
+     * @param[in,out] path The QPointerPath to create for the data plot.
+     */
     void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs, double channelMean) const;
 
     //=========================================================================================================
     /**
-    * createGridPath Creates the QPointer path for the grid plot.
-    *
-    * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
-    * @param[in] data The row vector of the data matrix <1 x nsamples>.
-    */
+     * createGridPath Creates the QPointer path for the grid plot.
+     *
+     * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
+     * @param[in] data The row vector of the data matrix <1 x nsamples>.
+     */
     void createGridPath(QPainterPath& path, const QStyleOptionViewItem &option, QList<RowVectorPair>& listPairs) const;
 
     //=========================================================================================================
     /**
-    * plotEvents Plots the events.
-    *
-    * @param[in] index QModelIndex for accessing associated data and model object.
-    * @param[in] painter The painter of the current table item.
-    */
+     * plotEvents Plots the events.
+     *
+     * @param[in] index QModelIndex for accessing associated data and model object.
+     * @param[in] painter The painter of the current table item.
+     */
     void plotEvents(const QModelIndex &index, const QStyleOptionViewItem &option, QPainter *painter) const;
 
     //Settings

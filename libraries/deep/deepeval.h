@@ -90,84 +90,84 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
-    */
+     * Default constructor
+     */
     DeepEval();
 
     //=========================================================================================================
     /**
-    * Constructor
-    *
-    * @param [in] sModelFilename    The model filename to set
-    */
+     * Constructor
+     *
+     * @param [in] sModelFilename    The model filename to set
+     */
     DeepEval(const QString &sModelFilename);
 
     //=========================================================================================================
     /**
-    * Destructs DeepEval
-    */
+     * Destructs DeepEval
+     */
     virtual ~DeepEval();
 
     //=========================================================================================================
     /**
-    * Returns the current set model file name
-    *
-    * @return the current model file name
-    */
+     * Returns the current set model file name
+     *
+     * @return the current model file name
+     */
     const QString& getModelFilename() const;
 
     //=========================================================================================================
     /**
-    * Set the model filename
-    *
-    * @param [in] sModelFilename    The model filename to set
-    */
+     * Set the model filename
+     *
+     * @param [in] sModelFilename    The model filename to set
+     */
     void setModelFilename(const QString &sModelFilename);
 
     //=========================================================================================================
     /**
-    * Evaluate the MNE Deep Model specified by the model file name
-    *
-    * @param [in] inputs    The input vector
-    * @param [out] outputs   The ouptut vector
-    *
-    * @return true when MNE Deep model was sucessfully evaluated.
-    */
+     * Evaluate the MNE Deep Model specified by the model file name
+     *
+     * @param [in] inputs    The input vector
+     * @param [out] outputs   The ouptut vector
+     *
+     * @return true when MNE Deep model was sucessfully evaluated.
+     */
     bool evalModel(const Eigen::VectorXf& inputs, Eigen::VectorXf& outputs);
 
     //=========================================================================================================
     /**
-    * Evaluate the MNE Deep Model specified by the model file name
-    *
-    * @param [in] inputs    The input vector
-    * @param [out] outputs  The ouptut vector
-    *
-    * @return true when MNE Deep model was sucessfully evaluated.
-    */
+     * Evaluate the MNE Deep Model specified by the model file name
+     *
+     * @param [in] inputs    The input vector
+     * @param [out] outputs  The ouptut vector
+     *
+     * @return true when MNE Deep model was sucessfully evaluated.
+     */
     bool evalModel(std::vector<float>& inputs, std::vector<float>& outputs);
 
     //=========================================================================================================
     /**
-    * Loads the Deep Model set by the model file name
-    *
-    * @return true when MNE Deep model was sucessfully loaded.
-    */
+     * Loads the Deep Model set by the model file name
+     *
+     * @return true when MNE Deep model was sucessfully loaded.
+     */
     bool loadModel();
 
     //=========================================================================================================
     /**
-    * Returns the Input Dimensions
-    *
-    * @return the Input dimensions
-    */
+     * Returns the Input Dimensions
+     *
+     * @return the Input dimensions
+     */
     size_t inputDimensions();
 
     //=========================================================================================================
     /**
-    * Returns the Output Dimensions
-    *
-    * @return the Output dimensions
-    */
+     * Returns the Output Dimensions
+     *
+     * @return the Output dimensions
+     */
     size_t outputDimensions();
 
 

@@ -76,14 +76,14 @@ class ANSHAREDSHARED_EXPORT IStandardView : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Destroys the view.
-    */
+     * Destroys the view.
+     */
     virtual ~IStandardView() {}
 
     //=========================================================================================================
     /**
-    * Implements printing of the standard view.
-    */
+     * Implements printing of the standard view.
+     */
     virtual void print() = 0;
 };
 

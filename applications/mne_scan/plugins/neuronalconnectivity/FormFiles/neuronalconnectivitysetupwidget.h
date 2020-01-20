@@ -83,26 +83,26 @@ class NeuronalConnectivitySetupWidget : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a NeuronalConnectivitySetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding NeuronalConnectivityToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NeuronalConnectivitySetupWidget becomes a window. If parent is another widget, NeuronalConnectivitySetupWidget becomes a child window inside parent. NeuronalConnectivitySetupWidget is deleted when its parent is deleted.
-    */
+     * Constructs a NeuronalConnectivitySetupWidget which is a child of parent.
+     *
+     * @param [in] toolbox a pointer to the corresponding NeuronalConnectivityToolbox.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new NeuronalConnectivitySetupWidget becomes a window. If parent is another widget, NeuronalConnectivitySetupWidget becomes a child window inside parent. NeuronalConnectivitySetupWidget is deleted when its parent is deleted.
+     */
     NeuronalConnectivitySetupWidget(NeuronalConnectivity* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the NeuronalConnectivitySetupWidget.
-    * All NeuronalConnectivitySetupWidget's children are deleted first. The application exits if NeuronalConnectivitySetupWidget is the main widget.
-    */
+     * Destroys the NeuronalConnectivitySetupWidget.
+     * All NeuronalConnectivitySetupWidget's children are deleted first. The application exits if NeuronalConnectivitySetupWidget is the main widget.
+     */
     ~NeuronalConnectivitySetupWidget();
 
 private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
 private:

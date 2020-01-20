@@ -112,39 +112,39 @@ class RTPROCESINGSHARED_EXPORT RtCovWorker : public QObject
 public:
     //=========================================================================================================
     /**
-    * Perform actual covariance estimation.
-    *
-    * @param[in] inputData  Data to estimate the covariance from.
-    */
+     * Perform actual covariance estimation.
+     *
+     * @param[in] inputData  Data to estimate the covariance from.
+     */
     void doWork(const RtCovInput &inputData);
 
 protected:
     //=========================================================================================================
     /**
-    * Computer multiplication with transposed.
-    *
-    * @param[in] matData  Data to self multiply with.
-    *
-    * @return   The multiplication result.
-    */
+     * Computer multiplication with transposed.
+     *
+     * @param[in] matData  Data to self multiply with.
+     *
+     * @return   The multiplication result.
+     */
     static RtCovComputeResult compute(const Eigen::MatrixXd &matData);
 
     //=========================================================================================================
     /**
-    * Computer multiplication with transposed.
-    *
-    * @param[out]   finalResult     The final covariance estimation.
-    * @param[in]    tempResult      The intermediate result from the compute function
-    */
+     * Computer multiplication with transposed.
+     *
+     * @param[out]   finalResult     The final covariance estimation.
+     * @param[in]    tempResult      The intermediate result from the compute function
+     */
     static void reduce(RtCovComputeResult& finalResult, const RtCovComputeResult &tempResult);
 
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenver a new covariance was estimated.
-    *
-    * @param[in] computedCov  The final covariance estimation.
-    */
+     * Emit this signal whenver a new covariance was estimated.
+     *
+     * @param[in] computedCov  The final covariance estimation.
+     */
     void resultReady(const FIFFLIB::FiffCov& computedCov);
 };
 
@@ -165,55 +165,55 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates the real-time covariance estimation object.
-    *
-    * @param[in] iMaxSamples      Number of samples to use for each data chunk
-    * @param[in] pFiffInfo        Associated Fiff Information
-    * @param[in] parent     Parent QObject (optional)
-    */
+     * Creates the real-time covariance estimation object.
+     *
+     * @param[in] iMaxSamples      Number of samples to use for each data chunk
+     * @param[in] pFiffInfo        Associated Fiff Information
+     * @param[in] parent     Parent QObject (optional)
+     */
     explicit RtCov(qint32 iMaxSamples,
                    QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                    QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the Real-time covariance estimation object.
-    */
+     * Destroys the Real-time covariance estimation object.
+     */
     ~RtCov();
 
     //=========================================================================================================
     /**
-    * Slot to receive incoming data.
-    *
-    * @param[in] matDataSegment  Data to estimate the covariance from -> ToDo Replace this by shared data pointer
-    */
+     * Slot to receive incoming data.
+     *
+     * @param[in] matDataSegment  Data to estimate the covariance from -> ToDo Replace this by shared data pointer
+     */
     void append(const Eigen::MatrixXd &matDataSegment);
 
     //=========================================================================================================
     /**
-    * Set number of estimation samples
-    *
-    * @param[in] samples    estimation samples to set
-    */
+     * Set number of estimation samples
+     *
+     * @param[in] samples    estimation samples to set
+     */
     void setSamples(qint32 samples);
 
     //=========================================================================================================
     /**
-    * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
-    */
+     * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+     */
     void restart();
 
     //=========================================================================================================
     /**
-    * Stops the thread by interrupting its computation queue, quitting and waiting.
-    */
+     * Stops the thread by interrupting its computation queue, quitting and waiting.
+     */
     void stop();
 
 protected:
     //=========================================================================================================
     /**
-    * Handles the result
-    */
+     * Handles the result
+     */
     void handleResults(const FIFFLIB::FiffCov& computedCov);
 
     QThread                 m_workerThread;             /**< The worker thread. */
@@ -229,18 +229,18 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Signal which is emitted when a new covariance Matrix is estimated.
-    *
-    * @param[int] computedCov  The computed covariance information
-    */
+     * Signal which is emitted when a new covariance Matrix is estimated.
+     *
+     * @param[int] computedCov  The computed covariance information
+     */
     void covCalculated(const FIFFLIB::FiffCov& computedCov);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenver the worker should process a new batch of stored data blocks.
-    *
-    * @param[in] inputData  The new batch of stored data.
-    */
+     * Emit this signal whenver the worker should process a new batch of stored data blocks.
+     *
+     * @param[in] inputData  The new batch of stored data.
+     */
     void operate(const RtCovInput &inputData);
 
 };

@@ -99,132 +99,132 @@ class AverageWindow : public QDockWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a AverageWindow which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
-    * @param [in] file default file used to read the evoked data from.
-    */
+     * Constructs a AverageWindow which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
+     * @param [in] file default file used to read the evoked data from.
+     */
     AverageWindow(QWidget *parent, QFile &file);
 
     //=========================================================================================================
     /**
-    * Constructs a AverageWindow which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
-    */
+     * Constructs a AverageWindow which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
+     */
     AverageWindow(QWidget *parent);
 
     //=========================================================================================================
     /**
-    * Constructs a AverageWindow which is a child of parent.
-    */
+     * Constructs a AverageWindow which is a child of parent.
+     */
 //    AverageWindow();
 
     //=========================================================================================================
     /**
-    * Destroys the AverageWindow.
-    * All AverageWindow's children are deleted first. The application exits if AverageWindow is the main widget.
-    */
+     * Destroys the AverageWindow.
+     * All AverageWindow's children are deleted first. The application exits if AverageWindow is the main widget.
+     */
     ~AverageWindow();
 
     //=========================================================================================================
     /**
-    * Returns the AverageModel of this window
-    */
+     * Returns the AverageModel of this window
+     */
     AverageModel* getAverageModel();
 
     //=========================================================================================================
     /**
-    * call this whenever the external channel selection manager changes
-    *
-    * * @param [in] selectedChannelItems list of selected graphic items
-    */
+     * call this whenever the external channel selection manager changes
+     *
+     * * @param [in] selectedChannelItems list of selected graphic items
+     */
     void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
 
     //=========================================================================================================
     /**
-    * Scales the averaged data according to scaleMap
-    *
-    * @param [in] scaleMap map with all channel types and their current scaling value
-    */
+     * Scales the averaged data according to scaleMap
+     *
+     * @param [in] scaleMap map with all channel types and their current scaling value
+     */
     void scaleAveragedData(const QMap<QString,double> &scaleMap);
 
     //=========================================================================================================
     /**
-    * Scales the averaged data according to scaleMap
-    *
-    * @param [in] mappedChannelNames all mapped channel names
-    */
+     * Scales the averaged data according to scaleMap
+     *
+     * @param [in] mappedChannelNames all mapped channel names
+     */
     void setMappedChannelNames(QStringList mappedChannelNames);
 
 private:
 
     //=========================================================================================================
     /**
-    * called by constructor to perform common initialization step
-    */
+     * called by constructor to perform common initialization step
+     */
     void init();
 
     //=========================================================================================================
     /**
-    * inits the model view controller paradigm of this window
-    *
-    * @param [in] file holds the file which is to be loaded on startup
-    */
+     * inits the model view controller paradigm of this window
+     *
+     * @param [in] file holds the file which is to be loaded on startup
+     */
     void initMVC(QFile &file);
 
     //=========================================================================================================
     /**
-    * inits the model view controller paradigm of this window
-    */
+     * inits the model view controller paradigm of this window
+     */
     void initMVC();
 
     //=========================================================================================================
     /**
-    * inits the table widgets of this window
-    */
+     * inits the table widgets of this window
+     */
     void initTableViewWidgets();
 
     //=========================================================================================================
     /**
-    * inits the average scene of this window
-    */
+     * inits the average scene of this window
+     */
     void initAverageSceneView();
 
     //=========================================================================================================
     /**
-    * Inits all QPushButtons in this window
-    */
+     * Inits all QPushButtons in this window
+     */
     void initButtons();
 
     //=========================================================================================================
     /**
-    * Inits all QComboBoxes in this window
-    */
+     * Inits all QComboBoxes in this window
+     */
     void initComboBoxes();
 
     //=========================================================================================================
     /**
-    * call this function whenever a selection was made in teh evoked data set list
-    */
+     * call this function whenever a selection was made in teh evoked data set list
+     */
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
     //=========================================================================================================
     /**
-    * saves the current layout average plot as png or svg to file
-    */
+     * saves the current layout average plot as png or svg to file
+     */
     void exportAverageLayoutPlot();
 
     //=========================================================================================================
     /**
-    * saves the current butterfly average plot as png or svg to file
-    */
+     * saves the current butterfly average plot as png or svg to file
+     */
     void exportAverageButterflyPlot();
 
     //=========================================================================================================
     /**
-    * reimplemented resize event.
-    */
+     * reimplemented resize event.
+     */
     void resizeEvent(QResizeEvent * event);
 
     Ui::AverageWindow*      ui;                     /**< Pointer to the qt designer generated ui class.*/

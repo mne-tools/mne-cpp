@@ -94,8 +94,8 @@ class DISPSHARED_EXPORT AverageSceneItem : public QGraphicsObject
 public:
     //=========================================================================================================
     /**
-    * Constructs a AverageSceneItem.
-    */
+     * Constructs a AverageSceneItem.
+     */
     AverageSceneItem(const QString& channelName,
                      int channelNumber,
                      const QPointF& channelPosition,
@@ -105,8 +105,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    */
+     * Reimplemented virtual functions
+     */
     QRectF boundingRect() const;
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -137,25 +137,25 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Create a plot path and paint the average data
-    *
-    * @param [in] painter The painter used to plot in this item.
-    */
+     * Create a plot path and paint the average data
+     *
+     * @param [in] painter The painter used to plot in this item.
+     */
     void paintAveragePath(QPainter *painter);
 
     //=========================================================================================================
     /**
-    * Create a plot path and paint the average data
-    *
-    * @param [in] painter The painter used to plot in this item.
-    */
+     * Create a plot path and paint the average data
+     *
+     * @param [in] painter The painter used to plot in this item.
+     */
     void paintStimLine(QPainter *painter);
 
 signals:
     //=========================================================================================================
     /**
-    * Signal to request a scene update.
-    */
+     * Signal to request a scene update.
+     */
     void sceneUpdateRequested();
 };
 

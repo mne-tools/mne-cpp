@@ -89,15 +89,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Triangle
-    */
+     * Constructs the MNE Triangle
+     */
     MneTriangle();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Triangle
-    * Refactored:  (.c)
-    */
+     * Destroys the MNE Triangle
+     * Refactored:  (.c)
+     */
     ~MneTriangle();
 
 

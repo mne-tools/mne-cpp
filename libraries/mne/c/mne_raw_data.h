@@ -101,16 +101,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Raw Data
-    * Refactored: new_raw_data (mne_raw_data.c)
-    */
+     * Constructs the MNE Raw Data
+     * Refactored: new_raw_data (mne_raw_data.c)
+     */
     MneRawData();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Raw Data
-    * Refactored: mne_raw_free_data (mne_raw_data.c)
-    */
+     * Destroys the MNE Raw Data
+     * Refactored: mne_raw_free_data (mne_raw_data.c)
+     */
     ~MneRawData();
 
 

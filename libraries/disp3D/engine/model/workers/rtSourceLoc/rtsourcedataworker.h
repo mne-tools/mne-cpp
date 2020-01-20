@@ -125,116 +125,116 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     explicit RtSourceDataWorker();
 
     //=========================================================================================================
     /**
-    * Add data which is to be streamed.
-    *
-    * @param[in] data         The new data.
-    */
+     * Add data which is to be streamed.
+     *
+     * @param[in] data         The new data.
+     */
     void addData(const Eigen::MatrixXd& data);
 
     //=========================================================================================================
     /**
-    * Clear this worker, empties the m_lData field that holds the current block of sensor activity
-    */
+     * Clear this worker, empties the m_lData field that holds the current block of sensor activity
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Set the color of the vertices for the left and right hemisphere.
-    *
-    * @param[in] matColorLeft      The color of the vertices for the left hemisphere.
-    * @param[in] matColorRight     The color of the vertices for the right hemisphere.
-    */
+     * Set the color of the vertices for the left and right hemisphere.
+     *
+     * @param[in] matColorLeft      The color of the vertices for the left hemisphere.
+     * @param[in] matColorRight     The color of the vertices for the right hemisphere.
+     */
     void setSurfaceColor(const Eigen::MatrixX4f &matColorLeft,
                          const Eigen::MatrixX4f &matColorRight);
 
     //=========================================================================================================
     /**
-    * Set the number of average to take after emitting the data to the listening threads.
-    *
-    * @param[in] iNumAvr                The new number of averages.
-    */
+     * Set the number of average to take after emitting the data to the listening threads.
+     *
+     * @param[in] iNumAvr                The new number of averages.
+     */
     void setNumberAverages(int iNumAvr);
 
     //=========================================================================================================
     /**
-    * Sets the state whether to stream smoothed or raw data
-    *
-    * @param[in] bStreamSmoothedData                 The new state.
-    */
+     * Sets the state whether to stream smoothed or raw data
+     *
+     * @param[in] bStreamSmoothedData                 The new state.
+     */
     void setStreamSmoothedData(bool bStreamSmoothedData);
 
     //=========================================================================================================
     /**
-    * Set the type of the colormap.
-    *
-    * @param[in] sColormapType          The new colormap type.
-    */
+     * Set the type of the colormap.
+     *
+     * @param[in] sColormapType          The new colormap type.
+     */
     void setColormapType(const QString& sColormapType);
 
     //=========================================================================================================
     /**
-    * Set the normalization value.
-    *
-    * @param[in] vecThresholds          The new threshold values used for normalizing the data.
-    */
+     * Set the normalization value.
+     *
+     * @param[in] vecThresholds          The new threshold values used for normalizing the data.
+     */
     void setThresholds(const QVector3D &vecThresholds);
     
     //=========================================================================================================
     /**
-    * Set the loop functionality on or off.
-    *
-    * @param[in] bLoopState                The new looping state.
-    */
+     * Set the loop functionality on or off.
+     *
+     * @param[in] bLoopState                The new looping state.
+     */
     void setLoopState(bool bLoopState);
 
     //=========================================================================================================
     /**
-    * Set the sampling frequency.
-    *
-    * @param[in] dSFreq                 The new sampling frequency.
-    */
+     * Set the sampling frequency.
+     *
+     * @param[in] dSFreq                 The new sampling frequency.
+     */
     void setSFreq(const double dSFreq);
 
     //=========================================================================================================
     /**
-    * Set the interpolation matrix for the left hemisphere.
-    *
-    * @param[in] pMatInterpolationMatrixLeft                 The new interpolation matrix.
-    */
+     * Set the interpolation matrix for the left hemisphere.
+     *
+     * @param[in] pMatInterpolationMatrixLeft                 The new interpolation matrix.
+     */
     void setInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeft);
 
     //=========================================================================================================
     /**
-    * Set the interpolation matrix for the right hemisphere.
-    *
-    * @param[in] pMatInterpolationMatrixRight                 The new interpolation matrix.
-    */
+     * Set the interpolation matrix for the right hemisphere.
+     *
+     * @param[in] pMatInterpolationMatrixRight                 The new interpolation matrix.
+     */
     void setInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRight);
 
     //=========================================================================================================
     /**
-    * Streams the data.
-    */
+     * Streams the data.
+     */
     void streamData();
 
 protected:
     //=========================================================================================================
     /**
-    * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
-    *
-    * @param[in] vecData                       The final values for each vertex of the surface
-    * @param[in,out] matFinalVertColor         The color matrix which the results are to be written to
-    * @param[in] dThresholdX                   Lower threshold for normalizing
-    * @param[in] dThresholdZ                   Upper threshold for normalizing
-    * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
-    * @param[in] sColorMap                     The color map to use
-    */
+     * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
+     *
+     * @param[in] vecData                       The final values for each vertex of the surface
+     * @param[in,out] matFinalVertColor         The color matrix which the results are to be written to
+     * @param[in] dThresholdX                   Lower threshold for normalizing
+     * @param[in] dThresholdZ                   Upper threshold for normalizing
+     * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
+     * @param[in] sColorMap                     The color map to use
+     */
     static void normalizeAndTransformToColor(const Eigen::VectorXf& vecData,
                                              Eigen::MatrixX4f &matFinalVertColor,
                                              double dThresholdX,
@@ -244,10 +244,10 @@ protected:
 
     //=========================================================================================================
     /**
-    * @brief generateColorsFromSensorValues     Produces the final color matrix that is to be emitted
-    *
-    * @param[in/out] visualizationInfoHemi      The needed visualization info
-    */
+     * @brief generateColorsFromSensorValues     Produces the final color matrix that is to be emitted
+     *
+     * @param[in/out] visualizationInfoHemi      The needed visualization info
+     */
     static void generateColorsFromSensorValues(VisualizationInfo &visualizationInfoHemi);
 
     QList<Eigen::VectorXd>                              m_lDataQ;                           /**< List that holds the matrix data <n_channels x n_samples>. */
@@ -268,21 +268,21 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever this item should stream new raw data to its listeners.
-    *
-    * @param[in] vecDataVectorLeftHemi          The new streamed raw data for the left hemispehre.
-    * @param[in] vecDataVectorRightHemi         The new streamed raw data for the right hemispehre.
-    */
+     * Emit this signal whenever this item should stream new raw data to its listeners.
+     *
+     * @param[in] vecDataVectorLeftHemi          The new streamed raw data for the left hemispehre.
+     * @param[in] vecDataVectorRightHemi         The new streamed raw data for the right hemispehre.
+     */
     void newRtRawData(const Eigen::VectorXd &vecDataVectorLeftHemi,
                       const Eigen::VectorXd &vecDataVectorRightHemi);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever this item should stream interpolated raw data to its listeners.
-    *
-    * @param[in] matColorMatrixLeftHemi          The new streamed interpolated raw data in form of RGB colors per vertex for the left hemisphere.
-    * @param[in] matColorMatrixRightHemi         The new streamed interpolated raw data in form of RGB colors per vertex for the right hemisphere.
-    */
+     * Emit this signal whenever this item should stream interpolated raw data to its listeners.
+     *
+     * @param[in] matColorMatrixLeftHemi          The new streamed interpolated raw data in form of RGB colors per vertex for the left hemisphere.
+     * @param[in] matColorMatrixRightHemi         The new streamed interpolated raw data in form of RGB colors per vertex for the right hemisphere.
+     */
     void newRtSmoothedData(const Eigen::MatrixX4f &matColorMatrixLeftHemi,
                            const Eigen::MatrixX4f &matColorMatrixRightHemi);
 };

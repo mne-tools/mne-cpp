@@ -101,125 +101,125 @@ class BABYMEGSHARED_EXPORT BabyMEGClient : public QThread
 public:
     //=========================================================================================================
     /**
-    * Constructs a BabyMEG.
-    */
+     * Constructs a BabyMEG.
+     */
     explicit BabyMEGClient(int myPort, QObject *parent = 0);
 
     ~BabyMEGClient();
 
     //=========================================================================================================
     /**
-    * Convert an integer (4 bytes) to a 4-byte array
-    *
-    * @param[in] a -- <int>.
-    * @param[out] Byte array
-    */
+     * Convert an integer (4 bytes) to a 4-byte array
+     *
+     * @param[in] a -- <int>.
+     * @param[out] Byte array
+     */
     QByteArray MGH_LM_Int2Byte(int a);
 
     //=========================================================================================================
     /**
-    * Convert a 4-byte array to an integer
-    *
-    * @param[in] InByte -- Byte array
-    * @param[out] <int>.
-    */
+     * Convert a 4-byte array to an integer
+     *
+     * @param[in] InByte -- Byte array
+     * @param[out] <int>.
+     */
     int MGH_LM_Byte2Int(QByteArray InByte);
 
     //=========================================================================================================
     /**
-    * Convert one 8-byte array to a double
-    *
-    * @param[in] InByte -- Byte array
-    * @param[out] <double>.
-    */
+     * Convert one 8-byte array to a double
+     *
+     * @param[in] InByte -- Byte array
+     * @param[out] <double>.
+     */
     double MGH_LM_Byte2Double(QByteArray InByte);
 
     //=========================================================================================================
     /**
-    * Hex display
-    *
-    * @param[in] a -- double number
-    */
+     * Hex display
+     *
+     * @param[in] a -- double number
+     */
     void HescDisplay(double a);
 
     //=========================================================================================================
     /**
-    * Set Head Info
-    *
-    * @param[in] pInfo -- struct of header information
-    */
+     * Set Head Info
+     *
+     * @param[in] pInfo -- struct of header information
+     */
     void SetInfo(QSharedPointer<BabyMEGInfo> pInfo);
 
     //=========================================================================================================
     /**
-    * Dispatch the data package
-    *
-    * @param[in] tmp -- block size
-    */
+     * Dispatch the data package
+     *
+     * @param[in] tmp -- block size
+     */
     void DispatchDataPackage(int tmp);
 
     //=========================================================================================================
     /**
-    * Read next data block
-    *
-    * @param[in] tmp -- block size
-    */
+     * Read next data block
+     *
+     * @param[in] tmp -- block size
+     */
     void ReadNextBlock(int tmp);
 
     //=========================================================================================================
     /**
-    * Send command with command format as string
-    *
-    * @param[in] s -- string
-    */
+     * Send command with command format as string
+     *
+     * @param[in] s -- string
+     */
     void SendCommand(QString s);
 
     //=========================================================================================================
     /**
-    * Handle the data buffer connecting to the TCP socket
-    *
-    * @param[in] void
-    */
+     * Handle the data buffer connecting to the TCP socket
+     *
+     * @param[in] void
+     */
     void handleBuffer();
 
     //=========================================================================================================
     /**
-    * Connect to BabyMEG server
-    *
-    * @param[in] void.
-    */
+     * Connect to BabyMEG server
+     *
+     * @param[in] void.
+     */
     void ConnectToBabyMEG();
 
     //=========================================================================================================
     /**
-    * DisConnect to BabyMEG server
-    *
-    * @param[in] void.
-    */
+     * DisConnect to BabyMEG server
+     *
+     * @param[in] void.
+     */
     void DisConnectBabyMEG();
 
     //=========================================================================================================
     /**
-    * Send Command to BabyMEG server
-    *
-    * @param[in] void.
-    */
+     * Send Command to BabyMEG server
+     *
+     * @param[in] void.
+     */
     void SendCommandToBabyMEG();
 
     //=========================================================================================================
     /**
-    * Read data from socket to a buffer
-    *
-    * @param[in] void.
-    */
+     * Read data from socket to a buffer
+     *
+     * @param[in] void.
+     */
     void ReadToBuffer();
 
     //=========================================================================================================
     /**
-    * Send Command to BabyMEG command server with short sync connection
-    *
-    * @param[in] String s - the string will be sent to server.
-    */
+     * Send Command to BabyMEG command server with short sync connection
+     *
+     * @param[in] String s - the string will be sent to server.
+     */
     void SendCommandToBabyMEGShortConnection(QByteArray s);
 
     void run();

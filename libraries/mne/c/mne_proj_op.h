@@ -97,23 +97,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Projection Operator
-    * Refactored: mne_new_proj_op (mne_lin_proj.c)
-    */
+     * Constructs the MNE Projection Operator
+     * Refactored: mne_new_proj_op (mne_lin_proj.c)
+     */
     MneProjOp();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Projection Operator
-    * Refactored: mne_free_proj_op (mne_lin_proj.c)
-    */
+     * Destroys the MNE Projection Operator
+     * Refactored: mne_free_proj_op (mne_lin_proj.c)
+     */
     ~MneProjOp();
 
     //=========================================================================================================
     /**
-    * Free Substructure; TODO: Remove later on
-    * Refactored: ne_free_proj_op_proj (mne_lin_proj.c)
-    */
+     * Free Substructure; TODO: Remove later on
+     * Refactored: ne_free_proj_op_proj (mne_lin_proj.c)
+     */
     static void mne_free_proj_op_proj(MneProjOp* op);
 
 

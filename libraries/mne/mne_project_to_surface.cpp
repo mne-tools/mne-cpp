@@ -287,8 +287,8 @@ bool MNEProjectToSurface::nearest_triangle_point(const Vector3f &r, const int tr
     bestp = p0;
     bestq = q0;
     /*
-    * Side 2 -> 3
-    */
+     * Side 2 -> 3
+     */
     t0 = ((a(tri)-c(tri))*(-p) + (b(tri)-c(tri))*q)/(a(tri)+b(tri)-2*c(tri));
     // Place the point in the corner if it is not on the side
     if (t0 < 0.0)
@@ -313,8 +313,8 @@ bool MNEProjectToSurface::nearest_triangle_point(const Vector3f &r, const int tr
         bestq = q0;
     }
     /*
-    * Side 1 -> 3
-    */
+     * Side 1 -> 3
+     */
     p0 = 0.0;
     q0 = q + (p * c(tri))/b(tri);
     // Place the point in the corner if it is not on the side

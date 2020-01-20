@@ -112,13 +112,13 @@ class RTPROCESINGSHARED_EXPORT RtHPISWorker : public QObject
 public:
     //=========================================================================================================
     /**
-    * Perform one single HPI fit.
-    *
-    * @param[in] matData            Data to estimate the HPI positions from
-    * @param[in] matProjectors      The projectors to apply. Bad channels are still included.
-    * @param[in] vFreqs             The frequencies for each coil.
-    * @param[in] pFiffInfo          Associated Fiff Information.
-    */
+     * Perform one single HPI fit.
+     *
+     * @param[in] matData            Data to estimate the HPI positions from
+     * @param[in] matProjectors      The projectors to apply. Bad channels are still included.
+     * @param[in] vFreqs             The frequencies for each coil.
+     * @param[in] pFiffInfo          Associated Fiff Information.
+     */
     void doWork(const Eigen::MatrixXd& matData,
                 const Eigen::MatrixXd& matProjectors,
                 const QVector<int>& vFreqs,
@@ -144,61 +144,61 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates the real-time HPIS estimation object.
-    *
-    * @param[in] p_pFiffInfo        Associated Fiff Information
-    * @param[in] parent     Parent QObject (optional)
-    */
+     * Creates the real-time HPIS estimation object.
+     *
+     * @param[in] p_pFiffInfo        Associated Fiff Information
+     * @param[in] parent     Parent QObject (optional)
+     */
     explicit RtHPIS(QSharedPointer<FIFFLIB::FiffInfo> p_pFiffInfo,
                     QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the Real-time HPI estimation object.
-    */
+     * Destroys the Real-time HPI estimation object.
+     */
     ~RtHPIS();    
 
     //=========================================================================================================
     /**
-    * Slot to receive incoming data.
-    *
-    * @param[in] data  Data to estimate the HPI positions from
-    */
+     * Slot to receive incoming data.
+     *
+     * @param[in] data  Data to estimate the HPI positions from
+     */
     void append(const Eigen::MatrixXd &data);
 
     //=========================================================================================================
     /**
-    * Set the coil frequencies.
-    *
-    * @param[in] vCoilFreqs  The coil frequencies.
-    */
+     * Set the coil frequencies.
+     *
+     * @param[in] vCoilFreqs  The coil frequencies.
+     */
     void setCoilFrequencies(const QVector<int>& vCoilFreqs);
 
     //=========================================================================================================
     /**
-    * Set the new projection matrix.
-    *
-    * @param[in] matProjectors  The new projection matrix.
-    */
+     * Set the new projection matrix.
+     *
+     * @param[in] matProjectors  The new projection matrix.
+     */
     void setProjectionMatrix(const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
     /**
-    * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
-    */
+     * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+     */
     void restart();
 
     //=========================================================================================================
     /**
-    * Stops the thread by interrupting its computation queue, quitting and waiting.
-    */
+     * Stops the thread by interrupting its computation queue, quitting and waiting.
+     */
     void stop();
 
 protected:
     //=========================================================================================================
     /**
-    * Handles the results.
-    */
+     * Handles the results.
+     */
     void handleResults(const FittingResult &fitResult);
 
     QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;           /**< Holds the fiff measurement information. */

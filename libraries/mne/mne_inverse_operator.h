@@ -173,30 +173,30 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
-    */
+     * Default constructor
+     */
     MNEInverseOperator();
 
     //=========================================================================================================
     /**
-    * Constructs an inverse operator, by reading from a IO device.
-    *
-    * @param[in] p_IODevice     IO device to read from the evoked data set.
-    */
+     * Constructs an inverse operator, by reading from a IO device.
+     *
+     * @param[in] p_IODevice     IO device to read from the evoked data set.
+     */
     MNEInverseOperator(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
-    * Constructs an inverse operator by making one.
-    *
-    * @param[in] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
-    * @param[in] forward            Forward operator.
-    * @param[in] p_noise_cov        The noise covariance matrix.
-    * @param[in] loose              float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
-    * @param[in] depth              float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.
-    * @param[in] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
-    * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
-    */
+     * Constructs an inverse operator by making one.
+     *
+     * @param[in] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
+     * @param[in] forward            Forward operator.
+     * @param[in] p_noise_cov        The noise covariance matrix.
+     * @param[in] loose              float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
+     * @param[in] depth              float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.
+     * @param[in] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
+     * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
+     */
     MNEInverseOperator(const FiffInfo &info,
                        const MNEForwardSolution& forward,
                        const FiffCov& p_noise_cov,
@@ -207,159 +207,159 @@ public:
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_MNEInverseOperator   MNE forward solution
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_MNEInverseOperator   MNE forward solution
+     */
     MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOperator);
 
     //=========================================================================================================
     /**
-    * Destroys the MNEInverseOperator.
-    */
+     * Destroys the MNEInverseOperator.
+     */
     ~MNEInverseOperator();
 
     //=========================================================================================================
     /**
-    * Simple matrix multiplication followed by combination of the
-    * current components
-    *
-    * This does all the data transformations to compute the weights for the
-    * eigenleads
-    *
-    * @param[in] label          labels.
-    * @param[in] method         The applied normals. ("MNE" | "dSPM" | "sLORETA")
-    * @param[in] pick_normal    Pick normals.
-    * @param[out] K             Kernel.
-    * @param[out] noise_norm    Noise normals.
-    * @param[out] vertno        Vertices of the hemispheres.
-    *
-    * @return the assembled kernel
-    */
+     * Simple matrix multiplication followed by combination of the
+     * current components
+     *
+     * This does all the data transformations to compute the weights for the
+     * eigenleads
+     *
+     * @param[in] label          labels.
+     * @param[in] method         The applied normals. ("MNE" | "dSPM" | "sLORETA")
+     * @param[in] pick_normal    Pick normals.
+     * @param[out] K             Kernel.
+     * @param[out] noise_norm    Noise normals.
+     * @param[out] vertno        Vertices of the hemispheres.
+     *
+     * @return the assembled kernel
+     */
     bool assemble_kernel(const Label &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno);
 
     //=========================================================================================================
     /**
-    * Check that channels in inverse operator are measurements.
-    *
-    * @param[in] info   The measurement info
-    *
-    * @return true when successful, false otherwise
-    */
+     * Check that channels in inverse operator are measurements.
+     *
+     * @param[in] info   The measurement info
+     *
+     * @return true when successful, false otherwise
+     */
     bool check_ch_names(const FiffInfo &info) const;
 
     //=========================================================================================================
     /**
-    * Clusters the current kernel
-    *
-    * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
-    * @param[in]    p_iClusterSize      Maximal cluster size per roi
-    * @param[out]   p_D                 The cluster operator
-    * @param[in]    p_sMethod           "cityblock" or "sqeuclidean"
-    *
-    * @return the clustered kernel
-    */
+     * Clusters the current kernel
+     *
+     * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
+     * @param[in]    p_iClusterSize      Maximal cluster size per roi
+     * @param[out]   p_D                 The cluster operator
+     * @param[in]    p_sMethod           "cityblock" or "sqeuclidean"
+     *
+     * @return the clustered kernel
+     */
     MatrixXd cluster_kernel(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, QString p_sMethod = "cityblock") const;
 
     //=========================================================================================================
     /**
-    * Returns the current kernel
-    *
-    * @return the current kernel
-    */
+     * Returns the current kernel
+     *
+     * @return the current kernel
+     */
     inline MatrixXd& getKernel();
 
     //=========================================================================================================
     /**
-    * Returns the current kernel
-    *
-    * @return the current kernel
-    */
+     * Returns the current kernel
+     *
+     * @return the current kernel
+     */
     inline MatrixXd getKernel() const;
 
     //=========================================================================================================
     /**
-    * Has inverse operator fixed orientation?
-    *
-    * @return true if inverse operator has fixed orientation, false otherwise
-    */
+     * Has inverse operator fixed orientation?
+     *
+     * @return true if inverse operator has fixed orientation, false otherwise
+     */
     inline bool isFixedOrient() const;
 
     //=========================================================================================================
     /**
-    * Assembles the inverse operator.
-    *
-    * @param[in] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
-    * @param[in] forward            Forward operator.
-    * @param[in] p_noise_cov        The noise covariance matrix.
-    * @param[in] loose              float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
-    * @param[in] depth              float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.
-    * @param[in] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
-    * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
-    *
-    * @return the assembled inverse operator
-    */
+     * Assembles the inverse operator.
+     *
+     * @param[in] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
+     * @param[in] forward            Forward operator.
+     * @param[in] p_noise_cov        The noise covariance matrix.
+     * @param[in] loose              float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
+     * @param[in] depth              float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.
+     * @param[in] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
+     * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
+     *
+     * @return the assembled inverse operator
+     */
     static MNEInverseOperator make_inverse_operator(const FiffInfo &info, MNEForwardSolution forward, const FiffCov& p_noise_cov, float loose = 0.2f, float depth = 0.8f, bool fixed = false, bool limit_depth_chs = true);
 
     //=========================================================================================================
     /**
-    * mne_prepare_inverse_operator
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Prepare for actually computing the inverse
-    *
-    * @param[in] nave      Number of averages (scales the noise covariance)
-    * @param[in] lambda2   The regularization factor
-    * @param[in] dSPM      Compute the noise-normalization factors for dSPM?
-    * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?
-    *
-    * @return the prepared inverse operator
-    */
+     * mne_prepare_inverse_operator
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Prepare for actually computing the inverse
+     *
+     * @param[in] nave      Number of averages (scales the noise covariance)
+     * @param[in] lambda2   The regularization factor
+     * @param[in] dSPM      Compute the noise-normalization factors for dSPM?
+     * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?
+     *
+     * @return the prepared inverse operator
+     */
     MNEInverseOperator prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false) const;
 
     //=========================================================================================================
     /**
-    * mne_read_inverse_operator
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Reads the inverse operator decomposition from a fif file
-    *
-    * @param [in] p_IODevice   A fiff IO device like a fiff QFile or QTCPSocket
-    * @param [out] inv          The read inverse operator
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * mne_read_inverse_operator
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Reads the inverse operator decomposition from a fif file
+     *
+     * @param [in] p_IODevice   A fiff IO device like a fiff QFile or QTCPSocket
+     * @param [out] inv          The read inverse operator
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool read_inverse_operator(QIODevice &p_IODevice, MNEInverseOperator& inv);
 
     //=========================================================================================================
     /**
-    * write_inverse_operator
-    *
-    * Writes an inverse operator to a fif file
-    *
-    * @param [in] p_IODevice   IO device to write the inverse operator to.
-    */
+     * write_inverse_operator
+     *
+     * Writes an inverse operator to a fif file
+     *
+     * @param [in] p_IODevice   IO device to write the inverse operator to.
+     */
     void write(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-    * Writes the inverse operator to a FIFF stream
-    *
-    * @param[in] p_pStream  The stream to write to.
-    */
+     * Writes the inverse operator to a FIFF stream
+     *
+     * @param[in] p_pStream  The stream to write to.
+     */
     void writeToStream(FiffStream* p_pStream);
 
     //=========================================================================================================
     /**
-    * overloading the stream out operator<<
-    *
-    * @param[in] out                    The stream to which the fiff covariance should be assigned to.
-    * @param[in] p_MNEInverseOperator   MNEInverseOperator which should be assigned to the stream.
-    *
-    * @return the stream with the attached fiff covariance matrix
-    */
+     * overloading the stream out operator<<
+     *
+     * @param[in] out                    The stream to which the fiff covariance should be assigned to.
+     * @param[in] p_MNEInverseOperator   MNEInverseOperator which should be assigned to the stream.
+     *
+     * @return the stream with the attached fiff covariance matrix
+     */
     friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEInverseOperator &p_MNEInverseOperator);
 
 public:

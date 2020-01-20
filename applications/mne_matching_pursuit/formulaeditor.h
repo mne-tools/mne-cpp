@@ -85,73 +85,73 @@ public:
 
     //========================================================================================================
     /**
-    * FormlaEditor_get_formula
-    *
-    * ### MP toolbox FormulaEditor function ###
-    *
-    * gets formula
-    *
-    * @return QString   formula
-    */
+     * FormlaEditor_get_formula
+     *
+     * ### MP toolbox FormulaEditor function ###
+     *
+     * gets formula
+     *
+     * @return QString   formula
+     */
     QString get_formula();
 
     //========================================================================================================
     /**
-    * FormlaEditor_strip_formula
-    *
-    * ### MP toolbox FormulaEditor function ###
-    *
-    * adapts formula for calculation
-    *
-    * @param QString    strformula
-    *
-    * @return void
-    */
+     * FormlaEditor_strip_formula
+     *
+     * ### MP toolbox FormulaEditor function ###
+     *
+     * adapts formula for calculation
+     *
+     * @param QString    strformula
+     *
+     * @return void
+     */
     void strip_formula(QString& strFormula);
 
     //========================================================================================================
     /**
-    * FormlaEditor_set_formula
-    *
-    * ### MP toolbox FormulaEditor function ###
-    *
-    * sets formula
-    *
-    * @param QString      Formula
-    *
-    * @return void
-    */
+     * FormlaEditor_set_formula
+     *
+     * ### MP toolbox FormulaEditor function ###
+     *
+     * sets formula
+     *
+     * @param QString      Formula
+     *
+     * @return void
+     */
     void set_formula(QString Formula);
 
     //========================================================================================================
     /**
-    * FormlaEditor_set_funct_const
-    *
-    * ### MP toolbox FormulaEditor function ###
-    *
-    * sets formula
-    *
-    * @param    int index       index of paramters
-    * @param    double val      value of paramters
-    *
-    * @return void
-    */
+     * FormlaEditor_set_funct_const
+     *
+     * ### MP toolbox FormulaEditor function ###
+     *
+     * sets formula
+     *
+     * @param    int index       index of paramters
+     * @param    double val      value of paramters
+     *
+     * @return void
+     */
     void set_funct_const(int index, double val);
 
     //========================================================================================================
     /**
-    * FormlaEditor_calculation
-    *
-    * ### MP toolbox FormulaEditor function ###
-    *
-    * calculation of function values
-    *
-    * @param    QString strFormula      formula
-    * @param    qreal xValue            value of paramters
-    * @param    bool strip              read in correct formula (true)
-    *
-    * @return   double calculation      function value
-    */
+     * FormlaEditor_calculation
+     *
+     * ### MP toolbox FormulaEditor function ###
+     *
+     * calculation of function values
+     *
+     * @param    QString strFormula      formula
+     * @param    qreal xValue            value of paramters
+     * @param    bool strip              read in correct formula (true)
+     *
+     * @return   double calculation      function value
+     */
     double calculation(QString strFormula, qreal xValue, bool strip  =true);
     //========================================================================================================
     

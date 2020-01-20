@@ -77,103 +77,103 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a CalcMetric object.
-    */
+     * Constructs a CalcMetric object.
+     */
     CalcMetric();
     //=========================================================================================================
     /**
-    * Handles new input data
-    *
-    * @param [in] input matrix containing the newest dataset.
-    */
+     * Handles new input data
+     *
+     * @param [in] input matrix containing the newest dataset.
+     */
     void setData(Eigen::MatrixXd input);
 
     //=========================================================================================================
     /**
-    * Handles calculation of measurements and multithreading.
-    *
-    * @param [in] input matrix containing the newest dataset.
-    * @param [in] dim embedding dimension of fuzzy entropy.
-    * @param [in] r width of fuzzy exponential function.
-    * @param [in] n step of fuzzy exponential function.
-    */
+     * Handles calculation of measurements and multithreading.
+     *
+     * @param [in] input matrix containing the newest dataset.
+     * @param [in] dim embedding dimension of fuzzy entropy.
+     * @param [in] r width of fuzzy exponential function.
+     * @param [in] n step of fuzzy exponential function.
+     */
     void calcAll(Eigen::MatrixXd input, int dim, double r, double n);
 
     //=========================================================================================================
     /**
-    * Calculates peak-to-peak-magnitude
-    *
-    */
+     * Calculates peak-to-peak-magnitude
+     *
+     */
     void calcP2P();
 
     //=========================================================================================================
     /**
-    * Calculates kurtosis
-    *
-    * @param [in] start index of the channel where calculation starts.
-    * @param [in] start index of the channel where calculation ends.
-    */
+     * Calculates kurtosis
+     *
+     * @param [in] start index of the channel where calculation starts.
+     * @param [in] start index of the channel where calculation ends.
+     */
     void calcKurtosis(int start, int end);
 
     //=========================================================================================================
     /**
-    * Called whenever a seizure is suspected to take place. Calculates the Fuzzy Entropy for every channel in the list.
-    *
-    * @param [in] dim embedding dimension of fuzzy entropy.
-    * @param [in] r width of fuzzy exponential function.
-    * @param [in] n step of fuzzy exponential function.
-    * @param [in] checkChs list of channels in which a seizure is suspected.
-    * @param [out] returns a matrix with the Fuzzy Entropy for all channels.
-    */
+     * Called whenever a seizure is suspected to take place. Calculates the Fuzzy Entropy for every channel in the list.
+     *
+     * @param [in] dim embedding dimension of fuzzy entropy.
+     * @param [in] r width of fuzzy exponential function.
+     * @param [in] n step of fuzzy exponential function.
+     * @param [in] checkChs list of channels in which a seizure is suspected.
+     * @param [out] returns a matrix with the Fuzzy Entropy for all channels.
+     */
     Eigen::VectorXd onSeizureDetection(int dim, double r, double n, QList<int> checkChs);
 
     //=========================================================================================================
     /**
-    * Returns the the value m_dvecKurtosis.
-    *
-    * @param [out] contains the current Kurtosis values.
-    */
+     * Returns the the value m_dvecKurtosis.
+     *
+     * @param [out] contains the current Kurtosis values.
+     */
     Eigen::VectorXd getKurtosis();
 
     //=========================================================================================================
     /**
-    * Returns the the value m_dvecP2P.
-    *
-    * @param [out] contains the current peak-to-peak-magnitude values.
-    */
+     * Returns the the value m_dvecP2P.
+     *
+     * @param [out] contains the current peak-to-peak-magnitude values.
+     */
     Eigen::VectorXd getP2P();
 
     //=========================================================================================================
     /**
-    * Returns the the value m_dvecFuzzyEn.
-    *
-    * @param [out] contains the current Fuzzy Entropy values.
-    */
+     * Returns the the value m_dvecFuzzyEn.
+     *
+     * @param [out] contains the current Fuzzy Entropy values.
+     */
     Eigen::VectorXd getFuzzyEn();
 
 
     //=========================================================================================================
     /**
-    * Returns the the value m_dvecKurtosisHistory.
-    *
-    * @param [out] contains Kurtosis value history.
-    */
+     * Returns the the value m_dvecKurtosisHistory.
+     *
+     * @param [out] contains Kurtosis value history.
+     */
     Eigen::MatrixXd getKurtosisHistory();
 
     //=========================================================================================================
     /**
-    * Returns the the value m_dvecP2PHistory.
-    *
-    * @param [out] contains the peak-to-peak-magnitude value history.
-    */
+     * Returns the the value m_dvecP2PHistory.
+     *
+     * @param [out] contains the peak-to-peak-magnitude value history.
+     */
     Eigen::MatrixXd getP2PHistory();
 
     //=========================================================================================================
     /**
-    * Returns the the value m_dvecFuzzyEnHistory.
-    *
-    * @param [out] contains the Fuzzy Entropy value history.
-    */
+     * Returns the the value m_dvecFuzzyEnHistory.
+     *
+     * @param [out] contains the Fuzzy Entropy value history.
+     */
     Eigen::MatrixXd getFuzzyEnHistory();
 
     bool                                    m_bHistoryReady;            /**< True if m_dvecFuzzyEnHistory has no undefined values.*/

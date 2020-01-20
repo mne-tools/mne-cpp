@@ -73,8 +73,8 @@ class TMSIImpedanceScene : public QGraphicsScene
 public:
     //=========================================================================================================
     /**
-    * Constructs a TMSIImpedanceScene.
-    */
+     * Constructs a TMSIImpedanceScene.
+     */
     explicit TMSIImpedanceScene(QGraphicsView* view, QObject *parent = 0);
 
 private:
@@ -84,26 +84,26 @@ private:
 
     //=========================================================================================================
     /**
-    * Reimplemented mouse press event handler.
-    */
+     * Reimplemented mouse press event handler.
+     */
     void mousePressEvent(QGraphicsSceneMouseEvent * event);
 
     //=========================================================================================================
     /**
-    * Reimplemented mouse move event handler.
-    */
+     * Reimplemented mouse move event handler.
+     */
     void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
 
     //=========================================================================================================
     /**
-    * Reimplemented mouse release event handler.
-    */
+     * Reimplemented mouse release event handler.
+     */
     void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
 
     //=========================================================================================================
     /**
-    * Updates position of all electrodes in the scene.
-    */
+     * Updates position of all electrodes in the scene.
+     */
     void scaleElectrodePositions(double scaleFactor);
 
 };

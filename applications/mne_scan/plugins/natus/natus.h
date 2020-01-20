@@ -114,50 +114,50 @@ class NATUSSHARED_EXPORT Natus : public SCSHAREDLIB::ISensor
 public:
     //=========================================================================================================
     /**
-    * Constructs a Natus.
-    */
+     * Constructs a Natus.
+     */
     Natus();
 
     //=========================================================================================================
     /**
-    * Destroys the Natus.
-    */
+     * Destroys the Natus.
+     */
     virtual ~Natus();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Sets up the fiff info with the current data chosen by the user.
-    */
+     * Sets up the fiff info with the current data chosen by the user.
+     */
     void setUpFiffInfo();
 
     //=========================================================================================================
     /**
-    * Starts the Natus by starting the tmsi's thread.
-    */
+     * Starts the Natus by starting the tmsi's thread.
+     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the Natus by stopping the tmsi's thread.
-    */
+     * Stops the Natus by stopping the tmsi's thread.
+     */
     virtual bool stop();
 
     virtual IPlugin::PluginType getType() const;
@@ -167,18 +167,18 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Call this function whenenver you received new data.
-    *
-    * @param [in] matData The new data.
-    */
+     * Call this function whenenver you received new data.
+     *
+     * @param [in] matData The new data.
+     */
     void onNewDataAvailable(const Eigen::MatrixXd &matData);
 
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
     int                     m_iSamplingFreq;                /**< The sampling frequency defined by the user via the GUI (in Hertz).*/

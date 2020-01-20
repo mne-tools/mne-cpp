@@ -83,84 +83,84 @@ class EventWindow : public QDockWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a EventWindow dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new EventWindow becomes a window. If parent is another widget, EventWindow becomes a child window inside parent. EventWindow is deleted when its parent is deleted.
-    */
+     * Constructs a EventWindow dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new EventWindow becomes a window. If parent is another widget, EventWindow becomes a child window inside parent. EventWindow is deleted when its parent is deleted.
+     */
     EventWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the EventWindow.
-    * All EventWindow's children are deleted first. The application exits if EventWindow is the main widget.
-    */
+     * Destroys the EventWindow.
+     * All EventWindow's children are deleted first. The application exits if EventWindow is the main widget.
+     */
     ~EventWindow();
 
     //=========================================================================================================
     /**
-    * Initialises this window.
-    */
+     * Initialises this window.
+     */
     void init();
 
     //=========================================================================================================
     /**
-    * Returns the QTableView of this window.
-    */
+     * Returns the QTableView of this window.
+     */
     QTableView* getEventTableView();
 
     //=========================================================================================================
     /**
-    * Returns the EventModel of this window
-    */
+     * Returns the EventModel of this window
+     */
     EventModel* getEventModel();
 
     //=========================================================================================================
     /**
-    * Returns the EventModel of this window
-    */
+     * Returns the EventModel of this window
+     */
     EventDelegate* getEventDelegate();
 
 private:
     //=========================================================================================================
     /**
-    * Setup the model view controller of the event window.
-    */
+     * Setup the model view controller of the event window.
+     */
     void initMVCSettings();
 
     //=========================================================================================================
     /**
-    * Inits all the QCheckBoxes of the event window.
-    */
+     * Inits all the QCheckBoxes of the event window.
+     */
     void initCheckBoxes();
 
     //=========================================================================================================
     /**
-    * Inits all the QCheckBoxes of the event window.
-    */
+     * Inits all the QCheckBoxes of the event window.
+     */
     void initComboBoxes();
 
     //=========================================================================================================
     /**
-    * Inits all the QCheckBoxes of the event window.
-    */
+     * Inits all the QCheckBoxes of the event window.
+     */
     void initToolButtons();
 
     //=========================================================================================================
     /**
-    * Inits all the QPushButtons of the event window.
-    */
+     * Inits all the QPushButtons of the event window.
+     */
     void initPushButtons();
 
     //=========================================================================================================
     /**
-    * Updates the event filter type combo box whenever a new event file was loaded
-    */
+     * Updates the event filter type combo box whenever a new event file was loaded
+     */
     void updateComboBox(const QString &currentEventType);
 
     //=========================================================================================================
     /**
-    * event reimplemented virtual function to handle events of the event dock window
-    */
+     * event reimplemented virtual function to handle events of the event dock window
+     */
     bool event(QEvent * event);
 
     Ui::EventWindowDockWidget *ui;                  /**< Pointer to the qt designer generated ui class.*/
@@ -177,29 +177,29 @@ private:
 protected slots:
     //=========================================================================================================
     /**
-    * jumpToEvent jumps to a event specified in the event table view
-    *
-    * @param [in] current model item focused in the view
-    * @param [in] previous model item focused in the view
-    */
+     * jumpToEvent jumps to a event specified in the event table view
+     *
+     * @param [in] current model item focused in the view
+     * @param [in] previous model item focused in the view
+     */
     void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
 
     //=========================================================================================================
     /**
-    * jumpToEvent jumps to a event specified in the event table view
-    */
+     * jumpToEvent jumps to a event specified in the event table view
+     */
     void removeEventfromEventModel();
 
     //=========================================================================================================
     /**
-    * Adds an event to the event model and its QTableView
-    */
+     * Adds an event to the event model and its QTableView
+     */
     void addEventToEventModel();
 
     //=========================================================================================================
     /**
-    * call this function whenever a new event type is to be added
-    */
+     * call this function whenever a new event type is to be added
+     */
     void addNewEventType();
 };
 

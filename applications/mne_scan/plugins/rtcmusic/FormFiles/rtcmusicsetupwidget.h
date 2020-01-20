@@ -91,62 +91,62 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtcMusicSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding RtcMusic.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtcMusicSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RtcMusicSetupWidget which is a child of parent.
+     *
+     * @param [in] toolbox a pointer to the corresponding RtcMusic.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new RtcMusicSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+     */
     RtcMusicSetupWidget(RtcMusic* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtcMusicSetupWidget.
-    * All RtcMusicSetupWidget's children are deleted first. The application exits if RtcMusicSetupWidget is the main widget.
-    */
+     * Destroys the RtcMusicSetupWidget.
+     * All RtcMusicSetupWidget's children are deleted first. The application exits if RtcMusicSetupWidget is the main widget.
+     */
     ~RtcMusicSetupWidget();
 
     //=========================================================================================================
     /**
-    * Adapts the UI to clustering state
-    */
+     * Adapts the UI to clustering state
+     */
     void setClusteringState();
 
     //=========================================================================================================
     /**
-    * Adapts the UI to setup state
-    */
+     * Adapts the UI to setup state
+     */
     void setSetupState();
 
 private:
 
     //=========================================================================================================
     /**
-    * Triggers th cluster process
-    */
+     * Triggers th cluster process
+     */
     void clusteringTriggered();
 
     //=========================================================================================================
     /**
-    * Shows the About Dialogs
-    */
+     * Shows the About Dialogs
+     */
     void showAboutDialog();
 
     //=========================================================================================================
     /**
-    * Shows forward solution selection dialog
-    */
+     * Shows forward solution selection dialog
+     */
     void showFwdFileDialog();
 
     //=========================================================================================================
     /**
-    * Shows atlas selection dialog
-    */
+     * Shows atlas selection dialog
+     */
     void showAtlasDirDialog();
 
     //=========================================================================================================
     /**
-    * Shows atlas selection dialog
-    */
+     * Shows atlas selection dialog
+     */
     void showSurfaceDirDialog();
 
 

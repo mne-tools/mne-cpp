@@ -74,37 +74,37 @@ class FilterPlotScene : public QGraphicsScene
 public:
     //=========================================================================================================
     /**
-    * Constructs a FilterPlotScene dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterPlotScene becomes a window. If parent is another widget, FilterPlotScene becomes a child window inside parent. FilterPlotScene is deleted when its parent is deleted.
-    */
+     * Constructs a FilterPlotScene dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new FilterPlotScene becomes a window. If parent is another widget, FilterPlotScene becomes a child window inside parent. FilterPlotScene is deleted when its parent is deleted.
+     */
     FilterPlotScene(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Updates the current filter.
-    *
-    * @param [in] operatorFilter pointer to the current filter operator which is to be plotted
-    * @param [in] samplingFreq holds the current sampling frequency
-    * @param [in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass
-    * @param [in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass
-    */
+     * Updates the current filter.
+     *
+     * @param [in] operatorFilter pointer to the current filter operator which is to be plotted
+     * @param [in] samplingFreq holds the current sampling frequency
+     * @param [in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass
+     * @param [in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass
+     */
     void updateFilter(QSharedPointer<MNEOperator> operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh);
 
 protected:
     //=========================================================================================================
     /**
-    * Draws the diagram to plot the magnitude.
-    *
-    * @param [in] holds the current sampling frequency
-    */
+     * Draws the diagram to plot the magnitude.
+     *
+     * @param [in] holds the current sampling frequency
+     */
     void plotMagnitudeDiagram(int samplingFreq);
 
     //=========================================================================================================
     /**
-    * Draws the filter's frequency response.
-    *
-    */
+     * Draws the filter's frequency response.
+     *
+     */
     void plotFilterFrequencyResponse();
 
     QSharedPointer<FilterOperator>      m_pCurrentFilter;       /**< Pointer to the filter operator */

@@ -100,111 +100,111 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
-    */
+     * Default constructor
+     */
     MNESourceEstimate();
 
     //=========================================================================================================
     /**
-    * Constructs a source estimation from given data
-    *
-    * @param[in] p_sol
-    * @param[in] p_vertices
-    * @param[in] p_tmin
-    * @param[in] p_tstep
-    */
+     * Constructs a source estimation from given data
+     *
+     * @param[in] p_sol
+     * @param[in] p_vertices
+     * @param[in] p_tmin
+     * @param[in] p_tstep
+     */
     MNESourceEstimate(const Eigen::MatrixXd &p_sol, const Eigen::VectorXi &p_vertices, float p_tmin, float p_tstep);
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_SourceEstimate    Source estimate data which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_SourceEstimate    Source estimate data which should be copied
+     */
     MNESourceEstimate(const MNESourceEstimate& p_SourceEstimate);
 
     //=========================================================================================================
     /**
-    * Constructs a source estimation, by reading from a IO device.
-    *
-    * @param[in] p_IODevice     IO device to read from the source estimation.
-    *
-    */
+     * Constructs a source estimation, by reading from a IO device.
+     *
+     * @param[in] p_IODevice     IO device to read from the source estimation.
+     *
+     */
     MNESourceEstimate(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-    * Initializes source estimate.
-    */
+     * Initializes source estimate.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Reduces the source estimate to selected samples.
-    *
-    * @param[in] start  The start index to cut the estimate from.
-    * @param[in] n      Number of samples to cut from start index.
-    */
+     * Reduces the source estimate to selected samples.
+     *
+     * @param[in] start  The start index to cut the estimate from.
+     * @param[in] n      Number of samples to cut from start index.
+     */
     MNESourceEstimate reduce(qint32 start, qint32 n);
 
     //=========================================================================================================
     /**
-    * mne_read_stc_file
-    *
-    * Reads a source estimate from a given file
-    *
-    * @param [in] p_IODevice    IO device to red the stc from.
-    * @param [out] p_stc        the read stc
-    *
-    * @return true if successful, false otherwise
-    */
+     * mne_read_stc_file
+     *
+     * Reads a source estimate from a given file
+     *
+     * @param [in] p_IODevice    IO device to red the stc from.
+     * @param [out] p_stc        the read stc
+     *
+     * @return true if successful, false otherwise
+     */
     static bool read(QIODevice &p_IODevice, MNESourceEstimate& p_stc);
 
     //=========================================================================================================
     /**
-    * mne_write_stc_file
-    *
-    * Writes a stc file
-    *
-    * @param [in] p_IODevice   IO device to write the stc to.
-    */
+     * mne_write_stc_file
+     *
+     * Writes a stc file
+     *
+     * @param [in] p_IODevice   IO device to write the stc to.
+     */
     bool write(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-    * Returns whether SourceEstimate is empty.
-    *
-    * @return true if is empty, false otherwise
-    */
+     * Returns whether SourceEstimate is empty.
+     *
+     * @return true if is empty, false otherwise
+     */
     inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
-    * Assignment Operator
-    *
-    * @param[in] rhs     SourceEstimate which should be assigned.
-    *
-    * @return the copied source estimate
-    */
+     * Assignment Operator
+     *
+     * @param[in] rhs     SourceEstimate which should be assigned.
+     *
+     * @return the copied source estimate
+     */
     MNESourceEstimate& operator= (const MNESourceEstimate &rhs);
 
     //=========================================================================================================
     /**
-    * Returns the number of samples.
-    *
-    * @return the number of samples
-    */
+     * Returns the number of samples.
+     *
+     * @return the number of samples
+     */
     int samples() const;
 
     //=========================================================================================================
     /**
-    * Returns the indices of sources in the data matrix based on their beloning label.
-    *
-    * @param[in] lPickedLabels      The labels base the selection on.
-    * @param[in] bIsClustered       Whether the source space was clustered.
-    *
-    * @return the indices
-    */
+     * Returns the indices of sources in the data matrix based on their beloning label.
+     *
+     * @param[in] lPickedLabels      The labels base the selection on.
+     * @param[in] bIsClustered       Whether the source space was clustered.
+     *
+     * @return the indices
+     */
     Eigen::VectorXi getIndicesByLabel(const QList<FSLIB::Label> &lPickedLabels, bool bIsClustered) const;
 
 public:
@@ -217,8 +217,8 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Update the times attribute after changing tmin, tmax, or tstep
-    */
+     * Update the times attribute after changing tmin, tmax, or tstep
+     */
     void update_times();
 };
 

@@ -92,16 +92,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Projection Item
-    * Refactored: mne_new_proj_op_item (mne_lin_proj.c)
-    */
+     * Constructs the MNE Projection Item
+     * Refactored: mne_new_proj_op_item (mne_lin_proj.c)
+     */
     MneProjItem();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Projection Item
-    * Refactored: mne_free_proj_op_item (mne_lin_proj.c)
-    */
+     * Destroys the MNE Projection Item
+     * Refactored: mne_free_proj_op_item (mne_lin_proj.c)
+     */
     ~MneProjItem();
 
 

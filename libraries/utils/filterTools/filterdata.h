@@ -123,17 +123,17 @@ public:
     FilterData();
 
     /**
-    * Constructs a FilterData object 
-    * @param [in] unique_name defines the name of the generated filter
-    * @param [in] type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
-    * @param [in] order represents the order of the filter, the higher the higher is the stopband attenuation
-    * @param [in] centerfreq determines the center of the frequency - normed to sFreq/2 (nyquist)
-    * @param [in] bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband - normed to sFreq/2 (nyquist)
-    * @param [in] parkswidth determines the width of the filter slopes (steepness) - normed to sFreq/2 (nyquist)
-    * @param [in] sFreq sampling frequency
-    * @param [in] fftlength length of the fft (multiple integer of 2^x)
-    * @param [in] designMethod specifies the design method to use. Choose between Cosind and Tschebyscheff
-    **/
+     * Constructs a FilterData object 
+     * @param [in] unique_name defines the name of the generated filter
+     * @param [in] type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
+     * @param [in] order represents the order of the filter, the higher the higher is the stopband attenuation
+     * @param [in] centerfreq determines the center of the frequency - normed to sFreq/2 (nyquist)
+     * @param [in] bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband - normed to sFreq/2 (nyquist)
+     * @param [in] parkswidth determines the width of the filter slopes (steepness) - normed to sFreq/2 (nyquist)
+     * @param [in] sFreq sampling frequency
+     * @param [in] fftlength length of the fft (multiple integer of 2^x)
+     * @param [in] designMethod specifies the design method to use. Choose between Cosind and Tschebyscheff
+     **/
 
     FilterData(QString unique_name,
                FilterType type,
@@ -156,24 +156,24 @@ public:
     void designFilter();
 
     /**
-    * Applies the current filter to the input data using convolution in time domain. Pro: Uses only past samples (real-time capable) Con: Might not be as ideal as acausal version (steepness etc.)
-    *
-    * @param [in] data holds the data to be filtered
-    * @param [in] keepOverhead whether the result should still include the overhead information in front and back of the data
-    *
-    * @return the filtered data in form of a RoVecotrXd
-    */
+     * Applies the current filter to the input data using convolution in time domain. Pro: Uses only past samples (real-time capable) Con: Might not be as ideal as acausal version (steepness etc.)
+     *
+     * @param [in] data holds the data to be filtered
+     * @param [in] keepOverhead whether the result should still include the overhead information in front and back of the data
+     *
+     * @return the filtered data in form of a RoVecotrXd
+     */
     RowVectorXd applyConvFilter(const RowVectorXd& data, bool keepOverhead = false, CompensateEdgeEffects compensateEdgeEffects = ZeroPad) const;
 
     /**
-    * Applies the current filter to the input data using multiplication in frequency domain. Pro: Fast, good filter parameters Con: Smears in error from future samples. Uses future samples (nor real time capable)
-    *
-    * @param [in] data holds the data to be filtered
-    * @param [in] keepOverhead whether the result should still include the overhead information in front and back of the data
-    * @param [in] compensateEdgeEffects defines how the edge effects should be handlted. Choose between ZeroPad and Mirroring
-    *
-    * @return the filtered data in form of a RoVecotrXd
-    */
+     * Applies the current filter to the input data using multiplication in frequency domain. Pro: Fast, good filter parameters Con: Smears in error from future samples. Uses future samples (nor real time capable)
+     *
+     * @param [in] data holds the data to be filtered
+     * @param [in] keepOverhead whether the result should still include the overhead information in front and back of the data
+     * @param [in] compensateEdgeEffects defines how the edge effects should be handlted. Choose between ZeroPad and Mirroring
+     *
+     * @return the filtered data in form of a RoVecotrXd
+     */
     RowVectorXd applyFFTFilter(const RowVectorXd& data,
                                bool keepOverhead = false,
                                CompensateEdgeEffects compensateEdgeEffects = MirrorData)

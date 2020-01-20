@@ -139,15 +139,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Surface or Volume
-    */
+     * Constructs the MNE Surface or Volume
+     */
     MneSurfaceOrVolume();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Surface or Volume description
-    * Refactored: mne_free_source_space (mne_source_space.c)
-    */
+     * Destroys the MNE Surface or Volume description
+     * Refactored: mne_free_source_space (mne_source_space.c)
+     */
     virtual ~MneSurfaceOrVolume();
 
 
@@ -445,13 +445,13 @@ public:
     int             id;            /* Surface id */
     int             coord_frame;   /* Which coordinate system are the data in now */
     /*
-    * These relate to the FreeSurfer way
-    */
+     * These relate to the FreeSurfer way
+     */
     MneVolGeom       *vol_geom;     /* MRI volume geometry information as FreeSurfer likes it */
     void             *mgh_tags;     /* Tags listed in the file */
     /*
-    * These are meaningful for both surfaces and volumes
-    */
+     * These are meaningful for both surfaces and volumes
+     */
     int              np;        /* Number of vertices */
     float            **rr;      /* The vertex locations */
     float            **nn;      /* Surface normals at these points */
@@ -465,8 +465,8 @@ public:
     int              *nneighbor_vert; /* Number of vertices neighboring each vertex */
     float            **vert_dist;     /* Distances between neigboring vertices */
     /*
-    * These are for surfaces only
-    */
+     * These are for surfaces only
+     */
     int              ntri;      /* Number of triangles */
     MneTriangle*     tris;      /* The triangulation information */
     int              **itris;   /* The vertex numbers */
@@ -489,8 +489,8 @@ public:
     float            *curv; /* The FreeSurfer curvature values */
     float            *val;  /* Some other values associated with the vertices */
     /*
-    * These are for volumes only
-    */
+     * These are for volumes only
+     */
     FIFFLIB::FiffCoordTransOld*  voxel_surf_RAS_t;   /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
     int             vol_dims[3];        /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
     float           voxel_size[3];      /* Derived from the above */
@@ -500,8 +500,8 @@ public:
     FIFFLIB::FiffCoordTransOld*  MRI_surf_RAS_RAS_t; /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
     int             MRI_vol_dims[3];       /* Dimensions of the MRI volume (width x height x depth) */
     /*
-    * Possibility to add user-defined data
-    */
+     * Possibility to add user-defined data
+     */
     void             *user_data;        /* Anything else we want */
     mneUserFreeFunc  user_data_free;    /* Function to set the above free */
 

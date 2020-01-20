@@ -93,28 +93,28 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the CTF software compensation data
-    */
+     * Constructs the CTF software compensation data
+     */
     FiffCtfComp();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffCtfComp   CTF software compensation data which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffCtfComp   CTF software compensation data which should be copied
+     */
     FiffCtfComp(const FiffCtfComp &p_FiffCtfComp);
 
     //=========================================================================================================
     /**
-    * Destroys the CTF software compensation data.
-    */
+     * Destroys the CTF software compensation data.
+     */
     ~FiffCtfComp();
 
     //=========================================================================================================
     /**
-    * Initializes the CTF software compensation data.
-    */
+     * Initializes the CTF software compensation data.
+     */
     void clear();
 
 public:

@@ -121,8 +121,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    */
+     * Reimplemented virtual functions
+     */
     virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
@@ -134,73 +134,73 @@ public:
 
     //=========================================================================================================
     /**
-    * Updates the fiff info
-    *
-    * @param fiffInfo fiff info variabel.
-    */
+     * Updates the fiff info
+     *
+     * @param fiffInfo fiff info variabel.
+     */
     void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
-    * Updates the fiff info
-    *
-    * @param assignedOperators the filter operators which are currently active.
-    */
+     * Updates the fiff info
+     *
+     * @param assignedOperators the filter operators which are currently active.
+     */
     void assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators);
 
     //=========================================================================================================
     /**
-    * Updates the layout map
-    *
-    * @param layoutMap the layout map with the 2D positions.
-    */
+     * Updates the layout map
+     *
+     * @param layoutMap the layout map with the 2D positions.
+     */
     void layoutChanged(const QMap<QString,QPointF> &layoutMap);
 
     //=========================================================================================================
     /**
-    * Updates the layout map
-    *
-    * @return the current mapped channel list
-    */
+     * Updates the layout map
+     *
+     * @return the current mapped channel list
+     */
     const QStringList & getMappedChannelsList();
 
     //=========================================================================================================
     /**
-    * Returns the model index for the given input channel fro mthe original channel list
-    *
-    * @param chName the channel name for which the model index is needed.
-    * @return the index number. if channel was not found in the data this functions returns -1
-    */
+     * Returns the model index for the given input channel fro mthe original channel list
+     *
+     * @param chName the channel name for which the model index is needed.
+     * @return the index number. if channel was not found in the data this functions returns -1
+     */
     int getIndexFromOrigChName(QString chName);
 
     //=========================================================================================================
     /**
-    * Returns the model index for the given input channel fro mthe mapped channel list
-    *
-    * @param chName the channel name for which the model index is needed.
-    * @return the index number. if channel was not found in the data this functions returns -1
-    */
+     * Returns the model index for the given input channel fro mthe mapped channel list
+     *
+     * @param chName the channel name for which the model index is needed.
+     * @return the index number. if channel was not found in the data this functions returns -1
+     */
     int getIndexFromMappedChName(QString chName);
 
     //=========================================================================================================
     /**
-    * Returns bad channel list.
-    *
-    * @return the bad channel list.
-    */
+     * Returns bad channel list.
+     *
+     * @return the bad channel list.
+     */
     QStringList getBadChannelList();
 
 protected:
     //=========================================================================================================
     /**
-    * clearModel clears all model's members
-    */
+     * clearModel clears all model's members
+     */
     void clearModel();
 
     //=========================================================================================================
     /**
-    * Maps the currently loaded channels to the loaded layout file
-    */
+     * Maps the currently loaded channels to the loaded layout file
+     */
     void mapLayoutToChannels();
 
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;            /**< The fiff info of the currently loaded fiff file. */
@@ -214,9 +214,9 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever channels where mapped to a layout
-    *
-    */
+     * Emit this signal whenever channels where mapped to a layout
+     *
+     */
     void channelsMappedToLayout(const QStringList &mappedLayoutChNames);
 };
 

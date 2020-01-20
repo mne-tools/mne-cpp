@@ -90,27 +90,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a AveragingSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding Averaging toolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new AveragingSetupWidget becomes a window. If parent is another widget, AveragingSetupWidget becomes a child window inside parent. AveragingSetupWidget is deleted when its parent is deleted.
-    */
+     * Constructs a AveragingSetupWidget which is a child of parent.
+     *
+     * @param [in] toolbox a pointer to the corresponding Averaging toolbox.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new AveragingSetupWidget becomes a window. If parent is another widget, AveragingSetupWidget becomes a child window inside parent. AveragingSetupWidget is deleted when its parent is deleted.
+     */
     AveragingSetupWidget(Averaging* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the AveragingSetupWidget.
-    * All AveragingSetupWidget's children are deleted first. The application exits if AveragingSetupWidget is the main widget.
-    */
+     * Destroys the AveragingSetupWidget.
+     * All AveragingSetupWidget's children are deleted first. The application exits if AveragingSetupWidget is the main widget.
+     */
     ~AveragingSetupWidget();
 
 
 private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
 private:

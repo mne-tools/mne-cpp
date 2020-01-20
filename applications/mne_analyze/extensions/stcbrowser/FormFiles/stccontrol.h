@@ -65,16 +65,16 @@ class STCControl : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs the STC Control.
-    *
-    * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
-    */
+     * Constructs the STC Control.
+     *
+     * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
+     */
     explicit STCControl(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the STC Control.
-    */
+     * Destroys the STC Control.
+     */
     ~STCControl();
 
 private:

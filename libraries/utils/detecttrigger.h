@@ -96,23 +96,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the DetectTrigger class.
-    */
+     * Destroys the DetectTrigger class.
+     */
     DetectTrigger();
 
     //=========================================================================================================
     /**
-    * detectTriggerFlanks detects flanks from a given data matrix in row wise order. This function uses a simple maxCoeff function implemented by eigen to locate the triggers.
-    *
-    * @param[in]        data  the data used to find the trigger flanks
-    * @param[in]        lTriggerChannels  The indeces of the trigger channels
-    * @param[in]        iOffsetIndex  the offset index gets added to the found trigger flank index
-    * @param[in]        dThreshold  the signal threshold value used to find the trigger flank
-    * @param[in]        bRemoveOffset  remove the first sample as offset
-    * @param[in]        iBurstLengthMs  The length in samples which is skipped after a trigger was found
-    *
-    * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggersand corresponding signal values are written to the value of the map.
-    */
+     * detectTriggerFlanks detects flanks from a given data matrix in row wise order. This function uses a simple maxCoeff function implemented by eigen to locate the triggers.
+     *
+     * @param[in]        data  the data used to find the trigger flanks
+     * @param[in]        lTriggerChannels  The indeces of the trigger channels
+     * @param[in]        iOffsetIndex  the offset index gets added to the found trigger flank index
+     * @param[in]        dThreshold  the signal threshold value used to find the trigger flank
+     * @param[in]        bRemoveOffset  remove the first sample as offset
+     * @param[in]        iBurstLengthMs  The length in samples which is skipped after a trigger was found
+     *
+     * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggersand corresponding signal values are written to the value of the map.
+     */
     static QMap<int, QList<QPair<int, double> > > detectTriggerFlanksMax(const MatrixXd &data,
                                                                          const QList<int>& lTriggerChannels,
                                                                          int iOffsetIndex,
@@ -122,17 +122,17 @@ public:
 
     //=========================================================================================================
     /**
-    * detectTriggerFlanks detects flanks from a given data matrix in row wise order. This function uses a simple maxCoeff function implemented by eigen to locate the triggers.
-    *
-    * @param[in]        data  the data used to find the trigger flanks
-    * @param[in]        iTriggerChannelIdx  the index of the trigger channel in the matrix.
-    * @param[in]        iOffsetIndex  the offset index gets added to the found trigger flank index
-    * @param[in]        dThreshold  the signal threshold value used to find the trigger flank
-    * @param[in]        bRemoveOffset  remove the first sample as offset
-    * @param[in]        iBurstLengthMs  The length in samples which is skipped after a trigger was found
-    *
-    * @param return     This list holds the found trigger indices and corresponding signal values.
-    */
+     * detectTriggerFlanks detects flanks from a given data matrix in row wise order. This function uses a simple maxCoeff function implemented by eigen to locate the triggers.
+     *
+     * @param[in]        data  the data used to find the trigger flanks
+     * @param[in]        iTriggerChannelIdx  the index of the trigger channel in the matrix.
+     * @param[in]        iOffsetIndex  the offset index gets added to the found trigger flank index
+     * @param[in]        dThreshold  the signal threshold value used to find the trigger flank
+     * @param[in]        bRemoveOffset  remove the first sample as offset
+     * @param[in]        iBurstLengthMs  The length in samples which is skipped after a trigger was found
+     *
+     * @param return     This list holds the found trigger indices and corresponding signal values.
+     */
     static QList<QPair<int,double> > detectTriggerFlanksMax(const MatrixXd &data,
                                                             int iTriggerChannelIdx,
                                                             int iOffsetIndex,
@@ -142,18 +142,18 @@ public:
 
     //=========================================================================================================
     /**
-    * detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order. This function uses a simple gradient to locate the triggers.
-    *
-    * @param[in]    data  the data used to find the trigger flanks
-    * @param[in]    lTriggerChannels  The indeces of the trigger channels
-    * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index
-    * @param[in]    iThreshold  the gradient threshold value used to find the trigger flank
-    * @param[in]    bRemoveOffset  remove the first sample as offset
-    * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input
-    * @param[in]    iBurstLengthMs  The length in samples which is skipped after a trigger was found
-    *
-    * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers and corresponding signal values are written to the value of the map.
-    */
+     * detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order. This function uses a simple gradient to locate the triggers.
+     *
+     * @param[in]    data  the data used to find the trigger flanks
+     * @param[in]    lTriggerChannels  The indeces of the trigger channels
+     * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index
+     * @param[in]    iThreshold  the gradient threshold value used to find the trigger flank
+     * @param[in]    bRemoveOffset  remove the first sample as offset
+     * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input
+     * @param[in]    iBurstLengthMs  The length in samples which is skipped after a trigger was found
+     *
+     * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers and corresponding signal values are written to the value of the map.
+     */
     static QMap<int,QList<QPair<int,double> > > detectTriggerFlanksGrad(const MatrixXd &data,
                                                                         const QList<int>& lTriggerChannels,
                                                                         int iOffsetIndex,
@@ -164,18 +164,18 @@ public:
 
     //=========================================================================================================
     /**
-    * detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order. This function uses a simple gradient to locate the triggers.
-    *
-    * @param[in]    data  the data used to find the trigger flanks
-    * @param[in]    iTriggerChannelIdx  the index of the trigger channel in the matrix.
-    * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index
-    * @param[in]    iThreshold  the gradient threshold value used to find the trigger flank
-    * @param[in]    bRemoveOffset  remove the first sample as offset
-    * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input
-    * @param[in]    iBurstLengthMs  The length in samples which is skipped after a trigger was found
-    *
-    * @param return     This list holds the found trigger indices and corresponding signal values.
-    */
+     * detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order. This function uses a simple gradient to locate the triggers.
+     *
+     * @param[in]    data  the data used to find the trigger flanks
+     * @param[in]    iTriggerChannelIdx  the index of the trigger channel in the matrix.
+     * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index
+     * @param[in]    iThreshold  the gradient threshold value used to find the trigger flank
+     * @param[in]    bRemoveOffset  remove the first sample as offset
+     * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input
+     * @param[in]    iBurstLengthMs  The length in samples which is skipped after a trigger was found
+     *
+     * @param return     This list holds the found trigger indices and corresponding signal values.
+     */
     static QList<QPair<int,double> > detectTriggerFlanksGrad(const MatrixXd &data,
                                                              int iTriggerChannelIdx,
                                                              int iOffsetIndex,

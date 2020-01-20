@@ -88,23 +88,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a CosineFilter object.
-    *
-    */
+     * Constructs a CosineFilter object.
+     *
+     */
     CosineFilter();
 
     //=========================================================================================================
     /**
-    * Constructs a CosineFilter object.
-    *
-    * @param fftLength length of the fft (multiple integer of 2^x)
-    * @param lowpass low cutoff frequency in Hz (not normed to sampling freq)
-    * @param lowpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
-    * @param highpass highpass high cutoff frequency in Hz (not normed to sampling freq)
-    * @param highpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
-    * @param sFreq sampling frequency
-    * @param type filter type (lowpass, highpass, etc.)
-    */
+     * Constructs a CosineFilter object.
+     *
+     * @param fftLength length of the fft (multiple integer of 2^x)
+     * @param lowpass low cutoff frequency in Hz (not normed to sampling freq)
+     * @param lowpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
+     * @param highpass highpass high cutoff frequency in Hz (not normed to sampling freq)
+     * @param highpass_width determines the width of the filter slopes (steepness) in Hz (not normed to sampling freq)
+     * @param sFreq sampling frequency
+     * @param type filter type (lowpass, highpass, etc.)
+     */
     CosineFilter(int fftLength, float lowpass, float lowpass_width, float highpass, float highpass_width, double sFreq, TPassType type);
 
     RowVectorXcd    m_dFFTCoeffA;   /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */

@@ -95,90 +95,90 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a KMeans algorithm object.
-    *
-    * @param[in] distance   (optional) K-Means distance measure: "sqeuclidean" (default), "cityblock" , "cosine", "correlation", "hamming"
-    * @param[in] start      (optional) Cluster initialization: "sample" (default), "uniform", "cluster"
-    * @param[in] replicates (optional) Number of K-Means replicates, which are generated. Best is returned.
-    * @param[in] emptyact   (optional) What happens if a cluster wents empty: "error" (default), "drop", "singleton"
-    * @param[in] online     (optional) If centroids should be updated during iterations: true (default), false
-    * @param[in] maxit      (optional) maximal number of iterations per replicate; 100 by default
-    */
+     * Constructs a KMeans algorithm object.
+     *
+     * @param[in] distance   (optional) K-Means distance measure: "sqeuclidean" (default), "cityblock" , "cosine", "correlation", "hamming"
+     * @param[in] start      (optional) Cluster initialization: "sample" (default), "uniform", "cluster"
+     * @param[in] replicates (optional) Number of K-Means replicates, which are generated. Best is returned.
+     * @param[in] emptyact   (optional) What happens if a cluster wents empty: "error" (default), "drop", "singleton"
+     * @param[in] online     (optional) If centroids should be updated during iterations: true (default), false
+     * @param[in] maxit      (optional) maximal number of iterations per replicate; 100 by default
+     */
     explicit KMeans(QString distance = QString("sqeuclidean") , QString start = QString("sample"), qint32 replicates = 1, QString emptyact = QString("error"), bool online = true, qint32 maxit = 100);
 
     //=========================================================================================================
     /**
-    * Clusters input data X
-    *
-    * @param[in] X          Input data (rows = points; cols = p dimensional space)
-    * @param[in] kClusters  Number of k clusters
-    * @param[out] idx       The cluster indeces to which cluster the input points belong to
-    * @param[out] C         Cluster centroids k x p
-    * @param[out] sumD      Summation of the distances to the centroid within one cluster
-    * @param[out] D         Cluster distances to the centroid
-    */
+     * Clusters input data X
+     *
+     * @param[in] X          Input data (rows = points; cols = p dimensional space)
+     * @param[in] kClusters  Number of k clusters
+     * @param[out] idx       The cluster indeces to which cluster the input points belong to
+     * @param[out] C         Cluster centroids k x p
+     * @param[out] sumD      Summation of the distances to the centroid within one cluster
+     * @param[out] D         Cluster distances to the centroid
+     */
     bool calculate( MatrixXd X, qint32 kClusters, VectorXi& idx, MatrixXd& C, VectorXd& sumD, MatrixXd& D);
 
 
 private:
     //=========================================================================================================
     /**
-    * Calculate point to cluster centroid distances.
-    *
-    * @param[in] X  Input data (rows = points; cols = p dimensional space)
-    * @param[in] C  Cluster centroids
-    *
-    * @return Cluster centroid distances
-    */
+     * Calculate point to cluster centroid distances.
+     *
+     * @param[in] X  Input data (rows = points; cols = p dimensional space)
+     * @param[in] C  Cluster centroids
+     *
+     * @return Cluster centroid distances
+     */
     MatrixXd distfun(const MatrixXd& X, MatrixXd& C);//, qint32 iter);
 
     //=========================================================================================================
     /**
-    * Updates clusters when points moved
-    *
-    * @param[in] X          Input data
-    * @param[in, out] C     Cluster centroids
-    * @param[in, out] idx   The cluster indeces to which cluster the input points belong to
-    *
-    * @return true if converged, false otherwise
-    */
+     * Updates clusters when points moved
+     *
+     * @param[in] X          Input data
+     * @param[in, out] C     Cluster centroids
+     * @param[in, out] idx   The cluster indeces to which cluster the input points belong to
+     *
+     * @return true if converged, false otherwise
+     */
     bool batchUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx);
 
     //=========================================================================================================
     /**
-    * Centroids and counts stratified by group.
-    *
-    * @param[in] X          Input data
-    * @param[in] index      The cluster indeces to which cluster the input points belong to
-    * @param[in] clusts     Cluster indeces
-    * @param[out] centroids The new centroids
-    * @param[out] counts    Number of points belonging to the new centroids
-    */
+     * Centroids and counts stratified by group.
+     *
+     * @param[in] X          Input data
+     * @param[in] index      The cluster indeces to which cluster the input points belong to
+     * @param[in] clusts     Cluster indeces
+     * @param[out] centroids The new centroids
+     * @param[out] counts    Number of points belonging to the new centroids
+     */
     void gcentroids(const MatrixXd& X, const VectorXi& index, const VectorXi& clusts,
                                         MatrixXd& centroids, VectorXi& counts);
 
     //=========================================================================================================
     /**
-    * Centroids and counts stratified by group.
-    *
-    * @param[in] X          Input data
-    * @param[out] C         The new centroids
-    * @param[out] idx       The new indeces
-    *
-    * @return true if converged, false otherwise
-    */
+     * Centroids and counts stratified by group.
+     *
+     * @param[in] X          Input data
+     * @param[out] C         The new centroids
+     * @param[out] idx       The new indeces
+     *
+     * @return true if converged, false otherwise
+     */
     bool onlineUpdate(const MatrixXd& X, MatrixXd& C,  VectorXi& idx);
 
 
     //=========================================================================================================
     /**
-    * Uniform random generator in the intervall [a, b]
-    *
-    * @param[in] a      lower boundary
-    * @param[in] b      upper boundary
-    *
-    * @return random number
-    */
+     * Uniform random generator in the intervall [a, b]
+     *
+     * @param[in] a      lower boundary
+     * @param[in] b      upper boundary
+     *
+     * @return random number
+     */
     double unifrnd(double a, double b);
 
 

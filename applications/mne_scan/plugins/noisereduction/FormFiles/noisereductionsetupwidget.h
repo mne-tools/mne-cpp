@@ -86,27 +86,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a NoiseReductionSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding NoiseReduction.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseReductionSetupWidget becomes a window. If parent is another widget, NoiseReductionSetupWidget becomes a child window inside parent. NoiseReductionSetupWidget is deleted when its parent is deleted.
-    */
+     * Constructs a NoiseReductionSetupWidget which is a child of parent.
+     *
+     * @param [in] toolbox a pointer to the corresponding NoiseReduction.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseReductionSetupWidget becomes a window. If parent is another widget, NoiseReductionSetupWidget becomes a child window inside parent. NoiseReductionSetupWidget is deleted when its parent is deleted.
+     */
     NoiseReductionSetupWidget(NoiseReduction* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the NoiseReductionSetupWidget.
-    * All NoiseReductionSetupWidget's children are deleted first. The application exits if NoiseReductionSetupWidget is the main widget.
-    */
+     * Destroys the NoiseReductionSetupWidget.
+     * All NoiseReductionSetupWidget's children are deleted first. The application exits if NoiseReductionSetupWidget is the main widget.
+     */
     ~NoiseReductionSetupWidget();
 
 
 private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
 private:

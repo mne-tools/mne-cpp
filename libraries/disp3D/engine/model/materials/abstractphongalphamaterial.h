@@ -104,68 +104,68 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructs a AbstractPhongAlphaMaterial object.
-    *
-    * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
-    * @param[in] parent             The parent of this object.
-    */
+     * Default constructs a AbstractPhongAlphaMaterial object.
+     *
+     * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
+     * @param[in] parent             The parent of this object.
+     */
     explicit AbstractPhongAlphaMaterial(bool bUseSortPolicy, QNode *parent);
 
     //=========================================================================================================
     /**
-    * The virtual default destructor.
-    */
+     * The virtual default destructor.
+     */
     virtual ~AbstractPhongAlphaMaterial() = default;
 
     //=========================================================================================================
     /**
-    * Get the current alpha value.
-    *
-    * @return   The current alpha value.
-    */
+     * Get the current alpha value.
+     *
+     * @return   The current alpha value.
+     */
     virtual float alpha() const;
 
     //=========================================================================================================
     /**
-    * Set the current alpha value.
-    *
-    * @param[in] fAlpha      The new alpha value.
-    */
+     * Set the current alpha value.
+     *
+     * @param[in] fAlpha      The new alpha value.
+     */
     virtual void setAlpha(float fAlpha);
 
 protected:
 
     //=========================================================================================================
     /**
-    * Inits the OpenGL 3.3, 2.0, ES2.0 techniques and add phong alpha parameters.
-    * This functions needs to be overridden for other techniques.
-    */
+     * Inits the OpenGL 3.3, 2.0, ES2.0 techniques and add phong alpha parameters.
+     * This functions needs to be overridden for other techniques.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * This abstract function should be used by the derived class to set the appropriate shader code.
-    * The implemented function has to be called by the derived class.
-    */
+     * This abstract function should be used by the derived class to set the appropriate shader code.
+     * The implemented function has to be called by the derived class.
+     */
     virtual void setShaderCode() = 0;
 
     //=========================================================================================================
     /**
-    * This function searches the children of this item for a QRenderPass with matching name
-    * and sets the given shader program.
-    *
-    * @param[in] sObjectName         The object name of the render pass.
-    * @param[in] pShaderProgramm     The shader programm. Passing a nullptr is not allowed.
-    */
+     * This function searches the children of this item for a QRenderPass with matching name
+     * and sets the given shader program.
+     *
+     * @param[in] sObjectName         The object name of the render pass.
+     * @param[in] pShaderProgramm     The shader programm. Passing a nullptr is not allowed.
+     */
     virtual void addShaderToRenderPass(const QString &sObjectName, Qt3DRender::QShaderProgram *pShaderProgramm);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the alpha value is changed.
-    * It handles the change between opaque and transparent depending on the new alpha.
-    *
-    * @param[in] fAlpha         The new alpha value.
-    */
+     * This function gets called whenever the alpha value is changed.
+     * It handles the change between opaque and transparent depending on the new alpha.
+     *
+     * @param[in] fAlpha         The new alpha value.
+     */
     virtual void onAlphaChanged(const QVariant &fAlpha);
 
     QPointer<Qt3DRender::QEffect>           m_pEffect;                  /**< Material Effect. */

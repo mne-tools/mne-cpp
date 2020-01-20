@@ -84,17 +84,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Forward BEM Solution
-    * Refactored: fwd_bem_new_coil_solution (fwd_bem_model.c)
-    *
-    */
+     * Constructs the Forward BEM Solution
+     * Refactored: fwd_bem_new_coil_solution (fwd_bem_model.c)
+     *
+     */
     FwdBemSolution();
 
     //=========================================================================================================
     /**
-    * Destroys the Forward BEM Solution
-    * Refactored: fwd_bem_free_coil_solution (fwd_bem_model.c)
-    */
+     * Destroys the Forward BEM Solution
+     * Refactored: fwd_bem_free_coil_solution (fwd_bem_model.c)
+     */
     ~FwdBemSolution();
 
     //============================= fwd_bem_model.c =============================

@@ -111,45 +111,45 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeConnectivityEstimateWidget which is a child of parent.
-    *
-    * @param [in] pRTCE     pointer to real-time connectivity estimate.
-    * @param [in] parent    pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RealTimeConnectivityEstimateWidget which is a child of parent.
+     *
+     * @param [in] pRTCE     pointer to real-time connectivity estimate.
+     * @param [in] parent    pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+     */
     RealTimeConnectivityEstimateWidget(QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate> &pRTCE,
                                        QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeConnectivityEstimateWidget.
-    */
+     * Destroys the RealTimeConnectivityEstimateWidget.
+     */
     ~RealTimeConnectivityEstimateWidget();
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    */
+     * Is called when new data are available.
+     */
     virtual void getData();
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    *
-    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
-    */
+     * Is called when new data are available.
+     *
+     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+     */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeConnectivityEstimateWidget.
-    */
+     * Initialise the RealTimeConnectivityEstimateWidget.
+     */
     virtual void init();
 
 protected:
     //=========================================================================================================
     /**
-    * Shows quick control view
-    */
+     * Shows quick control view
+     */
     void showQuickControlView();
 
     QSharedPointer<SCMEASLIB::RealTimeConnectivityEstimate>     m_pRTCE;                /**< The real-time source estimate measurement. */

@@ -114,69 +114,69 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates the real-time covariance estimation object.
-    *
-    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
-    * @param[in] p_pFiffInfo        Associated Fiff Information
-    * @param[in] parent     Parent QObject (optional)
-    */
+     * Creates the real-time covariance estimation object.
+     *
+     * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
+     * @param[in] p_pFiffInfo        Associated Fiff Information
+     * @param[in] parent     Parent QObject (optional)
+     */
     explicit RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, qint32 p_dataLen, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the Real-time noise estimation object.
-    */
+     * Destroys the Real-time noise estimation object.
+     */
     ~RtNoise();
 
     //=========================================================================================================
     /**
-    * Slot to receive incoming data.
-    *
-    * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
-    */
+     * Slot to receive incoming data.
+     *
+     * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
+     */
     void append(const MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
-    * Returns true if is running, otherwise false.
-    *
-    * @return true if is running, false otherwise
-    */
+     * Returns true if is running, otherwise false.
+     *
+     * @return true if is running, false otherwise
+     */
     inline bool isRunning();
 
 
     //=========================================================================================================
     /**
-    * Starts the RtNoise by starting the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * Starts the RtNoise by starting the producer's thread.
+     *
+     * @return true if succeeded, false otherwise
+     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the RtNoise by stopping the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * Stops the RtNoise by stopping the producer's thread.
+     *
+     * @return true if succeeded, false otherwise
+     */
     virtual bool stop();
 
 signals:
     //=========================================================================================================
     /**
-    * Signal which is emitted when a new data Matrix is estimated.
-    *
-    * @param[out]
-    */
+     * Signal which is emitted when a new data Matrix is estimated.
+     *
+     * @param[out]
+     */
     void SpecCalculated(Eigen::MatrixXd);
 
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
     QVector <float> hanning(int N, short itype);

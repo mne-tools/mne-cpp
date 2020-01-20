@@ -97,117 +97,117 @@ public:
 
     //=========================================================================================================
     /**
-    * Receive one tag from the data server.
-    *
-    * This routine reads a message from the data server
-    * socket and grabs the data. The data may actually
-    * be in a shared memory segment noted in the message.
-    *
-    * The id parameter is needed for two purposes. The
-    * data transfer mechanism varies depending on the client
-    * number. Clients with id above 10000 use shared memory
-    * transfer while other used a regular file to transfer the
-    * data.It is needed also if the conndedtion needs to be
-    * closed after an error.
-    *
-    * Ported from client_socket.c
-    *
-    * @param[in] p_pTag ToDo
-    *
-    * \return Status OK or FAIL.
-    */
+     * Receive one tag from the data server.
+     *
+     * This routine reads a message from the data server
+     * socket and grabs the data. The data may actually
+     * be in a shared memory segment noted in the message.
+     *
+     * The id parameter is needed for two purposes. The
+     * data transfer mechanism varies depending on the client
+     * number. Clients with id above 10000 use shared memory
+     * transfer while other used a regular file to transfer the
+     * data.It is needed also if the conndedtion needs to be
+     * closed after an error.
+     *
+     * Ported from client_socket.c
+     *
+     * @param[in] p_pTag ToDo
+     *
+     * \return Status OK or FAIL.
+     */
     int receive_tag (QSharedPointer<FIFFLIB::FiffTag>& p_pTag);
 
     //ToDo Connect is different? to: telnet localhost collector ???
     //=========================================================================================================
     /**
-    * Connect to the data server process
-    *
-    * @return
-    */
+     * Connect to the data server process
+     *
+     * @return
+     */
     bool connect_client ();
 
     //=========================================================================================================
     /**
-    * Disconnect from the data server process
-    *
-    * @return
-    */
+     * Disconnect from the data server process
+     *
+     * @return
+     */
     int disconnect_client ();
 
     //=========================================================================================================
     /*
-    * Select tags that we are not interested in!
-    *
-    */
+     * Select tags that we are not interested in!
+     *
+     */
     void set_data_filter (int *kinds, int nkind);
 
     //=========================================================================================================
     /**
-    *
-    * @return
-    */
+     *
+     * @return
+     */
     void close_socket ();
 
     //=========================================================================================================
     /**
-    *
-    * @return
-    */
+     *
+     * @return
+     */
     int connect_disconnect (int sock,int id);
 
     //=========================================================================================================
     /**
-    * Filter out some large data blocks
-    * which are not of interest
-    *
-    * @return
-    */
+     * Filter out some large data blocks
+     * which are not of interest
+     *
+     * @return
+     */
     int interesting_data (int kind);
 
 private:
     //Ported from shmem.c
     //=========================================================================================================
     /**
-    *
-    * @return
-    */
+     *
+     * @return
+     */
     dacqShmBlock get_shmem();
 
     //=========================================================================================================
     /**
-    * Initialize data acquisition shared memory segment
-    *
-    * @return
-    */
+     * Initialize data acquisition shared memory segment
+     *
+     * @return
+     */
     int init_shmem();
 
     //=========================================================================================================
     /**
-    * Release the shared memory
-    *
-    * @return
-    */
+     * Release the shared memory
+     *
+     * @return
+     */
     int release_shmem();
 
     //=========================================================================================================
     /**
-    *
-    * @return
-    */
+     *
+     * @return
+     */
     FILE* open_fif (char *name);
 
     //=========================================================================================================
     /**
-    *
-    *
-    * @param[in] fd     File to read from
-    * @param[in] pos    Position in file
-    * @param[in] size   How long
-    * @param[in] data   Put data here
-    *
-    * @return
-    */
+     *
+     *
+     * @param[in] fd     File to read from
+     * @param[in] pos    Position in file
+     * @param[in] size   How long
+     * @param[in] data   Put data here
+     *
+     * @return
+     */
     int read_fif (FILE *fd, long pos, size_t size, char *data);
 
 private:

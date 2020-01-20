@@ -91,21 +91,21 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ReferenceToolbarWidget.
-    */
+     * Constructs a ReferenceToolbarWidget.
+     */
     explicit ReferenceToolbarWidget(REFERENCEPLUGIN::Reference *pRef, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ReferenceToolbarWidget.
-    */
+     * Destroys the ReferenceToolbarWidget.
+     */
     ~ReferenceToolbarWidget();
 
 public slots:
     //=========================================================================================================
     /**
-    * updates the channels and sets them to the QListWidget
-    */
+     * updates the channels and sets them to the QListWidget
+     */
     void updateChannels(FIFFLIB::FiffInfo::SPtr &pFiffInfo);
 
 private:

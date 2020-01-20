@@ -78,80 +78,80 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] parent             Parent QObject (optional)
-    */
+     * Default constructor.
+     *
+     * @param[in] parent             Parent QObject (optional)
+     */
     explicit RawCommand(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructor which parses a command stored in a json object
-    *
-    * @param[in] p_sCommand         Command
-    * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
-    * @param[in] parent             Parent QObject (optional)
-    */
+     * Constructor which parses a command stored in a json object
+     *
+     * @param[in] p_sCommand         Command
+     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
+     * @param[in] parent             Parent QObject (optional)
+     */
     explicit RawCommand(const QString &p_sCommand, bool p_bIsJson = true, QObject *parent = 0);
 
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_rawCommand   RawCommand which should be copied.
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_rawCommand   RawCommand which should be copied.
+     */
     explicit RawCommand(const RawCommand &p_rawCommand);
 
     //=========================================================================================================
     /**
-    * Command name
-    *
-    * @return short command representation.
-    */
+     * Command name
+     *
+     * @return short command representation.
+     */
     inline QString command() const;
 
     //=========================================================================================================
     /**
-    * Returns the number of parameters.
-    *
-    * @return number of parameters.
-    */
+     * Returns the number of parameters.
+     *
+     * @return number of parameters.
+     */
     inline quint32 count() const;
 
     virtual void execute();
 
     //=========================================================================================================
     /**
-    * Returns whether the received command was in Json format.
-    *
-    * @return true if received command was in Json format, false otherwise.
-    */
+     * Returns whether the received command was in Json format.
+     *
+     * @return true if received command was in Json format, false otherwise.
+     */
     inline bool isJson() const;
 
     //=========================================================================================================
     /**
-    * Returns parameter values
-    *
-    * @return parameter values
-    */
+     * Returns parameter values
+     *
+     * @return parameter values
+     */
     inline QList<QString>& pValues();
 
     //=========================================================================================================
     /**
-    * Assignment Operator
-    *
-    * @param[in] rhs    RawCommand which should be assigned.
-    */
+     * Assignment Operator
+     *
+     * @param[in] rhs    RawCommand which should be assigned.
+     */
     RawCommand& operator= (const RawCommand &rhs);
 
 signals:
     //=========================================================================================================
     /**
-    * Signal which is emitted when command patterns execute method is processed.
-    *
-    * @param[in] p_qListParameters    Parameter List.
-    */
+     * Signal which is emitted when command patterns execute method is processed.
+     *
+     * @param[in] p_qListParameters    Parameter List.
+     */
     void executed(QList<QString> p_qListParameters);
 
 private:

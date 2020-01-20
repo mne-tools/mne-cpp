@@ -94,26 +94,26 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a SelectionScene.
-    */
+     * Constructs a SelectionScene.
+     */
     explicit SelectionScene(QGraphicsView* view, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Updates layout data.
-    *
-    * @param [in] layoutMap layout data map.
-    * @param [in] bad channel list.
-    */
+     * Updates layout data.
+     *
+     * @param [in] layoutMap layout data map.
+     * @param [in] bad channel list.
+     */
     void repaintItems(const QMap<QString, QPointF> &layoutMap,
                       QStringList badChannels);
 
     //=========================================================================================================
     /**
-    * Hides all items described in list.
-    *
-    * @param [in] list string list with items name which are to be hidden.
-    */
+     * Hides all items described in list.
+     *
+     * @param [in] list string list with items name which are to be hidden.
+     */
     void hideItems(QStringList visibleItems);
 
     int         m_iChannelTypeMode;     /**< The channel type mode. */

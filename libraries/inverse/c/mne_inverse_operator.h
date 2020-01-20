@@ -109,16 +109,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Inverse Operator
-    * Refactored:  (.c)
-    */
+     * Constructs the MNE Inverse Operator
+     * Refactored:  (.c)
+     */
     MneInverseOperator();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Inverse Operator
-    * Refactored:  (.c)
-    */
+     * Destroys the MNE Inverse Operator
+     * Refactored:  (.c)
+     */
     ~MneInverseOperator();
 
 public:

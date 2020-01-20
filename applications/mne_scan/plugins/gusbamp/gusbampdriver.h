@@ -89,8 +89,8 @@ class GUSBAMPSHARED_EXPORT GUSBAmpDriver
 private:
     //=========================================================================================================
     /**
-    * Refreshes the size-values of the ouput Matrix
-    */
+     * Refreshes the size-values of the ouput Matrix
+     */
     void refreshSizeOutputMatrix(void);
 
     //device parameters
@@ -126,108 +126,108 @@ private:
 public:
     //=========================================================================================================
     /**
-    * Constructs a GUSBAmpDriver.
-    *
-    * @param [in]   pGUSBAmpProducer a pointer to the corresponding GUSBAmp Producer class.
-    */
+     * Constructs a GUSBAmpDriver.
+     *
+     * @param [in]   pGUSBAmpProducer a pointer to the corresponding GUSBAmp Producer class.
+     */
     GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer);
 
     //=========================================================================================================
     /**
-    * Destroys the GUSBAmpDriver.
-    */
+     * Destroys the GUSBAmpDriver.
+     */
     ~GUSBAmpDriver();
 
     //=========================================================================================================
     /**
-    * Get sample from the device in form of a mtrix.
-    * @param [in]   MatrixXf    the block sample values in form of a matrix.
-    *
-    * @return                   returns true if sample was successfully written to the input variable, false otherwise.
-    */
+     * Get sample from the device in form of a mtrix.
+     * @param [in]   MatrixXf    the block sample values in form of a matrix.
+     *
+     * @return                   returns true if sample was successfully written to the input variable, false otherwise.
+     */
     bool getSampleMatrixValue(Eigen::MatrixXf& sampleMatrix);
 
     //=========================================================================================================
     /**
-    * Initialise and starts device with the set parameters . After that getSampleMatrixValue() has to be started
-    * immediatly and be executed continously. Otherwise a buffer overrun will occur.
-    *
-    * @return       returns true if succeeded
-    */
+     * Initialise and starts device with the set parameters . After that getSampleMatrixValue() has to be started
+     * immediatly and be executed continously. Otherwise a buffer overrun will occur.
+     *
+     * @return       returns true if succeeded
+     */
     bool initDevice();
 
     //=========================================================================================================
     /**
-    * Uninitialise device.
-    *
-    * @return       returns true if device was successfully uninitialised, false otherwise.
-    */
+     * Uninitialise device.
+     *
+     * @return       returns true if device was successfully uninitialised, false otherwise.
+     */
     bool uninitDevice();
 
     //=========================================================================================================
     /**
-    * Setting the adresses of the master amplifer and the slaves. The selections of the slaves are optional.
-    *
-    * @param[in]    list        list of serial numbers of the devices. Master is first serialnumber in the list
-    *
-    * @return                   true if executed successfully, false otherwise
-    *
-    */
+     * Setting the adresses of the master amplifer and the slaves. The selections of the slaves are optional.
+     *
+     * @param[in]    list        list of serial numbers of the devices. Master is first serialnumber in the list
+     *
+     * @return                   true if executed successfully, false otherwise
+     *
+     */
     bool setSerials(std::vector<QString> &list);
 
     //=========================================================================================================
     /**
-    * Setting the sampling rate of the amplifier and defining the Number of Scans
-    *
-    * @param[in]    samplingRate    sampling rate of the amplifier in [Hz] possible settings for the sample rate are:
-    *                               32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400
-    *
-    * @return                       true if executed successfully, false otherwise
-    *
-    */
+     * Setting the sampling rate of the amplifier and defining the Number of Scans
+     *
+     * @param[in]    samplingRate    sampling rate of the amplifier in [Hz] possible settings for the sample rate are:
+     *                               32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400
+     *
+     * @return                       true if executed successfully, false otherwise
+     *
+     */
     bool setSampleRate(int sampleRate);
 
     //=========================================================================================================
     /**
-    * Setting the channels and the Number of channels
-    *
-    * @param[in]    channels        Vector which behold the values of Channels as integer. The values have to be
-    *                               ascending and in number must not exceed 16
-    *
-    * @return                       true if executed successfully, false otherwise
-    *
-    */
+     * Setting the channels and the Number of channels
+     *
+     * @param[in]    channels        Vector which behold the values of Channels as integer. The values have to be
+     *                               ascending and in number must not exceed 16
+     *
+     * @return                       true if executed successfully, false otherwise
+     *
+     */
     bool setChannels(std::vector<int> &channels);
 
     //=========================================================================================================
     /**
-    * Setting Flag for Filewriting
-    *
-    * @param[in]    doFileWriting   Boolian, which indicates whether Filewriting should be done or not
-    *
-    * @return                       true if executed successfully, false otherwise
-    *
-    */
+     * Setting Flag for Filewriting
+     *
+     * @param[in]    doFileWriting   Boolian, which indicates whether Filewriting should be done or not
+     *
+     * @return                       true if executed successfully, false otherwise
+     *
+     */
     bool setFileWriting(bool doFileWriting);
 
     //=========================================================================================================
     /**
-    * Setting the path of the file
-    *
-    * @param[in]    QString         QString which beholds the the path of the File in which data will be stored
-    *
-    * @return                       true if executed successfully, false otherwise
-    *
-    */
+     * Setting the path of the file
+     *
+     * @param[in]    QString         QString which beholds the the path of the File in which data will be stored
+     *
+     * @return                       true if executed successfully, false otherwise
+     *
+     */
     bool setFilePath(QString FilePath);
 
     //=========================================================================================================
     /**
-    * Getting the size of the Sample Matrix
-    *
-    * @return                       vector which beholds the size of the matrix. first value refers to columns.
-    *
-    */
+     * Getting the size of the Sample Matrix
+     *
+     * @return                       vector which beholds the size of the matrix. first value refers to columns.
+     *
+     */
     std::vector<int> getSizeOfSampleMatrix(void);
 
 

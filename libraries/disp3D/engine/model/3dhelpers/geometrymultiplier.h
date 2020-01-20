@@ -113,69 +113,69 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a GeometryMultiplier object.
-    */
+     * Constructs a GeometryMultiplier object.
+     */
     explicit GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
                                                       Qt3DCore::QNode *tParent = nullptr);
 
     //=========================================================================================================
     /**
-    * Copy Constructor disabled
-    */
+     * Copy Constructor disabled
+     */
     GeometryMultiplier(const GeometryMultiplier& other) = delete;
 
     //=========================================================================================================
     /**
-    * Copy operator disabled
-    */
+     * Copy operator disabled
+     */
     GeometryMultiplier& operator =(const GeometryMultiplier& other) = delete;
 
     //=========================================================================================================
     /**
-    * Destructor
-    */
+     * Destructor
+     */
     ~GeometryMultiplier();
 
     //=========================================================================================================
     /**
-    * Sets the transformation matrix for each instance of the geometry.
-    * It can be used to translate, scale and rotate each instance individually.
-    *
-    * @param tInstanceTansform         Transformation matrix.
-    */
+     * Sets the transformation matrix for each instance of the geometry.
+     * It can be used to translate, scale and rotate each instance individually.
+     *
+     * @param tInstanceTansform         Transformation matrix.
+     */
     void setTransforms(const QVector<QMatrix4x4> &tInstanceTansform);
 
     //=========================================================================================================
     /**
-    * Sets the color for each instance of the geometry.
-    *
-    * @param tInstanceColors           Color of the geometry;
-    */
+     * Sets the color for each instance of the geometry.
+     *
+     * @param tInstanceColors           Color of the geometry;
+     */
     void setColors(const QVector<QColor> &tInstanceColors);
 
 private:
     //=========================================================================================================
     /**
-    * Initialize GeometryMultiplier object.
-    */
+     * Initialize GeometryMultiplier object.
+     */
     void init();
 
     //=========================================================================================================
     /**
-    * Builds the transform matrix buffer content.
-    *
-    * @param tInstanceTransform        Transformation matrix for each instance.
-    * @return                          buffer content.
-    */
+     * Builds the transform matrix buffer content.
+     *
+     * @param tInstanceTransform        Transformation matrix for each instance.
+     * @return                          buffer content.
+     */
     QByteArray buildTransformBuffer(const QVector<QMatrix4x4> &tInstanceTransform);
 
     //=========================================================================================================
     /**
-    * Builds color buffer content.
-    *
-    * @param tInstanceColor            Color for each instance.
-    * @return                          buffer content.
-    */
+     * Builds color buffer content.
+     *
+     * @param tInstanceColor            Color for each instance.
+     * @return                          buffer content.
+     */
     QByteArray buildColorBuffer(const QVector<QColor> &tInstanceColor);
 
     QSharedPointer<Qt3DRender::QGeometry>           m_pGeometry;

@@ -95,22 +95,22 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     FiffProj();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffProj  SSP projector data which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffProj  SSP projector data which should be copied
+     */
     FiffProj(const FiffProj& p_FiffProj);
 
     //=========================================================================================================
     /**
-    * Constructor
-    */
+     * Constructor
+     */
     explicit FiffProj(  fiff_int_t p_kind,
                         bool p_active,
                         QString p_desc,
@@ -118,47 +118,47 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the FiffProj.
-    */
+     * Destroys the FiffProj.
+     */
     ~FiffProj();
 
     //=========================================================================================================
     /**
-    * Set all projections to active
-    *
-    * @param[in, out] p_qListFiffProj  activates projectors in place
-    */
+     * Set all projections to active
+     *
+     * @param[in, out] p_qListFiffProj  activates projectors in place
+     */
     static void activate_projs(QList<FiffProj> &p_qListFiffProj);
 
     //=========================================================================================================
     /**
-    * mne_make_projector
-    *
-    * ToDo move this to fiff_proj; Before: check if info is needed and if make_projector_info should be also moved.
-    *
-    * ### MNE toolbox root function ### Definition of the mne_make_projector function
-    *
-    * Make an SSP operator
-    *
-    * @param[in] projs      A set of projection vectors
-    * @param[in] ch_names   A cell array of channel names
-    * @param[out] proj      The projection operator to apply to the data
-    * @param[in] bads       Bad channels to exclude
-    * @param[out] U         The orthogonal basis of the projection vectors (optional)
-    *
-    * @return nproj - How many items in the projector
-    */
+     * mne_make_projector
+     *
+     * ToDo move this to fiff_proj; Before: check if info is needed and if make_projector_info should be also moved.
+     *
+     * ### MNE toolbox root function ### Definition of the mne_make_projector function
+     *
+     * Make an SSP operator
+     *
+     * @param[in] projs      A set of projection vectors
+     * @param[in] ch_names   A cell array of channel names
+     * @param[out] proj      The projection operator to apply to the data
+     * @param[in] bads       Bad channels to exclude
+     * @param[out] U         The orthogonal basis of the projection vectors (optional)
+     *
+     * @return nproj - How many items in the projector
+     */
     static fiff_int_t make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd);
 
     //=========================================================================================================
     /**
-    * overloading the stream out operator<<
-    *
-    * @param[in] out           The stream to which the fiff projector should be assigned to.
-    * @param[in] p_FiffProj    Fiff projector which should be assigned to the stream.
-    *
-    * @return the stream with the attached fiff projector
-    */
+     * overloading the stream out operator<<
+     *
+     * @param[in] out           The stream to which the fiff projector should be assigned to.
+     * @param[in] p_FiffProj    Fiff projector which should be assigned to the stream.
+     *
+     * @return the stream with the attached fiff projector
+     */
     friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffProj &p_FiffProj);
 
 public:

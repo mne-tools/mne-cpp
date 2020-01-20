@@ -84,30 +84,30 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the digitization point description
-    */
+     * Constructs the digitization point description
+     */
     FiffDigPoint();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffDigPoint   Digitization point descriptor which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffDigPoint   Digitization point descriptor which should be copied
+     */
     FiffDigPoint(const FiffDigPoint& p_FiffDigPoint);
 
     //=========================================================================================================
     /**
-    * Destroys the digitization point description
-    */
+     * Destroys the digitization point description
+     */
     ~FiffDigPoint();
 
     //=========================================================================================================
     /**
-    * Size of the old struct (fiffDigPointRec) 5*int = 5*4 = 20
-    *
-    * @return the size of the old struct fiffDigPointRec.
-    */
+     * Size of the old struct (fiffDigPointRec) 5*int = 5*4 = 20
+     *
+     * @return the size of the old struct fiffDigPointRec.
+     */
     inline static qint32 storageSize();
 
 public:

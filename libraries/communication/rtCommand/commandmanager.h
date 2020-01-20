@@ -61,104 +61,104 @@ public:
 
     //=========================================================================================================
     /**
-    * Clears the command manager
-    */
+     * Clears the command manager
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Returns the lookup table of all available commands.
-    *
-    * @return the command lookup table
-    */
+     * Returns the lookup table of all available commands.
+     *
+     * @return the command lookup table
+     */
     inline QMap<QString, Command>& commandMap();
 
     //=========================================================================================================
     /**
-    * Checks if a command is managed;
-    *
-    * @param p_sCommand     COmmand to check.
-    *
-    * @return true if part of command manager, false otherwise
-    */
+     * Checks if a command is managed;
+     *
+     * @param p_sCommand     COmmand to check.
+     *
+     * @return true if part of command manager, false otherwise
+     */
     inline bool hasCommand(const QString &p_sCommand) const;
 
     //=========================================================================================================
     /**
-    * Inserts commands encoded in a json document.
-    * Attention existing items are overwritten.
-    *
-    * @param p_jsonDocument    JSON document containing commands.
-    */
+     * Inserts commands encoded in a json document.
+     * Attention existing items are overwritten.
+     *
+     * @param p_jsonDocument    JSON document containing commands.
+     */
     void insert(const QJsonDocument &p_jsonDocument);
 
     //=========================================================================================================
     /**
-    * Inserts a single command.
-    * Attention existing items are overwritten.
-    *
-    * @param p_jsonDocument    JSON document containing commands.
-    */
+     * Inserts a single command.
+     * Attention existing items are overwritten.
+     *
+     * @param p_jsonDocument    JSON document containing commands.
+     */
     void insert(const QString &p_sKey, const QString &p_sDescription);
 
     //=========================================================================================================
     /**
-    * Inserts a new command and emmits dataChanged signal.
-    *
-    * @param p_sKey     Command key word.
-    * @param p_command  Command content. Attention CommandManager takes ownership of that command by reseting commad's parent;
-    */
+     * Inserts a new command and emmits dataChanged signal.
+     *
+     * @param p_sKey     Command key word.
+     * @param p_command  Command content. Attention CommandManager takes ownership of that command by reseting commad's parent;
+     */
     void insert(const QString &p_sKey, const Command &p_command);
 
     //=========================================================================================================
     /**
-    * Returns if CommandManager is active. If true, this manager parses incomming commands.
-    *
-    * @return if true, incomming commands are parsed.
-    */
+     * Returns if CommandManager is active. If true, this manager parses incomming commands.
+     *
+     * @return if true, incomming commands are parsed.
+     */
     inline bool isActive() const;
 
     //=========================================================================================================
     /**
-    * Sets the activation status of the CommandManager.
-    *
-    * @param [in] status the new activation status of the CommandManager.
-    */
+     * Sets the activation status of the CommandManager.
+     *
+     * @param [in] status the new activation status of the CommandManager.
+     */
     inline void setStatus(bool status);
 
     //=========================================================================================================
     /**
-    * Updates the IObserver (CommandManager) when a new command was received.
-    *
-    * @param[in] p_pSubject  pointer to the subject (CommandParser) to which observer (CommandManager) is attached to.
-    */
+     * Updates the IObserver (CommandManager) when a new command was received.
+     *
+     * @param[in] p_pSubject  pointer to the subject (CommandParser) to which observer (CommandManager) is attached to.
+     */
     virtual void update(Subject* p_pSubject);
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access commands by command name
-    *
-    * @param[in] key    the command key word.
-    *
-    * @return Command object related to command key word.
-    */
+     * Subscript operator [] to access commands by command name
+     *
+     * @param[in] key    the command key word.
+     *
+     * @return Command object related to command key word.
+     */
     Command& operator[] (const QString &key);
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access commands by command name
-    *
-    * @param key    the command key word.
-    *
-    * @return Command object related to command key word.
-    */
+     * Subscript operator [] to access commands by command name
+     *
+     * @param key    the command key word.
+     *
+     * @return Command object related to command key word.
+     */
     const Command operator[] (const QString &key) const;
 
 private:
     //=========================================================================================================
     /**
-    * Initializes the command manager by connecting internal signal/slots
-    */
+     * Initializes the command manager by connecting internal signal/slots
+     */
     void init();
 
     bool m_bIsActive;
@@ -174,19 +174,19 @@ signals:
 
     //=========================================================================================================
     /**
-    * Is emitted when a command is ready to send
-    *
-    * @param p_command  Command which should be send
-    */
+     * Is emitted when a command is ready to send
+     *
+     * @param p_command  Command which should be send
+     */
     void triggered(Command p_command);
 
     //=========================================================================================================
     /**
-    * Is triggered when a reply is available. Commands are the emmiters of this signal -> access trough parent.
-    *
-    * @param p_sReply   the plain or JSON formatted reply
-    *@param p_command   Command which send the response
-    */
+     * Is triggered when a reply is available. Commands are the emmiters of this signal -> access trough parent.
+     *
+     * @param p_sReply   the plain or JSON formatted reply
+     *@param p_command   Command which send the response
+     */
     void response(QString p_sReply, Command p_command);
 };
 

@@ -119,16 +119,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a CustomFrameGraph object.
-    *
-    * @param[in] parent                 Pointer to parent node.
-    */
+     * Constructs a CustomFrameGraph object.
+     *
+     * @param[in] parent                 Pointer to parent node.
+     */
     explicit CustomFrameGraph(Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destructor.
-    */
+     * Destructor.
+     */
     ~CustomFrameGraph();
 
     //=========================================================================================================

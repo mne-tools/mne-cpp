@@ -80,16 +80,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a extract object.
-    */
+     * Constructs a extract object.
+     */
     explicit Extract(QWidget *parent = 0);
     ~Extract();
 
 signals:
     //=========================================================================================================
     /**
-    * Emitted if the extraction has finished.
-    */
+     * Emitted if the extraction has finished.
+     */
     void extractionDone();
 
 private:
@@ -101,42 +101,42 @@ private:
 public:
     //=========================================================================================================
     /**
-    * Looks for 7zip at the given filepath and extracts the file at the other filepath.
-    *
-    * @param[in] zip            Path to 7z.exe
-    *
-    * @param[in] current        Path to the .tar.gz
-    */
+     * Looks for 7zip at the given filepath and extracts the file at the other filepath.
+     *
+     * @param[in] zip            Path to 7z.exe
+     *
+     * @param[in] current        Path to the .tar.gz
+     */
     void beginExtraction(QString zip, QString current);
 
 signals:
     //=========================================================================================================
     /**
-    * Emitted if 7zip cannot be opened.
-    */
+     * Emitted if 7zip cannot be opened.
+     */
     void zipperError();
 
 private:
     //=========================================================================================================
     /**
-    * Extracts from .tar.gz to .tar using 7zip
-    *
-    * @param[in] archivePath    Path to the .tar.gz
-    */
+     * Extracts from .tar.gz to .tar using 7zip
+     *
+     * @param[in] archivePath    Path to the .tar.gz
+     */
     void extractGz(QString archivePath);
 
     //=========================================================================================================
     /**
-    * Extracts the sample set from .tar using 7zip
-    */
+     * Extracts the sample set from .tar using 7zip
+     */
     void extractTar();
 
 #else //Linux & OSX
 public:
     //=========================================================================================================
     /**
-    * Extracts the .tar.gz using a systemcall.
-    */
+     * Extracts the .tar.gz using a systemcall.
+     */
     void beginExtraction();
 
 #endif

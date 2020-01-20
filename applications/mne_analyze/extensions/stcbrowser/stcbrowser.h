@@ -94,14 +94,14 @@ class STCBROWSERSHARED_EXPORT STCBrowser : public ANSHAREDLIB::IExtension
 public:
     //=========================================================================================================
     /**
-    * Constructs a STCBrowser.
-    */
+     * Constructs a STCBrowser.
+     */
     STCBrowser();
 
     //=========================================================================================================
     /**
-    * Destroys the STCBrowser.
-    */
+     * Destroys the STCBrowser.
+     */
     ~STCBrowser();
 
     // IExtension functions

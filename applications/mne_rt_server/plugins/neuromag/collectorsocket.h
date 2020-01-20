@@ -75,24 +75,24 @@ class CollectorSocket : public QTcpSocket
 public:
     //=========================================================================================================
     /**
-    * Constructs a acquisition Server.
-    */
+     * Constructs a acquisition Server.
+     */
     CollectorSocket(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Open the collector control connection
-    *
-    * @return
-    */
+     * Open the collector control connection
+     *
+     * @return
+     */
     bool open();
 
     //=========================================================================================================
     /**
-    * Close the collector connection
-    *
-    * @return
-    */
+     * Close the collector connection
+     *
+     * @return
+     */
 //    int close();
 
     inline bool isMeasuring()
@@ -102,59 +102,59 @@ public:
 
     //=========================================================================================================
     /**
-    * Query the current buffer length of the Elekta acquisition system
-    *
-    * @return
-    */
+     * Query the current buffer length of the Elekta acquisition system
+     *
+     * @return
+     */
     int getMaxBuflen();
 
     //=========================================================================================================
     /**
-    * Set the desired maximum buffer length
-    *
-    * @return
-    */
+     * Set the desired maximum buffer length
+     *
+     * @return
+     */
     int setMaxBuflen(int maxbuflen);
 
     // new client.c to qt functions
     //=========================================================================================================
     /**
-    *
-    *
-    * @return
-    */
+     *
+     *
+     * @return
+     */
     bool server_command(const QString& p_sCommand);
 
     //=========================================================================================================
     /**
-    *
-    *
-    * @return
-    */
+     *
+     *
+     * @return
+     */
     bool server_login(const QString& p_sCollectorPass, const QString& p_sMyName);
 
     //=========================================================================================================
     /**
-    *
-    *
-    * @return
-    */
+     *
+     *
+     * @return
+     */
     bool server_send(QString& p_sDataSend, QByteArray& p_dataOut, int p_iInputFlag = DACQ_DRAIN_INPUT);
 
     //=========================================================================================================
     /**
-    *
-    *
-    * @return
-    */
+     *
+     *
+     * @return
+     */
     bool server_start();
 
     //=========================================================================================================
     /**
-    *
-    *
-    * @return
-    */
+     *
+     *
+     * @return
+     */
     bool server_stop();
 
 private:

@@ -168,88 +168,88 @@ public:
 
     //=========================================================================================================
     /**
-    * Writes to MainWindow log.
-    *
-    * @param [in] logMsg message
-    * @param [in] lgknd message kind; Message is formated depending on its kind.
-    * @param [in] lglvl message level; Message is displayed depending on its level.
-    */
+     * Writes to MainWindow log.
+     *
+     * @param [in] logMsg message
+     * @param [in] lgknd message kind; Message is formated depending on its kind.
+     * @param [in] lglvl message level; Message is displayed depending on its level.
+     */
     void writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl);
 
 private:
     //=========================================================================================================
     /**
-    * openFile opens a file dialog that picks the fiff data file to analyze and invokes the setup methods.
-    */
+     * openFile opens a file dialog that picks the fiff data file to analyze and invokes the setup methods.
+     */
     void openFile();
 
     //=========================================================================================================
     /**
-    * openFile opens a file dialog that lets choose the location and the file name of the fiff data file to write.
-    */
+     * openFile opens a file dialog that lets choose the location and the file name of the fiff data file to write.
+     */
     void writeFile();
 
     //=========================================================================================================
     /**
-    * loadEvents opens a file dialog that picks the event data file.
-    */
+     * loadEvents opens a file dialog that picks the event data file.
+     */
     void loadEvents();
 
     //=========================================================================================================
     /**
-    * saveEvents saves the event data to file.
-    */
+     * saveEvents saves the event data to file.
+     */
     void saveEvents();
 
     //=========================================================================================================
     /**
-    * loadEvoked load the evoked data from file.
-    */
+     * loadEvoked load the evoked data from file.
+     */
     void loadEvoked();
 
     //=========================================================================================================
     /**
-    * showFilterWindow shows the filtering window
-    */
+     * showFilterWindow shows the filtering window
+     */
     void showWindow(QWidget *window);
 
 private:
     //=========================================================================================================
     /**
-    * setupWindowWidgets sets up the windows which can be shown during runtime (i.e. filter window, event list window, etc.).
-    */
+     * setupWindowWidgets sets up the windows which can be shown during runtime (i.e. filter window, event list window, etc.).
+     */
     void setupWindowWidgets();
 
     //=========================================================================================================
     /**
-    * createToolBar sets up the applications toolbar
-    */
+     * createToolBar sets up the applications toolbar
+     */
     void createToolBar();
 
     //=========================================================================================================
     /**
-    * connectMenus sets up the filemenu
-    */
+     * connectMenus sets up the filemenu
+     */
     void connectMenus();
 
     //=========================================================================================================
     /**
-    * Sets the log level
-    *
-    * @param [in] lvl message level; Message is displayed depending on its level.
-    */
+     * Sets the log level
+     *
+     * @param [in] lvl message level; Message is displayed depending on its level.
+     */
     void setLogLevel(LogLevel lvl);
 
     //=========================================================================================================
     /**
-    * setupMainWindow makes settings that are related to the MainWindow
-    */
+     * setupMainWindow makes settings that are related to the MainWindow
+     */
     void setupMainWindow();
 
     //=========================================================================================================
     /**
-    * setWindowStatus sets the window status depending on m_pRawModel->m_bFileloaded
-    */
+     * setWindowStatus sets the window status depending on m_pRawModel->m_bFileloaded
+     */
     void setWindowStatus();
 
     QFile                   m_qFileRaw;                     /**< Fiff data file to read (set for convenience). */

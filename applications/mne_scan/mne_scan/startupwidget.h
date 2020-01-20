@@ -83,16 +83,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a StartUpWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new StartUpWidget becomes a window. If parent is another widget, StartUpWidget becomes a child window inside parent. StartUpWidget is deleted when its parent is deleted.
-    */
+     * Constructs a StartUpWidget which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new StartUpWidget becomes a window. If parent is another widget, StartUpWidget becomes a child window inside parent. StartUpWidget is deleted when its parent is deleted.
+     */
     StartUpWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the StartUpWidget.
-    */
+     * Destroys the StartUpWidget.
+     */
     ~StartUpWidget();
 
 private:

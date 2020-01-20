@@ -86,25 +86,25 @@ class BCIFeatureWindow : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a BCIFeatureWindow which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new BCIFeatureWindow becomes a window. If parent is another widget, BCIFeatureWindow becomes a child window inside parent. BCIFeatureWindow is deleted when its parent is deleted.
-    * @param [in] pBCI a pointer to the corresponding BCI.
-    */
+     * Constructs a BCIFeatureWindow which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new BCIFeatureWindow becomes a window. If parent is another widget, BCIFeatureWindow becomes a child window inside parent. BCIFeatureWindow is deleted when its parent is deleted.
+     * @param [in] pBCI a pointer to the corresponding BCI.
+     */
     BCIFeatureWindow(BCI* pBCI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the BCIFeatureWindow.
-    * All BCIFeatureWindow's children are deleted first. The application exits if BCIFeatureWindow is the main widget.
-    */
+     * Destroys the BCIFeatureWindow.
+     * All BCIFeatureWindow's children are deleted first. The application exits if BCIFeatureWindow is the main widget.
+     */
     ~BCIFeatureWindow();
 
     //=========================================================================================================
     /**
-    * Initializes the BCI's GUI properties.
-    *
-    */
+     * Initializes the BCI's GUI properties.
+     *
+     */
     void initGui();
 
 protected:

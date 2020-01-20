@@ -94,8 +94,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
-    */
+     * Default constructor
+     */
     explicit ECDView(const INVERSELIB::DipoleFitSettings& dipFitSettings,
                      const INVERSELIB::ECDSet& ecdSet,
                      QWidget *parent = 0,
@@ -103,8 +103,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Default destructor
-    */
+     * Default destructor
+     */
     ~ECDView();
 
 protected:

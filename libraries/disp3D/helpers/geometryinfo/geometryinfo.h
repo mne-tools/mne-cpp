@@ -115,21 +115,21 @@ public:
 
     //=========================================================================================================
     /**
-    * deleted default constructor (static class).
-    */
+     * deleted default constructor (static class).
+     */
     GeometryInfo() = delete;
 
     //=========================================================================================================
     /**
-    * @brief scdc                           Calculates surface constrained distances on a mesh.
-    *
-    * @param[in] matVertices                The surface on which distances should be calculated.
-    * @param[in] vecNeighborVertices        The neighbor vertex information.
-    * @param[in/out] pVecVertSubset         The subset of IDs for which the distances should be calculated.
-    * @param[in] dCancelDist                Distances higher than this are ignored, i.e. set to infinity.
-    *
-    * @return                               A double matrix. One column represents the distances for one vertex inside of the passed subset
-    */
+     * @brief scdc                           Calculates surface constrained distances on a mesh.
+     *
+     * @param[in] matVertices                The surface on which distances should be calculated.
+     * @param[in] vecNeighborVertices        The neighbor vertex information.
+     * @param[in/out] pVecVertSubset         The subset of IDs for which the distances should be calculated.
+     * @param[in] dCancelDist                Distances higher than this are ignored, i.e. set to infinity.
+     *
+     * @return                               A double matrix. One column represents the distances for one vertex inside of the passed subset
+     */
     static QSharedPointer<Eigen::MatrixXd> scdc(const Eigen::MatrixX3f &matVertices,
                                                 const QVector<QVector<int> > &vecNeighborVertices,
                                                 QVector<int> &pVecVertSubset,
@@ -137,26 +137,26 @@ public:
 
     //=========================================================================================================
     /**
-    * @brief                            Calculates the nearest neighbor (euclidian distance) vertex to each sensor
-    *
-    * @param[in] matVertices            Holds all vertex information that is needed.
-    * @param[in] vecSensorPositions     Each sensor postion in saved in an Eigen vector with x, y & z coord.
-    *
-    * @return                           Output vector where the vector index position represents the id of the sensor and the int in each cell is the vertex it is mapped to
-    */
+     * @brief                            Calculates the nearest neighbor (euclidian distance) vertex to each sensor
+     *
+     * @param[in] matVertices            Holds all vertex information that is needed.
+     * @param[in] vecSensorPositions     Each sensor postion in saved in an Eigen vector with x, y & z coord.
+     *
+     * @return                           Output vector where the vector index position represents the id of the sensor and the int in each cell is the vertex it is mapped to
+     */
     static QVector<int> projectSensors(const Eigen::MatrixX3f &matVertices,
                                           const QVector<Eigen::Vector3f> &vecSensorPositions);
 
     //=========================================================================================================
     /**
-    * @brief filterBadChannels          Filters bad channels from distance table
-    *
-    * @param[out] matDistanceTable      Result of SCDC.
-    * @param[in] fiffInfo               Container for sensors.
-    * @param[in] iSensorType            Sensor type to be filtered out, use fiff constants.
-    *
-    * @return Vector of bad channel indices.
-    */
+     * @brief filterBadChannels          Filters bad channels from distance table
+     *
+     * @param[out] matDistanceTable      Result of SCDC.
+     * @param[in] fiffInfo               Container for sensors.
+     * @param[in] iSensorType            Sensor type to be filtered out, use fiff constants.
+     *
+     * @return Vector of bad channel indices.
+     */
     static QVector<int> filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
                                              const FIFFLIB::FiffInfo& fiffInfo,
                                              qint32 iSensorType);
@@ -164,40 +164,40 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * @brief squared        Implemented for better readability only
-    *
-    * @param[in] dBase      Base double value
-    *
-    * @return               Base squared
-    */
+     * @brief squared        Implemented for better readability only
+     *
+     * @param[in] dBase      Base double value
+     *
+     * @return               Base squared
+     */
     static inline  double squared(double dBase);
 
     //=========================================================================================================
     /**
-    * @brief nearestNeighbor        Calculates the nearest vertex of an MNEmatVertices for each position between the two iterators
-    *
-    * @param[in] matVertices        The MNEmatVertices that holds the vertex information
-    * @param[in] itSensorBegin      The iterator that indicates the start of the wanted section of positions
-    * @param[in] itSensorEnd        The iterator that indicates the end of the wanted section of positions
-    *
-    * @return                       A vector of nearest vertex IDs that corresponds to the subvector between the two iterators
-    */
+     * @brief nearestNeighbor        Calculates the nearest vertex of an MNEmatVertices for each position between the two iterators
+     *
+     * @param[in] matVertices        The MNEmatVertices that holds the vertex information
+     * @param[in] itSensorBegin      The iterator that indicates the start of the wanted section of positions
+     * @param[in] itSensorEnd        The iterator that indicates the end of the wanted section of positions
+     *
+     * @return                       A vector of nearest vertex IDs that corresponds to the subvector between the two iterators
+     */
     static QVector<int> nearestNeighbor(const Eigen::MatrixX3f &matVertices,
                                            QVector<Eigen::Vector3f>::const_iterator itSensorBegin,
                                            QVector<Eigen::Vector3f>::const_iterator itSensorEnd);
 
     //=========================================================================================================
     /**
-    * @brief iterativeDijkstra     Calculates shortest distances on the mesh that is held by the MNEmatVertices for each vertex of the passed vector that lies between the two indices
-    *
-    * @param[out] matOutputDistMatrix  The matrix in which the distances will be stored
-    * @param[in] matVertices           The surface on which distances should be calculated
-    * @param[in] vecNeighborVertices   The neighbor vertex information.
-    * @param[in] vecVertSubset         The subset of vertices
-    * @param[in] iBegin                Start index of distance calculation
-    * @param[in] iEnd                  End index of distance calculation, exclusive
-    * @param[in] dCancelDistance       Distance threshold: all vertices that have a higher distance to the respective root vertex are set to infinity
-    */
+     * @brief iterativeDijkstra     Calculates shortest distances on the mesh that is held by the MNEmatVertices for each vertex of the passed vector that lies between the two indices
+     *
+     * @param[out] matOutputDistMatrix  The matrix in which the distances will be stored
+     * @param[in] matVertices           The surface on which distances should be calculated
+     * @param[in] vecNeighborVertices   The neighbor vertex information.
+     * @param[in] vecVertSubset         The subset of vertices
+     * @param[in] iBegin                Start index of distance calculation
+     * @param[in] iEnd                  End index of distance calculation, exclusive
+     * @param[in] dCancelDistance       Distance threshold: all vertices that have a higher distance to the respective root vertex are set to infinity
+     */
     static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> matOutputDistMatrix,
                                   const Eigen::MatrixX3f &matVertices,
                                   const QVector<QVector<int> > &vecNeighborVertices,

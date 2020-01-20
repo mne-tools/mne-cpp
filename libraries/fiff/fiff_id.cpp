@@ -100,19 +100,19 @@ FiffId FiffId::new_file_id()
     int fixed_id[2];
     get_machid(fixed_id);
     /*
-    * Internet address in the first two words
-    */
+     * Internet address in the first two words
+     */
     id.machid[0] = fixed_id[0];
     id.machid[1] = fixed_id[1];
     /*
-    * Time in the third and fourth words
-    */
+     * Time in the third and fourth words
+     */
     /*
-    * Time in the third and fourth words
-    * Since practically no system gives times in
-    * true micro seconds, the last three digits
-    * are randomized to insure uniqueness.
-    */
+     * Time in the third and fourth words
+     * Since practically no system gives times in
+     * true micro seconds, the last three digits
+     * are randomized to insure uniqueness.
+     */
     {
         id.time.secs = QDateTime::currentMSecsSinceEpoch()/1000;
         id.time.usecs = rand() % 1000;

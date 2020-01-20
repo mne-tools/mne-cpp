@@ -83,30 +83,30 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the dir entry.
-    */
+     * Constructs the dir entry.
+     */
     FiffDirEntry();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffDirEntry   Dir Entry which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffDirEntry   Dir Entry which should be copied
+     */
     FiffDirEntry(const FiffDirEntry& p_FiffDirEntry);
 
     //=========================================================================================================
     /**
-    * Destroys the dir entry.
-    */
+     * Destroys the dir entry.
+     */
     ~FiffDirEntry();
 
     //=========================================================================================================
     /**
-    * Size of the old struct (fiffDirEntryRec) 4*int = 4*4 = 16
-    *
-    * @return the size of the old struct fiffDirEntryRec.
-    */
+     * Size of the old struct (fiffDirEntryRec) 4*int = 4*4 = 16
+     *
+     * @return the size of the old struct fiffDirEntryRec.
+     */
     inline static qint32 storageSize();
 
 public:

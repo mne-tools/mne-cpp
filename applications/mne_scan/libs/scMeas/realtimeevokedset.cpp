@@ -147,7 +147,7 @@ void RealTimeEvokedSet::setValue(const FiffEvokedSet &v,
 {
     //Store
     m_qMutex.lock();
-    *m_pFiffEvokedSet = v;
+     *m_pFiffEvokedSet = v;
     m_lResponsibleTriggerTypes = lResponsibleTriggerTypes;
     m_qMutex.unlock();
 

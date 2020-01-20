@@ -94,14 +94,14 @@ class MUSICSHARED_EXPORT Music : public ANSHAREDLIB::IExtension
 public:
     //=========================================================================================================
     /**
-    * Constructs a Music.
-    */
+     * Constructs a Music.
+     */
     Music();
 
     //=========================================================================================================
     /**
-    * Destroys the Music.
-    */
+     * Destroys the Music.
+     */
     ~Music();
 
     // IExtension functions
@@ -116,8 +116,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Called when calculation is requested
-    */
+     * Called when calculation is requested
+     */
     void calculate();
 
 protected:

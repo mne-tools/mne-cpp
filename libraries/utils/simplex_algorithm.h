@@ -78,31 +78,31 @@ class UTILSSHARED_EXPORT SimplexAlgorithm
 protected:
     //=========================================================================================================
     /**
-    * Protected Constrcutor to make class non-instantiable.
-    */
+     * Protected Constrcutor to make class non-instantiable.
+     */
     SimplexAlgorithm();
 
 public:
     //=========================================================================================================
     /**
-    * mne_simplex_fit.c
-    * Refactored: mne_simplex_minimize
-    *
-    * Minimization with the simplex algorithm. Float implementation
-    * Modified from Numerical recipes
-    *
-    * @param[in] p              The initial simplex
-    * @param[in] y              Function values at the vertices
-    * @param[in] ftol           Relative convergence tolerance
-    * @param[in] func           The function to be evaluated
-    * @param[in] user_data      Data to be passed to the above function in each evaluation
-    * @param[in] max_eval       Maximum number of function evaluations
-    * @param[in] neval          Number of function evaluations
-    * @param[in] report         How often to report (-1 = no_reporting)
-    * @param[in] report_func    The function to be called when reporting
-    *
-    * @return True when setup was successful, false otherwise
-    */
+     * mne_simplex_fit.c
+     * Refactored: mne_simplex_minimize
+     *
+     * Minimization with the simplex algorithm. Float implementation
+     * Modified from Numerical recipes
+     *
+     * @param[in] p              The initial simplex
+     * @param[in] y              Function values at the vertices
+     * @param[in] ftol           Relative convergence tolerance
+     * @param[in] func           The function to be evaluated
+     * @param[in] user_data      Data to be passed to the above function in each evaluation
+     * @param[in] max_eval       Maximum number of function evaluations
+     * @param[in] neval          Number of function evaluations
+     * @param[in] report         How often to report (-1 = no_reporting)
+     * @param[in] report_func    The function to be called when reporting
+     *
+     * @return True when setup was successful, false otherwise
+     */
     template <typename T>
     static bool simplex_minimize(   Matrix<T,Dynamic,Dynamic>& p,
                                     Matrix<T,Dynamic, 1>& y,

@@ -76,48 +76,48 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
-    *
-    * @param[in] parent     Parent QObject (optional)
-    */
+     * Default constructor
+     *
+     * @param[in] parent     Parent QObject (optional)
+     */
     explicit CommandParser(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Checks if a command exists
-    *
-    * @param[in] p_sCommand     Command to check.
-    *
-    * @return true if command exists, false otherwise.
-    */
+     * Checks if a command exists
+     *
+     * @param[in] p_sCommand     Command to check.
+     *
+     * @return true if command exists, false otherwise.
+     */
     bool exists(const QString& p_sCommand);
 
     //=========================================================================================================
     /**
-    * Parses a CLI command or JSON command (list) and notifies all attached observers (command managers)
-    *
-    * @param[in] p_sInput               Input to parse.
-    * @param[out] p_qListCommandsParsed  List of parsed commands.
-    */
+     * Parses a CLI command or JSON command (list) and notifies all attached observers (command managers)
+     *
+     * @param[in] p_sInput               Input to parse.
+     * @param[out] p_qListCommandsParsed  List of parsed commands.
+     */
     bool parse(const QString &p_sInput, QStringList &p_qListCommandsParsed);
 
     //=========================================================================================================
     /**
-    * Returns the stored RawCommand
-    *
-    * @return the stored RawCommand
-    */
+     * Returns the stored RawCommand
+     *
+     * @return the stored RawCommand
+     */
     inline RawCommand& getRawCommand();
 
 
 signals:
     //=========================================================================================================
     /**
-    * Response channel which is used by attached observers (command managers) to send data back to subject
-    *
-    *@param[in] p_sResponse     Observer response/data.
-    *@param[in] p_command       Command which send the response
-    */
+     * Response channel which is used by attached observers (command managers) to send data back to subject
+     *
+     *@param[in] p_sResponse     Observer response/data.
+     *@param[in] p_command       Command which send the response
+     */
     void response(QString p_sResponse, Command p_command);
 
 private:

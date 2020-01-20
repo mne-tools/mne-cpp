@@ -84,14 +84,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummyToolbox.
-    */
+     * Constructs a DummyToolbox.
+     */
     explicit DummyYourWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummyToolbox.
-    */
+     * Destroys the DummyToolbox.
+     */
     ~DummyYourWidget();
 
 private:

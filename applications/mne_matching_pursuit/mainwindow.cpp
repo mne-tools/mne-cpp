@@ -311,7 +311,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
     if(mp_Thread != NULL)
         if(mp_Thread->isRunning())
             emit mp_Thread->requestInterruption();
-    */
+     */
 
     if(!this->isMaximized())
     {
@@ -1614,7 +1614,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         }/*
         _residuum_matrix = residuum;
         _atom_sum_matrix = _signal_matrix - residuum;
-    */}
+     */}
 
     //progressbar update remaining energy and iterations update
 

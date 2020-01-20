@@ -100,195 +100,195 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a NetworkNode object.
-    *
-    * @param[in] iId        The node's ID.
-    * @param[in] vecVert    The node's 3D position.
-    */
+     * Constructs a NetworkNode object.
+     *
+     * @param[in] iId        The node's ID.
+     * @param[in] vecVert    The node's 3D position.
+     */
     explicit NetworkNode(qint16 iId, const Eigen::RowVectorXf& vecVert);
 
     //=========================================================================================================
     /**
-    * Returns the ingoing edges corresponding to the full network.
-    *
-    * @return   Returns the list with all ingoing edges.
-    */
+     * Returns the ingoing edges corresponding to the full network.
+     *
+     * @return   Returns the list with all ingoing edges.
+     */
     const QList<QSharedPointer<NetworkEdge> >& getFullEdges() const;
 
     //=========================================================================================================
     /**
-    * Returns all edges corresponding to the thresholded network.
-    *
-    * @return   Returns the list with all ingoing edges.
-    */
+     * Returns all edges corresponding to the thresholded network.
+     *
+     * @return   Returns the list with all ingoing edges.
+     */
     QList<QSharedPointer<NetworkEdge> > getThresholdedEdges() const;
 
     //=========================================================================================================
     /**
-    * Returns the ingoing edges corresponding to the full network.
-    *
-    * @return   Returns the list with all ingoing edges.
-    */
+     * Returns the ingoing edges corresponding to the full network.
+     *
+     * @return   Returns the list with all ingoing edges.
+     */
     QList<QSharedPointer<NetworkEdge> > getFullEdgesIn() const;
 
     //=========================================================================================================
     /**
-    * Returns the ingoing edges corresponding to the thresholded network.
-    *
-    * @return   Returns the list with all ingoing edges.
-    */
+     * Returns the ingoing edges corresponding to the thresholded network.
+     *
+     * @return   Returns the list with all ingoing edges.
+     */
     QList<QSharedPointer<NetworkEdge> > getThresholdedEdgesIn() const;
 
     //=========================================================================================================
     /**
-    * Returns the outgoing edges corresponding to the full network.
-    *
-    * @return   Returns the list with all outgoing edges.
-    */
+     * Returns the outgoing edges corresponding to the full network.
+     *
+     * @return   Returns the list with all outgoing edges.
+     */
     QList<QSharedPointer<NetworkEdge> > getFullEdgesOut() const;
 
     //=========================================================================================================
     /**
-    * Returns the outgoing edges corresponding to the thresholded network.
-    *
-    * @return   Returns the list with all outgoing edges.
-    */
+     * Returns the outgoing edges corresponding to the thresholded network.
+     *
+     * @return   Returns the list with all outgoing edges.
+     */
     QList<QSharedPointer<NetworkEdge> > getThresholdedEdgesOut() const;
 
     //=========================================================================================================
     /**
-    * Returns the vertex (position) of the node.
-    *
-    * @return   Returns the 3D position of the node.
-    */
+     * Returns the vertex (position) of the node.
+     *
+     * @return   Returns the 3D position of the node.
+     */
     const Eigen::RowVectorXf& getVert() const;
 
     //=========================================================================================================
     /**
-    * Returns the node id.
-    *
-    * @return   Returns the node id.
-    */
+     * Returns the node id.
+     *
+     * @return   Returns the node id.
+     */
     qint16 getId() const;
 
     //=========================================================================================================
     /**
-    * Returns node degree corresponding to the full network.
-    *
-    * @return   The node degree calculated as the number of edges connected to a node (undirected gaph).
-    */
+     * Returns node degree corresponding to the full network.
+     *
+     * @return   The node degree calculated as the number of edges connected to a node (undirected gaph).
+     */
     qint16 getFullDegree() const;
 
     //=========================================================================================================
     /**
-    * Returns node degree corresponding to the thresholded network.
-    *
-    * @return   The node degree calculated as the number of edges connected to a node (undirected gaph).
-    */
+     * Returns node degree corresponding to the thresholded network.
+     *
+     * @return   The node degree calculated as the number of edges connected to a node (undirected gaph).
+     */
     qint16 getThresholdedDegree() const;
 
     //=========================================================================================================
     /**
-    * Returns node indegree corresponding to the full network.
-    *
-    * @return   The node degree calculated as the number of incoming edges (only in directed graphs).
-    */
+     * Returns node indegree corresponding to the full network.
+     *
+     * @return   The node degree calculated as the number of incoming edges (only in directed graphs).
+     */
     qint16 getFullIndegree() const;
 
     //=========================================================================================================
     /**
-    * Returns node indegree corresponding to the thresholded network.
-    *
-    * @return   The node degree calculated as the number of incoming edges (only in directed graphs).
-    */
+     * Returns node indegree corresponding to the thresholded network.
+     *
+     * @return   The node degree calculated as the number of incoming edges (only in directed graphs).
+     */
     qint16 getThresholdedIndegree() const;
 
     //=========================================================================================================
     /**
-    * Returns node outdegree corresponding to the full network.
-    *
-    * @return   The node degree calculated as the number of outgoing edges (only in directed graphs).
-    */
+     * Returns node outdegree corresponding to the full network.
+     *
+     * @return   The node degree calculated as the number of outgoing edges (only in directed graphs).
+     */
     qint16 getFullOutdegree() const;
 
     //=========================================================================================================
     /**
-    * Returns node outdegree corresponding to the thresholded network.
-    *
-    * @return   The node degree calculated as the number of outgoing edges (only in directed graphs).
-    */
+     * Returns node outdegree corresponding to the thresholded network.
+     *
+     * @return   The node degree calculated as the number of outgoing edges (only in directed graphs).
+     */
     qint16 getThresholdedOutdegree() const;
 
     //=========================================================================================================
     /**
-    * Returns node strength corresponding to the full network.
-    *
-    * @return   The node strength calculated as the sum of all weights of all edges of a node.
-    */
+     * Returns node strength corresponding to the full network.
+     *
+     * @return   The node strength calculated as the sum of all weights of all edges of a node.
+     */
     double getFullStrength() const;
 
     //=========================================================================================================
     /**
-    * Returns node strength corresponding to the thresholded network.
-    *
-    * @return   The node strength calculated as the sum of all weights of all edges of a node.
-    */
+     * Returns node strength corresponding to the thresholded network.
+     *
+     * @return   The node strength calculated as the sum of all weights of all edges of a node.
+     */
     double getThresholdedStrength() const;
 
     //=========================================================================================================
     /**
-    * Returns node strength of all ingoing edges corresponding to the full network.
-    *
-    * @return   The node strength calculated as the sum of all weights of all ingoing edges of a node.
-    */
+     * Returns node strength of all ingoing edges corresponding to the full network.
+     *
+     * @return   The node strength calculated as the sum of all weights of all ingoing edges of a node.
+     */
     double getFullInstrength() const;
 
     //=========================================================================================================
     /**
-    * Returns node strength of all ingoing edges corresponding to the thresholded network.
-    *
-    * @return   The node strength calculated as the sum of all weights of all ingoing edges of a node.
-    */
+     * Returns node strength of all ingoing edges corresponding to the thresholded network.
+     *
+     * @return   The node strength calculated as the sum of all weights of all ingoing edges of a node.
+     */
     double getThresholdedInstrength() const;
 
     //=========================================================================================================
     /**
-    * Returns node strength of all outgoing edges corresponding to the full network.
-    *
-    * @return   The node strength calculated as the sum of all weights of all outgoing edges of a node.
-    */
+     * Returns node strength of all outgoing edges corresponding to the full network.
+     *
+     * @return   The node strength calculated as the sum of all weights of all outgoing edges of a node.
+     */
     double getFullOutstrength() const;
 
     //=========================================================================================================
     /**
-    * Returns node strength of all outgoing edges corresponding to the thresholded network.
-    *
-    * @return   The node strength calculated as the sum of all weights of all outgoing edges of a node.
-    */
+     * Returns node strength of all outgoing edges corresponding to the thresholded network.
+     *
+     * @return   The node strength calculated as the sum of all weights of all outgoing edges of a node.
+     */
     double getThresholdedOutstrength() const;
 
     //=========================================================================================================
     /**
-    * Sets the hub status of this node.
-    *
-    * @param bIsHub   New hub status for this node.
-    */
+     * Sets the hub status of this node.
+     *
+     * @param bIsHub   New hub status for this node.
+     */
     void setHubStatus(bool bIsHub);
 
     //=========================================================================================================
     /**
-    * Returns flag describing whether this node is a hub or not.
-    *
-    * @return   Whether this node is a hub or not.
-    */
+     * Returns flag describing whether this node is a hub or not.
+     *
+     * @return   Whether this node is a hub or not.
+     */
     bool getHubStatus() const;
 
     //=========================================================================================================
     /**
-    * Appends a network edge to this network node. Automatically decides whether to add to the in or out edges.
-    *
-    * @param[in] newEdge    The new edge item.
-    */
+     * Appends a network edge to this network node. Automatically decides whether to add to the in or out edges.
+     *
+     * @param[in] newEdge    The new edge item.
+     */
     void append(QSharedPointer<NetworkEdge> newEdge);
 
 protected:

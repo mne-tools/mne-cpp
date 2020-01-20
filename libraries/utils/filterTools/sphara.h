@@ -85,23 +85,23 @@ class UTILSSHARED_EXPORT Sphara
 public:   
     //=========================================================================================================
     /**
-    * Constructs a Sphara object.
-    *
-    */
+     * Constructs a Sphara object.
+     *
+     */
     Sphara();
 
     //=========================================================================================================
     /**
-    * Constructs a SPHARA operator.
-    *
-    * @param [in] matBaseFct        The SPHARA basis functions.
-    * @param [in] vecIndices        The indices of the positions in the final oeprator which are to be filled with the basis functions weights (i.e. these indices could respond to the indices of gradioemteres in a VectorView system).
-    * @param [in] iOperatorDim      The dimensions of the final SPHARA operator. Make sure that these correspond to the dimensions of the data matrix you want tol multiply with the SPHARA operator.
-    * @param [in] iNBaseFct         The number of SPHARA basis functions to take.
-    * @param [in] skip              The value to skip when reading the vecIndices variabel. I.e. use this when dealing with VectorView triplets, which include two gradiometers.
-    *
-    * @return Returns the final SPHARA operator with dimensions (iOperatorDim,iOperatorDim).
-    */
+     * Constructs a SPHARA operator.
+     *
+     * @param [in] matBaseFct        The SPHARA basis functions.
+     * @param [in] vecIndices        The indices of the positions in the final oeprator which are to be filled with the basis functions weights (i.e. these indices could respond to the indices of gradioemteres in a VectorView system).
+     * @param [in] iOperatorDim      The dimensions of the final SPHARA operator. Make sure that these correspond to the dimensions of the data matrix you want tol multiply with the SPHARA operator.
+     * @param [in] iNBaseFct         The number of SPHARA basis functions to take.
+     * @param [in] skip              The value to skip when reading the vecIndices variabel. I.e. use this when dealing with VectorView triplets, which include two gradiometers.
+     *
+     * @return Returns the final SPHARA operator with dimensions (iOperatorDim,iOperatorDim).
+     */
     static MatrixXd makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct, int skip = 0);
 };
 

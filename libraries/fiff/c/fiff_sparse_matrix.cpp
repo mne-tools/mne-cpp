@@ -375,8 +375,8 @@ bad : {
 
 FiffSparseMatrix *FiffSparseMatrix::mne_add_upper_triangle_rcs()
 /*
-    * Fill in upper triangle with the lower triangle values
-    */
+     * Fill in upper triangle with the lower triangle values
+     */
 {
     int *nnz       = NULL;
     int **colindex = NULL;

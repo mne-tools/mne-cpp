@@ -84,86 +84,86 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DeepCNTKManager with the given parent.
-    *
-    * @param[in] parent     pointer to parent Object. (It's normally the default value.)
-    */
+     * Constructs a DeepCNTKManager with the given parent.
+     *
+     * @param[in] parent     pointer to parent Object. (It's normally the default value.)
+     */
     DeepCNTKManager(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DeepCNTKManager.
-    */
+     * Destroys the DeepCNTKManager.
+     */
     virtual ~DeepCNTKManager();
 
     //=========================================================================================================
     /**
-    * Loads deep configurations from given directory.
-    *
-    * @param [in] dir   the configuration directory.
-    */
+     * Loads deep configurations from given directory.
+     *
+     * @param [in] dir   the configuration directory.
+     */
     void loadDeepConfigurations(const QString& dir);
 
     //=========================================================================================================
     /**
-    * Initializes the deep configurations.
-    */
+     * Initializes the deep configurations.
+     */
     void initDeepConfigurations();
 
     //=========================================================================================================
     /**
-    * Finds index of configuration by name.
-    *
-    * @param [in] name  the configuration name.
-    *
-    * @return index of extension.
-    */
+     * Finds index of configuration by name.
+     *
+     * @param [in] name  the configuration name.
+     *
+     * @return index of extension.
+     */
     int findByName(const QString& name);
 
     //=========================================================================================================
     /**
-    * Returns vector containing all deep configurations.
-    *
-    * @return reference to vector containing all plugins.
-    */
+     * Returns vector containing all deep configurations.
+     *
+     * @return reference to vector containing all plugins.
+     */
     inline const QVector<IDeepCNTKNet*>& getDeepConfigurations();
 
     //=========================================================================================================
     /**
-    * Returns a string list of configuration names.
-    *
-    * @return Deep configuration names.
-    */
+     * Returns a string list of configuration names.
+     *
+     * @return Deep configuration names.
+     */
     QStringList getDeepConfigurationNames() const;
 
     //=========================================================================================================
     /**
-    * Returns the current deep configuration
-    *
-    * @return Current deep configuration.
-    */
+     * Returns the current deep configuration
+     *
+     * @return Current deep configuration.
+     */
     IDeepCNTKNet* currentDeepConfiguration() const;
 
 // Member functions for current configuration
 public:
     //=========================================================================================================
     /**
-    * Selects a deep configuration
-    *
-    * @param [in] idx   Idx of the configuration to select
-    */
+     * Selects a deep configuration
+     *
+     * @param [in] idx   Idx of the configuration to select
+     */
     void selectDeepConfiguration(int idx);
 
     //=========================================================================================================
     /**
-    * Train current Configuration
-    */
+     * Train current Configuration
+     */
     void trainCurrentConfiguration();
 
     //=========================================================================================================
     /**
-    * Train test Configuration
-    */
+     * Train test Configuration
+     */
     void evalCurrentConfiguration();
 
 signals:

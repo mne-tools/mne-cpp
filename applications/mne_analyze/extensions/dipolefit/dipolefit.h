@@ -94,14 +94,14 @@ class DIPOLEFITSHARED_EXPORT DipoleFit : public ANSHAREDLIB::IExtension
 public:
     //=========================================================================================================
     /**
-    * Constructs a DipoleFit.
-    */
+     * Constructs a DipoleFit.
+     */
     DipoleFit();
 
     //=========================================================================================================
     /**
-    * Destroys the DipoleFit.
-    */
+     * Destroys the DipoleFit.
+     */
     ~DipoleFit();
 
     // IExtension functions

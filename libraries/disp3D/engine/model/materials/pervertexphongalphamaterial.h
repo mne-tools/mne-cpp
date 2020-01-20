@@ -97,25 +97,25 @@ class DISP3DSHARED_EXPORT PerVertexPhongAlphaMaterial : public AbstractPhongAlph
 public:
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
-    * @param[in] parent             The parent of this object.
-    */
+     * Default constructor.
+     *
+     * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
+     * @param[in] parent             The parent of this object.
+     */
     explicit PerVertexPhongAlphaMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = nullptr);
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    */
+     * Default destructor.
+     */
     ~PerVertexPhongAlphaMaterial() = default;
 
 private:
 
     //=========================================================================================================
     /**
-    * Adds the shader code to the material.
-    */
+     * Adds the shader code to the material.
+     */
     void setShaderCode() override;
 
     QPointer<Qt3DRender::QShaderProgram>    m_pVertexES2Shader;         /**< Shader program for OpenGL version ES2.0. */

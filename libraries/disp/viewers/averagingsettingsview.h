@@ -106,8 +106,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the AveragingSettingsView.
-    */
+     * Destroys the AveragingSettingsView.
+     */
     ~AveragingSettingsView();
 
     void setStimChannels(const QMap<QString, int> &mapStimChsIndexNames);
@@ -133,24 +133,24 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Redraw the GUI.
-    */
+     * Redraw the GUI.
+     */
     void redrawGUI();
 
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     void onChangePreStim();

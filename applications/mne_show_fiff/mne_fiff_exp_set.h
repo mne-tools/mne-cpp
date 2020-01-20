@@ -97,132 +97,132 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs an MNE Fiff Explanation Set object.
-    */
+     * Constructs an MNE Fiff Explanation Set object.
+     */
     MneFiffExpSet();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_MneFiffExpSet       MNE Fiff Explanation Set which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_MneFiffExpSet       MNE Fiff Explanation Set which should be copied
+     */
     MneFiffExpSet(const MneFiffExpSet &p_MneFiffExpSet);
 
     //=========================================================================================================
     /**
-    * Destroys the Electric Current Dipole description
-    */
+     * Destroys the Electric Current Dipole description
+     */
     ~MneFiffExpSet();
 
     //=========================================================================================================
     /**
-    * Returns the number of stored MneFiffExps
-    *
-    * @return number of stored MneFiffExps
-    */
+     * Returns the number of stored MneFiffExps
+     *
+     * @return number of stored MneFiffExps
+     */
     inline qint32 size() const;
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access MneFiffExp by index
-    *
-    * @param[in] idx    the MneFiffExp index.
-    *
-    * @return MneFiffExp related to the parameter index.
-    */
+     * Subscript operator [] to access MneFiffExp by index
+     *
+     * @param[in] idx    the MneFiffExp index.
+     *
+     * @return MneFiffExp related to the parameter index.
+     */
     const MneFiffExp& operator[] (int idx) const;
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access MneFiffExp by index
-    *
-    * @param[in] idx    the MneFiffExp index.
-    *
-    * @return MneFiffExp related to the parameter index.
-    */
+     * Subscript operator [] to access MneFiffExp by index
+     *
+     * @param[in] idx    the MneFiffExp index.
+     *
+     * @return MneFiffExp related to the parameter index.
+     */
     MneFiffExp& operator[] (int idx);
 
     //=========================================================================================================
     /**
-    * Subscript operator << to add a new MneFiffExp
-    *
-    * @param[in] p_MneFiffExp      MneFiffExp to be added
-    *
-    * @return MneFiffExpSet
-    */
+     * Subscript operator << to add a new MneFiffExp
+     *
+     * @param[in] p_MneFiffExp      MneFiffExp to be added
+     *
+     * @return MneFiffExpSet
+     */
     MneFiffExpSet& operator<< (const MneFiffExp& p_MneFiffExp);
 
     //=========================================================================================================
     /**
-    * Read an explanation file and sort the entries
-    * Refactored: mne_read_fiff_explanations (explanation.c)
-    *
-    * @param[in] name   File to read
-    */
+     * Read an explanation file and sort the entries
+     * Refactored: mne_read_fiff_explanations (explanation.c)
+     *
+     * @param[in] name   File to read
+     */
     static MneFiffExpSet read_fiff_explanations(const QString& name);
 
     //=========================================================================================================
     /**
-    * Write the content to a std stream
-    * Refactored: mne_list_fiff_explanations (explanation.c)
-    *
-    * @param[in] out   Stream to write the content to
-    */
+     * Write the content to a std stream
+     * Refactored: mne_list_fiff_explanations (explanation.c)
+     *
+     * @param[in] out   Stream to write the content to
+     */
     void list_fiff_explanations(FILE *out);
 
     //=========================================================================================================
     /**
-    * Find fiff explanation
-    * Refactored: mne_find_fiff_explanation (explanation.c)
-    *
-    * @param[in] exclass    explanation class to find
-    * @param[in] kind       kind to find
-    */
+     * Find fiff explanation
+     * Refactored: mne_find_fiff_explanation (explanation.c)
+     *
+     * @param[in] exclass    explanation class to find
+     * @param[in] kind       kind to find
+     */
     QList<MneFiffExp>::const_iterator find_fiff_explanation(int exclass, int kind) const;
 
     //=========================================================================================================
     /**
-    * Returns a const STL-style iterator pointing to the imaginary item after the last item in the list.
-    *
-    * @return const STL-style iterator pointing to the item after the last item
-    */
+     * Returns a const STL-style iterator pointing to the imaginary item after the last item in the list.
+     *
+     * @return const STL-style iterator pointing to the item after the last item
+     */
     QList<MneFiffExp>::const_iterator constEnd() const;
 
     //=========================================================================================================
     /**
-    * Show contents of a fif file
-    *
-    * @param[in] out            Output file
-    * @param[in] settings       Show Fiff Settings object
-    *
-    * @return true if succeeded
-    */
+     * Show contents of a fif file
+     *
+     * @param[in] out            Output file
+     * @param[in] settings       Show Fiff Settings object
+     *
+     * @return true if succeeded
+     */
     bool show_fiff_contents (FILE *out, const MneShowFiffSettings& settings);
 
     //=========================================================================================================
     /**
-    * Show contents of a fif file
-    * Refactored: show_fiff_contents (mne_show_fiff.c)
-    *
-    * @param[in] out            Output file
-    * @param[in] name           Input file
-    * @param[in] verbose        Verbose output?
-    * @param[in] tags           Output these specific tags?
-    * @param[in] indent_step    Indentation step
-    * @param[in] long_strings   Print long strings in full?
-    * @param[in] blocks_only    Print blocks only?
-    *
-    * @return true if succeeded
-    */
+     * Show contents of a fif file
+     * Refactored: show_fiff_contents (mne_show_fiff.c)
+     *
+     * @param[in] out            Output file
+     * @param[in] name           Input file
+     * @param[in] verbose        Verbose output?
+     * @param[in] tags           Output these specific tags?
+     * @param[in] indent_step    Indentation step
+     * @param[in] long_strings   Print long strings in full?
+     * @param[in] blocks_only    Print blocks only?
+     *
+     * @return true if succeeded
+     */
     bool show_fiff_contents (FILE *out, const QString& name, bool verbose, const QList<int>& tags, int indent_step, bool long_strings, bool blocks_only);
 
 private:
     //=========================================================================================================
     /**
-    * Sort the fiff explanation set
-    * Refactored: mne_sort_fiff_explanations (explanation.c)
-    */
+     * Sort the fiff explanation set
+     * Refactored: mne_sort_fiff_explanations (explanation.c)
+     */
     void sort_fiff_explanations();
 
 private:

@@ -104,35 +104,35 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] p3DEntityParent    The parent 3D entity.
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] p3DEntityParent    The parent 3D entity.
+     * @param[in] iType      The type of the item. See types.h for declaration and definition.
+     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit SourceSpaceTreeItem(Qt3DCore::QEntity *p3DEntityParent = 0, int iType = Data3DTreeModelItemTypes::SourceSpaceItem, const QString& text = "Source space");
 
     //=========================================================================================================
     /**
-    * Adds source space data.
-    *
-    * @param[in] tHemisphere        The hemisphere data of the source space.
-    */
+     * Adds source space data.
+     *
+     * @param[in] tHemisphere        The hemisphere data of the source space.
+     */
     void addData(const MNELIB::MNEHemisphere& tHemisphere);
 
 protected:
     //=========================================================================================================
     /**
-    * Plots the sources a spheres.
-    *
-    * @param[in] tHemisphere        The hemisphere data of the source space.
-    */
+     * Plots the sources a spheres.
+     *
+     * @param[in] tHemisphere        The hemisphere data of the source space.
+     */
     void plotSources(const MNELIB::MNEHemisphere& tHemisphere);
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     void initItem();
 };
 

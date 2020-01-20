@@ -88,27 +88,27 @@ public:
 
     //=========================================================================================================
     /**
-    * dicitionary_Dicitionary
-    *
-    * ### MP toolbox function ###
-    *
-    * Constructor
-    *
-    * constructs Dicitionary class
-    *
-    */
+     * dicitionary_Dicitionary
+     *
+     * ### MP toolbox function ###
+     *
+     * Constructor
+     *
+     * constructs Dicitionary class
+     *
+     */
     Dictionary();
     //=========================================================================================================
     /**
-    *  dicitionary_Dicitionary
-    *
-    * ### MP toolbox function ###
-    *
-    * Deconstructor
-    *
-    * deconstructs Dicitionary class
-    *
-    */
+     *  dicitionary_Dicitionary
+     *
+     * ### MP toolbox function ###
+     *
+     * Deconstructor
+     *
+     * deconstructs Dicitionary class
+     *
+     */
     ~Dictionary();
     //=========================================================================================================
 
@@ -152,27 +152,27 @@ public:
 
     //=========================================================================================================
     /**
-    * fixdictMp_fixdictMP
-    *
-    * ### MP toolbox function ###
-    *
-    * Constructor
-    *
-    * constructs FixDictMp class
-    *
-    */
+     * fixdictMp_fixdictMP
+     *
+     * ### MP toolbox function ###
+     *
+     * Constructor
+     *
+     * constructs FixDictMp class
+     *
+     */
     FixDictMp();
     //=========================================================================================================
     /**
-    * fixdictMp_fixdictMP
-    *
-    * ### MP toolbox function ###
-    *
-    * Deconstructor
-    *
-    * deconstructs FixDictMp class
-    *
-    */
+     * fixdictMp_fixdictMP
+     *
+     * ### MP toolbox function ###
+     *
+     * Deconstructor
+     *
+     * deconstructs FixDictMp class
+     *
+     */
     ~FixDictMp();
 
     //=========================================================================================================

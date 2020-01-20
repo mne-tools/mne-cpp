@@ -99,90 +99,90 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a Electric Current Dipole Set object.
-    */
+     * Constructs a Electric Current Dipole Set object.
+     */
     ECDSet();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_ECDSet       Electric Current Dipole Set which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_ECDSet       Electric Current Dipole Set which should be copied
+     */
     ECDSet(const ECDSet &p_ECDSet);
 
     //=========================================================================================================
     /**
-    * Destroys the Electric Current Dipole description
-    */
+     * Destroys the Electric Current Dipole description
+     */
     ~ECDSet();
 
     //=========================================================================================================
     /**
-    * Appends an Electric Current Dipole to the set
-    */
+     * Appends an Electric Current Dipole to the set
+     */
     void addEcd(const ECD& p_ecd);
 
     //=========================================================================================================
     /**
-    * Read dipoles from the dip format compatible with mrilab
-    *
-    * @param[in] name   File name to read from.
-    */
+     * Read dipoles from the dip format compatible with mrilab
+     *
+     * @param[in] name   File name to read from.
+     */
     static ECDSet read_dipoles_dip(const QString& fileName);
 
     //=========================================================================================================
     /**
-    * Save dipoles in the bdip format employed by xfit
-    *
-    * @param[in] fileName   File name to save to.
-    */
+     * Save dipoles in the bdip format employed by xfit
+     *
+     * @param[in] fileName   File name to save to.
+     */
     bool save_dipoles_bdip(const QString& fileName);
 
     //=========================================================================================================
     /**
-    * Save dipoles in the dip format suitable for mrilab
-    *
-    * @param[in] fileName   File name to save to.
-    */
+     * Save dipoles in the dip format suitable for mrilab
+     *
+     * @param[in] fileName   File name to save to.
+     */
     bool save_dipoles_dip(const QString& fileName) const;
 
     //=========================================================================================================
     /**
-    * Returns the number of stored ECDs
-    *
-    * @return number of stored ECDs
-    */
+     * Returns the number of stored ECDs
+     *
+     * @return number of stored ECDs
+     */
     inline qint32 size() const;
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access ECD by index
-    *
-    * @param[in] idx    the ECD index.
-    *
-    * @return ECD related to the parameter index.
-    */
+     * Subscript operator [] to access ECD by index
+     *
+     * @param[in] idx    the ECD index.
+     *
+     * @return ECD related to the parameter index.
+     */
     const ECD& operator[] (int idx) const;
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access ECD by index
-    *
-    * @param[in] idx    the ECD index.
-    *
-    * @return ECD related to the parameter index.
-    */
+     * Subscript operator [] to access ECD by index
+     *
+     * @param[in] idx    the ECD index.
+     *
+     * @return ECD related to the parameter index.
+     */
     ECD& operator[] (int idx);
 
     //=========================================================================================================
     /**
-    * Subscript operator << to add a new ECD
-    *
-    * @param[in] p_ecd      ECD to be added
-    *
-    * @return ECDSet
-    */
+     * Subscript operator << to add a new ECD
+     *
+     * @param[in] p_ecd      ECD to be added
+     *
+     * @return ECDSet
+     */
     ECDSet& operator<< (const ECD& p_ecd);
 
 public:

@@ -105,65 +105,65 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FilterDesignView dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterDesignView becomes a window. If parent is another widget, FilterDesignView becomes a child window inside parent. FilterDesignView is deleted when its parent is deleted.
-    */
+     * Constructs a FilterDesignView dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new FilterDesignView becomes a window. If parent is another widget, FilterDesignView becomes a child window inside parent. FilterDesignView is deleted when its parent is deleted.
+     */
     FilterDesignView(const QString& sSettingsPath,
                QWidget *parent = 0,
                Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterDesignView.
-    * All FilterDesignView's children are deleted first. The application exits if FilterDesignView is the main widget.
-    */
+     * Destroys the FilterDesignView.
+     * All FilterDesignView's children are deleted first. The application exits if FilterDesignView is the main widget.
+     */
     ~FilterDesignView();
 
     //=========================================================================================================
     /**
-    * Inits the filter window.
-    *
-    * @param[in] dSFreq the new sampling frequency
-    */
+     * Inits the filter window.
+     *
+     * @param[in] dSFreq the new sampling frequency
+     */
     void init(double dSFreq);
 
     //=========================================================================================================
     /**
-    * Sets the new window size for the filter.
-    *
-    * @param[in] iWindowSize length of the data which is to be filtered
-    */
+     * Sets the new window size for the filter.
+     *
+     * @param[in] iWindowSize length of the data which is to be filtered
+     */
     void setWindowSize(int iWindowSize);
 
     //=========================================================================================================
     /**
-    * Sets the max number of allowed filter taps depending on the current block size of the incoming data.
-    *
-    * @param[in] iMaxNumberFilterTaps  number of max allowed filter taps
-    */
+     * Sets the max number of allowed filter taps depending on the current block size of the incoming data.
+     *
+     * @param[in] iMaxNumberFilterTaps  number of max allowed filter taps
+     */
     void setMaxFilterTaps(int iMaxNumberFilterTaps);
 
     //=========================================================================================================
     /**
-    * Sets the new samplingRate.
-    *
-    * @param[in] dSamplingRate the new sampling rate
-    */
+     * Sets the new samplingRate.
+     *
+     * @param[in] dSamplingRate the new sampling rate
+     */
     void setSamplingRate(double dSamplingRate);
 
     //=========================================================================================================
     /**
-    * Sets the new filter parameters.
-    *
-    * @param[in] hp                 Highpass frequency.
-    * @param[in] lp                 Lowpass frequency.
-    * @param[in] order              The order of the.
-    * @param[in] type               The filter type.
-    * @param[in] designMethod       The filter design method.
-    * @param[in] transition         The transition frequency.
-    * @param[in] channelType        the channel Type.
-    */
+     * Sets the new filter parameters.
+     *
+     * @param[in] hp                 Highpass frequency.
+     * @param[in] lp                 Lowpass frequency.
+     * @param[in] order              The order of the.
+     * @param[in] type               The filter type.
+     * @param[in] designMethod       The filter design method.
+     * @param[in] transition         The transition frequency.
+     * @param[in] channelType        the channel Type.
+     */
     void setFilterParameters(double hp,
                              double lp,
                              int order,
@@ -174,125 +174,125 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the current filter.
-    *
-    * @return returns the current filter
-    */
+     * Returns the current filter.
+     *
+     * @return returns the current filter
+     */
     UTILSLIB::FilterData getCurrentFilter();
 
     //=========================================================================================================
     /**
-    * Returns the current channel type which is to be filtered.
-    *
-    * @return returns the channel type.
-    */
+     * Returns the current channel type which is to be filtered.
+     *
+     * @return returns the channel type.
+     */
     QString getChannelType();
 
     //=========================================================================================================
     /**
-    * Sets the new samplingRate.
-    *
-    * @return return true if user designed filter is active
-    */
+     * Sets the new samplingRate.
+     *
+     * @return return true if user designed filter is active
+     */
     bool userDesignedFiltersIsActive();
 
 protected:
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * inits all spin boxes.
-    */
+     * inits all spin boxes.
+     */
     void initSpinBoxes();
 
     //=========================================================================================================
     /**
-    * inits all buttons.
-    */
+     * inits all buttons.
+     */
     void initButtons();
 
     //=========================================================================================================
     /**
-    * inits the QComboBoxes.
-    */
+     * inits the QComboBoxes.
+     */
     void initComboBoxes();
 
     //=========================================================================================================
     /**
-    * inits the filter plot.
-    */
+     * inits the filter plot.
+     */
     void initFilterPlot();
 
     //=========================================================================================================
     /**
-    * resizeEvent reimplemented virtual function to handle resize events of the filter window
-    */
+     * resizeEvent reimplemented virtual function to handle resize events of the filter window
+     */
     void resizeEvent(QResizeEvent * event);
 
     //=========================================================================================================
     /**
-    * keyPressEvent reimplemented virtual function to handle key events
-    */
+     * keyPressEvent reimplemented virtual function to handle key events
+     */
     virtual void keyPressEvent(QKeyEvent * event);
 
     //=========================================================================================================
     /**
-    * updates the filter plot scene with the newly generated filter
-    */
+     * updates the filter plot scene with the newly generated filter
+     */
     void updateFilterPlot();
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the combo box is altered by the user via the gui.
-    *
-    * @param currentIndex holds the current index of the combo box
-    */
+     * This function gets called whenever the combo box is altered by the user via the gui.
+     *
+     * @param currentIndex holds the current index of the combo box
+     */
     void changeStateSpinBoxes(int currentIndex);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the filter parameters are altered by the user via the gui.
-    */
+     * This function gets called whenever the filter parameters are altered by the user via the gui.
+     */
     void filterParametersChanged();
 
     //=========================================================================================================
     /**
-    * This function applies the user defined filter to all channels.
-    *
-    * @param channelType holds the current text of the connected spin box
-    */
+     * This function applies the user defined filter to all channels.
+     *
+     * @param channelType holds the current text of the connected spin box
+     */
     void onSpinBoxFilterChannelType(const QString &channelType);
 
     //=========================================================================================================
     /**
-    * Saves an svg graphic of the scene if wanted by the user.
-    */
+     * Saves an svg graphic of the scene if wanted by the user.
+     */
     void onBtnExportFilterPlot();
 
     //=========================================================================================================
     /**
-    * This function exports the filter coefficients to a txt file.
-    */
+     * This function exports the filter coefficients to a txt file.
+     */
     void onBtnExportFilterCoefficients();
 
     //=========================================================================================================
     /**
-    * This function loads a filter from a txt file.
-    */
+     * This function loads a filter from a txt file.
+     */
     void onBtnLoadFilter();
 
     Ui::FilterDesignViewWidget*               ui;                         /**< Pointer to the qt designer generated ui class.*/
@@ -310,18 +310,18 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emitted when the filter changes.
-    *
-    * @param activeFilter  The currently active filters.
-    */
+     * Emitted when the filter changes.
+     *
+     * @param activeFilter  The currently active filters.
+     */
     void filterChanged(const UTILSLIB::FilterData& activeFilter);
 
     //=========================================================================================================
     /**
-    * Emitted when the filter should be applied.
-    *
-    * @param channelType  The channel type on which the filter should be performed on.
-    */
+     * Emitted when the filter should be applied.
+     *
+     * @param channelType  The channel type on which the filter should be performed on.
+     */
     void filterChannelTypeChanged(const QString& channelType);
 };
 

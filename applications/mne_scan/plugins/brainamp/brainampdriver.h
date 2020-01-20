@@ -115,34 +115,34 @@ class BRAINAMPSHARED_EXPORT BrainAMPDriver
 public:
     //=========================================================================================================
     /**
-    * Constructs a BrainAMPDriver.
-    *
-    * @param [in] pEEGoSportsProducer a pointer to the corresponding EEGoSports Producer class.
-    */
+     * Constructs a BrainAMPDriver.
+     *
+     * @param [in] pEEGoSportsProducer a pointer to the corresponding EEGoSports Producer class.
+     */
     BrainAMPDriver(BrainAMPProducer* pBrainAmpProducer);
 
     //=========================================================================================================
     /**
-    * Destroys the BrainAMPDriver.
-    */
+     * Destroys the BrainAMPDriver.
+     */
     ~BrainAMPDriver();
 
     //=========================================================================================================
     /**
-    * Get sample from the device in form of a mtrix.
-    * @param [in] MatrixXf the block sample values in form of a matrix.
-    * @param [out] bool returns true if sample was successfully written to the input variable, false otherwise.
-    */
+     * Get sample from the device in form of a mtrix.
+     * @param [in] MatrixXf the block sample values in form of a matrix.
+     * @param [out] bool returns true if sample was successfully written to the input variable, false otherwise.
+     */
     bool getSampleMatrixValue(Eigen::MatrixXd& sampleMatrix);
 
     //=========================================================================================================
     /**
-    * Initialise device.
-    * @param [in] iSamplesPerBlock samples per block specified by the user.
-    * @param [in] iSamplingFrequency sampling frequency specified by the user.
-    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-    * @param [in] bMeasureImpedance Flag for measuring impedances.
-    */
+     * Initialise device.
+     * @param [in] iSamplesPerBlock samples per block specified by the user.
+     * @param [in] iSamplingFrequency sampling frequency specified by the user.
+     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
+     * @param [in] bMeasureImpedance Flag for measuring impedances.
+     */
     bool initDevice(int iSamplesPerBlock,
                     int iSamplingFrequency,
                     QString sOutpuFilePath,
@@ -150,26 +150,26 @@ public:
 
     //=========================================================================================================
     /**
-    * Opens the device.
-    *
-    * @return returns true if device was successfully opened, false otherwise.
-    */
+     * Opens the device.
+     *
+     * @return returns true if device was successfully opened, false otherwise.
+     */
     bool openDevice();
 
     //=========================================================================================================
     /**
-    * Finds amplifiers.
-    *
-    * @return returns number of successive amplifiers starting from the first position.
-    */
+     * Finds amplifiers.
+     *
+     * @return returns number of successive amplifiers starting from the first position.
+     */
     int findAmplifiers();
 
     //=========================================================================================================
     /**
-    * Uninitialise device.
-    *
-    * @return returns true if device was successfully uninitialised, false otherwise.
-    */
+     * Uninitialise device.
+     *
+     * @return returns true if device was successfully uninitialised, false otherwise.
+     */
     bool uninitDevice();
 
 private:

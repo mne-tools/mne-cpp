@@ -97,14 +97,14 @@ class DacqServer : public QThread
 public:
     //=========================================================================================================
     /**
-    * Constructs a acquisition Server.
-    */
+     * Constructs a acquisition Server.
+     */
     explicit DacqServer(Neuromag* p_pNeuromag, QObject * parent = 0);
         
     //=========================================================================================================
     /**
-    * Constructs a acquisition Server.
-    */
+     * Constructs a acquisition Server.
+     */
     ~DacqServer();
 
     void readCollectorMsg();
@@ -115,19 +115,19 @@ signals:
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
 private:
     //=========================================================================================================
     /**
-    * Quit function
-    *
-    * @return
-    */
+     * Quit function
+     *
+     * @return
+     */
 //    void clean_up();
 
     bool getMeasInfo(FIFFLIB::FiffInfo &p_FiffInfo);

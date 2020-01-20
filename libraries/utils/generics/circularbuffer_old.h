@@ -95,54 +95,54 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a CircularBuffer.
-    *
-    * @param [in] uiMaxNumElements length of buffer.
-    */
+     * Constructs a CircularBuffer.
+     *
+     * @param [in] uiMaxNumElements length of buffer.
+     */
     CircularBuffer_old(unsigned int uiMaxNumElements);
 
     //=========================================================================================================
     /**
-    * Destroys the CircularBuffer.
-    */
+     * Destroys the CircularBuffer.
+     */
     ~CircularBuffer_old();
 
     //=========================================================================================================
     /**
-    * Adds a whole array at the end buffer.
-    *
-    * @param [in] pArray pointer to an Array which should be apend to the end.
-    * @param [in] size number of elements containing the array.
-    */
+     * Adds a whole array at the end buffer.
+     *
+     * @param [in] pArray pointer to an Array which should be apend to the end.
+     * @param [in] size number of elements containing the array.
+     */
     inline void push(const _Tp* pArray, unsigned int size);
     //=========================================================================================================
     /**
-    * Adds an element at the end of the buffer.
-    *
-    * @param [in] newElement pointer to an Array which should be apend to the end.
-    */
+     * Adds an element at the end of the buffer.
+     *
+     * @param [in] newElement pointer to an Array which should be apend to the end.
+     */
     inline void push(const _Tp& newElement);
     //=========================================================================================================
     /**
-    * Returns the first element (first in first out).
-    *
-    * @return the first element
-    */
+     * Returns the first element (first in first out).
+     *
+     * @return the first element
+     */
     inline _Tp pop();
     //=========================================================================================================
     /**
-    * Clears the buffer.
-    */
+     * Clears the buffer.
+     */
     void clear();
 
 private:
     //=========================================================================================================
     /**
-    * Returns the current circular index to the corresponding given index.
-    *
-    * @param [in] index which should be mapped.
-    * @return the mapped index.
-    */
+     * Returns the current circular index to the corresponding given index.
+     *
+     * @param [in] index which should be mapped.
+     * @return the mapped index.
+     */
     inline unsigned int mapIndex(int& index);
     unsigned int    m_uiMaxNumElements;     /**< Holds the maximal number of buffer elements.*/
     _Tp*            m_pBuffer;              /**< Holds the circular buffer.*/

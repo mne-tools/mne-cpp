@@ -104,9 +104,9 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
                              bool mirrorYAxis)
 {
     /*
-    * Automatically make a layout according to the
-    * channel locations in inputPoints
-    */
+     * Automatically make a layout according to the
+     * channel locations in inputPoints
+     */
     VectorXf    r0(3);
     VectorXf    rr(3);
     float       rad,th,phi;
@@ -148,8 +148,8 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
     }
 
     /*
-    * Do the azimuthal equidistant projection
-    */
+     * Do the azimuthal equidistant projection
+     */
     for (k = 0; k < nchan; k++) {
         rr = r0 - static_cast<VectorXf>(rrs.row(k));
         sphere_coord(rr[0],rr[1],rr[2],&rad,&th,&phi);
@@ -158,8 +158,8 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
     }
 
     /*
-    * Find suitable range of viewports
-    */
+     * Find suitable range of viewports
+     */
     xmin = xmax = xx[0];
     ymin = ymax = yy[0];
 
@@ -186,8 +186,8 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
     ymin = ymin - 0.6*h;
 
     /*
-    * Compose the viewports
-    */
+     * Compose the viewports
+     */
     QVector<float> point;
     QTextStream out;
 
@@ -248,14 +248,14 @@ void LayoutMaker::sphere_coord (float x,
   /* Rectangular to spherical coordinates */
   float rxy = sqrt(x*x+y*y);
   if (rxy < EPS) {		/* Let's hope this is reasonable */
-    *r = z;
-    *theta = 0.0;
-    *phi   = 0.0;
+     *r = z;
+     *theta = 0.0;
+     *phi   = 0.0;
   }
   else {
-    *r = sqrt(x*x+y*y+z*z);
-    *theta = acos(z/(*r));
-    *phi = atan2 (y,x);
+     *r = sqrt(x*x+y*y+z*z);
+     *theta = acos(z/(*r));
+     *phi = atan2 (y,x);
     if (*phi < 0.0)
       *phi = *phi + 2.0*M_PI;
   }

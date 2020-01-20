@@ -81,77 +81,77 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a PluginSceneManager.
-    */
+     * Constructs a PluginSceneManager.
+     */
     explicit PluginSceneManager(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destructs a PluginSceneManager.
-    */
+     * Destructs a PluginSceneManager.
+     */
     ~PluginSceneManager();
 
     //=========================================================================================================
     /**
-    * Adds a plugin to the stage.
-    *
-    * @param[in] pPlugin        plugin to be cloned and added
-    * @param[out] pAddedPlugin  if plugin is successful added, this contains a pointer to the added instance
-    *
-    *@return true if plugin is added successful.
-    */
+     * Adds a plugin to the stage.
+     *
+     * @param[in] pPlugin        plugin to be cloned and added
+     * @param[out] pAddedPlugin  if plugin is successful added, this contains a pointer to the added instance
+     *
+     *@return true if plugin is added successful.
+     */
     bool addPlugin(const IPlugin* pPlugin, IPlugin::SPtr &pAddedPlugin);
 
     inline PluginList& getPlugins();
 
     //=========================================================================================================
     /**
-    * Removes a plugin from the stage.
-    *
-    * @param[in] pPlugin    plugin to be removed
-    *
-    *@return true if plugin is removed successful.
-    */
+     * Removes a plugin from the stage.
+     *
+     * @param[in] pPlugin    plugin to be removed
+     *
+     *@return true if plugin is removed successful.
+     */
     bool removePlugin(const IPlugin::SPtr pPlugin);
 
     //=========================================================================================================
     /**
-    * Starts all plugins.
-    *
-    * @return true if at least one ISensor plugin was started successfully, false otherwise.
-    */
+     * Starts all plugins.
+     *
+     * @return true if at least one ISensor plugin was started successfully, false otherwise.
+     */
     bool startPlugins();
 
     //=========================================================================================================
     /**
-    * Starts ISensor Plugins
-    *
-    * @return true if at least one ISensor plugin was started successfully, false otherwise.
-    */
+     * Starts ISensor Plugins
+     *
+     * @return true if at least one ISensor plugin was started successfully, false otherwise.
+     */
     bool startSensorPlugins();
 
     //=========================================================================================================
     /**
-    * Starts IAlgorithm plugins.
-    */
+     * Starts IAlgorithm plugins.
+     */
     void startAlgorithmPlugins();
 
     //=========================================================================================================
     /**
-    * Starts IIO plugins.
-    */
+     * Starts IIO plugins.
+     */
     void startIOPlugins();
 
     //=========================================================================================================
     /**
-    * Stops all plugins.
-    */
+     * Stops all plugins.
+     */
     void stopPlugins();
 
     //=========================================================================================================
     /**
-    * Clears the PluginStage.
-    */
+     * Clears the PluginStage.
+     */
     void clear();
 
 signals:

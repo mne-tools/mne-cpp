@@ -101,46 +101,46 @@ class SCDISPSHARED_EXPORT RealTimeSpectrumWidget : public MeasurementWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a RealTimeSpectrumWidget which is a child of parent.
-    *
-    * @param [in] pNE           pointer to noise estimation measurement.
-    * @param [in] pTime         pointer to application time.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RealTimeSpectrumWidget which is a child of parent.
+     *
+     * @param [in] pNE           pointer to noise estimation measurement.
+     * @param [in] pTime         pointer to application time.
+     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+     */
     RealTimeSpectrumWidget(QSharedPointer<SCMEASLIB::RealTimeSpectrum> pNE,
                             QSharedPointer<QTime> &pTime,
                             QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeSpectrumWidget.
-    */
+     * Destroys the RealTimeSpectrumWidget.
+     */
     ~RealTimeSpectrumWidget();
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    *
-    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
-    */
+     * Is called when new data are available.
+     *
+     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+     */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    */
+     * Is called when new data are available.
+     */
     virtual void getData();
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeSpectrumWidget.
-    */
+     * Initialise the RealTimeSpectrumWidget.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Initialise the SettingsWidget.
-    */
+     * Initialise the SettingsWidget.
+     */
     void initSettingsWidget();
 
     bool eventFilter(QObject *object, QEvent *event);
@@ -148,14 +148,14 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Broadcast settings of frequency spectrum settings widget
-    */
+     * Broadcast settings of frequency spectrum settings widget
+     */
     void broadcastSettings();
 
     //=========================================================================================================
     /**
-    * Show the frequency spectrum settings widget
-    */
+     * Show the frequency spectrum settings widget
+     */
     void showSpectrumSettingsView();
 
     QPointer<QAction>                                           m_pActionFrequencySettings;         /**< Frequency spectrum settings action */

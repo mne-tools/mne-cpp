@@ -235,8 +235,8 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
     }
 
     /*
-    * Special case: close old input file
-    */
+     * Special case: close old input file
+     */
     if (mess.kind == FIFF_CLOSE_FILE) {
         if (fd != NULL) {
             printf("File to be closed (lib/FIFF_CLOSE_FILE).\n");//dacq_log("File to be closed (lib/FIFF_CLOSE_FILE).\n");
@@ -247,8 +247,8 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
             printf("No file to close (lib/FIFF_CLOSE_FILE).\n");//dacq_log("No file to close (lib/FIFF_CLOSE_FILE).\n");
     }
     /*
-    * Another special case: open new input file
-    */
+     * Another special case: open new input file
+     */
     else if (mess.kind == FIFF_NEW_FILE) {
         if (fd != NULL) {
             (void)fclose(fd);

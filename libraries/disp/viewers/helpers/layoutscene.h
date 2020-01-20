@@ -97,91 +97,91 @@ class DISPSHARED_EXPORT LayoutScene : public QGraphicsScene
 public:
     //=========================================================================================================
     /**
-    * Constructs a LayoutScene.
-    */
+     * Constructs a LayoutScene.
+     */
     LayoutScene(QGraphicsView* view,
                 QObject *parent = 0);
 
 protected:
     //=========================================================================================================
     /**
-    * Reimplemented wheel event.
-    */
+     * Reimplemented wheel event.
+     */
     void wheelEvent(QGraphicsSceneWheelEvent* event);
 
     //=========================================================================================================
     /**
-    * Reimplemented double mouse press event.
-    */
+     * Reimplemented double mouse press event.
+     */
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent);
 
     //=========================================================================================================
     /**
-    * Reimplemented mouse press event.
-    */
+     * Reimplemented mouse press event.
+     */
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
     //=========================================================================================================
     /**
-    * Reimplemented double mouse move event.
-    */
+     * Reimplemented double mouse move event.
+     */
     void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
     //=========================================================================================================
     /**
-    * Reimplemented double mouse release event.
-    */
+     * Reimplemented double mouse release event.
+     */
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
     //=========================================================================================================
     /**
-    * Reimplemented key press event.
-    */
+     * Reimplemented key press event.
+     */
     void keyPressEvent(QKeyEvent *keyEvent);
 
     //=========================================================================================================
     /**
-    * Reimplemented key release event.
-    */
+     * Reimplemented key release event.
+     */
     void keyReleaseEvent(QKeyEvent *keyEvent);
 
     //=========================================================================================================
     /**
-    * reimplemented event function - intercepts touch gestures
-    */
+     * reimplemented event function - intercepts touch gestures
+     */
     bool event(QEvent *event);
 
     //=========================================================================================================
     /**
-    * gestureEvent processes gesture events
-    */
+     * gestureEvent processes gesture events
+     */
     bool gestureEvent(QGestureEvent *event);
 
     //=========================================================================================================
     /**
-    * pinchTriggered processes pan gesture events
-    */
+     * pinchTriggered processes pan gesture events
+     */
     void panTriggered(QPanGesture*);
 
     //=========================================================================================================
     /**
-    * pinchTriggered processes pinch gesture events
-    */
+     * pinchTriggered processes pinch gesture events
+     */
     void pinchTriggered(QPinchGesture*);
 
     //=========================================================================================================
     /**
-    * pinchTriggered processes swipe gesture events
-    */
+     * pinchTriggered processes swipe gesture events
+     */
     void swipeTriggered(QSwipeGesture*);
 
     //=========================================================================================================
     /**
-    * Installed event filter.
-    *
-    * @param [in] obj the qt object for which the event was intercpeted
-    * @param [in] event the current event
-    */
+     * Installed event filter.
+     *
+     * @param [in] obj the qt object for which the event was intercpeted
+     * @param [in] event the current event
+     */
     bool eventFilter(QObject *object, QEvent *event);
 
     QGraphicsView*                  m_qvView;                       /**< The view which visualizes this scene.*/

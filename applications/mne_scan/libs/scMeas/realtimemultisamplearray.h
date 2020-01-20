@@ -93,148 +93,148 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeMultiSampleArrayNew.
-    */
+     * Constructs a RealTimeMultiSampleArrayNew.
+     */
     explicit RealTimeMultiSampleArray(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeMultiSampleArrayNew.
-    */
+     * Destroys the RealTimeMultiSampleArrayNew.
+     */
     virtual ~RealTimeMultiSampleArray();
 
     //=========================================================================================================
     /**
-    * Clears all the data stored in the buffer.
-    */
+     * Clears all the data stored in the buffer.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Inits RealTimeMultiSampleArrayNew and adds uiNumChannels empty channel information
-    *
-    * @param [in] uiNumChannels     the number of channels to init.
-    */
+     * Inits RealTimeMultiSampleArrayNew and adds uiNumChannels empty channel information
+     *
+     * @param [in] uiNumChannels     the number of channels to init.
+     */
     void init(QList<RealTimeSampleArrayChInfo> &chInfo);
 
     //=========================================================================================================
     /**
-    * Init channel infos using fiff info
-    *
-    * @param[in] p_pFiffInfo     Info to init from
-    */
+     * Init channel infos using fiff info
+     *
+     * @param[in] p_pFiffInfo     Info to init from
+     */
     void initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo);
 
     //=========================================================================================================
     /**
-    * Returns whether channel info is initialized
-    *
-    * @return true whether the channel info is available.
-    */
+     * Returns whether channel info is initialized
+     *
+     * @return true whether the channel info is available.
+     */
     inline bool isChInit() const;
 
     //=========================================================================================================
     /**
-    * Returns the file name of the xml layout file.
-    *
-    * @return the file name of the layout file.
-    */
+     * Returns the file name of the xml layout file.
+     *
+     * @return the file name of the layout file.
+     */
     inline const QString& getXMLLayoutFile() const;
 
     //=========================================================================================================
     /**
-    * Sets the file name of the xml layout.
-    *
-    * @param[in] layout which should be set.
-    */
+     * Sets the file name of the xml layout.
+     *
+     * @param[in] layout which should be set.
+     */
     inline void setXMLLayoutFile(const QString& layout);
 
     //=========================================================================================================
     /**
-    * Sets the flags used in the QuickControl widget.
-    *
-    * @param[in] layout which should be set.
-    */
+     * Sets the flags used in the QuickControl widget.
+     *
+     * @param[in] layout which should be set.
+     */
     inline void setDisplayFlags(const QStringList& slFlags);
 
     //=========================================================================================================
     /**
-    * Sets the flags used in the QuickControl widget.
-    *
-    * @param[in] layout which should be set.
-    */
+     * Sets the flags used in the QuickControl widget.
+     *
+     * @param[in] layout which should be set.
+     */
     inline const QStringList& getDisplayFlags();
 
     //=========================================================================================================
     /**
-    * Sets the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
-    *
-    * @param[in] dSamplingRate the sampling rate of the RealTimeMultiSampleArrayNew.
-    */
+     * Sets the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
+     *
+     * @param[in] dSamplingRate the sampling rate of the RealTimeMultiSampleArrayNew.
+     */
     inline void setSamplingRate(double dSamplingRate);
 
     //=========================================================================================================
     /**
-    * Returns the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
-    *
-    * @return the sampling rate of the RealTimeMultiSampleArrayNew.
-    */
+     * Returns the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
+     *
+     * @return the sampling rate of the RealTimeMultiSampleArrayNew.
+     */
     inline double getSamplingRate() const;
 
     //=========================================================================================================
     /**
-    * Returns the number of channels.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
+     * Returns the number of channels.
+     *
+     * @return the number of values which are gathered before a notify() is called.
+     */
     inline unsigned int getNumChannels() const;
 
     //=========================================================================================================
     /**
-    * Returns the reference to the channel list.
-    *
-    * @return the reference to the channel list.
-    */
+     * Returns the reference to the channel list.
+     *
+     * @return the reference to the channel list.
+     */
     inline QList<RealTimeSampleArrayChInfo>& chInfo();
 
     //=========================================================================================================
     /**
-    * Returns the reference to the orig FiffInfo.
-    *
-    * @return the reference to the orig FiffInfo.
-    */
+     * Returns the reference to the orig FiffInfo.
+     *
+     * @return the reference to the orig FiffInfo.
+     */
     inline FiffInfo::SPtr& info();
 
     //=========================================================================================================
     /**
-    * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
-    *
-    * @param [in] iMultiArraySize the number of values.
-    */
+     * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
+     *
+     * @param [in] iMultiArraySize the number of values.
+     */
     inline void setMultiArraySize(qint32 iMultiArraySize);
 
     //=========================================================================================================
     /**
-    * Returns the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
+     * Returns the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
+     *
+     * @return the number of values which are gathered before a notify() is called.
+     */
     inline qint32 getMultiArraySize() const;
 
     //=========================================================================================================
     /**
-    * Returns the gathered multi sample array.
-    *
-    * @return the current multi sample array.
-    */
+     * Returns the gathered multi sample array.
+     *
+     * @return the current multi sample array.
+     */
     inline const QList< MatrixXd >& getMultiSampleArray();
 
     //=========================================================================================================
     /**
-    * Attaches a value to the sample array list.
-    *
-    * @param [in] mat   the value which is attached to the sample array list.
-    */
+     * Attaches a value to the sample array list.
+     *
+     * @param [in] mat   the value which is attached to the sample array list.
+     */
     virtual void setValue(const MatrixXd& mat);
 
 private:

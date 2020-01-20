@@ -517,8 +517,8 @@ void FwdBemModel::fwd_bem_free_solution()
 
 QString FwdBemModel::fwd_bem_make_bem_sol_name(const QString& name)
 /*
-    * Make a standard BEM solution file name
-    */
+     * Make a standard BEM solution file name
+     */
 {
     QString s1, s2;
 
@@ -563,8 +563,8 @@ const QString& FwdBemModel::fwd_bem_explain_method(int method)
 
 int FwdBemModel::get_int(FiffStream::SPtr &stream, const FiffDirNode::SPtr &node, int what, int *res)
 /*
-    * Wrapper to get int's
-    */
+     * Wrapper to get int's
+     */
 {
     FiffTag::SPtr t_pTag;
     if(node->find_tag(stream, what, t_pTag)) {
@@ -710,15 +710,15 @@ FwdBemModel *FwdBemModel::fwd_bem_load_three_layer_surfaces(const QString &name)
 
 int FwdBemModel::fwd_bem_load_solution(const QString &name, int bem_method, FwdBemModel *m)
 /*
-    * Load the potential solution matrix and attach it to the model:
-    *
-    * return values:
-    *
-    *       TRUE   found a suitable solution
-    *       FALSE  did not find a suitable solution
-    *       FAIL   error in reading the solution
-    *
-    */
+     * Load the potential solution matrix and attach it to the model:
+     *
+     * return values:
+     *
+     *       TRUE   found a suitable solution
+     *       FALSE  did not find a suitable solution
+     *       FAIL   error in reading the solution
+     *
+     */
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -814,8 +814,8 @@ not_found : {
 
 int FwdBemModel::fwd_bem_set_head_mri_t(FwdBemModel *m, FiffCoordTransOld *t)
 /*
-    * Set the coordinate transformation
-    */
+     * Set the coordinate transformation
+     */
 {
     if (t->from == FIFFV_COORD_HEAD && t->to == FIFFV_COORD_MRI) {
         if(m->head_mri_t)
@@ -1365,14 +1365,14 @@ void FwdBemModel::fwd_bem_ip_modify_solution(float **solution, float **ip_soluti
 #endif
     fprintf(stderr,"33 ");
     /*
-    * The lower right corner is a special case
-    */
+     * The lower right corner is a special case
+     */
     for (j = 0; j < nlast; j++)
         for (k = 0; k < nlast; k++)
             sub[j][k] = sub[j][k] + mult*ip_solution[j][k];
     /*
-    * Final scaling
-    */
+     * Final scaling
+     */
     fprintf(stderr,"done.\n\t\tScaling...");
     mne_scale_vector_40(ip_mult,solution[0],ntot*ntot);
     fprintf(stderr,"done.\n");
@@ -2060,7 +2060,7 @@ void FwdBemModel::calc_magic(double u, double z, double A, double B, double *bet
 {
     double B2 = 1.0 + B*B;
     double ABu = A + B*u;
-    *D = sqrt(u*u + z*z + ABu*ABu);
+     *D = sqrt(u*u + z*z + ABu*ABu);
     beta[0] = ABu/sqrt(u*u + z*z);
     beta[1] = (A*B + B2*u)/sqrt(A*A + B2*z*z);
     beta[2] = (B*z*z - A*u)/(z*(*D));
@@ -2172,7 +2172,7 @@ void FwdBemModel::field_integrals(float *from, MneTriangle* to, double *I1p, dou
     /*
        * Set return values
        */
-    *I1p = I1;
+     *I1p = I1;
     T[X_40] = Tx;
     T[Y_40] = Ty;
     S1[X_40] = S1x;
@@ -3242,8 +3242,8 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
             res_grad = ALLOC_CMATRIX_40(3*3*nsource,nmeg);
     }
     /*
-    * Set up the argument for the field computation
-    */
+     * Set up the argument for the field computation
+     */
     one_arg = new FwdThreadArg();
     one_arg->res            = res;
     one_arg->res_grad       = res_grad;
@@ -3335,7 +3335,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
         delete comp;
 
 
-    *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,
+     *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,
                                                nmeg,
                                                emptyList,
                                                names,
@@ -3364,9 +3364,9 @@ bad : {
 
 int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, FwdCoilSet *els, bool fixed_ori, FwdBemModel *bem_model, FwdEegSphereModel *m, bool use_threads, MneNamedMatrix **resp, MneNamedMatrix **resp_grad)
 /*
-    * Compute the EEG forward solution
-    * Use either the sphere model or BEM in the calculations
-    */
+     * Compute the EEG forward solution
+     * Use either the sphere model or BEM in the calculations
+     */
 {
     float            **res = NULL;          /* The forward solution matrix */
     float            **res_grad = NULL;     /* The gradient with respect to the dipole position */
@@ -3417,8 +3417,8 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
         client   = m;
     }
     /*
-    * Allocate space for the solution
-    */
+     * Allocate space for the solution
+     */
     if (fixed_ori)
         res = ALLOC_CMATRIX_40(nsource,neeg);
     else
@@ -3521,7 +3521,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces, int nspace, Fwd
     }
     if(one_arg)
         delete one_arg;
-    *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,neeg,emptyList,names,res);
+     *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,neeg,emptyList,names,res);
     if (resp_grad && res_grad)
         *resp_grad = MneNamedMatrix::build_named_matrix(fixed_ori ? 3*nsource : 3*3*nsource,neeg,emptyList,
                                             names,res_grad);

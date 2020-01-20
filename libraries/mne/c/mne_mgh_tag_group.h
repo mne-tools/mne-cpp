@@ -95,14 +95,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MneMghTagGroup.
-    */
+     * Constructs the MneMghTagGroup.
+     */
     MneMghTagGroup();
 
     //=========================================================================================================
     /**
-    * Destroys the MneMghTagGroup.
-    */
+     * Destroys the MneMghTagGroup.
+     */
     ~MneMghTagGroup();
 
 public:

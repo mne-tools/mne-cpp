@@ -86,27 +86,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a EpidetectSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding EpidetectToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new EpidetectSetupWidget becomes a window. If parent is another widget, EpidetectSetupWidget becomes a child window inside parent. EpidetectSetupWidget is deleted when its parent is deleted.
-    */
+     * Constructs a EpidetectSetupWidget which is a child of parent.
+     *
+     * @param [in] toolbox a pointer to the corresponding EpidetectToolbox.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new EpidetectSetupWidget becomes a window. If parent is another widget, EpidetectSetupWidget becomes a child window inside parent. EpidetectSetupWidget is deleted when its parent is deleted.
+     */
     EpidetectSetupWidget(Epidetect* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the EpidetectSetupWidget.
-    * All EpidetectSetupWidget's children are deleted first. The application exits if EpidetectSetupWidget is the main widget.
-    */
+     * Destroys the EpidetectSetupWidget.
+     * All EpidetectSetupWidget's children are deleted first. The application exits if EpidetectSetupWidget is the main widget.
+     */
     ~EpidetectSetupWidget();
 
 
 private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
 private:

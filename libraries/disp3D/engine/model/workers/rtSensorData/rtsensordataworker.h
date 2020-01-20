@@ -102,107 +102,107 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     explicit RtSensorDataWorker();
 
     //=========================================================================================================
     /**
-    * Add data which is to be streamed.
-    *
-    * @param[in] data         The new data.
-    */
+     * Add data which is to be streamed.
+     *
+     * @param[in] data         The new data.
+     */
     void addData(const Eigen::MatrixXd& data);
 
     //=========================================================================================================
     /**
-    * Clear this worker, empties the m_lData field that holds the current block of sensor activity
-    */
+     * Clear this worker, empties the m_lData field that holds the current block of sensor activity
+     */
     void clear();
     
     //=========================================================================================================
     /**
-    * Set number of vertices.
-    *
-    * @param[in] iNumberVerts      The number of vertices.
-    */
+     * Set number of vertices.
+     *
+     * @param[in] iNumberVerts      The number of vertices.
+     */
     void setNumberVertices(int iNumberVerts);
 
     //=========================================================================================================
     /**
-    * Set the number of average to take after emitting the data to the listening threads.
-    *
-    * @param[in] iNumAvr                The new number of averages.
-    */
+     * Set the number of average to take after emitting the data to the listening threads.
+     *
+     * @param[in] iNumAvr                The new number of averages.
+     */
     void setNumberAverages(int iNumAvr);
 
     //=========================================================================================================
     /**
-    * Sets the state whether to stream smoothed or raw data
-    *
-    * @param[in] bStreamSmoothedData                 The new state.
-    */
+     * Sets the state whether to stream smoothed or raw data
+     *
+     * @param[in] bStreamSmoothedData                 The new state.
+     */
     void setStreamSmoothedData(bool bStreamSmoothedData);
 
     //=========================================================================================================
     /**
-    * Set the type of the colormap.
-    *
-    * @param[in] sColormapType          The new colormap type.
-    */
+     * Set the type of the colormap.
+     *
+     * @param[in] sColormapType          The new colormap type.
+     */
     void setColormapType(const QString& sColormapType);
 
     //=========================================================================================================
     /**
-    * Set the normalization value.
-    *
-    * @param[in] vecThresholds          The new threshold values used for normalizing the data.
-    */
+     * Set the normalization value.
+     *
+     * @param[in] vecThresholds          The new threshold values used for normalizing the data.
+     */
     void setThresholds(const QVector3D &vecThresholds);
     
     //=========================================================================================================
     /**
-    * Set the loop functionality on or off.
-    *
-    * @param[in] bLoopState                The new looping state.
-    */
+     * Set the loop functionality on or off.
+     *
+     * @param[in] bLoopState                The new looping state.
+     */
     void setLoopState(bool bLoopState);
 
     //=========================================================================================================
     /**
-    * Set the sampling frequency.
-    *
-    * @param[in] dSFreq                 The new sampling frequency.
-    */
+     * Set the sampling frequency.
+     *
+     * @param[in] dSFreq                 The new sampling frequency.
+     */
     void setSFreq(const double dSFreq);
 
     //=========================================================================================================
     /**
-    * Set the interpolation matrix.
-    *
-    * @param[in] pMatInterpolationMatrix                 The new interpolation matrix.
-    */
+     * Set the interpolation matrix.
+     *
+     * @param[in] pMatInterpolationMatrix                 The new interpolation matrix.
+     */
     void setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 
     //=========================================================================================================
     /**
-    * Streams the data.
-    */
+     * Streams the data.
+     */
     void streamData();
 
 protected:
     //=========================================================================================================
     /**
-    * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
-    *
-    * @param[in] vecData                       The final values for each vertex of the surface
-    * @param[in,out] matFinalVertColor         The color matrix which the results are to be written to
-    * @param[in] dThresholdX                   Lower threshold for normalizing
-    * @param[in] dThreholdZ                    Upper threshold for normalizing
-    * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
-    * @param[in] sColorMap                     The color map to us
-    *
-    */
+     * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
+     *
+     * @param[in] vecData                       The final values for each vertex of the surface
+     * @param[in,out] matFinalVertColor         The color matrix which the results are to be written to
+     * @param[in] dThresholdX                   Lower threshold for normalizing
+     * @param[in] dThreholdZ                    Upper threshold for normalizing
+     * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
+     * @param[in] sColorMap                     The color map to us
+     *
+     */
     void normalizeAndTransformToColor(const Eigen::VectorXf& vecData,
                                       Eigen::MatrixX4f &matFinalVertColor,
                                       double dThresholdX,
@@ -212,12 +212,12 @@ protected:
 
     //=========================================================================================================
     /**
-    * @brief generateColorsFromSensorValues        Produces the final color matrix that is to be emitted
-    *
-    * @param[in] vecSensorValues                   A vector of sensor signals
-    *
-    * @return The final color values for the underlying mesh surface
-    */
+     * @brief generateColorsFromSensorValues        Produces the final color matrix that is to be emitted
+     *
+     * @param[in] vecSensorValues                   A vector of sensor signals
+     *
+     * @return The final color values for the underlying mesh surface
+     */
     Eigen::MatrixX4f generateColorsFromSensorValues(const Eigen::VectorXd& vecSensorValues);
 
     QList<Eigen::VectorXd>                              m_lDataQ;                           /**< List that holds the fiff matrix data <n_channels x n_samples>. */
@@ -236,8 +236,8 @@ protected:
 
     //=========================================================================================================
     /**
-    * The struct specifing visualization info.
-    */
+     * The struct specifing visualization info.
+     */
     struct VisualizationInfo {
         double                      dThresholdX;
         double                      dThresholdZ;
@@ -253,18 +253,18 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever this item should stream new raw data to its listeners.
-    *
-    * @param[in] vecDataVector     The raw data.
-    */
+     * Emit this signal whenever this item should stream new raw data to its listeners.
+     *
+     * @param[in] vecDataVector     The raw data.
+     */
     void newRtRawData(Eigen::VectorXd vecDataVector);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever this item should stream interpolated raw data to its listeners.
-    *
-    * @param[in] matColorMatrix     The interpolated raw data in form of rgb colors for each vertex.
-    */
+     * Emit this signal whenever this item should stream interpolated raw data to its listeners.
+     *
+     * @param[in] matColorMatrix     The interpolated raw data in form of rgb colors for each vertex.
+     */
     void newRtSmoothedData(const Eigen::MatrixX4f &matColorMatrix);
 };
 

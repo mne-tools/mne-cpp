@@ -87,14 +87,14 @@ class FIFFIOSHARED_EXPORT FiffIO : public ANSHAREDLIB::IExtension
 public:
     //=========================================================================================================
     /**
-    * Constructs a FiffIO.
-    */
+     * Constructs a FiffIO.
+     */
     FiffIO();
 
     //=========================================================================================================
     /**
-    * Destroys the FiffIO.
-    */
+     * Destroys the FiffIO.
+     */
     ~FiffIO();
 
     // IExtension functions

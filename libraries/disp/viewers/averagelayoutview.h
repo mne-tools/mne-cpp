@@ -101,105 +101,105 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a AverageLayoutView which is a child of parent.
-    *
-    * @param [in] parent    parent of widget
-    */
+     * Constructs a AverageLayoutView which is a child of parent.
+     *
+     * @param [in] parent    parent of widget
+     */
     AverageLayoutView(QWidget *parent = 0,
                       Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Sets the channel info model.
-    *
-    * @param [in] pChannelInfoModel     The new channel info model.
-    */
+     * Sets the channel info model.
+     *
+     * @param [in] pChannelInfoModel     The new channel info model.
+     */
     void setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
 
     //=========================================================================================================
     /**
-    * Sets the evoked set model.
-    *
-    * @param [in] pEvokedSetModel     The new evoked set model.
-    */
+     * Sets the evoked set model.
+     *
+     * @param [in] pEvokedSetModel     The new evoked set model.
+     */
     void setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvokedSetModel);
 
     //=========================================================================================================
     /**
-    * Sets the background color of the scene.
-    *
-    * @param [in] backgroundColor     The new background color.
-    */
+     * Sets the background color of the scene.
+     *
+     * @param [in] backgroundColor     The new background color.
+     */
     void setBackgroundColor(const QColor& backgroundColor);
 
     //=========================================================================================================
     /**
-    * Returns the background color of the scene.
-    *
-    * @return     The current background color.
-    */
+     * Returns the background color of the scene.
+     *
+     * @return     The current background color.
+     */
     QColor getBackgroundColor();
 
     //=========================================================================================================
     /**
-    * Renders a screenshot of the scene and saves it to the passed path. SVG and PNG supported.
-    *
-    * @param [in] fileName     The file name and path where to store the screenshot.
-    */
+     * Renders a screenshot of the scene and saves it to the passed path. SVG and PNG supported.
+     *
+     * @param [in] fileName     The file name and path where to store the screenshot.
+     */
     void takeScreenshot(const QString& fileName);
 
     //=========================================================================================================
     /**
-    * Sets the scale map to scaleMap.
-    *
-    * @param [in] scaleMap map with all channel types and their current scaling value.
-    */
+     * Sets the scale map to scaleMap.
+     *
+     * @param [in] scaleMap map with all channel types and their current scaling value.
+     */
     void setScaleMap(const QMap<qint32, float> &scaleMap);
 
     //=========================================================================================================
     /**
-    * Get the current average colors
-    *
-    * @return Pointer to the current average colors.
-    */
+     * Get the current average colors
+     *
+     * @return Pointer to the current average colors.
+     */
     QSharedPointer<QMap<QString, QColor> > getAverageColor() const;
 
     //=========================================================================================================
     /**
-    * Get the current average activations
-    *
-    * @return Pointer to the current average activations.
-    */
+     * Get the current average activations
+     *
+     * @return Pointer to the current average activations.
+     */
     QSharedPointer<QMap<QString, bool> > getAverageActivation() const;
 
     //=========================================================================================================
     /**
-    * Set the average colors
-    *
-    * @param [in] qMapAverageColor      Pointer to the new average colors
-    */
+     * Set the average colors
+     *
+     * @param [in] qMapAverageColor      Pointer to the new average colors
+     */
     void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
     //=========================================================================================================
     /**
-    * Set the average activations
-    *
-    * @param [in] qMapAverageActivation      Pointer to the new average activations
-    */
+     * Set the average activations
+     *
+     * @param [in] qMapAverageActivation      Pointer to the new average activations
+     */
     void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
     //=========================================================================================================
     /**
-    * call this whenever the external channel selection manager changes
-    *
-    * * @param [in] selectedChannelItems list of selected graphic items
-    */
+     * call this whenever the external channel selection manager changes
+     *
+     * * @param [in] selectedChannelItems list of selected graphic items
+     */
     void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
 
     //=========================================================================================================
     /**
-    * call this function whenever the items' data needs to be updated
-    */
+     * call this function whenever the items' data needs to be updated
+     */
     void updateData();
 
 protected:

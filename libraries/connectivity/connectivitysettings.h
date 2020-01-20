@@ -130,8 +130,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ConnectivitySettings object.
-    */
+     * Constructs a ConnectivitySettings object.
+     */
     explicit ConnectivitySettings();
 
     void clearAllData();

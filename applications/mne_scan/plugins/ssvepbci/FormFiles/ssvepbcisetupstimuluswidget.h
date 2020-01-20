@@ -101,157 +101,157 @@ class SsvepBciSetupStimulusWidget : public QDialog
 public:
     //=========================================================================================================
     /**
-    * Constructs a c which is a child of parent.
-    *
-    * @param [in] parent        a pointer to parent widget; If parent is 0, the new EEGoSportsSetupStimulusWidget becomes a window. If parent is another widget, EEGoSportsSetupStimulusWidget becomes a child window inside parent. EEGoSportsSetupStimulusWidget is deleted when its parent is deleted.
-    * @param [in] pSsvepBci     a pointer to the corresponding ECGSimulator.
-    */
+     * Constructs a c which is a child of parent.
+     *
+     * @param [in] parent        a pointer to parent widget; If parent is 0, the new EEGoSportsSetupStimulusWidget becomes a window. If parent is another widget, EEGoSportsSetupStimulusWidget becomes a child window inside parent. EEGoSportsSetupStimulusWidget is deleted when its parent is deleted.
+     * @param [in] pSsvepBci     a pointer to the corresponding ECGSimulator.
+     */
     explicit SsvepBciSetupStimulusWidget(SsvepBci *pSsvepBci, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destructs a EEGoSportsSetupStimulusWidget which is a child of parent.
-    *
-    */
+     * Destructs a EEGoSportsSetupStimulusWidget which is a child of parent.
+     *
+     */
     ~SsvepBciSetupStimulusWidget();
 
     //=========================================================================================================
     /**
-    * clears the QGraphicsScene from all Items.
-    *
-    */
+     * clears the QGraphicsScene from all Items.
+     *
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Close event, when setup-stimulus window is closed.
-    *
-    * @param [in] QClosEvent for clsoing the window
-    *
-    */
+     * Close event, when setup-stimulus window is closed.
+     *
+     * @param [in] QClosEvent for clsoing the window
+     *
+     */
     void closeEvent(QCloseEvent *event);
 
     //=========================================================================================================
     /**
-    * Gets the list of all displayed freuqnecies
-    *
-    * @return  list of all displayed frequencies
-    *
-    */
+     * Gets the list of all displayed freuqnecies
+     *
+     * @return  list of all displayed frequencies
+     *
+     */
     QList<double> getFrequencies();
 
     //=========================================================================================================
     /**
-    * gets pointer to private ScreenKeyboard-object
-    *
-    * @return  QSharedPointer to ScreenKeaboard-object
-    *
-    */
+     * gets pointer to private ScreenKeyboard-object
+     *
+     * @return  QSharedPointer to ScreenKeaboard-object
+     *
+     */
     QSharedPointer<ScreenKeyboard> getScreenKeyboardSPtr();
 
 signals:
     //=========================================================================================================
     /**
-    * signal for indicating a signal change
-    */
+     * signal for indicating a signal change
+     */
     void frequencyChanged();
 
     //=========================================================================================================
     /**
-    * signal for indicating a text change
-    */
+     * signal for indicating a text change
+     */
     void settledPhrase(QString phrase);
 
 private slots:
     //=========================================================================================================
     /**
-    * Shows the widget on Fullscreen.
-    */
+     * Shows the widget on Fullscreen.
+     */
     void showTestScreen();
 
     //=========================================================================================================
     /**
-    * Clears the blinking items from screen.
-    */
+     * Clears the blinking items from screen.
+     */
     void clearItems();
 
     //=========================================================================================================
     /**
-    * Sets the state of the window to minimized.
-    */
+     * Sets the state of the window to minimized.
+     */
     void minimizeScreen();
 
     //=========================================================================================================
     /**
-    * starts test 3
-    */
+     * starts test 3
+     */
     void test3();
 
     //=========================================================================================================
     /**
-    * starts test 1
-    *
-    */
+     * starts test 1
+     *
+     */
     void test1();
 
     //=========================================================================================================
     /**
-    * starts test 2
-    *
-    */
+     * starts test 2
+     *
+     */
     void test2();
 
     //=========================================================================================================
     /**
-    * choose Item for frequency reaading and writing
-    *
-    * @param [in] index value of the Item List
-    *
-    */
+     * choose Item for frequency reaading and writing
+     *
+     * @param [in] index value of the Item List
+     *
+     */
     void panelSelect(int index);
 
     //=========================================================================================================
     /**
-    * choose Item for frequency reaading and writing
-    *
-    * @param [in] index Get the frequencie's index of of the selected item.
-    *
-    */
+     * choose Item for frequency reaading and writing
+     *
+     * @param [in] index Get the frequencie's index of of the selected item.
+     *
+     */
     void frequencySelect(int index);
 
     //=========================================================================================================
     /**
-    * Changes the render order (frequency) of the selected item.
-    *
-    * @param [in]   item        Selected Item.
-    * @param [in]   freqKey     Frequency key of the Item.
-    *
-    */
+     * Changes the render order (frequency) of the selected item.
+     *
+     * @param [in]   item        Selected Item.
+     * @param [in]   freqKey     Frequency key of the Item.
+     *
+     */
     void setFreq(SsvepBciFlickeringItem &item, int freqKey);
 
     //=========================================================================================================
     /**
-    * Starts the Screen Keyboard device.
-    */
+     * Starts the Screen Keyboard device.
+     */
     void screenKeyboard();
 
     //=========================================================================================================
     /**
-    * Changes the render order (frequency) of the selected item.
-    *
-    * @param [in]   arg1        Edit the spell text.
-    *
-    */
+     * Changes the render order (frequency) of the selected item.
+     *
+     * @param [in]   arg1        Edit the spell text.
+     *
+     */
     void on_m_lineEdit_BCISpeller_textChanged(const QString &arg1);
 
 private:
     //=========================================================================================================
     /**
-    * adapts the Item list of the combox box automatically
-    *
-    * @param [in] QList of all FlashObject on screen
-    *
-    */
+     * adapts the Item list of the combox box automatically
+     *
+     * @param [in] QList of all FlashObject on screen
+     *
+     */
     void changeComboBox();
 
     Ui::SsvepBciSetupStimulusWidget*        ui;                     /**< Pointer to the graphical user interface. */

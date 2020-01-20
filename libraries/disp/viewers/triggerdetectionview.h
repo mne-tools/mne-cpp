@@ -110,74 +110,74 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a TriggerDetectionView which is a child of parent.
-    *
-    * @param [in] parent        parent of widget
-    */
+     * Constructs a TriggerDetectionView which is a child of parent.
+     *
+     * @param [in] parent        parent of widget
+     */
     TriggerDetectionView(const QString& sSettingsPath = "",
                          QWidget *parent = 0,
                          Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the TriggerDetectionView.
-    */
+     * Destroys the TriggerDetectionView.
+     */
     ~TriggerDetectionView();
 
     //=========================================================================================================
     /**
-    * Init the view.
-    */
+     * Init the view.
+     */
     void init(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
-    * Set total number of detected triggers and trigger types.
-    *
-    * @param [in] totalNumberDetections     The numger of detected triggers
-    * @param [in] mapDetectedTriggers       The currently detected triggers
-    */
+     * Set total number of detected triggers and trigger types.
+     *
+     * @param [in] totalNumberDetections     The numger of detected triggers
+     * @param [in] mapDetectedTriggers       The currently detected triggers
+     */
     void setNumberDetectedTriggersAndTypes(int totalNumberDetections, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 
 protected:
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Slot called when trigger info changed
-    */
+     * Slot called when trigger info changed
+     */
     void onTriggerInfoChanged();
 
     //=========================================================================================================
     /**
-    * Slot called when trigger detection color button was clicked
-    */
+     * Slot called when trigger detection color button was clicked
+     */
     void onRealTimeTriggerColorChanged(bool state);
 
     //=========================================================================================================
     /**
-    * Slot called when trigger type changed
-    */
+     * Slot called when trigger type changed
+     */
     void onRealTimeTriggerColorTypeChanged(const QString& value);
 
     //=========================================================================================================
     /**
-    * Slot called when reset number of detected triggers was pressed
-    */
+     * Slot called when reset number of detected triggers was pressed
+     */
     void onResetTriggerNumbers();
 
     Ui::TriggerDetectionViewWidget* ui;
@@ -191,14 +191,14 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user pressed the trigger counter.
-    */
+     * Emit this signal whenever the user pressed the trigger counter.
+     */
     void resetTriggerCounter();
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the trigger infomration changed.
-    */
+     * Emit this signal whenever the trigger infomration changed.
+     */
     void triggerInfoChanged(const QMap<double, QColor>& value, bool active, const QString& triggerCh, double threshold);
 
 };

@@ -86,18 +86,18 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a PluginConnector with the given parent.
-    *
-    * @param[in] parent     pointer to parent plugin
-    * @param[in] name       connection name
-    * @param[in] descr      connection description
-    */
+     * Constructs a PluginConnector with the given parent.
+     *
+     * @param[in] parent     pointer to parent plugin
+     * @param[in] name       connection name
+     * @param[in] descr      connection description
+     */
     PluginConnector(IPlugin *parent, const QString &name, const QString &descr);
     
     //=========================================================================================================
     /**
-    * Destructor
-    */
+     * Destructor
+     */
     virtual ~PluginConnector(){}
 
     //=========================================================================================================

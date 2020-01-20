@@ -128,20 +128,20 @@ class NEURONALCONNECTIVITYSHARED_EXPORT NeuronalConnectivity : public SCSHAREDLI
 public:
     //=========================================================================================================
     /**
-    * Constructs a NeuronalConnectivity.
-    */
+     * Constructs a NeuronalConnectivity.
+     */
     NeuronalConnectivity();
 
     //=========================================================================================================
     /**
-    * Destroys the NeuronalConnectivity.
-    */
+     * Destroys the NeuronalConnectivity.
+     */
     ~NeuronalConnectivity();
 
     //=========================================================================================================
     /**
-    * IAlgorithm functions
-    */
+     * IAlgorithm functions
+     */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
     virtual void init();
     virtual void unload();
@@ -153,89 +153,89 @@ public:
 
     //=========================================================================================================
     /**
-    * Udates the pugin with new (incoming) data.
-    *
-    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
-    */
+     * Udates the pugin with new (incoming) data.
+     *
+     * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
+     */
     void updateSource(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Updates the real time multi sample array data
-    *
-    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
-    */
+     * Updates the real time multi sample array data
+     *
+     * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
+     */
     void updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Slot to update the fiff evoked
-    *
-    * @param[in] pMeasurement   The evoked to be appended
-    */
+     * Slot to update the fiff evoked
+     *
+     * @param[in] pMeasurement   The evoked to be appended
+     */
     void updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
     /**
-    * Generate the node positions based on the current incoming data. Also take into account selected bad channels.
-    */
+     * Generate the node positions based on the current incoming data. Also take into account selected bad channels.
+     */
     void generateNodeVertices();
 
     //=========================================================================================================
     /**
-    * IAlgorithm function
-    */
+     * IAlgorithm function
+     */
     virtual void run();
 
     //=========================================================================================================
     /**
-    * Slot called when a new real-time connectivity estimate is available.
-    *
-    * @param [in] connectivityResult        The new connectivity estimate
-    */
+     * Slot called when a new real-time connectivity estimate is available.
+     *
+     * @param [in] connectivityResult        The new connectivity estimate
+     */
     void onNewConnectivityResultAvailable(const QList<CONNECTIVITYLIB::Network>& connectivityResults,
                                           const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
     //=========================================================================================================
     /**
-    * Slot called when the metric changed.
-    *
-    * @param [in] sMetric        The new metric
-    */
+     * Slot called when the metric changed.
+     *
+     * @param [in] sMetric        The new metric
+     */
     void onMetricChanged(const QString &sMetric);
 
     //=========================================================================================================
     /**
-    * Slot called when the number of trials changed.
-    *
-    * @param [in] iNumberTrials        The new number of trials.
-    */
+     * Slot called when the number of trials changed.
+     *
+     * @param [in] iNumberTrials        The new number of trials.
+     */
     void onNumberTrialsChanged(int iNumberTrials);
 
     //=========================================================================================================
     /**
-    * Slot called when the window type changed.
-    *
-    * @param [in] windowType        The new window type
-    */
+     * Slot called when the window type changed.
+     *
+     * @param [in] windowType        The new window type
+     */
     void onWindowTypeChanged(const QString& windowType);
 
     //=========================================================================================================
     /**
-    * Slot called when the trigger type changed.
-    *
-    * @param [in] triggerType        The new trigger type.
-    */
+     * Slot called when the trigger type changed.
+     *
+     * @param [in] triggerType        The new trigger type.
+     */
     void onTriggerTypeChanged(const QString& triggerType);
 
     //=========================================================================================================
     /**
-    * Slot called when the frequency band changed.
-    *
-    * @param [in] fFreqLow        The new lower frequency band.
-    * @param [in] fFreqHigh       The new higher frequency band.
-    */
+     * Slot called when the frequency band changed.
+     *
+     * @param [in] fFreqLow        The new lower frequency band.
+     * @param [in] fFreqHigh       The new higher frequency band.
+     */
     void onFrequencyBandChanged(float fFreqLow, float fFreqHigh);
 
 private:

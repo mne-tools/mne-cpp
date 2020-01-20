@@ -95,54 +95,54 @@ class FNNSHARED_EXPORT FNN : public DEEPCNTKEXTENSION::IDeepCNTKNet
 public:
     //=========================================================================================================
     /**
-    * Constructs a FNN.
-    */
+     * Constructs a FNN.
+     */
     FNN();
 
     //=========================================================================================================
     /**
-    * Destroys the FNN.
-    */
+     * Destroys the FNN.
+     */
     ~FNN();
 
     //=========================================================================================================
     /**
-    * Initializes the network configuration.
-    */
+     * Initializes the network configuration.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when network configuration unloaded.
-    */
+     * Is called when network configuration unloaded.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Returns the CNTK model.
-    *
-    * @return the CNTK model.
-    */
+     * Returns the CNTK model.
+     *
+     * @return the CNTK model.
+     */
     virtual QSharedPointer<DEEPLIB::Deep> getModel() const;
 
     //=========================================================================================================
     /**
-    * Returns the network configuration name.
-    *
-    * @return the name of the configuration.
-    */
+     * Returns the network configuration name.
+     *
+     * @return the name of the configuration.
+     */
     virtual QString getName() const;
 
     //=========================================================================================================
     /**
-    * Trains the network configuration.
-    */
+     * Trains the network configuration.
+     */
     virtual void train();
 
     //=========================================================================================================
     /**
-    * Evaluates the network configuration.
-    */
+     * Evaluates the network configuration.
+     */
     virtual void eval();
 
 private:

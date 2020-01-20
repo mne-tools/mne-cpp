@@ -76,17 +76,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtcMneAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtcMneAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RtcMneAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new RtcMneAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+     */
     RtcMneAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtcMneAboutWidget.
-    * All DummyAboutWidget's children are deleted first. The application exits if RtcMneAboutWidget is the main widget.
-    */
+     * Destroys the RtcMneAboutWidget.
+     * All DummyAboutWidget's children are deleted first. The application exits if RtcMneAboutWidget is the main widget.
+     */
     ~RtcMneAboutWidget();
 
 private:

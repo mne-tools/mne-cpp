@@ -85,15 +85,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Mne Data
-    */
+     * Constructs the MNE Mne Data
+     */
     MneMneData();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Mne Data description
-    * Refactored: mne_free_mne_data (mne_inverse_util.c)
-    */
+     * Destroys the MNE Mne Data description
+     * Refactored: mne_free_mne_data (mne_inverse_util.c)
+     */
     ~MneMneData();
 
 public:

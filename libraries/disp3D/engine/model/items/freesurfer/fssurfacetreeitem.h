@@ -102,42 +102,42 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] p3DEntityParent    The parent 3D entity.
-    * @param[in] iType              The type of the item. See types.h for declaration and definition.
-    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] p3DEntityParent    The parent 3D entity.
+     * @param[in] iType              The type of the item. See types.h for declaration and definition.
+     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit FsSurfaceTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
                                int iType = Data3DTreeModelItemTypes::SurfaceItem,
                                const QString& text = "Surface");
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surface and annotation data to this item.
-    *
-    * @param[in] tSurface           FreeSurfer surface.
-    */
+     * Adds FreeSurfer data based on surface and annotation data to this item.
+     *
+     * @param[in] tSurface           FreeSurfer surface.
+     */
     void addData(const FSLIB::Surface& tSurface);
 
     //=========================================================================================================
     /**
-    * Call this function whenever visibilty of teh annoation has changed.
-    *
-    * @param[in] isVisible     The visibility flag.
-    */
+     * Call this function whenever visibilty of teh annoation has changed.
+     *
+     * @param[in] isVisible     The visibility flag.
+     */
     void onAnnotationVisibilityChanged(bool isVisible);
 
     //=========================================================================================================
     /**
-    * Creates a QByteArray of colors for given curvature and color data.
-    *
-    * @param[in] curvature      The curvature information.
-    * @param[in] colSulci       The sulci color information.
-    * @param[in] colGyri        The gyri color information.
-    *
-    * @return The final colors per vertex (RGB).
-    */
+     * Creates a QByteArray of colors for given curvature and color data.
+     *
+     * @param[in] curvature      The curvature information.
+     * @param[in] colSulci       The sulci color information.
+     * @param[in] colGyri        The gyri color information.
+     *
+     * @return The final colors per vertex (RGB).
+     */
     static Eigen::MatrixX4f createCurvatureVertColor(const Eigen::VectorXf& curvature,
                                                      const QColor& colSulci = QColor(50,50,50),
                                                      const QColor& colGyri = QColor(125,125,125));
@@ -145,14 +145,14 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     void initItem();
 
     //=========================================================================================================
     /**
-    * Call this function whenever the curvature color or origin of color information (curvature or annotation) changed.
-    */
+     * Call this function whenever the curvature color or origin of color information (curvature or annotation) changed.
+     */
     void onColorInfoOriginOrCurvColorChanged();
 
 

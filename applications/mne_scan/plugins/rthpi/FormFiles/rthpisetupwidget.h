@@ -99,18 +99,18 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtHpiSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding RtHpi.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtHpiSetupWidget becomes a window. If parent is another widget, RtHpiSetupWidget becomes a child window inside parent. RtHpiSetupWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RtHpiSetupWidget which is a child of parent.
+     *
+     * @param [in] toolbox a pointer to the corresponding RtHpi.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new RtHpiSetupWidget becomes a window. If parent is another widget, RtHpiSetupWidget becomes a child window inside parent. RtHpiSetupWidget is deleted when its parent is deleted.
+     */
     RtHpiSetupWidget(RtHpi* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtHpiSetupWidget.
-    * All RtHpiSetupWidget's children are deleted first. The application exits if RtHpiSetupWidget is the main widget.
-    */
+     * Destroys the RtHpiSetupWidget.
+     * All RtHpiSetupWidget's children are deleted first. The application exits if RtHpiSetupWidget is the main widget.
+     */
     ~RtHpiSetupWidget();
 
 //    void ReadPolhemusDig(QString fileName);
@@ -122,9 +122,9 @@ signals:
 private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 //    //=========================================================================================================
 //    /**

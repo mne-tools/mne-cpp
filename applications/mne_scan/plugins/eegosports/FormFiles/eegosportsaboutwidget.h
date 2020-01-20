@@ -83,17 +83,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ECGAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsAboutWidget becomes a window. If parent is another widget, EEGoSportsAboutWidget becomes a child window inside parent. EEGoSportsAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a ECGAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsAboutWidget becomes a window. If parent is another widget, EEGoSportsAboutWidget becomes a child window inside parent. EEGoSportsAboutWidget is deleted when its parent is deleted.
+     */
     EEGoSportsAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the EEGoSportsAboutWidget.
-    * All EEGoSportsAboutWidget's children are deleted first. The application exits if EEGoSportsAboutWidget is the main widget.
-    */
+     * Destroys the EEGoSportsAboutWidget.
+     * All EEGoSportsAboutWidget's children are deleted first. The application exits if EEGoSportsAboutWidget is the main widget.
+     */
     ~EEGoSportsAboutWidget();
 
 private:

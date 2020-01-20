@@ -196,22 +196,22 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     MNEForwardSolution();
 
     //=========================================================================================================
     /**
-    * Constructs a forward operator, by reading from a IO device.
-    *
-    * @param[in] p_IODevice     IO device to read from the forward operator.
-    * @param[in] force_fixed   Force fixed source orientation mode? (optional)
-    * @param[in] surf_ori      Use surface based source coordinate system? (optional)
-    * @param[in] include       Include these channels (optional)
-    * @param[in] exclude       Exclude these channels (optional)
-    * @param[in] bExcludeBads  If true bads are also read; default = false (optional)
-    *
-    */
+     * Constructs a forward operator, by reading from a IO device.
+     *
+     * @param[in] p_IODevice     IO device to read from the forward operator.
+     * @param[in] force_fixed   Force fixed source orientation mode? (optional)
+     * @param[in] surf_ori      Use surface based source coordinate system? (optional)
+     * @param[in] include       Include these channels (optional)
+     * @param[in] exclude       Exclude these channels (optional)
+     * @param[in] bExcludeBads  If true bads are also read; default = false (optional)
+     *
+     */
     MNEForwardSolution(QIODevice &p_IODevice,
                        bool force_fixed = false,
                        bool surf_ori = false,
@@ -221,38 +221,38 @@ public:
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_MNEForwardSolution   MNE forward solution
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_MNEForwardSolution   MNE forward solution
+     */
     MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSolution);
 
     //=========================================================================================================
     /**
-    * Destroys the MNEForwardSolution.
-    */
+     * Destroys the MNEForwardSolution.
+     */
     ~MNEForwardSolution();
 
     //=========================================================================================================
     /**
-    * Initializes the MNE forward solution.
-    */
+     * Initializes the MNE forward solution.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Cluster the forward solution and stores the result to p_fwdOut.
-    * The clustering is done by using the provided annotations
-    *
-    * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
-    * @param[in]    p_iClusterSize      Maximal cluster size per roi
-    * @param[out]   p_D                 The cluster operator
-    * @param[in]    p_pNoise_cov
-    * @param[in]    p_pInfo
-    * @param[in]    p_sMethod           "cityblock" or "sqeuclidean"
-    *
-    * @return clustered MNE forward solution
-    */
+     * Cluster the forward solution and stores the result to p_fwdOut.
+     * The clustering is done by using the provided annotations
+     *
+     * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
+     * @param[in]    p_iClusterSize      Maximal cluster size per roi
+     * @param[out]   p_D                 The cluster operator
+     * @param[in]    p_pNoise_cov
+     * @param[in]    p_pInfo
+     * @param[in]    p_sMethod           "cityblock" or "sqeuclidean"
+     *
+     * @return clustered MNE forward solution
+     */
     MNEForwardSolution cluster_forward_solution(const AnnotationSet &p_AnnotationSet,
                                                 qint32 p_iClusterSize,
                                                 MatrixXd& p_D = defaultD,
@@ -262,28 +262,28 @@ public:
 
     //=========================================================================================================
     /**
-    * Compute orientation prior
-    *
-    * @param[in] loose      The loose orientation parameter.
-    *
-    * @return Orientation priors.
-    */
+     * Compute orientation prior
+     *
+     * @param[in] loose      The loose orientation parameter.
+     *
+     * @return Orientation priors.
+     */
     FiffCov compute_orient_prior(float loose = 0.2);
 
     //=========================================================================================================
     /**
-    * Compute weighting for depth prior. ToDo move this to FiffCov
-    *
-    * @param[in] Gain               gain matrix
-    * @param[in] gain_info          The measurement info to specify the channels to include.
-    * @param[in] is_fixed_ori       Fixed orientation?
-    * @param[in] exp                float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed. (optional; default = 0.8)
-    * @param[in] limit              (optional; default = 10.0)
-    * @param[in] patch_areas        (optional)
-    * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels. (optional)
-    *
-    * @return the depth prior
-    */
+     * Compute weighting for depth prior. ToDo move this to FiffCov
+     *
+     * @param[in] Gain               gain matrix
+     * @param[in] gain_info          The measurement info to specify the channels to include.
+     * @param[in] is_fixed_ori       Fixed orientation?
+     * @param[in] exp                float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed. (optional; default = 0.8)
+     * @param[in] limit              (optional; default = 10.0)
+     * @param[in] patch_areas        (optional)
+     * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels. (optional)
+     *
+     * @return the depth prior
+     */
     static FiffCov compute_depth_prior(const MatrixXd &Gain,
                                        const FiffInfo &gain_info,
                                        bool is_fixed_ori,
@@ -294,79 +294,79 @@ public:
 
     //=========================================================================================================
     /**
-    * Indicates whether fwd conatins a clustered forward solution.
-    *
-    * @return true if forward solution is clustered, false otherwise.
-    */
+     * Indicates whether fwd conatins a clustered forward solution.
+     *
+     * @return true if forward solution is clustered, false otherwise.
+     */
     inline bool isClustered() const;
 
     //=========================================================================================================
     /**
-    * True if FIFF measurement file information is empty.
-    *
-    * @return true if FIFF measurement file information is empty
-    */
+     * True if FIFF measurement file information is empty.
+     *
+     * @return true if FIFF measurement file information is empty
+     */
     inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
-    * Has forward operator fixed orientation?
-    *
-    * @return true if forward operator has fixed orientation, false otherwise
-    */
+     * Has forward operator fixed orientation?
+     *
+     * @return true if forward operator has fixed orientation, false otherwise
+     */
     inline bool isFixedOrient() const;
 
     //=========================================================================================================
     /**
-    * mne.fiff.pick_channels_forward
-    *
-    * Pick channels from forward operator
-    *
-    * @param[in] include    List of channels to include. (if None, include all available).
-    * @param[in] exclude    Channels to exclude (if None, do not exclude any).
-    *
-    * @return Forward solution restricted to selected channel types.
-    */
+     * mne.fiff.pick_channels_forward
+     *
+     * Pick channels from forward operator
+     *
+     * @param[in] include    List of channels to include. (if None, include all available).
+     * @param[in] exclude    Channels to exclude (if None, do not exclude any).
+     *
+     * @return Forward solution restricted to selected channel types.
+     */
     MNEForwardSolution pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
-    * Reduces a forward solution to selected regions
-    *
-    * @param[in] p_qListLabels  ROIs
-    *
-    * @return the reduced forward solution
-    */
+     * Reduces a forward solution to selected regions
+     *
+     * @param[in] p_qListLabels  ROIs
+     *
+     * @return the reduced forward solution
+     */
     MNEForwardSolution pick_regions(const QList<Label> &p_qListLabels) const;
 
     //=========================================================================================================
     /**
-    * mne.fiff.pick_types_forward
-    *
-    * Pick by channel type and names from a forward operator
-    *
-    * @param[in] meg        Include MEG channels
-    * @param[in] eeg        Include EEG channels
-    * @param[in] include    Additional channels to include (if empty, do not add any)
-    * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
-    *
-    * @return Forward solution restricted to selected channel types.
-    */
+     * mne.fiff.pick_types_forward
+     *
+     * Pick by channel type and names from a forward operator
+     *
+     * @param[in] meg        Include MEG channels
+     * @param[in] eeg        Include EEG channels
+     * @param[in] include    Additional channels to include (if empty, do not add any)
+     * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
+     *
+     * @return Forward solution restricted to selected channel types.
+     */
     MNEForwardSolution pick_types(bool meg, bool eeg, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
-    * Prepare forward for assembling the inverse operator
-    *
-    * @param[in] p_info             The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
-    * @param[in] p_noise_cov        The noise covariance matrix.
-    * @param[in] p_pca              Calculate pca or not.
-    * @param[out] ch_names          Selected channel names
-    * @param[out] gain              Gain matrix
-    * @param[out] p_outNoiseCov     noise covariance matrix
-    * @param[out] p_outWhitener     Whitener
-    * @param[out] p_outNumNonZero   the rank (non zeros)
-    */
+     * Prepare forward for assembling the inverse operator
+     *
+     * @param[in] p_info             The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
+     * @param[in] p_noise_cov        The noise covariance matrix.
+     * @param[in] p_pca              Calculate pca or not.
+     * @param[out] ch_names          Selected channel names
+     * @param[out] gain              Gain matrix
+     * @param[out] p_outNoiseCov     noise covariance matrix
+     * @param[out] p_outWhitener     Whitener
+     * @param[out] p_outNumNonZero   the rank (non zeros)
+     */
     void prepare_forward(const FiffInfo &p_info,
                          const FiffCov &p_noise_cov,
                          bool p_pca,
@@ -419,8 +419,8 @@ public:
 
     //=========================================================================================================
     /**
-    *
-    */
+     *
+     */
     VectorXi tripletSelection(const VectorXi& p_vecIdxSelection) const
     {
         MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);
@@ -435,20 +435,20 @@ public:
 
     //=========================================================================================================
     /**
-    * ### MNE toolbox root function ###: Definition of the mne_read_forward_solution function
-    *
-    * Reads a forward solution from a fif file
-    *
-    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
-    * @param[out] fwd          A forward solution from a fif file
-    * @param[in] force_fixed   Force fixed source orientation mode? (optional)
-    * @param[in] surf_ori      Use surface based source coordinate system? (optional)
-    * @param[in] include       Include these channels (optional)
-    * @param[in] exclude       Exclude these channels (optional)
-    * @param[in] bExcludeBads  If true bads are also read; default = false (optional)
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * ### MNE toolbox root function ###: Definition of the mne_read_forward_solution function
+     *
+     * Reads a forward solution from a fif file
+     *
+     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[out] fwd          A forward solution from a fif file
+     * @param[in] force_fixed   Force fixed source orientation mode? (optional)
+     * @param[in] surf_ori      Use surface based source coordinate system? (optional)
+     * @param[in] include       Include these channels (optional)
+     * @param[in] exclude       Exclude these channels (optional)
+     * @param[in] bExcludeBads  If true bads are also read; default = false (optional)
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool read(QIODevice& p_IODevice,
                      MNEForwardSolution& fwd,
                      bool force_fixed = false,
@@ -461,74 +461,74 @@ public:
 
     //=========================================================================================================
     /**
-    * reduces the forward solution and stores the result to p_fwdOut.
-    *
-    * @param[in]    p_iNumDipoles   Desired number of dipoles
-    * @param[out]   p_D             The reduction operator
-    *
-    * @return reduced MNE forward solution
-    */
+     * reduces the forward solution and stores the result to p_fwdOut.
+     *
+     * @param[in]    p_iNumDipoles   Desired number of dipoles
+     * @param[out]   p_D             The reduction operator
+     *
+     * @return reduced MNE forward solution
+     */
     MNEForwardSolution reduce_forward_solution(qint32 p_iNumDipoles, MatrixXd& p_D) const;
 
     //=========================================================================================================
     /**
-    * Restrict gain matrix entries for optimal depth weighting
-    *
-    * @param[in, out] G     Gain matrix to be restricted; result is stored in place.
-    * @param[in] info       Fiff information
-    */
+     * Restrict gain matrix entries for optimal depth weighting
+     *
+     * @param[in, out] G     Gain matrix to be restricted; result is stored in place.
+     * @param[in] info       Fiff information
+     */
     static void restrict_gain_matrix(MatrixXd &G, const FiffInfo &info);
 
     //=========================================================================================================
     /**
-    * Helper to convert the forward solution to fixed ori from free
-    */
+     * Helper to convert the forward solution to fixed ori from free
+     */
     void to_fixed_ori();
 
     //=========================================================================================================
     /**
-    * overloading the stream out operator<<
-    *
-    * @param[in] out                    The stream to which the MNE forward solution should be assigned to.
-    * @param[in] p_MNEForwardSolution   MNE forward solution which should be assigned to the stream.
-    *
-    * @return the stream with the attached fiff projector
-    */
+     * overloading the stream out operator<<
+     *
+     * @param[in] out                    The stream to which the MNE forward solution should be assigned to.
+     * @param[in] p_MNEForwardSolution   MNE forward solution which should be assigned to the stream.
+     *
+     * @return the stream with the attached fiff projector
+     */
     friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution);
 
     /**
-    * Overloaded == operator to compare an object to this instance.
-    *
-    * @param[in] object    The object which should be compared to.
-    *
-    * @return true if equal, false otherwise
-    */
+     * Overloaded == operator to compare an object to this instance.
+     *
+     * @param[in] object    The object which should be compared to.
+     *
+     * @return true if equal, false otherwise
+     */
     friend bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b);
 
     //=========================================================================================================
     /**
-    * Returns the positions of the specified sources based on their beloning labels
-    *
-    * @param[in] lPickedLabels                    The stream to which the MNE forward solution should be assigned to.
-    * @param[in] tSurfSetInflated                 The surface used to pick the source from, based on their index specified bzy this forward solution.
-    *
-    * @return the source position in 3D space
-    */
+     * Returns the positions of the specified sources based on their beloning labels
+     *
+     * @param[in] lPickedLabels                    The stream to which the MNE forward solution should be assigned to.
+     * @param[in] tSurfSetInflated                 The surface used to pick the source from, based on their index specified bzy this forward solution.
+     *
+     * @return the source position in 3D space
+     */
     MatrixX3f getSourcePositionsByLabel(const QList<Label> &lPickedLabels, const FSLIB::SurfaceSet& tSurfSetInflated);
 
 private:
     //=========================================================================================================
     /**
-    * Definition of the read_one function in mne_read_forward_solution.m
-    *
-    * Reads all interesting stuff for one forward solution
-    *
-    * @param[in] p_pStream  The opened fif file to read from
-    * @param[in] p_Node     The forward solution node
-    * @param[out] one       The read forward solution
-    *
-    * @return True if succeeded, false otherwise
-    */
+     * Definition of the read_one function in mne_read_forward_solution.m
+     *
+     * Reads all interesting stuff for one forward solution
+     *
+     * @param[in] p_pStream  The opened fif file to read from
+     * @param[in] p_Node     The forward solution node
+     * @param[out] one       The read forward solution
+     *
+     * @return True if succeeded, false otherwise
+     */
     static bool read_one(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Node, MNEForwardSolution& one);
 
 public:

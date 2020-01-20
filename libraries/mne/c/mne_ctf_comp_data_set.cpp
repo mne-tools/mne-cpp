@@ -702,8 +702,8 @@ MneCTFCompDataSet::~MneCTFCompDataSet()
 
 MneCTFCompDataSet *MneCTFCompDataSet::mne_read_ctf_comp_data(const QString &name)
 /*
-    * Read all CTF compensation data from a given file
-    */
+     * Read all CTF compensation data from a given file
+     */
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -823,8 +823,8 @@ good : {
 
 int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set, fiffChInfo chs, int nch, fiffChInfo compchs, int ncomp)      /* How many of these */
 /*
-    * Make compensation data to apply to a set of channels to yield (or uncompensated) compensated data
-    */
+     * Make compensation data to apply to a set of channels to yield (or uncompensated) compensated data
+     */
 {
     int *comps = NULL;
     int need_comp;
@@ -933,8 +933,8 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set, fiffChInfo chs,
         fprintf(stderr,"\tPreselector created.\n");
     }
     /*
-    * Pick the desired channels
-    */
+     * Pick the desired channels
+     */
     for (k = 0; k < nch; k++) {
         if (comps[k] != MNE_CTFV_COMP_NONE)
             names.append(chs[k].ch_name);
@@ -995,8 +995,8 @@ bad : {
 
 int MneCTFCompDataSet::mne_set_ctf_comp(fiffChInfo chs, int nch, int comp)
 /*
-    * Set the compensation bits to the desired value
-    */
+     * Set the compensation bits to the desired value
+     */
 {
     int k;
     int nset;
@@ -1016,8 +1016,8 @@ int MneCTFCompDataSet::mne_set_ctf_comp(fiffChInfo chs, int nch, int comp)
 
 int MneCTFCompDataSet::mne_apply_ctf_comp(MneCTFCompDataSet *set, int do_it, float *data, int ndata, float *compdata, int ncompdata)
 /*
-    * Apply compensation or revert to uncompensated data
-    */
+     * Apply compensation or revert to uncompensated data
+     */
 {
     MneCTFCompData* this_comp;
     float *presel,*comp;
@@ -1107,8 +1107,8 @@ int MneCTFCompDataSet::mne_apply_ctf_comp(MneCTFCompDataSet *set, int do_it, flo
 
 int MneCTFCompDataSet::mne_apply_ctf_comp_t(MneCTFCompDataSet *set, int do_it, float **data, int ndata, int ns)      /* Number of samples */
 /*
-    * Apply compensation or revert to uncompensated data
-    */
+     * Apply compensation or revert to uncompensated data
+     */
 {
     MneCTFCompData* this_comp;
     float **presel,**comp;
@@ -1261,8 +1261,8 @@ const char *MneCTFCompDataSet::mne_explain_ctf_comp(int kind)
 
 int MneCTFCompDataSet::mne_ctf_set_compensation(MneCTFCompDataSet *set, int compensate_to, fiffChInfo chs, int nchan, fiffChInfo comp_chs, int ncomp_chan)     /* How many */
 /*
-    * Make data which has the third-order gradient compensation applied
-    */
+     * Make data which has the third-order gradient compensation applied
+     */
 {
     int k;
     int have_comp_chs;

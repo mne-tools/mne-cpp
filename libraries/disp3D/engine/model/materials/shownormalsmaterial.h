@@ -105,23 +105,23 @@ class DISP3DSHARED_EXPORT ShowNormalsMaterial : public Qt3DRender::QMaterial
 public:
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] parent         The parent of this class.
-    */
+     * Default constructor.
+     *
+     * @param[in] parent         The parent of this class.
+     */
     explicit ShowNormalsMaterial(Qt3DCore::QNode *parent = 0);
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    */
+     * Default destructor.
+     */
     ~ShowNormalsMaterial() = default;
 
 private:
     //=========================================================================================================
     /**
-    * Init the ShowNormalsMaterial class.
-    */
+     * Init the ShowNormalsMaterial class.
+     */
     void init();
 
     QPointer<Qt3DRender::QEffect>                   m_pVertexEffect;

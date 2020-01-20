@@ -545,8 +545,8 @@ void FwdEegSphereModel::calc_pot_components(double beta, double cgamma, double *
         Vt = Vt + multn*p1/n;
         betan = beta*betan;
     }
-    *Vrp = Vr;
-    *Vtp = Vt;
+     *Vrp = Vr;
+     *Vtp = Vt;
     return;
 }
 
@@ -1062,8 +1062,8 @@ bool FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, bool fit_berg_sche
     float  rv;
 
     /*
-    * Scale the relative radiuses
-    */
+     * Scale the relative radiuses
+     */
     for (int k = 0; k < this->nlayer(); k++)
         this->layers[k].rad = rad*this->layers[k].rel_rad;
 
@@ -1483,7 +1483,7 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
     for (k = 0; k < nfit; k++) {
         /*
     mu[k] = (k+1)*0.1*f;
-    */
+     */
         mu[k] = (rand() / (RAND_MAX + 1.0))*f;//replacement for: mu[k] = drand48()*f;
     }
 

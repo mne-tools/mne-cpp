@@ -105,30 +105,30 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a SpharaSettingsView which is a child of parent.
-    *
-    * @param [in] parent        parent of widget
-    */
+     * Constructs a SpharaSettingsView which is a child of parent.
+     *
+     * @param [in] parent        parent of widget
+     */
     SpharaSettingsView(QWidget *parent = 0,
                 Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the SpharaSettingsView.
-    */
+     * Destroys the SpharaSettingsView.
+     */
     ~SpharaSettingsView();
 
 protected:
     //=========================================================================================================
     /**
-    * Slot called when the sphara tool was toggled
-    */
+     * Slot called when the sphara tool was toggled
+     */
     void onSpharaButtonClicked(bool state);
 
     //=========================================================================================================
     /**
-    * Slot called when the user changes the sphara options
-    */
+     * Slot called when the user changes the sphara options
+     */
     void onSpharaOptionsChanged();
 
     Ui::SpharaSettingsViewWidget* ui;
@@ -136,14 +136,14 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user toggled the SPHARA operator.
-    */
+     * Emit this signal whenever the user toggled the SPHARA operator.
+     */
     void spharaActivationChanged(bool state);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changes the SPHARA operator.
-    */
+     * Emit this signal whenever the user changes the SPHARA operator.
+     */
     void spharaOptionsChanged(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond);
 
 };

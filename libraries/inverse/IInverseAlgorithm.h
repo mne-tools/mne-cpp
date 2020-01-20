@@ -96,51 +96,51 @@ class IInverseAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Destroys the IInverseAlgorithm.
-    */
+     * Destroys the IInverseAlgorithm.
+     */
     virtual ~IInverseAlgorithm() {}
 
     //=========================================================================================================
     /**
-    * Applies the inverse algorithm to input data and returns a source estimate.
-    *
-    * @param[in] p_fiffEvoked   Evoked data.
-    * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
-    *                           radial component is kept. This is only applied when working with loose orientations.
-    *
-    * @return the calculated source estimation
-    */
+     * Applies the inverse algorithm to input data and returns a source estimate.
+     *
+     * @param[in] p_fiffEvoked   Evoked data.
+     * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
+     *                           radial component is kept. This is only applied when working with loose orientations.
+     *
+     * @return the calculated source estimation
+     */
     virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false) = 0;
 
     //=========================================================================================================
     /**
-    * Applies the inverse algorithm to input data and returns a source estimate.
-    *
-    * @param[in] p_fiffEvoked   Evoked data.
-    * @param[in] tmin           Minimal time point
-    * @param[in] tmin           Time between two samples
-    * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
-    *                           radial component is kept. This is only applied when working with loose orientations.
-    *
-    * @return the calculated source estimation
-    */
+     * Applies the inverse algorithm to input data and returns a source estimate.
+     *
+     * @param[in] p_fiffEvoked   Evoked data.
+     * @param[in] tmin           Minimal time point
+     * @param[in] tmin           Time between two samples
+     * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
+     *                           radial component is kept. This is only applied when working with loose orientations.
+     *
+     * @return the calculated source estimation
+     */
     virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the algorithm name
-    *
-    * @return the algorithm name
-    */
+     * Returns the algorithm name
+     *
+     * @return the algorithm name
+     */
     virtual const char* getName() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the current mne source space on which the inverse algorithm is performing on.
-    * Either from inverse operator (minimum norm estimate), or from forward solution (beamformers)
-    *
-    * @return the mne source space information
-    */
+     * Returns the current mne source space on which the inverse algorithm is performing on.
+     * Either from inverse operator (minimum norm estimate), or from forward solution (beamformers)
+     *
+     * @return the mne source space information
+     */
     virtual const MNESourceSpace& getSourceSpace() const = 0;
 };
 

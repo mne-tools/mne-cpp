@@ -87,10 +87,10 @@ class CInfo
 public:
     //=========================================================================================================
     /**
-    * Returns the short form of the application name.
-    *
-    * @return a string containing the short application name.
-    */
+     * Returns the short form of the application name.
+     *
+     * @return a string containing the short application name.
+     */
     const static QString AppNameShort()
     {
         return QObject::tr("MNE Analyze");
@@ -98,10 +98,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the application name.
-    *
-    * @return a string containing application name.
-    */
+     * Returns the application name.
+     *
+     * @return a string containing application name.
+     */
     const static QString AppName()
     {
         return QObject::tr("Data Analysis and Machine Learning.");
@@ -109,8 +109,8 @@ public:
 
     //=========================================================================================================
     /**
-    *
-    */
+     *
+     */
     const static QString OrganizationName()
     {
         return QObject::tr("MNE-CPP");
@@ -118,10 +118,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the major version number of the application which indicates larger changes of the application.
-    *
-    * @return the major version number.
-    */
+     * Returns the major version number of the application which indicates larger changes of the application.
+     *
+     * @return the major version number.
+     */
     static int MajorVersion()
     {
         return 1;
@@ -129,10 +129,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the minor version number of the application which indicates smaller changes of the application.
-    *
-    * @return the minor version number.
-    */
+     * Returns the minor version number of the application which indicates smaller changes of the application.
+     *
+     * @return the minor version number.
+     */
     static int MinorVersion()
     {
         return 0;
@@ -140,10 +140,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the revision number which indicates the bug fix level.
-    *
-    * @return the revision number.
-    */
+     * Returns the revision number which indicates the bug fix level.
+     *
+     * @return the revision number.
+     */
     static int RevisionVersion()
     {
         return 0;
@@ -151,10 +151,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the build number which corresponds to the SVN revision control number.
-    *
-    * @return the build number.
-    */
+     * Returns the build number which corresponds to the SVN revision control number.
+     *
+     * @return the build number.
+     */
     static int BuildVersion()
     {
         return 224;
@@ -162,10 +162,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the version number (major.minor.build-revision) of the application.
-    *
-    * @return the full version number.
-    */
+     * Returns the version number (major.minor.build-revision) of the application.
+     *
+     * @return the full version number.
+     */
     const static QString AppVersion()
     {
         return QString("%1.%2.%3-%4").arg(MajorVersion()).arg(MinorVersion()).arg(RevisionVersion()).arg(BuildVersion());

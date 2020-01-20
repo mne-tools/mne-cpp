@@ -100,38 +100,38 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a Correlation object.
-    */
+     * Constructs a Correlation object.
+     */
     explicit Correlation();
 
     //=========================================================================================================
     /**
-    * Calculates the correlation coefficient between the rows of the data matrix.
-    *
-    * @param[in] connectivitySettings   The input data and parameters.
-    *
-    * @return                   The connectivity information in form of a network structure.
-    */
+     * Calculates the correlation coefficient between the rows of the data matrix.
+     *
+     * @param[in] connectivitySettings   The input data and parameters.
+     *
+     * @return                   The connectivity information in form of a network structure.
+     */
     static Network calculate(ConnectivitySettings &connectivitySettings);
 
 protected:
     //=========================================================================================================
     /**
-    * Calculates the connectivity matrix for a given input data matrix based on the correlation coefficient.
-    *
-    * @param[in] inputData      The input data.
-    *
-    * @return                   The connectivity matrix.
-    */
+     * Calculates the connectivity matrix for a given input data matrix based on the correlation coefficient.
+     *
+     * @param[in] inputData      The input data.
+     *
+     * @return                   The connectivity matrix.
+     */
     static Eigen::MatrixXd compute(const ConnectivitySettings::IntermediateTrialData& inputData);
 
     //=========================================================================================================
     /**
-    * Sums up (reduces) the in parallel processed connectivity matrix.
-    *
-    * @param[out] resultData    The result data.
-    * @param[in]  data          The incoming, temporary result data.
-    */
+     * Sums up (reduces) the in parallel processed connectivity matrix.
+     *
+     * @param[out] resultData    The result data.
+     * @param[in]  data          The incoming, temporary result data.
+     */
     static void reduce(Eigen::MatrixXd &resultData,
                        const Eigen::MatrixXd &data);
 };

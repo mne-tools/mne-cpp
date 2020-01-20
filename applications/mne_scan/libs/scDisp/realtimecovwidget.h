@@ -114,53 +114,53 @@ class SCDISPSHARED_EXPORT RealTimeCovWidget : public MeasurementWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a RealTimeCovWidget which is a child of parent.
-    *
-    * @param [in] pRTC          pointer to real-time evoked measurement.
-    * @param [in] pTime         pointer to application time.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RealTimeCovWidget which is a child of parent.
+     *
+     * @param [in] pRTC          pointer to real-time evoked measurement.
+     * @param [in] pTime         pointer to application time.
+     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+     */
     RealTimeCovWidget(QSharedPointer<SCMEASLIB::RealTimeCov> pRTC,
                       QSharedPointer<QTime> &pTime,
                       QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeCovWidget.
-    */
+     * Destroys the RealTimeCovWidget.
+     */
     ~RealTimeCovWidget();
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    *
-    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
-    */
+     * Is called when new data are available.
+     *
+     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+     */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    */
+     * Is called when new data are available.
+     */
     virtual void getData();
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeCovWidget.
-    */
+     * Initialise the RealTimeCovWidget.
+     */
     virtual void init();
 
 protected:
     //=========================================================================================================
     /**
-    * Show modality view.
-    */
+     * Show modality view.
+     */
     void showModalitySelectionWidget();
 
     //=========================================================================================================
     /**
-    * Show modality view.
-    */
+     * Show modality view.
+     */
     void onNewModalitySelection(const QMap<QString, bool>& modalityMap);
 
     QSharedPointer<DISPLIB::ModalitySelectionView>   m_pModalitySelectionWidget;    /**< Modality selection widget */

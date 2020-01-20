@@ -944,8 +944,8 @@ FiffCoordTransOld* FiffCoordTransOld::procrustes_align(int   from_frame,  /* The
     float move[3];
 
     /*
-    * Calculate the centroids and subtract;
-    */
+     * Calculate the centroids and subtract;
+     */
     for (c = 0; c < 3; c++)
         from0[c] = to0[c] = 0.0;
     for (j = 0; j < np; j++) {
@@ -965,8 +965,8 @@ FiffCoordTransOld* FiffCoordTransOld::procrustes_align(int   from_frame,  /* The
         }
     }
     /*
-    * Compute the solution of the orthogonal Proscrustes problem
-    */
+     * Compute the solution of the orthogonal Proscrustes problem
+     */
     {
         float **S;
         float **uu = ALLOC_CMATRIX_20(3,3);
@@ -1005,16 +1005,16 @@ FiffCoordTransOld* FiffCoordTransOld::procrustes_align(int   from_frame,  /* The
         FREE_CMATRIX_20(vv);
     }
     /*
-    * Now we need to generate a transformed translation vector
-    */
+     * Now we need to generate a transformed translation vector
+     */
     for (j = 0; j < 3; j++) {
         move[j] = to0[j];
         for (k = 0; k < 3; k++)
             move[j] = move[j] - rot[j][k]*from0[k];
     }
     /*
-    * Test the transformation and print the results
-    */
+     * Test the transformation and print the results
+     */
     #ifdef DEBUG
     fprintf(stderr,"Procrustes matching (desired vs. transformed) :\n");
     #endif

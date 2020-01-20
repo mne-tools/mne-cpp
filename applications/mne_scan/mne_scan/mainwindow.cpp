@@ -836,7 +836,7 @@ void MainWindow::stopTimer()
 
 void MainWindow::updateTime()
 {
-    *m_pTime = m_pTime->addMSecs(m_iTimeoutMSec);
+     *m_pTime = m_pTime->addMSecs(m_iTimeoutMSec);
     QString strTime = m_pTime->toString();
     m_pLabelTime->setText(strTime);
 }

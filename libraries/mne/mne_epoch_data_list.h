@@ -89,30 +89,30 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     MNEEpochDataList();
 
     //=========================================================================================================
     /**
-    * Destroys the MNEEpochDataList.
-    */
+     * Destroys the MNEEpochDataList.
+     */
     ~MNEEpochDataList();
 
     //=========================================================================================================
     /**
-    * Read the epochs from a raw file based on provided events.
-    *
-    * @param[in] raw            The raw data.
-    * @param[in] events         The events provided in samples and event kind.
-    * @param[in] tmin           The start time relative to the event in samples.
-    * @param[in] tmax           The end time relative to the event in samples.
-    * @param[in] event          The event kind.
-    * @param[in] dThreshold     The threshold value to use to reject epochs. Default is set to 0.0.
-    * @param[in] sChType        The channel data type to scan for. EEG, MEG or EOG. Default is none.
-    * @param[in] lExcludeChs    List of channel names to exclude.
-    * @param[in] picks          Which channels to pick.
-    */
+     * Read the epochs from a raw file based on provided events.
+     *
+     * @param[in] raw            The raw data.
+     * @param[in] events         The events provided in samples and event kind.
+     * @param[in] tmin           The start time relative to the event in samples.
+     * @param[in] tmax           The end time relative to the event in samples.
+     * @param[in] event          The event kind.
+     * @param[in] dThreshold     The threshold value to use to reject epochs. Default is set to 0.0.
+     * @param[in] sChType        The channel data type to scan for. EEG, MEG or EOG. Default is none.
+     * @param[in] lExcludeChs    List of channel names to exclude.
+     * @param[in] picks          Which channels to pick.
+     */
     static MNEEpochDataList readEpochs(const FIFFLIB::FiffRawData& raw,
                                        const Eigen::MatrixXi& events,
                                        float tmin,
@@ -124,14 +124,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Averages epoch list. Note that no baseline correction performed.
-    *
-    * @param[in] info     measurement info
-    * @param[in] first    First time sample
-    * @param[in] last     Last time sample
-    * @param[in] sel      Which epochs should be averaged (optional)
-    * @param[in] proj     Apply SSP projection vectors (optional, default = false)
-    */
+     * Averages epoch list. Note that no baseline correction performed.
+     *
+     * @param[in] info     measurement info
+     * @param[in] first    First time sample
+     * @param[in] last     Last time sample
+     * @param[in] sel      Which epochs should be averaged (optional)
+     * @param[in] proj     Apply SSP projection vectors (optional, default = false)
+     */
     FIFFLIB::FiffEvoked average(FIFFLIB::FiffInfo& p_info,
                                 FIFFLIB::fiff_int_t first,
                                 FIFFLIB::fiff_int_t last,
@@ -140,37 +140,37 @@ public:
 
     //=========================================================================================================
     /**
-    * Applies baseline correction to the evoked data.
-    *
-    * @param[in] baseline     time definition of the baseline in seconds [from, to]
-    */
+     * Applies baseline correction to the evoked data.
+     *
+     * @param[in] baseline     time definition of the baseline in seconds [from, to]
+     */
     void applyBaselineCorrection(QPair<QVariant,QVariant>& baseline);
 
     //=========================================================================================================
     /**
-    * Drop/Remove all epochs tagged as rejected
-    */
+     * Drop/Remove all epochs tagged as rejected
+     */
     void dropRejected();
 
     //=========================================================================================================
     /**
-    * Reduces alld epochs to the selected rows.
-    *
-    * @param[in] sel     The selected rows to keep.
-    */
+     * Reduces alld epochs to the selected rows.
+     *
+     * @param[in] sel     The selected rows to keep.
+     */
     void pick_channels(const Eigen::RowVectorXi& sel);
 
     //=========================================================================================================
     /**
-    * Checks the givven matrix for artifacts beyond a threshold value.
-    *
-    * @param[in] data           The data matrix.
-    * @param[in] pFiffInfo      The fiff info.
-    * @param[in] mapReject      The channel data types to scan for. EEG, MEG or EOG.
-    * @param[in] lExcludeChs    List of channel names to exclude.
-    *
-    * @return   Whether a threshold artifact was detected.
-    */
+     * Checks the givven matrix for artifacts beyond a threshold value.
+     *
+     * @param[in] data           The data matrix.
+     * @param[in] pFiffInfo      The fiff info.
+     * @param[in] mapReject      The channel data types to scan for. EEG, MEG or EOG.
+     * @param[in] lExcludeChs    List of channel names to exclude.
+     *
+     * @return   Whether a threshold artifact was detected.
+     */
     static bool checkForArtifact(const Eigen::MatrixXd& data,
                                  const FIFFLIB::FiffInfo& pFiffInfo,
                                  const QMap<QString,double>& mapReject,

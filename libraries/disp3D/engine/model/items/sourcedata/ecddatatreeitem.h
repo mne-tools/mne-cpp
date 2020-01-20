@@ -101,37 +101,37 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] p3DEntityParent    The parent 3D entity.
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] p3DEntityParent    The parent 3D entity.
+     * @param[in] iType      The type of the item. See types.h for declaration and definition.
+     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit EcdDataTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
                              int iType = Data3DTreeModelItemTypes::ECDDataItem,
                              const QString& text = "ECD");
 
     //=========================================================================================================
     /**
-    * Adds actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
-    *
-    * @param[in] pECDSet        The ECDSet dipole fit data.
-    */
+     * Adds actual rt data which is streamed by this item's worker thread item. In order for this function to worker, you must call init(...) beforehand.
+     *
+     * @param[in] pECDSet        The ECDSet dipole fit data.
+     */
     void addData(const INVERSELIB::ECDSet& pECDSet);
 
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     void initItem();
 
     //=========================================================================================================
     /**
-    * Call this function whenever you want to plot the dipoles.
-    *
-    * @param[in] tECDSet     The dipole set data.
-    */
+     * Call this function whenever you want to plot the dipoles.
+     *
+     * @param[in] tECDSet     The dipole set data.
+     */
     void plotDipoles(const INVERSELIB::ECDSet& tECDSet);
 };
 

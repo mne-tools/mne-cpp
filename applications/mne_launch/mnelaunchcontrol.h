@@ -61,52 +61,52 @@ class MNELaunchControl : public QObject
 public:
     //=========================================================================================================
     /**
-    * Constructs the MNE Launch Application.
-    *
-    * @param[in] parent     If parent is not NULL the QObject becomes a child of QObject inside parent.
-    */
+     * Constructs the MNE Launch Application.
+     *
+     * @param[in] parent     If parent is not NULL the QObject becomes a child of QObject inside parent.
+     */
     MNELaunchControl(QObject *parent = nullptr);
 
     //=========================================================================================================
     /**
-    * Launches MNE Scan
-    */
+     * Launches MNE Scan
+     */
     Q_INVOKABLE void invokeScan();
 
     //=========================================================================================================
     /**
-    * Launches MNE Browse
-    */
+     * Launches MNE Browse
+     */
     Q_INVOKABLE void invokeBrowse();
 
     //=========================================================================================================
     /**
-    * Launches MNE Analyze
-    */
+     * Launches MNE Analyze
+     */
     Q_INVOKABLE void invokeAnalyze();
 
     //=========================================================================================================
     /**
-    * Invokes an application with the given arguments
-    *
-    * @param[in] application    The MNE application name to start.
-    * @param[in] arguments      The arguments to start the MNE application with.
-    */
+     * Invokes an application with the given arguments
+     *
+     * @param[in] application    The MNE application name to start.
+     * @param[in] arguments      The arguments to start the MNE application with.
+     */
     void invokeApplication(const QString& application, const QStringList& arguments);
 
     //=========================================================================================================
     /**
-    * Checks whether the SampleData are available.
-    *
-    * @return true if the SampleData are available.
-    */
+     * Checks whether the SampleData are available.
+     *
+     * @return true if the SampleData are available.
+     */
     bool getSampleDataAvailable() const;
 
 signals:
     //=========================================================================================================
     /**
-    * Shall be emitted when the SampleData availability has changed.
-    */
+     * Shall be emitted when the SampleData availability has changed.
+     */
     void sampleDataAvailableChanged_Signal();
 
 private:

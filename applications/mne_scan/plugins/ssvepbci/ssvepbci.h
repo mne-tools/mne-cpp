@@ -124,62 +124,62 @@ class SSVEPBCISHARED_EXPORT SsvepBci : public SCSHAREDLIB::IAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Constructs a SSVEP BCI.
-    */
+     * Constructs a SSVEP BCI.
+     */
     SsvepBci();
 
     //=========================================================================================================
     /**
-    * Destroys the BCI.
-    */
+     * Destroys the BCI.
+     */
     virtual ~SsvepBci();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Shows Setup of Stimulus Feature.
-    */
+     * Shows Setup of Stimulus Feature.
+     */
     void showSetupStimulus();
 
     //=========================================================================================================
     /**
-    * Shows configuration panel of BCI.
-    */
+     * Shows configuration panel of BCI.
+     */
     void showBCIConfiguration();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Starts the BCI by starting the BCI's thread.
-    */
+     * Starts the BCI by starting the BCI's thread.
+     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the BCI by stopping the BCI's thread.
-    */
+     * Stops the BCI by stopping the BCI's thread.
+     */
     virtual bool stop();
 
     //=========================================================================================================
     /**
-    * returns the plug-in type
-    */
+     * returns the plug-in type
+     */
     virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
 
     //=========================================================================================================
@@ -196,201 +196,201 @@ public:
 
     //=========================================================================================================
     /**
-    * get a current list of frquencies which are examined.
-    *
-    * @return       list of all desired frequencies
-    */
+     * get a current list of frquencies which are examined.
+     *
+     * @return       list of all desired frequencies
+     */
     QList<double>  getCurrentListOfFrequencies();
 
     //=========================================================================================================
     /**
-    * retruns the ssvep BCI resource path
-    *
-    * @return       string of the resource path
-    */
+     * retruns the ssvep BCI resource path
+     *
+     * @return       string of the resource path
+     */
     QString getSsvepBciResourcePath();
 
 protected:
     /**
-    * This update function gets called whenever the input buffer stream from the TMSI plugin is full and need to be emptied by this BCI plugin.
-    *
-    * @param [in] pMeasurement measurement object.
-    */
+     * This update function gets called whenever the input buffer stream from the TMSI plugin is full and need to be emptied by this BCI plugin.
+     *
+     * @param [in] pMeasurement measurement object.
+     */
     void updateSensor(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * This update function gets called whenever the input buffer stream from the Sourcelab plugin is full and need to be emptied by this BCI plugin.
-    *
-    * @param [in] pMeasurement measurement object.
-    */
+     * This update function gets called whenever the input buffer stream from the Sourcelab plugin is full and need to be emptied by this BCI plugin.
+     *
+     * @param [in] pMeasurement measurement object.
+     */
     void updateSource(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Clears all values from the list of classficiation results. Normally after a SSVEP has been detected
-    *
-    */
+     * Clears all values from the list of classficiation results. Normally after a SSVEP has been detected
+     *
+     */
     void clearClassifications();
 
 
     //=========================================================================================================
     /**
-    * Applying the Minimum Energy Combination approach in order to get the signal energy in Y detected by the
-    * reference signal X.
-    *
-    * @param [in]   Y           measured signal.
-    * @param [in]   X           reference signal.
-    *
-    * @return       signal energy of the reference signal in the measured signal.
-    *
-    */
+     * Applying the Minimum Energy Combination approach in order to get the signal energy in Y detected by the
+     * reference signal X.
+     *
+     * @param [in]   Y           measured signal.
+     * @param [in]   X           reference signal.
+     *
+     * @return       signal energy of the reference signal in the measured signal.
+     *
+     */
     double MEC(SCMEASLIB::MatrixXd &Y, SCMEASLIB::MatrixXd &X);
 
     //=========================================================================================================
     /**
-    * Applying Canoncial Correlation Analysis to get the correlation between the sets of signals of reference
-    * Signal X and the EEG Signal Y.
-    *
-    * @param [in]   Y           measured signal.
-    * @param [in]   X           reference signal.
-    *
-    * @return       maximal correlation between the signals.
-    *
-    */
+     * Applying Canoncial Correlation Analysis to get the correlation between the sets of signals of reference
+     * Signal X and the EEG Signal Y.
+     *
+     * @param [in]   Y           measured signal.
+     * @param [in]   X           reference signal.
+     *
+     * @return       maximal correlation between the signals.
+     *
+     */
     double CCA(SCMEASLIB::MatrixXd &Y, SCMEASLIB::MatrixXd &X);
 
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
     //=========================================================================================================
     /**
-    * Executing the whole SSVEP-BCI on sensor level.
-    */
+     * Executing the whole SSVEP-BCI on sensor level.
+     */
     void ssvepBciOnSensor();
 
     //=========================================================================================================
     /**
-    * Executing the whole SSVEP-BCI on sensor level.
-    */
+     * Executing the whole SSVEP-BCI on sensor level.
+     */
     void ssvepBciOnSource();
 
 public slots:
     //=========================================================================================================
     /**
-    * setting the flag for removing the power line
-    *
-    * @param [in]   removePowerline     Flag for power line
-    */
+     * setting the flag for removing the power line
+     *
+     * @param [in]   removePowerline     Flag for power line
+     */
     void removePowerLine(bool removePowerLine);
 
     //=========================================================================================================
     /**
-    * adjusting the powerline frequency
-    *
-    * @param [in]   powerLine     frequency of the power line
-    */
+     * adjusting the powerline frequency
+     *
+     * @param [in]   powerLine     frequency of the power line
+     */
     void setPowerLine(int powerLine);
 
     //=========================================================================================================
     /**
-    * slot adjusting the kind of feature extraction
-    *
-    * @param [in]   useMEC     flag for using MEC
-    */
+     * slot adjusting the kind of feature extraction
+     *
+     * @param [in]   useMEC     flag for using MEC
+     */
     void setFeatureExtractionMethod(bool useMEC);
 
     //=========================================================================================================
     /**
-    * slot for adjusting the kind of feature extraction
-    *
-    * @param [in]   useMEC     flag for using MEC
-    */
+     * slot for adjusting the kind of feature extraction
+     *
+     * @param [in]   useMEC     flag for using MEC
+     */
     void setThresholdValues(MyQList thresholds);
 
     //=========================================================================================================
     /**
-    * slot for changing the SSVEP parameter
-    */
+     * slot for changing the SSVEP parameter
+     */
     void setChangeSSVEPParameterFlag();
 
     //=========================================================================================================
     /**
-    * slot for adjusting the number of classification hits
-    *
-    * @param [in]   numClassHits     number of classification hits
-    */
+     * slot for adjusting the number of classification hits
+     *
+     * @param [in]   numClassHits     number of classification hits
+     */
     void setNumClassHits(int numClassHits);
 
     //=========================================================================================================
     /**
-    * slot for setting the number of classfication breaks to the next classification process
-    *
-    * @param [in]   numClassBreaks     number of classification breaks
-    */
+     * slot for setting the number of classfication breaks to the next classification process
+     *
+     * @param [in]   numClassBreaks     number of classification breaks
+     */
     void setNumClassBreaks(int numClassBreaks);
 
     //=========================================================================================================
     /**
-    * slot for setting the size of the classification list
-    *
-    * @param [in]   classListSize     size of the classification list
-    */
+     * slot for setting the size of the classification list
+     *
+     * @param [in]   classListSize     size of the classification list
+     */
     void setSizeClassList(int classListSize);
 
 signals:
     //=========================================================================================================
     /**
-    * emits the values of SSVEP probabilities
-    *
-    * @param [in]   ssvepProb     list of SSVEP frequencies
-    */
+     * emits the values of SSVEP probabilities
+     *
+     * @param [in]   ssvepProb     list of SSVEP frequencies
+     */
     void SSVEPprob(MyQList ssvepProb);
 
     //=========================================================================================================
     /**
-    * emits the classification result
-    *
-    * @param [in]   classResult     classification result
-    */
+     * emits the classification result
+     *
+     * @param [in]   classResult     classification result
+     */
     void classificationResult(double classResult);
 
     //=========================================================================================================
     /**
-    * emits the the values of detectable frequencies
-    *
-    * @param [in]   frequencyList     list of SSVEP frequencies
-    */
+     * emits the the values of detectable frequencies
+     *
+     * @param [in]   frequencyList     list of SSVEP frequencies
+     */
     void getFrequencyLabels(MyQList frequencyList);
 
 private:    
     //=========================================================================================================
     /**
-    * Reading actual segment from the sliding time window and write it to a data Matrix.
-    *
-    * @param [out] data      data space where current data from the sliding time window will be written to.
-    */
+     * Reading actual segment from the sliding time window and write it to a data Matrix.
+     *
+     * @param [out] data      data space where current data from the sliding time window will be written to.
+     */
     void readFromSlidingTimeWindow(SCMEASLIB::MatrixXd &data);
 
     //=========================================================================================================
     /**
-    * Updates the parameter of the classifiaction process and resets the time window. This function is called
-    * at the end of the algorithm.
-    */
+     * Updates the parameter of the classifiaction process and resets the time window. This function is called
+     * at the end of the algorithm.
+     */
     void changeSSVEPParameter();
 
     //=========================================================================================================
     /**
-    * Updates the list of desired frequencies and of all frequencies which will be examined.
-    *
-    * @param [in]   frequencyList   List of new frequencies.
-    *
-    */
+     * Updates the list of desired frequencies and of all frequencies which will be examined.
+     *
+     * @param [in]   frequencyList   List of new frequencies.
+     *
+     */
     void setFrequencyList(QList<double> frequencyList);
 
     QAction*                                            m_pActionBCIConfiguration;          /**< Start configuration feature. */

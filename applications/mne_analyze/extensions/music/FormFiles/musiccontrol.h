@@ -66,16 +66,16 @@ class MusicControl : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs the Music Control.
-    *
-    * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
-    */
+     * Constructs the Music Control.
+     *
+     * @param[in] parent     If parent is not NULL the QWidget becomes a child of QWidget inside parent.
+     */
     explicit MusicControl(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the Music Control.
-    */
+     * Destroys the Music Control.
+     */
     ~MusicControl();
 
 private:

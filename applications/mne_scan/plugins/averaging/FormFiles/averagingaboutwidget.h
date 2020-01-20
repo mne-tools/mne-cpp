@@ -76,17 +76,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a AveragingAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new AveragingAboutWidget becomes a window. If parent is another widget, AveragingAboutWidget becomes a child window inside parent. AveragingAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a AveragingAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new AveragingAboutWidget becomes a window. If parent is another widget, AveragingAboutWidget becomes a child window inside parent. AveragingAboutWidget is deleted when its parent is deleted.
+     */
     AveragingAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the AveragingAboutWidget.
-    * All AveragingAboutWidget's children are deleted first. The application exits if AveragingAboutWidget is the main widget.
-    */
+     * Destroys the AveragingAboutWidget.
+     * All AveragingAboutWidget's children are deleted first. The application exits if AveragingAboutWidget is the main widget.
+     */
     ~AveragingAboutWidget();
 
 private:

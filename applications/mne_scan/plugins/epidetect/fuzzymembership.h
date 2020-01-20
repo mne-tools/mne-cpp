@@ -67,14 +67,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FuzzyMembership object.
-    */
+     * Constructs a FuzzyMembership object.
+     */
     FuzzyMembership();
 
     //=========================================================================================================
     /**
-    * Returns membershipvalues.
-    */
+     * Returns membershipvalues.
+     */
     Eigen::VectorXd getMembership(const Eigen::MatrixXd valHistory, const Eigen::MatrixXd valHistoryOld, const Eigen::VectorXd current, const Eigen::VectorXd epiHistory,  double margin, char type);
 
 private:

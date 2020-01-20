@@ -104,122 +104,122 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeConnectivityEstimate.
-    *
-    * @param[in] parent     the QObject parent of this measurement
-    */
+     * Constructs a RealTimeConnectivityEstimate.
+     *
+     * @param[in] parent     the QObject parent of this measurement
+     */
     RealTimeConnectivityEstimate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeConnectivityEstimate.
-    */
+     * Destroys the RealTimeConnectivityEstimate.
+     */
     virtual ~RealTimeConnectivityEstimate();
 
     //=========================================================================================================
     /**
-    * Sets the annotation set.
-    *
-    * @param[in] annotSet   the annotation set to set
-    */
+     * Sets the annotation set.
+     *
+     * @param[in] annotSet   the annotation set to set
+     */
     inline void setAnnotSet(const QSharedPointer<FSLIB::AnnotationSet>& annotSet);
 
     //=========================================================================================================
     /**
-    * Returns the annotation set.
-    *
-    * @return the annotation set
-    */
+     * Returns the annotation set.
+     *
+     * @return the annotation set
+     */
     inline QSharedPointer<FSLIB::AnnotationSet>& getAnnotSet();
 
     //=========================================================================================================
     /**
-    * Sets the sensor surface.
-    *
-    * @param[in] sensorSurface   the sensor surface
-    */
+     * Sets the sensor surface.
+     *
+     * @param[in] sensorSurface   the sensor surface
+     */
     inline void setSensorSurface(const QSharedPointer<MNELIB::MNEBem>& sensorSurface);
 
     //=========================================================================================================
     /**
-    * Returns the sensor surface.
-    *
-    * @return the sensor surfac
-    */
+     * Returns the sensor surface.
+     *
+     * @return the sensor surfac
+     */
     inline QSharedPointer<MNELIB::MNEBem>& getSensorSurface();
 
     //=========================================================================================================
     /**
-    * Sets the sensor surface.
-    *
-    * @param[in] surfSet   the surface set to set
-    */
+     * Sets the sensor surface.
+     *
+     * @param[in] surfSet   the surface set to set
+     */
     inline void setSurfSet(const QSharedPointer<FSLIB::SurfaceSet>& surfSet);
 
     //=========================================================================================================
     /**
-    * Returns the surface set.
-    *
-    * @return the surface set
-    */
+     * Returns the surface set.
+     *
+     * @return the surface set
+     */
     inline QSharedPointer<FSLIB::SurfaceSet> &getSurfSet();
 
     //=========================================================================================================
     /**
-    * Sets the forward solution.
-    *
-    * @param[in] fwdSolution   the forward solution to set
-    */
+     * Sets the forward solution.
+     *
+     * @param[in] fwdSolution   the forward solution to set
+     */
     inline void setFwdSolution(const QSharedPointer<MNELIB::MNEForwardSolution>& fwdSolution);
 
     //=========================================================================================================
     /**
-    * Returns the forward solution.
-    *
-    * @return the forward solution
-    */
+     * Returns the forward solution.
+     *
+     * @return the forward solution
+     */
     inline QSharedPointer<MNELIB::MNEForwardSolution>& getFwdSolution();
 
     //=========================================================================================================
     /**
-    * Attaches a value to the sample array vector.
-    * This method is inherited by Measurement.
-    *
-    * @param [in] v the value which is attached to the sample array vector.
-    */
+     * Attaches a value to the sample array vector.
+     * This method is inherited by Measurement.
+     *
+     * @param [in] v the value which is attached to the sample array vector.
+     */
     virtual void setValue(const CONNECTIVITYLIB::Network &v);
 
     //=========================================================================================================
     /**
-    * Returns the current value set.
-    * This method is inherited by Measurement.
-    *
-    * @return the last attached value.
-    */
+     * Returns the current value set.
+     * This method is inherited by Measurement.
+     *
+     * @return the last attached value.
+     */
     virtual QSharedPointer<CONNECTIVITYLIB::Network>& getValue();
 
     //=========================================================================================================
     /**
-    * Returns whether RealTimeConnectivityEstimate contains values
-    *
-    * @return whether RealTimeConnectivityEstimate contains values.
-    */
+     * Returns whether RealTimeConnectivityEstimate contains values
+     *
+     * @return whether RealTimeConnectivityEstimate contains values.
+     */
     inline bool isInitialized() const;
 
     //=========================================================================================================
     /**
-    * Sets the current FiffInfo.
-    *
-    * @param [in] p_fiffInfo the new FiffInfo..
-    */
+     * Sets the current FiffInfo.
+     *
+     * @param [in] p_fiffInfo the new FiffInfo..
+     */
     void setFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo>& p_fiffInfo);
 
     //=========================================================================================================
     /**
-    * Returns the current FiffInfo.
-    *
-    * @return the current FiffInfo.
-    */
+     * Returns the current FiffInfo.
+     *
+     * @return the current FiffInfo.
+     */
     QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo();
 
 private:

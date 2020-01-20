@@ -93,23 +93,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE CTF Comepnsation Data
-    * Refactored: mne_new_ctf_comp_data (mne_ctf_comp.c)
-    */
+     * Constructs the MNE CTF Comepnsation Data
+     * Refactored: mne_new_ctf_comp_data (mne_ctf_comp.c)
+     */
     MneCTFCompData();
 
     //=========================================================================================================
     /**
-    * Copies MNE CTF Comepnsation Data
-    * Refactored: mne_dup_ctf_comp_data (mne_ctf_comp.c)
-    */
+     * Copies MNE CTF Comepnsation Data
+     * Refactored: mne_dup_ctf_comp_data (mne_ctf_comp.c)
+     */
     MneCTFCompData(const MneCTFCompData& comp);
 
     //=========================================================================================================
     /**
-    * Destroys the MNE CTF Comepnsation Data
-    * Refactored: mne_free_ctf_comp_data (mne_ctf_comp.c)
-    */
+     * Destroys the MNE CTF Comepnsation Data
+     * Refactored: mne_free_ctf_comp_data (mne_ctf_comp.c)
+     */
     ~MneCTFCompData();
 
 

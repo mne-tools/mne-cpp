@@ -82,40 +82,40 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructors the coil position descriptor.
-    */
+     * Constructors the coil position descriptor.
+     */
     FiffChPos();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffChPos  Coil position descriptor which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffChPos  Coil position descriptor which should be copied
+     */
     FiffChPos(const FiffChPos &p_FiffChPos);
 
     //=========================================================================================================
     /**
-    * Destroys the coil position descriptor.
-    */
+     * Destroys the coil position descriptor.
+     */
     ~FiffChPos();
 
     //=========================================================================================================
     /**
-    * Size of the old struct (fiffChPosRec) 13*int = 13*4 = 52
-    *
-    * @return the size of the old struct fiffChPosRec.
-    */
+     * Size of the old struct (fiffChPosRec) 13*int = 13*4 = 52
+     *
+     * @return the size of the old struct fiffChPosRec.
+     */
     inline static qint32 storageSize();
 
     //=========================================================================================================
     /**
-    * Overloaded == operator to compare an object to this instance.
-    *
-    * @param[in] object    The object which should be compared to.
-    *
-    * @return true if equal, false otherwise
-    */
+     * Overloaded == operator to compare an object to this instance.
+     *
+     * @param[in] object    The object which should be compared to.
+     *
+     * @return true if equal, false otherwise
+     */
     friend bool operator== (const FiffChPos &a, const FiffChPos &b);
 
 public:

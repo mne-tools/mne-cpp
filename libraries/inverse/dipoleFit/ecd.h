@@ -85,30 +85,30 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Electric Current Dipole
-    */
+     * Constructs the Electric Current Dipole
+     */
     ECD();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_ECD      Electric Current Dipole which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_ECD      Electric Current Dipole which should be copied
+     */
     ECD(const ECD& p_ECD);
 
     //=========================================================================================================
     /**
-    * Destroys the Electric Current Dipole description
-    */
+     * Destroys the Electric Current Dipole description
+     */
     ~ECD();
 
     //=========================================================================================================
     /**
-    * prints the ECD to an stdio file stream.
-    *
-    * @param[in] f      the file stream to print to;
-    */
+     * prints the ECD to an stdio file stream.
+     *
+     * @param[in] f      the file stream to print to;
+     */
     void print(FILE *f) const;
 
 public:

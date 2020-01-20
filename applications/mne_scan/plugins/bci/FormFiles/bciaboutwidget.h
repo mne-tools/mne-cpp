@@ -88,17 +88,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a BCIAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new BCIAboutWidget becomes a window. If parent is another widget, BCIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a BCIAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new BCIAboutWidget becomes a window. If parent is another widget, BCIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
+     */
     BCIAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the BCIAboutWidget.
-    * All BCIAboutWidget's children are deleted first. The application exits if BCIAboutWidget is the main widget.
-    */
+     * Destroys the BCIAboutWidget.
+     * All BCIAboutWidget's children are deleted first. The application exits if BCIAboutWidget is the main widget.
+     */
     ~BCIAboutWidget();
 
 private:

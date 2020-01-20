@@ -123,96 +123,96 @@ class IConnector : public QThread
 public:
     //=========================================================================================================
     /**
-    * Creates the IConnector.
-    */
+     * Creates the IConnector.
+     */
     IConnector(): m_bIsActive(false) {};
 
     //=========================================================================================================
     /**
-    * Destroys the IConnector.
-    */
+     * Destroys the IConnector.
+     */
     virtual ~IConnector(){};
 
     //=========================================================================================================
     /**
-    * Returns the CommandManager
-    *
-    * @return the CommandManager.
-    */
+     * Returns the CommandManager
+     *
+     * @return the CommandManager.
+     */
     inline CommandManager& getCommandManager();
 
     //=========================================================================================================
     /**
-    * Connects the command manager to the available slots.
-    */
+     * Connects the command manager to the available slots.
+     */
     virtual void connectCommandManager() = 0;
 
     //=========================================================================================================
     /**
-    * Returns the unique connector id
-    * Pure virtual method.
-    *
-    * @return the connector ID.
-    */
+     * Returns the unique connector id
+     * Pure virtual method.
+     *
+     * @return the connector ID.
+     */
     virtual ConnectorID getConnectorID() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the plugin name.
-    * Pure virtual method.
-    *
-    * @return the name of plugin.
-    */
+     * Returns the plugin name.
+     * Pure virtual method.
+     *
+     * @return the name of plugin.
+     */
     virtual const char* getName() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the activation status of the plugin.
-    *
-    * @return true if plugin is activated.
-    */
+     * Returns the activation status of the plugin.
+     *
+     * @return true if plugin is activated.
+     */
     inline bool isActive() const;
 
     //=========================================================================================================
     /**
-    * Starts the IConnector.
-    * Pure virtual method.
-    *
-    * @return true if successful, false otherwise
-    */
+     * Starts the IConnector.
+     * Pure virtual method.
+     *
+     * @return true if successful, false otherwise
+     */
     virtual bool start() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
 
     //=========================================================================================================
     /**
-    * Stops the IPlugin.
-    * Pure virtual method.
-    *
-    * @return true if success, false otherwise
-    */
+     * Stops the IPlugin.
+     * Pure virtual method.
+     *
+     * @return true if success, false otherwise
+     */
     virtual bool stop() = 0;
 
     //=========================================================================================================
     /**
-    * Sets itsmeta data of the plugin after it was laoded by the pluginmanager.
-    *
-    * @param [in] status the new activation status of the plugin.
-    */
+     * Sets itsmeta data of the plugin after it was laoded by the pluginmanager.
+     *
+     * @param [in] status the new activation status of the plugin.
+     */
     inline void setMetaData(QJsonObject& p_MetaData);
 
     //=========================================================================================================
     /**
-    * Sets the activation status of the plugin.
-    *
-    * @param [in] status    the new activation status of the plugin.
-    */
+     * Sets the activation status of the plugin.
+     *
+     * @param [in] status    the new activation status of the plugin.
+     */
     inline void setStatus(bool status);
 
     //=========================================================================================================
     /**
-    * Request FiffInfo to be released.
-    *
-    * @param [in] ID    ID of the data client to send to. ToDo Remove this - do this processing somewhere else
-    */
+     * Request FiffInfo to be released.
+     *
+     * @param [in] ID    ID of the data client to send to. ToDo Remove this - do this processing somewhere else
+     */
     virtual void info(qint32 ID) = 0;
 
 signals:
@@ -224,10 +224,10 @@ protected:
 
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread
+     */
     virtual void run() = 0;
 
     QJsonObject     m_qJsonObjectMetaData;  /**< The meta data of the plugin defined in Q_PLUGIN_METADATA and the corresponding json file. */

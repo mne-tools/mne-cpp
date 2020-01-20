@@ -85,78 +85,78 @@ class FilterWindow : public QDockWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a FilterWindow dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
-    */
+     * Constructs a FilterWindow dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
+     */
     FilterWindow(MainWindow *mainWindow, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterWindow.
-    * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
-    */
+     * Destroys the FilterWindow.
+     * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
+     */
     ~FilterWindow();
 
     //=========================================================================================================
     /**
-    * On new file loaded.
-    */
+     * On new file loaded.
+     */
     void newFileLoaded(FiffInfo::SPtr& pFiffInfo);
 
 private:
     //=========================================================================================================
     /**
-    * inits all spin boxes.
-    */
+     * inits all spin boxes.
+     */
     void initSpinBoxes();
 
     //=========================================================================================================
     /**
-    * inits all buttons.
-    */
+     * inits all buttons.
+     */
     void initButtons();
 
     //=========================================================================================================
     /**
-    * inits the QComboBoxes.
-    */
+     * inits the QComboBoxes.
+     */
     void initComboBoxes();
 
     //=========================================================================================================
     /**
-    * inits the filter plot.
-    */
+     * inits the filter plot.
+     */
     void initFilterPlot();
 
     //=========================================================================================================
     /**
-    * inits the table views.
-    */
+     * inits the table views.
+     */
     void initTableViews();
 
     //=========================================================================================================
     /**
-    * resizeEvent reimplemented virtual function to handle resize events of the filter window
-    */
+     * resizeEvent reimplemented virtual function to handle resize events of the filter window
+     */
     void resizeEvent(QResizeEvent * event);
 
     //=========================================================================================================
     /**
-    * keyPressEvent reimplemented virtual function to handle key events
-    */
+     * keyPressEvent reimplemented virtual function to handle key events
+     */
     virtual void keyPressEvent(QKeyEvent * event);
 
     //=========================================================================================================
     /**
-    * eventFilter reimplemented virtual function to handle object specific events
-    */
+     * eventFilter reimplemented virtual function to handle object specific events
+     */
     bool eventFilter(QObject *obj, QEvent *event);
 
     //=========================================================================================================
     /**
-    * updates the filter plot scene with the newly generated filter
-    */
+     * updates the filter plot scene with the newly generated filter
+     */
     void updateFilterPlot();
 
     Ui::FilterWindowDockWidget *ui;             /**< Pointer to the qt designer generated ui class.*/
@@ -173,40 +173,40 @@ private:
 protected slots:
     //=========================================================================================================
     /**
-    * This function gets called whenever the combo box is altered by the user via the gui.
-    *
-    * @param currentIndex holds the current index of the combo box
-    */
+     * This function gets called whenever the combo box is altered by the user via the gui.
+     *
+     * @param currentIndex holds the current index of the combo box
+     */
     void changeStateSpinBoxes(int currentIndex);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the filter parameters are altered by the user via the gui.
-    */
+     * This function gets called whenever the filter parameters are altered by the user via the gui.
+     */
     void filterParametersChanged();
 
     //=========================================================================================================
     /**
-    * This function applies the user defined filter to all channels.
-    */
+     * This function applies the user defined filter to all channels.
+     */
     void applyFilter();
 
     //=========================================================================================================
     /**
-    * This function undoes the user defined filter to all channels.
-    */
+     * This function undoes the user defined filter to all channels.
+     */
     void undoFilter();
 
     //=========================================================================================================
     /**
-    * Saves an svg graphic of the scene if wanted by the user.
-    */
+     * Saves an svg graphic of the scene if wanted by the user.
+     */
     void exportFilterPlot();
 
     //=========================================================================================================
     /**
-    * This function exports the filter coefficients to a txt file.
-    */
+     * This function exports the filter coefficients to a txt file.
+     */
     void exportFilterCoefficients();
 };
 

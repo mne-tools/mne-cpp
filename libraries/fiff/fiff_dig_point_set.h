@@ -102,61 +102,61 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FiffDigPointSet object.
-    */
+     * Constructs a FiffDigPointSet object.
+     */
     FiffDigPointSet();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffDigPointSet
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffDigPointSet
+     */
     FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet);
 
     //=========================================================================================================
     /**
-    * Default constructor
-    */
+     * Default constructor
+     */
     FiffDigPointSet(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffDigPointSet
-    */
+     * Destroys the FiffDigPointSet
+     */
     ~FiffDigPointSet();
 
     //=========================================================================================================
     /**
-    * Reads FiffDigPointSet from a fif file
-    *
-    * @param [in, out] p_Stream     The opened fif file
-    * @param [out] p_Dig            The read digitizer point set
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * Reads FiffDigPointSet from a fif file
+     *
+     * @param [in, out] p_Stream     The opened fif file
+     * @param [out] p_Dig            The read digitizer point set
+     *
+     * @return true if succeeded, false otherwise
+     */
     static bool readFromStream(FiffStream::SPtr& p_Stream, FiffDigPointSet& p_Dig);
 
     //=========================================================================================================
     /**
-    * Initializes FiffDigPointSet
-    */
+     * Initializes FiffDigPointSet
+     */
     inline void clear();
 
     //=========================================================================================================
     /**
-    * True if FiffDigPointSet is empty.
-    *
-    * @return true if MNE Bem is empty
-    */
+     * True if FiffDigPointSet is empty.
+     *
+     * @return true if MNE Bem is empty
+     */
     inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
-    * Returns the number of stored FiffDigPoints
-    *
-    * @return number of stored FiffDigPoints
-    */
+     * Returns the number of stored FiffDigPoints
+     *
+     * @return number of stored FiffDigPoints
+     */
     inline qint32 size() const;
 
     //=========================================================================================================
@@ -175,61 +175,61 @@ public:
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access FiffDigPoint by index
-    *
-    * @param[in] idx    the FiffDigPoint index.
-    *
-    * @return FiffDigPoint related to the parameter index.
-    */
+     * Subscript operator [] to access FiffDigPoint by index
+     *
+     * @param[in] idx    the FiffDigPoint index.
+     *
+     * @return FiffDigPoint related to the parameter index.
+     */
     const FiffDigPoint& operator[] (qint32 idx) const;
 
     //=========================================================================================================
     /**
-    * Subscript operator [] to access FiffDigPoint by index
-    *
-    * @param[in] idx    the FiffDigPoint index.
-    *
-    * @return FiffDigPoint related to the parameter index.
-    */
+     * Subscript operator [] to access FiffDigPoint by index
+     *
+     * @param[in] idx    the FiffDigPoint index.
+     *
+     * @return FiffDigPoint related to the parameter index.
+     */
     FiffDigPoint& operator[] (qint32 idx);
 
     //=========================================================================================================
     /**
-    * Pick the wanted types from this set and returns them
-    *
-    * @param[in] includeTypes    The include types (FIFFV_POINT_HPI, FIFFV_POINT_CARDINAL, FIFFV_POINT_EEG, FIFFV_POINT_ECG, FIFFV_POINT_EXTRA, FIFFV_POINT_LPA, FIFFV_POINT_NASION, FIFFV_POINT_RPA).
-    *
-    * @return FiffDigPointSet
-    */
+     * Pick the wanted types from this set and returns them
+     *
+     * @param[in] includeTypes    The include types (FIFFV_POINT_HPI, FIFFV_POINT_CARDINAL, FIFFV_POINT_EEG, FIFFV_POINT_ECG, FIFFV_POINT_EXTRA, FIFFV_POINT_LPA, FIFFV_POINT_NASION, FIFFV_POINT_RPA).
+     *
+     * @return FiffDigPointSet
+     */
     FiffDigPointSet pickTypes(QList<int> includeTypes) const;
 
     //=========================================================================================================
     /**
-    * Subscript operator << to add a new FiffDigPoint
-    *
-    * @param[in] dig    FiffDigPoint to be added
-    *
-    * @return FiffDigPointSet
-    */
+     * Subscript operator << to add a new FiffDigPoint
+     *
+     * @param[in] dig    FiffDigPoint to be added
+     *
+     * @return FiffDigPointSet
+     */
     FiffDigPointSet& operator<< (const FiffDigPoint& dig);
 
     //=========================================================================================================
     /**
-    * Subscript operator << to add a new FiffDigPoint
-    *
-    * @param[in] dig    FiffDigPoint to be added
-    *
-    * @return FiffDigPointSet
-    */
+     * Subscript operator << to add a new FiffDigPoint
+     *
+     * @param[in] dig    FiffDigPoint to be added
+     *
+     * @return FiffDigPointSet
+     */
     FiffDigPointSet& operator<< (const FiffDigPoint* dig);
 
     //=========================================================================================================
     /**
-    * Apply a transforamtion matrix on the 3D position of the digitzed points.
-    *
-    * @param[in] coordTrans    FiffCoordTrans which is to be applied
-    * @param[in] bApplyInverse Whether to apply the inverse. False by default.
-    */
+     * Apply a transforamtion matrix on the 3D position of the digitzed points.
+     *
+     * @param[in] coordTrans    FiffCoordTrans which is to be applied
+     * @param[in] bApplyInverse Whether to apply the inverse. False by default.
+     */
     void applyTransform(const FiffCoordTrans& coordTrans, bool bApplyInverse = false);
 
 //    ToDo:

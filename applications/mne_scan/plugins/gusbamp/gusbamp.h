@@ -97,107 +97,107 @@ class GUSBAMPSHARED_EXPORT GUSBAmp : public SCSHAREDLIB::ISensor
 public:
     //=========================================================================================================
     /**
-    * Constructs a GUSBAmp.
-    */
+     * Constructs a GUSBAmp.
+     */
     GUSBAmp();
 
     //=========================================================================================================
     /**
-    * Destroys the GUSBAmp.
-    */
+     * Destroys the GUSBAmp.
+     */
     virtual ~GUSBAmp();
 
     //=========================================================================================================
     /**
-    * building all setting for the FIFF-data-stream
-    */
+     * building all setting for the FIFF-data-stream
+     */
     void setUpFiffInfo();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Starts the GUSBAmp by starting the GUSBAmp's thread.
-    */
+     * Starts the GUSBAmp by starting the GUSBAmp's thread.
+     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the GUSBAmp by stopping the GUSBAmp's thread.
-    */
+     * Stops the GUSBAmp by stopping the GUSBAmp's thread.
+     */
     virtual bool stop();
 
     //=========================================================================================================
     /**
-    * Opens a dialog to setup the project to check the impedance values
-    */
+     * Opens a dialog to setup the project to check the impedance values
+     */
     void showSetupProjectDialog();
 
     //=========================================================================================================
     /**
-    * Starts data recording
-    */
+     * Starts data recording
+     */
     void showStartRecording();
 
     //=========================================================================================================
     /**
-    * Implements blinking recording button
-    */
+     * Implements blinking recording button
+     */
     void changeRecordingButton();
 
     //=========================================================================================================
     /**
-    * Checks if a dir exists
-    */
+     * Checks if a dir exists
+     */
     bool dirExists(const std::string& dirName_in);
 
     //=========================================================================================================
     /**
-    * returns the type of the plug in
-    */
+     * returns the type of the plug in
+     */
     virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
 
     //=========================================================================================================
     /**
-    * returns the name of the plugin
-    */
+     * returns the name of the plugin
+     */
     virtual QString getName() const;
 
     //=========================================================================================================
     /**
-    * setups the widget
-    */
+     * setups the widget
+     */
     virtual QWidget* setupWidget();
 
     //=========================================================================================================
     /**
-    * splits the recorded FIFF file
-    */
+     * splits the recorded FIFF file
+     */
     void splitRecordingFile();
 
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
 private:

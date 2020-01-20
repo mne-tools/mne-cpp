@@ -110,17 +110,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
-    * @param[in] parent             The parent of this class.
-    */
+     * Default constructor.
+     *
+     * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
+     * @param[in] parent             The parent of this class.
+     */
     explicit GpuInterpolationMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = nullptr);
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    */
+     * Default destructor.
+     */
     virtual ~GpuInterpolationMaterial() = default;
 
 protected:
@@ -132,8 +132,8 @@ protected:
 
     //=========================================================================================================
     /**
-    * Add the shader code to the material.
-    */
+     * Add the shader code to the material.
+     */
     void setShaderCode() override;
 
     //Compute Part

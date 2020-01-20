@@ -93,18 +93,18 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the FiffCoordTransOld
-    */
+     * Constructs the FiffCoordTransOld
+     */
     FiffCoordTransOld();
 
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    * Refactored: fiff_dup_transform (fiff_trans.c)
-    *
-    * @param[in] p_FiffCoordTransOld    FiffCoordTransOld which should be copied
-    */
+     * Copy constructor.
+     * Refactored: fiff_dup_transform (fiff_trans.c)
+     *
+     * @param[in] p_FiffCoordTransOld    FiffCoordTransOld which should be copied
+     */
     FiffCoordTransOld(const FiffCoordTransOld& p_FiffCoordTransOld);
 
 
@@ -117,18 +117,18 @@ public:
 
     //=========================================================================================================
     /**
-    * Compose the coordinate transformation structure from a known forward transform
-    * Refactored: fiff_make_transform (make_volume_source_space.c)
-    *
-    */
+     * Compose the coordinate transformation structure from a known forward transform
+     * Refactored: fiff_make_transform (make_volume_source_space.c)
+     *
+     */
     FiffCoordTransOld(int from,int to,float rot[3][3],float move[3]);
 
 
     //=========================================================================================================
     /**
-    * Destroys the FiffCoordTransOld
-    * Refactored:  (.c)
-    */
+     * Destroys the FiffCoordTransOld
+     * Refactored:  (.c)
+     */
     ~FiffCoordTransOld();
 
 
@@ -137,8 +137,8 @@ public:
 
 
     /*
-    * Add inverse transform to an existing one
-    */
+     * Add inverse transform to an existing one
+     */
     static int add_inverse(FiffCoordTransOld* t);
 
 

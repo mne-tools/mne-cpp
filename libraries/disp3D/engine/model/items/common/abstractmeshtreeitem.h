@@ -109,34 +109,34 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] p3DEntityParent    The parent 3D entity.
-    * @param[in] iType              The type of the item. See types.h for declaration and definition.
-    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] p3DEntityParent    The parent 3D entity.
+     * @param[in] iType              The type of the item. See types.h for declaration and definition.
+     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit AbstractMeshTreeItem(Qt3DCore::QEntity* p3DEntityParent = Q_NULLPTR,
                                   int iType = Data3DTreeModelItemTypes::AbstractMeshItem,
                                   const QString& text = "Abstract Mesh Item");
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     virtual void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
     virtual void setMaterial(Qt3DRender::QMaterial *pMaterial);
 
     //=========================================================================================================
     /**
-    * Set the needed information to create the mesh and then creates a new mesh.
-    *
-    * @param[in] tMatVert       Vertices in form of a matrix.
-    * @param[in] tMatNorm       Normals in form of a matrix.
-    * @param[in] tMatTris       Tris/Faces in form of a matrix.
-    * @param[in] tMatColors     The color info of all the vertices.
-    * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
-    */
+     * Set the needed information to create the mesh and then creates a new mesh.
+     *
+     * @param[in] tMatVert       Vertices in form of a matrix.
+     * @param[in] tMatNorm       Normals in form of a matrix.
+     * @param[in] tMatTris       Tris/Faces in form of a matrix.
+     * @param[in] tMatColors     The color info of all the vertices.
+     * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
+     */
     void setMeshData(const Eigen::MatrixX3f& tMatVert,
                      const Eigen::MatrixX3f& tMatNorm,
                      const Eigen::MatrixXi& tMatTris,
@@ -145,67 +145,67 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the custom mesh.
-    *
-    * @return The costum mesh.
-    */
+     * Returns the custom mesh.
+     *
+     * @return The costum mesh.
+     */
     virtual QPointer<CustomMesh> getCustomMesh();
 
     //=========================================================================================================
     /**
-    * Set new vertices colors to the mesh.
-    *
-    * @param[in] vertColor  New color matrix MatrixX3f.
-    *
-    * @return The costum mesh.
-    */
+     * Set new vertices colors to the mesh.
+     *
+     * @param[in] vertColor  New color matrix MatrixX3f.
+     *
+     * @return The costum mesh.
+     */
     virtual void setVertColor(const Eigen::MatrixX4f &vertColor);
 
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     virtual void initItem();
 
     //=========================================================================================================
     /**
-    * Call this function whenever the inner tesselation value changed.
-    *
-    * @param[in] fTessInner     The new inner tesselation value.
-    */
+     * Call this function whenever the inner tesselation value changed.
+     *
+     * @param[in] fTessInner     The new inner tesselation value.
+     */
     virtual void onSurfaceTessInnerChanged(const QVariant& fTessInner);
 
     //=========================================================================================================
     /**
-    * Call this function whenever the outer tesselation value changed.
-    *
-    * @param[in] fTessOuter     The new outer tesselation value.
-    */
+     * Call this function whenever the outer tesselation value changed.
+     *
+     * @param[in] fTessOuter     The new outer tesselation value.
+     */
     virtual void onSurfaceTessOuterChanged(const QVariant& fTessOuter);
 
     //=========================================================================================================
     /**
-    * Call this function whenever the triangle scale value changed.
-    *
-    * @param[in] fTriangleScale     The triangle scale value.
-    */
+     * Call this function whenever the triangle scale value changed.
+     *
+     * @param[in] fTriangleScale     The triangle scale value.
+     */
     virtual void onSurfaceTriangleScaleChanged(const QVariant& fTriangleScale);
 
     //=========================================================================================================
     /**
-    * Call this function whenever the surface color was changed.
-    *
-    * @param[in] color        The new surface color.
-    */
+     * Call this function whenever the surface color was changed.
+     *
+     * @param[in] color        The new surface color.
+     */
     virtual void onColorChanged(const QVariant& color);
 
     //=========================================================================================================
     /**
-    * Call this function whenever the surface material was changed.
-    *
-    * @param[in] material        The new surface material.
-    */
+     * Call this function whenever the surface material was changed.
+     *
+     * @param[in] material        The new surface material.
+     */
     virtual void onSurfaceMaterialChanged(const QVariant& sMaterial);
 
     QPointer<Qt3DRender::QMaterial>     m_pMaterial;                        /**< The material. Ownership belongs to RenderableEntity. */

@@ -99,122 +99,122 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeSourceEstimate.
-    *
-    * @param[in] parent     the QObject parent of this measurement
-    */
+     * Constructs a RealTimeSourceEstimate.
+     *
+     * @param[in] parent     the QObject parent of this measurement
+     */
     RealTimeSourceEstimate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeSourceEstimate.
-    */
+     * Destroys the RealTimeSourceEstimate.
+     */
     virtual ~RealTimeSourceEstimate();
 
     //=========================================================================================================
     /**
-    * Sets the annotation set.
-    *
-    * @param[in] annotSet   the annotation set to set
-    */
+     * Sets the annotation set.
+     *
+     * @param[in] annotSet   the annotation set to set
+     */
     inline void setAnnotSet(AnnotationSet::SPtr& annotSet);
 
     //=========================================================================================================
     /**
-    * Returns the annotation set.
-    *
-    * @return the annotation set
-    */
+     * Returns the annotation set.
+     *
+     * @return the annotation set
+     */
     inline AnnotationSet::SPtr& getAnnotSet();
 
     //=========================================================================================================
     /**
-    * Sets the surface set.
-    *
-    * @param[in] surfSet   the surface set to set
-    */
+     * Sets the surface set.
+     *
+     * @param[in] surfSet   the surface set to set
+     */
     inline void setSurfSet(SurfaceSet::SPtr& surfSet);
 
     //=========================================================================================================
     /**
-    * Returns the surface set.
-    *
-    * @return the surface set
-    */
+     * Returns the surface set.
+     *
+     * @return the surface set
+     */
     inline SurfaceSet::SPtr& getSurfSet();
 
     //=========================================================================================================
     /**
-    * Sets the forward solution.
-    *
-    * @param[in] fwdSolution   the forward solution to set
-    */
+     * Sets the forward solution.
+     *
+     * @param[in] fwdSolution   the forward solution to set
+     */
     inline void setFwdSolution(MNEForwardSolution::SPtr& fwdSolution);
 
     //=========================================================================================================
     /**
-    * Returns the forward solution.
-    *
-    * @return the forward solution
-    */
+     * Returns the forward solution.
+     *
+     * @return the forward solution
+     */
     inline MNEForwardSolution::SPtr& getFwdSolution();
 
     //=========================================================================================================
     /**
-    * Attaches a value to the sample array vector.
-    * This method is inherited by Measurement.
-    *
-    * @param [in] v the value which is attached to the sample array vector.
-    */
+     * Attaches a value to the sample array vector.
+     * This method is inherited by Measurement.
+     *
+     * @param [in] v the value which is attached to the sample array vector.
+     */
     virtual void setValue(MNESourceEstimate &v);
 
     //=========================================================================================================
     /**
-    * Returns the current value set.
-    * This method is inherited by Measurement.
-    *
-    * @return the last attached value.
-    */
+     * Returns the current value set.
+     * This method is inherited by Measurement.
+     *
+     * @return the last attached value.
+     */
     virtual QList<MNESourceEstimate::SPtr>& getValue();
 
     //=========================================================================================================
     /**
-    * Returns whether RealTimeSourceEstimate contains values
-    *
-    * @return whether RealTimeSourceEstimate contains values.
-    */
+     * Returns whether RealTimeSourceEstimate contains values
+     *
+     * @return whether RealTimeSourceEstimate contains values.
+     */
     inline bool isInitialized() const;
 
     //=========================================================================================================
     /**
-    * Sets the current FiffInfo.
-    *
-    * @param [in] p_fiffInfo the new FiffInfo..
-    */
+     * Sets the current FiffInfo.
+     *
+     * @param [in] p_fiffInfo the new FiffInfo..
+     */
     void setFiffInfo(FiffInfo::SPtr p_fiffInfo);
 
     //=========================================================================================================
     /**
-    * Returns the current FiffInfo.
-    *
-    * @return the current FiffInfo.
-    */
+     * Returns the current FiffInfo.
+     *
+     * @return the current FiffInfo.
+     */
     FiffInfo::SPtr getFiffInfo();
 
     //=========================================================================================================
     /**
-    * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
-    *
-    * @param [in] iSourceEstimateSize the number of values.
-    */
+     * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
+     *
+     * @param [in] iSourceEstimateSize the number of values.
+     */
     inline void setSourceEstimateSize(qint32 iSourceEstimateSize);
 
     //=========================================================================================================
     /**
-    * Returns the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
+     * Returns the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
+     *
+     * @return the number of values which are gathered before a notify() is called.
+     */
     inline qint32 getSourceEstimateSize() const;
 
 private:

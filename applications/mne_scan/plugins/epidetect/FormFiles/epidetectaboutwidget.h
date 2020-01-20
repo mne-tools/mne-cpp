@@ -75,17 +75,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a EpidetectAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new EpidetectAboutWidget becomes a window. If parent is another widget, EpidetectAboutWidget becomes a child window inside parent. EpidetectAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a EpidetectAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new EpidetectAboutWidget becomes a window. If parent is another widget, EpidetectAboutWidget becomes a child window inside parent. EpidetectAboutWidget is deleted when its parent is deleted.
+     */
     EpidetectAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the EpidetectAboutWidget.
-    * All EpidetectAboutWidget's children are deleted first. The application exits if EpidetectAboutWidget is the main widget.
-    */
+     * Destroys the EpidetectAboutWidget.
+     * All EpidetectAboutWidget's children are deleted first. The application exits if EpidetectAboutWidget is the main widget.
+     */
     ~EpidetectAboutWidget();
 
 private:

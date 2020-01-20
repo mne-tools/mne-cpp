@@ -459,8 +459,8 @@ double MneSurfaceOrVolume::sum_solids(float *from, MneSurfaceOld* surf)
 
 int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOld* surf, float limit, FiffCoordTransOld* mri_head_t, MneSourceSpaceOld* *spaces, int nspace, FILE *filtered)   /* Provide a list of filtered points here */
 /*
-    * Remove all source space points closer to the surface than a given limit
-    */
+     * Remove all source space points closer to the surface than a given limit
+     */
 {
     MneSourceSpaceOld* s;
     int k,p1,p2;
@@ -754,8 +754,8 @@ int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoo
         return FAIL;
     }
     /*
-    * How close are the source points to the surface?
-    */
+     * How close are the source points to the surface?
+     */
     fprintf(stderr,"Source spaces are in ");
     if (spaces[0]->coord_frame == FIFFV_COORD_HEAD)
         fprintf(stderr,"head coordinates.\n");
@@ -822,8 +822,8 @@ int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoo
 
 MneSourceSpaceOld* MneSurfaceOrVolume::make_volume_source_space(MneSurfaceOld* surf, float grid, float exclude, float mindist)
 /*
-    * Make a source space which covers the volume bounded by surf
-    */
+     * Make a source space which covers the volume bounded by surf
+     */
 {
     float min[3],max[3],cm[3];
     int   minn[3],maxn[3];
@@ -1036,8 +1036,8 @@ MneSourceSpaceOld* MneSurfaceOrVolume::make_volume_source_space(MneSurfaceOld* s
     }
     printf("[done]\n");
     /*
-    * Set up the volume data (needed for creating the interpolation matrix)
-    */
+     * Set up the volume data (needed for creating the interpolation matrix)
+     */
     {
         float r0[3],voxel_size[3],x_ras[3],y_ras[3],z_ras[3];
         int   width,height,depth;
@@ -1346,7 +1346,7 @@ void MneSurfaceOrVolume::mne_triangle_coords(float *r, MneSurfaceOld* s, int tri
     this_tri = s->tris+tri;
 
     VEC_DIFF_17(this_tri->r1,r,rr);
-    *z = VEC_DOT_17(rr,this_tri->nn);
+     *z = VEC_DOT_17(rr,this_tri->nn);
 
     a =  VEC_DOT_17(this_tri->r12,this_tri->r12);
     b =  VEC_DOT_17(this_tri->r13,this_tri->r13);
@@ -1357,8 +1357,8 @@ void MneSurfaceOrVolume::mne_triangle_coords(float *r, MneSurfaceOld* s, int tri
 
     det = a*b - c*c;
 
-    *x = (b*v1 - c*v2)/det;
-    *y = (a*v2 - c*v1)/det;
+     *x = (b*v1 - c*v2)/det;
+     *y = (a*v2 - c*v1)/det;
 
     return;
 }
@@ -1433,9 +1433,9 @@ int MneSurfaceOrVolume::nearest_triangle_point(float *r, MneSurfaceOld* s, void 
                  (p-p0)*(q-q0)*c +
                  dist*dist);
     best = dist0;
-    *x = p0;
-    *y = q0;
-    *z = dist0;
+     *x = p0;
+     *y = q0;
+     *z = dist0;
     /*
        * Side 2 -> 3
        */
@@ -1624,8 +1624,8 @@ void MneSurfaceOrVolume::decide_search_restriction(MneSurfaceOld* s,
     }
     else {
         /*
-    * Just use this triangle
-    */
+     * Just use this triangle
+     */
         MneTriangle* this_tri = NULL;
 
         this_tri = s->tris+approx_best;
@@ -1647,8 +1647,8 @@ void MneSurfaceOrVolume::decide_search_restriction(MneSurfaceOld* s,
         }
     }
     /*
-    * Activate triangles in the neighborhood
-    */
+     * Activate triangles in the neighborhood
+     */
     activate_neighbors(s,minvert,p->act,nstep);
 
     for (k = 0, p->nactive = 0; k < s->ntri; k++)
@@ -1990,8 +1990,8 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
     }
     stream->close();
 
-    *spacesp = spaces;
-    *nspacep = nspace;
+     *spacesp = spaces;
+     *nspacep = nspace;
 
     return FIFF_OK;
 
@@ -2068,8 +2068,8 @@ int MneSurfaceOrVolume::mne_is_left_hemi_source_space(MneSourceSpaceOld* s)
 
 int MneSurfaceOrVolume::mne_transform_source_space(MneSourceSpaceOld* ss, FiffCoordTransOld *t)
 /*
-    * Transform source space data into another coordinate frame
-    */
+     * Transform source space data into another coordinate frame
+     */
 {
     int k;
     if (ss == NULL)
@@ -2290,8 +2290,8 @@ int MneSurfaceOrVolume::mne_find_sources_in_label(char *label, MneSourceSpaceOld
             sel[nsel++] = q + off;
         }
     }
-    *nselp = nsel;
-    *selp  = sel;
+     *nselp = nsel;
+     *selp  = sel;
     res = OK;
 
 out : {
@@ -2373,8 +2373,8 @@ int MneSurfaceOrVolume::mne_read_label(const QString& label, char **commentp, in
         sel = REALLOC_17(sel,nsel+1,int);
         sel[nsel++] = p;
     }
-    *nselp = nsel;
-    *selp  = sel;
+     *nselp = nsel;
+     *selp  = sel;
     res = OK;
 
 out : {
@@ -2440,8 +2440,8 @@ out : {
 
 void MneSurfaceOrVolume::mne_add_triangle_data(MneSourceSpaceOld* s)
 /*
-    * Add the triangle data structures
-    */
+     * Add the triangle data structures
+     */
 {
     int k;
     MneTriangle* tri;
@@ -2888,7 +2888,7 @@ int MneSurfaceOrVolume::mne_label_area(char *label, MneSourceSpaceOld* s, float 
             area += s->tris[neigh[q]].area/3.0;
     }
     FREE_17(sel);
-    *areap = area;
+     *areap = area;
     return OK;
 
 bad : {
@@ -2971,8 +2971,8 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
     }
 
     /*
-    * Initial alignment
-    */
+     * Initial alignment
+     */
     FREE_17(head_dig->head_mri_t_adj);
     head_dig->head_mri_t_adj = FIFFLIB::FiffCoordTransOld::fiff_make_transform_card(FIFFV_COORD_HEAD,FIFFV_COORD_MRI,
                                                                                     mri_fid[0],mri_fid[1],mri_fid[2]);
@@ -2985,8 +2985,8 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
         discard_outlier_digitizer_points(head_dig,head_surf,omit_dist);
 
     /*
-    * Optional iterative refinement
-    */
+     * Optional iterative refinement
+     */
     if (niter > 0 && head_surf) {
         for (k = 0; k < niter; k++) {
             if (iterate_alignment_once(head_dig,head_surf,nasion_weight,mri_fid[1],k == niter-1 && niter > 1) == FAIL)
@@ -3029,8 +3029,8 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
     dig_rr  = MALLOC_17(dig->npoint,float *);
     head_rr = MALLOC_17(head_surf->s->np,float *);
     /*
-    * Pick only the points with positive z
-    */
+     * Pick only the points with positive z
+     */
     for (k = 0, ndig = 0; k < dig->npoint; k++)
         if (dig->points[k].r[Z_17] > 0)
             dig_rr[ndig++] = dig->points[k].r;
@@ -3040,8 +3040,8 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
 
     fprintf(stderr,"Polhemus : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rdig);
     /*
-    * Pick only the points above the fiducial plane
-    */
+     * Pick only the points above the fiducial plane
+     */
 
     VEC_DIFF_17(mri_fid[0],mri_fid[2],LR);
     VEC_DIFF_17(mri_fid[0],mri_fid[1],LN);
@@ -3157,8 +3157,8 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
 
     mne_find_closest_on_surface_approx(head->s,rr,nactive,closest,dist,nstep);
     /*
-    * Project the points on the triangles
-    */
+     * Project the points on the triangles
+     */
     if (!do_approx)
         fprintf(stderr,"Inside or outside for %d points...",nactive);
     for (k = 0, nactive = 0; k < dig->npoint; k++) {
@@ -3217,13 +3217,13 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
         goto out;
     }
     /*
-    * Calculate initial distances
-    */
+     * Calculate initial distances
+     */
     calculate_digitizer_distances(dig,head,FALSE,TRUE);
 
     /*
-    * Set up the alignment
-    */
+     * Set up the alignment
+     */
     rr_head = ALLOC_CMATRIX_17(dig->npoint,3);
     rr_mri  = ALLOC_CMATRIX_17(dig->npoint,3);
     w       = MALLOC_17(dig->npoint,float);
@@ -3264,8 +3264,8 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
         *dig->head_mri_t_adj = *t;
     FREE_17(t);
     /*
-    * Calculate final distances
-    */
+     * Calculate final distances
+     */
     dig->dist_valid = FALSE;
     calculate_digitizer_distances(dig,head,FALSE,!last_step);
     res = OK;
@@ -3391,8 +3391,8 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface_geom(char *surf_file,
                                                              int  add_geometry,
                                                              int  check_too_many_neighbors)
     /*
-    * Load the surface and add the geometry information
-    */
+     * Load the surface and add the geometry information
+     */
 {
     float **verts = Q_NULLPTR;
     float *curvs  = Q_NULLPTR;
@@ -3510,8 +3510,8 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
     }
     if (magic == TRIANGLE_FILE_MAGIC_NUMBER) {
         /*
-    * Get the comment
-    */
+     * Get the comment
+     */
         fprintf(stderr,"Triangle file : ");
         for (c = fgetc(fp); c != '\n'; c = fgetc(fp)) {
             if (c == EOF) {
@@ -3522,8 +3522,8 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
         }
         c = fgetc(fp);
         /*
-    * How many vertices and triangles?
-    */
+     * How many vertices and triangles?
+     */
         if (mne_read_int(fp,&nvert) != 0)
             goto bad;
         if (mne_read_int(fp,&ntri) != 0)
@@ -3532,8 +3532,8 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
         vert = ALLOC_CMATRIX_17(nvert,3);
         tri  = ALLOC_ICMATRIX_17(ntri,3);
         /*
-    * Read the vertices
-    */
+     * Read the vertices
+     */
         for (k = 0; k < nvert; k++) {
             if (mne_read_float(fp,vert[k]+X_17) != 0)
                 goto bad;
@@ -3543,8 +3543,8 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
                 goto bad;
         }
         /*
-    * Read the triangles
-    */
+     * Read the triangles
+     */
         for (k = 0; k < ntri; k++) {
             if (mne_read_int(fp,tri[k]+X_17) != 0)
                 goto bad;
@@ -3606,9 +3606,9 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
                 goto bad;
 
             /*
-    * The randomization is borrowed from FreeSurfer code
-    * Strange...
-    */
+     * The randomization is borrowed from FreeSurfer code
+     * Strange...
+     */
 #define EVEN(n)      ((((n) / 2) * 2) == n)
 #ifdef FOO
 #define WHICH_FACE_SPLIT(vno0, vno1) \
@@ -3619,7 +3619,7 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
             which = quad[0];
             /*
     fprintf(stderr,"%f ",sqrt(1.9*quad[0]) + sqrt(3.5*quad[1]));
-    */
+     */
 
             if (EVEN(which)) {
                 tri[ntri][X_17] = quad[0];
@@ -3646,8 +3646,8 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
         }
     }
     /*
-    * Optionally read the tags
-    */
+     * Optionally read the tags
+     */
     if (tagsp) {
         void *tags = NULL;
         if (mne_read_mgh_tags(fp, &tags) == FAIL) {
@@ -3657,10 +3657,10 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
         *tagsp = tags;
     }
     fclose(fp);
-    *nvertp = nvert;
-    *ntrip = ntri;
-    *vertp = vert;
-    *trip  = tri;
+     *nvertp = nvert;
+     *ntrip = ntri;
+     *vertp = vert;
+     *trip  = tri;
     for (k = 0; k < nvert; k++) {
         vert[k][X_17] = vert[k][X_17]/1000.0;
         vert[k][Y_17] = vert[k][Y_17]/1000.0;
@@ -3668,8 +3668,8 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
     }
 #ifdef FOO
     /*
-    * Which ordering does the file have???
-    */
+     * Which ordering does the file have???
+     */
     for (k = 0; k < ntri; k++) {
         help = tri[k][X_17];
         tri[k][X_17] = tri[k][Y_17];
@@ -3772,8 +3772,8 @@ int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
 #ifdef DEBUG
     fprintf(stderr,"Curvature range: %f...%f\n",curvmin,curvmax);
 #endif
-    *ncurvp = ncurv;
-    *curvsp = curvs;
+     *ncurvp = ncurv;
+     *curvsp = curvs;
     return OK;
 
 bad : {
@@ -3915,8 +3915,8 @@ int MneSurfaceOrVolume::read_next_tag(FILE *fp, int *tagp, long long *lenp, unsi
             return FAIL;
         break;
     }
-    *lenp = len;
-    *tagp = tag;
+     *lenp = len;
+     *tagp = tag;
     if (read_tag_data(fp,tag,len,datap,lenp) == FAIL)
         return FAIL;
     return OK;
@@ -3933,7 +3933,7 @@ int MneSurfaceOrVolume::read_tag_data(FILE *fp, int tag, long long nbytes, unsig
     unsigned char *dum = NULL;
     size_t snbytes = nbytes;
 
-    *val = NULL;
+     *val = NULL;
     if (nbytes > 0) {
         dum = MALLOC_17(nbytes+1,unsigned char);
         if (fread(dum,sizeof(unsigned char),nbytes,fp) != snbytes) {
@@ -4094,7 +4094,7 @@ int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
         return FAIL;
     }
     s = (unsigned int)UTILSLIB::IOUtils::swap_int(s);
-    *ival = ((s >> 8) & 0xffffff);
+     *ival = ((s >> 8) & 0xffffff);
     return OK;
 }
 
@@ -4114,7 +4114,7 @@ int MneSurfaceOrVolume::mne_read_int(FILE *in, qint32 *ival)
             qCritical("mne_read_int could not read data");
         return FAIL;
     }
-    *ival = UTILSLIB::IOUtils::swap_int(s);
+     *ival = UTILSLIB::IOUtils::swap_int(s);
     return OK;
 }
 
@@ -4134,7 +4134,7 @@ int MneSurfaceOrVolume::mne_read_int2(FILE *in, int *ival)
             qCritical("mne_read_int2 could not read data");
         return FAIL;
     }
-    *ival = UTILSLIB::IOUtils::swap_short(s);
+     *ival = UTILSLIB::IOUtils::swap_short(s);
     return OK;
 }
 
@@ -4154,7 +4154,7 @@ int MneSurfaceOrVolume::mne_read_float(FILE *in, float *fval)
             qCritical("mne_read_float could not read data");
         return FAIL;
     }
-    *fval = UTILSLIB::IOUtils::swap_float(f);
+     *fval = UTILSLIB::IOUtils::swap_float(f);
     return OK;
 }
 
@@ -4174,7 +4174,7 @@ int MneSurfaceOrVolume::mne_read_long(FILE *in, long long *lval)
             qCritical("mne_read_long could not read data");
         return FAIL;
     }
-    *lval = UTILSLIB::IOUtils::swap_long(s);
+     *lval = UTILSLIB::IOUtils::swap_long(s);
     return OK;
 }
 

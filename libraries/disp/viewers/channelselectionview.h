@@ -111,11 +111,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ChannelSelectionView which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ChannelSelectionView becomes a window. If parent is another widget, ChannelSelectionView becomes a child window inside parent. ChannelSelectionView is deleted when its parent is deleted.
-    * @param [in] pChannelInfoModel pointer to the channel info model.
-    */
+     * Constructs a ChannelSelectionView which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new ChannelSelectionView becomes a window. If parent is another widget, ChannelSelectionView becomes a child window inside parent. ChannelSelectionView is deleted when its parent is deleted.
+     * @param [in] pChannelInfoModel pointer to the channel info model.
+     */
     ChannelSelectionView(const QString& sSettingsPath = "",
                          QWidget *parent = 0,
                          QSharedPointer<ChannelInfoModel> pChannelInfoModel = QSharedPointer<ChannelInfoModel>(0),
@@ -123,234 +123,234 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the ChannelSelectionView.
-    * All ChannelSelectionView's children are deleted first. The application exits if ChannelSelectionView is the main widget.
-    */
+     * Destroys the ChannelSelectionView.
+     * All ChannelSelectionView's children are deleted first. The application exits if ChannelSelectionView is the main widget.
+     */
     ~ChannelSelectionView();
 
     //=========================================================================================================
     /**
-    * Sets the currently mapped fiff channels. used to create the group All.
-    *
-    * @param [in] mappedLayoutChNames the currently to layout mapped channels
-    */
+     * Sets the currently mapped fiff channels. used to create the group All.
+     *
+     * @param [in] mappedLayoutChNames the currently to layout mapped channels
+     */
     void setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames);
 
     //=========================================================================================================
     /**
-    * Highlight channels
-    * This function highlights channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
-    *
-    * @param [in] channelList channels which are be to set as selected
-    */
+     * Highlight channels
+     * This function highlights channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
+     *
+     * @param [in] channelList channels which are be to set as selected
+     */
     void highlightChannels(QModelIndexList channelIndexList);
 
     //=========================================================================================================
     /**
-    * Select channels
-    * This function selects channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
-    *
-    * @param [in] channelList channels which are be to set as selected
-    */
+     * Select channels
+     * This function selects channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
+     *
+     * @param [in] channelList channels which are be to set as selected
+     */
     void selectChannels(QStringList channelList);
 
     //=========================================================================================================
     /**
-    * Current selected channels
-    * This function returns the current channel selection
-    */
+     * Current selected channels
+     * This function returns the current channel selection
+     */
     QStringList getSelectedChannels();
 
     //=========================================================================================================
     /**
-    * gets the item corresponding to text in listWidget
-    *
-    * @param [in] listWidget QListWidget which inhibits the needed item
-    * @param [in] channelName the corresponding channel name
-    */
+     * gets the item corresponding to text in listWidget
+     *
+     * @param [in] listWidget QListWidget which inhibits the needed item
+     * @param [in] channelName the corresponding channel name
+     */
     QListWidgetItem* getItemForChName(QListWidget *listWidget,
                                       const QString& channelName);
 
     //=========================================================================================================
     /**
-    * returns the current layout map.
-    */
+     * returns the current layout map.
+     */
     const QMap<QString,QPointF>& getLayoutMap();
 
     //=========================================================================================================
     /**
-    * call this whenever a new file was loaded.
-    */
+     * call this whenever a new file was loaded.
+     */
     void newFiffFileLoaded(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
-    * returns the currently selected layout file.
-    *
-    * @return the currently selected layout file
-    */
+     * returns the currently selected layout file.
+     *
+     * @return the currently selected layout file
+     */
     QString getCurrentLayoutFile();
 
     //=========================================================================================================
     /**
-    * Sets the current layout file.
-    *
-    * @param [in] currentLayoutFile the current layout file
-    */
+     * Sets the current layout file.
+     *
+     * @param [in] currentLayoutFile the current layout file
+     */
     void setCurrentLayoutFile(QString currentLayoutFile);
 
     //=========================================================================================================
     /**
-    * Update the scene items according to the bad channel list in the fiff info file.
-    */
+     * Update the scene items according to the bad channel list in the fiff info file.
+     */
     void updateBadChannels();
 
     //=========================================================================================================
     /**
-    * Updates data view.
-    *
-    */
+     * Updates data view.
+     *
+     */
     void updateDataView();
 
 private:
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Initialises all tabel widgets in the selection window.
-    *
-    */
+     * Initialises all tabel widgets in the selection window.
+     *
+     */
     void initListWidgets();
 
     //=========================================================================================================
     /**
-    * Initialises all graphic views in the selection window.
-    *
-    */
+     * Initialises all graphic views in the selection window.
+     *
+     */
     void initSelectionSceneView();
 
     //=========================================================================================================
     /**
-    * Initialises all combo boxes in the selection window.
-    *
-    */
+     * Initialises all combo boxes in the selection window.
+     *
+     */
     void initComboBoxes();
 
     //=========================================================================================================
     /**
-    * Initialises all buttons in the selection window.
-    *
-    */
+     * Initialises all buttons in the selection window.
+     *
+     */
     void initButtons();
 
     //=========================================================================================================
     /**
-    * Initialises all check boxes in the selection window.
-    *
-    */
+     * Initialises all check boxes in the selection window.
+     *
+     */
     void initCheckBoxes();
 
     //=========================================================================================================
     /**
-    * Loads a new layout from given file path.
-    *
-    * @param [in] path holds file pathloll
-    */
+     * Loads a new layout from given file path.
+     *
+     * @param [in] path holds file pathloll
+     */
     bool loadLayout(QString path);
 
     //=========================================================================================================
     /**
-    * Loads a new selection from given file path.
-    *
-    * @param [in] path holds file path
-    */
+     * Loads a new selection from given file path.
+     *
+     * @param [in] path holds file path
+     */
     bool loadSelectionGroups(QString path);
 
     //=========================================================================================================
     /**
-    * Delete all MEG channels from the selection groups which are not in the loaded layout. This needs to be done to guarantee consistency between the selection files and layout files (the selection files always include ALL MEG channels (gradiometers+magnitometers))
-    *
-    */
+     * Delete all MEG channels from the selection groups which are not in the loaded layout. This needs to be done to guarantee consistency between the selection files and layout files (the selection files always include ALL MEG channels (gradiometers+magnitometers))
+     *
+     */
     void cleanUpMEGChannels();
 
     //=========================================================================================================
     /**
-    * Updates selection group widget in this window.
-    *
-    * @param [in] current the current selection group list item
-    * @param [in] previous the previous selection group list item
-    */
+     * Updates selection group widget in this window.
+     *
+     * @param [in] current the current selection group list item
+     * @param [in] previous the previous selection group list item
+     */
     void updateSelectionGroupsList(QListWidgetItem* current,
                                    QListWidgetItem* previous);
 
     //=========================================================================================================
     /**
-    * Updates the scene regarding the selecting channel QList.
-    *
-    */
+     * Updates the scene regarding the selecting channel QList.
+     *
+     */
     void updateSceneItems();
 
     //=========================================================================================================
     /**
-    * Updates user defined selections.
-    *
-    */
+     * Updates user defined selections.
+     *
+     */
     void updateUserDefinedChannelsList();
 
     //=========================================================================================================
     /**
-    * loads a user selection file.
-    *
-    */
+     * loads a user selection file.
+     *
+     */
     void onBtnLoadUserSelection();
 
     //=========================================================================================================
     /**
-    * Saves a user selection file.
-    *
-    */
+     * Saves a user selection file.
+     *
+     */
     void onBtnSaveUserSelection();
 
     //=========================================================================================================
     /**
-    * Add the user defined channels to the selection groups.
-    *
-    */
+     * Add the user defined channels to the selection groups.
+     *
+     */
     void onBtnAddToSelectionGroups();
 
     //=========================================================================================================
     /**
-    * Loads a new layout selected from the layout combo box.
-    *
-    */
+     * Loads a new layout selected from the layout combo box.
+     *
+     */
     void onComboBoxLayoutChanged();
 
     //=========================================================================================================
     /**
-    * Reimplemented resize event.
-    *
-    */
+     * Reimplemented resize event.
+     *
+     */
     void resizeEvent(QResizeEvent* event);
 
     //=========================================================================================================
     /**
-    * Installed event filter.
-    *
-    */
+     * Installed event filter.
+     *
+     */
     bool eventFilter(QObject *obj, QEvent *event);
 
     Ui::ChannelSelectionViewWidget*     ui;                                 /**< Pointer to the qt designer generated ui class. */
@@ -369,26 +369,26 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * emit this signal whenever the user or group selection has changed
-    *
-    * @param [in] selectedChannels currently user selected channels or items which are in the visible list widget
-    */
+     * emit this signal whenever the user or group selection has changed
+     *
+     * @param [in] selectedChannels currently user selected channels or items which are in the visible list widget
+     */
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
     //=========================================================================================================
     /**
-    * emit this signal whenever the selection in the scene has changed
-    *
-    * @param [in] selectedChannelItems currently user selected channels
-    */
+     * emit this signal whenever the selection in the scene has changed
+     *
+     * @param [in] selectedChannelItems currently user selected channels
+     */
     void selectionChanged(const QList<QGraphicsItem*> &selectedChannelItems);
 
     //=========================================================================================================
     /**
-    * emit this signal whenever a new layout was loaded
-    *
-    * @param [in] layoutMap currently loaded layout
-    */
+     * emit this signal whenever a new layout was loaded
+     *
+     * @param [in] layoutMap currently loaded layout
+     */
     void loadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
 };
 

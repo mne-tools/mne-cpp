@@ -104,178 +104,178 @@ class SsvepBciConfigurationWidget : public QDialog
 public:
     //=========================================================================================================
     /**
-    * Constructs a c which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupStimulusWidget becomes a window. If parent is another widget, EEGoSportsSetupStimulusWidget becomes a child window inside parent. EEGoSportsSetupStimulusWidget is deleted when its parent is deleted.
-    * @param [in] pEEGoSports a pointer to the corresponding ECGSimulator.
-    */
+     * Constructs a c which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupStimulusWidget becomes a window. If parent is another widget, EEGoSportsSetupStimulusWidget becomes a child window inside parent. EEGoSportsSetupStimulusWidget is deleted when its parent is deleted.
+     * @param [in] pEEGoSports a pointer to the corresponding ECGSimulator.
+     */
     explicit SsvepBciConfigurationWidget(SsvepBci* pSsvepBci, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destructs a EEGoSportsSetupStimulusWidget which is a child of parent.
-    *
-    */
+     * Destructs a EEGoSportsSetupStimulusWidget which is a child of parent.
+     *
+     */
     ~SsvepBciConfigurationWidget();
 
     //=========================================================================================================
     /**
-    * close event, when setup-stimulus window is closed.
-    *
-    * @param [in] QClosEvent for clsoing the window
-    *
-    */
+     * close event, when setup-stimulus window is closed.
+     *
+     * @param [in] QClosEvent for clsoing the window
+     *
+     */
     void closeEvent(QCloseEvent *event);
 
     //=========================================================================================================
     /**
-    * initialize selected channels-list on sensor level
-    */
+     * initialize selected channels-list on sensor level
+     */
     void initSelectedChannelsSensor();
 
     //=========================================================================================================
     /**
-    * updates the threshold values of the sliders and paints it to the screen
-    */
+     * updates the threshold values of the sliders and paints it to the screen
+     */
     void updateThresholdsToScreen();
 
     //=========================================================================================================
     /**
-    * returns the number of desired harmonics for which will be produced in the reference signal
-    *
-    * @return       number of desired harmonics
-    */
+     * returns the number of desired harmonics for which will be produced in the reference signal
+     *
+     * @return       number of desired harmonics
+     */
     int getNumOfHarmonics();
 
     //=========================================================================================================
     /**
-    * getting the string lists for senesor channel selection
-    */
+     * getting the string lists for senesor channel selection
+     */
     QStringList getSensorChannelSelection();
 
     //=========================================================================================================
     /**
-    * getting the string lists for source channel selection
-    */
+     * getting the string lists for source channel selection
+     */
     QStringList getSourceChannelSelection();
 
     //=========================================================================================================
     /**
-    * resetting thresholdbars values to maximal statusbar borders
-    */
+     * resetting thresholdbars values to maximal statusbar borders
+     */
     void resetThresholdValues();
 
 public slots:
     //=========================================================================================================
     /**
-    * sets the SSVEP probabilities and puts them to the GUI of the SsvepBciConfigurationWidget
-    *
-    * @param[in]    SSVEP   QList of all five SSVEP values
-    */
+     * sets the SSVEP probabilities and puts them to the GUI of the SsvepBciConfigurationWidget
+     *
+     * @param[in]    SSVEP   QList of all five SSVEP values
+     */
     void setSSVEPProbabilities(MyQList SSVEP);
 
     //=========================================================================================================
     /**
-    * sets the labels when the frequencies are changed
-    *
-    * @param[in]    frequencyList   frequencies which are looked for
-    */
+     * sets the labels when the frequencies are changed
+     *
+     * @param[in]    frequencyList   frequencies which are looked for
+     */
     void setFrequencyLabels(MyQList frequencyList);
 
     //=========================================================================================================
     /**
-    * signalizes the classification result and marks it red to the screen
-    *
-    * @param[in]    classResult     classification result
-    */
+     * signalizes the classification result and marks it red to the screen
+     *
+     * @param[in]    classResult     classification result
+     */
     void setClassResult(double classResult);
 
     //=========================================================================================================
     /**
-    * slot for stopping the measurement of the accuracy
-    */
+     * slot for stopping the measurement of the accuracy
+     */
     void stopMeasurement();
 
 private slots:
     //=========================================================================================================
     /**
-    * slot for adjusting MEC or CCA as extraction method which is connected to the MEC qRadioButton
-    *
-    * @param [in]   checked     unused paramater
-    */
+     * slot for adjusting MEC or CCA as extraction method which is connected to the MEC qRadioButton
+     *
+     * @param [in]   checked     unused paramater
+     */
     void onRadioButtonMECtoggled(bool checked);
 
     //=========================================================================================================
     /**
-    * slot for changing the thresholds
-    *
-    * @param [in]   threshodld     unused paramater
-    */
+     * slot for changing the thresholds
+     *
+     * @param [in]   threshodld     unused paramater
+     */
     void thresholdChanged(double threshold);
 
     //=========================================================================================================
     /**
-    * slot for changing the number of harmonics
-    *
-    * @param [in]   harmonics     number of harmonics
-    */
+     * slot for changing the number of harmonics
+     *
+     * @param [in]   harmonics     number of harmonics
+     */
     void numOfHarmonicsChanged(int harmonics);
 
     //=========================================================================================================
     /**
-    * slot for changing the selected channels
-    *
-    * @param [in]   parent      unused parameter
-    * @param [in]   first       unused parameter
-    * @param [in]   last        unused parameter
-    */
+     * slot for changing the selected channels
+     *
+     * @param [in]   parent      unused parameter
+     * @param [in]   first       unused parameter
+     * @param [in]   last        unused parameter
+     */
     void channelSelectChanged(const QModelIndex &parent, int first, int last);
 
     //=========================================================================================================
     /**
-    * evaluates the classification result
-    *
-    * @param [in]   isCorrectCommand     flag when there was a classification
-    */
+     * evaluates the classification result
+     *
+     * @param [in]   isCorrectCommand     flag when there was a classification
+     */
     void evaluateCommand(bool isCorrectCommand);
 
     //=========================================================================================================
     /**
-    * Slot for elapsed time. Triggered by a qTimer
-    */
+     * Slot for elapsed time. Triggered by a qTimer
+     */
     void showCurrentTime();
 
     //=========================================================================================================
     /**
-    * starts the accuracy measurement
-    */
+     * starts the accuracy measurement
+     */
     void onStartMeasurementClicked();
 
     //=========================================================================================================
     /**
-    * stops the accuracy measurement
-    */
+     * stops the accuracy measurement
+     */
     void onStopMeasurementClicked();
 
     //=========================================================================================================
     /**
-    * slot for changing the size of the classification list
-    */
+     * slot for changing the size of the classification list
+     */
     void classificationListSizeChanged(int arg1);
 
 signals:
     //=========================================================================================================
     /**
-    * emit newly adjusted threshold values
-    *
-    * @param[out]    thresholds     classification result
-    */
+     * emit newly adjusted threshold values
+     *
+     * @param[out]    thresholds     classification result
+     */
     void getThresholdValues(MyQList thresholds);
 
     //=========================================================================================================
     /**
-    * signal for indicating a signal parameter change
-    */
+     * signal for indicating a signal parameter change
+     */
     void changeSSVEPParameter();
 
 private:

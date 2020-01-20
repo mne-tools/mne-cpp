@@ -103,14 +103,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MneMshDisplaySurfaceSet.
-    */
+     * Constructs the MneMshDisplaySurfaceSet.
+     */
     MneMshDisplaySurfaceSet(int nsurf = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the MneMshDisplaySurfaceSet.
-    */
+     * Destroys the MneMshDisplaySurfaceSet.
+     */
     ~MneMshDisplaySurfaceSet();
 
     //============================= display_surfaces.c =============================

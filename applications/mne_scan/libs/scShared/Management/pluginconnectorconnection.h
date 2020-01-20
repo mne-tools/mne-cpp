@@ -101,20 +101,20 @@ public:
     
     //=========================================================================================================
     /**
-    * Destructor
-    */
+     * Destructor
+     */
     virtual ~PluginConnectorConnection();
 
     //=========================================================================================================
     /**
-    * Disconnect connection
-    */
+     * Disconnect connection
+     */
     void clearConnection();
 
     //=========================================================================================================
     /**
-    * Create connection
-    */
+     * Create connection
+     */
     static inline QSharedPointer<PluginConnectorConnection> create(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent = 0);
 
     static ConnectorDataType getDataType(QSharedPointer<PluginConnector> pPluginConnector);
@@ -127,10 +127,10 @@ public:
 
     //=========================================================================================================
     /**
-    * The connector connection setup widget
-    *
-    * @return the setup widget
-    */
+     * The connector connection setup widget
+     *
+     * @return the setup widget
+     */
     QWidget* setupWidget();
 
 signals:
@@ -138,8 +138,8 @@ signals:
 private:
     //=========================================================================================================
     /**
-    * Create connection
-    */
+     * Create connection
+     */
     bool createConnection();
 
     IPlugin::SPtr m_pSender;

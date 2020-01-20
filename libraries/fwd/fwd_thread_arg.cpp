@@ -131,7 +131,7 @@ FwdThreadArg *FwdThreadArg::create_eeg_multi_thread_duplicate(FwdThreadArg *one,
 {
     FwdThreadArg* res  = new FwdThreadArg;
 
-    *res = *one;
+     *res = *one;
     if (bem_model) {
         FwdBemModel*   new_bem  = new FwdBemModel;
         FwdBemModel*   orig_bem = (FwdBemModel*)res->client;
@@ -175,9 +175,9 @@ FwdThreadArg *FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg* one,
     FwdCompData*  orig = (FwdCompData*)one->client;
     FwdCompData*  comp = NULL;
 
-    *res = *one;
+     *res = *one;
     res->client = comp = new FwdCompData;
-    *comp = *orig;
+     *comp = *orig;
     comp->work     = NULL;
     comp->vec_work = NULL;
     comp->set      = orig->set ? new MneCTFCompDataSet(*(orig->set)) : NULL;

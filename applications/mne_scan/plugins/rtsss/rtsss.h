@@ -107,34 +107,34 @@ class RTSSSSHARED_EXPORT RtSss : public IAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Constructs a RtSss.
-    */
+     * Constructs a RtSss.
+     */
 //    DummyToolbox();
     RtSss();
 
     //=========================================================================================================
     /**
-    * Destroys the RtSss.
-    */
+     * Destroys the RtSss.
+     */
 //    ~DummyToolbox();
     ~RtSss();
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const;
 
     virtual bool start();

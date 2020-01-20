@@ -102,16 +102,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Forward Compensation Data
-    * Refactored: fwd_new_comp_data (fwd_comp.c)
-    */
+     * Constructs the Forward Compensation Data
+     * Refactored: fwd_new_comp_data (fwd_comp.c)
+     */
     FwdCompData();
 
     //=========================================================================================================
     /**
-    * Destroys the Forward Compensation Data
-    * Refactored: fwd_free_comp_data (fwd_comp.c)
-    */
+     * Destroys the Forward Compensation Data
+     * Refactored: fwd_free_comp_data (fwd_comp.c)
+     */
     ~FwdCompData();
 
 
