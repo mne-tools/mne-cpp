@@ -83,7 +83,7 @@ nav_order: 5
       ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -nomake examples -no-dbus -no-ssl -prefix /home/lorenz/Qt/5.14.0/wasm_em1393_64_withThread
       ```
 
-    * Build Qt and install to target (prefix) location afterwards. For mne-cpp we only need the qt charts, qtsvg and qtbase module (see [https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly) for officially supported modules):
+    * Build Qt and install to target (prefix) location afterwards. For MNE-CPP we only need the qt charts, qtsvg and qtbase module (see [https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly) for officially supported modules):
 
       ```
       make module-qtbase module-qtsvg module-qtcharts -j8
@@ -94,7 +94,7 @@ nav_order: 5
 
 ## Building MNE-CPP against QtWasm
 
- * Navigate to mne-cpp/mne-cpp.pri and add the wasm flag. This will build mne-cpp statically and configure only wasm supported MNE-CPP code.
+ * MNE-CPP needs to be build statically. This is automatically done if the `wasm` flag is set. Navigate to mne-cpp/mne-cpp.pri and add the wasm flag. This will build MNE-CPP statically and configure only wasm supported MNE-CPP code.
 
    ```
    MNECPP_CONFIG += wasm
@@ -131,7 +131,7 @@ Example builds can be found here (Chromium based and Mozilla browsers seem to wo
 
   [https://mne-cpp.github.io/wasm/mne_browse.html](https://mne-cpp.github.io/wasm/mne_browse.html)
 
-  [https://mne-cpp.github.io/wasm/mne_analyze.html](https://mne-cpp.github.io/wasm/mne_browse.html)
+  [https://mne-cpp.github.io/wasm/mne_analyze.html](https://mne-cpp.github.io/wasm/mne_analyze.html)
 
 ## General notes and helpful information
 
@@ -141,9 +141,7 @@ Example builds can be found here (Chromium based and Mozilla browsers seem to wo
  * QtWebAssembly does not support concurrent and Qt3D modules.
      [https://forum.qt.io/topic/109166/wasm-support-for-qt3d/4](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading)
 
- * MNE-CPP Code needs to be build statically
-
- * Thread support forQtWasm can be achieved since Qt5.13. Thread support is deactivated in pre-built binaries. The default Qt for WebAssembly build disables threads by default. To enable, build from source and configure with the **-feature-thread** flag. We’ve found that emscripten 1.38.30 works well for threaded builds. From [https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading)
+ * Thread support forQtWasm can be achieved since Qt5.13. Thread support is deactivated in pre-built binaries. The default Qt for WebAssembly build disables threads by default. To enable, build from source and configure with the `-feature-thread` flag. We’ve found that emscripten 1.38.30 works well for threaded builds. From [https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading)
 
  * Data access for local files:
      [https://forum.qt.io/topic/104608/access-local-user-file-on-qt-for-web-assembly](https://forum.qt.io/topic/104608/access-local-user-file-on-qt-for-web-assembly) and

@@ -5,6 +5,8 @@ nav_order: 2
 ---
 # Setup real-time source localization example
 
+|**Please note:** The information provided on this page might be outdated and will be updated soon.|
+
 This tutorial will show how you can setup an acquisition and processing chain in MNE Scan, which makes use of the real-time source localization method RTC-MNE.
 
 The following steps will show you how to setup the online processing pipeline in MNE Scan:
