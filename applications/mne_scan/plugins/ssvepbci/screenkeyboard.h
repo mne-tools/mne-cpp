@@ -88,98 +88,98 @@ class SSVEPBCISHARED_EXPORT ScreenKeyboard : public QObject
 public:
     //=========================================================================================================
     /**
-    * Constructrs the ScreenKeyboard class.
-    */
+     * Constructrs the ScreenKeyboard class.
+     */
     ScreenKeyboard(SsvepBci *pSsvepBci,
                    SsvepBciSetupStimulusWidget *pSsvepBciSetupStimulusWidget,
                    SsvepBciScreen *pSsvepBciScreen);
 
     //=========================================================================================================
     /**
-    * Destroys the ScreenKeyboard class.
-    */
+     * Destroys the ScreenKeyboard class.
+     */
     ~ScreenKeyboard();
 
     //=========================================================================================================
     /**
-    * Painting keyboard update to the screen
-    *
-    * @param[in]    paint device which links to to the corresponding widget.
-    */
+     * Painting keyboard update to the screen
+     *
+     * @param[in]    paint device which links to to the corresponding widget.
+     */
     void paint(QPaintDevice *device);
 
 signals:
     //=========================================================================================================
     /**
-    * emits the spelled letter
-    */
+     * emits the spelled letter
+     */
     void getLetter(QString letter);
 
     //=========================================================================================================
     /**
-    * emits a flag if the letter was spelled correctly or not.
-    *
-    * @param [out]  correctCommand      Flag for correct or wrong spelled letter
-    */
+     * emits a flag if the letter was spelled correctly or not.
+     *
+     * @param [out]  correctCommand      Flag for correct or wrong spelled letter
+     */
     void isCorrectCommand(bool correctCommand);
 
     //=========================================================================================================
     /**
-    * emits trigger signal for a finished spelling sequence
-    */
+     * emits trigger signal for a finished spelling sequence
+     */
     void spellingFinished();
 
 public slots:
     //=========================================================================================================
     /**
-    * slot when frequency list is changed.
-    *
-    * @param [in]  classList      List of new frequencies
-    */
+     * slot when frequency list is changed.
+     *
+     * @param [in]  classList      List of new frequencies
+     */
     void updateClassList(MyQList classList);
 
     //=========================================================================================================
     /**
-    * managing and interpreting a new detected frequency from the SsvepBci class
-    *
-    * @param [in]  value      detected frequency. Is supposed to be one of the values of the classification list
-    */
+     * managing and interpreting a new detected frequency from the SsvepBci class
+     *
+     * @param [in]  value      detected frequency. Is supposed to be one of the values of the classification list
+     */
     void updateCommand(double value);
 
     //=========================================================================================================
     /**
-    * sets a new phrase which has to be spelt
-    *
-    * @param [out]  phrase      newly adjusted phrase
-    */
+     * sets a new phrase which has to be spelt
+     *
+     * @param [out]  phrase      newly adjusted phrase
+     */
     void setPhrase(QString phrase);
 
     //=========================================================================================================
     /**
-    * initializes the screen keyboard
-    */
+     * initializes the screen keyboard
+     */
     void initScreenKeyboard();
 
     //=========================================================================================================
     /**
-    * initializes the accuracy feature of the screen keyboard device
-    */
+     * initializes the accuracy feature of the screen keyboard device
+     */
     void initSpellAccuracyFeature();
 
     //=========================================================================================================
     /**
-    * stops the accuracy feature
-    */
+     * stops the accuracy feature
+     */
     void stopSpellAccuracyFeature();
 
 private:
     //=========================================================================================================
     /**
-    * process the spelled letter and emit the classifiaction signal
-    *
-    * @param [in] letter    sign which will be classified
-    *
-    */
+     * process the spelled letter and emit the classifiaction signal
+     *
+     * @param [in] letter    sign which will be classified
+     *
+     */
     void spellLetter(QString letter);
 
     // Pointer to other classes

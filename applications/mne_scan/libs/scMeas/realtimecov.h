@@ -94,55 +94,55 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeMultiSampleArrayNew.
-    */
+     * Constructs a RealTimeMultiSampleArrayNew.
+     */
     explicit RealTimeCov(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeMultiSampleArrayNew.
-    */
+     * Destroys the RealTimeMultiSampleArrayNew.
+     */
     virtual ~RealTimeCov();
 
     //=========================================================================================================
     /**
-    * Set the fiff info
-    *
-    * @param [in] pFiffInfo     the new fiff info.
-    */
+     * Set the fiff info
+     *
+     * @param [in] pFiffInfo     the new fiff info.
+     */
     void setFiffInfo(QSharedPointer<FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
-    * Get the fiff info
-    *
-    * @return     the current fiff info.
-    */
+     * Get the fiff info
+     *
+     * @return     the current fiff info.
+     */
     QSharedPointer<FiffInfo> getFiffInfo();
 
     //=========================================================================================================
     /**
-    * New covariance to distribute
-    *
-    * @param [in] v     the covariance which should be distributed.
-    */
+     * New covariance to distribute
+     *
+     * @param [in] v     the covariance which should be distributed.
+     */
     virtual void setValue(const FiffCov& v);
 
     //=========================================================================================================
     /**
-    * Returns the current value set.
-    * This method is inherited by Measurement.
-    *
-    * @return the last attached value.
-    */
+     * Returns the current value set.
+     * This method is inherited by Measurement.
+     *
+     * @return the last attached value.
+     */
     virtual FiffCov::SPtr& getValue();
 
     //=========================================================================================================
     /**
-    * Returns whether RealTimeCov contains values
-    *
-    * @return whether RealTimeCov contains values.
-    */
+     * Returns whether RealTimeCov contains values
+     *
+     * @return whether RealTimeCov contains values.
+     */
     inline bool isInitialized() const;
 
 private:

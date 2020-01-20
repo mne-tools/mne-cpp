@@ -122,38 +122,38 @@ public:
 
     //=========================================================================================================
     /**
-    * FilterOperator::FilterOperator
-    *
-    * @param unique_name defines the name of the generated filter
-    * @param type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
-    * @param order represents the order of the filter, the higher the higher is the stopband attenuation
-    * @param centerfreq determines the center of the frequency
-    * @param bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband
-    * @param parkswidth determines the width of the filter slopes (steepness)
-    * @param sFreq sampling frequency
-    * @param fftlength length of the fft (multiple integer of 2^x)
-    */
+     * FilterOperator::FilterOperator
+     *
+     * @param unique_name defines the name of the generated filter
+     * @param type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
+     * @param order represents the order of the filter, the higher the higher is the stopband attenuation
+     * @param centerfreq determines the center of the frequency
+     * @param bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband
+     * @param parkswidth determines the width of the filter slopes (steepness)
+     * @param sFreq sampling frequency
+     * @param fftlength length of the fft (multiple integer of 2^x)
+     */
     FilterOperator(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength=4096, DesignMethod method = Cosine);
 
     //=========================================================================================================
     /**
-    * Destructor
-    */
+     * Destructor
+     */
     ~FilterOperator();
 
     //=========================================================================================================
     /**
-    * Transforms the calculated filter coefficients to frequency-domain
-    */
+     * Transforms the calculated filter coefficients to frequency-domain
+     */
     void fftTransformCoeffs();
 
     //=========================================================================================================
     /**
-    * FilterOperator::FilterOperator
-    *
-    * @param data the input data which is to be filtered
-    * @return a row vector truncated by numberFilterTaps/2 at front and end
-    */
+     * FilterOperator::FilterOperator
+     *
+     * @param data the input data which is to be filtered
+     * @return a row vector truncated by numberFilterTaps/2 at front and end
+     */
     RowVectorXd applyFFTFilter(const RowVectorXd& data) const;
 
     double          m_sFreq;            /**< the sampling frequency. */

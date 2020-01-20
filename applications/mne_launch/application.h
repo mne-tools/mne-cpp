@@ -66,34 +66,34 @@ class Application : public QObject
 public:
     //=========================================================================================================
     /**
-    * Constructs the MNE Launch Application.
-    *
-    * @param[in] parent     If parent is not NULL the QObject becomes a child of QObject inside parent.
-    */
+     * Constructs the MNE Launch Application.
+     *
+     * @param[in] parent     If parent is not NULL the QObject becomes a child of QObject inside parent.
+     */
     Application(QObject *parent = nullptr);
 
     //=========================================================================================================
     /**
-    * Initializes the Application
-    *
-    * @param[in] argc   Number of arguments
-    * @param[in] argv   Argument vector
-    * @param[in] app    Gui Application
-    *
-    * @return The error code.
-    */
+     * Initializes the Application
+     *
+     * @param[in] argc   Number of arguments
+     * @param[in] argv   Argument vector
+     * @param[in] app    Gui Application
+     *
+     * @return The error code.
+     */
     int init(int &argc, char **argv, QGuiApplication& app);
 
     //=========================================================================================================
     /**
-    * Registers the qml meta types
-    */
+     * Registers the qml meta types
+     */
     void registerTypes();
 
     //=========================================================================================================
     /**
-    * Starts the application
-    */
+     * Starts the application
+     */
     void start();
 
 private:

@@ -85,28 +85,28 @@ class EEGoSportsProducer : public QThread
 public:
     //=========================================================================================================
     /**
-    * Constructs a EEGoSportsProducer.
-    *
-    * @param [in] pEEGoSports a pointer to the corresponding EEGoSports class.
-    */
+     * Constructs a EEGoSportsProducer.
+     *
+     * @param [in] pEEGoSports a pointer to the corresponding EEGoSports class.
+     */
     EEGoSportsProducer(EEGoSports* pEEGoSports);
 
     //=========================================================================================================
     /**
-    * Destroys the EEGoSportsProducer.
-    */
+     * Destroys the EEGoSportsProducer.
+     */
     ~EEGoSportsProducer();
 
     //=========================================================================================================
     /**
-    * Starts the EEGoSportsProducer by starting the producer's thread and initialising the device.
-    * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
-    * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
-    * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
-    * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
-    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-    * @param [in] bMeasureImpedance Flag for measuring impedances.
-    */
+     * Starts the EEGoSportsProducer by starting the producer's thread and initialising the device.
+     * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
+     * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
+     * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
+     * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
+     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
+     * @param [in] bMeasureImpedance Flag for measuring impedances.
+     */
     virtual void start(int iNumberOfChannels,
                        int iSamplesPerBlock,
                        int iSamplingFrequency,
@@ -116,17 +116,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the EEGoSportsProducer by stopping the producer's thread.
-    */
+     * Stops the EEGoSportsProducer by stopping the producer's thread.
+     */
     void stop();
 
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
 private:

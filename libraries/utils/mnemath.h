@@ -99,25 +99,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the MNEMath object
-    */
+     * Destroys the MNEMath object
+     */
     virtual ~MNEMath()
     { }
 
     //=========================================================================================================
     /**
-    * ToDo make this a template function
-    *
-    * mne_combine_xyz
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Compute the three Cartesian components of a vector together
-    *
-    * @param[in] vec    Input row vector [ x1 y1 z1 ... x_n y_n z_n ]
-    *
-    * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
-    */
+     * ToDo make this a template function
+     *
+     * mne_combine_xyz
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Compute the three Cartesian components of a vector together
+     *
+     * @param[in] vec    Input row vector [ x1 y1 z1 ... x_n y_n z_n ]
+     *
+     * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
+     */
     static Eigen::VectorXd* combine_xyz(const Eigen::VectorXd& vec);
 
 //    //=========================================================================================================
@@ -128,241 +128,241 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the condition number of a given matrix.
-    *
-    * @param[in] A      Matrix to compute the condition number from
-    *
-    * @return the condition number
-    */
+     * Returns the condition number of a given matrix.
+     *
+     * @param[in] A      Matrix to compute the condition number from
+     *
+     * @return the condition number
+     */
     static double getConditionNumber(const Eigen::MatrixXd& A, Eigen::VectorXd &s);
 
     //=========================================================================================================
     /**
-    * Returns the condition slope of a given matrix.
-    *
-    * @param[in] A      Matrix to compute the condition number from
-    *
-    * @return the condition slope
-    */
+     * Returns the condition slope of a given matrix.
+     *
+     * @param[in] A      Matrix to compute the condition number from
+     *
+     * @return the condition slope
+     */
     static double getConditionSlope(const Eigen::MatrixXd& A, Eigen::VectorXd &s);
 
     //=========================================================================================================
     /**
-    * Returns the whitener of a given matrix.
-    *
-    * @param[in] A      Matrix to compute the whitener from
-    * @param[in] pca    perform a pca
-    *
-    * @return rank of matrix A
-    */
+     * Returns the whitener of a given matrix.
+     *
+     * @param[in] A      Matrix to compute the whitener from
+     * @param[in] pca    perform a pca
+     *
+     * @return rank of matrix A
+     */
     static void get_whitener(Eigen::MatrixXd& A, bool pca, QString ch_type, Eigen::VectorXd& eig, Eigen::MatrixXd& eigvec);
 
     //=========================================================================================================
     /**
-    * Find the intersection of two vectors
-    *
-    * @param[in] v1         Input vector 1
-    * @param[in] v2         Input vector 2
-    * @param[out] idx_sel   Index of intersection based on v1
-    *
-    * @return the sorted, unique values that are in both of the input arrays.
-    */
+     * Find the intersection of two vectors
+     *
+     * @param[in] v1         Input vector 1
+     * @param[in] v2         Input vector 2
+     * @param[out] idx_sel   Index of intersection based on v1
+     *
+     * @return the sorted, unique values that are in both of the input arrays.
+     */
     static Eigen::VectorXi intersect(const Eigen::VectorXi &v1, const Eigen::VectorXi &v2, Eigen::VectorXi &idx_sel);
 
     //=========================================================================================================
     /**
-    * Determines if a given data (stored as vector v) are representing a sparse matrix.
-    * ToDo: status is experimental -> needs to be increased in speed.
-    *
-    * @param[in] v      data to be tested
-    *
-    * @return true if sparse false otherwise;
-    */
+     * Determines if a given data (stored as vector v) are representing a sparse matrix.
+     * ToDo: status is experimental -> needs to be increased in speed.
+     *
+     * @param[in] v      data to be tested
+     *
+     * @return true if sparse false otherwise;
+     */
     static bool issparse(Eigen::VectorXd &v);
 
     //=========================================================================================================
     /**
-    * LEGENDRE Associated Legendre function.
-    *
-    *   P = LEGENDRE(N,X) computes the associated Legendre functions
-    *   of degree N and order M = 0, 1, ..., N, evaluated for each element
-    *   of X.  N must be a scalar integer and X must contain real values
-    *   between -1 <= X <= 1.
-    *
-    * @return associated Legendre functions
-    */
+     * LEGENDRE Associated Legendre function.
+     *
+     *   P = LEGENDRE(N,X) computes the associated Legendre functions
+     *   of degree N and order M = 0, 1, ..., N, evaluated for each element
+     *   of X.  N must be a scalar integer and X must contain real values
+     *   between -1 <= X <= 1.
+     *
+     * @return associated Legendre functions
+     */
     static Eigen::MatrixXd legendre(qint32 n, const Eigen::VectorXd &X, QString normalize = QString("unnorm"));
 
     //=========================================================================================================
     /**
-    * ToDo make this a template function
-    *
-    * ### MNE toolbox root function ###: Definition of the mne_block_diag function - encoding part
-    *
-    * Make a sparse block diagonal matrix
-    *
-    * Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising
-    * bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down
-    * the diagonal of the matrix.
-    *
-    * @param[in, out] A Matrix which should be diagonlized
-    * @param[in, out] n Columns of the submatrices
-    *
-    * @return A sparse block diagonal, diagonalized from the elements in "A".
-    */
+     * ToDo make this a template function
+     *
+     * ### MNE toolbox root function ###: Definition of the mne_block_diag function - encoding part
+     *
+     * Make a sparse block diagonal matrix
+     *
+     * Returns a sparse block diagonal, diagonalized from the elements in "A". "A" is ma x na, comprising
+     * bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down
+     * the diagonal of the matrix.
+     *
+     * @param[in, out] A Matrix which should be diagonlized
+     * @param[in, out] n Columns of the submatrices
+     *
+     * @return A sparse block diagonal, diagonalized from the elements in "A".
+     */
     static Eigen::SparseMatrix<double>* make_block_diag(const Eigen::MatrixXd &A, qint32 n);
 
     //=========================================================================================================
     /**
-    * Calculates the combination of n over 2 (nchoosek(n,2))
-    *
-    * @param[in] n  The number of elements which should be combined with each other (n over 2)
-    * @return   The number of combinations
-    */
+     * Calculates the combination of n over 2 (nchoosek(n,2))
+     *
+     * @param[in] n  The number of elements which should be combined with each other (n over 2)
+     * @return   The number of combinations
+     */
     static int nchoose2(int n);
 
     //=========================================================================================================
     /**
-    * ToDo make this a template function
-    *
-    * Returns the rank of a matrix A.
-    *
-    * @param[in] A      Matrix to get the rank from
-    * @param[in] tol    realtive threshold: biggest singualr value multiplied with tol is smallest singular value considered non-zero
-    *
-    * @return rank of matrix A
-    */
+     * ToDo make this a template function
+     *
+     * Returns the rank of a matrix A.
+     *
+     * @param[in] A      Matrix to get the rank from
+     * @param[in] tol    realtive threshold: biggest singualr value multiplied with tol is smallest singular value considered non-zero
+     *
+     * @return rank of matrix A
+     */
     static qint32 rank(const Eigen::MatrixXd& A, double tol = 1e-8);
 
     //=========================================================================================================
     /**
-    * ToDo: Maybe new processing class
-    *
-    * Rescale aka baseline correct data
-    *
-    * @param[in] data           Data Matrix (m x n_time)
-    * @param[in] times          Time instants is seconds.
-    * @param[in] baseline       If baseline is (a, b) the interval is between "a (s)" and "b (s)".
-    *                           If a is invalid the beginning of the data is used and if b is invalid then b is set to the end of the interval.
-    *                           If baseline is equal to (invalid, invalid) all the time interval is used.
-    * @param[in] baseline_usage See description of parameter baseline.
-    * @param[in] mode           Do baseline correction with ratio (power is divided by mean power during baseline) or zscore (power is divided by standard
-    *                           deviatio of power during baseline after substracting the mean, power = [power - mean(power_baseline)] / std(power_baseline)).
-    *                           ("logratio" | "ratio" | "zscore" | "mean" | "percent")
-    *
-    * @return   rescaled data matrix rescaling.
-    */
+     * ToDo: Maybe new processing class
+     *
+     * Rescale aka baseline correct data
+     *
+     * @param[in] data           Data Matrix (m x n_time)
+     * @param[in] times          Time instants is seconds.
+     * @param[in] baseline       If baseline is (a, b) the interval is between "a (s)" and "b (s)".
+     *                           If a is invalid the beginning of the data is used and if b is invalid then b is set to the end of the interval.
+     *                           If baseline is equal to (invalid, invalid) all the time interval is used.
+     * @param[in] baseline_usage See description of parameter baseline.
+     * @param[in] mode           Do baseline correction with ratio (power is divided by mean power during baseline) or zscore (power is divided by standard
+     *                           deviatio of power during baseline after substracting the mean, power = [power - mean(power_baseline)] / std(power_baseline)).
+     *                           ("logratio" | "ratio" | "zscore" | "mean" | "percent")
+     *
+     * @return   rescaled data matrix rescaling.
+     */
     static Eigen::MatrixXd rescale(const Eigen::MatrixXd &data, const Eigen::RowVectorXf &times, QPair<QVariant,QVariant> baseline, QString mode);
 
     //=========================================================================================================
     /**
-    * Sorts a vector (ascending order) in place and returns the track of the original indeces
-    *
-    * @param[in, out] v     vector to sort; it's sorted in place
-    * @param[in] desc       if true its sorted in a descending order, otherwise ascending (optional, default = true)
-    *
-    * @return Vector of the original indeces in the new order
-    */
+     * Sorts a vector (ascending order) in place and returns the track of the original indeces
+     *
+     * @param[in, out] v     vector to sort; it's sorted in place
+     * @param[in] desc       if true its sorted in a descending order, otherwise ascending (optional, default = true)
+     *
+     * @return Vector of the original indeces in the new order
+     */
     template<typename T>
     static Eigen::VectorXi sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, bool desc = true);
 
     //=========================================================================================================
     /**
-    * Sorts a vector (ascending order) and a corresponding matrix in place and returns the track of the original indeces
-    * The matrix is sorted along the columns using the vector values for comparison.
-    *
-    * @param[in, out] v_prime   vector to sort (sorted in place)
-    * @param[in, out] mat       matrix to sort (sorted in place)
-    * @param[in] desc           if true its sorted in a descending order, otherwise ascending (optional, default = true)
-    *
-    * @return Vector of the original indeces in the new order
-    */
+     * Sorts a vector (ascending order) and a corresponding matrix in place and returns the track of the original indeces
+     * The matrix is sorted along the columns using the vector values for comparison.
+     *
+     * @param[in, out] v_prime   vector to sort (sorted in place)
+     * @param[in, out] mat       matrix to sort (sorted in place)
+     * @param[in] desc           if true its sorted in a descending order, otherwise ascending (optional, default = true)
+     *
+     * @return Vector of the original indeces in the new order
+     */
     template<typename T>
     static Eigen::VectorXi sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &mat, bool desc = true);
 
     //=========================================================================================================
     /**
-    * Sort rows in ascending order
-    *
-    * @param[in] A          triplet vector to sort (sorted in place)
-    * @param[in] column     sorts the triplet vector based on the column specified
-    *
-    * @return Vector of the original indeces in the new order
-    */
+     * Sort rows in ascending order
+     *
+     * @param[in] A          triplet vector to sort (sorted in place)
+     * @param[in] column     sorts the triplet vector based on the column specified
+     *
+     * @return Vector of the original indeces in the new order
+     */
     template<typename T>
     static std::vector<Eigen::Triplet<T> > sortrows(const std::vector<Eigen::Triplet<T> > &A, qint32 column = 0);
 
     //=========================================================================================================
     /**
-    * Compares two index-value-pairs.
-    *
-    * @param[in] lhs    left hand side of the comparison
-    * @param[in] rhs    right hand side of the comparison
-    *
-    * @return true if value of lhs is bigger than value of rhs
-    */
+     * Compares two index-value-pairs.
+     *
+     * @param[in] lhs    left hand side of the comparison
+     * @param[in] rhs    right hand side of the comparison
+     *
+     * @return true if value of lhs is bigger than value of rhs
+     */
     template<typename T>
     static inline bool compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs, const std::pair<int,T>& rhs);
 
     //=========================================================================================================
     /**
-    * Compares two index-value-pairs.
-    *
-    * @param[in] lhs    left hand side of the comparison
-    * @param[in] rhs    right hand side of the comparison
-    *
-    * @return true if value of lhs is smaller than value of rhs
-    */
+     * Compares two index-value-pairs.
+     *
+     * @param[in] lhs    left hand side of the comparison
+     * @param[in] rhs    right hand side of the comparison
+     *
+     * @return true if value of lhs is smaller than value of rhs
+     */
     template<typename T>
     static inline bool compareIdxValuePairSmallerThan(const std::pair<int,T>& lhs, const std::pair<int,T>& rhs);
 
     //=========================================================================================================
     /**
-    * Compares triplet first entry
-    *
-    * @param[in] lhs    left hand side of the comparison
-    * @param[in] rhs    right hand side of the comparison
-    *
-    * @return true if value of lhs is smaller than value of rhs
-    */
+     * Compares triplet first entry
+     *
+     * @param[in] lhs    left hand side of the comparison
+     * @param[in] rhs    right hand side of the comparison
+     *
+     * @return true if value of lhs is smaller than value of rhs
+     */
     template<typename T>
     static inline bool compareTripletFirstEntry(const Eigen::Triplet<T>& lhs, const Eigen::Triplet<T> & rhs);
 
     //=========================================================================================================
     /**
-    * Compares triplet second entry
-    *
-    * @param[in] lhs    left hand side of the comparison
-    * @param[in] rhs    right hand side of the comparison
-    *
-    * @return true if value of lhs is smaller than value of rhs
-    */
+     * Compares triplet second entry
+     *
+     * @param[in] lhs    left hand side of the comparison
+     * @param[in] rhs    right hand side of the comparison
+     *
+     * @return true if value of lhs is smaller than value of rhs
+     */
     template<typename T>
     static inline bool compareTripletSecondEntry(const Eigen::Triplet<T>& lhs, const Eigen::Triplet<T> & rhs);
 
     //=========================================================================================================
     /**
-    * Compute log2 of given number
-    *
-    * @param[in] d  input value
-    *
-    * @return double result of log2 operation
-    */
+     * Compute log2 of given number
+     *
+     * @param[in] d  input value
+     *
+     * @return double result of log2 operation
+     */
     template<typename T>
     static inline double log2(const T d);
 
     //=========================================================================================================
     /**
-    * creates a class and frequency distribution from data matrix
-    *
-    * @param[in]  matRawData             raw data matrix that needs to be analyzed
-    * @param[in]  bMakeSymmetrical       user input to turn the x-axis symmetric
-    * @param[in]  iClassCount            user input to determine the amount of classes in the histogram
-    * @param[out] vecResultClassLimits   the upper limit of each individual class
-    * @param[out] vecResultFrequency     the amount of data that fits in the appropriate class ranges
-    * @param[in]  dGlobalMin             user input to determine the maximum value allowed in the histogram
-    * @param[in]  dGlobalMax             user input to determine the minimum value allowed in the histogram
-    */
+     * creates a class and frequency distribution from data matrix
+     *
+     * @param[in]  matRawData             raw data matrix that needs to be analyzed
+     * @param[in]  bMakeSymmetrical       user input to turn the x-axis symmetric
+     * @param[in]  iClassCount            user input to determine the amount of classes in the histogram
+     * @param[out] vecResultClassLimits   the upper limit of each individual class
+     * @param[out] vecResultFrequency     the amount of data that fits in the appropriate class ranges
+     * @param[in]  dGlobalMin             user input to determine the maximum value allowed in the histogram
+     * @param[in]  dGlobalMax             user input to determine the minimum value allowed in the histogram
+     */
     template<typename T>
     static void histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matRawData,
                            bool bMakeSymmetrical,
@@ -390,10 +390,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates the pseudo inverse of a matrix.
-    *
-    * @param[in]  a        raw data matrix that needs to be analyzed.
-    */
+     * Creates the pseudo inverse of a matrix.
+     *
+     * @param[in]  a        raw data matrix that needs to be analyzed.
+     */
     template<typename T>
     static Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> pinv(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a);
 };

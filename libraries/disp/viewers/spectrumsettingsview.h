@@ -92,26 +92,26 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a SpectrumSettingsView which is a child of parent.
-    *
-    * @param [in] parent    parent of widget
-    */
+     * Constructs a SpectrumSettingsView which is a child of parent.
+     *
+     * @param [in] parent    parent of widget
+     */
     SpectrumSettingsView(QWidget *parent,
                          Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Update slider value
-    *
-    * @param [in] value    slider value
-    */
+     * Update slider value
+     *
+     * @param [in] value    slider value
+     */
     void updateValue(qint32 value);
 
 signals:
     //=========================================================================================================
     /**
-    * Emitted whenever the settings changed and are ready to be retreived.
-    */
+     * Emitted whenever the settings changed and are ready to be retreived.
+     */
     void settingsChanged();
 
 public:

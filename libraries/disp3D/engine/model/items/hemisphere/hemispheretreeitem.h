@@ -114,45 +114,45 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor from single surface.
-    *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor from single surface.
+     *
+     * @param[in] iType      The type of the item. See types.h for declaration and definition.
+     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit HemisphereTreeItem(int iType = Data3DTreeModelItemTypes::HemisphereItem,
                                 const QString& text = "Unknown");
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on surfaces and annotation data to this item.
-    *
-    * @param[in] tSurface           FreeSurfer surface.
-    * @param[in] tAnnotation        FreeSurfer annotation.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns a pointer to the added tree item.
-    */
+     * Adds FreeSurfer data based on surfaces and annotation data to this item.
+     *
+     * @param[in] tSurface           FreeSurfer surface.
+     * @param[in] tAnnotation        FreeSurfer annotation.
+     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+     *
+     * @return                       Returns a pointer to the added tree item.
+     */
     FsSurfaceTreeItem* addData(const FSLIB::Surface& tSurface,
                                const FSLIB::Annotation& tAnnotation,
                                Qt3DCore::QEntity* p3DEntityParent = 0);
 
     //=========================================================================================================
     /**
-    * Adds source space information.
-    *
-    * @param[in] tHemisphere        The MNEHemisphere.
-    * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
-    *
-    * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
-    */
+     * Adds source space information.
+     *
+     * @param[in] tHemisphere        The MNEHemisphere.
+     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+     *
+     * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
+     */
     SourceSpaceTreeItem* addData(const MNELIB::MNEHemisphere& tHemisphere,
                                  Qt3DCore::QEntity* p3DEntityParent = 0);
 
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     void initItem();
 };
 

@@ -107,10 +107,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ModalitySelectionView which is a child of parent.
-    *
-    * @param [in] parent        parent of widget
-    */
+     * Constructs a ModalitySelectionView which is a child of parent.
+     *
+     * @param [in] parent        parent of widget
+     */
     ModalitySelectionView(const QList<FIFFLIB::FiffChInfo> &lChannelList,
                           const QString& sSettingsPath = "",
                           QWidget *parent = 0,
@@ -118,53 +118,53 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the ModalitySelectionView.
-    */
+     * Destroys the ModalitySelectionView.
+     */
     ~ModalitySelectionView();
 
     //=========================================================================================================
     /**
-    * Set the modality checkboxes.
-    *
-    * @param [in] modalityMap    The modality map.
-    */
+     * Set the modality checkboxes.
+     *
+     * @param [in] modalityMap    The modality map.
+     */
     void setModalityMap(const QMap<QString, bool>& modalityMap);
 
     //=========================================================================================================
     /**
-    * Get the activation of the already created modality check boxes.
-    *
-    * @return The current modality map.
-    */
+     * Get the activation of the already created modality check boxes.
+     *
+     * @return The current modality map.
+     */
     QMap<QString, bool> getModalityMap();
 
 protected:
     //=========================================================================================================
     /**
-    * Redraw the GUI.
-    */
+     * Redraw the GUI.
+     */
     void redrawGUI();
 
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Slot called when modality check boxes were changed
-    */
+     * Slot called when modality check boxes were changed
+     */
     void onUpdateModalityCheckbox(qint32 state);
 
     QMap<QString, bool>                 m_modalityMap;                  /**< Map of different modalities. */
@@ -177,8 +177,8 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changed the modality.
-    */
+     * Emit this signal whenever the user changed the modality.
+     */
     void modalitiesChanged(const QMap<QString, bool>& modalityMap);
 
 };

@@ -91,66 +91,66 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a PluginManager with the given parent.
-    *
-    * @param [in] parent    pointer to parent Object. (It's normally the default value.)
-    */
+     * Constructs a PluginManager with the given parent.
+     *
+     * @param [in] parent    pointer to parent Object. (It's normally the default value.)
+     */
     PluginManager(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the PluginManager.
-    */
+     * Destroys the PluginManager.
+     */
     virtual ~PluginManager();
 
     //=========================================================================================================
     /**
-    * Loads plugins from given directory.
-    *
-    * @param [in] dir   the plugin directory.
-    */
+     * Loads plugins from given directory.
+     *
+     * @param [in] dir   the plugin directory.
+     */
     void loadPlugins(const QString& dir);
 
     //=========================================================================================================
     /**
-    * Finds index of plugin by name.
-    *
-    * @param [in] name  the plugin name.
-    *
-    * @return index of plugin.
-    */
+     * Finds index of plugin by name.
+     *
+     * @param [in] name  the plugin name.
+     *
+     * @return index of plugin.
+     */
     int findByName(const QString& name);
 
     //=========================================================================================================
     /**
-    * Returns vector containing all plugins.
-    *
-    * @return reference to vector containing all plugins.
-    */
+     * Returns vector containing all plugins.
+     *
+     * @return reference to vector containing all plugins.
+     */
     inline const QVector<IPlugin*>& getPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing ISensor plugins.
-    *
-    * @return reference to vector containing ISensor plugins.
-    */
+     * Returns vector containing ISensor plugins.
+     *
+     * @return reference to vector containing ISensor plugins.
+     */
     inline const QVector<ISensor*>& getSensorPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing IAlgorithm plugins
-    *
-    * @return reference to vector containing IRTAlgorithm plugins
-    */
+     * Returns vector containing IAlgorithm plugins
+     *
+     * @return reference to vector containing IRTAlgorithm plugins
+     */
     inline const QVector<IAlgorithm*>& getAlgorithmPlugins();
 
     //=========================================================================================================
     /**
-    * Returns vector containing IIO plugins
-    *
-    * @return reference to vector containing IRTVisulaiztaion plugins
-    */
+     * Returns vector containing IIO plugins
+     *
+     * @return reference to vector containing IRTVisulaiztaion plugins
+     */
     inline const QVector<IIO*>& getIOPlugins();
 
 

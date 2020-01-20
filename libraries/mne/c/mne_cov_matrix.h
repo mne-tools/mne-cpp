@@ -118,16 +118,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Covariance Matrix
-    * Refactored: new_cov (mne_cov_matrix.c)
-    */
+     * Constructs the MNE Covariance Matrix
+     * Refactored: new_cov (mne_cov_matrix.c)
+     */
     MneCovMatrix(int p_kind, int p_ncov, const QStringList& p_names, double *p_cov, double *p_cov_diag, FIFFLIB::FiffSparseMatrix* p_cov_sparse);
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Covariance Matrix
-    * Refactored: mne_free_cov (mne_cov_matrix.c)
-    */
+     * Destroys the MNE Covariance Matrix
+     * Refactored: mne_free_cov (mne_cov_matrix.c)
+     */
     ~MneCovMatrix();
 
 

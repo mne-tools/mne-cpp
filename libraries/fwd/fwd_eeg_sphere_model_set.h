@@ -99,8 +99,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a Forward EEG Sphere Model Set object.
-    */
+     * Constructs a Forward EEG Sphere Model Set object.
+     */
     FwdEegSphereModelSet();
 
 //    //=========================================================================================================
@@ -113,9 +113,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the Forward EEG Sphere Model Set description
-    * Refactored: fwd_free_eeg_sphere_model_set
-    */
+     * Destroys the Forward EEG Sphere Model Set description
+     * Refactored: fwd_free_eeg_sphere_model_set
+     */
     ~FwdEegSphereModelSet();
 
 
@@ -139,45 +139,45 @@ public:
 
     //=========================================================================================================
     /**
-    * Choose and setup the default EEG sphere model
-    * Refactored from: fwd_eeg_sphere_models.c
-    *
-    * @param[in] s            The model set to which loaded models are added.
-    *
-    * @return The model set with the default model (s + default models)
-    */
+     * Choose and setup the default EEG sphere model
+     * Refactored from: fwd_eeg_sphere_models.c
+     *
+     * @param[in] s            The model set to which loaded models are added.
+     *
+     * @return The model set with the default model (s + default models)
+     */
     static FwdEegSphereModelSet* fwd_add_default_eeg_sphere_model(FwdEegSphereModelSet* s);
 
     //=========================================================================================================
     /**
-    * Load all models available in the specified file
-    * Refactored from: fwd_eeg_sphere_models.c
-    *
-    * @param[in] p_sFileName    file name to load models from
-    * @param[in] now            The model set to which loaded models are added.
-    *
-    * @return The loaded model set (now + loaded models)
-    */
+     * Load all models available in the specified file
+     * Refactored from: fwd_eeg_sphere_models.c
+     *
+     * @param[in] p_sFileName    file name to load models from
+     * @param[in] now            The model set to which loaded models are added.
+     *
+     * @return The loaded model set (now + loaded models)
+     */
     static FwdEegSphereModelSet* fwd_load_eeg_sphere_models(const QString& p_sFileName, FwdEegSphereModelSet* now);
 
     //=========================================================================================================
     /**
-    * Find a model with a given name and return a duplicate
-    * Refactored from: fwd_eeg_sphere_models.c
-    *
-    * @param[in] p_sName    Name of the model to find
-    *
-    * @return A duplicat of the found model
-    */
+     * Find a model with a given name and return a duplicate
+     * Refactored from: fwd_eeg_sphere_models.c
+     *
+     * @param[in] p_sName    Name of the model to find
+     *
+     * @return A duplicat of the found model
+     */
     FwdEegSphereModel* fwd_select_eeg_sphere_model(const QString& p_sName);
 
     //=========================================================================================================
     /**
-    * List the properties of available models
-    * Refactored from: dipole_fit_setup.c
-    *
-    * @param[in] f      std output stream
-    */
+     * List the properties of available models
+     * Refactored from: dipole_fit_setup.c
+     *
+     * @param[in] f      std output stream
+     */
     void fwd_list_eeg_sphere_models(FILE *f);
 
 

@@ -76,17 +76,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtcMusicAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtcMusicAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RtcMusicAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new RtcMusicAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+     */
     RtcMusicAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtcMusicAboutWidget.
-    * All DummyAboutWidget's children are deleted first. The application exits if RtcMusicAboutWidget is the main widget.
-    */
+     * Destroys the RtcMusicAboutWidget.
+     * All DummyAboutWidget's children are deleted first. The application exits if RtcMusicAboutWidget is the main widget.
+     */
     ~RtcMusicAboutWidget();
 
 private:

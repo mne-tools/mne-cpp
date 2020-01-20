@@ -92,38 +92,38 @@ class ChInfoWindow : public QDockWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a ChInfoWindow which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ChInfoWindow becomes a window. If parent is another widget, ChInfoWindow becomes a child window inside parent. ChInfoWindow is deleted when its parent is deleted.
-    */
+     * Constructs a ChInfoWindow which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new ChInfoWindow becomes a window. If parent is another widget, ChInfoWindow becomes a child window inside parent. ChInfoWindow is deleted when its parent is deleted.
+     */
     ChInfoWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ChInfoWindow.
-    * All ChInfoWindow's children are deleted first. The application exits if ChInfoWindow is the main widget.
-    */
+     * Destroys the ChInfoWindow.
+     * All ChInfoWindow's children are deleted first. The application exits if ChInfoWindow is the main widget.
+     */
     ~ChInfoWindow();
 
     //=========================================================================================================
     /**
-    * Returns the ChannelInfoModel of this window
-    */
+     * Returns the ChannelInfoModel of this window
+     */
     ChannelInfoModel::SPtr getDataModel();
 
 private:
     //=========================================================================================================
     /**
-    * Inits the model view controller pattern of this window.
-    *
-    */
+     * Inits the model view controller pattern of this window.
+     *
+     */
     void initMVC();
 
     //=========================================================================================================
     /**
-    * Inits all QTableViews of this window.
-    *
-    */
+     * Inits all QTableViews of this window.
+     *
+     */
     void initTableViews();
 
     Ui::ChInfoWindow*   ui;                 /**< Pointer to the qt designer generated ui class.*/

@@ -105,50 +105,50 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a MinimumNormSettingsView which is a child of parent.
-    *
-    * @param [in] parent        parent of widget.
-    */
+     * Constructs a MinimumNormSettingsView which is a child of parent.
+     *
+     * @param [in] parent        parent of widget.
+     */
     MinimumNormSettingsView(QWidget *parent = 0,
                 Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the MinimumNormSettingsView.
-    */
+     * Destroys the MinimumNormSettingsView.
+     */
     ~MinimumNormSettingsView();
 
     //=========================================================================================================
     /**
-    * Destroys the MinimumNormSettingsView.
-    *
-    * @param [in] lTriggerTypes        The new trigger types.
-    */
+     * Destroys the MinimumNormSettingsView.
+     *
+     * @param [in] lTriggerTypes        The new trigger types.
+     */
     void setTriggerTypes(const QStringList& lTriggerTypes);
 
 protected:
     //=========================================================================================================
     /**
-    * Slot called when the method changed.
-    *
-    * @param [in] method        The new method.
-    */
+     * Slot called when the method changed.
+     *
+     * @param [in] method        The new method.
+     */
     void onMethodChanged(const QString& method);
 
     //=========================================================================================================
     /**
-    * Slot called when the trigger type changed.
-    *
-    * @param [in] sTriggerType        The new trigger type.
-    */
+     * Slot called when the trigger type changed.
+     *
+     * @param [in] sTriggerType        The new trigger type.
+     */
     void onTriggerTypeChanged(const QString& sTriggerType);
 
     //=========================================================================================================
     /**
-    * Slot called when the time point changes.
-    *
-    * @param [in] iTimePointMs        The new time point in ms.
-    */
+     * Slot called when the time point changes.
+     *
+     * @param [in] iTimePointMs        The new time point in ms.
+     */
     void onTimePointValueChanged(int iTimePointMs);
 
     Ui::MinimumNormSettingsViewWidget* ui;
@@ -156,26 +156,26 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit signal whenever the method changed.
-    *
-    * @param [in] method        The new method.
-    */
+     * Emit signal whenever the method changed.
+     *
+     * @param [in] method        The new method.
+     */
     void methodChanged(const QString& method);
 
     //=========================================================================================================
     /**
-    * Emit signal whenever the trigger type changed.
-    *
-    * @param [in] triggerType        The new trigger type.
-    */
+     * Emit signal whenever the trigger type changed.
+     *
+     * @param [in] triggerType        The new trigger type.
+     */
     void triggerTypeChanged(const QString& triggerType);
 
     //=========================================================================================================
     /**
-    * Emit signal whenever the time point changed.
-    *
-    * @param [in] iTimePoint        The new time point.
-    */
+     * Emit signal whenever the time point changed.
+     *
+     * @param [in] iTimePoint        The new time point.
+     */
     void timePointChanged(int iTimePoint);
 
 };

@@ -98,102 +98,102 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a fiff evoked data set.
-    */
+     * Constructs a fiff evoked data set.
+     */
     FiffEvokedSet();
 
     //=========================================================================================================
     /**
-    * Constructs a fiff evoked data set, by reading from a IO device.
-    *
-    * @param[in] p_IODevice     IO device to read from the evoked data set.
-    */
+     * Constructs a fiff evoked data set, by reading from a IO device.
+     *
+     * @param[in] p_IODevice     IO device to read from the evoked data set.
+     */
     FiffEvokedSet(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_FiffEvokedSet    Fiff evoked data set which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_FiffEvokedSet    Fiff evoked data set which should be copied
+     */
     FiffEvokedSet(const FiffEvokedSet& p_FiffEvokedSet);
 
     //=========================================================================================================
     /**
-    * Destroys the fiff evoked data set.
-    */
+     * Destroys the fiff evoked data set.
+     */
     ~FiffEvokedSet();
 
     //=========================================================================================================
     /**
-    * Initializes fiff evoked data set.
-    */
+     * Initializes fiff evoked data set.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * fiff_pick_channels_evoked
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Pick desired channels from evoked-response data
-    *
-    * @param[in] include   - Channels to include (if empty, include all available)
-    * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
-    *
-    * @return the desired fiff evoked data set
-    */
+     * fiff_pick_channels_evoked
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Pick desired channels from evoked-response data
+     *
+     * @param[in] include   - Channels to include (if empty, include all available)
+     * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
+     *
+     * @return the desired fiff evoked data set
+     */
     FiffEvokedSet pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
-    * mne_compensate_to
-    *
-    * ### MNE toolbox root function ### Definition of the mne_compensate_to function
-    *
-    * Apply compensation to the data as desired
-    *
-    * @param[in] to                 desired compensation in the output
-    * @param[in,out] p_FiffEvoked   Evoked set to compensate
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * mne_compensate_to
+     *
+     * ### MNE toolbox root function ### Definition of the mne_compensate_to function
+     *
+     * Apply compensation to the data as desired
+     *
+     * @param[in] to                 desired compensation in the output
+     * @param[in,out] p_FiffEvoked   Evoked set to compensate
+     *
+     * @return true if succeeded, false otherwise
+     */
     bool compensate_to(FiffEvokedSet &p_FiffEvokedSet, fiff_int_t to) const;
 
     //=========================================================================================================
     /**
-    * fiff_find_evoked
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Find evoked data sets
-    *
-    * @param[out] p_FiffEvokedSet   The read evoked data set
-    *
-    * @return true when any set was found, false otherwise
-    */
+     * fiff_find_evoked
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Find evoked data sets
+     *
+     * @param[out] p_FiffEvokedSet   The read evoked data set
+     *
+     * @return true when any set was found, false otherwise
+     */
     bool find_evoked(const FiffEvokedSet& p_FiffEvokedSet) const;
 
     //=========================================================================================================
     /**
-    * fiff_read_evoked
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Wrapper for the FiffEvokedDataSet::read_evoked static function
-    *
-    * Read one evoked data set
-    *
-    * @param[in] p_IODevice         An fiff IO device like a fiff QFile or QTCPSocket
-    * @param[out] p_FiffEvokedSet   The read evoked data set
-    * @param[in] baseline           The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
-    *                               the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
-    *                               None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
-    *                               If None, no correction is applied.
-    * @param[in] proj           Apply SSP projection vectors (optional, default = true)
-    *
-    * @return true when successful, false otherwise
-    */
+     * fiff_read_evoked
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the FiffEvokedDataSet::read_evoked static function
+     *
+     * Read one evoked data set
+     *
+     * @param[in] p_IODevice         An fiff IO device like a fiff QFile or QTCPSocket
+     * @param[out] p_FiffEvokedSet   The read evoked data set
+     * @param[in] baseline           The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
+     *                               the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
+     *                               None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
+     *                               If None, no correction is applied.
+     * @param[in] proj           Apply SSP projection vectors (optional, default = true)
+     *
+     * @return true when successful, false otherwise
+     */
     static bool read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, QPair<QVariant,QVariant> baseline = defaultVariantPair, bool proj = true);
 
 public:

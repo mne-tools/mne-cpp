@@ -123,85 +123,85 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs an real-time multi sample array table model for the given parent.
-    *
-    * @param[in] parent     parent of the table model
-    */
+     * Constructs an real-time multi sample array table model for the given parent.
+     *
+     * @param[in] parent     parent of the table model
+     */
     EvokedSetModel(QObject *parent = 0);
     ~EvokedSetModel();
 
     //=========================================================================================================
     /**
-    * Returns whether this class is initalized.
-    *
-    * @return Flag specifying whether this class is initalized.
-    */
+     * Returns whether this class is initalized.
+     *
+     * @return Flag specifying whether this class is initalized.
+     */
     bool isInit() const;
 
     //=========================================================================================================
     /**
-    * Returns the number of samples.
-    *
-    * @return The number of samples.
-    */
+     * Returns the number of samples.
+     *
+     * @return The number of samples.
+     */
     qint32 getNumSamples() const;
 
     //=========================================================================================================
     /**
-    * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
-    *
-    * @param[in] parent     not used
-    *
-    * @return number of rows
-    */
+     * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
+     *
+     * @param[in] parent     not used
+     *
+     * @return number of rows
+     */
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
 
     //=========================================================================================================
     /**
-    * Returns the number of columns for the children of the given parent.
-    *
-    * @param[in] parent     not used
-    *
-    * @return number of columns
-    */
+     * Returns the number of columns for the children of the given parent.
+     *
+     * @param[in] parent     not used
+     *
+     * @return number of columns
+     */
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
     //=========================================================================================================
     /**
-    * Data for the row and column and given display role
-    *
-    * @param [in] row       index row
-    * @param [in] column    index column
-    * @param [in] role      display role to access
-    *
-    * @return the accessed data
-    */
+     * Data for the row and column and given display role
+     *
+     * @param [in] row       index row
+     * @param [in] column    index column
+     * @param [in] role      display role to access
+     *
+     * @return the accessed data
+     */
     QVariant data(int row,
                          int column,
                          int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
-    * Returns the data stored under the given role for the item referred to by the index.
-    *
-    * @param[in] index      determines item location
-    * @param[in] role       role to return
-    *
-    * @return accessed data
-    */
+     * Returns the data stored under the given role for the item referred to by the index.
+     *
+     * @param[in] index      determines item location
+     * @param[in] role       role to return
+     *
+     * @return accessed data
+     */
     virtual QVariant data(const QModelIndex &index,
                           int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
-    * Returns the data for the given role and section in the header with the specified orientation.
-    *
-    * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
-    * @param[in] orientation    Qt::Horizontal or Qt::Vertical
-    * @param[in] role           role to show
-    *
-    * @return accessed eader data
-    */
+     * Returns the data for the given role and section in the header with the specified orientation.
+     *
+     * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
+     * @param[in] orientation    Qt::Horizontal or Qt::Vertical
+     * @param[in] role           role to show
+     *
+     * @return accessed eader data
+     */
     virtual QVariant headerData(int section,
                                 Qt::Orientation orientation,
                                 int role = Qt::DisplayRole) const;
@@ -210,225 +210,225 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets corresponding evoked set
-    *
-    * @param [in] pEvokedSet      The evoked set
-    */
+     * Sets corresponding evoked set
+     *
+     * @param [in] pEvokedSet      The evoked set
+     */
     void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
     //=========================================================================================================
     /**
-    * Update stored data
-    */
+     * Update stored data
+     */
     void updateData();
 
     //=========================================================================================================
     /**
-    * Set filter activation
-    *
-    * @param[in] state    filter on/off flag
-    */
+     * Set filter activation
+     *
+     * @param[in] state    filter on/off flag
+     */
     void setFilterActive(bool state);
 
     //=========================================================================================================
     /**
-    * Get the current average colors
-    *
-    * @return Pointer to the current average colors.
-    */
+     * Get the current average colors
+     *
+     * @return Pointer to the current average colors.
+     */
     QSharedPointer<QMap<QString, QColor> > getAverageColor() const;
 
     //=========================================================================================================
     /**
-    * Get the current average activations
-    *
-    * @return Pointer to the current average activations.
-    */
+     * Get the current average activations
+     *
+     * @return Pointer to the current average activations.
+     */
     QSharedPointer<QMap<QString, bool> > getAverageActivation() const;
 
     //=========================================================================================================
     /**
-    * Set the average colors
-    *
-    * @param [in] qMapAverageColor      Pointer to the new average colors
-    */
+     * Set the average colors
+     *
+     * @param [in] qMapAverageColor      Pointer to the new average colors
+     */
     void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
     //=========================================================================================================
     /**
-    * Set the average activations
-    *
-    * @param [in] qMapAverageActivation      Pointer to the new average activations
-    */
+     * Set the average activations
+     *
+     * @param [in] qMapAverageActivation      Pointer to the new average activations
+     */
     void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
     //=========================================================================================================
     /**
-    * Returns the kind of a given channel number
-    *
-    * @param[in] row    row number which correspodns to a given channel
-    *
-    * @return kind of given channel number
-    */
+     * Returns the kind of a given channel number
+     *
+     * @param[in] row    row number which correspodns to a given channel
+     *
+     * @return kind of given channel number
+     */
     FIFFLIB::fiff_int_t getKind(qint32 row) const;
 
     //=========================================================================================================
     /**
-    * Returns true or fals whether the provided channel is bad.
-    *
-    * @param[in] row    row number which correspodns to a given channel
-    *
-    * @return Returns true or fals whether the provided channel is bad
-    */
+     * Returns true or fals whether the provided channel is bad.
+     *
+     * @param[in] row    row number which correspodns to a given channel
+     *
+     * @return Returns true or fals whether the provided channel is bad
+     */
     bool getIsChannelBad(qint32 row) const;
 
     //=========================================================================================================
     /**
-    * Returns the unit of a given channel number
-    *
-    * @param[in] row    row number which correspodns to a given channel
-    *
-    * @return unit of given channel number
-    */
+     * Returns the unit of a given channel number
+     *
+     * @param[in] row    row number which correspodns to a given channel
+     *
+     * @return unit of given channel number
+     */
     FIFFLIB::fiff_int_t getUnit(qint32 row) const;
 
     //=========================================================================================================
     /**
-    * Returns the coil type of a given channel number
-    *
-    * @param[in] row    row number which correspodns to a given channel
-    *
-    * @return coil type of given channel number
-    */
+     * Returns the coil type of a given channel number
+     *
+     * @param[in] row    row number which correspodns to a given channel
+     *
+     * @return coil type of given channel number
+     */
     FIFFLIB::fiff_int_t getCoil(qint32 row) const;
 
     //=========================================================================================================
     /**
-    * Returns a map which conatins the channel idx and its corresponding selection status
-    *
-    * @return the channel idx to selection status
-    */
+     * Returns a map which conatins the channel idx and its corresponding selection status
+     *
+     * @return the channel idx to selection status
+     */
     const QMap<qint32,qint32>& getIdxSelMap() const;
 
     //=========================================================================================================
     /**
-    * Returns the current number for the time spacers
-    *
-    * @return the current number for the time spacers
-    */
+     * Returns the current number for the time spacers
+     *
+     * @return the current number for the time spacers
+     */
     int getNumberOfTimeSpacers() const;
 
     //=========================================================================================================
     /**
-    * Returns the current baseline information
-    *
-    * @return the current baseline information as a from to QPair
-    */
+     * Returns the current baseline information
+     *
+     * @return the current baseline information as a from to QPair
+     */
     QPair<QVariant,QVariant> getBaselineInfo() const;
 
     //=========================================================================================================
     /**
-    * Returns the current number of stored averages
-    *
-    * @return the current number of stored averages
-    */
+     * Returns the current number of stored averages
+     *
+     * @return the current number of stored averages
+     */
     int getNumAverages() const;
 
     //=========================================================================================================
     /**
-    * Returns the number of pre-stimulus samples
-    *
-    * @return the number of pre-stimulus samples
-    */
+     * Returns the number of pre-stimulus samples
+     *
+     * @return the number of pre-stimulus samples
+     */
     qint32 getNumPreStimSamples() const;
 
     //=========================================================================================================
     /**
-    * Returns the current sampling frequency
-    *
-    * @return the current sampling frequency
-    */
+     * Returns the current sampling frequency
+     *
+     * @return the current sampling frequency
+     */
     float getSamplingFrequency() const;
 
     //=========================================================================================================
     /**
-    * Selects the given list of channel indeces and unselect all other channels
-    *
-    * @param[in] selection      channel index list to select
-    */
+     * Selects the given list of channel indeces and unselect all other channels
+     *
+     * @param[in] selection      channel index list to select
+     */
     void selectRows(const QList<qint32> &selection);
 
     //=========================================================================================================
     /**
-    * Resets the current selection (selects all channels)
-    */
+     * Resets the current selection (selects all channels)
+     */
     void resetSelection();
 
     //=========================================================================================================
     /**
-    * Returns the number of vertical lines (one per second)
-    *
-    * @return number of vertical lines
-    */
+     * Returns the number of vertical lines (one per second)
+     *
+     * @return number of vertical lines
+     */
     qint32 numVLines() const;
 
     //=========================================================================================================
     /**
-    * Returns current freezing status
-    *
-    * @return the current freezing status
-    */
+     * Returns current freezing status
+     *
+     * @return the current freezing status
+     */
     bool isFreezed() const;
 
     //=========================================================================================================
     /**
-    * Update projections
-    */
+     * Update projections
+     */
     void updateProjection(const QList<FIFFLIB::FiffProj>& projs);
 
     //=========================================================================================================
     /**
-    * Update the compensator
-    *
-    * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
-    */
+     * Update the compensator
+     *
+     * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+     */
     void updateCompensator(int to);
 
     //=========================================================================================================
     /**
-    * Toggle freeze for all channels when a channel is double clicked
-    */
+     * Toggle freeze for all channels when a channel is double clicked
+     */
     void toggleFreeze();
 
     //=========================================================================================================
     /**
-    * Set filter
-    *
-    * @param[in] filterData    list of the currently active filter
-    */
+     * Set filter
+     *
+     * @param[in] filterData    list of the currently active filter
+     */
     void setFilter(const UTILSLIB::FilterData &filterData);
 
     //=========================================================================================================
     /**
-    * Sets the type of channel which are to be filtered
-    *
-    * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
-    */
+     * Sets the type of channel which are to be filtered
+     *
+     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+     */
     void setFilterChannelType(QString channelType);
 
     //=========================================================================================================
     /**
-    * Create list of channels which are to be filtered based on channel names
-    *
-    * @param[in] channelNames    the channel names which are to be filtered
-    */
+     * Create list of channels which are to be filtered based on channel names
+     *
+     * @param[in] channelNames    the channel names which are to be filtered
+     */
     void createFilterChannelList(QStringList channelNames);
 
 private:
     //=========================================================================================================
     /**
-    * Calculates the filtered version of the channels in m_matData
-    */
+     * Calculates the filtered version of the channels in m_matData
+     */
     void filterDataBlock();
 
     QSharedPointer<FIFFLIB::FiffEvokedSet>  m_pEvokedSet;                   /**< The evoked set measurement. */
@@ -471,26 +471,26 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * Emmited when new selcetion was made
-    *
-    * @param [in] selection     list of all selected channels
-    */
+     * Emmited when new selcetion was made
+     *
+     * @param [in] selection     list of all selected channels
+     */
     void newSelection(QList<qint32> selection);
 
     //=========================================================================================================
     /**
-    * Emmited when new average color is available
-    *
-    * @param [in] qMapAverageColor     the average color map
-    */
+     * Emmited when new average color is available
+     *
+     * @param [in] qMapAverageColor     the average color map
+     */
     void newAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
     //=========================================================================================================
     /**
-    * Emmited when new average activation is available
-    *
-    * @param [in] qMapAverageActivation     the average activation map
-    */
+     * Emmited when new average activation is available
+     *
+     * @param [in] qMapAverageActivation     the average activation map
+     */
     void newAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 };
 

@@ -109,14 +109,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FiffSimulator.
-    */
+     * Constructs a FiffSimulator.
+     */
     FiffSimulator();
 
     //=========================================================================================================
     /**
-    * Destroys the FiffSimulator.
-    */
+     * Destroys the FiffSimulator.
+     */
     virtual ~FiffSimulator();
 
     virtual void connectCommandManager();
@@ -137,54 +137,54 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Sets the buffer sample size
-    *
-    * @param[in] p_command  The buffer sample size command.
-    */
+     * Sets the buffer sample size
+     *
+     * @param[in] p_command  The buffer sample size command.
+     */
     void comBufsize(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
-    * Returns the buffer sample size
-    *
-    * @param[in] p_command  The buffer sample size command.
-    */
+     * Returns the buffer sample size
+     *
+     * @param[in] p_command  The buffer sample size command.
+     */
     void comGetBufsize(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
-    * Sets the acceleration factor
-    *
-    * @param[in] p_command  The acceleration factor command.
-    */
+     * Sets the acceleration factor
+     *
+     * @param[in] p_command  The acceleration factor command.
+     */
     void comAccel(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
-    * Returns the acceleration factor
-    *
-    * @param[in] p_command  The acceleration factor command.
-    */
+     * Returns the acceleration factor
+     *
+     * @param[in] p_command  The acceleration factor command.
+     */
     void comGetAccel(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
-    * Sets the fiff simulation file
-    *
-    * @param[in] p_command  The fiff simulation file command.
-    */
+     * Sets the fiff simulation file
+     *
+     * @param[in] p_command  The fiff simulation file command.
+     */
     void comSimfile(RTSERVER::Command p_command);
 
     //=========================================================================================================
     /**
-    * Initialise the FiffSimulator.
-    */
+     * Initialise the FiffSimulator.
+     */
     void init();
 
     //=========================================================================================================
     /**
-    * Read the raw FiffInfo.
-    */
+     * Read the raw FiffInfo.
+     */
     bool readRawInfo();
 
     QMutex mutex;

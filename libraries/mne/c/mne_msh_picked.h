@@ -86,14 +86,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MneMshPicked.
-    */
+     * Constructs the MneMshPicked.
+     */
     MneMshPicked();
 
     //=========================================================================================================
     /**
-    * Destroys the MneMshPicked.
-    */
+     * Destroys the MneMshPicked.
+     */
     ~MneMshPicked();
 
 public:

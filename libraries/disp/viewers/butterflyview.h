@@ -105,143 +105,143 @@ public:
 
     //=========================================================================================================
     /**
-    * The constructor.
-    */
+     * The constructor.
+     */
     explicit ButterflyView(QWidget *parent = 0,
                            Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Set the evoked set model.
-    *
-    * @param [in] model     The new evoked set model.
-    */
+     * Set the evoked set model.
+     *
+     * @param [in] model     The new evoked set model.
+     */
     void setEvokedSetModel(QSharedPointer<EvokedSetModel> model);
 
     //=========================================================================================================
     /**
-    * Perform a data update.
-    */
+     * Perform a data update.
+     */
     void dataUpdate();
 
     //=========================================================================================================
     /**
-    * Get the activation of the already created modality check boxes.
-    *
-    * @return The current modality map.
-    */
+     * Get the activation of the already created modality check boxes.
+     *
+     * @return The current modality map.
+     */
     QMap<QString, bool> getModalityMap();
 
     //=========================================================================================================
     /**
-    * Set the modality checkboxes.
-    *
-    * @param [in] modalityMap    The modality map.
-    */
+     * Set the modality checkboxes.
+     *
+     * @param [in] modalityMap    The modality map.
+     */
     void setModalityMap(const QMap<QString, bool>& modalityMap);
 
     //=========================================================================================================
     /**
-    * Sets the scale map to scaleMap.
-    *
-    * @param [in] scaleMap map with all channel types and their current scaling value.
-    */
+     * Sets the scale map to scaleMap.
+     *
+     * @param [in] scaleMap map with all channel types and their current scaling value.
+     */
     void setScaleMap(const QMap<qint32, float> &scaleMap);
 
     //=========================================================================================================
     /**
-    * Set the selected channels.
-    *
-    * @param [in] selectedChannels     The new selected channels.
-    */
+     * Set the selected channels.
+     *
+     * @param [in] selectedChannels     The new selected channels.
+     */
     void setSelectedChannels(const QList<int> &selectedChannels);
 
     //=========================================================================================================
     /**
-    * Perform a view update from outside of this class.
-    */
+     * Perform a view update from outside of this class.
+     */
     void updateView();
 
     //=========================================================================================================
     /**
-    * Set the background color.
-    *
-    * @param [in] backgroundColor     The new background color.
-    */
+     * Set the background color.
+     *
+     * @param [in] backgroundColor     The new background color.
+     */
     void setBackgroundColor(const QColor& backgroundColor);
 
     //=========================================================================================================
     /**
-    * Returns the background color.
-    *
-    * @return The current background color.
-    */
+     * Returns the background color.
+     *
+     * @return The current background color.
+     */
     const QColor& getBackgroundColor();
 
     //=========================================================================================================
     /**
-    * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
-    *
-    * @param [in] fileName     The file name and path where to store the screenshot.
-    */
+     * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
+     *
+     * @param [in] fileName     The file name and path where to store the screenshot.
+     */
     void takeScreenshot(const QString& fileName);
 
     //=========================================================================================================
     /**
-    * Get the current average colors
-    *
-    * @return Pointer to the current average colors.
-    */
+     * Get the current average colors
+     *
+     * @return Pointer to the current average colors.
+     */
     QSharedPointer<QMap<QString, QColor> > getAverageColor() const;
 
     //=========================================================================================================
     /**
-    * Get the current average activations
-    *
-    * @return Pointer to the current average activations.
-    */
+     * Get the current average activations
+     *
+     * @return Pointer to the current average activations.
+     */
     QSharedPointer<QMap<QString, bool> > getAverageActivation() const;
 
     //=========================================================================================================
     /**
-    * Set the average colors
-    *
-    * @param [in] qMapAverageColor      Pointer to the new average colors
-    */
+     * Set the average colors
+     *
+     * @param [in] qMapAverageColor      Pointer to the new average colors
+     */
     void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
     //=========================================================================================================
     /**
-    * Set the average activations
-    *
-    * @param [in] qMapAverageActivation      Pointer to the new average activations
-    */
+     * Set the average activations
+     *
+     * @param [in] qMapAverageActivation      Pointer to the new average activations
+     */
     void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
     //=========================================================================================================
     /**
-    * Set the channel info model.
-    *
-    * @param [in] pChannelInfoModel     The new channel info model.
-    */
+     * Set the channel info model.
+     *
+     * @param [in] pChannelInfoModel     The new channel info model.
+     */
     void setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
 
     //=========================================================================================================
     /**
-    * Only shows the channels defined in the QStringList selectedChannels
-    *
-    * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
-    */
+     * Only shows the channels defined in the QStringList selectedChannels
+     *
+     * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
+     */
     void showSelectedChannelsOnly(const QStringList& selectedChannels);
 
 protected:
     //=========================================================================================================
     /**
-    * Is called to paint the incoming real-time data block.
-    * Function is painting the real-time butterfly plot
-    *
-    * @param [in] event pointer to PaintEvent -> not used.
-    */
+     * Is called to paint the incoming real-time data block.
+     * Function is painting the real-time butterfly plot
+     *
+     * @param [in] event pointer to PaintEvent -> not used.
+     */
 #if defined(USE_OPENGL)
     virtual void paintGL();
 #else
@@ -250,10 +250,10 @@ protected:
 
     //=========================================================================================================
     /**
-    * createPlotPath creates the QPointer path for the data plot.
-    *
-    * @param[in] index QModelIndex for accessing associated data and model object.
-    */
+     * createPlotPath creates the QPointer path for the data plot.
+     *
+     * @param[in] index QModelIndex for accessing associated data and model object.
+     */
     void createPlotPath(qint32 row, QPainter& painter) const;
 
     bool        m_bShowMAG;                     /**< Show Magnetometers channels */

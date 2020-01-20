@@ -77,14 +77,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a EpidetectToolbox.
-    */
+     * Constructs a EpidetectToolbox.
+     */
     explicit EpidetectWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the EpidetectToolbox.
-    */
+     * Destroys the EpidetectToolbox.
+     */
     ~EpidetectWidget();
     EpidetectWidget(int dimOld, double rOld, int nOld, double marginOld, double threshold1Old, double threshold2Old, int listLengthOld, int fuzzyStepOld, int chWheightOld, QWidget *parent = 0);
 
@@ -105,8 +105,8 @@ private:
 
     //=========================================================================================================
     /**
-    * Updates the parameters if changed in the GUI
-    */
+     * Updates the parameters if changed in the GUI
+     */
     void updateValues();
 
 signals:

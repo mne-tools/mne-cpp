@@ -87,49 +87,49 @@ class GUSBAMPSHARED_EXPORT GUSBAmpProducer : public QThread
 public:
     //=========================================================================================================
     /**
-    * Constructs a GUSBAmpProducer.
-    *
-    * @param [in] pGUSBAmp a pointer to the corresponding GUSBAmp class.
-    */
+     * Constructs a GUSBAmpProducer.
+     *
+     * @param [in] pGUSBAmp a pointer to the corresponding GUSBAmp class.
+     */
     GUSBAmpProducer(GUSBAmp* pGUSBAmp);
 
     //=========================================================================================================
     /**
-    * Destroys the GUSBAmpProducer.
-    */
+     * Destroys the GUSBAmpProducer.
+     */
     ~GUSBAmpProducer();
 
     //=========================================================================================================
     /**
-    * Starts the GUSBAmpProducer by starting the producer's thread and initialising the device.
-    *
-    * @param [in] serials       string array of all Serial names
-    * @param [in] channels      int field of calling number of the channels to be acquired
-    * @param [in] sampleRate    sample Rate as an integer
-    * @param [in] filePath      string of the filepath where data will be stored
-    *
-    */
+     * Starts the GUSBAmpProducer by starting the producer's thread and initialising the device.
+     *
+     * @param [in] serials       string array of all Serial names
+     * @param [in] channels      int field of calling number of the channels to be acquired
+     * @param [in] sampleRate    sample Rate as an integer
+     * @param [in] filePath      string of the filepath where data will be stored
+     *
+     */
     virtual void start(std::vector<QString> &serials, std::vector<int> channels, int sampleRate);
 
     //=========================================================================================================
     /**
-    * Stops the GUSBAmpProducer by stopping the producer's thread.
-    */
+     * Stops the GUSBAmpProducer by stopping the producer's thread.
+     */
     void stop();
 
     //=========================================================================================================
     /**
-    * @return           returns the size of the sample Matrix
-    */
+     * @return           returns the size of the sample Matrix
+     */
     std::vector<int> getSizeOfSampleMatrix(void);
 
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
 private:

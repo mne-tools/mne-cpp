@@ -108,74 +108,74 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructors the bem surface.
-    */
+     * Constructors the bem surface.
+     */
     MNEBemSurface();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_MNEBemSurface    BEM surface which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_MNEBemSurface    BEM surface which should be copied
+     */
     MNEBemSurface(const MNEBemSurface& p_MNEBemSurface);
 
     //=========================================================================================================
     /**
-    * Destroys the BEM surface.
-    */
+     * Destroys the BEM surface.
+     */
     ~MNEBemSurface();
 
     //=========================================================================================================
     /**
-    * Initializes the BEM surface.
-    */
+     * Initializes the BEM surface.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Definition of the   mne_add_triangle_data function in mne_add_geometry_info.c
-    *
-    * Completes triangulation info
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * Definition of the   mne_add_triangle_data function in mne_add_geometry_info.c
+     *
+     * Completes triangulation info
+     *
+     * @return true if succeeded, false otherwise
+     */
     bool addTriangleData();
 
     //=========================================================================================================
     /**
-    * Add vertex normals and neighbourhood information
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * Add vertex normals and neighbourhood information
+     *
+     * @return true if succeeded, false otherwise
+     */
     bool add_geometry_info();
 
     //=========================================================================================================
     /**
-    * Definition of the addVertexNormals function in mne_add_geometry_info.c
-    *
-    * Completes triangulation info
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * Definition of the addVertexNormals function in mne_add_geometry_info.c
+     *
+     * Completes triangulation info
+     *
+     * @return true if succeeded, false otherwise
+     */
     bool addVertexNormals();
 
     //=========================================================================================================
     /**
-    * Writes the bem surface to a FIFF stream
-    *
-    * @param[in] p_pStream  The stream to write to.
-    */
+     * Writes the bem surface to a FIFF stream
+     *
+     * @param[in] p_pStream  The stream to write to.
+     */
     void writeToStream(FiffStream* p_pStream);
 
     //=========================================================================================================
     /**
-    * Map bem id integers to human-readable names
-    *
-    * @param[in] frame  The bem id integer
-    *
-    * @return Human readable form of the bem id.
-    */
+     * Map bem id integers to human-readable names
+     *
+     * @param[in] frame  The bem id integer
+     *
+     * @return Human readable form of the bem id.
+     */
     static QString id_name(int id);
 
 public:

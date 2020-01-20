@@ -106,156 +106,156 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FiffRawViewSettings which is a child of parent.
-    *
-    * @param [in] parent        parent of widget
-    */
+     * Constructs a FiffRawViewSettings which is a child of parent.
+     *
+     * @param [in] parent        parent of widget
+     */
     FiffRawViewSettings(const QString& sSettingsPath = "",
                             QWidget *parent = 0,
                             Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffRawViewSettings.
-    */
+     * Destroys the FiffRawViewSettings.
+     */
     ~FiffRawViewSettings();
 
     //=========================================================================================================
     /**
-    * Init the view.
-    *
-    * @param [in] lVisibleWidgets       The widgets to be visible: numberChannels, windowSize, distanceSpacers,
-    *                                   backgroundcolor, signalColor, screenshot
-    */
+     * Init the view.
+     *
+     * @param [in] lVisibleWidgets       The widgets to be visible: numberChannels, windowSize, distanceSpacers,
+     *                                   backgroundcolor, signalColor, screenshot
+     */
     void setWidgetList(const QStringList &lVisibleWidgets = QStringList());
 
     //=========================================================================================================
     /**
-    * Sets the values of the windowSize spin box
-    *
-    * @param [in] windowSize    new window size value
-    */
+     * Sets the values of the windowSize spin box
+     *
+     * @param [in] windowSize    new window size value
+     */
     void setWindowSize(int windowSize);
 
     //=========================================================================================================
     /**
-    * Sets the values of the zoomFactor spin box
-    *
-    * @param [in] zoomFactor    new zoomFactor value
-    */
+     * Sets the values of the zoomFactor spin box
+     *
+     * @param [in] zoomFactor    new zoomFactor value
+     */
     void setZoom(double zoomFactor);
 
     //=========================================================================================================
     /**
-    * Get current distance time spacer.
-    *
-    * @return the current distance time spacer.
-    */
+     * Get current distance time spacer.
+     *
+     * @return the current distance time spacer.
+     */
     int getDistanceTimeSpacer();
 
     //=========================================================================================================
     /**
-    * Set current distance time spacer combo box.
-    *
-    * @param [in] value     the new value of the combo box
-    */
+     * Set current distance time spacer combo box.
+     *
+     * @param [in] value     the new value of the combo box
+     */
     void setDistanceTimeSpacer(int value);
 
     //=========================================================================================================
     /**
-    * Set current  background color.
-    *
-    * @param [in] backgroundColor   The new background color.
-    */
+     * Set current  background color.
+     *
+     * @param [in] backgroundColor   The new background color.
+     */
     void setBackgroundColor(const QColor& backgroundColor);
 
     //=========================================================================================================
     /**
-    * Set current signal color.
-    *
-    * @param [in] signalColor       The new signal color.
-    */
+     * Set current signal color.
+     *
+     * @param [in] signalColor       The new signal color.
+     */
     void setSignalColor(const QColor& signalColor);
 
     //=========================================================================================================
     /**
-    * Returns the current signal color.
-    *
-    * @return The current signal color.
-    */
+     * Returns the current signal color.
+     *
+     * @return The current signal color.
+     */
     const QColor& getSignalColor();
 
     //=========================================================================================================
     /**
-    * Returns the current background color.
-    *
-    * @return The current background color.
-    */
+     * Returns the current background color.
+     *
+     * @return The current background color.
+     */
     const QColor& getBackgroundColor();
 
     //=========================================================================================================
     /**
-    * Returns the current zoom.
-    *
-    * @return The current zoom.
-    */
+     * Returns the current zoom.
+     *
+     * @return The current zoom.
+     */
     double getZoom();
 
     //=========================================================================================================
     /**
-    * Returns the current window size.
-    *
-    * @return The current window size.
-    */
+     * Returns the current window size.
+     *
+     * @return The current window size.
+     */
     int getWindowSize();
 
 protected:
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Slot called when time window size changes
-    */
+     * Slot called when time window size changes
+     */
     void onTimeWindowChanged(int value);
 
     //=========================================================================================================
     /**
-    * Slot called when zoome changes
-    */
+     * Slot called when zoome changes
+     */
     void onZoomChanged(double value);
 
     //=========================================================================================================
     /**
-    * Slot called when time spacer distance changes
-    *
-    * @param [in] value for time spacer distance.
-    */
+     * Slot called when time spacer distance changes
+     *
+     * @param [in] value for time spacer distance.
+     */
     void onDistanceTimeSpacerChanged(qint32 value);
 
     //=========================================================================================================
     /**
-    * Slot called when the user changes the signal or background color.
-    */
+     * Slot called when the user changes the signal or background color.
+     */
     void onViewColorButtonClicked();
 
     //=========================================================================================================
     /**
-    * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
-    */
+     * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
+     */
     void onMakeScreenshot();
 
     Ui::FiffRawViewSettingsWidget* ui;
@@ -267,40 +267,40 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changes the window size.
-    */
+     * Emit this signal whenever the user changes the window size.
+     */
     void timeWindowChanged(int value);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changes the row height (zoom) of the channels.
-    */
+     * Emit this signal whenever the user changes the row height (zoom) of the channels.
+     */
     void zoomChanged(double value);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changed the time spacer distance.
-    */
+     * Emit this signal whenever the user changed the time spacer distance.
+     */
     void distanceTimeSpacerChanged(int value);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changed the signal color.
-    */
+     * Emit this signal whenever the user changed the signal color.
+     */
     void signalColorChanged(const QColor& signalColor);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changed the background color.
-    */
+     * Emit this signal whenever the user changed the background color.
+     */
     void backgroundColorChanged(const QColor& backgroundColor);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user wants to make a screenshot.
-    *
-    * @param[out] imageType     The current image type: png, svg.
-    */
+     * Emit this signal whenever the user wants to make a screenshot.
+     *
+     * @param[out] imageType     The current image type: png, svg.
+     */
     void makeScreenshot(const QString& imageType);
 
 };

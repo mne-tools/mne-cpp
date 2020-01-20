@@ -104,24 +104,24 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor
-    */
+     * Default constructor
+     */
     Dipole();
 
     //=========================================================================================================
     /**
-    * ctor
-    *
-    * @param p_sDataPath the path to the directory which contains the data folder.
-    */
+     * ctor
+     *
+     * @param p_sDataPath the path to the directory which contains the data folder.
+     */
     /*  Dipole();*/
 
 
     //=========================================================================================================
     /**
-    * dtor
-    * Do garbage collecting
-    */
+     * dtor
+     * Do garbage collecting
+     */
     virtual ~Dipole();
 
 
@@ -142,8 +142,8 @@ public:
 
     //=========================================================================================================
     /**
-    * clean
-    */
+     * clean
+     */
     void clean();
 
 protected:

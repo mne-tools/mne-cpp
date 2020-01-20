@@ -105,44 +105,44 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a Coherency object.
-    */
+     * Constructs a Coherency object.
+     */
     explicit Coherency();
 
     //=========================================================================================================
     /**
-    * Calculates the absolute value of coherency of the rows of the data matrix.
-    *
-    * @param[out]   finalNetwork          The resulting network.
-    * @param[in]    connectivitySettings  The input data and parameters.
-    */
+     * Calculates the absolute value of coherency of the rows of the data matrix.
+     *
+     * @param[out]   finalNetwork          The resulting network.
+     * @param[in]    connectivitySettings  The input data and parameters.
+     */
     static void calculateAbs(Network& finalNetwork,
                              ConnectivitySettings &connectivitySettings);
 
     //=========================================================================================================
     /**
-    * Calculates the imaginary part of coherency of the rows of the data matrix.
-    *
-    * @param[out]   finalNetwork          The resulting network.
-    * @param[in]    connectivitySettings  The input data and parameters.
-    */
+     * Calculates the imaginary part of coherency of the rows of the data matrix.
+     *
+     * @param[out]   finalNetwork          The resulting network.
+     * @param[in]    connectivitySettings  The input data and parameters.
+     */
     static void calculateImag(Network& finalNetwork,
                               ConnectivitySettings &connectivitySettings);
 
 private:
     //=========================================================================================================
     /**
-    * Computes the coherency values. This function gets called in parallel.
-    *
-    * @param[in]    inputData           The input data.
-    * @param[out]   matPsdSum           The sum of all PSD matrices for each trial.
-    * @param[out]   vecPairCsdSum       The sum of all CSD matrices for each trial.
-    * @param[in]    mutex               The mutex used to safely access matPsdSum and vecPairCsdSum.
-    * @param[in]    iNRows              The number of rows.
-    * @param[in]    iNFreqs             The number of frequenciy bins.
-    * @param[in]    iNfft               The FFT length.
-    * @param[in]    tapers              The taper information.
-    */
+     * Computes the coherency values. This function gets called in parallel.
+     *
+     * @param[in]    inputData           The input data.
+     * @param[out]   matPsdSum           The sum of all PSD matrices for each trial.
+     * @param[out]   vecPairCsdSum       The sum of all CSD matrices for each trial.
+     * @param[in]    mutex               The mutex used to safely access matPsdSum and vecPairCsdSum.
+     * @param[in]    iNRows              The number of rows.
+     * @param[in]    iNFreqs             The number of frequenciy bins.
+     * @param[in]    iNfft               The FFT length.
+     * @param[in]    tapers              The taper information.
+     */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         Eigen::MatrixXd& matPsdSum,
                         QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
@@ -154,8 +154,8 @@ private:
 
     //=========================================================================================================
     /**
-    * Computes the PSD and CSD. This function gets called in parallel.
-    */
+     * Computes the PSD and CSD. This function gets called in parallel.
+     */
     static void computePSDCSDAbs(QMutex& mutex,
                                  Network& finalNetwork,
                                  const QPair<int,Eigen::MatrixXcd>& pairInput,

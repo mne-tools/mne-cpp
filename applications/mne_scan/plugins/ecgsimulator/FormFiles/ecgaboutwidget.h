@@ -88,17 +88,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ECGAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ECGAboutWidget becomes a window. If parent is another widget, ECGAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a ECGAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new ECGAboutWidget becomes a window. If parent is another widget, ECGAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
+     */
     ECGAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ECGAboutWidget.
-    * All ECGAboutWidget's children are deleted first. The application exits if ECGAboutWidget is the main widget.
-    */
+     * Destroys the ECGAboutWidget.
+     * All ECGAboutWidget's children are deleted first. The application exits if ECGAboutWidget is the main widget.
+     */
     ~ECGAboutWidget();
 
 private:

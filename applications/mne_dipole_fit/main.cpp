@@ -105,16 +105,16 @@ int main(int argc, char *argv[])
     }
 
     /*
-    * Saving...
-    */
+     * Saving...
+     */
     if (!set.save_dipoles_dip(settings.dipname))
         printf("Dipoles could not be safed to %s.",settings.dipname.toUtf8().data());
     if (!set.save_dipoles_bdip(settings.bdipname))
         printf("Dipoles could not be safed to %s.",settings.bdipname.toUtf8().data());
 
     /*
-    * Test - Reading again
-    */
+     * Test - Reading again
+     */
     ECDSet::read_dipoles_dip(settings.dipname);
 
     return app.exec();

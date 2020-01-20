@@ -91,30 +91,30 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Patch Information
-    * Refactored: mne_new_patch (mne_source_space.c)
-    */
+     * Constructs the MNE Patch Information
+     * Refactored: mne_new_patch (mne_source_space.c)
+     */
     MnePatchInfo();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Patch Information
-    * Refactored: mne_free_patch (mne_source_space.c)
-    */
+     * Destroys the MNE Patch Information
+     * Refactored: mne_free_patch (mne_source_space.c)
+     */
     ~MnePatchInfo();
 
 
     //=========================================================================================================
     /**
-    * Refactored: calculate_patch_area (mne_patches.c)
-    */
+     * Refactored: calculate_patch_area (mne_patches.c)
+     */
     static void calculate_patch_area(MneSourceSpaceOld* s, MnePatchInfo* p);
 
 
     //=========================================================================================================
     /**
-    * Refactored: calculate_normal_stats (mne_patches.c)
-    */
+     * Refactored: calculate_normal_stats (mne_patches.c)
+     */
     static void calculate_normal_stats(MneSourceSpaceOld* s, MnePatchInfo* p);
 
 

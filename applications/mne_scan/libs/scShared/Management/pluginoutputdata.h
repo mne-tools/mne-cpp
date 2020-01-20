@@ -76,38 +76,38 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs PluginOutputData with the given parent.
-    *
-    * @param[in] parent     pointer to parent plugin
-    * @param[in] name       connection name
-    * @param[in] descr      connection description
-    */
+     * Constructs PluginOutputData with the given parent.
+     *
+     * @param[in] parent     pointer to parent plugin
+     * @param[in] name       connection name
+     * @param[in] descr      connection description
+     */
     PluginOutputData(IPlugin *parent, const QString &name, const QString &descr);
 
     //=========================================================================================================
     /**
-    * Destructor
-    */
+     * Destructor
+     */
     virtual ~PluginOutputData(){}
 
     //=========================================================================================================
     /**
-    * Creates PluginOutputData with the given parent.
-    *
-    * @param[in] parent     pointer to parent plugin
-    * @param[in] name       connection name
-    * @param[in] descr      connection description
-    *
-    * @return the created PluginOutputData
-    */
+     * Creates PluginOutputData with the given parent.
+     *
+     * @param[in] parent     pointer to parent plugin
+     * @param[in] name       connection name
+     * @param[in] descr      connection description
+     *
+     * @return the created PluginOutputData
+     */
     static inline QSharedPointer< PluginOutputData<T> > create(IPlugin *parent, const QString &name, const QString &descr);
 
     //=========================================================================================================
     /**
-    * Returns the measurement
-    *
-    * @return the measurement
-    */
+     * Returns the measurement
+     *
+     * @return the measurement
+     */
     inline QSharedPointer<T> &data();
 
     void update();

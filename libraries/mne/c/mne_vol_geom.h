@@ -90,15 +90,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Volume Geometry
-    */
+     * Constructs the MNE Volume Geometry
+     */
     MneVolGeom();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Volume Geometry
-    * Refactored: mne_free_vol_geom (mne_mgh_mri_io.c)
-    */
+     * Destroys the MNE Volume Geometry
+     * Refactored: mne_free_vol_geom (mne_mgh_mri_io.c)
+     */
     ~MneVolGeom();
 
 public:

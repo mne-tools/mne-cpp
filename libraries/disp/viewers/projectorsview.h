@@ -108,69 +108,69 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ProjectorsView which is a child of parent.
-    *
-    * @param [in] parent        parent of widget
-    */
+     * Constructs a ProjectorsView which is a child of parent.
+     *
+     * @param [in] parent        parent of widget
+     */
     ProjectorsView(const QString& sSettingsPath = "",
                    QWidget *parent = 0,
                    Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the ProjectorsView.
-    */
+     * Destroys the ProjectorsView.
+     */
     ~ProjectorsView();
 
     //=========================================================================================================
     /**
-    * Get the current projectors
-    *
-    * @return The current projectors.
-    */
+     * Get the current projectors
+     *
+     * @return The current projectors.
+     */
     QList<FIFFLIB::FiffProj> getProjectors() const;
 
     //=========================================================================================================
     /**
-    * Set the current projectors
-    *
-    * @param [in] projs    The new projectors.
-    */
+     * Set the current projectors
+     *
+     * @param [in] projs    The new projectors.
+     */
     void setProjectors(const QList<FIFFLIB::FiffProj>& projs);
 
 protected:
     //=========================================================================================================
     /**
-    * Redraw the view.
-    */
+     * Redraw the view.
+     */
     void redrawGUI();
 
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Slot called when user enables/disables all projectors
-    */
+     * Slot called when user enables/disables all projectors
+     */
     void onEnableDisableAllProj(bool status);
 
     //=========================================================================================================
     /**
-    * Slot called when the projector check state changes
-    */
+     * Slot called when the projector check state changes
+     */
     void onCheckProjStatusChanged();
 
     QList<QCheckBox*>                                   m_qListProjCheckBox;            /**< List of projection CheckBox. */
@@ -185,8 +185,8 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changes the projections.
-    */
+     * Emit this signal whenever the user changes the projections.
+     */
     void projSelectionChanged(const QList<FIFFLIB::FiffProj>& projs);
 
 };

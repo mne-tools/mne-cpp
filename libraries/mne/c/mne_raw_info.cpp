@@ -201,11 +201,11 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
     fiff_int_t kind, pos;
 
     //    tag.data    = NULL;
-    *chp        = NULL;
+     *chp        = NULL;
     ch          = NULL;
-    *trans      = NULL;
-    *id         = NULL;
-    *start_time = NULL;
+     *trans      = NULL;
+     *id         = NULL;
+     *start_time = NULL;
     /*
         * Find desired parents
         */
@@ -237,8 +237,8 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
     /*
        * Others from FIFFB_MEAS_INFO
        */
-    *lowpass  = -1;
-    *highpass = -1;
+     *lowpass  = -1;
+     *highpass = -1;
     for (k = 0; k < node->nent(); k++) {
         kind = node->dir[k]->kind;
         pos  = node->dir[k]->pos;
@@ -377,7 +377,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
         goto bad;
     }
     //    FREE_33(tag.data);
-    *chp = ch;
+     *chp = ch;
     return (0);
 
 bad : {
@@ -507,7 +507,7 @@ int MneRawInfo::mne_load_raw_info(const QString& name, int allow_maxshield, MneR
     }
     info->rawDir     = rawDir;
     info->ndir       = raw->nent();
-    *infop = info;
+     *infop = info;
     res = FIFF_OK;
 
 out : {

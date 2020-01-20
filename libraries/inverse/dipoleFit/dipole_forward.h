@@ -85,9 +85,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Dipole Forward
-    * Refactored: new_dipole_forward (dipole_forward.c)
-    */
+     * Constructs the Dipole Forward
+     * Refactored: new_dipole_forward (dipole_forward.c)
+     */
     DipoleForward();
 
 //    //=========================================================================================================
@@ -100,9 +100,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the Dipole Forward description
-    * Refactored: free_dipole_forward_2 (dipole_fit_setup.c)
-    */
+     * Destroys the Dipole Forward description
+     * Refactored: free_dipole_forward_2 (dipole_fit_setup.c)
+     */
     ~DipoleForward();
 
 public:

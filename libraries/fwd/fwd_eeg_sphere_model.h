@@ -108,19 +108,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Forward EEG Sphere Model
-    * Refactored: fwd_new_eeg_sphere_model
-    *
-    */
+     * Constructs the Forward EEG Sphere Model
+     * Refactored: fwd_new_eeg_sphere_model
+     *
+     */
     explicit FwdEegSphereModel();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    * Refactored: fwd_dup_eeg_sphere_model
-    *
-    * @param[in] p_FwdEegSphereModel      Forward EEG Sphere Model which should be copied
-    */
+     * Copy constructor.
+     * Refactored: fwd_dup_eeg_sphere_model
+     *
+     * @param[in] p_FwdEegSphereModel      Forward EEG Sphere Model which should be copied
+     */
     explicit FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel);
 
     /*
@@ -134,22 +134,22 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the Electric Current Dipole description
-    * Refactored: fwd_free_eeg_sphere_model
-    */
+     * Destroys the Electric Current Dipole description
+     * Refactored: fwd_free_eeg_sphere_model
+     */
     virtual ~FwdEegSphereModel();
 
     //=========================================================================================================
     /**
-    * Set up the desired sphere model for EEG
-    * Refactored: setup_eeg_sphere_model (dipole_fit_setup.c)
-    *
-    * @param[in] eeg_model_file     Contains the model specifications
-    * @param[in] eeg_model_name     Name of the model to use
-    * @param[in] eeg_sphere_rad     Outer surface radius
-    *
-    * @return the setup eeg sphere model
-    */
+     * Set up the desired sphere model for EEG
+     * Refactored: setup_eeg_sphere_model (dipole_fit_setup.c)
+     *
+     * @param[in] eeg_model_file     Contains the model specifications
+     * @param[in] eeg_model_name     Name of the model to use
+     * @param[in] eeg_sphere_rad     Outer surface radius
+     *
+     * @return the setup eeg sphere model
+     */
     static FwdEegSphereModel* setup_eeg_sphere_model(const QString& eeg_model_file, QString eeg_model_name, float eeg_sphere_rad);
 
 
@@ -165,14 +165,14 @@ public:
 
     //=========================================================================================================
     /**
-    * fwd_multi_spherepot.c
-    * Get the model depended weighting factor for n
-    * Refactored: fwd_eeg_get_multi_sphere_model_coeff (fwd_multi_spherepot.c)
-    *
-    * @param[in] n  coefficient to which the expansion shopuld be calculated
-    *
-    * @return       the weighting factor for n
-    */
+     * fwd_multi_spherepot.c
+     * Get the model depended weighting factor for n
+     * Refactored: fwd_eeg_get_multi_sphere_model_coeff (fwd_multi_spherepot.c)
+     *
+     * @param[in] n  coefficient to which the expansion shopuld be calculated
+     *
+     * @return       the weighting factor for n
+     */
     double fwd_eeg_get_multi_sphere_model_coeff(int n);
 
 
@@ -214,49 +214,49 @@ public:
 
     //=========================================================================================================
     /**
-    * Compute the electric potentials in a set of electrodes in spherically
-    * Symmetric head model. This routine calculates the fields for all
-    * dipole directions.
-    *
-    * The code is based on the formulas presented in
-    *
-    * J.C. Moscher, R.M. Leahy, and P.S. Lewis, Matrix Kernels for
-    * Modeling of EEG and MEG Data, Los Alamos Technical Report,
-    * LA-UR-96-1993, 1996.
-    *
-    * This routine uses the acceleration with help of equivalent sources
-    * in the homogeneous sphere.
-    *
-    * Refactored: fwd_eeg_spherepot_vec (fwd_multi_spherepot.c)
-    *
-    *
-    * @param[in] rd         Dipole position
-    * @param[in] el         Electrode positions
-    * @param[in] neeg       Number of electrodes
-    * @param[in] Vval_vec   The potential values Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k; Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k; Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k
-    *
-    * @return true when successful
-    */
+     * Compute the electric potentials in a set of electrodes in spherically
+     * Symmetric head model. This routine calculates the fields for all
+     * dipole directions.
+     *
+     * The code is based on the formulas presented in
+     *
+     * J.C. Moscher, R.M. Leahy, and P.S. Lewis, Matrix Kernels for
+     * Modeling of EEG and MEG Data, Los Alamos Technical Report,
+     * LA-UR-96-1993, 1996.
+     *
+     * This routine uses the acceleration with help of equivalent sources
+     * in the homogeneous sphere.
+     *
+     * Refactored: fwd_eeg_spherepot_vec (fwd_multi_spherepot.c)
+     *
+     *
+     * @param[in] rd         Dipole position
+     * @param[in] el         Electrode positions
+     * @param[in] neeg       Number of electrodes
+     * @param[in] Vval_vec   The potential values Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k; Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k; Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k
+     *
+     * @return true when successful
+     */
     static bool fwd_eeg_spherepot_vec (float *rd, float **el, int neeg, float **Vval_vec, void *client);
 
     //=========================================================================================================
     /**
-    * fwd_multi_spherepot.c
-    *
-    * Calculate the EEG in the sphere model using the fwdCoilSet structure
-    * MEG channels are skipped
-    *
-    * This routine uses the acceleration with help of equivalent sources
-    * in the homogeneous sphere.
-    *
-    *
-    * @param[in] rd         Dipole position
-    * @param[in] els        Electrode positions
-    * @param[in] Vval_vec   The potential values; Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k; Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k; Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k
-    * @param[in] client
-    *
-    * @return true when successful
-    */
+     * fwd_multi_spherepot.c
+     *
+     * Calculate the EEG in the sphere model using the fwdCoilSet structure
+     * MEG channels are skipped
+     *
+     * This routine uses the acceleration with help of equivalent sources
+     * in the homogeneous sphere.
+     *
+     *
+     * @param[in] rd         Dipole position
+     * @param[in] els        Electrode positions
+     * @param[in] Vval_vec   The potential values; Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k; Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k; Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k
+     * @param[in] client
+     *
+     * @return true when successful
+     */
     static int fwd_eeg_spherepot_coil_vec(float *rd, FwdCoilSet* els, float **Vval_vec, void *client);
 
 
@@ -277,55 +277,55 @@ public:
 
     //=========================================================================================================
     /**
-    * fwd_multi_spherepot.c
-    *
-    * This routine calculates the potentials for a specific dipole direction
-    *
-    * This routine uses the acceleration with help of equivalent sources
-    * in the homogeneous sphere.
-    *
-    * @param[in] rd         Dipole position
-    * @param[in] Q          Dipole moment
-    * @param[in] el         Electrode positions
-    * @param[in] neeg       Number of electrodes
-    * @param[in] Vval       The potential values
-    * @param[in] client
-    *
-    * @return true when successful
-    */
+     * fwd_multi_spherepot.c
+     *
+     * This routine calculates the potentials for a specific dipole direction
+     *
+     * This routine uses the acceleration with help of equivalent sources
+     * in the homogeneous sphere.
+     *
+     * @param[in] rd         Dipole position
+     * @param[in] Q          Dipole moment
+     * @param[in] el         Electrode positions
+     * @param[in] neeg       Number of electrodes
+     * @param[in] Vval       The potential values
+     * @param[in] client
+     *
+     * @return true when successful
+     */
     static int fwd_eeg_spherepot( float *rd, float *Q, float **el, int neeg, Eigen::VectorXf& Vval, void *client);
 
 
     //=========================================================================================================
     /**
-    * fwd_multi_spherepot.c
-    *
-    * Calculate the EEG in the sphere model using the megCoil structure
-    * MEG channels are skipped
-    *
-    * @param[in] rd         Dipole position
-    * @param[in] Q          Dipole moment
-    * @param[in] els        Electrode positions
-    * @param[in] Vval       The potential values
-    * @param[in] client
-    *
-    * @return true when successful
-    */
+     * fwd_multi_spherepot.c
+     *
+     * Calculate the EEG in the sphere model using the megCoil structure
+     * MEG channels are skipped
+     *
+     * @param[in] rd         Dipole position
+     * @param[in] Q          Dipole moment
+     * @param[in] els        Electrode positions
+     * @param[in] Vval       The potential values
+     * @param[in] client
+     *
+     * @return true when successful
+     */
     static int fwd_eeg_spherepot_coil(float *rd, float *Q, FwdCoilSet* els, float *Vval, void *client);
 
 
     //=========================================================================================================
     /**
-    * fwd_eeg_sphere_models.c
-    *
-    * Setup the EEG sphere model calculations
-    *
-    * @param[in] rad
-    * @param[in] fit_berg_scherg    If Fit Berg Scherg should be performed
-    * @param[in] nfit
-    *
-    * @return True when setup was successful, false otherwise
-    */
+     * fwd_eeg_sphere_models.c
+     *
+     * Setup the EEG sphere model calculations
+     *
+     * @param[in] rad
+     * @param[in] fit_berg_scherg    If Fit Berg Scherg should be performed
+     * @param[in] nfit
+     *
+     * @return True when setup was successful, false otherwise
+     */
     bool fwd_setup_eeg_sphere_model(float rad, bool fit_berg_scherg, int nfit);
 
 

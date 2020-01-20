@@ -102,44 +102,44 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] iType      The type of the item. See types.h for declaration and definition.
+     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit FsAnnotationTreeItem(int iType = Data3DTreeModelItemTypes::AnnotationItem, const QString& text = "Annotation" );
 
     //=========================================================================================================
     /**
-    * Adds FreeSurfer data based on annotation information to this item.
-    *
-    * @param[in] tSurface           FreeSurfer surface.
-    * @param[in] tAnnotation        FreeSurfer annotation.
-    */
+     * Adds FreeSurfer data based on annotation information to this item.
+     *
+     * @param[in] tSurface           FreeSurfer surface.
+     * @param[in] tAnnotation        FreeSurfer annotation.
+     */
     void addData(const FSLIB::Surface& tSurface, const FSLIB::Annotation& tAnnotation);
 
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     void initItem();
 
     //=========================================================================================================
     /**
-    * Call this function whenever the check box of this item was checked.
-    *
-    * @param[in] checkState        The current checkstate.
-    */
+     * Call this function whenever the check box of this item was checked.
+     *
+     * @param[in] checkState        The current checkstate.
+     */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the visibilty of the annotation set was changed.
-    *
-    * @param[in] isVisible      The visibility flag.
-    */
+     * Emit this signal whenever the visibilty of the annotation set was changed.
+     *
+     * @param[in] isVisible      The visibility flag.
+     */
     void annotationVisibiltyChanged(bool isVisible);
 };
 

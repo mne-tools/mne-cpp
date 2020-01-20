@@ -108,33 +108,33 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
-    * @param[in] parent             The parent of this object.
-    */
+     * Default constructor.
+     *
+     * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
+     * @param[in] parent             The parent of this object.
+     */
     explicit GeometryMultiplierMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = nullptr);
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    */
+     * Default destructor.
+     */
     virtual ~GeometryMultiplierMaterial() = default;
 
     //=========================================================================================================
     /**
-    * Sets the color for the ambient color parameter.
-    *
-    * @param[in]        The new ambient color.
-    */
+     * Sets the color for the ambient color parameter.
+     *
+     * @param[in]        The new ambient color.
+     */
     void setAmbient(const QColor &ambientColor);
 
 private:
 
     //=========================================================================================================
     /**
-    * Adds the shader code to the material.
-    */
+     * Adds the shader code to the material.
+     */
     virtual void setShaderCode() override;
 
     QPointer<Qt3DRender::QParameter>        m_pAmbientColor;            /**< Parameter that determines the ambient value. */

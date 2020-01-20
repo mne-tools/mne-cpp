@@ -552,7 +552,7 @@ void mne_create_filter_response(mneFilterDef    filter,
         filter_data->freq_resp[k]     = 1.0;
         filter_data->eog_freq_resp[k] = 1.0;
     }
-    *highpass_effective = FALSE;
+     *highpass_effective = FALSE;
 
     for (f = 0; f < 2; f++) {
         highpass       = f == 0 ? filter->highpass  : filter->eog_highpass;
@@ -629,8 +629,8 @@ void mne_create_filter_response(mneFilterDef    filter,
         else
             fprintf(stderr,"NOTE: Filter is presently switched off.\n");
     }
-    *filter_datap      = filter_data;
-    *filter_data_freep = filter_data_free;
+     *filter_datap      = filter_data;
+     *filter_data_freep = filter_data_free;
     return;
 }
 
@@ -717,7 +717,7 @@ void mne_allocate_from_ring(void *ringp, int nrow, int ncol, float ***res)
         FREE_36(*buf->datap);
         *buf->datap = NULL;
     }
-    *res = mat = MALLOC_36(nrow,float *);
+     *res = mat = MALLOC_36(nrow,float *);
     if (buf->size < nrow*ncol)
         buf->data = REALLOC_36(buf->data,nrow*ncol,float);
 
@@ -2029,7 +2029,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name, int omit_ski
        * Initialize the filter buffers
        */
     data->filter  = MALLOC_36(1,mneFilterDefRec);
-    *data->filter = *filter;
+     *data->filter = *filter;
     setup_filter_bufs(data);
 
     {

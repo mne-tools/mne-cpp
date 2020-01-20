@@ -85,15 +85,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Derivation
-    */
+     * Constructs the MNE Derivation
+     */
     MneDeriv();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Derivation
-    * Refactored: mne_free_deriv (mne_derivations.c)
-    */
+     * Destroys the MNE Derivation
+     * Refactored: mne_free_deriv (mne_derivations.c)
+     */
     ~MneDeriv();
 
 public:

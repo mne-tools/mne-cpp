@@ -407,10 +407,10 @@ void write_id_old(FiffStream::SPtr& t_pStream, fiff_int_t kind, fiffId id)
     //
     fiff_int_t datasize = 5*4;                       //   The id comprises five integers
 
-    *t_pStream << (qint32)kind;
-    *t_pStream << (qint32)FIFFT_ID_STRUCT;
-    *t_pStream << (qint32)datasize;
-    *t_pStream << (qint32)FIFFV_NEXT_SEQ;
+     *t_pStream << (qint32)kind;
+     *t_pStream << (qint32)FIFFT_ID_STRUCT;
+     *t_pStream << (qint32)datasize;
+     *t_pStream << (qint32)FIFFV_NEXT_SEQ;
     //
     // Collect the bits together for one write
     //
@@ -440,16 +440,16 @@ void write_coord_trans_old(FiffStream::SPtr& t_pStream, const FiffCoordTransOld*
     //} *fiffCoordTrans, fiffCoordTransRec;  /*!< Coordinate transformation descriptor */
     fiff_int_t datasize = 4*2*12 + 4*2;
 
-    *t_pStream << (qint32)FIFF_COORD_TRANS;
-    *t_pStream << (qint32)FIFFT_COORD_TRANS_STRUCT;
-    *t_pStream << (qint32)datasize;
-    *t_pStream << (qint32)FIFFV_NEXT_SEQ;
+     *t_pStream << (qint32)FIFF_COORD_TRANS;
+     *t_pStream << (qint32)FIFFT_COORD_TRANS_STRUCT;
+     *t_pStream << (qint32)datasize;
+     *t_pStream << (qint32)FIFFV_NEXT_SEQ;
 
     //
     //   Start writing fiffCoordTransRec
     //
-    *t_pStream << (qint32)trans->from;
-    *t_pStream << (qint32)trans->to;
+     *t_pStream << (qint32)trans->from;
+     *t_pStream << (qint32)trans->to;
 
     //
     //   The transform...
@@ -742,17 +742,17 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
 //    tag.next = FIFFV_NEXT_SEQ;
 
     //Write Tag Info
-    *t_pStream << (qint32)kind;
-    *t_pStream << (qint32)type;
-    *t_pStream << (qint32)(datasize+idxsize+ptrsize+4*sizeof(fiff_int_t));
-    *t_pStream << (qint32)FIFFV_NEXT_SEQ;
+     *t_pStream << (qint32)kind;
+     *t_pStream << (qint32)type;
+     *t_pStream << (qint32)(datasize+idxsize+ptrsize+4*sizeof(fiff_int_t));
+     *t_pStream << (qint32)FIFFV_NEXT_SEQ;
 //    if (fiff_write_tag_info(out,&tag) == FIFF_FAIL)
 //        return FIFF_FAIL;
 
 
     /*
-    * Write data
-    */
+     * Write data
+     */
     for(k = 0; k < mat->nz; ++k)
         *t_pStream << mat->data[k];
 
@@ -773,8 +773,8 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
 
 
     /*
-    * Write indexes
-    */
+     * Write indexes
+     */
     for(k = 0; k < mat->nz; ++k)
         *t_pStream << mat->inds[k];
 
@@ -830,22 +830,22 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
     /*
      * Write the dimensions
      */
-    *t_pStream << (qint32)mat->nz;
+     *t_pStream << (qint32)mat->nz;
 //    val = swap_int(mat->nz);
 //    if (fwrite (&val,sizeof(fiff_int_t),1,out) != 1)
 //        goto fwrite_error;
 
-    *t_pStream << (qint32)mat->m;
+     *t_pStream << (qint32)mat->m;
 //    val = swap_int(mat->m);
 //    if (fwrite (&val,sizeof(fiff_int_t),1,out) != 1)
 //        goto fwrite_error;
 
-    *t_pStream << (qint32)mat->n;
+     *t_pStream << (qint32)mat->n;
 //    val = swap_int(mat->n);
 //    if (fwrite (&val,sizeof(fiff_int_t),1,out) != 1)
 //        goto fwrite_error;
 
-    *t_pStream << (qint32)two;
+     *t_pStream << (qint32)two;
 //    val = swap_int(two);
 //    if (fwrite (&val,sizeof(fiff_int_t),1,out) != 1)
 //        goto fwrite_error;
@@ -1103,8 +1103,8 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
     //        goto out;
 
     /*
-    * Write some additional stuff
-    */
+     * Write some additional stuff
+     */
     if (!selected_only) {
         if (ss->voxel_surf_RAS_t) {
             write_coord_trans_old(t_pStream, ss->voxel_surf_RAS_t);//t_pStream->write_coord_trans(ss->voxel_surf_RAS_t);
@@ -1175,8 +1175,8 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
     t_pStream->start_block(FIFFB_MNE_SOURCE_SPACE);
 
     /*
-    * General information
-    */
+     * General information
+     */
     if (ss->type != FIFFV_MNE_SPACE_UNKNOWN)
         t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_TYPE,&ss->type);
     if (ss->id != FIFFV_MNE_SURF_UNKNOWN)
@@ -1331,8 +1331,8 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
         }
     }
     /*
-    * Volume source spaces have additional information
-    */
+     * Volume source spaces have additional information
+     */
     //    if (write_volume_space_info(out,ss,selected_only) == FIFF_FAIL)
     //        goto bad;
 
@@ -1509,8 +1509,8 @@ bool write_solution(const QString& name,         /* Destination file */
     t_pStream->start_block(FIFFB_MNE);
 
     /*
-    * Information from the MRI file
-    */
+     * Information from the MRI file
+     */
     {
         t_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
 
@@ -1523,8 +1523,8 @@ bool write_solution(const QString& name,         /* Destination file */
     }
 
     /*
-    * Information from the MEG file
-    */
+     * Information from the MEG file
+     */
     {
         QStringList file_bads;
         int  file_nbad   = 0;
@@ -1617,8 +1617,8 @@ bool write_solution(const QString& name,         /* Destination file */
     }
 
     /*
-    * Write the source spaces (again)
-    */
+     * Write the source spaces (again)
+     */
     for (k = 0, nvert = 0; k < nspace; k++) {
         if (mne_write_one_source_space(t_pStream,spaces[k],FALSE) == FIFF_FAIL)
             goto bad;
@@ -1626,8 +1626,8 @@ bool write_solution(const QString& name,         /* Destination file */
     }
 
     /*
-    * MEG forward solution
-    */
+     * MEG forward solution
+     */
     if (nmeg > 0) {
         t_pStream->start_block(FIFFB_MNE_FORWARD_SOLUTION);
 
@@ -1647,8 +1647,8 @@ bool write_solution(const QString& name,         /* Destination file */
         t_pStream->end_block(FIFFB_MNE_FORWARD_SOLUTION);
     }
     /*
-    * EEG forward solution
-    */
+     * EEG forward solution
+     */
     if (neeg > 0) {
         t_pStream->start_block(FIFFB_MNE_FORWARD_SOLUTION);
 
@@ -1674,8 +1674,8 @@ bool write_solution(const QString& name,         /* Destination file */
     t_pStream.clear();
 
     /*
-    * Add directory
-    */
+     * Add directory
+     */
     t_pStreamIn = FiffStream::open_update(fileIn);
 
     if (!fiff_put_dir(t_pStreamIn,t_pStreamIn->dir()))
@@ -1735,13 +1735,13 @@ bool mne_attach_env(const QString& name, const QString& command)
 //        return false;
 //    }
     /*
-    * Open the file to modify
-    */
+     * Open the file to modify
+     */
     if (!(t_pStreamInOut = FiffStream::open_update(fileInOut)))
         return false;
     /*
-    * Find an appropriate position to insert
-    */
+     * Find an appropriate position to insert
+     */
     for (insert = -1, b = 0; insert_blocks[b] >= 0; b++) {
         for (k = 0; k < t_pStreamInOut->nent(); k++) {
             if (t_pStreamInOut->dir()[k]->kind == FIFF_BLOCK_START) {
@@ -1762,15 +1762,15 @@ bool mne_attach_env(const QString& name, const QString& command)
     }
 
     /*
-    * Do not build the list of tags to insert -> Do insertion right away
-    */
+     * Do not build the list of tags to insert -> Do insertion right away
+     */
 
     // Modified of fiff_insert_after
     int where = insert;
     /*
-    * Insert new tags into a file
-    * The directory information in dest is updated
-    */
+     * Insert new tags into a file
+     * The directory information in dest is updated
+     */
     if (where < 0 || where >= t_pStreamInOut->nent()-1) {
         qCritical("illegal insertion point in fiff_insert_after!");
         return false;
@@ -1783,26 +1783,26 @@ bool mne_attach_env(const QString& name, const QString& command)
     if (!t_pStreamInOut->read_tag(t_pTagNext, this_ent[0]->pos))
         return false;
     /*
-    * Update next info to be sequential
-    */
+     * Update next info to be sequential
+     */
     qint64 next_tmp = t_pStreamInOut->device()->pos();
     /*
-    * Go to the end of the file
-    */
+     * Go to the end of the file
+     */
     t_pStreamInOut->device()->seek(fileInOut.size());//SEEK_END
     /*
-    * Allocate new directory
-    * Copy the beginning of old directory
-    */
+     * Allocate new directory
+     * Copy the beginning of old directory
+     */
     QList<FiffDirEntry::SPtr> new_dir = old_dir.mid(0,where+1);
 
     /*
-    * Save the old size for future purposes
-    */
+     * Save the old size for future purposes
+     */
     qint64 old_end = t_pStreamInOut->device()->pos();
     /*
-    * Write tags, check for errors
-    */
+     * Write tags, check for errors
+     */
 
     //Don't use the for loop here instead do it explicitly for specific tags
     FiffDirEntry::SPtr new_this;
@@ -1844,20 +1844,20 @@ bool mne_attach_env(const QString& name, const QString& command)
     new_dir.append(new_this);
 
     /*
-    * Copy the rest of the old directory
-    */
+     * Copy the rest of the old directory
+     */
     new_dir.append(old_dir.mid(where+1));
     /*
-    * Now, it is time to update the braching tag
-    * If something goes wrong here, we cannot be sure that
-    * the file is readable. Let's hope for the best...
-    */
+     * Now, it is time to update the braching tag
+     * If something goes wrong here, we cannot be sure that
+     * the file is readable. Let's hope for the best...
+     */
     t_pTagNext->next = (qint32)old_end;//2GB cut of
     t_pStreamInOut->write_tag(t_pTagNext,this_ent[0]->pos);
 
     /*
-    * Update
-    */
+     * Update
+     */
     t_pStreamInOut->dir() = new_dir;
 
     // Finished fiff_insert_after
@@ -1935,8 +1935,8 @@ void ComputeFwd::calculateFwd() const
 
 
     /*
-    * Report the setup
-    */
+     * Report the setup
+     */
     //    printf("\n");
     //    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
     printf("\n");
@@ -2032,9 +2032,9 @@ void ComputeFwd::calculateFwd() const
         mri_head_t = FiffCoordTransOld::mne_identity_transform(FIFFV_COORD_MRI,FIFFV_COORD_HEAD);
     FiffCoordTransOld::mne_print_coord_transform(stderr,mri_head_t);
     /*
-    * Read the channel information
-    * and the MEG device -> head coordinate transformation
-    */
+     * Read the channel information
+     * and the MEG device -> head coordinate transformation
+     */
     printf("\n");
     if (mne_read_meg_comp_eeg_ch_info_41(settings->measname,&megchs,&nmeg,&compchs,&ncomp,&eegchs,&neeg,&meg_head_t,&meas_id) != OK)
         goto out;
@@ -2063,8 +2063,8 @@ void ComputeFwd::calculateFwd() const
             goto out;
     }
     /*
-    * Create coil descriptions with transformation to head or MRI frame
-    */
+     * Create coil descriptions with transformation to head or MRI frame
+     */
     if (settings->include_meg) {
         //#ifdef USE_SHARE_PATH
         //        char *coilfile = mne_compose_mne_name("share/mne","coil_def.dat");
@@ -2139,14 +2139,14 @@ void ComputeFwd::calculateFwd() const
         printf("Head coordinate coil definitions created.\n");
     }
     /*
-    * Transform the source spaces into the appropriate coordinates
-    */
+     * Transform the source spaces into the appropriate coordinates
+     */
     if (MneSurfaceOrVolume::mne_transform_source_spaces_to(settings->coord_frame,mri_head_t,spaces,nspace) != OK)
         goto out;
     printf("Source spaces are now in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(settings->coord_frame));
     /*
-    * Prepare the BEM model if necessary
-    */
+     * Prepare the BEM model if necessary
+     */
     if (!settings->bemname.isEmpty()) {
         QString bemsolname = FwdBemModel::fwd_bem_make_bem_sol_name(settings->bemname);
         //        FREE(bemname);
@@ -2182,8 +2182,8 @@ void ComputeFwd::calculateFwd() const
         printf("Using the sphere model.\n");
     printf ("\n");
     /*
-    * Try to circumvent numerical problems by excluding points too close our ouside the inner skull surface
-    */
+     * Try to circumvent numerical problems by excluding points too close our ouside the inner skull surface
+     */
     if (settings->filter_spaces) {
         if (!settings->mindistoutname.isEmpty()) {
             out = fopen(settings->mindistoutname.toUtf8().constData(),"w");
@@ -2205,8 +2205,8 @@ void ComputeFwd::calculateFwd() const
         }
     }
     /*
-    * Do the actual computation
-    */
+     * Do the actual computation
+     */
     if (!bem_model)
         settings->use_threads = false;
     if (nmeg > 0)
@@ -2234,13 +2234,13 @@ void ComputeFwd::calculateFwd() const
                                               settings->compute_grad ? &eeg_forward_grad : NULL)) == FAIL)
             goto out;
     /*
-    * Transform the source spaces back into MRI coordinates
-    */
+     * Transform the source spaces back into MRI coordinates
+     */
     if (MneSourceSpaceOld::mne_transform_source_spaces_to(FIFFV_COORD_MRI,mri_head_t,spaces,nspace) != OK)
         goto out;
     /*
-    * We are ready to spill it out
-    */
+     * We are ready to spill it out
+     */
     printf("\nwriting %s...",settings->solname.toUtf8().constData());
     if (!write_solution(settings->solname,               /* Destination file */
                         spaces,                          /* The source spaces */

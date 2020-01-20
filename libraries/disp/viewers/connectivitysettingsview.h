@@ -105,135 +105,135 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ConnectivitySettingsView which is a child of parent.
-    *
-    * @param [in] parent        parent of widget.
-    */
+     * Constructs a ConnectivitySettingsView which is a child of parent.
+     *
+     * @param [in] parent        parent of widget.
+     */
     ConnectivitySettingsView(const QString& sSettingsPath = "",
                              QWidget *parent = 0,
                              Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the ConnectivitySettingsView.
-    */
+     * Destroys the ConnectivitySettingsView.
+     */
     ~ConnectivitySettingsView();
 
     //=========================================================================================================
     /**
-    * Destroys the ConnectivitySettingsView.
-    *
-    * @param [in] lTriggerTypes        The new trigger types.
-    */
+     * Destroys the ConnectivitySettingsView.
+     *
+     * @param [in] lTriggerTypes        The new trigger types.
+     */
     void setTriggerTypes(const QStringList& lTriggerTypes);
 
     //=========================================================================================================
     /**
-    * Sets the new number of trials.
-    *
-    * @param [in] iNumberTrials        The new number of trials.
-    */
+     * Sets the new number of trials.
+     *
+     * @param [in] iNumberTrials        The new number of trials.
+     */
     void setNumberTrials(int iNumberTrials);
 
     //=========================================================================================================
     /**
-    * Get the current connectivity metric.
-    *
-    * @return   The current connectivity metric.
-    */
+     * Get the current connectivity metric.
+     *
+     * @return   The current connectivity metric.
+     */
     QString getConnectivityMetric();
 
     //=========================================================================================================
     /**
-    * Get the current window type.
-    *
-    * @return   The current window type.
-    */
+     * Get the current window type.
+     *
+     * @return   The current window type.
+     */
     QString getWindowType();
 
     //=========================================================================================================
     /**
-    * Get the current number of trials.
-    *
-    * @return   The current number of trials.
-    */
+     * Get the current number of trials.
+     *
+     * @return   The current number of trials.
+     */
     int getNumberTrials();
 
     //=========================================================================================================
     /**
-    * Get the current trigger type.
-    *
-    * @return   The current trigger type.
-    */
+     * Get the current trigger type.
+     *
+     * @return   The current trigger type.
+     */
     QString getTriggerType();
 
     //=========================================================================================================
     /**
-    * Get the current lower frequency range.
-    *
-    * @return   The current lower frequency range.
-    */
+     * Get the current lower frequency range.
+     *
+     * @return   The current lower frequency range.
+     */
     double getLowerFreq();
 
     //=========================================================================================================
     /**
-    * Get the current upper frequency range.
-    *
-    * @return   The current upper frequency range.
-    */
+     * Get the current upper frequency range.
+     *
+     * @return   The current upper frequency range.
+     */
     double getUpperFreq();
 
 protected:
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Slot called when the metric changed.
-    *
-    * @param [in] sMetric        The new metric.
-    */
+     * Slot called when the metric changed.
+     *
+     * @param [in] sMetric        The new metric.
+     */
     void onMetricChanged(const QString& sMetric);
 
     //=========================================================================================================
     /**
-    * Slot called when the window type changed.
-    *
-    * @param [in] sWindowType        The new window type.
-    */
+     * Slot called when the window type changed.
+     *
+     * @param [in] sWindowType        The new window type.
+     */
     void onWindowTypeChanged(const QString& sWindowType);
 
     //=========================================================================================================
     /**
-    * Slot called when the number of trials changed.
-    */
+     * Slot called when the number of trials changed.
+     */
     void onNumberTrialsChanged();
 
     //=========================================================================================================
     /**
-    * Slot called when the trigger type changed.
-    *
-    * @param [in] sTriggerType        The new trigger type.
-    */
+     * Slot called when the trigger type changed.
+     *
+     * @param [in] sTriggerType        The new trigger type.
+     */
     void onTriggerTypeChanged(const QString& sTriggerType);
 
     //=========================================================================================================
     /**
-    * Slot called when the frequency band changed.
-    */
+     * Slot called when the frequency band changed.
+     */
     void onFrequencyBandChanged();
 
     Ui::ConnectivitySettingsViewWidget* ui;
@@ -244,43 +244,43 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit signal whenever the connectivity metric changed.
-    *
-    * @param [in] sMetric        The new metric.
-    */
+     * Emit signal whenever the connectivity metric changed.
+     *
+     * @param [in] sMetric        The new metric.
+     */
     void connectivityMetricChanged(const QString& sMetric);
 
     //=========================================================================================================
     /**
-    * Emit signal whenever the window type changed.
-    *
-    * @param [in] windowType        The new window type.
-    */
+     * Emit signal whenever the window type changed.
+     *
+     * @param [in] windowType        The new window type.
+     */
     void windowTypeChanged(const QString& windowType);
 
     //=========================================================================================================
     /**
-    * Emit signal whenever the number of trials changed.
-    *
-    * @param [in] iNumberTrials        The new number of trials.
-    */
+     * Emit signal whenever the number of trials changed.
+     *
+     * @param [in] iNumberTrials        The new number of trials.
+     */
     void numberTrialsChanged(int iNumberTrials);
 
     //=========================================================================================================
     /**
-    * Emit signal whenever the trigger type changed.
-    *
-    * @param [in] sTriggerType        The new trigger type.
-    */
+     * Emit signal whenever the trigger type changed.
+     *
+     * @param [in] sTriggerType        The new trigger type.
+     */
     void triggerTypeChanged(const QString& sTriggerType);
 
     //=========================================================================================================
     /**
-    * Emit signal whenever the frequency band changed.
-    *
-    * @param [in] fFreqLow        The new lower frequency band.
-    * @param [in] fFreqHigh       The new higher frequency band.
-    */
+     * Emit signal whenever the frequency band changed.
+     *
+     * @param [in] fFreqLow        The new lower frequency band.
+     * @param [in] fFreqHigh       The new higher frequency band.
+     */
     void freqBandChanged(float fFreqLow, float fFreqHigh);
 
 };

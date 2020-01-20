@@ -136,20 +136,20 @@ class RTCMNESHARED_EXPORT RtcMne : public SCSHAREDLIB::IAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Constructs a RtcMne.
-    */
+     * Constructs a RtcMne.
+     */
     RtcMne();
 
     //=========================================================================================================
     /**
-    * Destroys the RtcMne.
-    */
+     * Destroys the RtcMne.
+     */
     ~RtcMne();
 
     //=========================================================================================================
     /**
-    * IAlgorithm functions
-    */
+     * IAlgorithm functions
+     */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
     virtual void init();
     virtual void unload();
@@ -161,73 +161,73 @@ public:
 
     //=========================================================================================================
     /**
-    * Slot called when the fiff info is to be calculated.
-    */
+     * Slot called when the fiff info is to be calculated.
+     */
     void calcFiffInfo();
 
     //=========================================================================================================
     /**
-    * Slot called to do the clustering.
-    */
+     * Slot called to do the clustering.
+     */
     void doClustering();
 
     //=========================================================================================================
     /**
-    * Slot called when the clustering is finished.
-    */
+     * Slot called when the clustering is finished.
+     */
     void finishedClustering();
 
     //=========================================================================================================
     /**
-    * Slot to update the real time multi sample array data
-    */
+     * Slot to update the real time multi sample array data
+     */
     void updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Slot to update the fiff covariance
-    */
+     * Slot to update the fiff covariance
+     */
     void updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Slot to update the fiff evoked
-    *
-    * @param[in] pMeasurement   The evoked to be appended
-    */
+     * Slot to update the fiff evoked
+     *
+     * @param[in] pMeasurement   The evoked to be appended
+     */
     void updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Slot to update the inverse operator
-    *
-    * @param[in] invOp    The inverse operator to update
-    */
+     * Slot to update the inverse operator
+     *
+     * @param[in] invOp    The inverse operator to update
+     */
     void updateInvOp(const MNELIB::MNEInverseOperator& invOp);
 
 protected:
     //=========================================================================================================
     /**
-    * Slot called when the method changed.
-    *
-    * @param [in] method        The new method.
-    */
+     * Slot called when the method changed.
+     *
+     * @param [in] method        The new method.
+     */
     void onMethodChanged(const QString &method);
 
     //=========================================================================================================
     /**
-    * Slot called when the trigger type changed.
-    *
-    * @param [in] triggerType        The new trigger type.
-    */
+     * Slot called when the trigger type changed.
+     *
+     * @param [in] triggerType        The new trigger type.
+     */
     void onTriggerTypeChanged(const QString& triggerType);
 
     //=========================================================================================================
     /**
-    * Slot called when the time point changes.
-    *
-    * @param [in] iTimePointMs        The new time point in ms.
-    */
+     * Slot called when the time point changes.
+     *
+     * @param [in] iTimePointMs        The new time point in ms.
+     */
     void onTimePointValueChanged(int iTimePointMs);
 
     virtual void run();
@@ -279,14 +279,14 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Signal when clustering is started
-    */
+     * Signal when clustering is started
+     */
     void clusteringStarted();
 
     //=========================================================================================================
     /**
-    * Signal when clustering has finished
-    */
+     * Signal when clustering has finished
+     */
     void clusteringFinished();
 };
 

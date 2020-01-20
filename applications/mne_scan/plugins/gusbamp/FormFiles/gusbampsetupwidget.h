@@ -77,158 +77,158 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a GUSBAmpSetupWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new GUSBAmpSetupWidget becomes a window. If parent is another widget, GUSBAmpSetupWidget becomes a child window inside parent. GUSBAmpSetupWidget is deleted when its parent is deleted.
-    * @param [in] pGUSBAmp a pointer to the corresponding ECGSimulator.
-    */
+     * Constructs a GUSBAmpSetupWidget which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new GUSBAmpSetupWidget becomes a window. If parent is another widget, GUSBAmpSetupWidget becomes a child window inside parent. GUSBAmpSetupWidget is deleted when its parent is deleted.
+     * @param [in] pGUSBAmp a pointer to the corresponding ECGSimulator.
+     */
     GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the GUSBAmpSetupWidget.
-    * All GUSBAmpSetupWidget's children are deleted first. The application exits if GUSBAmpSetupWidget is the main widget.
-    */
+     * Destroys the GUSBAmpSetupWidget.
+     * All GUSBAmpSetupWidget's children are deleted first. The application exits if GUSBAmpSetupWidget is the main widget.
+     */
     ~GUSBAmpSetupWidget();
 
     //=========================================================================================================
     /**
-    * Initializes the Connector's GUI properties.
-    *
-    */
+     * Initializes the Connector's GUI properties.
+     *
+     */
     void initGui();
 
     //=========================================================================================================
     /**
-    * checks all the checkBoxes for their corresponding channels and sets the the vector for the
-    * cannel-selection
-    *
-    */
+     * checks all the checkBoxes for their corresponding channels and sets the the vector for the
+     * cannel-selection
+     *
+     */
     void checkBoxes();
 
 private slots:
     //=========================================================================================================
     /**
-    * push-button-click for setting the serial adresses for master and slaves
-    *
-    */
+     * push-button-click for setting the serial adresses for master and slaves
+     *
+     */
     void setSerialAdresses();
 
     //=========================================================================================================
     /**
-    * activate or deactivate groupbox for singel-channel-select
-    *
-    */
+     * activate or deactivate groupbox for singel-channel-select
+     *
+     */
     void activateChannelSelect(bool checked);
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel1();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel2();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel3();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel4();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel5();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel6();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel7();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel8();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel9();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel10();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel11();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel12();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel13();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel14();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel15();
 
     //=========================================================================================================
     /**
-    * grid of checkboxes for the channel select
-    */
+     * grid of checkboxes for the channel select
+     */
     void activateChannel16();
 
     //=========================================================================================================
     /**
-    * combo box for adjusting the sample rate
-    */
+     * combo box for adjusting the sample rate
+     */
     void on_comboBox_currentIndexChanged(const QString &arg1);
 
 private:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
     GUSBAmp*               m_pGUSBAmp;              /**< a pointer to corresponding GUSBAmp.*/

@@ -116,68 +116,68 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeEvokedSetWidget which is a child of parent.
-    *
-    * @param [in] pRTESet       pointer to real-time evoked set measurement.
-    * @param [in] pTime         pointer to application time.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RealTimeEvokedSetWidget which is a child of parent.
+     *
+     * @param [in] pRTESet       pointer to real-time evoked set measurement.
+     * @param [in] pTime         pointer to application time.
+     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+     */
     RealTimeEvokedSetWidget(QSharedPointer<SCMEASLIB::RealTimeEvokedSet> pRTESet,
                             QSharedPointer<QTime> &pTime,
                             QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeEvokedSetWidget.
-    */
+     * Destroys the RealTimeEvokedSetWidget.
+     */
     ~RealTimeEvokedSetWidget();
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    *
-    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
-    */
+     * Is called when new data are available.
+     *
+     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+     */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    */
+     * Is called when new data are available.
+     */
     virtual void getData();
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeEvokedSetWidget.
-    */
+     * Initialise the RealTimeEvokedSetWidget.
+     */
     virtual void init();
 
 private slots:
     //=========================================================================================================
     /**
-    * Shows sensor selection widget
-    */
+     * Shows sensor selection widget
+     */
     void showSensorSelectionWidget();
 
     //=========================================================================================================
     /**
-    * Shows quick control widget
-    */
+     * Shows quick control widget
+     */
     void showQuickControlWidget();
 
     //=========================================================================================================
     /**
-    * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
-    *
-    * @param[out] imageType     The current iamge type: png, svg.
-    */
+     * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
+     *
+     * @param[out] imageType     The current iamge type: png, svg.
+     */
     void onMakeScreenshot(const QString& imageType);
 
 private:
     //=========================================================================================================
     /**
-    * Reimplemented eventFilter
-    */
+     * Reimplemented eventFilter
+     */
     bool virtual eventFilter(QObject *object, QEvent *event);
 
     QSharedPointer<DISPLIB::EvokedSetModel>             m_pEvokedSetModel;          /**< RTE data model */

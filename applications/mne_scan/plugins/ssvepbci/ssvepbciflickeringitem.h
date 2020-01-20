@@ -77,71 +77,71 @@ class SSVEPBCISHARED_EXPORT SsvepBciFlickeringItem
 public:   
     //=========================================================================================================
     /**
-    * constructs a SsvepBciFlickeringItem object
-    */
+     * constructs a SsvepBciFlickeringItem object
+     */
     SsvepBciFlickeringItem();
 
     //=========================================================================================================
     /**
-    * destroys the SsvepBciFlickeringItem object
-    */
+     * destroys the SsvepBciFlickeringItem object
+     */
     ~SsvepBciFlickeringItem();
 
     //=========================================================================================================
     /**
-    * The function sets the relative position of the Item to the screen size
-    *
-    * @param[in]  x  relative horizontal position. x is element from [0..1]
-    * @param[in]  y  relative horizontal position. y is element from [0..1]
-    *
-    */
+     * The function sets the relative position of the Item to the screen size
+     *
+     * @param[in]  x  relative horizontal position. x is element from [0..1]
+     * @param[in]  y  relative horizontal position. y is element from [0..1]
+     *
+     */
     void setPos(double x, double y);
 
     //=========================================================================================================
     /**
-    * The function sets the relative dimension of the Item to the screen size
-    *
-    * @param[in]  w  relative width. w is element from [0..1]
-    * @param[in]  h  relative height. h is element from [0..1]
-    *
-    */
+     * The function sets the relative dimension of the Item to the screen size
+     *
+     * @param[in]  w  relative width. w is element from [0..1]
+     * @param[in]  h  relative height. h is element from [0..1]
+     *
+     */
     void setDim(double w, double h);
 
     //=========================================================================================================
     /**
-    * The function sets the order of rendering
-    *
-    * @param[in]  renderOrder   List of boolean commands where 1 is painting white and 0 is painting black
-    * @param[in]  freqKey       key of adjusted frequency
-    *
-    */
+     * The function sets the order of rendering
+     *
+     * @param[in]  renderOrder   List of boolean commands where 1 is painting white and 0 is painting black
+     * @param[in]  freqKey       key of adjusted frequency
+     *
+     */
     void setRenderOrder(QList<bool> renderOrder, int freqKey);
 
     //=========================================================================================================
     /**
-    * The function paints the item with the given paint device with all the setted configuration
-    *
-    * @param[in]  paintDevice  paint device to a Widget
-    *
-    */
+     * The function paints the item with the given paint device with all the setted configuration
+     *
+     * @param[in]  paintDevice  paint device to a Widget
+     *
+     */
     void paint(QPaintDevice *paintDevice);
 
     //=========================================================================================================
     /**
-    * The function outputs the adjusted frequency key
-    *
-    * @return saved frequency key
-    *
-    */
+     * The function outputs the adjusted frequency key
+     *
+     * @return saved frequency key
+     *
+     */
     int getFreqKey(void);
 
     //=========================================================================================================
     /**
-    * The function adds a sign of the ASCII code into the item
-    *
-    * @param[in] sign  saved frequency key
-    *
-    */
+     * The function adds a sign of the ASCII code into the item
+     *
+     * @param[in] sign  saved frequency key
+     *
+     */
     void addSign(QString sign);
 
     int                 m_iFreqKey;     /**< getting the adjusted key of the frquency */

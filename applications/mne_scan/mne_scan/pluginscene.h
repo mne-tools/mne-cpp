@@ -99,21 +99,21 @@ public:
 
     //=========================================================================================================
     /**
-    * Inserts an item depending on the selected action
-    *
-    * @param [in] pos   Position where to insert the plugin
-    */
+     * Inserts an item depending on the selected action
+     *
+     * @param [in] pos   Position where to insert the plugin
+     */
     void insertItem(const QPointF& pos);
 
     //=========================================================================================================
     /**
-    * Inserts the m_pActionPluginItem selected plugin into PluginSceneManager
-    *
-    * @param [in] pActionPluginItem     Current selected action item
-    * @param [out] pAddedPlugin         The added plugin
-    *
-    * @return true if successfull
-    */
+     * Inserts the m_pActionPluginItem selected plugin into PluginSceneManager
+     *
+     * @param [in] pActionPluginItem     Current selected action item
+     * @param [out] pAddedPlugin         The added plugin
+     *
+     * @return true if successfull
+     */
     bool insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::IPlugin::SPtr &pAddedPlugin);
 
     inline void setMode(Mode mode);

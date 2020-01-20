@@ -110,49 +110,49 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates the real-time client.
-    *
-    * @param[in] p_sRtServerHostname    The IP address of the mne_rt_server
-    * @param[in] p_sClientAlias         The client alias of the data client.
-    * @param[in] parent                 Parent QObject (optional)
-    */
+     * Creates the real-time client.
+     *
+     * @param[in] p_sRtServerHostname    The IP address of the mne_rt_server
+     * @param[in] p_sClientAlias         The client alias of the data client.
+     * @param[in] parent                 Parent QObject (optional)
+     */
     explicit RtClient(QString p_sRtServerHostname, QString p_sClientAlias = "rtclient", QObject *parent = 0);
     
     //=========================================================================================================
     /**
-    * Destroys the real time client.
-    */
+     * Destroys the real time client.
+     */
     ~RtClient();
 
     //=========================================================================================================
     /**
-    * Request Fiff Info
-    */
+     * Request Fiff Info
+     */
     inline FiffInfo::SPtr& getFiffInfo();
 
     //=========================================================================================================
     /**
-    * Rt Server status, returns true when rt server is started.
-    *
-    * @return true if started, false otherwise
-    */
+     * Rt Server status, returns true when rt server is started.
+     *
+     * @return true if started, false otherwise
+     */
     bool getConnectionStatus();
 
     //=========================================================================================================
     /**
-    * Stops the RtClient by stopping the producer's thread.
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * Stops the RtClient by stopping the producer's thread.
+     *
+     * @return true if succeeded, false otherwise
+     */
     virtual bool stop();
 
 protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run();
 
 private:
@@ -167,18 +167,18 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * Emits a received raw buffer - ToDo change the emits to fiff raw data.
-    *
-    * @param[in] p_rawBuffer    the received raw buffer
-    */
+     * Emits a received raw buffer - ToDo change the emits to fiff raw data.
+     *
+     * @param[in] p_rawBuffer    the received raw buffer
+     */
     void rawBufferReceived(Eigen::MatrixXf p_rawBuffer);
 
     //=========================================================================================================
     /**
-    * Emitted when connection status changed
-    *
-    * @param[in] p_bStatus  connection status
-    */
+     * Emitted when connection status changed
+     *
+     * @param[in] p_bStatus  connection status
+     */
     void connectionChanged(bool p_bStatus);
 };
 

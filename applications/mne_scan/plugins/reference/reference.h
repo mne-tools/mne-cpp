@@ -96,20 +96,20 @@ class REFERENCESHARED_EXPORT Reference : public SCSHAREDLIB::IAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Constructs a Reference.
-    */
+     * Constructs a Reference.
+     */
     Reference();
 
     //=========================================================================================================
     /**
-    * Destroys the Reference.
-    */
+     * Destroys the Reference.
+     */
     ~Reference();
 
     //=========================================================================================================
     /**
-    * IAlgorithm functions
-    */
+     * IAlgorithm functions
+     */
     virtual QSharedPointer<IPlugin> clone() const;
     virtual void init();
     virtual void unload();
@@ -121,23 +121,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Udates the pugin with new (incoming) data.
-    *
-    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
-    */
+     * Udates the pugin with new (incoming) data.
+     *
+     * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
+     */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
     /**
-    * IAlgorithm function
-    */
+     * IAlgorithm function
+     */
     virtual void run();
 
     //=========================================================================================================
     /**
-    * Shows the toolbar widget
-    */
+     * Shows the toolbar widget
+     */
     void showRefToolbarWidget();
 
 private:
@@ -156,8 +156,8 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
-    */
+     * Emitted when fiffInfo is available
+     */
     void fiffInfoAvailable();
 };
 

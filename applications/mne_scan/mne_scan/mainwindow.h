@@ -122,55 +122,55 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a MainWindow which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
-    */
+     * Constructs a MainWindow which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
+     */
     MainWindow(QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Destroys the MainWindow.
-    * All MainWindow's children are deleted first. The application exits if MainWindow is the main widget.
-    */
+     * Destroys the MainWindow.
+     * All MainWindow's children are deleted first. The application exits if MainWindow is the main widget.
+     */
     virtual ~MainWindow();
 
     //=========================================================================================================
     /**
-    * Garbage collection
-    */
+     * Garbage collection
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * This event handler is called when Qt receives a window close request from the window system.
-    *
-    * @param [in] event     close event
-    */
+     * This event handler is called when Qt receives a window close request from the window system.
+     *
+     * @param [in] event     close event
+     */
     void closeEvent(QCloseEvent *event);
 
     //=========================================================================================================
     /**
-    * Starts or restarts the main application timer with a timeout interval of msec milliseconds.
-    *
-    * @param [in] msec timeout interval in milliseconds
-    */
+     * Starts or restarts the main application timer with a timeout interval of msec milliseconds.
+     *
+     * @param [in] msec timeout interval in milliseconds
+     */
     void startTimer(int msec);
 
     //=========================================================================================================
     /**
-    * Stops the main application timer.
-    */
+     * Stops the main application timer.
+     */
     void stopTimer();
 
     //=========================================================================================================
     /**
-    * Writes to MainWindow log.
-    *
-    * @param [in] logMsg message
-    * @param [in] lgknd message kind; Message is formated depending on its kind.
-    * @param [in] lglvl message level; Message is displayed depending on its level.
-    */
+     * Writes to MainWindow log.
+     *
+     * @param [in] logMsg message
+     * @param [in] lgknd message kind; Message is formated depending on its kind.
+     * @param [in] lglvl message level; Message is displayed depending on its level.
+     */
     void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
 
 private:
@@ -187,10 +187,10 @@ private:
 
     //=========================================================================================================
     /**
-    * Setup the user interface for running mode.
-    *
-    * @param [in] state whether program is running.
-    */
+     * Setup the user interface for running mode.
+     *
+     * @param [in] state whether program is running.
+     */
     void uiSetupRunningState(bool state);
 
     // Class MainWindow user interface

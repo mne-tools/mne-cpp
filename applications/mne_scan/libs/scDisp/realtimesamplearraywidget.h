@@ -100,117 +100,117 @@ class SCDISPSHARED_EXPORT RealTimeSampleArrayWidget : public MeasurementWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a RealTimeSampleArrayWidget which is a child of parent.
-    *
-    * @param [in] pRTSA pointer to real-time sample array measurement.
-    * @param [in] pTime pointer to application time.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RealTimeSampleArrayWidget which is a child of parent.
+     *
+     * @param [in] pRTSA pointer to real-time sample array measurement.
+     * @param [in] pTime pointer to application time.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+     */
     RealTimeSampleArrayWidget(QSharedPointer<RealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeSampleArrayWidget.
-    */
+     * Destroys the RealTimeSampleArrayWidget.
+     */
     ~RealTimeSampleArrayWidget();
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    *
-    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
-    */
+     * Is called when new data are available.
+     *
+     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+     */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeSampleArrayWidget.
-    */
+     * Initialise the RealTimeSampleArrayWidget.
+     */
     virtual void init();
 
 protected:
 
     //=========================================================================================================
     /**
-    * Is called to paint the incoming real-time data.
-    * Function is painting the real-time curve, the grid, the measurement curve (when left button is pressed) and is calculating the zoom (when right button is pressed -> ToDo it's maybe better done in press event directly).
-    *
-    * @param [in] event pointer to PaintEvent -> not used.
-    */
+     * Is called to paint the incoming real-time data.
+     * Function is painting the real-time curve, the grid, the measurement curve (when left button is pressed) and is calculating the zoom (when right button is pressed -> ToDo it's maybe better done in press event directly).
+     *
+     * @param [in] event pointer to PaintEvent -> not used.
+     */
     virtual void paintEvent( QPaintEvent* event );
 
     //=========================================================================================================
     /**
-    * Is called when RealTimeSampleArrayWidget is resized.
-    *
-    * @param [in] event pointer to ResizeEvent -> not used.
-    */
+     * Is called when RealTimeSampleArrayWidget is resized.
+     *
+     * @param [in] event pointer to ResizeEvent -> not used.
+     */
     virtual void resizeEvent(QResizeEvent* event);
 
     //=========================================================================================================
     /**
-    * Is called when mouse button is pressed.
-    * Function is getting the current mouse position and to differ between left(measure curve) and right(zoom) mouse button.
-    *
-    * @param [in] mouseEvent pointer to MouseEvent.
-    */
+     * Is called when mouse button is pressed.
+     * Function is getting the current mouse position and to differ between left(measure curve) and right(zoom) mouse button.
+     *
+     * @param [in] mouseEvent pointer to MouseEvent.
+     */
     virtual void mousePressEvent(QMouseEvent* mouseEvent);
 
     //=========================================================================================================
     /**
-    * Is called when mouse is moved.
-    * Function is getting the current mouse position for measurement of the real-time curve and to zoom in or out.
-    *
-    * @param [in] mouseEvent pointer to MouseEvent.
-    */
+     * Is called when mouse is moved.
+     * Function is getting the current mouse position for measurement of the real-time curve and to zoom in or out.
+     *
+     * @param [in] mouseEvent pointer to MouseEvent.
+     */
     virtual void mouseMoveEvent(QMouseEvent* mouseEvent);
 
     //=========================================================================================================
     /**
-    * Is called when mouse button is released.
-    * Function is stopping measurement of the real-time curve or the zooming.
-    *
-    * @param [in] event pointer to MouseEvent -> not used.
-    */
+     * Is called when mouse button is released.
+     * Function is stopping measurement of the real-time curve or the zooming.
+     *
+     * @param [in] event pointer to MouseEvent -> not used.
+     */
     virtual void mouseReleaseEvent(QMouseEvent* event);
 
     //=========================================================================================================
     /**
-    * Is called when mouse button is double clicked.
-    * Depending on the current selected tool: Function is (un-)freezing the real-time curve or an annotation point is set.
-    *
-    * @param [in] event pointer to MouseEvent -> not used.
-    */
+     * Is called when mouse button is double clicked.
+     * Depending on the current selected tool: Function is (un-)freezing the real-time curve or an annotation point is set.
+     *
+     * @param [in] event pointer to MouseEvent -> not used.
+     */
     virtual void mouseDoubleClickEvent(QMouseEvent* event);
 
     //=========================================================================================================
     /**
-    * Is called when mouse wheel is used.
-    * Function is selecting the tool (freezing/annotation);
-    *
-    * @param [in] wheelEvent pointer to WheelEvent. Depending on the delta movement a tool is selected.
-    */
+     * Is called when mouse wheel is used.
+     * Function is selecting the tool (freezing/annotation);
+     *
+     * @param [in] wheelEvent pointer to WheelEvent. Depending on the delta movement a tool is selected.
+     */
     virtual void wheelEvent(QWheelEvent* wheelEvent);
 
 private slots:
     //=========================================================================================================
     /**
-    * Stops the Annotation
-    */
+     * Stops the Annotation
+     */
     void stopAnnotation();
 
     //=========================================================================================================
     /**
-    * Sets a new maximal value to the real time sample array.
-    * This is used for zooming functionality.
-    */
+     * Sets a new maximal value to the real time sample array.
+     * This is used for zooming functionality.
+     */
     void maxValueChanged(double maxValue);
 
     //=========================================================================================================
     /**
-    * Sets a new minimal value to the real time sample array.
-    * This is used for zooming functionality.
-    */
+     * Sets a new minimal value to the real time sample array.
+     * This is used for zooming functionality.
+     */
     void minValueChanged(double);
 
 private:

@@ -93,31 +93,31 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] iType      The type of the item. See types.h for declaration and definition.
-    * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] iType      The type of the item. See types.h for declaration and definition.
+     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit MetaTreeItem(int iType = MetaTreeItemTypes::UnknownItem, const QString& text = "");
 
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     void setData(const QVariant& value, int role = Qt::UserRole + 1);
 
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     void initItem();
 
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the data of this item changed.
-    */
+     * Emit this signal whenever the data of this item changed.
+     */
     void dataChanged(const QVariant& data);
 
 };

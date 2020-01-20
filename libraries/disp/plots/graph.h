@@ -98,59 +98,59 @@ public:
 
     //=========================================================================================================
     /**
-    * The constructor.
-    *
-    * @param[in] parent   The parent widget.
-    */
+     * The constructor.
+     *
+     * @param[in] parent   The parent widget.
+     */
     explicit Graph(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Init this class.
-    */
+     * Init this class.
+     */
     void init();
 
     //=========================================================================================================
     /**
-    * Sets the scaled image view title.
-    *
-    * @param[in] p_sTitle   The title
-    */
+     * Sets the scaled image view title.
+     *
+     * @param[in] p_sTitle   The title
+     */
     void setTitle(const QString &p_sTitle);
 
     //=========================================================================================================
     /**
-    * Sets the label of the y axes
-    *
-    * @param[in] p_sXLabel   The x axes label
-    */
+     * Sets the label of the y axes
+     *
+     * @param[in] p_sXLabel   The x axes label
+     */
     void setXLabel(const QString &p_sXLabel);
 
     //=========================================================================================================
     /**
-    * Sets the label of the y axes
-    *
-    * @param[in] p_sXLabel   The y axes label
-    */
+     * Sets the label of the y axes
+     *
+     * @param[in] p_sXLabel   The y axes label
+     */
     void setYLabel(const QString &p_sYLabel);
 
 protected:
 //    void paintEvent(QPaintEvent*);
     //=========================================================================================================
     /**
-    * Reimplemented resizeEvent
-    *
-    * @param[in] event   The resize event.
-    */
+     * Reimplemented resizeEvent
+     *
+     * @param[in] event   The resize event.
+     */
     void resizeEvent(QResizeEvent* event);
 
     //=========================================================================================================
     /**
-    * Draw the labels.
-    *
-    * @param[in] p_iContentWidth    The contents width.
-    * @param[in] p_iContentHeight   The contents height.
-    */
+     * Draw the labels.
+     *
+     * @param[in] p_iContentWidth    The contents width.
+     * @param[in] p_iContentHeight   The contents height.
+     */
     void drawLabels(qint32 p_iContentWidth,
                     qint32 p_iContentHeight);
 

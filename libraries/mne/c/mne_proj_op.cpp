@@ -293,8 +293,8 @@ void MneProjOp::mne_free_proj_op_proj(MneProjOp *op)
 
 MneProjOp *MneProjOp::mne_proj_op_combine(MneProjOp *to, MneProjOp *from)
 /*
-    * Copy items from 'from' operator to 'to' operator
-    */
+     * Copy items from 'from' operator to 'to' operator
+     */
 {
     int k;
     MneProjItem* it;
@@ -398,8 +398,8 @@ MneProjOp *MneProjOp::mne_dup_proj_op(MneProjOp *op)
 
 MneProjOp *MneProjOp::mne_proj_op_average_eeg_ref(FIFFLIB::fiffChInfo chs, int nch)
 /*
-    * Make the projection operator for average electrode reference
-    */
+     * Make the projection operator for average electrode reference
+     */
 {
     int eegcount = 0;
     int k;
@@ -477,9 +477,9 @@ int MneProjOp::mne_proj_op_affect_chs(MneProjOp *op, fiffChInfo chs, int nch)
 
 int MneProjOp::mne_proj_op_proj_vector(MneProjOp *op, float *vec, int nvec, int do_complement)
 /*
-    * Apply projection operator to a vector (floats)
-    * Assume that all dimension checking etc. has been done before
-    */
+     * Apply projection operator to a vector (floats)
+     * Assume that all dimension checking etc. has been done before
+     */
 {
     static float *res = NULL;
     int    res_size   = 0;
@@ -525,8 +525,8 @@ int MneProjOp::mne_proj_op_proj_vector(MneProjOp *op, float *vec, int nvec, int 
 
 MneProjOp *MneProjOp::mne_read_proj_op_from_node(FiffStream::SPtr &stream, const FiffDirNode::SPtr &start)
 /*
-    * Load all the linear projection data
-    */
+     * Load all the linear projection data
+     */
 {
     MneProjOp*   op     = NULL;
     QList<FiffDirNode::SPtr> proj;
@@ -702,8 +702,8 @@ MneProjOp *MneProjOp::mne_read_proj_op(const QString &name)
 
 void MneProjOp::mne_proj_op_report_data(FILE *out, const char *tag, MneProjOp *op, int list_data, char **exclude, int nexclude)
 /*
-    * Output info about the projection operator
-    */
+     * Output info about the projection operator
+     */
 {
     int j,k,p,q;
     MneProjItem* it;

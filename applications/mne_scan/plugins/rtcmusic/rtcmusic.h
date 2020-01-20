@@ -116,31 +116,31 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtcMusic.
-    */
+     * Constructs a RtcMusic.
+     */
     RtcMusic();
     //=========================================================================================================
     /**
-    * Destroys the RtcMusic.
-    */
+     * Destroys the RtcMusic.
+     */
     ~RtcMusic();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Initialise the RtcMusic.
-    */
+     * Initialise the RtcMusic.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     void calcFiffInfo();
@@ -159,23 +159,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Slot to update the fiff evoked
-    *
-    * @param[in] pMeasurement   The evoked to be appended
-    */
+     * Slot to update the fiff evoked
+     *
+     * @param[in] pMeasurement   The evoked to be appended
+     */
     void updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 signals:
     //=========================================================================================================
     /**
-    * Signal when clsutering is started
-    */
+     * Signal when clsutering is started
+     */
     void clusteringStarted();
 
     //=========================================================================================================
     /**
-    * Signal when clsutering has finished
-    */
+     * Signal when clsutering has finished
+     */
     void clusteringFinished();
 
 protected:

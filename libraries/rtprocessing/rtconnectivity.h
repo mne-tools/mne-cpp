@@ -102,10 +102,10 @@ class RTPROCESINGSHARED_EXPORT RtConnectivityWorker : public QObject
 public:
     //=========================================================================================================
     /**
-    * Perform actual connectivity estimation.
-    *
-    * @param[in] connectivitySettings           The connectivity settings to be used during connectivity estimation.
-    */
+     * Perform actual connectivity estimation.
+     *
+     * @param[in] connectivitySettings           The connectivity settings to be used during connectivity estimation.
+     */
     void doWork(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
 signals:
@@ -128,36 +128,36 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates the real-time connectivity estimation object.
-    *
-    * @param[in] parent     Parent QObject (optional)
-    */
+     * Creates the real-time connectivity estimation object.
+     *
+     * @param[in] parent     Parent QObject (optional)
+     */
     explicit RtConnectivity(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the real-time connectivity estimation object.
-    */
+     * Destroys the real-time connectivity estimation object.
+     */
     ~RtConnectivity();
 
     //=========================================================================================================
     /**
-    * Slot to receive incoming data.
-    *
-    * @param[in] data  Data to estimate the connectivity from
-    */
+     * Slot to receive incoming data.
+     *
+     * @param[in] data  Data to estimate the connectivity from
+     */
     void append(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
     //=========================================================================================================
     /**
-    * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
-    */
+     * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+     */
     void restart();
 
     //=========================================================================================================
     /**
-    * Stops the thread by interrupting its computation queue, quitting and waiting.
-    */
+     * Stops the thread by interrupting its computation queue, quitting and waiting.
+     */
     void stop();
 
 protected:

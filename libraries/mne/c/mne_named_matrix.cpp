@@ -216,8 +216,8 @@ MneNamedMatrix *MneNamedMatrix::pick_from_named_matrix(const QStringList& pickro
     pick_row = MALLOC_14(picknrow,int);
     pick_col = MALLOC_14(pickncol,int);
     /*
-    * Decide what to pick
-    */
+     * Decide what to pick
+     */
     if (!pickrowlist.isEmpty()) {
         for (j = 0; j < picknrow; j++) {
             one = pickrowlist[j];
@@ -263,8 +263,8 @@ MneNamedMatrix *MneNamedMatrix::pick_from_named_matrix(const QStringList& pickro
         my_pickcollist = this->collist;
     }
     /*
-    * Do the picking of the data accordingly
-    */
+     * Do the picking of the data accordingly
+     */
     pickdata = ALLOC_CMATRIX_14(picknrow,pickncol);
 
     data = this->data;
@@ -304,9 +304,9 @@ MneNamedMatrix *MneNamedMatrix::read_named_matrix(FiffStream::SPtr &stream, cons
     FiffDirNode::SPtr tmp_node = node;
 
     /*
-    * If the node is a named-matrix mode, use it.
-    * Otherwise, look in first-generation children
-    */
+     * If the node is a named-matrix mode, use it.
+     * Otherwise, look in first-generation children
+     */
     if (tmp_node->type == FIFFB_MNE_NAMED_MATRIX) {
         if(!tmp_node->find_tag(stream, kind, t_pTag))
             goto bad;

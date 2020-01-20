@@ -89,15 +89,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the FiffCoordTransSet
-    */
+     * Constructs the FiffCoordTransSet
+     */
     FiffCoordTransSet();
 
     //=========================================================================================================
     /**
-    * Destroys the FiffCoordTransSet
-    * Refactored:  (.c)
-    */
+     * Destroys the FiffCoordTransSet
+     * Refactored:  (.c)
+     */
     ~FiffCoordTransSet();
 
 public:

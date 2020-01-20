@@ -95,52 +95,52 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a Downloader object.
-    */
+     * Constructs a Downloader object.
+     */
     explicit Downloader(QWidget *parent = 0);
     ~Downloader();
 
     //=========================================================================================================
     /**
-    * Called once the extraction is done. Changes GUI and sets m_bExtraction = true.
-    */
+     * Called once the extraction is done. Changes GUI and sets m_bExtraction = true.
+     */
     void done();
 
 private:
     //=========================================================================================================
     /**
-    * Starts the Download and changes GUI.
-    */
+     * Starts the Download and changes GUI.
+     */
     void onDownloadButtonClicked();
 
     //=========================================================================================================
     /**
-    * Checks if extraction is finished.
-    *
-    * Closes GUI and deletes temporary files if m_bExtraction = true, triggers warning if not.
-    */
+     * Checks if extraction is finished.
+     *
+     * Closes GUI and deletes temporary files if m_bExtraction = true, triggers warning if not.
+     */
     void onExitButtonClicked();
 
     //=========================================================================================================
     /**
-    * Calls the extract class once the download is finished.
-    */
+     * Calls the extract class once the download is finished.
+     */
     void downloadFinished();
 
     //=========================================================================================================
     /**
-    * Writes data onto harddrive once it arrives.
-    */
+     * Writes data onto harddrive once it arrives.
+     */
     void dataReady();
 
     //=========================================================================================================
     /**
-    * Displays downloadprogress on the GUI.
-    *
-    * @param[in] recieved   Size of recieved data
-    *
-    * @param[in] total      Total size of the sample data set
-    */
+     * Displays downloadprogress on the GUI.
+     *
+     * @param[in] recieved   Size of recieved data
+     *
+     * @param[in] total      Total size of the sample data set
+     */
     void downloadProgress(qint64 recieved, qint64 total);
 
     Ui::Downloader *ui;                                     /**< Sets up the GUI. */
@@ -156,33 +156,33 @@ private:
 public:
     //=========================================================================================================
     /**
-    * Changes GUI for filepathinput if 7zip isn't found automatically.
-    */
+     * Changes GUI for filepathinput if 7zip isn't found automatically.
+     */
     void checkZipperPath();
 
 private:
     //=========================================================================================================
     /**
-    * Tries to extract again using the new filepath if the extract button is pressed.
-    */
+     * Tries to extract again using the new filepath if the extract button is pressed.
+     */
     void onExtractButtonClicked();
 
     //=========================================================================================================
     /**
-    * Opens filepath GUI for easy input.
-    */
+     * Opens filepath GUI for easy input.
+     */
     void onToolButtonClicked();
 
     //=========================================================================================================
     /**
-    * Starts Extraction if stat=true. Hands the extractor the path of the temporary file and of 7zip.
-    *
-    * @param[in] stat       Downloadstatus. stat = true if download has finished
-    *
-    * @param[in] zip        Path to 7z.exe
-    *
-    * @param[in] current    Path to the temporary .tar.gz file
-    */
+     * Starts Extraction if stat=true. Hands the extractor the path of the temporary file and of 7zip.
+     *
+     * @param[in] stat       Downloadstatus. stat = true if download has finished
+     *
+     * @param[in] zip        Path to 7z.exe
+     *
+     * @param[in] current    Path to the temporary .tar.gz file
+     */
     void readyToExtract(bool stat, QString zip, QString current);
 
 
@@ -191,10 +191,10 @@ private:
 private:
     //=========================================================================================================
     /**
-    * Starts Extraction if stat=true.
-    *
-    * @param[in] stat       Downloadstatus. stat = true if download has finished
-    */
+     * Starts Extraction if stat=true.
+     *
+     * @param[in] stat       Downloadstatus. stat = true if download has finished
+     */
     void readyToExtract(bool stat);
 
 #endif

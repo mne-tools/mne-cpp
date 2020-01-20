@@ -102,27 +102,27 @@ class UTILSSHARED_EXPORT LayoutMaker
 public:
     //=========================================================================================================
     /**
-    * Constructs a LayoutMaker object.
-    */
+     * Constructs a LayoutMaker object.
+     */
     LayoutMaker();
 
     //=========================================================================================================
     /**
-    * Reads the specified ANT elc-layout file.
-    * @param [in] inputPoints       The input points in 3D space.
-    * @param [out] outputPoints     The output layout points in 2D space.
-    * @param [in] names             The channel names.
-    * @param [in] outFile           The outout file.
-    * @param [in] do_fit            The flag whether to do a sphere fitting.
-    * @param [in] prad
-    * @param [in] w
-    * @param [in] h
-    * @param [in] writeFile         The flag whether to write to file.
-    * @param [in] mirrorXAxis       Mirror points at x axis.
-    * @param [in] mirrorYAxis       Mirror points at y axis.
-    *
-    * @return true if making layout was successful, false otherwise.
-    */
+     * Reads the specified ANT elc-layout file.
+     * @param [in] inputPoints       The input points in 3D space.
+     * @param [out] outputPoints     The output layout points in 2D space.
+     * @param [in] names             The channel names.
+     * @param [in] outFile           The outout file.
+     * @param [in] do_fit            The flag whether to do a sphere fitting.
+     * @param [in] prad
+     * @param [in] w
+     * @param [in] h
+     * @param [in] writeFile         The flag whether to write to file.
+     * @param [in] mirrorXAxis       Mirror points at x axis.
+     * @param [in] mirrorYAxis       Mirror points at y axis.
+     *
+     * @return true if making layout was successful, false otherwise.
+     */
     static bool makeLayout(const QList<QVector<float> > &inputPoints,
                            QList<QVector<float> > &outputPoints,
                            const QStringList &names,

@@ -107,26 +107,26 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MNE Meas Data
-    * Refactored: mne_new_meas_data (mne_read_data.c)
-    */
+     * Constructs the MNE Meas Data
+     * Refactored: mne_new_meas_data (mne_read_data.c)
+     */
     MneMeasData();
 
     //=========================================================================================================
     /**
-    * Destroys the MNE Meas Data description
-    * Refactored: mne_free_meas_data (mne_read_data.c)
-    */
+     * Destroys the MNE Meas Data description
+     * Refactored: mne_free_meas_data (mne_read_data.c)
+     */
     ~MneMeasData();
 
     //=========================================================================================================
     /**
-    * Change the baseline setting in the current data set
-    * Refactored: mne_adjust_baselines (mne_apply_baselines.c)
-    *
-    * @param[in] bmin   Baseline start timepoint
-    * @param[in] bmax   Baseline end timepoint
-    */
+     * Change the baseline setting in the current data set
+     * Refactored: mne_adjust_baselines (mne_apply_baselines.c)
+     *
+     * @param[in] bmin   Baseline start timepoint
+     * @param[in] bmax   Baseline end timepoint
+     */
     void adjust_baselines(float bmin, float bmax);
 
 
@@ -172,8 +172,8 @@ public:
     int                     nbad;       /* How many? */
     int                     *bad;       /* Which channels are bad? */
     /*
-    * These are the data sets loaded
-    */
+     * These are the data sets loaded
+     */
     int                     ch_major;   /* Rows are channels rather than times */
     QList<MneMeasDataSet*>  sets;       /* All loaded data sets */
     int                     nset;       /* How many */

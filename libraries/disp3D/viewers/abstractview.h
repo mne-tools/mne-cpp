@@ -98,62 +98,62 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     explicit AbstractView(QWidget *parent = 0,
                           Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    */
+     * Default destructor.
+     */
     ~AbstractView();
 
     //=========================================================================================================
     /**
-    * Returns the View3D.
-    *
-    * @return The currently set View3D.
-    */
+     * Returns the View3D.
+     *
+     * @return The currently set View3D.
+     */
     QSharedPointer<DISP3DLIB::View3D> getView();
 
     //=========================================================================================================
     /**
-    * Returns the Control3D.
-    *
-    * @return The currently set Control3D.
-    */
+     * Returns the Control3D.
+     *
+     * @return The currently set Control3D.
+     */
     QSharedPointer<DISPLIB::Control3DView> getControlView();
 
     //=========================================================================================================
     /**
-    * Returns the Data3DTreeModel.
-    *
-    * @return The currently set Data3DTreeModel.
-    */
+     * Returns the Data3DTreeModel.
+     *
+     * @return The currently set Data3DTreeModel.
+     */
     QSharedPointer<DISP3DLIB::Data3DTreeModel> getTreeModel();
 
     //=========================================================================================================
     /**
-    * Returns the quick control view.
-    *
-    * @return The currently set quick control view.
-    */
+     * Returns the quick control view.
+     *
+     * @return The currently set quick control view.
+     */
     QPointer<DISPLIB::QuickControlView> getQuickControl();
 
     //=========================================================================================================
     /**
-    * Sets the extra control widgets in the quick control view.
-    *
-    * @param[in] lControlWidgets    The new extra control widgets.
-    */
+     * Sets the extra control widgets in the quick control view.
+     *
+     * @param[in] lControlWidgets    The new extra control widgets.
+     */
     void setQuickControlWidgets(const QList<QSharedPointer<QWidget> >& lControlWidgets);
 
 protected:
     //=========================================================================================================
     /**
-    * Creates the GUI.
-    */
+     * Creates the GUI.
+     */
     void createGUI();
 
     QSharedPointer<DISP3DLIB::View3D>                   m_p3DView;              /**< The Disp3D view. */

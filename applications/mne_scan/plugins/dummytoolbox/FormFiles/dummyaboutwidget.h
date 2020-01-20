@@ -76,17 +76,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummyAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a DummyAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new DummyAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+     */
     DummyAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummyAboutWidget.
-    * All DummyAboutWidget's children are deleted first. The application exits if DummyAboutWidget is the main widget.
-    */
+     * Destroys the DummyAboutWidget.
+     * All DummyAboutWidget's children are deleted first. The application exits if DummyAboutWidget is the main widget.
+     */
     ~DummyAboutWidget();
 
 private:

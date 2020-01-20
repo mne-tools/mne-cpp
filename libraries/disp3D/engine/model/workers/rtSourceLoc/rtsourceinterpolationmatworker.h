@@ -104,60 +104,60 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     RtSourceInterpolationMatWorker();
 
     //=========================================================================================================
     /**
-    * This function sets the function that is used in the interpolation process.
-    * Warning: Using this function can take some seconds because recalculation are required.
-    *
-    * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
-    */
+     * This function sets the function that is used in the interpolation process.
+     * Warning: Using this function can take some seconds because recalculation are required.
+     *
+     * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
+     */
     void setInterpolationFunction(const QString &sInterpolationFunction);
 
     //=========================================================================================================
     /**
-    * Set the visualization type.
-    *
-    * @param[in] iVisType               The new visualization type.
-    */
+     * Set the visualization type.
+     *
+     * @param[in] iVisType               The new visualization type.
+     */
     void setVisualizationType(int iVisType);
 
     //=========================================================================================================
     /**
-    * This function sets the cancel distance used in distance calculations for the interpolation.
-    * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
-    * Warning: Using this function can take some seconds because recalculation are required.
-    *
-    * @param[in] dCancelDist           The new cancel distance value in meters.
-    */
+     * This function sets the cancel distance used in distance calculations for the interpolation.
+     * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
+     * Warning: Using this function can take some seconds because recalculation are required.
+     *
+     * @param[in] dCancelDist           The new cancel distance value in meters.
+     */
     void setCancelDistance(double dCancelDist);
 
     //=========================================================================================================
     /**
-    * Sets the information needed creating the interpolation matrix.
-    * Warning: Using this function can take some seconds because recalculation are required.
-    *
-    * @param[in] matVertices               The mesh information in form of vertices.
-    * @param[in] vecNeighborVertices       The neighbor vertex information.
-    * @param[in] vecMappedSubset           Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to.
-    *
-    * @return Returns the created interpolation matrix.
-    */
+     * Sets the information needed creating the interpolation matrix.
+     * Warning: Using this function can take some seconds because recalculation are required.
+     *
+     * @param[in] matVertices               The mesh information in form of vertices.
+     * @param[in] vecNeighborVertices       The neighbor vertex information.
+     * @param[in] vecMappedSubset           Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to.
+     *
+     * @return Returns the created interpolation matrix.
+     */
     void setInterpolationInfo(const Eigen::MatrixX3f &matVertices,
                               const QVector<QVector<int> > &vecNeighborVertices,
                               const QVector<int> &vecMappedSubset);
 
     //=========================================================================================================
     /**
-    * Set annotation data.
-    *
-    * @param[in] vecLabelIds       The labels ids for each of the right hemipshere surface vertex idx.
-    * @param[in] lLabels           The label information for the right hemipshere.
-    * @param[in] vecVertNo         The vertNos for the right hemisphere.
-    */
+     * Set annotation data.
+     *
+     * @param[in] vecLabelIds       The labels ids for each of the right hemipshere surface vertex idx.
+     * @param[in] lLabels           The label information for the right hemipshere.
+     * @param[in] vecVertNo         The vertNos for the right hemisphere.
+     */
     void setAnnotationInfo(const Eigen::VectorXi &vecLabelIds,
                            const QList<FSLIB::Label> &lLabels,
                            const Eigen::VectorXi &vecVertNo);
@@ -165,26 +165,26 @@ public:
 protected:    
     //=========================================================================================================
     /**
-    * Calculate the interpolation operator based on the set interpolation info.
-    */
+     * Calculate the interpolation operator based on the set interpolation info.
+     */
     void calculateInterpolationOperator();
 
     //=========================================================================================================
     /**
-    * Calculate the annotation operator based on the set annotation info.
-    */
+     * Calculate the annotation operator based on the set annotation info.
+     */
     void calculateAnnotationOperator();
 
     //=========================================================================================================
     /**
-    * Emit the interpolation matrix.
-    */
+     * Emit the interpolation matrix.
+     */
     void emitMatrix();
 
     //=============================================================================================================
     /**
-    * The struct specifing all data that is used in the interpolation process
-    */
+     * The struct specifing all data that is used in the interpolation process
+     */
     struct InterpolationData {
         double                          dCancelDistance;                /**< Cancel distance for the interpolaion in meters. */
 
@@ -212,10 +212,10 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever a new interpolation matrix was calcualted.
-    *
-    * @param[in] pMatInterpolationMatrix     The new interpolation matrix.
-    */
+     * Emit this signal whenever a new interpolation matrix was calcualted.
+     *
+     * @param[in] pMatInterpolationMatrix     The new interpolation matrix.
+     */
     void newInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 };
 

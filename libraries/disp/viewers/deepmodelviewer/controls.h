@@ -92,79 +92,79 @@ class DISPSHARED_EXPORT Controls : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs the Controls Widget without an attached view which is a child of parent
-    *
-    * @param [in] parent    The parent widget
-    */
+     * Constructs the Controls Widget without an attached view which is a child of parent
+     *
+     * @param [in] parent    The parent widget
+     */
     Controls(QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Constructs the Controls Widget with an attached view which is a child of parent
-    *
-    * @param [in] v         The view which should be controled by this
-    * @param [in] parent    The parent widgetarent widget
-    */
+     * Constructs the Controls Widget with an attached view which is a child of parent
+     *
+     * @param [in] v         The view which should be controled by this
+     * @param [in] parent    The parent widgetarent widget
+     */
     Controls(DeepViewer* v, QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Sets the associated viewer if none was set before
-    *
-    * @param [in] v     The viewer to set
-    */
+     * Sets the associated viewer if none was set before
+     *
+     * @param [in] v     The viewer to set
+     */
     void setDeepViewer(DeepViewer* v);
 
     //=========================================================================================================
     /**
-    * Returns the configuration combo box
-    *
-    * @return The configuration combo box
-    */
+     * Returns the configuration combo box
+     *
+     * @return The configuration combo box
+     */
     QComboBox* getConfigurationComboBox();
 
 signals:
     //=========================================================================================================
     /**
-    * Emmitted when training of the network is requested
-    */
+     * Emmitted when training of the network is requested
+     */
     void requestTraining_signal();
 
 private:
     //=========================================================================================================
     /**
-    * Create the Network controls
-    *
-    * @param [in] parent    the group box where the Network controls should be attached to
-    */
+     * Create the Network controls
+     *
+     * @param [in] parent    the group box where the Network controls should be attached to
+     */
     void createNetworkControls(QWidget* parent);
 
     //=========================================================================================================
     /**
-    * Create the Appearance controls
-    *
-    * @param [in] parent    the group box where the Appearance controls should be attached to
-    */
+     * Create the Appearance controls
+     *
+     * @param [in] parent    the group box where the Appearance controls should be attached to
+     */
     void createAppearanceControls(QWidget* parent);
 
     //=========================================================================================================
     /**
-    * Create the View controls
-    *
-    * @param [in] parent    the group box where the View controls should be attached to
-    */
+     * Create the View controls
+     *
+     * @param [in] parent    the group box where the View controls should be attached to
+     */
     void createViewControls(QWidget* parent);
 
     //=========================================================================================================
     /**
-    * Creates the layout
-    */
+     * Creates the layout
+     */
     void createLayout();
 
     //=========================================================================================================
     /**
-    * Request training after training button was pushed
-    */
+     * Request training after training button was pushed
+     */
     void requestTraining();
 
 

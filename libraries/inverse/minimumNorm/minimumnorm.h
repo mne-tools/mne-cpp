@@ -88,111 +88,111 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs minimum norm inverse algorithm
-    *
-    * @param[in] p_inverseOperator  The inverse operator
-    * @param[in] lambda             The regularization factor
-    * @param[in] method             Use mininum norm, dSPM or sLORETA. ("MNE" | "dSPM" | "sLORETA")
-    *
-    * @return the prepared inverse operator
-    */
+     * Constructs minimum norm inverse algorithm
+     *
+     * @param[in] p_inverseOperator  The inverse operator
+     * @param[in] lambda             The regularization factor
+     * @param[in] method             Use mininum norm, dSPM or sLORETA. ("MNE" | "dSPM" | "sLORETA")
+     *
+     * @return the prepared inverse operator
+     */
     explicit MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, const QString method);
 
     //=========================================================================================================
     /**
-    * Constructs minimum norm inverse algorithm
-    *
-    * @param[in] p_inverseOperator  The inverse operator
-    * @param[in] lambda             The regularization factor
-    * @param[in] dSPM               Compute the noise-normalization factors for dSPM?
-    * @param[in] sLORETA            Compute the noise-normalization factors for sLORETA?
-    *
-    * @return the prepared inverse operator
-    */
+     * Constructs minimum norm inverse algorithm
+     *
+     * @param[in] p_inverseOperator  The inverse operator
+     * @param[in] lambda             The regularization factor
+     * @param[in] dSPM               Compute the noise-normalization factors for dSPM?
+     * @param[in] sLORETA            Compute the noise-normalization factors for sLORETA?
+     *
+     * @return the prepared inverse operator
+     */
     explicit MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
 
     virtual ~MinimumNorm(){}
 
     //=========================================================================================================
     /**
-    * Computes a L2-norm inverse solution Actual code using these principles might be different because the
-    * inverse operator is often reused across data sets.
-    *
-    * @param[in] p_fiffEvoked   Evoked data.
-    * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
-    *                           radial component is kept. This is only applied when working with loose orientations.
-    *
-    * @return the calculated source estimation
-    */
+     * Computes a L2-norm inverse solution Actual code using these principles might be different because the
+     * inverse operator is often reused across data sets.
+     *
+     * @param[in] p_fiffEvoked   Evoked data.
+     * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
+     *                           radial component is kept. This is only applied when working with loose orientations.
+     *
+     * @return the calculated source estimation
+     */
     virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
     virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
 
     //=========================================================================================================
     /**
-    * Perform the inverse setup: Prepares this inverse operator and assembles the kernel.
-    *
-    * @param[in] nave           Number of averages to use.
-    * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
-    *                           radial component is kept. This is only applied when working with loose orientations.
-    */
+     * Perform the inverse setup: Prepares this inverse operator and assembles the kernel.
+     *
+     * @param[in] nave           Number of averages to use.
+     * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
+     *                           radial component is kept. This is only applied when working with loose orientations.
+     */
     virtual void doInverseSetup(qint32 nave, bool pick_normal = false);
 
     //=========================================================================================================
     /**
-    * Get the name of the inverse operator.
-    *
-    * @return the name of the inverse operator
-    */
+     * Get the name of the inverse operator.
+     *
+     * @return the name of the inverse operator
+     */
     virtual const char* getName() const;
 
     //=========================================================================================================
     /**
-    * Get the source space corresponding to this inverse operator.
-    *
-    * @return the source space corresponding to this inverse operator
-    */
+     * Get the source space corresponding to this inverse operator.
+     *
+     * @return the source space corresponding to this inverse operator
+     */
     virtual const MNESourceSpace& getSourceSpace() const;
 
     //=========================================================================================================
     /**
-    * Get the prepared inverse operator.
-    *
-    * @return the prepared inverse operator
-    */
+     * Get the prepared inverse operator.
+     *
+     * @return the prepared inverse operator
+     */
     inline MNEInverseOperator& getPreparedInverseOperator();
 
     //=========================================================================================================
     /**
-    * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
-    *
-    * @param[in] method   Use mininum norm, dSPM or sLORETA.
-    */
+     * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
+     *
+     * @param[in] method   Use mininum norm, dSPM or sLORETA.
+     */
     void setMethod(QString method);
 
     //=========================================================================================================
     /**
-    * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
-    *
-    * @param[in] dSPM      Compute the noise-normalization factors for dSPM?
-    * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?
-    */
+     * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
+     *
+     * @param[in] dSPM      Compute the noise-normalization factors for dSPM?
+     * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?
+     */
     void setMethod(bool dSPM, bool sLORETA);
 
     //=========================================================================================================
     /**
-    * Set regularization factor
-    *
-    * @param[in] lambda   The regularization factor
-    */
+     * Set regularization factor
+     *
+     * @param[in] lambda   The regularization factor
+     */
     void setRegularization(float lambda);
 
     //=========================================================================================================
     /**
-    * Get the assembled kernel
-    *
-    * @return the assembled kernel
-    */
+     * Get the assembled kernel
+     *
+     * @return the assembled kernel
+     */
     inline MatrixXd& getKernel();
 
 private:

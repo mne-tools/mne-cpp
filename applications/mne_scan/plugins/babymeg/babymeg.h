@@ -132,76 +132,76 @@ class BABYMEGSHARED_EXPORT BabyMEG : public SCSHAREDLIB::ISensor
 public:
     //=========================================================================================================
     /**
-    * Constructs a BabyMEG.
-    */
+     * Constructs a BabyMEG.
+     */
     BabyMEG();
 
     //=========================================================================================================
     /**
-    * Destroys the BabyMEG.
-    */
+     * Destroys the BabyMEG.
+     */
     virtual ~BabyMEG();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    *
-    * @return Returns the cloned widget.
-    */
+     * Clone the plugin
+     *
+     * @return Returns the cloned widget.
+     */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Initialise the BabyMEG.
-    */
+     * Initialise the BabyMEG.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Clears the babymeg
-    */
+     * Clears the babymeg
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Start the thread.
-    */
+     * Start the thread.
+     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stop the thread.
-    */
+     * Stop the thread.
+     */
     virtual bool stop();
 
     //=========================================================================================================
     /**
-    * Get plugin type.
-    *
-    * @return the plugin type in form of a IPlugin::PluginType
-    */
+     * Get plugin type.
+     *
+     * @return the plugin type in form of a IPlugin::PluginType
+     */
     virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
 
     //=========================================================================================================
     /**
-    * Get plugin name.
-    *
-    * @return the plugin name as a QString
-    */
+     * Get plugin name.
+     *
+     * @return the plugin name as a QString
+     */
     virtual QString getName() const;
 
     //=========================================================================================================
     /**
-    * Setups this widgets and returns a pointer to it.
-    *
-    * @return a QWidget pointer to the set up QWidget
-    */
+     * Setups this widgets and returns a pointer to it.
+     *
+     * @return a QWidget pointer to the set up QWidget
+     */
     virtual QWidget* setupWidget();
 
 protected:
@@ -209,184 +209,184 @@ protected:
 
     //=========================================================================================================
     /**
-    * Initialize the connector.
-    */
+     * Initialize the connector.
+     */
     void initConnector();
 
     //=========================================================================================================
     /**
-    * Sets the Fiff Info.
-    *
-    * @param[in] p_FiffInfo    the Fiff Info.
-    */
+     * Sets the Fiff Info.
+     *
+     * @param[in] p_FiffInfo    the Fiff Info.
+     */
     void setFiffInfo(const FIFFLIB::FiffInfo& p_FiffInfo);
 
     //=========================================================================================================
     /**
-    * Sets the Fiff Info data.
-    *
-    * @param[in] DATA    the Fiff Info data.
-    */
+     * Sets the Fiff Info data.
+     *
+     * @param[in] DATA    the Fiff Info data.
+     */
     void setFiffData(QByteArray DATA);
 
     //=========================================================================================================
     /**
-    * Sets the CMD data.
-    *
-    * @param[in] DATA    the CMD data.
-    */
+     * Sets the CMD data.
+     *
+     * @param[in] DATA    the CMD data.
+     */
     void setCMDData(QByteArray DATA);
 
     //=========================================================================================================
     /**
-    * Sets the gain info.
-    *
-    * @param[in] GainInfo    a QStringList with all the gain information.
-    */
+     * Sets the gain info.
+     *
+     * @param[in] GainInfo    a QStringList with all the gain information.
+     */
     void setFiffGainInfo(QStringList GainInfo);
 
     //=========================================================================================================
     /**
-    * Returns information from FLL hardware.
-    *
-    * @param[in] t_sFLLControlCommand  FLL command.
-    */
+     * Returns information from FLL hardware.
+     *
+     * @param[in] t_sFLLControlCommand  FLL command.
+     */
     void comFLL(QString t_sFLLControlCommand);
 
     //=========================================================================================================
     /**
-    * Update fiff information.
-    */
+     * Update fiff information.
+     */
     void updateFiffInfo();
 
     //=========================================================================================================
     /**
-    * Set HPI fiff information.
-    */
+     * Set HPI fiff information.
+     */
     void showHPIDialog();
 
     //=========================================================================================================
     /**
-    * Sends the current data block to the HPI dialog.
-    *
-    * @param [in] matData   The new data block.
-    */
+     * Sends the current data block to the HPI dialog.
+     *
+     * @param [in] matData   The new data block.
+     */
     void updateHPI(const Eigen::MatrixXf &matData);
 
     //=========================================================================================================
     /**
-    * Sends the current data block to the HPI dialog and performs a fit.
-    *
-    * @param [in] matData   The data block to which the HPI information is to be written.
-    */
+     * Sends the current data block to the HPI dialog and performs a fit.
+     *
+     * @param [in] matData   The data block to which the HPI information is to be written.
+     */
     void doContinousHPI(Eigen::MatrixXf& matData);
 
     //=========================================================================================================
     /**
-    * Toggles teh continous HPI flag.
-    *
-    * @param [in] bDoContinousHPI   Whether to do continous HPI.
-    */
+     * Toggles teh continous HPI flag.
+     *
+     * @param [in] bDoContinousHPI   Whether to do continous HPI.
+     */
     void onContinousHPIToggled(bool bDoContinousHPI);
 
     //=========================================================================================================
     /**
-    * Set the recording time in seconds.
-    *
-    * @param[in] time   the new recording time.
-    */
+     * Set the recording time in seconds.
+     *
+     * @param[in] time   the new recording time.
+     */
     void setRecordingTimerChanged(int timeMSecs);
 
     //=========================================================================================================
     /**
-    * Set the recording time active flag.
-    *
-    * @param[in] state   whether the recording should be used or not.
-    */
+     * Set the recording time active flag.
+     *
+     * @param[in] state   whether the recording should be used or not.
+     */
     void setRecordingTimerStateChanged(bool state);
 
     //=========================================================================================================
     /**
-    * Set the final file name including its full path.
-    *
-    * @param[in] sFileName   The new file name.
-    */
+     * Set the final file name including its full path.
+     *
+     * @param[in] sFileName   The new file name.
+     */
     void setFileName(const QString& sFileName);
 
     //=========================================================================================================
     /**
-    * Shows the project dialog/window.
-    */
+     * Shows the project dialog/window.
+     */
     void showProjectDialog();
 
     //=========================================================================================================
     /**
-    * Shows the project squid control dialog.
-    */
+     * Shows the project squid control dialog.
+     */
     void showSqdCtrlDialog();
 
     //=========================================================================================================
     /**
-    * Determines current file. And starts a new one.
-    */
+     * Determines current file. And starts a new one.
+     */
     void splitRecordingFile();
 
     //=========================================================================================================
     /**
-    * Starts or stops a file recording depending on the current recording state.
-    */
+     * Starts or stops a file recording depending on the current recording state.
+     */
     void toggleRecordingFile();
 
     //=========================================================================================================
     /**
-    * Combines all analog trigger signals to one single digital trigger line.
-    *
-    * @param[out] data  the data matrix
-    */
+     * Combines all analog trigger signals to one single digital trigger line.
+     *
+     * @param[out] data  the data matrix
+     */
     void createDigTrig(Eigen::MatrixXf& data);
 
     //=========================================================================================================
     /**
-    * Calibrate matrix.
-    *
-    * @param[out] data  the data matrix
-    */
+     * Calibrate matrix.
+     *
+     * @param[out] data  the data matrix
+     */
     Eigen::MatrixXd calibrate(const Eigen::MatrixXf& data);
 
     //=========================================================================================================
     /**
-    * Read projections from fiff file.
-    *
-    * @return true if successful, false otherwise
-    */
+     * Read projections from fiff file.
+     *
+     * @return true if successful, false otherwise
+     */
     bool readProjectors();
 
     //=========================================================================================================
     /**
-    * Read compensators from fiff file.
-    *
-    * @return true if successful, false otherwise
-    */
+     * Read compensators from fiff file.
+     *
+     * @return true if successful, false otherwise
+     */
     bool readCompensators();
 
     //=========================================================================================================
     /**
-    * Read bad channels from fiff file.
-    *
-    * @return true if successful, false otherwise
-    */
+     * Read bad channels from fiff file.
+     *
+     * @return true if successful, false otherwise
+     */
     bool readBadChannels();
 
     //=========================================================================================================
     /**
-    * change recording button.
-    */
+     * change recording button.
+     */
     void changeRecordingButton();
 
     //=========================================================================================================
     /**
-    * This function sends the current remaining recording time to the project window.
-    */
+     * This function sends the current remaining recording time to the project window.
+     */
     void onRecordingRemainingTimeChange();
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;    /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
@@ -439,32 +439,32 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emitted when command clients connection status changed.
-    *
-    * @param[in] p_bStatus  connection status
-    */
+     * Emitted when command clients connection status changed.
+     *
+     * @param[in] p_bStatus  connection status
+     */
     void cmdConnectionChanged(bool p_bStatus);
 
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available.
-    */
+     * Emitted when fiffInfo is available.
+     */
     void fiffInfoAvailable();
 
     //=========================================================================================================
     /**
-    * Emitted when data is ready.
-    *
-    * @param[in] tmp    data to squid control
-    */
+     * Emitted when data is ready.
+     *
+     * @param[in] tmp    data to squid control
+     */
     void dataToSquidCtrlGUI(Eigen::MatrixXf tmp);
 
     //=========================================================================================================
     /**
-    * Emitted when data received from tcp/ip socket.
-    *
-    * @param[in] DATA    data to squid control
-    */
+     * Emitted when data received from tcp/ip socket.
+     *
+     * @param[in] DATA    data to squid control
+     */
     void sendCMDDataToSQUIDControl(QByteArray DATA);
 };
 

@@ -97,14 +97,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the MneSurfacePatch.
-    */
+     * Constructs the MneSurfacePatch.
+     */
     MneSurfacePatch(int np);
 
     //=========================================================================================================
     /**
-    * Destroys the MneSurfacePatch.
-    */
+     * Destroys the MneSurfacePatch.
+     */
     ~MneSurfacePatch();
 
 public:

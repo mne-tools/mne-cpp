@@ -97,60 +97,60 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates the real-time data client.
-    *
-    * @param[in] parent     Parent QObject (optional)
-    */
+     * Creates the real-time data client.
+     *
+     * @param[in] parent     Parent QObject (optional)
+     */
     explicit RtDataClient(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Connect to a mne_rt_server using port 4218
-    *
-    * @param[in] p_sRtServerHostName    The IP address of the mne_rt_server
-    */
+     * Connect to a mne_rt_server using port 4218
+     *
+     * @param[in] p_sRtServerHostName    The IP address of the mne_rt_server
+     */
     void connectToHost(const QString& p_sRtServerHostName);
 
     //=========================================================================================================
     /**
-    * Attempts to close the socket. If there is pending data waiting to be written, QAbstractSocket will enter
-    * ClosingState and wait until all data has been written. Eventually, it will enter UnconnectedState and
-    * emit the disconnected() signal.
-    */
+     * Attempts to close the socket. If there is pending data waiting to be written, QAbstractSocket will enter
+     * ClosingState and wait until all data has been written. Eventually, it will enter UnconnectedState and
+     * emit the disconnected() signal.
+     */
     virtual void disconnectFromHost();
 
     //=========================================================================================================
     /**
-    * Requests the ID at mne_rt_server and returns it
-    *
-    * @return the requested id
-    */
+     * Requests the ID at mne_rt_server and returns it
+     *
+     * @return the requested id
+     */
     qint32 getClientId();
 
     //=========================================================================================================
     /**
-    * Reads fiff measurement information of a data the connection
-    *
-    * @return the read fiff measurement information
-    */
+     * Reads fiff measurement information of a data the connection
+     *
+     * @return the read fiff measurement information
+     */
     FiffInfo::SPtr readInfo();
 
     //=========================================================================================================
     /**
-    * Reads fiff measurement information of a data the connection
-    *
-    * @param[in] p_nChannels    Number of channels to reshape the received data
-    * @param[out] data          The read data - ToDo change this to raw buffer data object
-    * @param[out] kind          Data kind
-    */
+     * Reads fiff measurement information of a data the connection
+     *
+     * @param[in] p_nChannels    Number of channels to reshape the received data
+     * @param[out] data          The read data - ToDo change this to raw buffer data object
+     * @param[out] kind          Data kind
+     */
     void readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int_t& kind);
 
     //=========================================================================================================
     /**
-    * Sets the alias of the data client
-    *
-    * @param[in] p_sAlias    The alias of the data client
-    */
+     * Sets the alias of the data client
+     *
+     * @param[in] p_sAlias    The alias of the data client
+     */
     void setClientAlias(const QString &p_sAlias);
 
 private:

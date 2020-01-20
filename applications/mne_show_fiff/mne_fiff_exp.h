@@ -81,31 +81,31 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Mne Fiff Explanation
-    */
+     * Constructs the Mne Fiff Explanation
+     */
     MneFiffExp();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_MneFiffExp      Mne Fiff Explanation which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_MneFiffExp      Mne Fiff Explanation which should be copied
+     */
     MneFiffExp(const MneFiffExp& p_MneFiffExp);
 
     //=========================================================================================================
     /**
-    * Destroys the Mne Fiff Explanation
-    */
+     * Destroys the Mne Fiff Explanation
+     */
     ~MneFiffExp();
 
     //=========================================================================================================
     /**
-    * Compares if Explanation ex1 is lesser than ex2
-    *
-    * @param[in] ex1    MneFiffExp which should be checked wheter it is lesser than ex2.
-    * @param[in] ex2    MneFiffExp which should be checked wheter it is larger than ex1.
-    */
+     * Compares if Explanation ex1 is lesser than ex2
+     *
+     * @param[in] ex1    MneFiffExp which should be checked wheter it is lesser than ex2.
+     * @param[in] ex2    MneFiffExp which should be checked wheter it is larger than ex1.
+     */
     static bool comp_exp(const MneFiffExp& ex1, const MneFiffExp& ex2);
 
 public:

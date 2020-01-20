@@ -85,80 +85,80 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a CircularMultiChannelBuffer_old.
-    *
-    * @param [in] uiChannel selected channel.
-    * @param [in] uiMaxNumElements length of buffer.
-    */
+     * Constructs a CircularMultiChannelBuffer_old.
+     *
+     * @param [in] uiChannel selected channel.
+     * @param [in] uiMaxNumElements length of buffer.
+     */
     CircularMultiChannelBuffer_old(unsigned int uiNumChannels, unsigned int uiMaxNumElements);
 
     //=========================================================================================================
     /**
-    * Destroys the CircularMultiChannelBuffer_old.
-    */
+     * Destroys the CircularMultiChannelBuffer_old.
+     */
     ~CircularMultiChannelBuffer_old();
 
     //=========================================================================================================
     /**
-    * Initializes the buffer.
-    */
+     * Initializes the buffer.
+     */
     void init();
 
     //=========================================================================================================
     /**
-    * Adds a whole array at the end buffer.
-    *
-    * @param [in] uiChannel selected channel.
-    * @param [in] pArray pointer to an Array which should be append to the end.
-    * @param [in] size number of elements containing the array.
-    */
+     * Adds a whole array at the end buffer.
+     *
+     * @param [in] uiChannel selected channel.
+     * @param [in] pArray pointer to an Array which should be append to the end.
+     * @param [in] size number of elements containing the array.
+     */
     inline void push(unsigned int uiChannel, const _Tp* pArray, unsigned int size);
 
     //=========================================================================================================
     /**
-    * Adds an element at the end of the buffer.
-    *
-    * @param [in] uiChannel selected channel.
-    * @param [in] newElement pointer to an Array which should be append to the end.
-    */
+     * Adds an element at the end of the buffer.
+     *
+     * @param [in] uiChannel selected channel.
+     * @param [in] newElement pointer to an Array which should be append to the end.
+     */
     inline void push(unsigned int uiChannel, const _Tp& newElement);
 
     //=========================================================================================================
     /**
-    * Adds an element at the end of the buffer.
-    *
-    * @param [in] newElements vector which should be added to the channels.
-    */
+     * Adds an element at the end of the buffer.
+     *
+     * @param [in] newElements vector which should be added to the channels.
+     */
     inline void push(const QVector<_Tp>& newElements);
 
     //=========================================================================================================
     /**
-    * Returns the first element (first in first out).
-    *
-    * @return the first element
-    */
+     * Returns the first element (first in first out).
+     *
+     * @return the first element
+     */
     inline QVector<_Tp> pop();
 
     //=========================================================================================================
     /**
-    * Returns the first element (first in first out) of a specific channel.
-    *
-    * @param [in] uiChannel selected channel.
-    * @return the first element of the specific channel
-    */
+     * Returns the first element (first in first out) of a specific channel.
+     *
+     * @param [in] uiChannel selected channel.
+     * @return the first element of the specific channel
+     */
     inline _Tp pop(unsigned int uiChannel);
 
     //=========================================================================================================
     /**
-    * Returns the number of channels.
-    */
+     * Returns the number of channels.
+     */
     inline int numChannels();
 
 
     //=========================================================================================================
     /**
-    * Clears the buffer.
-    */
+     * Clears the buffer.
+     */
     void clear();
 
 private:

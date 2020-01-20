@@ -66,89 +66,89 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the ISensor.
-    */
+     * Destroys the ISensor.
+     */
     virtual ~ISensor() {}
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const = 0;
 
     //=========================================================================================================
     /**
-    * Initializes the plugin.
-    */
+     * Initializes the plugin.
+     */
     virtual void init() = 0;
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload() = 0;
 
     //=========================================================================================================
     /**
-    * Starts the ISensor.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return true if success, false otherwise
-    */
+     * Starts the ISensor.
+     * Pure virtual method inherited by IModule.
+     *
+     * @return true if success, false otherwise
+     */
     virtual bool start() = 0;
 
     //=========================================================================================================
     /**
-    * Stops the ISensor.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return true if success, false otherwise
-    */
+     * Stops the ISensor.
+     * Pure virtual method inherited by IModule.
+     *
+     * @return true if success, false otherwise
+     */
     virtual bool stop() = 0;
 
     //=========================================================================================================
     /**
-    * Returns the plugin type.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return type of the ISensor
-    */
+     * Returns the plugin type.
+     * Pure virtual method inherited by IModule.
+     *
+     * @return type of the ISensor
+     */
     virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**
-    * Returns the plugin name.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the name of the ISensor.
-    */
+     * Returns the plugin name.
+     * Pure virtual method inherited by IModule.
+     *
+     * @return the name of the ISensor.
+     */
     virtual QString getName() const = 0;
 
     //=========================================================================================================
     /**
-    * True if multi instantiation of plugin is allowed.
-    *
-    * @return true if multi instantiation of plugin is allowed.
-    */
+     * True if multi instantiation of plugin is allowed.
+     *
+     * @return true if multi instantiation of plugin is allowed.
+     */
     virtual inline bool multiInstanceAllowed() const;
 
     //=========================================================================================================
     /**
-    * Returns the set up widget for configuration of ISensor.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the setup widget.
-    */
+     * Returns the set up widget for configuration of ISensor.
+     * Pure virtual method inherited by IModule.
+     *
+     * @return the setup widget.
+     */
     virtual QWidget* setupWidget() = 0;
 
 protected:
 
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
+     */
     virtual void run() = 0;
 };
 

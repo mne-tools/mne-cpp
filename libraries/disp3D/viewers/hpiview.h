@@ -114,11 +114,11 @@ class DISP3DSHARED_EXPORT HpiView : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a HpiView object.
-    *
-    * @param[in] pFiffInfo      The FiffInfo.
-    * @param[in] parent         The parent widget.
-    */
+     * Constructs a HpiView object.
+     *
+     * @param[in] pFiffInfo      The FiffInfo.
+     * @param[in] parent         The parent widget.
+     */
     HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
             QWidget *parent = 0,
             Qt::WindowFlags f = Qt::Widget);
@@ -126,26 +126,26 @@ public:
 
     //=========================================================================================================
     /**
-    * Set the data needed for fitting.
-    *
-    * @param[in] matData  The data matrix
-    */
+     * Set the data needed for fitting.
+     *
+     * @param[in] matData  The data matrix
+     */
     void setData(const Eigen::MatrixXd& matData);
 
     //=========================================================================================================
     /**
-    * Get GOF per coil in mm.
-    *
-    * @return   The GOF vector
-    */
+     * Get GOF per coil in mm.
+     *
+     * @return   The GOF vector
+     */
     QVector<double> getGOF();
 
     //=========================================================================================================
     /**
-    * Returns if last fit was ok.
-    *
-    * @return   True if last fit was ok.
-    */
+     * Returns if last fit was ok.
+     *
+     * @return   True if last fit was ok.
+     */
     bool wasLastFitOk();
 
 protected:
@@ -153,95 +153,95 @@ protected:
 
     //=========================================================================================================
     /**
-    * Update the projectors for SSP and Comps.
-    */
+     * Update the projectors for SSP and Comps.
+     */
     void updateProjections();
 
     //=========================================================================================================
     /**
-    * Returns true if any digitizers were loaded that correspond to HPI coils.
-    *
-    * @return true  If any digitizers were loaded that correspond to HPI coils, false otherwise.
-    */
+     * Returns true if any digitizers were loaded that correspond to HPI coils.
+     *
+     * @return true  If any digitizers were loaded that correspond to HPI coils, false otherwise.
+     */
     bool hpiLoaded();
 
     //=========================================================================================================
     /**
-    * Read Polhemus data from fif file.
-    */
+     * Read Polhemus data from fif file.
+     */
     QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
 
     void alignFiducials(const QString& fileNameDigData);
 
     //=========================================================================================================
     /**
-    * Load a Polhemus file name.
-    *
-    * @param[in] fitResult  The fit result coming from the rt HPI class.
-    */
+     * Load a Polhemus file name.
+     *
+     * @param[in] fitResult  The fit result coming from the rt HPI class.
+     */
     void onNewFittingResultAvailable(const RTPROCESSINGLIB::FittingResult& fitResult);
 
     //=========================================================================================================
     /**
-    * Load a Polhemus file name.
-    */
+     * Load a Polhemus file name.
+     */
     void onBtnLoadPolhemusFile();
 
     //=========================================================================================================
     /**
-    * Load a Polhemus file name.
-    */
+     * Load a Polhemus file name.
+     */
     void onFreqsChanged();
 
     //=========================================================================================================
     /**
-    * Load a Polhemus file name.
-    */
+     * Load a Polhemus file name.
+     */
     void onDoContinousHPI();
 
     //=========================================================================================================
     /**
-    * The max distance value for continous HPI fitting changed.
-    */
+     * The max distance value for continous HPI fitting changed.
+     */
     void onContinousHPIMaxDistChanged();
 
     //=========================================================================================================
     /**
-    * Toggle SSP's and Comp's.
-    */
+     * Toggle SSP's and Comp's.
+     */
     void onSSPCompUsageChanged();
 
     //=========================================================================================================
     /**
-    * Perform a single HPI fit.
-    */
+     * Perform a single HPI fit.
+     */
     void onBtnDoSingleFit();
 
     //=========================================================================================================
     /**
-    * Updates the error related labels.
-    */
+     * Updates the error related labels.
+     */
     void updateErrorLabels();
 
     //=========================================================================================================
     /**
-    * Updates the transformation related labels.
-    */
+     * Updates the transformation related labels.
+     */
     void updateTransLabels();
 
     //=========================================================================================================
     /**
-    * Store the last fit which was ok.
-    *
-    * @param[in] devHeadTrans   The device to head transformation matrix to be stored.
-    * @param[in] fittedCoils    The fitted coils to be stored.
-    */
+     * Store the last fit which was ok.
+     *
+     * @param[in] devHeadTrans   The device to head transformation matrix to be stored.
+     * @param[in] fittedCoils    The fitted coils to be stored.
+     */
     void storeResults(const FIFFLIB::FiffCoordTrans& devHeadTrans, const FIFFLIB::FiffDigPointSet& fittedCoils);
 
     //=========================================================================================================
     /**
-    * Updates the digitizer and head models in the 3D view based on the current head/device transformation.
-    */
+     * Updates the digitizer and head models in the 3D view based on the current head/device transformation.
+     */
     void update3DView();
 
 //    //=========================================================================================================
@@ -283,10 +283,10 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user toggled the do HPI check box.
-    *
-    * @param[in] state    Whether to do continous HPI.
-    */
+     * Emit this signal whenever the user toggled the do HPI check box.
+     *
+     * @param[in] state    Whether to do continous HPI.
+     */
     void continousHPIToggled(bool state);
 };
 

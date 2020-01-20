@@ -96,8 +96,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a AbstractMetric object.
-    */
+     * Constructs a AbstractMetric object.
+     */
     explicit AbstractMetric();
 
     static bool     m_bStorageModeIsActive;

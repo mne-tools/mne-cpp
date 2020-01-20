@@ -98,55 +98,55 @@ class DISPSHARED_EXPORT FrequencySpectrumDelegate : public QAbstractItemDelegate
 public:
     //=========================================================================================================
     /**
-    * Creates a new abstract item delegate with the given parent.
-    *
-    * @param[in] parent     Parent of the delegate
-    */
+     * Creates a new abstract item delegate with the given parent.
+     *
+     * @param[in] parent     Parent of the delegate
+     */
     FrequencySpectrumDelegate(QTableView* m_pTableView,
                               QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Set scale type.
-    *
-    * @param [in] ScaleType.
-    */
+     * Set scale type.
+     *
+     * @param [in] ScaleType.
+     */
     void setScaleType(qint8 ScaleType);
 
     //=========================================================================================================
     /**
-    * Use the painter and style option to render the item specified by the item index.
-    *
-    * (sizeHint() must be implemented also)
-    *
-    * @param[in] painter    Low-level painting on widgets and other paint devices
-    * @param[in] option     Describes the parameters used to draw an item in a view widget
-    * @param[in] index      Used to locate data in a data model.
-    */
+     * Use the painter and style option to render the item specified by the item index.
+     *
+     * (sizeHint() must be implemented also)
+     *
+     * @param[in] painter    Low-level painting on widgets and other paint devices
+     * @param[in] option     Describes the parameters used to draw an item in a view widget
+     * @param[in] index      Used to locate data in a data model.
+     */
     virtual void paint(QPainter *painter,
                        const QStyleOptionViewItem &option,
                        const QModelIndex &index) const;
 
     //=========================================================================================================
     /**
-    * Item size
-    *
-    * @param[in] option     Describes the parameters used to draw an item in a view widget
-    * @param[in] index      Used to locate data in a data model.
-    */
+     * Item size
+     *
+     * @param[in] option     Describes the parameters used to draw an item in a view widget
+     * @param[in] index      Used to locate data in a data model.
+     */
     virtual QSize sizeHint(const QStyleOptionViewItem &option,
                            const QModelIndex &index) const;
 
     //=========================================================================================================
     /**
-    * Receive Mouse location
-    *
-    * @param[in] row    The select row of tableview
-    * @param[in] x      mouse x pos.
-    * @param[in] y      mouse y pos.
-    * @param[in] visRect      visual rect of row_tableview.
-    *
-    */
+     * Receive Mouse location
+     *
+     * @param[in] row    The select row of tableview
+     * @param[in] x      mouse x pos.
+     * @param[in] y      mouse y pos.
+     * @param[in] visRect      visual rect of row_tableview.
+     *
+     */
     void rcvMouseLoc(int row,
                      int x,
                      int y,
@@ -155,11 +155,11 @@ public:
 private:
     //=========================================================================================================
     /**
-    * CapturePoint capture one QPointer .
-    *
-    * @param[in]        index   QModelIndex for accessing associated data and model object.
-    * @param[in,out]    path    The QPointerPath to create for the data plot.
-    */
+     * CapturePoint capture one QPointer .
+     *
+     * @param[in]        index   QModelIndex for accessing associated data and model object.
+     * @param[in,out]    path    The QPointerPath to create for the data plot.
+     */
     void capturePoint(const QModelIndex &index,
                       const QStyleOptionViewItem &option,
                       QPainterPath& path,
@@ -168,11 +168,11 @@ private:
 
     //=========================================================================================================
     /**
-    * createPlotPath creates the QPointer path for the data plot.
-    *
-    * @param[in]        index   QModelIndex for accessing associated data and model object.
-    * @param[in,out]    path    The QPointerPath to create for the data plot.
-    */
+     * createPlotPath creates the QPointer path for the data plot.
+     *
+     * @param[in]        index   QModelIndex for accessing associated data and model object.
+     * @param[in,out]    path    The QPointerPath to create for the data plot.
+     */
     void createPlotPath(const QModelIndex &index,
                         const QStyleOptionViewItem &option,
                         QPainterPath& path,
@@ -180,11 +180,11 @@ private:
 
     //=========================================================================================================
     /**
-    * createGridPath Creates the QPointer path for the grid plot.
-    *
-    * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
-    * @param[in] data The row vector of the data matrix <1 x nsamples>.
-    */
+     * createGridPath Creates the QPointer path for the grid plot.
+     *
+     * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
+     * @param[in] data The row vector of the data matrix <1 x nsamples>.
+     */
     void createGridPath(const QModelIndex &index,
                         const QStyleOptionViewItem &option,
                         QPainterPath& path,
@@ -192,10 +192,10 @@ private:
 
     //=========================================================================================================
     /**
-    * createGridTick Creates x-axis tickes for the grid plot.
-    *
-    * Added by LImin Sun; 08.07/2014
-    */
+     * createGridTick Creates x-axis tickes for the grid plot.
+     *
+     * Added by LImin Sun; 08.07/2014
+     */
     void createGridTick(const QModelIndex &index,
                         const QStyleOptionViewItem &option,
                         QPainter *painter) const;

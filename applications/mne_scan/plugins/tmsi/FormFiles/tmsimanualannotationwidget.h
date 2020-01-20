@@ -80,25 +80,25 @@ class TMSIManualAnnotationWidget : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a TMSIManualAnnotationWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIManualAnnotationWidget becomes a window. If parent is another widget, TMSIManualAnnotationWidget becomes a child window inside parent. TMSIManualAnnotationWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
-    */
+     * Constructs a TMSIManualAnnotationWidget which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIManualAnnotationWidget becomes a window. If parent is another widget, TMSIManualAnnotationWidget becomes a child window inside parent. TMSIManualAnnotationWidget is deleted when its parent is deleted.
+     * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
+     */
     TMSIManualAnnotationWidget(TMSI* pTMSI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the TMSIManualAnnotationWidget.
-    * All TMSIManualAnnotationWidget's children are deleted first. The application exits if TMSIManualAnnotationWidget is the main widget.
-    */
+     * Destroys the TMSIManualAnnotationWidget.
+     * All TMSIManualAnnotationWidget's children are deleted first. The application exits if TMSIManualAnnotationWidget is the main widget.
+     */
     ~TMSIManualAnnotationWidget();
 
     //=========================================================================================================
     /**
-    * Initializes the Connector's GUI properties.
-    *
-    */
+     * Initializes the Connector's GUI properties.
+     *
+     */
     void initGui();
 
 private:

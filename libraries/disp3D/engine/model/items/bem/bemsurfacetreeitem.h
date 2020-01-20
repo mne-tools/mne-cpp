@@ -109,29 +109,29 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] p3DEntityParent    The parent 3D entity.
-    * @param[in] iType              The type of the item. See types.h for declaration and definition.
-    * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
-    */
+     * Default constructor.
+     *
+     * @param[in] p3DEntityParent    The parent 3D entity.
+     * @param[in] iType              The type of the item. See types.h for declaration and definition.
+     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+     */
     explicit BemSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent = 0,
                                 int iType = Data3DTreeModelItemTypes::BemSurfaceItem,
                                 const QString& text = "BEM Surface Item");
 
     //=========================================================================================================
     /**
-    * Adds BEM model data.
-    *
-    * @param[in] tBemSurface        The bem data.
-    */
+     * Adds BEM model data.
+     *
+     * @param[in] tBemSurface        The bem data.
+     */
     void addData(const MNELIB::MNEBemSurface &tBemSurface);
 
 protected:
     //=========================================================================================================
     /**
-    * AbstractTreeItem functions
-    */
+     * AbstractTreeItem functions
+     */
     virtual void initItem() override;
 };
 

@@ -85,8 +85,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs the Electric Current Dipole
-    */
+     * Constructs the Electric Current Dipole
+     */
     FwdEegSphereLayer();
 
 //    //=========================================================================================================
@@ -99,8 +99,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the Forward EEG Sphere Layer description
-    */
+     * Destroys the Forward EEG Sphere Layer description
+     */
     ~FwdEegSphereLayer();
 
 

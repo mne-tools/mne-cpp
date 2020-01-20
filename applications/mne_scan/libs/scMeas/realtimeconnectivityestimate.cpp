@@ -105,7 +105,7 @@ void RealTimeConnectivityEstimate::setValue(const Network& v)
     m_qMutex.lock();
 
     //Store
-    *m_pNetwork = v;
+     *m_pNetwork = v;
 
     m_bInitialized = true;
 

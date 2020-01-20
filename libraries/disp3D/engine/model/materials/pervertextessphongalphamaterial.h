@@ -102,30 +102,30 @@ class DISP3DSHARED_EXPORT PerVertexTessPhongAlphaMaterial : public AbstractPhong
 public:
     //=========================================================================================================
     /**
-    * Default constructor.
-    *
-    * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
-    * @param[in] parent             The parent of this class.
-    */
+     * Default constructor.
+     *
+     * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
+     * @param[in] parent             The parent of this class.
+     */
     explicit PerVertexTessPhongAlphaMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = nullptr);
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    */
+     * Default destructor.
+     */
     ~PerVertexTessPhongAlphaMaterial() = default;
 
 private:
     //=========================================================================================================
     /**
-    * Init the PerVertexTessPhongAlphaMaterial class.
-    */
+     * Init the PerVertexTessPhongAlphaMaterial class.
+     */
     void init() override;
 
     //=========================================================================================================
     /**
-    * Add the shader code to the material.
-    */
+     * Add the shader code to the material.
+     */
     void setShaderCode() override;
 
     QPointer<Qt3DRender::QParameter>                m_pInnerTessParameter;

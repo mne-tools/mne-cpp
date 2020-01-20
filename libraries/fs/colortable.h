@@ -85,38 +85,38 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     explicit Colortable();
 
     //=========================================================================================================
     /**
-    * Initializes colortable.
-    */
+     * Initializes colortable.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Ids encoded in the colortable
-    *
-    * @return ids
-    */
+     * Ids encoded in the colortable
+     *
+     * @return ids
+     */
     inline VectorXi getLabelIds() const;
 
     //=========================================================================================================
     /**
-    * Names encoded in the colortable
-    *
-    * @return ids
-    */
+     * Names encoded in the colortable
+     *
+     * @return ids
+     */
     inline QStringList getNames() const;
 
     //=========================================================================================================
     /**
-    * RGBAs encoded in the colortable
-    *
-    * @return RGBAs
-    */
+     * RGBAs encoded in the colortable
+     *
+     * @return RGBAs
+     */
     inline MatrixX4i getRGBAs() const;
 
 public:

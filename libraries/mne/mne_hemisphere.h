@@ -109,95 +109,95 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructors the hemisphere source space.
-    */
+     * Constructors the hemisphere source space.
+     */
     MNEHemisphere();
 
     //=========================================================================================================
     /**
-    * Copy constructor.
-    *
-    * @param[in] p_MNEHemisphere    Hemisphere source space which should be copied
-    */
+     * Copy constructor.
+     *
+     * @param[in] p_MNEHemisphere    Hemisphere source space which should be copied
+     */
     MNEHemisphere(const MNEHemisphere& p_MNEHemisphere);
 
     //=========================================================================================================
     /**
-    * Destroys the hemisphere source space.
-    */
+     * Destroys the hemisphere source space.
+     */
     ~MNEHemisphere();
 
     //=========================================================================================================
     /**
-    * Add vertex normals and neighbourhood information
-    *
-    * @param [in, out] p_pHemisphere   Hemisphere to be completed
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * Add vertex normals and neighbourhood information
+     *
+     * @param [in, out] p_pHemisphere   Hemisphere to be completed
+     *
+     * @return true if succeeded, false otherwise
+     */
     bool add_geometry_info();
 
     //=========================================================================================================
     /**
-    * Initializes the hemisphere source space.
-    */
+     * Initializes the hemisphere source space.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Qt 3d geometry information. Data are generated within first call.
-    *
-    * @param[in] p_fScaling  Scale factor of the returned geometry tri model.
-    *
-    * @return the geometry model
-    */
+     * Qt 3d geometry information. Data are generated within first call.
+     *
+     * @param[in] p_fScaling  Scale factor of the returned geometry tri model.
+     *
+     * @return the geometry model
+     */
     MatrixXf& getTriCoords(float p_fScaling = 1.0f);
 
     //=========================================================================================================
     /**
-    * is hemisphere clustered?
-    *
-    * @return true if hemisphere is clustered, false otherwise.
-    */
+     * is hemisphere clustered?
+     *
+     * @return true if hemisphere is clustered, false otherwise.
+     */
     inline bool isClustered() const;
 
     //=========================================================================================================
     /**
-    * mne_transform_source_space_to
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Definition of the mne_transform_source_space_to for a single hemisphere function
-    * Transform source space data to the desired coordinate system.
-    *
-    * @param[in] dest       The id of the destination coordinate system (FIFFV_COORD_...)
-    * @param[in] p_Trans    The coordinate transformation structure to use
-    *
-    * @return true if succeeded, false otherwise
-    */
+     * mne_transform_source_space_to
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Definition of the mne_transform_source_space_to for a single hemisphere function
+     * Transform source space data to the desired coordinate system.
+     *
+     * @param[in] dest       The id of the destination coordinate system (FIFFV_COORD_...)
+     * @param[in] p_Trans    The coordinate transformation structure to use
+     *
+     * @return true if succeeded, false otherwise
+     */
     bool transform_hemisphere_to(fiff_int_t dest, const FiffCoordTrans &p_Trans);
 
     //=========================================================================================================
     /**
-    * mne_python _write_one_source_space
-    *
-    * ### MNE toolbox root function ###
-    *
-    * Write the hemisphere to a FIF stream
-    *
-    * @param[in] p_pStream  The stream to write to.
-    */
+     * mne_python _write_one_source_space
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Write the hemisphere to a FIF stream
+     *
+     * @param[in] p_pStream  The stream to write to.
+     */
     void writeToStream(FiffStream* p_pStream);
 
     //ToDo write(IODevice &)
 
     /**
-    * Overloaded == operator to compare an object to this instance.
-    *
-    * @param[in] object    The object which should be compared to.
-    *
-    * @return true if equal, false otherwise
-    */
+     * Overloaded == operator to compare an object to this instance.
+     *
+     * @param[in] object    The object which should be compared to.
+     *
+     * @return true if equal, false otherwise
+     */
     friend bool operator== (const MNEHemisphere &a, const MNEHemisphere &b);
 
 public:

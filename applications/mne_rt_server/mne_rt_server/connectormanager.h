@@ -108,30 +108,30 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ConnectorManager with the given parent.
-    *
-    * @param[in] parent pointer to parent Object. (It's normally the default value.)
-    */
+     * Constructs a ConnectorManager with the given parent.
+     *
+     * @param[in] parent pointer to parent Object. (It's normally the default value.)
+     */
     ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ConnectorManager.
-    */
+     * Destroys the ConnectorManager.
+     */
     virtual ~ConnectorManager();
 
     //=========================================================================================================
     /**
-    * Connect connector manager to mne_rt_server commands
-    */
+     * Connect connector manager to mne_rt_server commands
+     */
     void connectCommands();
 
     //=========================================================================================================
     /**
-    * Loads plugins from given directory.
-    *
-    * @param dir the plugin directory.
-    */
+     * Loads plugins from given directory.
+     *
+     * @param dir the plugin directory.
+     */
     void loadConnectors(const QString& dir);
 
     static void clearConnectorActivation();
@@ -142,32 +142,32 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns vector containing active ISensor plugins.
-    *
-    * @return reference to vector containing active ISensor plugins.
-    */
+     * Returns vector containing active ISensor plugins.
+     *
+     * @return reference to vector containing active ISensor plugins.
+     */
     IConnector* getActiveConnector();
 
     //=========================================================================================================
     /**
-    * Returns vector containing all plugins.
-    *
-    * @return reference to vector containing all plugins.
-    */
+     * Returns vector containing all plugins.
+     *
+     * @return reference to vector containing all plugins.
+     */
     static inline const QVector<IConnector*>& getConnectors();
 
     //=========================================================================================================
     /**
-    * Prints a list of all connectors and their status
-    *
-    * @param[in] p_bFlagJSON    if true, function return JSON formatted (default = false)
-    */
+     * Prints a list of all connectors and their status
+     *
+     * @param[in] p_bFlagJSON    if true, function return JSON formatted (default = false)
+     */
     QByteArray getConnectorList(bool p_bFlagJSON = false) const;
 
     //=========================================================================================================
     /**
-    * ToDo
-    */
+     * ToDo
+     */
     QByteArray setActiveConnector(qint32 ID);
 
 signals:
@@ -181,34 +181,34 @@ private:
     //SLOTS
     //=========================================================================================================
     /**
-    * Sends the connector list
-    *
-    * @param[in] p_command  The connector list command.
-    */
+     * Sends the connector list
+     *
+     * @param[in] p_command  The connector list command.
+     */
     void comConlist(Command p_command);
 
     //=========================================================================================================
     /**
-    * Selects a connector
-    *
-    * @param[in] p_command  The select connector command.
-    */
+     * Selects a connector
+     *
+     * @param[in] p_command  The select connector command.
+     */
     void comSelcon(Command p_command);
 
     //=========================================================================================================
     /**
-    * Starts the Measurement
-    *
-    * @param[in] p_command  The start command.
-    */
+     * Starts the Measurement
+     *
+     * @param[in] p_command  The start command.
+     */
     void comStart(Command p_command);//comMeas
 
     //=========================================================================================================
     /**
-    * Stops all connectors
-    *
-    * @param[in] p_command  The stop all command.
-    */
+     * Stops all connectors
+     *
+     * @param[in] p_command  The stop all command.
+     */
     void comStopAll(Command p_command);
 
 

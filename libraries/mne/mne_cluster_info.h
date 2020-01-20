@@ -92,47 +92,47 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     MNEClusterInfo();
 
     //=========================================================================================================
     /**
-    * Initializes the cluster information.
-    */
+     * Initializes the cluster information.
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Returns true if MNE cluster information contains no data.
-    *
-    * @return true if MNE cluster information is empty.
-    */
+     * Returns true if MNE cluster information contains no data.
+     *
+     * @return true if MNE cluster information is empty.
+     */
     inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
-    * Returns the number of clusters
-    *
-    * @return number of clusters.
-    */
+     * Returns the number of clusters
+     *
+     * @return number of clusters.
+     */
     inline qint32 numClust() const;
 
     //=========================================================================================================
     /**
-    * Writes the cluster info to a file
-    *
-    * @param[in] p_sFileName    FileName to write to
-    */
+     * Writes the cluster info to a file
+     *
+     * @param[in] p_sFileName    FileName to write to
+     */
     void write(QString p_sFileName) const;
 
     /**
-    * Overloaded == operator to compare an object to this instance.
-    *
-    * @param[in] object    The object which should be compared to.
-    *
-    * @return true if equal, false otherwise
-    */
+     * Overloaded == operator to compare an object to this instance.
+     *
+     * @param[in] object    The object which should be compared to.
+     *
+     * @return true if equal, false otherwise
+     */
     friend bool operator== (const MNEClusterInfo &a, const MNEClusterInfo &b);
 
 public:

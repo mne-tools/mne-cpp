@@ -107,47 +107,47 @@ class SCDISPSHARED_EXPORT RealTimeSourceEstimateWidget : public MeasurementWidge
 public:
     //=========================================================================================================
     /**
-    * Constructs a RealTimeSourceEstimateWidget which is a child of parent.
-    *
-    * @param [in] pRTMSE        pointer to real-time multi sample array measurement.
-    * @param [in] pTime         pointer to application time.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
-    */
+     * Constructs a RealTimeSourceEstimateWidget which is a child of parent.
+     *
+     * @param [in] pRTMSE        pointer to real-time multi sample array measurement.
+     * @param [in] pTime         pointer to application time.
+     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+     */
     RealTimeSourceEstimateWidget(QSharedPointer<SCMEASLIB::RealTimeSourceEstimate> &pRTSE, QWidget* parent = 0);
 
 //    RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTMSE, QSharedPointer<QTime> pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeSourceEstimateWidget.
-    */
+     * Destroys the RealTimeSourceEstimateWidget.
+     */
     ~RealTimeSourceEstimateWidget();
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    */
+     * Is called when new data are available.
+     */
     virtual void getData();
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
-    *
-    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
-    */
+     * Is called when new data are available.
+     *
+     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+     */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeSourceEstimateWidget.
-    */
+     * Initialise the RealTimeSourceEstimateWidget.
+     */
     virtual void init();
 
 protected:
     //=========================================================================================================
     /**
-    * Shows quick control view
-    */
+     * Shows quick control view
+     */
     void showQuickControlView();
 
     QSharedPointer<SCMEASLIB::RealTimeSourceEstimate>   m_pRTSE;                /**< The real-time source estimate measurement. */

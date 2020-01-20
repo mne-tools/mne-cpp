@@ -156,8 +156,8 @@ MneCTFCompData::~MneCTFCompData()
 
 int MneCTFCompData::mne_calibrate_ctf_comp(MneCTFCompData *one, fiffChInfo chs, int nch, int do_it)
 /*
-    * Calibrate or decalibrate a compensation data set
-    */
+     * Calibrate or decalibrate a compensation data set
+     */
 {
     float *col_cals,*row_cals;
     int   j,k,p,found;

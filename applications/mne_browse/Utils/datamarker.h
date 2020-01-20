@@ -77,43 +77,43 @@ class DataMarker : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a DataMarker dialog which is a child of parent
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DataMarker becomes a window. If parent is another widget, DataMarker becomes a child window inside parent. DataWindow is deleted when its parent is deleted.
-    */
+     * Constructs a DataMarker dialog which is a child of parent
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new DataMarker becomes a window. If parent is another widget, DataMarker becomes a child window inside parent. DataWindow is deleted when its parent is deleted.
+     */
     DataMarker(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * set the m_movementBoundary
-    *
-    * @param [in] QRect Hols the bounding rect
-    */
+     * set the m_movementBoundary
+     *
+     * @param [in] QRect Hols the bounding rect
+     */
     void setMovementBoundary(QRegion rect);
 
 private:
     //=========================================================================================================
     /**
-    * Reimplemnted mouse press event handler
-    */
+     * Reimplemnted mouse press event handler
+     */
     void mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
-    * Reimplemnted mouse move event handler
-    */
+     * Reimplemnted mouse move event handler
+     */
     void mouseMoveEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
-    * Reimplemnted enter event handler
-    */
+     * Reimplemnted enter event handler
+     */
     void enterEvent(QEvent *event);
 
     //=========================================================================================================
     /**
-    * Reimplemnted move event handler
-    */
+     * Reimplemnted move event handler
+     */
     void moveEvent(QMoveEvent *event);
 
     QPoint      m_oldPos;               /**< The old mouse position */
@@ -125,8 +125,8 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * markerMoved is emmitted whenever the data marker was moved
-    */
+     * markerMoved is emmitted whenever the data marker was moved
+     */
     void markerMoved();
 };
 

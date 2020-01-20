@@ -112,18 +112,18 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FilterSettingsView which is a child of parent.
-    *
-    * @param [in] parent        parent of widget
-    */
+     * Constructs a FilterSettingsView which is a child of parent.
+     *
+     * @param [in] parent        parent of widget
+     */
     FilterSettingsView(const QString& sSettingsPath = "",
                        QWidget *parent = 0,
                        Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterSettingsView.
-    */
+     * Destroys the FilterSettingsView.
+     */
     ~FilterSettingsView();
 
     QSharedPointer<FilterDesignView> getFilterView();
@@ -133,30 +133,30 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Show the filter option screen to the user.
-    */
+     * Show the filter option screen to the user.
+     */
     void onShowFilterView();
 
     //=========================================================================================================
     /**
-    * Whenever the filter activation changed
-    */
+     * Whenever the filter activation changed
+     */
     void onFilterActivationChanged();
 
     QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */

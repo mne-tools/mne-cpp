@@ -385,30 +385,30 @@ int FwdCompData::fwd_comp_field_grad(float *rd, float *Q, FwdCoilSet* coils, flo
         return FAIL;
     }
     /*
-    * First compute the field in the primary set of coils
-    */
+     * First compute the field in the primary set of coils
+     */
     if (comp->field_grad(rd,Q,coils,res,xgrad,ygrad,zgrad,comp->client) == FAIL)
         return FAIL;
     /*
-    * Compensation needed?
-    */
+     * Compensation needed?
+     */
     if (!comp->comp_coils || comp->comp_coils->ncoil <= 0 || !comp->set || !comp->set->current)
         return OK;
     /*
-    * Workspace needed?
-    */
+     * Workspace needed?
+     */
     if (!comp->work)
         comp->work = MALLOC_60(comp->comp_coils->ncoil,float);
     if (!comp->vec_work)
         comp->vec_work = ALLOC_CMATRIX_60(3,comp->comp_coils->ncoil);
     /*
-    * Compute the field in the compensation coils
-    */
+     * Compute the field in the compensation coils
+     */
     if (comp->field_grad(rd,Q,comp->comp_coils,comp->work,comp->vec_work[0],comp->vec_work[1],comp->vec_work[2],comp->client) == FAIL)
         return FAIL;
     /*
-    * Compute the compensated field
-    */
+     * Compute the compensated field
+     */
     if (MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil) != OK)
         return FAIL;
     if (MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,xgrad,coils->ncoil,comp->vec_work[0],comp->comp_coils->ncoil) != OK)

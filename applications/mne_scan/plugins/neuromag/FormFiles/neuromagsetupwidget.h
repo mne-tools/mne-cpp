@@ -84,24 +84,24 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a NeuromagSetupWidget which is a child of parent.
-    *
-    * @param [in] p_pNeuromag   a pointer to the corresponding Neuromag.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new NeuromagSetupWidget becomes a window. If parent is another widget, NeuromagSetupWidget becomes a child window inside parent. NeuromagSetupWidget is deleted when its parent is deleted.
-    */
+     * Constructs a NeuromagSetupWidget which is a child of parent.
+     *
+     * @param [in] p_pNeuromag   a pointer to the corresponding Neuromag.
+     * @param [in] parent        pointer to parent widget; If parent is 0, the new NeuromagSetupWidget becomes a window. If parent is another widget, NeuromagSetupWidget becomes a child window inside parent. NeuromagSetupWidget is deleted when its parent is deleted.
+     */
     NeuromagSetupWidget(Neuromag* p_pNeuromag, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the NeuromagSetupWidget.
-    * All NeuromagSetupWidget's children are deleted first. The application exits if NeuromagSetupWidget is the main widget.
-    */
+     * Destroys the NeuromagSetupWidget.
+     * All NeuromagSetupWidget's children are deleted first. The application exits if NeuromagSetupWidget is the main widget.
+     */
     ~NeuromagSetupWidget();
 
     //=========================================================================================================
     /**
-    * Inits the setup widget
-    */
+     * Inits the setup widget
+     */
     void init();
 
     void bufferSizeEdited();            /**< Buffer size edited and set new buffer size.*/
@@ -117,17 +117,17 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Set command connection status
-    *
-    * @param[in] p_bConnectionStatus    the connection status
-    */
+     * Set command connection status
+     *
+     * @param[in] p_bConnectionStatus    the connection status
+     */
     void cmdConnectionChanged(bool p_bConnectionStatus);
 
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     *
+     */
     void showAboutDialog();
 
     Neuromag*                       m_pNeuromag;    /**< a pointer to corresponding mne rt client.*/

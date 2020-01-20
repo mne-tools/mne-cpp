@@ -116,32 +116,32 @@ class COVARIANCESHARED_EXPORT Covariance : public SCSHAREDLIB::IAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Constructs a Covariance.
-    */
+     * Constructs a Covariance.
+     */
     Covariance();
 
     //=========================================================================================================
     /**
-    * Destroys the Covariance.
-    */
+     * Destroys the Covariance.
+     */
     ~Covariance();
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
-    */
+     * Initialise input and output connectors.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     virtual bool start();

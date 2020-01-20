@@ -102,49 +102,49 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a OrbitalCameraController object.
-    */
+     * Constructs a OrbitalCameraController object.
+     */
     OrbitalCameraController(Qt3DCore::QNode *pParent = nullptr);
 
     //=========================================================================================================
     /**
-    * Default destructor.
-    */
+     * Default destructor.
+     */
     ~OrbitalCameraController() = default;
 
     //=========================================================================================================
     /**
-    * Turns invers rotation of the camera on and off.
-    *
-    * @param[in] newStatusFlag      The new status of the inversion
-    */
+     * Turns invers rotation of the camera on and off.
+     *
+     * @param[in] newStatusFlag      The new status of the inversion
+     */
     void invertCameraRotation(bool newStatusFlag);
 
 private:
     //=========================================================================================================
     /**
-    * QAbstractCameraController function:
-    *
-    * This method is called whenever a frame action is triggered.
-    * It does implement the camera movement specific to this controller.
-    */
+     * QAbstractCameraController function:
+     *
+     * This method is called whenever a frame action is triggered.
+     * It does implement the camera movement specific to this controller.
+     */
     void moveCamera(const QAbstractCameraController::InputState &state, float dt) override;
 
     //=========================================================================================================
     /**
-    * Initialzes OrbitalCameraController object.
-    */
+     * Initialzes OrbitalCameraController object.
+     */
     void initController();
 
     //=========================================================================================================
     /**
-    * Calcultes the distance between 2 points.
-    *
-    * @param[in] firstPoint     The first point.
-    * @param[in] secondPoint    The second point.
-    *
-    * @returns the distance between the 2 points.
-    */
+     * Calcultes the distance between 2 points.
+     *
+     * @param[in] firstPoint     The first point.
+     * @param[in] secondPoint    The second point.
+     *
+     * @returns the distance between the 2 points.
+     */
     inline float distance(const QVector3D &firstPoint, const QVector3D &secondPoint) const;
 
     float m_rotationInversFactor = 1.0f;             /**< The factor used to invers the camera rotation. */

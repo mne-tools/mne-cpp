@@ -88,136 +88,136 @@ class DataWindow : public QWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a DataWindow dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DataWindow becomes a window. If parent is another widget, DataWindow becomes a child window inside parent. DataWindow is deleted when its parent is deleted.
-    */
+     * Constructs a DataWindow dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new DataWindow becomes a window. If parent is another widget, DataWindow becomes a child window inside parent. DataWindow is deleted when its parent is deleted.
+     */
     DataWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DataWindow.
-    * All DataWindow's children are deleted first. The application exits if DataWindow is the main widget.
-    */
+     * Destroys the DataWindow.
+     * All DataWindow's children are deleted first. The application exits if DataWindow is the main widget.
+     */
     ~DataWindow();
 
     //=========================================================================================================
     /**
-    * Initialises this window.
-    */
+     * Initialises this window.
+     */
     void init();
 
     //=========================================================================================================
     /**
-    * Setup the model view controller of the data window
-    */
+     * Setup the model view controller of the data window
+     */
     void initMVCSettings();
 
     //=========================================================================================================
     /**
-    * Returns the data QTableView of this window
-    */
+     * Returns the data QTableView of this window
+     */
     QTableView* getDataTableView();
 
     //=========================================================================================================
     /**
-    * Returns the undocked data QTableView of this window
-    */
+     * Returns the undocked data QTableView of this window
+     */
     QTableView* getUndockedDataTableView();
 
     //=========================================================================================================
     /**
-    * Returns the RawModel of this window
-    */
+     * Returns the RawModel of this window
+     */
     RawModel* getDataModel();
 
     //=========================================================================================================
     /**
-    * Returns the RawModel of this window
-    */
+     * Returns the RawModel of this window
+     */
     RawDelegate* getDataDelegate();
 
     //=========================================================================================================
     /**
-    * Scales the data according to scaleMap
-    *
-    * @param [in] scaleMap map with all channel types and their current scaling value
-    */
+     * Scales the data according to scaleMap
+     *
+     * @param [in] scaleMap map with all channel types and their current scaling value
+     */
     void scaleData(const QMap<QString,double> &scaleMap);
 
     //=========================================================================================================
     /**
-    * Updates the data table views
-    */
+     * Updates the data table views
+     */
     void updateDataTableViews();
 
     //=========================================================================================================
     /**
-    * Only shows the channels defined in the QStringList selectedChannels
-    *
-    * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
-    */
+     * Only shows the channels defined in the QStringList selectedChannels
+     *
+     * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
+     */
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
     //=========================================================================================================
     /**
-    * Change the channel plot height in the data views to the double value heigt
-    */
+     * Change the channel plot height in the data views to the double value heigt
+     */
     void changeRowHeight(int height);
 
     //=========================================================================================================
     /**
-    * hide all bad channels
-    */
+     * hide all bad channels
+     */
     void hideBadChannels(bool hideChannels);
 
 private:
     //=========================================================================================================
     /**
-    * Setup the tool bar of the data window.
-    */
+     * Setup the tool bar of the data window.
+     */
     void initToolBar();
 
     //=========================================================================================================
     /**
-    * Setup the sample labels of the data window
-    */
+     * Setup the sample labels of the data window
+     */
     void initLabels();
 
     //=========================================================================================================
     /**
-    * Setup the marker of the data window
-    */
+     * Setup the marker of the data window
+     */
     void initMarker();
 
     //=========================================================================================================
     /**
-    * resizeEvent reimplemented virtual function to handle resize events of the data dock window
-    */
+     * resizeEvent reimplemented virtual function to handle resize events of the data dock window
+     */
     void resizeEvent(QResizeEvent* event);
 
     //=========================================================================================================
     /**
-    * keyPressEvent reimplemented virtual function to handle key press events of the data dock window
-    */
+     * keyPressEvent reimplemented virtual function to handle key press events of the data dock window
+     */
     void keyPressEvent(QKeyEvent* event);
 
     //=========================================================================================================
     /**
-    * Installed event filter.
-    */
+     * Installed event filter.
+     */
     bool eventFilter(QObject *object, QEvent *event);
 
     //=========================================================================================================
     /**
-    * gestureEvent processes gesture events
-    */
+     * gestureEvent processes gesture events
+     */
     bool gestureEvent(QGestureEvent *event);
 
     //=========================================================================================================
     /**
-    * pinchTriggered processes pinch gesture events
-    */
+     * pinchTriggered processes pinch gesture events
+     */
     bool pinchTriggered(QPinchGesture *gesture);
 
     Ui::DataWindowDockWidget *ui;                   /**< Pointer to the qt designer generated ui class.*/
@@ -242,40 +242,40 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * scaleChannels gets called whenever the user performed a scaling gesture (pinch)
-    */
+     * scaleChannels gets called whenever the user performed a scaling gesture (pinch)
+     */
     void scaleChannels(double);
 
 protected slots:
     //=========================================================================================================
     /**
-    * @brief customContextMenuRequested
-    * @param pos is the position, where the right-click occurred
-    */
+     * @brief customContextMenuRequested
+     * @param pos is the position, where the right-click occurred
+     */
     void customContextMenuRequested(QPoint pos);
 
     //=========================================================================================================
     /**
-    * Set the range sample labels of the data window
-    */
+     * Set the range sample labels of the data window
+     */
     void setRangeSampleLabels();
 
     //=========================================================================================================
     /**
-    * Set the sample labels of the data window
-    */
+     * Set the sample labels of the data window
+     */
     void setMarkerSampleLabel();
 
     //=========================================================================================================
     /**
-    * Updates the marker position
-    */
+     * Updates the marker position
+     */
     void updateMarkerPosition();
 
     //=========================================================================================================
     /**
-    * Highlights the current selected channels in the 2D plot of selection manager
-    */
+     * Highlights the current selected channels in the 2D plot of selection manager
+     */
     void highlightChannelsInSelectionManager();
 };
 

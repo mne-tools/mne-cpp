@@ -108,9 +108,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Reimplemented virtual functions
-    *
-    */
+     * Reimplemented virtual functions
+     *
+     */
     virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
@@ -122,26 +122,26 @@ public:
 
     //=========================================================================================================
     /**
-    * loadEvokedData loads the fiff evoked data file
-    *
-    * @param p_IODevice fiff data evoked file to read from
-    */
+     * loadEvokedData loads the fiff evoked data file
+     *
+     * @param p_IODevice fiff data evoked file to read from
+     */
     bool loadEvokedData(QFile& qFile);
 
     //=========================================================================================================
     /**
-    * saveEvokedData saves the fiff evoked data file
-    *
-    * @param p_IODevice fiff data evoked file to save to
-    */
+     * saveEvokedData saves the fiff evoked data file
+     *
+     * @param p_IODevice fiff data evoked file to save to
+     */
     bool saveEvokedData(QFile& qFile);
 
     //=========================================================================================================
     /**
-    * getFiffInfo returns the fiff info
-    *
-    * @param FiffInfo of the evoked file
-    */
+     * getFiffInfo returns the fiff info
+     *
+     * @param FiffInfo of the evoked file
+     */
     const FiffInfo getFiffInfo();
 
     bool                        m_bFileloaded;          /**< true when a Fiff evoked file is loaded. */
@@ -152,15 +152,15 @@ protected:
 
     //=========================================================================================================
     /**
-    * clearModel clears all model's members
-    */
+     * clearModel clears all model's members
+     */
     void clearModel();
 
 signals:
     //=========================================================================================================
     /**
-    * fileLoaded is emitted whenever a file was (tried) to be loaded
-    */
+     * fileLoaded is emitted whenever a file was (tried) to be loaded
+     */
     void fileLoaded(bool);
 };
 

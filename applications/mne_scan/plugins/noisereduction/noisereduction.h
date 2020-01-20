@@ -133,20 +133,20 @@ class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public IAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Constructs a NoiseReduction.
-    */
+     * Constructs a NoiseReduction.
+     */
     NoiseReduction();
 
     //=========================================================================================================
     /**
-    * Destroys the NoiseReduction.
-    */
+     * Destroys the NoiseReduction.
+     */
     ~NoiseReduction();
 
     //=========================================================================================================
     /**
-    * IAlgorithm functions
-    */
+     * IAlgorithm functions
+     */
     virtual QSharedPointer<IPlugin> clone() const;
     virtual void init();
     virtual void unload();
@@ -158,28 +158,28 @@ public:
 
     //=========================================================================================================
     /**
-    * Udates the pugin with new (incoming) data.
-    *
-    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
-    */
+     * Udates the pugin with new (incoming) data.
+     *
+     * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
+     */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Set the active flag for SPHARA processing.
-    *
-    * @param[in] state    The new activity flag.
-    */
+     * Set the active flag for SPHARA processing.
+     *
+     * @param[in] state    The new activity flag.
+     */
     void setSpharaActive(bool state);
 
     //=========================================================================================================
     /**
-    * Set the number of base functions and acquisition system for SPHARA processing.
-    *
-    * @param[in] sSytemType         The acquisition system.
-    * @param[in] nBaseFctsGrad      The number of grad/mag base functions to keep.
-    * @param[in] nBaseFctsMag       The number of grad/mag base functions to keep.
-    */
+     * Set the number of base functions and acquisition system for SPHARA processing.
+     *
+     * @param[in] sSytemType         The acquisition system.
+     * @param[in] nBaseFctsGrad      The number of grad/mag base functions to keep.
+     * @param[in] nBaseFctsMag       The number of grad/mag base functions to keep.
+     */
     void setSpharaOptions(const QString& sSytemType,
                           int nBaseFctsFirst,
                           int nBaseFctsSecond);
@@ -187,58 +187,58 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Update the SSP projection
-    */
+     * Update the SSP projection
+     */
     void updateProjection(const QList<FIFFLIB::FiffProj>& projs);
 
     //=========================================================================================================
     /**
-    * Update the compensator
-    *
-    * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
-    */
+     * Update the compensator
+     *
+     * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+     */
     void updateCompensator(int to);
 
     //=========================================================================================================
     /**
-    * Sets the type of channel which are to be filtered
-    *
-    * @param[in] sType    the channel type which is to be filtered (EEG, MEG, All)
-    */
+     * Sets the type of channel which are to be filtered
+     *
+     * @param[in] sType    the channel type which is to be filtered (EEG, MEG, All)
+     */
     void setFilterChannelType(QString sType);
 
     //=========================================================================================================
     /**
-    * Filter parameters changed
-    *
-    * @param[in] filterData    currently active filter
-    */
+     * Filter parameters changed
+     *
+     * @param[in] filterData    currently active filter
+     */
     void setFilter(const UTILSLIB::FilterData& filterData);
 
     //=========================================================================================================
     /**
-    * Filter avtivated
-    *
-    * @param[in] state    filter on/off flag
-    */
+     * Filter avtivated
+     *
+     * @param[in] state    filter on/off flag
+     */
     void setFilterActive(bool state);
 
     //=========================================================================================================
     /**
-    * Init the SPHARA method.
-    */
+     * Init the SPHARA method.
+     */
     void initSphara();
 
     //=========================================================================================================
     /**
-    * Create/Update the SPHARA projection operator.
-    */
+     * Create/Update the SPHARA projection operator.
+     */
     void createSpharaOperator();
 
     //=========================================================================================================
     /**
-    * IAlgorithm function
-    */
+     * IAlgorithm function
+     */
     virtual void run();
 
 private:

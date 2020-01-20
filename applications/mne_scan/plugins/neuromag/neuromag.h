@@ -140,72 +140,72 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a Neuromag.
-    */
+     * Constructs a Neuromag.
+     */
     Neuromag();
 
     //=========================================================================================================
     /**
-    * Destroys the Neuromag.
-    */
+     * Destroys the Neuromag.
+     */
     virtual ~Neuromag();
 
     //=========================================================================================================
     /**
-    * Clears the rt server
-    */
+     * Clears the rt server
+     */
     void clear();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Initialise the Neuromag.
-    */
+     * Initialise the Neuromag.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();    
 
     //=========================================================================================================
     /**
-    * Shows the project dialog/window.
-    */
+     * Shows the project dialog/window.
+     */
     void showProjectDialog();
 
     //=========================================================================================================
     /**
-    * Determines current file. And starts a new one.
-    */
+     * Determines current file. And starts a new one.
+     */
     void splitRecordingFile();
 
     //=========================================================================================================
     /**
-    * Starts or stops a file recording depending on the current recording state.
-    */
+     * Starts or stops a file recording depending on the current recording state.
+     */
     void toggleRecordingFile();
 
     //=========================================================================================================
     /**
-    * Set the recording time in seconds.
-    *
-    * @param[in] time   the new recording time.
-    */
+     * Set the recording time in seconds.
+     *
+     * @param[in] time   the new recording time.
+     */
     void setRecordingTimerChanged(int timeMSecs);
 
     //=========================================================================================================
     /**
-    * Set the recording time active flag.
-    *
-    * @param[in] state   whether the recording should be used or not.
-    */
+     * Set the recording time active flag.
+     *
+     * @param[in] state   whether the recording should be used or not.
+     */
     void setRecordingTimerStateChanged(bool state);
 
     virtual bool start();
@@ -220,28 +220,28 @@ public:
 
     //=========================================================================================================
     /**
-    * Change connector
-    *
-    * @param[in] p_iNewConnectorId      new connector ID
-    */
+     * Change connector
+     *
+     * @param[in] p_iNewConnectorId      new connector ID
+     */
     void changeConnector(qint32 p_iNewConnectorId);
 
     //=========================================================================================================
     /**
-    * Connects the cmd client.
-    */
+     * Connects the cmd client.
+     */
     void connectCmdClient();
 
     //=========================================================================================================
     /**
-    * Disconnects the cmd client.
-    */
+     * Disconnects the cmd client.
+     */
     void disconnectCmdClient();
 
     //=========================================================================================================
     /**
-    * Request FiffInfo using cmd client and producer (data client)
-    */
+     * Request FiffInfo using cmd client and producer (data client)
+     */
     void requestInfo();
 
 protected:
@@ -249,42 +249,42 @@ protected:
 
     //=========================================================================================================
     /**
-    * Calibrate matrix.
-    *
-    * @param[out] data  the data matrix
-    */
+     * Calibrate matrix.
+     *
+     * @param[out] data  the data matrix
+     */
     Eigen::MatrixXd calibrate(const Eigen::MatrixXf& data);
 
     //=========================================================================================================
     /**
-    * change recording button.
-    */
+     * change recording button.
+     */
     void changeRecordingButton();
 
     //=========================================================================================================
     /**
-    * This function sends the current remaining recording time to the project window.
-    */
+     * This function sends the current remaining recording time to the project window.
+     */
     void onRecordingRemainingTimeChange();
 
     //=========================================================================================================
     /**
-    * Initialises the output connector.
-    */
+     * Initialises the output connector.
+     */
     void initConnector();
 
     //=========================================================================================================
     /**
-    * Set HPI fiff information.
-    */
+     * Set HPI fiff information.
+     */
     void showHPIDialog();
 
     //=========================================================================================================
     /**
-    * Sends the current data block to the HPI dialog.
-    *
-    * @param [in] matData   The new data block.
-    */
+     * Sends the current data block to the HPI dialog.
+     *
+     * @param [in] matData   The new data block.
+     */
     void updateHPI(const Eigen::MatrixXf &matData);
 
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA_Neuromag;          /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
@@ -339,16 +339,16 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Emitted when command clients connection status changed
-    *
-    * @param[in] p_bStatus  connection status
-    */
+     * Emitted when command clients connection status changed
+     *
+     * @param[in] p_bStatus  connection status
+     */
     void cmdConnectionChanged(bool p_bStatus);
 
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
-    */
+     * Emitted when fiffInfo is available
+     */
     void fiffInfoAvailable();
 
 };

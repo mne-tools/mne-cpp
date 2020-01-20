@@ -375,8 +375,8 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         //    printf("Wrote guess locations to %s\n",guess_save_name);
     }
     /*
-    * Transform the guess locations to the appropriate coordinate frame
-    */
+     * Transform the guess locations to the appropriate coordinate frame
+     */
     if (MneSurfaceOrVolume::mne_transform_source_spaces_to(f->coord_frame,f->mri_head_t,&guesses,1) != OK)
         goto bad;
     printf("Guess locations are now in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(f->coord_frame));

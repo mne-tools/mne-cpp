@@ -96,60 +96,60 @@ public:
 
     //=========================================================================================================
     /**
-    * Calculates the TPS Warp of given setup
-    *
-    * @param[in]  sLm      3D Landmarks of the source geometry
-    * @param[in]  dLm      3D Landmarks of the destination geometry
-    * @param[in]  sVert    Vertices of the source geometry
-    *
-    * @return wVert   Vertices of the warped destination geometry
-    */
+     * Calculates the TPS Warp of given setup
+     *
+     * @param[in]  sLm      3D Landmarks of the source geometry
+     * @param[in]  dLm      3D Landmarks of the destination geometry
+     * @param[in]  sVert    Vertices of the source geometry
+     *
+     * @return wVert   Vertices of the warped destination geometry
+     */
     MatrixXf calculate(const MatrixXf & sLm, const MatrixXf &dLm, const MatrixXf & sVert);
 
     //=========================================================================================================
     /**
-    * Calculates the TPS Warp of a given setup for a List of vertices
-    *
-    * @param[in]  sLm       3D Landmarks of the source geometry
-    * @param[in]  dLm       3D Landmarks of the destination geometry
-    * @param[in/out] vertList  List of Vertices of the source geometry that are warped to the destination
-    */
+     * Calculates the TPS Warp of a given setup for a List of vertices
+     *
+     * @param[in]  sLm       3D Landmarks of the source geometry
+     * @param[in]  dLm       3D Landmarks of the destination geometry
+     * @param[in/out] vertList  List of Vertices of the source geometry that are warped to the destination
+     */
     void calculate(const MatrixXf & sLm, const MatrixXf &dLm, QList<MatrixXf> & vertList);
 
     //=========================================================================================================
     /**
-    * Read electrode positions from MRI Database
-    *
-    * @param[in]  electrodeFileName    .txt file of electrodes
-    *
-    * @return electrodes   Matrix with electrode positions
-    */
+     * Read electrode positions from MRI Database
+     *
+     * @param[in]  electrodeFileName    .txt file of electrodes
+     *
+     * @return electrodes   Matrix with electrode positions
+     */
     MatrixXf readsLm(const QString &electrodeFileName);
 
 private:
 
     //=========================================================================================================
     /**
-    * Calculate the weighting parameters.
-    *
-    * @param[in]  sLm      3D Landmarks of the source geometry
-    * @param[in]  dLm      3D Landmarks of the destination geometry
-    * @param[out] warpWeight Weighting parameters of the tps warp
-    * @param[out] polWeight  Weighting papameters of the polynomial warp
-    */
+     * Calculate the weighting parameters.
+     *
+     * @param[in]  sLm      3D Landmarks of the source geometry
+     * @param[in]  dLm      3D Landmarks of the destination geometry
+     * @param[out] warpWeight Weighting parameters of the tps warp
+     * @param[out] polWeight  Weighting papameters of the polynomial warp
+     */
     bool calcWeighting(const MatrixXf& sLm, const MatrixXf &dLm, MatrixXf& warpWeight, MatrixXf& polWeight);
 
     //=========================================================================================================
     /**
-    * Warp the Vertices of the source geometry
-    *
-    * @param[in]  sVert    Vertices of the source geometry
-    * @param[in]  sLm      3D Landmarks of the source geometry
-    * @param[in]  warpWeight Weighting parameters of the tps warp
-    * @param[in]  polWeight  Weighting papameters of the polynomial warp
-    *
-    * @return Warped Vertices
-    */
+     * Warp the Vertices of the source geometry
+     *
+     * @param[in]  sVert    Vertices of the source geometry
+     * @param[in]  sLm      3D Landmarks of the source geometry
+     * @param[in]  warpWeight Weighting parameters of the tps warp
+     * @param[in]  polWeight  Weighting papameters of the polynomial warp
+     *
+     * @return Warped Vertices
+     */
     MatrixXf warpVertices(const MatrixXf & sVert, const MatrixXf & sLm, const MatrixXf& warpWeight, const MatrixXf& polWeight);
 
 };

@@ -104,19 +104,19 @@ class RTPROCESINGSHARED_EXPORT RtInvOpWorker : public QObject
 public:
     //=========================================================================================================
     /**
-    * Perform actual inverse operator creation.
-    *
-    * @param[in] inputData  Data to estimate the inverser operator from.
-    */
+     * Perform actual inverse operator creation.
+     *
+     * @param[in] inputData  Data to estimate the inverser operator from.
+     */
     void doWork(const RtInvOpInput &inputData);
 
 signals:
     //=========================================================================================================
     /**
-    * Wmit this signal whenver a new inverser operator was estimated.
-    *
-    * @param[in] invOp  The final inverser operator estimation.
-    */
+     * Wmit this signal whenver a new inverser operator was estimated.
+     *
+     * @param[in] invOp  The final inverser operator estimation.
+     */
     void resultReady(const MNELIB::MNEInverseOperator& invOp);
 };
 
@@ -135,47 +135,47 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates the real-time inverse operator estimation object
-    *
-    * @param[in] p_pFiffInfo    Fiff measurement info
-    * @param[in] p_pFwd         Forward solution
-    * @param[in] parent         Parent QObject (optional)
-    */
+     * Creates the real-time inverse operator estimation object
+     *
+     * @param[in] p_pFiffInfo    Fiff measurement info
+     * @param[in] p_pFwd         Forward solution
+     * @param[in] parent         Parent QObject (optional)
+     */
     explicit RtInvOp(QSharedPointer<FIFFLIB::FiffInfo> &p_pFiffInfo,
                      QSharedPointer<MNELIB::MNEForwardSolution> &p_pFwd,
                      QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the inverse operator estimation object.
-    */
+     * Destroys the inverse operator estimation object.
+     */
     ~RtInvOp();
 
     //=========================================================================================================
     /**
-    * Slot to receive incoming noise covariance estimations.
-    *
-    * @param[in] noiseCov     Noise covariance estimation
-    */
+     * Slot to receive incoming noise covariance estimations.
+     *
+     * @param[in] noiseCov     Noise covariance estimation
+     */
     void append(const FIFFLIB::FiffCov &noiseCov);
 
     //=========================================================================================================
     /**
-    * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
-    */
+     * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+     */
     void restart();
 
     //=========================================================================================================
     /**
-    * Stops the thread by interrupting its computation queue, quitting and waiting.
-    */
+     * Stops the thread by interrupting its computation queue, quitting and waiting.
+     */
     void stop();
 
 protected:
     //=========================================================================================================
     /**
-    * Handles the result
-    */
+     * Handles the result
+     */
     void handleResults(const MNELIB::MNEInverseOperator& invOp);
 
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The fiff measurement information. */
@@ -186,18 +186,18 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Signal which is emitted when a inverse operator is calculated.
-    *
-    * @param[out] invOp  The inverse operator
-    */
+     * Signal which is emitted when a inverse operator is calculated.
+     *
+     * @param[out] invOp  The inverse operator
+     */
     void invOperatorCalculated(const MNELIB::MNEInverseOperator& invOp);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenver the worker should create a new inverse operator estimation.
-    *
-    * @param[in] inputData  The new covariance estimation.
-    */
+     * Emit this signal whenver the worker should create a new inverse operator estimation.
+     *
+     * @param[in] inputData  The new covariance estimation.
+     */
     void operate(const RtInvOpInput &inputData);
 
 };

@@ -101,114 +101,114 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the IOUtils class.
-    */
+     * Destroys the IOUtils class.
+     */
     ~IOUtils(){};
 
     //=========================================================================================================
     /**
-    * mne_fread3(fid)
-    *
-    * Reads a 3-byte integer out of a stream
-    *
-    * @param[in] p_qStream  Stream to read from
-    *
-    * @return the read 3-byte integer
-    */
+     * mne_fread3(fid)
+     *
+     * Reads a 3-byte integer out of a stream
+     *
+     * @param[in] p_qStream  Stream to read from
+     *
+     * @return the read 3-byte integer
+     */
     static qint32 fread3(QDataStream &p_qStream);
 
     //=========================================================================================================
     /**
-    * fread3_many(fid,count)
-    *
-    * Reads a 3-byte integer out of a stream
-    *
-    * @param[in] p_qStream  Stream to read from
-    * @param[in] count      Number of elements to read
-    *
-    * @return the read 3-byte integer
-    */
+     * fread3_many(fid,count)
+     *
+     * Reads a 3-byte integer out of a stream
+     *
+     * @param[in] p_qStream  Stream to read from
+     * @param[in] count      Number of elements to read
+     *
+     * @return the read 3-byte integer
+     */
     static VectorXi fread3_many(QDataStream &p_qStream, qint32 count);
 
     //=========================================================================================================
     /**
-    * swap short
-    *
-    * @param[in] source     short to swap
-    *
-    * @return swapped short
-    */
+     * swap short
+     *
+     * @param[in] source     short to swap
+     *
+     * @return swapped short
+     */
     static qint16 swap_short (qint16 source);
 
     //=========================================================================================================
     /**
-    * swap integer
-    *
-    * @param[in] source     integer to swap
-    *
-    * @return swapped integer
-    */
+     * swap integer
+     *
+     * @param[in] source     integer to swap
+     *
+     * @return swapped integer
+     */
     static qint32 swap_int (qint32 source);
 
     //=========================================================================================================
     /**
-    * swap integer
-    *
-    * @param[in, out] source     integer to swap
-    */
+     * swap integer
+     *
+     * @param[in, out] source     integer to swap
+     */
     static void swap_intp (qint32 *source);
 
     //=========================================================================================================
     /**
-    * swap long
-    *
-    * @param[in] source     long to swap
-    *
-    * @return swapped long
-    */
+     * swap long
+     *
+     * @param[in] source     long to swap
+     *
+     * @return swapped long
+     */
     static qint64 swap_long (qint64 source);
 
     //=========================================================================================================
     /**
-    * swap long
-    *
-    * @param[in, out] source     long to swap
-    */
+     * swap long
+     *
+     * @param[in, out] source     long to swap
+     */
     static void swap_longp (qint64 *source);
 
     //=========================================================================================================
     /**
-    * swap float
-    *
-    * @param[in] source     float to swap
-    *
-    * @return swapped float
-    */
+     * swap float
+     *
+     * @param[in] source     float to swap
+     *
+     * @return swapped float
+     */
     static float swap_float (float source);
 
     //=========================================================================================================
     /**
-    * swap float
-    *
-    * @param[in, out] source     float to swap
-    */
+     * swap float
+     *
+     * @param[in, out] source     float to swap
+     */
     static void swap_floatp (float *source);
 
     //=========================================================================================================
     /**
-    * swap double
-    *
-    * @param[in, out] source     double to swap
-    */
+     * swap double
+     *
+     * @param[in, out] source     double to swap
+     */
     static void swap_doublep(double *source);
 
     //=========================================================================================================
     /**
-    * Write Eigen Matrix to file
-    *
-    * @param[in] in         input eigen value which is to be written to file
-    * @param[in] path       path and file name to write to
-    */
+     * Write Eigen Matrix to file
+     *
+     * @param[in] in         input eigen value which is to be written to file
+     * @param[in] path       path and file name to write to
+     */
     template<typename T>
     static bool write_eigen_matrix(const Matrix<T, Dynamic, Dynamic>& in, const QString& sPath, const QString& sDescription = QString());
     template<typename T>
@@ -218,11 +218,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Read Eigen Matrix from file
-    *
-    * @param[out] out       output eigen value
-    * @param[in] path       path and file name to read from
-    */
+     * Read Eigen Matrix from file
+     *
+     * @param[out] out       output eigen value
+     * @param[in] path       path and file name to read from
+     */
     template<typename T>
     static bool read_eigen_matrix(Matrix<T, Dynamic, Dynamic>& out, const QString& path);
     template<typename T>
@@ -232,34 +232,34 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the new channel naming conventions (whitespcae between channel type and number) for the input list.
-    *
-    * @param[in] chNames    The channel names.
-    *
-    * @return The new channel names.
-    */
+     * Returns the new channel naming conventions (whitespcae between channel type and number) for the input list.
+     *
+     * @param[in] chNames    The channel names.
+     *
+     * @return The new channel names.
+     */
     static QStringList get_new_chnames_conventions(const QStringList& chNames);
 
     //=========================================================================================================
     /**
-    * Returns the old channel naming conventions (whitespcae between channel type and number) for the input list.
-    *
-    * @param[in] chNames    The channel names.
-    *
-    * @return The new channel names.
-    */
+     * Returns the old channel naming conventions (whitespcae between channel type and number) for the input list.
+     *
+     * @param[in] chNames    The channel names.
+     *
+     * @return The new channel names.
+     */
     static QStringList get_old_chnames_conventions(const QStringList& chNames);
 
     //=========================================================================================================
     /**
-    * Checks if all names from chNamesA are in chNamesB. If wanted each name in chNamesA is transformed to the old and new naming convention and checked if in chNamesB.
-    *
-    * @param[in] chNamesA    The channel names.
-    * @param[in] chNamesB    The channel names which is to be compared to.
-    * @param[in] bCheckForNewNamingConvention    Whether to use old and new naming conventions while checking.
-    *
-    * @return True if all names in chNamesA are present in chNamesB, false otherwise.
-    */
+     * Checks if all names from chNamesA are in chNamesB. If wanted each name in chNamesA is transformed to the old and new naming convention and checked if in chNamesB.
+     *
+     * @param[in] chNamesA    The channel names.
+     * @param[in] chNamesB    The channel names which is to be compared to.
+     * @param[in] bCheckForNewNamingConvention    Whether to use old and new naming conventions while checking.
+     *
+     * @return True if all names in chNamesA are present in chNamesB, false otherwise.
+     */
     static bool check_matching_chnames_conventions(const QStringList& chNamesA, const QStringList& chNamesB, bool bCheckForNewNamingConvention = false);
 };
 

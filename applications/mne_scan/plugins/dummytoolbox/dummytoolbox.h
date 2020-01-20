@@ -101,20 +101,20 @@ class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
 public:
     //=========================================================================================================
     /**
-    * Constructs a DummyToolbox.
-    */
+     * Constructs a DummyToolbox.
+     */
     DummyToolbox();
 
     //=========================================================================================================
     /**
-    * Destroys the DummyToolbox.
-    */
+     * Destroys the DummyToolbox.
+     */
     ~DummyToolbox();
 
     //=========================================================================================================
     /**
-    * IAlgorithm functions
-    */
+     * IAlgorithm functions
+     */
     virtual QSharedPointer<IPlugin> clone() const;
     virtual void init();
     virtual void unload();
@@ -126,17 +126,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Udates the pugin with new (incoming) data.
-    *
-    * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
-    */
+     * Udates the pugin with new (incoming) data.
+     *
+     * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
+     */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
     /**
-    * IAlgorithm function
-    */
+     * IAlgorithm function
+     */
     virtual void run();
 
     void showYourWidget();
@@ -156,8 +156,8 @@ private:
 signals:
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
-    */
+     * Emitted when fiffInfo is available
+     */
     void fiffInfoAvailable();
 };
 

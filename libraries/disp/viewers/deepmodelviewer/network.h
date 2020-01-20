@@ -94,168 +94,168 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs an Network with parent object parent.
-    *
-    * @param [in] parent   The parent of the Network
-    */
+     * Constructs an Network with parent object parent.
+     *
+     * @param [in] parent   The parent of the Network
+     */
     Network(QObject *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-    * Network destructor
-    */
+     * Network destructor
+     */
     virtual ~Network() {}
 
     //=========================================================================================================
     /**
-    * Sets the CNTK Model Wrapper
-    *
-    * @param [in] deepModel     CNTK Model Wrapper
-    */
+     * Sets the CNTK Model Wrapper
+     *
+     * @param [in] deepModel     CNTK Model Wrapper
+     */
     void setModel(const QSharedPointer<DEEPLIB::Deep>& deepModel);
 
     //=========================================================================================================
     /**
-    * Returns the CNTK Model v2
-    *
-    * @return the current CNTK model v2
-    */
+     * Returns the CNTK Model v2
+     *
+     * @return the current CNTK model v2
+     */
     inline QSharedPointer<DEEPLIB::Deep> model() const;
 
     //=========================================================================================================
     /**
-    * Returns the layer-wise lists of nodes
-    *
-    * @return layer-wise lists of nodes
-    */
+     * Returns the layer-wise lists of nodes
+     *
+     * @return layer-wise lists of nodes
+     */
     QList<QList<Node *> > layerNodes() const;
 
     //=========================================================================================================
     /**
-    * Sets the layer-wise lists of nodes
-    *
-    * @param [in] listLayerNodes   layer-wise lists of nodes
-    */
+     * Sets the layer-wise lists of nodes
+     *
+     * @param [in] listLayerNodes   layer-wise lists of nodes
+     */
     void setLayerNodes(const QList<QList<Node *> > &listLayerNodes);
 
     //=========================================================================================================
     /**
-    * Returns the layer-connection-wise lists of edges, representing weights
-    *
-    * @return layer-connection-wise lists of edges
-    */
+     * Returns the layer-connection-wise lists of edges, representing weights
+     *
+     * @return layer-connection-wise lists of edges
+     */
     QList<QList<Edge *> > edges() const;
 
     //=========================================================================================================
     /**
-    * Sets the layer-connection-wise lists of edges, representing weights
-    *
-    * @param [in] listEdges     layer-connection-wise lists of edges
-    */
+     * Sets the layer-connection-wise lists of edges, representing weights
+     *
+     * @param [in] listEdges     layer-connection-wise lists of edges
+     */
     void setEdges(const QList<QList<Edge *> > &listEdges);
 
     //=========================================================================================================
     /**
-    * Returns whether Network UI representation was setup
-    *
-    * @return true if Network UI representation was setup, false otherwise
-    */
+     * Returns whether Network UI representation was setup
+     *
+     * @return true if Network UI representation was setup, false otherwise
+     */
     bool isSetup() const;
 
     //=========================================================================================================
     /**
-    * Returns the current setup pen style
-    *
-    * @return the current pen style
-    */
+     * Returns the current setup pen style
+     *
+     * @return the current pen style
+     */
     inline Qt::PenStyle getPenStyle() const;
 
     //=========================================================================================================
     /**
-    * Sets solid line as the current pen style
-    */
+     * Sets solid line as the current pen style
+     */
     void setSolidLine();
 
     //=========================================================================================================
     /**
-    * Sets dash line as the current pen style
-    */
+     * Sets dash line as the current pen style
+     */
     void setDashLine();
 
     //=========================================================================================================
     /**
-    * Sets dot line as the current pen style
-    */
+     * Sets dot line as the current pen style
+     */
     void setDotLine();
 
     //=========================================================================================================
     /**
-    * Sets the weight threshold, i.e., the threshold over which edges should be attached to the scene
-    *
-    * @param [in] thr   the weight threshold
-    */
+     * Sets the weight threshold, i.e., the threshold over which edges should be attached to the scene
+     *
+     * @param [in] thr   the weight threshold
+     */
     void setWeightThreshold(int thr);
 
     //=========================================================================================================
     /**
-    * Returns the weight threshold, i.e., the threshold over which edges should be attached to the scene
-    *
-    * @return the weight threshold
-    */
+     * Returns the weight threshold, i.e., the threshold over which edges should be attached to the scene
+     *
+     * @return the weight threshold
+     */
     inline float weightThreshold() const;
 
     //=========================================================================================================
     /**
-    * Sets the weight strength, i.e., the basic strength multiplier
-    *
-    * @param [in] strength   the weight strength
-    */
+     * Sets the weight strength, i.e., the basic strength multiplier
+     *
+     * @param [in] strength   the weight strength
+     */
     void setWeightStrength(int strength);
 
     //=========================================================================================================
     /**
-    * Returns the weight strength, i.e., the basic strength multiplier for the edges pen width
-    *
-    * @return the weight strength
-    */
+     * Returns the weight strength, i.e., the basic strength multiplier for the edges pen width
+     *
+     * @return the weight strength
+     */
     inline float weightStrength() const;
 
     //=========================================================================================================
     /**
-    * Update the weights according to the current model
-    */
+     * Update the weights according to the current model
+     */
     void updateWeights();
 
 signals:
     //=========================================================================================================
     /**
-    * Signal emitted when the CNTK network UI representation got updated
-    */
+     * Signal emitted when the CNTK network UI representation got updated
+     */
     void update_signal();
 
     //=========================================================================================================
     /**
-    * Signal emitted when the threshold weights got updated
-    */
+     * Signal emitted when the threshold weights got updated
+     */
     void updateWeightThreshold_signal();
 
     //=========================================================================================================
     /**
-    * Signal emitted when the weight strength got updated
-    */
+     * Signal emitted when the weight strength got updated
+     */
     void updateWeightStrength_signal();
 
 protected:
     //=========================================================================================================
     /**
-    * Cleanes the UI representation of the CNTK Network
-    */
+     * Cleanes the UI representation of the CNTK Network
+     */
     void cleanNetwork();
 
     //=========================================================================================================
     /**
-    * Generates the UI representation of the CNTK Network
-    */
+     * Generates the UI representation of the CNTK Network
+     */
     void generateNetwork();
 
 private:

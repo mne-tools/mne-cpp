@@ -108,71 +108,71 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a CompensatorView which is a child of parent.
-    *
-    * @param [in] parent        parent of widget
-    */
+     * Constructs a CompensatorView which is a child of parent.
+     *
+     * @param [in] parent        parent of widget
+     */
     CompensatorView(const QString& sSettingsPath = "",
                     QWidget *parent = 0,
                     Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
-    * Destroys the CompensatorView.
-    */
+     * Destroys the CompensatorView.
+     */
     ~CompensatorView();
 
     //=========================================================================================================
     /**
-    * Get the current compensators
-    *
-    * @return The current compensators.
-    */
+     * Get the current compensators
+     *
+     * @return The current compensators.
+     */
     QList<FIFFLIB::FiffCtfComp> getCompensators() const;
 
     //=========================================================================================================
     /**
-    * Get the last value of comp.to
-    *
-    * @return The last value of comp.to.
-    */
+     * Get the last value of comp.to
+     *
+     * @return The last value of comp.to.
+     */
     int getLastTo() const;
 
     //=========================================================================================================
     /**
-    * Set the current compensators
-    *
-    * @param [in] comps    The new compensators.
-    */
+     * Set the current compensators
+     *
+     * @param [in] comps    The new compensators.
+     */
     void setCompensators(const QList<FIFFLIB::FiffCtfComp>& comps);
 
 protected:    
     //=========================================================================================================
     /**
-    * Redraw the selection.
-    */
+     * Redraw the selection.
+     */
     void redrawGUI();
 
     //=========================================================================================================
     /**
-    * Saves all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to store the settings to.
-    */
+     * Saves all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to store the settings to.
+     */
     void saveSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Loads and inits all important settings of this view via QSettings.
-    *
-    * @param[in] settingsPath        the path to load the settings from.
-    */
+     * Loads and inits all important settings of this view via QSettings.
+     *
+     * @param[in] settingsPath        the path to load the settings from.
+     */
     void loadSettings(const QString& settingsPath);
 
     //=========================================================================================================
     /**
-    * Slot called when the compensator check state changes
-    */
+     * Slot called when the compensator check state changes
+     */
     void onCheckCompStatusChanged();
 
     QList<QCheckBox*>                                   m_qListCompCheckBox;            /**< List of compensator CheckBox. */
@@ -188,14 +188,14 @@ protected:
 signals:
     //=========================================================================================================
     /**
-    * Signal mapper signal for compensator changes.
-    */
+     * Signal mapper signal for compensator changes.
+     */
     void compClicked(const QString& text);
 
     //=========================================================================================================
     /**
-    * Emit this signal whenever the user changes the compensator.
-    */
+     * Emit this signal whenever the user changes the compensator.
+     */
     void compSelectionChanged(int to);
 };
 

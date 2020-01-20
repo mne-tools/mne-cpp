@@ -76,17 +76,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a CovarianceAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new CovarianceAboutWidget becomes a window. If parent is another widget, CovarianceAboutWidget becomes a child window inside parent. CovarianceAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a CovarianceAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new CovarianceAboutWidget becomes a window. If parent is another widget, CovarianceAboutWidget becomes a child window inside parent. CovarianceAboutWidget is deleted when its parent is deleted.
+     */
     CovarianceAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the CovarianceAboutWidget.
-    * All CovarianceAboutWidget's children are deleted first. The application exits if CovarianceAboutWidget is the main widget.
-    */
+     * Destroys the CovarianceAboutWidget.
+     * All CovarianceAboutWidget's children are deleted first. The application exits if CovarianceAboutWidget is the main widget.
+     */
     ~CovarianceAboutWidget();
 
 private:

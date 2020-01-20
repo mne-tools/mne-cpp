@@ -96,20 +96,20 @@ class ButterflySceneItem : public QGraphicsItem
 public:
     //=========================================================================================================
     /**
-    * Constructs a ButterflySceneItem.
-    */
+     * Constructs a ButterflySceneItem.
+     */
     ButterflySceneItem(QString setName, int setKind = FIFFV_MEG_CH, int setUnit = FIFF_UNIT_T_M, const QList<QColor> &defaultColors = QList<QColor>());
 
     //=========================================================================================================
     /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
-    */
+     * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
+     */
     QRectF boundingRect() const;
 
     //=========================================================================================================
     /**
-    * Reimplemented paint function.
-    */
+     * Reimplemented paint function.
+     */
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     QString                 m_sSetName;                 /**< The set name.*/
@@ -125,10 +125,10 @@ public:
 protected:
     //=========================================================================================================
     /**
-    * Create a plot path and paint the average data
-    *
-    * @param [in] painter The painter used to plot in this item.
-    */
+     * Create a plot path and paint the average data
+     *
+     * @param [in] painter The painter used to plot in this item.
+     */
     void paintAveragePaths(QPainter *painter);
 };
 

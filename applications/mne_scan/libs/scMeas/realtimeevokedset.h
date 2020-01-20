@@ -103,140 +103,140 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeMultiSampleArrayNew.
-    */
+     * Constructs a RealTimeMultiSampleArrayNew.
+     */
     explicit RealTimeEvokedSet(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeMultiSampleArrayNew.
-    */
+     * Destroys the RealTimeMultiSampleArrayNew.
+     */
     virtual ~RealTimeEvokedSet();
 
     //=========================================================================================================
     /**
-    * Returns the file name of the xml layout file.
-    *
-    * @return the file name of the layout file.
-    */
+     * Returns the file name of the xml layout file.
+     *
+     * @return the file name of the layout file.
+     */
     inline const QString& getXMLLayoutFile() const;
 
     //=========================================================================================================
     /**
-    * Sets the file name of the xml layout.
-    *
-    * @param[in] layout which should be set.
-    */
+     * Sets the file name of the xml layout.
+     *
+     * @param[in] layout which should be set.
+     */
     inline void setXMLLayoutFile(const QString& layout);
 
     //=========================================================================================================
     /**
-    * Returns the number of channels.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
+     * Returns the number of channels.
+     *
+     * @return the number of values which are gathered before a notify() is called.
+     */
     inline unsigned int getNumChannels() const;
 
     //=========================================================================================================
     /**
-    * Returns the number of pre-stimulus samples
-    *
-    * @return the number of pre-stimulus samples
-    */
+     * Returns the number of pre-stimulus samples
+     *
+     * @return the number of pre-stimulus samples
+     */
     inline qint32 getNumPreStimSamples() const;
 
     //=========================================================================================================
     /**
-    * Set the number of pre-stimulus samples
-    *
-    * @param[in] samples the number of pre-stimulus samples
-    */
+     * Set the number of pre-stimulus samples
+     *
+     * @param[in] samples the number of pre-stimulus samples
+     */
     inline void setNumPreStimSamples(qint32 samples);
 
     //=========================================================================================================
     /**
-    * Returns the number of channels.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
+     * Returns the number of channels.
+     *
+     * @return the number of values which are gathered before a notify() is called.
+     */
     inline QList<QColor>& chColor();
 
     //=========================================================================================================
     /**
-    * Returns the reference to the channel list.
-    *
-    * @return the reference to the channel list.
-    */
+     * Returns the reference to the channel list.
+     *
+     * @return the reference to the channel list.
+     */
     inline QList<RealTimeSampleArrayChInfo>& chInfo();
 
     //=========================================================================================================
     /**
-    * Returns the reference to the current info.
-    *
-    * @return the reference to the current info.
-    */
+     * Returns the reference to the current info.
+     *
+     * @return the reference to the current info.
+     */
     inline FiffInfo::SPtr info();
 
     //=========================================================================================================
     /**
-    * New devoked to distribute
-    *
-    * @param [in] v                         the evoked set which should be distributed.
-    * @param [in] p_fiffinfo                the evoked fiff info as shared pointer.
-    * @param [in] lResponsibleTriggerTypes  List of all trigger types which lead to the recent emit of a new evoked set.
-    */
+     * New devoked to distribute
+     *
+     * @param [in] v                         the evoked set which should be distributed.
+     * @param [in] p_fiffinfo                the evoked fiff info as shared pointer.
+     * @param [in] lResponsibleTriggerTypes  List of all trigger types which lead to the recent emit of a new evoked set.
+     */
     virtual void setValue(const FiffEvokedSet &v,
                           const FiffInfo::SPtr& p_fiffinfo,
                           const QStringList& lResponsibleTriggerTypes);
 
     //=========================================================================================================
     /**
-    * Returns the current value set.
-    * This method is inherited by Measurement.
-    *
-    * @return the last attached value.
-    */
+     * Returns the current value set.
+     * This method is inherited by Measurement.
+     *
+     * @return the last attached value.
+     */
     virtual FiffEvokedSet::SPtr& getValue();
 
     //=========================================================================================================
     /**
-    * Returns the trigger types which lead to the emit of this evoked set.
-    *
-    * @return the trigger types which lead to the emit of this evoked set.
-    */
+     * Returns the trigger types which lead to the emit of this evoked set.
+     *
+     * @return the trigger types which lead to the emit of this evoked set.
+     */
     const QStringList& getResponsibleTriggerTypes();
 
     //=========================================================================================================
     /**
-    * Returns whether RealTimeEvokedSet contains values
-    *
-    * @return whether RealTimeEvokedSet contains values.
-    */
+     * Returns whether RealTimeEvokedSet contains values
+     *
+     * @return whether RealTimeEvokedSet contains values.
+     */
     inline bool isInitialized() const;
 
     //=========================================================================================================
     /**
-    * Set baseline information
-    *
-    * @param [in] info             the min max information of the baseline
-    */
+     * Set baseline information
+     *
+     * @param [in] info             the min max information of the baseline
+     */
     inline void setBaselineInfo(QPair<qint32,qint32> info);
 
     //=========================================================================================================
     /**
-    * Get baseline information
-    *
-    * @return the min max information of the baseline as a QPair
-    */
+     * Get baseline information
+     *
+     * @return the min max information of the baseline as a QPair
+     */
     inline QPair<qint32,qint32> getBaselineInfo();
 
 private:
     //=========================================================================================================
     /**
-    * Init channel infos using fiff info
-    *
-    * @param[in] p_fiffInfo     Info to init from
-    */
+     * Init channel infos using fiff info
+     *
+     * @param[in] p_fiffInfo     Info to init from
+     */
     void init(FiffInfo::SPtr p_fiffInfo);
 
     mutable QMutex                      m_qMutex;           /**< Mutex to ensure thread safety */
