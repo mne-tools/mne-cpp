@@ -39,7 +39,7 @@ void RawView::dataChanged(const QModelIndex &topLeft,
 
 /*
     Returns the item that covers the coordinate given in the view.
-*/
+ */
 
 QModelIndex RawView::indexAt(const QPoint &point) const
 {
@@ -91,7 +91,7 @@ bool RawView::isIndexHidden(const QModelIndex & /*index*/) const
 /*
     Returns the rectangle of the item at position \a index in the
     model. The rectangle is in contents coordinates.
-*/
+ */
 
 QRect RawView::itemRect(const QModelIndex &index) const
 {
@@ -375,7 +375,7 @@ void RawView::scrollTo(const QModelIndex &index, ScrollHint)
 
 /*
     Find the indices corresponding to the extent of the selection.
-*/
+ */
 
 void PieView::setSelection(const QRect &rect, QItemSelectionModel::SelectionFlags command)
 {
@@ -440,7 +440,7 @@ int RawView::verticalOffset() const
 
 /*
     Returns the position of the item in viewport coordinates.
-*/
+ */
 
 QRect RawView::visualRect(const QModelIndex &index) const
 {
@@ -455,7 +455,7 @@ QRect RawView::visualRect(const QModelIndex &index) const
 
 /*
     Returns a region corresponding to the selection in viewport coordinates.
-*/
+ */
 
 //QRegion RawView::visualRegionForSelection(const QItemSelection &selection) const
 //{

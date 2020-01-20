@@ -1,14 +1,22 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     testframes.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @author   Lars Debor <Lars.Debor@tu-ilmenau.de>;
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Ruben Doerfel <Ruben.Doerfel@tu-ilmenau.de>;
+#           Felix Griesau <Felix.Griesau@tu-ilmenau.de>;
+#           Gabriel B Motta <gabrielbenmotta@gmail.com>;
+#           Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
+#           Lorenz Esch <lesch@mgh.harvard.edu>;
+#           Ricky Tjen <ricky270@student.sgu.ac.id>;
+#           Sugandha Sachdeva <sugandha.sachdeva@tu-ilmenau.de>
 # @version  1.0
 # @date     July, 2012
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2012, Lars Debor, Christoph Dinh, Ruben Doerfel, Felix Griesau, Gabriel B Motta, 
+#                     Daniel Strohmeier, Lorenz Esch, Ricky Tjen, Sugandha Sachdeva. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:

@@ -1,37 +1,38 @@
 //=============================================================================================================
 /**
-* @file     fiff_coord_trans_old.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     January, 2017
-*
-* @section  LICENSE
-*
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    Definition of the FiffCoordTransOld Class.
-*
-*/
+ * @file     fiff_coord_trans_old.cpp
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @version  1.0
+ * @date     January, 2017
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Definition of the FiffCoordTransOld Class.
+ *
+ */
 
 
 //*************************************************************************************************************
@@ -491,8 +492,8 @@ FiffCoordTransOld *FiffCoordTransOld::fiff_invert_transform() const
 
 void FiffCoordTransOld::fiff_coord_trans(float r[], const FiffCoordTransOld *t, int do_move)
 /*
-* Apply coordinate transformation
-*/
+ * Apply coordinate transformation
+ */
 {
     int j,k;
     float res[3];
@@ -511,13 +512,13 @@ void FiffCoordTransOld::fiff_coord_trans(float r[], const FiffCoordTransOld *t, 
 
 FiffCoordTransOld *FiffCoordTransOld::fiff_combine_transforms(int from, int to, FiffCoordTransOld *t1, FiffCoordTransOld *t2)
 /*
-* Combine two coordinate transformations
-* to yield a transform from 'from' system
-* to 'to' system.
-*
-* Return NULL if this fails
-*
-*/
+ * Combine two coordinate transformations
+ * to yield a transform from 'from' system
+ * to 'to' system.
+ *
+ * Return NULL if this fails
+ *
+ */
 {
     FiffCoordTransOld* t = NULL;
     int swapped = 0;
@@ -577,8 +578,8 @@ FiffCoordTransOld *FiffCoordTransOld::fiff_combine_transforms(int from, int to, 
 
 void FiffCoordTransOld::fiff_coord_trans_inv(float r[], FiffCoordTransOld *t, int do_move)
 /*
-* Apply inverse coordinate transformation
-*/
+ * Apply inverse coordinate transformation
+ */
 {
     int j,k;
     float res[3];
@@ -730,8 +731,8 @@ out : {
 
 FiffCoordTransOld *FiffCoordTransOld::mne_read_transform_from_node(FiffStream::SPtr &stream, const FiffDirNode::SPtr &node, int from, int to)
 /*
-* Read the specified coordinate transformation
-*/
+ * Read the specified coordinate transformation
+ */
 {
     FiffCoordTransOld* res = NULL;
     FiffTag::SPtr t_pTag;
@@ -788,8 +789,8 @@ FiffCoordTransOld *FiffCoordTransOld::mne_read_mri_transform(const QString &name
 
 FiffCoordTransOld *FiffCoordTransOld::mne_read_meas_transform(const QString &name)
 /*
-* Read the MEG device -> HEAD coordinate transformation
-*/
+ * Read the MEG device -> HEAD coordinate transformation
+ */
 {
     return mne_read_transform(name,FIFFV_COORD_DEVICE,FIFFV_COORD_HEAD);
 }
@@ -799,8 +800,8 @@ FiffCoordTransOld *FiffCoordTransOld::mne_read_meas_transform(const QString &nam
 
 FiffCoordTransOld *FiffCoordTransOld::mne_read_transform_ascii(char *name, int from, int to)
 /*
-* Read the Neuromag -> FreeSurfer transformation matrix
-*/
+ * Read the Neuromag -> FreeSurfer transformation matrix
+ */
 {
     FILE *in = NULL;
     FiffCoordTransOld* t = NULL;
@@ -875,8 +876,8 @@ FiffCoordTransOld * FiffCoordTransOld::fiff_make_transform_card (int from,int to
                                                                  float *rN,
                                                                  float *rR)
 /* 'from' coordinate system
-* cardinal points expressed in
-* the 'to' system */
+ * cardinal points expressed in
+ * the 'to' system */
 
 {
     FiffCoordTransOld* t = new FiffCoordTransOld();
