@@ -314,11 +314,11 @@ void SsvepBciSetupStimulusWidget::screenKeyboard()
     item3.setPos(0.5-0.1,1-0.2);
     item4.setPos(0,0.5-0.1);
     item5.setPos(0,0);
-
-    item1.addSign("â??");
-    item2.addSign("â??");
-    item3.addSign("â??");
-    item4.addSign("â?");
+    
+    item1.addSign("â†‘");
+    item2.addSign("â†’");
+    item3.addSign("â†“");
+    item4.addSign("â†");
     item5.addSign("Select");
 
     //add items to List

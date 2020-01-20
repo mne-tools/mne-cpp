@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
- * @file     main.cpp
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @file     %{CppFileName}
+ * @author   %{author} <%{eMail}>
+ * @version  dev
  * @date     %{Month}, %{Year}
  *
  * @section  LICENSE
  *
- * Copyright (C) ear}, Lorenz Esch. All rights reserved.
+ * Copyright (C) %{Year}, %{author}. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -89,6 +89,9 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     // Add exampel code here
+
+    return a.exec();
+}
 
     return a.exec();
 }
