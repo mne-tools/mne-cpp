@@ -4,7 +4,7 @@
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Limin Sun <limin.sun@childrens.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     February, 2013
  *
  * @section  LICENSE

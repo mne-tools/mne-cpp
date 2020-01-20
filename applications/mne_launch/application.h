@@ -2,7 +2,7 @@
 /**
  * @file     application.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     November, 2016
  *
  * @section  LICENSE

@@ -2,7 +2,7 @@
 /**
  * @file     main.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     November, 2016
  *
  * @section  LICENSE
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     try {
         return_code = app.exec();
     } catch ( ... ) {
-        // Catch all exceptions â?? dangerous!!!
+        // Catch all exceptions ï¿½?? dangerous!!!
         // Respond (perhaps only partially) to the exception, then
         // re-throw to pass the exception to some other handler
         // ...

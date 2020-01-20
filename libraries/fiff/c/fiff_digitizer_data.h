@@ -3,7 +3,7 @@
  * @file     fiff_digitizer_data.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     April, 2017
  *
  * @section  LICENSE

@@ -2,7 +2,7 @@
 /**
  * @file     sphara.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     February, 2016
  *
  * @section  LICENSE

@@ -5,7 +5,7 @@
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Daniel Knobl <Daniel.Knobl@tu-ilmenau.de>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>
-# @version  1.0
+# @version  dev
 # @date     July, 2012
 #
 # @section  LICENSE

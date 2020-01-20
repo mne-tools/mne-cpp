@@ -2,7 +2,7 @@
 /**
  * @file     pluginitem.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     August, 2013
  *
  * @section  LICENSE

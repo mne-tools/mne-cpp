@@ -4,7 +4,7 @@
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Louis Eichhorst <Louis.Eichhorst@tu-ilmenau.de>
- * @version  1.0
+ * @version  dev
  * @date     January, 2017
  *
  * @section  LICENSE

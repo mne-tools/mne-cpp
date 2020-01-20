@@ -2,7 +2,7 @@
 /**
  * @file     abstractview.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     March, 2017
  *
  * @section  LICENSE

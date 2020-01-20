@@ -2,7 +2,7 @@
 /**
  * @file     rtsssalgo.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     June, 2013
  *
  * @section  LICENSE

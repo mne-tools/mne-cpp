@@ -2,7 +2,7 @@
 /**
  * @file     spline.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @version  dev
  * @date     April, 2016
  *
  * @section  LICENSE
