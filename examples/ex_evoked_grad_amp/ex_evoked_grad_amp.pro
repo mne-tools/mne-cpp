@@ -1,14 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     ex_evoked_grad_amp.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @author   Robert Dicamillo <rd521@nmr.mgh.harvard.edu>;
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Lorenz Esch <lesch@mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2012
 #
 # @section  LICENSE
 #d
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2012, Robert Dicamillo, Christoph Dinh, Lorenz Esch. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:

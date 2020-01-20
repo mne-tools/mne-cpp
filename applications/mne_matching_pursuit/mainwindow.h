@@ -1,41 +1,42 @@
 //=============================================================================================================
 /**
-* @file     mainwindow.h
-* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
-*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
-*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
-* @version  1.0
-* @date     July, 2014
-*
-* @section  LICENSE
-*
-* Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    MainWindow class declaration shows the main window of the matching pursuit toolbox which includes
-*           all main functions. It is composed of three widgets (input signal, approximation and residuum). One
-*           can choose the truncation criterions and the typ of MP-Algorithm. Also the channels (if multichannel
-*           data) and the calculated atoms could be selected. With the help of the toolbar above, signals can be
-*           loaded and approximations can be saved. Furthermore one can open dictionary editor, advanced
-*           dictionary editor und atom formula editor.
-*/
+ * @file     mainwindow.h
+ * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
+ *           Daniel Knobl <Daniel.Knobl@tu-ilmenau.de>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Martin Henfling <Martin.Henfling@tu-ilmenau.de>
+ * @version  1.0
+ * @date     July, 2014
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2014, Gabriel B Motta, Daniel Knobl, Lorenz Esch, Martin Henfling. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    MainWindow class declaration shows the main window of the matching pursuit toolbox which includes
+ *           all main functions. It is composed of three widgets (input signal, approximation and residuum). One
+ *           can choose the truncation criterions and the typ of MP-Algorithm. Also the channels (if multichannel
+ *           data) and the calculated atoms could be selected. With the help of the toolbar above, signals can be
+ *           loaded and approximations can be saved. Furthermore one can open dictionary editor, advanced
+ *           dictionary editor und atom formula editor.
+ */
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H

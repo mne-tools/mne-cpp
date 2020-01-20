@@ -1,37 +1,38 @@
 //=============================================================================================================
 /**
-* @file     mne_proj_op.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     January, 2017
-*
-* @section  LICENSE
-*
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    Definition of the MNEProjOp Class.
-*
-*/
+ * @file     mne_proj_op.cpp
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @version  1.0
+ * @date     January, 2017
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Definition of the MNEProjOp Class.
+ *
+ */
 
 
 //*************************************************************************************************************
@@ -195,8 +196,8 @@ void fromFloatEigenMatrix_23(const Eigen::MatrixXf& from_mat, float **& to_mat)
 
 QString mne_name_list_to_string_23(const QStringList& list)
 /*
-* Convert a string array to a colon-separated string
-*/
+ * Convert a string array to a colon-separated string
+ */
 {
     int nlist = list.size();
     QString res;
@@ -214,8 +215,8 @@ QString mne_name_list_to_string_23(const QStringList& list)
 
 QString mne_channel_names_to_string_23(FIFFLIB::fiffChInfo chs, int nch)
 /*
-* Make a colon-separated string out of channel names
-*/
+ * Make a colon-separated string out of channel names
+ */
 {
     QStringList names;
     QString res;
@@ -315,8 +316,8 @@ MneProjOp *MneProjOp::mne_proj_op_combine(MneProjOp *to, MneProjOp *from)
 
 void MneProjOp::mne_proj_op_add_item_act(MneProjOp *op, MneNamedMatrix *vecs, int kind, const QString& desc, int is_active)
 /*
-* Add a new item to an existing projection operator
-*/
+ * Add a new item to an existing projection operator
+ */
 {
     MneProjItem* new_item;
     int         k;
@@ -374,8 +375,8 @@ void MneProjOp::mne_proj_op_add_item(MneProjOp *op, MneNamedMatrix *vecs, int ki
 
 MneProjOp *MneProjOp::mne_dup_proj_op(MneProjOp *op)
 /*
-* Provide a duplicate (item data only)
-*/
+ * Provide a duplicate (item data only)
+ */
 {
     MneProjOp* dup = new MneProjOp();
     MneProjItem* it;

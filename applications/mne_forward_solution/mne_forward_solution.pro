@@ -1,14 +1,16 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     mne_forward_solution.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @author   Robert Dicamillo <rd521@nmr.mgh.harvard.edu>;
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Lorenz Esch <lesch@mgh.harvard.edu>;
+#           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
 # @version  1.0
 # @date     February, 2017
 #
 # @section  LICENSE
 #
-# Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2017, Robert Dicamillo, Christoph Dinh, Lorenz Esch, Simon Heinke. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:

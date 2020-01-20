@@ -46,10 +46,10 @@ class TriggerControl;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TriggerControlSetupWidget
-*
-* @brief The TriggerControlSetupWidget class provides the TriggerControlToolbox configuration window.
-*/
+ * DECLARE CLASS TriggerControlSetupWidget
+ *
+ * @brief The TriggerControlSetupWidget class provides the TriggerControlToolbox configuration window.
+ */
 class SettingsWidget : public QDialog
 {
     Q_OBJECT

@@ -170,8 +170,8 @@ void mne_free_cmatrix (float **m)
 
 void mne_free_name_list(char **list, int nlist)
 /*
-* Free a name list array
-*/
+ * Free a name list array
+ */
 {
     int k;
     if (list == NULL || nlist == 0)

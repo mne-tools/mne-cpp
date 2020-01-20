@@ -1,14 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     disp3D.pro
-# @author   Lorenz Esch <Lorenz.Esch@tu-ilmenauu.de>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @author   Lars Debor <Lars.Debor@tu-ilmenau.de>;
+#           Juan Garcia-Prieto <juangpc@gmail.com>;
+#           Lorenz Esch <lesch@mgh.harvard.edu>
 # @version  1.0
 # @date     November, 2015
 #
 # @section  LICENSE
 #
-# Copyright (C) 2015, Lorenz Esch and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2015, Lars Debor, Juan Garcia-Prieto, Lorenz Esch. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:

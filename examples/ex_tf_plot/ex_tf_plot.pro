@@ -1,14 +1,13 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     ex_tf_plot.pro
-# @author   Lorenz Esch <lesch@mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @author   Lorenz Esch <lesch@mgh.harvard.edu>
 # @version  1.0
 # @date     September, 2018
 #
 # @section  LICENSE
 #
-# Copyright (C) 2018, Lorenz Esch and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2018, Lorenz Esch. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:

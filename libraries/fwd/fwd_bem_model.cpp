@@ -1,37 +1,38 @@
 //=============================================================================================================
 /**
-* @file     fwd_bem_model.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     January, 2017
-*
-* @section  LICENSE
-*
-* Copyright (C) 2017, Christoph Dinh and Matti Hamalainen. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    Definition of the FwdBemModel Class.
-*
-*/
+ * @file     fwd_bem_model.cpp
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @version  1.0
+ * @date     January, 2017
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Definition of the FwdBemModel Class.
+ *
+ */
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -598,8 +599,8 @@ MneSurfaceOld *FwdBemModel::fwd_bem_find_surface(int kind)
 
 FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, int *kinds, int nkind)
 /*
-* Load a set of surfaces
-*/
+ * Load a set of surfaces
+ */
 {
     QList<MneSurfaceOld*> surfs;// = NULL;
     float      *sigma = NULL;
@@ -681,8 +682,8 @@ bad : {
 
 FwdBemModel *FwdBemModel::fwd_bem_load_homog_surface(const QString &name)
 /*
-* Load surfaces for the homogeneous model
-*/
+ * Load surfaces for the homogeneous model
+ */
 {
     int kinds[] = { FIFFV_BEM_SURF_ID_BRAIN };
     int nkind   = 1;
@@ -695,8 +696,8 @@ FwdBemModel *FwdBemModel::fwd_bem_load_homog_surface(const QString &name)
 
 FwdBemModel *FwdBemModel::fwd_bem_load_three_layer_surfaces(const QString &name)
 /*
-* Load surfaces for three-layer model
-*/
+ * Load surfaces for three-layer model
+ */
 {
     int kinds[] = { FIFFV_BEM_SURF_ID_HEAD, FIFFV_BEM_SURF_ID_SKULL, FIFFV_BEM_SURF_ID_BRAIN };
     int nkind   = 3;
@@ -1110,8 +1111,8 @@ void FwdBemModel::correct_auto_elements(MneSurfaceOld *surf, float **mat)
 
 float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
 /*
-* Calculate the coefficients for linear collocation approach
-*/
+ * Calculate the coefficients for linear collocation approach
+ */
 {
     float **mat = NULL;
     float **sub_mat = NULL;
@@ -1384,8 +1385,8 @@ void FwdBemModel::fwd_bem_ip_modify_solution(float **solution, float **ip_soluti
 
 int FwdBemModel::fwd_bem_check_solids(float **angles, int ntri1, int ntri2, float desired)
 /*
-* Check the angle computations
-*/
+ * Check the angle computations
+ */
 {
     float *sums = MALLOC_40(ntri1,float);
     float sum;
@@ -1541,8 +1542,8 @@ bad : {
 
 int FwdBemModel::fwd_bem_compute_solution(FwdBemModel *m, int bem_method)
 /*
-* Compute the solution
-*/
+ * Compute the solution
+ */
 {
     /*
         * Compute the solution
@@ -1563,8 +1564,8 @@ int FwdBemModel::fwd_bem_compute_solution(FwdBemModel *m, int bem_method)
 
 int FwdBemModel::fwd_bem_load_recompute_solution(const QString& name, int bem_method, int force_recompute, FwdBemModel *m)
 /*
-* Load or recompute the potential solution matrix
-*/
+ * Load or recompute the potential solution matrix
+ */
 {
     int solres;
 
@@ -1728,8 +1729,8 @@ bad : {
 
 void FwdBemModel::fwd_bem_pot_grad_calc(float *rd, float *Q, FwdBemModel* m, FwdCoilSet* els, int all_surfs, float *xgrad, float *ygrad, float *zgrad)
 /*
-* Compute the potentials due to a current dipole
-*/
+ * Compute the potentials due to a current dipole
+ */
 {
     MneTriangle* tri;
     int         ntri;
@@ -1791,9 +1792,9 @@ void FwdBemModel::fwd_bem_pot_grad_calc(float *rd, float *Q, FwdBemModel* m, Fwd
 
 void FwdBemModel::fwd_bem_lin_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdCoilSet *els, int all_surfs, float *pot)              /* Put the result here */
 /*
-* Compute the potentials due to a current dipole
-* using the linear potential approximation
-*/
+ * Compute the potentials due to a current dipole
+ * using the linear potential approximation
+ */
 {
     float **rr;
     int   np;
@@ -1839,9 +1840,9 @@ void FwdBemModel::fwd_bem_lin_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdC
 
 void FwdBemModel::fwd_bem_lin_pot_grad_calc(float *rd, float *Q, FwdBemModel *m, FwdCoilSet *els, int all_surfs, float *xgrad, float *ygrad, float *zgrad)
 /*
-* Compute the derivaties of potentials due to a current dipole with respect to the dipole position
-* using the linear potential approximation
-*/
+ * Compute the derivaties of potentials due to a current dipole with respect to the dipole position
+ * using the linear potential approximation
+ */
 {
     float **rr;
     int   np;
@@ -2054,8 +2055,8 @@ void FwdBemModel::calc_f(double *xx, double *yy, double *f0, double *fx, double 
 
 void FwdBemModel::calc_magic(double u, double z, double A, double B, double *beta, double *D)
 /*
-* Calculate Urankar's magic numbers
-*/
+ * Calculate Urankar's magic numbers
+ */
 {
     double B2 = 1.0 + B*B;
     double ABu = A + B*u;
@@ -2186,9 +2187,9 @@ void FwdBemModel::field_integrals(float *from, MneTriangle* to, double *I1p, dou
 
 double FwdBemModel::one_field_coeff(float *dest, float *normal, MneTriangle* tri)
 /*
-* Compute the integral over one triangle.
-* This looks magical but it is not.
-*/
+ * Compute the integral over one triangle.
+ * This looks magical but it is not.
+ */
 {
     double *yy[4];
     double y1[3],y2[3],y3[3];
@@ -2725,8 +2726,8 @@ void FwdBemModel::fwd_bem_field_calc(float *rd, float *Q, FwdCoilSet *coils, Fwd
 
 void FwdBemModel::fwd_bem_field_grad_calc(float *rd, float *Q, FwdCoilSet* coils, FwdBemModel* m, float *xgrad, float *ygrad, float *zgrad)
 /*
-* Calculate the magnetic field in a set of coils
-*/
+ * Calculate the magnetic field in a set of coils
+ */
 {
     FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
     float          *v0;
@@ -2805,9 +2806,9 @@ void FwdBemModel::fwd_bem_field_grad_calc(float *rd, float *Q, FwdCoilSet* coils
 
 float FwdBemModel::fwd_bem_inf_field_der(float *rd, float *Q, float *rp, float *dir, float *comp)	   /* Which gradient component */
 /*
-* Derivative of the infinite-medium magnetic field with respect to
-* one of the dipole position coordinates (without \mu_0/4\pi)
-*/
+ * Derivative of the infinite-medium magnetic field with respect to
+ * one of the dipole position coordinates (without \mu_0/4\pi)
+ */
 {
     float diff[3],diff2,diff3,diff5,cross[3],crossn[3],res;
 
@@ -2827,9 +2828,9 @@ float FwdBemModel::fwd_bem_inf_field_der(float *rd, float *Q, float *rp, float *
 
 float FwdBemModel::fwd_bem_inf_pot_der(float *rd, float *Q, float *rp, float *comp) /* Which gradient component */
 /*
-* Derivative of the infinite-medium potential with respect to one of
-* the dipole position coordinates
-*/
+ * Derivative of the infinite-medium potential with respect to one of
+ * the dipole position coordinates
+ */
 {
     float diff[3];
     float diff2,diff5,diff3;
@@ -2996,9 +2997,9 @@ int FwdBemModel::fwd_bem_field_grad(float *rd, float Q[], FwdCoilSet *coils, flo
 
 void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
 /*
-* Compute the MEG or EEG forward solution for one source space
-* and possibly for only one source component
-*/
+ * Compute the MEG or EEG forward solution for one source space
+ * and possibly for only one source component
+ */
 {
     FwdThreadArg* a = (FwdThreadArg*)arg;
     MneSourceSpaceOld* s = a->s;
@@ -3141,9 +3142,9 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
                                      MneNamedMatrix **resp,
                                      MneNamedMatrix **resp_grad)
 /*
-* Compute the MEG forward solution
-* Use either the sphere model or BEM in the calculations
-*/
+ * Compute the MEG forward solution
+ * Use either the sphere model or BEM in the calculations
+ */
 {
     float               **res = NULL;       /* The forward solution matrix */
     float               **res_grad = NULL;  /* The gradient with respect to the dipole position */
@@ -3761,9 +3762,9 @@ int FwdBemModel::fwd_sphere_field_vec(float *rd, FwdCoilSet *coils, float **Bval
 
 int FwdBemModel::fwd_sphere_field_grad(float *rd, float Q[], FwdCoilSet *coils, float Bval[], float xgrad[], float ygrad[], float zgrad[], void *client)  /* Client data to be passed to some foward modelling routines */
 /*
-* Compute the derivatives of the sphere model field with respect to
-* dipole coordinates
-*/
+ * Compute the derivatives of the sphere model field with respect to
+ * dipole coordinates
+ */
 {
     /* This version uses Jukka Sarvas' field computation
          for details, see
@@ -3924,8 +3925,8 @@ int FwdBemModel::fwd_sphere_field_grad(float *rd, float Q[], FwdCoilSet *coils, 
 
 int FwdBemModel::fwd_mag_dipole_field(float *rm, float M[], FwdCoilSet *coils, float Bval[], void *client)	/* Client data will be the sphere model origin */
 /*
-* This is for a specific dipole component
-*/
+ * This is for a specific dipole component
+ */
 {
     int     j,k,np;
     FwdCoil* this_coil;
@@ -3962,9 +3963,9 @@ int FwdBemModel::fwd_mag_dipole_field(float *rm, float M[], FwdCoilSet *coils, f
 
 int FwdBemModel::fwd_mag_dipole_field_vec(float *rm, FwdCoilSet *coils, float **Bval, void *client)     /* Client data will be the sphere model origin */
 /*
-* This is for all dipole components
-* For EEG this produces a zero result
-*/
+ * This is for all dipole components
+ * For EEG this produces a zero result
+ */
 {
     int     j,k,p,np;
     FwdCoil* this_coil;

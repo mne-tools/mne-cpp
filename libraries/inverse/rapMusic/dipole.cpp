@@ -1,22 +1,23 @@
 //=============================================================================================================
 /**
-* @file     dipole.cpp
-* @author   Christoph Dinh <christoph.dinh@live.de>;
-* @version  1.0
-* @date     March, 2011
-*
-* @section  LICENSE
-*
-* Copyright (C) 2013 Christoph Dinh. All rights reserved.
-*
-* No part of this program may be photocopied, reproduced,
-* or translated to another program language without the
-* prior written consent of the author.
-*
-*
-* @brief    ToDo Documentation...
-*
-*/
+ * @file     dipole.cpp
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @version  1.0
+ * @date     March, 2011
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2011, Lorenz Esch, Christoph Dinh. All rights reserved.
+ *
+ * No part of this program may be photocopied, reproduced,
+ * or translated to another program language without the
+ * prior written consent of the author.
+ *
+ *
+ * @brief    ToDo Documentation...
+ *
+ */
 
 #ifndef DIPOLE_SOURCES //Because this cpp is part of the header -> template
 #define DIPOLE_SOURCES
