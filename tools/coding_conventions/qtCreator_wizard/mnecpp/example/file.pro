@@ -1,13 +1,13 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     file.pro
-# @author   Lorenz Esch <lesch@mgh.harvard.edu>
-# @version  1.0
+# @file     %{ProjectName}.pro
+# @author   %{author} <%{eMail}>
+# @version  dev
 # @date     %{Month}, %{Year}
 #
 # @section  LICENSE
 #
-# Copyright (C) ear}, Lorenz Esch. All rights reserved.
+# Copyright (C) %{Year}, %{author}. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -73,4 +73,6 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 # Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD
+origin --> cause other src is pointing at them
 UI_DIR = $$PWD

@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
- * @file     templateclass.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @version  1.0
+ * @file     %{HdrFileName}
+ * @author   %{author} <%{eMail}>
+ * @version  dev
  * @date     %{Month}, %{Year}
  *
  * @section  LICENSE
  *
- * Copyright (C) ear}, Lorenz Esch. All rights reserved.
+ * Copyright (C) %{Year}, %{author}. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -130,4 +130,6 @@ signals:
 //=============================================================================================================
 
 %{JS: Cpp.closeNamespaces('%{Class}')}
+#endif // %{GUARD}
+ass}')}
 #endif // %{GUARD}
