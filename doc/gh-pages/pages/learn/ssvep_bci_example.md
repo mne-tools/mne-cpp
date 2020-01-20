@@ -5,6 +5,8 @@ nav_order: 3
 ---
 # Setup SSVEP BCI example
 
+|**Please note:** The information provided on this page might be outdated and will be updated soon.|
+
 ## Abstract
 
 The SSVEP-BCI plugin beholds a Brain Computer Interface (BCI) using Steady-State-Visual-Evoked-Potentials (SSVEP). It was developed under the Master Thesis "[Development of a BCI based on real-time neural source localization](http://opac.lbs-ilmenau.gbv.de/DB=1/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=Development+of+a+BCI+based+on+real-time+neural+source+localization)", in which the so called [Bremen-BCI](http://iopscience.iop.org/article/10.1088/1741-2560/8/3/036020/meta) was used as a role model in order to setup classification pipeline and visualization. This tutorial describes both the setup of the processing pipeline and usage of the SSVEP-BCI plugin.

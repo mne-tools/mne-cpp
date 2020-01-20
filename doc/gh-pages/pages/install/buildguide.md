@@ -26,7 +26,7 @@ Please note that Qt 5.10.0 or higher is needed in order to have full Qt3D suppor
 - Qt/5.12.6/MSVC 2017 64-bit (Make sure to select the correct version based on your compiler)
 - Qt/5.12.6/QtCharts
 
-After the installation is finsihed make sure to add the Qt bin folder (e.g. `<QtFolder>\5.12.6\msvc2017_64\bin`) to your path variable. On Linux and MacOS you might also need to add the Qt lib folder (e.g. `<QtFolder>\5.12.6\msvc2017_64\lib`) to the `LD_LIBRARY_PATH` and `DYLD_LIBRARY_PATH`, respectivley.
+After the installation is finished make sure to add the Qt bin folder (e.g. `<QtFolder>\5.12.6\msvc2017_64\bin`) to your path variable. On Linux and MacOS you might also need to add the Qt lib folder (e.g. `<QtFolder>\5.12.6\msvc2017_64\lib`) to the `LD_LIBRARY_PATH` and `DYLD_LIBRARY_PATH`, respectivley.
 
 ## Get the source code
 
@@ -52,7 +52,7 @@ Every time you want to update to the newest changes use:
 1. Go to your cloned repository folder and run the `mne-cpp.pro` file with QtCreator.
 2. The first time you open the mne-cpp.pro file you will be prompted to configure the project with a pre-defined kit. Select the appropriate kit, e.g., `Desktop Qt 5.12.6 MSVC2017 64bit` and configure the project.
 3. In QtCreator select the Release mode in the lower left corner.
-4. In the Qt Creator's Projects window, right mouse click on the top level mne-cpp tree item and select Run qmake. Wait until progress bar in lower right corner turns green (this step may take some time).
+4. In the Qt Creator's Projects window, right mouse click on the top level MNE-CPP tree item and select Run qmake. Wait until progress bar in lower right corner turns green (this step may take some time).
 5. Right mouse click again and then hit Build (this step may take some time). Wait until progress bar in lower right corner turns green.
 6. After the build process is finished, go to the `mne-cpp/bin` folder. All applications and libraries should have been created throughout the build process.
 
