@@ -3,7 +3,7 @@ title: CI Pipeline
 parent: Develop
 nav_order: 2
 ---
-# CI Pipeline
+# CI (Continuous Integration) Pipeline
 
 Everytime a merge to mne-tools/mne-cpp:master occurs the [devbuild workflow in Github Actions](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/devbuilds.yml) is triggered. This workflow builds, solves for dependencies, packages and distributes the last commited version to our [development release](https://github.com/mne-tools/mne-cpp/releases). 
 
