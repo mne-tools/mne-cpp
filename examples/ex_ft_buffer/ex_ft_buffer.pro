@@ -43,7 +43,7 @@ VERSION = $${MNE_CPP_VERSION}
 CONFIG   += console
 CONFIG   -= app_bundle
 
-QT += core gui widgets charts opengl concurrent network testlib
+QT += core gui widgets opengl concurrent network testlib
 
 TARGET = ex_ft_buffer
 
