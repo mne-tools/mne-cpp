@@ -5,7 +5,7 @@ nav_order: 4
 ---
 # MNE-CPP on Neuromag Linux
 
-#### Warning: You should know what you are doing and be familiar with the Neuromag system!
+|**Warning:** The information provided on this page should be followed with great care. You should know what you are doing and be familiar with the Neuromag acquisition setup/system.|
 
 ## Setup mne_rt_server
 
@@ -44,7 +44,7 @@ make install
 
 #### Download MNE-cpp
 
-Navigate to the mne-cpp repository and run:
+Navigate to the MNE-CPP repository and run:
 
 ```
 qmake mne-cpp.pro MNECPP_CONFIG+=minimalVersion MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=noTests
@@ -53,7 +53,7 @@ make
 
 #### Edit .bashrc
 
-After you compiled mne-cpp succesfully edit your .bashrc to make the shared libraries globally available:
+After you compiled MNE-CPP succesfully edit your .bashrc to make the shared libraries globally available:
 
 ```
 #

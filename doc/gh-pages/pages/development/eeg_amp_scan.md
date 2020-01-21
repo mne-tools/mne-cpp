@@ -5,6 +5,8 @@ nav_order: 3
 ---
 # Setup EEG amplifier plugins in MNE Scan
 
+|**Please note:** The information provided on this page might be outdated and will be updated soon.|
+
 ## Available amplifier plugins in MNE Scan
 
 Following driver setup tutorials are offered for MNE Scan:
