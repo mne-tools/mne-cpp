@@ -67,7 +67,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fwdd \
             -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Connectivity \
+            -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lscMeasd \
             -lscDispd \
             -lscSharedd
