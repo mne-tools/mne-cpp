@@ -43,11 +43,9 @@ TEMPLATE = subdirs
 
 #Sensors
 SUBDIRS += \
-    ecgsimulator \
     fiffsimulator \
     neuromag \
     babymeg \
-    triggercontrol \
     natus \
 #    gusbamp \ # Needs header files, shipped with the vendor's SDK
 #    eegosports \ # Needs header files, shipped with the vendor's SDK
@@ -58,16 +56,10 @@ SUBDIRS += \
 #Algorithms
 SUBDIRS += \
     dummytoolbox \
-    epidetect \
     rtcmne \
     rtcmusic \
     averaging \
     covariance \
-    noise \
-    bci \
-    rtsss \
-    rthpi \
     noisereduction \
     ssvepbci \
     neuronalconnectivity \
-    reference

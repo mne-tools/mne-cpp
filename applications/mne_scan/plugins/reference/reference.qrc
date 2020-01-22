@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/icons">
-        <file alias="options.png">images/icons/options.png</file>
-    </qresource>
-</RCC>
