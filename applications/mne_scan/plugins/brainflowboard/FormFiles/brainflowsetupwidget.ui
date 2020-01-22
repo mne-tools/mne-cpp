@@ -19,7 +19,7 @@
      <x>90</x>
      <y>50</y>
      <width>241</width>
-     <height>371</height>
+     <height>401</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -151,9 +151,9 @@
      <widget class="QLineEdit" name="boardId"/>
     </item>
     <item row="13" column="0" colspan="2">
-     <widget class="QPushButton" name="submitInfo">
+     <widget class="QPushButton" name="prepareSession">
       <property name="text">
-       <string>Submit Board Info</string>
+       <string>Submit Params and Prepare Session</string>
       </property>
      </widget>
     </item>
@@ -195,6 +195,13 @@
        </size>
       </property>
      </spacer>
+    </item>
+    <item row="14" column="0" colspan="2">
+     <widget class="QPushButton" name="releaseSession">
+      <property name="text">
+       <string>Release Session</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
