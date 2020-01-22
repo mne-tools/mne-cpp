@@ -42,6 +42,7 @@ TEMPLATE = subdirs
 
 #Sensors
 SUBDIRS += \
+    brainflowboard \
     fiffsimulator \
     neuromag \
     babymeg \
