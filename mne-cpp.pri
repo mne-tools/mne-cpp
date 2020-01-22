@@ -167,14 +167,6 @@ MNE_SCAN_INCLUDE_DIR = $$MNE_SCAN_INCLUDE_DIR
 isEmpty( MNE_SCAN_INCLUDE_DIR ) {
     MNE_SCAN_INCLUDE_DIR = $$shell_path($${PWD}/applications/mne_scan/libs)
 }
-MNE_ANALYZE_INCLUDE_DIR = $$MNE_ANALYZE_INCLUDE_DIR
-isEmpty( MNE_ANALYZE_INCLUDE_DIR ) {
-    MNE_ANALYZE_INCLUDE_DIR = $$shell_path($${PWD}/applications/mne_analyze/libs)
-}
-MNE_ANALYZE_EXTENSIONS_DIR = $$MNE_ANALYZE_EXTENSIONS_DIR
-isEmpty( MNE_ANALYZE_EXTENSIONS_DIR ) {
-    MNE_ANALYZE_EXTENSIONS_DIR = $$shell_path($${PWD}/applications/mne_analyze/extensions)
-}
 
 # lib
 MNE_LIBRARY_DIR = $$MNE_LIBRARY_DIR

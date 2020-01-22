@@ -22,9 +22,6 @@
 /lib/
 /bin/
 
-# Applications folder
-/applications/mne_analyze/extensions/deepcntknets/bio
-
 # External device SDKs (if installed)
 /applications/mne_scan/plugins/eegosports/eemagine/
 /applications/mne_scan/plugins/gusbamp/gtec_gUSBamp.h
