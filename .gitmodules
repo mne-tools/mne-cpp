@@ -1,0 +1,4 @@
+[submodule "applications/mne_scan/plugins/brainflowboard/brainflow"]
+	path = applications/mne_scan/plugins/brainflowboard/brainflow
+	url = https://github.com/Andrey1994/brainflow
+	branch = master
