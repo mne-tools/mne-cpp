@@ -97,7 +97,6 @@ mne.depends = utils fs fiff
 fwd.depends = utils fs fiff mne
 inverse.depends = utils fs fiff mne fwd
 communication.depends = utils fiff
-deep.depends = utils fs fiff mne
 rtprocessing.depends = utils connectivity fiff mne fwd inverse
 connectivity.depends = utils fs fiff mne
 disp.depends = utils fs fiff mne fwd inverse
