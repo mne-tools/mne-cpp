@@ -81,18 +81,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Inverse
 }
 
-# CNTK related stuff
-!isEmpty( CNTK_INCLUDE_DIR ) {
-    LIBS += -L$${CNTK_LIBRARY_DIR}
-    CONFIG(debug, debug|release) {
-        LIBS += -lMNE$${MNE_LIB_VERSION}Deepd \
-                -lCntk.Core-2.0
-    } else {
-        LIBS += -lMNE$${MNE_LIB_VERSION}Deep \
-                -lCntk.Core-2.0
-    }
-}
-
 SOURCES += \
     plots/imagesc.cpp \
     plots/plot.cpp \
@@ -196,28 +184,6 @@ qtHaveModule(charts) {
         plots/lineplot.h \
 }
 
-# CNTK related stuff
-!isEmpty( CNTK_INCLUDE_DIR ) {
-    SOURCES += \
-        viewers/deepmodelviewers/controls.cpp \
-        viewers/deepmodelviewers/edge.cpp \
-        viewers/deepmodelviewers/node.cpp \
-        viewers/deepmodelviewers/view.cpp \
-        viewers/deepmodelviewers/network.cpp \
-        viewers/deepmodelviewers/deepviewer.cpp
-
-    HEADERS += \
-        viewers/deepmodelviewers/controls.h \
-        viewers/deepmodelviewers/edge.h \
-        viewers/deepmodelviewers/node.h \
-        viewers/deepmodelviewers/view.h \
-        viewers/deepmodelviewers/network.h \
-        viewers/deepmodelviewers/deepviewer.h
-
-    RESOURCES += \
-        viewers/deepmodelviewers/images.qrc
-}
-
 FORMS += \
     viewers/formfiles/filterdesignview.ui \
     viewers/formfiles/channelselectionview.ui \
@@ -260,7 +226,6 @@ QMAKE_POST_LINK += $${COPY_CMD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${CNTK_INCLUDE_DIR}
 
 # Install headers to include directory
 header_files.files = $${HEADERS}
