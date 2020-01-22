@@ -66,9 +66,6 @@ SOURCES += \
     ioutils.cpp \
     layoutloader.cpp \
     layoutmaker.cpp \
-    mp/adaptivemp.cpp \
-    mp/atom.cpp \
-    mp/fixdictmp.cpp \
     selectionio.cpp \
     filterTools/cosinefilter.cpp \
     filterTools/parksmcclellan.cpp \
@@ -92,9 +89,6 @@ HEADERS += \
     ioutils.h \
     layoutloader.h \
     layoutmaker.h \
-    mp/adaptivemp.h \
-    mp/atom.h \
-    mp/fixdictmp.h \
     selectionio.h \
     layoutmaker.h \
     filterTools/cosinefilter.h \
