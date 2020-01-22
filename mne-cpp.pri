@@ -125,7 +125,6 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To disable examples run: qmake MNECPP_CONFIG+=noExamples
 ## To disable applications run: qmake MNECPP_CONFIG+=noApplications
 ## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=static
-## To build MNE-CPP Deep library based CNTK: qmake MNECPP_CONFIG+=buildDeep
 ## To build MNE-CPP with FFTW support in Eigen (make sure to specify FFTW_DIRs below): qmake MNECPP_CONFIG+=useFFTW
 ## To build MNE-CPP Disp library with OpenGL support (default is with OpenGL support): qmake MNECPP_CONFIG+=dispOpenGL
 ## To build MNE-CPP against wasm: qmake MNECPP_CONFIG+=wasm
@@ -159,29 +158,6 @@ isEmpty(EIGEN_INCLUDE_DIR) {
     EIGEN_INCLUDE_DIR = $$shell_path($${PWD}/include/3rdParty/eigen3)
 }
 
-#CNTK
-CNTK_INCLUDE_DIR = $$CNTK_INCLUDE_DIR
-isEmpty( CNTK_INCLUDE_DIR ) {
-    # Check CNTK Path options
-    exists($$shell_path($$(CNTKPATH)/cntk/Include/Eval.h)) {
-        CNTK_TEST_DIR = $$shell_path($$(CNTKPATH)/cntk)
-    }
-    exists($$shell_path($$(CNTKPATH)/Include/Eval.h)) {
-        CNTK_TEST_DIR = $$(CNTKPATH)
-    }
-    exists($$shell_path($$(MYCNTKPATH)/cntk/Include/Eval.h)) {
-        CNTK_TEST_DIR = $$shell_path($$(MYCNTKPATH)/cntk)
-    }
-    exists($$shell_path($$(MYCNTKPATH)/Include/Eval.h)) {
-        CNTK_TEST_DIR = $$(MYCNTKPATH)
-    }
-    # Set CNTK path variables
-    !isEmpty( CNTK_TEST_DIR ) {
-        CNTK_INCLUDE_DIR = $$shell_path($${CNTK_TEST_DIR}/Include)
-        CNTK_LIBRARY_DIR = $$shell_path($${CNTK_TEST_DIR}/cntk)
-    }
-}
-
 # include
 MNE_INCLUDE_DIR = $$MNE_INCLUDE_DIR
 isEmpty( MNE_INCLUDE_DIR ) {
@@ -204,12 +180,6 @@ isEmpty( MNE_ANALYZE_EXTENSIONS_DIR ) {
 MNE_LIBRARY_DIR = $$MNE_LIBRARY_DIR
 isEmpty( MNE_LIBRARY_DIR ) {
     MNE_LIBRARY_DIR = $$shell_path($${PWD}/lib)
-}
-contains(MNECPP_CONFIG, buildDeep) {
-    CNTK_LIBRARY_DIR = $$CNTK_LIBRARY_DIR
-    isEmpty( CNTK_LIBRARY_DIR ) {
-        CNTK_LIBRARY_DIR = $$shell_path(C:/local/cntk/cntk)
-    }
 }
 
 # bin

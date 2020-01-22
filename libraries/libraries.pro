@@ -50,11 +50,6 @@ SUBDIRS += \
 
 # Libraries which are not supported in the minimalVersion
 !contains(MNECPP_CONFIG, minimalVersion) {
-    !isEmpty( CNTK_INCLUDE_DIR ) {
-        SUBDIRS += \
-            deep
-    }
-
     SUBDIRS += \
         rtprocessing \
         connectivity \
