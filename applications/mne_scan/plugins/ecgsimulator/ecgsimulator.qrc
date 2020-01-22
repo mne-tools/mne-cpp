@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/images">
-        <file alias="ecgsimulator.png">images/ecgsimulator.png</file>
-    </qresource>
-</RCC>

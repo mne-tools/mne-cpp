@@ -127,7 +127,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2019 Authors of mne-cpp. All rights reser
 ## To build MNE-CPP libraries as static libs: qmake MNECPP_CONFIG+=static
 ## To build MNE-CPP Deep library based CNTK: qmake MNECPP_CONFIG+=buildDeep
 ## To build MNE-CPP with FFTW support in Eigen (make sure to specify FFTW_DIRs below): qmake MNECPP_CONFIG+=useFFTW
-## To build MNE-CPP Disp library and MNE Browse with OpenGL support (default is with OpenGL support): qmake MNECPP_CONFIG+=dispOpenGL
+## To build MNE-CPP Disp library with OpenGL support (default is with OpenGL support): qmake MNECPP_CONFIG+=dispOpenGL
 ## To build MNE-CPP against wasm: qmake MNECPP_CONFIG+=wasm
 
 # Default flags

@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    This class represents the channel info model of the model/view framework of mne_browse application.
+ * @brief    The declaration for ChannelInfoModel..
  *
  */
 
