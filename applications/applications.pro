@@ -46,20 +46,14 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     mne_rt_server \
-    mne_show_fiff
 
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
-        mne_browse \
         mne_forward_solution \
-        mne_matching_pursuit \
-        mne_sample_set_downloader
 
         qtHaveModule(charts) {
             SUBDIRS += \
-                mne_analyze \
                 mne_dipole_fit \
-                mne_launch \
                 mne_scan
         } else {
             message("applications.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
@@ -68,7 +62,7 @@ SUBDIRS += \
 
 # Overwrite SUBDIRS if wasm flag was defined
 contains(MNECPP_CONFIG, wasm) {
-    SUBDIRS = mne_browse
+    SUBDIRS =
 
     qtHaveModule(charts) {
         #SUBDIRS += mne_analyze # needs qt3D which is not yet wasm supported
