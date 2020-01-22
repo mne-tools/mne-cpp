@@ -98,7 +98,7 @@ jobs:
     - name: Package binaries
       run: |
         # Creating archive of all macos deployed applications
-        tar cfvz mne-cpp-macos-x86_64.tar.gz bin/mne_scan.dmg bin/mne_browse.dmg bin/mne_analyze.dmg
+        tar cfvz mne-cpp-macos-x86_64.tar.gz bin/mne_scan.dmg
     - name: Deploy MNE Scan binaries with dev_build release on Github
       uses: svenstaro/upload-release-action@v1-release
       with:

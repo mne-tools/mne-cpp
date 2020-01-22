@@ -65,7 +65,7 @@ contains(MNECPP_CONFIG, wasm) {
     SUBDIRS =
 
     qtHaveModule(charts) {
-        #SUBDIRS += mne_analyze # needs qt3D which is not yet wasm supported
+        #SUBDIRS += # needs qt3D which is not yet wasm supported
     } else {
         message("applications.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
     }
