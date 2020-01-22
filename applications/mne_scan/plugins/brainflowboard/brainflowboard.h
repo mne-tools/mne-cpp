@@ -39,7 +39,9 @@ protected:
     virtual void run();
 
 private:
-    BrainFlowInputParams params;
+    void releaseSession(bool useQmessage = true);
+    void prepareSession(BrainFlowInputParams params, std::string streamerParams, int boardId, int dataType);
+
     std::string streamerParams;
     int boardId;
     BoardShim *boardShim;

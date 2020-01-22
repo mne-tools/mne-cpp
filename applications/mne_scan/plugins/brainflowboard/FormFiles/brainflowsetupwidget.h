@@ -17,11 +17,11 @@ public:
     explicit BrainFlowSetupWidget(BrainFlowBoard *board, QWidget *parent = nullptr);
     ~BrainFlowSetupWidget();
 
-    void prepareParams();
+    void prepareSession();
+    void releaseSession();
 
 private:
     BrainFlowBoard *brainFlowBoard;
-    bool initialized;
     Ui::BrainFlowSetupWidget *ui;
 };
 
