@@ -5,9 +5,9 @@ nav_order: 2
 ---
 # Coding Conventions and Style Guide
 
-### Naming Conventions
+## Naming Conventions
 
-Please make use of the following coding conventions when contributing to MNE-CPP.
+Please make use of the following coding conventions when contributing to MNE-CPP:
 
 |Object|Rule|
 | --------------- | ------------------- |
@@ -17,16 +17,16 @@ Please make use of the following coding conventions when contributing to MNE-CPP
 |Member variables |`m_typeMeaningfulName` |
 |Local variables 	|`typeMeaningfulName`   |
 
-### Command Line Outputs
+## Command Line Outputs
 
-Please make use of `qDebug()` for debugging, `qInfo()` for user information and `qWarning` for user warning purposes. `qFatal()` should only be used to initiate an application stop. Please note that Eigen structures can only be plotted via std::cout.
+Please make use of `qDebug()` for debugging, `qInfo()` for user information and `qWarning()` for user warning purposes. `qFatal()` should only be used to initiate an application stop. Please note that Eigen structures can only be plotted via std::cout.
 
-### Readability and Understandability
+## Readability
 
  * Avoid complex and condensed expressions
  * Use meaningful variable names
 
-### Documentations
+## Documentation
 
  * Please use the DoxyGen style to document your code.
 
