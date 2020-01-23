@@ -30,7 +30,7 @@ These steps assume you already have MNE-Scan. If not please start [here](https:/
 
 4. Include ftbuffer in the build process:
 
-   The lines of code that include the ftbuffer plugin in `applications/mne_scan/libs/scShared/Management/pluginmanager.cpp`, `applications/mne_scan/libs/scShared/scShared.pro`, `applications/mne_scan/mne_scan.pro`, and `applications/mne_scan/plugins/plugins.pro` are commented out by default.
+   The lines of code that include the ftbuffer plugin in `applications/mne_scan/libs/scShared/Management/pluginmanager.cpp`, `applications/mne_scan/libs/scShared/scShared.pro`, `applications/mne_scan/mne_scan/mne_scan.pro`, and `applications/mne_scan/plugins/plugins.pro` are commented out by default.
 
 5. Build:
 
