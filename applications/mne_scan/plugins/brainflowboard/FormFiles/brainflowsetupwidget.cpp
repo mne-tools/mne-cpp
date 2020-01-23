@@ -43,6 +43,8 @@ void BrainFlowSetupWidget::prepareSession()
     std::string streamerParams = ui->streamerParams->text().toStdString();
     int boardId = ui->boardId->text().toInt();
     int dataType = ui->dataType->currentIndex();
+    int maxValue = ui->maxValue->text().toDouble();
+    int minValue = ui->minValue->text().toDouble();
 
-    brainFlowBoard->prepareSession(params, streamerParams, boardId, dataType);
+    brainFlowBoard->prepareSession(params, streamerParams, boardId, dataType, maxValue, minValue);
 }
