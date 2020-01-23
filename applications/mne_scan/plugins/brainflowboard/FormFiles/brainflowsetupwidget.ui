@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>437</width>
-    <height>481</height>
+    <width>422</width>
+    <height>578</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>90</x>
      <y>50</y>
      <width>241</width>
-     <height>401</height>
+     <height>491</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -122,7 +122,11 @@
      </widget>
     </item>
     <item row="7" column="1">
-     <widget class="QLineEdit" name="streamerParams"/>
+     <widget class="QLineEdit" name="streamerParams">
+      <property name="text">
+       <string>file://results.csv:w</string>
+      </property>
+     </widget>
     </item>
     <item row="8" column="0" colspan="2">
      <spacer name="horizontalSpacer">
@@ -150,7 +154,7 @@
     <item row="9" column="1">
      <widget class="QLineEdit" name="boardId"/>
     </item>
-    <item row="13" column="0" colspan="2">
+    <item row="15" column="0" colspan="2">
      <widget class="QPushButton" name="prepareSession">
       <property name="text">
        <string>Submit Params and Prepare Session</string>
@@ -160,7 +164,7 @@
     <item row="11" column="0">
      <widget class="QLineEdit" name="lineEdit_2">
       <property name="text">
-       <string>Data to display</string>
+       <string>Data to Display</string>
       </property>
       <property name="readOnly">
        <bool>true</bool>
@@ -183,7 +187,7 @@
     <item row="11" column="1">
      <widget class="QComboBox" name="dataType"/>
     </item>
-    <item row="12" column="0" colspan="2">
+    <item row="14" column="0" colspan="2">
      <spacer name="horizontalSpacer_4">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -196,10 +200,38 @@
       </property>
      </spacer>
     </item>
-    <item row="14" column="0" colspan="2">
+    <item row="16" column="0" colspan="2">
      <widget class="QPushButton" name="releaseSession">
       <property name="text">
        <string>Release Session</string>
+      </property>
+     </widget>
+    </item>
+    <item row="12" column="0">
+     <widget class="QLineEdit" name="lineEdit_4">
+      <property name="text">
+       <string>Min Value(opt)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="0">
+     <widget class="QLineEdit" name="lineEdit_6">
+      <property name="text">
+       <string>Max Value(opt)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="12" column="1">
+     <widget class="QLineEdit" name="minValue">
+      <property name="text">
+       <string>0.0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="1">
+     <widget class="QLineEdit" name="maxValue">
+      <property name="text">
+       <string>0.0</string>
       </property>
      </widget>
     </item>

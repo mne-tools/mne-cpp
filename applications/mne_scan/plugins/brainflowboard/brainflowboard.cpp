@@ -11,7 +11,9 @@ BrainFlowBoard::BrainFlowBoard() :
     output(NULL),
     samplingRate(0),
     streamerParams(""),
-    numChannels(0)
+    numChannels(0),
+    minValue(0),
+    maxValue(0)
 {
 
 }
@@ -88,7 +90,7 @@ QWidget* BrainFlowBoard::setupWidget()
     return widget;
 }
 
-void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string streamerParams, int boardId, int dataType)
+void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string streamerParams, int boardId, int dataType, double maxValue, double minValue)
 {
     if (boardShim)
     {
@@ -131,6 +133,41 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string str
         boardShim = new BoardShim(boardId, params);
         boardShim->prepare_session();
 
+        // if its not provided run streaming for a few seconds, get data and use this data as a reference for axis
+        if ((abs(maxValue) < DBL_EPSILON) || (abs(minValue) < DBL_EPSILON))
+        {
+            boardShim->start_stream();
+            sleep(2);
+            boardShim->stop_stream();
+            int dataCount = 0;
+            double **data = boardShim->get_board_data(&dataCount);
+            int numRows = BoardShim::get_num_rows(boardId);
+            for (int i = 0; i < dataCount; i++)
+            {
+                for (int j = 0; j < numChannels; j++)
+                {
+
+                   if (abs(minValue) < DBL_EPSILON || (data[channels[j]][i] < minValue))
+                   {
+                       minValue = (int)data[channels[j]][i];
+                   }
+                   if (abs(maxValue) < DBL_EPSILON || (data[channels[j]][i] > maxValue))
+                   {
+                       maxValue = (int)data[channels[j]][i];
+                   }
+                }
+            }
+            // increare ref values by 1.5 times and use as axis
+            maxValue = maxValue + (int)abs(maxValue) * 0.5;
+            minValue = minValue - (int)abs(minValue) * 0.5;
+            BoardShim::log_message((int)LogLevels::LEVEL_ERROR, "set maxValue to %lf and minValue to %lf", maxValue, minValue);
+            for (int i = 0; i < numRows; i++)
+            {
+                delete[] data[i];
+            }
+            delete[] data;
+        }
+
         output = new PluginOutputData<RealTimeSampleArray>::SPtr[numChannels];
         for (int i = 0; i < numChannels; i++)
         {
@@ -139,6 +176,8 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string str
             output[i]->data()->setSamplingRate(samplingRate);
             output[i]->data()->setVisibility(true);
             output[i]->data()->setArraySize(1);
+            output[i]->data()->setMinValue(minValue);
+            output[i]->data()->setMaxValue(maxValue);
         }
 
         msgBox.setText("Streaming session is ready");
@@ -164,6 +203,7 @@ void BrainFlowBoard::run()
 
     double **data = NULL;
     int dataCount = 0;
+    bool changeAxis = false;
     while(isRunning)
     {
         usleep(samplingPeriod);
