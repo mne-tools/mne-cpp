@@ -44,7 +44,7 @@ TEMPLATE = subdirs
 #Sensors
 SUBDIRS += \
     fiffsimulator \
-    ftbuffer \
+#    ftbuffer \ #needs fieldtrip buffer source code
     neuromag \
     babymeg \
     natus \
