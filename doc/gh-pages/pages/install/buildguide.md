@@ -30,7 +30,7 @@ After the installation is finished make sure to add the Qt bin folder (e.g. `<Qt
 
 ## Get the source code
 
-Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp) to your own GitHub account. For a detailed overview of how to fork a repository, we recommend checking out the [guide on the official GitHub website](https://help.github.com/en/github/getting-started-with-github/fork-a-repo). 
+Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp) to your own GitHub account. For a detailed guide on how to fork a repository, we recommend checking out the [guide on the official GitHub website](https://help.github.com/en/github/getting-started-with-github/fork-a-repo). 
 
 Clone the fork to your local machine:
 
