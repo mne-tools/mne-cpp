@@ -64,13 +64,14 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lscMeasd \
             -lscDispd \
-            -lscSharedd
+            -lscSharedd \
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lscMeas \
             -lscDisp \
-            -lscShared
+            -lscShared \
+            -lbuffer \
 }
 
 SOURCES += \
@@ -80,24 +81,6 @@ SOURCES += \
     FormFiles/ftbufferyourwidget.cpp \
     ftbuffproducer.cpp \
         ftsrc/cpp/FtConnection.cc \
-        ftsrc/src/cleanup.c \
-        ftsrc/src/clientrequest.c \
-        ftsrc/src/compat_clock_gettime.c \
-        ftsrc/src/compat_fsync.c \
-        ftsrc/src/compat_gettimeofday.c \
-        ftsrc/src/dmarequest.c \
-        ftsrc/src/endianutil.c \
-        ftsrc/src/extern.c \
-        ftsrc/src/interface.c \
-        ftsrc/src/printstruct.c \
-        ftsrc/src/rdaserver.c \
-        ftsrc/src/socketserver.c \
-        ftsrc/src/swapbytes.c \
-        ftsrc/src/tcprequest.c \
-        ftsrc/src/tcpsocket.c \
-        ftsrc/src/tcpserver.c \
-        ftsrc/src/timestamp.c \
-        ftsrc/src/util.c \
         ftsrc/ftbuffclient.cpp \
 
 HEADERS += \

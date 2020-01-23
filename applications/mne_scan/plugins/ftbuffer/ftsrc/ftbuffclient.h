@@ -65,7 +65,6 @@
 
 #include <FtBuffer.h>
 #include <MultiChannelFilter.h>
-#include <buffer.h>
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
