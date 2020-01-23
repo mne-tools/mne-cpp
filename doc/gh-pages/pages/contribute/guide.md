@@ -17,7 +17,7 @@ MNE-CPP is an open-source project and is made better by contributions from our u
    * Name the pull reqest, describe your changes and hit Create pull request button.
    * For a more detailed overview of how to make a pull request, we recommend checking out the [guide on the official GitHub website](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project).
 5. After you created the pull request, wait for the peer review process to be finished:
-   * Two MNE-CPP developers will review your code.
+   * MNE-CPP developers will review your code.
    * Please change your code on your local machine based on the comments made by the reviewers. Note: There is no need to create a new pull request for every new change you make to your code. Just commit the changes and push your code to your remote (forked Git Hub) repository. The changes will automatically be added to your already created pull request.
    * As soon as your code suits all of the MNE-CPP coding conventions and possible inconsistencies were dealt with, your code will be merged into the main MNE-CPP repository.
 6. Congratulations! You are now an official contributor to the MNE-CPP project.
