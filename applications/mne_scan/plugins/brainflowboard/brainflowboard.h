@@ -40,7 +40,7 @@ protected:
 
 private:
     void releaseSession(bool useQmessage = true);
-    void prepareSession(BrainFlowInputParams params, std::string streamerParams, int boardId, int dataType);
+    void prepareSession(BrainFlowInputParams params, std::string streamerParams, int boardId, int dataType, double maxValue, double minValue);
 
     std::string streamerParams;
     int boardId;
@@ -49,6 +49,8 @@ private:
     int *channels;
     int samplingRate;
     bool isRunning;
+    double maxValue;
+    double minValue;
     PluginOutputData<RealTimeSampleArray>::SPtr *output;
 };
 
