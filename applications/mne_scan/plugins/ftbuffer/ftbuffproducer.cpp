@@ -71,6 +71,10 @@ void FtBuffProducer::run() {
     while (true) {
         m_pFtBuffClient->getData();
 
+        if (m_pFtBuffClient->extendedHeader()) {
+            emit extendedHeaderChunks(/* m_pFtBuffClient->chunkData() */);
+        }
+
         if (m_pFtBuffClient->newData()){
             qDebug() << "Returning mat";
             emit newDataAvailable(m_pFtBuffClient->dataMat());

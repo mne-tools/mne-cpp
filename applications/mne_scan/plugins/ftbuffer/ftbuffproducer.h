@@ -145,6 +145,8 @@ signals:
     */
     void newDataAvailable(const Eigen::MatrixXd &matData);
 
+    void extendedHeaderChunks();
+
 private:
 
     FtBuffer*                       m_pFtBuffer;                /**< Pointer to FtBuffer that created this object. Destination of collected data */
