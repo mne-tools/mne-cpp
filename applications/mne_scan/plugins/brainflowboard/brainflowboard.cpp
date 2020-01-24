@@ -1,7 +1,11 @@
 #include <QMessageBox>
 
+#include "data_filter.h"
+
 #include "brainflowboard.h"
 #include "FormFiles/brainflowsetupwidget.h"
+#include "FormFiles/brainflowstreamingwidget.h"
+
 
 BrainFlowBoard::BrainFlowBoard() :
     boardShim(NULL),
@@ -12,15 +16,28 @@ BrainFlowBoard::BrainFlowBoard() :
     samplingRate(0),
     streamerParams(""),
     numChannels(0),
-    minValue(0),
-    maxValue(0)
+    bandStart(1),
+    bandStop(30),
+    notchFreq(50),
+    filterType((int)FilterTypes::BUTTERWORTH),
+    filterOrder(4),
+    ripple(0.5)
 {
-
+    showSettingsAction = new QAction(QIcon(":/images/options.png"), tr("Streaming Settings"),this);
+    showSettingsAction->setStatusTip(tr("Streaming Settings"));
+    connect(showSettingsAction, &QAction::triggered, this, &BrainFlowBoard::showSettings);
+    addPluginAction(showSettingsAction);
 }
 
 BrainFlowBoard::~BrainFlowBoard()
 {
     releaseSession(false);
+}
+
+void BrainFlowBoard::showSettings()
+{
+    BrainFlowStreamingWidget *widget = new BrainFlowStreamingWidget(this);
+    widget->show();
 }
 
 QSharedPointer<IPlugin> BrainFlowBoard::clone() const
@@ -90,7 +107,7 @@ QWidget* BrainFlowBoard::setupWidget()
     return widget;
 }
 
-void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string streamerParams, int boardId, int dataType, double maxValue, double minValue)
+void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string streamerParams, int boardId, int dataType, int vertScale)
 {
     if (boardShim)
     {
@@ -100,6 +117,7 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string str
         return;
     }
 
+    BoardShim::log_message((int)LogLevels::LEVEL_ERROR, "Vert Scale is %d %d", vertScale);
     QMessageBox msgBox;
     this->boardId = boardId;
     this->streamerParams = streamerParams;
@@ -120,9 +138,6 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string str
                 channels = BoardShim::get_eog_channels(boardId, &numChannels);
                 break;
             case 4:
-                channels = BoardShim::get_ppg_channels(boardId, &numChannels);
-                break;
-            case 5:
                 channels = BoardShim::get_eda_channels(boardId, &numChannels);
                 break;
             default:
@@ -133,41 +148,6 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string str
         boardShim = new BoardShim(boardId, params);
         boardShim->prepare_session();
 
-        // if its not provided run streaming for a few seconds, get data and use this data as a reference for axis
-        if ((abs(maxValue) < DBL_EPSILON) || (abs(minValue) < DBL_EPSILON))
-        {
-            boardShim->start_stream();
-            sleep(2);
-            boardShim->stop_stream();
-            int dataCount = 0;
-            double **data = boardShim->get_board_data(&dataCount);
-            int numRows = BoardShim::get_num_rows(boardId);
-            for (int i = 0; i < dataCount; i++)
-            {
-                for (int j = 0; j < numChannels; j++)
-                {
-
-                   if (abs(minValue) < DBL_EPSILON || (data[channels[j]][i] < minValue))
-                   {
-                       minValue = (int)data[channels[j]][i];
-                   }
-                   if (abs(maxValue) < DBL_EPSILON || (data[channels[j]][i] > maxValue))
-                   {
-                       maxValue = (int)data[channels[j]][i];
-                   }
-                }
-            }
-            // increare ref values by 1.5 times and use as axis
-            maxValue = maxValue + (int)abs(maxValue) * 0.5;
-            minValue = minValue - (int)abs(minValue) * 0.5;
-            BoardShim::log_message((int)LogLevels::LEVEL_ERROR, "set maxValue to %lf and minValue to %lf", maxValue, minValue);
-            for (int i = 0; i < numRows; i++)
-            {
-                delete[] data[i];
-            }
-            delete[] data;
-        }
-
         output = new PluginOutputData<RealTimeSampleArray>::SPtr[numChannels];
         for (int i = 0; i < numChannels; i++)
         {
@@ -176,8 +156,9 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string str
             output[i]->data()->setSamplingRate(samplingRate);
             output[i]->data()->setVisibility(true);
             output[i]->data()->setArraySize(1);
-            output[i]->data()->setMinValue(minValue);
-            output[i]->data()->setMaxValue(maxValue);
+            output[i]->data()->setMinValue((double)(0 - vertScale));
+            output[i]->data()->setMaxValue((double)vertScale);
+            output[i]->data()->setUnit("uV");
         }
 
         msgBox.setText("Streaming session is ready");
@@ -196,22 +177,63 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string str
     msgBox.exec();
 }
 
+void BrainFlowBoard::configureBoard(std::string config)
+{
+    QMessageBox msgBox;
+    if (!boardShim)
+    {
+        msgBox.setText("Prepare Session first.");
+        return;
+    }
+    else
+    {
+        try {
+            boardShim->config_board((char *)config.c_str());
+            msgBox.setText("Configured.");
+        } catch (const BrainFlowException &err) {
+            BoardShim::log_message((int)LogLevels::LEVEL_ERROR, err.what());
+            msgBox.setText("Failed to Configure.");
+        }
+    }
+    msgBox.exec();
+}
+
+void BrainFlowBoard::applyFilters(int notchFreq, int bandStart, int bandStop, int filterType, int filterOrder, double ripple)
+{
+    this->notchFreq = notchFreq;
+    this->bandStart = bandStart;
+    this->bandStop = bandStop;
+    this->filterType = filterType;
+    this->filterOrder = filterOrder;
+    this->ripple = ripple;
+}
+
 void BrainFlowBoard::run()
 {
-    int samplingPeriod = 1000000.0 / samplingRate;
+    unsigned long samplingPeriod = (unsigned long)(1000000.0 / samplingRate);
     int numRows = BoardShim::get_num_rows(boardId);
 
     double **data = NULL;
     int dataCount = 0;
-    bool changeAxis = false;
     while(isRunning)
     {
         usleep(samplingPeriod);
         data = boardShim->get_board_data (&dataCount);
 
-        for (int i = 0; i < dataCount; i++)
+        for (int j = 0; j < numChannels; j++)
         {
-            for (int j = 0; j < numChannels; j++)
+            if (notchFreq != 0)
+            {
+                // notch filter is bandstop filter
+                DataFilter::perform_bandstop(data[channels[j]], dataCount, samplingRate, (double)notchFreq, 2.0, filterOrder, filterType, ripple);
+            }
+            if ((bandStop != 0) && (bandStop != 0))
+            {
+                double centerFreq = bandStart + (double)(bandStop - bandStart) / 2.0;
+                double width = (double)(bandStop - bandStart) / 2.0;
+                DataFilter::perform_bandpass(data[channels[j]], dataCount, samplingRate,  centerFreq, width, filterOrder, filterType, ripple);
+            }
+            for (int i = 0; i < dataCount; i++)
             {
                 output[j]->data()->setValue(data[channels[j]][i]);
             }
