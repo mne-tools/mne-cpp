@@ -129,6 +129,14 @@ bool FtBuffClient::readHeader() {
     m_iNumChannels = header_def.nchans;
     m_uiNumSamples = header_def.nsamples;
 
+    m_ssChunkData = chunkBuffer;
+
+    qDebug() << "";
+    qDebug() << "";
+    qDebug() << "Chunk Buffer size:" << chunkBuffer.size();
+    qDebug() << "";
+    qDebug() << "";
+
     return true;
 }
 
@@ -348,6 +356,23 @@ bool FtBuffClient::newData() {
 
 Eigen::MatrixXd FtBuffClient::dataMat() {
     return *m_pMatEmit;
+}
+
+//*************************************************************************************************************
+
+SimpleStorage FtBuffClient::chunkData() {
+    return m_ssChunkData;
+}
+
+//*************************************************************************************************************
+
+bool FtBuffClient::extendedHeader() {
+    if (m_bChunkData) {
+        m_bChunkData = false;
+        return true;
+    } else {
+        return m_bChunkData;
+    }
 }
 
 //*************************************************************************************************************

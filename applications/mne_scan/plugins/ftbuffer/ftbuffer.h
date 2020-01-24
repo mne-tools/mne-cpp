@@ -219,6 +219,10 @@ protected:
     */
     void onNewDataAvailable(const Eigen::MatrixXd &matData);
 
+    void setupRTMSA();
+
+    void parseHeader();
+
 private:
 
     QSharedPointer<FtBuffProducer>                                                      m_pFtBuffProducer;              /**< Pointer to producer object that handles data from FtBuffClient*/
@@ -232,6 +236,9 @@ private:
     QAction*                                                                            m_pActionShowYourWidget;        /**< Action used in the displaying of the widget */
 
     bool                                                                                m_bIsRunning;                   /**< Whether ftbuffer is running. */
+
+    bool                                                                                m_bBuffOutputSet;
+    bool                                                                                m_bCustomFiff;
 
     int                                                                                 m_iNumChannels;                 /**< Parameter for how many channels expecet from buffer data */
     int                                                                                 m_iSampFreq;                    /**< Parameter for sampling rate expected from buffer data */
