@@ -59,6 +59,7 @@ FtBuffer::FtBuffer()
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
 , m_bBuffOutputSet(false)
+, m_bCustomFiff(false)
 {
     qDebug() << "Constructing FtBuffer Object";
 
@@ -182,14 +183,24 @@ void FtBuffer::setUpFiffInfo()
     //
     m_pFiffInfo->clear();
 
-    //
-    //Set number of channels, sampling frequency and high/-lowpass
-    //
-    //CURRENTLY HARDWIRED TO FTBUFFER EXAMPLE DATA PARAMS FROM SINE2FT
-    m_pFiffInfo->nchan = m_iNumChannels;
-    m_pFiffInfo->sfreq = m_iSampFreq;
-    m_pFiffInfo->highpass = 0.001f;
-    m_pFiffInfo->lowpass = m_iSampFreq/2;
+
+//    if (m_bCustomFiff) {
+////        //
+////        //Set number of channels, sampling frequency and high/-lowpass
+////        //
+////        m_pFiffInfo->nchan = m_iNumChannels;
+////        m_pFiffInfo->sfreq = m_iSampFreq;
+////        m_pFiffInfo->highpass = 0.001f;
+////        m_pFiffInfo->lowpass = m_iSampFreq/2;
+//    } else {
+        //
+        //Set number of channels, sampling frequency and high/-lowpass
+        //
+        m_pFiffInfo->nchan = m_iNumChannels;
+        m_pFiffInfo->sfreq = m_iSampFreq;
+        m_pFiffInfo->highpass = 0.001f;
+        m_pFiffInfo->lowpass = m_iSampFreq/2;
+    //}
 
     //
     //Set up the channel info
@@ -298,6 +309,7 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
     m_mutex.lock();
     if(m_bIsRunning) {
         if (!m_bBuffOutputSet) {
+            qDebug() << "!@%$%$&$#$%";
             setupRTMSA();
         }
         m_pRTMSA_BufferOutput->data()->setValue(matData);
@@ -327,7 +339,8 @@ void FtBuffer::setupRTMSA() {
 //*************************************************************************************************************
 
 void FtBuffer::parseHeader() {
-
+    //code to parse header chunks
+    m_bCustomFiff = true;
 }
 
 //*************************************************************************************************************
