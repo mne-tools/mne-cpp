@@ -14,6 +14,8 @@ It works by connecting to a given address where a FieldTrip buffer is running af
 
 These steps assume you already have MNE-Scan. If not please start [here](https://mne-cpp.github.io/pages/started/started.html).
 
+Currently the plugin only works on **Linux** due to incompatibilities with the FieldTrip buffer source code on other platforms. 
+
 1. Download FieldTrip Buffer source code:
 
    You can get the source code either from their [website](http://www.fieldtriptoolbox.org/download/) or their [github page](https://github.com/fieldtrip/fieldtrip). The website download gives you the option to download only the buffer source code. The github repository has the buffer source code located under `realtime/src/buffer`.
