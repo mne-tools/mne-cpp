@@ -146,7 +146,25 @@ public:
     bool newData();
 
     //=========================================================================================================
+    /**
+    * @brief dataMat - returns the buffer data in matrix format
+    * @return buffer data in matrix format
+    */
     Eigen::MatrixXd dataMat();
+
+    //=========================================================================================================
+    /**
+    * @brief chunkData - returns the data from the
+    * @return
+    */
+    SimpleStorage chunkData();
+
+    //=========================================================================================================
+    /**
+    * @brief extendedHeader - returns whether the header is extended, then sets flag back to false
+    * @return whether the header data has chunks
+    */
+    bool extendedHeader();
 
 private:
 
@@ -180,6 +198,9 @@ private:
 
     int                             m_iNumChannels;             /**< Number of data channels in the buffer */
     uint                            m_uiNumSamples;             /**< How many samples are in the buffer */
+
+    SimpleStorage                   m_ssChunkData;              /**< Contains optional chunk data tha can be read with buffer header */
+    bool                            m_bChunkData;               /**< Whether the header has chunk data */
 
     const char*                     m_pcAddrField;              /**< Address of where to connect to the buffer */
 

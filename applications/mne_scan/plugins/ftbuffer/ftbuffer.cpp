@@ -58,6 +58,7 @@ FtBuffer::FtBuffer()
 , m_pFtBuffProducer(QSharedPointer<FtBuffProducer>::create(this))
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
+, m_bBuffOutputSet(false)
 {
     qDebug() << "Constructing FtBuffer Object";
 
@@ -103,18 +104,12 @@ bool FtBuffer::start() {
     qDebug() << "Starting FtBuffer...";
     m_bIsRunning = true;
 
-    //Setup fiff info before setting up the RMTSA because we need it to init the RTMSA
-    setUpFiffInfo();
-
-    //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
-
     QThread::start();
 
     // FtProducer in it's own thread and connect communications signals/slots
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
+    connect(m_pFtBuffProducer.data(), &FtBuffProducer::extendedHeaderChunks, this, &FtBuffer::parseHeader);
     connect(this, &FtBuffer::workCommand, m_pFtBuffProducer.data(),&FtBuffProducer::doWork);
     m_pProducerThread.start();
 
@@ -302,6 +297,9 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
     qDebug() << "Appending matrix";
     m_mutex.lock();
     if(m_bIsRunning) {
+        if (!m_bBuffOutputSet) {
+            setupRTMSA();
+        }
         m_pRTMSA_BufferOutput->data()->setValue(matData);
     }
     m_mutex.unlock();
@@ -313,6 +311,23 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
 void FtBuffer::setParams(int freq, int chan) {
     m_iSampFreq = freq;
     m_iNumChannels = chan;
+}
+
+//*************************************************************************************************************
+
+void FtBuffer::setupRTMSA() {
+    //Setup fiff info before setting up the RMTSA because we need it to init the RTMSA
+    setUpFiffInfo();
+
+    //Set the channel size of the RMTSA
+    m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
+}
+
+//*************************************************************************************************************
+
+void FtBuffer::parseHeader() {
+
 }
 
 //*************************************************************************************************************
