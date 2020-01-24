@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BrainFlowStreamingWidget</class>
+ <widget class="QWidget" name="BrainFlowStreamingWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>474</width>
+    <height>374</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="formLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>40</y>
+     <width>371</width>
+     <height>271</height>
+    </rect>
+   </property>
+   <layout class="QFormLayout" name="formLayout">
+    <item row="0" column="0">
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="text">
+       <string>Notch Filter</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLineEdit" name="lineEdit_2">
+      <property name="text">
+       <string>BandPass Filter</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QComboBox" name="bandPassFilter"/>
+    </item>
+    <item row="5" column="0" colspan="2">
+     <widget class="QPushButton" name="submitFilters">
+      <property name="text">
+       <string>Submit Filter Settings</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0" colspan="2">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="7" column="0">
+     <widget class="QLineEdit" name="lineEdit_3">
+      <property name="text">
+       <string>Send String to Board</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="1">
+     <widget class="QLineEdit" name="stringToSend"/>
+    </item>
+    <item row="8" column="0" colspan="2">
+     <widget class="QPushButton" name="sendToBoard">
+      <property name="text">
+       <string>Send to Board</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="notchFilter"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLineEdit" name="lineEdit_4">
+      <property name="text">
+       <string>Filter Type</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLineEdit" name="lineEdit_5">
+      <property name="text">
+       <string>Filter Order</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QComboBox" name="filterType"/>
+    </item>
+    <item row="3" column="1">
+     <widget class="QSpinBox" name="filterOrder"/>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLineEdit" name="lineEdit_6">
+      <property name="text">
+       <string>Ripple(Chebyshev)</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLineEdit" name="ripple">
+      <property name="text">
+       <string>0.5</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

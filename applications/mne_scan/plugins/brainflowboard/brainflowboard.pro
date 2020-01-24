@@ -45,10 +45,12 @@ DEPENDPATH += $$PWD/brainflow/installed/inc
 
 SOURCES += \
     FormFiles/brainflowsetupwidget.cpp \
+    FormFiles/brainflowstreamingwidget.cpp \
     brainflowboard.cpp
 
 HEADERS += \
     FormFiles/brainflowsetupwidget.h \
+    FormFiles/brainflowstreamingwidget.h \
     brainflowboard_global.h \
     brainflowboard.h
 
@@ -70,4 +72,5 @@ OTHER_FILES += \
     brainflowboard.json
 
 FORMS += \
-    FormFiles/brainflowsetupwidget.ui
+    FormFiles/brainflowsetupwidget.ui \
+    FormFiles/brainflowstreamingwidget.ui
