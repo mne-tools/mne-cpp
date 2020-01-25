@@ -55,8 +55,17 @@ jobs:
       with:
         version: 5.14.1
         modules: qtcharts
+    - name: Build BrainFlow
+      run: |
+        sudo pip install cmake==3.13.0
+        mkdir $GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/build
+        cd $GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/build
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/installed ..
+        make
+        make install
+        cd $GITHUB_WORKSPACE
     - name: Configure and compile MNE-CPP
-      run: |        
+      run: |
         qmake -r MNECPP_CONFIG+=noTests
         make -j2 
     - name: Package binaries
@@ -101,8 +110,17 @@ jobs:
       with:
         version: 5.14.1
         modules: qtcharts
+    - name: Build BrainFlow
+      run: |
+        sudo pip install cmake==3.13.0
+        mkdir $GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/build
+        cd $GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/build
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/installed ..
+        make
+        make install
+        cd $GITHUB_WORKSPACE
     - name: Configure and compile MNE-CPP
-      run: |        
+      run: |
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples
         make -j2
     - name: Package binaries
@@ -141,6 +159,14 @@ jobs:
         Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
         expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
         echo "::add-path::$HOME\jom"
+    - name: Build BrainFlow
+      run: |
+        sudo pip install cmake==3.13.0
+        mkdir $GITHUB_WORKSPACE\applications/mne_scan/plugins/brainflowboard/brainflow/build
+        cd $GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/build
+        cmake -G "Visual Studio 14 2015 Win64" -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed ..
+        cmake --build . --target install --config Release
+        cd $GITHUB_WORKSPACE
     - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
@@ -213,7 +239,7 @@ jobs:
         sudo apt-get update -qq
         sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
     - name: Run Doxygen and package result
-      run: |        
+      run: |
         cd doc/doxygen
         doxygen mne-cpp_doxyfile
     - name: Setup Github credentials
@@ -229,7 +255,7 @@ jobs:
         tag: dev_build
         overwrite: true
     - name: Update documentation at Github pages
-      run: |    
+      run: |
         cd doc/doxygen
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE

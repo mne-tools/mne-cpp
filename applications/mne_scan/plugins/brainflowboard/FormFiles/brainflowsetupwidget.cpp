@@ -7,7 +7,7 @@
 
 BrainFlowSetupWidget::BrainFlowSetupWidget(BrainFlowBoard *board, QWidget *parent) :
     QWidget(parent),
-    brainFlowBoard(board),
+    m_pBrainFlowBoard(board),
     ui(new Ui::BrainFlowSetupWidget)
 {
     ui->setupUi(this);
@@ -48,7 +48,7 @@ BrainFlowSetupWidget::~BrainFlowSetupWidget()
 
 void BrainFlowSetupWidget::releaseSession()
 {
-    brainFlowBoard->releaseSession();
+    m_pBrainFlowBoard->releaseSession();
 }
 
 void BrainFlowSetupWidget::prepareSession()
@@ -95,5 +95,5 @@ void BrainFlowSetupWidget::prepareSession()
             break;
     }
 
-    brainFlowBoard->prepareSession(params, streamerParams, boardId, dataType, vertScale);
+    m_pBrainFlowBoard->prepareSession(params, streamerParams, boardId, dataType, vertScale);
 }

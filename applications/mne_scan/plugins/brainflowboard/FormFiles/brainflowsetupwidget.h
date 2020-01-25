@@ -21,7 +21,7 @@ public:
     void releaseSession();
 
 private:
-    BrainFlowBoard *brainFlowBoard;
+    BrainFlowBoard *m_pBrainFlowBoard;
     Ui::BrainFlowSetupWidget *ui;
 };
 
