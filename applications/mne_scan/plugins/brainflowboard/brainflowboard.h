@@ -42,22 +42,22 @@ protected:
 
 private:
 
-    std::string streamerParams;
-    int boardId;
-    BoardShim *boardShim;
-    int numChannels;
-    int *channels;
-    int samplingRate;
-    PluginOutputData<RealTimeSampleArray>::SPtr *output;
-    volatile int notchFreq;
-    volatile int bandStart;
-    volatile int bandStop;
-    volatile int filterOrder;
-    volatile int filterType;
-    volatile double ripple;
-    volatile bool isRunning;
+    std::string m_sStreamerParams;
+    int m_iBoardId;
+    BoardShim *m_pBoardShim;
+    int m_iNumChannels;
+    int *m_pChannels;
+    int m_iSamplingRate;
+    PluginOutputData<RealTimeSampleArray>::SPtr *m_pOutput;
+    volatile int m_iNotchFreq;
+    volatile int m_iBandStart;
+    volatile int m_iBandStop;
+    volatile int m_iFilterOrder;
+    volatile int m_iFilterType;
+    volatile double m_dRipple;
+    volatile bool m_bIsRunning;
 
-    QAction *showSettingsAction;
+    QAction *m_pShowSettingsAction;
 };
 
 #endif // BRAINFLOWBOARD_H

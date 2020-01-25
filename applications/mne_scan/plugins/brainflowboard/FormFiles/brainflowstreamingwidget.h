@@ -21,7 +21,7 @@ public:
     void applyFilters();
 
 private:
-    BrainFlowBoard *brainFlowBoard;
+    BrainFlowBoard *m_pBrainFlowBoard;
     Ui::BrainFlowStreamingWidget *ui;
 };
 
