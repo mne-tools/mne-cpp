@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     RtHPIS class declaration.
+ * @brief     RtHpi class declaration.
  *
  */
 
@@ -99,13 +99,14 @@ struct FittingResult {
     QVector<double> errorDistances;
 };
 
+
 //=============================================================================================================
 /**
  * Real-time HPI worker.
  *
  * @brief Real-time HPI worker.
  */
-class RTPROCESINGSHARED_EXPORT RtHPISWorker : public QObject
+class RTPROCESINGSHARED_EXPORT RtHpiWorker : public QObject
 {
     Q_OBJECT
 
@@ -134,13 +135,13 @@ signals:
  *
  * @brief Real-time Head Coil Positions estimation.
  */
-class RTPROCESINGSHARED_EXPORT RtHPIS : public QObject
+class RTPROCESINGSHARED_EXPORT RtHpi : public QObject
 {
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<RtHPIS> SPtr;             /**< Shared pointer type for RtHPIS. */
-    typedef QSharedPointer<const RtHPIS> ConstSPtr;  /**< Const shared pointer type for RtHPIS. */
+    typedef QSharedPointer<RtHpi> SPtr;             /**< Shared pointer type for RtHpi. */
+    typedef QSharedPointer<const RtHpi> ConstSPtr;  /**< Const shared pointer type for RtHpi. */
 
     //=========================================================================================================
     /**
@@ -149,14 +150,14 @@ public:
      * @param[in] p_pFiffInfo        Associated Fiff Information
      * @param[in] parent     Parent QObject (optional)
      */
-    explicit RtHPIS(QSharedPointer<FIFFLIB::FiffInfo> p_pFiffInfo,
+    explicit RtHpi(QSharedPointer<FIFFLIB::FiffInfo> p_pFiffInfo,
                     QObject *parent = 0);
 
     //=========================================================================================================
     /**
      * Destroys the Real-time HPI estimation object.
      */
-    ~RtHPIS();    
+    ~RtHpi();
 
     //=========================================================================================================
     /**

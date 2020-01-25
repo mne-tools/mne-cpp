@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    HPIFitData class defintion.
+ * @brief    HpiFitData class defintion.
  *
  */
 
@@ -78,7 +78,7 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HPIFitData::HPIFitData()
+HpiFitData::HpiFitData()
 {
 
 }
@@ -86,9 +86,9 @@ HPIFitData::HPIFitData()
 
 //*************************************************************************************************************
 
-void HPIFitData::doDipfitConcurrent()
+void HpiFitData::doDipfitConcurrent()
 {
-    // Initialize variables
+    // Initialize fitting
     Eigen::RowVectorXd currentCoil = this->coilPos;
     Eigen::VectorXd currentData = this->sensorData;
     SensorInfo currentSensors = this->sensorPos;
@@ -117,7 +117,9 @@ void HPIFitData::doDipfitConcurrent()
 
 //*************************************************************************************************************
 
-Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt, Eigen::MatrixXd ori)
+Eigen::MatrixXd HpiFitData::magnetic_dipole(Eigen::MatrixXd pos,
+                                            Eigen::MatrixXd pnt,
+                                            Eigen::MatrixXd ori)
 {
     double u0 = 1e-7;
     int nchan;
@@ -171,7 +173,8 @@ Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd
 
 //*************************************************************************************************************
 
-Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& pos, const struct SensorInfo& sensors)
+Eigen::MatrixXd HpiFitData::compute_leadfield(const Eigen::MatrixXd& pos,
+                                              const struct SensorInfo& sensors)
 {
 
     Eigen::MatrixXd pnt, ori, lf;
@@ -189,7 +192,10 @@ Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& pos, const 
 
 //*************************************************************************************************************
 
-DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const struct SensorInfo& sensors, const Eigen::MatrixXd& matProjectors)
+DipFitError HpiFitData::dipfitError(const Eigen::MatrixXd& pos,
+                                    const Eigen::MatrixXd& data,
+                                    const struct SensorInfo& sensors,
+                                    const Eigen::MatrixXd& matProjectors)
 {
     // Variable Declaration
     struct DipFitError e;
@@ -213,7 +219,8 @@ DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& pos, const Eigen::Mat
 
 //*************************************************************************************************************
 
-bool HPIFitData::compare(HPISortStruct a, HPISortStruct b)
+bool HpiFitData::compare(HpiSortStruct a,
+                         HpiSortStruct b)
 {
     return (a.base_arr < b.base_arr);
 }
@@ -221,7 +228,7 @@ bool HPIFitData::compare(HPISortStruct a, HPISortStruct b)
 
 //*************************************************************************************************************
 
-Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
+Eigen::MatrixXd HpiFitData::fminsearch(const Eigen::MatrixXd& pos,
                                        int maxiter,
                                        int maxfun,
                                        int display,
@@ -305,10 +312,10 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
     }
 
     // Sort elements of fv
-    std::vector<HPISortStruct> vecSortStruct;
+    std::vector<HpiSortStruct> vecSortStruct;
 
     for (int i = 0; i < fv.size(); i++) {
-        HPISortStruct structTemp;
+        HpiSortStruct structTemp;
         structTemp.base_arr = fv[i];
         structTemp.idx = i;
         vecSortStruct.push_back(structTemp);
@@ -383,8 +390,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
                 fv[n] = fxr.error;
                 how = "reflect";
             }
-        }
-        else {
+        } else {
             if(fxr.error < fv[n-1]) {
                 v.col(v.cols()-1) = xr;
                 fv[n] = fxr.error;
@@ -436,7 +442,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
         vecSortStruct.clear();
 
         for (int i = 0; i < fv.size(); i++) {
-            HPISortStruct structTemp;
+            HpiSortStruct structTemp;
             structTemp.base_arr = fv[i];
             structTemp.idx = i;
             vecSortStruct.push_back(structTemp);
