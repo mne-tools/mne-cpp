@@ -3,7 +3,7 @@
 
 BrainFlowStreamingWidget::BrainFlowStreamingWidget(BrainFlowBoard *board, QWidget *parent) :
     QWidget(parent),
-    brainFlowBoard(board),
+    m_pBrainFlowBoard(board),
     ui(new Ui::BrainFlowStreamingWidget)
 {
     ui->setupUi(this);
@@ -39,7 +39,7 @@ BrainFlowStreamingWidget::BrainFlowStreamingWidget(BrainFlowBoard *board, QWidge
 
 void BrainFlowStreamingWidget::configureBoard()
 {
-    brainFlowBoard->configureBoard(ui->stringToSend->text().toStdString());
+    m_pBrainFlowBoard->configureBoard(ui->stringToSend->text().toStdString());
 }
 
 void BrainFlowStreamingWidget::applyFilters()
@@ -60,7 +60,7 @@ void BrainFlowStreamingWidget::applyFilters()
         bandStart = splitted[0].toInt();
         bandStop = splitted[1].toInt();
     }
-    brainFlowBoard->applyFilters(notchFreq, bandStart, bandStop, filterType, order, ripple);
+    m_pBrainFlowBoard->applyFilters(notchFreq, bandStart, bandStop, filterType, order, ripple);
 }
 
 BrainFlowStreamingWidget::~BrainFlowStreamingWidget()
