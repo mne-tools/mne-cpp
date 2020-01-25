@@ -109,8 +109,8 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
 , m_pFiffInfo(pFiffInfo)
 , m_pView3D(View3D::SPtr(new View3D))
 , m_pData3DModel(Data3DTreeModel::SPtr(new Data3DTreeModel))
-, m_pRtHPI(RtHPIS::SPtr(new RtHPIS(m_pFiffInfo)))
-, m_dMaxHPIFitError(0.01)
+, m_pRtHPI(RtHpi::SPtr(new RtHpi(m_pFiffInfo)))
+, m_dMaxHpiFitError(0.01)
 , m_dMeanErrorDist(0.0)
 , m_iNubmerBadChannels(0)
 , m_bUseSSP(false)
@@ -219,7 +219,7 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
 
     //Init RtHPIs
     m_pRtHPI->setCoilFrequencies(m_vCoilFreqs);
-    connect(m_pRtHPI.data(), &RtHPIS::newFittingResultAvailable,
+    connect(m_pRtHPI.data(), &RtHpi::newFittingResultAvailable,
             this, &HpiView::onNewFittingResultAvailable);
 }
 
@@ -569,7 +569,7 @@ void HpiView::onDoContinousHPI()
 
 void HpiView::onContinousHPIMaxDistChanged()
 {
-    m_dMaxHPIFitError = ui->m_doubleSpinBox_maxHPIContinousDist->value() * 0.001;
+    m_dMaxHpiFitError = ui->m_doubleSpinBox_maxHPIContinousDist->value() * 0.001;
 }
 
 
@@ -613,7 +613,7 @@ void HpiView::updateErrorLabels()
     ui->m_label_averagedFitError->setText(QString::number(m_dMeanErrorDist*1000,'f',2)+QString("mm"));
 
     //Update good/bad fit label
-    if(m_dMeanErrorDist > m_dMaxHPIFitError) {
+    if(m_dMeanErrorDist > m_dMaxHpiFitError) {
         ui->m_label_fitFeedback->setText("Bad Fit");
         ui->m_label_fitFeedback->setStyleSheet("QLabel { background-color : red;}");
     } else {
@@ -669,7 +669,7 @@ void HpiView::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPoin
     updateErrorLabels();
 
     //If distance is to big, do not store results
-    if(m_dMeanErrorDist > m_dMaxHPIFitError) {
+    if(m_dMeanErrorDist > m_dMaxHpiFitError) {
         m_bLastFitGood = false;
         return;
     }

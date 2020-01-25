@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Definition of the RtHPIS Class.
+ * @brief     Definition of the RtHpi Class.
  *
  */
 
@@ -72,10 +72,10 @@ using namespace INVERSELIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS RtHPISWorker
+// DEFINE MEMBER METHODS RtHpiWorker
 //=============================================================================================================
 
-void RtHPISWorker::doWork(const Eigen::MatrixXd& matData,
+void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
                           const Eigen::MatrixXd& matProjectors,
                           const QVector<int>& vFreqs,
                           QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
@@ -89,7 +89,7 @@ void RtHPISWorker::doWork(const Eigen::MatrixXd& matData,
     fitResult.devHeadTrans.from = 1;
     fitResult.devHeadTrans.to = 4;
 
-    HPIFit::fitHPI(matData,
+    HpiFit::fitHpi(matData,
                     matProjectors,
                     fitResult.devHeadTrans,
                     vFreqs,
@@ -103,10 +103,10 @@ void RtHPISWorker::doWork(const Eigen::MatrixXd& matData,
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS RtHPIS
+// DEFINE MEMBER METHODS RtHpi
 //=============================================================================================================
 
-RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
+RtHpi::RtHpi(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 : QObject(parent)
 , m_pFiffInfo(p_pFiffInfo)
 {
@@ -114,17 +114,17 @@ RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
     qRegisterMetaType<QVector<int> >("QVector<int>");
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo> >("QSharedPointer<FIFFLIB::FiffInfo>");
 
-    RtHPISWorker *worker = new RtHPISWorker;
+    RtHpiWorker *worker = new RtHpiWorker;
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,
             worker, &QObject::deleteLater);
 
-    connect(this, &RtHPIS::operate,
-            worker, &RtHPISWorker::doWork);
+    connect(this, &RtHpi::operate,
+            worker, &RtHpiWorker::doWork);
 
-    connect(worker, &RtHPISWorker::resultReady,
-            this, &RtHPIS::handleResults);
+    connect(worker, &RtHpiWorker::resultReady,
+            this, &RtHpi::handleResults);
 
     m_workerThread.start();
 }
@@ -132,7 +132,7 @@ RtHPIS::RtHPIS(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 
 //*************************************************************************************************************
 
-RtHPIS::~RtHPIS()
+RtHpi::~RtHpi()
 {
     stop();
 }
@@ -140,7 +140,7 @@ RtHPIS::~RtHPIS()
 
 //*************************************************************************************************************
 
-void RtHPIS::append(const MatrixXd &data)
+void RtHpi::append(const MatrixXd &data)
 {
     emit operate(data,
                  m_matProjectors,
@@ -151,7 +151,7 @@ void RtHPIS::append(const MatrixXd &data)
 
 //*************************************************************************************************************
 
-void RtHPIS::setCoilFrequencies(const QVector<int>& vCoilFreqs)
+void RtHpi::setCoilFrequencies(const QVector<int>& vCoilFreqs)
 {
     m_vCoilFreqs = vCoilFreqs;
 }
@@ -159,7 +159,7 @@ void RtHPIS::setCoilFrequencies(const QVector<int>& vCoilFreqs)
 
 //*************************************************************************************************************
 
-void RtHPIS::setProjectionMatrix(const Eigen::MatrixXd& matProjectors)
+void RtHpi::setProjectionMatrix(const Eigen::MatrixXd& matProjectors)
 {
     m_matProjectors = matProjectors;
 }
@@ -167,7 +167,7 @@ void RtHPIS::setProjectionMatrix(const Eigen::MatrixXd& matProjectors)
 
 //*************************************************************************************************************
 
-void RtHPIS::handleResults(const RTPROCESSINGLIB::FittingResult& fitResult)
+void RtHpi::handleResults(const RTPROCESSINGLIB::FittingResult& fitResult)
 {
     emit newFittingResultAvailable(fitResult);
 }
@@ -175,21 +175,21 @@ void RtHPIS::handleResults(const RTPROCESSINGLIB::FittingResult& fitResult)
 
 //*************************************************************************************************************
 
-void RtHPIS::restart()
+void RtHpi::restart()
 {
     stop();
 
-    RtHPISWorker *worker = new RtHPISWorker;
+    RtHpiWorker *worker = new RtHpiWorker;
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,
             worker, &QObject::deleteLater);
 
-    connect(this, &RtHPIS::operate,
-            worker, &RtHPISWorker::doWork);
+    connect(this, &RtHpi::operate,
+            worker, &RtHpiWorker::doWork);
 
-    connect(worker, &RtHPISWorker::resultReady,
-            this, &RtHPIS::handleResults);
+    connect(worker, &RtHpiWorker::resultReady,
+            this, &RtHpi::handleResults);
 
     m_workerThread.start();
 }
@@ -197,7 +197,7 @@ void RtHPIS::restart()
 
 //*************************************************************************************************************
 
-void RtHPIS::stop()
+void RtHpi::stop()
 {
     m_workerThread.requestInterruption();
     m_workerThread.quit();

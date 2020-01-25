@@ -12,7 +12,7 @@
  *
  * @section  LICENSE
  *
- * Copyright (C) 2016, Lars Debor, Christoph Dinh, Felix Griesau, Juan Garcia-Prieto, Lorenz Esch, 
+ * Copyright (C) 2016, Lars Debor, Christoph Dinh, Felix Griesau, Juan Garcia-Prieto, Lorenz Esch,
  *                     Simon Heinke. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
