@@ -271,14 +271,14 @@ protected:
     QSharedPointer<DISP3DLIB::View3D>           m_pView3D;              /**< The 3D view. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;         /**< The Disp3D model. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;            /**< The FiffInfo. */
-    QSharedPointer<RTPROCESSINGLIB::RtHPIS>         m_pRtHPI;               /**< The real-time HPI object. */
+    QSharedPointer<RTPROCESSINGLIB::RtHpi>         m_pRtHPI;               /**< The real-time HPI object. */
 
     QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadKid;          /**< The BEM head model for a kid. */
     QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadAdult;        /**< The BEM head model for an adult. */
 
     QPointer<DISP3DLIB::DigitizerSetTreeItem>   m_pTrackedDigitizer;    /**< The 3D item pointing to the tracked digitizers. */
 
-    double                                      m_dMaxHPIFitError;      /**< The maximum HPI fitting error allowed.*/
+    double                                      m_dMaxHpiFitError;      /**< The maximum HPI fitting error allowed.*/
 
 signals:
     //=========================================================================================================

@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    HPIFitData class declaration.
+ * @brief    HpiFitData class declaration.
  *
  */
 
@@ -108,7 +108,7 @@ struct SensorInfo {
 /**
  * The strucut specifing the sorting parameters.
  */
-struct HPISortStruct {
+struct HpiSortStruct {
     double base_arr;
     int idx;
 };
@@ -126,18 +126,18 @@ struct HPISortStruct {
  *
  * @brief HPI Fit algorithm data structure.
  */
-class INVERSESHARED_EXPORT HPIFitData
+class INVERSESHARED_EXPORT HpiFitData
 {
 
 public:
-    typedef QSharedPointer<HPIFitData> SPtr;             /**< Shared pointer type for HPIFitData. */
-    typedef QSharedPointer<const HPIFitData> ConstSPtr;  /**< Const shared pointer type for HPIFitData. */
+    typedef QSharedPointer<HpiFitData> SPtr;             /**< Shared pointer type for HpiFitData. */
+    typedef QSharedPointer<const HpiFitData> ConstSPtr;  /**< Const shared pointer type for HpiFitData. */
 
     //=========================================================================================================
     /**
      * Default constructor.
      */
-    explicit HPIFitData();
+    explicit HpiFitData();
 
     //=========================================================================================================
     /**
@@ -145,19 +145,25 @@ public:
      */
     void doDipfitConcurrent();
 
-    Eigen::RowVectorXd  coilPos;
-    Eigen::RowVectorXd  sensorData;
-    DipFitError         errorInfo;
-    SensorInfo          sensorPos;
-    Eigen::MatrixXd     matProjector;
+    Eigen::RowVectorXd  coilPos;        /**< . */
+    Eigen::RowVectorXd  sensorData;     /**< . */
+    DipFitError         errorInfo;      /**< . */
+    SensorInfo          sensorPos;      /**< . */
+    Eigen::MatrixXd     matProjector;   /**< . */
 
 protected:
     //=========================================================================================================
     /**
      * magnetic_dipole leadfield for a magnetic dipole in an infinite medium.
      * The function has been compared with matlab magnetic_dipole and it gives same output.
+     *
+     * @param[in] pos
+     * @param[in] pnt
+     * @param[in] ori
      */
-    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt, Eigen::MatrixXd ori);
+    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos,
+                                    Eigen::MatrixXd pnt,
+                                    Eigen::MatrixXd ori);
 
     //=========================================================================================================
     /**
@@ -167,8 +173,12 @@ protected:
      * distributions on all sensors for one of the x,y,z-orientations of the dipole.
      * The function has been compared with matlab ft_compute_leadfield and it gives
      * same output.
+     *
+     * @param[in] pos
+     * @param[in] sensors
      */
-    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos, const struct SensorInfo& sensors);
+    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos,
+                                      const struct SensorInfo& sensors);
 
     //=========================================================================================================
     /**
@@ -176,20 +186,41 @@ protected:
      * and can be used for non-linear fitting of dipole position.
      * The function has been compared with matlab dipfit_error and it gives
      * same output
+     *
+     * @param[in] pos
+     * @param[in] data
+     * @param[in] sensors
+     * @param[in] matProjectors
      */
-    DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const struct SensorInfo& sensors, const Eigen::MatrixXd& matProjectors);
+    DipFitError dipfitError(const Eigen::MatrixXd& pos,
+                            const Eigen::MatrixXd& data,
+                            const struct SensorInfo& sensors,
+                            const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
     /**
      * Compare function for sorting
+     *
+     * @param[in] a
+     * @param[in] b
      */
-    static bool compare(HPISortStruct a, HPISortStruct b);
+    static bool compare(HpiSortStruct a,
+                        HpiSortStruct b);
 
     //=========================================================================================================
     /**
      * fminsearch Multidimensional unconstrained nonlinear minimization (Nelder-Mead).
      * X = fminsearch(X0, maxiter, maxfun, display, data, sensors) starts at X0 and
      * attempts to find a local minimizer
+     *
+     * @param[in] pos
+     * @param[in] maxiter
+     * @param[in] maxfun
+     * @param[in] display
+     * @param[in] data
+     * @param[in] matProjectors
+     * @param[in] sensors
+     * @param[in] simplex_numitr
      */
     Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& pos,
                                int maxiter,

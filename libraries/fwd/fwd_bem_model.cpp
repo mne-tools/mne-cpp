@@ -2961,7 +2961,14 @@ int FwdBemModel::fwd_bem_field(float *rd, float *Q, FwdCoilSet *coils, float *B,
 
 //*************************************************************************************************************
 
-int FwdBemModel::fwd_bem_field_grad(float *rd, float Q[], FwdCoilSet *coils, float Bval[], float xgrad[], float ygrad[], float zgrad[], void *client)  /* Client data to be passed to some foward modelling routines */
+int FwdBemModel::fwd_bem_field_grad(float *rd,
+                                    float Q[],
+                                    FwdCoilSet *coils,
+                                    float Bval[],
+                                    float xgrad[],
+                                    float ygrad[],
+                                    float zgrad[],
+                                    void *client)  /* Client data to be passed to some foward modelling routines */
 {
     FwdBemModel* m = (FwdBemModel*)client;
     FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
@@ -2970,26 +2977,50 @@ int FwdBemModel::fwd_bem_field_grad(float *rd, float Q[], FwdCoilSet *coils, flo
         qCritical("No BEM model specified to fwd_bem_field");
         return FAIL;
     }
+
     if (!sol || !sol->solution || sol->ncoil != coils->ncoil) {
         qCritical("No appropriate coil-specific data available in fwd_bem_field");
         return FAIL;
     }
+
     if (m->bem_method == FWD_BEM_CONSTANT_COLL) {
-        if (Bval)
-            fwd_bem_field_calc(rd,Q,coils,m,Bval);
-        fwd_bem_field_grad_calc(rd,Q,coils,m,xgrad,ygrad,zgrad);
-    }
-    else if (m->bem_method == FWD_BEM_LINEAR_COLL) {
-        if (Bval)
-            fwd_bem_lin_field_calc(rd,Q,coils,m,Bval);
-        fwd_bem_lin_field_grad_calc(rd,Q,coils,m,xgrad,ygrad,zgrad);
-    }
-    else {
+        if (Bval) {
+            fwd_bem_field_calc(rd,
+                               Q,
+                               coils,
+                               m,
+                               Bval);
+        }
+
+        fwd_bem_field_grad_calc(rd,
+                                Q,
+                                coils,
+                                m,
+                                xgrad,
+                                ygrad,
+                                zgrad);
+    } else if (m->bem_method == FWD_BEM_LINEAR_COLL) {
+        if (Bval) {
+            fwd_bem_lin_field_calc(rd,
+                                   Q,
+                                   coils,
+                                   m,
+                                   Bval);
+        }
+
+        fwd_bem_lin_field_grad_calc(rd,
+                                    Q,
+                                    coils,
+                                    m,
+                                    xgrad,
+                                    ygrad,
+                                    zgrad);
+    } else {
         qCritical("Unknown BEM method : %d",m->bem_method);
         return FAIL;
     }
-    return OK;
 
+    return OK;
 }
 
 
@@ -3010,20 +3041,30 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
     q = 3*a->off;
     if (a->fixed_ori) {					  /* The normal source component only */
         if (a->field_pot_grad && a->res_grad) {                   /* Gradient requested? */
-            for (j = 0; j < s->np; j++)
+            for (j = 0; j < s->np; j++) {
                 if (s->inuse[j]) {
-                    if (a->field_pot_grad(s->rr[j],s->nn[j],a->coils_els,a->res[p],
-                                          a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
-                                          a->client) != OK)
+                    if (a->field_pot_grad(s->rr[j],
+                                          s->nn[j],
+                                          a->coils_els,
+                                          a->res[p],
+                                          a->res_grad[q],
+                                          a->res_grad[q+1],
+                                          a->res_grad[q+2],
+                                          a->client) != OK) {
                         goto bad;
+                    }
                     q = q + 3;
                     p++;
                 }
-        }
-        else {
+            }
+        } else {
             for (j = 0; j < s->np; j++)
                 if (s->inuse[j])
-                    if (a->field_pot(s->rr[j],s->nn[j],a->coils_els,a->res[p++],a->client) != OK)
+                    if (a->field_pot(s->rr[j],
+                                     s->nn[j],
+                                     a->coils_els,
+                                     a->res[p++],
+                                     a->client) != OK)
                         goto bad;
         }
     }
@@ -3032,25 +3073,45 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
             for (j = 0; j < s->np; j++) {
                 if (s->inuse[j]) {
                     if (a->comp < 0) {				  /* Compute all components */
-                        if (a->field_pot_grad(s->rr[j],Qx,a->coils_els,a->res[p],
-                                              a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                        if (a->field_pot_grad(s->rr[j],
+                                              Qx,
+                                              a->coils_els,
+                                              a->res[p],
+                                              a->res_grad[q],
+                                              a->res_grad[q+1],
+                                              a->res_grad[q+2],
                                               a->client) != OK)
                             goto bad;
                         q = q + 3; p++;
-                        if (a->field_pot_grad(s->rr[j],Qy,a->coils_els,a->res[p],
-                                              a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                        if (a->field_pot_grad(s->rr[j],
+                                              Qy,
+                                              a->coils_els,
+                                              a->res[p],
+                                              a->res_grad[q],
+                                              a->res_grad[q+1],
+                                              a->res_grad[q+2],
                                               a->client) != OK)
                             goto bad;
                         q = q + 3; p++;
-                        if (a->field_pot_grad(s->rr[j],Qz,a->coils_els,a->res[p],
-                                              a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                        if (a->field_pot_grad(s->rr[j],
+                                              Qz,
+                                              a->coils_els,
+                                              a->res[p],
+                                              a->res_grad[q],
+                                              a->res_grad[q+1],
+                                              a->res_grad[q+2],
                                               a->client) != OK)
                             goto bad;
                         q = q + 3; p++;
                     }
                     else if (a->comp == 0) {			  /* Compute x component */
-                        if (a->field_pot_grad(s->rr[j],Qx,a->coils_els,a->res[p],
-                                              a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                        if (a->field_pot_grad(s->rr[j],
+                                              Qx,
+                                              a->coils_els,
+                                              a->res[p],
+                                              a->res_grad[q],
+                                              a->res_grad[q+1],
+                                              a->res_grad[q+2],
                                               a->client) != OK)
                             goto bad;
                         q = q + 3; p++;
@@ -3059,8 +3120,13 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
                     }
                     else if (a->comp == 1) {			  /* Compute y component */
                         q = q + 3; p++;
-                        if (a->field_pot_grad(s->rr[j],Qy,a->coils_els,a->res[p],
-                                              a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                        if (a->field_pot_grad(s->rr[j],
+                                              Qy,
+                                              a->coils_els,
+                                              a->res[p],
+                                              a->res_grad[q],
+                                              a->res_grad[q+1],
+                                              a->res_grad[q+2],
                                               a->client) != OK)
                             goto bad;
                         q = q + 3; p++;
@@ -3069,8 +3135,13 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
                     else if (a->comp == 2) {			  /* Compute z component */
                         q = q + 3; p++;
                         q = q + 3; p++;
-                        if (a->field_pot_grad(s->rr[j],Qz,a->coils_els,a->res[p],
-                                              a->res_grad[q],a->res_grad[q+1],a->res_grad[q+2],
+                        if (a->field_pot_grad(s->rr[j],
+                                              Qz,
+                                              a->coils_els,
+                                              a->res[p],
+                                              a->res_grad[q],
+                                              a->res_grad[q+1],
+                                              a->res_grad[q+2],
                                               a->client) != OK)
                             goto bad;
                         q = q + 3; p++;
@@ -3169,11 +3240,22 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
          */
 #ifdef TEST
         fprintf(stderr,"Using differences.\n");
-        comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
-                                               FwdBemModel::fwd_bem_field,NULL,my_bem_field_grad,bem_model,NULL);
+        comp = FwdCompData::fwd_make_comp_data(comp_data,
+                                               coils,comp_coils,
+                                               FwdBemModel::fwd_bem_field,
+                                               NULL,
+                                               my_bem_field_grad,
+                                               bem_model,
+                                               NULL);
 #else
-        comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
-                                               FwdBemModel::fwd_bem_field,NULL,FwdBemModel::fwd_bem_field_grad,bem_model,NULL);
+        comp = FwdCompData::fwd_make_comp_data(comp_data,
+                                               coils,
+                                               comp_coils,
+                                               FwdBemModel::fwd_bem_field,
+                                               NULL,
+                                               FwdBemModel::fwd_bem_field_grad,
+                                               bem_model,
+                                               NULL);
 #endif
         if (!comp)
             goto bad;

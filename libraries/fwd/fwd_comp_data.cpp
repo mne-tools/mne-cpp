@@ -288,7 +288,14 @@ int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set,
 
 //*************************************************************************************************************
 
-FwdCompData *FwdCompData::fwd_make_comp_data(MneCTFCompDataSet *set, FwdCoilSet *coils, FwdCoilSet *comp_coils, fwdFieldFunc field, fwdVecFieldFunc vec_field, fwdFieldGradFunc field_grad, void *client, fwdUserFreeFunc client_free)
+FwdCompData *FwdCompData::fwd_make_comp_data(MneCTFCompDataSet *set,
+                                             FwdCoilSet *coils,
+                                             FwdCoilSet *comp_coils,
+                                             fwdFieldFunc field,
+                                             fwdVecFieldFunc vec_field,
+                                             fwdFieldGradFunc field_grad,
+                                             void *client,
+                                             fwdUserFreeFunc client_free)
 /*
  * Compose a compensation data set
  */
