@@ -18,15 +18,15 @@
 
 -----------------
 
-MNE-CPP is an open-source software framework which offers a variety of neuroscientific tools. It provide a cross-platform library which allows the processing of MEG/EEG data. MNE-CPP also includes standalone applications for the acquisition and processing of MEG/EEG data, both in real-time and offline. For more information and documentation please visit https://mne-cpp.github.io/.
+MNE-CPP is an open-source software framework which offers a variety of neuroscientific tools. It provides a cross-platform library, which allows to build standalone applications for the acquisition and processing of MEG/EEG data, both in real-time and offline. For more information and documentation please visit https://mne-cpp.github.io/.
 
 Build from source
 -----------------
 
-To get and compile the latest source code please follow the [build guide](https://mne-cpp.github.io/pages/install/buildguide.html). The minimum requirements for building MNE-CPP are:
+To get the latest source code and compile it please follow the [build guide](https://mne-cpp.github.io/pages/install/buildguide.html). The minimum requirements to build MNE-CPP are:
 
   * Compiler
-    * Windows - [MSVC 2015](https://www.visualstudio.com/downloads/) or later
+    * Windows - [MSVC 2015](https://visualstudio.microsoft.com/vs/older-downloads/) or later
     * Linux - [GCC 5.3.1](https://gcc.gnu.org/releases.html) or later
     * MacOS - [Clang 3.5](https://developer.apple.com/xcode/) or later
   * External dependencies

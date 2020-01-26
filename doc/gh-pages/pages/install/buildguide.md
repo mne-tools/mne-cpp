@@ -11,7 +11,7 @@ Make sure you have one of the following compilers installed:
 
 | Windows | Linux | MacOS |
 |---------|-------|-------|
-| min. MSVC 2015 (We recommend the [MSVC 2017 Community Version](https://visualstudio.microsoft.com/de/vs/older-downloads/) compiler) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html) | min. [Clang 3.5](https://developer.apple.com/xcode/)|
+| min. MSVC 2015 (We recommend the [MSVC 2017 Community Version](https://visualstudio.microsoft.com/vs/older-downloads/) compiler) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html) | min. [Clang 3.5](https://developer.apple.com/xcode/)|
 
 ## Get Qt
 
