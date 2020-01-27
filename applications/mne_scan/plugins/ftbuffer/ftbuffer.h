@@ -220,10 +220,17 @@ protected:
     void onNewDataAvailable(const Eigen::MatrixXd &matData);
 
     //=========================================================================================================
+    /**
+    * @brief setupRTMSA - sets up Fiff info and uses it to initialize m_pRTMSA_BufferOutput
+    */
     void setupRTMSA();
 
     //=========================================================================================================
-    void parseHeader();
+    /**
+    * @brief parseHeader -
+    * @param chunkData - Chunk data from header file
+    */
+    void parseHeader(SimpleStorage chunkData);
 
 private:
 

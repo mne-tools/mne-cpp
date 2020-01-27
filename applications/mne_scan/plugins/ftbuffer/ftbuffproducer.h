@@ -145,7 +145,12 @@ signals:
     */
     void newDataAvailable(const Eigen::MatrixXd &matData);
 
-    void extendedHeaderChunks();
+    //=========================================================================================================
+    /**
+    * @brief extendedHeaderChunks
+    * @param chunkData
+    */
+    void extendedHeaderChunks(SimpleStorage chunkData);
 
 private:
 

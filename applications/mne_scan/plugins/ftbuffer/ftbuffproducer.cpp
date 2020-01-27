@@ -72,7 +72,8 @@ void FtBuffProducer::run() {
         m_pFtBuffClient->getData();
 
         if (m_pFtBuffClient->extendedHeader()) {
-            emit extendedHeaderChunks(/* m_pFtBuffClient->chunkData() */);
+            qDebug() << "Returning chunk data";
+            emit extendedHeaderChunks(m_pFtBuffClient->chunkData());
         }
 
         if (m_pFtBuffClient->newData()){
