@@ -239,8 +239,8 @@ private:
 
     bool                                                                                m_bIsRunning;                   /**< Whether ftbuffer is running. */
 
-    bool                                                                                m_bBuffOutputSet;
-    bool                                                                                m_bCustomFiff;
+    bool                                                                                m_bBuffOutputSet;               /**< Whether RTMSA output has been initialized with fiff info */
+    bool                                                                                m_bCustomFiff;                  /**< Whether the buffer has a header with trailing chunk data */
 
     int                                                                                 m_iNumChannels;                 /**< Parameter for how many channels expecet from buffer data */
     int                                                                                 m_iSampFreq;                    /**< Parameter for sampling rate expected from buffer data */
