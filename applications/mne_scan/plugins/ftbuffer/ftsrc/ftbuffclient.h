@@ -191,7 +191,6 @@ private:
      */
     bool isConnected();
 
-
 //*************************************************************************************************************
 
     FtConnection                    m_ftCon_Connector;          /**< Manages connection to the buffer */
