@@ -129,13 +129,18 @@ bool FtBuffClient::readHeader() {
     m_iNumChannels = header_def.nchans;
     m_uiNumSamples = header_def.nsamples;
 
-    m_ssChunkData = chunkBuffer;
 
-    qDebug() << "";
-    qDebug() << "";
-    qDebug() << "Chunk Buffer size:" << chunkBuffer.size();
-    qDebug() << "";
-    qDebug() << "";
+    if (chunkBuffer.size() != 0) {
+        m_ssChunkData = chunkBuffer;
+
+        m_bChunkData = true;
+
+        qDebug() << "";
+        qDebug() << "";
+        qDebug() << "Chunk Buffer size:" << chunkBuffer.size();
+        qDebug() << "";
+        qDebug() << "";
+    }
 
     return true;
 }
