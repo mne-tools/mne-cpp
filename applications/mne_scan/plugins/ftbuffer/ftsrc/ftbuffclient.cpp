@@ -118,7 +118,7 @@ bool FtBuffClient::readHeader() {
         return false;
     }
 
-    //Attempt to revieve and read header
+    //Attempt to retrieve and read header and chunks if applicable
     qDebug() << "Attempting to retrieve header...";
     if (!response.checkGetHeader(header_def, &chunkBuffer)) {
         qDebug() << "Could not read header.";
@@ -129,7 +129,7 @@ bool FtBuffClient::readHeader() {
     m_iNumChannels = header_def.nchans;
     m_uiNumSamples = header_def.nsamples;
 
-
+    //saving header chunks and updating extended header flag
     if (chunkBuffer.size() != 0) {
         m_ssChunkData = chunkBuffer;
 
@@ -309,7 +309,7 @@ void FtBuffClient::idleCall() {
     int count = 0;
     for (int i = 0; i < int (ddef.nsamples); i++) {
         for (int j = 0; j < int (ddef.nchans); j++) {
-            matData(j,i) = fdata[count]/5000;
+            matData(j,i) = fdata[count]/10000;
             if (count % 32 == 0) qDebug() << "---Blockstart---" << count/32;
             qDebug() << fdata[count];
             count++;
