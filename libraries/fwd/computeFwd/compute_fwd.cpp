@@ -53,10 +53,10 @@ using namespace MNELIB;
 #define ALLOC_ICMATRIX_41(x,y) mne_imatrix_41((x),(y))
 
 #define MALLOC_41(x,t) (t *)malloc((x)*sizeof(t))
-#define REALLOC_41(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
+#define REALLOC_41(x,y,t) (t *)((x == Q_NULLPTR) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
 
-#define FREE_41(x) if ((char *)(x) != NULL) free((char *)(x))
+#define FREE_41(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
 
 
 #define VEC_COPY_41(to,from) {\
@@ -157,7 +157,7 @@ fiffId get_file_id(const QString& name)
     fiffId   id;
     if(!stream->open()) {
         stream->close();
-        return NULL;
+        return Q_NULLPTR;
     }
     else {
         id = MALLOC_41(1,fiffIdRec);
@@ -175,14 +175,14 @@ fiffId get_file_id(const QString& name)
 //============================= mne_read_forward_solution.c =============================
 
 int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
-                                     fiffChInfo     *megp,	 /* MEG channels */
-                                     int            *nmegp,
-                                     fiffChInfo     *meg_compp,
-                                     int            *nmeg_compp,
-                                     fiffChInfo     *eegp,	 /* EEG channels */
-                                     int            *neegp,
-                                     FiffCoordTransOld* *meg_head_t,
-                                     fiffId         *idp)	 /* The measurement ID */
+                                     QList<FiffChInfo>& megp,	 /* MEG channels */
+                                     int* nmegp,
+                                     QList<FiffChInfo>& meg_compp,
+                                     int* nmeg_compp,
+                                     QList<FiffChInfo>& eegp,	 /* EEG channels */
+                                     int* neegp,
+                                     FiffCoordTransOld** meg_head_t,
+                                     fiffId* idp)	 /* The measurement ID */
 /*
       * Read the channel information and split it into three arrays,
       * one for MEG, one for MEG compensation channels, and one for EEG
@@ -191,21 +191,20 @@ int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-
-    fiffChInfo chs   = NULL;
-    int        nchan = 0;
-    fiffChInfo meg   = NULL;
-    int        nmeg  = 0;
-    fiffChInfo meg_comp = NULL;
-    int        nmeg_comp = 0;
-    fiffChInfo eeg   = NULL;
-    int        neeg  = 0;
-    fiffId     id    = NULL;
+    QList<FiffChInfo> chs;
+    int nchan = 0;
+    QList<FiffChInfo> meg;
+    int nmeg = 0;
+    QList<FiffChInfo> meg_comp;
+    int nmeg_comp = 0;
+    QList<FiffChInfo> eeg;
+    int neeg = 0;
+    fiffId id = Q_NULLPTR;
     QList<FiffDirNode::SPtr> nodes;
     FiffDirNode::SPtr info;
     FiffTag::SPtr t_pTag;
-    fiffChInfo   this_ch = NULL;
-    FiffCoordTransOld* t = NULL;
+    FiffChInfo this_ch;
+    FiffCoordTransOld* t = Q_NULLPTR;
     fiff_int_t kind, pos;
     int j,k,to_find;
 
@@ -231,9 +230,11 @@ int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             nchan = *t_pTag->toInt();
-            chs = MALLOC_41(nchan,fiffChInfoRec);
-            for (j = 0; j < nchan; j++)
+
+            for (j = 0; j < nchan; j++) {
+                chs.append(FiffChInfo());
                 chs[j].scanNo = -1;
+            }
             to_find = nchan;
             break;
 
@@ -250,21 +251,19 @@ int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
             //            t = t_pTag->toCoordTrans();
             t = FiffCoordTransOld::read_helper( t_pTag );
             if (t->from != FIFFV_COORD_DEVICE || t->to   != FIFFV_COORD_HEAD)
-                t = NULL;
+                t = Q_NULLPTR;
             break;
 
         case FIFF_CH_INFO : /* Information about one channel */
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-            //            this_ch = t_pTag->toChInfo();
-            this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
-            *this_ch = *(fiffChInfo)(t_pTag->data());
-            if (this_ch->scanNo <= 0 || this_ch->scanNo > nchan) {
-                printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch->scanNo,nchan);
+            this_ch = t_pTag->toChInfo();
+            if (this_ch.scanNo <= 0 || this_ch.scanNo > nchan) {
+                printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch.scanNo,nchan);
                 goto bad;
             }
             else
-                chs[this_ch->scanNo-1] = *this_ch;
+                chs[this_ch.scanNo-1] = this_ch;
             to_find--;
             break;
         }
@@ -273,80 +272,73 @@ int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
         qCritical("Some of the channel information was missing.");
         goto bad;
     }
-    if (t == NULL && meg_head_t != NULL) {
-        /*
+    if (t == Q_NULLPTR && meg_head_t != Q_NULLPTR) {
+    /*
      * Try again in a more general fashion
      */
-        if ((t = FiffCoordTransOld::mne_read_meas_transform(name)) == NULL) {
+        if ((t = FiffCoordTransOld::mne_read_meas_transform(name)) == Q_NULLPTR) {
             qCritical("MEG -> head coordinate transformation not found.");
             goto bad;
         }
     }
-    /*
-   * Sort out the channels
-   */
-    for (k = 0; k < nchan; k++)
+   /*
+    * Sort out the channels
+    */
+    for (k = 0; k < nchan; k++) {
         if (chs[k].kind == FIFFV_MEG_CH)
             nmeg++;
         else if (chs[k].kind == FIFFV_REF_MEG_CH)
             nmeg_comp++;
         else if (chs[k].kind == FIFFV_EEG_CH)
             neeg++;
-    if (nmeg > 0)
-        meg = MALLOC_41(nmeg,fiffChInfoRec);
-    if (neeg > 0)
-        eeg = MALLOC_41(neeg,fiffChInfoRec);
-    if (nmeg_comp > 0)
-        meg_comp = MALLOC_41(nmeg_comp,fiffChInfoRec);
-    neeg = nmeg = nmeg_comp = 0;
+    }
 
-    for (k = 0; k < nchan; k++)
-        if (chs[k].kind == FIFFV_MEG_CH)
-            meg[nmeg++] = chs[k];
-        else if (chs[k].kind == FIFFV_REF_MEG_CH)
-            meg_comp[nmeg_comp++] = chs[k];
-        else if (chs[k].kind == FIFFV_EEG_CH)
-            eeg[neeg++] = chs[k];
+    if (nmeg > 0)
+        meg.reserve(nmeg);
+    if (neeg > 0)
+        eeg.reserve(neeg);
+    if (nmeg_comp > 0)
+        meg_comp.reserve(nmeg_comp);
+
+    for (k = 0; k < nchan; k++) {
+        if (chs[k].kind == FIFFV_MEG_CH) {
+            meg.append(chs[k]);
+        } else if (chs[k].kind == FIFFV_REF_MEG_CH) {
+            meg_comp.append(chs[k]);
+        } else if (chs[k].kind == FIFFV_EEG_CH) {
+            eeg.append(chs[k]);
+        }
+    }
     //    fiff_close(in);
+
     stream->close();
-    FREE_41(chs);
-    if (megp) {
-        *megp  = meg;
-        *nmegp = nmeg;
-    }
-    else
-        FREE_41(meg);
-    if (meg_compp) {
-        *meg_compp = meg_comp;
-        *nmeg_compp = nmeg_comp;
-    }
-    else
-        FREE_41(meg_comp);
-    if (eegp) {
-        *eegp  = eeg;
-        *neegp = neeg;
-    }
-    else
-        FREE_41(eeg);
-    if (idp == NULL) {
+
+    megp  = meg;
+    *nmegp = nmeg;
+
+    meg_compp = meg_comp;
+    *nmeg_compp = nmeg_comp;
+
+    eegp  = eeg;
+    *neegp = neeg;
+
+    if (idp == Q_NULLPTR) {
         FREE_41(id);
-    }
-    else
+    } else {
         *idp   = id;
-    if (meg_head_t == NULL) {
-        FREE_41(t);
     }
-    else
+
+    if (meg_head_t == Q_NULLPTR) {
+        FREE_41(t);
+    } else {
         *meg_head_t = t;
+    }
 
     return FIFF_OK;
 
 bad : {
         //        fiff_close(in);
         stream->close();
-        FREE_41(chs);
-        FREE_41(meg);
-        FREE_41(eeg);
         FREE_41(id);
         //        FREE_41(tag.data);
         FREE_41(t);
@@ -356,24 +348,25 @@ bad : {
 
 
 
-int mne_check_chinfo(fiffChInfo chs,
-                     int        nch)
+int mne_check_chinfo(const QList<FiffChInfo>& chs,
+                     int nch)
 /*
  * Check that all EEG channels have reasonable locations
  */
 {
     int k;
-    fiffChInfo ch;
+    FiffChInfo ch;
     float close = 0.02;
 
-    for (k = 0, ch = chs; k < nch; k++, ch++) {
-        if (ch->kind == FIFFV_EEG_CH) {
-            if (VEC_LEN_41(ch->chpos.r0) < close) {
+    for (k = 0; k < nch; k++) {
+        if (chs.at(k).kind == FIFFV_EEG_CH) {
+            if (chs.at(k).chpos.r0.norm() < close) {
                 qCritical("Some EEG channels do not have locations assigned.");
                 return FAIL;
             }
         }
     }
+
     return OK;
 }
 
@@ -388,12 +381,12 @@ void write_id_old(FiffStream::SPtr& t_pStream, fiff_int_t kind, fiffId id)
     if(t_id->version == -1)
     {
         /* initialize random seed: */
-        srand ( time(NULL) );
+        srand ( time(Q_NULLPTR) );
         double rand_1 = (double)(rand() % 100);rand_1 /= 100;
         double rand_2 = (double)(rand() % 100);rand_2 /= 100;
 
         time_t seconds;
-        seconds = time (NULL);
+        seconds = time (Q_NULLPTR);
 
         //fiff_int_t timezone = 5;      //   Matlab does not know the timezone
         t_id->version   = (1 << 16) | 2;   //   Version (1 << 16) | 2
@@ -514,11 +507,11 @@ void mne_write_bad_channel_list_new(FiffStream::SPtr& t_pStream, const QStringLi
 
     //    fiff_int_t  bad_channel_block = FIFFB_MNE_BAD_CHANNELS;
     //    fiffTagRec  bad_channel_block_tags[] = {
-    //        { FIFF_BLOCK_START,      FIFFT_INT,    0, FIFFV_NEXT_SEQ, NULL },
-    //        { FIFF_MNE_CH_NAME_LIST, FIFFT_STRING, 0, FIFFV_NEXT_SEQ, NULL },
-    //        { FIFF_BLOCK_END,        FIFFT_INT,    0, FIFFV_NEXT_SEQ, NULL }};
+    //        { FIFF_BLOCK_START,      FIFFT_INT,    0, FIFFV_NEXT_SEQ, Q_NULLPTR },
+    //        { FIFF_MNE_CH_NAME_LIST, FIFFT_STRING, 0, FIFFV_NEXT_SEQ, Q_NULLPTR },
+    //        { FIFF_BLOCK_END,        FIFFT_INT,    0, FIFFV_NEXT_SEQ, Q_NULLPTR }};
     //    int         nbad_channel_block_tags = 3;
-    //    char        *names = NULL;
+    //    char        *names = Q_NULLPTR;
     //    int         k;
 
     //    if (nlist <= 0)
@@ -576,7 +569,7 @@ void fiff_write_float_matrix_old (  FiffStream::SPtr& t_pStream,    /* Destinati
     //  tag.kind = kind;
     //  tag.type = FIFFT_FLOAT | FIFFT_MATRIX;
     //  tag.size = rows*cols*sizeof(fiff_float_t) + 3*sizeof(fiff_int_t);
-    //  tag.data = NULL;
+    //  tag.data = Q_NULLPTR;
     //  tag.next = FIFFV_NEXT_SEQ;
 
     //  if ((res = fiff_write_tag_info(out,&tag)) == -1)
@@ -652,7 +645,7 @@ void fiff_write_int_matrix_old (    FiffStream::SPtr& t_pStream,
     //  tag.kind = kind;
     //  tag.type = FIFFT_INT | FIFFT_MATRIX;
     //  tag.size = rows*cols*sizeof(fiff_int_t) + 3*sizeof(fiff_int_t);
-    //  tag.data = NULL;
+    //  tag.data = Q_NULLPTR;
     //  tag.next = FIFFV_NEXT_SEQ;
 
     //  if ((res = fiff_write_tag_info(out,&tag)) == -1)
@@ -738,7 +731,7 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
     }
 
 //    tag.size = datasize+idxsize+ptrsize+4*sizeof(fiff_int_t);
-//    tag.data = NULL;
+//    tag.data = Q_NULLPTR;
 //    tag.next = FIFFV_NEXT_SEQ;
 
     //Write Tag Info
@@ -879,7 +872,7 @@ static int comp_points2(const void *vp1,const void *vp2)
 void mne_sort_nearest_by_vertex(MneNearest* points, int npoint)
 
 {
-    if (npoint > 1 && points != NULL)
+    if (npoint > 1 && points != Q_NULLPTR)
         qsort(points,npoint,sizeof(MneNearest),comp_points2);
     return;
 }
@@ -895,10 +888,10 @@ FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
                                         int *nnz,           /* Number of non-zero elements on each row */
                                         int **colindex,     /* Column indices of non-zero elements on each row */
                                         float **vals)       /* The nonzero elements on each row
-                                                     * If null, the matrix will be all zeroes */
+                                                     * If Q_NULLPTR, the matrix will be all zeroes */
 
 {
-    FiffSparseMatrix* sparse = NULL;
+    FiffSparseMatrix* sparse = Q_NULLPTR;
     int j,k,nz,ptr,size,ind;
     int stor_type = FIFFTS_MC_RCS;
 
@@ -907,7 +900,7 @@ FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
 
     if (nz <= 0) {
         qCritical("No nonzero elements specified.");
-        return NULL;
+        return Q_NULLPTR;
     }
     if (stor_type == FIFFTS_MC_RCS) {
         size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
@@ -915,7 +908,7 @@ FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
     }
     else {
         qCritical("Illegal sparse matrix storage type: %d",stor_type);
-        return NULL;
+        return Q_NULLPTR;
     }
     sparse = new FiffSparseMatrix;
     sparse->coding = stor_type;
@@ -953,7 +946,7 @@ FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
 bad : {
         if(sparse)
             delete sparse;
-        return NULL;
+        return Q_NULLPTR;
     }
 }
 
@@ -964,10 +957,10 @@ FiffSparseMatrix* mne_pick_lower_triangle_rcs(FiffSparseMatrix* mat)
  * Fill in upper triangle with the lower triangle values
  */
 {
-    int             *nnz       = NULL;
-    int             **colindex = NULL;
-    float           **vals     = NULL;
-    FiffSparseMatrix* res = NULL;
+    int             *nnz       = Q_NULLPTR;
+    int             **colindex = Q_NULLPTR;
+    float           **vals     = Q_NULLPTR;
+    FiffSparseMatrix* res = Q_NULLPTR;
     int             i,j,k;
 
     if (mat->coding != FIFFTS_MC_RCS) {
@@ -999,8 +992,8 @@ FiffSparseMatrix* mne_pick_lower_triangle_rcs(FiffSparseMatrix* mat)
             nnz[i] = k;
         }
         else {
-            colindex[i] = NULL;
-            vals[i] = NULL;
+            colindex[i] = Q_NULLPTR;
+            vals[i] = Q_NULLPTR;
         }
     }
     /*
@@ -1031,9 +1024,9 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
  */
 {
     int ntot,nvert;
-    int *nneighbors = NULL;
-    int *neighbors = NULL;
-    int *inuse_map = NULL;
+    int *nneighbors = Q_NULLPTR;
+    int *neighbors = Q_NULLPTR;
+    int *inuse_map = Q_NULLPTR;
     int nneigh,*neigh;
     int k,p;
     fiffTagRec tag;
@@ -1161,10 +1154,10 @@ out : {
 
 int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* ss,bool selected_only)
 {
-    float **sel = NULL;
-    int   **tris = NULL;
-    int   *nearest = NULL;
-    float *nearest_dist = NULL;
+    float **sel = Q_NULLPTR;
+    int   **tris = Q_NULLPTR;
+    int   *nearest = Q_NULLPTR;
+    float *nearest_dist = Q_NULLPTR;
     int   p,pp;
 
     if (ss->np <= 0) {
@@ -1214,7 +1207,7 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
             }
         }
         fiff_write_float_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, sel,ss->nuse,3);
-        FREE_CMATRIX_41(sel); sel = NULL;
+        FREE_CMATRIX_41(sel); sel = Q_NULLPTR;
 #ifdef WRONG
         /*
      * This code is incorrect because the numbering in the nuse triangulation refers to the complete source space
@@ -1235,7 +1228,7 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
             if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES,tris,
                                       ss->nuse_tri,3) == FIFF_FAIL)
                 goto bad;
-            FREE_ICMATRIX(tris); tris = NULL;
+            FREE_ICMATRIX(tris); tris = Q_NULLPTR;
         }
 #endif
     }
@@ -1270,7 +1263,7 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
             //            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_TRIANGLES,tris,
             //                                      ss->ntri,3) == FIFF_FAIL)
             //                goto bad;
-            FREE_ICMATRIX_41(tris); tris = NULL;
+            FREE_ICMATRIX_41(tris); tris = Q_NULLPTR;
         }
         if (ss->nuse_tri > 0) { /* Write the triangulation information for the vertices in use */
             t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NUSE_TRI,&ss->nuse_tri);
@@ -1282,7 +1275,7 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
             //            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES,tris,
             //                                      ss->nuse_tri,3) == FIFF_FAIL)
             //                goto bad;
-            FREE_ICMATRIX_41(tris); tris = NULL;
+            FREE_ICMATRIX_41(tris); tris = Q_NULLPTR;
         }
         if (ss->nearest) {    /* Write the patch information */
             nearest = MALLOC_41(ss->np,int);
@@ -1312,8 +1305,8 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
             //            if (fiff_write_tag(out,&tag) == FIFF_FAIL)
             //                goto bad;
 
-            FREE_41(nearest); nearest = NULL;
-            FREE_41(nearest_dist); nearest_dist = NULL;
+            FREE_41(nearest); nearest = Q_NULLPTR;
+            FREE_41(nearest_dist); nearest_dist = Q_NULLPTR;
         }
         if (ss->dist) {     /* Distance information */
             FiffSparseMatrix* m = mne_pick_lower_triangle_rcs(ss->dist);
@@ -1469,25 +1462,23 @@ bool fiff_put_dir (FiffStream::SPtr& t_pStream, const QList<FiffDirEntry::SPtr>&
 
 bool write_solution(const QString& name,         /* Destination file */
                    MneSourceSpaceOld* *spaces,  /* The source spaces */
-                   int            nspace,
+                   int nspace,
                    const QString& mri_file,     /* MRI file and data obtained from there */
-                   fiffId         mri_id,
+                   fiffId mri_id,
                    FiffCoordTransOld* mri_head_t,
-
                    const QString& meas_file,    /* MEG file and data obtained from there */
-                   fiffId         meas_id,
+                   fiffId meas_id,
                    FiffCoordTransOld* meg_head_t,
-                   fiffChInfo     meg_chs,
-                   int            nmeg,
-                   fiffChInfo     eeg_chs,
-                   int            neeg,
-                   int            fixed_ori,    /* Fixed orientation dipoles? */
-                   int            coord_frame,  /* Coordinate frame employed in the forward calculations */
+                   QList<FiffChInfo> meg_chs,
+                   int nmeg,
+                   QList<FiffChInfo> eeg_chs,
+                   int neeg,
+                   int fixed_ori,    /* Fixed orientation dipoles? */
+                   int coord_frame,  /* Coordinate frame employed in the forward calculations */
                    MneNamedMatrix* meg_solution,
                    MneNamedMatrix* eeg_solution,
                    MneNamedMatrix* meg_solution_grad,
                    MneNamedMatrix* eeg_solution_grad)
-
 {
     // New Stuff
     QFile file(name);
@@ -1515,7 +1506,7 @@ bool write_solution(const QString& name,         /* Destination file */
         t_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
 
         t_pStream->write_string(FIFF_MNE_FILE_NAME, mri_file);
-        if (mri_id != NULL)
+        if (mri_id != Q_NULLPTR)
             write_id_old(t_pStream, FIFF_PARENT_FILE_ID, mri_id);//t_pStream->write_id(FIFF_PARENT_FILE_ID, mri_id);
         write_coord_trans_old(t_pStream, mri_head_t);//t_pStream->write_coord_trans(mri_head_t);
 
@@ -1532,7 +1523,7 @@ bool write_solution(const QString& name,         /* Destination file */
         t_pStream->start_block(FIFFB_MNE_PARENT_MEAS_FILE);
 
         t_pStream->write_string(FIFF_MNE_FILE_NAME, meas_file);
-        if (meas_id != NULL)
+        if (meas_id != Q_NULLPTR)
             write_id_old(t_pStream, FIFF_PARENT_BLOCK_ID, meas_id);//t_pStream->write_id(FIFF_PARENT_BLOCK_ID, meas_id);
         write_coord_trans_old(t_pStream, meg_head_t);//t_pStream->write_coord_trans(meg_head_t);
 
@@ -1542,57 +1533,57 @@ bool write_solution(const QString& name,         /* Destination file */
         FiffChInfo chInfo;
         int k, p;
         for (k = 0, p = 0; k < nmeg; k++) {
-            meg_chs[k].scanNo = ++p;
-            chInfo.scanNo = meg_chs[k].scanNo;
-            chInfo.logNo = meg_chs[k].logNo;
-            chInfo.kind = meg_chs[k].kind;
-            chInfo.range = meg_chs[k].range;
-            chInfo.cal = meg_chs[k].cal;
-            chInfo.chpos.coil_type = meg_chs[k].chpos.coil_type;
-            chInfo.chpos.r0[0] = meg_chs[k].chpos.r0[0];
-            chInfo.chpos.r0[1] = meg_chs[k].chpos.r0[1];
-            chInfo.chpos.r0[2] = meg_chs[k].chpos.r0[2];
-            chInfo.chpos.ex[0] = meg_chs[k].chpos.ex[0];
-            chInfo.chpos.ex[1] = meg_chs[k].chpos.ex[1];
-            chInfo.chpos.ex[2] = meg_chs[k].chpos.ex[2];
-            chInfo.chpos.ey[0] = meg_chs[k].chpos.ey[0];
-            chInfo.chpos.ey[1] = meg_chs[k].chpos.ey[1];
-            chInfo.chpos.ey[2] = meg_chs[k].chpos.ey[2];
-            chInfo.chpos.ez[0] = meg_chs[k].chpos.ez[0];
-            chInfo.chpos.ez[1] = meg_chs[k].chpos.ez[1];
-            chInfo.chpos.ez[2] = meg_chs[k].chpos.ez[2];
-            chInfo.unit = meg_chs[k].unit;
-            chInfo.unit_mul = meg_chs[k].unit_mul;
-            chInfo.ch_name = QString(meg_chs[k].ch_name);
+//            meg_chs[k].scanNo = ++p;
+//            chInfo.scanNo = meg_chs[k].scanNo;
+//            chInfo.logNo = meg_chs[k].logNo;
+//            chInfo.kind = meg_chs[k].kind;
+//            chInfo.range = meg_chs[k].range;
+//            chInfo.cal = meg_chs[k].cal;
+//            chInfo.chpos.coil_type = meg_chs[k].chpos.coil_type;
+//            chInfo.chpos.r0[0] = meg_chs[k].chpos.r0[0];
+//            chInfo.chpos.r0[1] = meg_chs[k].chpos.r0[1];
+//            chInfo.chpos.r0[2] = meg_chs[k].chpos.r0[2];
+//            chInfo.chpos.ex[0] = meg_chs[k].chpos.ex[0];
+//            chInfo.chpos.ex[1] = meg_chs[k].chpos.ex[1];
+//            chInfo.chpos.ex[2] = meg_chs[k].chpos.ex[2];
+//            chInfo.chpos.ey[0] = meg_chs[k].chpos.ey[0];
+//            chInfo.chpos.ey[1] = meg_chs[k].chpos.ey[1];
+//            chInfo.chpos.ey[2] = meg_chs[k].chpos.ey[2];
+//            chInfo.chpos.ez[0] = meg_chs[k].chpos.ez[0];
+//            chInfo.chpos.ez[1] = meg_chs[k].chpos.ez[1];
+//            chInfo.chpos.ez[2] = meg_chs[k].chpos.ez[2];
+//            chInfo.unit = meg_chs[k].unit;
+//            chInfo.unit_mul = meg_chs[k].unit_mul;
+//            chInfo.ch_name = QString(meg_chs[k].ch_name);
 
-            t_pStream->write_ch_info(chInfo);
+            t_pStream->write_ch_info(meg_chs[k]);
         }
 
         for (k = 0; k < neeg; k++) {
-            eeg_chs[k].scanNo = ++p;
-            chInfo.scanNo = eeg_chs[k].scanNo;
-            chInfo.logNo = eeg_chs[k].logNo;
-            chInfo.kind = eeg_chs[k].kind;
-            chInfo.range = eeg_chs[k].range;
-            chInfo.cal = eeg_chs[k].cal;
-            chInfo.chpos.coil_type = eeg_chs[k].chpos.coil_type;
-            chInfo.chpos.r0[0] = eeg_chs[k].chpos.r0[0];
-            chInfo.chpos.r0[1] = eeg_chs[k].chpos.r0[1];
-            chInfo.chpos.r0[2] = eeg_chs[k].chpos.r0[2];
-            chInfo.chpos.ex[0] = eeg_chs[k].chpos.ex[0];
-            chInfo.chpos.ex[1] = eeg_chs[k].chpos.ex[1];
-            chInfo.chpos.ex[2] = eeg_chs[k].chpos.ex[2];
-            chInfo.chpos.ey[0] = eeg_chs[k].chpos.ey[0];
-            chInfo.chpos.ey[1] = eeg_chs[k].chpos.ey[1];
-            chInfo.chpos.ey[2] = eeg_chs[k].chpos.ey[2];
-            chInfo.chpos.ez[0] = eeg_chs[k].chpos.ez[0];
-            chInfo.chpos.ez[1] = eeg_chs[k].chpos.ez[1];
-            chInfo.chpos.ez[2] = eeg_chs[k].chpos.ez[2];
-            chInfo.unit = eeg_chs[k].unit;
-            chInfo.unit_mul = eeg_chs[k].unit_mul;
-            chInfo.ch_name = QString(eeg_chs[k].ch_name);
+//            eeg_chs[k].scanNo = ++p;
+//            chInfo.scanNo = eeg_chs[k].scanNo;
+//            chInfo.logNo = eeg_chs[k].logNo;
+//            chInfo.kind = eeg_chs[k].kind;
+//            chInfo.range = eeg_chs[k].range;
+//            chInfo.cal = eeg_chs[k].cal;
+//            chInfo.chpos.coil_type = eeg_chs[k].chpos.coil_type;
+//            chInfo.chpos.r0[0] = eeg_chs[k].chpos.r0[0];
+//            chInfo.chpos.r0[1] = eeg_chs[k].chpos.r0[1];
+//            chInfo.chpos.r0[2] = eeg_chs[k].chpos.r0[2];
+//            chInfo.chpos.ex[0] = eeg_chs[k].chpos.ex[0];
+//            chInfo.chpos.ex[1] = eeg_chs[k].chpos.ex[1];
+//            chInfo.chpos.ex[2] = eeg_chs[k].chpos.ex[2];
+//            chInfo.chpos.ey[0] = eeg_chs[k].chpos.ey[0];
+//            chInfo.chpos.ey[1] = eeg_chs[k].chpos.ey[1];
+//            chInfo.chpos.ey[2] = eeg_chs[k].chpos.ey[2];
+//            chInfo.chpos.ez[0] = eeg_chs[k].chpos.ez[0];
+//            chInfo.chpos.ez[1] = eeg_chs[k].chpos.ez[1];
+//            chInfo.chpos.ez[2] = eeg_chs[k].chpos.ez[2];
+//            chInfo.unit = eeg_chs[k].unit;
+//            chInfo.unit_mul = eeg_chs[k].unit_mul;
+//            chInfo.ch_name = QString(eeg_chs[k].ch_name);
 
-            t_pStream->write_ch_info(chInfo);
+            t_pStream->write_ch_info(eeg_chs[k]);
         }
         /*
         * Copy the bad channel list from the measurement file
@@ -1897,38 +1888,38 @@ void ComputeFwd::calculateFwd() const
 {
     // TODO: This only temporary until we have the fwd dlibrary refactored. This is only done in order to provide easy testing in test_forward_solution.
     bool                res = false;
-    MneSourceSpaceOld*  *spaces = NULL;  /* The source spaces */
+    MneSourceSpaceOld*  *spaces = Q_NULLPTR;  /* The source spaces */
     int                 nspace  = 0;
     int                 nsource = 0;     /* Number of source space points */
 
-    FiffCoordTransOld* mri_head_t = NULL;   /* MRI <-> head coordinate transformation */
-    FiffCoordTransOld* meg_head_t = NULL;   /* MEG <-> head coordinate transformation */
+    FiffCoordTransOld* mri_head_t = Q_NULLPTR;   /* MRI <-> head coordinate transformation */
+    FiffCoordTransOld* meg_head_t = Q_NULLPTR;   /* MEG <-> head coordinate transformation */
 
-    fiffChInfo     megchs   = NULL; /* The MEG channel information */
+    QList<FiffChInfo>     megchs; /* The MEG channel information */
     int            nmeg     = 0;
-    fiffChInfo     eegchs   = NULL; /* The EEG channel information */
+    QList<FiffChInfo>     eegchs; /* The EEG channel information */
     int            neeg     = 0;
-    fiffChInfo     compchs = NULL;
+    QList<FiffChInfo>     compchs;
     int            ncomp    = 0;
 
-    FwdCoilSet*             megcoils = NULL;     /* The coil descriptions */
-    FwdCoilSet*             compcoils = NULL;    /* MEG compensation coils */
-    MneCTFCompDataSet*      comp_data  = NULL;
-    FwdCoilSet*             eegels = NULL;
-    FwdEegSphereModelSet*   eeg_models = NULL;
+    FwdCoilSet*             megcoils = Q_NULLPTR;     /* The coil descriptions */
+    FwdCoilSet*             compcoils = Q_NULLPTR;    /* MEG compensation coils */
+    MneCTFCompDataSet*      comp_data  = Q_NULLPTR;
+    FwdCoilSet*             eegels = Q_NULLPTR;
+    FwdEegSphereModelSet*   eeg_models = Q_NULLPTR;
 
-    MneNamedMatrix* meg_forward      = NULL;    /* Result of the MEG forward calculation */
-    MneNamedMatrix* eeg_forward      = NULL;    /* Result of the EEG forward calculation */
-    MneNamedMatrix* meg_forward_grad = NULL;    /* Result of the MEG forward gradient calculation */
-    MneNamedMatrix* eeg_forward_grad = NULL;    /* Result of the EEG forward gradient calculation */
+    MneNamedMatrix* meg_forward      = Q_NULLPTR;    /* Result of the MEG forward calculation */
+    MneNamedMatrix* eeg_forward      = Q_NULLPTR;    /* Result of the EEG forward calculation */
+    MneNamedMatrix* meg_forward_grad = Q_NULLPTR;    /* Result of the MEG forward gradient calculation */
+    MneNamedMatrix* eeg_forward_grad = Q_NULLPTR;    /* Result of the EEG forward gradient calculation */
     int            k;
-    fiffId         mri_id  = NULL;
-    fiffId         meas_id = NULL;
-    FILE           *out = NULL;     /* Output filtered points here */
+    fiffId         mri_id  = Q_NULLPTR;
+    fiffId         meas_id = Q_NULLPTR;
+    FILE           *out = Q_NULLPTR;     /* Output filtered points here */
 
-    FwdCoilSet*       templates = NULL;
-    FwdEegSphereModel* eeg_model = NULL;
-    FwdBemModel*       bem_model = NULL;
+    FwdCoilSet*       templates = Q_NULLPTR;
+    FwdEegSphereModel* eeg_model = Q_NULLPTR;
+    FwdBemModel*       bem_model = Q_NULLPTR;
 
     QString qPath;
     QFile file;
@@ -1963,7 +1954,7 @@ void ComputeFwd::calculateFwd() const
 
             if (settings->eeg_model_name.isEmpty())
                 settings->eeg_model_name = QString("Default");
-            if ((eeg_model = eeg_models->fwd_select_eeg_sphere_model(settings->eeg_model_name)) == NULL)
+            if ((eeg_model = eeg_models->fwd_select_eeg_sphere_model(settings->eeg_model_name)) == Q_NULLPTR)
                 goto out;
 
             if (!eeg_model->fwd_setup_eeg_sphere_model(settings->eeg_sphere_rad,settings->use_equiv_eeg,3))
@@ -2013,16 +2004,16 @@ void ComputeFwd::calculateFwd() const
      */
     printf("\n");
     if (!settings->mriname.isEmpty()) {
-        if ((mri_head_t = FiffCoordTransOld::mne_read_mri_transform(settings->mriname)) == NULL)
+        if ((mri_head_t = FiffCoordTransOld::mne_read_mri_transform(settings->mriname)) == Q_NULLPTR)
             goto out;
-        if ((mri_id = get_file_id(settings->mriname)) == NULL) {
+        if ((mri_id = get_file_id(settings->mriname)) == Q_NULLPTR) {
             qCritical("Couln't read MRI file id (How come?)");
             goto out;
         }
     }
     else if (!settings->transname.isEmpty()) {
         FiffCoordTransOld* t;
-        if ((t = FiffCoordTransOld::mne_read_FShead2mri_transform(settings->transname.toUtf8().data())) == NULL)
+        if ((t = FiffCoordTransOld::mne_read_FShead2mri_transform(settings->transname.toUtf8().data())) == Q_NULLPTR)
             goto out;
         mri_head_t = t->fiff_invert_transform();
         if(t)
@@ -2036,7 +2027,15 @@ void ComputeFwd::calculateFwd() const
      * and the MEG device -> head coordinate transformation
      */
     printf("\n");
-    if (mne_read_meg_comp_eeg_ch_info_41(settings->measname,&megchs,&nmeg,&compchs,&ncomp,&eegchs,&neeg,&meg_head_t,&meas_id) != OK)
+    if (mne_read_meg_comp_eeg_ch_info_41(settings->measname,
+                                         megchs,
+                                         &nmeg,
+                                         compchs,
+                                         &ncomp,
+                                         eegchs,
+                                         &neeg,
+                                         &meg_head_t,
+                                         &meas_id) != OK)
         goto out;
     if (nmeg > 0)
         printf("Read %3d MEG channels from %s\n",nmeg,settings->measname.toUtf8().constData());
@@ -2046,8 +2045,8 @@ void ComputeFwd::calculateFwd() const
         printf("Read %3d EEG channels from %s\n",neeg,settings->measname.toUtf8().constData());
     if (!settings->include_meg) {
         printf("MEG not requested. MEG channels omitted.\n");
-        FREE_41(megchs); megchs = NULL;
-        FREE_41(compchs); compchs = NULL;
+        megchs.clear();
+        compchs.clear();
         nmeg = 0;
         ncomp = 0;
     }
@@ -2055,7 +2054,7 @@ void ComputeFwd::calculateFwd() const
         FiffCoordTransOld::mne_print_coord_transform(stderr,meg_head_t);
     if (!settings->include_eeg) {
         printf("EEG not requested. EEG channels omitted.\n");
-        FREE_41(eegchs); eegchs = NULL;
+        eegchs.clear();
         neeg = 0;
     }
     else {
@@ -2092,49 +2091,58 @@ void ComputeFwd::calculateFwd() const
         /*
         * Compensation data
         */
-        if ((comp_data = MneCTFCompDataSet::mne_read_ctf_comp_data(settings->measname)) == NULL)
+        if ((comp_data = MneCTFCompDataSet::mne_read_ctf_comp_data(settings->measname)) == Q_NULLPTR)
             goto out;
         if (comp_data->ncomp > 0) /* Compensation channel information may be needed */
             printf("%d compensation data sets in %s\n",comp_data->ncomp,settings->measname.toUtf8().constData());
         else {
-            FREE_41(compchs); compchs = NULL;
+            compchs.clear();
             ncomp = 0;
 
             if(comp_data)
                 delete comp_data;
-            comp_data = NULL;
+            comp_data = Q_NULLPTR;
         }
     }
     if (settings->coord_frame == FIFFV_COORD_MRI) {
         FiffCoordTransOld* head_mri_t = mri_head_t->fiff_invert_transform();
         FiffCoordTransOld* meg_mri_t = FiffCoordTransOld::fiff_combine_transforms(FIFFV_COORD_DEVICE,FIFFV_COORD_MRI,meg_head_t,head_mri_t);
-        if (meg_mri_t == NULL)
+        if (meg_mri_t == Q_NULLPTR)
             goto out;
-        if ((megcoils = templates->create_meg_coils(megchs,nmeg,
+        if ((megcoils = templates->create_meg_coils(megchs,
+                                                    nmeg,
                                                     settings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                    meg_mri_t)) == NULL)
+                                                    meg_mri_t)) == Q_NULLPTR)
             goto out;
         if (ncomp > 0) {
-            if ((compcoils = templates->create_meg_coils(   compchs,ncomp,
-                                                            FWD_COIL_ACCURACY_NORMAL,meg_mri_t)) == NULL)
+            if ((compcoils = templates->create_meg_coils(compchs,
+                                                         ncomp,
+                                                         FWD_COIL_ACCURACY_NORMAL,
+                                                         meg_mri_t)) == Q_NULLPTR)
                 goto out;
         }
-        if ((eegels = FwdCoilSet::create_eeg_els(eegchs,neeg,head_mri_t)) == NULL)
+        if ((eegels = FwdCoilSet::create_eeg_els(eegchs,
+                                                 neeg,
+                                                 head_mri_t)) == Q_NULLPTR)
             goto out;
         FREE_41(head_mri_t);
         printf("MRI coordinate coil definitions created.\n");
     }
     else {
-        if ((megcoils = templates->create_meg_coils(megchs,nmeg,
+        if ((megcoils = templates->create_meg_coils(megchs,
+                                                    nmeg,
                                                     settings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                    meg_head_t)) == NULL)
+                                                    meg_head_t)) == Q_NULLPTR)
             goto out;
         if (ncomp > 0) {
-            if ((compcoils = templates->create_meg_coils(compchs,ncomp,
-                                                         FWD_COIL_ACCURACY_NORMAL,meg_head_t)) == NULL)
+            if ((compcoils = templates->create_meg_coils(compchs,
+                                                         ncomp,
+                                                         FWD_COIL_ACCURACY_NORMAL,meg_head_t)) == Q_NULLPTR)
                 goto out;
         }
-        if ((eegels = FwdCoilSet::create_eeg_els(eegchs,neeg,NULL)) == NULL)
+        if ((eegels = FwdCoilSet::create_eeg_els(eegchs,
+                                                 neeg,
+                                                 Q_NULLPTR)) == Q_NULLPTR)
             goto out;
         printf("Head coordinate coil definitions created.\n");
     }
@@ -2187,7 +2195,7 @@ void ComputeFwd::calculateFwd() const
     if (settings->filter_spaces) {
         if (!settings->mindistoutname.isEmpty()) {
             out = fopen(settings->mindistoutname.toUtf8().constData(),"w");
-            if (out == NULL) {
+            if (out == Q_NULLPTR) {
                 qCritical() << settings->mindistoutname;
                 goto out;
             }
@@ -2201,7 +2209,7 @@ void ComputeFwd::calculateFwd() const
             goto out;
         if (out) {
             fclose(out);
-            out = NULL;
+            out = Q_NULLPTR;
         }
     }
     /*
@@ -2220,7 +2228,7 @@ void ComputeFwd::calculateFwd() const
                                               &settings->r0,
                                               settings->use_threads,
                                               &meg_forward,
-                                              settings->compute_grad ? &meg_forward_grad : NULL)) == FAIL)
+                                              settings->compute_grad ? &meg_forward_grad : Q_NULLPTR)) == FAIL)
             goto out;
     if (neeg > 0)
         if ((FwdBemModel::compute_forward_eeg(spaces,
@@ -2231,7 +2239,7 @@ void ComputeFwd::calculateFwd() const
                                               eeg_model,
                                               settings->use_threads,
                                               &eeg_forward,
-                                              settings->compute_grad ? &eeg_forward_grad : NULL)) == FAIL)
+                                              settings->compute_grad ? &eeg_forward_grad : Q_NULLPTR)) == FAIL)
             goto out;
     /*
      * Transform the source spaces back into MRI coordinates
@@ -2276,8 +2284,6 @@ out : {
             delete mri_head_t;
         if(meg_head_t)
             delete meg_head_t;
-        FREE_41(megchs);
-        FREE_41(eegchs);
         if(megcoils)
             delete megcoils;
         if(eegels)

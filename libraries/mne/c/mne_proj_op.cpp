@@ -213,7 +213,7 @@ QString mne_name_list_to_string_23(const QStringList& list)
 }
 
 
-QString mne_channel_names_to_string_23(FIFFLIB::fiffChInfo chs, int nch)
+QString mne_channel_names_to_string_23(const QList<FIFFLIB::FiffChInfo>& chs, int nch)
 /*
  * Make a colon-separated string out of channel names
  */
@@ -223,7 +223,7 @@ QString mne_channel_names_to_string_23(FIFFLIB::fiffChInfo chs, int nch)
     if (nch <= 0)
         return res;
     for (int k = 0; k < nch; k++)
-        names.append(chs[k].ch_name);
+        names.append(chs.at(k).ch_name);
     res = mne_name_list_to_string_23(names);
     return res;
 }
@@ -396,7 +396,7 @@ MneProjOp *MneProjOp::mne_dup_proj_op(MneProjOp *op)
 
 //*************************************************************************************************************
 
-MneProjOp *MneProjOp::mne_proj_op_average_eeg_ref(FIFFLIB::fiffChInfo chs, int nch)
+MneProjOp *MneProjOp::mne_proj_op_average_eeg_ref(const QList<FiffChInfo>& chs, int nch)
 /*
      * Make the projection operator for average electrode reference
      */
@@ -409,7 +409,7 @@ MneProjOp *MneProjOp::mne_proj_op_average_eeg_ref(FIFFLIB::fiffChInfo chs, int n
     MneProjOp*      op;
 
     for (k = 0; k < nch; k++)
-        if (chs[k].kind == FIFFV_EEG_CH)
+        if (chs.at(k).kind == FIFFV_EEG_CH)
             eegcount++;
     if (eegcount == 0) {
         qCritical("No EEG channels specified for average reference.");
@@ -419,8 +419,8 @@ MneProjOp *MneProjOp::mne_proj_op_average_eeg_ref(FIFFLIB::fiffChInfo chs, int n
     vec_data = ALLOC_CMATRIX_23(1,eegcount);
 
     for (k = 0; k < nch; k++)
-        if (chs[k].kind == FIFFV_EEG_CH)
-            names.append(chs[k].ch_name);
+        if (chs.at(k).kind == FIFFV_EEG_CH)
+            names.append(chs.at(k).ch_name);
 
     for (k = 0; k < eegcount; k++)
         vec_data[0][k] = 1.0/sqrt((double)eegcount);
@@ -455,7 +455,7 @@ int MneProjOp::mne_proj_op_affect(MneProjOp *op, const QStringList& list, int nl
 
 //*************************************************************************************************************
 
-int MneProjOp::mne_proj_op_affect_chs(MneProjOp *op, fiffChInfo chs, int nch)
+int MneProjOp::mne_proj_op_affect_chs(MneProjOp *op, const QList<FiffChInfo>& chs, int nch)
 {
     QString ch_string;
     int  res;

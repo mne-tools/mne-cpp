@@ -383,7 +383,7 @@ QString mne_name_list_to_string_3(const QStringList& list)
 }
 
 
-QString mne_channel_names_to_string_3(fiffChInfo chs, int nch)
+QString mne_channel_names_to_string_3(const QList<FiffChInfo>& chs, int nch)
 /*
  * Make a colon-separated string out of channel names
  */
@@ -1250,39 +1250,41 @@ static int check_cov_data(double *vals, int nval)
 
 
 
-int mne_classify_channels_cov(MneCovMatrix* cov, fiffChInfo chs, int nchan)
+int mne_classify_channels_cov(MneCovMatrix* cov,
+                              const QList<FiffChInfo>& chs,
+                              int nchan)
 /*
  * Assign channel classes in a covariance matrix with help of channel infos
  */
 {
     int k,p;
-    fiffChInfo ch;
+    FiffChInfo ch;
 
-    if (!chs) {
+    if (chs.isEmpty()) {
         qCritical("Channel information not available in mne_classify_channels_cov");
         goto bad;
     }
     cov->ch_class = REALLOC_3(cov->ch_class,cov->ncov,int);
     for (k = 0; k < cov->ncov; k++) {
         cov->ch_class[k] = MNE_COV_CH_UNKNOWN;
-        for (p = 0, ch = NULL; p < nchan; p++) {
+        for (p = 0; p < nchan; p++) {
             if (QString::compare(chs[p].ch_name,cov->names[k]) == 0) {
-                ch = chs+p;
-                if (ch->kind == FIFFV_MEG_CH) {
-                    if (ch->unit == FIFF_UNIT_T)
+                ch = chs[p];
+                if (ch.kind == FIFFV_MEG_CH) {
+                    if (ch.unit == FIFF_UNIT_T)
                         cov->ch_class[k] = MNE_COV_CH_MEG_MAG;
                     else
                         cov->ch_class[k] = MNE_COV_CH_MEG_GRAD;
                 }
-                else if (ch->kind == FIFFV_EEG_CH)
+                else if (ch.kind == FIFFV_EEG_CH)
                     cov->ch_class[k] = MNE_COV_CH_EEG;
                 break;
             }
         }
-        if (!ch) {
-            printf("Could not find channel info for channel %s in mne_classify_channels_cov",cov->names[k].toUtf8().constData());
-            goto bad;
-        }
+//        if (!ch) {
+//            printf("Could not find channel info for channel %s in mne_classify_channels_cov",cov->names[k].toUtf8().constData());
+//            goto bad;
+//        }
     }
     return OK;
 
@@ -2546,14 +2548,14 @@ int mne_proj_op_make_proj(MneProjOp* op)
 //============================= mne_read_forward_solution.c =============================
 
 int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
-                                  fiffChInfo     *megp,	 /* MEG channels */
-                                  int            *nmegp,
-                                  fiffChInfo     *meg_compp,
-                                  int            *nmeg_compp,
-                                  fiffChInfo     *eegp,	 /* EEG channels */
-                                  int            *neegp,
-                                  FiffCoordTransOld* *meg_head_t,
-                                  fiffId         *idp)	 /* The measurement ID */
+                                    QList<FiffChInfo>& megp,	 /* MEG channels */
+                                    int            *nmegp,
+                                    QList<FiffChInfo>& meg_compp,
+                                    int            *nmeg_compp,
+                                    QList<FiffChInfo>& eegp,	 /* EEG channels */
+                                    int            *neegp,
+                                    FiffCoordTransOld** meg_head_t,
+                                    fiffId         *idp)	 /* The measurement ID */
 /*
       * Read the channel information and split it into three arrays,
       * one for MEG, one for MEG compensation channels, and one for EEG
@@ -2563,19 +2565,19 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
     FiffStream::SPtr stream(new FiffStream(&file));
 
 
-    fiffChInfo chs   = NULL;
+    QList<FiffChInfo> chs;
     int        nchan = 0;
-    fiffChInfo meg   = NULL;
+    QList<FiffChInfo> meg;
     int        nmeg  = 0;
-    fiffChInfo meg_comp = NULL;
+    QList<FiffChInfo> meg_comp;
     int        nmeg_comp = 0;
-    fiffChInfo eeg   = NULL;
+    QList<FiffChInfo> eeg;
     int        neeg  = 0;
     fiffId     id    = NULL;
     QList<FiffDirNode::SPtr> nodes;
     FiffDirNode::SPtr info;
     FiffTag::SPtr t_pTag;
-    fiffChInfo   this_ch = NULL;
+    FiffChInfo   this_ch;
     FiffCoordTransOld* t = NULL;
     fiff_int_t kind, pos;
     int j,k,to_find;
@@ -2602,8 +2604,9 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             nchan = *t_pTag->toInt();
-            chs = MALLOC_3(nchan,fiffChInfoRec);
+
             for (j = 0; j < nchan; j++)
+                chs.append(FiffChInfo());
                 chs[j].scanNo = -1;
             to_find = nchan;
             break;
@@ -2627,15 +2630,13 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
         case FIFF_CH_INFO : /* Information about one channel */
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-//            this_ch = t_pTag->toChInfo();
-            this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
-            *this_ch = *(fiffChInfo)(t_pTag->data());
-            if (this_ch->scanNo <= 0 || this_ch->scanNo > nchan) {
-                printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch->scanNo,nchan);
+            this_ch = t_pTag->toChInfo();
+            if (this_ch.scanNo <= 0 || this_ch.scanNo > nchan) {
+                printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch.scanNo,nchan);
                 goto bad;
             }
             else
-                chs[this_ch->scanNo-1] = *this_ch;
+                chs[this_ch.scanNo-1] = this_ch;
             to_find--;
             break;
         }
@@ -2663,42 +2664,36 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
             nmeg_comp++;
         else if (chs[k].kind == FIFFV_EEG_CH)
             neeg++;
-    if (nmeg > 0)
-        meg = MALLOC_3(nmeg,fiffChInfoRec);
-    if (neeg > 0)
-        eeg = MALLOC_3(neeg,fiffChInfoRec);
-    if (nmeg_comp > 0)
-        meg_comp = MALLOC_3(nmeg_comp,fiffChInfoRec);
-    neeg = nmeg = nmeg_comp = 0;
 
-    for (k = 0; k < nchan; k++)
-        if (chs[k].kind == FIFFV_MEG_CH)
-            meg[nmeg++] = chs[k];
-        else if (chs[k].kind == FIFFV_REF_MEG_CH)
-            meg_comp[nmeg_comp++] = chs[k];
-        else if (chs[k].kind == FIFFV_EEG_CH)
-            eeg[neeg++] = chs[k];
+    if (nmeg > 0)
+        meg.reserve(nmeg);
+    if (neeg > 0)
+        eeg.reserve(neeg);
+    if (nmeg_comp > 0)
+        meg_comp.reserve(nmeg_comp);
+
+    for (k = 0; k < nchan; k++) {
+        if (chs[k].kind == FIFFV_MEG_CH) {
+            meg.append(chs[k]);
+        } else if (chs[k].kind == FIFFV_REF_MEG_CH) {
+            meg_comp.append(chs[k]);
+        } else if (chs[k].kind == FIFFV_EEG_CH) {
+            eeg.append(chs[k]);
+        }
+    }
+
 //    fiff_close(in);
     stream->close();
-    FREE_3(chs);
-    if (megp) {
-        *megp  = meg;
-        *nmegp = nmeg;
-    }
-    else
-        FREE_3(meg);
-    if (meg_compp) {
-        *meg_compp = meg_comp;
-        *nmeg_compp = nmeg_comp;
-    }
-    else
-        FREE_3(meg_comp);
-    if (eegp) {
-        *eegp  = eeg;
-        *neegp = neeg;
-    }
-    else
-        FREE_3(eeg);
+
+    megp = meg;
+    *nmegp = nmeg;
+
+    meg_compp = meg_comp;
+    *nmeg_compp = nmeg_comp;
+
+    eegp = eeg;
+    *neegp = neeg;
+
     if (idp == NULL) {
         FREE_3(id);
     }
@@ -2715,9 +2710,6 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
 bad : {
 //        fiff_close(in);
         stream->close();
-        FREE_3(chs);
-        FREE_3(meg);
-        FREE_3(eeg);
         FREE_3(id);
 //        FREE_3(tag.data);
         FREE_3(t);
@@ -3139,19 +3131,24 @@ const char *mne_coord_frame_name_3(int frame)
 
 //============================= mne_read_process_forward_solution.c =============================
 
-void mne_merge_channels(fiffChInfo chs1, int nch1,
-                        fiffChInfo chs2, int nch2,
-                        fiffChInfo *resp, int *nresp)
+void mne_merge_channels(const QList<FiffChInfo>& chs1,
+                        int nch1,
+                        const QList<FiffChInfo>& chs2,
+                        int nch2,
+                        QList<FiffChInfo>& resp,
+                        int *nresp)
 
 {
-    fiffChInfo res = MALLOC_3(nch1+nch2,fiffChInfoRec);
+    QList<FiffChInfo> res;
+    res.reserve(nch1+nch2);
+
     int k,p;
     for (p = 0, k = 0; k < nch1; k++)
         res[p++] = chs1[k];
     for (k = 0; k < nch2;k++)
         res[p++] = chs2[k];
-     *resp = res;
-     *nresp = nch1+nch2;
+    resp = res;
+    *nresp = nch1+nch2;
     return;
 }
 
@@ -3204,9 +3201,8 @@ static FiffDirNode::SPtr find_meas_info_3 (const FiffDirNode::SPtr& node)
 static int get_all_chs (//fiffFile file,	        /* The file we are reading */
                         FiffStream::SPtr& stream,
                         const FiffDirNode::SPtr& p_node,	/* The directory node containing our data */
-                        fiffId *id,		/* The block id from the nearest FIFFB_MEAS
-                                                   parent */
-                        fiffChInfo *chp,	/* Channel descriptions */
+                        fiffId *id,		/* The block id from the nearest FIFFB_MEAS parent */
+                        QList<FiffChInfo>& chp,	/* Channel descriptions */
                         int *nchan)		/* Number of channels */
 /*
       * Find channel information from
@@ -3214,8 +3210,8 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
       * node.
       */
 {
-    fiffChInfo ch;
-    fiffChInfo this_ch = NULL;
+    QList<FiffChInfo> ch;
+    FiffChInfo this_ch;
     int j,k;
     int to_find = 0;
     FiffDirNode::SPtr meas;
@@ -3223,9 +3219,7 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
 
-     *chp     = NULL;
-    ch       = NULL;
-     *id      = NULL;
+    *id      = NULL;
     /*
      * Find desired parents
      */
@@ -3259,7 +3253,7 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *nchan = *t_pTag->toInt();
-            ch = MALLOC_3(*nchan,fiffChInfoRec);
+            ch.reserve(*nchan);
             for (j = 0; j < *nchan; j++)
                 ch[j].scanNo = -1;
             to_find = to_find + *nchan - 1;
@@ -3268,24 +3262,22 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
         case FIFF_CH_INFO : /* Information about one channel */
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
-            this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
-            *this_ch = *(fiffChInfo)t_pTag->data();
-            if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
+            this_ch = t_pTag->toChInfo();
+            if (this_ch.scanNo <= 0 || this_ch.scanNo > *nchan) {
                 qCritical ("FIFF_CH_INFO : scan # out of range!");
                 goto bad;
             }
             else
-                memcpy(ch+this_ch->scanNo-1,this_ch,
-                       sizeof(fiffChInfoRec));
+                ch[this_ch.scanNo-1] = this_ch;
             to_find--;
             break;
         }
     }
-     *chp = ch;
+
+    chp = ch;
     return FIFF_OK;
 
 bad : {
-        FREE_3(ch);
         return FIFF_FAIL;
     }
 }
@@ -3294,7 +3286,7 @@ bad : {
 
 
 static int read_ch_info(const QString&  name,
-                        fiffChInfo      *chsp,
+                        QList<FiffChInfo>& chsp,
                         int             *nchanp,
                         fiffId          *idp)
 /*
@@ -3304,7 +3296,7 @@ static int read_ch_info(const QString&  name,
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-    fiffChInfo chs = NULL;
+    QList<FiffChInfo> chs;
     int        nchan = 0;
     fiffId     id = NULL;
 
@@ -3320,16 +3312,19 @@ static int read_ch_info(const QString&  name,
         goto bad;
     }
     node = meas[0];
-    if (get_all_chs (stream,node,&id,&chs,&nchan) == FIFF_FAIL)
+    if (get_all_chs(stream,
+                    node,
+                    &id,
+                    chs,
+                    &nchan) == FIFF_FAIL)
         goto bad;
-     *chsp   = chs;
+     chsp   = chs;
      *nchanp = nchan;
      *idp = id;
     stream->close();
     return FIFF_OK;
 
 bad : {
-        FREE_3(chs);
         FREE_3(id);
         stream->close();
         return FIFF_FAIL;
@@ -3341,23 +3336,22 @@ bad : {
 
 #define TOO_CLOSE 1e-4
 
-static int at_origin (float *rr)
-
+static int at_origin (const Eigen::Vector3f& rr)
 {
-    return (VEC_LEN_3(rr) < TOO_CLOSE);
+    return (rr.norm() < TOO_CLOSE);
 }
 
 
 
 
-static int is_valid_eeg_ch(fiffChInfo ch)
+static int is_valid_eeg_ch(const FiffChInfo& ch)
 /*
       * Is the electrode position information present?
       */
 {
-    if (ch->kind == FIFFV_EEG_CH) {
-        if (at_origin(ch->chpos.r0) ||
-                ch->chpos.coil_type == FIFFV_COIL_NONE)
+    if (ch.kind == FIFFV_EEG_CH) {
+        if (at_origin(ch.chpos.r0) ||
+                ch.chpos.coil_type == FIFFV_COIL_NONE)
             return FALSE;
         else
             return TRUE;
@@ -3371,14 +3365,14 @@ static int is_valid_eeg_ch(fiffChInfo ch)
 
 
 
-static int accept_ch(fiffChInfo ch,
+static int accept_ch(const FiffChInfo& ch,
                      const QStringList& bads,
                      int        nbad)
 
 {
     int k;
     for (k = 0; k < nbad; k++)
-        if (QString::compare(ch->ch_name,bads[k]) == 0)
+        if (QString::compare(ch.ch_name,bads[k]) == 0)
             return FALSE;
     return TRUE;
 }
@@ -3395,7 +3389,7 @@ int read_meg_eeg_ch_info(const QString& name,       /* Input file */
                          int        do_eeg,         /* Use EEG */
                          const QStringList& bads,   /* List of bad channels */
                          int        nbad,
-                         fiffChInfo *chsp,          /* MEG + EEG channels */
+                         QList<FiffChInfo>& chsp,          /* MEG + EEG channels */
                          int        *nmegp,         /* Count of each */
                          int        *neegp)
 /*
@@ -3403,18 +3397,21 @@ int read_meg_eeg_ch_info(const QString& name,       /* Input file */
       * one for MEG and one for EEG
       */
 {
-    fiffChInfo chs   = NULL;
+    QList<FiffChInfo> chs;
     int        nchan = 0;
-    fiffChInfo meg   = NULL;
+    QList<FiffChInfo> meg;
     int        nmeg  = 0;
-    fiffChInfo eeg   = NULL;
+    QList<FiffChInfo> eeg;
     int        neeg  = 0;
     fiffId     id    = NULL;
     int        nch;
 
     int k;
 
-    if (read_ch_info(name,&chs,&nchan,&id) != FIFF_OK)
+    if (read_ch_info(name,
+                     chs,
+                     &nchan,
+                     &id) != FIFF_OK)
         goto bad;
     /*
    * Sort out the channels
@@ -3422,33 +3419,36 @@ int read_meg_eeg_ch_info(const QString& name,       /* Input file */
     for (k = 0; k < nchan; k++)
         if (chs[k].kind == FIFFV_MEG_CH)
             nmeg++;
-        else if (chs[k].kind == FIFFV_EEG_CH && is_valid_eeg_ch(chs+k))
+        else if (chs[k].kind == FIFFV_EEG_CH && is_valid_eeg_ch(chs[k]))
             neeg++;
+
     if (nmeg > 0)
-        meg = MALLOC_3(nmeg,fiffChInfoRec);
+        meg.reserve(nmeg);
     if (neeg > 0)
-        eeg = MALLOC_3(neeg,fiffChInfoRec);
-    neeg = nmeg = 0;
-    for (k = 0; k < nchan; k++)
-        if (accept_ch(chs+k,bads,nbad)) {
-            if (do_meg && chs[k].kind == FIFFV_MEG_CH)
-                meg[nmeg++] = chs[k];
-            else if (do_eeg && chs[k].kind == FIFFV_EEG_CH && is_valid_eeg_ch(chs+k))
-                eeg[neeg++] = chs[k];
+        eeg.reserve(neeg);
+
+    for (k = 0; k < nchan; k++) {
+        if (accept_ch(chs[k],bads,nbad)) {
+            if (do_meg && chs[k].kind == FIFFV_MEG_CH) {
+                meg.append(chs[k]);
+            } else if (do_eeg && chs[k].kind == FIFFV_EEG_CH && is_valid_eeg_ch(chs[k])) {
+                eeg.append(chs[k]);
+            }
         }
-    FREE_3(chs);
-    mne_merge_channels(meg,nmeg,eeg,neeg,chsp,&nch);
-    FREE_3(meg);
-    FREE_3(eeg);
-     *nmegp = nmeg;
-     *neegp = neeg;
+    }
+
+    mne_merge_channels(meg,
+                       nmeg,
+                       eeg,
+                       neeg,
+                       chsp,
+                       &nch);
+    *nmegp = nmeg;
+    *neegp = neeg;
     FREE_3(id);
     return FIFF_OK;
 
 bad : {
-        FREE_3(chs);
-        FREE_3(meg);
-        FREE_3(eeg);
         FREE_3(id);
         return FIFF_FAIL;
     }
@@ -3499,7 +3499,11 @@ void mne_revert_to_diag_cov(MneCovMatrix* c)
 
 
 
-MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, const QStringList& new_names, int ncov, int omit_meg_eeg, fiffChInfo chs)
+MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c,
+                                    const QStringList& new_names,
+                                    int ncov,
+                                    int omit_meg_eeg,
+                                    const QList<FiffChInfo>& chs)
 /*
  * Pick designated channels from a covariance matrix, optionally omit MEG/EEG correlations
  */
@@ -3539,7 +3543,7 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c, const QStringList& new_name
     }
     if (omit_meg_eeg) {
         is_meg = MALLOC_3(ncov,int);
-        if (chs) {
+        if (!chs.isEmpty()) {
             for (j = 0; j < ncov; j++)
                 if (chs[j].kind == FIFFV_MEG_CH)
                     is_meg[j] = TRUE;
@@ -3768,7 +3772,6 @@ int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
 DipoleFitData::DipoleFitData()
 : mri_head_t (NULL)
 , meg_head_t (NULL)
-, chs (NULL)
 , meg_coils (NULL)
 , eeg_els (NULL)
 , nmeg (0)
@@ -3805,8 +3808,6 @@ DipoleFitData::~DipoleFitData()
         delete mri_head_t;
     if(meg_head_t)
         delete meg_head_t;
-
-    FREE_3(chs);
 
     if(meg_coils)
         delete meg_coils;
@@ -4051,7 +4052,10 @@ MneCovMatrix* DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, floa
 
 //*************************************************************************************************************
 
-int DipoleFitData::make_projection(const QList<QString> &projnames, fiffChInfo chs, int nch, MneProjOp* *res)
+int DipoleFitData::make_projection(const QList<QString> &projnames,
+                                   const QList<FiffChInfo>& chs,
+                                   int nch,
+                                   MneProjOp* *res)
 /*
           * Process the projection data
           */
@@ -4298,7 +4302,24 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
 
 //*************************************************************************************************************
 
-DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, const QString &measname, const QString& bemname, Vector3f *r0, FwdEegSphereModel *eeg_model, int accurate_coils, const QString &badname, const QString &noisename, float grad_std, float mag_std, float eeg_std, float mag_reg, float grad_reg, float eeg_reg, int diagnoise, const QList<QString> &projnames, int include_meg, int include_eeg)              /**< Include EEG in the fitting? */
+DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
+                                                    const QString &measname,
+                                                    const QString& bemname,
+                                                    Vector3f *r0,
+                                                    FwdEegSphereModel *eeg_model,
+                                                    int accurate_coils,
+                                                    const QString &badname,
+                                                    const QString &noisename,
+                                                    float grad_std,
+                                                    float mag_std,
+                                                    float eeg_std,
+                                                    float mag_reg,
+                                                    float grad_reg,
+                                                    float eeg_reg,
+                                                    int diagnoise,
+                                                    const QList<QString> &projnames,
+                                                    int include_meg,
+                                                    int include_eeg)              /**< Include EEG in the fitting? */
 /*
           * Background work for modelling
           */
@@ -4360,8 +4381,13 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     /*
        * Read the channel information
        */
-    if (read_meg_eeg_ch_info(measname,include_meg,include_eeg,badlist,nbad,
-                             &res->chs,&res->nmeg,&res->neeg) != OK)
+    if (read_meg_eeg_ch_info(measname,
+                             include_meg,
+                             include_eeg,
+                             badlist,nbad,
+                             res->chs,
+                             &res->nmeg,
+                             &res->neeg) != OK)
         goto bad;
 
     if (res->nmeg > 0)
@@ -4369,7 +4395,8 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     if (res->neeg > 0)
         printf("Will use %3d EEG channels from %s\n",res->neeg,measname.toUtf8().data());
     {
-        QString s = mne_channel_names_to_string_3(res->chs,res->nmeg+res->neeg);
+        QString s = mne_channel_names_to_string_3(res->chs,
+                                                  res->nmeg+res->neeg);
         int  n;
         mne_string_to_name_list_3(s,res->ch_names,n);
     }
@@ -4405,11 +4432,14 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
             goto bad;
         }
 
-        if ((res->meg_coils = templates->create_meg_coils(res->chs,res->nmeg,
+        if ((res->meg_coils = templates->create_meg_coils(res->chs,
+                                                          res->nmeg,
                                                           accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
                                                           res->meg_head_t)) == NULL)
             goto bad;
-        if ((res->eeg_els = FwdCoilSet::create_eeg_els(res->chs+res->nmeg,res->neeg,NULL)) == NULL)
+        if ((res->eeg_els = FwdCoilSet::create_eeg_els(res->chs.mid(res->nmeg),
+                                                       res->neeg,
+                                                       NULL)) == NULL)
             goto bad;
         printf("Head coordinate coil definitions created.\n");
     }
@@ -4433,21 +4463,30 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     if ((comp_data = MneCTFCompDataSet::mne_read_ctf_comp_data(measname)) == NULL)
         goto bad;
     if (comp_data->ncomp > 0) {	/* Compensation channel information may be needed */
-        fiffChInfo comp_chs = NULL;
+        QList<FiffChInfo> comp_chs;
         int        ncomp    = 0;
 
         printf("%d compensation data sets in %s\n",comp_data->ncomp,measname.toUtf8().data());
-        if (mne_read_meg_comp_eeg_ch_info_3(measname,NULL,0,&comp_chs,&ncomp,NULL,NULL,NULL,NULL) == FAIL)
+        QList<FiffChInfo> temp;
+        if (mne_read_meg_comp_eeg_ch_info_3(measname,
+                                            temp,
+                                            NULL,
+                                            comp_chs,
+                                            &ncomp,
+                                            temp,
+                                            NULL,
+                                            NULL,
+                                            NULL) == FAIL)
             goto bad;
         if (ncomp > 0) {
-            if ((comp_coils = templates->create_meg_coils(comp_chs,ncomp,
-                                                          FWD_COIL_ACCURACY_NORMAL,res->meg_head_t)) == NULL) {
-                FREE_3(comp_chs);
+            if ((comp_coils = templates->create_meg_coils(comp_chs,
+                                                          ncomp,
+                                                          FWD_COIL_ACCURACY_NORMAL,
+                                                          res->meg_head_t)) == NULL) {
                 goto bad;
             }
             printf("%d compensation channels in %s\n",comp_coils->ncoil,measname.toUtf8().data());
         }
-        FREE_3(comp_chs);
     }
     else {          /* Get rid of the empty data set */
         if(comp_data)
@@ -4463,7 +4502,10 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
     /*
        * Projection data should go here
        */
-    if (make_projection(projnames,res->chs,res->nmeg+res->neeg,&res->proj) == FAIL)
+    if (make_projection(projnames,
+                        res->chs,
+                        res->nmeg+res->neeg,
+                        &res->proj) == FAIL)
         goto bad;
     if (res->proj && res->proj->nitems > 0) {
         fprintf(stderr,"Final projection operator is:\n");
@@ -4490,7 +4532,11 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         if ((cov = ad_hoc_noise(res->meg_coils,res->eeg_els,grad_std,mag_std,eeg_std)) == NULL)
             goto bad;
     }
-    res->noise = mne_pick_chs_cov_omit(cov,res->ch_names,res->nmeg+res->neeg,TRUE,res->chs);
+    res->noise = mne_pick_chs_cov_omit(cov,
+                                       res->ch_names,
+                                       res->nmeg+res->neeg,
+                                       TRUE,
+                                       res->chs);
     if (res->noise == NULL) {
         mne_free_cov_3(cov);
         goto bad;
@@ -4529,7 +4575,9 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname, cons
         /*
          * Classify the channels
          */
-        if (mne_classify_channels_cov(res->noise,res->chs,res->nmeg+res->neeg) == FAIL)
+        if (mne_classify_channels_cov(res->noise,
+                                      res->chs,
+                                      res->nmeg+res->neeg) == FAIL)
             goto bad;
         /*
          * Do we need to do anything?
