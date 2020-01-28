@@ -131,13 +131,13 @@ public:
     static MneProjOp* mne_dup_proj_op(MneProjOp* op);
 
     // mne_lin_proj.c
-    static MneProjOp* mne_proj_op_average_eeg_ref(FIFFLIB::fiffChInfo chs, int nch);
+    static MneProjOp* mne_proj_op_average_eeg_ref(const QList<FIFFLIB::FiffChInfo>& chs, int nch);
 
 
     static int mne_proj_op_affect(MneProjOp* op, const QStringList& list, int nlist);
 
 
-    static int mne_proj_op_affect_chs(MneProjOp* op, FIFFLIB::fiffChInfo chs, int nch);
+    static int mne_proj_op_affect_chs(MneProjOp* op, const QList<FIFFLIB::FiffChInfo> &chs, int nch);
 
 
     static int mne_proj_op_proj_vector(MneProjOp* op, float *vec, int nvec, int do_complement);

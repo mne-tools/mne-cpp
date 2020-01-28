@@ -130,7 +130,7 @@ public:
      *
      * @return   The created meg coil.
      */
-    FwdCoil* create_meg_coil( FIFFLIB::FiffChInfo ch, int acc, const FIFFLIB::FiffCoordTransOld* t);
+    FwdCoil* create_meg_coil(const FIFFLIB::FiffChInfo& ch, int acc, const FIFFLIB::FiffCoordTransOld* t);
 
     //=========================================================================================================
     /**
@@ -145,7 +145,10 @@ public:
      *
      * @return   The created meg coil set.
      */
-    FwdCoilSet* create_meg_coils(FIFFLIB::FiffChInfo chs,  int nch, int acc, const FIFFLIB::FiffCoordTransOld* t);
+    FwdCoilSet* create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
+                                 int nch,
+                                 int acc,
+                                 const FIFFLIB::FiffCoordTransOld* t);
 
     //=========================================================================================================
     /**
@@ -159,7 +162,9 @@ public:
      *
      * @return   The created meg coil set.
      */
-    static FwdCoilSet* create_eeg_els(FIFFLIB::FiffChInfo chs, int nch, const FIFFLIB::FiffCoordTransOld* t);
+    static FwdCoilSet* create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
+                                      int nch,
+                                      const FIFFLIB::FiffCoordTransOld* t);
 
     //=========================================================================================================
     /**

@@ -37,6 +37,7 @@
 #ifndef FWDCOIL_H
 #define FWDCOIL_H
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -62,8 +63,6 @@
 
 #include <QSharedPointer>
 
-
-
 #define FWD_COIL_UNKNOWN      0
 
 #define FWD_COILC_UNKNOWN     0
@@ -78,9 +77,6 @@
 #define FWD_COIL_ACCURACY_ACCURATE 2
 
 #define FWD_IS_MEG_COIL(x) ((x) != FWD_COILC_EEG && (x) != FWD_COILC_UNKNOWN)
-
-
-
 
 
 //*************************************************************************************************************
@@ -136,7 +132,8 @@ public:
      *
      * @return   The created coil.
      */
-    static FwdCoil* create_eeg_el( FIFFLIB::FiffChInfo ch,const FIFFLIB::FiffCoordTransOld* t);
+    static FwdCoil* create_eeg_el(const FIFFLIB::FiffChInfo& ch,
+                                  const FIFFLIB::FiffCoordTransOld* t);
 
     //=========================================================================================================
     /**

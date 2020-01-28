@@ -42,6 +42,8 @@
 #include "fwd_coil_set.h"
 #include "fwd_coil.h"
 
+#include <fiff/fiff_ch_info.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -325,27 +327,27 @@ FwdCoilSet::~FwdCoilSet()
 
 //*************************************************************************************************************
 
-FwdCoil *FwdCoilSet::create_meg_coil(fiffChInfo ch, int acc, const FiffCoordTransOld* t)
+FwdCoil *FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCoordTransOld* t)
 {
     int        k,p,c;
     FwdCoil*    def;
     FwdCoil*    res = NULL;
 
-    if (ch->kind != FIFFV_MEG_CH && ch->kind != FIFFV_REF_MEG_CH) {
-        printf("%s is not a MEG channel. Cannot create a coil definition.",ch->ch_name);
+    if (ch.kind != FIFFV_MEG_CH && ch.kind != FIFFV_REF_MEG_CH) {
+        qWarning() << ch.ch_name << "is not a MEG channel. Cannot create a coil definition.";
         goto bad;
     }
     /*
         * Simple linear search from the coil definitions
         */
     for (k = 0, def = NULL; k < this->ncoil; k++) {
-        if ((this->coils[k]->type == (ch->chpos.coil_type & 0xFFFF)) &&
+        if ((this->coils[k]->type == (ch.chpos.coil_type & 0xFFFF)) &&
                 this->coils[k]->accuracy == acc) {
             def = this->coils[k];
         }
     }
     if (!def) {
-        printf("Desired coil definition not found (type = %d acc = %d)",ch->chpos.coil_type,acc);
+        printf("Desired coil definition not found (type = %d acc = %d)",ch.chpos.coil_type,acc);
         goto bad;
     }
     /*
@@ -353,19 +355,19 @@ FwdCoil *FwdCoilSet::create_meg_coil(fiffChInfo ch, int acc, const FiffCoordTran
         */
     res = new FwdCoil(def->np);
 
-    res->chname   = ch->ch_name;
+    res->chname   = ch.ch_name;
     if (!def->desc.isEmpty())
         res->desc   = def->desc;
     res->coil_class = def->coil_class;
     res->accuracy   = def->accuracy;
     res->base       = def->base;
     res->size       = def->size;
-    res->type       = ch->chpos.coil_type;
+    res->type       = ch.chpos.coil_type;
 
-    VEC_COPY_6(res->r0,ch->chpos.r0);
-    VEC_COPY_6(res->ex,ch->chpos.ex);
-    VEC_COPY_6(res->ey,ch->chpos.ey);
-    VEC_COPY_6(res->ez,ch->chpos.ez);
+    VEC_COPY_6(res->r0,ch.chpos.r0);
+    VEC_COPY_6(res->ex,ch.chpos.ex);
+    VEC_COPY_6(res->ey,ch.chpos.ey);
+    VEC_COPY_6(res->ez,ch.chpos.ez);
     /*
         * Apply a coordinate transformation if so desired
         */
@@ -396,14 +398,17 @@ bad : {
 
 //*************************************************************************************************************
 
-FwdCoilSet *FwdCoilSet::create_meg_coils(FIFFLIB::FiffChInfo chs, int nch, int acc, const FiffCoordTransOld* t)
+FwdCoilSet *FwdCoilSet::create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
+                                         int nch,
+                                         int acc,
+                                         const FiffCoordTransOld* t)
 {
     FwdCoilSet* res = new FwdCoilSet();
     FwdCoil*    next;
     int        k;
 
     for (k = 0; k < nch; k++) {
-        if ((next = this->create_meg_coil(chs+k,acc,t)) == NULL)
+        if ((next = this->create_meg_coil(chs.at(k),acc,t)) == Q_NULLPTR)
             goto bad;
         res->coils = REALLOC_6(res->coils,res->ncoil+1,FwdCoil*);
         res->coils[res->ncoil++] = next;
@@ -421,14 +426,16 @@ bad : {
 
 //*************************************************************************************************************
 
-FwdCoilSet *FwdCoilSet::create_eeg_els(fiffChInfo chs, int nch, const FiffCoordTransOld* t)
+FwdCoilSet *FwdCoilSet::create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
+                                       int nch,
+                                       const FiffCoordTransOld* t)
 {
     FwdCoilSet* res = new FwdCoilSet();
     FwdCoil*    next;
     int        k;
 
     for (k = 0; k < nch; k++) {
-        if ((next = FwdCoil::create_eeg_el(chs+k,t)) == NULL)
+        if ((next = FwdCoil::create_eeg_el(chs.at(k),t)) == Q_NULLPTR)
             goto bad;
         res->coils = REALLOC_6(res->coils,res->ncoil+1,FwdCoil*);
         res->coils[res->ncoil++] = next;

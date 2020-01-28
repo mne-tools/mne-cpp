@@ -158,7 +158,7 @@ public:
 
     //ToDo  move to mneProjOp class
     static int make_projection(const QList<QString>& projnames,
-                               FIFFLIB::fiffChInfo chs,
+                               const QList<FIFFLIB::FiffChInfo>& chs,
                                int        nch,
                                MNELIB::MneProjOp*  *res);
 
@@ -237,7 +237,7 @@ public:
       FIFFLIB::FiffCoordTransOld*    mri_head_t; /**< MRI <-> head coordinate transformation */
       FIFFLIB::FiffCoordTransOld*    meg_head_t; /**< MEG <-> head coordinate transformation */
       int               coord_frame;        /**< Common coordinate frame */
-      FIFFLIB::fiffChInfo        chs;       /**< Channels */
+      QList<FIFFLIB::FiffChInfo>        chs;       /**< Channels */
       int               nmeg;               /**< How many MEG */
       int               neeg;               /**< How many EEG */
       QStringList       ch_names;           /**< List of all channel names */
