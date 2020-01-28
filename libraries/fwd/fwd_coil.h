@@ -136,7 +136,7 @@ public:
      *
      * @return   The created coil.
      */
-    static FwdCoil* create_eeg_el( FIFFLIB::fiffChInfo ch,const FIFFLIB::FiffCoordTransOld* t);
+    static FwdCoil* create_eeg_el( FIFFLIB::FiffChInfo ch,const FIFFLIB::FiffCoordTransOld* t);
 
     //=========================================================================================================
     /**
