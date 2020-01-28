@@ -132,7 +132,7 @@ bool FtBuffClient::readHeader() {
     //Updating channel and sample info
     m_iNumChannels = header_def.nchans;
     m_uiNumSamples = header_def.nsamples;
-    m_iSampleFrequency = (int)(header_def.fsample);
+    m_iSampleFrequency = header_def.fsample;
 
     m_bGotParams = true;
 
@@ -397,6 +397,8 @@ bool FtBuffClient::extendedHeader() {
     }
 }
 
+//*************************************************************************************************************
+
 bool FtBuffClient::regularHeader() {
     if (m_bGotParams) {
          m_bGotParams = false;
@@ -407,8 +409,10 @@ bool FtBuffClient::regularHeader() {
     }
 }
 
-QPair<int,int> FtBuffClient::getChannelAndFrequency() {
-    QPair<int,int> val;
+//*************************************************************************************************************
+
+QPair<int,float> FtBuffClient::getChannelAndFrequency() {
+    QPair<int,float> val;
     val.first = m_iNumChannels;
     val.second = m_iSampleFrequency;
     return val;
