@@ -129,17 +129,10 @@ p, li { white-space: pre-wrap; }
         <bool>false</bool>
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Properties">
-        <item row="2" column="0">
+        <item row="1" column="0">
          <widget class="QLineEdit" name="m_lineEditIP"/>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>IP Address:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
+        <item row="2" column="0">
          <widget class="QPushButton" name="m_qPushButton_Connect">
           <property name="text">
            <string>Connect</string>
@@ -147,120 +140,10 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item row="0" column="0">
-         <widget class="QGroupBox" name="m_qGroupBox_SamplingOptions">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>IP Address:</string>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="title">
-           <string>Sampling options</string>
-          </property>
-          <property name="flat">
-           <bool>false</bool>
-          </property>
-          <layout class="QFormLayout" name="formLayout_5">
-           <property name="fieldGrowthPolicy">
-            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-           </property>
-           <item row="0" column="0">
-            <widget class="QLabel" name="m_qLabel_SamplingRate_4">
-             <property name="layoutDirection">
-              <enum>Qt::LeftToRight</enum>
-             </property>
-             <property name="text">
-              <string>Sampling Frequency (Hz):</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="m_comboBox_SamplingFreq_4">
-             <property name="currentText">
-              <string>100</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>100</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>128</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>250</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>256</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>500</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>512</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>1000</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>1024</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>2000</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>2048</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_9">
-             <property name="text">
-              <string>Number of channels:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QSpinBox" name="m_spinBox_numberChannels_4">
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>500</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
          </widget>
         </item>
        </layout>
