@@ -102,8 +102,8 @@ void FtBufferSetupWidget::pressedConnect()
         //qDebug() << "TEXTFIELD:" << this->ui.m_lineEditIP->text();
         if (m_pFtBuffer->m_pFtBuffProducer->connectToBuffer(this->ui.m_lineEditIP->text())) {
             ui.m_qPushButton_Connect->setText("Disconnect");
-            m_pFtBuffer->setParams(ui.m_comboBox_SamplingFreq_4->currentText().toInt(),
-                                   ui.m_spinBox_numberChannels_4->value());
+//            m_pFtBuffer->setParams(ui.m_comboBox_SamplingFreq_4->currentText().toInt(),
+//                                   ui.m_spinBox_numberChannels_4->value());
         }
     }
 }

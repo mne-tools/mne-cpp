@@ -66,6 +66,8 @@
 
 #include <scMeas/realtimemultisamplearray.h>
 
+#include <fiff/fiff_raw_data.h>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE FTBUFFERPLUGIN
@@ -188,7 +190,7 @@ public:
     * @param freq - sampling frequency
     * @param chan - number of channels
     */
-    void setParams(int freq, int chan);
+    void setParams(QPair<int,int> val);
 
 signals:
 
@@ -243,6 +245,9 @@ private:
 
     QSharedPointer<FtBufferYourWidget>                                                  m_pYourWidget;                  /**< Pointer used in the displaying of the widget */
     QAction*                                                                            m_pActionShowYourWidget;        /**< Action used in the displaying of the widget */
+
+    QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagHeadChunkData;       /**< Fiff into parser for header data collected from Neuromag extended header */
+    QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagIsoChunkData;        /**< Fiff into parser for isotrak data collected from Neuromag extended header */
 
     bool                                                                                m_bIsRunning;                   /**< Whether ftbuffer is running. */
 
