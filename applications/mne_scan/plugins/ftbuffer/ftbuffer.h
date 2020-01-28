@@ -190,7 +190,7 @@ public:
     * @param freq - sampling frequency
     * @param chan - number of channels
     */
-    void setParams(QPair<int,int> val);
+    void setParams(QPair<int,float> val);
 
 signals:
 
@@ -255,7 +255,7 @@ private:
     bool                                                                                m_bCustomFiff;                  /**< Whether the buffer has a header with trailing chunk data */
 
     int                                                                                 m_iNumChannels;                 /**< Parameter for how many channels expecet from buffer data */
-    int                                                                                 m_iSampFreq;                    /**< Parameter for sampling rate expected from buffer data */
+    float                                                                               m_iSampFreq;                    /**< Parameter for sampling rate expected from buffer data */
 };
 
 }//namespace end brace

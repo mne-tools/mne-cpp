@@ -153,7 +153,7 @@ signals:
     void extendedHeaderChunks(SimpleStorage chunkData);
 
 
-    void bufferParameters(QPair<int,int> numChanandFreq);
+    void bufferParameters(QPair<int,float> numChanandFreq);
 
 private:
 

@@ -168,7 +168,7 @@ public:
 
     bool regularHeader();
 
-    QPair<int,int> getChannelAndFrequency();
+    QPair<int,float> getChannelAndFrequency();
 
 private:
 
@@ -201,7 +201,7 @@ private:
 
     int                             m_iNumChannels;             /**< Number of data channels in the buffer */
     uint                            m_uiNumSamples;             /**< How many samples are in the buffer */
-    int                             m_iSampleFrequency;         /**< Sampling frequency of the data in the buffer */
+    float                           m_iSampleFrequency;         /**< Sampling frequency of the data in the buffer */
 
     SimpleStorage                   m_ssChunkData;              /**< Contains optional chunk data tha can be read with buffer header */
     bool                            m_bChunkData;               /**< Whether the header has chunk data */

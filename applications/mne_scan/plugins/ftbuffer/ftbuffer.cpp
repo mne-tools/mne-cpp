@@ -108,12 +108,14 @@ bool FtBuffer::start() {
 
     QThread::start();
 
+    qRegisterMetaType<QPair<int,float>>("QPair<int,float>");
+
     // FtProducer in it's own thread and connect communications signals/slots
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::extendedHeaderChunks, this, &FtBuffer::parseHeader);
     connect(this, &FtBuffer::workCommand, m_pFtBuffProducer.data(),&FtBuffProducer::doWork);
-    //connect(m_pFtBuffProducer.data(), &FtBuffProducer::bufferParameters, this, &FtBuffer::);
+    connect(m_pFtBuffProducer.data(), &FtBuffProducer::bufferParameters, this, &FtBuffer::setParams);
     m_pProducerThread.start();
 
     qDebug() << "Producer thread created, sending work command...";
@@ -325,7 +327,7 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
 
 //*************************************************************************************************************
 
-void FtBuffer::setParams(QPair<int,int> val) {
+void FtBuffer::setParams(QPair<int,float> val) {
     m_iNumChannels = val.first;
     m_iSampFreq = val.second;
 }
