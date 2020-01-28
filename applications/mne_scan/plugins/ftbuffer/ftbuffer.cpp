@@ -115,7 +115,7 @@ bool FtBuffer::start() {
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::extendedHeaderChunks, this, &FtBuffer::parseHeader);
     connect(this, &FtBuffer::workCommand, m_pFtBuffProducer.data(),&FtBuffProducer::doWork);
-    connect(m_pFtBuffProducer.data(), &FtBuffProducer::bufferParameters, this, &FtBuffer::setParams);
+    connect(m_pFtBuffProducer.data(), &FtBuffProducer::bufferParameters, this, &FtBuffer::setParams, Qt::DirectConnection);
     m_pProducerThread.start();
 
     qDebug() << "Producer thread created, sending work command...";
@@ -330,13 +330,16 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
 void FtBuffer::setParams(QPair<int,float> val) {
     m_iNumChannels = val.first;
     m_iSampFreq = val.second;
+    qDebug() << "Parameters set";
 }
 
 //*************************************************************************************************************
 
 void FtBuffer::setupRTMSA() {
     //Setup fiff info before setting up the RMTSA because we need it to init the RTMSA
+    qDebug() << "Setting up RTMSA...";
     if(!m_bCustomFiff){
+        qDebug() << "Default Fiff:";
         setUpFiffInfo();
     }
 

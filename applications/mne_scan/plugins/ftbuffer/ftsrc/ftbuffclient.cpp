@@ -326,8 +326,8 @@ void FtBuffClient::idleCall() {
     for (int i = 0; i < int (ddef.nsamples); i++) {
         for (int j = 0; j < int (ddef.nchans); j++) {
             matData(j,i) = fdata[count]/10000;
-            if (count % 32 == 0) qDebug() << "---Blockstart---" << count/32;
-            qDebug() << fdata[count];
+            //if (count % 32 == 0) qDebug() << "---Blockstart---" << count/32;
+            //qDebug() << fdata[count];
             count++;
         }
     }
@@ -370,6 +370,7 @@ void FtBuffClient::reset(){
 //*************************************************************************************************************
 
 bool FtBuffClient::newData() {
+    qDebug() << "New data found in buffer";
     return m_bnewData;
 }
 
