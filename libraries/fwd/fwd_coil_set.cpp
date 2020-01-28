@@ -396,7 +396,7 @@ bad : {
 
 //*************************************************************************************************************
 
-FwdCoilSet *FwdCoilSet::create_meg_coils(FIFFLIB::fiffChInfo chs, int nch, int acc, const FiffCoordTransOld* t)
+FwdCoilSet *FwdCoilSet::create_meg_coils(FIFFLIB::FiffChInfo chs, int nch, int acc, const FiffCoordTransOld* t)
 {
     FwdCoilSet* res = new FwdCoilSet();
     FwdCoil*    next;
