@@ -105,6 +105,7 @@ bool FtBuffer::start() {
     qDebug() << "Starting FtBuffer...";
     m_bIsRunning = true;
 
+
     QThread::start();
 
     // FtProducer in it's own thread and connect communications signals/slots
@@ -112,6 +113,7 @@ bool FtBuffer::start() {
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::extendedHeaderChunks, this, &FtBuffer::parseHeader);
     connect(this, &FtBuffer::workCommand, m_pFtBuffProducer.data(),&FtBuffProducer::doWork);
+    //connect(m_pFtBuffProducer.data(), &FtBuffProducer::bufferParameters, this, &FtBuffer::);
     m_pProducerThread.start();
 
     qDebug() << "Producer thread created, sending work command...";
@@ -313,6 +315,7 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
         if (!m_bBuffOutputSet) {
             qDebug() << "Setting up buffer output";
             setupRTMSA();
+            m_bBuffOutputSet = true;
         }
         m_pRTMSA_BufferOutput->data()->setValue(matData);
     }
@@ -322,16 +325,18 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
 
 //*************************************************************************************************************
 
-void FtBuffer::setParams(int freq, int chan) {
-    m_iSampFreq = freq;
-    m_iNumChannels = chan;
+void FtBuffer::setParams(QPair<int,int> val) {
+    m_iNumChannels = val.first;
+    m_iSampFreq = val.second;
 }
 
 //*************************************************************************************************************
 
 void FtBuffer::setupRTMSA() {
     //Setup fiff info before setting up the RMTSA because we need it to init the RTMSA
-    setUpFiffInfo();
+    if(!m_bCustomFiff){
+        setUpFiffInfo();
+    }
 
     //Set the channel size of the RMTSA
     m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
@@ -344,6 +349,42 @@ void FtBuffer::parseHeader(SimpleStorage chunkData) {
     //code to parse header chunks
     m_bCustomFiff = true;
 
+    uint32_t *iData = (uint32_t *) chunkData.data();
+
+    qDebug() << "Header Type:" << iData[0];
+
+    //In Fieldtrip, FT_CHUNK_NEUROMAG_HEADER = 8
+    if (iData[0] == 8) {
+        qDebug() << "Size:" << iData[1];
+
+        char* cData_NEUROMAG_HEADER = new char[iData[1]];
+        char* cData_NEUROMAG_ISOTRAK = new char[*((iData + 3 * sizeof(uint32_t)) + (sizeof (char) * iData[1]))]; //2* size of uint32 to account for iData[0] and iData[1], plus size of fiff file, plus 1* size of uint32 to account for 'type' field of isotrak header
+
+        //extract the data from the associated fiff files, based on type and size of chunk headers, formatted to be made into a QBuffer
+        memcpy(cData_NEUROMAG_HEADER,
+               iData + 2 * sizeof(uint32_t),
+               sizeof(char) * iData[1]);
+        memcpy(cData_NEUROMAG_ISOTRAK,
+               iData + 4 * sizeof(uint32_t) + sizeof (char) * iData[1],
+               *((iData + 3 * sizeof(uint32_t)) + (sizeof (char) * iData[1])) * sizeof (char));
+
+        QBuffer bData_NEUROMAG_HEADER;
+        QBuffer bData_NEUROMAG_ISOTRAK;
+
+
+        bData_NEUROMAG_HEADER.setData(cData_NEUROMAG_HEADER, iData[1]);
+
+//         = new FiffRawData(bData_NEUROMAG_HEADER);
+
+
+
+
+
+
+
+    } else {
+        qDebug() << "Unable to recognize header type.";
+    }
 
 }
 

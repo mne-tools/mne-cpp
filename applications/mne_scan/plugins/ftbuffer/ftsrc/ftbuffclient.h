@@ -166,6 +166,10 @@ public:
     */
     bool extendedHeader();
 
+    bool regularHeader();
+
+    QPair<int,int> getChannelAndFrequency();
+
 private:
 
     /**
@@ -197,6 +201,7 @@ private:
 
     int                             m_iNumChannels;             /**< Number of data channels in the buffer */
     uint                            m_uiNumSamples;             /**< How many samples are in the buffer */
+    int                             m_iSampleFrequency;         /**< Sampling frequency of the data in the buffer */
 
     SimpleStorage                   m_ssChunkData;              /**< Contains optional chunk data tha can be read with buffer header */
     bool                            m_bChunkData;               /**< Whether the header has chunk data */
@@ -204,6 +209,7 @@ private:
     const char*                     m_pcAddrField;              /**< Address of where to connect to the buffer */
 
     bool                            m_bnewData;                 /**< flag to show new data has been received from buffer */
+    bool                            m_bGotParams;
 
     SimpleStorage                   m_ssRawStore;               /**< container to receie raw buffer data */
     SimpleStorage                   m_ssFloatStore;             /**< container to store buffer data as float */

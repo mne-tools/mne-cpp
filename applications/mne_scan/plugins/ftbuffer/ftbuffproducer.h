@@ -152,6 +152,9 @@ signals:
     */
     void extendedHeaderChunks(SimpleStorage chunkData);
 
+
+    void bufferParameters(QPair<int,int> numChanandFreq);
+
 private:
 
     FtBuffer*                       m_pFtBuffer;                /**< Pointer to FtBuffer that created this object. Destination of collected data */

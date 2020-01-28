@@ -61,6 +61,8 @@ FtBuffClient::FtBuffClient()
 , m_uiNumSamples(0)
 , m_bnewData(false)
 , m_pcAddrField("localhost:1972")
+, m_bGotParams(false)
+, m_bChunkData(false)
 {
 }
 
@@ -71,6 +73,8 @@ FtBuffClient::FtBuffClient(char* addr)
 , m_iNumChannels(0)
 , m_uiNumSamples(0)
 , m_bnewData(false)
+, m_bGotParams(false)
+, m_bChunkData(false)
 {
 }
 
@@ -128,6 +132,18 @@ bool FtBuffClient::readHeader() {
     //Updating channel and sample info
     m_iNumChannels = header_def.nchans;
     m_uiNumSamples = header_def.nsamples;
+    m_iSampleFrequency = (int)(header_def.fsample);
+
+    m_bGotParams = true;
+
+    qDebug() << "***   Header Data   ***";
+    qDebug() << "Channels:" << header_def.nchans;
+    qDebug() << "Buffer size:" << header_def.bufsize;
+    qDebug() << "Fsample:" << header_def.fsample;
+    qDebug() << "NEvents:" << header_def.nevents;
+    qDebug() << "NSamples" << header_def.nsamples;
+    qDebug() << "Data Type:" << header_def.data_type;
+    qDebug() << "***********************";
 
     //saving header chunks and updating extended header flag
     if (chunkBuffer.size() != 0) {
@@ -374,10 +390,28 @@ SimpleStorage FtBuffClient::chunkData() {
 bool FtBuffClient::extendedHeader() {
     if (m_bChunkData) {
         m_bChunkData = false;
+        m_bGotParams = false;
         return true;
     } else {
         return m_bChunkData;
     }
+}
+
+bool FtBuffClient::regularHeader() {
+    if (m_bGotParams) {
+         m_bGotParams = false;
+         m_bChunkData = false;
+        return true;
+    } else {
+        return m_bGotParams;
+    }
+}
+
+QPair<int,int> FtBuffClient::getChannelAndFrequency() {
+    QPair<int,int> val;
+    val.first = m_iNumChannels;
+    val.second = m_iSampleFrequency;
+    return val;
 }
 
 //*************************************************************************************************************
