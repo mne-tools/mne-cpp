@@ -40,8 +40,17 @@
 //=============================================================================================================
 
 #include "fwd_coil.h"
-#include <fiff/fiff_types.h>
+//#include <fiff/fiff_types.h>
+#include <fiff/fiff_ch_info.h>
 #include <stdio.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -213,13 +222,13 @@ FwdCoil::~FwdCoil()
 
 //*************************************************************************************************************
 
-FwdCoil *FwdCoil::create_eeg_el(FIFFLIB::fiffChInfo ch, const FiffCoordTransOld* t)
+FwdCoil *FwdCoil::create_eeg_el(const FiffChInfo& ch, const FiffCoordTransOld* t)
 {
     FwdCoil*    res = NULL;
     int        c;
 
-    if (ch->kind != FIFFV_EEG_CH) {
-        printf("%s is not an EEG channel. Cannot create an electrode definition.",ch->ch_name);
+    if (ch.kind != FIFFV_EEG_CH) {
+        qWarning() << ch.ch_name << "is not an EEG channel. Cannot create an electrode definition.";
         goto bad;
     }
     if (t && t->from != FIFFV_COORD_HEAD) {
@@ -227,18 +236,18 @@ FwdCoil *FwdCoil::create_eeg_el(FIFFLIB::fiffChInfo ch, const FiffCoordTransOld*
         goto bad;
     }
 
-    if (VEC_LEN_5(ch->chpos.ex) < 1e-4)
+    if (ch.chpos.ex.norm() < 1e-4)
         res = new FwdCoil(1);	             /* No reference electrode */
     else
         res = new FwdCoil(2);		     /* Reference electrode present */
 
-    res->chname     = ch->ch_name;
+    res->chname     = ch.ch_name;
     res->desc       = "EEG electrode";
     res->coil_class = FWD_COILC_EEG;
     res->accuracy   = FWD_COIL_ACCURACY_NORMAL;
-    res->type       = ch->chpos.coil_type;
-    VEC_COPY_5(res->r0,ch->chpos.r0);
-    VEC_COPY_5(res->ex,ch->chpos.ex);
+    res->type       = ch.chpos.coil_type;
+    VEC_COPY_5(res->r0,ch.chpos.r0);
+    VEC_COPY_5(res->ex,ch.chpos.ex);
     /*
        * Optional coordinate transformation
        */
