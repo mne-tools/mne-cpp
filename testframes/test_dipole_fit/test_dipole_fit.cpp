@@ -118,7 +118,8 @@ void TestDipoleFit::dipoleFitSimple()
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole Fit Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    //Following is equivalent to: --meas ./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1 --meg --eeg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --dip ./mne-cpp-test-data/Result/dip_fit.dat
+    //Following is equivalent to: --meas ./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1 --meg
+    //--eeg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --dip ./mne-cpp-test-data/Result/dip_fit.dat
     DipoleFitSettings settings;
     testFile.setFileName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"); QVERIFY( testFile.exists() );
     settings.measname = testFile.fileName();
@@ -192,7 +193,10 @@ void TestDipoleFit::dipoleFitAdvanced()
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole Fit Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    //Following is equivalent to: --meas ./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1 --noise ./mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif --bem ./mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif --mri ./mne-cpp-test-data/MEG/sample/all-trans.fif --meg --tmin 150 --tmax 250 --tstep 10 --dip ./mne-cpp-test-data/Result/dip-5120-bem-result_new.dat --mindist 0 --guessrad 100
+    //Following is equivalent to: --meas ./mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1
+    //--noise ./mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif --bem ./mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif
+    //--mri ./mne-cpp-test-data/MEG/sample/all-trans.fif --meg --tmin 150 --tmax 250 --tstep 10 --dip ./mne-cpp-test-data/Result/dip-5120-bem_fit.dat
+    //--mindist 0 --guessrad 100
     DipoleFitSettings settings;
 
     testFile.setFileName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"); QVERIFY( testFile.exists() );
