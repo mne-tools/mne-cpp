@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="splashscreen_mne_analyze.png">resources/images/splashscreen/splashscreen_mne_analyze.png</file>
+    </qresource>
+</RCC>
