@@ -147,15 +147,26 @@ bool FtBuffClient::readHeader() {
 
     //saving header chunks and updating extended header flag
     if (chunkBuffer.size() != 0) {
-        m_ssChunkData = chunkBuffer;
-
-        m_bChunkData = true;
+        //m_ssChunkData = chunkBuffer;
 
         qDebug() << "";
         qDebug() << "";
         qDebug() << "Chunk Buffer size:" << chunkBuffer.size();
         qDebug() << "";
         qDebug() << "";
+
+        const ft_chunk_t* chanNames = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_CHANNEL_NAMES);
+        const ft_chunk_t* neuromagHead = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_NEUROMAG_HEADER);
+
+        if (chanNames != Q_NULLPTR) {
+            qDebug() << "Channel name chunk found, size" << chanNames->def.size;
+        }
+
+        if (neuromagHead != Q_NULLPTR) {
+            qDebug () << "Neuromag header found, size" << neuromagHead->def.size;
+        }
+
+        //m_bChunkData = true;
     }
 
     return true;
@@ -320,7 +331,7 @@ void FtBuffClient::idleCall() {
 
     Eigen::MatrixXf matData;
 
-    matData.resize(m_iNumChannels, 32);
+    matData.resize(m_iNumChannels, ddef.nsamples);
 
     int count = 0;
     for (int i = 0; i < int (ddef.nsamples); i++) {
@@ -370,7 +381,7 @@ void FtBuffClient::reset(){
 //*************************************************************************************************************
 
 bool FtBuffClient::newData() {
-    qDebug() << "New data found in buffer";
+    if (m_bnewData) qDebug() << "New data found in buffer";
     return m_bnewData;
 }
 
