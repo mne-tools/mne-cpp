@@ -629,12 +629,21 @@ ECDSet DipoleFit::calculateFit() const
     if ((fit_data = DipoleFitData::setup_dipole_fit_data(   settings->mriname,
                                                             settings->measname,
                                                             settings->bemname.isEmpty() ? NULL : settings->bemname.toUtf8().data(),
-                                                            &settings->r0,eeg_model,settings->accurate,
+                                                            &settings->r0,
+                                                            eeg_model,
+                                                            settings->accurate,
                                                             settings->badname,
                                                             settings->noisename,
-                                                            settings->grad_std,settings->mag_std,settings->eeg_std,
-                                                            settings->mag_reg,settings->grad_reg,settings->eeg_reg,
-                                                            settings->diagnoise,settings->projnames,settings->include_meg,settings->include_eeg)) == NULL   )
+                                                            settings->grad_std,
+                                                            settings->mag_std,
+                                                            settings->eeg_std,
+                                                            settings->mag_reg,
+                                                            settings->grad_reg,
+                                                            settings->eeg_reg,
+                                                            settings->diagnoise,
+                                                            settings->projnames,
+                                                            settings->include_meg,
+                                                            settings->include_eeg)) == NULL)
         goto out;
 
     fit_data->fit_mag_dipoles = settings->fit_mag_dipoles;
@@ -673,8 +682,12 @@ ECDSet DipoleFit::calculateFit() const
     }
     else {
         printf("\n---- Reading data...\n\n");
-        if ((data = MneMeasData::mne_read_meas_data(settings->measname,settings->setno,NULL,NULL,
-                                       fit_data->ch_names,fit_data->nmeg+fit_data->neeg)) == NULL)
+        if ((data = MneMeasData::mne_read_meas_data(settings->measname,
+                                                    settings->setno,
+                                                    NULL,
+                                                    NULL,
+                                                    fit_data->ch_names,
+                                                    fit_data->nmeg+fit_data->neeg)) == NULL)
             goto out;
         if (settings->do_baseline)
             data->adjust_baselines(settings->bmin,settings->bmax);

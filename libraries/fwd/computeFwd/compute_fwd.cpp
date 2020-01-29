@@ -285,28 +285,15 @@ int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
     * Sort out the channels
     */
     for (k = 0; k < nchan; k++) {
-        if (chs[k].kind == FIFFV_MEG_CH)
-            nmeg++;
-        else if (chs[k].kind == FIFFV_REF_MEG_CH)
-            nmeg_comp++;
-        else if (chs[k].kind == FIFFV_EEG_CH)
-            neeg++;
-    }
-
-    if (nmeg > 0)
-        meg.reserve(nmeg);
-    if (neeg > 0)
-        eeg.reserve(neeg);
-    if (nmeg_comp > 0)
-        meg_comp.reserve(nmeg_comp);
-
-    for (k = 0; k < nchan; k++) {
         if (chs[k].kind == FIFFV_MEG_CH) {
             meg.append(chs[k]);
+            nmeg++;
         } else if (chs[k].kind == FIFFV_REF_MEG_CH) {
             meg_comp.append(chs[k]);
+            nmeg_comp++;
         } else if (chs[k].kind == FIFFV_EEG_CH) {
             eeg.append(chs[k]);
+            neeg++;
         }
     }
     //    fiff_close(in);
