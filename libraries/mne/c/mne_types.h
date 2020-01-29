@@ -467,7 +467,7 @@ typedef struct {		/* Information about raw data in fiff file */
   char          *filename;	/* The name of the file this comes from */
   FIFFLIB::fiffId        id;		/* Measurement id from the file */
   int           nchan;		/* Number of channels */
-  FIFFLIB::fiffChInfo    chInfo;		/* Channel info data  */
+  QList<FIFFLIB::FiffChInfo>    chInfo;		/* Channel info data  */
   int           coord_frame;	/* 
 				 * Which coordinate frame are the
 				 * positions defined in? 

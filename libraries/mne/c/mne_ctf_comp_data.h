@@ -116,7 +116,7 @@ public:
 
 
     static int mne_calibrate_ctf_comp(MneCTFCompData*       one,
-                                      FIFFLIB::fiffChInfo   chs,
+                                      const QList<FIFFLIB::FiffChInfo> &chs,
                                       int            nch,
                                       int            do_it);
 

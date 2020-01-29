@@ -3432,8 +3432,13 @@ int read_meg_eeg_ch_info(const QString& name,       /* Input file */
                        neeg,
                        chsp,
                        &nch);
-    *nmegp = nmeg;
-    *neegp = neeg;
+
+    if(nmegp) {
+        *nmegp = nmeg;
+    }
+    if(neegp) {
+        *neegp = neeg;
+    }
     FREE_3(id);
     return FIFF_OK;
 

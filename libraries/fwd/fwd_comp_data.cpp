@@ -240,13 +240,15 @@ void FwdCompData::fwd_free_comp_data(void *d)
 
 //*************************************************************************************************************
 
-int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set, FwdCoilSet *coils, FwdCoilSet *comp_coils)   /* The compensation coil set */
+int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set,
+                                         FwdCoilSet *coils,
+                                         FwdCoilSet *comp_coils)   /* The compensation coil set */
 /*
  * Call mne_make_ctf_comp using the information in the coil sets
  */
 {
-    fiffChInfo chs     = NULL;
-    fiffChInfo compchs = NULL;
+    QList<FiffChInfo> chs;
+    QList<FiffChInfo> compchs;
     int        nchan   = 0;
     int        ncomp   = 0;
     FwdCoil* coil;
@@ -260,28 +262,25 @@ int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set, FwdCoilSet *coi
        * Create the fake channel info which contain just enough information
        * for mne_make_ctf_comp
        */
-    chs = MALLOC_60(coils->ncoil,fiffChInfoRec);
     for (k = 0; k < coils->ncoil; k++) {
+        chs.append(FiffChInfo());
         coil = coils->coils[k];
-        strcpy(chs[k].ch_name,coil->chname.toUtf8().constData());
+        chs[k].ch_name = coil->chname;
         chs[k].chpos.coil_type = coil->type;
         chs[k].kind = (coil->coil_class == FWD_COILC_EEG) ? FIFFV_EEG_CH : FIFFV_MEG_CH;
     }
     nchan = coils->ncoil;
     if (comp_coils && comp_coils->ncoil > 0) {
-        compchs = MALLOC_60(comp_coils->ncoil,fiffChInfoRec);
         for (k = 0; k < comp_coils->ncoil; k++) {
+            compchs.append(FiffChInfo());
             coil = comp_coils->coils[k];
-            strcpy(compchs[k].ch_name,coil->chname.toUtf8().constData());
+            compchs[k].ch_name = coil->chname;
             compchs[k].chpos.coil_type = coil->type;
             compchs[k].kind = (coil->coil_class == FWD_COILC_EEG) ? FIFFV_EEG_CH : FIFFV_MEG_CH;
         }
         ncomp = comp_coils->ncoil;
     }
     res = MneCTFCompDataSet::mne_make_ctf_comp(set,chs,nchan,compchs,ncomp);
-
-    FREE_60(chs);
-    FREE_60(compchs);
 
     return res;
 }
