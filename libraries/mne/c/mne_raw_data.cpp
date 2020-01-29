@@ -255,7 +255,8 @@ void mne_string_to_name_list(const QString& s, QStringList& listp,int &nlistp)
     QStringList list;
 
     if (!s.isEmpty() && s.size() > 0) {
-        list = s.split(":");
+        list = FIFFLIB::FiffStream::split_name_list(s);
+        //list = s.split(":");
     }
     listp  = list;
     nlistp = list.size();

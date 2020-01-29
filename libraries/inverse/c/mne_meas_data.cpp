@@ -292,7 +292,8 @@ void mne_string_to_name_list_9(const QString& s, QStringList& listp,int &nlistp)
     QStringList list;
 
     if (!s.isEmpty() && s.size() > 0) {
-        list = s.split(":");
+        list = FIFFLIB::FiffStream::split_name_list(s);
+        //list = s.split(":");
     }
     listp  = list;
     nlistp = list.size();
@@ -339,6 +340,7 @@ void mne_channel_names_to_name_list_9(fiffChInfo chs, int nch,
 
 {
     QString s = mne_channel_names_to_string_9(chs,nch);
+
     mne_string_to_name_list_9(s,listp,nlistp);
     return;
 }
@@ -1760,7 +1762,13 @@ void MneMeasData::adjust_baselines(float bmin, float bmax)
 
 //*************************************************************************************************************
 
-MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name, int set, MneInverseOperator* op, MneNamedMatrix *fwd, const QStringList& namesp, int nnamesp, MneMeasData *add_to)     /* Add to this */
+MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
+                                                 int set,
+                                                 MneInverseOperator* op,
+                                                 MneNamedMatrix *fwd,
+                                                 const QStringList& namesp,
+                                                 int nnamesp,
+                                                 MneMeasData *add_to)     /* Add to this */
 /*
           * Read an evoked-response data file
           */
@@ -1825,8 +1833,20 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name, int set, M
        * Read the evoked data file
        */
     if (mne_read_evoked(name,set-1,
-                        &nchan_file,&nsamp,&dtmin,&sfreq,&chs,&data,
-                        &comment,&highpass,&lowpass,&nave,&aspect_kind,&t,&id,&meas_date) == FAIL)
+                        &nchan_file,
+                        &nsamp,
+                        &dtmin,
+                        &sfreq,
+                        &chs,
+                        &data,
+                        &comment,
+                        &highpass,
+                        &lowpass,
+                        &nave,
+                        &aspect_kind,
+                        &t,
+                        &id,
+                        &meas_date) == FAIL)
         goto out;
 
     if (id)
@@ -2035,7 +2055,12 @@ out : {
 
 //*************************************************************************************************************
 
-MneMeasData *MneMeasData::mne_read_meas_data(const QString &name, int set, MneInverseOperator* op, MneNamedMatrix *fwd, const QStringList& namesp, int nnamesp)
+MneMeasData *MneMeasData::mne_read_meas_data(const QString &name,
+                                             int set,
+                                             MneInverseOperator* op,
+                                             MneNamedMatrix *fwd,
+                                             const QStringList& namesp,
+                                             int nnamesp)
 
 {
     return mne_read_meas_data_add(name,set,op,fwd,namesp,nnamesp,NULL);
