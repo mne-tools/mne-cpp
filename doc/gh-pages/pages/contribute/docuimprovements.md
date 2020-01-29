@@ -26,7 +26,7 @@ Create a new access token and give it repo rights only. A guide on how to create
 
 ## Set secrets
 
-Create a secret for your forked MNE-CPP repository. A guide on how to create a new token can be found [here](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets). The secret must be named `GIT_CREDENTIALS` and have the following format `https://$username:$token@github.com/`, where `$token` is the access token created in the step above and `$username` is your GitHub user name.
+Create a secret for your forked MNE-CPP repository. A guide on how to create a new token can be found [here](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets). The secret must be named `GIT_CREDENTIALS_DOCU_TEST` and have the following format `https://$username:$token@github.com/`, where `$token` is the access token created in the step above and `$username` is your GitHub user name.
 
 ## Make your changes to the documentation
 
