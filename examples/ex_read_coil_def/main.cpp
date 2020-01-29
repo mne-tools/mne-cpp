@@ -38,33 +38,40 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
+#include <vector>
+#include <math.h>
 
+#include <fiff/fiff.h>
+#include <fiff/fiff_types.h>
+#include <utils/filterTools/filterdata.h>
+#include <rtprocessing/rtfilter.h>
+
+#include <fwd/fwd_coil_set.h>
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen
+// Qt INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QApplication>
+#include <QtCore/QCoreApplication>
+#include <QFile>
 #include <QCommandLineParser>
-
-
+    #include <QDebug>
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FIFFLIB;
+using namespace UTILSLIB;
+using namespace RTPROCESSINGLIB;
+using namespace FWDLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-
+#define MALLOC_41(x,t) (t *)malloc((x)*sizeof(t))
 //=============================================================================================================
 /**
 * The function main marks the entry point of the program.
@@ -76,20 +83,40 @@
 */
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Example name");
+    parser.setApplicationDescription("Read Write Raw Example");
     parser.addHelpOption();
 
-    QCommandLineOption parameterOption("parameter", "The first parameter description.");
-
-    parser.addOption(parameterOption);
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    parser.addOption(inputOption);
 
     parser.process(a);
 
-    // Add exampel code here
+    // Init data loading of .fif file
+    QFile t_fileIn(parser.value(inputOption));
+    FiffRawData raw(t_fileIn);
+    // only use meg channels
+    RowVectorXi picks = raw.info.pick_types(true, false, false);
+    FiffInfo info = raw.info;
+    info = info.pick_info(picks);
+    // Set path for doil_def.dat file
+    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
 
-    return a.exec();
+    // Setup Constructors for Coil Set
+    FwdCoilSet* templates = NULL;
+    FwdCoilSet* megCoils = NULL;
+
+    FiffChInfo channels = info.chs[0];
+
+    // Create MEG-Coils and read data
+    int acc = 2;
+    int t = 0;
+    templates = FwdCoilSet::read_coil_defs(qPath);
+    megCoils = templates->create_meg_coils(channels,info.nchan,acc,t);
+
+
+    return 0;
 }
