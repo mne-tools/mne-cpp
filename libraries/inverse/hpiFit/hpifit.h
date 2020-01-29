@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    HpiFit class declaration.
+ * @brief    HPIFit class declaration.
  *
  */
 
@@ -108,18 +108,18 @@ struct CoilParam {
  *
  * @brief HPI Fit algorithms.
  */
-class INVERSESHARED_EXPORT HpiFit
+class INVERSESHARED_EXPORT HPIFit
 {
 
 public:
-    typedef QSharedPointer<HpiFit> SPtr;             /**< Shared pointer type for HpiFit. */
-    typedef QSharedPointer<const HpiFit> ConstSPtr;  /**< Const shared pointer type for HpiFit. */
+    typedef QSharedPointer<HPIFit> SPtr;             /**< Shared pointer type for HPIFit. */
+    typedef QSharedPointer<const HPIFit> ConstSPtr;  /**< Const shared pointer type for HPIFit. */
 
     //=========================================================================================================
     /**
      * Default constructor.
      */
-    explicit HpiFit();
+    explicit HPIFit();
 
     //=========================================================================================================
     /**
@@ -135,7 +135,7 @@ public:
      * @param[in]    bDoDebug        Print debug info to cmd line and write debug info to file.
      * @param[in]    sHPIResourceDir The path to the debug file which is to be written.
      */
-    static void fitHpi(const Eigen::MatrixXd& t_mat,
+    static void fitHPI(const Eigen::MatrixXd& t_mat,
                        const Eigen::MatrixXd& t_matProjectors,
                        FIFFLIB::FiffCoordTrans &transDevHead,
                        const QVector<int>& vFreqs,
@@ -143,7 +143,7 @@ public:
                        FIFFLIB::FiffDigPointSet& fittedPointSet,
                        QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                        bool bDoDebug = false,
-                       const QString& sHPIResourceDir = QString("./HpiFittingDebug"));
+                       const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
 
 protected:
     //=========================================================================================================
@@ -158,11 +158,7 @@ protected:
      *
      * @return Returns the coil parameters.
      */
-    static CoilParam dipfit(struct CoilParam coil,
-                            struct SensorInfo sensors,
-                            const Eigen::MatrixXd &data,
-                            int numCoils,
-                            const Eigen::MatrixXd &t_matProjectors);
+    static CoilParam dipfit(struct CoilParam coil, struct SensorInfo sensors, const Eigen::MatrixXd &data, int numCoils, const Eigen::MatrixXd &t_matProjectors);
 
     //=========================================================================================================
     /**
@@ -173,8 +169,7 @@ protected:
      *
      * @return Returns the transformation matrix.
      */
-    static Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH,
-                                                 Eigen::MatrixXd BT);
+    static Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT);
 
     static QString         m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
 };
