@@ -138,11 +138,11 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     //Set coil frequencies
     Eigen::VectorXd coilfreq(numCoils);
-    Eigen::VectorXi order = {2,4,3,1};      // order for coil freqs
-
+    Eigen::Vector4d order;      // order for coil freqs
+    order << 2,4,3,1;
     if(vFreqs.size() >= numCoils) {
         for(int i = 0; i < numCoils; ++i) {
-            coilfreq[i] = vFreqs.at(order[i]);
+            coilfreq[order[i]] = vFreqs.at(i);
             //std::cout<<std::endl << coilfreq[i] << "Hz";
         }
     } else {
