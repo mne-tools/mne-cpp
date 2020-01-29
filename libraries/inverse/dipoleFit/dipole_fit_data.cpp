@@ -10,6 +10,7 @@
 #include <mne/c/mne_cov_matrix.h>
 #include "ecd.h"
 
+#include <fiff/fiff_stream.h>
 #include <fwd/fwd_bem_model.h>
 #include <mne/c/mne_surface_old.h>
 
@@ -410,7 +411,8 @@ void mne_string_to_name_list_3(const QString& s, QStringList& listp,int &nlistp)
     QStringList list;
 
     if (!s.isEmpty() && s.size() > 0) {
-        list = s.split(":");
+        list = FIFFLIB::FiffStream::split_name_list(s);
+        //list = s.split(":");
     }
     listp  = list;
     nlistp = list.size();
@@ -2657,28 +2659,16 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
     /*
    * Sort out the channels
    */
-    for (k = 0; k < nchan; k++)
-        if (chs[k].kind == FIFFV_MEG_CH)
-            nmeg++;
-        else if (chs[k].kind == FIFFV_REF_MEG_CH)
-            nmeg_comp++;
-        else if (chs[k].kind == FIFFV_EEG_CH)
-            neeg++;
-
-    if (nmeg > 0)
-        meg.reserve(nmeg);
-    if (neeg > 0)
-        eeg.reserve(neeg);
-    if (nmeg_comp > 0)
-        meg_comp.reserve(nmeg_comp);
-
     for (k = 0; k < nchan; k++) {
         if (chs[k].kind == FIFFV_MEG_CH) {
             meg.append(chs[k]);
+            nmeg++;
         } else if (chs[k].kind == FIFFV_REF_MEG_CH) {
             meg_comp.append(chs[k]);
+            nmeg_comp++;
         } else if (chs[k].kind == FIFFV_EEG_CH) {
             eeg.append(chs[k]);
+            neeg++;
         }
     }
 
@@ -2817,7 +2807,9 @@ bad : {
 
 
 int mne_read_bad_channel_list_from_node_3(FiffStream::SPtr& stream,
-                                        const FiffDirNode::SPtr& pNode, QStringList& listp, int& nlistp)
+                                          const FiffDirNode::SPtr& pNode,
+                                          QStringList& listp,
+                                          int& nlistp)
 {
     FiffDirNode::SPtr node,bad;
     QList<FiffDirNode::SPtr> temp;
@@ -2842,7 +2834,7 @@ int mne_read_bad_channel_list_from_node_3(FiffStream::SPtr& stream,
         }
     }
     listp = list;
-    nlistp = nlist;
+    nlistp = list.size();
     return OK;
 }
 
@@ -3139,15 +3131,17 @@ void mne_merge_channels(const QList<FiffChInfo>& chs1,
                         int *nresp)
 
 {
-    QList<FiffChInfo> res;
-    res.reserve(nch1+nch2);
+    resp.clear();
+    resp.reserve(nch1+nch2);
 
-    int k,p;
-    for (p = 0, k = 0; k < nch1; k++)
-        res[p++] = chs1[k];
-    for (k = 0; k < nch2;k++)
-        res[p++] = chs2[k];
-    resp = res;
+    int k;
+    for (k = 0; k < nch1; k++) {
+        resp.append(chs1.at(k));
+    }
+    for (k = 0; k < nch2; k++) {
+        resp.append(chs2.at(k));
+    }
+
     *nresp = nch1+nch2;
     return;
 }
@@ -3203,7 +3197,7 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
                         const FiffDirNode::SPtr& p_node,	/* The directory node containing our data */
                         fiffId *id,		/* The block id from the nearest FIFFB_MEAS parent */
                         QList<FiffChInfo>& chp,	/* Channel descriptions */
-                        int *nchan)		/* Number of channels */
+                        int *nchanp)		/* Number of channels */
 /*
       * Find channel information from
       * nearest FIFFB_MEAS_INFO parent of
@@ -3212,7 +3206,7 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
 {
     QList<FiffChInfo> ch;
     FiffChInfo this_ch;
-    int j,k;
+    int j,k,nchan;
     int to_find = 0;
     FiffDirNode::SPtr meas;
     FiffDirNode::SPtr meas_info;
@@ -3252,18 +3246,22 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
         case FIFF_NCHAN :
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
-            *nchan = *t_pTag->toInt();
-            ch.reserve(*nchan);
-            for (j = 0; j < *nchan; j++)
+            nchan = *t_pTag->toInt();
+            *nchanp = nchan;
+
+            for (j = 0; j < nchan; j++) {
+                ch.append(FiffChInfo());
                 ch[j].scanNo = -1;
-            to_find = to_find + *nchan - 1;
+            }
+
+            to_find += nchan - 1;
             break;
 
         case FIFF_CH_INFO : /* Information about one channel */
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             this_ch = t_pTag->toChInfo();
-            if (this_ch.scanNo <= 0 || this_ch.scanNo > *nchan) {
+            if (this_ch.scanNo <= 0 || this_ch.scanNo > nchan) {
                 qCritical ("FIFF_CH_INFO : scan # out of range!");
                 goto bad;
             }
@@ -3416,23 +3414,14 @@ int read_meg_eeg_ch_info(const QString& name,       /* Input file */
     /*
    * Sort out the channels
    */
-    for (k = 0; k < nchan; k++)
-        if (chs[k].kind == FIFFV_MEG_CH)
-            nmeg++;
-        else if (chs[k].kind == FIFFV_EEG_CH && is_valid_eeg_ch(chs[k]))
-            neeg++;
-
-    if (nmeg > 0)
-        meg.reserve(nmeg);
-    if (neeg > 0)
-        eeg.reserve(neeg);
-
     for (k = 0; k < nchan; k++) {
         if (accept_ch(chs[k],bads,nbad)) {
             if (do_meg && chs[k].kind == FIFFV_MEG_CH) {
                 meg.append(chs[k]);
+                nmeg++;
             } else if (do_eeg && chs[k].kind == FIFFV_EEG_CH && is_valid_eeg_ch(chs[k])) {
                 eeg.append(chs[k]);
+                neeg++;
             }
         }
     }
@@ -4384,7 +4373,8 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     if (read_meg_eeg_ch_info(measname,
                              include_meg,
                              include_eeg,
-                             badlist,nbad,
+                             badlist,
+                             nbad,
                              res->chs,
                              &res->nmeg,
                              &res->neeg) != OK)
