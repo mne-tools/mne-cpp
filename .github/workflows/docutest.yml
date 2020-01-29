@@ -3,7 +3,7 @@ name: DocuTest
 on:
   push:
     branches:
-    # Change this back to <YourBranch> before you create a pull request
+    # Change this to the branch name you make changes to the documentation on
     - docu
 
 jobs:

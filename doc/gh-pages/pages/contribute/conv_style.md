@@ -1,7 +1,7 @@
 ---
 title: Coding Conventions and Style Guide
 parent: Contribute
-nav_order: 2
+nav_order: 3
 ---
 # Coding Conventions and Style Guide
 
