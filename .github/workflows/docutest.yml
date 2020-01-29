@@ -16,7 +16,7 @@ jobs:
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}
+        credentials: ${{secrets.GIT_CREDENTIALS_DOCU_TEST}}
     - name: Clone doc/gh-pages into gh-pages branch
       run: |
         git config --global user.email dev@dev.com
