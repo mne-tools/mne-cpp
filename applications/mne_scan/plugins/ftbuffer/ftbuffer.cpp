@@ -322,6 +322,7 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
         m_pRTMSA_BufferOutput->data()->setValue(matData);
     }
     m_mutex.unlock();
+    qDebug() << "Done.";
 
 }
 
