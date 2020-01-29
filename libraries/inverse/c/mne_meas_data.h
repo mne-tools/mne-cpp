@@ -155,7 +155,7 @@ public:
     QString                 filename;  /* The source file name */
     FIFFLIB::fiffId         meas_id;    /* The id from the measurement file */
     FIFFLIB::fiffTimeRec    meas_date;  /* The measurement date from the file */
-    FIFFLIB::fiffChInfo     chs;        /* The channel information */
+    QList<FIFFLIB::FiffChInfo>     chs;        /* The channel information */
     FIFFLIB::FiffCoordTransOld* meg_head_t; /* MEG device <-> head coordinate transformation */
     FIFFLIB::FiffCoordTransOld* mri_head_t; /* MRI device <-> head coordinate transformation (duplicated from the inverse operator or loaded separately) */
     float                   sfreq;      /* Sampling frequency */

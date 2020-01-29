@@ -301,13 +301,19 @@ int mne_read_meg_comp_eeg_ch_info_41(const QString& name,
     stream->close();
 
     megp  = meg;
-    *nmegp = nmeg;
+    if(nmegp) {
+        *nmegp = nmeg;
+    }
 
     meg_compp = meg_comp;
-    *nmeg_compp = nmeg_comp;
+    if(nmeg_compp) {
+        *nmeg_compp = nmeg_comp;
+    }
 
-    eegp  = eeg;
-    *neegp = neeg;
+    eegp = eeg;
+    if(neegp) {
+        *neegp = neeg;
+    }
 
     if (idp == Q_NULLPTR) {
         FREE_41(id);

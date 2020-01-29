@@ -95,7 +95,6 @@ MneRawInfo::MneRawInfo()
 MneRawInfo::~MneRawInfo()
 {
     this->filename.clear();
-    FREE_33(this->chInfo);
     FREE_33(this->trans);
 //    FREE_33(this->rawDir);
     FREE_33(this->id);
@@ -181,7 +180,16 @@ FiffDirNode::SPtr MneRawInfo::find_maxshield(const FiffDirNode::SPtr &node)
 
 //*************************************************************************************************************
 
-int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node, fiffId *id, int *nchan, float *sfreq, float *highpass, float *lowpass, fiffChInfo *chp, FiffCoordTransOld **trans, fiffTime *start_time)  /* Measurement date (starting time) */
+int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
+                              FiffDirNode::SPtr &node,
+                              fiffId *id,
+                              int *nchan,
+                              float *sfreq,
+                              float *highpass,
+                              float *lowpass,
+                              QList<FiffChInfo>& chp,
+                              FiffCoordTransOld **trans,
+                              fiffTime *start_time)  /* Measurement date (starting time) */
 /*
           * Find channel information from
           * nearest FIFFB_MEAS_INFO parent of
@@ -191,8 +199,8 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
     FiffTag::SPtr t_pTag;
     //    fiffTagRec tag;
     //    fiffDirEntry this_ent;
-    fiffChInfo ch;
-    fiffChInfo this_ch;
+    QList<FiffChInfo> ch;
+    FiffChInfo this_ch;
     FiffCoordTransOld* t;
     int j,k;
     int to_find = 4;
@@ -201,8 +209,6 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
     fiff_int_t kind, pos;
 
     //    tag.data    = NULL;
-     *chp        = NULL;
-    ch          = NULL;
      *trans      = NULL;
      *id         = NULL;
      *start_time = NULL;
@@ -251,9 +257,11 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *nchan = *t_pTag->toInt();
-            ch = MALLOC_33(*nchan,fiffChInfoRec);
-            for (j = 0; j < *nchan; j++)
+
+            for (j = 0; j < *nchan; j++) {
+                ch.append(FiffChInfo());
                 ch[j].scanNo = -1;
+            }
             to_find = to_find + *nchan - 1;
             break;
 
@@ -293,14 +301,14 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
             //            this_ch = (fiffChInfo)(tag.data);
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
-            this_ch = (fiffChInfo)t_pTag->data();
-            if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
+
+            this_ch = t_pTag->toChInfo();
+            if (this_ch.scanNo <= 0 || this_ch.scanNo > *nchan) {
                 qCritical ("FIFF_CH_INFO : scan # out of range!");
                 goto bad;
             }
             else
-                memcpy(ch+this_ch->scanNo-1,this_ch,
-                       sizeof(fiffChInfoRec));
+                ch[this_ch.scanNo-1] = this_ch;
             to_find--;
             break;
 
@@ -377,11 +385,10 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream, FiffDirNode::SPtr &node,
         goto bad;
     }
     //    FREE_33(tag.data);
-     *chp = ch;
+    chp = ch;
     return (0);
 
 bad : {
-        FREE_33(ch);
         //        FREE_33(tag.data);
         return (-1);
     }
@@ -401,7 +408,7 @@ int MneRawInfo::mne_load_raw_info(const QString& name, int allow_maxshield, MneR
     //    fiffFile       in       = NULL;
 
     int            res      = FIFF_FAIL;
-    fiffChInfo     chs      = NULL;	/* Channel info */
+    QList<FiffChInfo> chs;	/* Channel info */
     FiffCoordTransOld* trans    = NULL;	/* The coordinate transformation */
     fiffId         id       = NULL;	/* Measurement id */
     QList<FiffDirEntry::SPtr>   rawDir;	/* Directory of raw data tags */
@@ -440,7 +447,16 @@ int MneRawInfo::mne_load_raw_info(const QString& name, int allow_maxshield, MneR
     /*
        * Get the essential measurement information
        */
-    if (get_meas_info (stream,raw,&id,&nchan,&sfreq,&highpass,&lowpass,&chs,&trans,&start_time) < 0)
+    if (get_meas_info (stream,
+                       raw,
+                       &id,
+                       &nchan,
+                       &sfreq,
+                       &highpass,
+                       &lowpass,
+                       chs,
+                       &trans,
+                       &start_time) < 0)
         goto out;
     /*
         * Get the raw directory
@@ -512,7 +528,6 @@ int MneRawInfo::mne_load_raw_info(const QString& name, int allow_maxshield, MneR
 
 out : {
         if (res != FIFF_OK) {
-            FREE_33(chs);
             FREE_33(trans);
             //            FREE_33(rawDir);
             FREE_33(info);

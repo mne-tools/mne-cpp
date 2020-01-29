@@ -154,7 +154,7 @@ MneCTFCompData::~MneCTFCompData()
 
 //*************************************************************************************************************
 
-int MneCTFCompData::mne_calibrate_ctf_comp(MneCTFCompData *one, fiffChInfo chs, int nch, int do_it)
+int MneCTFCompData::mne_calibrate_ctf_comp(MneCTFCompData *one, const QList<FIFFLIB::FiffChInfo>& chs, int nch, int do_it)
 /*
      * Calibrate or decalibrate a compensation data set
      */

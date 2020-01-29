@@ -120,15 +120,15 @@ public:
 
 
     static int mne_make_ctf_comp(MneCTFCompDataSet* set,        /* The available compensation data */
-                          FIFFLIB::fiffChInfo        chs,        /* Channels to compensate These may contain channels other than those requiring compensation */
-                          int               nch,        /* How many of these */
-                          FIFFLIB::fiffChInfo        compchs,    /* The compensation input channels These may contain channels other than the MEG compensation channels */
-                          int               ncomp);
+                          const QList<FIFFLIB::FiffChInfo>& chs,        /* Channels to compensate These may contain channels other than those requiring compensation */
+                          int nch,        /* How many of these */
+                          QList<FIFFLIB::FiffChInfo> compchs,    /* The compensation input channels These may contain channels other than the MEG compensation channels */
+                          int ncomp);
 
 
 
 
-    static int mne_set_ctf_comp(FIFFLIB::fiffChInfo chs,
+    static int mne_set_ctf_comp(QList<FIFFLIB::FiffChInfo> &chs,
                          int        nch,
                          int        comp);
 
@@ -158,7 +158,7 @@ public:
 
 
 
-    static int mne_get_ctf_comp(FIFFLIB::fiffChInfo chs,int nch);
+    static int mne_get_ctf_comp(const QList<FIFFLIB::FiffChInfo>& chs,int nch);
 
 
 
@@ -265,11 +265,11 @@ public:
 
 
     static int mne_ctf_set_compensation(MneCTFCompDataSet* set,            /* The compensation data */
-                                 int               compensate_to,  /* What is the desired compensation to achieve */
-                                 FIFFLIB::fiffChInfo        chs,            /* The channels to compensate */
-                                 int               nchan,          /* How many? */
-                                 FIFFLIB::fiffChInfo        comp_chs,       /* Maybe a different set, defaults to the same */
-                                 int               ncomp_chan);
+                                 int compensate_to,  /* What is the desired compensation to achieve */
+                                 QList<FIFFLIB::FiffChInfo>& chs,            /* The channels to compensate */
+                                 int nchan,          /* How many? */
+                                 QList<FIFFLIB::FiffChInfo> comp_chs,       /* Maybe a different set, defaults to the same */
+                                 int ncomp_chan);
 
 
 
@@ -277,7 +277,7 @@ public:
 public:
     QList<MneCTFCompData*> comps;   /* All available compensation data sets */
     int            ncomp;           /* How many? */
-    FIFFLIB::fiffChInfo     chs;    /* Channel information */
+    QList<FIFFLIB::FiffChInfo>     chs;    /* Channel information */
     int            nch;             /* How many of the above */
     MneCTFCompData* undo;           /* Compensation data to undo the current compensation before applying current */
     MneCTFCompData* current;        /* The current compensation data composed from the above taking into account channels presently available */

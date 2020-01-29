@@ -319,7 +319,8 @@ QString mne_name_list_to_string_9(const QStringList& list)
     return res;
 }
 
-QString mne_channel_names_to_string_9(fiffChInfo chs, int nch)
+QString mne_channel_names_to_string_9(const QList<FIFFLIB::FiffChInfo>& chs,
+                                      int nch)
 /*
  * Make a colon-separated string out of channel names
  */
@@ -335,8 +336,10 @@ QString mne_channel_names_to_string_9(fiffChInfo chs, int nch)
 }
 
 
-void mne_channel_names_to_name_list_9(fiffChInfo chs, int nch,
-                                      QStringList& listp, int &nlistp)
+void mne_channel_names_to_name_list_9(const QList<FIFFLIB::FiffChInfo>& chs,
+                                      int nch,
+                                      QStringList& listp,
+                                      int &nlistp)
 
 {
     QString s = mne_channel_names_to_string_9(chs,nch);
@@ -526,7 +529,7 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
                             float *sfreq,                   /* Sampling frequency */
                             float *highpass,                /* Highpass filter setting */
                             float *lowpass,                 /* Lowpass filter setting */
-                            fiffChInfo *chp,                /* Channel descriptions */
+                            QList<FIFFLIB::FiffChInfo>& chp,                /* Channel descriptions */
                             FiffCoordTransOld* *trans)          /* Coordinate transformation (head <-> device) */
 /*
  * Find channel information from
@@ -534,8 +537,8 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
  * node.
  */
 {
-    fiffChInfo ch;
-    fiffChInfo this_ch;
+    QList<FIFFLIB::FiffChInfo> ch;
+    FIFFLIB::FiffChInfo this_ch;
     FiffCoordTransOld* t;
     int j,k;
     int to_find = 4;
@@ -545,8 +548,6 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
 
-     *chp     = NULL;
-    ch       = NULL;
      *trans   = NULL;
      *id      = NULL;
     /*
@@ -584,9 +585,11 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *nchan = *t_pTag->toInt();
-            ch = MALLOC_9(*nchan,fiffChInfoRec);
-            for (j = 0; j < *nchan; j++)
+
+            for (j = 0; j < *nchan; j++) {
+                ch.append(FiffChInfo());
                 ch[j].scanNo = -1;
+            }
             to_find = to_find + *nchan - 1;
             break;
 
@@ -624,13 +627,14 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
 
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
-            this_ch = (fiffChInfo)t_pTag->data();
-            if (this_ch->scanNo <= 0 || this_ch->scanNo > *nchan) {
+
+            this_ch = t_pTag->toChInfo();
+            if (this_ch.scanNo <= 0 || this_ch.scanNo > *nchan) {
                 qCritical ("FIFF_CH_INFO : scan # out of range!");
                 goto bad;
             }
             else
-                memcpy(ch+this_ch->scanNo-1,this_ch,sizeof(fiffChInfoRec));
+                ch[this_ch.scanNo-1] = this_ch;
             to_find--;
             break;
 
@@ -681,11 +685,11 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
         printf ("Not all essential tags were found!");
         goto bad;
     }
-     *chp = ch;
+
+    chp = ch;
     return (0);
 
 bad : {
-        FREE_9(ch);
         return (-1);
     }
 }
@@ -866,18 +870,18 @@ out : {
 static int get_evoked_optional( FiffStream::SPtr& stream,
                                 const FiffDirNode::SPtr& node, /* The directory node containing our data */
                                 int *nchan,	 /* Number of channels */
-                                fiffChInfo *chp)	 /* Channel descriptions */
+                                QList<FiffChInfo>& chp)	 /* Channel descriptions */
 /*
  * The channel info may have been modified
  */
 {
     int res = FIFF_FAIL;
-    fiffChInfo   new_ch = NULL;
-    int          new_nchan = *nchan;
-    int          k,to_find;
+    QList<FiffChInfo> new_ch;
+    int new_nchan = *nchan;
+    int k,to_find;
     FiffTag::SPtr t_pTag;
     fiff_int_t kind, pos;
-    fiffChInfo   this_ch;
+    FiffChInfo this_ch;
     FiffDirNode::SPtr evoked_node;
 
     if (!(evoked_node = find_evoked(node))) {
@@ -895,20 +899,22 @@ static int get_evoked_optional( FiffStream::SPtr& stream,
         kind = evoked_node->dir[k]->kind;
         pos  = evoked_node->dir[k]->pos;
         if (kind == FIFF_CH_INFO) {     /* Information about one channel */
-            if (new_ch == NULL) {
-                new_ch = MALLOC_9(new_nchan,fiffChInfoRec);
+            if (new_ch.isEmpty()) {
                 to_find = new_nchan;
+                for (int i = 0; i < to_find; i++) {
+                    new_ch.append(FiffChInfo());
+                }
             }
             if (!stream->read_tag(t_pTag,pos))
                 goto out;
-            this_ch = MALLOC_9(1,fiffChInfoRec);
-            this_ch = (fiffChInfo)t_pTag->data();
-            if (this_ch->scanNo <= 0 || this_ch->scanNo > new_nchan) {
+
+            this_ch = t_pTag->toChInfo();
+            if (this_ch.scanNo <= 0 || this_ch.scanNo > new_nchan) {
                 printf ("FIFF_CH_INFO : scan # out of range!");
                 goto out;
             }
             else
-                new_ch[this_ch->scanNo-1] = *this_ch;
+                new_ch[this_ch.scanNo-1] = this_ch;
             to_find--;
         }
     }
@@ -923,13 +929,10 @@ static int get_evoked_optional( FiffStream::SPtr& stream,
 out : {
         if (res == FIFF_OK) {
             *nchan = new_nchan;
-            if (new_ch != NULL) {
-                FREE_9(*chp);
-                *chp = new_ch;
-                new_ch = NULL;
+            if (!new_ch.isEmpty()) {
+                chp = new_ch;
             }
         }
-        FREE_9(new_ch);
         return res;
     }
 }
@@ -1202,7 +1205,7 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
                     int        *nsampp,         /* Number of time points */
                     float      *tminp,          /* First time point */
                     float      *sfreqp,         /* Sampling frequency */
-                    fiffChInfo *chsp,           /* Channel info (this is now optional as well) */
+                    QList<FiffChInfo>& chsp,           /* Channel info (this is now optional as well) */
                     float      ***epochsp,      /* Data, channel by channel */
                     /*
                                         * Optional items follow
@@ -1228,7 +1231,7 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
     QStringList comments;               /* The associated comments */
     float       sfreq = 0.0;            /* What sampling frequency */
     FiffDirNode::SPtr start;
-    fiffChInfo   chs     = NULL;        /* Channel info */
+    QList<FiffChInfo>   chs;        /* Channel info */
     int          *artefs = NULL;        /* Artefact limits */
     int           nartef = 0;           /* How many */
     float       **epochs = NULL;        /* The averaged epochs */
@@ -1275,7 +1278,16 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
     /*
      * Get various things...
      */
-    if (get_meas_info (stream,start,&id,&meas_date,&nchan,&sfreq,&highpass,&lowpass,&chs,&trans) == -1)
+    if (get_meas_info (stream,
+                       start,
+                       &id,
+                       &meas_date,
+                       &nchan,
+                       &sfreq,
+                       &highpass,
+                       &lowpass,
+                       chs,
+                       &trans) == -1)
         goto out;
 
     /*
@@ -1290,7 +1302,10 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
     /*
      * Some things may be redefined at a lower level
      */
-    if (get_evoked_optional(stream,start,&nchan,&chs) == -1)
+    if (get_evoked_optional(stream,
+                            start,
+                            &nchan,
+                            chs) == -1)
         goto out;
     /*
      * Omit nonmagnetic channels
@@ -1314,14 +1329,12 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
     /*
    * Ready to go
    */
-    if (chsp) {
-        *chsp    = chs; chs = NULL;
-    }
-     *tminp   = tmin;
-     *nchanp  = nchan;
-     *nsampp  = nsamp;
-     *sfreqp  = sfreq;
-     *epochsp = epochs; epochs = NULL;
+    chsp    = chs;
+    *tminp   = tmin;
+    *nchanp  = nchan;
+    *nsampp  = nsamp;
+    *sfreqp  = sfreq;
+    *epochsp = epochs; epochs = NULL;
     /*
      * Fill in the optional data
      */
@@ -1355,7 +1368,6 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
      */
 out : {
         comments.clear();
-        FREE_9(chs);
         FREE_9(artefs);
         FREE_9(trans);
         FREE_9(id);
@@ -1401,11 +1413,11 @@ char *mne_format_file_id (fiffId id)
 
 
 int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
-                                    fiffChInfo     *megp,	 /* MEG channels */
+                                    QList<FiffChInfo>& megp,	 /* MEG channels */
                                     int            *nmegp,
-                                    fiffChInfo     *meg_compp,
+                                    QList<FiffChInfo>& meg_compp,
                                     int            *nmeg_compp,
-                                    fiffChInfo     *eegp,	 /* EEG channels */
+                                    QList<FiffChInfo>& eegp,	 /* EEG channels */
                                     int            *neegp,
                                     FiffCoordTransOld* *meg_head_t,
                                     fiffId         *idp)	 /* The measurement ID */
@@ -1418,19 +1430,19 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
     FiffStream::SPtr stream(new FiffStream(&file));
 
 
-    fiffChInfo chs   = NULL;
+    QList<FiffChInfo> chs;
     int        nchan = 0;
-    fiffChInfo meg   = NULL;
+    QList<FiffChInfo> meg;
     int        nmeg  = 0;
-    fiffChInfo meg_comp = NULL;
+    QList<FiffChInfo> meg_comp;
     int        nmeg_comp = 0;
-    fiffChInfo eeg   = NULL;
+    QList<FiffChInfo> eeg;
     int        neeg  = 0;
     fiffId     id    = NULL;
     QList<FiffDirNode::SPtr> nodes;
     FiffDirNode::SPtr info;
     FiffTag::SPtr t_pTag;
-    fiffChInfo   this_ch = NULL;
+    FiffChInfo this_ch;
     FiffCoordTransOld* t = NULL;
     fiff_int_t kind, pos;
     int j,k,to_find;
@@ -1457,9 +1469,11 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             nchan = *t_pTag->toInt();
-            chs = MALLOC_9(nchan,fiffChInfoRec);
-            for (j = 0; j < nchan; j++)
+
+            for (j = 0; j < nchan; j++) {
+                chs.append(FiffChInfo());
                 chs[j].scanNo = -1;
+            }
             to_find = nchan;
             break;
 
@@ -1482,15 +1496,14 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
         case FIFF_CH_INFO : /* Information about one channel */
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-            //            this_ch = t_pTag->toChInfo();
-            this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
-            *this_ch = *(fiffChInfo)(t_pTag->data());
-            if (this_ch->scanNo <= 0 || this_ch->scanNo > nchan) {
-                printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch->scanNo,nchan);
+
+            this_ch = t_pTag->toChInfo();
+            if (this_ch.scanNo <= 0 || this_ch.scanNo > nchan) {
+                printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch.scanNo,nchan);
                 goto bad;
             }
             else
-                chs[this_ch->scanNo-1] = *this_ch;
+                chs[this_ch.scanNo-1] = this_ch;
             to_find--;
             break;
         }
@@ -1511,49 +1524,35 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
     /*
    * Sort out the channels
    */
-    for (k = 0; k < nchan; k++)
-        if (chs[k].kind == FIFFV_MEG_CH)
+    for (k = 0; k < nchan; k++) {
+        if (chs[k].kind == FIFFV_MEG_CH) {
+            meg.append(chs[k]);
             nmeg++;
-        else if (chs[k].kind == FIFFV_REF_MEG_CH)
+        } else if (chs[k].kind == FIFFV_REF_MEG_CH) {
+            meg_comp.append(chs[k]);
             nmeg_comp++;
-        else if (chs[k].kind == FIFFV_EEG_CH)
+        } else if (chs[k].kind == FIFFV_EEG_CH) {
+            eeg.append(chs[k]);
             neeg++;
-    if (nmeg > 0)
-        meg = MALLOC_9(nmeg,fiffChInfoRec);
-    if (neeg > 0)
-        eeg = MALLOC_9(neeg,fiffChInfoRec);
-    if (nmeg_comp > 0)
-        meg_comp = MALLOC_9(nmeg_comp,fiffChInfoRec);
-    neeg = nmeg = nmeg_comp = 0;
-
-    for (k = 0; k < nchan; k++)
-        if (chs[k].kind == FIFFV_MEG_CH)
-            meg[nmeg++] = chs[k];
-        else if (chs[k].kind == FIFFV_REF_MEG_CH)
-            meg_comp[nmeg_comp++] = chs[k];
-        else if (chs[k].kind == FIFFV_EEG_CH)
-            eeg[neeg++] = chs[k];
+        }
+    }
     //    fiff_close(in);
     stream->close();
-    FREE_9(chs);
-    if (megp) {
-        *megp  = meg;
+
+    megp  = meg;
+    if(nmegp) {
         *nmegp = nmeg;
     }
-    else
-        FREE_9(meg);
-    if (meg_compp) {
-        *meg_compp = meg_comp;
+
+    meg_compp = meg_comp;
+    if(nmeg_compp) {
         *nmeg_compp = nmeg_comp;
     }
-    else
-        FREE_9(meg_comp);
-    if (eegp) {
-        *eegp  = eeg;
+    eegp  = eeg;
+    if(neegp) {
         *neegp = neeg;
     }
-    else
-        FREE_9(eeg);
+
     if (idp == NULL) {
         FREE_9(id);
     }
@@ -1570,9 +1569,6 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
 bad : {
         //        fiff_close(in);
         stream->close();
-        FREE_9(chs);
-        FREE_9(meg);
-        FREE_9(eeg);
         FREE_9(id);
         //        FREE(tag.data);
         FREE_9(t);
@@ -1654,7 +1650,6 @@ MneMeasData::MneMeasData()
     ,fwd       (NULL)
     ,meg_head_t(NULL)
     ,mri_head_t(NULL)
-    ,chs       (NULL)
     ,proj      (NULL)
     ,comp      (NULL)
     ,raw       (NULL)
@@ -1676,7 +1671,6 @@ MneMeasData::~MneMeasData()
 
     filename.clear();
     FREE_9(meas_id);
-    FREE_9(chs);
     if(meg_head_t)
         delete meg_head_t;
     if(mri_head_t)
@@ -1776,7 +1770,7 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
     /*
        * Data read from the file
        */
-    fiffChInfo     chs = NULL;
+    QList<FiffChInfo> chs;
     int            nchan_file,nsamp;
     float          dtmin,dtmax,sfreq;
     QString        comment;
@@ -1837,7 +1831,7 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
                         &nsamp,
                         &dtmin,
                         &sfreq,
-                        &chs,
+                        chs,
                         &data,
                         &comment,
                         &highpass,
@@ -1929,7 +1923,6 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
         }
         new_data->lowpass   = lowpass;
         new_data->highpass  = highpass;
-        new_data->chs       = MALLOC_9(nchan,fiffChInfoRec);
         new_data->nchan     = nchan;
         new_data->sfreq     = sfreq;
 
@@ -1947,8 +1940,10 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
         /*
          * Channel list
          */
-        for (k = 0; k < nchan; k++)
+        for (k = 0; k < nchan; k++) {
+            new_data->chs.append(FiffChInfo());
             new_data->chs[k] = chs[sel[k]];
+        }
 
         new_data->op  = op;		/* Attach inverse operator */
         new_data->fwd = fwd;		/* ...or a fwd operator */
@@ -2041,7 +2036,6 @@ out : {
         FREE_9(sel);
         comment.clear();
         FREE_CMATRIX_9(data);
-        FREE_9(chs);
         FREE_9(t);
         FREE_9(id);
         if (res == NULL && !add_to)
