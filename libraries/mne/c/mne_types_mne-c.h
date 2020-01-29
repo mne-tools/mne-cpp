@@ -335,84 +335,84 @@ typedef struct {
 #define MNE_COV_CH_MEG_GRAD  1  /* Planar gradiometer [T/m] */
 #define MNE_COV_CH_EEG       2  /* EEG [V] */
 
-typedef struct {		/* Covariance matrix storage */
-  int        kind;		/* Sensor or source covariance */
-  int        ncov;		/* Dimension */
-  int        nfree;		/* Number of degrees of freedom */
-  int        nproj;		/* Number of dimensions projected out */
-  int        nzero;		/* Number of zero or small eigenvalues */
-  char       **names;		/* Names of the entries (optional) */
-  double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
-  double     *cov_diag;		/* Diagonal covariance matrix */
-  mneSparseMatrix cov_sparse;   /* A sparse covariance matrix 
-				 * (Note: data are floats in this which is an inconsistency) */
-  double     *lambda;		/* Eigenvalues of cov */
-  double     *inv_lambda;	/* Inverses of the square roots of the eigenvalues of cov */
-  float      **eigen;		/* Eigenvectors of cov */
-  double     *chol;		/* Cholesky decomposition */
-  mneProjOp  proj;		/* The projection which was active when this matrix was computed */
-  mneSssData sss;		/* The SSS data present in the associated raw data file */
-  int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
-  char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
-  int        nbad;		/* How many of them */
-} *mneCovMatrix,mneCovMatrixRec;
+//typedef struct {		/* Covariance matrix storage */
+//  int        kind;		/* Sensor or source covariance */
+//  int        ncov;		/* Dimension */
+//  int        nfree;		/* Number of degrees of freedom */
+//  int        nproj;		/* Number of dimensions projected out */
+//  int        nzero;		/* Number of zero or small eigenvalues */
+//  char       **names;		/* Names of the entries (optional) */
+//  double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
+//  double     *cov_diag;		/* Diagonal covariance matrix */
+//  mneSparseMatrix cov_sparse;   /* A sparse covariance matrix
+//				 * (Note: data are floats in this which is an inconsistency) */
+//  double     *lambda;		/* Eigenvalues of cov */
+//  double     *inv_lambda;	/* Inverses of the square roots of the eigenvalues of cov */
+//  float      **eigen;		/* Eigenvectors of cov */
+//  double     *chol;		/* Cholesky decomposition */
+//  mneProjOp  proj;		/* The projection which was active when this matrix was computed */
+//  mneSssData sss;		/* The SSS data present in the associated raw data file */
+//  int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
+//  char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
+//  int        nbad;		/* How many of them */
+//} *mneCovMatrix,mneCovMatrixRec;
 
-typedef struct {		/* A forward solution */
-  char           *fwdname;	/* Name of the file this was loaded from */
-  fiffId         meas_id;       /* The assosiated measurement ID */
-  mneSourceSpace *spaces;	/* The source spaces */
-  int            nspace;	/* Number of source spaces */
-  fiffCoordTrans mri_head_t;	/* MRI <-> head coordinate transformation */
-  fiffCoordTrans meg_head_t;    /* MEG <-> head coordinate transformation */ 
-  int            methods;	/* EEG, MEG or EEG+MEG (see mne_fiff.h) */
-  int            coord_frame;	/* The coordinate frame employed in the forward calculations */
-  int            source_ori;	/* Fixed or free source orientations */
-  float          **rr_source;	/* The active source points */
-  float          **nn_source;	/* The source orientations 
-				 * (These are equal to the cortex normals 
-				 * in the fixed orientation case) */
-  int            nsource;	/* Number of source (recalculated for convenience) */
-  fiffChInfo     chs;		/* The channel list */
-  int            nch;		/* Number of channels */
-  mneNamedMatrix fwd;	        /* The forward solution (may be whitened) */
-  mneNamedMatrix fwd_proc;	/* This is an alternate matrix for a processed forward matrix (linear projection 
-				 * and whitening) As a rule, this field is not used but rater the operations are 
-				 * applied to the field fwd itself */
-  float          *patch_areas;  /* Contains the patch areas if the CSD transformation has been applied */
-  int            fwd_whitened;	/* Has the noise covariance been applied to the field fwd? */
-  mneCovMatrix   noise_cov;	/* The noise covariance matrix employed in whitening */
-  mneProjOp      proj;		/* Associated projection operator */
-} *mneForwardSolution,mneForwardSolutionRec;
+//typedef struct {		/* A forward solution */
+//  char           *fwdname;	/* Name of the file this was loaded from */
+//  fiffId         meas_id;       /* The assosiated measurement ID */
+//  mneSourceSpace *spaces;	/* The source spaces */
+//  int            nspace;	/* Number of source spaces */
+//  fiffCoordTrans mri_head_t;	/* MRI <-> head coordinate transformation */
+//  fiffCoordTrans meg_head_t;    /* MEG <-> head coordinate transformation */
+//  int            methods;	/* EEG, MEG or EEG+MEG (see mne_fiff.h) */
+//  int            coord_frame;	/* The coordinate frame employed in the forward calculations */
+//  int            source_ori;	/* Fixed or free source orientations */
+//  float          **rr_source;	/* The active source points */
+//  float          **nn_source;	/* The source orientations
+//				 * (These are equal to the cortex normals
+//				 * in the fixed orientation case) */
+//  int            nsource;	/* Number of source (recalculated for convenience) */
+//  fiffChInfo     chs;		/* The channel list */
+//  int            nch;		/* Number of channels */
+//  mneNamedMatrix fwd;	        /* The forward solution (may be whitened) */
+//  mneNamedMatrix fwd_proc;	/* This is an alternate matrix for a processed forward matrix (linear projection
+//				 * and whitening) As a rule, this field is not used but rater the operations are
+//				 * applied to the field fwd itself */
+//  float          *patch_areas;  /* Contains the patch areas if the CSD transformation has been applied */
+//  int            fwd_whitened;	/* Has the noise covariance been applied to the field fwd? */
+//  mneCovMatrix   noise_cov;	/* The noise covariance matrix employed in whitening */
+//  mneProjOp      proj;		/* Associated projection operator */
+//} *mneForwardSolution,mneForwardSolutionRec;
 
-typedef struct {		          /* An inverse operator */
-  fiffId         meas_id;                 /* The assosiated measurement ID */
-  mneSourceSpace *spaces;	          /* The source spaces */
-  int            nspace;	          /* Number of source spaces */
-  fiffCoordTrans meg_head_t;              /* MEG device <-> head coordinate transformation */ 
-  fiffCoordTrans mri_head_t;	          /* MRI device <-> head coordinate transformation */
-  int            methods;	          /* EEG, MEG or EEG+MEG (see mne_fiff.h) */
-  int            nchan;		          /* Number of measurement channels */
-  int            nsource;	          /* Number of source points */
-  int            fixed_ori;	          /* Fixed source orientations? */
-  float          **rr_source;	          /* The active source points */
-  float          **nn_source;	          /* The source orientations 
-					   * (These are equal to the cortex normals 
-					   * in the fixed orientation case) */
-  int            coord_frame;             /* Which coordinates are the locations and orientations given in? */
-  mneCovMatrix   sensor_cov;	          /* Sensor covariance matrix */
-  int            nave;		          /* Number of averaged responses (affects scaling of the noise covariance) */
-  int            current_unit;		  /* This can be FIFF_UNIT_AM, FIFF_UNIT_AM_M2, FIFF_UNIT_AM_M3 */
-  mneCovMatrix   source_cov;	          /* Source covariance matrix */
-  mneCovMatrix   orient_prior;	          /* Orientation prior applied */
-  mneCovMatrix   depth_prior;	          /* Depth-weighting prior applied */
-  mneCovMatrix   fMRI_prior;	          /* fMRI prior applied */
-  float          *sing;		          /* Singular values of the inverse operator */
-  mneNamedMatrix eigen_leads;	          /* The eigen leadfields */
-  int            eigen_leads_weighted;    /* Have the above been already weighted with R^0.5? */
-  mneNamedMatrix eigen_fields;	          /* Associated field patterns */
-  float          trace_ratio;	          /* tr(GRG^T)/tr(C) */
-  mneProjOp      proj;		          /* The associated projection operator */
-} *mneInverseOperator,mneInverseOperatorRec;
+//typedef struct {		          /* An inverse operator */
+//  fiffId         meas_id;                 /* The assosiated measurement ID */
+//  mneSourceSpace *spaces;	          /* The source spaces */
+//  int            nspace;	          /* Number of source spaces */
+//  fiffCoordTrans meg_head_t;              /* MEG device <-> head coordinate transformation */
+//  fiffCoordTrans mri_head_t;	          /* MRI device <-> head coordinate transformation */
+//  int            methods;	          /* EEG, MEG or EEG+MEG (see mne_fiff.h) */
+//  int            nchan;		          /* Number of measurement channels */
+//  int            nsource;	          /* Number of source points */
+//  int            fixed_ori;	          /* Fixed source orientations? */
+//  float          **rr_source;	          /* The active source points */
+//  float          **nn_source;	          /* The source orientations
+//					   * (These are equal to the cortex normals
+//					   * in the fixed orientation case) */
+//  int            coord_frame;             /* Which coordinates are the locations and orientations given in? */
+//  mneCovMatrix   sensor_cov;	          /* Sensor covariance matrix */
+//  int            nave;		          /* Number of averaged responses (affects scaling of the noise covariance) */
+//  int            current_unit;		  /* This can be FIFF_UNIT_AM, FIFF_UNIT_AM_M2, FIFF_UNIT_AM_M3 */
+//  mneCovMatrix   source_cov;	          /* Source covariance matrix */
+//  mneCovMatrix   orient_prior;	          /* Orientation prior applied */
+//  mneCovMatrix   depth_prior;	          /* Depth-weighting prior applied */
+//  mneCovMatrix   fMRI_prior;	          /* fMRI prior applied */
+//  float          *sing;		          /* Singular values of the inverse operator */
+//  mneNamedMatrix eigen_leads;	          /* The eigen leadfields */
+//  int            eigen_leads_weighted;    /* Have the above been already weighted with R^0.5? */
+//  mneNamedMatrix eigen_fields;	          /* Associated field patterns */
+//  float          trace_ratio;	          /* tr(GRG^T)/tr(C) */
+//  mneProjOp      proj;		          /* The associated projection operator */
+//} *mneInverseOperator,mneInverseOperatorRec;
 
 
 typedef struct {		/* For storing the wdata */
@@ -435,37 +435,37 @@ typedef struct {
   float **data;			/* The data, time by time */
 } *mneStcData,mneStcDataRec;
 
-typedef struct {		/* Information about raw data in fiff file */
-  char          *filename;	/* The name of the file this comes from */
-  fiffId        id;		/* Measurement id from the file */
-  int           nchan;		/* Number of channels */
-  fiffChInfo    chInfo;		/* Channel info data  */
-  int           coord_frame;	/* 
-				 * Which coordinate frame are the
-				 * positions defined in? 
-				 */
-  fiffCoordTrans trans;	        /* This is the coordinate transformation
-				 * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
-				 */
-  float         sfreq;		/* Sampling frequency */
-  float         lowpass;	/* Lowpass filter setting */
-  float         highpass;       /* Highpass filter setting */
-  fiffTimeRec   start_time;	/* Starting time of the acquisition
-				 * taken from the meas date 
-				 * or the meas block id
-				 * whence it may be inaccurate. */
-  int           buf_size;	/* Buffer size in samples */
-  int           maxshield_data; /* Are these unprocessed MaxShield data */
-  fiffDirEntry  rawDir;		/* Directory of raw data tags 
-				 * These may be of type
-				 *       FIFF_DATA_BUFFER
-				 *       FIFF_DATA_SKIP
-				 *       FIFF_DATA_SKIP_SAMP
-				 *       FIFF_NOP
-				 */
-  int           ndir;		/* Number of tags in the above
-				 * directory */
-} mneRawInfoRec, *mneRawInfo;
+//typedef struct {		/* Information about raw data in fiff file */
+//  char          *filename;	/* The name of the file this comes from */
+//  fiffId        id;		/* Measurement id from the file */
+//  int           nchan;		/* Number of channels */
+//  fiffChInfo    chInfo;		/* Channel info data  */
+//  int           coord_frame;	/*
+//				 * Which coordinate frame are the
+//				 * positions defined in?
+//				 */
+//  fiffCoordTrans trans;	        /* This is the coordinate transformation
+//				 * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
+//				 */
+//  float         sfreq;		/* Sampling frequency */
+//  float         lowpass;	/* Lowpass filter setting */
+//  float         highpass;       /* Highpass filter setting */
+//  fiffTimeRec   start_time;	/* Starting time of the acquisition
+//				 * taken from the meas date
+//				 * or the meas block id
+//				 * whence it may be inaccurate. */
+//  int           buf_size;	/* Buffer size in samples */
+//  int           maxshield_data; /* Are these unprocessed MaxShield data */
+//  fiffDirEntry  rawDir;		/* Directory of raw data tags
+//				 * These may be of type
+//				 *       FIFF_DATA_BUFFER
+//				 *       FIFF_DATA_SKIP
+//				 *       FIFF_DATA_SKIP_SAMP
+//				 *       FIFF_NOP
+//				 */
+//  int           ndir;		/* Number of tags in the above
+//				 * directory */
+//} mneRawInfoRec, *mneRawInfo;
 
 
 typedef struct {		/* Spatiotemporal map */
@@ -555,18 +555,18 @@ typedef struct {
   float eog_lowpass_width;	/* EOG lowpass transition width in Hz */
 } *mneFilterDef,mneFilterDefRec;
 
-typedef struct {
-  fiffDirEntry ent;		/* Where is this in the file (file bufs only, pointer to info) */
-  int   firsts,lasts;		/* First and last sample */
-  int   ntaper;			/* For filtered buffers: taper length */
-  int   ns;			/* Number of samples (last - first + 1) */
-  int   nchan;			/* Number of channels */
-  int   is_skip;		/* Is this a skip? */
-  float **vals;			/* Values (null if not in memory) */
-  int   valid;			/* Are the data meaningful? */
-  int   *ch_filtered;		/* For filtered buffers: has this channel filtered already */
-  int   comp_status;		/* For raw buffers: compensation status */
-} *mneRawBufDef,mneRawBufDefRec;
+//typedef struct {
+//  fiffDirEntry ent;		/* Where is this in the file (file bufs only, pointer to info) */
+//  int   firsts,lasts;		/* First and last sample */
+//  int   ntaper;			/* For filtered buffers: taper length */
+//  int   ns;			/* Number of samples (last - first + 1) */
+//  int   nchan;			/* Number of channels */
+//  int   is_skip;		/* Is this a skip? */
+//  float **vals;			/* Values (null if not in memory) */
+//  int   valid;			/* Are the data meaningful? */
+//  int   *ch_filtered;		/* For filtered buffers: has this channel filtered already */
+//  int   comp_status;		/* For raw buffers: compensation status */
+//} *mneRawBufDef,mneRawBufDefRec;
 
 
 /*
