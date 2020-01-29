@@ -290,7 +290,8 @@ QString mne_name_list_to_string(const QStringList& list)
 }
 
 
-QString mne_channel_names_to_string(fiffChInfo chs, int nch)
+QString mne_channel_names_to_string(const QList<FIFFLIB::FiffChInfo>& chs,
+                                    int nch)
 /*
  * Make a colon-separated string out of channel names
  */
@@ -307,8 +308,10 @@ QString mne_channel_names_to_string(fiffChInfo chs, int nch)
 
 
 
-void mne_channel_names_to_name_list(fiffChInfo chs, int nch,
-                                    QStringList& listp, int &nlistp)
+void mne_channel_names_to_name_list(const QList<FIFFLIB::FiffChInfo>& chs,
+                                    int nch,
+                                    QStringList& listp,
+                                    int &nlistp)
 
 {
     QString s = mne_channel_names_to_string(chs,nch);
@@ -743,7 +746,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
                           float        **data,      /* Allocated for npick x nsamp samples */
                           int          nchan,       /* Number of channels in the data */
                           int          nsamp,       /* Expected number of samples */
-                          fiffChInfo   chs,         /* Channel info for ALL channels */
+                          const QList<FIFFLIB::FiffChInfo>&   chs,         /* Channel info for ALL channels */
                           int          *pickno,     /* Which channels to pick */
                           int          npick)       /* How many */
 
@@ -1790,7 +1793,11 @@ bad : {
 
 //*************************************************************************************************************
 
-MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name, int omit_skip, int allow_maxshield, mneFilterDef filter, int comp_set)
+MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name,
+                                               int omit_skip,
+                                               int allow_maxshield,
+                                               mneFilterDef filter,
+                                               int comp_set)
 /*
      * Open a raw data file
      */
@@ -1806,7 +1813,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name, int omit_ski
     QList<FiffDirEntry::SPtr> dir0;
     //    fiffTagRec   tag;
     FiffTag::SPtr t_pTag;
-    fiffChInfo   ch;
+    FiffChInfo   ch;
     MneRawBufDef* bufs;
     int k, b, nbuf, ndir, nnames;
     int current_dir0 = 0;
@@ -1817,20 +1824,20 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name, int omit_ski
         goto bad;
 
     for (k = 0; k < info->nchan; k++) {
-        ch = info->chInfo+k;
-        if (QString::compare(ch->ch_name,MNE_DEFAULT_TRIGGER_CH) == 0) {
-            if (std::fabs(1.0 - ch->range) > 1e-5) {
-                ch->range = 1.0;
-                fprintf(stderr,"%s range set to %f\n",MNE_DEFAULT_TRIGGER_CH,ch->range);
+        ch = info->chInfo.at(k);
+        if (QString::compare(ch.ch_name,MNE_DEFAULT_TRIGGER_CH) == 0) {
+            if (std::fabs(1.0 - ch.range) > 1e-5) {
+                ch.range = 1.0;
+                fprintf(stderr,"%s range set to %f\n",MNE_DEFAULT_TRIGGER_CH,ch.range);
             }
         }
         /*
          * Take care of the nonzero unit multiplier
          */
-        if (ch->unit_mul != 0) {
-            ch->cal = pow(10.0,(double)(ch->unit_mul))*ch->cal;
-            fprintf(stderr,"Ch %s unit multiplier %d -> 0\n",ch->ch_name,ch->unit_mul);
-            ch->unit_mul = 0;
+        if (ch.unit_mul != 0) {
+            ch.cal = pow(10.0,(double)(ch.unit_mul))*ch.cal;
+            fprintf(stderr,"Ch %s unit multiplier %d -> 0\n",ch.ch_name.toLatin1().data(),ch.unit_mul);
+            ch.unit_mul = 0;
         }
     }
     //    if ((in = fiff_open(name)) == NULL)
@@ -1845,7 +1852,10 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name, int omit_ski
     /*
        * Add the channel name list
        */
-    mne_channel_names_to_name_list(info->chInfo,info->nchan,data->ch_names,nnames);
+    mne_channel_names_to_name_list(info->chInfo,
+                                   info->nchan,
+                                   data->ch_names,
+                                   nnames);
     if (nnames != info->nchan) {
         printf("Channel names were not translated correctly into a name list");
         goto bad;
@@ -1870,7 +1880,12 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name, int omit_ski
     else
         data->comp_now = comp_set;
 
-    if (MneCTFCompDataSet::mne_ctf_set_compensation(data->comp,data->comp_now,data->info->chInfo,data->info->nchan,NULL,0) == FAIL)
+    if (MneCTFCompDataSet::mne_ctf_set_compensation(data->comp,
+                                                    data->comp_now,
+                                                    data->info->chInfo,
+                                                    data->info->nchan,
+                                                    QList<FIFFLIB::FiffChInfo>(),
+                                                    0) == FAIL)
         goto bad;
     /*
        * SSS data

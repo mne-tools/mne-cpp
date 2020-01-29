@@ -131,7 +131,7 @@ public:
                               float *sfreq,	         /* Sampling frequency */
                               float *highpass,       /* Highpass filter freq. */
                               float *lowpass,        /* Lowpass filter setting */
-                              FIFFLIB::fiffChInfo *chp,	 /* Channel descriptions */
+                              QList<FIFFLIB::FiffChInfo>& chp,	 /* Channel descriptions */
                               FIFFLIB::FiffCoordTransOld* *trans, /* Coordinate transformation
                                                                                   (head <-> device) */
                               FIFFLIB::fiffTime *start_time);
@@ -155,7 +155,7 @@ public:
     QString             filename;      /**< The name of the file this comes from */
     FIFFLIB::fiffId     id;             /**< Measurement id from the file */
     int                 nchan;          /**< Number of channels */
-    FIFFLIB::fiffChInfo chInfo;         /**< Channel info data  */
+    QList<FIFFLIB::FiffChInfo> chInfo;         /**< Channel info data  */
     int                 coord_frame;    /**< Which coordinate frame are the
                                          * positions defined in?
                                          */

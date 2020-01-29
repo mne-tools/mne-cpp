@@ -102,7 +102,6 @@ MneDeriv::MneDeriv()
 , deriv_data(NULL)
 , in_use(NULL)
 , valid(NULL)
-, chs(NULL)
 {
 
 }
@@ -117,5 +116,4 @@ MneDeriv::~MneDeriv()
     mne_free_sparse_named_matrix_15(deriv_data);
     FREE_15(in_use);
     FREE_15(valid);
-    FREE_15(chs);
 }

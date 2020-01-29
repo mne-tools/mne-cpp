@@ -170,14 +170,14 @@ using namespace MNELIB;
 //============================= mne_read_forward_solution.c =============================
 
 int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
-                                  fiffChInfo     *megp,	 /* MEG channels */
-                                  int            *nmegp,
-                                  fiffChInfo     *meg_compp,
-                                  int            *nmeg_compp,
-                                  fiffChInfo     *eegp,	 /* EEG channels */
-                                  int            *neegp,
+                                  QList<FIFFLIB::FiffChInfo>& megp,	 /* MEG channels */
+                                  int *nmegp,
+                                  QList<FIFFLIB::FiffChInfo>& meg_compp,
+                                  int *nmeg_compp,
+                                  QList<FIFFLIB::FiffChInfo>& eegp,	 /* EEG channels */
+                                  int *neegp,
                                   FiffCoordTransOld* *meg_head_t,
-                                  fiffId         *idp)	 /* The measurement ID */
+                                  fiffId *idp)	 /* The measurement ID */
 /*
       * Read the channel information and split it into three arrays,
       * one for MEG, one for MEG compensation channels, and one for EEG
@@ -186,20 +186,19 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-
-    fiffChInfo chs   = NULL;
+    QList<FIFFLIB::FiffChInfo> chs;
     int        nchan = 0;
-    fiffChInfo meg   = NULL;
+    QList<FIFFLIB::FiffChInfo> meg;
     int        nmeg  = 0;
-    fiffChInfo meg_comp = NULL;
+    QList<FIFFLIB::FiffChInfo> meg_comp;
     int        nmeg_comp = 0;
-    fiffChInfo eeg   = NULL;
+    QList<FIFFLIB::FiffChInfo> eeg;
     int        neeg  = 0;
     fiffId     id    = NULL;
     QList<FiffDirNode::SPtr> nodes;
     FiffDirNode::SPtr info;
     FiffTag::SPtr t_pTag;
-    fiffChInfo   this_ch = NULL;
+    FIFFLIB::FiffChInfo   this_ch;
     FiffCoordTransOld* t = NULL;
     fiff_int_t kind, pos;
     int j,k,to_find;
@@ -226,9 +225,11 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             nchan = *t_pTag->toInt();
-            chs = MALLOC_32(nchan,fiffChInfoRec);
-            for (j = 0; j < nchan; j++)
+
+            for (j = 0; j < nchan; j++) {
+                chs.append(FiffChInfo());
                 chs[j].scanNo = -1;
+            }
             to_find = nchan;
             break;
 
@@ -251,15 +252,14 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
         case FIFF_CH_INFO : /* Information about one channel */
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-//            this_ch = t_pTag->toChInfo();
-            this_ch = (fiffChInfo)malloc(sizeof(fiffChInfoRec));
-            *this_ch = *(fiffChInfo)(t_pTag->data());
-            if (this_ch->scanNo <= 0 || this_ch->scanNo > nchan) {
-                printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch->scanNo,nchan);
+
+            this_ch = t_pTag->toChInfo();
+            if (this_ch.scanNo <= 0 || this_ch.scanNo > nchan) {
+                printf ("FIFF_CH_INFO : scan # out of range %d (%d)!",this_ch.scanNo,nchan);
                 goto bad;
             }
             else
-                chs[this_ch->scanNo-1] = *this_ch;
+                chs[this_ch.scanNo-1] = this_ch;
             to_find--;
             break;
         }
@@ -280,49 +280,36 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     /*
    * Sort out the channels
    */
-    for (k = 0; k < nchan; k++)
-        if (chs[k].kind == FIFFV_MEG_CH)
+    for (k = 0; k < nchan; k++) {
+        if (chs[k].kind == FIFFV_MEG_CH) {
+            meg.append(chs[k]);
             nmeg++;
-        else if (chs[k].kind == FIFFV_REF_MEG_CH)
+        } else if (chs[k].kind == FIFFV_REF_MEG_CH) {
+            meg_comp.append(chs[k]);
             nmeg_comp++;
-        else if (chs[k].kind == FIFFV_EEG_CH)
+        } else if (chs[k].kind == FIFFV_EEG_CH) {
+            eeg.append(chs[k]);
             neeg++;
-    if (nmeg > 0)
-        meg = MALLOC_32(nmeg,fiffChInfoRec);
-    if (neeg > 0)
-        eeg = MALLOC_32(neeg,fiffChInfoRec);
-    if (nmeg_comp > 0)
-        meg_comp = MALLOC_32(nmeg_comp,fiffChInfoRec);
-    neeg = nmeg = nmeg_comp = 0;
-
-    for (k = 0; k < nchan; k++)
-        if (chs[k].kind == FIFFV_MEG_CH)
-            meg[nmeg++] = chs[k];
-        else if (chs[k].kind == FIFFV_REF_MEG_CH)
-            meg_comp[nmeg_comp++] = chs[k];
-        else if (chs[k].kind == FIFFV_EEG_CH)
-            eeg[neeg++] = chs[k];
+        }
+    }
 //    fiff_close(in);
     stream->close();
-    FREE_32(chs);
-    if (megp) {
-        *megp  = meg;
+
+    megp  = meg;
+    if(nmegp) {
         *nmegp = nmeg;
     }
-    else
-        FREE_32(meg);
-    if (meg_compp) {
-        *meg_compp = meg_comp;
+
+    meg_compp = meg_comp;
+    if(nmeg_compp) {
         *nmeg_compp = nmeg_comp;
     }
-    else
-        FREE_32(meg_comp);
-    if (eegp) {
-        *eegp  = eeg;
+
+    eegp = eeg;
+    if(neegp) {
         *neegp = neeg;
     }
-    else
-        FREE_32(eeg);
+
     if (idp == NULL) {
         FREE_32(id);
     }
@@ -339,9 +326,6 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
 bad : {
 //        fiff_close(in);
         stream->close();
-        FREE_32(chs);
-        FREE_32(meg);
-        FREE_32(eeg);
         FREE_32(id);
 //        FREE_32(tag.data);
         FREE_32(t);
@@ -654,7 +638,6 @@ void mne_mat_vec_mult2_32 (float **m,float *v,float *result, int d1,int d2)
 
 MneCTFCompDataSet::MneCTFCompDataSet()
 :ncomp(0)
-,chs(NULL)
 ,nch(0)
 ,current(NULL)
 ,undo(NULL)
@@ -692,7 +675,6 @@ MneCTFCompDataSet::~MneCTFCompDataSet()
         if(comps[k])
             delete comps[k];
 
-    FREE_32(chs);
     if(current)
         delete current;
 }
@@ -709,31 +691,37 @@ MneCTFCompDataSet *MneCTFCompDataSet::mne_read_ctf_comp_data(const QString &name
     FiffStream::SPtr stream(new FiffStream(&file));
 
     MneCTFCompDataSet* set = NULL;
-    MneCTFCompData*   one;
+    MneCTFCompData* one;
     QList<FiffDirNode::SPtr> nodes;
     QList<FiffDirNode::SPtr> comps;
-    int               ncomp;
-    MneNamedMatrix*    mat = NULL;
-    int               kind,k;
+    int ncomp;
+    MneNamedMatrix* mat = NULL;
+    int kind,k;
     FiffTag::SPtr t_pTag;
-    fiffChInfo        chs = NULL;
-    int               nch = 0;
-    int               calibrated;
+    QList<FiffChInfo> chs;
+    int nch = 0;
+    int calibrated;
     /*
         * Read the channel information
         */
     {
-        fiffChInfo        comp_chs = NULL;
-        int               ncompch = 0;
+        QList<FiffChInfo> comp_chs, temp;
+        int ncompch = 0;
 
-        if (mne_read_meg_comp_eeg_ch_info_32(name,&chs,&nch,&comp_chs,&ncompch,NULL,NULL,NULL,NULL) == FAIL)
+        if (mne_read_meg_comp_eeg_ch_info_32(name,
+                                             chs,
+                                             &nch,
+                                             comp_chs,
+                                             &ncompch,
+                                             temp,
+                                             NULL,
+                                             NULL,
+                                             NULL) == FAIL)
             goto bad;
         if (ncompch > 0) {
-            chs = REALLOC_32(chs,nch+ncompch,fiffChInfoRec);
             for (k = 0; k < ncompch; k++)
-                chs[k+nch] = comp_chs[k];
+                chs.append(comp_chs[k]);
             nch = nch + ncompch;
-            FREE_32(comp_chs);
         }
     }
     /*
@@ -755,7 +743,7 @@ MneCTFCompDataSet *MneCTFCompDataSet::mne_read_ctf_comp_data(const QString &name
     /*
         * Set the channel info
         */
-    set->chs = chs; chs = NULL;
+    set->chs = chs;
     set->nch = nch;
     /*
         * Read each data set
@@ -812,7 +800,6 @@ bad : {
     }
 
 good : {
-        FREE_32(chs);
         stream->close();
         return set;
     }
@@ -821,7 +808,11 @@ good : {
 
 //*************************************************************************************************************
 
-int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set, fiffChInfo chs, int nch, fiffChInfo compchs, int ncomp)      /* How many of these */
+int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set,
+                                         const QList<FiffChInfo>& chs,
+                                         int nch,
+                                         QList<FiffChInfo> compchs,
+                                         int ncomp)      /* How many of these */
 /*
      * Make compensation data to apply to a set of channels to yield (or uncompensated) compensated data
      */
@@ -841,7 +832,7 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set, fiffChInfo chs,
 
     QStringList emptyList;
 
-    if (!compchs) {
+    if (compchs.isEmpty()) {
         compchs = chs;
         ncomp   = nch;
     }
@@ -993,7 +984,9 @@ bad : {
 
 //*************************************************************************************************************
 
-int MneCTFCompDataSet::mne_set_ctf_comp(fiffChInfo chs, int nch, int comp)
+int MneCTFCompDataSet::mne_set_ctf_comp(QList<FIFFLIB::FiffChInfo>& chs,
+                                        int nch,
+                                        int comp)
 /*
      * Set the compensation bits to the desired value
      */
@@ -1196,7 +1189,7 @@ int MneCTFCompDataSet::mne_apply_ctf_comp_t(MneCTFCompDataSet *set, int do_it, f
 
 //*************************************************************************************************************
 
-int MneCTFCompDataSet::mne_get_ctf_comp(fiffChInfo chs, int nch)
+int MneCTFCompDataSet::mne_get_ctf_comp(const QList<FIFFLIB::FiffChInfo> &chs, int nch)
 {
     int res = MNE_CTFV_NOGRAD;
     int first_comp,comp;
@@ -1259,7 +1252,12 @@ const char *MneCTFCompDataSet::mne_explain_ctf_comp(int kind)
 
 //*************************************************************************************************************
 
-int MneCTFCompDataSet::mne_ctf_set_compensation(MneCTFCompDataSet *set, int compensate_to, fiffChInfo chs, int nchan, fiffChInfo comp_chs, int ncomp_chan)     /* How many */
+int MneCTFCompDataSet::mne_ctf_set_compensation(MneCTFCompDataSet *set,
+                                                int compensate_to,
+                                                QList<FiffChInfo>& chs,
+                                                int nchan,
+                                                QList<FiffChInfo> comp_chs,
+                                                int ncomp_chan)     /* How many */
 /*
      * Make data which has the third-order gradient compensation applied
      */
@@ -1276,7 +1274,7 @@ int MneCTFCompDataSet::mne_ctf_set_compensation(MneCTFCompDataSet *set, int comp
             return FAIL;
         }
     }
-    if (!comp_chs) {
+    if (comp_chs.isEmpty()) {
         comp_chs = chs;
         ncomp_chan = nchan;
     }

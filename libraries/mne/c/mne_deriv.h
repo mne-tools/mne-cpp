@@ -102,7 +102,7 @@ public:
     mneSparseNamedMatrix    deriv_data; /* The derivation data itself */
     int                     *in_use;    /* How many non-zero elements on each column of the derivation data (This field is not always used) */
     int                     *valid;     /* Which of the derivations are valid considering the units of the input channels (This field is not always used) */
-    FIFFLIB::fiffChInfo     chs;        /* First matching channel info in each derivation */
+    QList<FIFFLIB::FiffChInfo>     chs;        /* First matching channel info in each derivation */
 
 // ### OLD STRUCT ###
 //typedef struct {                        /* One item in a derivation data set */
