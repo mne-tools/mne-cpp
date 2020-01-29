@@ -55,7 +55,8 @@ SUBDIRS += \
         qtHaveModule(charts) {
             SUBDIRS += \
                 mne_dipole_fit \
-                mne_scan
+                mne_scan \
+                mne_analyze
         } else {
             message("applications.pro - The Qt Charts module is missing. Please install to build the complete set of MNE-CPP features.")
         }
