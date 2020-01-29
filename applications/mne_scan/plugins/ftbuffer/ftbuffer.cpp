@@ -355,42 +355,26 @@ void FtBuffer::parseHeader(SimpleStorage chunkData) {
     //code to parse header chunks
     m_bCustomFiff = true;
 
-    uint32_t *iData = (uint32_t *) chunkData.data();
-
-    qDebug() << "Header Type:" << iData[0];
-
-    //In Fieldtrip, FT_CHUNK_NEUROMAG_HEADER = 8
-    if (iData[0] == 8) {
-        qDebug() << "Size:" << iData[1];
-
-        char* cData_NEUROMAG_HEADER = new char[iData[1]];
-        char* cData_NEUROMAG_ISOTRAK = new char[*((iData + 3 * sizeof(uint32_t)) + (sizeof (char) * iData[1]))]; //2* size of uint32 to account for iData[0] and iData[1], plus size of fiff file, plus 1* size of uint32 to account for 'type' field of isotrak header
-
-        //extract the data from the associated fiff files, based on type and size of chunk headers, formatted to be made into a QBuffer
-        memcpy(cData_NEUROMAG_HEADER,
-               iData + 2 * sizeof(uint32_t),
-               sizeof(char) * iData[1]);
-        memcpy(cData_NEUROMAG_ISOTRAK,
-               iData + 4 * sizeof(uint32_t) + sizeof (char) * iData[1],
-               *((iData + 3 * sizeof(uint32_t)) + (sizeof (char) * iData[1])) * sizeof (char));
-
-        QBuffer bData_NEUROMAG_HEADER;
-        QBuffer bData_NEUROMAG_ISOTRAK;
+    const ft_chunk_t* chanNames = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_CHANNEL_NAMES);
+    const ft_chunk_t* neuromagHead = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_HEADER);
+    //const ft_chunk_t* neuromagIso = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_ISOTRAK);
+    //const ft_chunk_t* neuromagHPI = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_HPIRESULT);
 
 
-        bData_NEUROMAG_HEADER.setData(cData_NEUROMAG_HEADER, iData[1]);
-
-//         = new FiffRawData(bData_NEUROMAG_HEADER);
-
-
-
-
-
-
-
-    } else {
-        qDebug() << "Unable to recognize header type.";
+    if (chanNames != Q_NULLPTR) {
+        qDebug() << "Channel name chunk found, size" << chanNames->def.size;
     }
+
+    if (neuromagHead != Q_NULLPTR) {
+        qDebug () << "Neuromag header found, size" << neuromagHead->def.size;
+    }
+
+    QBuffer bData_NEUROMAG_HEADER;
+    //QBuffer bData_NEUROMAG_ISOTRAK;
+
+    bData_NEUROMAG_HEADER.setData(neuromagHead->data, neuromagHead->def.size);
+
+    m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(bData_NEUROMAG_HEADER));
 
 }
 
@@ -478,4 +462,43 @@ void FtBuffer::parseHeader(SimpleStorage chunkData) {
 //        pushData();
 //        QThread::usleep(100);
 //    }
+//}
+
+//*************************************************************************************************************
+
+//void FtBuffer::parseHeader(SimpleStorage chunkData) {
+//    //code to parse header chunks
+//    m_bCustomFiff = true;
+
+//    uint32_t *iData = (uint32_t *) chunkData.data();
+
+//    qDebug() << "Header Type:" << iData[0];
+
+//    //In Fieldtrip, FT_CHUNK_NEUROMAG_HEADER = 8
+//    if (iData[0] == 8) {
+//        qDebug() << "Size:" << iData[1];
+
+//        char* cData_NEUROMAG_HEADER = new char[iData[1]];
+//        char* cData_NEUROMAG_ISOTRAK = new char[*((iData + 3 * sizeof(uint32_t)) + (sizeof (char) * iData[1]))]; //2* size of uint32 to account for iData[0] and iData[1], plus size of fiff file, plus 1* size of uint32 to account for 'type' field of isotrak header
+
+//        //extract the data from the associated fiff files, based on type and size of chunk headers, formatted to be made into a QBuffer
+//        memcpy(cData_NEUROMAG_HEADER,
+//               iData + 2 * sizeof(uint32_t),
+//               sizeof(char) * iData[1]);
+//        memcpy(cData_NEUROMAG_ISOTRAK,
+//               iData + 4 * sizeof(uint32_t) + sizeof (char) * iData[1],
+//               *((iData + 3 * sizeof(uint32_t)) + (sizeof (char) * iData[1])) * sizeof (char));
+
+//        QBuffer bData_NEUROMAG_HEADER;
+//        QBuffer bData_NEUROMAG_ISOTRAK;
+
+
+//        bData_NEUROMAG_HEADER.setData(cData_NEUROMAG_HEADER, iData[1]);
+
+////         = new FiffRawData(bData_NEUROMAG_HEADER);
+
+//    } else {
+//        qDebug() << "Unable to recognize header type.";
+//    }
+
 //}
