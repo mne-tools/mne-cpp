@@ -3,11 +3,12 @@ name: DocuTest
 on:
   push:
     branches:
-    - <YourBranch>
+    # Change this back to <YourBranch> before you create a pull request
+    - docu
 
+jobs:
   gh-pages:
     runs-on: ubuntu-latest
-    needs: UpdateDevTag
 
     steps:
     - name: Clone repository
@@ -20,14 +21,15 @@ on:
       run: |
         git config --global user.email dev@dev.com
         git config --global user.name dev
-        cd mne-cpp
-        git checkout --track -b gh-pages
+        # Copy the changed docu files first
+        cp -RT ../mne-cpp/doc/gh-pages ../newDoc
+        # Checkout the gh-pages branch
+        git checkout --track origin/gh-pages
         # Remove all files first
         git rm * -r
         git commit --amend -a -m 'Update docu' --allow-empty
-        cd ..
-        cp -RT doc/gh-pages mne-cpp
-        cd mne-cpp
-        git add .
+        # Add the changed doc files
+        cp -RT ../newDoc ../mne-cpp
+        git add --all
         git commit --amend -a -m 'Update docu'
         git push -f --all
