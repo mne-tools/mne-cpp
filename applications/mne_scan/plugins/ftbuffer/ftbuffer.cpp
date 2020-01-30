@@ -365,6 +365,9 @@ void FtBuffer::parseHeader(QBuffer* chunkData) {
                              << chunkData->getChar(&ch) << ch
                              << chunkData->getChar(&ch) << ch;
 
+    chunkData->close();
+
+
     //m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(bData_NEUROMAG_HEADER));
 
 }
