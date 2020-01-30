@@ -51,7 +51,6 @@ SUBDIRS += \
     ex_evoked_grad_amp \
     ex_fiff_io \
     ex_find_evoked \
-    ex_hpiFit \
     ex_inverse_mne \
     ex_make_inverse_operator \
     ex_make_layout \
@@ -77,6 +76,7 @@ SUBDIRS += \
             ex_fs_surface \
             ex_filtering \
             ex_histogram \
+            ex_hpiFit \
             ex_inverse_mne_raw \
             ex_inverse_pwl_rap_music \
             ex_inverse_rap_music \
