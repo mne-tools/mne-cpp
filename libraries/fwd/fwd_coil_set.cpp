@@ -188,6 +188,7 @@ static int get_fval(FILE *in, float *fval)
 
 {
     char *next = next_word(in);
+    setlocale(LC_NUMERIC, "C");
     if (next == NULL) {
         qWarning("bad integer");
         return FAIL;

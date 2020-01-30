@@ -230,7 +230,10 @@ void CustomMesh::setVertex(const Eigen::MatrixX3f& tMatVert)
 void CustomMesh::setIndex(const Eigen::MatrixXi& tMatTris)
 {
     QByteArray indexBufferData;
-    indexBufferData.resize(tMatTris.rows() * tMatTris.cols() * (int)sizeof(uint));
+
+    const uint iIndicesCount = tMatTris.rows() * tMatTris.cols();
+    indexBufferData.resize(iIndicesCount * (int)sizeof(uint));
+
     uint *rawIndexArray = reinterpret_cast<uint *>(indexBufferData.data());
     int idxTris = 0;
 
@@ -243,10 +246,7 @@ void CustomMesh::setIndex(const Eigen::MatrixXi& tMatTris)
 
     m_pIndexDataBuffer->setData(indexBufferData);
 
-    //m_pIndexAttribute->setBuffer(m_pIndexDataBuffer);
-    m_pIndexAttribute->setByteStride(tMatTris.cols() * sizeof(uint));
-    m_pIndexAttribute->setCount(tMatTris.rows());
-    m_pIndexAttribute->setDataSize(tMatTris.cols());
+    m_pIndexAttribute->setCount(iIndicesCount);
 
     //Set the final geometry and primitive type
     this->setVerticesPerPatch(tMatTris.cols());
