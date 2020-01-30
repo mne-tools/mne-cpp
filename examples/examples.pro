@@ -55,7 +55,6 @@ SUBDIRS += \
     ex_make_inverse_operator \
     ex_make_layout \
     ex_read_bem \
-    ex_read_coil_def \
     ex_read_epochs \
     ex_read_evoked \
     ex_read_fwd \
