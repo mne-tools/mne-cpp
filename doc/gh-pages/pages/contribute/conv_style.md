@@ -52,5 +52,5 @@ The following steps will show you how to setup the MNE-CPP QtCreator wizard. Thi
 
 You can display external documentation in the Help mode, which you can open via pressing the F1 key. To augment or replace the documentation that ships with Qt Creator and Qt:
 
- * Download the .qch file `mne-cpp-doc-qtcreator.qch` file for the MNE-CPP version you use [here](https://github.com/mne-tools/mne-cpp/releases).
+ * Download the .qch file `mne-cpp-doc-qtcreator.qch` file for the MNE-CPP version you use [here](https://github.com/mne-tools/mne-cpp/releases){:target="_blank" rel="noopener"}.
  * To add the .qch file to Qt Creator, select Tools > Options > Help > Documentation > Add.

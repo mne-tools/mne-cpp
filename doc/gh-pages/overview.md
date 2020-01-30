@@ -7,7 +7,7 @@ nav_order: 1
 
 MNE-CPP can be used to build standalone software applications, which offer a variety of neuroscientific analysis tools and are easy to use. MNE-CPP provides a cross-platform library which allows the processing of MEG/EEG data. It can be used to develop cross-platform applications, which next to the common operation systems also include mobile devices and embedded systems.
 
-Besides the basic library (MNE Lib) we deliver a number of applications, e.g., an acquisition and real-time processing (MNE Scan), as well as an offline processing application (MNE Analzye). MNE-CPP is open source BSD licensed (clause 3) and can be freely accessed. MNE-CPP has two external dependencies, namely [Qt](https://www.qt.io/) and [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). 
+Besides the basic library (MNE Lib) we deliver a number of applications, e.g., an acquisition and real-time processing (MNE Scan), as well as an offline processing application (MNE Analzye). MNE-CPP is open source BSD licensed (clause 3) and can be freely accessed. MNE-CPP has two external dependencies, namely [Qt](https://www.qt.io/){:target="_blank" rel="noopener"} and [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page){:target="_blank" rel="noopener"}. 
 
 We are targeting two user groups:
 * Front-End users with little or no coding background. These users are interested in straight-forward setups and applications with an easy to use GUI, such as MNE Scan and MNE Analyze.
