@@ -1,39 +1,39 @@
 //=============================================================================================================
 /**
-* @file     IExtension.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Lars Debor <lars.debor@tu-ilmenau.de>;
-*           Simon Heinke <simon.heinke@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     February, 2017
-*
-* @section  LICENSE
-*
-* Copyright (C) 2017 Christoph Dinh, Lars Debor, Simon Heinke and Matti Hamalainen. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    Contains declaration of IExtension interface class.
-*
-*/
+ * @file     IExtension.h
+ * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ * @version  1.0
+ * @date     February, 2017
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2017, Christoph Dinh, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Contains declaration of IExtension interface class.
+ *
+ */
 
 #ifndef IEXTENSION_H
 #define IEXTENSION_H
@@ -80,10 +80,10 @@ class AnalyzeSettings;
 
 //=========================================================================================================
 /**
-* DECLARE CLASS IExtension
-*
-* @brief The IExtension class is the base interface class for all extensions.
-*/
+ * DECLARE CLASS IExtension
+ *
+ * @brief The IExtension class is the base interface class for all extensions.
+ */
 class ANSHAREDSHARED_EXPORT IExtension : public QObject
 {
     Q_OBJECT
@@ -94,94 +94,94 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the extension.
-    */
+     * Destroys the extension.
+     */
     virtual ~IExtension() {}
 
     //=========================================================================================================
     /**
-    * Clone the extension
-    */
+     * Clone the extension
+     */
     virtual QSharedPointer<IExtension> clone() const = 0;
 
     //=========================================================================================================
     /**
-    * Initializes the extension.
-    */
+     * Initializes the extension.
+     */
     virtual void init() = 0;
 
     //=========================================================================================================
     /**
-    * Is called when extension unloaded.
-    */
+     * Is called when extension unloaded.
+     */
     virtual void unload() = 0;
 
     //=========================================================================================================
     /**
-    * Returns the plugin name.
-    * Pure virtual method.
-    *
-    * @return the name of plugin.
-    */
+     * Returns the plugin name.
+     * Pure virtual method.
+     *
+     * @return the name of plugin.
+     */
     virtual QString getName() const = 0;
 
     //=========================================================================================================
     /**
-    * Provides the menu, in case no menu is provided it returns a Q_NULLPTR
-    *
-    * @return the menu
-    */
+     * Provides the menu, in case no menu is provided it returns a Q_NULLPTR
+     *
+     * @return the menu
+     */
     virtual QMenu* getMenu() = 0;
 
     //=========================================================================================================
     /**
-    * Provides the control, in case no control is provided it returns a Q_NULLPTR
-    *
-    * @return the control
-    */
+     * Provides the control, in case no control is provided it returns a Q_NULLPTR
+     *
+     * @return the control
+     */
     virtual QDockWidget* getControl() = 0;
 
     //=========================================================================================================
     /**
-    * Provides the view, in case no view is provided it returns a Q_NULLPTR
-    *
-    * @return the view
-    */
+     * Provides the view, in case no view is provided it returns a Q_NULLPTR
+     *
+     * @return the view
+     */
     virtual QWidget* getView() = 0;
 
     //=========================================================================================================
     /**
-    * Informs the EventManager about all Events that the Extension wants to know about. Can return an empty
-    * vector in case no Events need to be seen by the Extension.
-    *
-    * @return The vector of relevant Events
-    */
+     * Informs the EventManager about all Events that the Extension wants to know about. Can return an empty
+     * vector in case no Events need to be seen by the Extension.
+     *
+     * @return The vector of relevant Events
+     */
     virtual QVector<EVENT_TYPE> getEventSubscriptions(void) const = 0;
 
     //=========================================================================================================
     /**
-    * Sets the global data, which provides the central database.
-    *
-    * @param[in] globalData  the global data
-    */
+     * Sets the global data, which provides the central database.
+     *
+     * @param[in] globalData  the global data
+     */
     virtual inline void setGlobalData(QSharedPointer<AnalyzeData> globalData);
 
     //=========================================================================================================
     /**
-    * Sets the global settings, which provides the mne analyze settings.
-    *
-    * @param[in] globalSettings  the global settings
-    */
+     * Sets the global settings, which provides the mne analyze settings.
+     *
+     * @param[in] globalSettings  the global settings
+     */
     virtual inline void setGlobalSettings(QSharedPointer<AnalyzeSettings> globalSettings);
 
 public slots:
 
     //=========================================================================================================
     /**
-    * Called by the EventManager in case a subscribed-for Event has happened.
-    *
-    * @param e The Event that has taken place
-    */
+     * Called by the EventManager in case a subscribed-for Event has happened.
+     *
+     * @param e The Event that has taken place
+     */
     virtual void handleEvent(QSharedPointer<Event> e) = 0;
 
 protected:

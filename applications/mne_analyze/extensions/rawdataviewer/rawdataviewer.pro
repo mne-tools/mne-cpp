@@ -1,15 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     rawdataviewer.pro
-# @author   Lars Debor <lars.debor@tu-ilmenau.de>;
-#           Simon Heinke <simon.heinke@tu-ilmenau.de>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+#           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+#           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
 # @version  1.0
 # @date     October, 2018
 #
 # @section  LICENSE
 #
-# Copyright (C) 2018 Lars Debor, Simon Heinke and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
