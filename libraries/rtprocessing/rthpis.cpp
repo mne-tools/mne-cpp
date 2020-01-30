@@ -89,7 +89,7 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
     fitResult.devHeadTrans.from = 1;
     fitResult.devHeadTrans.to = 4;
 
-    HpiFit::fitHpi(matData,
+    HPIFit::fitHPI(matData,
                     matProjectors,
                     fitResult.devHeadTrans,
                     vFreqs,
