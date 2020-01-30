@@ -51,9 +51,7 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(STATICLIB)
-#  define NEUROMAGSHARED_EXPORT
-#elif defined(NEUROMAG_LIBRARY)
+#if defined(MNERTSERVER_NEUROMAG_PLUGIN)
 #  define NEUROMAGSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define NEUROMAGSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
