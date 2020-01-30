@@ -40,7 +40,7 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += SSVEPBCI_LIBRARY
+DEFINES += SSVEPBCI_PLUGIN
 
 QT += core widgets concurrent gui
 
@@ -51,13 +51,6 @@ CONFIG(debug, debug|release) {
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 
-contains(MNECPP_CONFIG, static) {
-    CONFIG += staticlib
-    DEFINES += STATICLIB
-} else {
-    CONFIG += shared
-}
-
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
@@ -67,8 +60,7 @@ CONFIG(debug, debug|release) {
             -lscMeasd \
             -lscDispd \
             -lscSharedd
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \

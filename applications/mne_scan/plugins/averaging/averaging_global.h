@@ -50,9 +50,7 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(STATICLIB)
-#  define AVERAGINGSHARED_EXPORT
-#elif defined(AVERAGING_LIBRARY)
+#if defined(AVERAGING_PLUGIN)
 #  define AVERAGINGSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define AVERAGINGSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */

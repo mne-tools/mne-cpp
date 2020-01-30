@@ -37,9 +37,7 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(STATICLIB)
-#  define NATUSSHARED_EXPORT
-#elif defined(NATUS_LIBRARY)
+#if defined(NATUS_PLUGIN)
 #  define NATUSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define NATUSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */

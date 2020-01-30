@@ -40,7 +40,7 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += NEUROMAG_LIBRARY
+DEFINES += MNERTSERVER_NEUROMAG_PLUGIN
 
 #DEFINES += DACQ_OLD_CONNECTION_SCHEME # HP-UX
 
@@ -59,8 +59,7 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Communicationd
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Communication

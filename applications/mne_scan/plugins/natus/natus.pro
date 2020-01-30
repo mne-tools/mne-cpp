@@ -38,7 +38,7 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += NATUS_LIBRARY
+DEFINES += NATUS_PLUGIN
 
 QT += core widgets
 QT += network
@@ -49,14 +49,6 @@ CONFIG(debug, debug|release) {
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
-
-contains(MNECPP_CONFIG, static) {
-    CONFIG += staticlib
-    DEFINES += STATICLIB
-} else {
-    CONFIG += shared
-}
-
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {

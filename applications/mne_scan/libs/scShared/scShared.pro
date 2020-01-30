@@ -51,11 +51,9 @@ contains(MNECPP_CONFIG, static) {
     CONFIG += staticlib
     DEFINES += STATICLIB
     LIBS += -L$${MNE_BINARY_DIR}/mne_scan_plugins
-    QTPLUGIN += ecgsimulator
     QTPLUGIN += fiffsimulator
     QTPLUGIN += neuromag
     QTPLUGIN += babymeg
-    QTPLUGIN += triggercontrol
     QTPLUGIN += natus
 #    QTPLUGIN += gusbamp
 #    QTPLUGIN += eegosports
@@ -63,20 +61,14 @@ contains(MNECPP_CONFIG, static) {
 #    QTPLUGIN += tmsi
 #    QTPLUGIN += lsladapter
     QTPLUGIN += dummytoolbox
-    QTPLUGIN += epidetect
     QTPLUGIN += rtcmne
     QTPLUGIN += rtcmusic
     QTPLUGIN += averaging
     QTPLUGIN += covariance
-    QTPLUGIN += noise
-    QTPLUGIN += bci
-    QTPLUGIN += rtsss
-    QTPLUGIN += rthpi
     QTPLUGIN += noisereduction
     QTPLUGIN += rthpi
     QTPLUGIN += ssvepbci
     QTPLUGIN += neuronalconnectivity
-    QTPLUGIN += reference
 } else {
     CONFIG += shared
 }
@@ -89,8 +81,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lscMeasd \
             -lscDispd
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \

@@ -43,7 +43,7 @@ QT -= gui
 
 CONFIG += plugin
 
-DEFINES += FIFFSIMULATOR_LIBRARY
+DEFINES += MNERTSERVER_FIFFSIMULATOR_PLUGIN
 
 TARGET = FiffSimulator
 CONFIG(debug, debug|release) {
