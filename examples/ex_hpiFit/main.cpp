@@ -44,6 +44,7 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_dig_point_set.h>
 #include <inverse/hpiFit/hpifit.h>
 
 //*************************************************************************************************************
@@ -54,6 +55,7 @@
 #include <QtCore/QCoreApplication>
 #include <QFile>
 #include <QCommandLineParser>
+#include <QDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,19 +89,18 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("hpiFit Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_filt_raw.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/raw_meas_stat.fif");
 
     parser.addOption(inputOption);
-    parser.addOption(outputOption);
 
     parser.process(a);
 
     // Init data loading and writing
     QFile t_fileIn(parser.value(inputOption));
-    QFile t_fileOut(parser.value(outputOption));
 
     FiffRawData raw(t_fileIn);
+    QSharedPointer<FiffInfo> pFiffInfo;
+    FiffInfo fiffInfo = raw.info;
 
     RowVectorXd cals;
 
@@ -123,11 +124,17 @@ int main(int argc, char *argv[])
     // setup informations to be passed to fitHPI
 
     QVector<int> vFreqs;
+
     vFreqs << 154,158,161,166;
     QVector<double> vGof;
-    FIFFLIB::FiffDigPointSet fitResult;
-    Eigen::MatrixXd matProjectors = raw.proj;
+    FiffDigPointSet fittedPointSet;
+    std::cout << fiffInfo.sfreq;
 
+    Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
+
+    qDebug() << "raw.info sfreq: "<< raw.info.sfreq;
+    qDebug() << "pFiffInof sfreq: "<< pFiffInfo->sfreq;
+    qDebug() << "raw.info sfreq: " << vFreqs;
     // do hpiFit
     HPIFit::fitHPI(matData,
                    matProjectors,
@@ -135,7 +142,9 @@ int main(int argc, char *argv[])
                    vFreqs,
                    vGof,
                    fittedPointSet,
-                   raw.info);
-
+                   pFiffInfo);
+    qDebug() << "[done]\n";
+    qDebug() << "vGof: " << vGof;
+    qDebug() << "HPI Coil 1 Pos: " << fittedPointSet[0].r;
     return a.exec();
 }
