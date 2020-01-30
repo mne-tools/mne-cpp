@@ -66,7 +66,6 @@ contains(MNECPP_CONFIG, static) {
     QTPLUGIN += averaging
     QTPLUGIN += covariance
     QTPLUGIN += noisereduction
-    QTPLUGIN += rthpi
     QTPLUGIN += ssvepbci
     QTPLUGIN += neuronalconnectivity
 } else {
