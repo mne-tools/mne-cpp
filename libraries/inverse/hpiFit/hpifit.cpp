@@ -41,14 +41,15 @@
 #include "hpifit.h"
 #include "hpifitdata.h"
 
-#include <fiff/fiff_dig_point_set.h>
-
 #include <utils/ioutils.h>
 #include <utils/mnemath.h>
 
 #include <iostream>
 #include <fiff/fiff_cov.h>
+#include <fiff/fiff_dig_point_set.h>
 #include <fstream>
+
+#include <fwd/fwd_coil_set.h>
 
 
 //*************************************************************************************************************
@@ -67,7 +68,6 @@
 #include <QFuture>
 #include <QtConcurrent/QtConcurrent>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -76,7 +76,7 @@
 using namespace Eigen;
 using namespace INVERSELIB;
 using namespace FIFFLIB;
-
+using namespace FWDLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -138,11 +138,10 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     //Set coil frequencies
     Eigen::VectorXd coilfreq(numCoils);
-    Eigen::Vector4d order;      // order for coil freqs
-    order << 2,4,3,1;
+
     if(vFreqs.size() >= numCoils) {
         for(int i = 0; i < numCoils; ++i) {
-            coilfreq[order[i]] = vFreqs.at(i);
+            coilfreq[i] = vFreqs.at(i);
             //std::cout<<std::endl << coilfreq[i] << "Hz";
         }
     } else {
