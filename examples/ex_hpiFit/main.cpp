@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Ruben Dörfel <doerfelruben@aol.com>;
+* @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     01, 2020
@@ -99,8 +99,7 @@ int main(int argc, char *argv[])
     QFile t_fileIn(parser.value(inputOption));
 
     FiffRawData raw(t_fileIn);
-    QSharedPointer<FiffInfo> pFiffInfo;
-    FiffInfo fiffInfo = raw.info;
+    QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(raw.info));
 
     RowVectorXd cals;
 
@@ -114,37 +113,39 @@ int main(int argc, char *argv[])
     // Read, filter and write the data
     MatrixXd matData;
     MatrixXd times;
-
+    qDebug() << "Reading ...\n";
     // Reading
     if(!raw.read_raw_segment(matData, times, from, to)) {
         printf("error during read_raw_segment\n");
         return -1;
     }
+    qDebug() << "[done]\n";
 
     // setup informations to be passed to fitHPI
 
-    QVector<int> vFreqs;
-
-    vFreqs << 154,158,161,166;
+    QVector<int> vFreqs {154,158,161,166};
     QVector<double> vGof;
     FiffDigPointSet fittedPointSet;
-    std::cout << fiffInfo.sfreq;
-
     Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
 
-    qDebug() << "raw.info sfreq: "<< raw.info.sfreq;
-    qDebug() << "pFiffInof sfreq: "<< pFiffInfo->sfreq;
     qDebug() << "raw.info sfreq: " << vFreqs;
-    // do hpiFit
+
+    // enable debug
+    bool bDoDebug = true;
+    QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
+    qDebug() << "HPI-Fit... \n";
     HPIFit::fitHPI(matData,
                    matProjectors,
                    raw.info.dev_head_t,
                    vFreqs,
                    vGof,
                    fittedPointSet,
-                   pFiffInfo);
+                   pFiffInfo,
+                   bDoDebug,
+                   sHPIResourceDir);
+
     qDebug() << "[done]\n";
-    qDebug() << "vGof: " << vGof;
-    qDebug() << "HPI Coil 1 Pos: " << fittedPointSet[0].r;
+    qDebug() << "\nResults:\n";
+
     return a.exec();
 }
