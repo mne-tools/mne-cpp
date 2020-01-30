@@ -17,7 +17,7 @@ nav_order: 5
 
  | **Please note:** With the versions above some functions are not able to be linked and produce errors. It is possible that some MNE-CPP functions are not compatible with these emscripten versions. However, emscripten version 1.39.3 seems to be working with MNE-CPP code. The following two setups should work: **Qt5.13.2 compiled with em++ 1.39.3 with thread support** and **Qt5.14.0 compiled with em++ 1.39.3 with thread support**. | 
 
-* Get the [emscripten](https://emscripten.org/) compiler:
+* Get the [emscripten](https://emscripten.org/){:target="_blank" rel="noopener"} compiler:
 
    ```
    # Get the emsdk repo
@@ -83,7 +83,7 @@ nav_order: 5
       ../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -nomake examples -no-dbus -no-ssl -prefix /home/lorenz/Qt/5.14.0/wasm_em1393_64_withThread
       ```
 
-    * Build Qt and install to target (prefix) location afterwards. For MNE-CPP we only need the qt charts, qtsvg and qtbase module (see [https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly) for officially supported modules):
+    * Build Qt and install to target (prefix) location afterwards. For MNE-CPP we only need the qt charts, qtsvg and qtbase module (see [https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly){:target="_blank" rel="noopener"} for officially supported modules):
 
       ```
       make module-qtbase module-qtsvg module-qtcharts -j8
@@ -129,9 +129,9 @@ nav_order: 5
 
 Example builds can be found here (Chromium based and Mozilla browsers seem to work the best):
 
-  [https://mne-cpp.github.io/wasm/mne_browse.html](https://mne-cpp.github.io/wasm/mne_browse.html)
+  [https://mne-cpp.github.io/wasm/mne_browse.html](https://mne-cpp.github.io/wasm/mne_browse.html){:target="_blank" rel="noopener"}
 
-  [https://mne-cpp.github.io/wasm/mne_analyze.html](https://mne-cpp.github.io/wasm/mne_analyze.html)
+  [https://mne-cpp.github.io/wasm/mne_analyze.html](https://mne-cpp.github.io/wasm/mne_analyze.html){:target="_blank" rel="noopener"}
 
 ## General notes and helpful information
 
@@ -139,38 +139,38 @@ Example builds can be found here (Chromium based and Mozilla browsers seem to wo
      installed.
 
  * QtWebAssembly does not support concurrent and Qt3D modules.
-     [https://forum.qt.io/topic/109166/wasm-support-for-qt3d/4](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading)
+     [https://forum.qt.io/topic/109166/wasm-support-for-qt3d/4](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading){:target="_blank" rel="noopener"}
 
- * Thread support forQtWasm can be achieved since Qt5.13. Thread support is deactivated in pre-built binaries. The default Qt for WebAssembly build disables threads by default. To enable, build from source and configure with the `-feature-thread` flag. We’ve found that emscripten 1.38.30 works well for threaded builds. From [https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading)
+ * Thread support forQtWasm can be achieved since Qt5.13. Thread support is deactivated in pre-built binaries. The default Qt for WebAssembly build disables threads by default. To enable, build from source and configure with the `-feature-thread` flag. We’ve found that emscripten 1.38.30 works well for threaded builds. From [https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading){:target="_blank" rel="noopener"}
 
  * Data access for local files:
-     [https://forum.qt.io/topic/104608/access-local-user-file-on-qt-for-web-assembly](https://forum.qt.io/topic/104608/access-local-user-file-on-qt-for-web-assembly) and
-     [https://stackoverflow.com/questions/56886410/access-local-user-file-on-qt-for-web-assembly](https://stackoverflow.com/questions/56886410/access-local-user-file-on-qt-for-web-assembly)
+     [https://forum.qt.io/topic/104608/access-local-user-file-on-qt-for-web-assembly](https://forum.qt.io/topic/104608/access-local-user-file-on-qt-for-web-assembly){:target="_blank" rel="noopener"} and
+     [https://stackoverflow.com/questions/56886410/access-local-user-file-on-qt-for-web-assembly](https://stackoverflow.com/questions/56886410/access-local-user-file-on-qt-for-web-assembly){:target="_blank" rel="noopener"}
 
  * Emscripten installer only supports 64 bit versions. 32bit versions need to be build from scratch.
 
- * If you get an idbc error see [https://bugreports.qt.io/browse/QTBUG-79872](https://bugreports.qt.io/browse/QTBUG-79872).
+ * If you get an idbc error see [https://bugreports.qt.io/browse/QTBUG-79872](https://bugreports.qt.io/browse/QTBUG-79872){:target="_blank" rel="noopener"}.
 
- * For browser support information see [https://caniuse.com/#feat=wasm](https://caniuse.com/#feat=wasm).
+ * For browser support information see [https://caniuse.com/#feat=wasm](https://caniuse.com/#feat=wasm){:target="_blank" rel="noopener"}.
 
 ## Wasm references
 
-[https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly](https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly)
+[https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly](https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly){:target="_blank" rel="noopener"}
 
-[https://doc.qt.io/qt-5/wasm.html](https://doc.qt.io/qt-5/wasm.html)
+[https://doc.qt.io/qt-5/wasm.html](https://doc.qt.io/qt-5/wasm.html){:target="_blank" rel="noopener"}
 
-[https://medium.com/@jimmychen009/qt-quick-on-the-browser-30d5349c11ec](https://medium.com/@jimmychen009/qt-quick-on-the-browser-30d5349c11ec)
+[https://medium.com/@jimmychen009/qt-quick-on-the-browser-30d5349c11ec](https://medium.com/@jimmychen009/qt-quick-on-the-browser-30d5349c11ec){:target="_blank" rel="noopener"}
 
-[https://dev.to/captainsafia/why-the-heck-is-everyone-talking-about-webassembly-455a](https://dev.to/captainsafia/why-the-heck-is-everyone-talking-about-webassembly-455a)
+[https://dev.to/captainsafia/why-the-heck-is-everyone-talking-about-webassembly-455a](https://dev.to/captainsafia/why-the-heck-is-everyone-talking-about-webassembly-455a){:target="_blank" rel="noopener"}
 
-[https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly)
+[https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly){:target="_blank" rel="noopener"}
 
-[https://doc.qt.io/qt-5/qtwebassembly-platform-notes.html](https://doc.qt.io/qt-5/qtwebassembly-platform-notes.html)
+[https://doc.qt.io/qt-5/qtwebassembly-platform-notes.html](https://doc.qt.io/qt-5/qtwebassembly-platform-notes.html){:target="_blank" rel="noopener"}
 
-[https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading)
+[https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading){:target="_blank" rel="noopener"}
 
-[https://forum.qt.io/topic/107689/building-qt-apps-to-wasm/18](https://forum.qt.io/topic/107689/building-qt-apps-to-wasm/18)
+[https://forum.qt.io/topic/107689/building-qt-apps-to-wasm/18](https://forum.qt.io/topic/107689/building-qt-apps-to-wasm/18){:target="_blank" rel="noopener"}
 
-[https://doc-snapshots.qt.io/qtcreator-master/creator-setup-webassembly.html](https://doc-snapshots.qt.io/qtcreator-master/creator-setup-webassembly.html)
+[https://doc-snapshots.qt.io/qtcreator-master/creator-setup-webassembly.html](https://doc-snapshots.qt.io/qtcreator-master/creator-setup-webassembly.html){:target="_blank" rel="noopener"}
 
-[https://github.com/msorvig/qt-webassembly-examples](https://github.com/msorvig/qt-webassembly-examples)
+[https://github.com/msorvig/qt-webassembly-examples](https://github.com/msorvig/qt-webassembly-examples){:target="_blank" rel="noopener"}

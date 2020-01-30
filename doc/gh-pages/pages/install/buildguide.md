@@ -11,13 +11,13 @@ Make sure you have one of the following compilers installed:
 
 | Windows | Linux | MacOS |
 |---------|-------|-------|
-| min. MSVC 2015 (We recommend the [MSVC 2017 Community Version](https://visualstudio.microsoft.com/vs/older-downloads/) compiler) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html) | min. [Clang 3.5](https://developer.apple.com/xcode/)|
+| min. MSVC 2015 (We recommend the [MSVC 2017 Community Version](https://visualstudio.microsoft.com/vs/older-downloads/){:target="_blank" rel="noopener"} compiler) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html){:target="_blank" rel="noopener"} | min. [Clang 3.5](https://developer.apple.com/xcode/){:target="_blank" rel="noopener"}|
 
 ## Get Qt
 
 ### Download the Qt installer
 
-Qt is the only dependency you will need to install. Go to the Qt download section and download the [Qt installer](https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5). 
+Qt is the only dependency you will need to install. Go to the Qt download section and download the [Qt installer](https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5){:target="_blank" rel="noopener"}. 
 
 ### Install Qt
 
@@ -30,7 +30,7 @@ After the installation is finished make sure to add the Qt bin folder (e.g. `<Qt
 
 ## Get the source code
 
-Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp) to your own GitHub account. For a detailed guide on how to fork a repository, we recommend checking out the [guide on the official GitHub website](https://help.github.com/en/github/getting-started-with-github/fork-a-repo). 
+Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp){:target="_blank" rel="noopener"} to your own GitHub account. For a detailed guide on how to fork a repository, we recommend checking out the [guide on the official GitHub website](https://help.github.com/en/github/getting-started-with-github/fork-a-repo){:target="_blank" rel="noopener"}. 
 
 Clone the fork to your local machine:
 
@@ -58,4 +58,4 @@ Every time you want to update to the newest changes use:
 
 ## Test the build
 
-In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download) and extract the files to `mne-cpp/bin/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp3D. If the build was successfull the example should start and display a window including a 3D brain as well as a source localization result.
+In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download){:target="_blank" rel="noopener"} and extract the files to `mne-cpp/bin/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp3D. If the build was successfull the example should start and display a window including a 3D brain as well as a source localization result.

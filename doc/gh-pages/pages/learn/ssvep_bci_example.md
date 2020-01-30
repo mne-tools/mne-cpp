@@ -9,7 +9,7 @@ nav_order: 3
 
 ## Abstract
 
-The SSVEP-BCI plugin beholds a Brain Computer Interface (BCI) using Steady-State-Visual-Evoked-Potentials (SSVEP). It was developed under the Master Thesis "[Development of a BCI based on real-time neural source localization](http://opac.lbs-ilmenau.gbv.de/DB=1/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=Development+of+a+BCI+based+on+real-time+neural+source+localization)", in which the so called [Bremen-BCI](http://iopscience.iop.org/article/10.1088/1741-2560/8/3/036020/meta) was used as a role model in order to setup classification pipeline and visualization. This tutorial describes both the setup of the processing pipeline and usage of the SSVEP-BCI plugin.
+The SSVEP-BCI plugin beholds a Brain Computer Interface (BCI) using Steady-State-Visual-Evoked-Potentials (SSVEP). It was developed under the Master Thesis "[Development of a BCI based on real-time neural source localization](http://opac.lbs-ilmenau.gbv.de/DB=1/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=Development+of+a+BCI+based+on+real-time+neural+source+localization){:target="_blank" rel="noopener"}", in which the so called [Bremen-BCI](http://iopscience.iop.org/article/10.1088/1741-2560/8/3/036020/meta){:target="_blank" rel="noopener"} was used as a role model in order to setup classification pipeline and visualization. This tutorial describes both the setup of the processing pipeline and usage of the SSVEP-BCI plugin.
 
 ## Editing the Processing Pipeline
 
@@ -19,7 +19,7 @@ In the following figure an edited setup of the SSVEP-BCI processing pipeline is 
 
 ## Adjusting the SSVEP-BCI
 
-Like already mentioned, in the thesis "[Development of a BCI based on real-time neural source localization](http://opac.lbs-ilmenau.gbv.de/DB=1/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=Development+of+a+BCI+based+on+real-time+neural+source+localization)" different scientific approaches are combined in order to realize this BCI. The adjustment of these features can be done by clicking the configuration icon:![](../../images/ssvep_bci_example2.png) on the SSVEP-BCI's GUI which is depictured in the previous figure. With this command, the configuration GUI is opened which is shown in the following figure.
+Like already mentioned, in the thesis "[Development of a BCI based on real-time neural source localization](http://opac.lbs-ilmenau.gbv.de/DB=1/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=Development+of+a+BCI+based+on+real-time+neural+source+localization){:target="_blank" rel="noopener"}" different scientific approaches are combined in order to realize this BCI. The adjustment of these features can be done by clicking the configuration icon:![](../../images/ssvep_bci_example2.png) on the SSVEP-BCI's GUI which is depictured in the previous figure. With this command, the configuration GUI is opened which is shown in the following figure.
 
 ![](../../images/ssvep_bci_example3.jpeg "Configuration Window of the SSVEP-BCI plugin")
 
@@ -63,7 +63,7 @@ The fourth button initializes the visualization of the screen keyboard device. I
 
 ## Handling of the Screen Keyboard
 
-The Screen Keyboard is a special application for SSVEP-BCIs which was designed for the [Bremen-BCI](http://iopscience.iop.org/article/10.1088/1741-2560/8/3/036020/meta). Following figure shows the surface of the subject's screen.
+The Screen Keyboard is a special application for SSVEP-BCIs which was designed for the [Bremen-BCI](http://iopscience.iop.org/article/10.1088/1741-2560/8/3/036020/meta){:target="_blank" rel="noopener"}. Following figure shows the surface of the subject's screen.
 
 ![](../../images/ssvep_bci_example6.jpg "Stimulation feature of the SSVEP-BCI plugin.")"
 
