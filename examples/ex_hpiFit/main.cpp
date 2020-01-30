@@ -45,8 +45,10 @@
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_dig_point_set.h>
+#include <fiff/fiff_cov.h>
 #include <inverse/hpiFit/hpifit.h>
 
+#include <fwd/fwd_coil_set.h>
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
@@ -65,6 +67,7 @@
 using namespace FIFFLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
+using namespace FWDLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -121,9 +124,37 @@ int main(int argc, char *argv[])
     }
     qDebug() << "[done]\n";
 
-    // setup informations to be passed to fitHPI
+    // read coil_def.dat
+    //Read coil_def.dat file
+    // Setup Constructors for Coil Set
+    FwdCoilSet* templates = NULL;
+    FwdCoilSet* megCoils = NULL;
 
-    QVector<int> vFreqs {154,158,161,166};
+    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+    QList<FiffChInfo> channels;
+    for (int i = 0; i < pFiffInfo->nchan; ++i) {
+        if(pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
+                channels.append(pFiffInfo->chs[i]);
+            }
+        }
+    }
+
+    // Create MEG-Coils and read data
+    int acc = 2;
+    FiffCoordTransOld t = FiffCoordTransOld();
+    qDebug() << "Reading Coil_def.dat ...";
+    templates = FwdCoilSet::read_coil_defs(qPath);
+    qDebug() << "[done]";
+    //megCoils = templates->create_meg_coils(channels,pFiffInfo->nchan,acc,&t);
+    //std::cout << "megCoils->ncoil: " << megCoils->ncoil;
+
+    // setup informations to be passed to fitHPI
+    QVector<int> vFreqs {166,154,161,158};
     QVector<double> vGof;
     FiffDigPointSet fittedPointSet;
     Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
@@ -144,8 +175,7 @@ int main(int argc, char *argv[])
                    bDoDebug,
                    sHPIResourceDir);
 
-    qDebug() << "[done]\n";
-    qDebug() << "\nResults:\n";
+    std::cout << "[done]\n";
 
     return a.exec();
 }
