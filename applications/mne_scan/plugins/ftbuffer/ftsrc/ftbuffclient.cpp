@@ -338,7 +338,7 @@ void FtBuffClient::idleCall() {
         for (int j = 0; j < int (ddef.nchans); j++) {
             matData(j,i) = fdata[count];
             //if (count % 32 == 0) qDebug() << "---Blockstart---" << count/32;
-            qDebug() << fdata[count];
+            //qDebug() << fdata[count];
             count++;
         }
     }
