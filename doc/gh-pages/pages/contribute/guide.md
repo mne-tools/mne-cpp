@@ -5,7 +5,7 @@ nav_order: 1
 ---
 # Contribution Guide
 
-MNE-CPP is an open-source project and is made better by contributions from our users. To start contributing, make sure to first follow our [guide](../install/buildguide.md) to setup MNE-CPP for development. You can also view our overview on [deploying MNE-CPP](build_run_depl_pack.md), and our [convention and style guide](conv_style.md).
+MNE-CPP is an open-source project and is made better by contributions from our users. To start contributing, make sure to first follow our [guide](../install/buildguide.md) to setup MNE-CPP for development. You can also view our overview on [deploying MNE-CPP](../development/ci.md), and our [convention and style guide](conv_style.md).
 
 1. Read the [coding conventions and style guide](conv_style.md).
 2. Create a new branch and make your changes to the code (please follow the coding conventions) and do a commit (please follow the commit policy).
