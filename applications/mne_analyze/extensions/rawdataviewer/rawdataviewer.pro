@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the rawdataviewer plug-in.
+# @brief    This project file generates the makefile for the rawdataviewer plugin.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -66,8 +66,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Connectivityd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lanSharedd
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
@@ -117,14 +116,9 @@ INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 header_files.files = $${HEADERS}
 header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_extensions
 
-OTHER_FILES += rawdataviewer.json
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
-# Deploy library
-win32 {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
+OTHER_FILES += rawdataviewer.json
 
 # Activate FFTW backend in Eigen
 contains(MNECPP_CONFIG, useFFTW) {

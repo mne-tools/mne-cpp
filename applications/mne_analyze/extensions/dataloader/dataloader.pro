@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the fiffio extension.
+# @brief    This project file generates the makefile for the dataloader plugin.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -53,8 +53,7 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lanSharedd
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lanShared
@@ -71,11 +70,6 @@ HEADERS += \
     dataloader_global.h \
     dataloader.h \
     FormFiles/dataloadercontrol.h
-
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
-
 
 FORMS += \
     FormFiles/dataloadercontrol.ui
@@ -98,14 +92,9 @@ INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 header_files.files = $${HEADERS}
 header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_extensions
 
-OTHER_FILES += dataloader.json
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
-# Deploy library
-win32 {
-    EXTRA_ARGS =
-    DEPLOY_CMD = $$winDeployLibArgs($${TARGET},$${TARGET_EXT},$${MNE_BINARY_DIR},$${MNE_LIBRARY_DIR},$${EXTRA_ARGS})
-    QMAKE_POST_LINK += $${DEPLOY_CMD}
-}
+OTHER_FILES += dataloader.json
 
 # Activate FFTW backend in Eigen for non-static builds only
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
