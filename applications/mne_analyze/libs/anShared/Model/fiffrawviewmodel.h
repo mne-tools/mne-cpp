@@ -1,38 +1,38 @@
 //=============================================================================================================
 /**
-* @file     fiffrawviewmodel.h
-* @author   Simon Heinke <simon.heinke@tu-ilmenau.de>;
-*           Lars Debor <lars.debor@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     October, 2018
-*
-* @section  LICENSE
-*
-* Copyright (C) 2018, Simon Heinke, Lars Debor and Matti Hamalainen. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief     FiffRawViewModel class declaration.
-*
-*/
+ * @file     fiffrawviewmodel.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ * @version  dev
+ * @date     October, 2018
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief     FiffRawViewModel class declaration.
+ *
+ */
 
 #ifndef ANSHAREDLIB_FIFFRAWVIEWMODEL_H
 #define ANSHAREDLIB_FIFFRAWVIEWMODEL_H
@@ -98,9 +98,9 @@ namespace ANSHAREDLIB {
 
 //=============================================================================================================
 /**
-*
-* @brief Model that holds and manages raw fiff data.
-*/
+ *
+ * @brief Model that holds and manages raw fiff data.
+ */
 class ANSHAREDSHARED_EXPORT FiffRawViewModel : public AbstractModel
 {
     Q_OBJECT
@@ -111,14 +111,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FiffRawViewModel object.
-    */
+     * Constructs a FiffRawViewModel object.
+     */
     FiffRawViewModel(QObject *pParent = nullptr);
 
     //=========================================================================================================
     /**
-    * Constructs a FiffRawViewModel object.
-    */
+     * Constructs a FiffRawViewModel object.
+     */
     FiffRawViewModel(const QString &sFilePath,
                      qint32 iVisibleWindowSize = 10,
                      qint32 iPreloadBufferSize = 1,
@@ -126,138 +126,138 @@ public:
 
     //=========================================================================================================
     /**
-    * Destructs a FiffRawViewModel.
-    */
+     * Destructs a FiffRawViewModel.
+     */
     ~FiffRawViewModel();
 
     //=========================================================================================================
     /**
-    * Helper function for initialization
-    */
+     * Helper function for initialization
+     */
     void initFiffData();
 
     //=========================================================================================================
     /**
-    * Returns the data stored under the given role for the index.
-    * Currently only Qt::DisplayRole is supported.
-    * Index rows reflect channels, first column is channel names, second is raw data.
-    *
-    * @param[in] index   The index that referres to the requested item.
-    * @param[in] role    The requested role.
-    */
+     * Returns the data stored under the given role for the index.
+     * Currently only Qt::DisplayRole is supported.
+     * Index rows reflect channels, first column is channel names, second is raw data.
+     *
+     * @param[in] index   The index that referres to the requested item.
+     * @param[in] role    The requested role.
+     */
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
     /**
-    * Returns the data for the given role and section in the header with the specified orientation.
-    *
-    * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
-    * @param[in] orientation    Qt::Horizontal or Qt::Vertical
-    * @param[in] role           role to show
-    *
-    * @return accessed eader data
-    */
+     * Returns the data for the given role and section in the header with the specified orientation.
+     *
+     * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
+     * @param[in] orientation    Qt::Horizontal or Qt::Vertical
+     * @param[in] role           role to show
+     *
+     * @return accessed eader data
+     */
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
     /**
-    * Returns the item flags for the given index.
-    *
-    * @param[in] index   The index that referres to the requested item.
-    */
+     * Returns the item flags for the given index.
+     *
+     * @param[in] index   The index that referres to the requested item.
+     */
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     //=========================================================================================================
     /**
-    * Returns the index for the item in the model specified by the given row, column and parent index.
-    * Currently only Qt::DisplayRole is supported.
-    * Index rows reflect channels, first column is channel names, second is raw data.
-    *
-    * @param[in] row      The specified row.
-    * @param[in] column   The specified column.
-    * @param[in] parent   The parent index.
-    */
+     * Returns the index for the item in the model specified by the given row, column and parent index.
+     * Currently only Qt::DisplayRole is supported.
+     * Index rows reflect channels, first column is channel names, second is raw data.
+     *
+     * @param[in] row      The specified row.
+     * @param[in] column   The specified column.
+     * @param[in] parent   The parent index.
+     */
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
-    * Returns the parent index of the given index.
-    * In this Model the parent index in always QModelIndex().
-    *
-    * @param[in] index   The index that referres to the child.
-    */
+     * Returns the parent index of the given index.
+     * In this Model the parent index in always QModelIndex().
+     *
+     * @param[in] index   The index that referres to the child.
+     */
     QModelIndex parent(const QModelIndex &index) const override;
 
     //=========================================================================================================
     /**
-    * Returns the number of childeren for the parent node.
-    *
-    * @param[in] parent     The parent index.
-    */
+     * Returns the number of childeren for the parent node.
+     *
+     * @param[in] parent     The parent index.
+     */
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
-    * Returns the number of objects stored in the node.
-    *
-    * @param[in] parent     The index of the requested node.
-    */
+     * Returns the number of objects stored in the node.
+     *
+     * @param[in] parent     The index of the requested node.
+     */
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
-    * Returns true if parent has any children; otherwise returns false.
-    *
-    * @param[in] parent     The index of the parent node.
-    */
+     * Returns true if parent has any children; otherwise returns false.
+     *
+     * @param[in] parent     The index of the parent node.
+     */
     bool hasChildren(const QModelIndex &parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
-    * The type of this model (FiffRawViewModel)
-    *
-    * @return The type of this model (FiffRawViewModel)
-    */
+     * The type of this model (FiffRawViewModel)
+     *
+     * @return The type of this model (FiffRawViewModel)
+     */
     inline MODEL_TYPE getType() const override;
 
     //=========================================================================================================
     /**
-    * Return the first sample of the currently loaded blocks
-    *
-    * @return The first sample of the currently loaded blocks
-    */
+     * Return the first sample of the currently loaded blocks
+     *
+     * @return The first sample of the currently loaded blocks
+     */
     inline qint32 currentFirstSample() const;
 
     //=========================================================================================================
     /**
-    * Return the first sample of the loaded Fiff file
-    *
-    * @return The first sample of the loaded Fiff file
-    */
+     * Return the first sample of the loaded Fiff file
+     *
+     * @return The first sample of the loaded Fiff file
+     */
     inline qint32 absoluteFirstSample() const;
 
     //=========================================================================================================
     /**
-    * Return the last sample of the currently loaded blocks (inclusive)
-    *
-    * @return The last sample of the currently loaded blocks (inclusive)
-    */
+     * Return the last sample of the currently loaded blocks (inclusive)
+     *
+     * @return The last sample of the currently loaded blocks (inclusive)
+     */
     inline qint32 currentLastSample() const;
 
     //=========================================================================================================
     /**
-    * Returns the last sample of the loaded Fiff file
-    *
-    * @return The last sample of the loaded Fiff file
-    */
+     * Returns the last sample of the loaded Fiff file
+     *
+     * @return The last sample of the loaded Fiff file
+     */
     inline qint32 absoluteLastSample() const;
 
     //=========================================================================================================
     /**
-    * Returns the the number of samples that can be loaded in the window.
-    *
-    * @return The the number of samples that can be loaded in the window
-    */
+     * Returns the the number of samples that can be loaded in the window.
+     *
+     * @return The the number of samples that can be loaded in the window
+     */
     inline qint32 sampleWindowSize() const;
 
     inline void setDataColumnWidth(int iWidth);
@@ -267,51 +267,51 @@ public:
 public slots:
 
     /**
-    * This tells the model where the view currently is.
-    *
-    * @param newScrollPosition Absolute sample number.
-    */
+     * This tells the model where the view currently is.
+     *
+     * @param newScrollPosition Absolute sample number.
+     */
     void updateScrollPosition(qint32 newScrollPosition);
 
 private:
 
     //=========================================================================================================
     /**
-    * This is a helper method thats is meant to correctly set the endOfFile / startOfFile flags whenever needed
-    */
+     * This is a helper method thats is meant to correctly set the endOfFile / startOfFile flags whenever needed
+     */
     void updateEndStartFlags();
 
     //=========================================================================================================
     /**
-    * This is helper function, its main purpose is to avoid code redundancy.
-    *
-    * @param[in] loadFunction The function that will be run in the background. Should be either loadEarlierBlocks or loadLaterBlocks.
-    * @param[in] numBlocks The Number of blocks to load.
-    */
+     * This is helper function, its main purpose is to avoid code redundancy.
+     *
+     * @param[in] loadFunction The function that will be run in the background. Should be either loadEarlierBlocks or loadLaterBlocks.
+     * @param[in] numBlocks The Number of blocks to load.
+     */
     void startBackgroundOperation(int (FiffRawViewModel::*loadFunction)(int), int iBlocksToLoad);
 
     //=========================================================================================================
     /**
-    * This is run concurrently
-    *
-    * @param[in] iCursorRequested Cursor that points to the requested sample
-    */
+     * This is run concurrently
+     *
+     * @param[in] iCursorRequested Cursor that points to the requested sample
+     */
     int loadEarlierBlocks(qint32 numBlocks);
 
     //=========================================================================================================
     /**
-    * This is run concurrently
-    *
-    * @param[in] iCursorRequested Cursor that points to the requested sample
-    */
+     * This is run concurrently
+     *
+     * @param[in] iCursorRequested Cursor that points to the requested sample
+     */
     int loadLaterBlocks(qint32 numBlocks);
 
     //=========================================================================================================
     /**
-    * This is run by the FutureWatcher when its finished
-    *
-    * @param[in] result Code value for the result
-    */
+     * This is run by the FutureWatcher when its finished
+     *
+     * @param[in] result Code value for the result
+     */
     void postBlockLoad(int result);
 
 signals:
@@ -430,16 +430,16 @@ inline double FiffRawViewModel::pixelDifference() const {
 //=============================================================================================================
 
 /**
-* The ChannelData class is meant to serve as a wrapper / container for more convenient access of channel-row data.
-* It supports range-based looping (for-each), as well as random access of data.
-*/
+ * The ChannelData class is meant to serve as a wrapper / container for more convenient access of channel-row data.
+ * It supports range-based looping (for-each), as well as random access of data.
+ */
 class ChannelData
 {
 
 public:
     /**
-    * This nested class enables the range-based looping.
-    */
+     * This nested class enables the range-based looping.
+     */
     class ChannelIterator : public std::iterator<std::random_access_iterator_tag, const double>
     {
 
