@@ -150,7 +150,7 @@ signals:
     * @brief extendedHeaderChunks
     * @param chunkData
     */
-    void extendedHeaderChunks(SimpleStorage chunkData);
+    void extendedHeaderChunks(QBuffer* chunkData);
 
 
     void bufferParameters(QPair<int,float> numChanandFreq);

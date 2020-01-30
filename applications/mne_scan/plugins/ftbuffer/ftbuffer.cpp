@@ -109,6 +109,7 @@ bool FtBuffer::start() {
     QThread::start();
 
     qRegisterMetaType<QPair<int,float>>("QPair<int,float>");
+    qRegisterMetaType<SimpleStorage>("SimpleStorage");
 
     // FtProducer in it's own thread and connect communications signals/slots
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
@@ -351,41 +352,18 @@ void FtBuffer::setupRTMSA() {
 
 //*************************************************************************************************************
 
-void FtBuffer::parseHeader(SimpleStorage chunkData) {
+void FtBuffer::parseHeader(QBuffer* chunkData) {
 
-    const ft_chunk_t* chanNames = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_CHANNEL_NAMES);
-    const ft_chunk_t* neuromagHead = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_HEADER);
-//    const ft_chunk_t* neuromagIso = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_ISOTRAK);
-//    const ft_chunk_t* neuromagHPI = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_HPIRESULT);
-
-    QBuffer bData_CHANNEL_NAMES;
-    QBuffer bData_NEUROMAG_HEADER;
-//    QBuffer bData_NEUROMAG_ISOTRAK;
-//    QBuffer bData_NEUROMAG_HPIRESULT;
+    qDebug() << "Chunk data received";
+    qDebug() << "";
 
 
-    if (chanNames != Q_NULLPTR) {
-        qDebug() << "Channel name chunk found, size" << chanNames->def.size;
-        bData_CHANNEL_NAMES.setData(chanNames->data, chanNames->def.size);
-
-        m_bCustomFiff = true;
-    }
-
-    if (neuromagHead != Q_NULLPTR) {
-        qDebug () << "Neuromag header found, size" << neuromagHead->def.size;
-        bData_NEUROMAG_HEADER.setData(neuromagHead->data, neuromagHead->def.size);
-
-        m_bCustomFiff = true;
-    }
-
-//    if (neuromagIso != Q_NULLPTR) {
-//        qDebug () << "Neuromag Isotrak found, size" << neuromagIso->def.size;
-//    }
-
-//    if (neuromagHPI != Q_NULLPTR) {
-//        qDebug () << "Neuromag HPI found, size" << neuromagHPI->def.size;
-//    }
-
+    char ch;
+    chunkData->open(QBuffer::ReadWrite);
+    chunkData->seek(0);
+    qDebug() << "test read:" << chunkData->getChar(&ch) << ch
+                             << chunkData->getChar(&ch) << ch
+                             << chunkData->getChar(&ch) << ch;
 
     //m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(bData_NEUROMAG_HEADER));
 
@@ -515,3 +493,40 @@ void FtBuffer::parseHeader(SimpleStorage chunkData) {
 //    }
 
 //}
+
+//other version of parseHeader
+
+//qDebug() << "Hey, we got here :)";
+//const ft_chunk_t* chanNames = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_CHANNEL_NAMES);
+//const ft_chunk_t* neuromagHead = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_HEADER);
+////    const ft_chunk_t* neuromagIso = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_ISOTRAK);
+////    const ft_chunk_t* neuromagHPI = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_HPIRESULT);
+
+//QBuffer bData_CHANNEL_NAMES;
+//QBuffer bData_NEUROMAG_HEADER;
+////    QBuffer bData_NEUROMAG_ISOTRAK;
+////    QBuffer bData_NEUROMAG_HPIRESULT;
+
+
+//if (chanNames != Q_NULLPTR) {
+//    qDebug() << "Channel name chunk found, size" << chanNames->def.size;
+//    bData_CHANNEL_NAMES.setData(chanNames->data, chanNames->def.size);
+
+//    m_bCustomFiff = true;
+//}
+
+//if (neuromagHead != Q_NULLPTR) {
+//    qDebug () << "Neuromag header found, size" << neuromagHead->def.size;
+//    bData_NEUROMAG_HEADER.setData(neuromagHead->data, neuromagHead->def.size);
+
+//    m_bCustomFiff = true;
+//}
+
+////    if (neuromagIso != Q_NULLPTR) {
+////        qDebug () << "Neuromag Isotrak found, size" << neuromagIso->def.size;
+////    }
+
+////    if (neuromagHPI != Q_NULLPTR) {
+////        qDebug () << "Neuromag HPI found, size" << neuromagHPI->def.size;
+////    }
+

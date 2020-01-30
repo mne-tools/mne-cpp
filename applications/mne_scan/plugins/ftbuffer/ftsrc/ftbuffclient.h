@@ -157,7 +157,7 @@ public:
     * @brief chunkData - returns the data from the
     * @return
     */
-    SimpleStorage chunkData();
+    QBuffer* chunkData();
 
     //=========================================================================================================
     /**
@@ -203,7 +203,7 @@ private:
     uint                            m_uiNumSamples;             /**< How many samples are in the buffer */
     float                           m_iSampleFrequency;         /**< Sampling frequency of the data in the buffer */
 
-    SimpleStorage                   m_ssChunkData;              /**< Contains optional chunk data tha can be read with buffer header */
+    QSharedPointer<SimpleStorage>   m_ssChunkData;              /**< Contains optional chunk data tha can be read with buffer header */
     bool                            m_bChunkData;               /**< Whether the header has chunk data */
 
     const char*                     m_pcAddrField;              /**< Address of where to connect to the buffer */
@@ -214,6 +214,8 @@ private:
     SimpleStorage                   m_ssRawStore;               /**< container to receie raw buffer data */
     SimpleStorage                   m_ssFloatStore;             /**< container to store buffer data as float */
     Eigen::MatrixXd*                m_pMatEmit;                 /**< container to format data to tansmit to FtBuffProducer */
+
+    QBuffer         bData_CHANNEL_NAMES;
 };
 
 #endif // FTBUFFCLIENT_H
