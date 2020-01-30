@@ -147,26 +147,40 @@ bool FtBuffClient::readHeader() {
 
     //saving header chunks and updating extended header flag
     if (chunkBuffer.size() != 0) {
-        //m_ssChunkData = chunkBuffer;
+//        m_ssChunkData.reset(&chunkBuffer);
 
-        qDebug() << "";
-        qDebug() << "";
-        qDebug() << "Chunk Buffer size:" << chunkBuffer.size();
-        qDebug() << "";
-        qDebug() << "";
+//        qDebug() << "";
+//        qDebug() << "";
+//        qDebug() << "Chunk Buffer size:" << chunkBuffer.size();
+//        qDebug() << "";
+//        qDebug() << "";
 
+//        const ft_chunk_t* chanNames = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_CHANNEL_NAMES);
+//        const ft_chunk_t* neuromagHead = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_NEUROMAG_HEADER);
+
+//        if (chanNames != Q_NULLPTR) {
+//            qDebug() << "Channel name chunk found, size" << chanNames->def.size;
+//        }
+
+//        if (neuromagHead != Q_NULLPTR) {
+//            qDebug () << "Neuromag header found, size" << neuromagHead->def.size;
+//        }
+
+        m_bChunkData = true;
+
+//        qDebug() << "";
+//        qDebug() << "Set m_bChunkData to true";
+//        qDebug() << "";
+        qDebug() << "Extended Buffer";
         const ft_chunk_t* chanNames = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_CHANNEL_NAMES);
-        const ft_chunk_t* neuromagHead = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_NEUROMAG_HEADER);
+        //const ft_chunk_t* neuromagHead = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_NEUROMAG_HEADER);
+    //    const ft_chunk_t* neuromagIso = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_ISOTRAK);
+    //    const ft_chunk_t* neuromagHPI = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_HPIRESULT);
+        qDebug() << "parsed header";
 
-        if (chanNames != Q_NULLPTR) {
-            qDebug() << "Channel name chunk found, size" << chanNames->def.size;
-        }
+        bData_CHANNEL_NAMES.setData(chanNames->data, chanNames->def.size);
 
-        if (neuromagHead != Q_NULLPTR) {
-            qDebug () << "Neuromag header found, size" << neuromagHead->def.size;
-        }
-
-        //m_bChunkData = true;
+        qDebug() << "created buffer";
     }
 
     return true;
@@ -393,8 +407,9 @@ Eigen::MatrixXd FtBuffClient::dataMat() {
 
 //*************************************************************************************************************
 
-SimpleStorage FtBuffClient::chunkData() {
-    return m_ssChunkData;
+QBuffer* FtBuffClient::chunkData() {
+    //return *(m_ssChunkData.data());
+    return &bData_CHANNEL_NAMES;
 }
 
 //*************************************************************************************************************
