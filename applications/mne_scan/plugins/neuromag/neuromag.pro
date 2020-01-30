@@ -39,7 +39,7 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += NEUROMAG_LIBRARY
+DEFINES += NEUROMAG_PLUGIN
 
 QT += widgets
 QT += network
@@ -50,14 +50,6 @@ CONFIG(debug, debug|release) {
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
-
-contains(MNECPP_CONFIG, static) {
-    CONFIG += staticlib
-    DEFINES += STATICLIB
-} else {
-    CONFIG += shared
-}
-
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -75,8 +67,7 @@ CONFIG(debug, debug|release) {
             -lscMeasd \
             -lscDispd \
             -lscSharedd
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \

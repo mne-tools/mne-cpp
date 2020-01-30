@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "dummysetupwidget.h"
+#include "../ui_dummysetup.h"
 
 
 //*************************************************************************************************************
@@ -56,6 +57,7 @@
 //=============================================================================================================
 
 using namespace DUMMYTOOLBOXPLUGIN;
+using namespace Ui;
 
 
 //*************************************************************************************************************
@@ -67,10 +69,11 @@ DummySetupWidget::DummySetupWidget(DummyToolbox* toolbox, QWidget *parent)
 : QWidget(parent)
 , m_pDummyToolbox(toolbox)
 {
-    ui.setupUi(this);
+    m_pUi = new DummySetupWidgetClass();
+    m_pUi->setupUi(this);
 
-    //Always connect GUI elemts after ui.setpUi has been called
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+    //Always connect GUI elemts after m_pUi->setpUi has been called
+    connect(m_pUi->m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 }
 
 
