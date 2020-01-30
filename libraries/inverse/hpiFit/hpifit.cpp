@@ -357,8 +357,8 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     if(bDoDebug) {
         // DEBUG HPI fitting and write debug results
-        std::cout << std::endl << std::endl << "HPIFit::fitHPI - dpfiterror" << coil.dpfiterror << std::endl << coil.pos << std::endl;
-        std::cout << std::endl << std::endl << "HPIFit::fitHPI - Initial seed point for HPI coils" << std::endl << coil.pos << std::endl;
+        std::cout << std::endl << std::endl << "HPIFit::fitHPI - dpfiterror" << coil.dpfiterror << std::endl << std::endl;
+        std::cout << std::endl << std::endl << "HPIFit::fitHPI - Initial seed point for HPI coils" << std::endl << coilPos << std::endl;
         std::cout << std::endl << std::endl << "HPIFit::fitHPI - temp" << std::endl << temp << std::endl;
         std::cout << std::endl << std::endl << "HPIFit::fitHPI - testPos" << std::endl << testPos << std::endl;
         std::cout << std::endl << std::endl << "HPIFit::fitHPI - Diff fitted - original" << std::endl << diffPos << std::endl;
