@@ -232,7 +232,7 @@ protected:
     * @brief parseHeader -
     * @param chunkData - Chunk data from header file
     */
-    void parseHeader(SimpleStorage chunkData);
+    void parseHeader(QBuffer* chunkData);
 
 private:
 
