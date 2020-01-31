@@ -173,9 +173,13 @@ bool FtBuffClient::readHeader() {
 //        qDebug() << "";
         qDebug() << "Extended Buffer";
         const ft_chunk_t* chanNames = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_CHANNEL_NAMES);
-        //const ft_chunk_t* neuromagHead = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_NEUROMAG_HEADER);
+        const ft_chunk_t* neuromagHead = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_NEUROMAG_HEADER);
     //    const ft_chunk_t* neuromagIso = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_ISOTRAK);
     //    const ft_chunk_t* neuromagHPI = find_chunk(chunkData.data(), 0, chunkData.size(), FT_CHUNK_NEUROMAG_HPIRESULT);
+
+        if (chanNames->def.type == FT_CHUNK_CHANNEL_NAMES)      qDebug() << "Found channel name chunk";
+        if (neuromagHead->def.type ==FT_CHUNK_NEUROMAG_HEADER)  qDebug() << "Found neuromag cheader chunk";
+
         qDebug() << "parsed header";
         bData_CHANNEL_NAMES.open(QIODevice::ReadWrite);
         bData_CHANNEL_NAMES.write(chanNames->data, chanNames->def.size);
