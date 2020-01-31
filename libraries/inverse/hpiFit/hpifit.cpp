@@ -118,7 +118,9 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     }
 
     vGof.clear();
-
+    // Setup Constructors for Coil Set
+    FwdCoilSet* templates = NULL;
+    FwdCoilSet* megCoils = NULL;
     struct SensorInfo sensors;
     struct CoilParam coil;
     int numCh = pFiffInfo->nchan;
@@ -188,8 +190,11 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         }
     }
 
-    // Get the indices of inner layer channels and exclude bad channels.
+    // Get the indices of inner layer channels and exclude bad channels and create
+    // channellist with used channels.
     //TODO: Only supports babymeg and vectorview gradiometeres for hpi fitting.
+
+    QList<FiffChInfo> channels;
     QVector<int> innerind(0);
 
     for (int i = 0; i < numCh; ++i) {
@@ -200,9 +205,23 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
             // Check if the sensor is bad, if not append to innerind
             if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
                 innerind.append(i);
+                channels.append(pFiffInfo->chs[i]);
             }
         }
     }
+
+    // Create MEG-Coils and read doil_def.dat
+    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+    int acc = 2;
+    int nch = channels.size();
+    FiffCoordTransOld t = FiffCoordTransOld();
+    qDebug() << "Reading Coil_def.dat ...";
+    templates = FwdCoilSet::read_coil_defs(qPath);
+    qDebug() << "[done]";
+    qDebug() << "Creating MEG Coils ...";
+    megCoils = templates->create_meg_coils(channels,nch,acc,&t);
+    qDebug() << "Coils created: " << megCoils->ncoil;
+    qDebug() << "Coordinateframe: " << megCoils->coord_frame;
 
     //Create new projector based on the excluded channels, first exclude the rows then the columns
     MatrixXd matProjectorsRows(innerind.size(),t_matProjectors.cols());
