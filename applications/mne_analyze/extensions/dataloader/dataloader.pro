@@ -3,7 +3,7 @@
 # @file     dataloader.pro
 # @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
-# @version  1.0
+# @version  dev
 # @date     July, 2017
 #
 # @section  LICENSE
@@ -59,8 +59,7 @@ CONFIG(debug, debug|release) {
             -lanShared
 }
 
-win32: DLLDESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
-unix: DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
+DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 
 SOURCES += \
     dataloader.cpp \
@@ -74,6 +73,8 @@ HEADERS += \
 FORMS += \
     FormFiles/dataloadercontrol.ui
 
+OTHER_FILES += dataloader.json
+
 RESOURCES += \
 
 RESOURCE_FILES +=\
@@ -82,6 +83,7 @@ RESOURCE_FILES +=\
 COPY_CMD = $$copyResources($${RESOURCE_FILES})
 QMAKE_POST_LINK += $${COPY_CMD}
 
+# Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
@@ -94,7 +96,13 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_extensions
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
-OTHER_FILES += dataloader.json
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes
+
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../../lib
+}
 
 # Activate FFTW backend in Eigen for non-static builds only
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
