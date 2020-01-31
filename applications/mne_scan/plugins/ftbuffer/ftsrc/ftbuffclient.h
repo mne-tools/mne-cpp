@@ -215,7 +215,11 @@ private:
     SimpleStorage                   m_ssFloatStore;             /**< container to store buffer data as float */
     Eigen::MatrixXd*                m_pMatEmit;                 /**< container to format data to tansmit to FtBuffProducer */
 
-    QBuffer         bData_CHANNEL_NAMES;
+    QBuffer                         bData_CHANNEL_NAMES;        /**< buffer to emit channel name chunk data */
+    QBuffer                         bData_NEUROMAG_HEADER;      /**< buffer to emit neuromag header chunk data */
+//    QBuffer                         bData_NEUROMAG_ISOTRAK;
+//    QBuffer                         bData_NEUROMAG_HPIRESULT;
+
 };
 
 #endif // FTBUFFCLIENT_H
