@@ -64,7 +64,7 @@ SUBDIRS += \
 
 # Overwrite SUBDIRS if wasm flag was defined
 contains(MNECPP_CONFIG, wasm) {
-    SUBDIRS =
+    SUBDIRS = mne_analyze
 
     qtHaveModule(charts) {
         #SUBDIRS += # needs qt3D which is not yet wasm supported
