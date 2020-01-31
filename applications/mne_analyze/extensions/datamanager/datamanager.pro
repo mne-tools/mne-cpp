@@ -4,7 +4,7 @@
 # @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Lars Debor <Lars.Debor@tu-ilmenau.de>;
 #           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
-# @version  1.0
+# @version  dev
 # @date     March, 2017
 #
 # @section  LICENSE
@@ -52,18 +52,15 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lanSharedd
 } else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lanShared
 }
 
-win32: DLLDESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
-unix: DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
+DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 
 SOURCES += \
     datamanager.cpp \
@@ -77,6 +74,8 @@ HEADERS += \
 FORMS += \
     FormFiles/datamanagerview.ui
 
+OTHER_FILES += datamanager.json
+
 RESOURCES += \
 
 RESOURCE_FILES +=\
@@ -85,6 +84,7 @@ RESOURCE_FILES +=\
 COPY_CMD = $$copyResources($${RESOURCE_FILES})
 QMAKE_POST_LINK += $${COPY_CMD}
 
+# Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
@@ -97,9 +97,13 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_extensions
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
+# suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
-OTHER_FILES += datamanager.json
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../../lib
+}
 
 # Activate FFTW backend in Eigen
 contains(MNECPP_CONFIG, useFFTW) {

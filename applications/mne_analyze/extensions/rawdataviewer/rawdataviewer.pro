@@ -4,7 +4,7 @@
 # @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Lars Debor <Lars.Debor@tu-ilmenau.de>;
 #           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
-# @version  1.0
+# @version  dev
 # @date     October, 2018
 #
 # @section  LICENSE
@@ -79,8 +79,7 @@ CONFIG(debug, debug|release) {
             -lanShared
 }
 
-win32: DLLDESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
-unix: DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
+DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_extensions
 
 SOURCES += \
     rawdataviewer.cpp \
@@ -98,6 +97,8 @@ HEADERS += \
 FORMS += \
     FormFiles/rawdataviewercontrol.ui
 
+OTHER_FILES += rawdataviewer.json
+
 RESOURCES += \
 
 RESOURCE_FILES +=\
@@ -106,7 +107,8 @@ RESOURCE_FILES +=\
 COPY_CMD = $$copyResources($${RESOURCE_FILES})
 QMAKE_POST_LINK += $${COPY_CMD}
 
-UI_DIR = $${PWD}
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -118,7 +120,13 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_extensions
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
-OTHER_FILES += rawdataviewer.json
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes
+
+unix:!macx {
+    # === Unix ===
+    QMAKE_RPATHDIR += $ORIGIN/../../lib
+}
 
 # Activate FFTW backend in Eigen
 contains(MNECPP_CONFIG, useFFTW) {
