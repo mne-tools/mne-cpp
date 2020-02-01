@@ -51,7 +51,6 @@
 
 #include <fwd/fwd_coil_set.h>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -321,7 +320,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
             coilPos(j,1) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[1] * 0.03 + y;
             coilPos(j,2) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[2] * 0.03 + z;
         }
-
         //std::cout << "HPIFit::fitHPI - Coil " << j << " max value index " << chIdx << std::endl;
     }
 
