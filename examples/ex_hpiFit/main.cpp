@@ -124,8 +124,7 @@ int main(int argc, char *argv[])
     }
     qDebug() << "[done]\n";
 
-    // read coil_def.dat
-    //Read coil_def.dat file
+    // Read coil_def.dat file
     // Setup Constructors for Coil Set
     FwdCoilSet* templates = NULL;
     FwdCoilSet* megCoils = NULL;
@@ -146,36 +145,41 @@ int main(int argc, char *argv[])
 
     // Create MEG-Coils and read data
     int acc = 2;
+    int nch = channels.size();
     FiffCoordTransOld t = FiffCoordTransOld();
     qDebug() << "Reading Coil_def.dat ...";
     templates = FwdCoilSet::read_coil_defs(qPath);
     qDebug() << "[done]";
-    //megCoils = templates->create_meg_coils(channels,pFiffInfo->nchan,acc,&t);
-    //std::cout << "megCoils->ncoil: " << megCoils->ncoil;
 
-    // setup informations to be passed to fitHPI
-    QVector<int> vFreqs {166,154,161,158};
-    QVector<double> vGof;
-    FiffDigPointSet fittedPointSet;
-    Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
+    megCoils = templates->create_meg_coils(channels,nch,acc,&t);
+    FwdCoil coils = **megCoils->coils;
 
-    qDebug() << "raw.info sfreq: " << vFreqs;
+    qDebug() << "*coils.w: " << *(coils.w+5);
+    qDebug() << "*coils.r0: "<< *(coils.r0+2);
+    qDebug() << "**coils.rmag: " << *(*coils.rmag+2);
+//    // setup informations to be passed to fitHPI
+//    QVector<int> vFreqs {166,154,161,158};
+//    QVector<double> vGof;
+//    FiffDigPointSet fittedPointSet;
+//    Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
 
-    // enable debug
-    bool bDoDebug = true;
-    QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
-    qDebug() << "HPI-Fit... \n";
-    HPIFit::fitHPI(matData,
-                   matProjectors,
-                   raw.info.dev_head_t,
-                   vFreqs,
-                   vGof,
-                   fittedPointSet,
-                   pFiffInfo,
-                   bDoDebug,
-                   sHPIResourceDir);
+//    qDebug() << "raw.info sfreq: " << vFreqs;
 
-    std::cout << "[done]\n";
+//    // enable debug
+//    bool bDoDebug = true;
+//    QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
+//    qDebug() << "HPI-Fit... \n";
+//    HPIFit::fitHPI(matData,
+//                   matProjectors,
+//                   raw.info.dev_head_t,
+//                   vFreqs,
+//                   vGof,
+//                   fittedPointSet,
+//                   pFiffInfo,
+//                   bDoDebug = 0,
+//                   sHPIResourceDir);
+
+//    std::cout << "[done]\n";
 
     return a.exec();
 }
