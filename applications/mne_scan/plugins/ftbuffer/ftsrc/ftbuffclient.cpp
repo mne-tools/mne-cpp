@@ -180,24 +180,24 @@ bool FtBuffClient::readHeader() {
 //        const ft_chunk_t* neuromagHPI = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_NEUROMAG_HPIRESULT);
 
         if (chanNames != Q_NULLPTR) {
-            qDebug() << "Found channel name chunk";
+            qDebug() << "Found channel name chunk of size" << chanNames->def.size;
             m_bChunkData = true;
 
             bData_CHANNEL_NAMES.open(QIODevice::ReadWrite);
-            bData_CHANNEL_NAMES.write(chanNames->data, chanNames->def.size);
+            bData_CHANNEL_NAMES.setData(chanNames->data, chanNames->def.size);
             bData_CHANNEL_NAMES.close();
 
-            qDebug() << "Created channel name qbuffer";
+            qDebug() << "Created channel name qbuffer of size" << bData_CHANNEL_NAMES.size();
         }
         if (neuromagHead != Q_NULLPTR) {
-            qDebug() << "Found neuromag cheader chunk";
+            qDebug() << "Found neuromag cheader chunk of size" << neuromagHead->def.size;
             m_bChunkData = true;
 
             bData_NEUROMAG_HEADER.open(QIODevice::ReadWrite);
-            bData_NEUROMAG_HEADER.write(neuromagHead->data, neuromagHead->def.size);
+            bData_NEUROMAG_HEADER.setData(neuromagHead->data, neuromagHead->def.size);
             bData_NEUROMAG_HEADER.close();
 
-            qDebug() << "Created neuromag header qbuffer";
+            qDebug() << "Created neuromag header qbuffer of size" << bData_NEUROMAG_HEADER.size();
         }
 //        if (neuromagIso != Q_NULLPTR) {
 //            qDebug() << "Found neuromag isotrak chunk";
@@ -219,11 +219,6 @@ bool FtBuffClient::readHeader() {
 
 //            qDebug() << "Created neuromag hpi qbuffer";
 //        }
-
-
-
-
-
 
     }
 
@@ -394,7 +389,7 @@ void FtBuffClient::idleCall() {
     int count = 0;
     for (int i = 0; i < int (ddef.nsamples); i++) {
         for (int j = 0; j < int (ddef.nchans); j++) {
-            matData(j,i) = fdata[count];
+            matData(j,i) = fdata[count]/100000;
             //if (count % 32 == 0) qDebug() << "---Blockstart---" << count/32;
             //qDebug() << fdata[count];
             count++;
@@ -455,7 +450,6 @@ QBuffer* FtBuffClient::chunkData() {
     //return *(m_ssChunkData.data());
     //return &bData_CHANNEL_NAMES;
     return &bData_NEUROMAG_HEADER;
-
 }
 
 //*************************************************************************************************************
