@@ -83,6 +83,47 @@ using namespace FWDLIB;
  * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
+
+struct SInfo {
+    Eigen::RowVector3d r0;
+    Eigen::MatrixXd rmag;
+    Eigen::MatrixXd cosmag;
+    Eigen::MatrixXd tra;
+    Eigen::RowVectorXd w;
+    int np;
+};
+
+void create_sensor_set(QList<SInfo>& sensors, FwdCoilSet* coils){
+    int nchan = coils->ncoil;
+    std::cout << nchan << std::endl;
+    for(int i = 0; i < nchan; i++){
+        SInfo s;
+        FwdCoil* coil = (coils->coils[i]);
+        int np = coil->np;
+        Eigen::MatrixXd rmag = Eigen::MatrixXd::Zero(np,3);
+        Eigen::MatrixXd cosmag = Eigen::MatrixXd::Zero(np,3);
+        Eigen::RowVectorXd w(8);
+
+        std::cout << np << std::endl;
+        std::cout << "r0: " << coil->r0[0] << std::endl;
+        s.r0(0) = coil->r0[0];
+        s.r0(1) = coil->r0[1];
+        s.r0(2) = coil->r0[2];
+        std::cout << "r0: " << coil->r0[0] << std::endl;
+        for (int p = 0; p < np; p++){
+            w(p) = coil->w[p];
+            for (int c = 0; c < 3; c++) {
+                rmag(p,c)   = coil->rmag[p][c];
+                cosmag(p,c) = coil->cosmag[p][c];
+            }
+        }
+        s.w = w;
+        s.cosmag = cosmag;
+        s.rmag = rmag;
+        sensors.append(s);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
@@ -146,17 +187,24 @@ int main(int argc, char *argv[])
     // Create MEG-Coils and read data
     int acc = 2;
     int nch = channels.size();
-    FiffCoordTransOld t = FiffCoordTransOld();
+    FiffCoordTransOld* t = NULL;
+
     qDebug() << "Reading Coil_def.dat ...";
     templates = FwdCoilSet::read_coil_defs(qPath);
     qDebug() << "[done]";
 
-    megCoils = templates->create_meg_coils(channels,nch,acc,&t);
-    FwdCoil coils = **megCoils->coils;
+    megCoils = templates->create_meg_coils(channels,nch,acc,t);
+    FwdCoil* coils = *megCoils->coils;
 
-    qDebug() << "*coils.w: " << *(coils.w+5);
-    qDebug() << "*coils.r0: "<< *(coils.r0+2);
-    qDebug() << "**coils.rmag: " << *(*coils.rmag+2);
+    qDebug() << "*coils.w: " << coils[0].w[1];
+    qDebug() << "*coils.r0: "<< coils[0].r0[2];
+    qDebug() << "**coils.rmag: " << coils[0].rmag[0][1];
+    qDebug() << "Integration points" << coils[0].np;
+
+    QList<SInfo> info;
+    create_sensor_set(info,megCoils);
+    std::cout << "create sensor done" << std::endl;
+
 //    // setup informations to be passed to fitHPI
 //    QVector<int> vFreqs {166,154,161,158};
 //    QVector<double> vGof;
