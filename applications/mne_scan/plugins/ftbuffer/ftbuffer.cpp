@@ -358,17 +358,26 @@ void FtBuffer::parseHeader(QBuffer* chunkData) {
     qDebug() << "";
 
 
-    char ch;
+//    char ch;
     chunkData->open(QBuffer::ReadWrite);
-    chunkData->seek(0);
-    qDebug() << "test read:" << chunkData->getChar(&ch) << ch
-                             << chunkData->getChar(&ch) << ch
-                             << chunkData->getChar(&ch) << ch;
-
-    chunkData->close();
+    qDebug() << "Data buffer of size" << chunkData->size();
+//    qDebug() << "test read:" << chunkData->getChar(&ch) << ch
+//                             << chunkData->getChar(&ch) << ch
+//                             << chunkData->getChar(&ch) << ch;
 
     m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(*chunkData));
 
+    qDebug() << "Buffer fed to FiffRawData, now buffer of size" << chunkData->size();
+
+//    QFile file("mytestoutput.txt");
+
+//    if(!file.open(QIODevice::ReadWrite)){
+//        qDebug() << "Could not open file";
+//    } else {
+//        file.write(chunkData->read(chunkData->size()));
+//    }
+
+    chunkData->close();
 }
 
 //*************************************************************************************************************
