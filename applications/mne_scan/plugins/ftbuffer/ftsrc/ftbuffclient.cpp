@@ -183,9 +183,9 @@ bool FtBuffClient::readHeader() {
             qDebug() << "Found channel name chunk of size" << chanNames->def.size;
             m_bChunkData = true;
 
-            bData_CHANNEL_NAMES.open(QIODevice::ReadWrite);
+            //bData_CHANNEL_NAMES.open(QIODevice::ReadWrite);
             bData_CHANNEL_NAMES.setData(chanNames->data, chanNames->def.size);
-            bData_CHANNEL_NAMES.close();
+            //bData_CHANNEL_NAMES.close();
 
             qDebug() << "Created channel name qbuffer of size" << bData_CHANNEL_NAMES.size();
         }
@@ -193,9 +193,9 @@ bool FtBuffClient::readHeader() {
             qDebug() << "Found neuromag cheader chunk of size" << neuromagHead->def.size;
             m_bChunkData = true;
 
-            bData_NEUROMAG_HEADER.open(QIODevice::ReadWrite);
+            //bData_NEUROMAG_HEADER.open(QIODevice::ReadWrite);
             bData_NEUROMAG_HEADER.setData(neuromagHead->data, neuromagHead->def.size);
-            bData_NEUROMAG_HEADER.close();
+            //bData_NEUROMAG_HEADER.close();
 
             qDebug() << "Created neuromag header qbuffer of size" << bData_NEUROMAG_HEADER.size();
         }
