@@ -203,7 +203,6 @@ private:
     uint                            m_uiNumSamples;             /**< How many samples are in the buffer */
     float                           m_iSampleFrequency;         /**< Sampling frequency of the data in the buffer */
 
-    QSharedPointer<SimpleStorage>   m_ssChunkData;              /**< Contains optional chunk data tha can be read with buffer header */
     bool                            m_bChunkData;               /**< Whether the header has chunk data */
 
     const char*                     m_pcAddrField;              /**< Address of where to connect to the buffer */

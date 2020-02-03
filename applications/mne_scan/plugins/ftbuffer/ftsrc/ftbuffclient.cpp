@@ -166,7 +166,7 @@ bool FtBuffClient::readHeader() {
 //            qDebug () << "Neuromag header found, size" << neuromagHead->def.size;
 //        }
 
-        m_bChunkData = true;
+
 
 //        qDebug() << "";
 //        qDebug() << "Set m_bChunkData to true";
@@ -179,35 +179,51 @@ bool FtBuffClient::readHeader() {
 //        const ft_chunk_t* neuromagIso = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_NEUROMAG_ISOTRAK);
 //        const ft_chunk_t* neuromagHPI = find_chunk(chunkBuffer.data(), 0, chunkBuffer.size(), FT_CHUNK_NEUROMAG_HPIRESULT);
 
-        if (chanNames->def.type == FT_CHUNK_CHANNEL_NAMES)      qDebug() << "Found channel name chunk";
-        if (neuromagHead->def.type ==FT_CHUNK_NEUROMAG_HEADER)  qDebug() << "Found neuromag cheader chunk";
-//        if (neuromagIso->def.type ==FT_CHUNK_NEUROMAG_ISOTRAK)  qDebug() << "Found neuromag isotrak chunk";
-//        if (neuromagHPI->def.type ==FT_CHUNK_NEUROMAG_HPIRESULT)  qDebug() << "Found neuromag hpi chunk";
+        if (chanNames != Q_NULLPTR) {
+            qDebug() << "Found channel name chunk";
+            m_bChunkData = true;
 
-        bData_CHANNEL_NAMES.open(QIODevice::ReadWrite);
-        bData_CHANNEL_NAMES.write(chanNames->data, chanNames->def.size);
-        bData_CHANNEL_NAMES.close();
+            bData_CHANNEL_NAMES.open(QIODevice::ReadWrite);
+            bData_CHANNEL_NAMES.write(chanNames->data, chanNames->def.size);
+            bData_CHANNEL_NAMES.close();
 
-        qDebug() << "Created channel name qbuffer";
+            qDebug() << "Created channel name qbuffer";
+        }
+        if (neuromagHead != Q_NULLPTR) {
+            qDebug() << "Found neuromag cheader chunk";
+            m_bChunkData = true;
 
-        bData_NEUROMAG_HEADER.open(QIODevice::ReadWrite);
-        bData_NEUROMAG_HEADER.write(neuromagHead->data, neuromagHead->def.size);
-        bData_NEUROMAG_HEADER.close();
+            bData_NEUROMAG_HEADER.open(QIODevice::ReadWrite);
+            bData_NEUROMAG_HEADER.write(neuromagHead->data, neuromagHead->def.size);
+            bData_NEUROMAG_HEADER.close();
 
-        qDebug() << "Created neuromag header qbuffer";
+            qDebug() << "Created neuromag header qbuffer";
+        }
+//        if (neuromagIso != Q_NULLPTR) {
+//            qDebug() << "Found neuromag isotrak chunk";
+//            m_bChunkData = true;
 
-//        bData_NEUROMAG_ISOTRAK.open(QIODevice::ReadWrite);
-//        bData_NEUROMAG_ISOTRAK.write(neuromagIso->data, neuromagIso->def.size);
-//        bData_NEUROMAG_ISOTRAK.close();
+//            bData_NEUROMAG_ISOTRAK.open(QIODevice::ReadWrite);
+//            bData_NEUROMAG_ISOTRAK.write(neuromagIso->data, neuromagIso->def.size);
+//            bData_NEUROMAG_ISOTRAK.close();
 
-//        qDebug() << "Created neuromag isotrak qbuffer";
+//            qDebug() << "Created neuromag isotrak qbuffer";
+//        }
+//        if (neuromagHPI != Q_NULLPTR) {
+//            qDebug() << "Found neuromag hpi chunk";
+//            m_bChunkData = true;
 
-//        bData_NEUROMAG_HPIRESULT.open(QIODevice::ReadWrite);
-//        bData_NEUROMAG_HPIRESULT.write(neuromagHPI->data, neuromagHPI->def.size);
-//        bData_NEUROMAG_HPIRESULT.close();
+//            bData_NEUROMAG_HPIRESULT.open(QIODevice::ReadWrite);
+//            bData_NEUROMAG_HPIRESULT.write(neuromagHPI->data, neuromagHPI->def.size);
+//            bData_NEUROMAG_HPIRESULT.close();
+
+//            qDebug() << "Created neuromag hpi qbuffer";
+//        }
 
 
-//        qDebug() << "Created neuromag hpi qbuffer";
+
+
+
 
     }
 
@@ -437,8 +453,8 @@ Eigen::MatrixXd FtBuffClient::dataMat() {
 
 QBuffer* FtBuffClient::chunkData() {
     //return *(m_ssChunkData.data());
-    return &bData_CHANNEL_NAMES;
-    //return &bData_NEUROMAG_HEADER;
+    //return &bData_CHANNEL_NAMES;
+    return &bData_NEUROMAG_HEADER;
 
 }
 
