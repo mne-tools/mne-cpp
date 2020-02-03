@@ -103,6 +103,8 @@ public:
      */
     FiffRawData(QIODevice &p_IODevice);
 
+    FiffRawData(QIODevice &p_IODevice, bool b_littleEndian);
+
     //=========================================================================================================
     /**
      * Destroys the FiffInfo.

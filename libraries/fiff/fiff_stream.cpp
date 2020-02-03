@@ -1624,10 +1624,18 @@ bool FiffStream::read_tag(FiffTag::SPtr &p_pTag, fiff_long_t pos)
     //
     // Read data when available
     //
+    int endian;
+    if (this->byteOrder()){
+        endian = 1;
+    } else {
+        endian = 2;
+    }
+
     if (p_pTag->size() > 0)
     {
         this->readRawData(p_pTag->data(), p_pTag->size());
-        FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+        //FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
+        FiffTag::convert_tag_data(p_pTag,endian,FIFFV_NATIVE_ENDIAN);
     }
 
     if (p_pTag->next != FIFFV_NEXT_SEQ)
@@ -1638,13 +1646,17 @@ bool FiffStream::read_tag(FiffTag::SPtr &p_pTag, fiff_long_t pos)
 
 //=============================================================================================================
 
-bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool allow_maxshield)
+bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool allow_maxshield, bool is_littleEndian)
 {
     //
     //   Open the file
     //
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
     QString t_sFileName = t_pStream->streamName();
+
+    if(is_littleEndian){
+        t_pStream->setByteOrder(QDataStream::LittleEndian);
+    }
 
     printf("Opening raw data %s...\n",t_sFileName.toUtf8().constData());
 

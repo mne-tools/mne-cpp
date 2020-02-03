@@ -77,6 +77,21 @@ FiffRawData::FiffRawData(QIODevice &p_IODevice)
 
 //=============================================================================================================
 
+FiffRawData::FiffRawData(QIODevice &p_IODevice, bool b_littleEndian)
+: first_samp(-1)
+, last_samp(-1)
+{
+    //setup FiffRawData object
+    if(!FiffStream::setup_read_raw(p_IODevice, *this, false, b_littleEndian))
+    {
+        printf("\tError during fiff setup raw read.\n");
+        //exit(EXIT_FAILURE); //ToDo Throw here, e.g.: throw std::runtime_error("IO Error! File not found");
+        return;
+    }
+}
+
+//=============================================================================================================
+
 FiffRawData::FiffRawData(const FiffRawData &p_FiffRawData)
 : file(p_FiffRawData.file)
 , info(p_FiffRawData.info)
