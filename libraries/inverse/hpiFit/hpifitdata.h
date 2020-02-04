@@ -157,7 +157,7 @@ public:
     Eigen::MatrixXd     coilPos;
     Eigen::RowVectorXd  sensorData;
     DipFitError         errorInfo;
-    SensorInfo          sensorPos;
+    QList<SInfo>        sensorSet;
     Eigen::MatrixXd     matProjector;
 
 protected:
@@ -177,7 +177,7 @@ protected:
      * The function has been compared with matlab ft_compute_leadfield and it gives
      * same output.
      */
-    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos, const struct SensorInfo& sensors);
+    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos, const QList<SInfo>& sensorSet);
 
     //=========================================================================================================
     /**
@@ -186,7 +186,7 @@ protected:
      * The function has been compared with matlab dipfit_error and it gives
      * same output
      */
-    DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const struct SensorInfo& sensors, const Eigen::MatrixXd& matProjectors);
+    DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const QList<SInfo>& sensorSet, const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
     /**
@@ -206,7 +206,7 @@ protected:
                                int display,
                                const Eigen::MatrixXd& data,
                                const Eigen::MatrixXd& matProjectors,
-                               const struct SensorInfo& sensors,
+                               const QList<SInfo>& sensorSet,
                                int &simplex_numitr);
 };
 
