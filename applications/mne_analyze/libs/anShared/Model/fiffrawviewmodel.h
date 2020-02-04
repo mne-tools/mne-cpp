@@ -412,7 +412,8 @@ inline qint32 FiffRawViewModel::sampleWindowSize() const {
 inline void FiffRawViewModel::setDataColumnWidth(int iWidth) {
     qDebug() << "FiffRawViewModel::setDataColumnWidth - m_iVisibleWindowSize" << m_iVisibleWindowSize;
     qDebug() << "FiffRawViewModel::setDataColumnWidth - m_iSamplesPerBlock" << m_iSamplesPerBlock;
-    m_dDx = (double)iWidth/double(m_iVisibleWindowSize*m_iSamplesPerBlock);
+    qDebug() << "FiffRawViewModel::setDataColumnWidth - iWidth" << iWidth;
+    m_dDx = (double)iWidth / double(m_iVisibleWindowSize*m_iSamplesPerBlock);
     qDebug() << "FiffRawViewModel::setDataColumnWidth - m_dDx" << m_dDx;
 }
 
