@@ -114,7 +114,7 @@ bool FtBuffer::start() {
     // FtProducer in it's own thread and connect communications signals/slots
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
-    connect(m_pFtBuffProducer.data(), &FtBuffProducer::extendedHeaderChunks, this, &FtBuffer::parseHeader);
+    connect(m_pFtBuffProducer.data(), &FtBuffProducer::extendedHeaderChunks, this, &FtBuffer::parseHeader, Qt::DirectConnection);
     connect(this, &FtBuffer::workCommand, m_pFtBuffProducer.data(),&FtBuffProducer::doWork);
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::bufferParameters, this, &FtBuffer::setParams, Qt::DirectConnection);
     m_pProducerThread.start();
@@ -343,6 +343,8 @@ void FtBuffer::setupRTMSA() {
     if(!m_bCustomFiff){
         qDebug() << "Default Fiff:";
         setUpFiffInfo();
+    } else {
+        m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo (m_pNeuromagHeadChunkData->info));
     }
 
     //Set the channel size of the RMTSA
@@ -359,26 +361,47 @@ void FtBuffer::parseHeader(QBuffer* chunkData) {
 
 
 //    char ch;
-    chunkData->open(QBuffer::ReadWrite);
+//    chunkData->open(QBuffer::ReadWrite);
     qDebug() << "Data buffer of size" << chunkData->size();
 //    qDebug() << "test read:" << chunkData->getChar(&ch) << ch
 //                             << chunkData->getChar(&ch) << ch
 //                             << chunkData->getChar(&ch) << ch;
 
 
-    m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(*chunkData, true));
+    QFile infile("neuromag2ft.fif");
 
-    qDebug() << "Buffer fed to FiffRawData, now buffer of size" << chunkData->size();
+    QBuffer mynewbuffer;
 
-    QFile file("mytestoutput.txt");
+    mynewbuffer.open(QIODevice::ReadWrite);
 
-    if(!file.open(QIODevice::ReadWrite)){
+    if(!infile.open(QIODevice::ReadOnly)){
         qDebug() << "Could not open file";
     } else {
-        file.write(chunkData->read(chunkData->size()));
+        mynewbuffer.write(infile.readAll());
     }
 
-    chunkData->close();
+    qDebug() << "My new buffer of size" << mynewbuffer.size();
+
+//    mynewbuffer.seek(0);
+
+    m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(mynewbuffer));
+
+    //qDebug() << "Buffer fed to FiffRawData, now buffer of size" << chunkData->size();
+
+    m_bCustomFiff = true;
+
+
+//    QFile outfile("mytestoutput.txt");
+
+//    if(!outfile.open(QIODevice::ReadWrite)){
+//        qDebug() << "Could not open file";
+//    } else {
+//        outfile.write(mynewbuffer.read(mynewbuffer.size()));
+//    }
+
+//    outfile.close();
+
+//    chunkData->close();
 }
 
 //*************************************************************************************************************

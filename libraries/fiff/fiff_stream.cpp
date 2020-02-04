@@ -279,6 +279,7 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
     }
     m_id = t_pTag->toFiffID();
 
+    printf("trying to read tag 1\n");
     this->read_tag(t_pTag);
     if (t_pTag->kind != FIFF_DIR_POINTER) {
         printf("Fiff::open: file does have a directory pointer");//consider throw
@@ -286,11 +287,13 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
         return false;
     }
 
+    printf("breakpoint?\n");
+
     //
     //   Read or create the directory tree
     //
     //printf("\nCreating tag directory for %s...", t_sFileName.toUtf8().constData());
-
+    printf("test\n");
     m_dir.clear();
     qint32 dirpos = *t_pTag->toInt();
     /*
@@ -944,6 +947,7 @@ bool FiffStream::read_meas_info_base(const FiffDirNode::SPtr& p_Node, FiffInfoBa
 
 bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info, FiffDirNode::SPtr& p_NodeInfo)
 {
+    printf("Reading measurment info");
 //    if (info)
 //        delete info;
     info.clear();
@@ -1603,6 +1607,7 @@ bool FiffStream::read_rt_tag(FiffTag::SPtr &p_pTag)
 
 bool FiffStream::read_tag(FiffTag::SPtr &p_pTag, fiff_long_t pos)
 {
+    printf("Reading tag\n");
     if (pos >= 0) {
         this->device()->seek(pos);
     }
@@ -1625,22 +1630,27 @@ bool FiffStream::read_tag(FiffTag::SPtr &p_pTag, fiff_long_t pos)
     // Read data when available
     //
     int endian;
-    if (this->byteOrder()){
-        endian = 1;
+    if (this->byteOrder() == QDataStream::LittleEndian){
+        endian = FIFFV_LITTLE_ENDIAN;
+        printf("Endian: Little\n");
     } else {
-        endian = 2;
+        endian = FIFFV_BIG_ENDIAN;
+        printf("Endian: Big\n");
     }
 
     if (p_pTag->size() > 0)
     {
+        printf("Reading tag of size greater than 0\n");
         this->readRawData(p_pTag->data(), p_pTag->size());
         //FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
         FiffTag::convert_tag_data(p_pTag,endian,FIFFV_NATIVE_ENDIAN);
+        printf("tag data converted\n");
     }
 
     if (p_pTag->next != FIFFV_NEXT_SEQ)
         this->device()->seek(p_pTag->next);//fseek(fid,tag.next,'bof');
 
+    printf("returing\n");
     return true;
 }
 
@@ -1655,13 +1665,18 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     QString t_sFileName = t_pStream->streamName();
 
     if(is_littleEndian){
+        printf("Setting stream to little Endian\n");
         t_pStream->setByteOrder(QDataStream::LittleEndian);
     }
 
     printf("Opening raw data %s...\n",t_sFileName.toUtf8().constData());
 
-    if(!t_pStream->open())
+    if(!t_pStream->open()){
+        printf("Could not open stream\n");
         return false;
+    }
+
+    printf("Opened stream");
 
     //
     //   Read the measurement info
@@ -1701,6 +1716,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
             }
         }
     }
+    printf("No data of interest found\n");
     //
     //   Set up the output structure
     //
@@ -1727,6 +1743,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     FiffTag::SPtr t_pTag;
     if (dir[first]->kind == FIFF_FIRST_SAMPLE)
     {
+        printf("first sample tag\n");
         t_pStream->read_tag(t_pTag, dir[first]->pos);
         first_samp = *t_pTag->toInt();
         ++first;
@@ -1740,6 +1757,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
         //
         //  This first skip can be applied only after we know the buffer size
         //
+        printf("data skip tag");
         t_pStream->read_tag(t_pTag, dir[first]->pos);
         first_skip = *t_pTag->toInt();
         ++first;
@@ -1758,6 +1776,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
         FiffDirEntry::SPtr ent = dir[k];
         if (ent->kind == FIFF_DATA_SKIP)
         {
+            printf("data skip in loop\n");
             t_pStream->read_tag(t_pTag, ent->pos);
             nskip = *t_pTag->toInt();
         }
