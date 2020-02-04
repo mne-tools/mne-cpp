@@ -166,22 +166,32 @@ public:
     */
     bool extendedHeader();
 
+    //=========================================================================================================
+    /**
+    * @brief regularHeader - returns whether the header is extended, then sets flag back to false
+    * @return whether the header has no neuromag chunk data
+    */
     bool regularHeader();
 
+    //=========================================================================================================
+    /**
+    * @brief getChannelAndFrequency - returns channel and frequency parameters formatted as a qpair
+    * @return channel and frequency parameters as a QPair of <int,float> type
+    */
     QPair<int,float> getChannelAndFrequency();
 
 private:
 
     /**
-     * @brief readHeader - Attempts to get and read header from buffer. This gives us info about the data in the buffer.
-     * @return Returns whether header was succesffully retrieved and read.
-     */
+    * @brief readHeader - Attempts to get and read header from buffer. This gives us info about the data in the buffer.
+    * @return Returns whether header was succesffully retrieved and read.
+    */
     bool readHeader();
 
     //=========================================================================================================
     /**
-     * @brief idleCall - gets called repetedly to get new data from buffer.
-     */
+    * @brief idleCall - gets called repetedly to get new data from buffer.
+    */
     void idleCall();
 
     //=========================================================================================================
@@ -190,9 +200,9 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief isConnected - returns whether a connection is open with a buffer.
-     * @return true - connection open / false - no connection
-     */
+    * @brief isConnected - returns whether a connection is open with a buffer.
+    * @return true - connection open / false - no connection
+    */
     bool isConnected();
 
 //*************************************************************************************************************
