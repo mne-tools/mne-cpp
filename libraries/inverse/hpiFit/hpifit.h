@@ -164,7 +164,7 @@ protected:
      * @return Returns the coil parameters.
      */
     static CoilParam dipfit(struct CoilParam coil,
-                            const QList<struct SInfo>& sensorSet,
+                            const QList<struct Sensor>& sensorSet,
                             const Eigen::MatrixXd &data,
                             int numCoils,
                             const Eigen::MatrixXd &t_matProjectors);
@@ -189,7 +189,7 @@ protected:
      * @param[in] coils     The coilset to read the sensor information from.
      *
      */
-    static void create_sensor_set(QList<struct SInfo>& sensors, FWDLIB::FwdCoilSet* coils);
+    static void create_sensor_set(QList<struct Sensor>& sensors, FWDLIB::FwdCoilSet* coils);
 
     //=========================================================================================================
 

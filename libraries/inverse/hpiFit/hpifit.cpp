@@ -217,15 +217,11 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     int nch = channels.size();
     FiffCoordTransOld* t = NULL;
 
-    qDebug() << "Reading Coil_def.dat ...";
     templates = FwdCoilSet::read_coil_defs(qPath);
-    qDebug() << "[done]";
 
-    qDebug() << "Create Sensor List ...";
-    QList<SInfo> sensorSet;
+    QList<Sensor> sensorSet;
     megCoils = templates->create_meg_coils(channels,nch,acc,t);
     create_sensor_set(sensorSet,megCoils);
-    qDebug() << "[done]";
 
     //Create new projector based on the excluded channels, first exclude the rows then the columns
     MatrixXd matProjectorsRows(innerind.size(),t_matProjectors.cols());
@@ -418,7 +414,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 //*************************************************************************************************************
 
 CoilParam HPIFit::dipfit(struct CoilParam coil,
-                         const QList<SInfo>& sensorSet,
+                         const QList<Sensor>& sensorSet,
                          const Eigen::MatrixXd& data,
                          int numCoils,
                          const Eigen::MatrixXd& t_matProjectors)
@@ -533,10 +529,10 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
 
 //*************************************************************************************************************
 
-void HPIFit::create_sensor_set(QList<struct SInfo>& sensors, FwdCoilSet* coils){
+void HPIFit::create_sensor_set(QList<struct Sensor>& sensors, FwdCoilSet* coils){
     int nchan = coils->ncoil;
     for(int i = 0; i < nchan; i++){
-        SInfo s;
+        Sensor s;
         FwdCoil* coil = (coils->coils[i]);
         int np = coil->np;
         Eigen::MatrixXd rmag = Eigen::MatrixXd::Zero(np,3);

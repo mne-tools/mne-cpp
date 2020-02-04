@@ -91,7 +91,7 @@ void HPIFitData::doDipfitConcurrent()
     // Initialize variables
     Eigen::RowVectorXd currentCoil = this->coilPos;
     Eigen::VectorXd currentData = this->sensorData;
-    QList<SInfo> currentSensors = this->sensorSet;
+    QList<Sensor> currentSensors = this->sensorSet;
 
     int display = 0;
     int maxiter = 500;
@@ -171,7 +171,7 @@ Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd
 
 //*************************************************************************************************************
 
-Eigen::MatrixXd HPIFitData:: compute_leadfield(const Eigen::MatrixXd& pos, const struct SInfo& sensor)
+Eigen::MatrixXd HPIFitData:: compute_leadfield(const Eigen::MatrixXd& pos, const struct Sensor& sensor)
 {
 
     Eigen::MatrixXd pnt, ori, lf;
@@ -180,7 +180,6 @@ Eigen::MatrixXd HPIFitData:: compute_leadfield(const Eigen::MatrixXd& pos, const
     ori = sensor.cosmag; // orientation of each coil
 
     lf = magnetic_dipole(pos, pnt, ori);
-    tra =
     lf = tra * lf;
 
     return lf;
@@ -189,17 +188,17 @@ Eigen::MatrixXd HPIFitData:: compute_leadfield(const Eigen::MatrixXd& pos, const
 
 //*************************************************************************************************************
 
-DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const QList<SInfo>& sensorSet, const Eigen::MatrixXd& matProjectors)
+DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const QList<Sensor>& sensorSet, const Eigen::MatrixXd& matProjectors)
 {
     // Variable Declaration
     struct DipFitError e;
-    Eigen::MatrixXd lf, dif;
-    Eigen::RowVectorXd field(data.size());
+    Eigen::MatrixXd lfSensor, dif;
+    Eigen::MatrixXd lf(data.size(),3);
     // field vector to store calculated value from averaging np integration points on sensor
     for(int i = 0; i < sensorSet.size(); i++){
-        SInfo sensor = sensorSet[i];
-        lf = compute_leadfield(pos, sensor);
-
+        Sensor sensor = sensorSet[i];
+        lfSensor = compute_leadfield(pos, sensor);
+        lf.row(i) = sensor.w * lfSensor;
     }
     // Compute lead field for a magnetic dipole in infinite vacuum
 
@@ -233,7 +232,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
                                        int display,
                                        const Eigen::MatrixXd& data,
                                        const Eigen::MatrixXd& matProjectors,
-                                       const QList<SInfo>& sensorSet,
+                                       const QList<Sensor>& sensorSet,
                                        int &simplex_numitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;
