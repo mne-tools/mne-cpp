@@ -65,6 +65,11 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace FWDLIB{
+    class FwdCoil;
+    class FwdCoilSet;
+}
+
 namespace FIFFLIB{
     class FiffInfo;
     class FiffCoordTrans;
@@ -145,6 +150,7 @@ public:
                        bool bDoDebug = false,
                        const QString& sHPIResourceDir = QString("./HPIFittingDebug"));
 
+
 protected:
     //=========================================================================================================
     /**
@@ -174,6 +180,16 @@ protected:
      * @return Returns the transformation matrix.
      */
     static Eigen::Matrix4d computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT);
+
+    /**
+     * Read from FwdCoilSet and store into sensors struct.
+     * Can be deleted as soon as FwdCoilSet is refactored to QList and EigenMatrix.
+     *
+     * @param[in] sensors     The struct to save sensor information.
+     * @param[in] coils     The coilset to read the sensor information from.
+     *
+     */
+    static void create_sensor_set(QList<struct SInfo>& sensors, FWDLIB::FwdCoilSet* coils);
 
     static QString         m_sHPIResourceDir;      /**< Hold the resource folder to store the debug information in. */
 };

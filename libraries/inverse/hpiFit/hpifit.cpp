@@ -209,6 +209,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         }
     }
 
+
     // Create MEG-Coils and read doil_def.dat
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
     int acc = 2;
@@ -219,8 +220,11 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     qDebug() << "[done]";
     qDebug() << "Creating MEG Coils ...";
     megCoils = templates->create_meg_coils(channels,nch,acc,&t);
-    qDebug() << "Coils created: " << megCoils->ncoil;
-    qDebug() << "Coordinateframe: " << megCoils->coord_frame;
+    qDebug() << "[done]";
+    QList<SInfo> info;
+    qDebug() << "Creating QList<SInfo> ...";
+    create_sensor_set(info,megCoils);
+    qDebug() << "[done]";
 
     //Create new projector based on the excluded channels, first exclude the rows then the columns
     MatrixXd matProjectorsRows(innerind.size(),t_matProjectors.cols());
@@ -521,4 +525,40 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
     }
 
     return transFinal;
+}
+
+//*************************************************************************************************************
+
+void create_sensor_set(QList<SInfo>& sensors, FwdCoilSet* coils){
+    int nchan = coils->ncoil;
+    std::cout << nchan << std::endl;
+    for(int i = 0; i < nchan; i++){
+        SInfo s;
+        FwdCoil* coil = (coils->coils[i]);
+
+        int np = coil->np;
+        Eigen::MatrixXd rmag = Eigen::MatrixXd::Zero(np,3);
+        Eigen::MatrixXd cosmag = Eigen::MatrixXd::Zero(np,3);
+        Eigen::RowVectorXd w(8);
+
+        s.r0(0) = coil->r0[0];
+        s.r0(1) = coil->r0[1];
+        s.r0(2) = coil->r0[2];
+        s.ez(0) = coil->ez[0];
+        s.ez(1) = coil->ez[1];
+        s.ez(2) = coil->ez[2];
+
+        for (int p = 0; p < np; p++){
+            w(p) = coil->w[p];
+            for (int c = 0; c < 3; c++) {
+                rmag(p,c)   = coil->rmag[p][c];
+                cosmag(p,c) = coil->cosmag[p][c];
+            }
+        }
+        s.w = w;
+        s.rmag = rmag;
+        s.cosmag = cosmag;
+        s.np = np;
+        sensors.append(s);
+    }
 }
