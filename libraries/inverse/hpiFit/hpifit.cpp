@@ -120,7 +120,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     // Setup Constructors for Coil Set
     FwdCoilSet* templates = NULL;
     FwdCoilSet* megCoils = NULL;
-    struct SensorInfo sensors;
+    //struct SensorInfo sensors;
     struct CoilParam coil;
     int numCh = pFiffInfo->nchan;
     int samF = pFiffInfo->sfreq;
@@ -243,18 +243,18 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     //UTILSLIB::IOUtils::write_eigen_matrix(t_matProjectors, "t_matProjectors.txt");
 
     // Initialize inner layer sensors
-    sensors.coilpos = Eigen::MatrixXd::Zero(innerind.size(),3);
-    sensors.coilori = Eigen::MatrixXd::Zero(innerind.size(),3);
-    sensors.tra = Eigen::MatrixXd::Identity(innerind.size(),innerind.size());
+//    sensors.coilpos = Eigen::MatrixXd::Zero(innerind.size(),3);
+//    sensors.coilori = Eigen::MatrixXd::Zero(innerind.size(),3);
+//    sensors.tra = Eigen::MatrixXd::Identity(innerind.size(),innerind.size());
 
-    for(int i = 0; i < innerind.size(); i++) {
-        sensors.coilpos(i,0) = pFiffInfo->chs[innerind.at(i)].chpos.r0[0];
-        sensors.coilpos(i,1) = pFiffInfo->chs[innerind.at(i)].chpos.r0[1];
-        sensors.coilpos(i,2) = pFiffInfo->chs[innerind.at(i)].chpos.r0[2];
-        sensors.coilori(i,0) = pFiffInfo->chs[innerind.at(i)].chpos.ez[0];
-        sensors.coilori(i,1) = pFiffInfo->chs[innerind.at(i)].chpos.ez[1];
-        sensors.coilori(i,2) = pFiffInfo->chs[innerind.at(i)].chpos.ez[2];
-    }
+//    for(int i = 0; i < innerind.size(); i++) {
+//        sensors.coilpos(i,0) = pFiffInfo->chs[innerind.at(i)].chpos.r0[0];
+//        sensors.coilpos(i,1) = pFiffInfo->chs[innerind.at(i)].chpos.r0[1];
+//        sensors.coilpos(i,2) = pFiffInfo->chs[innerind.at(i)].chpos.r0[2];
+//        sensors.coilori(i,0) = pFiffInfo->chs[innerind.at(i)].chpos.ez[0];
+//        sensors.coilori(i,1) = pFiffInfo->chs[innerind.at(i)].chpos.ez[1];
+//        sensors.coilori(i,2) = pFiffInfo->chs[innerind.at(i)].chpos.ez[2];
+//    }
 
     Eigen::MatrixXd topo(innerind.size(), numCoils*2);
     Eigen::MatrixXd amp(innerind.size(), numCoils);

@@ -177,7 +177,7 @@ protected:
      * The function has been compared with matlab ft_compute_leadfield and it gives
      * same output.
      */
-    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos, const QList<SInfo>& sensorSet);
+    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos, const struct SInfo& sensor);
 
     //=========================================================================================================
     /**
