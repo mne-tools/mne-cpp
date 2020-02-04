@@ -104,6 +104,16 @@ struct SensorInfo {
     Eigen::MatrixXd tra;
 };
 
+struct SInfo {
+    Eigen::RowVector3d r0;
+    Eigen::RowVector3d ez;
+    Eigen::MatrixXd rmag;
+    Eigen::MatrixXd cosmag;
+    Eigen::MatrixXd tra;
+    Eigen::RowVectorXd w;
+    int np;
+};
+
 //=========================================================================================================
 /**
  * The strucut specifing the sorting parameters.
@@ -145,7 +155,7 @@ public:
      */
     void doDipfitConcurrent();
 
-    Eigen::RowVectorXd  coilPos;
+    Eigen::MatrixXd     coilPos;
     Eigen::RowVectorXd  sensorData;
     DipFitError         errorInfo;
     SensorInfo          sensorPos;
