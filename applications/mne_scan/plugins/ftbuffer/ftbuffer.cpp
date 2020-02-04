@@ -109,7 +109,6 @@ bool FtBuffer::start() {
     QThread::start();
 
     qRegisterMetaType<QPair<int,float>>("QPair<int,float>");
-    qRegisterMetaType<SimpleStorage>("SimpleStorage");
 
     // FtProducer in it's own thread and connect communications signals/slots
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
