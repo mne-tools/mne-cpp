@@ -212,17 +212,18 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     // Create MEG-Coils and read doil_def.dat
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+    // Create MEG-Coils and read data
     int acc = 2;
     int nch = channels.size();
-    FiffCoordTransOld t = FiffCoordTransOld();
+    FiffCoordTransOld* t = NULL;
+
     qDebug() << "Reading Coil_def.dat ...";
     templates = FwdCoilSet::read_coil_defs(qPath);
     qDebug() << "[done]";
-    qDebug() << "Creating MEG Coils ...";
-    megCoils = templates->create_meg_coils(channels,nch,acc,&t);
-    qDebug() << "[done]";
+
+    qDebug() << "Create Sensor List ...";
     QList<SInfo> info;
-    qDebug() << "Creating QList<SInfo> ...";
+    megCoils = templates->create_meg_coils(channels,nch,acc,t);
     create_sensor_set(info,megCoils);
     qDebug() << "[done]";
 
@@ -523,19 +524,16 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
         // ToDo: Replace this for loop with a least square solution process
         transFinal = Rot * Trans * transFinal;
     }
-
     return transFinal;
 }
 
 //*************************************************************************************************************
 
-void create_sensor_set(QList<SInfo>& sensors, FwdCoilSet* coils){
+void HPIFit::create_sensor_set(QList<struct SInfo>& sensors, FwdCoilSet* coils){
     int nchan = coils->ncoil;
-    std::cout << nchan << std::endl;
     for(int i = 0; i < nchan; i++){
         SInfo s;
         FwdCoil* coil = (coils->coils[i]);
-
         int np = coil->np;
         Eigen::MatrixXd rmag = Eigen::MatrixXd::Zero(np,3);
         Eigen::MatrixXd cosmag = Eigen::MatrixXd::Zero(np,3);
@@ -544,9 +542,6 @@ void create_sensor_set(QList<SInfo>& sensors, FwdCoilSet* coils){
         s.r0(0) = coil->r0[0];
         s.r0(1) = coil->r0[1];
         s.r0(2) = coil->r0[2];
-        s.ez(0) = coil->ez[0];
-        s.ez(1) = coil->ez[1];
-        s.ez(2) = coil->ez[2];
 
         for (int p = 0; p < np; p++){
             w(p) = coil->w[p];
