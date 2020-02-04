@@ -84,8 +84,8 @@ FiffRawViewDelegate::FiffRawViewDelegate(QObject *parent)
 //*************************************************************************************************************
 
 void FiffRawViewDelegate::paint(QPainter *painter,
-                            const QStyleOptionViewItem &option,
-                            const QModelIndex &index) const
+                                const QStyleOptionViewItem &option,
+                                const QModelIndex &index) const
 {
     float t_fPlotHeight = option.rect.height();
     painter->setRenderHint(QPainter::Antialiasing, true);
@@ -116,7 +116,10 @@ void FiffRawViewDelegate::paint(QPainter *painter,
 
                 QPainterPath path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
 
-                createPlotPath(option, path, data, pFiffRawModel->pixelDifference());
+                createPlotPath(option,
+                               path,
+                               data,
+                               pFiffRawModel->pixelDifference());
 
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->save();
@@ -155,7 +158,10 @@ QSize FiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option,
             const FiffRawViewModel* pFiffRawModel = static_cast<const FiffRawViewModel*>(index.model());
             qint32 nsamples = pFiffRawModel->absoluteLastSample() - pFiffRawModel->absoluteFirstSample();
 
-            size = QSize(nsamples*pFiffRawModel->pixelDifference(), option.rect.height());
+            size = QSize(nsamples * pFiffRawModel->pixelDifference(), option.rect.height());
+
+            qDebug() << "FiffRawViewDelegate::sizeHint - nsamples" << nsamples;
+            qDebug() << "FiffRawViewDelegate::sizeHint - size" << size;
             break;
     }
 
@@ -179,19 +185,26 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
 
     QPointF qSamplePosition;
     double dValue, newY;
-    int iStep = floor(1.0/dDx);
-    if(iStep < 1) {
-        iStep = 1;
+
+    int iPixelsToJump = 1;
+    if(dDx > 1.0) {
+        iPixelsToJump = dDx;
     }
 
-    for(qint32 j=0; j < data.size(); j+=iStep) {
-        dValue = data[j]*dScaleY;
+    int iDataToJump = floor(1.0/dDx);
+    qDebug() << "FiffRawViewDelegate::createPlotPath - iDataToJump" << iDataToJump;
+    if(iDataToJump < 1) {
+        iDataToJump = 1;
+    }
+
+    for(int j = 0; j < data.size() - iDataToJump; j += iDataToJump) {
+        dValue = data[j] * dScaleY;
 
         //Reverse direction -> plot the right way
-        newY = y_base-dValue;
+        newY = y_base - dValue;
 
         qSamplePosition.setY(newY);
-        qSamplePosition.setX(path.currentPosition().x()+1.0);
+        qSamplePosition.setX(path.currentPosition().x() + iPixelsToJump);
         path.lineTo(qSamplePosition);
     }
 }

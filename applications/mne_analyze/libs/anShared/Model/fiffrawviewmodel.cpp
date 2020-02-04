@@ -168,7 +168,10 @@ void FiffRawViewModel::initFiffData()
 
     // read in all blocks, use the already prepared list m_lData
     for(auto &pairPointer : m_lData) {
-        if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(pairPointer->first, pairPointer->second, start, end)) {
+        if(m_pFiffIO->m_qlistRaw[0]->read_raw_segment(pairPointer->first,
+                                                      pairPointer->second,
+                                                      start,
+                                                      end)) {
             // qDebug() << "[FiffRawmodel::loadFiffData] Successfully read a block ";
         } else {
             qDebug() << "[FiffRawViewModel::loadFiffData] Could not read samples " << start << " to " << end;
