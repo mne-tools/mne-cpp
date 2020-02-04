@@ -171,17 +171,17 @@ Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd
 
 //*************************************************************************************************************
 
-Eigen::MatrixXd HPIFitData:: compute_leadfield(const Eigen::MatrixXd& pos, const struct SensorInfo& sensors)
+Eigen::MatrixXd HPIFitData:: compute_leadfield(const Eigen::MatrixXd& pos, const struct SInfo& sensor)
 {
 
     Eigen::MatrixXd pnt, ori, lf;
-
-    pnt = sensors.coilpos; // position of each coil
-    ori = sensors.coilori; // orientation of each coil
+    Eigen::MatrixXd tra = Eigen::MatrixXd::Identity(sensor.np,sensor.np);
+    pnt = sensor.rmag; // position of each integrationpoint
+    ori = sensor.cosmag; // orientation of each coil
 
     lf = magnetic_dipole(pos, pnt, ori);
-
-    lf = sensors.tra * lf;
+    tra =
+    lf = tra * lf;
 
     return lf;
 }
@@ -189,14 +189,20 @@ Eigen::MatrixXd HPIFitData:: compute_leadfield(const Eigen::MatrixXd& pos, const
 
 //*************************************************************************************************************
 
-DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const struct SensorInfo& sensors, const Eigen::MatrixXd& matProjectors)
+DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const QList<SInfo>& sensorSet, const Eigen::MatrixXd& matProjectors)
 {
     // Variable Declaration
     struct DipFitError e;
     Eigen::MatrixXd lf, dif;
+    Eigen::RowVectorXd field(data.size());
+    // field vector to store calculated value from averaging np integration points on sensor
+    for(int i = 0; i < sensorSet.size(); i++){
+        SInfo sensor = sensorSet[i];
+        lf = compute_leadfield(pos, sensor);
 
+    }
     // Compute lead field for a magnetic dipole in infinite vacuum
-    lf = compute_leadfield(pos, sensors);
+
 
     e.moment = UTILSLIB::MNEMath::pinv(lf) * data;
 
@@ -276,7 +282,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
         v(i,0) = posCopy(i);
     }
 
-    tempdip = dipfitError(posCopy, data, sensors, matProjectors);
+    tempdip = dipfitError(posCopy, data, sensorSet, matProjectors);
     fv[0] = tempdip.error;
 
     func_evals = 1;
@@ -300,7 +306,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
 
         v.col(j+1).array() = y;
         posCopy = y.transpose();
-        tempdip = dipfitError(posCopy, data, sensors, matProjectors);
+        tempdip = dipfitError(posCopy, data, sensorSet, matProjectors);
         fv[j+1] = tempdip.error;
     }
 
@@ -363,7 +369,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
         x = xr.transpose();
         //std::cout << "Iteration Count: " << itercount << ":" << x << std::endl;
 
-        fxr = dipfitError(x, data, sensors, matProjectors);
+        fxr = dipfitError(x, data, sensorSet, matProjectors);
 
         func_evals = func_evals+1;
 
@@ -371,7 +377,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
             // Calculate the expansion point
             xe = (1 + rho * chi) * xbar - rho * chi * v.col(v.cols()-1);
             x = xe.transpose();
-            fxe = dipfitError(x, data, sensors, matProjectors);
+            fxe = dipfitError(x, data, sensorSet, matProjectors);
             func_evals = func_evals+1;
 
             if(fxe.error < fxr.error) {
@@ -395,7 +401,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
                     // Perform an outside contraction
                     xc = (1 + psi * rho) * xbar - psi * rho * v.col(v.cols()-1);
                     x = xc.transpose();
-                    fxc = dipfitError(x, data, sensors, matProjectors);
+                    fxc = dipfitError(x, data, sensorSet, matProjectors);
                     func_evals = func_evals + 1;
 
                     if(fxc.error <= fxr.error) {
@@ -409,7 +415,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
                 } else {
                     xcc = (1 - psi) * xbar + psi * v.col(v.cols()-1);
                     x = xcc.transpose();
-                    fxcc = dipfitError(x, data, sensors, matProjectors);
+                    fxcc = dipfitError(x, data, sensorSet, matProjectors);
                     func_evals = func_evals+1;
                     if(fxcc.error < fv[n]) {
                         v.col(v.cols()-1) = xcc;
@@ -425,7 +431,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
                     for(int j = 1;j < n+1;j++) {
                         v.col(j).array() = v.col(0).array() + sigma * (v.col(j).array() - v.col(0).array());
                         x = v.col(j).array().transpose();
-                        tempdip = dipfitError(x,data, sensors, matProjectors);
+                        tempdip = dipfitError(x,data, sensorSet, matProjectors);
                         fv[j] = tempdip.error;
                     }
                 }
