@@ -91,7 +91,7 @@ void HPIFitData::doDipfitConcurrent()
     // Initialize variables
     Eigen::RowVectorXd currentCoil = this->coilPos;
     Eigen::VectorXd currentData = this->sensorData;
-    SensorInfo currentSensors = this->sensorPos;
+    QList<SInfo> currentSensors = this->sensorSet;
 
     int display = 0;
     int maxiter = 500;
@@ -227,7 +227,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
                                        int display,
                                        const Eigen::MatrixXd& data,
                                        const Eigen::MatrixXd& matProjectors,
-                                       const struct SensorInfo& sensors,
+                                       const QList<SInfo>& sensorSet,
                                        int &simplex_numitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;

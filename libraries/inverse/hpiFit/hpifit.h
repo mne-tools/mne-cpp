@@ -164,7 +164,7 @@ protected:
      * @return Returns the coil parameters.
      */
     static CoilParam dipfit(struct CoilParam coil,
-                            struct SensorInfo sensors,
+                            const QList<struct SInfo>& sensorSet,
                             const Eigen::MatrixXd &data,
                             int numCoils,
                             const Eigen::MatrixXd &t_matProjectors);

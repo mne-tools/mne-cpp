@@ -222,9 +222,9 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     qDebug() << "[done]";
 
     qDebug() << "Create Sensor List ...";
-    QList<SInfo> info;
+    QList<SInfo> sensorSet;
     megCoils = templates->create_meg_coils(channels,nch,acc,t);
-    create_sensor_set(info,megCoils);
+    create_sensor_set(sensorSet,megCoils);
     qDebug() << "[done]";
 
     //Create new projector based on the excluded channels, first exclude the rows then the columns
@@ -331,7 +331,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     coil.pos = coilPos;
 
     // Perform actual localization
-    coil = dipfit(coil, sensors, amp, numCoils, matProjectorsInnerind);
+    coil = dipfit(coil, sensorSet, amp, numCoils, matProjectorsInnerind);
 
     Eigen::Matrix4d trans = computeTransformation(headHPI, coil.pos);
     //Eigen::Matrix4d trans = computeTransformation(coil.pos, headHPI);
@@ -417,7 +417,11 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
 //*************************************************************************************************************
 
-CoilParam HPIFit::dipfit(struct CoilParam coil, struct SensorInfo sensors, const Eigen::MatrixXd& data, int numCoils, const Eigen::MatrixXd& t_matProjectors)
+CoilParam HPIFit::dipfit(struct CoilParam coil,
+                         const QList<SInfo>& sensorSet,
+                         const Eigen::MatrixXd& data,
+                         int numCoils,
+                         const Eigen::MatrixXd& t_matProjectors)
 {
     //Do this in conncurrent mode
     //Generate QList structure which can be handled by the QConcurrent framework
@@ -427,7 +431,7 @@ CoilParam HPIFit::dipfit(struct CoilParam coil, struct SensorInfo sensors, const
         HPIFitData coilData;
         coilData.coilPos = coil.pos.row(i);
         coilData.sensorData = data.col(i);
-        coilData.sensorPos = sensors;
+        coilData.sensorSet = sensorSet;
         coilData.matProjector = t_matProjectors;
 
         lCoilData.append(coilData);
