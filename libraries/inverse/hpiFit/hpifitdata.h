@@ -106,7 +106,6 @@ struct SensorInfo {
 
 struct SInfo {
     Eigen::RowVector3d r0;
-    Eigen::RowVector3d ez;
     Eigen::MatrixXd rmag;
     Eigen::MatrixXd cosmag;
     Eigen::MatrixXd tra;

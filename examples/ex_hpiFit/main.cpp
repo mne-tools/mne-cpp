@@ -47,6 +47,7 @@
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_cov.h>
 #include <inverse/hpiFit/hpifit.h>
+#include <inverse/hpiFit/hpifitdata.h>
 
 #include <fwd/fwd_coil_set.h>
 //*************************************************************************************************************
@@ -64,9 +65,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace FIFFLIB;
 using namespace INVERSELIB;
+using namespace FIFFLIB;
 using namespace FWDLIB;
 
 //*************************************************************************************************************
@@ -84,32 +84,25 @@ using namespace FWDLIB;
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
 
-struct SInfo {
-    Eigen::RowVector3d r0;
-    Eigen::MatrixXd rmag;
-    Eigen::MatrixXd cosmag;
-    Eigen::MatrixXd tra;
-    Eigen::RowVectorXd w;
-    int np;
-};
-
-void create_sensor_set(QList<SInfo>& sensors, FwdCoilSet* coils){
+void create_sensor_set(QList<INVERSELIB::SInfo>& sensors, FwdCoilSet* coils){
     int nchan = coils->ncoil;
     std::cout << nchan << std::endl;
     for(int i = 0; i < nchan; i++){
-        SInfo s;
+        struct INVERSELIB::SInfo s;
         FwdCoil* coil = (coils->coils[i]);
+
         int np = coil->np;
         Eigen::MatrixXd rmag = Eigen::MatrixXd::Zero(np,3);
         Eigen::MatrixXd cosmag = Eigen::MatrixXd::Zero(np,3);
         Eigen::RowVectorXd w(8);
 
-        std::cout << np << std::endl;
-        std::cout << "r0: " << coil->r0[0] << std::endl;
         s.r0(0) = coil->r0[0];
         s.r0(1) = coil->r0[1];
         s.r0(2) = coil->r0[2];
-        std::cout << "r0: " << coil->r0[0] << std::endl;
+        s.ez(0) = coil->ez[0];
+        s.ez(1) = coil->ez[1];
+        s.ez(2) = coil->ez[2];
+
         for (int p = 0; p < np; p++){
             w(p) = coil->w[p];
             for (int c = 0; c < 3; c++) {
@@ -118,8 +111,9 @@ void create_sensor_set(QList<SInfo>& sensors, FwdCoilSet* coils){
             }
         }
         s.w = w;
-        s.cosmag = cosmag;
         s.rmag = rmag;
+        s.cosmag = cosmag;
+        s.np = np;
         sensors.append(s);
     }
 }
@@ -193,41 +187,33 @@ int main(int argc, char *argv[])
     templates = FwdCoilSet::read_coil_defs(qPath);
     qDebug() << "[done]";
 
-    megCoils = templates->create_meg_coils(channels,nch,acc,t);
-    FwdCoil* coils = *megCoils->coils;
-
-    qDebug() << "*coils.w: " << coils[0].w[1];
-    qDebug() << "*coils.r0: "<< coils[0].r0[2];
-    qDebug() << "**coils.rmag: " << coils[0].rmag[0][1];
-    qDebug() << "Integration points" << coils[0].np;
-
+    qDebug() << "Create Sensor List ..."; 
     QList<SInfo> info;
+    megCoils = templates->create_meg_coils(channels,nch,acc,t);
     create_sensor_set(info,megCoils);
-    std::cout << "create sensor done" << std::endl;
+    qDebug() << "[done]";
 
-//    // setup informations to be passed to fitHPI
-//    QVector<int> vFreqs {166,154,161,158};
-//    QVector<double> vGof;
-//    FiffDigPointSet fittedPointSet;
-//    Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
+    // setup informations to be passed to fitHPI
+    QVector<int> vFreqs {166,154,161,158};
+    QVector<double> vGof;
+    FiffDigPointSet fittedPointSet;
+    Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
 
-//    qDebug() << "raw.info sfreq: " << vFreqs;
+    // enable debug
+    bool bDoDebug = true;
+    QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
+    qDebug() << "HPI-Fit...";
+    HPIFit::fitHPI(matData,
+                   matProjectors,
+                   raw.info.dev_head_t,
+                   vFreqs,
+                   vGof,
+                   fittedPointSet,
+                   pFiffInfo,
+                   bDoDebug = 0,
+                   sHPIResourceDir);
 
-//    // enable debug
-//    bool bDoDebug = true;
-//    QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
-//    qDebug() << "HPI-Fit... \n";
-//    HPIFit::fitHPI(matData,
-//                   matProjectors,
-//                   raw.info.dev_head_t,
-//                   vFreqs,
-//                   vGof,
-//                   fittedPointSet,
-//                   pFiffInfo,
-//                   bDoDebug = 0,
-//                   sHPIResourceDir);
-
-//    std::cout << "[done]\n";
+    std::cout << "[done]\n";
 
     return a.exec();
 }
