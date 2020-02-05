@@ -1,7 +1,8 @@
 ---
 title: SSVEP Brain Computer Interface
-parent: Learn
-nav_order: 3
+parent: MNE Scan
+grand_parent: Learn
+nav_order: 2
 ---
 # Setup SSVEP BCI example
 

@@ -1,7 +1,8 @@
 ---
 title: Real-time Source Localization
-parent: Learn
-nav_order: 2
+parent: MNE Scan
+grand_parent: Learn
+nav_order: 1
 ---
 # Setup real-time source localization example
 
