@@ -48,7 +48,7 @@
 #include <fiff/fiff_cov.h>
 #include <inverse/hpiFit/hpifit.h>
 #include <inverse/hpiFit/hpifitdata.h>
-
+#include <utils/ioutils.h>
 #include <fwd/fwd_coil_set.h>
 //*************************************************************************************************************
 //=============================================================================================================
@@ -59,6 +59,8 @@
 #include <QFile>
 #include <QCommandLineParser>
 #include <QDebug>
+#include <QGenericMatrix>
+#include <QQuaternion>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -67,7 +69,7 @@
 
 using namespace INVERSELIB;
 using namespace FIFFLIB;
-using namespace FWDLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -84,39 +86,6 @@ using namespace FWDLIB;
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
 
-void create_sensor_set(QList<INVERSELIB::SInfo>& sensors, FwdCoilSet* coils){
-    int nchan = coils->ncoil;
-    std::cout << nchan << std::endl;
-    for(int i = 0; i < nchan; i++){
-        struct INVERSELIB::SInfo s;
-        FwdCoil* coil = (coils->coils[i]);
-
-        int np = coil->np;
-        Eigen::MatrixXd rmag = Eigen::MatrixXd::Zero(np,3);
-        Eigen::MatrixXd cosmag = Eigen::MatrixXd::Zero(np,3);
-        Eigen::RowVectorXd w(8);
-
-        s.r0(0) = coil->r0[0];
-        s.r0(1) = coil->r0[1];
-        s.r0(2) = coil->r0[2];
-        s.ez(0) = coil->ez[0];
-        s.ez(1) = coil->ez[1];
-        s.ez(2) = coil->ez[2];
-
-        for (int p = 0; p < np; p++){
-            w(p) = coil->w[p];
-            for (int c = 0; c < 3; c++) {
-                rmag(p,c)   = coil->rmag[p][c];
-                cosmag(p,c) = coil->cosmag[p][c];
-            }
-        }
-        s.w = w;
-        s.rmag = rmag;
-        s.cosmag = cosmag;
-        s.np = np;
-        sensors.append(s);
-    }
-}
 
 int main(int argc, char *argv[])
 {
@@ -127,7 +96,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("hpiFit Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/raw_meas_stat.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/test_meas_move.fif");
 
     parser.addOption(inputOption);
 
@@ -141,9 +110,18 @@ int main(int argc, char *argv[])
 
     RowVectorXd cals;
 
+    // Read Quaternion File
+
+    Eigen::MatrixXd pos;
+    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/meas_move.txt");
+
     // Set up the reading parameters to read the whole file at once
-    fiff_int_t from = raw.first_samp;
-    fiff_int_t to = raw.last_samp;
+    // seconds to read
+    float from = 0;
+    float to = 20;
+
+    from = floor(from*pFiffInfo->sfreq);
+    to   = ceil(to*pFiffInfo->sfreq);
 
     // Only filter MEG and EEG channels
     RowVectorXi picks = raw.info.pick_types(true, false, false);
@@ -151,47 +129,14 @@ int main(int argc, char *argv[])
     // Read, filter and write the data
     MatrixXd matData;
     MatrixXd times;
+
     qDebug() << "Reading ...\n";
     // Reading
-    if(!raw.read_raw_segment(matData, times, from, to)) {
+    if(!raw.read_raw_segment_times(matData, times, from, to)) {
         printf("error during read_raw_segment\n");
         return -1;
     }
     qDebug() << "[done]\n";
-
-    // Read coil_def.dat file
-    // Setup Constructors for Coil Set
-    FwdCoilSet* templates = NULL;
-    FwdCoilSet* megCoils = NULL;
-
-    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-    QList<FiffChInfo> channels;
-    for (int i = 0; i < pFiffInfo->nchan; ++i) {
-        if(pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
-                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
-                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
-                pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
-            // Check if the sensor is bad, if not append to innerind
-            if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
-                channels.append(pFiffInfo->chs[i]);
-            }
-        }
-    }
-
-    // Create MEG-Coils and read data
-    int acc = 2;
-    int nch = channels.size();
-    FiffCoordTransOld* t = NULL;
-
-    qDebug() << "Reading Coil_def.dat ...";
-    templates = FwdCoilSet::read_coil_defs(qPath);
-    qDebug() << "[done]";
-
-    qDebug() << "Create Sensor List ..."; 
-    QList<SInfo> info;
-    megCoils = templates->create_meg_coils(channels,nch,acc,t);
-    create_sensor_set(info,megCoils);
-    qDebug() << "[done]";
 
     // setup informations to be passed to fitHPI
     QVector<int> vFreqs {166,154,161,158};
@@ -213,7 +158,28 @@ int main(int argc, char *argv[])
                    bDoDebug = 0,
                    sHPIResourceDir);
 
-    std::cout << "[done]\n";
+    std::cout << "[done]\n"<< std::endl;
 
-    return a.exec();
+    QMatrix3x3 rot;
+
+    for(int ir = 0; ir < 3; ir++) {
+        for(int ic = 0; ic < 3; ic++) {
+            rot(ir,ic) = raw.info.dev_head_t.trans(ir,ic);
+        }
+    }
+
+    QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
+
+    std::cout << "quatHPI.x(): " << quatHPI.x() << std::endl;
+    std::cout << "quatHPI.y(): " << quatHPI.y() << std::endl;
+    std::cout << "quatHPI.z(): " << quatHPI.z() << std::endl;
+
+    std::cout << "trans x: " << raw.info.dev_head_t.trans(0,3) << std::endl;
+    std::cout << "trans y: " << raw.info.dev_head_t.trans(1,3) << std::endl;
+    std::cout << "trans z: " << raw.info.dev_head_t.trans(2,3) << std::endl;
+
+    // Write GOF to HPI Ch #7
+    // Write goodness of fit (GOF)to HPI Ch #7
+    std::cout << "GOF: " << vGof[0] << std::endl;
+    return 0;
 }
