@@ -99,19 +99,24 @@ public:
 
     //=========================================================================================================
     /**
-     * Starts the EEGoSportsProducer by starting the producer's thread and initialising the device.
-     * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
-     * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
-     * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
-     * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
-     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-     * @param [in] bMeasureImpedance Flag for measuring impedances.
-     */
-    virtual void start(int iNumberOfChannels,
-                       int iSamplesPerBlock,
+    * Initializes the EEGoSportsProducer by initialising the device.
+    * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
+    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
+    * @param [in] bMeasureImpedance Flag for measuring impedances.
+    */
+    virtual void init(bool bWriteDriverDebugToFile,
+                      QString sOutputFilePath,
+                      bool bMeasureImpedance);
+
+    //=========================================================================================================
+    /**
+    * Starts the EEGoSportsProducer by starting the producer's thread and starting the stream from the device.
+    * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
+    * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
+    * @param [in] bMeasureImpedance Flag for measuring impedances.
+    */
+    virtual void start(int iSamplesPerBlock,
                        int iSamplingFrequency,
-                       bool bWriteDriverDebugToFile,
-                       QString sOutputFilePath,
                        bool bMeasureImpedance);
 
     //=========================================================================================================
@@ -119,6 +124,12 @@ public:
      * Stops the EEGoSportsProducer by stopping the producer's thread.
      */
     void stop();
+
+    //=========================================================================================================
+    /**
+    * Get list of channel types.
+    */
+    QList<uint> getChannellist();
 
 protected:
     //=========================================================================================================
@@ -133,7 +144,10 @@ private:
     EEGoSports*                         m_pEEGoSports;              /**< A pointer to the corresponding EEGoSports class.*/
     QSharedPointer<EEGoSportsDriver>    m_pEEGoSportsDriver;        /**< A pointer to the corresponding EEGoSportsDriver class.*/
 
+    bool                                m_bMeasureImpedance;        /**< Whether it is an impedance measurement.*/
     bool                                m_bIsRunning;               /**< Whether EEGoSportsProducer is running.*/
+    bool                                m_bIsConnected;             /**< Whether EEGoSportsProducer is connected to device.*/
+
 };
 
 } // NAMESPACE

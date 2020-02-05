@@ -45,6 +45,8 @@
 
 #include "eegosports_global.h"
 
+#include "eegosportsproducer.h"
+#include "FormFiles/eegosportsimpedancewidget.h"
 #include "FormFiles/eegosportssetupwidget.h"
 #include "FormFiles/eegosportssetupprojectwidget.h"
 
@@ -119,6 +121,7 @@ class EEGOSPORTSSHARED_EXPORT EEGoSports : public SCSHAREDLIB::ISensor
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
     friend class EEGoSportsProducer;
+    friend class EEGoSportsImpedanceWidget;
     friend class EEGoSportsSetupWidget;
     friend class EEGoSportsSetupProjectWidget;
 
@@ -161,8 +164,14 @@ public:
 
     //=========================================================================================================
     /**
-     * Starts the EEGoSports by starting the thread.
-     */
+    * Sets up the fiff info with the current data chosen by the user.
+    */
+    void setNumberOfChannels(int iNumberOfChannels, int iNumberOfEEGChannels, int iNumberOfBipolarChannels);
+
+    //=========================================================================================================
+    /**
+    * Starts the EEGoSports by starting the thread.
+    */
     virtual bool start();
 
     //=========================================================================================================
@@ -176,6 +185,8 @@ public:
      * Set/Add received samples to a QList.
      */
     void setSampleData(Eigen::MatrixXd &matRawBuffer);
+
+    //=========================================================================================================
 
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
@@ -199,8 +210,14 @@ protected slots:
 protected:
     //=========================================================================================================
     /**
-     * Opens a dialog to setup the project to check the impedance values
-     */
+    * Opens a dialog to setup the project to check the impedance values
+    */
+    void showImpedanceDialog();
+
+    //=========================================================================================================
+    /**
+    * Opens a dialog to setup the project to check the impedance values
+    */
     void showSetupProjectDialog();
 
     //=========================================================================================================
@@ -217,27 +234,25 @@ protected:
 
     //=========================================================================================================
     /**
-     * Checks if a dir exists
-     */
-    bool dirExists(const std::string& dirName_in);
-
-    //=========================================================================================================
-    /**
-     * The starting point for the thread. After calling start(), the newly created thread calls this function.
-     * Returning from this method will end the execution of the thread.
-     * Pure virtual method inherited by QThread.
-     */
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
     virtual void run();
 
 private:
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRMTSA_EEGoSports;                    /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<EEGoSportsImpedanceWidget> m_pEEGoSportsImpedanceWidget;             /**< Widget for checking the impedances*/
     QSharedPointer<EEGoSportsSetupProjectWidget>                                m_pEEGoSportsSetupProjectWidget;        /**< Widget for checking the impedances*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
     int                                 m_iSamplingFreq;                    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
-    int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
+    int                                 m_iNumberOfChannels;                /**< The number of channels.*/
+    int                                 m_iNumberOfEEGChannels;             /**< The number of EEG channels.*/
+    int                                 m_iNumberOfBipolarChannels;         /**< The number of Bipolar channels.*/
+
+    int                                 m_iSamplesPerBlock;                 /**< The samples per block defined by the user via the GUI.*/
 
     double                              m_dLPAShift;                        /**< The shift in m in to generate the LPA.*/
     double                              m_dRPAShift;                        /**< The shift in m in to generate the RPA.*/
@@ -268,6 +283,7 @@ private:
 
     QMutex                              m_mutex;                            /**< Holds the threads mutex.*/
 
+    QAction*                            m_pActionImpedance;                 /**< shows impedance widget */
     QAction*                            m_pActionSetupProject;              /**< Shows setup project dialog */
     QAction*                            m_pActionStartRecording;            /**< Starts to record data */
 

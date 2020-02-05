@@ -135,35 +135,60 @@ public:
 
     //=========================================================================================================
     /**
-     * Initialise device.
-     * @param [in] iNumberOfChannels number of channels specified by the user.
-     * @param [in] iSamplesPerBlock samples per block specified by the user.
-     * @param [in] iSamplingFrequency sampling frequency specified by the user.
-     * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
-     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-     * @param [in] bMeasureImpedance Flag for measuring impedances.
-     */
-    bool initDevice(int iNumberOfChannels,
-                    int iSamplesPerBlock,
-                    int iSamplingFrequency,
-                    bool bWriteDriverDebugToFile,
+    * Initialise device.
+    * @param [in] iNumberOfChannels number of channels specified by the user.
+    * @param [in] iSamplesPerBlock samples per block specified by the user.
+    * @param [in] iSamplingFrequency sampling frequency specified by the user.
+    * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
+    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
+    * @param [in] bMeasureImpedance Flag for measuring impedances.
+    */
+    bool initDevice(bool bWriteDriverDebugToFile,
                     QString sOutpuFilePath,
                     bool bMeasureImpedance);
 
     //=========================================================================================================
     /**
-     * Uninitialise device.
-     * @param [out] bool returns true if device was successfully uninitialised, false otherwise.
-     */
+    * Start recording.
+    * @param [in] iSamplesPerBlock samples per block specified by the user.
+    * @param [in] iSamplingFrequency sampling frequency specified by the user.
+    * @param [in] bMeasureImpedance Flag for measuring impedances.
+    */
+    bool startRecording(int iSamplesPerBlock,
+                    int iSamplingFrequency,
+                    bool bMeasureImpedance);
+
+    //=========================================================================================================
+    /**
+    * Uninitialise device.
+    * @param [out] bool returns true if device was successfully uninitialised, false otherwise.
+    */
     bool uninitDevice();
+
+    //=========================================================================================================
+    /**
+    * Get number of channels.
+    */
+    uint getNumberOfChannels();
+    uint getNumberOfEEGChannels();
+    uint getNumberOfBipolarChannels();
+
+    //=========================================================================================================
+    /**
+    * Get list of channel types.
+    */
+    QList<uint> getChannellist();
 
 private:
     EEGoSportsProducer*         m_pEEGoSportsProducer;          /**< A pointer to the corresponding EEGoSportsProducer class.*/
 
-    bool                        m_bInitDeviceSuccess;           /**< Flag which defines if the device initialisation was successfull.*/
+    bool                        m_bInitDeviceSuccess;           /**< Flag which defines if the device initialisation was successfully.*/
+    bool                        m_bStartRecordingSuccess;       /**< Flag which defines if the recording was started successfully.*/
     bool                        m_bDllLoaded;                   /**< Flag which defines if the driver DLL was loaded successfully.*/
 
-    uint                        m_uiNumberOfChannels;           /**< The number of channels defined by the user via the GUI.*/
+    uint                        m_uiNumberOfChannels;           /**< The number of channels.*/
+    uint                        m_uiNumberOfEEGChannels;        /**< The number of EEG channels.*/
+    uint                        m_uiNumberOfBipolarChannels;    /**< The number of Bipolar channels.*/
     uint                        m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
     uint                        m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
     bool                        m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/

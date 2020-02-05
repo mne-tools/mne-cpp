@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EEGoSportsImpedanceWidget</class>
+ <widget class="QWidget" name="EEGoSportsImpedanceWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>696</width>
+    <height>552</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="2">
+    <widget class="QGroupBox" name="m_groupbox_Visualization">
+     <property name="title">
+      <string>Visualization</string>
+     </property>
+     <widget class="QRadioButton" name="m_radioButton_Threshold">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>94</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Threshold</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+      <attribute name="buttonGroup">
+       <string notr="true">buttonGroup</string>
+      </attribute>
+     </widget>
+     <widget class="QDoubleSpinBox" name="m_doubleSpinBox_manualImpedanceColormapMax">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>110</y>
+        <width>74</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="decimals">
+       <number>0</number>
+      </property>
+      <property name="maximum">
+       <double>50000.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>1000.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>20000.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="m_radioButton_Colormap">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>92</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Colormap</string>
+      </property>
+      <attribute name="buttonGroup">
+       <string notr="true">buttonGroup</string>
+      </attribute>
+     </widget>
+     <widget class="QDoubleSpinBox" name="m_doubleSpinBox_manualImpedanceThreshold">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>50</y>
+        <width>74</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="decimals">
+       <number>0</number>
+      </property>
+      <property name="maximum">
+       <double>30000.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>1000.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>10000.000000000000000</double>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QPushButton" name="m_pushButton_stop">
+     <property name="text">
+      <string>Stop</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QGroupBox" name="m_groupBox_Options">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QPushButton" name="m_pushButton_takeScreenshot">
+        <property name="text">
+         <string>Screenshot</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="m_pushButton_loadLayout">
+        <property name="text">
+         <string>Load Layout</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="m_pushButton_saveValues">
+        <property name="text">
+         <string>Save Values</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="m_pushButton_Help">
+        <property name="text">
+         <string>Help</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QPushButton" name="m_pushButton_start">
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Start</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" rowspan="4">
+    <widget class="EEGOSPORTSPLUGIN::EEGoSportsImpedanceView" name="m_graphicsView_impedanceView"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>EEGOSPORTSPLUGIN::EEGoSportsImpedanceView</class>
+   <extends>QGraphicsView</extends>
+   <header>eegosportsimpedanceview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
+</ui>

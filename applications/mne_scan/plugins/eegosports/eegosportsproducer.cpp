@@ -82,22 +82,35 @@ EEGoSportsProducer::~EEGoSportsProducer()
 {
 }
 
+//*************************************************************************************************************
+
+void EEGoSportsProducer::init(bool bWriteDriverDebugToFile,
+                              QString sOutputFilePath,
+                              bool bMeasureImpedance)
+{
+    //Initialise device
+    if(m_pEEGoSportsDriver->initDevice(bWriteDriverDebugToFile,
+                                       sOutputFilePath,
+                                       bMeasureImpedance)) {
+        m_bIsConnected = true;
+    } else {
+        m_bIsConnected = false;
+    }
+
+    //Return number of channels
+    m_pEEGoSports->setNumberOfChannels(m_pEEGoSportsDriver->getNumberOfChannels(),m_pEEGoSportsDriver->getNumberOfEEGChannels(),m_pEEGoSportsDriver->getNumberOfBipolarChannels());
+}
+
 
 //*************************************************************************************************************
 
-void EEGoSportsProducer::start(int iNumberOfChannels,
-                        int iSamplesPerBlock,
+void EEGoSportsProducer::start(int iSamplesPerBlock,
                         int iSamplingFrequency,
-                        bool bWriteDriverDebugToFile,
-                        QString sOutputFilePath,
                         bool bMeasureImpedance)
 {
     //Initialise device
-    if(m_pEEGoSportsDriver->initDevice(iNumberOfChannels,
-                                iSamplesPerBlock,
+    if(m_bIsConnected && m_pEEGoSportsDriver->startRecording(iSamplesPerBlock,
                                 iSamplingFrequency,
-                                bWriteDriverDebugToFile,
-                                sOutputFilePath,
                                 bMeasureImpedance)) {
         m_bIsRunning = true;
         QThread::start();
@@ -120,8 +133,16 @@ void EEGoSportsProducer::stop()
 
     //Unitialise device only after the thread stopped
     m_pEEGoSportsDriver->uninitDevice();
+
+    m_bIsConnected = false;
 }
 
+//*************************************************************************************************************
+
+QList<uint> EEGoSportsProducer::getChannellist()
+{
+    return m_pEEGoSportsDriver->getChannellist();
+}
 
 //*************************************************************************************************************
 

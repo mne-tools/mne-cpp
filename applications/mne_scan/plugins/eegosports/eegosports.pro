@@ -76,7 +76,11 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
+    FormFiles/eegosportsimpedancewidget.cpp \
         eegosports.cpp \
+    eegosportselectrodeitem.cpp \
+    eegosportsimpedancescene.cpp \
+    eegosportsimpedanceview.cpp \
         eegosportsproducer.cpp \
         FormFiles/eegosportssetupwidget.cpp \
         FormFiles/eegosportsaboutwidget.cpp \
@@ -84,8 +88,12 @@ SOURCES += \
         FormFiles/eegosportssetupprojectwidget.cpp \
 
 HEADERS += \
+    FormFiles/eegosportsimpedancewidget.h \
         eegosports.h\
         eegosports_global.h \
+    eegosportselectrodeitem.h \
+    eegosportsimpedancescene.h \
+    eegosportsimpedanceview.h \
         eegosportsproducer.h \
         FormFiles/eegosportssetupwidget.h \
         FormFiles/eegosportsaboutwidget.h \
@@ -93,6 +101,7 @@ HEADERS += \
         FormFiles/eegosportssetupprojectwidget.h \
 
 FORMS += \
+    FormFiles/eegosportsimpedancewidget.ui \
         FormFiles/eegosportssetup.ui \
         FormFiles/eegosportsabout.ui \
         FormFiles/eegosportssetupprojectwidget.ui \

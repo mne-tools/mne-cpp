@@ -45,6 +45,9 @@
 #include <eemagine/sdk/wrapper.cc> // Wrapper code to be compiled.
 #include <eemagine/sdk/factory.h> // SDK header
 
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -71,7 +74,9 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 : m_pEEGoSportsProducer(pEEGoSportsProducer)
 , m_bDllLoaded(true)
 , m_bInitDeviceSuccess(false)
+, m_bStartRecordingSuccess(false)
 , m_uiNumberOfChannels(90)
+, m_uiNumberOfEEGChannels(64)
 , m_uiSamplingFrequency(512)
 , m_uiSamplesPerBlock(100)
 , m_bWriteDriverDebugToFile(false)
@@ -91,55 +96,68 @@ EEGoSportsDriver::~EEGoSportsDriver()
 
 //*************************************************************************************************************
 
-bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
-                            int iSamplesPerBlock,
-                            int iSamplingFrequency,
-                            bool bWriteDriverDebugToFile,
-                            QString sOutpuFilePath,
-                            bool bMeasureImpedance)
+bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
+                            QString sOutpuFilePath, bool bMeasureImpedance)
 {
+    m_bMeasureImpedances = bMeasureImpedance;
+
     //Check if the driver DLL was loaded
     if(!m_bDllLoaded) {
         return false;
     }
 
     //Set global variables
-    m_uiNumberOfChannels = iNumberOfChannels;
-    m_uiSamplesPerBlock = iSamplesPerBlock;
-    m_uiSamplingFrequency = iSamplingFrequency;
     m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
     m_sOutputFilePath = sOutpuFilePath;
-    m_bMeasureImpedances = bMeasureImpedance;
 
     //Open debug file to write to
     if(m_bWriteDriverDebugToFile) {
-        m_outputFileStream.open("./resources/mne_scan/plugins/eegosports/EEGoSports_Driver_Debug.txt", std::ios::trunc); //ios::trunc deletes old file data
+        m_outputFileStream.open("./EEGoSports_Driver_Debug.txt", std::ios::trunc); //ios::trunc deletes old file data
     }
 
     try {
         // Get device handler
+#ifdef _WIN32
         factory factoryObj ("eego-SDK.dll"); // Make sure that eego-SDK.dll resides in the working directory
+#else
+        factory factoryObj ("/home/vorwerkj/git/mne-cpp/lib/libeego-SDK.so"); // Make sure that eego-SDK.dll resides in the working directory
+#endif
+
         m_pAmplifier = factoryObj.getAmplifier(); // Get an amplifier
 
         //std::cout<<"EEGoSportsDriver::initDevice - Serial number of connected eegosports device: "<<m_pAmplifier->getSerialNumber()<<std::endl;
 
-        //Start the stream
-        if(bMeasureImpedance) {
-            m_pDataStream = m_pAmplifier->OpenImpedanceStream(m_uiSamplingFrequency);
-        } else {            
-            //reference_range the range, in volt, for the referential channels. Valid values are: 1, 0.75, 0.15
-            //bipolar_range the range, in volt, for the bipolar channels. Valid values are: 4, 1.5, 0.7, 0.35
-            double reference_range = 0.75;
-            double bipolar_range = 4;
-
-            m_pDataStream = m_pAmplifier->OpenEegStream(m_uiSamplingFrequency, reference_range, bipolar_range);
-        }
-
+#ifdef _WIN32
         Sleep(100);
+#else
+        sleep(0.1);
+#endif
     } catch (std::runtime_error& e) {
         std::cout <<"EEGoSportsDriver::initDevice - error " << e.what() << std::endl;
         return false;
     }
+
+    std::vector<channel> channellist = m_pAmplifier->getChannelList();
+
+    int iEEGChannelCount = 0;
+    int iBipolarChannelCount = 0;
+    for(std::vector<channel>::iterator it = channellist.begin(); it != channellist.end(); ++it){
+        if(it->getType() == 1)
+            ++iEEGChannelCount;
+        else if(it->getType() == 2)
+         ++iBipolarChannelCount;
+    }
+    if(!bMeasureImpedance)
+        m_uiNumberOfChannels = channellist.size() + 3; //trigger, sample count, and ref not considered here
+    else
+        m_uiNumberOfChannels = iEEGChannelCount + 2; //ref and gnd not considered here
+
+    m_uiNumberOfEEGChannels = iEEGChannelCount;
+    m_uiNumberOfBipolarChannels = iBipolarChannelCount;
+
+    std::cout << "iChannelcount " << m_uiNumberOfChannels << std::endl;
+    std::cout << "iEEGChannelcount " << iEEGChannelCount << std::endl;
+    std::cout << "iBipolarChannelCount " << iBipolarChannelCount << std::endl;
 
     std::cout << "EEGoSportsDriver::initDevice - Successfully initialised the device." << std::endl;
 
@@ -149,11 +167,59 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     return true;
 }
 
+//*************************************************************************************************************
+
+bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
+                            int iSamplingFrequency,
+                            bool bMeasureImpedance)
+{
+    //Set global variables
+    m_uiSamplesPerBlock = iSamplesPerBlock;
+    m_uiSamplingFrequency = iSamplingFrequency;
+    m_bMeasureImpedances = bMeasureImpedance;
+
+    try {
+        //Start the stream
+        if(bMeasureImpedance) {
+            m_pDataStream = m_pAmplifier->OpenImpedanceStream();
+
+        } else {
+            //reference_range the range, in volt, for the referential channels. Valid values are: 1, 0.75, 0.15
+            //bipolar_range the range, in volt, for the bipolar channels. Valid values are: 4, 1.5, 0.7, 0.35
+            double reference_range = 0.75;
+            double bipolar_range = 4;
+
+            m_pDataStream = m_pAmplifier->OpenEegStream(m_uiSamplingFrequency, reference_range, bipolar_range);
+        }
+
+#ifdef _WIN32
+        Sleep(100);
+#else
+        sleep(0.1);
+#endif
+    } catch (std::runtime_error& e) {
+        std::cout <<"EEGoSportsDriver::startRecording - error " << e.what() << std::endl;
+        return false;
+    }
+
+    std::cout << "EEGoSportsDriver::startRecording - Successfully started recording." << std::endl;
+
+    // Set flag for successfull initialisation true
+    m_bStartRecordingSuccess = true;
+
+    return true;
+}
 
 //*************************************************************************************************************
 
 bool EEGoSportsDriver::uninitDevice()
 {
+    //Check if the device was initialised
+    if(!m_bStartRecordingSuccess) {
+        std::cout << "Plugin EEGoSports - ERROR - uninitDevice() - Recording was not started - therefore can not be stopped" << std::endl;
+        return false;
+    }
+
     //Check if the device was initialised
     if(!m_bInitDeviceSuccess) {
         std::cout << "Plugin EEGoSports - ERROR - uninitDevice() - Device was not initialised - therefore can not be uninitialised" << std::endl;
@@ -177,6 +243,9 @@ bool EEGoSportsDriver::uninitDevice()
 
     std::cout << "Plugin EEGoSports - INFO - uninitDevice() - Successfully uninitialised the device" << std::endl;
 
+    m_bStartRecordingSuccess = false;
+    m_bInitDeviceSuccess = false;
+
     return true;
 }
 
@@ -188,6 +257,11 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
     //Check if device was initialised and connected correctly
     if(!m_bInitDeviceSuccess) {
         std::cout << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly" << std::endl;
+        return false;
+    }
+
+    if(!m_bStartRecordingSuccess) {
+        std::cout << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because recording was not started" << std::endl;
         return false;
     }
 
@@ -208,7 +282,7 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
         iReceivedSamples = buf.getSampleCount();
         iChannelCount = buf.getChannelCount();
 
-         //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
+        //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
         for(i = 0; i < iReceivedSamples; ++i) {
             vec.resize(iChannelCount);
 
@@ -226,7 +300,7 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
                 break;
             }
 
-            sampleMatrix.col(iSampleIterator) = m_lSampleBlockBuffer.takeFirst();
+            sampleMatrix.col(iSampleIterator).head(iChannelCount) = m_lSampleBlockBuffer.takeFirst();
 
             iSampleIterator++;
         }
@@ -237,8 +311,44 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
             m_outputFileStream << "buf.size(): " << buf.size() << std::endl;
             m_outputFileStream << "iSampleIterator: " << iSampleIterator << std::endl;
             m_outputFileStream << "m_lSampleBlockBuffer.size(): " << m_lSampleBlockBuffer.size() << std::endl << std::endl;
+            std::vector<channel> channellist = m_pDataStream->getChannelList();
+            if(iSampleIterator == 1)
+                for(std::vector<channel>::iterator it = channellist.begin(); it != channellist.end(); ++it){
+                    m_outputFileStream << "Channeltype " << it->getType() << std::endl;
+                    m_outputFileStream << "Channelindex " << it->getIndex() << std::endl;
+                }
         }
     }
 
     return true;
+}
+
+//*************************************************************************************************************
+
+uint EEGoSportsDriver::getNumberOfChannels()
+{
+    return m_uiNumberOfChannels;
+}
+
+uint EEGoSportsDriver::getNumberOfEEGChannels()
+{
+    return m_uiNumberOfEEGChannels;
+}
+
+uint EEGoSportsDriver::getNumberOfBipolarChannels()
+{
+    return m_uiNumberOfBipolarChannels;
+}
+
+//*************************************************************************************************************
+
+QList<uint> EEGoSportsDriver::getChannellist()
+{
+    std::vector<channel> channellist = m_pAmplifier->getChannelList();
+
+    QList<uint> uichannellist;
+    for(std::vector<channel>::iterator it = channellist.begin(); it != channellist.end(); ++it)
+        uichannellist.append(it->getType());
+
+    return uichannellist;
 }
