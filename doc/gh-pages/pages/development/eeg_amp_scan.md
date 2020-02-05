@@ -1,10 +1,11 @@
 ---
 title: EEG amplifier in MNE Scan
+has_children: true
 parent: Develop
 has_children: true
 nav_order: 3
 ---
-# Setup EEG amplifier plugins in MNE Scan
+# EEG amplifier in MNE Scan
 
 |**Please note:** The information provided on this page might be outdated and will be updated soon.|
 
