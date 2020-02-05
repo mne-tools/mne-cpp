@@ -1,9 +1,9 @@
 ---
-title: Team
+title: Contact
 parent: Home
 nav_order: 3
 ---
-# Team
+# Contact
 
 For a list of all contributors please [click here](https://github.com/mne-tools/mne-cpp/graphs/contributors){:target="_blank" rel="noopener"}. If you have questions or feedback please reach out to us via the [MNE Analysis mailing list](https://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis){:target="_blank" rel="noopener"} or contact one of the following people:
 
