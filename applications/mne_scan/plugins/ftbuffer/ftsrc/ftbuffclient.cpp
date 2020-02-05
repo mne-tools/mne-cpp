@@ -386,12 +386,16 @@ void FtBuffClient::idleCall() {
 
     matData.resize(m_iNumChannels, ddef.nsamples);
 
+    qDebug() << "# of Samples:" << ddef.nsamples;
+
     int count = 0;
     for (int i = 0; i < int (ddef.nsamples); i++) {
         for (int j = 0; j < int (ddef.nchans); j++) {
-            matData(j,i) = fdata[count]/100000;
-            //if (count % 32 == 0) qDebug() << "---Blockstart---" << count/32;
-            //qDebug() << fdata[count];
+            if(fdata[count] < 100)
+                matData(j,i) = fdata[count];
+            else
+                matData(j,i) = 0;
+            //if (count % 5 == 0) qDebug() << fdata[count];
             count++;
         }
     }
