@@ -52,8 +52,11 @@
 
 #include <fiff/fiff.h>
 
+#ifdef _WIN32
 #include <Windows.h>
-
+#else
+#include <unistd.h>
+#endif
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -111,6 +114,12 @@ EEGoSports::EEGoSports()
     m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
     connect(m_pActionStartRecording, &QAction::triggered, this, &EEGoSports::showStartRecording);
     addPluginAction(m_pActionStartRecording);
+
+    // Create impedance action bar item/button
+    m_pActionImpedance = new QAction(QIcon(":/images/impedances.png"), tr("Check impedance values"), this);
+    m_pActionImpedance->setStatusTip(tr("Check impedance values"));
+    connect(m_pActionImpedance, &QAction::triggered, this, &EEGoSports::showImpedanceDialog);
+    addPluginAction(m_pActionImpedance);
 }
 
 
@@ -163,6 +172,7 @@ void EEGoSports::init()
     QSettings settings;
     m_iSamplingFreq = settings.value(QString("EEGOSPORTS/sFreq"), 512).toInt();
     m_iNumberOfChannels = 90;
+    m_iNumberOfEEGChannels = 64;
     m_iSamplesPerBlock = settings.value(QString("EEGOSPORTS/samplesPerBlock"), 512).toInt();
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
@@ -172,7 +182,7 @@ void EEGoSports::init()
     QDate date;
     m_sOutputFilePath = settings.value(QString("EEGOSPORTS/outputFilePath"), QString("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day())).toString();
 
-    m_sElcFilePath = settings.value(QString("EEGOSPORTS/elcFilePath"), QString("./Resources/3DLayouts/standard_waveguard64_duke.elc")).toString();
+    m_sElcFilePath = settings.value(QString("EEGOSPORTS/elcFilePath"), QString("./resources/3DLayouts/standard_waveguard64.elc")).toString();
 
     m_sCardinalFilePath = settings.value(QString("EEGOSPORTS/cardinalFilePath"), QString("")).toString();
 
@@ -213,6 +223,14 @@ void EEGoSports::setUpFiffInfo()
     m_pFiffInfo->sfreq = m_iSamplingFreq;
 
     //
+    //Get amplifier data
+    //
+    /*QList<uint> channellist = m_pEEGoSportsProducer->getChannellist();
+
+    for(QList<uint>::iterator i=channellist.begin(); i!=channellist.end(); ++i)
+        std::cout << *i << std::endl;*/
+
+    //
     //Read electrode positions from .elc file
     //
     QList<QVector<float> > elcLocation3D;
@@ -223,6 +241,9 @@ void EEGoSports::setUpFiffInfo()
     if(!LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
         qDebug() << "Error: Reading elc file.";
     }
+
+    bool breflocation = elcChannelNames.contains("ref",Qt::CaseInsensitive);
+    bool bgndlocation = elcChannelNames.contains("gnd",Qt::CaseInsensitive);
 
     //qDebug() << elcLocation3D;
     //qDebug() << elcLocation2D;
@@ -261,14 +282,12 @@ void EEGoSports::setUpFiffInfo()
     QList<FiffDigPoint> digitizerInfo;
 
     //Only write the EEG channel positions to the fiff info. The Refa devices have next to the EEG input channels 10 other input channels (Bipolar, Auxilary, Digital, Test)
-    int numberEEGCh = 64;
-
-    //Check if channel size by user corresponds with read channel informations from the elc file. If not append zeros and string 'unknown' until the size matches.
-    if(numberEEGCh > elcLocation3D.size()) {
+    //Check if channel size by user corresponds with read channel informations from the elc file. Adding 1 for reference channel. If not append zeros and string 'unknown' until the size matches.
+    if((m_iNumberOfEEGChannels + int(breflocation) + int(bgndlocation && m_bCheckImpedances)) > elcLocation3D.size()) {
         qDebug()<<"Warning: setUpFiffInfo() - Not enough positions read from the elc file. Filling missing channel names and positions with zeroes and 'unknown' strings.";
         QVector<float> tempA(3, 0.0);
         QVector<float> tempB(2, 0.0);
-        int size = numberEEGCh-elcLocation3D.size();
+        int size = (m_iNumberOfEEGChannels + int(breflocation) + int(bgndlocation && m_bCheckImpedances)) - elcLocation3D.size();
 
         for(int i = 0; i<size; i++) {
             elcLocation3D.push_back(tempA);
@@ -377,7 +396,7 @@ void EEGoSports::setUpFiffInfo()
     }
 
     //Add EEG electrode positions as digitizers
-    for(int i=0; i<numberEEGCh; i++) {
+    for(int i=0; i < (m_iNumberOfEEGChannels + int(breflocation) + int(bgndlocation && m_bCheckImpedances)); i++) {
         FiffDigPoint digPoint;
         digPoint.kind = FIFFV_POINT_EEG;
         digPoint.ident = i;
@@ -404,7 +423,7 @@ void EEGoSports::setUpFiffInfo()
         FiffChInfo fChInfo;
 
         //EEG Channels
-        if(i<=numberEEGCh-1) {
+        if(i < m_iNumberOfEEGChannels || (i > (m_iNumberOfEEGChannels + m_iNumberOfBipolarChannels)  && m_bCheckImpedances)) {
             //Set channel name
             if(!elcChannelNames.empty() && i<elcChannelNames.size()) {
                 sChType = QString("EEG ");
@@ -463,38 +482,85 @@ void EEGoSports::setUpFiffInfo()
 
             //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
         }
-
-        //Bipolar channels
-        if(i>=64 && i<=87) {
+        //Bipolar channels -- no idea how this behaves for impedance measurement
+        else if(!m_bCheckImpedances && (i >= m_iNumberOfEEGChannels && i < m_iNumberOfEEGChannels + m_iNumberOfBipolarChannels)) {
             //Set channel type
             fChInfo.kind = FIFFV_MISC_CH;
 
             sChType = QString("BIPO ");
-            fChInfo.ch_name = sChType.append(sChType.number(i-64));
+            fChInfo.ch_name = sChType.append(sChType.number(i - m_iNumberOfEEGChannels));
         }
-
         //Digital input channel
-        if(i==88) {
+        else if(!m_bCheckImpedances && i == m_iNumberOfEEGChannels + m_iNumberOfBipolarChannels) {
             //Set channel type
             fChInfo.kind = FIFFV_STIM_CH;
 
             sChType = QString("STIM");
             fChInfo.ch_name = sChType;
         }
-
         //Internally generated test signal - ramp signal
-        if(i==89) {
+        else if(!m_bCheckImpedances && i == m_iNumberOfEEGChannels + m_iNumberOfBipolarChannels + 1) {
             //Set channel type
             fChInfo.kind = FIFFV_MISC_CH;
 
             sChType = QString("TEST");
             fChInfo.ch_name = sChType;
         }
+        //Add reference channel for EEG measurement
+        //Set channel name
+        else if(!m_bCheckImpedances && i == m_iNumberOfChannels - 1) {
+            int refindex = elcChannelNames.indexOf(QRegExp("ref", Qt::CaseInsensitive, QRegExp::RegExp));
+
+            sChType = QString("EEG REF");
+            fChInfo.ch_name = sChType;
+
+            //Set channel type
+            fChInfo.kind = FIFFV_EEG_CH;
+
+            //Set logno
+            fChInfo.logNo = m_iNumberOfChannels;
+
+            //Set coord frame
+            fChInfo.coord_frame = FIFFV_COORD_HEAD;
+
+            //Set unit
+            fChInfo.unit = FIFF_UNIT_V;
+            fChInfo.unit_mul = 0;
+
+            //Set EEG electrode location - Convert from mm to m
+            fChInfo.eeg_loc(0,0) = elcLocation3D[refindex][0]*0.001;
+            fChInfo.eeg_loc(1,0) = elcLocation3D[refindex][1]*0.001;
+            fChInfo.eeg_loc(2,0) = elcLocation3D[refindex][2]*0.001;
+
+            //Set EEG electrode direction - Convert from mm to m
+            fChInfo.eeg_loc(0,1) = center_pos.x()*0.001;
+            fChInfo.eeg_loc(1,1) = center_pos.y()*0.001;
+            fChInfo.eeg_loc(2,1) = center_pos.z()*0.001;
+
+            //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
+            fChInfo.chpos.r0(0) = elcLocation3D[refindex][0]*0.001;
+            fChInfo.chpos.r0(1) = elcLocation3D[refindex][1]*0.001;
+            fChInfo.chpos.r0(2) = elcLocation3D[refindex][2]*0.001;
+
+            fChInfo.chpos.ex(0) = center_pos.x()*0.001;
+            fChInfo.chpos.ex(1) = center_pos.y()*0.001;
+            fChInfo.chpos.ex(2) = center_pos.z()*0.001;
+
+            fChInfo.chpos.ey(0) = 0;
+            fChInfo.chpos.ey(1) = 1;
+            fChInfo.chpos.ey(2) = 0;
+
+            fChInfo.chpos.ez(0) = 0;
+            fChInfo.chpos.ez(1) = 0;
+            fChInfo.chpos.ez(2) = 1;
+        }
 
         QSLChNames << sChType;
 
         m_pFiffInfo->chs.append(fChInfo);
     }
+
+    std::cout << "number of channels " << QSLChNames.length() << std::endl;
 
     //Set channel names in fiff_info_base
     m_pFiffInfo->ch_names = QSLChNames;
@@ -511,12 +577,26 @@ void EEGoSports::setUpFiffInfo()
 
 //*************************************************************************************************************
 
+void EEGoSports::setNumberOfChannels(int iNumberOfChannels, int iNumberOfEEGChannels, int iNumberOfBipolarChannels)
+{
+    m_iNumberOfChannels = iNumberOfChannels;
+    m_iNumberOfEEGChannels = iNumberOfEEGChannels;
+    m_iNumberOfBipolarChannels = iNumberOfBipolarChannels;
+}
+
+//*************************************************************************************************************
+
 bool EEGoSports::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning()) {
         QThread::wait();
     }
+
+    //Initialize amplifier
+    m_pEEGoSportsProducer->init(m_bWriteDriverDebugToFile,
+                                m_sOutputFilePath,
+                                m_bCheckImpedances);
 
     //Setup fiff info
     setUpFiffInfo();
@@ -529,11 +609,8 @@ bool EEGoSports::start()
     //Buffer
     m_qListReceivedSamples.clear();
 
-    m_pEEGoSportsProducer->start(m_iNumberOfChannels,
-                       m_iSamplesPerBlock,
+    m_pEEGoSportsProducer->start(m_iSamplesPerBlock,
                        m_iSamplingFreq,
-                       m_bWriteDriverDebugToFile,
-                       m_sOutputFilePath,
                        m_bCheckImpedances);
 
     if(m_pEEGoSportsProducer->isRunning()) {
@@ -573,7 +650,6 @@ void EEGoSports::setSampleData(MatrixXd &matRawBuffer)
     m_qListReceivedSamples.append(matRawBuffer);
     m_mutex.unlock();
 }
-
 
 //*************************************************************************************************************
 
@@ -617,6 +693,26 @@ void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const 
     m_sNasion = sNasion;
 }
 
+//*************************************************************************************************************
+
+void EEGoSports::showImpedanceDialog()
+{
+    // Open Impedance dialog only if no sampling process is active
+    if(!m_bIsRunning)
+    {
+        if(m_pEEGoSportsImpedanceWidget == NULL)
+            m_pEEGoSportsImpedanceWidget = QSharedPointer<EEGoSportsImpedanceWidget>(new EEGoSportsImpedanceWidget(this));
+
+        if(!m_pEEGoSportsImpedanceWidget->isVisible())
+        {
+            m_pEEGoSportsImpedanceWidget->setWindowTitle("MNE-X - Measure impedances");
+            m_pEEGoSportsImpedanceWidget->show();
+            m_pEEGoSportsImpedanceWidget->raise();
+        }
+
+        m_pEEGoSportsImpedanceWidget->initGraphicScene();
+    }
+}
 
 
 //*************************************************************************************************************
@@ -682,10 +778,10 @@ void EEGoSports::showStartRecording()
         list.removeLast(); // remove file name
         QString fileDir = list.join("/");
 
-        if(!dirExists(fileDir.toStdString())) {
-            QDir dir;
-            dir.mkpath(fileDir);
-        }
+        QDir dir;
+        if(!dir.exists(fileDir))
+            if(!dir.mkpath(fileDir))
+                return;
 
         m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
         fiff_int_t first = 0;
@@ -713,25 +809,6 @@ void EEGoSports::changeRecordingButton()
     }
 }
 
-
-//*************************************************************************************************************
-
-bool EEGoSports::dirExists(const std::string& dirName_in)
-{
-    DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
-
-    if (ftyp == INVALID_FILE_ATTRIBUTES) {
-        return false;  //something is wrong with your path!
-    }
-
-    if (ftyp & FILE_ATTRIBUTE_DIRECTORY) {
-        return true;   // this is a directory!
-    }
-
-    return false;    // this is not a directory!
-}
-
-
 //*************************************************************************************************************
 
 void EEGoSports::run()
@@ -742,18 +819,39 @@ void EEGoSports::run()
         if(m_pEEGoSportsProducer->isRunning()) {
             m_mutex.lock();
 
-            if(m_qListReceivedSamples.isEmpty() == false) {
+            // Check impedances - send new impedance values to graphic scene
+            if(m_bCheckImpedances)
+            {
+                /*MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
 
-                matValue = m_qListReceivedSamples.takeFirst();
+                for(qint32 i = 0; i < matValue.cols(); ++i)
+                    m_pTmsiImpedanceWidget->updateGraphicScene(matValue.col(i).cast<double>());*/
+                if(m_qListReceivedSamples.isEmpty() == false) {
+                    matValue = m_qListReceivedSamples.takeFirst();
+                    //for(qint32 i = 0; i < matValue.cols(); ++i)
+                    m_pEEGoSportsImpedanceWidget->updateGraphicScene(matValue.col(0).cast<double>());
 
-                //Write raw data to fif file
-                if(m_bWriteToFile) {
-                    m_pOutfid->write_raw_buffer(matValue, m_cals);
+                    m_qListReceivedSamples.clear();
                 }
+            }
 
-                //emit values to real time multi sample array
-                //qDebug()<<"EEGoSports::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
-                m_pRMTSA_EEGoSports->data()->setValue(matValue);
+            //pop matrix only if the producer thread is running
+            if(!m_bCheckImpedances)
+            {
+
+                if(m_qListReceivedSamples.isEmpty() == false) {
+
+                    matValue = m_qListReceivedSamples.takeFirst();
+
+                    //Write raw data to fif file
+                    if(m_bWriteToFile) {
+                        m_pOutfid->write_raw_buffer(matValue, m_cals);
+                    }
+
+                    //emit values to real time multi sample array
+                    //qDebug()<<"EEGoSports::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
+                    m_pRMTSA_EEGoSports->data()->setValue(matValue);
+                }
             }
 
             m_mutex.unlock();            
