@@ -6,4 +6,4 @@ nav_order: 1
 ---
 # Learn
 
-Below are some guides to get you started MNE Scan. 
+Below are some guides to get you started with MNE Scan. 
