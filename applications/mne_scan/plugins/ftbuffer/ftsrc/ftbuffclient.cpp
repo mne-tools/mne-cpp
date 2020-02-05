@@ -391,10 +391,7 @@ void FtBuffClient::idleCall() {
     int count = 0;
     for (int i = 0; i < int (ddef.nsamples); i++) {
         for (int j = 0; j < int (ddef.nchans); j++) {
-            if(fdata[count] < 100)
-                matData(j,i) = fdata[count];
-            else
-                matData(j,i) = 0;
+                matData(j,i) = fdata[count] / 100;
             //if (count % 5 == 0) qDebug() << fdata[count];
             count++;
         }
