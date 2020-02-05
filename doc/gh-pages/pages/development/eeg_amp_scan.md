@@ -1,6 +1,7 @@
 ---
 title: EEG amplifier in MNE Scan
 parent: Develop
+has_children: true
 nav_order: 3
 ---
 # Setup EEG amplifier plugins in MNE Scan
