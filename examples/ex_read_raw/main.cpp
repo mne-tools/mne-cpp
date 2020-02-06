@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            qInfo("Could not make the compensator\n");
+            qWarning("Could not make the compensator\n");
             return -1;
         }
     }
