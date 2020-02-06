@@ -2,7 +2,6 @@
 title: EEG amplifier in MNE Scan
 has_children: true
 parent: Develop
-has_children: true
 nav_order: 3
 ---
 # EEG amplifier in MNE Scan
