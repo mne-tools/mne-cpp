@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
     //   Setup for reading the raw data
     //
     FiffRawData raw(t_fileRaw);
-    
+
     //
     //   Set up pick list: MEG + STI 014 - bad channels
     //
