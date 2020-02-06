@@ -12,11 +12,11 @@ This article describes the installation and usage of the BrainAMP EEG driver plu
 
 In order to build the BrainAMP driver, at first, the header file `BrainAmpIoCtl.h` from the BrainAMP SDK has to be included into the mne-cpp project. These files can be found in the device's attached software library. They have to be copied to the BrainAMP driver repository which is to be found under:
 
-`%\mne-cpp\applications\mne_scan\plugins\brainamp`
+`\mne-cpp\applications\mne_scan\plugins\brainamp`
 
 In a second step, the plugin's source code has to be reintegrated into the mne-cpp project. Therefore, in the file :
 
-`%\mne-cpp\applications\mne_scan\plugins\plugins.pro`
+`\mne-cpp\applications\mne_scan\plugins\plugins.pro`
 
 the plugin's project `brainamp` has to be restored by deleting the `#` in front of the name in the Sensor section. After this is done, the MNE Scan project can be rebuilt.
 

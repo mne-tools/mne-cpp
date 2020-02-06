@@ -32,9 +32,9 @@ The acquisition plugins of MNE Scan have similiar structure and therefore can be
 
 On the left side the border of MNE Scan can be seen, whereas on the right side the border to the actual device, in this case the gUSBamp amplifier, is depicted. In between, according to their hierarchical order, the three classes are shown as the interface between program and device:
 
- 1. **gUSBamp**: regulates the communication between MNE Scan and the driver and acts as the main-class.
- 2. **gUSBampproducer**: controls the data acquisition and manages the interface between driver and gUSBamp
- 3. **gUSBampdriver**: actual driver which provides data acquisition and controls the communication between the project and the device
+* **gUSBamp**: regulates the communication between MNE Scan and the driver and acts as the main plugin class.
+* **gUSBampproducer**: controls the data acquisition and manages the interface between driver and gUSBamp
+* **gUSBampdriver**: actual driver which provides data acquisition and controls the communication between the project and the device
 
 However, gUSBampdriver is the actual class, communicating and exchanging data with the device. The gUSBamp and gUSBampproducer classes can be seen as a way, how to integrate the gUSBampdriver class properly into the project.
 
