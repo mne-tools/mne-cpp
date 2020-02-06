@@ -1,10 +1,10 @@
 ---
-title: Natus Amplifier
+title: Natus
 parent: EEG amplifier in MNE Scan
 grand_parent: Develop
-nav_order: 1
+nav_order: 4
 ---
-# Natus Amplifier
+# Natus
 
 |**Please note:** We are working with the SDK v 8.4 so we are only able to connect to a Quantum system. These are typically used in phase 2 surgery of epilepsy.|
 
