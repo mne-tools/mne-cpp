@@ -1,7 +1,7 @@
 ---
 title: GUSBAmp
 parent: EEG amplifier in MNE Scan
-nav_order: 1
+nav_order: 2
 ---
 
 # GUSBAmp
@@ -27,6 +27,6 @@ the plugin's project "gusbamp" has to be restored by deleting the "#" in front o
 For running the gUSBamp EEG plugin, the according driver has to be installed to the operating system. The files can also be found on the device attached software, as well as a documentation which will guide the whole process. After that, the gUSBamp EEG plugin can be used in the MNE Scan environment, like shown in the following figure.
 
 
-The GUI of the gUSBamp EEG plugin.
+![](../../images/GUSBampGUI.jpg "The GUI of the gUSBamp EEG plugin.")
 
 The connected devices and the sample frequency can be set under "set serials" ande "sample rate". Up to 3 more gUSBamp slaves can be connected to one gUSBamp master. Usually, all channels are selected by default. Under "Single Channel Select", this can be changed by clicking on the desired selection. After the settings are done, the acquisition can be started with the green "run" button.
