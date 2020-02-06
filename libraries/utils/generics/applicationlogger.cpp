@@ -8,7 +8,7 @@
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Mainak Jas, Ruben Dörfel. All rights reserved.
+ * Copyright (C) 2019, Mainak Jas, Ruben Dörfel. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -40,6 +40,7 @@
 
 #include <iostream>
 #include "applicationlogger.h"
+#include <stdio.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -60,20 +61,35 @@
 
 
 using namespace UTILSLIB;
-
+using namespace std;
 //*************************************************************************************************************
 //=============================================================================================================
 // Definitions
 //=============================================================================================================
 
-#define COLOR_DEBUG "\033[32;1m"
-#define COLOR_WARN "\033[33;1m"
-#define COLOR_CRITICAL "\033[31;1m"
-#define COLOR_FATAL "\033[33;1m"
-#define COLOR_RESET "\033[0m"
+#ifdef WIN32 
+    #include <wchar.h>
+    #include <windows.h>
+    #define COLOR_DEBUG         SetConsoleTextAttribute(hOut, 0x02)     //green
+    #define COLOR_WARN          SetConsoleTextAttribute(hOut, 0x0E)     //yellow
+    #define COLOR_CRITICAL      SetConsoleTextAttribute(hOut, 0x04)     //red
+    #define COLOR_FATAL         SetConsoleTextAttribute(hOut, 0x04)     //red
+    #define COLOR_RESET         SetConsoleTextAttribute(hOut, 0x0F)     //reset
+    #define COLOR_INFO          SetConsoleTextAttribute(hOut, 0x0A)     //green
+    #define WIN 1                                                       // Flag for using windows
+    #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) COLOR; OUTPUT << ""LEVEL " ";COLOR_RESET; OUTPUT<< MSG << std::endl
 
-#define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) OUTPUT << COLOR << \
-" " LEVEL " " << MSG << COLOR_RESET << "\n"
+#elif
+    #define COLOR_INFO          "\033[32;1m"        //green
+    #define COLOR_DEBUG         "\033[32;1m"        //green
+    #define COLOR_WARN          "\033[33;1m"        //yellow
+    #define COLOR_CRITICAL      "\033[31;1m"        //red
+    #define COLOR_FATAL         "\033[33;1m"        //red
+    #define COLOR_RESET         "\033[0m"           //reset
+
+    #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) OUTPUT << COLOR << \
+    " " LEVEL " " << MSG << COLOR_RESET << "Linux \n"
+#endif
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -93,7 +109,16 @@ void ApplicationLogger::myCustomLogWriter(QtMsgType type,
     static QMutex mutex;
     QMutexLocker locker(&mutex);
 
+    #ifdef WIN32
+        // Enable colored output for
+        // Set output mode to handle virtual terminal sequences
+        HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        DWORD dwMode = 0;
+        dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    #endif
+
     switch (type) {
+
         case QtWarningMsg:
             LOG_WRITE(std::cout, COLOR_WARN, "WARN", msg.toStdString());
             break;
@@ -105,6 +130,9 @@ void ApplicationLogger::myCustomLogWriter(QtMsgType type,
             break;
         case QtDebugMsg:
             LOG_WRITE(std::cout, COLOR_DEBUG, "DEBUG", msg.toStdString());
+            break;
+        case QtInfoMsg:
+            LOG_WRITE(std::cout, COLOR_INFO, "Info", msg.toStdString());
             break;
     }
 }
