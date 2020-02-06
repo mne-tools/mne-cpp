@@ -41,6 +41,7 @@
 
 #include "ftbuffer.h"
 #include "ftbuffproducer.h"
+#include <iostream>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,6 +93,37 @@ QSharedPointer<IPlugin> FtBuffer::clone() const {
 void FtBuffer::init() {
     qDebug() << "Initializing FtBuffer plugin...";
     m_outputConnectors.append(m_pRTMSA_BufferOutput);
+
+    QFile infile("neuromag2ft.fif");
+
+    QBuffer mynewbuffer;
+
+    mynewbuffer.open(QIODevice::ReadWrite);
+
+    if(!infile.open(QIODevice::ReadOnly)){
+        qDebug() << "Could not open file";
+    } else {
+        mynewbuffer.write(infile.readAll());
+    }
+
+    qDebug() << "My new buffer of size" << mynewbuffer.size();
+
+//    mynewbuffer.seek(0);
+
+    m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(mynewbuffer));
+
+    //qDebug() << "Buffer fed to FiffRawData, now buffer of size" << chunkData->size();
+
+    m_bCustomFiff = true;
+
+    m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo (m_pNeuromagHeadChunkData->info));
+
+
+    //Set the channel size of the RMTSA
+    m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
+    m_pRTMSA_BufferOutput->data()->setVisibility(true);
+
 }
 
 //*************************************************************************************************************
@@ -314,12 +346,14 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
     qDebug() << "Appending matrix";
     m_mutex.lock();
     if(m_bIsRunning) {
-        if (!m_bBuffOutputSet) {
-            qDebug() << "Setting up buffer output";
-            setupRTMSA();
-            m_bBuffOutputSet = true;
-        }
+//        if (!m_bBuffOutputSet) {
+//            qDebug() << "Setting up buffer output";
+//            setupRTMSA();
+//            m_bBuffOutputSet = true;
+//        }
         m_pRTMSA_BufferOutput->data()->setValue(matData);
+        //std::cout << matData.col(0);
+
     }
     m_mutex.unlock();
     qDebug() << "Done.";
@@ -367,27 +401,27 @@ void FtBuffer::parseHeader(QBuffer* chunkData) {
 //                             << chunkData->getChar(&ch) << ch;
 
 
-    QFile infile("neuromag2ft.fif");
+//    QFile infile("neuromag2ft.fif");
 
-    QBuffer mynewbuffer;
+//    QBuffer mynewbuffer;
 
-    mynewbuffer.open(QIODevice::ReadWrite);
+//    mynewbuffer.open(QIODevice::ReadWrite);
 
-    if(!infile.open(QIODevice::ReadOnly)){
-        qDebug() << "Could not open file";
-    } else {
-        mynewbuffer.write(infile.readAll());
-    }
+//    if(!infile.open(QIODevice::ReadOnly)){
+//        qDebug() << "Could not open file";
+//    } else {
+//        mynewbuffer.write(infile.readAll());
+//    }
 
-    qDebug() << "My new buffer of size" << mynewbuffer.size();
+//    qDebug() << "My new buffer of size" << mynewbuffer.size();
 
-//    mynewbuffer.seek(0);
+////    mynewbuffer.seek(0);
 
-    m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(mynewbuffer));
+//    m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(mynewbuffer));
 
-    //qDebug() << "Buffer fed to FiffRawData, now buffer of size" << chunkData->size();
+//    //qDebug() << "Buffer fed to FiffRawData, now buffer of size" << chunkData->size();
 
-    m_bCustomFiff = true;
+//    m_bCustomFiff = true;
 
 
 //    QFile outfile("mytestoutput.txt");
