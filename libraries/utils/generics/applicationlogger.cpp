@@ -78,7 +78,7 @@ using namespace std;
     #define COLOR_RESET         SetConsoleTextAttribute(hOut, 7)        //reset
     #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) COLOR; OUTPUT << ""LEVEL " ";COLOR_RESET; OUTPUT<< MSG << std::endl
 
-#elif
+#else
     #define COLOR_INFO          "\033[32;1m"        //green
     #define COLOR_DEBUG         "\033[32;1m"        //green
     #define COLOR_WARN          "\033[33;1m"        //yellow
