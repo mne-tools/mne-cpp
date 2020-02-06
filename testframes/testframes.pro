@@ -49,6 +49,7 @@ SUBDIRS += \
     test_dipole_fit \
     test_fiff_rwr \
     test_fiff_mne_types_io \
+    test_hpiFpit \
     test_mne_forward_solution \
     test_fiff_cov \
     test_fiff_digitizer \
