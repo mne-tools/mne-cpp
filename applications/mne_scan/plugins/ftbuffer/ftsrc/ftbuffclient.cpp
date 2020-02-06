@@ -391,12 +391,19 @@ void FtBuffClient::idleCall() {
     int count = 0;
     for (int i = 0; i < int (ddef.nsamples); i++) {
         for (int j = 0; j < int (ddef.nchans); j++) {
-                matData(j,i) = fdata[count] / 100;
-            //if (count % 5 == 0) qDebug() << fdata[count];
+                matData(j,i) = fdata[count];
+            //if (j % 2 == 0 && i == 0) qDebug() << fdata[count];
+            //if (j % 3 == 0) qDebug() << fdata[count];
             count++;
         }
     }
     qDebug() << "matData" << matData.size();
+
+//    for (int i = 0; i < 40; i++){
+//        for (int j = 0; j < 40; j++){
+//            qDebug() << fdata[i + j];
+//        }
+//    }
 
     m_pMatEmit = new Eigen::MatrixXd(matData.cast<double>());
     m_bnewData = true;
