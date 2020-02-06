@@ -182,7 +182,13 @@ int main(int argc, char *argv[])
 
     if (current_comp != dest_comp)
     {
-        qDebug() << "This part needs to be debugged";
+        qDebug() << "Debug Message";
+        qInfo() << "Info Message";
+        qWarning() << "Warning Message";
+        qCritical() << "Critical Message";
+        qFatal("Debug Message");
+
+
         if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
         {
             raw.info.set_current_comp(dest_comp);
