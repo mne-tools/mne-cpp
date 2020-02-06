@@ -11,8 +11,7 @@
 #
 # @section  LICENSE
 #
-#
-#                      Copyright (C) 2013, Christoph Dinh, Lorenz Esch, Louis Eichhorst, Simon Heinke, Viktor Klueber. All rights reserved.
+# Copyright (C) 2013, Christoph Dinh, Lorenz Esch, Louis Eichhorst, Simon Heinke, Viktor Klueber. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -33,7 +32,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the plugins for MNE Scan project.
+# @brief    This project file builds the plugins for MNE Scan.
 #
 #--------------------------------------------------------------------------------------------------------------
 
