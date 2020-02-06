@@ -61,6 +61,7 @@
 #include <QDebug>
 #include <QGenericMatrix>
 #include <QQuaternion>
+#include <QElapsedTimer>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,9 +87,31 @@ using namespace FIFFLIB;
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
 
+void write_pos(const float time, const int index, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::MatrixXd& position){
+    // Write quaternions and time in position matri. Format is the same as in maxfilter .pos files, but we only write quaternions and time. So column 7,8,9 are not used
+    QMatrix3x3 rot;
+
+    for(int ir = 0; ir < 3; ir++) {
+        for(int ic = 0; ic < 3; ic++) {
+            rot(ir,ic) = info->dev_head_t.trans(ir,ic);
+        }
+    }
+
+    QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
+    quatHPI.normalize();
+    //std::cout << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
+    position(index,0) = time;
+    position(index,1) = quatHPI.x();
+    position(index,2) = quatHPI.y();
+    position(index,3) = quatHPI.z();
+    position(index,4) = info->dev_head_t.trans(0,3);
+    position(index,5) = info->dev_head_t.trans(1,3);
+    position(index,6) = info->dev_head_t.trans(2,3);
+}
 
 int main(int argc, char *argv[])
 {
+    QElapsedTimer timer;
     QCoreApplication a(argc, argv);
 
     // Command Line Parser
@@ -96,7 +119,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("hpiFit Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/test_meas_move.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/data_with_movement_chpi_raw.fif");
 
     parser.addOption(inputOption);
 
@@ -111,17 +134,13 @@ int main(int argc, char *argv[])
     RowVectorXd cals;
 
     // Read Quaternion File
-
     Eigen::MatrixXd pos;
-    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/meas_move.txt");
+    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/quat_meas_move.txt");
 
+    //std::cout << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
+    Eigen::MatrixXd position = Eigen::MatrixXd::Zero(pos.rows(),pos.cols());
     // Set up the reading parameters to read the whole file at once
     // seconds to read
-    float from = 0;
-    float to = 20;
-
-    from = floor(from*pFiffInfo->sfreq);
-    to   = ceil(to*pFiffInfo->sfreq);
 
     // Only filter MEG and EEG channels
     RowVectorXi picks = raw.info.pick_types(true, false, false);
@@ -130,56 +149,50 @@ int main(int argc, char *argv[])
     MatrixXd matData;
     MatrixXd times;
 
-    qDebug() << "Reading ...\n";
-    // Reading
-    if(!raw.read_raw_segment_times(matData, times, from, to)) {
-        printf("error during read_raw_segment\n");
-        return -1;
-    }
-    qDebug() << "[done]\n";
+    // Set up the reading parameters
+    fiff_int_t from;
+    fiff_int_t to;
+    fiff_int_t first = raw.first_samp;
+    fiff_int_t last = raw.last_samp;
 
-    // setup informations to be passed to fitHPI
+    float quantum_sec = 0.2f;//read and write in 200 ms junks
+    fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
+
+    // setup informations for HPI fit
     QVector<int> vFreqs {166,154,161,158};
     QVector<double> vGof;
     FiffDigPointSet fittedPointSet;
     Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
-
-    // enable debug
     bool bDoDebug = true;
-    QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
-    qDebug() << "HPI-Fit...";
-    HPIFit::fitHPI(matData,
-                   matProjectors,
-                   raw.info.dev_head_t,
-                   vFreqs,
-                   vGof,
-                   fittedPointSet,
-                   pFiffInfo,
-                   bDoDebug = 0,
-                   sHPIResourceDir);
 
-    std::cout << "[done]\n"<< std::endl;
-
-    QMatrix3x3 rot;
-
-    for(int ir = 0; ir < 3; ir++) {
-        for(int ic = 0; ic < 3; ic++) {
-            rot(ir,ic) = raw.info.dev_head_t.trans(ir,ic);
+    for(int i = 0; i < pos.rows(); i++) {
+        from = first + pos(i,0)*pFiffInfo->sfreq;
+        to = from + quantum;
+        if (to > last) {
+            to = last;
         }
+        // Reading
+        if(!raw.read_raw_segment(matData, times, from, to)) {
+            printf("error during read_raw_segment\n");
+            return -1;
+        }
+        qDebug() << "[done]\n";
+
+        QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
+        qDebug() << "HPI-Fit...";
+        timer.start();
+        HPIFit::fitHPI(matData,
+                       matProjectors,
+                       pFiffInfo->dev_head_t,
+                       vFreqs,
+                       vGof,
+                       fittedPointSet,
+                       pFiffInfo,
+                       bDoDebug = 0,
+                       sHPIResourceDir);
+        qDebug() << "The slow operation took" << timer.elapsed() << "milliseconds";
+        std::cout << "[done]\n"<< std::endl;
+        write_pos(pos(i,0),i,pFiffInfo,position);
     }
-
-    QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
-
-    std::cout << "quatHPI.x(): " << quatHPI.x() << std::endl;
-    std::cout << "quatHPI.y(): " << quatHPI.y() << std::endl;
-    std::cout << "quatHPI.z(): " << quatHPI.z() << std::endl;
-
-    std::cout << "trans x: " << raw.info.dev_head_t.trans(0,3) << std::endl;
-    std::cout << "trans y: " << raw.info.dev_head_t.trans(1,3) << std::endl;
-    std::cout << "trans z: " << raw.info.dev_head_t.trans(2,3) << std::endl;
-
-    // Write GOF to HPI Ch #7
-    // Write goodness of fit (GOF)to HPI Ch #7
-    std::cout << "GOF: " << vGof[0] << std::endl;
-    return 0;
+    UTILSLIB::IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
 }
