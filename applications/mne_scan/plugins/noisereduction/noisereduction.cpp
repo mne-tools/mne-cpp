@@ -478,11 +478,11 @@ void NoiseReduction::setFilterChannelType(QString sType)
             m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH)/* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
 
             if(m_sFilterChannelType == "All") {
-                m_lFilterChannelList.resize(m_lFilterChannelList.cols() + 1);
-                m_lFilterChannelList[m_lFilterChannelList.cols() -1] = i;
+                m_lFilterChannelList.conservativeResize(m_lFilterChannelList.cols() + 1);
+                m_lFilterChannelList[m_lFilterChannelList.cols()-1] = i;
             } else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
-                m_lFilterChannelList.resize(m_lFilterChannelList.cols() + 1);
-                m_lFilterChannelList[m_lFilterChannelList.cols() -1] = i;
+                m_lFilterChannelList.conservativeResize(m_lFilterChannelList.cols() + 1);
+                m_lFilterChannelList[m_lFilterChannelList.cols()-1] = i;
             }
         }
     }
@@ -695,9 +695,9 @@ void NoiseReduction::run()
             QList<FilterData> list;
             list << m_filterData;
             t_mat = m_pRtFilter->filterDataBlock(t_mat,
-                                                            m_iMaxFilterLength,
-                                                            m_lFilterChannelList,
-                                                            list);
+                                                 m_iMaxFilterLength,
+                                                 m_lFilterChannelList,
+                                                 list);
         }
 
 //        qDebug()<<"t_mat dim:"<<t_mat.rows()<<"x"<<t_mat.cols();
