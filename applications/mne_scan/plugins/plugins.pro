@@ -42,11 +42,11 @@ TEMPLATE = subdirs
 
 #Sensors
 SUBDIRS += \
-    brainflowboard \
     fiffsimulator \
     neuromag \
     babymeg \
     natus \
+#    brainflowboard \ # needs to change workflows a little to build brainflow
 #    gusbamp \ # Needs header files, shipped with the vendor's SDK
 #    eegosports \ # Needs header files, shipped with the vendor's SDK
 #    brainamp \ # Needs header files, shipped with the vendor's SDK
