@@ -75,7 +75,7 @@
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
+    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
     QApplication a(argc, argv);
 
     // Command Line Parser

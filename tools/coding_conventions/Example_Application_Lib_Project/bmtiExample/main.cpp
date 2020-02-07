@@ -77,7 +77,7 @@ Test *m_pTest = NULL;
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
+    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
     QApplication a(argc, argv);
 
     //Create main window instance and show

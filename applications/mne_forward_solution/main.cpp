@@ -77,7 +77,7 @@ using namespace FWDLIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
+    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
     QApplication app(argc, argv);
 
     ComputeFwdSettings settings(&argc,argv);

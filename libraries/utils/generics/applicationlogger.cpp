@@ -101,7 +101,7 @@ ApplicationLogger::ApplicationLogger()
 
 //*************************************************************************************************************
 
-void ApplicationLogger::myCustomLogWriter(QtMsgType type,
+void ApplicationLogger::CustomLogWriter(QtMsgType type,
                                           const QMessageLogContext &context,
                                           const QString &msg) {
 

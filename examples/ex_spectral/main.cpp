@@ -88,7 +88,7 @@ using namespace UTILSLIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
+    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
     QApplication a(argc, argv);
 
     // Generate input data
