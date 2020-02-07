@@ -68,9 +68,6 @@ namespace UTILSLIB
 class UTILSSHARED_EXPORT ApplicationLogger
 {
 public:
-
-    ApplicationLogger();
-
     //=========================================================================================================
     /**
      * Customized logWriter to colorize type of the message in the terminal

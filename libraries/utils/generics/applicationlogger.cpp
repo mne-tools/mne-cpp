@@ -94,13 +94,6 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ApplicationLogger::ApplicationLogger()
-{
-
-}
-
-//*************************************************************************************************************
-
 void ApplicationLogger::CustomLogWriter(QtMsgType type,
                                           const QMessageLogContext &context,
                                           const QString &msg) {
