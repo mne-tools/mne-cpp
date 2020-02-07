@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     //
     qint32 k = 0;
     if (raw.info.projs.size() == 0)
-        printf("No projector specified for these data\n");
+        qInfo("No projector specified for these data\n");
     else
     {
         //
@@ -156,16 +156,16 @@ int main(int argc, char *argv[])
         for (k = 0; k < raw.info.projs.size(); ++k)
             raw.info.projs[k].active = true;
 
-        printf("%d projection items activated\n",raw.info.projs.size());
+        qInfo("%d projection items activated\n",raw.info.projs.size());
         //
         //   Create the projector
         //
         fiff_int_t nproj = raw.info.make_projector(raw.proj);
 
         if (nproj == 0)
-            printf("The projection vectors do not apply to these channels\n");
+            qWarning("The projection vectors do not apply to these channels\n");
         else
-            printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+            qInfo("Created an SSP operator (subspace dimension = %d)\n",nproj);
     }
 
     //
@@ -175,28 +175,21 @@ int main(int argc, char *argv[])
     qint32 dest_comp = -1;
 
     if (current_comp > 0)
-        printf("Current compensation grade : %d\n",current_comp);
+        qInfo("Current compensation grade : %d\n",current_comp);
 
     if (keep_comp)
         dest_comp = current_comp;
 
     if (current_comp != dest_comp)
     {
-        qDebug() << "Debug Message";
-        qInfo() << "Info Message";
-        qWarning() << "Warning Message";
-        qCritical() << "Critical Message";
-        qFatal("Debug Message");
-
-
         if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
         {
             raw.info.set_current_comp(dest_comp);
-            printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
+            qInfo("Appropriate compensator added to change to grade %d.\n",dest_comp);
         }
         else
         {
-            printf("Could not make the compensator\n");
+            qInfo("Could not make the compensator\n");
             return -1;
         }
     }
@@ -214,15 +207,13 @@ int main(int argc, char *argv[])
 
     if (!readSuccessful)
     {
-        printf("Could not read raw segment.\n");
+        qWarning("Could not read raw segment.\n");
         return -1;
     }
 
-    printf("Read %d samples.\n",(qint32)data.cols());
-
+    qInfo("Read %d samples.\n",(qint32)data.cols());
 
     std::cout << data.block(0,0,10,10) << std::endl;
-
 
     return app.exec();
 }
