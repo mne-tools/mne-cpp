@@ -80,7 +80,7 @@ using namespace RTSERVER;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::CustomLogWriter);
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
 
     MNERTServer t_MneRtServer;
