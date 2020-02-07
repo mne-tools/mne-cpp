@@ -39,6 +39,8 @@
 //=============================================================================================================
 
 #include <stdio.h>
+#include <utils/generics/applicationlogger.h>
+
 #include "info.h"
 #include "analyzecore.h"
 
@@ -76,6 +78,8 @@ AnalyzeCore *pAnalyzeCore;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
 
     //set application settings
     QCoreApplication::setOrganizationName(CInfo::OrganizationName());
