@@ -43,8 +43,14 @@
 #include <math.h>
 
 #include <fiff/fiff.h>
-#include <utils/filterTools/filterdata.h>
-#include <rtprocessing/rtfilter.h>
+
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_dig_point_set.h>
+#include <fiff/fiff_cov.h>
+#include <inverse/hpiFit/hpifit.h>
+#include <inverse/hpiFit/hpifitdata.h>
+#include <utils/ioutils.h>
+#include <fwd/fwd_coil_set.h>
 
 #include <Eigen/Dense>
 
@@ -56,6 +62,8 @@
 #include <QtCore/QCoreApplication>
 #include <QFile>
 #include <QCommandLineParser>
+#include <QDebug>
+#include <QQuaternion>
 #include <QtTest>
 
 //*************************************************************************************************************
@@ -65,7 +73,7 @@
 
 using namespace FIFFLIB;
 using namespace UTILSLIB;
-using namespace RTPROCESSINGLIB;
+using namespace INVERSELIB;
 
 //=============================================================================================================
 /**
@@ -91,15 +99,11 @@ private:
     double epsilon;
     int order;
 
-    MatrixXd first_in_data;
-    MatrixXd first_in_times;
-    MatrixXd first_filtered;
+    MatrixXd matData;
+    MatrixXd times;
 
-    MatrixXd ref_in_data;
-    MatrixXd ref_in_times;
-    MatrixXd ref_filtered;
-
-    MatrixXi picks;
+    Eigen::MatrixXd ref_pos;
+    Eigen::MatrixXd hpi_pos;
 };
 
 //*************************************************************************************************************
@@ -111,121 +115,116 @@ TestFiffRFR::TestFiffRFR()
 
 //*************************************************************************************************************
 
+void write_pos(const float time, const int index, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::MatrixXd& position){
+    // Write quaternions and time in position matri. Format is the same as in maxfilter .pos files, but we only write quaternions and time. So column 7,8,9 are not used
+    QMatrix3x3 rot;
+
+    for(int ir = 0; ir < 3; ir++) {
+        for(int ic = 0; ic < 3; ic++) {
+            rot(ir,ic) = info->dev_head_t.trans(ir,ic);
+        }
+    }
+
+    QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
+    quatHPI.normalize();
+    //std::cout << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
+    position(index,0) = time;
+    position(index,1) = quatHPI.x();
+    position(index,2) = quatHPI.y();
+    position(index,3) = quatHPI.z();
+    position(index,4) = info->dev_head_t.trans(0,3);
+    position(index,5) = info->dev_head_t.trans(1,3);
+    position(index,6) = info->dev_head_t.trans(2,3);
+}
+
 void TestFiffRFR::initTestCase()
 {
     qDebug() << "Epsilon" << epsilon;
 
-    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");
-
-    // Filter in Python is created with following function: mne.filter.design_mne_c_filter(raw.info['sfreq'], 5, 10, 1, 1)
-    // This will create a filter with with 8193 elements/taps/order. In order to be concise with the MNE-CPP implementation
-    // the filter is cut to the order used in mne-cpp (1024, see below).//
-    // The actual filtering was performed with the function: mne.filter._overlap_add_filter(dataIn, filter_python, phase = 'linear')
-    QFile t_fileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_rtfilter_filterdata_raw.fif");
+    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
     // Make sure test folder exists
-    QFileInfo t_fileOutInfo(t_fileOut);
-    QDir().mkdir(t_fileOutInfo.path());
+    QFileInfo t_fileInInfo(t_fileIn);
+    QDir().mkdir(t_fileInInfo.path());
 
     //*********************************************************************************************************
-    // First Read, Filter & Write
+    // Read and HPI fit
     //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read, Filter & Write >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read and HPI fit  >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     // Setup for reading the raw data
-    FiffRawData first_in_raw;
-    first_in_raw = FiffRawData(t_fileIn);
+    FiffRawData raw;
+    raw = FiffRawData(t_fileIn);
+    QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(raw.info));
 
     // Only filter MEG channels
-    RowVectorXi picks = first_in_raw.info.pick_types(true, true, false);
+    RowVectorXi picks = raw.info.pick_types(true, false, false);
     RowVectorXd cals;
-    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, first_in_raw.info, cals);
 
-    //   Set up the reading parameters
-    //   To read the whole file at once set
+    // Set up the reading parameters
+    fiff_int_t from;
+    fiff_int_t to;
+    fiff_int_t first = raw.first_samp;
+    fiff_int_t last = raw.last_samp;
 
-    fiff_int_t from = first_in_raw.first_samp;
-    fiff_int_t to = first_in_raw.last_samp;
+    float quantum_sec = 0.2f;//read and write in 200 ms junks
+    fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
 
-    // initialize filter settings
-    QString filter_name = "example_cosine";
-    FilterData::FilterType type = FilterData::BPF;
-    double sFreq = first_in_raw.info.sfreq;
-    double dCenterfreq = 10;
-    double dBandwidth = 10;
-    double dTransition = 1;
-    order = 1024;
+    // Read Quaternion File from maxfilter
+    UTILSLIB::IOUtils::read_eigen_matrix(ref_pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
+    hpi_pos = Eigen::MatrixXd::Zero(ref_pos.rows(),ref_pos.cols());
 
-    RtFilter rtFilter;
-    MatrixXd dataFiltered;
+    // Setup informations for HPI fit
+    QVector<int> vFreqs {166,154,161,158};
+    QVector<double> vGof;
+    FiffDigPointSet fittedPointSet;
+    Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
+    bool bDoDebug = false;
 
-    // Reading
-    if(!first_in_raw.read_raw_segment(first_in_data, first_in_times, from, to)) {
-        printf("error during read_raw_segment\n");
+    for(int i = 0; i < hpi_pos.rows(); i++) {
+        from = first + hpi_pos(i,0)*pFiffInfo->sfreq;
+        to = from + quantum;
+        if (to > last) {
+            to = last;
+        }
+        // Reading
+        if(!raw.read_raw_segment(matData, times, from, to)) {
+            qWarning("error during read_raw_segment\n");
+        }
+        qInfo() << "[done]\n";
+
+        QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
+        qInfo()  << "HPI-Fit...";
+
+        HPIFit::fitHPI(matData,
+                       matProjectors,
+                       pFiffInfo->dev_head_t,
+                       vFreqs,
+                       vGof,
+                       fittedPointSet,
+                       pFiffInfo,
+                       bDoDebug = 0,
+                       sHPIResourceDir);
+        qInfo() << "[done]\n";
+        write_pos(ref_pos(i,0),i,pFiffInfo,hpi_pos);
     }
-
-    // Filtering
-    printf("Filtering...");
-    first_filtered = rtFilter.filterData(first_in_data, type, dCenterfreq, dBandwidth, dTransition, sFreq, picks);
-    printf("[done]\n");
-
-    // Writing
-    printf("Writing...");
-    outfid->write_int(FIFF_FIRST_SAMPLE, &from);
-    outfid->write_raw_buffer(first_filtered,cals);
-    printf("[done]\n");
-
-    outfid->finish_writing_raw();
-
-    // Read filtered data from the filtered output file to check if read and write is working correctly
-    FiffRawData second_in_Raw;
-    second_in_Raw = FiffRawData(t_fileOut);
-
-    // Reading
-    if (!second_in_Raw.read_raw_segment(first_filtered,first_in_times,from,to,picks)) {
-        printf("error during read_raw_segment\n");
-    }
-
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Read, Filter & Write Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
-
-    //*********************************************************************************************************
-    // Read MNE-PYTHON Results As Reference
-    //*********************************************************************************************************
-
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read MNE-PYTHON Results As Reference >>>>>>>>>>>>>>>>>>>>>>>>>\n");
-
-    FiffRawData ref_in_raw;
-    ref_in_raw = FiffRawData(t_fileRef);
-
-    // Reading
-    if (!ref_in_raw.read_raw_segment(ref_filtered,ref_in_times,from,to,picks)) {
-        printf("error during read_raw_segment\n");
-    }
-
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Read MNE-PYTHON Results Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
 
 //*************************************************************************************************************
 
 void TestFiffRFR::compareData()
 {
-    //make sure to only read data after 1/2 filter length
-    int length = first_filtered.cols()-int(order/2);
-    MatrixXd data_diff = first_filtered.block(0,int(order/2),first_filtered.rows(),length) - ref_filtered.block(0,int(order/2),ref_filtered.rows(),length);
-    QVERIFY( data_diff.sum() < epsilon );
+    // create error matrix for quaternion and translation channels
+    MatrixXd diff = MatrixXd::Zero(ref_pos.rows(),ref_pos.cols()-3);
+    for(int i = 0;i < diff.cols();i++){
+        diff.col(i) = ref_pos.col(i)-hpi_pos.col(i);
+    }
 
+    QVERIFY( data_diff.sum() < epsilon );
 }
 
 //*************************************************************************************************************
-
-void TestFiffRFR::compareTimes()
-{
-    MatrixXd times_diff = first_in_times - ref_in_times;
-    QVERIFY( times_diff.sum() < epsilon );
-
-}
 
 void TestFiffRFR::cleanupTestCase()
 {

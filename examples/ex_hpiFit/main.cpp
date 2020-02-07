@@ -142,10 +142,10 @@ int main(int argc, char *argv[])
     // Set up the reading parameters to read the whole file at once
     // seconds to read
 
-    // Only filter MEG and EEG channels
+    // Only filter MEG channels
     RowVectorXi picks = raw.info.pick_types(true, false, false);
 
-    // Read, filter and write the data
+    // Read the data
     MatrixXd matData;
     MatrixXd times;
 

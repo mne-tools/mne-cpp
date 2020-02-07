@@ -40,7 +40,7 @@ TEMPLATE = app
 VERSION = $${MNE_CPP_VERSION}
 
 QT += testlib
-QT -= gui
+QT += gui
 
 CONFIG   += console
 CONFIG   -= app_bundle
