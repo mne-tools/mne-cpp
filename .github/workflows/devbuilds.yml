@@ -37,7 +37,6 @@ jobs:
         git push -f --tag
         # Create new dev_build release
         hub release create -m "Development Builds" dev_build --prerelease
-
   Linux:
     runs-on: ubuntu-16.04
     needs: UpdateDevTag
@@ -55,17 +54,8 @@ jobs:
       with:
         version: 5.14.1
         modules: qtcharts
-    - name: Build BrainFlow
-      run: |
-        sudo pip install cmake==3.13.0
-        mkdir $GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/build
-        cd $GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/build
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/installed ..
-        make
-        make install
-        cd $GITHUB_WORKSPACE
     - name: Configure and compile MNE-CPP
-      run: |
+      run: |        
         qmake -r MNECPP_CONFIG+=noTests
         make -j2 
     - name: Package binaries
@@ -77,7 +67,7 @@ jobs:
         sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
         # Creating a directory for linuxdeployqt to create results 
         sudo mkdir -p -m777 mne-cpp
-        # Copying built data to folder for easy packaging 	
+        # Copying built data to folder for easy packaging   
         cp -r ./bin ./lib mne-cpp/
         # linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
         cd mne-cpp
@@ -110,17 +100,8 @@ jobs:
       with:
         version: 5.14.1
         modules: qtcharts
-    - name: Build BrainFlow
-      run: |
-        sudo pip install cmake==3.13.0
-        mkdir $GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/build
-        cd $GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/build
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/installed ..
-        make
-        make install
-        cd $GITHUB_WORKSPACE
     - name: Configure and compile MNE-CPP
-      run: |
+      run: |        
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples
         make -j2
     - name: Package binaries
@@ -156,17 +137,9 @@ jobs:
         modules: qtcharts
     - name: Install jom (Windows)
       run: |
-        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
-    - name: Build BrainFlow
-      run: |
-        sudo pip install cmake==3.13.0
-        mkdir $GITHUB_WORKSPACE\applications/mne_scan/plugins/brainflowboard/brainflow/build
-        cd $GITHUB_WORKSPACE/applications/mne_scan/plugins/brainflowboard/brainflow/build
-        cmake -G "Visual Studio 14 2015 Win64" -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed ..
-        cmake --build . --target install --config Release
-        cd $GITHUB_WORKSPACE
+        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
@@ -226,7 +199,6 @@ jobs:
           # Hide codecov output since it corrupts the log too much
           codecov > /dev/null
         done
-
   Doxygen:
     runs-on: ubuntu-latest
     needs: UpdateDevTag
@@ -239,7 +211,7 @@ jobs:
         sudo apt-get update -qq
         sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
     - name: Run Doxygen and package result
-      run: |
+      run: |        
         cd doc/doxygen
         doxygen mne-cpp_doxyfile
     - name: Setup Github credentials
@@ -255,7 +227,7 @@ jobs:
         tag: dev_build
         overwrite: true
     - name: Update documentation at Github pages
-      run: |
+      run: |    
         cd doc/doxygen
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE
@@ -272,7 +244,6 @@ jobs:
         git add .nojekyll
         git commit --amend -a -m 'Update docu'
         git push -f --all    
-
   gh-pages:
     runs-on: ubuntu-latest
     needs: UpdateDevTag
