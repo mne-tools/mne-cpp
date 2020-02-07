@@ -18,7 +18,6 @@ public:
     ~BrainFlowStreamingWidget();
 
     void configureBoard();
-    void applyFilters();
 
 private:
     BrainFlowBoard *m_pBrainFlowBoard;
