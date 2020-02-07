@@ -93,37 +93,6 @@ QSharedPointer<IPlugin> FtBuffer::clone() const {
 void FtBuffer::init() {
     qDebug() << "Initializing FtBuffer plugin...";
     m_outputConnectors.append(m_pRTMSA_BufferOutput);
-
-    QFile infile("neuromag2ft.fif");
-
-    QBuffer mynewbuffer;
-
-    mynewbuffer.open(QIODevice::ReadWrite);
-
-    if(!infile.open(QIODevice::ReadOnly)){
-        qDebug() << "Could not open file";
-    } else {
-        mynewbuffer.write(infile.readAll());
-    }
-
-    qDebug() << "My new buffer of size" << mynewbuffer.size();
-
-//    mynewbuffer.seek(0);
-
-    m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(mynewbuffer));
-
-    //qDebug() << "Buffer fed to FiffRawData, now buffer of size" << chunkData->size();
-
-    m_bCustomFiff = true;
-
-    m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo (m_pNeuromagHeadChunkData->info));
-
-
-    //Set the channel size of the RMTSA
-    m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
-    m_pRTMSA_BufferOutput->data()->setVisibility(true);
-
 }
 
 //*************************************************************************************************************
@@ -371,18 +340,32 @@ void FtBuffer::setParams(QPair<int,float> val) {
 //*************************************************************************************************************
 
 void FtBuffer::setupRTMSA() {
-    //Setup fiff info before setting up the RMTSA because we need it to init the RTMSA
-    qDebug() << "Setting up RTMSA...";
-    if(!m_bCustomFiff){
-        qDebug() << "Default Fiff:";
-        setUpFiffInfo();
-    } else {
-        m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo (m_pNeuromagHeadChunkData->info));
-    }
 
-    //Set the channel size of the RMTSA
-    m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
+    qInfo() << "Attempting to set up parameters from .fif file...";
+
+    QBuffer qbuffInputSampleFif;
+    qbuffInputSampleFif.open(QIODevice::ReadWrite);
+
+    QFile infile("neuromag2ft.fif");
+
+    if(!infile.open(QIODevice::ReadOnly)){
+        qWarning() << "Could not open file. Plugin will not run as expected";
+        qInfo() << "Please verify neuromag2ft.fif is present in bin folder.";
+    } else {
+        qbuffInputSampleFif.write(infile.readAll());
+
+        m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(qbuffInputSampleFif));
+        m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo (m_pNeuromagHeadChunkData->info));
+
+        m_bCustomFiff = true;
+
+        //Set the RMTSA parameters
+        m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
+        m_pRTMSA_BufferOutput->data()->setVisibility(true);
+
+        qInfo() << "Done.";
+    }
 }
 
 //*************************************************************************************************************
@@ -598,3 +581,19 @@ void FtBuffer::parseHeader(QBuffer* chunkData) {
 ////        qDebug () << "Neuromag HPI found, size" << neuromagHPI->def.size;
 ////    }
 
+//*************************************************************************************************************
+
+//void FtBuffer::setupRTMSA() {
+//    //Setup fiff info before setting up the RMTSA because we need it to init the RTMSA
+//    qDebug() << "Setting up RTMSA...";
+//    if(!m_bCustomFiff){
+//        qDebug() << "Default Fiff:";
+//        setUpFiffInfo();
+//    } else {
+//        m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo (m_pNeuromagHeadChunkData->info));
+//    }
+
+//    //Set the channel size of the RMTSA
+//    m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
+//    m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
+//}
