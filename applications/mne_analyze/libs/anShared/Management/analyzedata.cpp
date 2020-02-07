@@ -42,6 +42,8 @@
 
 #include "analyzedata.h"
 
+#include "../Model/fiffrawviewmodel.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -90,8 +92,7 @@ QVector<QSharedPointer<AbstractModel> > AnalyzeData::getObjectsOfType(MODEL_TYPE
     // simply iterate over map, number of objects in memory should be small enough to ensure acceptable execution time
     QVector<QSharedPointer<AbstractModel> > result;
     QHash<QString, QSharedPointer<AbstractModel> >::const_iterator iter = m_data.cbegin();
-    for (; iter != m_data.cend(); iter++)
-    {
+    for (; iter != m_data.cend(); iter++) {
         if (iter.value()->getType() == mtype)
         {
             result.push_back(iter.value());
@@ -108,6 +109,25 @@ QSharedPointer<AbstractModel> AnalyzeData::getModel(const QString &sName) const
     return m_data.value(sName);
 }
 
+
+//*************************************************************************************************************
+
+QSharedPointer<FiffRawViewModel> AnalyzeData::loadFiffRawViewModel(const QString &sPath, const QByteArray& byteLoadedData)
+{
+    if(byteLoadedData.isEmpty() || sPath.isEmpty()) {
+        qDebug() << "[AnalyzeData::loadFiffRawViewModel] Could not load model!";
+        return QSharedPointer<FiffRawViewModel>();
+    }
+    if (m_data.contains(sPath)) {
+        qDebug() << "[AnalyzeData::loadFiffRawViewModel] Path already exists " << sPath;
+        return qSharedPointerDynamicCast<FiffRawViewModel>(m_data.value(sPath));
+    }
+
+    QSharedPointer<FiffRawViewModel> pModel = QSharedPointer<FiffRawViewModel>::create(sPath, byteLoadedData);
+    m_data.insert(sPath, pModel);
+    emit newModelAvailable(pModel);
+    return pModel;
+}
 
 
 //*************************************************************************************************************

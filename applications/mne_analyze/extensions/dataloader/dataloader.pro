@@ -43,6 +43,10 @@ DEFINES += DATALOADER_EXTENSION
 
 QT += gui widgets
 
+contains(MNECPP_CONFIG, wasm) {
+    DEFINES += WASMBUILD
+}
+
 TARGET = dataloader
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)

@@ -74,6 +74,14 @@ namespace ANSHAREDLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
+// ANSHAREDLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+class FiffRawViewModel;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // ENUMERATIONS
 //=============================================================================================================
 
@@ -123,6 +131,18 @@ public:
      * @return                       Pointer to the model
      */
     QSharedPointer<AbstractModel> getModel(const QString &sName) const;
+
+    //=========================================================================================================
+    /**
+    * Creates a FiffRawViewModel based on the loaded QByteArray. This function can, e.g., be used when using a WASM build.
+    * The function returns a nullptr when model loading fails.
+    *
+    * @param[in] sPath              The path where the Model is saved.
+    * @param[in] byteLoadedData     The loaded data in form of a QByteArray.
+    *
+    * @return                       FiffRawViewModel that contains the loaded Fiff raw data.
+    */
+    QSharedPointer<FiffRawViewModel> loadFiffRawViewModel(const QString &sPath, const QByteArray& byteLoadedData);
 
     //=========================================================================================================
     /**
