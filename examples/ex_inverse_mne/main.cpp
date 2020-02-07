@@ -93,7 +93,7 @@ using namespace INVERSELIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication app(argc, argv);
 
     // Command Line Parser

@@ -80,7 +80,7 @@ using namespace UTILSLIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

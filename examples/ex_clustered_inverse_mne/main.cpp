@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     #ifdef STATICLIB
     Q_INIT_RESOURCE(disp3d);
     #endif
-    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QApplication app(argc, argv);
 
     // Command Line Parser
