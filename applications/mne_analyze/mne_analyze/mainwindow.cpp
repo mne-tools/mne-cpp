@@ -215,7 +215,13 @@ void MainWindow::createMdiView(QSharedPointer<ExtensionManager> pExtensionManage
         QWidget* pView = pExtension->getView();
         if(pView) {
             //m_pMdiView->addSubWindow(pView);
-            m_pMdiView->splitterVertical->addWidget(pExtension->getView());
+            QDockWidget* pDockWidget = new QDockWidget();
+            pDockWidget->setWidget(pView);
+            pDockWidget->setWindowFlags(Qt::CustomizeWindowHint |
+                                        Qt::Window | Qt::WindowMinimizeButtonHint |
+                                        Qt::WindowMaximizeButtonHint |
+                                        Qt::WindowCloseButtonHint);
+            m_pMdiView->splitterVertical->addWidget(pDockWidget);
             qDebug() << "[MainWindow::createMdiView] Found and added subwindow for " << pExtension->getName();
         }
     }
