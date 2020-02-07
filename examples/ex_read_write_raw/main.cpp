@@ -80,7 +80,7 @@ using namespace FIFFLIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
+    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

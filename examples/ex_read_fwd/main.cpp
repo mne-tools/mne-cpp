@@ -77,7 +77,7 @@ using namespace MNELIB;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
+    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
     QCoreApplication app(argc, argv);
 
     // Command Line Parser

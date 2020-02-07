@@ -81,7 +81,7 @@ public:
      *
      */
 
-    static void myCustomLogWriter(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+    static void CustomLogWriter(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
 };
 }
