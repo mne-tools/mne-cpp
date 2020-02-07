@@ -52,6 +52,7 @@
 #include <QGridLayout>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QListView>
 
 #if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
 #include <QPrinter>
@@ -74,9 +75,24 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 MdiView::MdiView(QWidget *parent)
-: QMdiArea(parent)
+: QWidget(parent)
 {
-
+    QHBoxLayout *layout = new QHBoxLayout;
+    splitterHorizontal = new QSplitter(this);
+    splitterHorizontal->setOrientation(Qt::Horizontal);
+    splitterVertical = new QSplitter(this);
+    splitterVertical->setOrientation(Qt::Vertical);
+    splitterVertical->addWidget(splitterHorizontal);
+    layout->addWidget(splitterVertical);
+    QListView *listview = new QListView;
+    splitterHorizontal->addWidget(listview);
+    QListView *listviewa = new QListView;
+    splitterHorizontal->addWidget(listviewa);
+    QListView *listviewv = new QListView;
+    splitterHorizontal->addWidget(listviewv);
+    QListView *listviewvx = new QListView;
+    splitterHorizontal->addWidget(listviewvx);
+    this->setLayout(layout);
 }
 
 
@@ -92,23 +108,23 @@ MdiView::~MdiView()
 
 void MdiView::printCurrentSubWindow()
 {
-    if(! currentSubWindow())
-        return;
+//    if(! currentSubWindow())
+//        return;
 
-#if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
-    IStandardView *view = qobject_cast<IStandardView *>(currentSubWindow());
-    // if no standard view -> render widget to printer otherwise call print function
-    if(! view){
-        QPrinter printer;
-        QPrintDialog dialog(&printer, this);
-        if (dialog.exec() == QDialog::Accepted) {
-            QPainter painter(&printer);
-            currentSubWindow()->render(&painter);
-        }
-    }
-    else {
-        view->print();
-    }
-#endif
+//#if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
+//    IStandardView *view = qobject_cast<IStandardView *>(currentSubWindow());
+//    // if no standard view -> render widget to printer otherwise call print function
+//    if(! view){
+//        QPrinter printer;
+//        QPrintDialog dialog(&printer, this);
+//        if (dialog.exec() == QDialog::Accepted) {
+//            QPainter painter(&printer);
+//            currentSubWindow()->render(&painter);
+//        }
+//    }
+//    else {
+//        view->print();
+//    }
+//#endif
 
 }

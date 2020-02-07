@@ -117,15 +117,16 @@ void RawDataViewer::init()
 
     // we need this since the top-level main window runs "QMdiView::addSubWindow()", which requires a subwindow
     // to be passed (if a non-window would be passed, QMdiView would silently create a new QMidSubWindow )
-    m_pSubWindow = new QMdiSubWindow();
-    m_pSubWindow->setWidget(m_pFiffRawView);
+    //m_pSubWindow = new QMdiSubWindow();
+    //m_pSubWindow->setWidget(m_pFiffRawView);
+    m_pSubWindow = new QWidget();
     m_pSubWindow->setWindowTitle(QString("Raw Data Viewer"));
     m_pSubWindow->setAttribute(Qt::WA_DeleteOnClose, false);
 
     // remember that the display was built
     m_bDisplayCreated = true;
 
-    m_pSubWindow->show();
+    //m_pSubWindow->show();
 }
 
 
@@ -183,7 +184,8 @@ QDockWidget *RawDataViewer::getControl()
 
 QWidget *RawDataViewer::getView()
 {
-    return m_pSubWindow;
+    return m_pFiffRawView;
+    //return m_pSubWindow;
 }
 
 

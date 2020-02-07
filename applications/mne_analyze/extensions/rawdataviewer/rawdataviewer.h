@@ -134,7 +134,8 @@ private:
     QSharedPointer<FiffRawViewDelegate>             m_pRawDelegate;
 
     QPointer<FiffRawView>                           m_pFiffRawView;     /**< View for Fiff data */
-    QPointer<QMdiSubWindow>                         m_pSubWindow;       /**< Window that wraps the display */
+    //QPointer<QMdiSubWindow>                         m_pSubWindow;       /**< Window that wraps the display */
+    QPointer<QWidget>                         m_pSubWindow;       /**< Window that wraps the display */
     bool                                            m_bDisplayCreated;  /**< Flag for remembering whether or not the display was already created */
 };
 
