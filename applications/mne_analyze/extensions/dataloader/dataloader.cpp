@@ -156,6 +156,14 @@ QVector<EVENT_TYPE> DataLoader::getEventSubscriptions(void) const
 
 void DataLoader::onLoadFiffFilePressed()
 {
+#ifdef WASMBUILD
+    auto fileContentReady = [&](const QString &filePath, const QByteArray &fileContent) {
+        if(!filePath.isNull()) {
+            m_pAnalyzeData->loadFiffRawViewModel(filePath,fileContent);
+        }
+    };
+    QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)",  fileContentReady);
+#else
     //Get the path
     QString filePath = QFileDialog::getOpenFileName(m_pControl,
                                                     tr("Open Fiff File"),
@@ -165,6 +173,7 @@ void DataLoader::onLoadFiffFilePressed()
     if(!filePath.isNull()) {
         m_pAnalyzeData->loadModel<FiffRawViewModel>(filePath);
     }
+#endif
 }
 
 

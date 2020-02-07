@@ -445,7 +445,9 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         }
     }
 
-//        fclose(fid);
+    if (!this->file->device()->isOpen()) {
+        this->file->device()->close();
+    }
 
     times = MatrixXd(1, to-from+1);
 
@@ -782,7 +784,10 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         multSegment = cal;
     else
         multSegment = mult;
-//        fclose(fid);
+
+    if (!this->file->device()->isOpen()) {
+        this->file->device()->close();
+    }
 
     times = MatrixXd(1, to-from+1);
 

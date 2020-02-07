@@ -59,6 +59,8 @@ contains(MNECPP_CONFIG, wasm) {
     DEFINES += __EMSCRIPTEN__
     LIBS += -lidbfs.js
     INCLUDEPATH += /home/lorenz/Git/emsdk/usptream/emscripten/src
+
+    DEFINES += WASMBUILD
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
@@ -84,8 +86,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}RtProcessingd \
             -lMNE$${MNE_LIB_VERSION}Dispd \
             -lanSharedd
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
