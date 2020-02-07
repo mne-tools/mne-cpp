@@ -41,9 +41,10 @@
 //=============================================================================================================
 
 #include "fiffrawviewmodel.h"
+
 #include "../Utils/metatypes.h"
 
-#include <algorithm>
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -53,6 +54,7 @@
 
 #include <QtConcurrent/QtConcurrent>
 #include <QElapsedTimer>
+#include <QFile>
 
 
 //*************************************************************************************************************
@@ -91,9 +93,9 @@ FiffRawViewModel::FiffRawViewModel(QObject *pParent)
 //*************************************************************************************************************
 
 FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
-                           qint32 iVisibleWindowSize,
-                           qint32 iPreloadBufferSize,
-                           QObject *pParent)
+                                   qint32 iVisibleWindowSize,
+                                   qint32 iPreloadBufferSize,
+                                   QObject *pParent)
 : AbstractModel(pParent)
 , m_iVisibleWindowSize(iVisibleWindowSize)
 , m_iPreloadBufferSize(std::max(2, iPreloadBufferSize))
@@ -105,7 +107,6 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_blockLoadFutureWatcher()
 , m_bCurrentlyLoading(false)
 , m_dataMutex()
-, m_file(sFilePath)
 , m_pFiffIO()
 , m_pFiffInfo()
 , m_ChannelInfoList()
@@ -118,7 +119,47 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
                 postBlockLoad(m_blockLoadFutureWatcher.future().result());
             });
 
-    initFiffData();
+    m_file.setFileName(sFilePath);
+    initFiffData(m_file);
+
+    updateEndStartFlags();
+}
+
+
+//*************************************************************************************************************
+
+FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
+                                   const QByteArray& byteLoadedData,
+                                   qint32 iVisibleWindowSize,
+                                   qint32 iPreloadBufferSize,
+                                   QObject *pParent)
+: AbstractModel(pParent)
+, m_iVisibleWindowSize(iVisibleWindowSize)
+, m_iPreloadBufferSize(std::max(2, iPreloadBufferSize))
+, m_iSamplesPerBlock(1024)
+, m_iTotalBlockCount(m_iVisibleWindowSize + 2 * m_iPreloadBufferSize)
+, m_iFiffCursorBegin(-1)
+, m_bStartOfFileReached(true)
+, m_bEndOfFileReached(false)
+, m_blockLoadFutureWatcher()
+, m_bCurrentlyLoading(false)
+, m_dataMutex()
+, m_pFiffIO()
+, m_pFiffInfo()
+, m_ChannelInfoList()
+, m_dDx(1.0)
+{
+    // connect data reloading: this will be run concurrently
+    connect(&m_blockLoadFutureWatcher,
+            &QFutureWatcher<int>::finished,
+            [this]() {
+                postBlockLoad(m_blockLoadFutureWatcher.future().result());
+            });
+
+    m_byteLoadedData = byteLoadedData;
+    m_buffer.setData(m_byteLoadedData);
+
+    initFiffData(m_buffer);
     updateEndStartFlags();
 }
 
@@ -133,13 +174,13 @@ FiffRawViewModel::~FiffRawViewModel()
 
 //*************************************************************************************************************
 
-void FiffRawViewModel::initFiffData()
+void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
 {
     // build FiffIO
-    m_pFiffIO = QSharedPointer<FiffIO>::create(m_file);
+    m_pFiffIO = QSharedPointer<FiffIO>::create(p_IODevice);
 
     if(m_pFiffIO->m_qlistRaw.empty()) {
-        qDebug() << "[FiffRawViewModel::loadFiffData] File " << m_file.fileName() << " does not contain any Fiff data";
+        qDebug() << "[FiffRawViewModel::loadFiffData] File does not contain any Fiff data";
         return;
     }
 
@@ -185,7 +226,7 @@ void FiffRawViewModel::initFiffData()
     qDebug() << "[FiffRawViewModel::initFiffData] Loaded " << m_lData.size() << " blocks";
 
     // need to close the file manually
-    m_file.close();
+    p_IODevice.close();
 }
 
 
@@ -430,9 +471,6 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
         }
     }
 
-    // need to close the file manually
-    m_file.close();
-
     // adjust fiff cursor
     m_iFiffCursorBegin = start;
 
@@ -494,9 +532,6 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
         start += m_iSamplesPerBlock;
         end += m_iSamplesPerBlock;
     }
-
-    // need to close the file manually
-    m_file.close();
 
     // adjust fiff cursor
     m_iFiffCursorBegin += numBlocks * m_iSamplesPerBlock;

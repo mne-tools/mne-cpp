@@ -47,9 +47,7 @@
 #include "../Utils/types.h"
 #include "abstractmodel.h"
 
-#include <list>
-
-#include <fiff/fiff.h>
+#include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_io.h>
 
 
@@ -61,6 +59,8 @@
 #include <QSharedPointer>
 #include <QFutureWatcher>
 #include <QMutex>
+#include <QBuffer>
+#include <QFile>
 
 
 //*************************************************************************************************************
@@ -76,10 +76,8 @@
 
 namespace FIFFLIB
 {
-    class FiffChInfo;
+    class FiffInfo;
 }
-
-class QFile;
 
 
 //*************************************************************************************************************
@@ -126,6 +124,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Constructs a FiffRawViewModel object. This function takes the whole Fiff raw data as a QByteArray.
+     * It can, e.g., be used when using a WASM build.
+     */
+    FiffRawViewModel(const QString &sFilePath,
+                     const QByteArray& byteLoadedData,
+                     qint32 iVisibleWindowSize = 10,
+                     qint32 iPreloadBufferSize = 1,
+                     QObject *pParent = nullptr);
+
+    //=========================================================================================================
+    /**
      * Destructs a FiffRawViewModel.
      */
     ~FiffRawViewModel();
@@ -134,7 +143,7 @@ public:
     /**
      * Helper function for initialization
      */
-    void initFiffData();
+    void initFiffData(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -340,12 +349,16 @@ private:
     QFutureWatcher<int> m_blockLoadFutureWatcher;   /**< QFutureWatcher for watching process of reloading fiff data. */
     bool m_bCurrentlyLoading;                       /**< Flag to indicate whether or not a background operation is going on. */
     mutable QMutex m_dataMutex;                     /**< Using mutable is not a pretty solution */
+
+    // data stuff
     QFile m_file;
+    QByteArray m_byteLoadedData;
+    QBuffer m_buffer;
 
     // fiff stuff
-    QSharedPointer<FIFFLIB::FiffIO> m_pFiffIO;      /**< Fiff IO */
-    FIFFLIB::FiffInfo::SPtr m_pFiffInfo;            /**< Fiff info of whole fiff file */
-    QList<FIFFLIB::FiffChInfo> m_ChannelInfoList;   /**< List of FiffChInfo objects that holds the corresponding channels information */
+    QSharedPointer<FIFFLIB::FiffIO>     m_pFiffIO;              /**< Fiff IO */
+    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;            /**< Fiff info of whole fiff file */
+    QList<FIFFLIB::FiffChInfo>          m_ChannelInfoList;      /**< List of FiffChInfo objects that holds the corresponding channels information */
 };
 
 
