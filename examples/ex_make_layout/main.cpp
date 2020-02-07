@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     // Please notice that this example only works in release mode.
     // Debug mode somehow corrupts the simplex coder. ToDo: Fix this!
     //
-    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

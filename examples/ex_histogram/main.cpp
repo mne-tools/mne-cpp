@@ -121,7 +121,7 @@ Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int 
 int main(int argc, char *argv[])
 {
     //code to generate source localization data
-    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QApplication a(argc, argv);
 
     // Command Line Parser

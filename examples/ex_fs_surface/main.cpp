@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(disp3d);
     #endif
     
-    qInstallMessageHandler(UTILSLIB::ApplicationLogger::CustomLogWriter);
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     QApplication a(argc, argv);
 
     // Command Line Parser
