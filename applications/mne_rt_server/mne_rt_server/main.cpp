@@ -64,7 +64,6 @@
 
 using namespace RTSERVER;
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
@@ -81,7 +80,7 @@ using namespace RTSERVER;
  */
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(ApplicationLogger::CustomLogWriter);
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::CustomLogWriter);
     QCoreApplication app(argc, argv);
 
     MNERTServer t_MneRtServer;
