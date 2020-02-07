@@ -52,6 +52,7 @@
 #include <QMdiArea>
 #include <QSharedPointer>
 #include <QPointer>
+#include <QSplitter>
 
 
 //*************************************************************************************************************
@@ -78,7 +79,7 @@ namespace MNEANALYZE
 /**
  * @brief The MdiView class inherits from QMdiArea and allows printing of subwindows.
  */
-class MdiView : public QMdiArea
+class MdiView : public QWidget
 {
     Q_OBJECT
 public:
@@ -103,8 +104,9 @@ public:
      */
     void printCurrentSubWindow();
 
+    QSplitter *splitterHorizontal;
+    QSplitter *splitterVertical;
 private:
-
 };
 
 }// NAMESPACE

@@ -80,9 +80,9 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager, QWidget *parent)
-    : QMainWindow(parent),
-      m_pMdiView(Q_NULLPTR),
-      m_pGridLayout(Q_NULLPTR)
+: QMainWindow(parent)
+, m_pMdiView(Q_NULLPTR)
+, m_pGridLayout(Q_NULLPTR)
 {
     setWindowState(Qt::WindowMaximized);
     setMinimumSize(400, 400);
@@ -132,11 +132,11 @@ void MainWindow::createActions()
     //View QMenu
     m_pActionCascade = new QAction(tr("Cascade"), this);
     m_pActionCascade->setStatusTip(tr("Cascade the windows in the mdi window"));
-    connect(m_pActionCascade, &QAction::triggered, this->m_pMdiView, &MdiView::cascadeSubWindows);
+    //connect(m_pActionCascade, &QAction::triggered, this->m_pMdiView, &MdiView::cascadeSubWindows);
 
     m_pActionTile = new QAction(tr("Tile"), this);
     m_pActionTile->setStatusTip(tr("Tile the windows in the mdi window"));
-    connect(m_pActionTile, &QAction::triggered, this->m_pMdiView, &MdiView::tileSubWindows);
+    //connect(m_pActionTile, &QAction::triggered, this->m_pMdiView, &MdiView::tileSubWindows);
 
     m_pActionPrint = new QAction(tr("Print..."), this);
     m_pActionPrint->setStatusTip(tr("Prints the current view."));
@@ -214,12 +214,13 @@ void MainWindow::createMdiView(QSharedPointer<ExtensionManager> pExtensionManage
     for(IExtension* pExtension : pExtensionManager->getExtensions()) {
         QWidget* pView = pExtension->getView();
         if(pView) {
-            m_pMdiView->addSubWindow(pView);
+            //m_pMdiView->addSubWindow(pView);
+            m_pMdiView->splitterVertical->addWidget(pExtension->getView());
             qDebug() << "[MainWindow::createMdiView] Found and added subwindow for " << pExtension->getName();
         }
     }
 
-    m_pMdiView->cascadeSubWindows();
+    //m_pMdiView->cascadeSubWindows();
 }
 
 
