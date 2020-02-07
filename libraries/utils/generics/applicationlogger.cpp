@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the applicationlogger class.
+ * @brief    Contains the declaration of the ApplicationLogger class.
  *
  */
 
@@ -70,12 +70,12 @@ using namespace std;
 #ifdef WIN32
     #include <wchar.h>
     #include <windows.h>
-    #define COLOR_INFO          SetConsoleTextAttribute(hOut, 0x0A)     //green
+    #define COLOR_INFO          SetConsoleTextAttribute(hOut, 0x02)     //green
     #define COLOR_DEBUG         SetConsoleTextAttribute(hOut, 0x02)     //green
     #define COLOR_WARN          SetConsoleTextAttribute(hOut, 0x0E)     //yellow
     #define COLOR_FATAL         SetConsoleTextAttribute(hOut, 0x0E)     //yellow
     #define COLOR_CRITICAL      SetConsoleTextAttribute(hOut, 0x04)     //red
-    #define COLOR_RESET         SetConsoleTextAttribute(hOut, 0x0F)     //reset
+    #define COLOR_RESET         SetConsoleTextAttribute(hOut, 7)        //reset
     #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) COLOR; OUTPUT << ""LEVEL " ";COLOR_RESET; OUTPUT<< MSG << std::endl
 
 #elif
@@ -86,8 +86,7 @@ using namespace std;
     #define COLOR_FATAL         "\033[33;1m"        //yellow
     #define COLOR_RESET         "\033[0m"           //reset
 
-    #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) OUTPUT << COLOR << \
-    " " LEVEL " " << MSG << COLOR_RESET << "\n"
+    #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) OUTPUT << COLOR << ""LEVEL " " << COLOR_RESET << MSG << "\n"
 #endif
 
 //*************************************************************************************************************
@@ -99,6 +98,8 @@ ApplicationLogger::ApplicationLogger()
 {
 
 }
+
+//*************************************************************************************************************
 
 void ApplicationLogger::myCustomLogWriter(QtMsgType type,
                                           const QMessageLogContext &context,
@@ -116,7 +117,6 @@ void ApplicationLogger::myCustomLogWriter(QtMsgType type,
     #endif
 
     switch (type) {
-
         case QtWarningMsg:
             LOG_WRITE(std::cout, COLOR_WARN, "WARN", msg.toStdString());
             break;
@@ -130,7 +130,7 @@ void ApplicationLogger::myCustomLogWriter(QtMsgType type,
             LOG_WRITE(std::cout, COLOR_DEBUG, "DEBUG", msg.toStdString());
             break;
         case QtInfoMsg:
-            LOG_WRITE(std::cout, COLOR_INFO, "Info", msg.toStdString());
+            LOG_WRITE(std::cout, COLOR_INFO, "INFO", msg.toStdString());
             break;
     }
 }
