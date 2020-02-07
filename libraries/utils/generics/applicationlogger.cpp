@@ -76,7 +76,7 @@ using namespace std;
     #define COLOR_FATAL         SetConsoleTextAttribute(hOut, 0x0E)     //yellow
     #define COLOR_CRITICAL      SetConsoleTextAttribute(hOut, 0x04)     //red
     #define COLOR_RESET         SetConsoleTextAttribute(hOut, 7)        //reset
-    #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) COLOR; OUTPUT << ""LEVEL " ";COLOR_RESET; OUTPUT<< MSG << std::endl
+    #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) COLOR; OUTPUT << "" LEVEL " ";COLOR_RESET; OUTPUT<< MSG << std::endl
 
 #else
     #define COLOR_INFO          "\033[32;1m"        //green
@@ -86,7 +86,7 @@ using namespace std;
     #define COLOR_FATAL         "\033[33;1m"        //yellow
     #define COLOR_RESET         "\033[0m"           //reset
 
-    #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) OUTPUT << COLOR << ""LEVEL " " << COLOR_RESET << MSG << "\n"
+    #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) OUTPUT << COLOR << "" LEVEL " " << COLOR_RESET << MSG << "\n"
 #endif
 
 //*************************************************************************************************************
