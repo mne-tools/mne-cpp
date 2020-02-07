@@ -2,6 +2,8 @@
 
 #include "data_filter.h"
 
+#include <scMeas/realtimemultisamplearray.h>
+
 #include "brainflowboard.h"
 #include "FormFiles/brainflowsetupwidget.h"
 #include "FormFiles/brainflowstreamingwidget.h"
@@ -15,18 +17,13 @@ BrainFlowBoard::BrainFlowBoard() :
     m_pOutput(NULL),
     m_iSamplingRate(0),
     m_sStreamerParams(""),
-    m_iNumChannels(0),
-    m_iBandStart(1),
-    m_iBandStop(30),
-    m_iNotchFreq(50),
-    m_iFilterType((int)FilterTypes::BUTTERWORTH),
-    m_iFilterOrder(4),
-    m_dRipple(0.5)
+    m_iNumChannels(0)
 {
     m_pShowSettingsAction = new QAction(QIcon(":/images/options.png"), tr("Streaming Settings"),this);
     m_pShowSettingsAction->setStatusTip(tr("Streaming Settings"));
     connect(m_pShowSettingsAction, &QAction::triggered, this, &BrainFlowBoard::showSettings);
     addPluginAction(m_pShowSettingsAction);
+    m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo> (new FIFFLIB::FiffInfo);
 }
 
 BrainFlowBoard::~BrainFlowBoard()
@@ -84,6 +81,7 @@ bool BrainFlowBoard::stop()
     try {
         m_pBoardShim->stop_stream();
         m_bIsRunning = false;
+        m_pOutput->data()->clear();
     } catch (const BrainFlowException &err) {
         BoardShim::log_message((int)LogLevels::LEVEL_ERROR, err.what());
         return false;
@@ -148,18 +146,13 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string str
         m_pBoardShim = new BoardShim(m_iBoardId, params);
         m_pBoardShim->prepare_session();
 
-        m_pOutput = new PluginOutputData<RealTimeSampleArray>::SPtr[m_iNumChannels];
-        for (int i = 0; i < m_iNumChannels; i++)
-        {
-            m_pOutput[i] = PluginOutputData<RealTimeSampleArray>::create(this, "Channel", "Channel output data");
-            m_outputConnectors.append(m_pOutput[i]);
-            m_pOutput[i]->data()->setSamplingRate(m_iSamplingRate);
-            m_pOutput[i]->data()->setVisibility(true);
-            m_pOutput[i]->data()->setArraySize(1);
-            m_pOutput[i]->data()->setMinValue((double)(0 - vertScale));
-            m_pOutput[i]->data()->setMaxValue((double)vertScale);
-            m_pOutput[i]->data()->setUnit("uV");
-        }
+        m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BrainFlowBoard", "BrainFlow Board Output");
+        m_pFiffInfo->nchan = m_iNumChannels;
+        m_pFiffInfo->sfreq = m_iSamplingRate;
+        m_pOutput->data()->initFromFiffInfo(m_pFiffInfo);
+        m_pOutput->data()->setVisibility(true);
+        m_pOutput->data()->setMultiArraySize(1);
+        m_outputConnectors.append(m_pOutput);
 
         msgBox.setText("Streaming session is ready");
     } catch (const BrainFlowException &err) {
@@ -171,7 +164,6 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string str
         m_pChannels = NULL;
         m_pBoardShim = NULL;
         m_iNumChannels = 0;
-        delete[] m_pOutput;
     }
 
     msgBox.exec();
@@ -198,16 +190,6 @@ void BrainFlowBoard::configureBoard(std::string config)
     msgBox.exec();
 }
 
-void BrainFlowBoard::applyFilters(int notchFreq, int bandStart, int bandStop, int filterType, int filterOrder, double ripple)
-{
-    m_iNotchFreq = notchFreq;
-    m_iBandStart = bandStart;
-    m_iBandStop = bandStop;
-    m_iFilterType = filterType;
-    m_iFilterOrder = filterOrder;
-    m_dRipple = ripple;
-}
-
 void BrainFlowBoard::run()
 {
     unsigned long samplingPeriod = (unsigned long)(1000000.0 / m_iSamplingRate);
@@ -226,17 +208,6 @@ void BrainFlowBoard::run()
 
         for (int j = 0; j < m_iNumChannels; j++)
         {
-            if (m_iNotchFreq != 0)
-            {
-                // notch filter is bandstop filter
-                DataFilter::perform_bandstop(data[m_pChannels[j]], dataCount, m_iSamplingRate, (double)m_iNotchFreq, 2.0, m_iFilterOrder, m_iFilterType, m_dRipple);
-            }
-            if ((m_iBandStart != 0) && (m_iBandStop != 0))
-            {
-                double centerFreq = m_iBandStart + (double)(m_iBandStop - m_iBandStart) / 2.0;
-                double width = (double)(m_iBandStop - m_iBandStart) / 2.0;
-                DataFilter::perform_bandpass(data[m_pChannels[j]], dataCount, m_iSamplingRate,  centerFreq, width, m_iFilterOrder, m_iFilterType, m_dRipple);
-            }
             for (int i = 0; i < dataCount; i++)
             {
                 m_pOutput[j]->data()->setValue(data[m_pChannels[j]][i]);
@@ -262,7 +233,6 @@ void BrainFlowBoard::releaseSession(bool useQmessage)
     }
     delete m_pBoardShim;
     delete[] m_pChannels;
-    delete[] m_pOutput;
 
     for (int i = 0; i < m_iNumChannels; i++)
     {
@@ -276,6 +246,7 @@ void BrainFlowBoard::releaseSession(bool useQmessage)
     m_iSamplingRate = 0;
     m_sStreamerParams = "";
     m_iNumChannels = 0;
+    m_pFiffInfo->clear();
 
     if (useQmessage)
     {
