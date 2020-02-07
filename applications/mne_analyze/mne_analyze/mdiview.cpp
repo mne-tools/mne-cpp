@@ -53,6 +53,7 @@
 #include <QMdiSubWindow>
 #include <QPainter>
 #include <QListView>
+#include <QDockWidget>
 
 #if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
 #include <QPrinter>
@@ -84,14 +85,33 @@ MdiView::MdiView(QWidget *parent)
     splitterVertical->setOrientation(Qt::Vertical);
     splitterVertical->addWidget(splitterHorizontal);
     layout->addWidget(splitterVertical);
+
     QListView *listview = new QListView;
-    splitterHorizontal->addWidget(listview);
     QListView *listviewa = new QListView;
-    splitterHorizontal->addWidget(listviewa);
     QListView *listviewv = new QListView;
-    splitterHorizontal->addWidget(listviewv);
-    QListView *listviewvx = new QListView;
-    splitterHorizontal->addWidget(listviewvx);
+    QListView *listviewvx = new QListView();
+
+    QDockWidget* pDockWidgeta = new QDockWidget();
+    pDockWidgeta->setWidget(listview);
+    pDockWidgeta->setFeatures(pDockWidgeta->features() & ~QDockWidget::DockWidgetClosable);
+
+    QDockWidget* pDockWidgetb = new QDockWidget();
+    pDockWidgetb->setWidget(listviewa);
+    pDockWidgetb->setFeatures(pDockWidgetb->features() & ~QDockWidget::DockWidgetClosable);
+
+    QDockWidget* pDockWidgetc = new QDockWidget();
+    pDockWidgetc->setWidget(listviewv);
+    pDockWidgetc->setFeatures(pDockWidgetc->features() & ~QDockWidget::DockWidgetClosable);
+
+    QDockWidget* pDockWidgetv = new QDockWidget();
+    pDockWidgetv->setWidget(listviewvx);
+    pDockWidgetv->setFeatures(pDockWidgetv->features() & ~QDockWidget::DockWidgetClosable);
+
+    splitterHorizontal->addWidget(pDockWidgeta);
+    splitterHorizontal->addWidget(pDockWidgetb);
+    splitterHorizontal->addWidget(pDockWidgetc);
+    splitterHorizontal->addWidget(pDockWidgetv);
+
     this->setLayout(layout);
 }
 
