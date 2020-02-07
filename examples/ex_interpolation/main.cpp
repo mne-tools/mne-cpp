@@ -52,6 +52,8 @@
 #include <disp3D/helpers/interpolation/interpolation.h>
 #include <fiff/fiff_constants.h>
 
+#include <utils/generics/applicationlogger.h>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -93,7 +95,8 @@ int main(int argc, char *argv[])
     #ifdef STATICLIB
     Q_INIT_RESOURCE(disp3d);
     #endif
-
+    
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

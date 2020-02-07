@@ -69,6 +69,7 @@
 #include <inverse/minimumNorm/minimumnorm.h>
 
 #include <utils/ioutils.h>
+#include <utils/generics/applicationlogger.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
 #include <disp/viewers/minimumnormsettingsview.h>
@@ -128,7 +129,7 @@ int main(int argc, char *argv[])
     #ifdef STATICLIB
     Q_INIT_RESOURCE(disp3d);
     #endif
-
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QApplication a(argc, argv);
 
     AbstractMetric::m_bStorageModeIsActive = false;

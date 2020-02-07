@@ -53,6 +53,7 @@
 
 #include <mne/mne_epoch_data_list.h>
 
+#include <utils/generics/applicationlogger.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -88,6 +89,7 @@ using namespace MNELIB;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

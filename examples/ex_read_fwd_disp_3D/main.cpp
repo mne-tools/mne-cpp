@@ -42,7 +42,7 @@
 #include <disp3D/engine/model/data3Dtreemodel.h>
 
 #include <mne/mne_forwardsolution.h>
-
+#include <utils/generics/applicationlogger.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(disp3d);
     #endif
 
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QApplication a(argc, argv);
 
     // Command Line Parser
