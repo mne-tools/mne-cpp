@@ -43,6 +43,8 @@
 #include <iostream>
 #include <vector>
 
+#include <utils/generics/applicationlogger.h>
+
 #include "mne_rt_server.h"
 
 
@@ -79,6 +81,7 @@ using namespace RTSERVER;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QCoreApplication app(argc, argv);
 
     MNERTServer t_MneRtServer;

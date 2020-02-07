@@ -43,6 +43,7 @@
 #include <vector>
 #include <math.h>
 
+#include <utils/generics/applicationlogger.h>
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
@@ -82,6 +83,7 @@ using namespace MNELIB;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QCoreApplication app(argc, argv);
 
     // Command Line Parser

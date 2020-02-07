@@ -42,6 +42,8 @@
 #include <inverse/dipoleFit/dipole_fit_settings.h>
 #include <inverse/dipoleFit/dipole_fit.h>
 
+#include <utils/generics/applicationlogger.h>
+
 #include <mne/mne_bem.h>
 
 #include <disp3D/viewers/ecdview.h>
@@ -51,7 +53,6 @@
 #include <fs/annotationset.h>
 
 #include <iostream>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -92,6 +93,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(disp3d);
     #endif
 
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QApplication app(argc, argv);
 
     DipoleFitSettings settings(&argc,argv);

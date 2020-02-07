@@ -61,6 +61,7 @@
 #include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
 
 #include <utils/mnemath.h>
+#include <utils/generics/applicationlogger.h>
 
 #include <iostream>
 
@@ -112,7 +113,8 @@ int main(int argc, char *argv[])
     #ifdef STATICLIB
     Q_INIT_RESOURCE(disp3d);
     #endif
-
+    
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QApplication a(argc, argv);
 
     // Command Line Parser
