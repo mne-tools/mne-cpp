@@ -44,6 +44,7 @@
 
 #include <fs/surfaceset.h>
 
+#include <utils/generics/applicationlogger.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -82,7 +83,8 @@ int main(int argc, char *argv[])
     #ifdef STATICLIB
     Q_INIT_RESOURCE(disp3d);
     #endif
-
+    
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QApplication a(argc, argv);
 
     // Command Line Parser

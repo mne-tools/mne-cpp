@@ -41,6 +41,7 @@
 #include <math.h>
 #include <disp/plots/plot.h>
 #include <utils/spectral.h>
+#include <utils/generics/applicationlogger.h>
 #include <mne/mne.h>
 
 
@@ -87,6 +88,7 @@ using namespace UTILSLIB;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QApplication a(argc, argv);
 
     // Generate input data

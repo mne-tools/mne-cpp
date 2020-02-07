@@ -41,6 +41,7 @@
 #include <fiff/fiff.h>
 
 #include <utils/spectrogram.h>
+#include <utils/generics/applicationlogger.h>
 
 #include <disp/plots/tfplot.h>
 
@@ -80,6 +81,7 @@ using namespace UTILSLIB;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QApplication a(argc, argv);
 
     // Command Line Parser

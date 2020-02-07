@@ -44,7 +44,7 @@
 #include <math.h>
 
 #include <fiff/fiff.h>
-
+#include <utils/generics/applicationlogger.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -80,6 +80,7 @@ using namespace FIFFLIB;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

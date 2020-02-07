@@ -39,7 +39,7 @@
 
 #include <bmti/test.h>
 #include <bmti/mainwindow.h>
-
+#include <utils/generics/applicationlogger.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -77,6 +77,7 @@ Test *m_pTest = NULL;
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QApplication a(argc, argv);
 
     //Create main window instance and show

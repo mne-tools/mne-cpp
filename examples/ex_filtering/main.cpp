@@ -43,7 +43,10 @@
 #include <math.h>
 
 #include <fiff/fiff.h>
+
 #include <utils/filterTools/filterdata.h>
+#include <utils/generics/applicationlogger.h>
+
 #include <rtprocessing/rtfilter.h>
 
 //*************************************************************************************************************
@@ -80,6 +83,7 @@ using namespace RTPROCESSINGLIB;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

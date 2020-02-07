@@ -42,7 +42,7 @@
 #include <fiff/fiff_evoked.h>
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
-
+#include <utils/generics/applicationlogger.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,6 +87,8 @@ using namespace INVERSELIB;
  */
 int main(int argc, char *argv[])
 {
+    
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

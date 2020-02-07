@@ -43,6 +43,7 @@
 
 #include <iostream>
 
+#include <utils/generics/applicationlogger.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -76,6 +77,7 @@ using namespace FWDLIB;
  */
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::myCustomLogWriter);
     QApplication app(argc, argv);
 
     ComputeFwdSettings settings(&argc,argv);
