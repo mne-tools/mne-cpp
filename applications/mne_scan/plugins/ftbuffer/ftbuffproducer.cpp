@@ -109,6 +109,8 @@ bool FtBuffProducer::connectToBuffer(QString addr) {
     delete m_pFtBuffClient;
     m_pFtBuffClient = new FtBuffClient(m_pTempAddress);
 
+    m_pFtBuffer->setupRTMSA();
+
     return this->m_pFtBuffClient->startConnection();
 }
 
