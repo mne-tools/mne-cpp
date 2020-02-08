@@ -23,7 +23,6 @@ BrainFlowBoard::BrainFlowBoard() :
     m_pShowSettingsAction->setStatusTip(tr("Streaming Settings"));
     connect(m_pShowSettingsAction, &QAction::triggered, this, &BrainFlowBoard::showSettings);
     addPluginAction(m_pShowSettingsAction);
-    m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo> (new FIFFLIB::FiffInfo);
 }
 
 BrainFlowBoard::~BrainFlowBoard()
@@ -147,12 +146,20 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string str
         m_pBoardShim->prepare_session();
 
         m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BrainFlowBoard", "BrainFlow Board Output");
-        m_pFiffInfo->nchan = m_iNumChannels;
-        m_pFiffInfo->sfreq = m_iSamplingRate;
-        m_pOutput->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pOutput->data()->setVisibility(true);
+        QList<RealTimeSampleArrayChInfo> chInfos;
+        for (int i = 0; i < m_iNumChannels; i++)
+        {
+            RealTimeSampleArrayChInfo chInfo;
+            chInfo.setMaxValue(vertScale);
+            chInfo.setMinValue(0 - vertScale);
+            chInfos.append(chInfo);
+        }
+        m_pOutput->data()->init(chInfos);
         m_pOutput->data()->setMultiArraySize(1);
+        m_pOutput->data()->setVisibility(true);
+        m_pOutput->data()->setSamplingRate(m_iSamplingRate);
         m_outputConnectors.append(m_pOutput);
+        chInfos.clear();
 
         msgBox.setText("Streaming session is ready");
     } catch (const BrainFlowException &err) {
@@ -206,13 +213,15 @@ void BrainFlowBoard::run()
             continue;
         }
 
+        Eigen::MatrixXd matrix (m_iNumChannels, dataCount);
         for (int j = 0; j < m_iNumChannels; j++)
         {
             for (int i = 0; i < dataCount; i++)
             {
-                m_pOutput[j]->data()->setValue(data[m_pChannels[j]][i]);
+                matrix(j, i) = data[m_pChannels[j]][i];
             }
         }
+        m_pOutput->data()->setValue(matrix);
 
         for (int i = 0; i < numRows; i++)
         {
@@ -246,7 +255,6 @@ void BrainFlowBoard::releaseSession(bool useQmessage)
     m_iSamplingRate = 0;
     m_sStreamerParams = "";
     m_iNumChannels = 0;
-    m_pFiffInfo->clear();
 
     if (useQmessage)
     {

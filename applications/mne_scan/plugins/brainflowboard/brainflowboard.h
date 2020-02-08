@@ -9,10 +9,6 @@ namespace SCMEASLIB {
     class RealTimeMultiSampleArray;
 }
 
-namespace FIFFLIB {
-    class FiffInfo;
-}
-
 #include "board_shim.h"
 
 using namespace SCSHAREDLIB;
@@ -54,8 +50,7 @@ private:
     int m_iNumChannels;
     int *m_pChannels;
     int m_iSamplingRate;
-    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pOutput;
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pOutput;
     volatile bool m_bIsRunning;
 
     QAction *m_pShowSettingsAction;
