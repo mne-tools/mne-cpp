@@ -32,6 +32,7 @@ contains(QT_ARCH, i386) {
 }
 
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 INCLUDEPATH += $$PWD/brainflow/installed/inc
 DEPENDPATH += $$PWD/brainflow/installed/inc
@@ -58,6 +59,8 @@ unix {
 }
 !isEmpty(target.path): INSTALLS += target
 
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
 DISTFILES += \
     brainflowboard.json
 
@@ -67,3 +70,23 @@ OTHER_FILES += \
 FORMS += \
     FormFiles/brainflowsetupwidget.ui \
     FormFiles/brainflowstreamingwidget.ui
+
+# Activate FFTW backend in Eigen for non-static builds only
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
+    DEFINES += EIGEN_FFTW_DEFAULT
+    INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
+    LIBS += -L$$shell_path($${FFTW_DIR_LIBS})
+
+    win32 {
+        # On Windows
+        LIBS += -llibfftw3-3 \
+                -llibfftw3f-3 \
+                -llibfftw3l-3 \
+    }
+
+    unix:!macx {
+        # On Linux
+        LIBS += -lfftw3 \
+                -lfftw3_threads \
+    }
+}
