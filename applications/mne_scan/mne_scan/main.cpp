@@ -41,7 +41,6 @@
 #include "mainsplashscreen.h"
 #include "mainwindow.h"
 
-
 #include <scMeas/measurementtypes.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/numeric.h>
@@ -50,6 +49,14 @@
 #include <scShared/Management/pluginoutputdata.h>
 #include <scShared/Management/plugininputdata.h>
 #include <scShared/Interfaces/IPlugin.h>
+
+#include <utils/generics/applicationlogger.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 #include <Eigen/Core>
 
@@ -72,76 +79,16 @@
 using namespace SCMEASLIB;
 using namespace MNESCAN;
 using namespace Eigen;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// global var
+// GLOBAL DEFINTIONS
 //=============================================================================================================
 
 QSharedPointer<MainWindow> mainWin;
 
-//=============================================================================================================
-/**
- * Custom Qt message handler.
- *
- * @param [in] type      enum to identify the various message types
- * @param [in] context   additional information about a log message
- * @param [in] msg       the message to log
- */
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
-{
-    Q_UNUSED(context);
-
-    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss.z");
-    QString txt = QString("[%1] ").arg(dt);
-
-    if(mainWin)
-    {
-        switch (type)
-        {
-            case QtDebugMsg:
-                txt += QString("{Debug} \t\t %1").arg(msg);
-                mainWin->writeToLog(txt,_LogKndMessage, _LogLvMax);
-                break;
-            case QtInfoMsg:
-                txt += QString("{Info} \t\t %1").arg(msg);
-                mainWin->writeToLog(txt,_LogKndMessage, _LogLvMax);
-                break;
-            case QtWarningMsg:
-                txt += QString("{Warning} \t %1").arg(msg);
-                mainWin->writeToLog(txt,_LogKndWarning, _LogLvNormal);
-                break;
-            case QtCriticalMsg:
-                txt += QString("{Critical} \t %1").arg(msg);
-                mainWin->writeToLog(txt,_LogKndError, _LogLvMin);
-                break;
-            case QtFatalMsg:
-                txt += QString("{Fatal} \t\t %1").arg(msg);
-                mainWin->writeToLog(txt,_LogKndError, _LogLvMin);
-                abort();
-                break;
-            default:
-                txt += QString("{Unknown} \t\t %1").arg(msg);
-                mainWin->writeToLog(txt,_LogKndMessage, _LogLvNormal);
-                break;
-        }
-    }
-}
-
-
-
-//void debugTest(QSharedPointer<RealTimeMultiSampleArray> testData)
-//{
-//    qDebug() << "Here in debug Test Callback new";
-
-//    QVector< VectorXd > matSamples = testData->getMultiSampleArray();
-//    qDebug() << "Received data:";
-//    for(qint32 i = 0; i < matSamples.size(); ++i)
-//        qDebug() << matSamples[i][0];
-
-
-//}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -175,6 +122,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(scDisp);
     #endif
 
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
     QApplication app(argc, argv);
 
     //Store application info to use QSettings
@@ -200,10 +148,6 @@ int main(int argc, char *argv[])
     mainWin->show();
 
     splashscreen->finish(mainWin.data());
-
-    //ToDo Check the message handler and FiffSimulator
-
-    //qInstallMessageHandler(customMessageHandler);
 
     QSurfaceFormat fmt;
     fmt.setSamples(10);
