@@ -50,8 +50,6 @@ SUBDIRS += \
 !contains(MNECPP_CONFIG, minimalVersion) {
     SUBDIRS += \
         mne_forward_solution \
-        mne_matching_pursuit \
-        mne_sample_set_downloader \
         mne_anonymize \
 
         qtHaveModule(charts) {

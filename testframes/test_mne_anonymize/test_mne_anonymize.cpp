@@ -79,7 +79,6 @@ private slots:
     //test app behaviour
     void initTestCase();
     void testDefaultOutput();
-//    void testDefaultWildcard(); // Remove wild card feature
     void testDeleteInputFile();
     void testInOutSameName();
 //    void testInOutSameNameAndDeleteInFile(); // Not working -> error indicates that first tag in the fif file is not a tag
@@ -138,42 +137,12 @@ void TestMneAnonymize::testDefaultOutput()
         QFile::remove(sFileOut);
     }
 
-    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
+    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "dev");
     QVERIFY(QFile::exists(sFileOut));
 
     //verify tags of the file
     QFile::remove(sFileOut);
 }
-
-
-////*************************************************************************************************************
-
-//void TestMneAnonymize::testDefaultWildcard()
-//{
-//    // Init testing arguments
-//    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/*.fif");
-//    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
-
-//    qInfo() << "\n\n-------------------------testDefaultWildcard-------------------------------------";
-//    qInfo() << "sFileIn" << sFileIn;
-
-//    QStringList arguments;
-//    arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
-//    arguments << "--in" << sFileIn;
-
-//    qInfo() << "arguments" << arguments;
-
-//    MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize - Testing", "1.0");
-
-//    QStringList listOfFiles = MNEANONYMIZE::listFilesMatchingPatternName(sFileIn);
-
-//    for(QString fin: listOfFiles) {
-//        QString fout(fin.replace(fin.size()-4,4,"_anonymized.fif"));
-//        QVERIFY(QFile::exists(fout));
-//        //for each file verify tags.
-//        QFile::remove(fout);
-//    }
-//}
 
 
 //*************************************************************************************************************

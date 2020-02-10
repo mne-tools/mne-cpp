@@ -108,7 +108,7 @@ void SettingsController::initParser()
     m_parser.addHelpOption();
     m_parser.addVersionOption();
 
-    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Wildcards (like '*' or '?') are allowed and several --in <infile> statements can be present."),
+    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Multiple --in <infile> statements can be present."),
                                  QCoreApplication::translate("main","infile"));
     m_parser.addOption(inFileOpt);
 
@@ -169,7 +169,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("verbose")) {
         if(m_bMultipleInFiles) {
-            qDebug() << "Error. Multiple Input files. You cannot specify the verbose option.";
+            qCritical() << "Verbose does not work with multiple Input files.";
             m_parser.showHelp();
         }
         m_bShowHeaderFlag=true;
@@ -197,7 +197,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("measurement_date")) {
         if(m_bMultipleInFiles) {
-            qDebug() << "Error. Multiple Input files. You cannot specify the option measurement_date.";
+            qCritical() << "Multiple Input files. You cannot specify the option measurement_date.";
             m_parser.showHelp();
         }
 
@@ -207,7 +207,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("measurement_date_offset")) {
         if(m_bMultipleInFiles) {
-            qDebug() << "Error. Multiple Input files. You cannot specify the option measurement_date_offset.";
+            qCritical() << "Multiple Input files. You cannot specify the option measurement_date_offset.";
             m_parser.showHelp();
         }
 
@@ -217,7 +217,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("subject_birthday")) {
         if(m_bMultipleInFiles) {
-            qDebug() << "Error. Multiple Input files. You cannot specify the option \"subject_birthday\".";
+            qCritical() << "Multiple Input files. You cannot specify the option \"subject_birthday\".";
             m_parser.showHelp();
         }
 
@@ -227,7 +227,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("subject_birthday_offset")) {
         if(m_bMultipleInFiles) {
-            qDebug() << "Error. Multiple Input files. You cannot specify the option \"subject_birthday_offset\".";
+            qCritical() << "Multiple Input files. You cannot specify the option \"subject_birthday_offset\".";
             m_parser.showHelp();
         }
         QString bdoffset(m_parser.value("subject_birthday_offset"));
@@ -236,7 +236,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("his")) {
         if(m_bMultipleInFiles) {
-            qDebug() << "Error. Multiple Input files. You cannot specify the optio \"his\".";
+            qCritical() << "Multiple Input files. You cannot specify the optio \"his\".";
             m_parser.showHelp();
         }
 
@@ -249,18 +249,16 @@ void SettingsController::parseInputs(const QStringList& arguments)
 
 void SettingsController::parseInputAndOutputFiles()
 {
-    QStringList inFilesAux{};
+    QStringList inFilesAux;
     if(m_parser.isSet("in")) {
-//        QStringList inFilesAux(m_parser.values("in");
         for(QString f: m_parser.values("in")) {
             inFilesAux.append(f);
         }
     }
 
-    qDebug() << "Count of items in Qlist: " + qvariant_cast<QString>(inFilesAux.count());
-    qDebug() << "Each input item";
+    qInfo() << QString("%1 files to anonymize:").arg(inFilesAux.count());
     for(QString f: inFilesAux){
-        qDebug() << "Filename: " + f;
+        qInfo() << f;
     }
 
     for(QString f: inFilesAux) {
@@ -268,7 +266,7 @@ void SettingsController::parseInputAndOutputFiles()
     }
 
     if(m_SLInFiles.count() == 0) {
-        qDebug() << "Error. No valid input files.";
+        qCritical() << "No valid input files specified.";
         m_parser.showHelp();
     } else if(m_SLInFiles.count() == 1) {
         m_bMultipleInFiles = false;
@@ -279,12 +277,9 @@ void SettingsController::parseInputAndOutputFiles()
     QString boolMultiStr(QVariant(m_bMultipleInFiles).toString());
     QString countFilesStr(QVariant(m_SLInFiles.count()).toString());
 
-    qDebug() << "Total number of Input Files: " + countFilesStr;
-    qDebug() << "Value of Multi files: " + boolMultiStr;
-
     if(m_bMultipleInFiles) {
         if(m_parser.isSet("out")) {
-            qDebug() << "Warning. Multiple input files selected. Output filename option will be ignored.";
+            qWarning() << "Multiple input files selected. Output filename option will be ignored.";
         }
 
         for(QString fi:m_SLInFiles) {
@@ -310,7 +305,7 @@ void SettingsController::parseInputAndOutputFiles()
     }
 
     if(m_SLInFiles.size() != m_SLOutFiles.size()) {
-        qDebug() << "Error. something went wrong while parsing the input files.";
+        qCritical() << "Something went wrong while parsing the input files.";
     }
 }
 
@@ -320,7 +315,7 @@ void SettingsController::parseInputAndOutputFiles()
 void SettingsController::generateAnonymizerInstances()
 {
     if(m_SLInFiles.isEmpty() || m_SLOutFiles.isEmpty()) {
-        qDebug() << "SettingsController::generateAnonymizerInstances - No input and/or output file names specified.";
+        qCritical() << "SettingsController::generateAnonymizerInstances - No input and/or output file names specified.";
         return;
     }
 
@@ -367,10 +362,10 @@ void SettingsController::execute()
 void SettingsController::printHeaderIfVerbose()
 {
     if(m_bShowHeaderFlag) {
-        qDebug() << " ";
-        qDebug() << "-------------------------------------------------------------------------------------------";
-        qDebug() << " ";
-        qDebug() << m_sAppName;
-        qDebug() << "Version: " + m_sAppVer;
+        qInfo() << " ";
+        qInfo() << "-------------------------------------------------------------------------------------------";
+        qInfo() << " ";
+        qInfo() << m_sAppName;
+        qInfo() << "Version: " + m_sAppVer;
     }
 }
