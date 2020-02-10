@@ -176,7 +176,7 @@ private:
     QString m_sAppVer;                  /**< Application version number.*/
     QStringList m_SLInFiles;            /**< List of input file names (absolute paths).*/
     QStringList m_SLOutFiles;           /**< List of output file names (absolute paths).*/
-    bool m_bShowHeaderFlag;                 /**< Show header when executing.*/
+    bool m_bShowHeaderFlag;             /**< Show header when executing.*/
     bool m_bMultipleInFiles;            /**< Multpiple files concurrent execution flag.*/
 
     QList<QSharedPointer<FiffAnonymizer> > m_pAppList; /**< list of addresses to FiffAnonyizer objects. */
@@ -193,9 +193,11 @@ private:
 
 /**
 * Finds all files in a folder matching a filename pattern (compatible with wildcard [*,?]).
+*
 * @details This is a helper function. Given a filename with some pattern. It lists all possible filenames matching the pattern.
 * @param [in] Reference to a QString containing the input filename search pattern.
 * @param [out] QStringList with all possible filenames compatible with the search pattern.
+*
 * It outputs a QStringList with all the possible files in the folder matching the search pattern.
 */
 
@@ -206,7 +208,7 @@ inline static QStringList listFilesMatchingPatternName(const QString &fileName)
     fiFileIn.makeAbsolute();
     if(fiFileIn.isDir())
     {
-        qDebug() << "Error. Input file is infact a directory: " << fileName;
+        qCritical() << "Input file is infact a directory: " << fileName;
     }
 
     QStringList filter;

@@ -44,6 +44,8 @@
 
 #include "settingscontroller.h"
 
+#include <utils/generics/applicationlogger.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,6 +66,8 @@
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -109,10 +113,12 @@ QCoreApplication* createApplication(int &argc, char *argv[])
 */
 int main(int argc, char* argv[])
 {
+    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+
     QScopedPointer<QCoreApplication> qtApp(createApplication(argc, argv));
 
     QString nameStr("MNE Anonymize");
-    QString versionStr("1.0");
+    QString versionStr("dev");
 
     qtApp->setApplicationName(nameStr);
     qtApp->setApplicationVersion(versionStr);
