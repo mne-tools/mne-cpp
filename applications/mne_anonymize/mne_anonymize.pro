@@ -1,17 +1,17 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     mne_anonymize.pro
-# @author   Juan Garcia-Prieto <Juan.GarciaPrieto@uth.tmc.edu> <juangpc@gmail.com>;
-#           Wayne Mead <wayne.mead@uth.tmc.edu> <wayne.isk@gmail.com>;
-#           Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+# @author   Juan Garcia-Prieto <juangpc@gmail.com>;
+#           Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-#           John C. Mosher <John.C.Mosher@uth.tmc.edu> <jcmosher@gmail.com>;
+#           Wayne Mead <wayne.mead@uth.tmc.edu>;
+#           John C. Mosher <John.C.Mosher@uth.tmc.edu>
 # @version  1.0
 # @date     August, 2019
 #
 # @section  LICENSE
 #
-# Copyright (C) 2019, Juan Garcia-Prieto and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2019, Juan Garcia-Prieto, Lorenz Esch, Matti Hamalainen, Wayne Mead, John C. Mosher. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
