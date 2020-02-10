@@ -42,6 +42,7 @@
 #include "applicationlogger.h"
 #include <stdio.h>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
@@ -54,14 +55,16 @@
 #include <QMutex>
 #include <QMutexLocker>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-
 using namespace UTILSLIB;
 using namespace std;
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Definitions
@@ -95,11 +98,10 @@ using namespace std;
 //=============================================================================================================
 
 void ApplicationLogger::customLogWriter(QtMsgType type,
-                                          const QMessageLogContext &context,
-                                          const QString &msg) {
-
-    static QMutex mutex;
-    QMutexLocker locker(&mutex);
+                                        const QMessageLogContext &context,
+                                        const QString &msg)
+{
+    QMutexLocker locker(&m_mutex);
 
     #ifdef WIN32
         // Enable colored output for
@@ -124,6 +126,9 @@ void ApplicationLogger::customLogWriter(QtMsgType type,
             break;
         case QtInfoMsg:
             LOG_WRITE(std::cout, COLOR_INFO, "INFO", msg.toStdString());
+            break;
+        default:
+            LOG_WRITE(std::cout, COLOR_RESET, "", msg.toStdString());
             break;
     }
 }
