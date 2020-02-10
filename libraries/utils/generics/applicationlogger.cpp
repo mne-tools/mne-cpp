@@ -51,8 +51,6 @@
 #include <QtGlobal>
 #include <QDebug>
 #include <QTime>
-
-#include <QMutex>
 #include <QMutexLocker>
 
 
@@ -79,7 +77,7 @@ using namespace std;
     #define COLOR_FATAL         SetConsoleTextAttribute(hOut, 0x0E)     //yellow
     #define COLOR_CRITICAL      SetConsoleTextAttribute(hOut, 0x04)     //red
     #define COLOR_RESET         SetConsoleTextAttribute(hOut, 7)        //reset
-    #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) COLOR; OUTPUT << "" LEVEL " ";COLOR_RESET; OUTPUT<< MSG << std::endl
+    #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) COLOR; OUTPUT << LEVEL;COLOR_RESET; OUTPUT<< MSG << std::endl
 
 #else
     #define COLOR_INFO          "\033[32;1m"        //green
@@ -89,19 +87,29 @@ using namespace std;
     #define COLOR_FATAL         "\033[33;1m"        //yellow
     #define COLOR_RESET         "\033[0m"           //reset
 
-    #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) OUTPUT << COLOR << "" LEVEL " " << COLOR_RESET << MSG << "\n"
+    #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) OUTPUT << COLOR << LEVEL << COLOR_RESET << MSG << "\n"
 #endif
+
+//*************************************************************************************************************
+//=============================================================================================================
+// GLOBAL VARIABLES
+//=============================================================================================================
+
+QString sDate = QString("] ");
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+
 void ApplicationLogger::customLogWriter(QtMsgType type,
                                         const QMessageLogContext &context,
                                         const QString &msg)
 {
-    QMutexLocker locker(&m_mutex);
+    // Comment in following line if you want to display the date and time of the message
+    //sDate = QString(" %1] ").arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss.z"));
 
     #ifdef WIN32
         // Enable colored output for
@@ -113,19 +121,19 @@ void ApplicationLogger::customLogWriter(QtMsgType type,
 
     switch (type) {
         case QtWarningMsg:
-            LOG_WRITE(std::cout, COLOR_WARN, "WARN", msg.toStdString());
-            break;
+            LOG_WRITE(std::cout, COLOR_WARN, QString("[WARN%1").arg(sDate).toStdString(), msg.toStdString());
+        break;
         case QtCriticalMsg:
-            LOG_WRITE(std::cout, COLOR_CRITICAL, "CRIT", msg.toStdString());
+            LOG_WRITE(std::cout, COLOR_CRITICAL, QString("[CRIT%1").arg(sDate).toStdString(), msg.toStdString());
             break;
         case QtFatalMsg:
-            LOG_WRITE(std::cout, COLOR_FATAL, "FATAL", msg.toStdString());
+            LOG_WRITE(std::cout, COLOR_FATAL, QString("[FATAL%1").arg(sDate).toStdString(), msg.toStdString());
             break;
         case QtDebugMsg:
-            LOG_WRITE(std::cout, COLOR_DEBUG, "DEBUG", msg.toStdString());
+            LOG_WRITE(std::cout, COLOR_DEBUG, QString("[DEBUG%1").arg(sDate).toStdString(), msg.toStdString());
             break;
         case QtInfoMsg:
-            LOG_WRITE(std::cout, COLOR_INFO, "INFO", msg.toStdString());
+            LOG_WRITE(std::cout, COLOR_INFO, QString("[INFO%1").arg(sDate).toStdString(), msg.toStdString());
             break;
         default:
             LOG_WRITE(std::cout, COLOR_RESET, "", msg.toStdString());

@@ -51,8 +51,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-
-class QMutex;
+#include <QMutex>
 
 
 //*************************************************************************************************************
@@ -77,14 +76,13 @@ public:
     /**
      * Customized logWriter to colorize type of the message in the terminal
      *
-     * @param[in]  type      The type of the qMessage, can be qDebug, qInfo, qCritical, qWarning and qFatal
+     * @param[in]  type      Enum to identify the various message types (qDebug, qInfo, qCritical, qWarning and qFatal)
      * @param[in]  context   Context provides information about the source code location
-     * @param[out]  msg      The message to print in the terminal
+     * @param[in]  msg       The message to print in the terminal
      */
     static void customLogWriter(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
 private:
-    static QMutex m_mutex;
 };
 
 }
