@@ -546,6 +546,7 @@ void HPIFit::create_sensor_set(QList<struct Sensor>& sensors, FwdCoilSet* coils)
                 cosmag(p,c) = coil->cosmag[p][c];
             }
         }
+        s.tra = Eigen::MatrixXd::Identity(np,np);
         s.w = w;
         s.rmag = rmag;
         s.cosmag = cosmag;
