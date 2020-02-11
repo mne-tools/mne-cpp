@@ -212,7 +212,7 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
 
     //Init coil freqs
-    m_vCoilFreqs << 154 << 158 << 161 << 166;
+    m_vCoilFreqs << << 155 << 165 << 190 << 220;
 
     //Init data
     m_matValue.resize(0,0);
@@ -391,7 +391,7 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
         ui->m_spinBox_freqCoil4->show();
 
         m_vCoilFreqs.clear();
-        m_vCoilFreqs << 154 << 158 << 161 << 166;
+        m_vCoilFreqs << 155 << 165 << 190 << 220;
     }
 
     //alignFiducials(fileName);
