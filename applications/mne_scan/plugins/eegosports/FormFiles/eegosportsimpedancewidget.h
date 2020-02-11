@@ -3,13 +3,14 @@
 * @file     eegosportsimpedancewidget.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     June, 2014
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Johannes Vorwerk <johannes.vorwerk@umit.at>
+* @version  dev
+* @date     February, 2020
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2020, Lorenz Esch, Christoph Dinh, Matti Hamalainen, Johannes Vorwerk. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -108,8 +109,9 @@ public:
     //=========================================================================================================
     /**
     * Updates the values of the electrodes placed in the QGraphicsScene.
+    * @param [in] matValue Matrix of electrode positions.
     */
-    void updateGraphicScene(VectorXd matValue);
+    void updateGraphicScene(const VectorXd matValue);
 
     //=========================================================================================================
     /**
@@ -117,14 +119,15 @@ public:
     */
     void initGraphicScene();
 
-private:
-    EEGoSports*                                       m_pEEGoSports;                    /**< The pointer back to the EEGoSports plugin.*/
 
-    EEGoSportsImpedanceScene*                         m_qGScene;                  /**< The QGraphicScene.*/
+private:
+    EEGoSports*                                 m_pEEGoSports;                    /**< The pointer back to the EEGoSports plugin.*/
+
+    EEGoSportsImpedanceScene*                   m_qGScene;                  /**< The QGraphicScene.*/
 
     QMap< QString, int >                        m_qmElectrodeNameIndex;     /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
 
-    Ui::EEGoSportsImpedanceWidget*                    ui;                         /**< The user interface for the EEGoSportsImpedanceWidget.*/
+    Ui::EEGoSportsImpedanceWidget*              ui;                         /**< The user interface for the EEGoSportsImpedanceWidget.*/
 
     QSharedPointer<ColorMap>                    m_cbColorMap;               /**< The pointer the colormap object.*/
 
@@ -133,8 +136,10 @@ private:
     //=========================================================================================================
     /**
     * Adds an electrode item to the QGraphicScene.
+    * @param [in] electrodeName Name of added electrode.
+    * @param [in] position of added electrode (2D)
     */
-    void addElectrodeItem(QString electrodeName, QVector2D position);
+    void addElectrodeItem(const QString electrodeName, const QVector2D position);
 
     //=========================================================================================================
     /**
@@ -168,6 +173,14 @@ private:
 
     //=========================================================================================================
     /**
+    * Indicates whether index of Electrode a is larger than index of Electrode b.
+    * @param [in] a first electrode
+    * @param [in] b second electrode
+    */
+    static bool compareChannelIndex(EEGoSportsElectrodeItem* a, EEGoSportsElectrodeItem* b);
+
+    //=========================================================================================================
+    /**
     * Saves the current labels and impedance values to a ASI formated file.
     */
     void saveToFile();
@@ -177,7 +190,6 @@ private:
     * Open a help dialog.
     */
     void helpDialog();
-
 };
 
 } // NAMESPACE

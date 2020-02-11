@@ -4,12 +4,13 @@
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-* @version  1.0
-* @date     June, 2014
+*           Johannes Vorwerk <johannes.vorwerk@umit.at;
+* @version  dev
+* @date     February, 2020
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen, Johannes Vorwerk. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -56,7 +57,8 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EEGoSportsElectrodeItem::EEGoSportsElectrodeItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor, int channelIndex)
+EEGoSportsElectrodeItem::EEGoSportsElectrodeItem(QString electrodeName, QPointF electrodePosition,
+                                                 QColor electrodeColor, int channelIndex)
 : m_sElectrodeName(electrodeName)
 , m_qpElectrodePosition(electrodePosition)
 , m_cElectrodeColor(electrodeColor)
@@ -157,13 +159,3 @@ int EEGoSportsElectrodeItem::getChannelIndex()
 {
     return m_iChannelIndex;
 }
-
-
-
-
-
-
-
-
-
-
