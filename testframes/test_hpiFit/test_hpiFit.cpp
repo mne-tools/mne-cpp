@@ -126,7 +126,6 @@ void write_pos(const float time, const int index, QSharedPointer<FIFFLIB::FiffIn
     }
 
     QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
-    quatHPI.normalize();
     //std::cout << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
     position(index,0) = time;
     position(index,1) = quatHPI.x();
@@ -211,7 +210,8 @@ void TestFiffRFR::initTestCase()
         qInfo() << "[done]\n";
         write_pos(ref_pos(i,0),i,pFiffInfo,hpi_pos);
     }
-    UTILSLIB::IOUtils::write_eigen_matrix(hpi_pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/hpi_pos.txt");
+    // For debug: position file for HPIFit
+    // UTILSLIB::IOUtils::write_eigen_matrix(hpi_pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/hpi_pos.txt");
 }
 
 //*************************************************************************************************************
