@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Example for hpi fitting on raw data with enabled chpi .
+* @brief     Example for continious hpi fitting on raw data. The result is written in to a .txt file for comparison with MaxFilter's .pos file
 *
 */
 

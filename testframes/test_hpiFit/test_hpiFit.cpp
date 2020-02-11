@@ -100,7 +100,7 @@ private slots:
     void cleanupTestCase();
 
 private:
-    double errorTrans = 0.0002;
+    double errorTrans = 0.0003;
     double errorQuat = 0.002;
     double errorTime = 0.00000001;
     MatrixXd ref_pos;
@@ -209,7 +209,6 @@ void TestFiffRFR::initTestCase()
                        bDoDebug = 0,
                        sHPIResourceDir);
         qInfo() << "[done]\n";
-        qDebug() << i;
         write_pos(ref_pos(i,0),i,pFiffInfo,hpi_pos);
     }
     UTILSLIB::IOUtils::write_eigen_matrix(hpi_pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/hpi_pos.txt");
@@ -225,8 +224,12 @@ void TestFiffRFR::compareTranslation()
     diff_trans(0) = (ref_pos.col(4)-hpi_pos.col(4)).mean();
     diff_trans(1) = (ref_pos.col(5)-hpi_pos.col(5)).mean();
     diff_trans(2) = (ref_pos.col(6)-hpi_pos.col(6)).mean();
-    qDebug() << "errorTrans: " << std::abs(diff_trans.mean());
-    QVERIFY(std::abs(diff_trans.mean()) < errorTrans);
+    qDebug() << "errorTrans x: " << std::abs(diff_trans(0));
+    qDebug() << "errorTrans y: " << std::abs(diff_trans(1));
+    qDebug() << "errorTrans z: " << std::abs(diff_trans(2));
+    QVERIFY(std::abs(diff_trans(0)) < errorTrans);
+    QVERIFY(std::abs(diff_trans(1)) < errorTrans);
+    QVERIFY(std::abs(diff_trans(2)) < errorTrans);
 }
 
 //*************************************************************************************************************
@@ -238,8 +241,12 @@ void TestFiffRFR::compareRotation()
     diff_quat(0) = (ref_pos.col(1)-hpi_pos.col(1)).mean();
     diff_quat(1) = (ref_pos.col(2)-hpi_pos.col(2)).mean();
     diff_quat(2) = (ref_pos.col(3)-hpi_pos.col(3)).mean();
-    qDebug() << "errorQuat: " <<std::abs(diff_quat.mean());
-    QVERIFY(std::abs(diff_quat.mean()) < errorQuat);
+    qDebug() << "errorQuat q1: " <<std::abs(diff_quat(0));
+    qDebug() << "errorQuat q2: " <<std::abs(diff_quat(1));
+    qDebug() << "errorQuat q3: " <<std::abs(diff_quat(2));
+    QVERIFY(std::abs(diff_quat(0)) < errorQuat);
+    QVERIFY(std::abs(diff_quat(1)) < errorQuat);
+    QVERIFY(std::abs(diff_quat(2)) < errorQuat);
 }
 
 //*************************************************************************************************************
@@ -249,7 +256,7 @@ void TestFiffRFR::compareTime()
     MatrixXd diff = MatrixXd::Zero(ref_pos.rows(),1);
     diff.col(0) = ref_pos.col(0)-hpi_pos.col(0);
     float diff_t = diff.col(0).mean();
-    qDebug() << diff_t;
+    qDebug() << "errorTime: " << diff_t;
     QVERIFY(std::abs(diff_t) < errorTime);
 }
 
