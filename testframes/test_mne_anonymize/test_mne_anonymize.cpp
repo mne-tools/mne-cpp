@@ -405,10 +405,11 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         case FIFF_REF_BLOCK_ID:
         {
             FiffId inId = pTag->toFiffID();
-            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs));
-            QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0));
 
             if(testArg != "MeasDateOffset"){
+                QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs, Qt::UTC));
+                QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC);
+
                 QVERIFY(inMeasDate == defaultMeasDate);
                 QVERIFY(inId.time.secs == static_cast<int32_t>(defaultMeasDate.toSecsSinceEpoch()));
                 QVERIFY(inId.time.usecs == 0);
@@ -421,9 +422,9 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         }
         case FIFF_MEAS_DATE:
         {
-            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*pTag->toInt()));
-            QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0));
-            QDateTime actualDate(QDate(2002,12,3), QTime(14, 1, 10));
+            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*pTag->toInt(), Qt::UTC));
+            QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC);
+            QDateTime actualDate(QDate(2002,12,3), QTime(19, 1, 10), Qt::UTC);
             QDateTime offSetMeasDate(actualDate.addDays(-35));
 
             if(testArg == "MeasDateOffset"){
@@ -489,9 +490,9 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
             QDateTime inBirthday(QDate::fromJulianDay(*pTag->toJulian()));
             QDateTime offSetBirtday(defaultDate.date().addDays(-35));
 
-            qDebug() << "defaultDate" << defaultDate;
-            qDebug() << "inBirthday" << inBirthday;
-            qDebug() << "offSetBirtday" << offSetBirtday;
+            defaultDate.setTimeSpec(Qt::UTC);
+            inBirthday.setTimeSpec(Qt::UTC);
+            offSetBirtday.setTimeSpec(Qt::UTC);
 
             if(testArg == "SubjBirthdayOffset") {
                 QVERIFY(defaultDate == offSetBirtday);

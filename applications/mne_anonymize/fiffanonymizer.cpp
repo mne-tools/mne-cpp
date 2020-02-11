@@ -82,7 +82,7 @@ using namespace FIFFLIB;
 FiffAnonymizer::FiffAnonymizer()
 : maxValidFiffVerion(1.3)
 , m_sDefaultString("mne_anonymize")
-, m_dateDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0)))
+, m_dateDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC))
 , m_dateMeasurmentDate(m_dateDefaultDate)
 , m_bUseMeasurementDayOffset(false)
 , m_iMeasurementDayOffset(0)
@@ -466,7 +466,7 @@ QString FiffAnonymizer::getsFileNameOut()
 int FiffAnonymizer::anonymizeFile()
 {
     printIfVerbose("Max. Valid Fiff version: " + QString::number(maxValidFiffVerion));
-    printIfVerbose("Current date: " + QDateTime::currentDateTime().toString("ddd MMMM d yyyy hh:mm:ss"));
+    printIfVerbose("Current date: " + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz t"));
     printIfVerbose(" ");
 
     FiffStream inStream(&m_fFileIn);
@@ -774,7 +774,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     case FIFF_REF_BLOCK_ID:
     {
         FiffId inId = inTag->toFiffID();
-        QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs);
+        QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs, Qt::UTC);
         QDateTime outMeasDate;
 
         if(m_bUseMeasurementDayOffset) {
@@ -800,12 +800,12 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         outTag->resize(fiffIdSize*sizeof(fiff_int_t));
         memcpy(outTag->data(),reinterpret_cast<char*>(outData),fiffIdSize*sizeof(fiff_int_t));
         printIfVerbose("MAC address in ID tag changed: " + inId.toMachidString() + " -> "  + outId.toMachidString());
-        printIfVerbose("Measurement date in ID tag changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
+        printIfVerbose("Measurement date in ID tag changed: " + inMeasDate.toString("dd.MM.yyyy hh:mm:ss.zzz t") + " -> " + outMeasDate.toString("dd.MM.yyyy hh:mm:ss.zzz t"));
         break;
     }
     case FIFF_MEAS_DATE:
     {
-        QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*inTag->toInt()));
+        QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*inTag->toInt(), Qt::UTC));
         QDateTime outMeasDate;
 
         if(m_bUseMeasurementDayOffset) {
@@ -817,7 +817,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         fiff_int_t outData[1];
         outData[0] = static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
         memcpy(outTag->data(),reinterpret_cast<char*>(outData),sizeof(fiff_int_t));
-        printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
+        printIfVerbose("Measurement date changed: " + inMeasDate.toString("dd.MM.yyyy hh:mm:ss.zzz t") + " -> " + outMeasDate.toString("dd.MM.yyyy hh:mm:ss.zzz t"));
         break;
     }
     case FIFF_COMMENT:
@@ -892,7 +892,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         fiff_int_t outData[1];
         outData[0] = static_cast<int32_t> (outBirthday.toSecsSinceEpoch());
         memcpy(outTag->data(),reinterpret_cast<char*>(outData),sizeof(fiff_int_t));
-        printIfVerbose("Subject birthday date changed: " + inBirthday.toString() + " -> " + outBirthday.toString());
+        printIfVerbose("Subject birthday date changed: " + inBirthday.toString("dd.MM.yyyy hh:mm:ss.zzz t") + " -> " + outBirthday.toString("dd.MM.yyyy hh:mm:ss.zzz t"));
 
         break;
     }
