@@ -528,6 +528,9 @@ FwdCoilSet *FwdCoilSet::read_coil_defs(const QString &name)
             normalize(def->cosmag[p]);
         }
     }
+
+    fclose(in);
+
     printf("%d coil definitions read\n",res->ncoil);
     return res;
 
