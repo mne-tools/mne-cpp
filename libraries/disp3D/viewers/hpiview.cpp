@@ -212,7 +212,7 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
 
     //Init coil freqs
-    m_vCoilFreqs << << 155 << 165 << 190 << 220;
+    m_vCoilFreqs << 155 << 165 << 190 << 220;
 
     //Init data
     m_matValue.resize(0,0);
