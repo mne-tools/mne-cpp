@@ -166,7 +166,9 @@ protected:
      * magnetic_dipole leadfield for a magnetic dipole in an infinite medium.
      * The function has been compared with matlab magnetic_dipole and it gives same output.
      */
-    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt, Eigen::MatrixXd ori);
+    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd pos,
+                                    Eigen::MatrixXd pnt,
+                                    Eigen::MatrixXd ori);
 
     //=========================================================================================================
     /**
@@ -177,7 +179,8 @@ protected:
      * The function has been compared with matlab ft_compute_leadfield and it gives
      * same output.
      */
-    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos, const struct Sensor& sensor);
+    Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& pos,
+                                      const struct Sensor& sensor);
 
     //=========================================================================================================
     /**
@@ -186,7 +189,10 @@ protected:
      * The function has been compared with matlab dipfit_error and it gives
      * same output
      */
-    DipFitError dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const QList<Sensor>& sensorSet, const Eigen::MatrixXd& matProjectors);
+    DipFitError dipfitError(const Eigen::MatrixXd& pos,
+                            const Eigen::MatrixXd& data,
+                            const QList<Sensor>& sensorSet,
+                            const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
     /**
