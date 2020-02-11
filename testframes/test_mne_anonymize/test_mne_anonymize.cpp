@@ -431,8 +431,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         {
             if(m_pBlockTypeList->first()==FIFFB_MEAS_INFO) {
                 QString defaultComment("mne_anonymize");
-                QString anonFileComment(pTag->data());
-                QVERIFY(anonFileComment == defaultComment);
+                QString anonFiffInfoComment(pTag->data());
+                QVERIFY(anonFiffInfoComment == defaultComment);
             }
 
             break;
@@ -440,39 +440,39 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         case FIFF_EXPERIMENTER:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
+            QString anonFiffExperimenter(pTag->data());
+            QVERIFY(anonFiffExperimenter == defaultComment);
 
            break;
         }
         case FIFF_SUBJ_ID:
         {
-            fiff_int_t intAnonFile(*pTag->toInt());
-            QVERIFY(intAnonFile == 0);
+            fiff_int_t intAnnonSubjId(*pTag->toInt());
+            QVERIFY(intAnnonSubjId == 0);
 
             break;
         }
         case FIFF_SUBJ_FIRST_NAME:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
+            QString anonSubjFirstName(pTag->data());
+            QVERIFY(anonSubjFirstName == defaultComment);
 
             break;
         }
         case FIFF_SUBJ_MIDDLE_NAME:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
+            QString anonSubjMiddleName(pTag->data());
+            QVERIFY(anonSubjMiddleName == defaultComment);
 
             break;
         }
         case FIFF_SUBJ_LAST_NAME:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
+            QString anonSubjLastName(pTag->data());
+            QVERIFY(anonSubjLastName == defaultComment);
 
             break;
         }
@@ -490,12 +490,26 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
 
             break;
         }
+        case FIFF_SUBJ_SEX:
+        {
+            fiff_int_t intAnonSubjSex(*pTag->toInt());
+            QVERIFY(intAnonSubjSex == 0);
+
+            break;
+        }
+        case FIFF_SUBJ_HAND:
+        {
+            fiff_int_t intAnonSubjHand(*pTag->toInt());
+            QVERIFY(intAnonSubjHand == 0);
+
+            break;
+        }
         case FIFF_SUBJ_WEIGHT:
         {
             if(testArg == "BruteMode")
             {
-                fiff_int_t intAnonFile(*pTag.data()->toInt());
-                QVERIFY(intAnonFile == 0);
+                fiff_int_t intAnonSubjWeight(*pTag.data()->toInt());
+                QVERIFY(intAnonSubjWeight == 0);
             }
             break;
         }
@@ -503,32 +517,32 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         {
             if(testArg == "BruteMode")
             {
-                fiff_int_t intAnonFile(*pTag.data()->toInt());
-                QVERIFY(intAnonFile == 0);
+                fiff_int_t intAnonSubjHeight(*pTag.data()->toInt());
+                QVERIFY(intAnonSubjHeight == 0);
             }
             break;
         }
         case FIFF_SUBJ_COMMENT:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
+            QString anonSubjComment(pTag->data());
+            QVERIFY(anonSubjComment == defaultComment);
 
             break;
         }
         case FIFF_SUBJ_HIS_ID:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
+            QString anonSubjHis(pTag->data());
+            QVERIFY(anonSubjHis == defaultComment);
             break;
         }
         case FIFF_PROJ_ID:
         {
             if(testArg == "BruteMode")
             {
-                fiff_int_t intAnonFile(*pTag.data()->toInt());
-                QVERIFY(intAnonFile == 0);
+                fiff_int_t intAnonProjId(*pTag.data()->toInt());
+                QVERIFY(intAnonProjId == 0);
             }
             break;
         }
@@ -537,8 +551,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
             if(testArg == "BruteMode")
             {
                 QString defaultComment("mne_anonymize");
-                QString anonFileComment(pTag->data());
-                QVERIFY(anonFileComment == defaultComment);
+                QString intAnonProjName(pTag->data());
+                QVERIFY(intAnonProjName == defaultComment);
             }
             break;
         }
@@ -547,16 +561,16 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
             if(testArg == "BruteMode")
             {
                 QString defaultComment("mne_anonymize");
-                QString anonFileComment(pTag->data());
-                QVERIFY(anonFileComment == defaultComment);
+                QString intAnonProjAim(pTag->data());
+                QVERIFY(intAnonProjAim == defaultComment);
             }
             break;
         }
         case FIFF_PROJ_PERSONS:
         {
             QString defaultComment("mne_anonymize");
-            QString anonFileComment(pTag->data());
-            QVERIFY(anonFileComment == defaultComment);
+            QString intAnonProjPersons(pTag->data());
+            QVERIFY(intAnonProjPersons == defaultComment);
 
             break;
         }
@@ -565,8 +579,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
             if(testArg == "BruteMode")
             {
                 QString defaultComment("mne_anonymize");
-                QString anonFileComment(pTag.data()->toString());
-                QVERIFY(anonFileComment == defaultComment);
+                QString intAnonProjComment(pTag.data()->toString());
+                QVERIFY(intAnonProjComment == defaultComment);
             }
             break;
         }
