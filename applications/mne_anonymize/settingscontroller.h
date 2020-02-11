@@ -36,8 +36,8 @@
  *
  */
 
-#ifndef FIFFANONYMIZER_SETTINGSCONTROLLER_H
-#define FIFFANONYMIZER_SETTINGSCONTROLLER_H
+#ifndef MNEANONYMIZE_SETTINGSCONTROLLER_H
+#define MNEANONYMIZE_SETTINGSCONTROLLER_H
 
 
 //*************************************************************************************************************
@@ -95,7 +95,7 @@ namespace MNEANONYMIZE
  *
  * @brief Interface between main and fiffAnonymizer object.
  * @details Handles command line input parameters, parses them and sets up anynymizer member objects, properly,
- *   depending on the different options.
+ *          depending on the different options.
  */
 class SettingsController
 {
@@ -127,8 +127,6 @@ public:
      */
     void execute();
 
-    //=========================================================================================================
-
 private:
     //=========================================================================================================
     /**
@@ -140,16 +138,22 @@ private:
     /**
      * Processes the input parser and configures the state of the FiffAnonymizer instance according to
      * the options selected. Including input and output files treatment, execution modes and anonymizing options.
+     *
+     * @param[in] arguments The arguments to parse
+     *
+     * @return Returns true if parsing was successful, false otherwise.
      */
-    void parseInputs(const QStringList& arguments);
+    bool parseInputs(const QStringList& arguments);
 
     //=========================================================================================================
     /**
      * Processes the options related to input and output files, like file names or deletion options. It also
      * hables wild cards used while defining input filenames and configures the member QStringList with
      * filenames to anonymize.
+     *
+     * @return Returns true if parsing was successful, false otherwise.
      */
-    void parseInputAndOutputFiles();
+    bool parseInputAndOutputFiles();
 
     //=========================================================================================================
     /**
@@ -205,19 +209,19 @@ inline static QStringList listFilesMatchingPatternName(const QString &fileName)
     QStringList listOfFilteredFiles;
     QFileInfo fiFileIn(QDir::toNativeSeparators(fileName));
     fiFileIn.makeAbsolute();
-    if(fiFileIn.isDir())
-    {
+    if(fiFileIn.isDir()) {
         qCritical() << "Input file is infact a directory: " << fileName;
     }
 
     QStringList filter;
     filter << fiFileIn.fileName();
-    QDirIterator iteratorFileIn(fiFileIn.absoluteDir().absolutePath(),filter,QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot);
-    while(iteratorFileIn.hasNext())
-    {
+    QDirIterator iteratorFileIn(fiFileIn.absoluteDir().absolutePath(),
+                                filter,
+                                QDir::AllEntries | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::CaseSensitive);
+
+    while(iteratorFileIn.hasNext()) {
         QFileInfo fi(iteratorFileIn.next());
-        if(fi.isFile())
-        {
+        if(fi.isFile()) {
             listOfFilteredFiles.append(fi.absoluteFilePath());
         }
     }
@@ -227,4 +231,4 @@ inline static QStringList listFilesMatchingPatternName(const QString &fileName)
 
 } // namespace MNEANONYMIZE
 
-#endif // FIFFANONYMIZER_SETTINGSCONTROLLER_H
+#endif // MNEANONYMIZE_SETTINGSCONTROLLER_H

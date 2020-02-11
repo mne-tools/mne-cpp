@@ -502,10 +502,11 @@ int FiffAnonymizer::anonymizeFile()
     } else {
         qWarning() << "This file may not be compatible with this application.";
     }
+
     censorTag(pOutTag,pInTag);
     pOutTag->next = FIFFV_NEXT_SEQ;
 
-    //we build the tag directory on the go
+    // Build the tag directory on the go
     addEntryToDir(pOutTag,outStream.device()->pos());
     FiffTag::convert_tag_data(pOutTag,FIFFV_NATIVE_ENDIAN,FIFFV_BIG_ENDIAN);
     outStream.write_tag(pOutTag, 0);
@@ -549,7 +550,7 @@ int FiffAnonymizer::anonymizeFile()
         updateBlockTypeList(pInTag);
         censorTag(pOutTag,pInTag);
 
-        //the order of the tags in the output file is sequential. No jumps in the output file.
+        // The order of the tags in the output file is sequential. No jumps in the output file.
         if(pOutTag->next > 0) {
             pOutTag->next = FIFFV_NEXT_SEQ;
         }
@@ -565,6 +566,8 @@ int FiffAnonymizer::anonymizeFile()
     }
 
     addFinalEntryToDir();
+
+    // We do not want to write the FiffDir at the end. This was only needed back in the old days.
 //    fiff_long_t posOfDirectory(outStream.device()->pos());
 //    writeDirectory(&outStream);
 //    updatePointer(&outStream,FIFF_DIR_POINTER,posOfDirectory);
@@ -898,8 +901,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_WEIGHT:
     {
-        if(m_bBruteMode)
-        {
+        if(m_bBruteMode) {
             float inWeight(*inTag->toFloat());
             float outWeight(m_iSubjectWeight);
             memcpy(outTag->data(),&outWeight,sizeof(float));
@@ -910,8 +912,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_SUBJ_HEIGHT:
     {
-        if(m_bBruteMode)
-        {
+        if(m_bBruteMode) {
             float inHeight(*inTag->toFloat());
             float outHeight(m_iSubjectHeight);
             memcpy(outTag->data(),&outHeight,sizeof(float));
@@ -940,8 +941,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_PROJ_ID:
     {
-        if(m_bBruteMode)
-        {
+        if(m_bBruteMode) {
             qint32 inProjID(*inTag->toInt());
             qint32 newProjID(m_iProjectId);
             memcpy(outTag->data(),&newProjID,sizeof(qint32));
@@ -952,8 +952,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_PROJ_NAME:
     {
-        if(m_bBruteMode)
-        {
+        if(m_bBruteMode) {
             QString newStr(m_sProjectName);
             outTag->resize(newStr.size());
             memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -964,8 +963,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_PROJ_AIM:
     {
-        if(m_bBruteMode)
-        {
+        if(m_bBruteMode) {
             QString newStr(m_sProjectAim);
             outTag->resize(newStr.size());
             memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -985,8 +983,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     }
     case FIFF_PROJ_COMMENT:
     {
-        if(m_bBruteMode)
-        {
+        if(m_bBruteMode) {
             QString newStr(m_sProjectComment);
             outTag->resize(newStr.size());
             memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
@@ -1011,7 +1008,6 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         outTag->resize(inTag->size());
         memcpy(outTag->data(),inTag->data(),static_cast<size_t>(inTag->size()));
     }
-
     }
 
     sizeDiff = outTag->size() - inTag->size();

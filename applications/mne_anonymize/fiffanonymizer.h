@@ -36,8 +36,8 @@
  *
  */
 
-#ifndef FIFFANONYMIZER_H
-#define FIFFANONYMIZER_H
+#ifndef MNEANONYMIZE_H
+#define MNEANONYMIZE_H
 
 
 //*************************************************************************************************************

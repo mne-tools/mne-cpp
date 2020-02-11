@@ -86,8 +86,9 @@ SettingsController::SettingsController(const QStringList& arguments,
 , m_bMultipleInFiles(false)
 {
     initParser();
-    parseInputs(arguments);
-    execute();
+    if(parseInputs(arguments)) {
+        execute();
+    }
 }
 
 
@@ -161,16 +162,19 @@ void SettingsController::initParser()
 
 //*************************************************************************************************************
 
-void SettingsController::parseInputs(const QStringList& arguments)
+bool SettingsController::parseInputs(const QStringList& arguments)
 {
     m_parser.process(arguments);
 
-    parseInputAndOutputFiles();
+    if(!parseInputAndOutputFiles()) {
+
+        return false;
+    }
 
     if(m_parser.isSet("verbose")) {
         if(m_bMultipleInFiles) {
             qCritical() << "Verbose does not work with multiple Input files.";
-            return;
+            return false;
         }
         m_bShowHeaderFlag=true;
         m_anonymizer.setVerboseMode(true);
@@ -198,7 +202,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("measurement_date")) {
         if(m_bMultipleInFiles) {
             qCritical() << "Multiple Input files. You cannot specify the option measurement_date.";
-            return;
+            return false;
         }
 
         QString d(m_parser.value("measurement_date"));
@@ -208,7 +212,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("measurement_date_offset")) {
         if(m_bMultipleInFiles) {
             qCritical() << "Multiple Input files. You cannot specify the option measurement_date_offset.";
-            return;
+            return false;
         }
 
         QString doffset(m_parser.value("measurement_date_offset"));
@@ -218,7 +222,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("subject_birthday")) {
         if(m_bMultipleInFiles) {
             qCritical() << "Multiple Input files. You cannot specify the option \"subject_birthday\".";
-            return;
+            return false;
         }
 
         QString birthday(m_parser.value("subject_birthday"));
@@ -228,7 +232,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("subject_birthday_offset")) {
         if(m_bMultipleInFiles) {
             qCritical() << "Multiple Input files. You cannot specify the option \"subject_birthday_offset\".";
-            return;
+            return false;
         }
         QString bdoffset(m_parser.value("subject_birthday_offset"));
         m_anonymizer.setSubjectBirthdayOffset(bdoffset.toInt());
@@ -237,17 +241,19 @@ void SettingsController::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("his")) {
         if(m_bMultipleInFiles) {
             qCritical() << "Multiple Input files. You cannot specify the option \"his\".";
-            return;
+            return false;
         }
 
         m_anonymizer.setSubjectHisId(m_parser.value("his"));
     }
+
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-void SettingsController::parseInputAndOutputFiles()
+bool SettingsController::parseInputAndOutputFiles()
 {
     QStringList inFilesAux;
     if(m_parser.isSet("in")) {
@@ -256,18 +262,13 @@ void SettingsController::parseInputAndOutputFiles()
         }
     }
 
-    qInfo() << QString("%1 files to anonymize:").arg(inFilesAux.count());
-    for(QString f: inFilesAux){
-        qInfo() << f;
-    }
-
     for(QString f: inFilesAux) {
         m_SLInFiles.append(listFilesMatchingPatternName(f));
     }
 
     if(m_SLInFiles.count() == 0) {
         qCritical() << "No valid input files specified.";
-        return;
+        return false;
     } else if(m_SLInFiles.count() == 1) {
         m_bMultipleInFiles = false;
     } else {
@@ -306,7 +307,15 @@ void SettingsController::parseInputAndOutputFiles()
 
     if(m_SLInFiles.size() != m_SLOutFiles.size()) {
         qCritical() << "Something went wrong while parsing the input files.";
+        return false;
     }
+
+    qInfo() << QString("%1 files to anonymize:").arg(m_SLInFiles.count());
+    for(int i = 0; i < m_SLInFiles.size(); ++i) {
+        qInfo() << "Anonymize" << m_SLInFiles.at(i) << "->" << m_SLOutFiles.at(i);
+    }
+
+    return true;
 }
 
 

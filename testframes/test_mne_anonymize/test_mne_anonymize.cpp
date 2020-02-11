@@ -109,7 +109,6 @@ TestMneAnonymize::TestMneAnonymize()
 
 void TestMneAnonymize::initTestCase()
 {
-
 }
 
 
@@ -151,7 +150,6 @@ void TestMneAnonymize::testMultipleInputs()
     QString sFileInB(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_B_raw.fif");
 
     qInfo() << "\n\n-------------------------testMultipleInputs-------------------------------------";
-    qInfo() << "sFileIn" << sFileIn;
 
     QFile::copy(sFileIn,sFileInA);
     QFile::copy(sFileIn,sFileInB);
@@ -164,11 +162,13 @@ void TestMneAnonymize::testMultipleInputs()
 
     qInfo() << "arguments" << arguments;
 
+    // Delete anoymized file from other test runs
     if(QFile::exists(QCoreApplication::applicationDirPath() + QString("/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif"))) {
         QFile::remove(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
     }
 
     MNEANONYMIZE::SettingsController controller(arguments, "MNE Anonymize", "dev");
+
     QVERIFY(QFile::exists(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif"));
     QVERIFY(QFile::exists(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_A_raw_anonymized.fif"));
     QVERIFY(QFile::exists(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_B_raw_anonymized.fif"));
@@ -375,14 +375,6 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
 
 //*************************************************************************************************************
 
-void TestMneAnonymize::cleanupTestCase()
-{
-
-}
-
-
-//*************************************************************************************************************
-
 void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
                                   QString testArg)
 {
@@ -486,13 +478,9 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         }
         case FIFF_SUBJ_BIRTH_DAY:
         {
-            QDateTime defaultDate(QDate(2000,1,1), QTime(1, 1, 0));
+            QDateTime defaultDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC);
             QDateTime inBirthday(QDate::fromJulianDay(*pTag->toJulian()));
             QDateTime offSetBirtday(defaultDate.date().addDays(-35));
-
-            defaultDate.setTimeSpec(Qt::UTC);
-            inBirthday.setTimeSpec(Qt::UTC);
-            offSetBirtday.setTimeSpec(Qt::UTC);
 
             if(testArg == "SubjBirthdayOffset") {
                 QVERIFY(defaultDate == offSetBirtday);
@@ -598,6 +586,14 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         }
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void TestMneAnonymize::cleanupTestCase()
+{
+
 }
 
 
