@@ -104,57 +104,67 @@ SettingsController::~SettingsController()
 
 void SettingsController::initParser()
 {
-    m_parser.setApplicationDescription(QCoreApplication::translate("main",
-                                                                   "Application that removes or modifies Personal Health Information or Personal Identifiable information from a FIFF file."));
+    m_parser.setApplicationDescription(QCoreApplication::translate("main", "Application that removes or modifies Personal "
+                                                                           "Health Information or Personal Identifiable information from a FIFF file."));
     m_parser.addHelpOption();
     m_parser.addVersionOption();
 
-    QCommandLineOption inFileOpt("in",QCoreApplication::translate("main","File to anonymize. Multiple --in <infile> statements can be present."),
+    QCommandLineOption inFileOpt(QStringList() << "i" << "in",
+                                 QCoreApplication::translate("main","File to anonymize. Multiple --in <infile> statements can be present (files will be "
+                                                                    "processed in parallel)."),
                                  QCoreApplication::translate("main","infile"));
     m_parser.addOption(inFileOpt);
 
-    QCommandLineOption outFileOpt("out",QCoreApplication::translate("main","Output file <outfile>. Only allowed when anonymizing one single file."),
+    QCommandLineOption outFileOpt(QStringList() << "o" << "out",
+                                  QCoreApplication::translate("main","Output file <outfile>. Only allowed when anonymizing one single file. As default "
+                                                                     "‘_anonymized.fif’ is attached to the file name."),
                                   QCoreApplication::translate("main","outfile"));
     m_parser.addOption(outFileOpt);
 
-    QCommandLineOption verboseOpt("verbose",QCoreApplication::translate("main","Prints out more information, about each specific anonymized field. Only allowed when anonymizing one single file."));
+    QCommandLineOption verboseOpt("verbose",QCoreApplication::translate("main","Prints out more information, about each specific anonymized field. Only "
+                                                                               "allowed when anonymizing one single file. Default: false"));
     m_parser.addOption(verboseOpt);
 
-    QCommandLineOption quietOpt("quiet",QCoreApplication::translate("main","Show no output."));
-    m_parser.addOption(quietOpt);
-
-    QCommandLineOption deleteInFileOpt("delete_input_file_after",
-                                       QCoreApplication::translate("main","Delete input fiff file after anonymization. A confirmation message will be prompted to the user. Default: false"));
+    QCommandLineOption deleteInFileOpt(QStringList() << "d" << "delete_input_file_after",
+                                       QCoreApplication::translate("main","Delete input fiff file after anonymization. A confirmation message will be "
+                                                                          "prompted to the user. Default: false"));
     m_parser.addOption(deleteInFileOpt);
 
-    QCommandLineOption deleteInFileConfirmOpt("avoid_delete_confirmation",
+    QCommandLineOption deleteInFileConfirmOpt(QStringList() << "ad" << "avoid_delete_confirmation",
                                               QCoreApplication::translate("main","Avoid confirming the deletion of the input fiff file. Default: false"));
     m_parser.addOption(deleteInFileConfirmOpt);
 
-    QCommandLineOption bruteOpt("brute",QCoreApplication::translate("main","Apart from anonymizing other more usual fields in the Fiff file, if present in the input fiff file, anonymize also Subject's weight and height, and Project's ID, Name, Aim and Comment."));
+    QCommandLineOption bruteOpt("brute",
+                                QCoreApplication::translate("main","Also anonymize subject’s weight and height, and project’s ID, name, aim and "
+                                                                   "comment. Default: false"));
     m_parser.addOption(bruteOpt);
 
-    QCommandLineOption measDateOpt("measurement_date",
-                                   QCoreApplication::translate("main","Specify the measurement date. Only when anonymizing a single file. Format: YYYMMDD Default: 20000101"),
+    QCommandLineOption measDateOpt(QStringList() << "md" << "measurement_date",
+                                   QCoreApplication::translate("main","Specify the measurement date. Only when anonymizing a single file. Format: YYYMMDD. "
+                                                                      "Default: 20000101"),
                                    QCoreApplication::translate("main","days"));
     m_parser.addOption(measDateOpt);
 
-    QCommandLineOption measDateOffsetOpt("measurement_date_offset",
-                                         QCoreApplication::translate("main","Specify number of days to subtract to the measurement <date>. Only allowed when anonymizing a single file. Default: 0"),
+    QCommandLineOption measDateOffsetOpt(QStringList() << "mdo" << "measurement_date_offset",
+                                         QCoreApplication::translate("main","Specify number of days to subtract to the measurement . Only allowed when "
+                                                                            "anonymizing a single file. Default: 0"),
                                          QCoreApplication::translate("main","date"));
     m_parser.addOption(measDateOffsetOpt);
 
-    QCommandLineOption birthdayOpt("subject_birthday",
-                                   QCoreApplication::translate("main","Specify the subject's birthday <date>. Only allowed when anonymizing a single file. Format: YYYMMDD Default: 20000101"),
+    QCommandLineOption birthdayOpt(QStringList() << "sb" << "subject_birthday",
+                                   QCoreApplication::translate("main","Specify the subject’s birthday . Only allowed when anonymizing a single file. "
+                                                                      "Format: YYYMMDD. Default: 20000101"),
                                    QCoreApplication::translate("main","date"));
     m_parser.addOption(birthdayOpt);
 
-    QCommandLineOption birthdayOffsetOpt("subject_birthday_offset",
-                                         QCoreApplication::translate("main","Specify number of <days> to subtract to the subject's birthday. Only allowed when anonymizing a single file. Default: 0"),
+    QCommandLineOption birthdayOffsetOpt(QStringList() << "sbo" << "subject_birthday_offset",
+                                         QCoreApplication::translate("main","Specify number of to subtract to the subject's birthday. Only allowed when "
+                                                                            "anonymizing a single file. Default: 0"),
                                          QCoreApplication::translate("main","days"));
     m_parser.addOption(birthdayOffsetOpt);
 
-    QCommandLineOption SubjectIdOpt("his",QCoreApplication::translate("main","Specify the Subject's Id# within the Hospital system. Only allowed when anonymizing a single file. Default: mne_anonymize"),
+    QCommandLineOption SubjectIdOpt("his",QCoreApplication::translate("main","Specify the subject’s ID within the Hospital system. Only allowed when "
+                                                                             "anonymizing a single file. Default: ‘mne_anonymize’"),
                                           QCoreApplication::translate("main","id#"));
     m_parser.addOption(SubjectIdOpt);
 }
@@ -182,13 +192,6 @@ bool SettingsController::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("brute")) {
         m_anonymizer.setBruteMode(true);
-    }
-
-    if(m_parser.isSet("quiet")) {
-        if(m_anonymizer.getVerboseMode()) {
-            m_anonymizer.setVerboseMode(false);
-        }
-        m_anonymizer.setQuietMode(true);
     }
 
     if(m_parser.isSet("delete_input_file_after")) {
