@@ -236,7 +236,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
 
     if(m_parser.isSet("his")) {
         if(m_bMultipleInFiles) {
-            qCritical() << "Multiple Input files. You cannot specify the optio \"his\".";
+            qCritical() << "Multiple Input files. You cannot specify the option \"his\".";
             m_parser.showHelp();
         }
 
@@ -315,7 +315,7 @@ void SettingsController::parseInputAndOutputFiles()
 void SettingsController::generateAnonymizerInstances()
 {
     if(m_SLInFiles.isEmpty() || m_SLOutFiles.isEmpty()) {
-        qCritical() << "SettingsController::generateAnonymizerInstances - No input and/or output file names specified.";
+        qCritical() << "No input and/or output file names specified.";
         return;
     }
 
@@ -340,11 +340,14 @@ void SettingsController::generateAnonymizerInstances()
 void SettingsController::execute()
 {
     generateAnonymizerInstances();
+
     if(m_bMultipleInFiles) {
         for(int th_i=0; th_i<m_pAppList.size(); ++th_i) {
             QSharedPointer<QFuture<void> > promise( new QFuture<void>);
+
             FiffAnonymizer localApp(*m_pAppList.at(th_i));
-            *promise = QtConcurrent::run(localApp,&FiffAnonymizer::anonymizeFile);
+            *promise = QtConcurrent::run(localApp, &FiffAnonymizer::anonymizeFile);
+
             promisesList.append(promise);
         }
 
@@ -356,6 +359,7 @@ void SettingsController::execute()
         m_anonymizer.anonymizeFile();
     }
 }
+
 
 //*************************************************************************************************************
 
