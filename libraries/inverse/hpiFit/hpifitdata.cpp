@@ -117,7 +117,9 @@ void HPIFitData::doDipfitConcurrent()
 
 //*************************************************************************************************************
 
-Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd pnt, Eigen::MatrixXd ori)
+Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd pos,
+                                            Eigen::MatrixXd pnt,
+                                            Eigen::MatrixXd ori)
 {
     double u0 = 1e-7;
     int nchan;
@@ -171,16 +173,15 @@ Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd pos, Eigen::MatrixXd
 
 //*************************************************************************************************************
 
-Eigen::MatrixXd HPIFitData:: compute_leadfield(const Eigen::MatrixXd& pos, const struct Sensor& sensor)
+Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& pos, const struct Sensor& sensor)
 {
 
     Eigen::MatrixXd pnt, ori, lf;
-    Eigen::MatrixXd tra = Eigen::MatrixXd::Identity(sensor.np,sensor.np);
     pnt = sensor.rmag; // position of each integrationpoint
     ori = sensor.cosmag; // orientation of each coil
 
     lf = magnetic_dipole(pos, pnt, ori);
-    lf = tra * lf;
+    lf = sensor.tra * lf;
 
     return lf;
 }
@@ -188,7 +189,10 @@ Eigen::MatrixXd HPIFitData:: compute_leadfield(const Eigen::MatrixXd& pos, const
 
 //*************************************************************************************************************
 
-DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& pos, const Eigen::MatrixXd& data, const QList<Sensor>& sensorSet, const Eigen::MatrixXd& matProjectors)
+DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& pos,
+                                    const Eigen::MatrixXd& data,
+                                    const QList<Sensor>& sensorSet,
+                                    const Eigen::MatrixXd& matProjectors)
 {
     // Variable Declaration
     struct DipFitError e;
