@@ -3,13 +3,14 @@
  * @file     eegosportsdriver.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
+ *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>;
+ *           Johannes Vorwerk <johannes.vorwerk@umit.at>
  * @version  dev
- * @date     July, 2014
+ * @date     February, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Christoph Dinh, Lorenz Esch, Viktor Klueber. All rights reserved.
+ * Copyright (C) 2020, Christoph Dinh, Lorenz Esch, Viktor Klueber, Johannes Vorwerk. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -54,6 +55,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -97,7 +99,7 @@ EEGoSportsDriver::~EEGoSportsDriver()
 //*************************************************************************************************************
 
 bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
-                            QString sOutpuFilePath, bool bMeasureImpedance)
+                                  const QString sOutpuFilePath, bool bMeasureImpedance)
 {
     m_bMeasureImpedances = bMeasureImpedance;
 
@@ -127,13 +129,10 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
 
         //std::cout<<"EEGoSportsDriver::initDevice - Serial number of connected eegosports device: "<<m_pAmplifier->getSerialNumber()<<std::endl;
 
-#ifdef _WIN32
-        Sleep(100);
-#else
-        sleep(0.1);
-#endif
+        QThread::msleep(100);
+
     } catch (std::runtime_error& e) {
-        std::cout <<"EEGoSportsDriver::initDevice - error " << e.what() << std::endl;
+        qWarning() <<"EEGoSportsDriver::initDevice - error " << e.what();
         return false;
     }
 
@@ -145,7 +144,7 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
         if(it->getType() == 1)
             ++iEEGChannelCount;
         else if(it->getType() == 2)
-         ++iBipolarChannelCount;
+            ++iBipolarChannelCount;
     }
     if(!bMeasureImpedance)
         m_uiNumberOfChannels = channellist.size() + 3; //trigger, sample count, and ref not considered here
@@ -155,11 +154,11 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
     m_uiNumberOfEEGChannels = iEEGChannelCount;
     m_uiNumberOfBipolarChannels = iBipolarChannelCount;
 
-    std::cout << "iChannelcount " << m_uiNumberOfChannels << std::endl;
-    std::cout << "iEEGChannelcount " << iEEGChannelCount << std::endl;
-    std::cout << "iBipolarChannelCount " << iBipolarChannelCount << std::endl;
+    qDebug() << "iChannelcount " << m_uiNumberOfChannels;
+    qDebug() << "iEEGChannelcount " << iEEGChannelCount;
+    qDebug() << "iBipolarChannelCount " << iBipolarChannelCount;
 
-    std::cout << "EEGoSportsDriver::initDevice - Successfully initialised the device." << std::endl;
+    qInfo() << "EEGoSportsDriver::initDevice - Successfully initialised the device.";
 
     // Set flag for successfull initialisation true
     m_bInitDeviceSuccess = true;
@@ -169,9 +168,9 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
 
 //*************************************************************************************************************
 
-bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
-                            int iSamplingFrequency,
-                            bool bMeasureImpedance)
+bool EEGoSportsDriver::startRecording(const int iSamplesPerBlock,
+                                      const int iSamplingFrequency,
+                                      bool bMeasureImpedance)
 {
     //Set global variables
     m_uiSamplesPerBlock = iSamplesPerBlock;
@@ -192,17 +191,14 @@ bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
             m_pDataStream = m_pAmplifier->OpenEegStream(m_uiSamplingFrequency, reference_range, bipolar_range);
         }
 
-#ifdef _WIN32
-        Sleep(100);
-#else
-        sleep(0.1);
-#endif
+        QThread::msleep(100);
+
     } catch (std::runtime_error& e) {
-        std::cout <<"EEGoSportsDriver::startRecording - error " << e.what() << std::endl;
+        qWarning() <<"EEGoSportsDriver::startRecording - error " << e.what();
         return false;
     }
 
-    std::cout << "EEGoSportsDriver::startRecording - Successfully started recording." << std::endl;
+    qInfo() << "EEGoSportsDriver::startRecording - Successfully started recording.";
 
     // Set flag for successfull initialisation true
     m_bStartRecordingSuccess = true;
@@ -216,19 +212,19 @@ bool EEGoSportsDriver::uninitDevice()
 {
     //Check if the device was initialised
     if(!m_bStartRecordingSuccess) {
-        std::cout << "Plugin EEGoSports - ERROR - uninitDevice() - Recording was not started - therefore can not be stopped" << std::endl;
+        qWarning() << "Plugin EEGoSports - ERROR - uninitDevice() - Recording was not started - therefore can not be stopped";
         return false;
     }
 
     //Check if the device was initialised
     if(!m_bInitDeviceSuccess) {
-        std::cout << "Plugin EEGoSports - ERROR - uninitDevice() - Device was not initialised - therefore can not be uninitialised" << std::endl;
+        qWarning() << "Plugin EEGoSports - ERROR - uninitDevice() - Device was not initialised - therefore can not be uninitialised";
         return false;
     }
 
     //Check if the driver DLL was loaded
     if(!m_bDllLoaded) {
-        std::cout << "Plugin EEGoSports - ERROR - uninitDevice() - Driver DLL was not loaded" << std::endl;
+        qWarning() << "Plugin EEGoSports - ERROR - uninitDevice() - Driver DLL was not loaded";
         return false;
     }
 
@@ -241,7 +237,7 @@ bool EEGoSportsDriver::uninitDevice()
     delete m_pDataStream;
     delete m_pAmplifier;
 
-    std::cout << "Plugin EEGoSports - INFO - uninitDevice() - Successfully uninitialised the device" << std::endl;
+    qInfo() << "Plugin EEGoSports - INFO - uninitDevice() - Successfully uninitialised the device";
 
     m_bStartRecordingSuccess = false;
     m_bInitDeviceSuccess = false;
@@ -256,12 +252,12 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 {
     //Check if device was initialised and connected correctly
     if(!m_bInitDeviceSuccess) {
-        std::cout << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly" << std::endl;
+        qWarning() << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly";
         return false;
     }
 
     if(!m_bStartRecordingSuccess) {
-        std::cout << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because recording was not started" << std::endl;
+        qWarning() << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because recording was not started";
         return false;
     }
 

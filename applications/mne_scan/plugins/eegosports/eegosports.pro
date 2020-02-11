@@ -3,13 +3,14 @@
 # @file     eegosports.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>;
-#           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
+#           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>;
+#           Johannes Vorwerk <johannes.vorwerk@umit.at>
 # @version  dev
-# @date     July, 2014
+# @date     February, 2020
 #
 # @section  LICENSE
 #
-# Copyright (C) 2014, Christoph Dinh, Lorenz Esch, Viktor Klueber. All rights reserved.
+# Copyright (C) 2020, Christoph Dinh, Lorenz Esch, Viktor Klueber, Johannes Vorwerk. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -78,9 +79,9 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     FormFiles/eegosportsimpedancewidget.cpp \
         eegosports.cpp \
-    eegosportselectrodeitem.cpp \
-    eegosportsimpedancescene.cpp \
-    eegosportsimpedanceview.cpp \
+        eegosportselectrodeitem.cpp \
+        eegosportsimpedancescene.cpp \
+        eegosportsimpedanceview.cpp \
         eegosportsproducer.cpp \
         FormFiles/eegosportssetupwidget.cpp \
         FormFiles/eegosportsaboutwidget.cpp \
@@ -91,9 +92,9 @@ HEADERS += \
     FormFiles/eegosportsimpedancewidget.h \
         eegosports.h\
         eegosports_global.h \
-    eegosportselectrodeitem.h \
-    eegosportsimpedancescene.h \
-    eegosportsimpedanceview.h \
+        eegosportselectrodeitem.h \
+        eegosportsimpedancescene.h \
+        eegosportsimpedanceview.h \
         eegosportsproducer.h \
         FormFiles/eegosportssetupwidget.h \
         FormFiles/eegosportsaboutwidget.h \
@@ -107,7 +108,8 @@ FORMS += \
         FormFiles/eegosportssetupprojectwidget.ui \
 
 RESOURCE_FILES +=\
-    $${MNE_DIR}/resources/mne_scan/plugins/eegosports/readme.txt \
+    $${ROOT_DIR}/resources/mne_scan/plugins/eegosports/readme.txt \
+    $${ROOT_DIR}/resources/general/3DLayouts/standard_waveguard64_duke.elc
 
 # Copy resource files to bin resource folder
 for(FILE, RESOURCE_FILES) {

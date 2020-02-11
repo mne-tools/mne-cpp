@@ -3,13 +3,14 @@
  * @file     eegosports.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
+ *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>;
+ *           Johannes Vorwerk <johannes.vorwerk@umit.at>
  * @version  dev
- * @date     July, 2014
+ * @date     February, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Christoph Dinh, Lorenz Esch, Viktor Klueber. All rights reserved.
+ * Copyright (C) 2020, Christoph Dinh, Lorenz Esch, Viktor Klueber, Johannes Vorwerk. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:

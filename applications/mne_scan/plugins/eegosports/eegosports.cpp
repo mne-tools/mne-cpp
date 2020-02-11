@@ -3,13 +3,14 @@
  * @file     eegosports.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>
+ *           Viktor Klueber <Viktor.Klueber@tu-ilmenau.de>;
+ *           Johannes Vorwerk <johannes.vorwerk@umit.at>
  * @version  dev
- * @date     July, 2014
+ * @date     February, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Christoph Dinh, Lorenz Esch, Viktor Klueber. All rights reserved.
+ * Copyright (C) 2020, Christoph Dinh, Lorenz Esch, Viktor Klueber, Johannes Vorwerk. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -182,7 +183,7 @@ void EEGoSports::init()
     QDate date;
     m_sOutputFilePath = settings.value(QString("EEGOSPORTS/outputFilePath"), QString("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day())).toString();
 
-    m_sElcFilePath = settings.value(QString("EEGOSPORTS/elcFilePath"), QString("./resources/3DLayouts/standard_waveguard64.elc")).toString();
+    m_sElcFilePath = settings.value(QString("EEGOSPORTS/elcFilePath"), QString(QCoreApplication::applicationDirPath() + "/resources/3DLayouts/standard_waveguard64_duke.elc")).toString();
 
     m_sCardinalFilePath = settings.value(QString("EEGOSPORTS/cardinalFilePath"), QString("")).toString();
 
@@ -560,7 +561,7 @@ void EEGoSports::setUpFiffInfo()
         m_pFiffInfo->chs.append(fChInfo);
     }
 
-    std::cout << "number of channels " << QSLChNames.length() << std::endl;
+    qDebug() << "Number of Channels " << QSLChNames.length();
 
     //Set channel names in fiff_info_base
     m_pFiffInfo->ch_names = QSLChNames;

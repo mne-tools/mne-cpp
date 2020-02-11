@@ -3,13 +3,14 @@
 * @file     eegosportsimpedancewidget.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     June, 2014
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Johannes Vorwerk <johannes.vorwerk@umit.at>
+* @version  dev
+* @date     February, 2020
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2020, Lorenz Esch, Christoph Dinh, Matti Hamalainen, Johannes Vorwerk. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -111,7 +112,7 @@ EEGoSportsImpedanceWidget::~EEGoSportsImpedanceWidget()
 
 //*************************************************************************************************************
 
-void EEGoSportsImpedanceWidget::updateGraphicScene(VectorXd matValue)
+void EEGoSportsImpedanceWidget::updateGraphicScene(const VectorXd matValue)
 {
     // Get scene items
     QList<QGraphicsItem *> itemList = m_qGScene->items();
@@ -215,7 +216,7 @@ void EEGoSportsImpedanceWidget::initGraphicScene()
 
 //*************************************************************************************************************
 
-void EEGoSportsImpedanceWidget::addElectrodeItem(QString electrodeName, QVector2D position)
+void EEGoSportsImpedanceWidget::addElectrodeItem(const QString electrodeName, const QVector2D position)
 {
     EEGoSportsElectrodeItem *item = new EEGoSportsElectrodeItem(electrodeName, QPointF(position.x(), position.y()), QColor(m_cbColorMap->valueToJet(1)), m_qmElectrodeNameIndex[electrodeName]);
     item->setPos(QPointF(position.x(), position.y()));
@@ -343,11 +344,12 @@ void EEGoSportsImpedanceWidget::closeEvent(QCloseEvent *event)
 
 //*************************************************************************************************************
 
-// This function is needed to sort the QList
-bool compareChannelIndex(EEGoSportsElectrodeItem* a, EEGoSportsElectrodeItem* b)
+bool EEGoSportsImpedanceWidget::compareChannelIndex(EEGoSportsElectrodeItem* a, EEGoSportsElectrodeItem* b)
 {
     return a->getChannelIndex() < b->getChannelIndex();
 }
+
+//*************************************************************************************************************
 
 void EEGoSportsImpedanceWidget::saveToFile()
 {
@@ -369,7 +371,7 @@ void EEGoSportsImpedanceWidget::saveToFile()
         itemListNew.append((EEGoSportsElectrodeItem *)itemList.at(i));
 
     // Sort list corresponding to the channelIndex
-    std::sort(itemListNew.begin(), itemListNew.end(), compareChannelIndex);
+    std::sort(itemListNew.begin(), itemListNew.end(), EEGoSportsImpedanceWidget::compareChannelIndex);
 
     // Update position
     for(int i = 0; i<itemListNew.size(); i++)
