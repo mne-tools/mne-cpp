@@ -89,7 +89,7 @@ using namespace FIFFLIB;
  */
 
 void write_pos(const float time, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::MatrixXd& position, const QVector<double>& vGoF){
-    // Write quaternions and time in position matri. Format is the same as in maxfilter .pos files, but we only write quaternions and time. So column 7,8,9 are not used
+    // Write quaternions and time in position matrix. Format is the same like MaxFilter's .pos files.
     QMatrix3x3 rot;
 
     for(int ir = 0; ir < 3; ir++) {
@@ -136,15 +136,12 @@ int main(int argc, char *argv[])
     FiffRawData raw(t_fileIn);
     QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(raw.info));
 
-    RowVectorXd cals;
-
     //std::cout << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
     Eigen::MatrixXd position;
 
     // Set up the reading parameters
-
     // Only read MEG channels
-    RowVectorXi picks = raw.info.pick_types(true, false, false);
+    RowVectorXi picks = pFiffInfo->pick_types(true, false, false);
 
     MatrixXd matData;
     MatrixXd times;
@@ -154,12 +151,12 @@ int main(int argc, char *argv[])
     fiff_int_t first = raw.first_samp;
     fiff_int_t last = raw.last_samp;
 
-    float dT_sec = 0.1;            // time between hpi fits
-    float quantum_sec = 0.2f;       //read and write in 200 ms junks
+    float dT_sec = 0.1;             // time between hpi fits
+    float quantum_sec = 0.2f;       // read and write in 200 ms junks
     fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
     fiff_int_t dT = ceil(dT_sec*pFiffInfo->sfreq);
     float t = 0;
-    // setup informations for HPI fit
+    // setup informations for HPI fit (VectorView)
     QVector<int> vFreqs {166,154,161,158};
     QVector<double> vGof;
     FiffDigPointSet fittedPointSet;
@@ -179,7 +176,7 @@ int main(int argc, char *argv[])
         matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
     }
 
-    // if debugging files are necessary
+    // if debugging files are necessary set bDoDebug = true;
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
     bool bDoDebug = false;
 

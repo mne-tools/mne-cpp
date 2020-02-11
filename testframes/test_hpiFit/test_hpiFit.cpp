@@ -82,15 +82,15 @@ using namespace INVERSELIB;
 /**
  * DECLARE CLASS TestFiffRFR
  *
- * @brief The TestFiffRFR class provides read filter read fiff verification tests
+ * @brief The TestFitHPI class provides hpi fit verifivcation tests
  *
  */
-class TestFiffRFR: public QObject
+class TestFitHPI: public QObject
 {
     Q_OBJECT
 
 public:
-    TestFiffRFR();
+    TestFitHPI();
 
 private slots:
     void initTestCase();
@@ -109,7 +109,7 @@ private:
 
 //*************************************************************************************************************
 
-TestFiffRFR::TestFiffRFR()
+TestFitHPI::TestFitHPI()
 {
 }
 
@@ -136,7 +136,7 @@ void write_pos(const float time, const int index, QSharedPointer<FIFFLIB::FiffIn
     position(index,6) = info->dev_head_t.trans(2,3);
 }
 
-void TestFiffRFR::initTestCase()
+void TestFitHPI::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     qInfo() << "Error Translation" << errorTrans;
@@ -181,6 +181,7 @@ void TestFiffRFR::initTestCase()
     QVector<double> vGof;
     FiffDigPointSet fittedPointSet;
     Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
+    QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
     bool bDoDebug = false;
 
     for(int i = 0; i < ref_pos.rows(); i++) {
@@ -189,15 +190,12 @@ void TestFiffRFR::initTestCase()
         if (to > last) {
             to = last;
         }
-        // Reading
+        qInfo()  << "Reading...";
         if(!raw.read_raw_segment(matData, times, from, to)) {
             qWarning("error during read_raw_segment\n");
         }
-        qInfo() << "[done]\n";
 
-        QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
         qInfo()  << "HPI-Fit...";
-
         HPIFit::fitHPI(matData,
                        matProjectors,
                        pFiffInfo->dev_head_t,
@@ -216,9 +214,8 @@ void TestFiffRFR::initTestCase()
 
 //*************************************************************************************************************
 
-void TestFiffRFR::compareTranslation()
+void TestFitHPI::compareTranslation()
 {
-    // create error matrix for quaternion and translation channels
     MatrixXd diff = MatrixXd::Zero(ref_pos.rows(),3);
     RowVector3d diff_trans;
     diff_trans(0) = (ref_pos.col(4)-hpi_pos.col(4)).mean();
@@ -233,9 +230,8 @@ void TestFiffRFR::compareTranslation()
 }
 
 //*************************************************************************************************************
-void TestFiffRFR::compareRotation()
+void TestFitHPI::compareRotation()
 {
-    // create error matrix for quaternion and translation channels
     MatrixXd diff = MatrixXd::Zero(ref_pos.rows(),3);
     RowVector3d diff_quat;
     diff_quat(0) = (ref_pos.col(1)-hpi_pos.col(1)).mean();
@@ -250,9 +246,8 @@ void TestFiffRFR::compareRotation()
 }
 
 //*************************************************************************************************************
-void TestFiffRFR::compareTime()
+void TestFitHPI::compareTime()
 {
-    // create error matrix for quaternion and translation channels
     MatrixXd diff = MatrixXd::Zero(ref_pos.rows(),1);
     diff.col(0) = ref_pos.col(0)-hpi_pos.col(0);
     float diff_t = diff.col(0).mean();
@@ -262,7 +257,7 @@ void TestFiffRFR::compareTime()
 
 //*************************************************************************************************************
 
-void TestFiffRFR::cleanupTestCase()
+void TestFitHPI::cleanupTestCase()
 {
 }
 
@@ -271,5 +266,5 @@ void TestFiffRFR::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_GUILESS_MAIN(TestFiffRFR)
+QTEST_GUILESS_MAIN(TestFitHPI)
 #include "test_hpiFit.moc"
