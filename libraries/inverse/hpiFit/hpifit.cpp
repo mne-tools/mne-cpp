@@ -209,7 +209,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         }
     }
 
-
     // Create MEG-Coils and read doil_def.dat
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
     // Create MEG-Coils and read data
@@ -537,7 +536,7 @@ void HPIFit::create_sensor_set(QList<struct Sensor>& sensors, FwdCoilSet* coils)
         int np = coil->np;
         Eigen::MatrixXd rmag = Eigen::MatrixXd::Zero(np,3);
         Eigen::MatrixXd cosmag = Eigen::MatrixXd::Zero(np,3);
-        Eigen::RowVectorXd w(8);
+        Eigen::RowVectorXd w(np);
 
         s.r0(0) = coil->r0[0];
         s.r0(1) = coil->r0[1];
