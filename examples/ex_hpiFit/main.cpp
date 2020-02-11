@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Example for continious hpi fitting on raw data. The result is written in to a .txt file for comparison with MaxFilter's .pos file
+* @brief     Example for cHPI fitting on raw data with SSP. The result is written to a .txt file for comparison with MaxFilter's .pos file.
 *
 */
 
@@ -88,7 +88,7 @@ using namespace FIFFLIB;
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
 
-void write_pos(const float time, const int index, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::MatrixXd& position){
+void write_pos(const float time, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::MatrixXd& position, const QVector<double>& vGoF){
     // Write quaternions and time in position matri. Format is the same as in maxfilter .pos files, but we only write quaternions and time. So column 7,8,9 are not used
     QMatrix3x3 rot;
 
@@ -97,16 +97,20 @@ void write_pos(const float time, const int index, QSharedPointer<FIFFLIB::FiffIn
             rot(ir,ic) = info->dev_head_t.trans(ir,ic);
         }
     }    
+    double GoF = std::accumulate(vGoF.begin(), vGoF.end(), .0) / vGoF.size();
     QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
-    quatHPI.normalize();
     //std::cout << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
-    position(index,0) = time;
-    position(index,1) = quatHPI.x();
-    position(index,2) = quatHPI.y();
-    position(index,3) = quatHPI.z();
-    position(index,4) = info->dev_head_t.trans(0,3);
-    position(index,5) = info->dev_head_t.trans(1,3);
-    position(index,6) = info->dev_head_t.trans(2,3);
+    position.conservativeResize(position.rows()+1, 10);
+    position(position.rows()-1,0) = time;
+    position(position.rows()-1,1) = quatHPI.x();
+    position(position.rows()-1,2) = quatHPI.y();
+    position(position.rows()-1,3) = quatHPI.z();
+    position(position.rows()-1,4) = info->dev_head_t.trans(0,3);
+    position(position.rows()-1,5) = info->dev_head_t.trans(1,3);
+    position(position.rows()-1,6) = info->dev_head_t.trans(2,3);
+    position(position.rows()-1,7) = 1-GoF;
+    position(position.rows()-1,8) = GoF;
+    position(position.rows()-1,9) = 0;
 }
 
 int main(int argc, char *argv[])
@@ -120,7 +124,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("hpiFit Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/data_with_movement_chpi_raw.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/test_hpiFit_raw.fif");
 
     parser.addOption(inputOption);
 
@@ -134,53 +138,66 @@ int main(int argc, char *argv[])
 
     RowVectorXd cals;
 
-    // Read Quaternion File
-    Eigen::MatrixXd pos;
-    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/pos_maxf.txt");
-
     //std::cout << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
-    Eigen::MatrixXd position = Eigen::MatrixXd::Zero(pos.rows(),pos.cols());
-    // Set up the reading parameters to read the whole file at once
-    // seconds to read
+    Eigen::MatrixXd position;
 
-    // Only filter MEG channels
+    // Set up the reading parameters
+
+    // Only read MEG channels
     RowVectorXi picks = raw.info.pick_types(true, false, false);
 
-    // Read the data
     MatrixXd matData;
     MatrixXd times;
 
-    // Set up the reading parameters
     fiff_int_t from;
     fiff_int_t to;
     fiff_int_t first = raw.first_samp;
     fiff_int_t last = raw.last_samp;
 
-    float quantum_sec = 0.2f;//read and write in 200 ms junks
+    float dT_sec = 0.1;            // time between hpi fits
+    float quantum_sec = 0.2f;       //read and write in 200 ms junks
     fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
-
+    fiff_int_t dT = ceil(dT_sec*pFiffInfo->sfreq);
+    float t = 0;
     // setup informations for HPI fit
     QVector<int> vFreqs {166,154,161,158};
     QVector<double> vGof;
     FiffDigPointSet fittedPointSet;
-    Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
-    bool bDoDebug = true;
 
-    for(int i = 0; i < pos.rows(); i++) {
-        from = first + pos(i,0)*pFiffInfo->sfreq;
+    // Use SSP + SGM + calibration
+    Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
+    //Do a copy here because we are going to change the activity flags of the SSP's
+    FiffInfo infoTemp = *(pFiffInfo.data());
+    //Turn on all SSP
+    for(int i = 0; i < infoTemp.projs.size(); ++i) {
+        infoTemp.projs[i].active = true;
+    }
+    //Create the projector for all SSP's on
+    infoTemp.make_projector(matProjectors);
+    //set columns of matrix to zero depending on bad channels indexes
+    for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
+        matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
+    }
+
+    // if debugging files are necessary
+    QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
+    bool bDoDebug = false;
+
+    // read and fit
+    for(from = first; from < last; from+=dT) {
         to = from + quantum;
         if (to > last) {
             to = last;
+            qWarning() << "Block size < quantum " << quantum;
         }
         // Reading
         if(!raw.read_raw_segment(matData, times, from, to)) {
-            printf("error during read_raw_segment\n");
+            qCritical("error during read_raw_segment");
             return -1;
         }
-        qDebug() << "[done]\n";
+        qInfo() << "[done]";
 
-        QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
-        qDebug() << "HPI-Fit...";
+        qInfo() << "HPI-Fit...";
         timer.start();
         HPIFit::fitHPI(matData,
                        matProjectors,
@@ -189,11 +206,12 @@ int main(int argc, char *argv[])
                        vGof,
                        fittedPointSet,
                        pFiffInfo,
-                       bDoDebug = 0,
+                       bDoDebug,
                        sHPIResourceDir);
-        qDebug() << "The slow operation took" << timer.elapsed() << "milliseconds";
-        std::cout << "[done]\n"<< std::endl;
-        write_pos(pos(i,0),i,pFiffInfo,position);
+        qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
+        qInfo() << "[done]";
+        write_pos(t,pFiffInfo,position,vGof);
+        t +=dT_sec;
     }
     UTILSLIB::IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
 }
