@@ -189,10 +189,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         }
     }
 
-    // Get the indices of inner layer channels and exclude bad channels and create
-    // channellist with used channels.
-    //TODO: Only supports babymeg and vectorview gradiometeres for hpi fitting.
-
+    // Get the indices of inner layer channels and exclude bad channels and create channellist
     QList<FiffChInfo> channels;
     QVector<int> innerind(0);
 
