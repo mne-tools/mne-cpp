@@ -179,8 +179,8 @@ private:
     bool m_bShowHeaderFlag;             /**< Show header when executing.*/
     bool m_bMultipleInFiles;            /**< Multpiple files concurrent execution flag.*/
 
-    QList<QSharedPointer<FiffAnonymizer> > m_pAppList; /**< list of addresses to FiffAnonyizer objects. */
-    QList<QSharedPointer<QFuture<void> > > promisesList; /**< List of synchronizing waits for each concurrent execution.*/
+    QList<FiffAnonymizer> m_lApps;   /**< list of addresses to FiffAnonyizer objects. */
+    QList<QFuture<void> > promisesList; /**< List of synchronizing waits for each concurrent execution.*/
     QCommandLineParser m_parser;        /**< parser object to work with member pointer to QCoreApp and parse input command line options.*/
 
 };

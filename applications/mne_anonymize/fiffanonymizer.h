@@ -114,6 +114,11 @@ public:
      */
     FiffAnonymizer(const FiffAnonymizer& obj);
 
+    FiffAnonymizer& operator = (const FiffAnonymizer &t)
+    {
+        return *this;
+    }
+
     //=========================================================================================================
     /**
      * Move contructor
