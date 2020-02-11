@@ -175,15 +175,6 @@ public:
      */
     bool getVerboseMode();
 
-    //=========================================================================================================
-    /**
-     * Sets the state of the object the desired verbose mode to none. If set to TRUE, absolutely no message will be printed
-     * to on screen during the anonymizing process.
-     *
-     * @param [in] bFlag    Bool argument whether to use the quiet mode.
-     */
-    void setQuietMode(bool bFlag);
-
     /**
      * Sets the state of the FiffAnonymizer object's desired anonymization mode. If set to TRUE, apart from the default information
      * additional information will also be anonymized, like Subject's weight, height, or different project information.
@@ -391,12 +382,6 @@ public:
      * Get value of default Advanced anonymization. Anonymize also weight, height and some other fields.
      */
     bool getBruteMode();
-
-    //=========================================================================================================
-    /**
-     * Value of Quite mode enabler.
-     */
-    bool getQuietMode();
 
     //=========================================================================================================
     /**
@@ -621,7 +606,6 @@ private:
     bool m_bUseSubjectBirthdayOffset;   /**< Flags use of Subject's birthday offset.*/
     bool m_bVerboseMode;                /**< Verbosity mode enabler.*/
     bool m_bBruteMode;                  /**< Advanced anonymization. Anonymize also weight, height and some other fields.*/
-    bool m_bQuietMode;                  /**< Quite mode enabler.*/
     bool m_bDeleteInputFileAfter;       /**< User's request to delete the input file after anonymization.*/
     bool m_bDeleteInputFileConfirmation;/**< User's request to avoid confirmation prompt for input file deletion.*/
     bool m_bInputFileDeleted;           /**< Flags if the input file has been deleted. */
@@ -630,7 +614,9 @@ private:
 
     int  m_iMeasurementDayOffset;       /**< Number of days to subtract from the measurement date.*/
     int  m_iSubjectBirthdayOffset;      /**< Subjects's birthday offset.*/
+    int m_iDfltSubjectSex;              /**< Subject's sex substitutor.*/
     int m_iDfltSubjectId;               /**< Subject's id substitutor.*/
+    int m_iDfltSubjectHand;             /**< Subject's hand substitutor.*/
     int m_iSubjectWeight;               /**< Subject's weight substitutor.*/
     int m_iSubjectHeight;               /**< Subject's height substitutor.*/
     int m_iProjectId;                   /**< Project's id# substitutor.*/

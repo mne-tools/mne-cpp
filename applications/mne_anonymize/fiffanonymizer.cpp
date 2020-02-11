@@ -90,6 +90,8 @@ FiffAnonymizer::FiffAnonymizer()
 , m_bUseSubjectBirthdayOffset(false)
 , m_iSubjectBirthdayOffset(0)
 , m_iDfltSubjectId(0)
+, m_iDfltSubjectHand(0)
+, m_iDfltSubjectSex(0)
 , m_sSubjectFirstName(m_sDefaultString)
 , m_sSubjectMidName("x")
 , m_sSubjectLastName(m_sDefaultString)
@@ -104,7 +106,6 @@ FiffAnonymizer::FiffAnonymizer()
 , m_sProjectComment(m_sDefaultString)
 , m_bVerboseMode(false)
 , m_bBruteMode(false)
-, m_bQuietMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
 , m_bInputFileDeleted(false)
@@ -137,6 +138,8 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
 , m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
 , m_iDfltSubjectId(obj.m_iDfltSubjectId)
+, m_iDfltSubjectHand(obj.m_iDfltSubjectHand)
+, m_iDfltSubjectSex(obj.m_iDfltSubjectSex)
 , m_sSubjectFirstName(obj.m_sSubjectFirstName)
 , m_sSubjectMidName(obj.m_sSubjectMidName)
 , m_sSubjectLastName(obj.m_sSubjectLastName)
@@ -151,7 +154,6 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 , m_sProjectComment(obj.m_sProjectComment)
 , m_bVerboseMode(obj.m_bVerboseMode)
 , m_bBruteMode(obj.m_bBruteMode)
-, m_bQuietMode(obj.m_bQuietMode)
 , m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
 , m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
 , m_bInputFileDeleted(obj.m_bInputFileDeleted)
@@ -181,6 +183,8 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_bUseSubjectBirthdayOffset(obj.m_bUseSubjectBirthdayOffset)
 , m_iSubjectBirthdayOffset(obj.m_iSubjectBirthdayOffset)
 , m_iDfltSubjectId(obj.m_iDfltSubjectId)
+, m_iDfltSubjectHand(obj.m_iDfltSubjectHand)
+, m_iDfltSubjectSex(obj.m_iDfltSubjectSex)
 , m_sSubjectFirstName(obj.m_sSubjectFirstName)
 , m_sSubjectMidName(obj.m_sSubjectMidName)
 , m_sSubjectLastName(obj.m_sSubjectLastName)
@@ -195,7 +199,6 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
 , m_sProjectComment(obj.m_sProjectComment)
 , m_bVerboseMode(obj.m_bVerboseMode)
 , m_bBruteMode(obj.m_bBruteMode)
-, m_bQuietMode(obj.m_bQuietMode)
 , m_bDeleteInputFileAfter(obj.m_bDeleteInputFileAfter)
 , m_bDeleteInputFileConfirmation(obj.m_bDeleteInputFileConfirmation)
 , m_bInputFileDeleted(obj.m_bInputFileDeleted)
@@ -399,14 +402,6 @@ bool FiffAnonymizer::getBruteMode()
 
 //*************************************************************************************************************
 
-bool FiffAnonymizer::getQuietMode()
-{
-    return m_bQuietMode;
-}
-
-
-//*************************************************************************************************************
-
 bool FiffAnonymizer::getDeleteInputFileAfter()
 {
     return m_bDeleteInputFileAfter;
@@ -498,7 +493,7 @@ int FiffAnonymizer::anonymizeFile()
 
     printIfVerbose("Reading info in the file.");
     if(checkValidFiffFormatVersion(pInTag)) {
-        printIfVerbose("Input file compatible with this version of mne_fiffAnonymizer.");
+        printIfVerbose("Input file compatible with this version of mne_anonymizer.");
     } else {
         qWarning() << "This file may not be compatible with this application.";
     }
@@ -587,9 +582,7 @@ int FiffAnonymizer::anonymizeFile()
         renameOutputFileAsInputFile();
     }
 
-    if(!m_bQuietMode) {
-        qInfo() << "MNE Anonymize finished correctly: " + QFileInfo(m_fFileIn).fileName() + " -> " + QFileInfo(m_fFileOut).fileName();
-    }
+    qInfo() << "MNE Anonymize finished correctly: " + QFileInfo(m_fFileIn).fileName() + " -> " + QFileInfo(m_fFileOut).fileName();
 
     printIfVerbose(" ");
     printIfVerbose("----------------------------------------------------------------------------");
@@ -830,8 +823,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
             QString newStr(m_sDefaultString);
             outTag->resize(newStr.size());
             memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-            printIfVerbose("Description of the measurement block changed: " +
-                           QString(inTag->data()) + " -> " + newStr);
+            printIfVerbose("Description of the measurement block changed: " + QString(inTag->data()) + " -> " + newStr);
         }
         break;
     }
@@ -848,8 +840,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
         qint32 inSubjID(*inTag->toInt());
         qint32 newSubjID(m_iDfltSubjectId);
         memcpy(outTag->data(),&newSubjID, sizeof(qint32));
-        printIfVerbose("Subject's SubjectID changed: " +
-                       QString::number(inSubjID) + " -> " + QString::number(newSubjID));
+        printIfVerbose("Subject's SubjectID changed: " + QString::number(inSubjID) + " -> " + QString::number(newSubjID));
         break;
     }
     case FIFF_SUBJ_FIRST_NAME:
@@ -857,8 +848,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
         QString newStr(m_sSubjectFirstName);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-        printIfVerbose("Experimenter changed: " +
-                       QString(inTag->data()) + " -> " + newStr);
+        printIfVerbose("Experimenter changed: " + QString(inTag->data()) + " -> " + newStr);
         break;
     }
     case FIFF_SUBJ_MIDDLE_NAME:
@@ -866,8 +856,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
         QString newStr(m_sSubjectMidName);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-        printIfVerbose("Experimenter changed: " +
-                       QString(inTag->data()) + " -> " + newStr);
+        printIfVerbose("Experimenter changed: " + QString(inTag->data()) + " -> " + newStr);
         break;
     }
     case FIFF_SUBJ_LAST_NAME:
@@ -875,8 +864,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
         QString newStr(m_sSubjectLastName);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-        printIfVerbose("Experimenter changed: " +
-                       QString(inTag->data()) + " -> " + newStr);
+        printIfVerbose("Experimenter changed: " + QString(inTag->data()) + " -> " + newStr);
         break;
     }
     case FIFF_SUBJ_BIRTH_DAY:
@@ -898,14 +886,29 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
 
         break;
     }
+    case FIFF_SUBJ_SEX:
+    {
+        qint32 inSubjSex(*inTag->toInt());
+        qint32 newSubjSex(m_iDfltSubjectSex);
+        memcpy(outTag->data(),&newSubjSex, sizeof(qint32));
+        printIfVerbose("Subject's sex changed: " + QString::number(inSubjSex) + " -> " + QString::number(newSubjSex));
+        break;
+    }
+    case FIFF_SUBJ_HAND:
+    {
+        qint32 inSubjHand(*inTag->toInt());
+        qint32 newSubjHand(m_iDfltSubjectHand);
+        memcpy(outTag->data(),&newSubjHand, sizeof(qint32));
+        printIfVerbose("Subject's hand changed: " + QString::number(inSubjHand) + " -> " + QString::number(newSubjHand));
+        break;
+    }
     case FIFF_SUBJ_WEIGHT:
     {
         if(m_bBruteMode) {
             float inWeight(*inTag->toFloat());
             float outWeight(m_iSubjectWeight);
             memcpy(outTag->data(),&outWeight,sizeof(float));
-            printIfVerbose("Subject's weight changed from: " +
-                           QString::number(static_cast<double>(inWeight)) + " -> " + QString::number(static_cast<double>(outWeight)));
+            printIfVerbose("Subject's weight changed: " + QString::number(static_cast<double>(inWeight)) + " -> " + QString::number(static_cast<double>(outWeight)));
         }
         break;
     }
@@ -915,8 +918,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
             float inHeight(*inTag->toFloat());
             float outHeight(m_iSubjectHeight);
             memcpy(outTag->data(),&outHeight,sizeof(float));
-            printIfVerbose("Subject's Height changed from: " +
-                           QString::number(static_cast<double>(inHeight)) + " -> " + QString::number(static_cast<double>(outHeight)));
+            printIfVerbose("Subject's Height changed: " + QString::number(static_cast<double>(inHeight)) + " -> " + QString::number(static_cast<double>(outHeight)));
         }
         break;
     }
@@ -925,8 +927,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
         QString newStr(m_sSubjectComment);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-        printIfVerbose("Subject Comment changed: " +
-                       QString(inTag->data()) + " -> " + newStr);
+        printIfVerbose("Subject Comment changed: " + QString(inTag->data()) + " -> " + newStr);
         break;
     }
     case FIFF_SUBJ_HIS_ID:
@@ -944,8 +945,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
             qint32 inProjID(*inTag->toInt());
             qint32 newProjID(m_iProjectId);
             memcpy(outTag->data(),&newProjID,sizeof(qint32));
-            printIfVerbose("ProjectID changed: " +
-                           QString::number(inProjID) + " -> " + QString::number(newProjID));
+            printIfVerbose("ProjectID changed: " + QString::number(inProjID) + " -> " + QString::number(newProjID));
         }
         break;
     }
@@ -955,8 +955,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
             QString newStr(m_sProjectName);
             outTag->resize(newStr.size());
             memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-            printIfVerbose("Project name changed: " +
-                           QString(inTag->data()) + " -> " + newStr);
+            printIfVerbose("Project name changed: " + QString(inTag->data()) + " -> " + newStr);
         }
         break;
     }
@@ -966,8 +965,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
             QString newStr(m_sProjectAim);
             outTag->resize(newStr.size());
             memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-            printIfVerbose("Project Aim changed: " +
-                           QString(inTag->data()) + " -> " + newStr);
+            printIfVerbose("Project Aim changed: " + QString(inTag->data()) + " -> " + newStr);
         }
         break;
     }
@@ -976,8 +974,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
         QString newStr(m_sProjectPersons);
         outTag->resize(newStr.size());
         memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-        printIfVerbose("Project Persons changed: " +
-                       QString(inTag->data()) + " -> " + newStr);
+        printIfVerbose("Project Persons changed: " + QString(inTag->data()) + " -> " + newStr);
         break;
     }
     case FIFF_PROJ_COMMENT:
@@ -986,20 +983,17 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
             QString newStr(m_sProjectComment);
             outTag->resize(newStr.size());
             memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-            printIfVerbose("Project comment changed: " +
-                           QString(inTag->data()) + " -> " + newStr);
+            printIfVerbose("Project comment changed: " + QString(inTag->data()) + " -> " + newStr);
         }
         break;
     }
     case FIFF_MRI_PIXEL_DATA:
     {
-        if(!m_bQuietMode) {
-            qWarning() << " ";
-            qWarning() << "The input fif file contains MRI data.";
-            qWarning() << "Beware that a subject''s face can be reconstructed from it";
-            qWarning() << "This software can not anonymize MRI data, at the moment.";
-            qWarning() << " ";
-        }
+        qWarning() << " ";
+        qWarning() << "The input fif file contains MRI data.";
+        qWarning() << "Beware that a subject''s face can be reconstructed from it";
+        qWarning() << "This software can not anonymize MRI data, at the moment.";
+        qWarning() << " ";
         break;
     }
     default:
@@ -1063,17 +1057,6 @@ bool FiffAnonymizer::getVerboseMode()
 void FiffAnonymizer::setBruteMode(bool bFlag)
 {
     m_bBruteMode = bFlag;
-}
-
-
-//*************************************************************************************************************
-
-void FiffAnonymizer::setQuietMode(bool bFlag)
-{
-    if(bFlag) {
-        m_bVerboseMode = false;
-    }
-    m_bQuietMode = bFlag;
 }
 
 
