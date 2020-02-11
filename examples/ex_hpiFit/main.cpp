@@ -49,6 +49,7 @@
 #include <inverse/hpiFit/hpifit.h>
 #include <inverse/hpiFit/hpifitdata.h>
 #include <utils/ioutils.h>
+#include <utils/generics/applicationlogger.h>
 #include <fwd/fwd_coil_set.h>
 //*************************************************************************************************************
 //=============================================================================================================
@@ -95,8 +96,7 @@ void write_pos(const float time, const int index, QSharedPointer<FIFFLIB::FiffIn
         for(int ic = 0; ic < 3; ic++) {
             rot(ir,ic) = info->dev_head_t.trans(ir,ic);
         }
-    }
-
+    }    
     QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
     quatHPI.normalize();
     //std::cout << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
@@ -111,6 +111,7 @@ void write_pos(const float time, const int index, QSharedPointer<FIFFLIB::FiffIn
 
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     QElapsedTimer timer;
     QCoreApplication a(argc, argv);
 
@@ -135,7 +136,7 @@ int main(int argc, char *argv[])
 
     // Read Quaternion File
     Eigen::MatrixXd pos;
-    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/quat_meas_move.txt");
+    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/pos_maxf.txt");
 
     //std::cout << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
     Eigen::MatrixXd position = Eigen::MatrixXd::Zero(pos.rows(),pos.cols());
