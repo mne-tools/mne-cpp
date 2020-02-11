@@ -758,7 +758,8 @@ bool FiffAnonymizer::checkDeleteInputFile()
 
 //*************************************************************************************************************
 
-int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
+int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
+                              FiffTag::SPtr inTag)
 {
     int sizeDiff(0);
 
@@ -882,12 +883,10 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         QDateTime inBirthday(QDate::fromJulianDay(*inTag->toJulian()));
 
-        qDebug() << "*inTag->toJulian()" << *inTag->toJulian();
-
         QDateTime outBirthday;
 
         if(m_bUseSubjectBirthdayOffset) {
-            outBirthday = inBirthday.addDays(-m_iMeasurementDayOffset);
+            outBirthday = inBirthday.addDays(-m_iSubjectBirthdayOffset);
         } else {
             outBirthday = m_dateSubjectBirthday;
         }
@@ -1045,9 +1044,9 @@ void FiffAnonymizer::setFileOut(const QString &sFileOut)
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setVerboseMode(bool v)
+void FiffAnonymizer::setVerboseMode(bool bFlag)
 {
-    m_bVerboseMode = v;
+    m_bVerboseMode = bFlag;
 }
 
 
@@ -1061,71 +1060,70 @@ bool FiffAnonymizer::getVerboseMode()
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setBruteMode(bool b)
+void FiffAnonymizer::setBruteMode(bool bFlag)
 {
-    m_bBruteMode = b;
+    m_bBruteMode = bFlag;
 }
 
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setQuietMode(bool q)
+void FiffAnonymizer::setQuietMode(bool bFlag)
 {
-    if(q) {
+    if(bFlag) {
         m_bVerboseMode = false;
     }
-    m_bQuietMode = q;
+    m_bQuietMode = bFlag;
 }
 
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setMeasurementDay(QString d)
+void FiffAnonymizer::setMeasurementDay(const QString& sMeasDay)
 {
-    m_dateMeasurmentDate = QDateTime(QDate::fromString(d),QTime(1,1,0));
+    m_dateMeasurmentDate = QDateTime(QDate::fromString(sMeasDay),QTime(1,1,0));
 }
 
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setMeasurementDayOffset(int d)
+void FiffAnonymizer::setMeasurementDayOffset(int iMeasDayOffset)
 {
     m_bUseMeasurementDayOffset = true;
-    m_iMeasurementDayOffset = d;
+    m_iMeasurementDayOffset = iMeasDayOffset;
 }
 
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setSubjectBirthday(QString d)
+void FiffAnonymizer::setSubjectBirthday(const QString& sSubjBirthday)
 {
-    m_dateSubjectBirthday = QDateTime(QDate::fromString(d),QTime(1, 1, 0));
+    m_dateSubjectBirthday = QDateTime(QDate::fromString(sSubjBirthday),QTime(1, 1, 0));
 }
 
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setSubjectBirthdayOffset(int d)
+void FiffAnonymizer::setSubjectBirthdayOffset(int iSubjBirthdayOffset)
 {
-    m_bUseSubjectBirthdayOffset= true;
-    m_iSubjectBirthdayOffset= d;
+    m_bUseSubjectBirthdayOffset = true;
+    m_iSubjectBirthdayOffset = iSubjBirthdayOffset;
 }
 
 
 //*************************************************************************************************************
 
-
-void FiffAnonymizer::setDeleteInputFileAfter(bool d)
+void FiffAnonymizer::setDeleteInputFileAfter(bool bFlag)
 {
-    m_bDeleteInputFileAfter = d;
+    m_bDeleteInputFileAfter = bFlag;
 }
 
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setDeleteInputFileAfterConfirmation(bool dc)
+void FiffAnonymizer::setDeleteInputFileAfterConfirmation(bool bFlag)
 {
-    m_bDeleteInputFileConfirmation = dc;
+    m_bDeleteInputFileConfirmation = bFlag;
 }
 
 
@@ -1202,7 +1200,7 @@ void FiffAnonymizer::renameOutputFileAsInputFile()
 
 //*************************************************************************************************************
 
-void FiffAnonymizer::setSubjectHisId(QString id)
+void FiffAnonymizer::setSubjectHisId(const QString& sSubjectId)
 {
-    m_sSubjectHisId = id;
+    m_sSubjectHisId = sSubjectId;
 }

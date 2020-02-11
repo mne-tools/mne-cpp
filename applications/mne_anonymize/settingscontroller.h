@@ -77,8 +77,6 @@
 // DEFINE NAMESPACE MNEANONYMIZE
 //=============================================================================================================
 
-/** @brief Contains classes for mne_anonymize application */
-
 namespace MNEANONYMIZE
 {
 
@@ -108,7 +106,9 @@ public:
     /**
      * Constructs a SettingsController object.
      *
-     * @param [in] arguments     The input arguments in form of a QStringList.
+     * @param [in] arguments    The input arguments in form of a QStringList.
+     * @param [in] name         The name of the application.
+     * @param [in] ver          The version of the application.
      */
     SettingsController(const QStringList& arguments,
                        const QString& name,
@@ -116,8 +116,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Destroys SettingsController Object.
-     * All space allocated for FiffAnonymizer objects will be deleted.
+     * Destroys SettingsController Object. All space allocated for FiffAnonymizer objects will be deleted.
      */
     ~SettingsController();
 
@@ -139,7 +138,7 @@ private:
      * Processes the input parser and configures the state of the FiffAnonymizer instance according to
      * the options selected. Including input and output files treatment, execution modes and anonymizing options.
      *
-     * @param[in] arguments The arguments to parse
+     * @param[in] arguments The arguments to parse.
      *
      * @return Returns true if parsing was successful, false otherwise.
      */
@@ -172,21 +171,21 @@ private:
 
     //=========================================================================================================
 
-    //we at least create one app as a member var here in the stack
-    //if we later see we have more than one file we'll create more in the heap.
-    //So that we can deploy a concurrent execution (one app per thread).
-    FiffAnonymizer m_anonymizer;        /**< local instance of Fiffanonyzer, in which perform configurations.*/
+    FiffAnonymizer m_anonymizer;        /**< Local instance of Fiffanonyzer, in which perform configurations.*/
+
     QString m_sAppName;                 /**< Application name.*/
     QString m_sAppVer;                  /**< Application version number.*/
+
     QStringList m_SLInFiles;            /**< List of input file names (absolute paths).*/
     QStringList m_SLOutFiles;           /**< List of output file names (absolute paths).*/
+
     bool m_bShowHeaderFlag;             /**< Show header when executing.*/
     bool m_bMultipleInFiles;            /**< Multpiple files concurrent execution flag.*/
 
-    QList<FiffAnonymizer> m_lApps;   /**< list of addresses to FiffAnonyizer objects. */
+    QList<FiffAnonymizer> m_lApps;      /**< list of addresses to FiffAnonyizer objects. */
     QList<QFuture<void> > promisesList; /**< List of synchronizing waits for each concurrent execution.*/
-    QCommandLineParser m_parser;        /**< parser object to work with member pointer to QCoreApp and parse input command line options.*/
 
+    QCommandLineParser m_parser;        /**< parser object to work with member pointer to QCoreApp and parse input command line options.*/
 };
 
 
@@ -197,12 +196,12 @@ private:
 
 /**
  * Finds all files in a folder matching a filename pattern (compatible with wildcard [*,?]).
- *
- * @details This is a helper function. Given a filename with some pattern. It lists all possible filenames matching the pattern.
- * @param [in] Reference to a QString containing the input filename search pattern.
- * @param [out] QStringList with all possible filenames compatible with the search pattern.
- *
+ * This is a helper function. Given a filename with some pattern. It lists all possible filenames matching the pattern.
  * It outputs a QStringList with all the possible files in the folder matching the search pattern.
+ *
+ * @param [in] fileName     Reference to a QString containing the input filename search pattern.
+ *
+ * @return QStringList with all possible filenames compatible with the search pattern.
  */
 inline static QStringList listFilesMatchingPatternName(const QString &fileName)
 {
