@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "fiffanonymizer.h"
+
 #include <fiff/fiff_dir_entry.h>
 
 
@@ -469,8 +470,7 @@ int FiffAnonymizer::anonymizeFile()
     printIfVerbose(" ");
 
     FiffStream inStream(&m_fFileIn);
-    if(inStream.open(QIODevice::ReadOnly))
-    {
+    if(inStream.open(QIODevice::ReadOnly)) {
         printIfVerbose("Input file opened correctly: " + m_fFileIn.fileName());
     } else {
         qCritical() << "Problem opening the input file: " << m_fFileIn.fileName();
@@ -500,9 +500,7 @@ int FiffAnonymizer::anonymizeFile()
     if(checkValidFiffFormatVersion(pInTag)) {
         printIfVerbose("Input file compatible with this version of mne_fiffAnonymizer.");
     } else {
-        printIfVerbose("***");
-        printIfVerbose("***   Warning: This file may not be compatible with this application.");
-        printIfVerbose("***");
+        qWarning() << "This file may not be compatible with this application.";
     }
     censorTag(pOutTag,pInTag);
     pOutTag->next = FIFFV_NEXT_SEQ;
@@ -552,8 +550,7 @@ int FiffAnonymizer::anonymizeFile()
         censorTag(pOutTag,pInTag);
 
         //the order of the tags in the output file is sequential. No jumps in the output file.
-        if(pOutTag->next > 0)
-        {
+        if(pOutTag->next > 0) {
             pOutTag->next = FIFFV_NEXT_SEQ;
         }
         addEntryToDir(pOutTag,outStream.device()->pos());
@@ -588,7 +585,7 @@ int FiffAnonymizer::anonymizeFile()
     }
 
     if(!m_bQuietMode) {
-        qDebug() << "MNE Fiff Anonymize finished correctly: " + QFileInfo(m_fFileIn).fileName() + " -> " + QFileInfo(m_fFileOut).fileName();
+        qInfo() << "MNE Anonymize finished correctly: " + QFileInfo(m_fFileIn).fileName() + " -> " + QFileInfo(m_fFileOut).fileName();
     }
 
     printIfVerbose(" ");
@@ -734,15 +731,16 @@ void FiffAnonymizer::updatePointer(FiffStream* stream,
 bool FiffAnonymizer::checkDeleteInputFile()
 {
     if(m_bDeleteInputFileAfter) { //false by default
-        qDebug() << "You have requested to delete the input file: " + m_fFileIn.fileName();
+        qInfo() << "You have requested to delete the input file: " + m_fFileIn.fileName();
 
         if(m_bDeleteInputFileConfirmation) { //true by default
             QTextStream consoleOut(stdout);
             QTextStream consoleIn(stdin);
             QString confirmation;
-            qDebug() << "You can avoid this confirmation by using the delete_confirmation option.";
+            qInfo() << "You can avoid this confirmation by using the delete_confirmation option.";
             consoleOut << "Are you sure you want to delete this file? [Y/n] ";
             consoleIn >> confirmation;
+
             if(confirmation == "Y") {
                 return true;
             }
@@ -954,11 +952,11 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     {
         if(m_bBruteMode)
         {
-                QString newStr(m_sProjectName);
-                outTag->resize(newStr.size());
-                memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
-                printIfVerbose("Project name changed: " +
-                               QString(inTag->data()) + " -> " + newStr);
+            QString newStr(m_sProjectName);
+            outTag->resize(newStr.size());
+            memcpy(outTag->data(),newStr.toUtf8(),static_cast<size_t>(newStr.size()));
+            printIfVerbose("Project name changed: " +
+                           QString(inTag->data()) + " -> " + newStr);
         }
         break;
     }
@@ -998,12 +996,11 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
     case FIFF_MRI_PIXEL_DATA:
     {
         if(!m_bQuietMode) {
-            qDebug() << " ";
-            qDebug() << "WARNING. The input fif file contains MRI data.";
-            qDebug() << "Beware that a subject''s face can be reconstructed from it";
-            qDebug() << "This software can not anonymize MRI data, at the moment.";
-            qDebug() << "Contanct the authors for more information.";
-            qDebug() << " ";
+            qWarning() << " ";
+            qWarning() << "The input fif file contains MRI data.";
+            qWarning() << "Beware that a subject''s face can be reconstructed from it";
+            qWarning() << "This software can not anonymize MRI data, at the moment.";
+            qWarning() << " ";
         }
         break;
     }
@@ -1034,18 +1031,18 @@ void FiffAnonymizer::setFileIn(const QString &sFileIn)
 
 void FiffAnonymizer::setFileOut(const QString &sFileOut)
 {
-    if(m_fFileOut.fileName().isEmpty()) {
-        m_sFileNameOut = sFileOut;
+//    if(m_fFileOut.fileName().isEmpty()) {
+//        m_sFileNameOut = sFileOut;
+//    }
+
+    if(m_fFileIn.fileName().compare(sFileOut,Qt::CaseInsensitive) == 0) {
+        m_bInOutFileNamesEqual = true;
+        QFileInfo outFileInfo(sFileOut);
+        outFileInfo.makeAbsolute();
+        m_sFileNameOut = outFileInfo.absolutePath() + "/" + generateRandomFileName();
     } else {
-        if(m_fFileIn.fileName().compare(sFileOut,Qt::CaseInsensitive) == 0) {
-            m_bInOutFileNamesEqual = true;
-            QFileInfo outFileInfo(sFileOut);
-            outFileInfo.makeAbsolute();
-            m_sFileNameOut = outFileInfo.absolutePath() + generateRandomFileName();
-        } else {
-            m_bInOutFileNamesEqual = false;
-            m_sFileNameOut = sFileOut;
-        }
+        m_bInOutFileNamesEqual = false;
+        m_sFileNameOut = sFileOut;
     }
 
     m_fFileOut.setFileName(m_sFileNameOut);
@@ -1145,10 +1142,12 @@ QString FiffAnonymizer::generateRandomFileName()
     QString randomFileName("mne_anonymize_");
     const QString charPool("abcdefghijklmnopqrstuvwxyz1234567890");
     const int randomLength(8);
+
     for(int i=0;i<randomLength;++i) {
         int p=qrand() % charPool.length();
         randomFileName.append(charPool.at(p));
     }
+
     return randomFileName.append(".fif");
 }
 
@@ -1164,15 +1163,15 @@ void FiffAnonymizer::deleteInputFile()
 
 //*************************************************************************************************************
 
-//if both files in and out have the same name, Anonymizer class would already know and a temporary
-//random filename will be in use, during the anonymizing process, for the outputfile.
-//When this fucn is called Anonymizer will check if this needs to be reverted:
-// -if the infile has been deleted already there is no conflict->outfile name = infile name.
-// -if the infile has not been deleted but the user has never been asked. They is asked.
-// -if the infile has not been deleted but the user was already asked, it means they answered NO.
-//  Thus, a warning is shown.
 bool FiffAnonymizer::checkRenameOutputFile()
 {
+    //if both files in and out have the same name, Anonymizer class would already know and a temporary
+    //random filename will be in use, during the anonymizing process, for the outputfile.
+    //When this fucn is called Anonymizer will check if this needs to be reverted:
+    // -if the infile has been deleted already there is no conflict->outfile name = infile name.
+    // -if the infile has not been deleted but the user has never been asked. They is asked.
+    // -if the infile has not been deleted but the user was already asked, it means they answered NO.
+    //  Thus, a warning is shown.
     if(m_bInOutFileNamesEqual) {
         if(m_bDeleteInputFileAfter) {
             if(m_bInputFileDeleted) {
