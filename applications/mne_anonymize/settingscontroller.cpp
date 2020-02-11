@@ -95,7 +95,7 @@ SettingsController::SettingsController(const QStringList& arguments,
 
 SettingsController::~SettingsController()
 {
-    m_pAppList.clear();
+    m_lApps.clear();
 }
 
 
@@ -170,7 +170,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("verbose")) {
         if(m_bMultipleInFiles) {
             qCritical() << "Verbose does not work with multiple Input files.";
-            m_parser.showHelp();
+            return;
         }
         m_bShowHeaderFlag=true;
         m_anonymizer.setVerboseMode(true);
@@ -198,7 +198,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("measurement_date")) {
         if(m_bMultipleInFiles) {
             qCritical() << "Multiple Input files. You cannot specify the option measurement_date.";
-            m_parser.showHelp();
+            return;
         }
 
         QString d(m_parser.value("measurement_date"));
@@ -208,7 +208,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("measurement_date_offset")) {
         if(m_bMultipleInFiles) {
             qCritical() << "Multiple Input files. You cannot specify the option measurement_date_offset.";
-            m_parser.showHelp();
+            return;
         }
 
         QString doffset(m_parser.value("measurement_date_offset"));
@@ -218,7 +218,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("subject_birthday")) {
         if(m_bMultipleInFiles) {
             qCritical() << "Multiple Input files. You cannot specify the option \"subject_birthday\".";
-            m_parser.showHelp();
+            return;
         }
 
         QString birthday(m_parser.value("subject_birthday"));
@@ -228,7 +228,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("subject_birthday_offset")) {
         if(m_bMultipleInFiles) {
             qCritical() << "Multiple Input files. You cannot specify the option \"subject_birthday_offset\".";
-            m_parser.showHelp();
+            return;
         }
         QString bdoffset(m_parser.value("subject_birthday_offset"));
         m_anonymizer.setSubjectBirthdayOffset(bdoffset.toInt());
@@ -237,7 +237,7 @@ void SettingsController::parseInputs(const QStringList& arguments)
     if(m_parser.isSet("his")) {
         if(m_bMultipleInFiles) {
             qCritical() << "Multiple Input files. You cannot specify the option \"his\".";
-            m_parser.showHelp();
+            return;
         }
 
         m_anonymizer.setSubjectHisId(m_parser.value("his"));
@@ -267,7 +267,7 @@ void SettingsController::parseInputAndOutputFiles()
 
     if(m_SLInFiles.count() == 0) {
         qCritical() << "No valid input files specified.";
-        m_parser.showHelp();
+        return;
     } else if(m_SLInFiles.count() == 1) {
         m_bMultipleInFiles = false;
     } else {
@@ -320,13 +320,10 @@ void SettingsController::generateAnonymizerInstances()
     }
 
     if(m_bMultipleInFiles) {
-        for(int i=0; i< m_SLInFiles.size(); ++i) {
-            QSharedPointer<FiffAnonymizer> pAppAux(new FiffAnonymizer(m_anonymizer));
-            pAppAux->setFileIn(m_SLInFiles.at(i));
-            pAppAux->setFileOut(m_SLOutFiles.at(i));
-            //m_pAppList.append(QSharedPointer<FiffAnonymizer>(pAppAux));
-            //note that QList will copy & append.
-            m_pAppList.append(pAppAux);
+        for(int i = 0; i < m_SLInFiles.size(); ++i) {
+            m_lApps.append(m_anonymizer);
+            m_lApps[i].setFileIn(m_SLInFiles.at(i));
+            m_lApps[i].setFileOut(m_SLOutFiles.at(i));
         }
     } else {
         m_anonymizer.setFileIn(m_SLInFiles.first());
@@ -342,18 +339,7 @@ void SettingsController::execute()
     generateAnonymizerInstances();
 
     if(m_bMultipleInFiles) {
-        for(int th_i=0; th_i<m_pAppList.size(); ++th_i) {
-            QSharedPointer<QFuture<void> > promise( new QFuture<void>);
-
-            FiffAnonymizer localApp(*m_pAppList.at(th_i));
-            *promise = QtConcurrent::run(localApp, &FiffAnonymizer::anonymizeFile);
-
-            promisesList.append(promise);
-        }
-
-        for(int p_i=0;p_i<promisesList.size();++p_i) {
-            promisesList.at(p_i)->waitForFinished();
-        }
+        QtConcurrent::blockingMap(m_lApps, &FiffAnonymizer::anonymizeFile);
     } else {
         printHeaderIfVerbose();
         m_anonymizer.anonymizeFile();

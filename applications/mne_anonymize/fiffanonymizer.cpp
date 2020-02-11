@@ -776,6 +776,7 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
         FiffId inId = inTag->toFiffID();
         QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs);
         QDateTime outMeasDate;
+
         if(m_bUseMeasurementDayOffset) {
             outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
         } else {
@@ -798,22 +799,23 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,FiffTag::SPtr inTag)
 
         outTag->resize(fiffIdSize*sizeof(fiff_int_t));
         memcpy(outTag->data(),reinterpret_cast<char*>(outData),fiffIdSize*sizeof(fiff_int_t));
-        printIfVerbose("MAC address changed: " + inId.toMachidString() + " -> "  + outId.toMachidString());
-        printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
+        printIfVerbose("MAC address in ID tag changed: " + inId.toMachidString() + " -> "  + outId.toMachidString());
+        printIfVerbose("Measurement date in ID tag changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
         break;
     }
     case FIFF_MEAS_DATE:
     {
         QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*inTag->toInt()));
         QDateTime outMeasDate;
+
         if(m_bUseMeasurementDayOffset) {
-            outMeasDate = QDateTime(inMeasDate.date()).addDays(-m_iMeasurementDayOffset);
+            outMeasDate = inMeasDate.addDays(-m_iMeasurementDayOffset);
         } else {
             outMeasDate = m_dateMeasurmentDate;
         }
 
         fiff_int_t outData[1];
-        outData[0]=static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
+        outData[0] = static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
         memcpy(outTag->data(),reinterpret_cast<char*>(outData),sizeof(fiff_int_t));
         printIfVerbose("Measurement date changed: " + inMeasDate.toString() + " -> " + outMeasDate.toString());
         break;
@@ -1031,10 +1033,6 @@ void FiffAnonymizer::setFileIn(const QString &sFileIn)
 
 void FiffAnonymizer::setFileOut(const QString &sFileOut)
 {
-//    if(m_fFileOut.fileName().isEmpty()) {
-//        m_sFileNameOut = sFileOut;
-//    }
-
     if(m_fFileIn.fileName().compare(sFileOut,Qt::CaseInsensitive) == 0) {
         m_bInOutFileNamesEqual = true;
         QFileInfo outFileInfo(sFileOut);
