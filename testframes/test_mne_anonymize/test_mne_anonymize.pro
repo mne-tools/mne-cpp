@@ -2,7 +2,7 @@
 #
 # @file     test_mne_anonymize.pro
 # @author   Lorenz Esch <lorenzesch@hotmail.com>;
-# @version  1.0
+# @version  dev
 # @date     September, 2019
 #
 # @section  LICENSE

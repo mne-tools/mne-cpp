@@ -6,7 +6,7 @@
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 #           Wayne Mead <wayne.mead@uth.tmc.edu>;
 #           John C. Mosher <John.C.Mosher@uth.tmc.edu>
-# @version  1.0
+# @version  dev
 # @date     August, 2019
 #
 # @section  LICENSE
