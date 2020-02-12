@@ -29,7 +29,7 @@ Use meaningful variable names and type indicators. Avoid complex as well as cond
 
 ## Command Line Outputs
 
-Every output should start with `[<ClassName::FunctionName>]`. Please make use of `qDebug()` for during development only and `qInfo()` for user information. `qWarning()` should be used to indicate unusual situations which do not lead to a termination of the application. `qCritical()` should only be used if an error was catched which will lead to the application being terminated. For example:
+Every output should start with `[<ClassName::FunctionName>]`. Please make use of `qDebug()` during development and `qInfo()` for general user information. `qWarning()` should be used to alert about unusual situations which do not lead to a termination of the application. `qCritical()` should only be used if an error was catched which will lead to the application being terminated. For example:
 
 ```cpp
 void FileLoader::loadTxtFile(const QString& sPath)
