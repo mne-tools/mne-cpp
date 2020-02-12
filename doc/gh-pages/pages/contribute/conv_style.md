@@ -19,7 +19,20 @@ Please make use of the following coding conventions when contributing to MNE-CPP
 
 ## Command Line Outputs
 
-Please make use of `qDebug()` for debugging, `qInfo()` for user information and `qWarning()` for user warning purposes. `qFatal()` should only be used to initiate an application stop. Please note that Eigen structures can only be plotted via std::cout.
+Every output should start with `[<ClassName::FunctionName>]`. Please make use of `qDebug()` for debugging during development only and `qInfo()` for user information. `qWarning()` should be used to indicate about unusual situations which do not lead to a termination of the application. `qCritical()` should only be used if an error was catched which will lead to the application being terminated. Please note that Eigen structures can only be plotted via `std::cout`. For example:
+
+```cpp
+void ExampleClass::exampleFunction(const QString& sPath, int iNumLines)
+{
+    qInfo() << "[ExampleClass::exampleFunction] Working on file" << sPath;
+
+    QFile file(sPath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "[ExampleClass::exampleFunction] Unable to open file."
+        return;
+    }
+}
+```
 
 ## Readability
 
