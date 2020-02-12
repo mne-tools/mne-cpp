@@ -65,7 +65,7 @@ using namespace EEGOSPORTSPLUGIN;
 EEGoSportsAboutWidget::EEGoSportsAboutWidget(QWidget *parent)
 : QDialog(parent)
 {
-    ui.setupUi(this);
+    m_ui.setupUi(this);
 }
 
 

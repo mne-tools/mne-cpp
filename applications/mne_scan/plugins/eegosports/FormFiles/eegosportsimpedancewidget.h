@@ -1,39 +1,39 @@
 //=============================================================================================================
 /**
-* @file     eegosportsimpedancewidget.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Johannes Vorwerk <johannes.vorwerk@umit.at>
-* @version  dev
-* @date     February, 2020
-*
-* @section  LICENSE
-*
-* Copyright (C) 2020, Lorenz Esch, Christoph Dinh, Matti Hamalainen, Johannes Vorwerk. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    Contains the declaration of the EEGoSportsImpedanceWidget class.
-*
-*/
+ * @file     eegosportsimpedancewidget.h
+ * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Johannes Vorwerk <johannes.vorwerk@umit.at>
+ * @version  dev
+ * @date     February, 2020
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2020, Lorenz Esch, Christoph Dinh, Matti Hamalainen, Johannes Vorwerk. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Contains the declaration of the EEGoSportsImpedanceWidget class.
+ *
+ */
 
 #ifndef EEGOSPORTSIMPEDANCEWIDGET_H
 #define EEGOSPORTSIMPEDANCEWIDGET_H
@@ -50,6 +50,7 @@
 
 #include <scMeas/realtimemultisamplearray.h>
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -62,8 +63,13 @@
 #include <QtSvg/QSvgGenerator>
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
 namespace Ui {
-class EEGoSportsImpedanceWidget;
+    class EEGoSportsImpedanceWidget;
 }
 
 
@@ -85,19 +91,20 @@ using namespace Eigen;
 using namespace UTILSLIB;
 using namespace DISPLIB;
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// EEGOSPORTSPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 class EEGoSports;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EEGoSportsImpedanceWidget
-*
-* @brief The EEGoSportsImpedanceWidget class provides the EEGoSportsImpedanceWidget configuration window.
-*/
+ * DECLARE CLASS EEGoSportsImpedanceWidget
+ *
+ * @brief The EEGoSportsImpedanceWidget class provides the EEGoSportsImpedanceWidget configuration window.
+ */
 class EEGoSportsImpedanceWidget : public QWidget
 {
     Q_OBJECT
@@ -119,20 +126,7 @@ public:
     */
     void initGraphicScene();
 
-
 private:
-    EEGoSports*                                 m_pEEGoSports;                    /**< The pointer back to the EEGoSports plugin.*/
-
-    EEGoSportsImpedanceScene*                   m_qGScene;                  /**< The QGraphicScene.*/
-
-    QMap< QString, int >                        m_qmElectrodeNameIndex;     /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
-
-    Ui::EEGoSportsImpedanceWidget*              ui;                         /**< The user interface for the EEGoSportsImpedanceWidget.*/
-
-    QSharedPointer<ColorMap>                    m_cbColorMap;               /**< The pointer the colormap object.*/
-
-    double                                      m_dMaxImpedance;            /**< Maximum impedance value. This is a fixed value to scale the color map.*/
-
     //=========================================================================================================
     /**
     * Adds an electrode item to the QGraphicScene.
@@ -190,6 +184,19 @@ private:
     * Open a help dialog.
     */
     void helpDialog();
+    
+    EEGoSports*                                 m_pEEGoSports;              /**< The pointer back to the EEGoSports plugin.*/
+
+    EEGoSportsImpedanceScene*                   m_qGScene;                  /**< The QGraphicScene.*/
+
+    QMap< QString, int >                        m_qmElectrodeNameIndex;     /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
+
+    Ui::EEGoSportsImpedanceWidget*              m_pUi;                      /**< The user interface for the EEGoSportsImpedanceWidget.*/
+
+    QSharedPointer<ColorMap>                    m_cbColorMap;               /**< The pointer the colormap object.*/
+
+    double                                      m_dMaxImpedance;            /**< Maximum impedance value. This is a fixed value to scale the color map.*/
+
 };
 
 } // NAMESPACE

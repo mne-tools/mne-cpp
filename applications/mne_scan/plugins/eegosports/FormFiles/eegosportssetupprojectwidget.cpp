@@ -71,42 +71,42 @@ using namespace UTILSLIB;
 
 EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSports, QWidget *parent)
 : QWidget(parent)
-, ui(new Ui::EEGoSportsSetupProjectWidget)
+, m_pUi(new Ui::EEGoSportsSetupProjectWidget)
 , m_pEEGoSports(pEEGoSports)
 {
-    ui->setupUi(this);
+    m_pUi->setupUi(this);
 
     // Connect write to file options
-    connect(ui->m_qPushButton_NewProject, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::addProject);
-    connect(ui->m_qPushButton_NewSubject, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::addSubject);
-    connect(ui->m_qPushButton_FiffRecordFile, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeOutputFile);
+    connect(m_pUi->m_qPushButton_NewProject, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::addProject);
+    connect(m_pUi->m_qPushButton_NewSubject, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::addSubject);
+    connect(m_pUi->m_qPushButton_FiffRecordFile, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeOutputFile);
 
     // Connect drop down menus
-    connect(ui->m_qComboBox_SubjectSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+    connect(m_pUi->m_qComboBox_SubjectSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &EEGoSportsSetupProjectWidget::generateFilePath);
-    connect(ui->m_qComboBox_ProjectSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+    connect(m_pUi->m_qComboBox_ProjectSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &EEGoSportsSetupProjectWidget::generateFilePath);
 
     // Connect EEG hat
-    connect(ui->m_qPushButton_EEGCap, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeCap);
-    connect(ui->m_qLineEdit_EEGCap, &QLineEdit::textChanged, this, &EEGoSportsSetupProjectWidget::updateCardinalComboBoxes);
+    connect(m_pUi->m_qPushButton_EEGCap, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeCap);
+    connect(m_pUi->m_qLineEdit_EEGCap, &QLineEdit::textChanged, this, &EEGoSportsSetupProjectWidget::updateCardinalComboBoxes);
 
     // Connect cardinal combo boxes and shift spin boxes
-    connect(ui->m_comboBox_cardinalMode, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::changeCardinalMode);
+    connect(m_pUi->m_comboBox_cardinalMode, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::changeCardinalMode);
 
-    connect(ui->m_comboBox_LPA, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(ui->m_comboBox_RPA, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(ui->m_comboBox_Nasion, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(ui->m_doubleSpinBox_LPA, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(ui->m_doubleSpinBox_RPA, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
-    connect(ui->m_doubleSpinBox_Nasion, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);    
+    connect(m_pUi->m_comboBox_LPA, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(m_pUi->m_comboBox_RPA, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(m_pUi->m_comboBox_Nasion, &QComboBox::currentTextChanged, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(m_pUi->m_doubleSpinBox_LPA, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(m_pUi->m_doubleSpinBox_RPA, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
+    connect(m_pUi->m_doubleSpinBox_Nasion, &QDoubleSpinBox::editingFinished, this, &EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged);
 
-    connect(ui->m_pushButton_cardinalFile, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeCardinalFile);
+    connect(m_pUi->m_pushButton_cardinalFile, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeCardinalFile);
 
     // Connect QLineEdit's
-    connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
+    connect(m_pUi->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
             this, &EEGoSportsSetupProjectWidget::changeQLineEdits);
-    connect(ui->m_qLineEdit_FiffRecordFile, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
+    connect(m_pUi->m_qLineEdit_FiffRecordFile, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
             this, &EEGoSportsSetupProjectWidget::changeQLineEdits);
 
     initGui();
@@ -117,7 +117,7 @@ EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSpor
 
 EEGoSportsSetupProjectWidget::~EEGoSportsSetupProjectWidget()
 {
-    delete ui;
+    delete m_pUi;
 }
 
 
@@ -126,38 +126,38 @@ EEGoSportsSetupProjectWidget::~EEGoSportsSetupProjectWidget()
 void EEGoSportsSetupProjectWidget::initGui()
 {
     // Init output file path
-    ui->m_qLineEdit_FiffRecordFile->setText(m_pEEGoSports->m_sOutputFilePath);
+    m_pUi->m_qLineEdit_FiffRecordFile->setText(m_pEEGoSports->m_sOutputFilePath);
 
     // Init location of layout file
-    ui->m_qLineEdit_EEGCap->setText(m_pEEGoSports->m_sElcFilePath);
+    m_pUi->m_qLineEdit_EEGCap->setText(m_pEEGoSports->m_sElcFilePath);
 
     updateCardinalComboBoxes(m_pEEGoSports->m_sElcFilePath);
 
-    ui->m_doubleSpinBox_LPA->setValue(1e2*m_pEEGoSports->m_dLPAShift);
-    ui->m_doubleSpinBox_RPA->setValue(1e2*m_pEEGoSports->m_dRPAShift);
-    ui->m_doubleSpinBox_Nasion->setValue(1e2*m_pEEGoSports->m_dNasionShift);
+    m_pUi->m_doubleSpinBox_LPA->setValue(1e2*m_pEEGoSports->m_dLPAShift);
+    m_pUi->m_doubleSpinBox_RPA->setValue(1e2*m_pEEGoSports->m_dRPAShift);
+    m_pUi->m_doubleSpinBox_Nasion->setValue(1e2*m_pEEGoSports->m_dNasionShift);
 
-    ui->m_comboBox_LPA->setCurrentText(m_pEEGoSports->m_sLPA);
-    ui->m_comboBox_RPA->setCurrentText(m_pEEGoSports->m_sRPA);
-    ui->m_comboBox_Nasion->setCurrentText(m_pEEGoSports->m_sNasion);
+    m_pUi->m_comboBox_LPA->setCurrentText(m_pEEGoSports->m_sLPA);
+    m_pUi->m_comboBox_RPA->setCurrentText(m_pEEGoSports->m_sRPA);
+    m_pUi->m_comboBox_Nasion->setCurrentText(m_pEEGoSports->m_sNasion);
 
-    ui->m_lineEdit_cardinalFile->setText(m_pEEGoSports->m_sCardinalFilePath);
+    m_pUi->m_lineEdit_cardinalFile->setText(m_pEEGoSports->m_sCardinalFilePath);
 
     // Init project and subject menus
-    ui->m_qComboBox_ProjectSelection->addItem("Sequence_01");
-    ui->m_qComboBox_SubjectSelection->addItem("Subject_01");
-    ui->m_qComboBox_ProjectSelection->addItem("Sequence_02");
-    ui->m_qComboBox_SubjectSelection->addItem("Subject_02");
+    m_pUi->m_qComboBox_ProjectSelection->addItem("Sequence_01");
+    m_pUi->m_qComboBox_SubjectSelection->addItem("Subject_01");
+    m_pUi->m_qComboBox_ProjectSelection->addItem("Sequence_02");
+    m_pUi->m_qComboBox_SubjectSelection->addItem("Subject_02");
 
     // Init file name
     generateFilePath();
 
     //Init cardinal support
     if(m_pEEGoSports->m_bUseTrackedCardinalMode) {
-        ui->m_comboBox_cardinalMode->setCurrentText("Use tracked cardinals");
+        m_pUi->m_comboBox_cardinalMode->setCurrentText("Use tracked cardinals");
         changeCardinalMode("Use tracked cardinals");
     } else if (m_pEEGoSports->m_bUseElectrodeShiftMode) {
-        ui->m_comboBox_cardinalMode->setCurrentText("Use electrode shift");
+        m_pUi->m_comboBox_cardinalMode->setCurrentText("Use electrode shift");
         changeCardinalMode("Use electrode shift");
     }
 }
@@ -168,36 +168,36 @@ void EEGoSportsSetupProjectWidget::initGui()
 void EEGoSportsSetupProjectWidget::changeCardinalMode(const QString& text)
 {
     if(text == "Use tracked cardinals") {
-        ui->m_label_cardinal->show();
-        ui->m_lineEdit_cardinalFile->show();
-        ui->m_pushButton_cardinalFile->show();
+        m_pUi->m_label_cardinal->show();
+        m_pUi->m_lineEdit_cardinalFile->show();
+        m_pUi->m_pushButton_cardinalFile->show();
 
-        ui->m_label_LPA->hide();
-        ui->m_doubleSpinBox_LPA->hide();
-        ui->m_comboBox_LPA->hide();
-        ui->m_label_RPA->hide();
-        ui->m_doubleSpinBox_RPA->hide();
-        ui->m_comboBox_RPA->hide();
-        ui->m_label_Nasion->hide();
-        ui->m_doubleSpinBox_Nasion->hide();
-        ui->m_comboBox_Nasion->hide();
+        m_pUi->m_label_LPA->hide();
+        m_pUi->m_doubleSpinBox_LPA->hide();
+        m_pUi->m_comboBox_LPA->hide();
+        m_pUi->m_label_RPA->hide();
+        m_pUi->m_doubleSpinBox_RPA->hide();
+        m_pUi->m_comboBox_RPA->hide();
+        m_pUi->m_label_Nasion->hide();
+        m_pUi->m_doubleSpinBox_Nasion->hide();
+        m_pUi->m_comboBox_Nasion->hide();
 
         m_pEEGoSports->m_bUseTrackedCardinalMode = true;
         m_pEEGoSports->m_bUseElectrodeShiftMode = false;
     } else if(text == "Use electrode shift") {
-        ui->m_label_cardinal->hide();
-        ui->m_lineEdit_cardinalFile->hide();
-        ui->m_pushButton_cardinalFile->hide();
+        m_pUi->m_label_cardinal->hide();
+        m_pUi->m_lineEdit_cardinalFile->hide();
+        m_pUi->m_pushButton_cardinalFile->hide();
 
-        ui->m_label_LPA->show();
-        ui->m_doubleSpinBox_LPA->show();
-        ui->m_comboBox_LPA->show();
-        ui->m_label_RPA->show();
-        ui->m_doubleSpinBox_RPA->show();
-        ui->m_comboBox_RPA->show();
-        ui->m_label_Nasion->show();
-        ui->m_doubleSpinBox_Nasion->show();
-        ui->m_comboBox_Nasion->show();
+        m_pUi->m_label_LPA->show();
+        m_pUi->m_doubleSpinBox_LPA->show();
+        m_pUi->m_comboBox_LPA->show();
+        m_pUi->m_label_RPA->show();
+        m_pUi->m_doubleSpinBox_RPA->show();
+        m_pUi->m_comboBox_RPA->show();
+        m_pUi->m_label_Nasion->show();
+        m_pUi->m_doubleSpinBox_Nasion->show();
+        m_pUi->m_comboBox_Nasion->show();
 
         m_pEEGoSports->m_bUseTrackedCardinalMode = false;
         m_pEEGoSports->m_bUseElectrodeShiftMode = true;
@@ -211,12 +211,12 @@ void EEGoSportsSetupProjectWidget::changeCardinalMode(const QString& text)
 
 void EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged()
 {
-    QString sLPA = ui->m_comboBox_LPA->currentText();
-    double dLPAShift = ui->m_doubleSpinBox_LPA->value()*1e-2;
-    QString sRPA = ui->m_comboBox_RPA->currentText();
-    double dRPAShift = ui->m_doubleSpinBox_RPA->value()*1e-2;
-    QString sNasion = ui->m_comboBox_Nasion->currentText();
-    double dNasionShift = ui->m_doubleSpinBox_Nasion->value()*1e-2;
+    QString sLPA = m_pUi->m_comboBox_LPA->currentText();
+    double dLPAShift = m_pUi->m_doubleSpinBox_LPA->value()*1e-2;
+    QString sRPA = m_pUi->m_comboBox_RPA->currentText();
+    double dRPAShift = m_pUi->m_doubleSpinBox_RPA->value()*1e-2;
+    QString sNasion = m_pUi->m_comboBox_Nasion->currentText();
+    double dNasionShift = m_pUi->m_doubleSpinBox_Nasion->value()*1e-2;
 
     emit cardinalPointsChanged(sLPA, dLPAShift, sRPA, dRPAShift, sNasion, dNasionShift);
 }
@@ -232,17 +232,17 @@ void EEGoSportsSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath
     QStringList elcChannelNames;
 
     if(!LayoutLoader::readAsaElcFile(sPath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
-        qDebug() << "Error: Reading elc file.";
+        qCritical() << "Unable to read elc file.";
         return;
     }
 
-    ui->m_comboBox_LPA->clear();
-    ui->m_comboBox_RPA->clear();
-    ui->m_comboBox_Nasion->clear();
+    m_pUi->m_comboBox_LPA->clear();
+    m_pUi->m_comboBox_RPA->clear();
+    m_pUi->m_comboBox_Nasion->clear();
 
-    ui->m_comboBox_LPA->addItems(elcChannelNames);
-    ui->m_comboBox_RPA->addItems(elcChannelNames);
-    ui->m_comboBox_Nasion->addItems(elcChannelNames);
+    m_pUi->m_comboBox_LPA->addItems(elcChannelNames);
+    m_pUi->m_comboBox_RPA->addItems(elcChannelNames);
+    m_pUi->m_comboBox_Nasion->addItems(elcChannelNames);
 }
 
 
@@ -259,8 +259,8 @@ void EEGoSportsSetupProjectWidget::addProject()
     QStringList list = path.split("/");
 
     // Add to combo box
-    ui->m_qComboBox_ProjectSelection->addItem(list.at(list.size()-1));
-    ui->m_qComboBox_ProjectSelection->setCurrentIndex(ui->m_qComboBox_ProjectSelection->count()-1);
+    m_pUi->m_qComboBox_ProjectSelection->addItem(list.at(list.size()-1));
+    m_pUi->m_qComboBox_ProjectSelection->setCurrentIndex(m_pUi->m_qComboBox_ProjectSelection->count()-1);
 }
 
 
@@ -277,8 +277,8 @@ void EEGoSportsSetupProjectWidget::addSubject()
     QStringList list = path.split("/");
 
     // Add to combo box
-    ui->m_qComboBox_SubjectSelection->addItem(list.at(list.size()-1));
-    ui->m_qComboBox_SubjectSelection->setCurrentIndex(ui->m_qComboBox_SubjectSelection->count()-1);
+    m_pUi->m_qComboBox_SubjectSelection->addItem(list.at(list.size()-1));
+    m_pUi->m_qComboBox_SubjectSelection->setCurrentIndex(m_pUi->m_qComboBox_SubjectSelection->count()-1);
 }
 
 
@@ -293,11 +293,11 @@ void EEGoSportsSetupProjectWidget::changeOutputFile()
                  tr("Fif files (*.fif)"));
 
     if(path==NULL){
-        path = ui->m_qLineEdit_FiffRecordFile->text();
+        path = m_pUi->m_qLineEdit_FiffRecordFile->text();
     }
 
-    ui->m_qLineEdit_FiffRecordFile->setText(path);
-    m_pEEGoSports->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
+    m_pUi->m_qLineEdit_FiffRecordFile->setText(path);
+    m_pEEGoSports->m_sOutputFilePath = m_pUi->m_qLineEdit_FiffRecordFile->text();
 }
 
 
@@ -311,11 +311,11 @@ void EEGoSportsSetupProjectWidget::changeCap()
                                                  tr("Electrode location files (*.elc)"));
 
     if(path==NULL){
-        path = ui->m_qLineEdit_EEGCap->text();
+        path = m_pUi->m_qLineEdit_EEGCap->text();
     }
 
-    ui->m_qLineEdit_EEGCap->setText(path);
-    m_pEEGoSports->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
+    m_pUi->m_qLineEdit_EEGCap->setText(path);
+    m_pEEGoSports->m_sElcFilePath = m_pUi->m_qLineEdit_EEGCap->text();
 }
 
 
@@ -329,10 +329,10 @@ void EEGoSportsSetupProjectWidget::changeCardinalFile()
                                                  tr("Electrode location files (*.elc)"));
 
     if(path==NULL)
-        path = ui->m_lineEdit_cardinalFile->text();
+        path = m_pUi->m_lineEdit_cardinalFile->text();
 
-    ui->m_lineEdit_cardinalFile->setText(path);
-    m_pEEGoSports->m_sCardinalFilePath = ui->m_lineEdit_cardinalFile->text();
+    m_pUi->m_lineEdit_cardinalFile->setText(path);
+    m_pEEGoSports->m_sCardinalFilePath = m_pUi->m_lineEdit_cardinalFile->text();
 }
 
 
@@ -348,13 +348,13 @@ void EEGoSportsSetupProjectWidget::generateFilePath(int index)
 
     // Append new file name, subject and project
     QString resourcePath = m_pEEGoSports->m_qStringResourcePath;
-    resourcePath.append(ui->m_qComboBox_ProjectSelection->currentText());
+    resourcePath.append(m_pUi->m_qComboBox_ProjectSelection->currentText());
     resourcePath.append("/");
-    resourcePath.append(ui->m_qComboBox_SubjectSelection->currentText());
+    resourcePath.append(m_pUi->m_qComboBox_SubjectSelection->currentText());
     resourcePath.append("/");
     resourcePath.append(fileName);
 
-    ui->m_qLineEdit_FiffRecordFile->setText(resourcePath);
+    m_pUi->m_qLineEdit_FiffRecordFile->setText(resourcePath);
     m_pEEGoSports->m_sOutputFilePath = resourcePath;
 }
 
@@ -363,6 +363,6 @@ void EEGoSportsSetupProjectWidget::generateFilePath(int index)
 
 void EEGoSportsSetupProjectWidget::changeQLineEdits()
 {
-    m_pEEGoSports->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
-    m_pEEGoSports->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
+    m_pEEGoSports->m_sElcFilePath = m_pUi->m_qLineEdit_EEGCap->text();
+    m_pEEGoSports->m_sOutputFilePath = m_pUi->m_qLineEdit_FiffRecordFile->text();
 }
