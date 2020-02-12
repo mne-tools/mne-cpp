@@ -48,7 +48,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QWidget>
@@ -57,7 +57,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 
@@ -107,11 +107,13 @@ public:
     /**
      * Constructs a FilterDesignView dialog which is a child of parent.
      *
-     * @param [in] parent pointer to parent widget; If parent is 0, the new FilterDesignView becomes a window. If parent is another widget, FilterDesignView becomes a child window inside parent. FilterDesignView is deleted when its parent is deleted.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new FilterDesignView becomes a window.
+     *             If parent is another widget, FilterDesignView becomes a child window inside parent. FilterDesignView
+     *             is deleted when its parent is deleted.
      */
     FilterDesignView(const QString& sSettingsPath,
-               QWidget *parent = 0,
-               Qt::WindowFlags f = Qt::Widget);
+                     QWidget *parent = 0,
+                     Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
