@@ -91,7 +91,7 @@ FilterData::FilterData()
 , m_dLowpassFreq(4)
 , m_dHighpassFreq(40)
 {
-
+    designFilter();
 }
 
 
@@ -116,6 +116,10 @@ FilterData::FilterData(QString unique_name,
 , m_dBandwidth(bandwidth)
 , m_sFreq(sFreq)
 {
+    if(order < 9) {
+       qWarning() << "[FilterData::FilterData] Less than 9 taps were provided. Setting number of taps to 9.";
+    }
+
     designFilter();
 }
 
