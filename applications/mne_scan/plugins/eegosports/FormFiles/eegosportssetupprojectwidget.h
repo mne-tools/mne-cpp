@@ -115,7 +115,7 @@ public:
 private:
     EEGoSports*                           m_pEEGoSports;        /**< a pointer to corresponding EEGoSports.*/
 
-    Ui::EEGoSportsSetupProjectWidget*     ui;                   /**< the user interface for the EEGoSportsSetupWidget.*/
+    Ui::EEGoSportsSetupProjectWidget*     m_pUi;                /**< the user interface for the EEGoSportsSetupWidget.*/
 
     //=========================================================================================================
     /**

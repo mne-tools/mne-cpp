@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the EEGoSportsDriver class. This class implements the basic communication between MNE-X and a ANT EEGoSports device
+ * @brief    Contains the declaration of the EEGoSportsDriver class.
  *
  */
 
@@ -61,7 +61,7 @@
 //=============================================================================================================
 
 #include <QString>
-#include <QVector>
+#include <QList>
 
 
 //*************************************************************************************************************
@@ -106,7 +106,7 @@ class EEGoSportsProducer;
 /**
  * EEGoSportsDriver
  *
- * @brief The EEGoSportsDriver class provides real time data acquisition of EEG data with a EEGoSports device.
+ * @brief  This class implements the basic communication between MNE Scan and a ANT EEGoSports device.
  */
 class EEGoSportsDriver
 {
@@ -129,6 +129,7 @@ public:
     //=========================================================================================================
     /**
      * Get sample from the device in form of a mtrix.
+     *
      * @param [in] MatrixXf the block sample values in form of a matrix.
      * @param [out] bool returns true if sample was successfully written to the input variable, false otherwise.
      */
@@ -136,48 +137,51 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise device.
-    * @param [in] iNumberOfChannels number of channels specified by the user.
-    * @param [in] iSamplesPerBlock samples per block specified by the user.
-    * @param [in] iSamplingFrequency sampling frequency specified by the user.
-    * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
-    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-    * @param [in] bMeasureImpedance Flag for measuring impedances.
-    */
+     *  Initialise device.
+     *
+     *  @param [in] iNumberOfChannels number of channels specified by the user.
+     *  @param [in] iSamplesPerBlock samples per block specified by the user.
+     *  @param [in] iSamplingFrequency sampling frequency specified by the user.
+     *  @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
+     *  @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
+     *  @param [in] bMeasureImpedance Flag for measuring impedances.
+     */
     bool initDevice(bool bWriteDriverDebugToFile,
                     const QString& sOutpuFilePath,
                     bool bMeasureImpedance);
 
     //=========================================================================================================
     /**
-    * Start recording.
-    * @param [in] iSamplesPerBlock samples per block specified by the user.
-    * @param [in] iSamplingFrequency sampling frequency specified by the user.
-    * @param [in] bMeasureImpedance Flag for measuring impedances.
-    */
+     *  Start recording.
+     *
+     *  @param [in] iSamplesPerBlock samples per block specified by the user.
+     *  @param [in] iSamplingFrequency sampling frequency specified by the user.
+     *  @param [in] bMeasureImpedance Flag for measuring impedances.
+     */
     bool startRecording(int iSamplesPerBlock,
-                    int iSamplingFrequency,
-                    bool bMeasureImpedance);
+                        int iSamplingFrequency,
+                        bool bMeasureImpedance);
 
     //=========================================================================================================
     /**
-    * Uninitialise device.
-    * @param [out] bool returns true if device was successfully uninitialised, false otherwise.
-    */
+     *  Uninitialise device.
+     *
+     *  @param [out] bool returns true if device was successfully uninitialised, false otherwise.
+     */
     bool uninitDevice();
 
     //=========================================================================================================
     /**
-    * Get number of channels.
-    */
+     *  Get number of channels.
+     */
     uint getNumberOfChannels();
     uint getNumberOfEEGChannels();
     uint getNumberOfBipolarChannels();
 
     //=========================================================================================================
     /**
-    * Get list of channel types.
-    */
+     *  Get list of channel types.
+     */
     QList<uint> getChannellist();
 
 private:

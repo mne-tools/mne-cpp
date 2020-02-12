@@ -167,7 +167,9 @@ public:
     /**
     * Sets up the fiff info with the current data chosen by the user.
     */
-    void setNumberOfChannels(int iNumberOfChannels, int iNumberOfEEGChannels, int iNumberOfBipolarChannels);
+    void setNumberOfChannels(int iNumberOfChannels,
+                             int iNumberOfEEGChannels,
+                             int iNumberOfBipolarChannels);
 
     //=========================================================================================================
     /**
@@ -206,7 +208,12 @@ protected slots:
      * @param[in] sNasion  The channel name to take as the Nasion.
      * @param[in] dNasion  The amount (in m) to translate the Nasion channel position on the z axis.
      */
-    void onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion);
+    void onUpdateCardinalPoints(const QString& sLPA,
+                                double dLPA,
+                                const QString& sRPA,
+                                double dRPA,
+                                const QString& sNasion,
+                                double dNasion);
 
 protected:
     //=========================================================================================================
@@ -242,8 +249,8 @@ protected:
     virtual void run();
 
 private:
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRMTSA_EEGoSports;                    /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<EEGoSportsImpedanceWidget> m_pEEGoSportsImpedanceWidget;             /**< Widget for checking the impedances*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr    m_pRMTSA_EEGoSports;                    /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<EEGoSportsImpedanceWidget>                                   m_pEEGoSportsImpedanceWidget;           /**< Widget for checking the impedances*/
     QSharedPointer<EEGoSportsSetupProjectWidget>                                m_pEEGoSportsSetupProjectWidget;        /**< Widget for checking the impedances*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/

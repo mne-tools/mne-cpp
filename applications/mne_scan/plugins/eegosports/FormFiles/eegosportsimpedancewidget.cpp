@@ -1,39 +1,39 @@
 //=============================================================================================================
 /**
-* @file     eegosportsimpedancewidget.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Johannes Vorwerk <johannes.vorwerk@umit.at>
-* @version  dev
-* @date     February, 2020
-*
-* @section  LICENSE
-*
-* Copyright (C) 2020, Lorenz Esch, Christoph Dinh, Matti Hamalainen, Johannes Vorwerk. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-* the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*
-*
-* @brief    Contains the declaration of the EEGoSportsImpedanceWidget class.
-*
-*/
+ * @file     eegosportsimpedancewidget.cpp
+ * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Johannes Vorwerk <johannes.vorwerk@umit.at>
+ * @version  dev
+ * @date     February, 2020
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2020, Lorenz Esch, Christoph Dinh, Matti Hamalainen, Johannes Vorwerk. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Contains the declaration of the EEGoSportsImpedanceWidget class.
+ *
+ */
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -77,38 +77,40 @@ using namespace EEGOSPORTSPLUGIN;
 EEGoSportsImpedanceWidget::EEGoSportsImpedanceWidget(EEGoSports* pEEGoSports, QWidget *parent)
 : m_pEEGoSports(pEEGoSports)
 , QWidget(parent)
-, ui(new Ui::EEGoSportsImpedanceWidget)
+, m_pUi(new Ui::EEGoSportsImpedanceWidget)
 , m_dMaxImpedance(20000)
 {
-    ui->setupUi(this);
+    m_pUi->setupUi(this);
 
     // Init colormap object
     m_cbColorMap = QSharedPointer<ColorMap>(new ColorMap());
 
     // Init GUI stuff
-    m_qGScene = new EEGoSportsImpedanceScene(ui->m_graphicsView_impedanceView);
-    ui->m_graphicsView_impedanceView->setScene(m_qGScene);
-    ui->m_graphicsView_impedanceView->show();
+    m_qGScene = new EEGoSportsImpedanceScene(m_pUi->m_graphicsView_impedanceView);
+    m_pUi->m_graphicsView_impedanceView->setScene(m_qGScene);
+    m_pUi->m_graphicsView_impedanceView->show();
 
-    ui->m_pushButton_stop->setEnabled(false);
+    m_pUi->m_pushButton_stop->setEnabled(false);
 
     // Connects of this widget
-    connect(ui->m_pushButton_stop, &QPushButton::released, this, &EEGoSportsImpedanceWidget::stopImpedanceMeasurement);
-    connect(ui->m_pushButton_start, &QPushButton::released, this, &EEGoSportsImpedanceWidget::startImpedanceMeasurement);
-    connect(ui->m_pushButton_takeScreenshot, &QPushButton::released, this, &EEGoSportsImpedanceWidget::takeScreenshot);
-    connect(ui->m_pushButton_loadLayout, &QPushButton::released, this, &EEGoSportsImpedanceWidget::loadLayout);
-    connect(ui->m_pushButton_saveValues, &QPushButton::released, this, &EEGoSportsImpedanceWidget::saveToFile);
-    connect(ui->m_pushButton_Help, &QPushButton::released, this, &EEGoSportsImpedanceWidget::helpDialog);
-    //connect(ui->m_verticalSlider_manualImpedanceValue, &QSlider::valueChanged, this, &EEGoSportsImpedanceWidget::setIm);
+    connect(m_pUi->m_pushButton_stop, &QPushButton::released, this, &EEGoSportsImpedanceWidget::stopImpedanceMeasurement);
+    connect(m_pUi->m_pushButton_start, &QPushButton::released, this, &EEGoSportsImpedanceWidget::startImpedanceMeasurement);
+    connect(m_pUi->m_pushButton_takeScreenshot, &QPushButton::released, this, &EEGoSportsImpedanceWidget::takeScreenshot);
+    connect(m_pUi->m_pushButton_loadLayout, &QPushButton::released, this, &EEGoSportsImpedanceWidget::loadLayout);
+    connect(m_pUi->m_pushButton_saveValues, &QPushButton::released, this, &EEGoSportsImpedanceWidget::saveToFile);
+    connect(m_pUi->m_pushButton_Help, &QPushButton::released, this, &EEGoSportsImpedanceWidget::helpDialog);
+    //connect(m_pUi->m_verticalSlider_manualImpedanceValue, &QSlider::valueChanged, this, &EEGoSportsImpedanceWidget::setIm);
 
 }
+
 
 //*************************************************************************************************************
 
 EEGoSportsImpedanceWidget::~EEGoSportsImpedanceWidget()
 {
-    delete ui;
+    delete m_pUi;
 }
+
 
 //*************************************************************************************************************
 
@@ -131,10 +133,10 @@ void EEGoSportsImpedanceWidget::updateGraphicScene(const VectorXd& matValue)
     }
 
     // For testing purposes only!
-    //impedanceValue = ui->m_verticalSlider_manualImpedanceValue->value();
+    //impedanceValue = m_pUi->m_verticalSlider_manualImpedanceValue->value();
 
-    double threshold = ui->m_doubleSpinBox_manualImpedanceThreshold->value();
-    double colormapmax = ui->m_doubleSpinBox_manualImpedanceColormapMax->value();
+    double threshold = m_pUi->m_doubleSpinBox_manualImpedanceThreshold->value();
+    double colormapmax = m_pUi->m_doubleSpinBox_manualImpedanceColormapMax->value();
 
     for(int i = 0; i<numberItems; i++)
     {
@@ -151,7 +153,7 @@ void EEGoSportsImpedanceWidget::updateGraphicScene(const VectorXd& matValue)
         //cout << scale <<endl;
         //double valueScaledNormalized = (scale*impedanceValue)/(scale*impedanceValue+1);
 
-        if(ui->m_radioButton_Threshold->isChecked())
+        if(m_pUi->m_radioButton_Threshold->isChecked())
         {
             QColor thresholdColor;
             if(impedanceValue > 2*threshold)
@@ -170,7 +172,7 @@ void EEGoSportsImpedanceWidget::updateGraphicScene(const VectorXd& matValue)
                 thresholdColor.setRed(255);
             item->setColor(thresholdColor);
         }
-        else if(ui->m_radioButton_Colormap->isChecked())
+        else if(m_pUi->m_radioButton_Colormap->isChecked())
             item->setColor(m_cbColorMap->valueToJet(std::min(colormapmax,impedanceValue/colormapmax)));
 
         item->setImpedanceValue(impedanceValue);
@@ -178,6 +180,7 @@ void EEGoSportsImpedanceWidget::updateGraphicScene(const VectorXd& matValue)
 
     m_qGScene->update(m_qGScene->itemsBoundingRect());
 }
+
 
 //*************************************************************************************************************
 
@@ -211,8 +214,9 @@ void EEGoSportsImpedanceWidget::initGraphicScene()
         addElectrodeItem(elcChannelNames.at(i), position);
     }
 
-    ui->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    m_pUi->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
+
 
 //*************************************************************************************************************
 
@@ -223,6 +227,7 @@ void EEGoSportsImpedanceWidget::addElectrodeItem(const QString& electrodeName, c
     m_qGScene->addItem(item);
 }
 
+
 //*************************************************************************************************************
 
 void EEGoSportsImpedanceWidget::startImpedanceMeasurement()
@@ -231,12 +236,13 @@ void EEGoSportsImpedanceWidget::startImpedanceMeasurement()
 
     if(m_pEEGoSports->start())
     {
-        ui->m_pushButton_stop->setEnabled(true);
-        ui->m_pushButton_start->setEnabled(false);
+        m_pUi->m_pushButton_stop->setEnabled(true);
+        m_pUi->m_pushButton_start->setEnabled(false);
     }
     else
         m_pEEGoSports->m_bCheckImpedances = false;
 }
+
 
 //*************************************************************************************************************
 
@@ -246,12 +252,13 @@ void EEGoSportsImpedanceWidget::stopImpedanceMeasurement()
 
     if(m_pEEGoSports->stop())
     {
-        ui->m_pushButton_stop->setEnabled(false);
-        ui->m_pushButton_start->setEnabled(true);
+        m_pUi->m_pushButton_stop->setEnabled(false);
+        m_pUi->m_pushButton_start->setEnabled(true);
     }
     else
         m_pEEGoSports->m_bCheckImpedances = true;
 }
+
 
 //*************************************************************************************************************
 
@@ -293,6 +300,7 @@ void EEGoSportsImpedanceWidget::takeScreenshot()
     }
 }
 
+
 //*************************************************************************************************************
 
 void EEGoSportsImpedanceWidget::loadLayout()
@@ -328,8 +336,9 @@ void EEGoSportsImpedanceWidget::loadLayout()
         addElectrodeItem(elcChannelNames.at(i), position);
     }
 
-    ui->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    m_pUi->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
+
 
 //*************************************************************************************************************
 
@@ -342,12 +351,14 @@ void EEGoSportsImpedanceWidget::closeEvent(QCloseEvent *event)
         stopImpedanceMeasurement();
 }
 
+
 //*************************************************************************************************************
 
 bool EEGoSportsImpedanceWidget::compareChannelIndex(EEGoSportsElectrodeItem* a, EEGoSportsElectrodeItem* b)
 {
     return a->getChannelIndex() < b->getChannelIndex();
 }
+
 
 //*************************************************************************************************************
 
@@ -382,6 +393,7 @@ void EEGoSportsImpedanceWidget::saveToFile()
 
     outputFileStream.close();
 }
+
 
 //*************************************************************************************************************
 

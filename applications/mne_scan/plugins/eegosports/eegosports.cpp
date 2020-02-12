@@ -59,6 +59,7 @@
 #include <unistd.h>
 #endif
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -240,7 +241,7 @@ void EEGoSports::setUpFiffInfo()
     QStringList elcChannelNames;
 
     if(!LayoutLoader::readAsaElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit)) {
-        qDebug() << "Error: Reading elc file.";
+        qWarning() << "Unable to read elc file.";
     }
 
     bool breflocation = elcChannelNames.contains("ref",Qt::CaseInsensitive);
@@ -285,7 +286,8 @@ void EEGoSports::setUpFiffInfo()
     //Only write the EEG channel positions to the fiff info. The Refa devices have next to the EEG input channels 10 other input channels (Bipolar, Auxilary, Digital, Test)
     //Check if channel size by user corresponds with read channel informations from the elc file. Adding 1 for reference channel. If not append zeros and string 'unknown' until the size matches.
     if((m_iNumberOfEEGChannels + int(breflocation) + int(bgndlocation && m_bCheckImpedances)) > elcLocation3D.size()) {
-        qDebug()<<"Warning: setUpFiffInfo() - Not enough positions read from the elc file. Filling missing channel names and positions with zeroes and 'unknown' strings.";
+        qWarning()<<"[EEGoSports::setUpFiffInfo] Not enough positions read from the elc file. Filling missing channel names and positions with zeroes and 'unknown' strings.";
+
         QVector<float> tempA(3, 0.0);
         QVector<float> tempB(2, 0.0);
         int size = (m_iNumberOfEEGChannels + int(breflocation) + int(bgndlocation && m_bCheckImpedances)) - elcLocation3D.size();
@@ -305,7 +307,7 @@ void EEGoSports::setUpFiffInfo()
     QStringList cardinalNames;
 
     if(!LayoutLoader::readAsaElcFile(m_sCardinalFilePath, cardinalNames, cardinals3D, cardinals2D, unit)) {
-        qDebug() << "Error: Reading elc cardinal file.";
+        qWarning() << "[EEGoSports::setUpFiffInfo] Unable to read elc cardinal file.";
     }
 
     //Rotate cardinal points
@@ -344,7 +346,7 @@ void EEGoSports::setUpFiffInfo()
             digPoint.r[2] = (elcLocation3D[indexLPA][2]-m_dLPAShift*10)*0.001;
             digitizerInfo.push_back(digPoint);
         } else {
-            qDebug() << "Plugin EEGOSPORTS - ERROR creating LPA - " << m_sLPA << " not found. Check loaded layout.";
+            qWarning() << "[EEGoSports::setUpFiffInfo] LPA" << m_sLPA << " not found. Check loaded layout.";
         }
     }
 
@@ -368,7 +370,7 @@ void EEGoSports::setUpFiffInfo()
             digPoint.r[2] = (elcLocation3D[indexNasion][2]-m_dNasionShift*10)*0.001;
             digitizerInfo.push_back(digPoint);
         } else {
-            qDebug() << "Plugin EEGOSPORTS - ERROR creating Nasion - " << m_sNasion << " not found. Check loaded layout.";
+            qWarning() << "[EEGoSports::setUpFiffInfo] Nasion" << m_sNasion << " not found. Check loaded layout.";
         }
     }
 
@@ -392,7 +394,7 @@ void EEGoSports::setUpFiffInfo()
             digPoint.r[2] = (elcLocation3D[indexRPA][2]-m_dRPAShift*10)*0.001;
             digitizerInfo.push_back(digPoint);
         } else {
-            qDebug() << "Plugin EEGOSPORTS - ERROR creating RPA - " << m_sRPA << " not found. Check loaded layout.";
+            qWarning() << "[EEGoSports::setUpFiffInfo] RPA" << m_sRPA << " not found. Check loaded layout.";
         }
     }
 
@@ -561,7 +563,7 @@ void EEGoSports::setUpFiffInfo()
         m_pFiffInfo->chs.append(fChInfo);
     }
 
-    qDebug() << "Number of Channels " << QSLChNames.length();
+    qInfo() << "[EEGoSports::setUpFiffInfo] Number of Channels " << QSLChNames.length();
 
     //Set channel names in fiff_info_base
     m_pFiffInfo->ch_names = QSLChNames;
@@ -584,6 +586,7 @@ void EEGoSports::setNumberOfChannels(int iNumberOfChannels, int iNumberOfEEGChan
     m_iNumberOfEEGChannels = iNumberOfEEGChannels;
     m_iNumberOfBipolarChannels = iNumberOfBipolarChannels;
 }
+
 
 //*************************************************************************************************************
 
@@ -619,7 +622,7 @@ bool EEGoSports::start()
         QThread::start();
         return true;
     } else {
-        qWarning() << "Plugin EEGoSports - ERROR - EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
+        qWarning() << "[EEGoSports::start] Producer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
         return false;
     }
 }
@@ -651,6 +654,7 @@ void EEGoSports::setSampleData(MatrixXd &matRawBuffer)
     m_qListReceivedSamples.append(matRawBuffer);
     m_mutex.unlock();
 }
+
 
 //*************************************************************************************************************
 
@@ -694,6 +698,7 @@ void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const 
     m_sNasion = sNasion;
 }
 
+
 //*************************************************************************************************************
 
 void EEGoSports::showImpedanceDialog()
@@ -706,7 +711,7 @@ void EEGoSports::showImpedanceDialog()
 
         if(!m_pEEGoSportsImpedanceWidget->isVisible())
         {
-            m_pEEGoSportsImpedanceWidget->setWindowTitle("MNE-X - Measure impedances");
+            m_pEEGoSportsImpedanceWidget->setWindowTitle("EEGoSports - Measure impedances");
             m_pEEGoSportsImpedanceWidget->show();
             m_pEEGoSportsImpedanceWidget->raise();
         }
@@ -810,6 +815,7 @@ void EEGoSports::changeRecordingButton()
     }
 }
 
+
 //*************************************************************************************************************
 
 void EEGoSports::run()
@@ -850,7 +856,7 @@ void EEGoSports::run()
                     }
 
                     //emit values to real time multi sample array
-                    //qDebug()<<"EEGoSports::run() - mat size"<<matValue.rows()<<"x"<<matValue.cols();
+                    //qDebug()<<"EEGoSports::run - mat size"<<matValue.rows()<<"x"<<matValue.cols();
                     m_pRMTSA_EEGoSports->data()->setValue(matValue);
                 }
             }
@@ -867,6 +873,6 @@ void EEGoSports::run()
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
     }
 
-    //std::cout<<"EXITING - EEGoSports::run()"<<std::endl;
+    //qDebug() << "[EEGoSports::run] Thread's run routine finished";
 }
 

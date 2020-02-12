@@ -85,7 +85,9 @@ public:
     /**
      * Constructs a ECGAboutWidget dialog which is a child of parent.
      *
-     * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsAboutWidget becomes a window. If parent is another widget, EEGoSportsAboutWidget becomes a child window inside parent. EEGoSportsAboutWidget is deleted when its parent is deleted.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsAboutWidget becomes a window.
+     *             If parent is another widget, EEGoSportsAboutWidget becomes a child window inside parent.
+     *             EEGoSportsAboutWidget is deleted when its parent is deleted.
      */
     EEGoSportsAboutWidget(QWidget *parent = 0);
 
@@ -97,7 +99,7 @@ public:
     ~EEGoSportsAboutWidget();
 
 private:
-    Ui::EEGoSportsAboutWidgetClass ui;    /**< Holds the user interface for the EEGoSportsAboutWidgetClass.*/
+    Ui::EEGoSportsAboutWidgetClass m_ui;    /**< Holds the user interface for the EEGoSportsAboutWidgetClass.*/
 };
 
 } // NAMESPACE

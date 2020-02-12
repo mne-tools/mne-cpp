@@ -43,8 +43,8 @@
 #include "eegosportsdriver.h"
 #include "eegosportsproducer.h"
 
-#include <eemagine/sdk/wrapper.cc> // Wrapper code to be compiled.
-#include <eemagine/sdk/factory.h> // SDK header
+#include "eemagine/sdk/wrapper.cc" // Wrapper code to be compiled.
+#include "eemagine/sdk/factory.h" // SDK header
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -56,6 +56,7 @@
 //=============================================================================================================
 
 #include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -127,12 +128,12 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
 
         m_pAmplifier = factoryObj.getAmplifier(); // Get an amplifier
 
-        //std::cout<<"EEGoSportsDriver::initDevice - Serial number of connected eegosports device: "<<m_pAmplifier->getSerialNumber()<<std::endl;
+        //std::cout<<"[EEGoSportsDriver::initDevice] Serial number of connected eegosports device: "<<m_pAmplifier->getSerialNumber()<<std::endl;
 
         QThread::msleep(100);
 
     } catch (std::runtime_error& e) {
-        qWarning() <<"EEGoSportsDriver::initDevice - error " << e.what();
+        qWarning() <<"[EEGoSportsDriver::initDevice] error " << e.what();
         return false;
     }
 
@@ -154,17 +155,18 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
     m_uiNumberOfEEGChannels = iEEGChannelCount;
     m_uiNumberOfBipolarChannels = iBipolarChannelCount;
 
-    qDebug() << "iChannelcount " << m_uiNumberOfChannels;
-    qDebug() << "iEEGChannelcount " << iEEGChannelCount;
-    qDebug() << "iBipolarChannelCount " << iBipolarChannelCount;
+    qDebug() << "[EEGoSportsDriver::initDevice] iChannelcount " << m_uiNumberOfChannels;
+    qDebug() << "[EEGoSportsDriver::initDevice] iEEGChannelcount " << iEEGChannelCount;
+    qDebug() << "[EEGoSportsDriver::initDevice] iBipolarChannelCount " << iBipolarChannelCount;
 
-    qInfo() << "EEGoSportsDriver::initDevice - Successfully initialised the device.";
+    qInfo() << "[EEGoSportsDriver::initDevice] Successfully initialised the device.";
 
     // Set flag for successfull initialisation true
     m_bInitDeviceSuccess = true;
 
     return true;
 }
+
 
 //*************************************************************************************************************
 
@@ -194,11 +196,11 @@ bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
         QThread::msleep(100);
 
     } catch (std::runtime_error& e) {
-        qWarning() <<"EEGoSportsDriver::startRecording - error " << e.what();
+        qWarning() <<"[EEGoSportsDriver::startRecording]" << e.what();
         return false;
     }
 
-    qInfo() << "EEGoSportsDriver::startRecording - Successfully started recording.";
+    qInfo() << "[EEGoSportsDriver::startRecording] Successfully started recording";
 
     // Set flag for successfull initialisation true
     m_bStartRecordingSuccess = true;
@@ -206,25 +208,26 @@ bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
     return true;
 }
 
+
 //*************************************************************************************************************
 
 bool EEGoSportsDriver::uninitDevice()
 {
     //Check if the device was initialised
     if(!m_bStartRecordingSuccess) {
-        qWarning() << "Plugin EEGoSports - ERROR - uninitDevice() - Recording was not started - therefore can not be stopped";
+        qWarning() << "[EEGoSportsDriver::uninitDevice] Recording was not started - therefore can not be stopped";
         return false;
     }
 
     //Check if the device was initialised
     if(!m_bInitDeviceSuccess) {
-        qWarning() << "Plugin EEGoSports - ERROR - uninitDevice() - Device was not initialised - therefore can not be uninitialised";
+        qWarning() << "[EEGoSportsDriver::uninitDevice] Device was not initialised - therefore can not be uninitialised";
         return false;
     }
 
     //Check if the driver DLL was loaded
     if(!m_bDllLoaded) {
-        qWarning() << "Plugin EEGoSports - ERROR - uninitDevice() - Driver DLL was not loaded";
+        qWarning() << "[EEGoSportsDriver::uninitDevice] Driver DLL was not loaded";
         return false;
     }
 
@@ -237,7 +240,7 @@ bool EEGoSportsDriver::uninitDevice()
     delete m_pDataStream;
     delete m_pAmplifier;
 
-    qInfo() << "Plugin EEGoSports - INFO - uninitDevice() - Successfully uninitialised the device";
+    qInfo() << "[EEGoSportsDriver::uninitDevice] Successfully uninitialised the device";
 
     m_bStartRecordingSuccess = false;
     m_bInitDeviceSuccess = false;
@@ -252,12 +255,12 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
 {
     //Check if device was initialised and connected correctly
     if(!m_bInitDeviceSuccess) {
-        qWarning() << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly";
+        qWarning() << "[EEGoSportsDriver::getSampleMatrixValue] Cannot start to get samples from device because device was not initialised correctly";
         return false;
     }
 
     if(!m_bStartRecordingSuccess) {
-        qWarning() << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because recording was not started";
+        qWarning() << "[EEGoSportsDriver::getSampleMatrixValue] Cannot start to get samples from device because recording was not started";
         return false;
     }
 
@@ -319,6 +322,7 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
     return true;
 }
 
+
 //*************************************************************************************************************
 
 uint EEGoSportsDriver::getNumberOfChannels()
@@ -326,15 +330,22 @@ uint EEGoSportsDriver::getNumberOfChannels()
     return m_uiNumberOfChannels;
 }
 
+
+//*************************************************************************************************************
+
 uint EEGoSportsDriver::getNumberOfEEGChannels()
 {
     return m_uiNumberOfEEGChannels;
 }
 
+
+//*************************************************************************************************************
+
 uint EEGoSportsDriver::getNumberOfBipolarChannels()
 {
     return m_uiNumberOfBipolarChannels;
 }
+
 
 //*************************************************************************************************************
 
