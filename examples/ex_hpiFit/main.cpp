@@ -99,7 +99,10 @@ void write_pos(const float time, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::
     }    
     double GoF = std::accumulate(vGoF.begin(), vGoF.end(), .0) / vGoF.size();
     QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
-    //std::cout << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
+
+    //qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
+    //qDebug() << quatHPI.x() << quatHPI.y() << quatHPI.z() << info->dev_head_t.trans(0,3) << info->dev_head_t.trans(1,3) << info->dev_head_t.trans(2,3) << std::endl;
+
     position.conservativeResize(position.rows()+1, 10);
     position(position.rows()-1,0) = time;
     position(position.rows()-1,1) = quatHPI.x();
@@ -136,11 +139,7 @@ int main(int argc, char *argv[])
     FiffRawData raw(t_fileIn);
     QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(raw.info));
 
-    //std::cout << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
-    Eigen::MatrixXd position;
-
     // Set up the reading parameters
-    // Only read MEG channels
     RowVectorXi picks = pFiffInfo->pick_types(true, false, false);
 
     MatrixXd matData;
@@ -154,8 +153,22 @@ int main(int argc, char *argv[])
     float dT_sec = 0.1;             // time between hpi fits
     float quantum_sec = 0.2f;       // read and write in 200 ms junks
     fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
-    fiff_int_t dT = ceil(dT_sec*pFiffInfo->sfreq);
-    float t = 0;
+
+    // create time vector that specifies when to fit
+    int N = ceil((last-first)/quantum);
+    RowVectorXf time(N);
+    for(int i = 0; i < N; i++){
+        time(i) = i * dT_sec;
+    }
+
+//    // Read Quaternion File
+//    Eigen::MatrixXd pos;
+//    qInfo() << "Specify the path to your position file (.txt)";
+//    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/posMax_data_with_movement_chpi.txt");
+//    RowVectorXd time = pos.col(0);
+
+    Eigen::MatrixXd position;       // Position matrix to save quaternions etc.
+
     // setup informations for HPI fit (VectorView)
     QVector<int> vFreqs {166,154,161,158};
     QVector<double> vGof;
@@ -163,14 +176,18 @@ int main(int argc, char *argv[])
 
     // Use SSP + SGM + calibration
     Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
+
     //Do a copy here because we are going to change the activity flags of the SSP's
     FiffInfo infoTemp = *(pFiffInfo.data());
+
     //Turn on all SSP
     for(int i = 0; i < infoTemp.projs.size(); ++i) {
         infoTemp.projs[i].active = true;
     }
+
     //Create the projector for all SSP's on
     infoTemp.make_projector(matProjectors);
+
     //set columns of matrix to zero depending on bad channels indexes
     for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
         matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
@@ -181,7 +198,8 @@ int main(int argc, char *argv[])
     bool bDoDebug = false;
 
     // read and fit
-    for(from = first; from < last; from+=dT) {
+    for(int i = 0; i < time.size(); i++) {
+        from = first + time(i)*pFiffInfo->sfreq;
         to = from + quantum;
         if (to > last) {
             to = last;
@@ -207,8 +225,8 @@ int main(int argc, char *argv[])
                        sHPIResourceDir);
         qInfo() << "The HPI-Fit took" << timer.elapsed() << "milliseconds";
         qInfo() << "[done]";
-        write_pos(t,pFiffInfo,position,vGof);
-        t +=dT_sec;
+
+        write_pos(time(i),pFiffInfo,position,vGof);
     }
     UTILSLIB::IOUtils::write_eigen_matrix(position, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
 }
