@@ -19,7 +19,7 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
-//#include <Eigen/Core>
+#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -116,6 +116,8 @@ typedef struct {
     qint32 nevents;
 } samples_events_t;
 
+//*************************************************************************************************************
+
 class FtConnector : public QObject
 {
     Q_OBJECT
@@ -145,6 +147,9 @@ public:
 
     //=========================================================================================================
     void echoStatus();
+
+    //=========================================================================================================
+    Eigen::MatrixXd getMatrix();
 
 private:
 
@@ -177,6 +182,9 @@ private:
     //=========================================================================================================
     int totalBuffSamples();
 
+    //=========================================================================================================
+    void resetEmitData();
+
 //*************************************************************************************************************
 
     QTcpSocket          m_Socket;                               /**< Socket that manages the connection to the ft buffer */
@@ -190,7 +198,11 @@ private:
 
     int                 m_iNumSamples;                          /**< Number of samples we've read from the buffer */
     int                 m_iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer */
+    int                 m_iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied */
 
+    Eigen::MatrixXd*    m_pMatEmit;                             /**< Container to format data to tansmit to FtBuffProducer */
+
+    bool                m_bNewData;                             /**< Indicate whether we've received new data */
 };
 
 #endif // FTCONNECTOR_H

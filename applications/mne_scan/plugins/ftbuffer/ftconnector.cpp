@@ -14,6 +14,7 @@ FtConnector::FtConnector()
 ,m_fSampleFreq(0)
 ,m_iNumSamples(0)
 ,m_iNumNewSamples(0)
+,m_bNewData(false)
 {
 }
 
@@ -25,7 +26,13 @@ FtConnector::~FtConnector() {}
 
 bool FtConnector::connect() {
     m_Socket.connectToHost(QHostAddress(m_sAddress), m_iPort);
-    if(m_Socket.waitForConnected(10000)) {
+    int tries = 0;
+
+    while ((m_Socket.state() != QAbstractSocket::ConnectedState) || (tries < 5)){
+        m_Socket.waitForConnected(200);
+    }
+
+    if(m_Socket.state() == QAbstractSocket::ConnectedState) {
         qInfo() << "Connected!";
         return true;
     } else {
@@ -284,6 +291,8 @@ int FtConnector::parseDataDef(QBuffer &dataBuffer) {
 //        return false;
 //    }
 
+    m_iMsgSamples = datadef.nsamples;
+
     return datadef.bufsize;
 }
 
@@ -370,8 +379,9 @@ bool FtConnector::parseData(QBuffer &datasampBuffer, int bufsize) {
 
     QByteArray dataArray = datasampBuffer.readAll();
 
-    float* data = (float*) dataArray.data();
+    float* fdata = (float*) dataArray.data();
 
+//TODO: Implement receiving other types of data
 //    switch (m_iDataType) {
 //        case DATATYPE_FLOAT32:
 //            auto data = reinterpret_cast<float*>(dataArray.data(), bufsize);
@@ -384,9 +394,43 @@ bool FtConnector::parseData(QBuffer &datasampBuffer, int bufsize) {
 //            break;
 //    }
 
-    for (int i = 0; i < 100 ; i++) {
-        qDebug() << data[i];
+    //format data into eigen matrix to pass up
+    Eigen::MatrixXf matData;
+    matData.resize(m_iNumChannels, m_iMsgSamples);
+
+    int count = 0;
+    for (int i = 0; i < int (m_iMsgSamples); i++) {
+        for (int j = 0; j < int (m_iNumChannels); j++) {
+                matData(j,i) = fdata[count];
+            count++;
+        }
     }
 
+    m_pMatEmit = new Eigen::MatrixXd(matData.cast<double>());
+    m_bNewData  = true;
+
     return true;
+}
+
+//*************************************************************************************************************
+
+void FtConnector::resetEmitData() {
+    m_bNewData = false;
+    delete m_pMatEmit;
+    m_pMatEmit = Q_NULLPTR;
+}
+
+//*************************************************************************************************************
+
+bool FtConnector::disconnect() {
+    m_Socket.disconnectFromHost();
+    m_Socket.waitForDisconnected(200);
+
+    return true;
+}
+
+//*************************************************************************************************************
+
+Eigen::MatrixXd FtConnector::getMatrix() {
+    return *m_pMatEmit;
 }
