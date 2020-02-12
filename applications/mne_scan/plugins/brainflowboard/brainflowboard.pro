@@ -26,9 +26,9 @@ else {
 }
 
 contains(QT_ARCH, i386) {
-    LIBS += -L"brainflow/installed/lib/" -lBrainflow32  -lDataHandler32 -lBoardController32
+    LIBS += -L"$$PWD/brainflow/installed/lib/" -lBrainflow32  -lDataHandler32 -lBoardController32
 } else {
-    LIBS += -L"brainflow/installed/lib/" -lBrainflow  -lDataHandler -lBoardController
+    LIBS += -L"$$PWD/brainflow/installed/lib/" -lBrainflow  -lDataHandler -lBoardController
 }
 
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
