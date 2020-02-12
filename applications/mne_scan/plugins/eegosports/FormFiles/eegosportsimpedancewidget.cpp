@@ -112,7 +112,7 @@ EEGoSportsImpedanceWidget::~EEGoSportsImpedanceWidget()
 
 //*************************************************************************************************************
 
-void EEGoSportsImpedanceWidget::updateGraphicScene(const VectorXd matValue)
+void EEGoSportsImpedanceWidget::updateGraphicScene(const VectorXd& matValue)
 {
     // Get scene items
     QList<QGraphicsItem *> itemList = m_qGScene->items();
@@ -216,7 +216,7 @@ void EEGoSportsImpedanceWidget::initGraphicScene()
 
 //*************************************************************************************************************
 
-void EEGoSportsImpedanceWidget::addElectrodeItem(const QString electrodeName, const QVector2D position)
+void EEGoSportsImpedanceWidget::addElectrodeItem(const QString& electrodeName, const QVector2D& position)
 {
     EEGoSportsElectrodeItem *item = new EEGoSportsElectrodeItem(electrodeName, QPointF(position.x(), position.y()), QColor(m_cbColorMap->valueToJet(1)), m_qmElectrodeNameIndex[electrodeName]);
     item->setPos(QPointF(position.x(), position.y()));
