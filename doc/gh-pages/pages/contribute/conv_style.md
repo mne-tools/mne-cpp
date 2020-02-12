@@ -1,9 +1,9 @@
 ---
-title: Coding Conventions and Style Guide
+title: Coding Conventions
 parent: Contribute
 nav_order: 3
 ---
-# Coding Conventions and Style Guide
+# Coding Conventions
 
 ## Naming Conventions
 
