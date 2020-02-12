@@ -505,22 +505,21 @@ bool ChannelSelectionView::loadLayout(QString path)
     float height = 4.0;
     int numberTries = 0;
 
-    if(inputPoints.size()>0) {
-        while(numberTries<10) {
+    if(inputPoints.size() > 0) {
+        while(numberTries < 10) {
             if(!LayoutMaker::makeLayout(inputPoints,
-                                       outputPoints,
-                                       names,
-                                       out,
-                                       true,
-                                       prad,
-                                       width,
-                                       height,
-                                       false,
-                                       true,
-                                       false)) {
+                                        outputPoints,
+                                        names,
+                                        out,
+                                        true,
+                                        prad,
+                                        width,
+                                        height,
+                                        false,
+                                        true,
+                                        false)) {
                 numberTries++;
-            }
-            else {
+            } else {
                 numberTries = 11;
             }
         }

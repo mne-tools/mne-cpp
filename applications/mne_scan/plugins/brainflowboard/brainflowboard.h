@@ -68,6 +68,10 @@ namespace SCMEASLIB {
     class RealTimeMultiSampleArray;
 }
 
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -104,6 +108,7 @@ public:
     virtual QSharedPointer<IPlugin> clone() const;
     virtual void init();
     virtual void unload();
+    void setUpFiffInfo();
     virtual bool start();
     virtual bool stop();
     virtual IPlugin::PluginType getType() const;
@@ -127,13 +132,16 @@ private:
     std::string m_sStreamerParams;
     int m_iBoardId;
     BoardShim *m_pBoardShim;
-    int m_iNumChannels;
+    int m_iNumberChannels;
     int *m_pChannels;
-    int m_iSamplingRate;
+    int m_iSamplingFreq;
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pOutput;
     volatile bool m_bIsRunning;
 
     QAction *m_pShowSettingsAction;
+
+    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;        /**< Fiff measurement info.*/
+
 };
 
 }
