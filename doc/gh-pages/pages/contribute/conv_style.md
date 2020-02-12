@@ -17,33 +17,47 @@ Please make use of the following coding conventions when contributing to MNE-CPP
 |Member variables |`m_typeMeaningfulName` |
 |Local variables 	|`typeMeaningfulName`   |
 
-## Command Line Outputs
+## Readability
 
-Every output should start with `[<ClassName::FunctionName>]`. Please make use of `qDebug()` for debugging during development only and `qInfo()` for user information. `qWarning()` should be used to indicate about unusual situations which do not lead to a termination of the application. `qCritical()` should only be used if an error was catched which will lead to the application being terminated. Please note that Eigen structures can only be plotted via `std::cout`. For example:
+Use meaningful variable names and type indicators. Avoid complex as well as condensed expressions. For example:
 
 ```cpp
-void ExampleClass::exampleFunction(const QString& sPath, int iNumLines)
+    int iNumChs = 306;
+    QString sChName = "MEG0000";
+    void loadTxtFile(const QString& sPath);
+```
+
+## Command Line Outputs
+
+Every output should start with `[<ClassName::FunctionName>]`. Please make use of `qDebug()` for during development only and `qInfo()` for user information. `qWarning()` should be used to indicate unusual situations which do not lead to a termination of the application. `qCritical()` should only be used if an error was catched which will lead to the application being terminated. For example:
+
+```cpp
+void FileLoader::loadTxtFile(const QString& sPath)
 {
-    qInfo() << "[ExampleClass::exampleFunction] Working on file" << sPath;
+    qInfo() << "[FileLoader::loadTxtFile] Working on file" << sPath;
+
+    if(!sPath.contains(".txt")) {
+        qWarning() << "[FileLoader::loadTxtFile] The file does not end with .txt."
+    }
 
     QFile file(sPath);
     if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "[ExampleClass::exampleFunction] Unable to open file."
+        qCritical() << "[FileLoader::loadTxtFile] Unable to open file."
         return;
     }
+    ...
 }
 ```
 
-## Readability
-
- * Avoid complex and condensed expressions
- * Use meaningful variable names
+| **Please note:** Eigen objects (`MatrixXd`, `VectorXd`, etc.) can only be plotted via `std::cout`.|
 
 ## Documentation
 
- * Please use the DoxyGen style to document your code.
+Please use the DoxyGen style to document your code. For an example see [here](https://github.com/mne-tools/mne-cpp/blob/master/libraries/connectivity/network/network.h).
 
 ## Commit Policy
+
+A good commit should follow: 
 
  * If you add new functions/classes, ensure everything is documented properly.
  * All code should follow the Coding Conventions & Style.
