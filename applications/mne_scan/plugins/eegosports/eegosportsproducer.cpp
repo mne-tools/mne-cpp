@@ -83,6 +83,7 @@ EEGoSportsProducer::~EEGoSportsProducer()
 {
 }
 
+
 //*************************************************************************************************************
 
 void EEGoSportsProducer::init(bool bWriteDriverDebugToFile,
@@ -138,12 +139,14 @@ void EEGoSportsProducer::stop()
     m_bIsConnected = false;
 }
 
+
 //*************************************************************************************************************
 
 QList<uint> EEGoSportsProducer::getChannellist()
 {
     return m_pEEGoSportsDriver->getChannellist();
 }
+
 
 //*************************************************************************************************************
 
@@ -158,5 +161,3 @@ void EEGoSportsProducer::run()
         }
     }
 }
-
-
