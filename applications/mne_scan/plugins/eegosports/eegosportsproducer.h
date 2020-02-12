@@ -106,7 +106,7 @@ public:
     * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
     virtual void init(bool bWriteDriverDebugToFile,
-                      const QString sOutputFilePath,
+                      const QString& sOutputFilePath,
                       bool bMeasureImpedance);
 
     //=========================================================================================================
@@ -116,8 +116,8 @@ public:
     * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
     * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
-    virtual void start(const int iSamplesPerBlock,
-                       const int iSamplingFrequency,
+    virtual void start(int iSamplesPerBlock,
+                       int iSamplingFrequency,
                        bool bMeasureImpedance);
 
     //=========================================================================================================

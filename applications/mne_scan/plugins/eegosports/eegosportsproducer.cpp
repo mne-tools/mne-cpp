@@ -86,7 +86,7 @@ EEGoSportsProducer::~EEGoSportsProducer()
 //*************************************************************************************************************
 
 void EEGoSportsProducer::init(bool bWriteDriverDebugToFile,
-                              const QString sOutputFilePath,
+                              const QString& sOutputFilePath,
                               bool bMeasureImpedance)
 {
     //Initialise device
@@ -105,8 +105,8 @@ void EEGoSportsProducer::init(bool bWriteDriverDebugToFile,
 
 //*************************************************************************************************************
 
-void EEGoSportsProducer::start(const int iSamplesPerBlock,
-                               const int iSamplingFrequency,
+void EEGoSportsProducer::start(int iSamplesPerBlock,
+                               int iSamplingFrequency,
                                bool bMeasureImpedance)
 {
     //Initialise device

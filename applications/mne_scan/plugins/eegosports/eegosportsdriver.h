@@ -145,7 +145,7 @@ public:
     * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
     bool initDevice(bool bWriteDriverDebugToFile,
-                    const QString sOutpuFilePath,
+                    const QString& sOutpuFilePath,
                     bool bMeasureImpedance);
 
     //=========================================================================================================
@@ -155,8 +155,8 @@ public:
     * @param [in] iSamplingFrequency sampling frequency specified by the user.
     * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
-    bool startRecording(const int iSamplesPerBlock,
-                    const int iSamplingFrequency,
+    bool startRecording(int iSamplesPerBlock,
+                    int iSamplingFrequency,
                     bool bMeasureImpedance);
 
     //=========================================================================================================
