@@ -52,8 +52,7 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Bmtid
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Bmti
 }
 

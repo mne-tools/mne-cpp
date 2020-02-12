@@ -77,8 +77,7 @@ CONFIG(debug, debug|release) {
             -lscMeasd \
             -lscDispd \
             -lscSharedd
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
