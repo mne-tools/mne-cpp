@@ -14,12 +14,13 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lscMeasd \
             -lscDispd \
             -lscSharedd
-}
-else {
+} else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
             -lscMeas \
             -lscDisp \
             -lscShared
