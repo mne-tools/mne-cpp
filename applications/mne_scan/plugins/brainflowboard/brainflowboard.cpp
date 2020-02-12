@@ -1,3 +1,42 @@
+//=============================================================================================================
+/**
+ * @file     brainflowboard.cpp
+ * @author   Andrey Parfenov <a1994ndrey@gmail.com>
+ * @version  dev
+ * @date     February, 2020
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2020, Andrey Parfenov. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    Contains the definition of the BrainFlowBoard class.
+ *
+ */
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include <QMessageBox>
 
 #include "data_filter.h"
@@ -9,15 +48,30 @@
 #include "FormFiles/brainflowstreamingwidget.h"
 
 
-BrainFlowBoard::BrainFlowBoard() :
-    m_pBoardShim(NULL),
-    m_pChannels(NULL),
-    m_iBoardId((int)BoardIds::SYNTHETIC_BOARD),
-    m_bIsRunning(false),
-    m_pOutput(NULL),
-    m_iSamplingRate(0),
-    m_sStreamerParams(""),
-    m_iNumChannels(0)
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace BRAINFLOWBOARDPLUGIN;
+using namespace SCSHAREDLIB;
+using namespace SCMEASLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+BrainFlowBoard::BrainFlowBoard()
+: m_pBoardShim(NULL)
+, m_pChannels(NULL)
+, m_iBoardId((int)BoardIds::SYNTHETIC_BOARD)
+, m_bIsRunning(false)
+, m_pOutput(NULL)
+, m_iSamplingRate(0)
+, m_sStreamerParams("")
+, m_iNumChannels(0)
 {
     m_pShowSettingsAction = new QAction(QIcon(":/images/options.png"), tr("Streaming Settings"),this);
     m_pShowSettingsAction->setStatusTip(tr("Streaming Settings"));
@@ -25,10 +79,16 @@ BrainFlowBoard::BrainFlowBoard() :
     addPluginAction(m_pShowSettingsAction);
 }
 
+
+//*************************************************************************************************************
+
 BrainFlowBoard::~BrainFlowBoard()
 {
     releaseSession(false);
 }
+
+
+//*************************************************************************************************************
 
 void BrainFlowBoard::showSettings()
 {
@@ -36,11 +96,17 @@ void BrainFlowBoard::showSettings()
     widget->show();
 }
 
+
+//*************************************************************************************************************
+
 QSharedPointer<IPlugin> BrainFlowBoard::clone() const
 {
     QSharedPointer<BrainFlowBoard> pClone(new BrainFlowBoard());
     return pClone;
 }
+
+
+//*************************************************************************************************************
 
 void BrainFlowBoard::init()
 {
@@ -48,9 +114,15 @@ void BrainFlowBoard::init()
     BoardShim::enable_dev_board_logger();
 }
 
+
+//*************************************************************************************************************
+
 void BrainFlowBoard::unload()
 {
 }
+
+
+//*************************************************************************************************************
 
 bool BrainFlowBoard::start()
 {
@@ -75,6 +147,9 @@ bool BrainFlowBoard::start()
     return true;
 }
 
+
+//*************************************************************************************************************
+
 bool BrainFlowBoard::stop()
 {
     try {
@@ -88,15 +163,24 @@ bool BrainFlowBoard::stop()
     return true;
 }
 
+
+//*************************************************************************************************************
+
 IPlugin::PluginType BrainFlowBoard::getType() const
 {
     return _ISensor;
 }
 
+
+//*************************************************************************************************************
+
 QString BrainFlowBoard::getName() const
 {
     return "BrainFlow Board Plugin";
 }
+
+
+//*************************************************************************************************************
 
 QWidget* BrainFlowBoard::setupWidget()
 {
@@ -104,7 +188,14 @@ QWidget* BrainFlowBoard::setupWidget()
     return widget;
 }
 
-void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string streamerParams, int boardId, int dataType, int vertScale)
+
+//*************************************************************************************************************
+
+void BrainFlowBoard::prepareSession(BrainFlowInputParams params,
+                                    std::string streamerParams,
+                                    int boardId,
+                                    int dataType,
+                                    int vertScale)
 {
     if (m_pBoardShim)
     {
@@ -176,6 +267,9 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params, std::string str
     msgBox.exec();
 }
 
+
+//*************************************************************************************************************
+
 void BrainFlowBoard::configureBoard(std::string config)
 {
     QMessageBox msgBox;
@@ -196,6 +290,9 @@ void BrainFlowBoard::configureBoard(std::string config)
     }
     msgBox.exec();
 }
+
+
+//*************************************************************************************************************
 
 void BrainFlowBoard::run()
 {
@@ -230,6 +327,9 @@ void BrainFlowBoard::run()
         delete[] data;
     }
 }
+
+
+//*************************************************************************************************************
 
 void BrainFlowBoard::releaseSession(bool useQmessage)
 {
