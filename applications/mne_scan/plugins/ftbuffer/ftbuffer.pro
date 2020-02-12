@@ -82,6 +82,7 @@ SOURCES += \
     FormFiles/ftbufferaboutwidget.cpp \
     FormFiles/ftbufferyourwidget.cpp \
     ftbuffproducer.cpp \
+    ftconnector.cpp \
         ftsrc/cpp/FtConnection.cc \
         ftsrc/ftbuffclient.cpp \
 
@@ -91,7 +92,8 @@ HEADERS += \
     FormFiles/ftbuffersetupwidget.h \
     FormFiles/ftbufferaboutwidget.h \
     FormFiles/ftbufferyourwidget.h \
-    ftbuffproducer.h \
+    ftbuffproducer.h \ \
+    ftconnector.h
 
 FORMS += \
     FormFiles/ftbuffersetup.ui \
