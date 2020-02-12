@@ -99,7 +99,7 @@ EEGoSportsDriver::~EEGoSportsDriver()
 //*************************************************************************************************************
 
 bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
-                                  const QString sOutpuFilePath, bool bMeasureImpedance)
+                                  const QString& sOutpuFilePath, bool bMeasureImpedance)
 {
     m_bMeasureImpedances = bMeasureImpedance;
 
@@ -168,8 +168,8 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
 
 //*************************************************************************************************************
 
-bool EEGoSportsDriver::startRecording(const int iSamplesPerBlock,
-                                      const int iSamplingFrequency,
+bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
+                                      int iSamplingFrequency,
                                       bool bMeasureImpedance)
 {
     //Set global variables

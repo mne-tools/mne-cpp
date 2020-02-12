@@ -85,13 +85,14 @@ public:
     /**
     * Constructs a EEGoSportsElectrodeItem.
     */
-    EEGoSportsElectrodeItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor, int channelIndex);
+    EEGoSportsElectrodeItem(const QString& electrodeName, const QPointF& electrodePosition,
+                            const QColor& electrodeColor, int channelIndex);
 
     //=========================================================================================================
     /**
     * Sets the color of the electrode item.
     */
-    void setColor(QColor electrodeColor);
+    void setColor(const QColor& electrodeColor);
 
     //=========================================================================================================
     /**
@@ -127,7 +128,7 @@ public:
     /**
     * Updates the electrodes position.
     */
-    void setPosition(QPointF newPosition);
+    void setPosition(const QPointF& newPosition);
 
     //=========================================================================================================
     /**

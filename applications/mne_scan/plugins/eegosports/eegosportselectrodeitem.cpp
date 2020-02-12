@@ -57,8 +57,8 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EEGoSportsElectrodeItem::EEGoSportsElectrodeItem(QString electrodeName, QPointF electrodePosition,
-                                                 QColor electrodeColor, int channelIndex)
+EEGoSportsElectrodeItem::EEGoSportsElectrodeItem(const QString& electrodeName, const QPointF& electrodePosition,
+                                                 const QColor& electrodeColor, int channelIndex)
 : m_sElectrodeName(electrodeName)
 , m_qpElectrodePosition(electrodePosition)
 , m_cElectrodeColor(electrodeColor)
@@ -113,7 +113,7 @@ void EEGoSportsElectrodeItem::paint(QPainter *painter, const QStyleOptionGraphic
 
 //*************************************************************************************************************
 
-void EEGoSportsElectrodeItem::setColor(QColor electrodeColor)
+void EEGoSportsElectrodeItem::setColor(const QColor& electrodeColor)
 {
     m_cElectrodeColor = electrodeColor;
 }
@@ -141,7 +141,7 @@ double EEGoSportsElectrodeItem::getImpedanceValue()
 
 //*************************************************************************************************************
 
-void EEGoSportsElectrodeItem::setPosition(QPointF newPosition)
+void EEGoSportsElectrodeItem::setPosition(const QPointF& newPosition)
 {
     m_qpElectrodePosition = newPosition;
 }

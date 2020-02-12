@@ -111,7 +111,7 @@ public:
     * Updates the values of the electrodes placed in the QGraphicsScene.
     * @param [in] matValue Matrix of electrode positions.
     */
-    void updateGraphicScene(const VectorXd matValue);
+    void updateGraphicScene(const VectorXd& matValue);
 
     //=========================================================================================================
     /**
@@ -139,7 +139,7 @@ private:
     * @param [in] electrodeName Name of added electrode.
     * @param [in] position of added electrode (2D)
     */
-    void addElectrodeItem(const QString electrodeName, const QVector2D position);
+    void addElectrodeItem(const QString& electrodeName, const QVector2D& position);
 
     //=========================================================================================================
     /**
