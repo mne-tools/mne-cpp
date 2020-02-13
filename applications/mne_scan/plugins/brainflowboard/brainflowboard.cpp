@@ -58,6 +58,7 @@
 using namespace BRAINFLOWBOARDPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
