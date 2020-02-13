@@ -10,7 +10,7 @@ nav_order: 2
 
 Depending on the settings during acquisition the data files may contain subject identifying information in unencrypted form. The utility `mne_anonymize` was written to clear tags containing such information from a fiff file. Specifically, this utility removes the following tags from the fiff file:
 
-| Tag | Description | Default anonymization value |
+| Tag | Description | Default Anonymization Value |
 |-----|-------------|-----------------------------|
 |`FIFF_FILE_ID`, `FIFF_BLOCK_ID`, `FIFF_PARENT_FILE_ID`, `FIFF_PARENT_BLOCK_ID`, `FIFF_REF_FILE_ID`, `FIFF_REF_BLOCK_ID`| The ID tag includes a measurement date and unique machine ID. The machine ID usually contains the hardware address of the primary LAN card. | 2000/01/01 and 00:00:00:00:00:00:00:00 |
 |`FIFF_MEAS_DATE`| The date of the measurement. | 2000/01/01 |
