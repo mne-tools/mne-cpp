@@ -71,13 +71,6 @@
 namespace FSLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -172,7 +165,7 @@ public:
      *
      * @return vertix indeces
      */
-    inline VectorXi& getVertices();
+    inline Eigen::VectorXi& getVertices();
 
     //=========================================================================================================
     /**
@@ -180,7 +173,7 @@ public:
      *
      * @return vertix indeces
      */
-    inline const VectorXi getVertices() const;
+    inline const Eigen::VectorXi getVertices() const;
 
     //=========================================================================================================
     /**
@@ -188,7 +181,7 @@ public:
      *
      * @return vertix labels
      */
-    inline VectorXi& getLabelIds();
+    inline Eigen::VectorXi& getLabelIds();
 
     //=========================================================================================================
     /**
@@ -196,7 +189,7 @@ public:
      *
      * @return vertix labels
      */
-    inline const VectorXi getLabelIds() const;
+    inline const Eigen::VectorXi getLabelIds() const;
 
     //=========================================================================================================
     /**
@@ -267,7 +260,7 @@ public:
      */
     bool toLabels(const Surface &p_surf,
                   QList<Label> &p_qListLabels,
-                  QList<RowVector4i> &p_qListLabelRGBAs,
+                  QList<Eigen::RowVector4i> &p_qListLabelRGBAs,
                   const QStringList& lLabelPicks = QStringList()) const;
 
     //=========================================================================================================
@@ -291,8 +284,8 @@ private:
     QString m_sFilePath;        /**< Annotation file path */
 
     qint32 m_iHemi;             /**< Hemisphere (lh = 0; rh = 1) */
-    VectorXi m_Vertices;        /**< Vertice indeces */
-    VectorXi m_LabelIds;        /**< Vertice label ids */
+    Eigen::VectorXi m_Vertices;        /**< Vertice indeces */
+    Eigen::VectorXi m_LabelIds;        /**< Vertice label ids */
 
     Colortable m_Colortable;    /**< Lookup table label colors & ids */
 };
@@ -316,7 +309,7 @@ inline bool Annotation::isEmpty() const
 
 //*************************************************************************************************************
 
-inline VectorXi& Annotation::getVertices()
+inline Eigen::VectorXi& Annotation::getVertices()
 {
     return m_Vertices;
 }
@@ -324,7 +317,7 @@ inline VectorXi& Annotation::getVertices()
 
 //*************************************************************************************************************
 
-inline const VectorXi Annotation::getVertices() const
+inline const Eigen::VectorXi Annotation::getVertices() const
 {
     return m_Vertices;
 }
@@ -332,7 +325,7 @@ inline const VectorXi Annotation::getVertices() const
 
 //*************************************************************************************************************
 
-inline VectorXi& Annotation::getLabelIds()
+inline Eigen::VectorXi& Annotation::getLabelIds()
 {
     return m_LabelIds;
 }
@@ -340,7 +333,7 @@ inline VectorXi& Annotation::getLabelIds()
 
 //*************************************************************************************************************
 
-inline const VectorXi Annotation::getLabelIds() const
+inline const Eigen::VectorXi Annotation::getLabelIds() const
 {
     return m_LabelIds;
 }

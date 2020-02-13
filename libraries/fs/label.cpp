@@ -64,6 +64,7 @@
 //=============================================================================================================
 
 using namespace FSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -80,7 +81,12 @@ Label::Label()
 
 //*************************************************************************************************************
 
-Label::Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id)
+Label::Label(const VectorXi &p_vertices,
+             const MatrixX3f &p_pos,
+             const VectorXd &p_values,
+             qint32 p_hemi,
+             const QString &p_name,
+             qint32 p_id)
 : vertices(p_vertices)
 , pos(p_pos)
 , values(p_values)

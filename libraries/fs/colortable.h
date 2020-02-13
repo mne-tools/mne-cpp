@@ -64,12 +64,6 @@
 namespace FSLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 //=============================================================================================================
 /**
@@ -101,7 +95,7 @@ public:
      *
      * @return ids
      */
-    inline VectorXi getLabelIds() const;
+    inline Eigen::VectorXi getLabelIds() const;
 
     //=========================================================================================================
     /**
@@ -117,13 +111,13 @@ public:
      *
      * @return RGBAs
      */
-    inline MatrixX4i getRGBAs() const;
+    inline Eigen::MatrixX4i getRGBAs() const;
 
 public:
     QString orig_tab;           /**< Colortable raw data */
     qint32 numEntries;          /**< Number of entries */
     QStringList struct_names;   /**< Anatomical ROI description */
-    MatrixXi table;             /**< labels and corresponing colorcode */
+    Eigen::MatrixXi table;      /**< labels and corresponing colorcode */
 };
 
 //*************************************************************************************************************
@@ -131,9 +125,9 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline VectorXi Colortable::getLabelIds() const
+inline Eigen::VectorXi Colortable::getLabelIds() const
 {
-    VectorXi p_vecIds;
+    Eigen::VectorXi p_vecIds;
     if (table.cols() == 5)
         p_vecIds = table.block(0,4,table.rows(),1);
 
@@ -151,9 +145,9 @@ inline QStringList Colortable::getNames() const
 
 //*************************************************************************************************************
 
-inline MatrixX4i Colortable::getRGBAs() const
+inline Eigen::MatrixX4i Colortable::getRGBAs() const
 {
-    MatrixX4i p_matRGBAs;
+    Eigen::MatrixX4i p_matRGBAs;
     if (table.cols() == 5)
         p_matRGBAs = table.block(0,0,table.rows(),4);
 

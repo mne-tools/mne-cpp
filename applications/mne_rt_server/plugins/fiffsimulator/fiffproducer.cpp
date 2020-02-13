@@ -61,6 +61,7 @@
 
 using namespace FIFFLIB;
 using namespace FIFFSIMULATORRTSERVERPLUGIN;
+using namespace Eigen;
 
 
 //*************************************************************************************************************

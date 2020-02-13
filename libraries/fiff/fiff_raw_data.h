@@ -77,14 +77,6 @@ namespace FIFFLIB
 class FiffRawData;
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
-
 //=============================================================================================================
 /**
  *Provides fiff raw measurement data, including I/O routines.
@@ -156,11 +148,11 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    bool read_raw_segment(MatrixXd& data,
-                          MatrixXd& times,
+    bool read_raw_segment(Eigen::MatrixXd& data,
+                          Eigen::MatrixXd& times,
                           fiff_int_t from = -1,
                           fiff_int_t to = -1,
-                          const RowVectorXi& sel = defaultRowVectorXi,
+                          const Eigen::RowVectorXi& sel = defaultRowVectorXi,
                           bool do_debug = false) const;
 
     //=========================================================================================================
@@ -178,12 +170,12 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    bool read_raw_segment(MatrixXd& data,
-                          MatrixXd& times,
-                          SparseMatrix<double>& multSegment,
+    bool read_raw_segment(Eigen::MatrixXd& data,
+                          Eigen::MatrixXd& times,
+                          Eigen::SparseMatrix<double>& multSegment,
                           fiff_int_t from = -1,
                           fiff_int_t to = -1,
-                          const RowVectorXi& sel = defaultRowVectorXi,
+                          const Eigen::RowVectorXi& sel = defaultRowVectorXi,
                           bool do_debug = false) const;
 
     //=========================================================================================================
@@ -200,20 +192,20 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    bool read_raw_segment_times(MatrixXd& data,
-                                MatrixXd& times,
+    bool read_raw_segment_times(Eigen::MatrixXd& data,
+                                Eigen::MatrixXd& times,
                                 float from,
                                 float to,
-                                const RowVectorXi& sel = defaultRowVectorXi) const;
+                                const Eigen::RowVectorXi& sel = defaultRowVectorXi) const;
 
 public:
     FiffStream::SPtr file;      /**< replaces fid */
     FiffInfo info;              /**< Fiff measurement information */
     fiff_int_t first_samp;      /**< Do we have a skip ToDo... */
     fiff_int_t last_samp;       /**< Do we have a skip ToDo... */
-    RowVectorXd cals;           /**< Calibration values. ToDo: Check if RowVectorXd is enough */
+    Eigen::RowVectorXd cals;    /**< Calibration values. ToDo: Check if RowVectorXd is enough */
     QList<FiffRawDir> rawdir;   /**< Special fiff diretory entry for raw data. */
-    MatrixXd proj;              /**< SSP operator to apply to the data. */
+    Eigen::MatrixXd proj;       /**< SSP operator to apply to the data. */
     FiffCtfComp comp;           /**< Compensator. */
 };
 
