@@ -72,13 +72,6 @@
 namespace FIFFLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
 
 //=============================================================================================================
 /**
@@ -142,8 +135,8 @@ public:
     QString       ch_name;      /**< Descriptive name for the channel 16*/
 
     //Convinience members - MATLAB -
-    Matrix<float,4,4, DontAlign>    coil_trans;     /**< Coil coordinate system transformation */
-    Matrix<float,3,2, DontAlign>    eeg_loc;        /**< Channel location */
+    Eigen::Matrix<float,4,4, Eigen::DontAlign>    coil_trans;     /**< Coil coordinate system transformation */
+    Eigen::Matrix<float,3,2, Eigen::DontAlign>    eeg_loc;        /**< Channel location */
     fiff_int_t    coord_frame;                      /**< Coordinate Frame */
 
 // ### OLD STRUCT ###

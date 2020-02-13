@@ -58,6 +58,7 @@
 
 using namespace SCMEASLIB;
 using namespace FIFFLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
