@@ -116,7 +116,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         std::cout<<std::endl<< "HPIFit::fitHPI - No projector passed. Returning.";
     }
 
-    vGof.clear();
+//    vGof.clear();
     // Setup Constructors for Coil Set
     FwdCoilSet* templates = NULL;
     FwdCoilSet* megCoils = NULL;
@@ -284,10 +284,10 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
         chIdcs(j) = chIdx;
     }
-
+    double error = std::accumulate(vGof.begin(), vGof.end(), .0) / vGof.size();
     //Generate seed point by projection the found channel position 3cm inwards
     Eigen::MatrixXd coilPos = Eigen::MatrixXd::Zero(numCoils,3);
-    if(transDevHead.trans == Eigen::MatrixXd::Identity(4,4).cast<float>()){
+    if(transDevHead.trans == Eigen::MatrixXd::Identity(4,4).cast<float>() || error > 0.005){
         for (int j = 0; j < chIdcs.rows(); ++j) {
             int chIdx = chIdcs(j);
 
@@ -303,33 +303,32 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
             //std::cout << "HPIFit::fitHPI - Coil " << j << " max value index " << chIdx << std::endl;
         }
     }
+    else{
+        Eigen::Matrix4d trans_init = transDevHead.trans.inverse().cast<double>();
+        Eigen::Matrix3d rot;
+        Eigen::RowVector3d transl;
+        for(int r = 0; r < 3; ++r) {
+            for(int c = 0; c < 3 ; ++c) {
+                rot(r,c) = trans_init(r,c);
+                transl(r) = trans_init(r,3);
+            }
+        }
 
-    Eigen::Matrix4d trans_init = transDevHead.trans.inverse().cast<double>();
-    Eigen::Matrix3d rot;
-    Eigen::RowVector3d transl;
-    for(int r = 0; r < 3; ++r) {
-        for(int c = 0; c < 3 ; ++c) {
-            rot(r,c) = trans_init(r,c);
-            transl(r) = trans_init(r,3);
+        coilPos = headHPI;
+        rot.transposeInPlace();
+        for(int r = 0; r < 4; ++r) {
+            for(int c = 0; c < 3 ; ++c) {
+                coilPos(r,c) = coilPos.row(r).dot(rot.col(c));
+            }
+        }
+
+        // apply translation
+        for(int r = 0; r < 4; ++r) {
+            for(int c = 0; c < 3 ; ++c) {
+                coilPos(r,c) = coilPos(r,c) + transl(c);
+            }
         }
     }
-
-    coilPos = headHPI;
-    rot.transposeInPlace();
-    for(int r = 0; r < 4; ++r) {
-        for(int c = 0; c < 3 ; ++c) {
-            coilPos(r,c) = coilPos.row(r).dot(rot.col(c));
-        }
-    }
-
-    // apply translation
-    for(int r = 0; r < 4; ++r) {
-        for(int c = 0; c < 3 ; ++c) {
-            coilPos(r,c) = coilPos(r,c) + transl(c);
-        }
-    }
-
-    coil.pos = coilPos;
 
     coil.pos = coilPos;
 
