@@ -8,6 +8,13 @@
 #include <QThread>
 
 //*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FTBUFFERPLUGIN;
+
+//*************************************************************************************************************
 
 FtConnector::FtConnector()
 :m_iNumChannels(0)
@@ -263,9 +270,9 @@ int FtConnector::parseDataDef(QBuffer &dataBuffer) {
     datadef_t datadef;
 
     //Get nchans, int32
-    char c_nchans[sizeof(datadef.nchans)];
-    dataBuffer.read(c_nchans, sizeof(datadef.nchans));
-    std::memcpy(&datadef.nchans, c_nchans, sizeof(datadef.nchans));
+    char c_chans[sizeof(datadef.nchans)];
+    dataBuffer.read(c_chans, sizeof(datadef.nchans));
+    std::memcpy(&datadef.nchans, c_chans, sizeof(datadef.nchans));
     qDebug() << "nchans:" << datadef.nchans;
 
     //Get nsamples, int32
@@ -433,4 +440,16 @@ bool FtConnector::disconnect() {
 
 Eigen::MatrixXd FtConnector::getMatrix() {
     return *m_pMatEmit;
+}
+
+//*************************************************************************************************************
+
+bool FtConnector::newData() {
+    return m_bNewData;
+}
+
+//*************************************************************************************************************
+
+QString FtConnector::getAddr() {
+    return m_sAddress;
 }

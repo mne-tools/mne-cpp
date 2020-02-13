@@ -67,7 +67,7 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox, QWidget *parent)
 {
     ui.setupUi(this);
 
-    this->ui.m_lineEditIP->setText(toolbox->m_pFtBuffProducer->m_pFtBuffClient->getAddress());
+    this->ui.m_lineEditIP->setText(toolbox->m_pFtBuffProducer->m_pFtConnector->getAddr());
 
 
     //Always connect GUI elemts after ui.setpUi has been called
@@ -100,6 +100,7 @@ void FtBufferSetupWidget::pressedConnect()
         }
     } else {
         //qDebug() << "TEXTFIELD:" << this->ui.m_lineEditIP->text();
+        m_pFtBuffer->m_pFtBuffProducer->m_pFtConnector->setPort(ui.m_spinBoxPort->value());
         if (m_pFtBuffer->m_pFtBuffProducer->connectToBuffer(this->ui.m_lineEditIP->text())) {
             ui.m_qPushButton_Connect->setText("Disconnect");
 //            m_pFtBuffer->setParams(ui.m_comboBox_SamplingFreq_4->currentText().toInt(),
