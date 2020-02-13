@@ -51,6 +51,7 @@
 
 using namespace COMMUNICATIONLIB;
 using namespace FIFFLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
