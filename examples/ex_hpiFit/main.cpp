@@ -71,7 +71,7 @@
 
 using namespace INVERSELIB;
 using namespace FIFFLIB;
-
+using namespace Eigen;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 //    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/posMax_data_with_movement_chpi.txt");
 //    RowVectorXd time = pos.col(0);
 
-    Eigen::MatrixXd position;       // Position matrix to save quaternions etc.
+    MatrixXd position;       // Position matrix to save quaternions etc.
 
     // setup informations for HPI fit (VectorView)
     QVector<int> vFreqs {166,154,161,158};
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
     FiffDigPointSet fittedPointSet;
 
     // Use SSP + SGM + calibration
-    Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
+    MatrixXd matProjectors = MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
 
     //Do a copy here because we are going to change the activity flags of the SSP's
     FiffInfo infoTemp = *(pFiffInfo.data());
