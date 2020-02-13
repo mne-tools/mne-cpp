@@ -261,7 +261,9 @@ public:
      * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
      * @return the selector matrix (row Vector)
      */
-    inline static RowVectorXi pick_channels(QStringList& ch_names, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList)
+    inline static Eigen::RowVectorXi pick_channels(QStringList& ch_names,
+                                                   const QStringList& include = defaultQStringList,
+                                                   const QStringList& exclude = defaultQStringList)
     {
         return FiffInfo::pick_channels(ch_names, include, exclude);
     }
@@ -282,7 +284,9 @@ public:
      *
      * @return the desired fiff evoked data set
      */
-    inline static FiffEvokedSet pick_channels(FiffEvokedSet& orig, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList)
+    inline static FiffEvokedSet pick_channels(FiffEvokedSet& orig,
+                                              const QStringList& include = defaultQStringList,
+                                              const QStringList& exclude = defaultQStringList)
     {
         return orig.pick_channels(include, exclude);
     }
@@ -321,7 +325,8 @@ public:
      *
      * @return Info modified according to sel
      */
-    inline static FiffInfo pick_info(const FiffInfo& info, const RowVectorXi &sel = defaultVectorXi)
+    inline static FiffInfo pick_info(const FiffInfo& info,
+                                     const Eigen::RowVectorXi &sel = defaultVectorXi)
     {
         return info.pick_info(sel);
     }
@@ -345,7 +350,12 @@ public:
      *
      * @return the selector matrix (row vector)
      */
-    inline static RowVectorXi pick_types(FiffInfo &info, bool meg, bool eeg = false, bool stim = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList)
+    inline static Eigen::RowVectorXi pick_types(FiffInfo &info,
+                                                bool meg,
+                                                bool eeg = false,
+                                                bool stim = false,
+                                                const QStringList& include = defaultQStringList,
+                                                const QStringList& exclude = defaultQStringList)
     {
         return info.pick_types(meg, eeg, stim, include, exclude);
     }
@@ -365,7 +375,8 @@ public:
      *
      * @return the bad channel list
      */
-    static inline QStringList read_bad_channels(FiffStream::SPtr& p_pStream, FiffDirNode::SPtr& p_Node)
+    static inline QStringList read_bad_channels(FiffStream::SPtr& p_pStream,
+                                                FiffDirNode::SPtr& p_Node)
     {
         return p_pStream->read_bad_channels(p_Node);
     }
@@ -386,7 +397,9 @@ public:
      *
      * @return the CTF software compensation data
      */
-    static inline QList<FiffCtfComp> read_ctf_comp(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Node, const QList<FiffChInfo>& p_Chs)
+    static inline QList<FiffCtfComp> read_ctf_comp(FiffStream::SPtr& p_pStream,
+                                                   const FiffDirNode::SPtr& p_Node,
+                                                   const QList<FiffChInfo>& p_Chs)
     {
         return p_pStream->read_ctf_comp(p_Node, p_Chs);
     }
@@ -413,7 +426,12 @@ public:
      *
      * @return true if successful, false otherwise
      */
-    static inline bool read_evoked(QIODevice& p_IODevice, FiffEvoked& data, QVariant setno = 0, QPair<QVariant,QVariant> baseline = defaultVariantPair, bool proj = true, fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE)
+    static inline bool read_evoked(QIODevice& p_IODevice,
+                                   FiffEvoked& data,
+                                   QVariant setno = 0,
+                                   QPair<QVariant,QVariant> baseline = defaultVariantPair,
+                                   bool proj = true,
+                                   fiff_int_t p_aspect_kind = FIFFV_ASPECT_AVERAGE)
     {
         return FiffEvoked::read(p_IODevice, data, setno, baseline, proj, p_aspect_kind);
     }
@@ -516,7 +534,12 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    inline static bool read_raw_segment(FiffRawData& raw, MatrixXd& data, MatrixXd& times, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi)
+    inline static bool read_raw_segment(FiffRawData& raw,
+                                        Eigen::MatrixXd& data,
+                                        Eigen::MatrixXd& times,
+                                        fiff_int_t from = -1,
+                                        fiff_int_t to = -1,
+                                        Eigen::MatrixXi sel = defaultMatrixXi)
     {
         return raw.read_raw_segment(data, times, from, to, sel);
     }
@@ -540,7 +563,13 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    inline static bool read_raw_segment(FiffRawData& raw, MatrixXd& data, MatrixXd& times, SparseMatrix<double>& mult, fiff_int_t from = -1, fiff_int_t to = -1, MatrixXi sel = defaultMatrixXi)
+    inline static bool read_raw_segment(FiffRawData& raw,
+                                        Eigen::MatrixXd& data,
+                                        Eigen::MatrixXd& times,
+                                        Eigen::SparseMatrix<double>& mult,
+                                        fiff_int_t from = -1,
+                                        fiff_int_t to = -1,
+                                        Eigen::MatrixXi sel = defaultMatrixXi)
     {
         return raw.read_raw_segment(data, times, mult, from, to, sel);
     }
@@ -682,7 +711,10 @@ public:
      *
      * @return the started fiff file
      */
-    inline static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice, const FiffInfo& info, RowVectorXd& cals, MatrixXi sel = defaultMatrixXi)
+    inline static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice,
+                                                     const FiffInfo& info,
+                                                     Eigen::RowVectorXd& cals,
+                                                     Eigen::MatrixXi sel = defaultMatrixXi)
     {
         return FiffStream::start_writing_raw(p_IODevice, info, cals, sel);
     }
@@ -835,7 +867,7 @@ public:
      * @param[in] kind       The tag kind
      * @param[in] mat        The data matrix
      */
-    inline static void write_float_matrix(FiffStream* p_pStream, fiff_int_t kind, MatrixXf& mat)
+    inline static void write_float_matrix(FiffStream* p_pStream, fiff_int_t kind, Eigen::MatrixXf& mat)
     {
         p_pStream->write_float_matrix(kind, mat);
     }
@@ -912,7 +944,7 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    inline static bool write_raw_buffer(FiffStream* p_pStream, const MatrixXd& buf, const MatrixXd& cals)
+    inline static bool write_raw_buffer(FiffStream* p_pStream, const Eigen::MatrixXd& buf, const Eigen::MatrixXd& cals)
     {
         return p_pStream->write_raw_buffer(buf, cals);
     }

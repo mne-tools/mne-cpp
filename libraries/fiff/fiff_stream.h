@@ -105,14 +105,6 @@ class FiffDigitizerData;
 static FiffId defaultFiffId;
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
-
 //=============================================================================================================
 /**
  * FiffStream provides an interface for reading from and writing to fiff files
@@ -527,8 +519,8 @@ public:
      */
     static FiffStream::SPtr start_writing_raw(QIODevice &p_IODevice,
                                               const FiffInfo& info,
-                                              RowVectorXd& cals,
-                                              MatrixXi sel = defaultMatrixXi,
+                                              Eigen::RowVectorXd& cals,
+                                              Eigen::MatrixXi sel = defaultMatrixXi,
                                               bool bResetRange = true);
 
     //=========================================================================================================
@@ -706,7 +698,7 @@ public:
      *
      * @return the position where the write_int_matrix was written to
      */
-    fiff_long_t write_int_matrix(fiff_int_t kind, const MatrixXi& mat);
+    fiff_long_t write_int_matrix(fiff_int_t kind, const Eigen::MatrixXi& mat);
 
     //=========================================================================================================
     /**
@@ -731,7 +723,7 @@ public:
      *
      * @return the position where the float matrix struct was written to
      */
-    fiff_long_t write_float_matrix(fiff_int_t kind, const MatrixXf& mat);
+    fiff_long_t write_float_matrix(fiff_int_t kind, const Eigen::MatrixXf& mat);
 
     //=========================================================================================================
     /**
@@ -746,7 +738,7 @@ public:
      *
      * @return the position where the float sparse ccs matrix struct was written to
      */
-    fiff_long_t write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<float>& mat);
+    fiff_long_t write_float_sparse_ccs(fiff_int_t kind, const Eigen::SparseMatrix<float>& mat);
 
     //=========================================================================================================
     /**
@@ -761,7 +753,7 @@ public:
      *
      * @return the position where the float sparse rcs matrix struct was written to
      */
-    fiff_long_t write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<float>& mat);
+    fiff_long_t write_float_sparse_rcs(fiff_int_t kind, const Eigen::SparseMatrix<float>& mat);
 
     //=========================================================================================================
     /**
@@ -820,7 +812,7 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    bool write_raw_buffer(const MatrixXd& buf, const RowVectorXd& cals);
+    bool write_raw_buffer(const Eigen::MatrixXd& buf, const Eigen::RowVectorXd& cals);
 
     //=========================================================================================================
     /**
@@ -835,7 +827,7 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    bool write_raw_buffer(const MatrixXd& buf, const SparseMatrix<double>& mult);
+    bool write_raw_buffer(const Eigen::MatrixXd& buf, const Eigen::SparseMatrix<double>& mult);
 
     //=========================================================================================================
     /**
@@ -848,7 +840,7 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    bool write_raw_buffer(const MatrixXd& buf);
+    bool write_raw_buffer(const Eigen::MatrixXd& buf);
 
     //=========================================================================================================
     /**

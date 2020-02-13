@@ -63,6 +63,7 @@
 using namespace FIFFLIB;
 using namespace DISPLIB;
 using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
