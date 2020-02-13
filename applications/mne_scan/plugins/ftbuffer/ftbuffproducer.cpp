@@ -54,13 +54,13 @@ using namespace FTBUFFERPLUGIN;
 FtBuffProducer::FtBuffProducer(FtBuffer* pFtBuffer)
 : m_pFtBuffer(pFtBuffer)
 {
-    m_pFtBuffClient = new FtBuffClient();
+    m_pFtConnector = new FtConnector();
 }
 
 //*************************************************************************************************************
 
 FtBuffProducer::~FtBuffProducer() {
-    delete m_pFtBuffClient;
+    delete m_pFtConnector;
 }
 
 //*************************************************************************************************************
@@ -68,22 +68,16 @@ FtBuffProducer::~FtBuffProducer() {
 void FtBuffProducer::run() {
     qDebug() << "Running producer..";
 
+    while(!m_pFtConnector->getHeader())
+
     while (true) {
-        m_pFtBuffClient->getData();
+        m_pFtConnector->getData();
 
-        if (m_pFtBuffClient->extendedHeader()) {
-            qDebug() << "Returning chunk header data";
-            emit extendedHeaderChunks(m_pFtBuffClient->chunkData());
-            emit bufferParameters(m_pFtBuffClient->getChannelAndFrequency());
-        } else if (m_pFtBuffClient->regularHeader()) {
-            qDebug() << "Returning regular header data";
-            emit bufferParameters(m_pFtBuffClient->getChannelAndFrequency());
-        }
 
-        if (m_pFtBuffClient->newData()){
+        if (m_pFtConnector->newData()){
             qDebug() << "Returning mat";
-            emit newDataAvailable(m_pFtBuffClient->dataMat());
-            m_pFtBuffClient->reset();
+            emit newDataAvailable(m_pFtConnector->getMatrix());
+            m_pFtConnector->resetEmitData();
         }
 
         QThread::usleep(50);
@@ -106,18 +100,20 @@ bool FtBuffProducer::connectToBuffer(QString addr) {
     m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
     strcpy(m_pTempAddress, addr.toLocal8Bit().constData());
 
-    delete m_pFtBuffClient;
-    m_pFtBuffClient = new FtBuffClient(m_pTempAddress);
+    delete m_pFtConnector;
+    m_pFtConnector = new FtConnector();
+    m_pFtConnector->setAddr(addr);
+
 
     m_pFtBuffer->setupRTMSA();
 
-    return this->m_pFtBuffClient->startConnection();
+    return this->m_pFtConnector->connect();
 }
 
 //*************************************************************************************************************
 
 bool FtBuffProducer::disconnectFromBuffer() {
-    return this->m_pFtBuffClient->stopConnection();
+    return this->m_pFtBuffer->disconnect();
 }
 
 //*************************************************************************************************************

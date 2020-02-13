@@ -73,7 +73,6 @@ else {
             -lscMeas \
             -lscDisp \
             -lscShared \
-            -lbuffer \
 }
 
 SOURCES += \
@@ -83,8 +82,6 @@ SOURCES += \
     FormFiles/ftbufferyourwidget.cpp \
     ftbuffproducer.cpp \
     ftconnector.cpp \
-        ftsrc/cpp/FtConnection.cc \
-        ftsrc/ftbuffclient.cpp \
 
 HEADERS += \
     ftbuffer_global.h \
@@ -92,8 +89,8 @@ HEADERS += \
     FormFiles/ftbuffersetupwidget.h \
     FormFiles/ftbufferaboutwidget.h \
     FormFiles/ftbufferyourwidget.h \
-    ftbuffproducer.h \ \
-    ftconnector.h
+    ftbuffproducer.h \
+    ftconnector.h \
 
 FORMS += \
     FormFiles/ftbuffersetup.ui \
@@ -103,9 +100,6 @@ FORMS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
-INCLUDEPATH += $$MNE_BINARY_DIR/../applications/mne_scan/plugins/ftbuffer/ftsrc/cpp
-INCLUDEPATH += $$MNE_BINARY_DIR/../applications/mne_scan/plugins/ftbuffer/ftsrc/src
-INCLUDEPATH += $$MNE_BINARY_DIR/../applications/mne_scan/plugins/ftbuffer/ftsrc/
 
 OTHER_FILES += ftbuffer.json
 
