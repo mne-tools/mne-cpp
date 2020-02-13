@@ -65,6 +65,7 @@
 
 using namespace RTCMUSICPLUGIN;
 using namespace MNELIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************

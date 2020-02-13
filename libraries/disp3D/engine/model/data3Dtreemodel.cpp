@@ -87,6 +87,8 @@ using namespace MNELIB;
 using namespace DISP3DLIB;
 using namespace INVERSELIB;
 using namespace CONNECTIVITYLIB;
+using namespace Eigen;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************

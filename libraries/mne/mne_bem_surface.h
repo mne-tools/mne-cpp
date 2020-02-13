@@ -79,14 +79,6 @@
 namespace MNELIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace FIFFLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -166,7 +158,7 @@ public:
      *
      * @param[in] p_pStream  The stream to write to.
      */
-    void writeToStream(FiffStream* p_pStream);
+    void writeToStream(FIFFLIB::FiffStream* p_pStream);
 
     //=========================================================================================================
     /**
@@ -179,17 +171,17 @@ public:
     static QString id_name(int id);
 
 public:
-    fiff_int_t id;              /**< Id information */
-    fiff_int_t np;              /**< Number of vertices of the whole/original surface used to create the source locations. */
-    fiff_int_t ntri;            /**< Number of available triangles */
-    fiff_int_t coord_frame;     /**< Coil coordinate system definition */
-    fiff_float_t sigma;         /**< Conductivity of a compartment */
-    MatrixX3f rr;               /**< Source locations of available dipoles. */
-    MatrixX3f nn;               /**< Source normals of available dipoles. */
-    MatrixX3i tris;             /**< Triangles */
-    MatrixX3d tri_cent;         /**< Triangle centers */
-    MatrixX3d tri_nn;           /**< Triangle normals */
-    VectorXd tri_area;          /**< Triangle areas */
+    FIFFLIB::fiff_int_t id;            /**< Id information */
+    FIFFLIB::fiff_int_t np;            /**< Number of vertices of the whole/original surface used to create the source locations. */
+    FIFFLIB::fiff_int_t ntri;          /**< Number of available triangles */
+    FIFFLIB::fiff_int_t coord_frame;   /**< Coil coordinate system definition */
+    FIFFLIB::fiff_float_t sigma;       /**< Conductivity of a compartment */
+    Eigen::MatrixX3f rr;               /**< Source locations of available dipoles. */
+    Eigen::MatrixX3f nn;               /**< Source normals of available dipoles. */
+    Eigen::MatrixX3i tris;             /**< Triangles */
+    Eigen::MatrixX3d tri_cent;         /**< Triangle centers */
+    Eigen::MatrixX3d tri_nn;           /**< Triangle normals */
+    Eigen::VectorXd tri_area;          /**< Triangle areas */
     QVector<QVector<int> > neighbor_tri;           /**< Vector of neighboring triangles for each vertex */
     QVector<QVector<int> > neighbor_vert;          /**< Vector of neighboring vertices for each vertex */
 };

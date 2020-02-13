@@ -180,10 +180,10 @@ public:
 //    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2) */ Don't mix both hemis - KISS principle
     QString name;               /**< Name of the label */
     qint32 label_id;            /**< Label id (optional) */
-//    MatrixX3i tris;     /**< Tris for plotting (optional) */
+//    Eigen::MatrixX3i tris;     /**< Tris for plotting (optional) */
 
 //    QMap<qint32, VectorXi> vertices;    /**< Vertex indices (0 based) */
-//    QMap<qint32, MatrixX3d> pos;        /**< Locations in meters */
+//    QMap<qint32, Eigen::MatrixX3d> pos;        /**< Locations in meters */
 //    QMap<qint32, VectorXd> values;      /**< Values at the vertices */
 };
 

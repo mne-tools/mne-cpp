@@ -64,6 +64,7 @@ using namespace SCMEASLIB;
 using namespace SCSHAREDLIB;
 using namespace MNELIB;
 using namespace INVERSELIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************

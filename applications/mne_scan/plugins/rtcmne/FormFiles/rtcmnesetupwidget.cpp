@@ -65,6 +65,7 @@
 
 using namespace RTCMNEPLUGIN;
 using namespace MNELIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
