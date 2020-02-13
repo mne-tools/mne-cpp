@@ -78,6 +78,7 @@ using namespace UTILSLIB;
 using namespace IOBUFFER;
 using namespace DISPLIB;
 using namespace RTPROCESSINGLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************

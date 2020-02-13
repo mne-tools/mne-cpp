@@ -101,16 +101,6 @@ enum ConnectorID
 #define RAW_BUFFFER_SIZE  10
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-using namespace COMMUNICATIONLIB;
-using namespace Eigen;
-
-
 //=========================================================================================================
 /**
  * The IConnector class is the interface class for all connectors.
@@ -139,7 +129,7 @@ public:
      *
      * @return the CommandManager.
      */
-    inline CommandManager& getCommandManager();
+    inline COMMUNICATIONLIB::CommandManager& getCommandManager();
 
     //=========================================================================================================
     /**
@@ -232,7 +222,7 @@ protected:
 
     QJsonObject     m_qJsonObjectMetaData;  /**< The meta data of the plugin defined in Q_PLUGIN_METADATA and the corresponding json file. */
 
-    CommandManager  m_commandManager;       /**< The CommandManager of the connector. */
+    COMMUNICATIONLIB::CommandManager  m_commandManager;       /**< The CommandManager of the connector. */
 
 private:
     bool        m_bIsActive;                /**< Holds the activation status. */
@@ -243,7 +233,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline CommandManager& IConnector::getCommandManager()
+inline COMMUNICATIONLIB::CommandManager& IConnector::getCommandManager()
 {
     return m_commandManager;
 }
