@@ -57,7 +57,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <ftsrc/ftbuffclient.h>
+//#include <ftsrc/ftbuffclient.h>
 #include <ftconnector.h>
 
 //*************************************************************************************************************
@@ -73,6 +73,7 @@ namespace FTBUFFERPLUGIN {
 //=============================================================================================================
 
 class FtBuffer;
+class FtConnector;
 
 //=============================================================================================================
 
@@ -90,7 +91,8 @@ class FtBuffProducer : public QObject
     Q_OBJECT
 
     friend class FtBuffer;
-    friend class FtBuffClient;
+    //friend class FtBuffClient;
+    friend class FtConnector;
     friend class FtBufferSetupWidget;
 
 public:
@@ -159,7 +161,8 @@ signals:
 private:
 
     FtBuffer*                       m_pFtBuffer;                /**< Pointer to FtBuffer that created this object. Destination of collected data */
-    FtBuffClient*                   m_pFtBuffClient;            /**< FtBuffClient object that interfaces with buffer and gets buffer data */
+    //FtBuffClient*                   m_pFtBuffClient;            /**< FtBuffClient object that interfaces with buffer and gets buffer data */
+    FtConnector*                    m_pFtConnector;
 
     Eigen::MatrixXd                 m_matData;                  /**< Aquired buffer data that will be sent to FtBuffProduer */
     char*                           m_pTempAddress;             /**< Temporary storage for setting FtBuffClient address */
