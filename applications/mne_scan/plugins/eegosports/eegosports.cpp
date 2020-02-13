@@ -598,9 +598,13 @@ bool EEGoSports::start()
     }
 
     //Initialize amplifier
-    m_pEEGoSportsProducer->init(m_bWriteDriverDebugToFile,
-                                m_sOutputFilePath,
-                                m_bCheckImpedances);
+    if(!m_pEEGoSportsProducer->init(m_bWriteDriverDebugToFile,
+                                    m_sOutputFilePath,
+                                    m_bCheckImpedances))
+    {
+        qWarning() << "Plugin EEGoSports - ERROR - EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
+        return false;
+    }
 
     //Setup fiff info
     setUpFiffInfo();
