@@ -63,13 +63,6 @@
 namespace RTSERVER
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace COMMUNICATIONLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -107,7 +100,7 @@ public:
      *
      * @return the command parser.
      */
-    inline CommandParser& getCommandParser();
+    inline COMMUNICATIONLIB::CommandParser& getCommandParser();
 
     //=========================================================================================================
     /**
@@ -124,7 +117,7 @@ public:
      *
      * @param[in] p_commandManager   Command Manager to register.
      */
-    void registerCommandManager(CommandManager &p_commandManager);
+    void registerCommandManager(COMMUNICATIONLIB::CommandManager &p_commandManager);
 
     //=========================================================================================================
     /**
@@ -133,7 +126,7 @@ public:
      * @param[in] p_sReply   The reply which should be send back
      * @param[in] p_command  Comman which evoked the reply
      */
-    void prepareReply(QString p_sReply, Command p_command);
+    void prepareReply(QString p_sReply, COMMUNICATIONLIB::Command p_command);
 
 signals:
     //=========================================================================================================
@@ -161,7 +154,7 @@ protected:
 private:
     qint32 m_iThreadCount;              /**< Is incresed each time a new command client connects to mne_rt_server. */
 
-    CommandParser m_commandParser;      /**< Command parser. */
+    COMMUNICATIONLIB::CommandParser m_commandParser;      /**< Command parser. */
 
 //    QMultiMap<QString, qint32> m_qMultiMapCommandThreadID;//This is need when commands are processed by different threads; currently its only one command per time processed by one thread --> m_iCurrentCommandThreadID
     qint32 m_iCurrentCommandThreadID;   /**< Command Thread ID of the current command. */
@@ -173,7 +166,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline CommandParser& CommandServer::getCommandParser()
+inline COMMUNICATIONLIB::CommandParser& CommandServer::getCommandParser()
 {
     return m_commandParser;
 }

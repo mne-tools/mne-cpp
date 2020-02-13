@@ -59,6 +59,7 @@
 using namespace NEUROMAGRTSERVERPLUGIN;
 using namespace FIFFLIB;
 using namespace RTSERVER;
+using namespace COMMUNICATIONLIB;
 
 
 //*************************************************************************************************************

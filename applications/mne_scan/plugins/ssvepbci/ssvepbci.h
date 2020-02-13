@@ -444,7 +444,7 @@ private:
     int                     m_iClassListSize;                   /**< maximum size of m_lIndexOfClassResultSensor. */
 
     // Sensor level
-    SCMEASLIB::FiffInfo::SPtr   m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
+    FIFFLIB::FiffInfo::SPtr     m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
     QStringList                 m_slChosenChannelsSensor;           /**< Sensor level: Features used to calculate data points in feature space on sensor level. */
     QMap<QString, int>          m_mapElectrodePinningScheme;        /**< Sensor level: Loaded pinning scheme of the Duke 64 Dry EEG cap. */
 

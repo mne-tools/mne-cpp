@@ -55,6 +55,7 @@
 
 using namespace RTSERVER;
 using namespace FIFFLIB;
+using namespace COMMUNICATIONLIB;
 
 
 //*************************************************************************************************************

@@ -70,14 +70,6 @@ namespace SCMEASLIB
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-
-
 //=========================================================================================================
 /**
  * DECLARE CLASS RealTimeMultiSampleArray -> ToDo check feasibilty of QAbstractTableModel
@@ -123,7 +115,7 @@ public:
      *
      * @param[in] p_pFiffInfo     Info to init from
      */
-    void initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo);
+    void initFromFiffInfo(FIFFLIB::FiffInfo::SPtr &p_pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -203,7 +195,7 @@ public:
      *
      * @return the reference to the orig FiffInfo.
      */
-    inline FiffInfo::SPtr& info();
+    inline FIFFLIB::FiffInfo::SPtr& info();
 
     //=========================================================================================================
     /**
@@ -227,7 +219,7 @@ public:
      *
      * @return the current multi sample array.
      */
-    inline const QList< MatrixXd >& getMultiSampleArray();
+    inline const QList<Eigen::MatrixXd>& getMultiSampleArray();
 
     //=========================================================================================================
     /**
@@ -235,18 +227,18 @@ public:
      *
      * @param [in] mat   the value which is attached to the sample array list.
      */
-    virtual void setValue(const MatrixXd& mat);
+    virtual void setValue(const Eigen::MatrixXd& mat);
 
 private:
     mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety */
 
-    FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
+    FIFFLIB::FiffInfo::SPtr     m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
 
     QStringList                 m_slDisplayFlag;    /**< The flags to use in the displays quick control widget. Possible flags are: projections, compensators, view,filter, triggerdetection, modalities, scaling, sphara. */
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     qint32                      m_iMultiArraySize;  /**< Sample size of the multi sample array.*/
-    QList<MatrixXd>             m_matSamples;       /**< The multi sample array.*/
+    QList<Eigen::MatrixXd>      m_matSamples;       /**< The multi sample array.*/
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
 
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
@@ -348,7 +340,7 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeMultiSampleArray::chInfo()
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr& RealTimeMultiSampleArray::info()
+inline FIFFLIB::FiffInfo::SPtr& RealTimeMultiSampleArray::info()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo_orig;
@@ -379,7 +371,7 @@ qint32 RealTimeMultiSampleArray::getMultiArraySize() const
 
 //*************************************************************************************************************
 
-inline const QList< MatrixXd >& RealTimeMultiSampleArray::getMultiSampleArray()
+inline const QList<Eigen::MatrixXd>& RealTimeMultiSampleArray::getMultiSampleArray()
 {
     return m_matSamples;
 }
