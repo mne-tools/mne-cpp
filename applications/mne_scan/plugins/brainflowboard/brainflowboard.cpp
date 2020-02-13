@@ -398,9 +398,10 @@ void BrainFlowBoard::configureBoard(std::string config)
 
 //*************************************************************************************************************
 
+#include <iostream>
 void BrainFlowBoard::run()
 {
-    int iMinSamples = 10;
+    int iMinSamples = 32;
     unsigned long lSamplingPeriod = (unsigned long)(1000000.0 / m_iSamplingFreq) * iMinSamples;
     int numRows = BoardShim::get_num_rows(m_iBoardId);
 
@@ -420,9 +421,11 @@ void BrainFlowBoard::run()
         {
             for (int i = 0; i < dataCount; i++)
             {
-                matrix(j, i) = data[m_pChannels[j]][i];
+                matrix(j, i) = data[m_pChannels[j]][i]/1000000.0;
             }
         }
+
+        //std::cout << matrix.col(0);
 
         m_pOutput->data()->setValue(matrix);
 
