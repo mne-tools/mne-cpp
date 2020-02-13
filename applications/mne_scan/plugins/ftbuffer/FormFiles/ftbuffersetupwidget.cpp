@@ -73,6 +73,9 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox, QWidget *parent)
     //Always connect GUI elemts after ui.setpUi has been called
     connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog())); // About page
     connect(ui.m_qPushButton_Connect, SIGNAL(released()), this, SLOT(pressedConnect())); // Connect/Disconnect button
+
+    connect(this, &FtBufferSetupWidget::connectAtAddr, m_pFtBuffer->m_pFtBuffProducer.data(), &FtBuffProducer::connectToBuffer);
+    connect(m_pFtBuffer->m_pFtBuffProducer.data(), &FtBuffProducer::connecStatus, this, &FtBufferSetupWidget::isConnected);
 }
 
 //*************************************************************************************************************
@@ -94,19 +97,16 @@ void FtBufferSetupWidget::showAboutDialog()
 
 void FtBufferSetupWidget::pressedConnect()
 {
-    if(ui.m_qPushButton_Connect->text() == "Disconnect" && !m_pFtBuffer->isRunning()) {
-        if (m_pFtBuffer->m_pFtBuffProducer->disconnectFromBuffer()) {
-            ui.m_qPushButton_Connect->setText("Connect");
-        }
-    } else {
-        //qDebug() << "TEXTFIELD:" << this->ui.m_lineEditIP->text();
-        m_pFtBuffer->m_pFtBuffProducer->m_pFtConnector->setPort(ui.m_spinBoxPort->value());
-        if (m_pFtBuffer->m_pFtBuffProducer->connectToBuffer(this->ui.m_lineEditIP->text())) {
-            ui.m_qPushButton_Connect->setText("Disconnect");
-//            m_pFtBuffer->setParams(ui.m_comboBox_SamplingFreq_4->currentText().toInt(),
-//                                   ui.m_spinBox_numberChannels_4->value());
-        }
+    if (ui.m_qPushButton_Connect->text() == "Connect") {
+        emit connectAtAddr(ui.m_lineEditIP->text(),ui.m_spinBoxPort->value());
     }
+
 }
 
 //*************************************************************************************************************
+
+void FtBufferSetupWidget::isConnected(bool stat) {
+    if (stat) {
+        ui.m_qPushButton_Connect->setText("Disconnect");
+    }
+}

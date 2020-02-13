@@ -204,9 +204,16 @@ private:
     //=========================================================================================================
     int totalBuffSamples();
 
+    //=========================================================================================================
+    /**
+    * @brief newDataAvailable - Sends new buffer data
+    * @param matData - formated data from buffer
+    */
+    void newDataAvailable(const Eigen::MatrixXd &matData);
+
 //*************************************************************************************************************
 
-    QTcpSocket          m_Socket;                               /**< Socket that manages the connection to the ft buffer */
+    QTcpSocket*         m_Socket;                               /**< Socket that manages the connection to the ft buffer */
 
     QString             m_sAddress          = "127.0.0.1";      /**< Address where the ft buffer is found */
     int                 m_iPort             = 1972;             /**< Port where the ft bufferis found */

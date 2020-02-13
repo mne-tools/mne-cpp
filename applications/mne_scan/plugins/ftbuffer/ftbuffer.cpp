@@ -106,12 +106,14 @@ bool FtBuffer::start() {
     qDebug() << "Starting FtBuffer...";
     m_bIsRunning = true;
 
-
+    qDebug() << this->thread();
+    QThread::usleep(4000000);
     QThread::start();
 
     qRegisterMetaType<QPair<int,float>>("QPair<int,float>");
 
     // FtProducer in it's own thread and connect communications signals/slots
+    m_pFtBuffProducer->m_pFtConnector->moveToThread(&m_pProducerThread);
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::extendedHeaderChunks, this, &FtBuffer::parseHeader, Qt::DirectConnection);
@@ -174,7 +176,8 @@ void FtBuffer::run() {}
 
 //*************************************************************************************************************
 
-void FtBuffer::showYourWidget() {
+void FtBuffer::showYourWidget()
+{
     m_pYourWidget = FtBufferYourWidget::SPtr(new FtBufferYourWidget());
     m_pYourWidget->show();
 }

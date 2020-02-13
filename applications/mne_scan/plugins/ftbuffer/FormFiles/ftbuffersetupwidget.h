@@ -117,7 +117,11 @@ private slots:
     */
     void pressedConnect();
 
+    void isConnected(bool stat);
+
 signals:
+
+    void connectAtAddr(QString Addr, int port);
 
 private:
 

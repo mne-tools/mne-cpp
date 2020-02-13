@@ -68,11 +68,16 @@ FtBuffProducer::~FtBuffProducer() {
 void FtBuffProducer::run() {
     qDebug() << "Running producer..";
 
-    while(!m_pFtConnector->getHeader())
+    while(!m_pFtConnector->connect()){
+        QThread::usleep(50000);
+    }
+
+    while(!m_pFtConnector->getHeader()){
+        QThread::usleep(50000);
+    }
 
     while (true) {
         m_pFtConnector->getData();
-
 
         if (m_pFtConnector->newData()){
             qDebug() << "Returning mat";
@@ -96,18 +101,18 @@ void FtBuffProducer::doWork() {
 
 //*************************************************************************************************************
 
-bool FtBuffProducer::connectToBuffer(QString addr) {
+void FtBuffProducer::connectToBuffer(QString addr, int port) {
     m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
     strcpy(m_pTempAddress, addr.toLocal8Bit().constData());
 
     delete m_pFtConnector;
     m_pFtConnector = new FtConnector();
     m_pFtConnector->setAddr(addr);
-
+    m_pFtConnector->setPort(port);
 
     m_pFtBuffer->setupRTMSA();
 
-    return this->m_pFtConnector->connect();
+    emit connecStatus(true);
 }
 
 //*************************************************************************************************************
