@@ -51,6 +51,8 @@
 using namespace SCSHAREDLIB;
 using namespace FTBUFFERPLUGIN;
 using namespace SCMEASLIB;
+using namespace Eigen;
+using namespace FIFFLIB;
 
 //*************************************************************************************************************
 

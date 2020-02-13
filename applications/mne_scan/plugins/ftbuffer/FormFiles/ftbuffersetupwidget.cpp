@@ -97,16 +97,15 @@ void FtBufferSetupWidget::showAboutDialog()
 
 void FtBufferSetupWidget::pressedConnect()
 {
-    if (ui.m_qPushButton_Connect->text() == "Connect") {
-        emit connectAtAddr(ui.m_lineEditIP->text(),ui.m_spinBoxPort->value());
-    }
-
+    qDebug() << "ayyy";
+    emit connectAtAddr(ui.m_lineEditIP->text(),ui.m_spinBoxPort->value());
+    qDebug() << "lmao";
 }
 
 //*************************************************************************************************************
 
 void FtBufferSetupWidget::isConnected(bool stat) {
     if (stat) {
-        ui.m_qPushButton_Connect->setText("Disconnect");
+        ui.m_qPushButton_Connect->setText("Set");
     }
 }
