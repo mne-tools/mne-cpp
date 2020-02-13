@@ -66,13 +66,6 @@
 namespace RTSERVER
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -96,7 +89,7 @@ public:
 //    void deactivateRawBufferSending();
 
 
-    void parseCommand(QSharedPointer<FiffTag> p_pTag);
+    void parseCommand(QSharedPointer<FIFFLIB::FiffTag> p_pTag);
 
     void writeClientId();
 
@@ -122,7 +115,7 @@ private:
 
     void stopMeas(qint32 ID);
 
-    void sendMeasurementInfo(qint32 ID, const FiffInfo& p_fiffInfo);
+    void sendMeasurementInfo(qint32 ID, const FIFFLIB::FiffInfo& p_fiffInfo);
 
     void sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
     //void readToBuffer1();

@@ -71,14 +71,6 @@
 namespace RTSERVER
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-using namespace COMMUNICATIONLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -185,7 +177,7 @@ private:
      *
      * @param[in] p_command  The connector list command.
      */
-    void comConlist(Command p_command);
+    void comConlist(COMMUNICATIONLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -193,7 +185,7 @@ private:
      *
      * @param[in] p_command  The select connector command.
      */
-    void comSelcon(Command p_command);
+    void comSelcon(COMMUNICATIONLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -201,7 +193,7 @@ private:
      *
      * @param[in] p_command  The start command.
      */
-    void comStart(Command p_command);//comMeas
+    void comStart(COMMUNICATIONLIB::Command p_command);//comMeas
 
     //=========================================================================================================
     /**
@@ -209,7 +201,7 @@ private:
      *
      * @param[in] p_command  The stop all command.
      */
-    void comStopAll(Command p_command);
+    void comStopAll(COMMUNICATIONLIB::Command p_command);
 
 
 

@@ -65,6 +65,7 @@ using namespace SCMEASLIB;
 using namespace IOBUFFER;
 using namespace FSLIB;
 using namespace std;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************

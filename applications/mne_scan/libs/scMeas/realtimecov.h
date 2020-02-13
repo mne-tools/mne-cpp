@@ -71,14 +71,6 @@ namespace SCMEASLIB
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-
-
 //=========================================================================================================
 /**
  * DECLARE CLASS RealTimeCov -> ToDo check feasibilty of QAbstractTableModel
@@ -110,7 +102,7 @@ public:
      *
      * @param [in] pFiffInfo     the new fiff info.
      */
-    void setFiffInfo(QSharedPointer<FiffInfo> pFiffInfo);
+    void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -118,7 +110,7 @@ public:
      *
      * @return     the current fiff info.
      */
-    QSharedPointer<FiffInfo> getFiffInfo();
+    QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo();
 
     //=========================================================================================================
     /**
@@ -126,7 +118,7 @@ public:
      *
      * @param [in] v     the covariance which should be distributed.
      */
-    virtual void setValue(const FiffCov& v);
+    virtual void setValue(const FIFFLIB::FiffCov& v);
 
     //=========================================================================================================
     /**
@@ -135,7 +127,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual FiffCov::SPtr& getValue();
+    virtual FIFFLIB::FiffCov::SPtr& getValue();
 
     //=========================================================================================================
     /**
@@ -146,12 +138,12 @@ public:
     inline bool isInitialized() const;
 
 private:
-    mutable QMutex  m_qMutex;       /**< Mutex to ensure thread safety */
+    mutable QMutex          m_qMutex;       /**< Mutex to ensure thread safety */
 
-    FiffCov::SPtr   m_pFiffCov;     /**< Covariance data set */
-    FiffInfo::SPtr  m_pFiffInfo;    /**< The Fiff Info. */
+    FIFFLIB::FiffCov::SPtr  m_pFiffCov;     /**< Covariance data set */
+    FIFFLIB::FiffInfo::SPtr m_pFiffInfo;    /**< The Fiff Info. */
 
-    bool            m_bInitialized; /**< If values are stored.*/
+    bool                    m_bInitialized; /**< If values are stored.*/
 };
 
 

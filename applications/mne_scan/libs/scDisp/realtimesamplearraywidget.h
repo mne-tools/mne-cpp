@@ -68,7 +68,7 @@ class QTime;
 
 namespace SCMEASLIB
 {
-class RealTimeSampleArray;
+    class RealTimeSampleArray;
 }
 
 
@@ -79,13 +79,6 @@ class RealTimeSampleArray;
 
 namespace SCDISPLIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCMEASLIB;
 
 
 //=============================================================================================================
@@ -104,9 +97,12 @@ public:
      *
      * @param [in] pRTSA pointer to real-time sample array measurement.
      * @param [in] pTime pointer to application time.
-     * @param [in] parent pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+     * @param [in] parent pointer to parent widget; If parent is 0, the new NumericWidget becomes a window.
+     *             If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
-    RealTimeSampleArrayWidget(QSharedPointer<RealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    RealTimeSampleArrayWidget(QSharedPointer<SCMEASLIB::RealTimeSampleArray> &pRTSA,
+                              QSharedPointer<QTime> &pTime,
+                              QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -216,7 +212,7 @@ private slots:
 private:
     void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
     Ui::RealTimeSampleArrayClass    ui;                             /**< the user interface of the RealTimeSampleArray widget. */
-    QSharedPointer<RealTimeSampleArray> m_pRTSA;                 /**< the real-time sample array measurement. */
+    QSharedPointer<SCMEASLIB::RealTimeSampleArray> m_pRTSA;         /**< the real-time sample array measurement. */
     QPainterPath                    m_qPainterPath;                 /**< the current painter path which is the real-time curve. */
     QPainterPath                    m_qPainterPath_Freeze;          /**< the frozen painter path which is the frozen real-time curve. */
     QMutex                          m_qMutex;                       /**< a mutex to make the access to the painter path thread safe. */

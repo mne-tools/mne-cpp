@@ -75,6 +75,7 @@ using namespace SCDISPLIB;
 using namespace DISP3DLIB;
 using namespace DISPLIB;
 using namespace SCMEASLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************

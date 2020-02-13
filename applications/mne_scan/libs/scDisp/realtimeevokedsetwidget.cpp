@@ -95,6 +95,7 @@ using namespace SCDISPLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace UTILSLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************

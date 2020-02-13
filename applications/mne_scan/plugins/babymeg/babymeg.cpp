@@ -83,6 +83,7 @@ using namespace IOBUFFER;
 using namespace SCMEASLIB;
 using namespace DISP3DLIB;
 using namespace DISPLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
