@@ -128,20 +128,22 @@ protected:
     virtual void run();
 
 private:
+    std::string     m_sStreamerParams;
 
-    std::string m_sStreamerParams;
-    int m_iBoardId;
-    BoardShim *m_pBoardShim;
-    int m_iNumberChannels;
-    int *m_pChannels;
-    int m_iSamplingFreq;
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pOutput;
+    BoardShim*      m_pBoardShim;
+
+    QAction*        m_pShowSettingsAction;
+
+    int     m_iBoardId;
+    int     m_iNumberChannels;
+    int     m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
+    int*    m_pChannels;
+    int     m_iSamplingFreq;
+
     volatile bool m_bIsRunning;
 
-    QAction *m_pShowSettingsAction;
-
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pOutput;
     QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;        /**< Fiff measurement info.*/
-
 };
 
 }

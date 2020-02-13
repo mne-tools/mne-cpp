@@ -75,6 +75,7 @@ BrainFlowBoard::BrainFlowBoard()
 , m_iSamplingFreq(0)
 , m_sStreamerParams("")
 , m_iNumberChannels(0)
+, m_uiSamplesPerBlock(100)
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 {
     m_pShowSettingsAction = new QAction(QIcon(":/images/options.png"), tr("Streaming Settings"),this);
@@ -398,42 +399,60 @@ void BrainFlowBoard::configureBoard(std::string config)
 
 //*************************************************************************************************************
 
-#include <iostream>
 void BrainFlowBoard::run()
 {
-    int iMinSamples = 32;
+    int iMinSamples = 10;
     unsigned long lSamplingPeriod = (unsigned long)(1000000.0 / m_iSamplingFreq) * iMinSamples;
     int numRows = BoardShim::get_num_rows(m_iBoardId);
 
+    int iSampleIterator, iReceivedSamples, i, j;
+    iSampleIterator = 0;
+    Eigen::VectorXd vec(m_iNumberChannels);
+    Eigen::MatrixXd matrix (m_iNumberChannels, m_uiSamplesPerBlock);
     double **data = NULL;
-    int dataCount = 0;
-    while(m_bIsRunning)
-    {
+    QList<Eigen::VectorXd> lSampleBlockBuffer;
+
+    while(m_bIsRunning) {
         usleep(lSamplingPeriod);
-        data = m_pBoardShim->get_board_data (&dataCount);
-        if (dataCount == 0)
-        {
-            continue;
-        }
+        iSampleIterator = 0;
 
-        Eigen::MatrixXd matrix (m_iNumberChannels, dataCount);
-        for (int j = 0; j < m_iNumberChannels; j++)
-        {
-            for (int i = 0; i < dataCount; i++)
-            {
-                matrix(j, i) = data[m_pChannels[j]][i]/1000000.0;
+        //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
+        while(iSampleIterator < m_uiSamplesPerBlock) {
+            //Get sample block from device
+            data = m_pBoardShim->get_board_data (&iReceivedSamples);
+            if (iReceivedSamples == 0) {
+                continue;
             }
-        }
 
-        //std::cout << matrix.col(0);
+            //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received.
+            //These are then written to the next matrix (block)
+            for(i = 0; i < iReceivedSamples; ++i) {
+                for(j = 0; j < m_iNumberChannels; ++j) {
+                    vec(j) = data[m_pChannels[j]][i]/1000000.0;
+                }
+
+                lSampleBlockBuffer.push_back(vec);
+            }
+
+            //Fill matrix with data from buffer
+            while(!lSampleBlockBuffer.isEmpty()) {
+                if(iSampleIterator >= m_uiSamplesPerBlock) {
+                    break;
+                }
+
+                matrix.col(iSampleIterator) = lSampleBlockBuffer.takeFirst();
+
+                iSampleIterator++;
+            }
+
+            for (int i = 0; i < numRows; i++) {
+                delete[] data[i];
+            }
+
+            delete[] data;
+        }
 
         m_pOutput->data()->setValue(matrix);
-
-        for (int i = 0; i < numRows; i++)
-        {
-            delete[] data[i];
-        }
-        delete[] data;
     }
 }
 
