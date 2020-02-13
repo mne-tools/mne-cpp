@@ -106,9 +106,9 @@ public:
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
     * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
-    virtual void init(bool bWriteDriverDebugToFile,
-                      const QString& sOutputFilePath,
-                      bool bMeasureImpedance);
+    bool init(bool bWriteDriverDebugToFile,
+              const QString& sOutputFilePath,
+              bool bMeasureImpedance);
 
     //=========================================================================================================
     /**

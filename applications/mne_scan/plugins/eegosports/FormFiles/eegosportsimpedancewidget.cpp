@@ -240,7 +240,11 @@ void EEGoSportsImpedanceWidget::startImpedanceMeasurement()
         m_pUi->m_pushButton_start->setEnabled(false);
     }
     else
+    {
         m_pEEGoSports->m_bCheckImpedances = false;
+        QMessageBox::information(0, tr("MNE Scan - Start"), QString(QObject::tr("Not able to start impedance measurement!\nEither the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll paths.")), QMessageBox::Ok);
+        return;
+    }
 }
 
 
