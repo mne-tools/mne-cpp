@@ -46,6 +46,7 @@ SUBDIRS += \
     neuromag \
     babymeg \
     natus \
+#    brainflowboard \ # Need to update workflows to build submodule
 #    gusbamp \ # Needs header files, shipped with the vendor's SDK
 #    eegosports \ # Needs header files, shipped with the vendor's SDK
 #    brainamp \ # Needs header files, shipped with the vendor's SDK
