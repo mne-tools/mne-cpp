@@ -681,10 +681,12 @@ void Neuromag::run()
             } else {
                 size = 0;
             }
+            //Update HPI data (for single and continous HPI fitting)
+            updateHPI(matValue);
 
             if(m_pRTMSA_Neuromag) {
                 m_pRTMSA_Neuromag->data()->setValue(this->calibrate(matValue));
-            }
+            }                    
         }
     }
 }
