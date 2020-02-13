@@ -131,50 +131,110 @@ class FtConnector : public QObject
     Q_OBJECT
 
     friend class FtBufferSetupWidget;
+
 public:
+
+    /**
+     * FtConnector - constructor of the FtConnector class. Only initializes variables to zero.
+     */
     FtConnector();
 
     //=========================================================================================================
+    /**
+     * ~FtConnector - desctructor of the FtConnector class. Disconnects and deletes m_pSocket.
+     */
     ~FtConnector();
 
     //=========================================================================================================
+    /**
+     * @brief connect - connects to buffer at address m_sAddress and port m_iPort
+     * @return true if successful, false if unsuccessful
+     */
     bool connect();
 
     //=========================================================================================================
+    /**
+     * @brief disconnect - disconnects m_pSocket
+     * @return true if successful, false if unsuccessful
+     */
     bool disconnect();
 
     //=========================================================================================================
+    /**
+     * @brief getHeader - requests and receives header data from buffer, saves relevant parameters internally.
+     * @return true if successful, false if unsuccessful
+     */
     bool getHeader();
 
     //=========================================================================================================
+    /**
+     * @brief getData - requests and receives data from buffer, parses it, and stores it in m_pMatEmit
+     * @return true if successful, false if unsuccessful
+     */
     bool getData();
 
     //=========================================================================================================
+    /**
+     * @brief getAddr - gets address currently stored in m_sAddress
+     * @return returns m_sAddress
+     */
     QString getAddr();
 
     //=========================================================================================================
+    /**
+     * @brief setAddr - sets m_sAddress to a new address
+     * @param sNewAddress - a QString with an address (not checked to se if valid)
+     * @return true if successful, false if unsuccessful
+     */
     bool setAddr(const QString &sNewAddress);
 
     //=========================================================================================================
+    /**
+     * @brief getPort - gets port numbr currently stored in m_iPort
+     * @return returns m_iPort
+     */
     int getPort();
 
     //=========================================================================================================
+    /**
+     * @brief setPort - sets m_iPort to a new port number
+     * @param iPort - an int with a new desired port number
+     * @return true if successful, false if unsuccessful
+     */
     bool setPort(const int& iPort);
 
     //=========================================================================================================
+    /**
+     * @brief echoStatus - prints relevant class data to terminal. Useful for debugging.
+     */
     void echoStatus();
 
     //=========================================================================================================
+    /**
+     * @brief getMatrix - returns m_pMatEmit, newest buffer data formatted as an Eigen MatrixXd
+     * @return returns m_pMatEmit
+     */
     Eigen::MatrixXd getMatrix();
 
     //=========================================================================================================
+    /**
+     * @brief newData - returns m_bNewData whether or not new data has been read from buffer
+     * @return returns m_bNewData
+     */
     bool newData();
 
     //=========================================================================================================
+    /**
+     * @brief resetEmitData - sets m_bNewData to false, deletes m_pMatEmit
+     */
     void resetEmitData();
 
 private:
 
+    /**
+     * @brief sendRequest - sends a formatted message to the buffer. command and bufsize must be set before calling.
+     * @param messagedef - request structure with the appropriate command and bufszie paramters set.
+     */
     void sendRequest(messagedef_t &messagedef);
 
     //=========================================================================================================
@@ -204,16 +264,9 @@ private:
     //=========================================================================================================
     int totalBuffSamples();
 
-    //=========================================================================================================
-    /**
-    * @brief newDataAvailable - Sends new buffer data
-    * @param matData - formated data from buffer
-    */
-    void newDataAvailable(const Eigen::MatrixXd &matData);
-
 //*************************************************************************************************************
 
-    QTcpSocket*         m_Socket;                               /**< Socket that manages the connection to the ft buffer */
+    QTcpSocket*         m_pSocket;                              /**< Socket that manages the connection to the ft buffer */
 
     QString             m_sAddress          = "127.0.0.1";      /**< Address where the ft buffer is found */
     int                 m_iPort             = 1972;             /**< Port where the ft bufferis found */
@@ -227,7 +280,6 @@ private:
     int                 m_iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied */
 
     Eigen::MatrixXd*    m_pMatEmit;                             /**< Container to format data to tansmit to FtBuffProducer */
-
     bool                m_bNewData;                             /**< Indicate whether we've received new data */
 };
 
