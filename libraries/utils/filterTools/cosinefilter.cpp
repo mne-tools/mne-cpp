@@ -62,6 +62,7 @@
 //=============================================================================================================
 
 using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -78,7 +79,13 @@ CosineFilter::CosineFilter()
 
 //*************************************************************************************************************
 
-CosineFilter::CosineFilter(int fftLength, float lowpass, float lowpass_width, float highpass, float highpass_width, double sFreq, TPassType type)
+CosineFilter::CosineFilter(int fftLength,
+                           float lowpass,
+                           float lowpass_width,
+                           float highpass,
+                           float highpass_width,
+                           double sFreq,
+                           TPassType type)
 {
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();

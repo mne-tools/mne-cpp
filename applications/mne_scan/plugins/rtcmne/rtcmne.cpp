@@ -89,6 +89,7 @@ using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
 using namespace MNELIB;
 using namespace FSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************

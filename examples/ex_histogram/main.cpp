@@ -92,6 +92,7 @@ using namespace DISPLIB;
 using namespace FSLIB;
 using namespace INVERSELIB;
 using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************

@@ -71,14 +71,6 @@ namespace UTILSLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -104,7 +96,9 @@ public:
      *
      * @return wVert   Vertices of the warped destination geometry
      */
-    Eigen::MatrixXf calculate(const Eigen::MatrixXf & sLm, const Eigen::MatrixXf &dLm, const Eigen::MatrixXf & sVert);
+    Eigen::MatrixXf calculate(const Eigen::MatrixXf & sLm,
+                              const Eigen::MatrixXf &dLm,
+                              const Eigen::MatrixXf & sVert);
 
     //=========================================================================================================
     /**
@@ -114,7 +108,9 @@ public:
      * @param[in]  dLm       3D Landmarks of the destination geometry
      * @param[in/out] vertList  List of Vertices of the source geometry that are warped to the destination
      */
-    void calculate(const Eigen::MatrixXf & sLm, const Eigen::MatrixXf &dLm, QList<MatrixXf> & vertList);
+    void calculate(const Eigen::MatrixXf & sLm,
+                   const Eigen::MatrixXf &dLm,
+                   QList<Eigen::MatrixXf> & vertList);
 
     //=========================================================================================================
     /**
@@ -137,7 +133,10 @@ private:
      * @param[out] warpWeight Weighting parameters of the tps warp
      * @param[out] polWeight  Weighting papameters of the polynomial warp
      */
-    bool calcWeighting(const Eigen::MatrixXf& sLm, const Eigen::MatrixXf &dLm, Eigen::MatrixXf& warpWeight, Eigen::MatrixXf& polWeight);
+    bool calcWeighting(const Eigen::MatrixXf& sLm,
+                       const Eigen::MatrixXf &dLm,
+                       Eigen::MatrixXf& warpWeight,
+                       Eigen::MatrixXf& polWeight);
 
     //=========================================================================================================
     /**
@@ -150,7 +149,10 @@ private:
      *
      * @return Warped Vertices
      */
-    Eigen::MatrixXf warpVertices(const Eigen::MatrixXf & sVert, const Eigen::MatrixXf & sLm, const Eigen::MatrixXf& warpWeight, const Eigen::MatrixXf& polWeight);
+    Eigen::MatrixXf warpVertices(const Eigen::MatrixXf & sVert,
+                                 const Eigen::MatrixXf & sLm,
+                                 const Eigen::MatrixXf& warpWeight,
+                                 const Eigen::MatrixXf& polWeight);
 
 };
 

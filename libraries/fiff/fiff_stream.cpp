@@ -98,6 +98,7 @@
 
 using namespace FIFFLIB;
 using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************

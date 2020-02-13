@@ -53,6 +53,7 @@ using namespace NEUROMAGPLUGIN;
 using namespace IOBUFFER;
 using namespace COMMUNICATIONLIB;
 using namespace FIFFLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
