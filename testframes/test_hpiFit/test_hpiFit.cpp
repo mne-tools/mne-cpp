@@ -77,7 +77,7 @@
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace INVERSELIB;
-
+using namespace Eigen;
 //=============================================================================================================
 /**
  * DECLARE CLASS TestFiffRFR
