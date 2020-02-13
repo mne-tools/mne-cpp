@@ -399,14 +399,15 @@ void BrainFlowBoard::configureBoard(std::string config)
 
 void BrainFlowBoard::run()
 {
-    unsigned long samplingPeriod = (unsigned long)(1000000.0 / m_iSamplingFreq);
+    int iMinSamples = 10;
+    unsigned long lSamplingPeriod = (unsigned long)(1000000.0 / m_iSamplingFreq) * iMinSamples;
     int numRows = BoardShim::get_num_rows(m_iBoardId);
 
     double **data = NULL;
     int dataCount = 0;
     while(m_bIsRunning)
     {
-        usleep(samplingPeriod);
+        usleep(lSamplingPeriod);
         data = m_pBoardShim->get_board_data (&dataCount);
         if (dataCount == 0)
         {
