@@ -71,13 +71,6 @@
 namespace FIFFLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
 
 //=============================================================================================================
 /**
@@ -121,8 +114,8 @@ public:
     fiff_int_t ctfkind;             /**< CTF kind. */
     fiff_int_t kind;                /**< Fiff kind -> fiff_constants.h */
     bool save_calibrated;           /**< If data should be safed calibrated. */
-    MatrixXd rowcals;               /**< Row calibrations. */
-    MatrixXd colcals;               /**< Colum calibrations. */
+    Eigen::MatrixXd rowcals;        /**< Row calibrations. */
+    Eigen::MatrixXd colcals;        /**< Colum calibrations. */
     FiffNamedMatrix::SDPtr data;    /**< Compensation data. */
 };
 

@@ -64,6 +64,7 @@
 
 using namespace DISPLIB;
 using namespace FIFFLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
