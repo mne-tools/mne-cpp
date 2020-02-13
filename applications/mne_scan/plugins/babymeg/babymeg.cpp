@@ -84,6 +84,7 @@ using namespace SCMEASLIB;
 using namespace DISP3DLIB;
 using namespace DISPLIB;
 using namespace FIFFLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************

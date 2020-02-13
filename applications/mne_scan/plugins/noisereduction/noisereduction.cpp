@@ -80,6 +80,7 @@ using namespace DISPLIB;
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace SCSHAREDLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************

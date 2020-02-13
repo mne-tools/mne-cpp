@@ -76,14 +76,6 @@ namespace IOBUFFER
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
-
 //=============================================================================================================
 /**
  * Circular Matrix buffer provides a template for thread safe circular matrix buffers.
@@ -106,7 +98,9 @@ public:
      * @param [in] uiRows            Number of rows.
      * @param [in] uiCols            Number of columns.
      */
-    explicit CircularMatrixBuffer(unsigned int uiMaxNumMatrices, unsigned int uiRows, unsigned int uiCols);
+    explicit CircularMatrixBuffer(unsigned int uiMaxNumMatrices,
+                                  unsigned int uiRows,
+                                  unsigned int uiCols);
 
     //=========================================================================================================
     /**
@@ -120,7 +114,7 @@ public:
      *
      * @param [in] pMatrix pointer to a Matrix which should be apend to the end.
      */
-    inline void push(const Matrix<_Tp, Dynamic, Dynamic>* pMatrix);
+    inline void push(const Eigen::Matrix<_Tp, Eigen::Dynamic, Eigen::Dynamic>* pMatrix);
 
     //=========================================================================================================
     /**
@@ -128,7 +122,7 @@ public:
      *
      * @return the first matrix
      */
-    inline Matrix<_Tp, Dynamic, Dynamic> pop();
+    inline Eigen::Matrix<_Tp, Eigen::Dynamic, Eigen::Dynamic> pop();
 
     //=========================================================================================================
     /**
@@ -234,7 +228,7 @@ CircularMatrixBuffer<_Tp>::~CircularMatrixBuffer()
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline void CircularMatrixBuffer<_Tp>::push(const Matrix<_Tp, Dynamic, Dynamic>* pMatrix)
+inline void CircularMatrixBuffer<_Tp>::push(const Eigen::Matrix<_Tp, Eigen::Dynamic, Eigen::Dynamic>* pMatrix)
 {
     if(!m_bPause)
     {
@@ -257,9 +251,9 @@ inline void CircularMatrixBuffer<_Tp>::push(const Matrix<_Tp, Dynamic, Dynamic>*
 //*************************************************************************************************************
 
 template<typename _Tp>
-inline Matrix<_Tp, Dynamic, Dynamic> CircularMatrixBuffer<_Tp>::pop()
+inline Eigen::Matrix<_Tp, Eigen::Dynamic, Eigen::Dynamic> CircularMatrixBuffer<_Tp>::pop()
 {
-    Matrix<_Tp, Dynamic, Dynamic> matrix(m_uiRows, m_uiCols);
+    Eigen::Matrix<_Tp, Eigen::Dynamic, Eigen::Dynamic> matrix(m_uiRows, m_uiCols);
 
     if(!m_bPause)
     {
@@ -389,10 +383,10 @@ inline bool CircularMatrixBuffer<_Tp>::releaseFromPush()
 
 //ToDo Typedef -> warning visibility ignored -> dllexport/dllimport problem
 
-typedef UTILSSHARED_EXPORT CircularMatrixBuffer<int>                      _int_CircularMatrixBuffer;                 /**< Defines CircularMatrixBuffer of integer type.*/
-typedef UTILSSHARED_EXPORT CircularMatrixBuffer<float>                    _float_CircularMatrixBuffer;               /**< Defines CircularMatrixBuffer of float type.*/
-typedef UTILSSHARED_EXPORT CircularMatrixBuffer<char>                     _char_CircularMatrixBuffer;                /**< Defines CircularMatrixBuffer of char type.*/
-typedef UTILSSHARED_EXPORT CircularMatrixBuffer<double>                   _double_CircularMatrixBuffer;              /**< Defines CircularMatrixBuffer of double type.*/
+typedef UTILSSHARED_EXPORT CircularMatrixBuffer<int>                     _int_CircularMatrixBuffer;                 /**< Defines CircularMatrixBuffer of integer type.*/
+typedef UTILSSHARED_EXPORT CircularMatrixBuffer<float>                   _float_CircularMatrixBuffer;               /**< Defines CircularMatrixBuffer of float type.*/
+typedef UTILSSHARED_EXPORT CircularMatrixBuffer<char>                    _char_CircularMatrixBuffer;                /**< Defines CircularMatrixBuffer of char type.*/
+typedef UTILSSHARED_EXPORT CircularMatrixBuffer<double>                  _double_CircularMatrixBuffer;              /**< Defines CircularMatrixBuffer of double type.*/
 
 typedef UTILSSHARED_EXPORT _float_CircularMatrixBuffer                   RawMatrixBuffer;                           /**< Defines RawMatrixBuffer of type _float_CircularMatrixBuffer.*/
 

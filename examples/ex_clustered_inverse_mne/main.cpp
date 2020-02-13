@@ -82,6 +82,7 @@ using namespace FIFFLIB;
 using namespace INVERSELIB;
 using namespace DISP3DLIB;
 using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
