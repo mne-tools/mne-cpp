@@ -1,9 +1,10 @@
 ---
-title: MNE-CPP with BrainFlow
-parent: Develop
-nav_order: 4
+title: BrainFlow
+parent: EEG amplifier in MNE Scan
+grand_parent: Develop
+nav_order: 5
 ---
-# MNE-CPP with BrainFlow
+# BrainFlow
 
 This plugin adds BrainFlow data acquisition SDK to MNE-SCAN app.
 
