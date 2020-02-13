@@ -109,14 +109,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Changes stored address and connects the member FtBuffClient to that address
-    *
-    * @brief connects buffer client to provided address
-    */
-    bool connectToBuffer(QString addr);
-
-    //=========================================================================================================
-    /**
     * @brief disconnects the member FtBuffClient from the buffer it is connected to
     */
     bool disconnectFromBuffer();
@@ -128,6 +120,14 @@ public slots:
     * @brief doWork - runs run()
     */
     void doWork();
+
+    //=========================================================================================================
+    /**
+    * Changes stored address and connects the member FtBuffClient to that address
+    *
+    * @brief connects buffer client to provided address
+    */
+    void connectToBuffer(QString addr, int port);
 
 protected:
 
@@ -158,6 +158,8 @@ signals:
 
     void bufferParameters(QPair<int,float> numChanandFreq);
 
+    void connecStatus(bool connection);
+
 private:
 
     FtBuffer*                       m_pFtBuffer;                /**< Pointer to FtBuffer that created this object. Destination of collected data */
@@ -166,6 +168,9 @@ private:
 
     Eigen::MatrixXd                 m_matData;                  /**< Aquired buffer data that will be sent to FtBuffProduer */
     char*                           m_pTempAddress;             /**< Temporary storage for setting FtBuffClient address */
+
+    bool                            m_bHeaderReady;
+
 };
 
 } // namespace
