@@ -231,23 +231,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         matProjectorsInnerind.col(i) = matProjectorsRows.col(innerind.at(i));
     }
 
-    //UTILSLIB::IOUtils::write_eigen_matrix(matProjectorsInnerind, "matProjectorsInnerind.txt");
-    //UTILSLIB::IOUtils::write_eigen_matrix(t_matProjectors, "t_matProjectors.txt");
-
-    // Initialize inner layer sensors
-//    sensors.coilpos = Eigen::MatrixXd::Zero(innerind.size(),3);
-//    sensors.coilori = Eigen::MatrixXd::Zero(innerind.size(),3);
-//    sensors.tra = Eigen::MatrixXd::Identity(innerind.size(),innerind.size());
-
-//    for(int i = 0; i < innerind.size(); i++) {
-//        sensors.coilpos(i,0) = pFiffInfo->chs[innerind.at(i)].chpos.r0[0];
-//        sensors.coilpos(i,1) = pFiffInfo->chs[innerind.at(i)].chpos.r0[1];
-//        sensors.coilpos(i,2) = pFiffInfo->chs[innerind.at(i)].chpos.r0[2];
-//        sensors.coilori(i,0) = pFiffInfo->chs[innerind.at(i)].chpos.ez[0];
-//        sensors.coilori(i,1) = pFiffInfo->chs[innerind.at(i)].chpos.ez[1];
-//        sensors.coilori(i,2) = pFiffInfo->chs[innerind.at(i)].chpos.ez[2];
-//    }
-
     Eigen::MatrixXd topo(innerind.size(), numCoils*2);
     Eigen::MatrixXd amp(innerind.size(), numCoils);
     Eigen::MatrixXd ampC(innerind.size(), numCoils);
@@ -304,21 +287,49 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     //Generate seed point by projection the found channel position 3cm inwards
     Eigen::MatrixXd coilPos = Eigen::MatrixXd::Zero(numCoils,3);
+    if(transDevHead.trans == Eigen::MatrixXd::Identity(4,4).cast<float>()){
+        for (int j = 0; j < chIdcs.rows(); ++j) {
+            int chIdx = chIdcs(j);
 
-    for (int j = 0; j < chIdcs.rows(); ++j) {
-        int chIdx = chIdcs(j);
+            if(chIdx < pFiffInfo->chs.size()) {
+                double x = pFiffInfo->chs.at(chIdcs(j)).chpos.r0[0];
+                double y = pFiffInfo->chs.at(chIdcs(j)).chpos.r0[1];
+                double z = pFiffInfo->chs.at(chIdcs(j)).chpos.r0[2];
 
-        if(chIdx < pFiffInfo->chs.size()) {
-            double x = pFiffInfo->chs.at(chIdcs(j)).chpos.r0[0];
-            double y = pFiffInfo->chs.at(chIdcs(j)).chpos.r0[1];
-            double z = pFiffInfo->chs.at(chIdcs(j)).chpos.r0[2];
-
-            coilPos(j,0) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[0] * 0.03 + x;
-            coilPos(j,1) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[1] * 0.03 + y;
-            coilPos(j,2) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[2] * 0.03 + z;
+                coilPos(j,0) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[0] * 0.03 + x;
+                coilPos(j,1) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[1] * 0.03 + y;
+                coilPos(j,2) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[2] * 0.03 + z;
+            }
+            //std::cout << "HPIFit::fitHPI - Coil " << j << " max value index " << chIdx << std::endl;
         }
-        //std::cout << "HPIFit::fitHPI - Coil " << j << " max value index " << chIdx << std::endl;
     }
+
+    Eigen::Matrix4d trans_init = transDevHead.trans.inverse().cast<double>();
+    Eigen::Matrix3d rot;
+    Eigen::RowVector3d transl;
+    for(int r = 0; r < 3; ++r) {
+        for(int c = 0; c < 3 ; ++c) {
+            rot(r,c) = trans_init(r,c);
+            transl(r) = trans_init(r,3);
+        }
+    }
+
+    coilPos = headHPI;
+    rot.transposeInPlace();
+    for(int r = 0; r < 4; ++r) {
+        for(int c = 0; c < 3 ; ++c) {
+            coilPos(r,c) = coilPos.row(r).dot(rot.col(c));
+        }
+    }
+
+    // apply translation
+    for(int r = 0; r < 4; ++r) {
+        for(int c = 0; c < 3 ; ++c) {
+            coilPos(r,c) = coilPos(r,c) + transl(c);
+        }
+    }
+
+    coil.pos = coilPos;
 
     coil.pos = coilPos;
 

@@ -98,12 +98,6 @@ struct DipFitError {
 /**
  * The strucut specifing the sensor parameters.
  */
-struct SensorInfo {
-    Eigen::MatrixXd coilpos;
-    Eigen::MatrixXd coilori;
-    Eigen::MatrixXd tra;
-};
-
 struct Sensor {
     Eigen::RowVector3d r0;
     Eigen::MatrixXd rmag;
