@@ -66,6 +66,7 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************

@@ -54,6 +54,7 @@
 
 using namespace SCMEASLIB;
 using namespace MNELIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************

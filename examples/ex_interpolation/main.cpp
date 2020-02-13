@@ -73,6 +73,8 @@
 using namespace MNELIB;
 using namespace FIFFLIB;
 using namespace DISP3DLIB;
+using namespace Eigen;
+
 
 
 //*************************************************************************************************************

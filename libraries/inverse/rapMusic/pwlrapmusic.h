@@ -72,13 +72,6 @@
 namespace INVERSELIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNELIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -114,7 +107,7 @@ public:
      *                           the strongest.
      * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
      */
-    PwlRapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
+    PwlRapMusic(MNELIB::MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
     virtual ~PwlRapMusic();
 
@@ -129,7 +122,7 @@ public:
      *
      * @return
      */
-    virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
+    virtual MNELIB::MNESourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
     //=========================================================================================================
     /**
@@ -143,9 +136,9 @@ public:
      *
      * @return
      */
-    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const;
+    virtual MNELIB::MNESourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep) const;
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const;
+    virtual MNELIB::MNESourceEstimate calculateInverse(const Eigen::MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const;
 
     static int PowellOffset(int p_iRow, int p_iNumPoints);
 

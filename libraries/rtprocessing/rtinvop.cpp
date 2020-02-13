@@ -70,6 +70,7 @@
 using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 using namespace MNELIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************

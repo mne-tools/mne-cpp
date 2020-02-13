@@ -72,13 +72,6 @@
 namespace INVERSELIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNELIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -148,7 +141,7 @@ public:
      *                           the strongest.
      * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
      */
-    RapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
+    RapMusic(MNELIB::MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
     virtual ~RapMusic();
 
@@ -163,17 +156,17 @@ public:
      * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
      * @return   true if successful initialized, false otherwise.
      */
-    bool init(MNEForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
+    bool init(MNELIB::MNEForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
 
-    virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
+    virtual MNELIB::MNESourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
+    virtual MNELIB::MNESourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const;
+    virtual MNELIB::MNESourceEstimate calculateInverse(const Eigen::MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const;
 
     virtual const char* getName() const;
 
-    virtual const MNESourceSpace& getSourceSpace() const;
+    virtual const MNELIB::MNESourceSpace& getSourceSpace() const;
 
     //=========================================================================================================
     /**
@@ -314,7 +307,7 @@ protected:
                         double p_valCor,
                         QList< DipolePair<double> > &p_RapDipoles);
 
-    MNEForwardSolution m_ForwardSolution; /**< The Forward operator which should be scanned through*/
+    MNELIB::MNEForwardSolution m_ForwardSolution; /**< The Forward operator which should be scanned through*/
 
     int m_iN;               /**< Number of Sources to find*/
     double m_dThreshold;    /**< Threshold which defines the minimal correlation. Is the correlation of

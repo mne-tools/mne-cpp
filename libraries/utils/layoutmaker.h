@@ -86,7 +86,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 typedef struct {
-  MatrixXf rr;
+  Eigen::MatrixXf rr;
   int   np;
   int   report;
 } *fitUser,fitUserRec;

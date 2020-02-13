@@ -82,14 +82,6 @@
 namespace MNELIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace UTILSLIB;
-using namespace FIFFLIB;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -129,9 +121,9 @@ public:
      *
      * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
      */
-    inline static VectorXd* combine_xyz(const VectorXd& vec)
+    inline static Eigen::VectorXd* combine_xyz(const Eigen::VectorXd& vec)
     {
-        return MNEMath::combine_xyz(vec);
+        return UTILSLIB::MNEMath::combine_xyz(vec);
     }
 
     //=========================================================================================================
@@ -142,7 +134,7 @@ public:
      *
      * Wrapper for the MNEForwardSolution::extract_block_diag static function
      */
-    //    static inline MatrixXd extract_block_diag(MatrixXd& A, qint32 n);
+    //    static inline Eigen::MatrixXd extract_block_diag(MatrixXd& A, qint32 n);
 
     //=========================================================================================================
     /**
@@ -177,7 +169,7 @@ public:
      *
      * @return the current compensation
      */
-    static inline qint32 get_current_comp(FiffInfo* info)
+    static inline qint32 get_current_comp(FIFFLIB::FiffInfo* info)
     {
         return info->get_current_comp();
     }
@@ -202,9 +194,9 @@ public:
      *
      * @return A sparse block diagonal, diagonalized from the elements in "A".
      */
-    static inline SparseMatrix<double>* make_block_diag(const MatrixXd &A, qint32 n)
+    static inline Eigen::SparseMatrix<double>* make_block_diag(const Eigen::MatrixXd &A, qint32 n)
     {
-        return MNEMath::make_block_diag(A, n);
+        return UTILSLIB::MNEMath::make_block_diag(A, n);
     }
 
     //=========================================================================================================
@@ -225,7 +217,11 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    inline static bool make_compensator(const FiffInfo& info, fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false)
+    inline static bool make_compensator(const FIFFLIB::FiffInfo& info,
+                                        FIFFLIB::fiff_int_t from,
+                                        FIFFLIB::fiff_int_t to,
+                                        FIFFLIB::FiffCtfComp& ctf_comp,
+                                        bool exclude_comp_chs = false)
     {
         return info.make_compensator(from, to, ctf_comp, exclude_comp_chs);
     }
@@ -238,7 +234,7 @@ public:
      *
      * Wrapper for the FiffInfo::make_projector static function
      * There exists also a member function which should be preferred:
-     * make_projector(MatrixXd& proj, MatrixXd& U = defaultUMatrix)
+     * make_projector(MatrixXd& proj, Eigen::MatrixXd& U = defaultUMatrix)
      *
      * Make an SSP operator
      *
@@ -250,9 +246,13 @@ public:
      *
      * @return nproj - How many items in the projector
      */
-    inline static fiff_int_t make_projector(const QList<FiffProj>& projs, const QStringList& ch_names, MatrixXd& proj, const QStringList& bads = defaultQStringList, MatrixXd& U = defaultMatrixXd)
+    inline static FIFFLIB::fiff_int_t make_projector(const QList<FIFFLIB::FiffProj>& projs,
+                                                     const QStringList& ch_names,
+                                                     Eigen::MatrixXd& proj,
+                                                     const QStringList& bads = FIFFLIB::defaultQStringList,
+                                                     Eigen::MatrixXd& U = FIFFLIB::defaultMatrixXd)
     {
-        return FiffProj::make_projector(projs, ch_names, proj, bads, U);
+        return FIFFLIB::FiffProj::make_projector(projs, ch_names, proj, bads, U);
     }
 
     //=========================================================================================================
@@ -270,7 +270,7 @@ public:
      *
      * @return nproj - How many items in the projector
      */
-    static inline qint32 make_projector(FiffInfo& info, MatrixXd& proj)
+    static inline qint32 make_projector(FIFFLIB::FiffInfo& info, Eigen::MatrixXd& proj)
     {
         return info.make_projector(proj);
     }
@@ -315,7 +315,7 @@ public:
         return orig.prepare_inverse_operator(nave, lambda2, dSPM, sLORETA);
     }
 
-    static bool read_events(QString t_sEventName, QString t_fileRawName, MatrixXi& events);
+    static bool read_events(QString t_sEventName, QString t_fileRawName, Eigen::MatrixXi& events);
 
 // ToDo Eventlist Class??
     //=========================================================================================================
@@ -331,11 +331,11 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool read_events(QIODevice &p_IODevice, MatrixXi& eventlist);
+    static bool read_events(QIODevice &p_IODevice, Eigen::MatrixXi& eventlist);
 
-    static void setup_compensators(FiffRawData& raw,
-                                  fiff_int_t dest_comp,
-                                  bool keep_comp);
+    static void setup_compensators(FIFFLIB::FiffRawData& raw,
+                                   FIFFLIB::fiff_int_t dest_comp,
+                                   bool keep_comp);
 
     //=========================================================================================================
     /**
@@ -354,7 +354,10 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    inline static bool read_cov(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, FiffCov& p_covData)
+    inline static bool read_cov(FIFFLIB::FiffStream::SPtr& p_pStream,
+                                const FIFFLIB::FiffDirNode::SPtr& p_Node,
+                                FIFFLIB::fiff_int_t cov_kind,
+                                FIFFLIB::FiffCov& p_covData)
     {
         return p_pStream->read_cov(p_Node, cov_kind, p_covData);
     }
@@ -398,7 +401,12 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static inline bool read_forward_solution(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList)
+    static inline bool read_forward_solution(QIODevice& p_IODevice,
+                                             MNEForwardSolution& fwd,
+                                             bool force_fixed = false,
+                                             bool surf_ori = false,
+                                             const QStringList& include = FIFFLIB::defaultQStringList,
+                                             const QStringList& exclude = FIFFLIB::defaultQStringList)
     {
         return MNEForwardSolution::read(p_IODevice, fwd, force_fixed, surf_ori, include, exclude);
     }
@@ -420,7 +428,9 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool read_source_spaces(FiffStream::SPtr& p_pStream, bool add_geom, MNESourceSpace& p_SourceSpace)
+    static bool read_source_spaces(FIFFLIB::FiffStream::SPtr& p_pStream,
+                                   bool add_geom,
+                                   MNESourceSpace& p_SourceSpace)
     {
         return MNESourceSpace::readFromStream(p_pStream, add_geom, p_SourceSpace);
     }
@@ -443,7 +453,10 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool read_bem_surface(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirNode::SPtr& p_Tree, QList<MNESurface::SPtr>& p_Surfaces)
+    static bool read_bem_surface(FIFFLIB::FiffStream::SPtr& p_pStream,
+                                 bool add_geom,
+                                 FIFFLIB::FiffDirNode::SPtr& p_Tree,
+                                 QList<MNESurface::SPtr>& p_Surfaces)
     {
         return MNESurface::read(p_pStream, add_geom, p_Tree, p_Surfaces);
     }
@@ -466,9 +479,10 @@ public:
      *
      * @return the current compensation
      */
-    static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& chs, fiff_int_t value)
+    static QList<FIFFLIB::FiffChInfo> set_current_comp(QList<FIFFLIB::FiffChInfo>& chs,
+                                              FIFFLIB::fiff_int_t value)
     {
-        return FiffInfo::set_current_comp(chs, value);
+        return FIFFLIB::FiffInfo::set_current_comp(chs, value);
     }
 
     //=========================================================================================================
@@ -487,7 +501,9 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static inline bool transform_source_space_to(MNESourceSpace& p_pMNESourceSpace, fiff_int_t dest, FiffCoordTrans& trans)
+    static inline bool transform_source_space_to(MNESourceSpace& p_pMNESourceSpace,
+                                                 FIFFLIB::fiff_int_t dest,
+                                                 FIFFLIB::FiffCoordTrans& trans)
     {
         return p_pMNESourceSpace.transform_source_space_to(dest, trans);
     }
@@ -505,7 +521,7 @@ public:
      * @param[in, out] mat FiffNamedMatrix which shoul be transposed.
      *
      */
-    static inline void transpose_named_matrix(FiffNamedMatrix& mat)
+    static inline void transpose_named_matrix(FIFFLIB::FiffNamedMatrix& mat)
     {
         mat.transpose_named_matrix();
     }

@@ -69,15 +69,6 @@ class MNESourceEstimate;
 namespace INVERSELIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace Eigen;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -110,7 +101,7 @@ public:
      *
      * @return the calculated source estimation
      */
-    virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false) = 0;
+    virtual MNELIB::MNESourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false) = 0;
 
     //=========================================================================================================
     /**
@@ -124,7 +115,7 @@ public:
      *
      * @return the calculated source estimation
      */
-    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const = 0;
+    virtual MNELIB::MNESourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const = 0;
 
     //=========================================================================================================
     /**
@@ -141,7 +132,7 @@ public:
      *
      * @return the mne source space information
      */
-    virtual const MNESourceSpace& getSourceSpace() const = 0;
+    virtual const MNELIB::MNESourceSpace& getSourceSpace() const = 0;
 };
 
 } //NAMESPACE

@@ -86,6 +86,7 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************

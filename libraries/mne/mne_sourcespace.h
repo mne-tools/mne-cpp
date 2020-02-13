@@ -61,6 +61,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -74,7 +82,7 @@
 
 namespace FSLIB
 {
-class Label;
+    class Label;
 }
 
 
@@ -85,14 +93,6 @@ class Label;
 
 namespace MNELIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FSLIB;
-using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -164,7 +164,7 @@ public:
      *
      * @return the hemisphere vertices
      */
-    QList<VectorXi> get_vertno() const;
+    QList<Eigen::VectorXi> get_vertno() const;
 
     //=========================================================================================================
     /**
@@ -176,7 +176,7 @@ public:
      *
      * @return vertno list of length 2 Vertex numbers for lh and rh
      */
-    QList<VectorXi> label_src_vertno_sel(const Label &p_label, VectorXi &src_sel) const;
+    QList<Eigen::VectorXi> label_src_vertno_sel(const FSLIB::Label &p_label, Eigen::VectorXi &src_sel) const;
 
     //=========================================================================================================
     /**
@@ -199,7 +199,7 @@ public:
      *
      * @return the reduced source space
      */
-    MNESourceSpace pick_regions(const QList<Label> &p_qListLabels) const;
+    MNESourceSpace pick_regions(const QList<FSLIB::Label> &p_qListLabels) const;
 
     //=========================================================================================================
     /**
@@ -213,7 +213,9 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNESourceSpace& p_SourceSpace);
+    static bool readFromStream(FIFFLIB::FiffStream::SPtr& p_pStream,
+                               bool add_geom,
+                               MNESourceSpace& p_SourceSpace);
 
     //=========================================================================================================
     /**
@@ -238,7 +240,8 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    bool transform_source_space_to(fiff_int_t dest, FiffCoordTrans& trans);
+    bool transform_source_space_to(FIFFLIB::fiff_int_t dest,
+                                   FIFFLIB::FiffCoordTrans& trans);
 
     //=========================================================================================================
     /**
@@ -248,7 +251,7 @@ public:
      *
      * @param[in] p_pStream  The stream to write to.
      */
-    void writeToStream(FiffStream* p_pStream);
+    void writeToStream(FIFFLIB::FiffStream* p_pStream);
 
     //=========================================================================================================
     /**
@@ -325,7 +328,9 @@ private:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool read_source_space(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Tree, MNEHemisphere& p_Hemisphere);
+    static bool read_source_space(FIFFLIB::FiffStream::SPtr& p_pStream,
+                                  const FIFFLIB::FiffDirNode::SPtr& p_Tree,
+                                  MNEHemisphere& p_Hemisphere);
 
 private:
     QList<MNEHemisphere> m_qListHemispheres;    /**< List of the hemispheres containing the source space information. */

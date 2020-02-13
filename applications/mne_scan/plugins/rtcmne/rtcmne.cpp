@@ -87,6 +87,8 @@ using namespace INVERSELIB;
 using namespace RTPROCESSINGLIB;
 using namespace SCSHAREDLIB;
 using namespace IOBUFFER;
+using namespace MNELIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************

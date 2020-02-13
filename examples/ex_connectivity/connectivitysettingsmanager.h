@@ -132,8 +132,8 @@ public:
     DISPLIB::ImageSc *m_pImageConnWeights = Q_NULLPTR;
 
     TFplot::SPtr m_pTfPlot;
-    MatrixXd m_matEvoked;
-    MatrixXd m_matEvokedSource;
+    Eigen::MatrixXd m_matEvoked;
+    Eigen::MatrixXd m_matEvokedSource;
     MNELIB::MNEEpochDataList epochs;
 
     void onConnectivityMetricChanged(const QString& sMetric)
@@ -217,7 +217,7 @@ public:
 
 //            if(!m_networkData.isEmpty()) {
 //                Network network = m_networkData.first();
-//                MatrixXd image;
+//                Eigen::MatrixXd image;
 
 //                for(int i = 0; i < network.getNodes().size(); i++) {
 //                    for(int j = 0; j < network.getNodes().at(i)->getFullEdges().size(); j++) {
@@ -270,7 +270,7 @@ public:
                 m_pSignalCoursePlot->setTitle(QString("Conn used signal for trial %1 and source %2").arg(QString::number(iTrialNumber)).arg(QString::number(iRowNumber)));
                 m_pSignalCoursePlot->show();
 
-    //            MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(plotVeca, m_settings.getSamplingFrequency()*0.05);
+    //            Eigen::MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(plotVeca, m_settings.getSamplingFrequency()*0.05);
 
     //            m_pTfPlot = TFplot::SPtr::create(dataSpectrum, m_settings.getSamplingFrequency(), 2,50, ColorMaps::Jet);
     //            m_pTfPlot->show();

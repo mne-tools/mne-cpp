@@ -155,7 +155,7 @@ public:
     /**
      * Set new vertices colors to the mesh.
      *
-     * @param[in] vertColor  New color matrix MatrixX3f.
+     * @param[in] vertColor  New color matrix Eigen::MatrixX3f.
      *
      * @return The costum mesh.
      */

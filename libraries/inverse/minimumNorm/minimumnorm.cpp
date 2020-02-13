@@ -63,6 +63,8 @@
 using namespace Eigen;
 using namespace MNELIB;
 using namespace INVERSELIB;
+using namespace UTILSLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************

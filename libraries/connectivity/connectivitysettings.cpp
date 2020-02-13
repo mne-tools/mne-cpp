@@ -70,6 +70,7 @@ using namespace CONNECTIVITYLIB;
 using namespace MNELIB;
 using namespace Eigen;
 using namespace FIFFLIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************
