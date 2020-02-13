@@ -74,14 +74,6 @@ namespace COMMUNICATIONLIB
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-
-
 //=============================================================================================================
 /**
  * The real-time data client class provides an interface to communicate with the data port 4218 of a running mne_rt_server.
@@ -133,7 +125,7 @@ public:
      *
      * @return the read fiff measurement information
      */
-    FiffInfo::SPtr readInfo();
+    FIFFLIB::FiffInfo::SPtr readInfo();
 
     //=========================================================================================================
     /**
@@ -143,7 +135,7 @@ public:
      * @param[out] data          The read data - ToDo change this to raw buffer data object
      * @param[out] kind          Data kind
      */
-    void readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int_t& kind);
+    void readRawBuffer(qint32 p_nChannels, Eigen::MatrixXf& data, FIFFLIB::fiff_int_t& kind);
 
     //=========================================================================================================
     /**
