@@ -245,7 +245,7 @@ protected:
      * @return       signal energy of the reference signal in the measured signal.
      *
      */
-    double MEC(SCMEASLIB::MatrixXd &Y, SCMEASLIB::MatrixXd &X);
+    double MEC(Eigen::MatrixXd &Y, Eigen::MatrixXd &X);
 
     //=========================================================================================================
     /**
@@ -258,7 +258,7 @@ protected:
      * @return       maximal correlation between the signals.
      *
      */
-    double CCA(SCMEASLIB::MatrixXd &Y, SCMEASLIB::MatrixXd &X);
+    double CCA(Eigen::MatrixXd &Y, Eigen::MatrixXd &X);
 
     //=========================================================================================================
     /**
@@ -375,7 +375,7 @@ private:
      *
      * @param [out] data      data space where current data from the sliding time window will be written to.
      */
-    void readFromSlidingTimeWindow(SCMEASLIB::MatrixXd &data);
+    void readFromSlidingTimeWindow(Eigen::MatrixXd &data);
 
     //=========================================================================================================
     /**
@@ -413,7 +413,7 @@ private:
     QMutex                  m_qMutex;                           /**< QMutex to guarantee thread safety.*/
 
     // adaptable sliding time window with downsampling function
-    SCMEASLIB::MatrixXd     m_matSlidingTimeWindow;             /**< Sensor Level: adaptational sliding time window. */
+    Eigen::MatrixXd     m_matSlidingTimeWindow;             /**< Sensor Level: adaptational sliding time window. */
     int                     m_iCounter;                         /**< iterative index for counting the amount of misclassifications */
     double                  m_dSampleFrequency;                 /**< sample frequency of the device [Hz] */
     int                     m_iReadSampleSize;                  /**< numbers of sample for one time segment (about 0.1 seconds) */
@@ -449,7 +449,7 @@ private:
     QMap<QString, int>          m_mapElectrodePinningScheme;        /**< Sensor level: Loaded pinning scheme of the Duke 64 Dry EEG cap. */
 
     // Source level
-    QVector< SCMEASLIB::VectorXd >      m_vLoadedSourceBoundary;            /**< Source level: Loaded decision boundary on source level. */
+    QVector< Eigen::VectorXd >      m_vLoadedSourceBoundary;            /**< Source level: Loaded decision boundary on source level. */
     QStringList                         m_slChosenChannelsSource;           /**< Source level: Features used to calculate data points in feature space on source level. */
     QMap<QString, int>                  m_mapDestrieuxAtlasRegions;         /**< Source level: Loaded Destrieux atlas regions. */
     bool                                m_bInitializeSource;                /**< Source level: initalizie parameter for processing on source level. */

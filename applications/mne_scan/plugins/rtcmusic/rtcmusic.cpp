@@ -61,6 +61,9 @@
 using namespace RTCMUSICPLUGIN;
 using namespace FIFFLIB;
 using namespace SCMEASLIB;
+using namespace SCSHAREDLIB;
+using namespace MNELIB;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -128,7 +131,6 @@ void RtcMusic::init()
 
     // start clustering
     QFuture<void> future = QtConcurrent::run(this, &RtcMusic::doClustering);
-
 }
 
 

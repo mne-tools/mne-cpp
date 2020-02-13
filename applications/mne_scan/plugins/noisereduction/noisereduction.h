@@ -105,14 +105,6 @@ namespace NOISEREDUCTIONPLUGIN
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCSHAREDLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // NOISEREDUCTIONPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -123,7 +115,7 @@ using namespace SCSHAREDLIB;
  *
  * @brief The NoiseReduction class provides a tools to reduce noise of an incoming data stream. It then forwards the processed data to subsequent plugins.
  */
-class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public IAlgorithm
+class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "noisereduction.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -147,7 +139,7 @@ public:
     /**
      * IAlgorithm functions
      */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
     virtual void init();
     virtual void unload();
     virtual bool start();
@@ -293,8 +285,8 @@ private:
     QSharedPointer<DISPLIB::FilterSettingsView>                     m_pFilterSettingsView;
     QSharedPointer<DISPLIB::SpharaSettingsView>                     m_pSpharaSettingsView;
 
-    PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
-    PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pNoiseReductionInput;      /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pNoiseReductionOutput;     /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/
 
 signals:
 };
