@@ -102,13 +102,17 @@ void FtBuffProducer::doWork() {
 //*************************************************************************************************************
 
 void FtBuffProducer::connectToBuffer(QString addr, int port) {
-    m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
-    strcpy(m_pTempAddress, addr.toLocal8Bit().constData());
+//    m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
+//    strcpy(m_pTempAddress, addr.toLocal8Bit().constData());
 
-    delete m_pFtConnector;
+//    if (m_pFtConnector != Q_NULLPTR)
+//        delete m_pFtConnector;
+
     m_pFtConnector = new FtConnector();
     m_pFtConnector->setAddr(addr);
     m_pFtConnector->setPort(port);
+
+    qDebug() << "We got here";
 
     m_pFtBuffer->setupRTMSA();
 
