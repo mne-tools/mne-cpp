@@ -79,20 +79,6 @@ namespace RTCMUSICPLUGIN
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FSLIB;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace IOBUFFER;
-using namespace INVERSELIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -103,7 +89,7 @@ using namespace INVERSELIB;
  *
  * @brief The RtcMusic class provides a dummy algorithm structure.
  */
-class RTCMUSICSHARED_EXPORT RtcMusic : public IAlgorithm
+class RTCMUSICSHARED_EXPORT RtcMusic : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "rtcmusic.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -182,39 +168,38 @@ protected:
     virtual void run();
 
 private:
-    PluginInputData<RealTimeEvokedSet>::SPtr   m_pRTEInput;    /**< The RealTimeEvoked input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>::SPtr   m_pRTEInput;    /**< The RealTimeEvoked input.*/
 
-    PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
 
     QMutex m_qMutex;
 
-    QVector<FiffEvokedSet> m_qVecFiffEvoked;
+    QVector<FIFFLIB::FiffEvokedSet> m_qVecFiffEvoked;
     qint32 m_iNumAverages;
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bReceiveData;    /**< If thread is ready to receive data */
     bool m_bProcessData;    /**< If data should be received for processing */
 
-    //RtcMusic stuff
-    QFile                       m_qFileFwdSolution; /**< File to forward solution. */
-    MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
-    MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
+    QFile                               m_qFileFwdSolution; /**< File to forward solution. */
+    MNELIB::MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
+    MNELIB::MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
 
     bool m_bFinishedClustering;                     /**< If clustered forward solution is available. */
 
-    QString                     m_sAtlasDir;        /**< File to Atlas. */
-    AnnotationSet::SPtr         m_pAnnotationSet;   /**< Annotation set. */
-    QString                     m_sSurfaceDir;      /**< File to Surface. */
-    SurfaceSet::SPtr            m_pSurfaceSet;      /**< Surface set. */
+    QString                             m_sAtlasDir;        /**< File to Atlas. */
+    FSLIB::AnnotationSet::SPtr          m_pAnnotationSet;   /**< Annotation set. */
+    QString                             m_sSurfaceDir;      /**< File to Surface. */
+    FSLIB::SurfaceSet::SPtr             m_pSurfaceSet;      /**< Surface set. */
 
-    FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
-    FiffInfo::SPtr              m_pFiffInfoEvoked;  /**< Fiff information of the evoked. */
-    FiffInfoBase::SPtr          m_pFiffInfoForward; /**< Fiff information of the forward solution. */
+    FIFFLIB::FiffInfo::SPtr             m_pFiffInfo;        /**< Fiff information. */
+    FIFFLIB::FiffInfo::SPtr             m_pFiffInfoEvoked;  /**< Fiff information of the evoked. */
+    FIFFLIB::FiffInfoBase::SPtr         m_pFiffInfoForward; /**< Fiff information of the forward solution. */
 
-    QStringList                 m_qListPickChannels;        /**< Channels to pick */
+    QStringList                         m_qListPickChannels;        /**< Channels to pick */
 
-    PwlRapMusic::SPtr           m_pPwlRapMusic;     /**< Powell RAP MUSIC. */
-    qint32                      m_iDownSample;      /**< Sampling rate */
+    INVERSELIB::PwlRapMusic::SPtr       m_pPwlRapMusic;     /**< Powell RAP MUSIC. */
+    qint32                              m_iDownSample;      /**< Sampling rate */
 
 //    RealTimeSourceEstimate::SPtr m_pRTSE_MNE; /**< Source Estimate output channel. */
 };

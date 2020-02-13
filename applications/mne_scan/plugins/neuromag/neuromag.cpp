@@ -77,6 +77,7 @@ using namespace SCMEASLIB;
 using namespace FIFFLIB;
 using namespace DISPLIB;
 using namespace DISP3DLIB;
+using namespace COMMUNICATIONLIB;
 
 
 //*************************************************************************************************************
