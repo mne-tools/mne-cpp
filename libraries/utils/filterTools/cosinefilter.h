@@ -67,14 +67,6 @@ namespace UTILSLIB
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
-
 //=============================================================================================================
 /**
  * Creates a cosine filter response in the frequency domain.
@@ -105,10 +97,16 @@ public:
      * @param sFreq sampling frequency
      * @param type filter type (lowpass, highpass, etc.)
      */
-    CosineFilter(int fftLength, float lowpass, float lowpass_width, float highpass, float highpass_width, double sFreq, TPassType type);
+    CosineFilter(int fftLength,
+                 float lowpass,
+                 float lowpass_width,
+                 float highpass,
+                 float highpass_width,
+                 double sFreq,
+                 TPassType type);
 
-    RowVectorXcd    m_dFFTCoeffA;   /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
-    RowVectorXd     m_dCoeffA;      /**< the time filter coefficient set*/
+    Eigen::RowVectorXcd    m_dFFTCoeffA;   /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    Eigen::RowVectorXd     m_dCoeffA;      /**< the time filter coefficient set*/
 
     int             m_iFilterOrder;
 };

@@ -70,13 +70,6 @@ namespace UTILSLIB
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
 //=============================================================================================================
 /**
  * K-Means Clustering
@@ -104,7 +97,12 @@ public:
      * @param[in] online     (optional) If centroids should be updated during iterations: true (default), false
      * @param[in] maxit      (optional) maximal number of iterations per replicate; 100 by default
      */
-    explicit KMeans(QString distance = QString("sqeuclidean") , QString start = QString("sample"), qint32 replicates = 1, QString emptyact = QString("error"), bool online = true, qint32 maxit = 100);
+    explicit KMeans(QString distance = QString("sqeuclidean") ,
+                    QString start = QString("sample"),
+                    qint32 replicates = 1,
+                    QString emptyact = QString("error"),
+                    bool online = true,
+                    qint32 maxit = 100);
 
     //=========================================================================================================
     /**
@@ -117,7 +115,12 @@ public:
      * @param[out] sumD      Summation of the distances to the centroid within one cluster
      * @param[out] D         Cluster distances to the centroid
      */
-    bool calculate( Eigen::MatrixXd X, qint32 kClusters, VectorXi& idx, Eigen::MatrixXd& C, VectorXd& sumD, Eigen::MatrixXd& D);
+    bool calculate( Eigen::MatrixXd X,
+                    qint32 kClusters,
+                    Eigen::VectorXi& idx,
+                    Eigen::MatrixXd& C,
+                    Eigen::VectorXd& sumD,
+                    Eigen::MatrixXd& D);
 
 
 private:
@@ -130,7 +133,8 @@ private:
      *
      * @return Cluster centroid distances
      */
-    Eigen::MatrixXd distfun(const Eigen::MatrixXd& X, Eigen::MatrixXd& C);//, qint32 iter);
+    Eigen::MatrixXd distfun(const Eigen::MatrixXd& X,
+                            Eigen::MatrixXd& C);//, qint32 iter);
 
     //=========================================================================================================
     /**
@@ -142,7 +146,9 @@ private:
      *
      * @return true if converged, false otherwise
      */
-    bool batchUpdate(const Eigen::MatrixXd& X, Eigen::MatrixXd& C, VectorXi& idx);
+    bool batchUpdate(const Eigen::MatrixXd& X,
+                     Eigen::MatrixXd& C,
+                     Eigen::VectorXi& idx);
 
     //=========================================================================================================
     /**
@@ -154,8 +160,11 @@ private:
      * @param[out] centroids The new centroids
      * @param[out] counts    Number of points belonging to the new centroids
      */
-    void gcentroids(const Eigen::MatrixXd& X, const VectorXi& index, const VectorXi& clusts,
-                                        Eigen::MatrixXd& centroids, VectorXi& counts);
+    void gcentroids(const Eigen::MatrixXd& X,
+                    const Eigen::VectorXi& index,
+                    const Eigen::VectorXi& clusts,
+                    Eigen::MatrixXd& centroids,
+                    Eigen::VectorXi& counts);
 
     //=========================================================================================================
     /**
@@ -167,7 +176,9 @@ private:
      *
      * @return true if converged, false otherwise
      */
-    bool onlineUpdate(const Eigen::MatrixXd& X, Eigen::MatrixXd& C,  VectorXi& idx);
+    bool onlineUpdate(const Eigen::MatrixXd& X,
+                      Eigen::MatrixXd& C,
+                      Eigen::VectorXi& idx);
 
 
     //=========================================================================================================
@@ -196,15 +207,15 @@ private:
     qint32 n;               /**< Number of points to be clustered */
     qint32 p;               /**< dimension of space in which the clustering is performed */
 
-    Eigen::MatrixXd Del;           /**< reassignment criterion */
-    VectorXd d;             /**< Minimal distances of each point to its centroid */
-    VectorXi m;             /**< m number of points belonging to the cluster */
+    Eigen::MatrixXd Del;    /**< reassignment criterion */
+    Eigen::VectorXd d;      /**< Minimal distances of each point to its centroid */
+    Eigen::VectorXi m;      /**< m number of points belonging to the cluster */
 
     double totsumD;         /**< Total sum of centroid distances */
 
     double prevtotsumD;     /**< Sum of centroid distances of the previous iteration */
 
-    VectorXi previdx;       /**< Previous point cluster indeces */
+    Eigen::VectorXi previdx;/**< Previous point cluster indeces */
 
 };
 

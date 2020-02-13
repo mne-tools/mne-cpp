@@ -80,6 +80,7 @@ using namespace SCMEASLIB;
 using namespace IOBUFFER;
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************

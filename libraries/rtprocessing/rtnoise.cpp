@@ -60,6 +60,8 @@
 
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
+using namespace Eigen;
+using namespace IOBUFFER;
 
 
 //*************************************************************************************************************
@@ -67,7 +69,10 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtNoise::RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, qint32 p_dataLen, QObject *parent)
+RtNoise::RtNoise(qint32 p_iMaxSamples,
+                 FiffInfo::SPtr p_pFiffInfo,
+                 qint32 p_dataLen,
+                 QObject *parent)
 : QThread(parent)
 , m_iFFTlength(p_iMaxSamples)
 , m_pFiffInfo(p_pFiffInfo)

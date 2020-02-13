@@ -72,6 +72,7 @@ using namespace UTILSLIB;
 using namespace MNELIB;
 using namespace FIFFLIB;
 using namespace FSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
