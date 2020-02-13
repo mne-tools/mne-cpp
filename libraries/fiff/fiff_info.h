@@ -167,7 +167,7 @@ public:
      *
      * @return nproj - How many items in the projector
      */
-    inline qint32 make_projector(MatrixXd& proj) const;
+    inline qint32 make_projector(Eigen::MatrixXd& proj) const;
 
     //=========================================================================================================
     /**
@@ -182,7 +182,7 @@ public:
      *
      * @return nproj - How many items in the projector
      */
-    inline qint32 make_projector(MatrixXd& proj, const QStringList& p_chNames) const;
+    inline qint32 make_projector(Eigen::MatrixXd& proj, const QStringList& p_chNames) const;
 
     //=========================================================================================================
     /**
@@ -196,7 +196,7 @@ public:
      *
      * @return Info modified according to sel
      */
-    FiffInfo pick_info(const RowVectorXi &sel = defaultVectorXi) const;
+    FiffInfo pick_info(const Eigen::RowVectorXi &sel = defaultVectorXi) const;
 
     //=========================================================================================================
     /**
@@ -253,7 +253,7 @@ private:
      *
      * @return true if succeeded, false otherwise
      */
-    bool make_compensator(fiff_int_t kind, MatrixXd& this_comp) const;
+    bool make_compensator(fiff_int_t kind, Eigen::MatrixXd& this_comp) const;
 
 public: //Public because it's a mne struct
     FiffId file_id;             /**< File ID. */
@@ -275,7 +275,7 @@ public: //Public because it's a mne struct
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 FiffInfo::make_projector(MatrixXd& proj) const
+inline qint32 FiffInfo::make_projector(Eigen::MatrixXd& proj) const
 {
     return FiffProj::make_projector(this->projs,this->ch_names, proj, this->bads);
 }
@@ -283,7 +283,7 @@ inline qint32 FiffInfo::make_projector(MatrixXd& proj) const
 
 //*************************************************************************************************************
 
-inline qint32 FiffInfo::make_projector(MatrixXd& proj, const QStringList& p_chNames) const
+inline qint32 FiffInfo::make_projector(Eigen::MatrixXd& proj, const QStringList& p_chNames) const
 {
     return FiffProj::make_projector(this->projs, p_chNames, proj, this->bads);
 }

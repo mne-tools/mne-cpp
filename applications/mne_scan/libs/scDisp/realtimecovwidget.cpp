@@ -78,6 +78,7 @@ using namespace SCDISPLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace FIFFLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************

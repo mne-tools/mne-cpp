@@ -75,14 +75,6 @@ namespace FIFFLIB
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
-
 //=============================================================================================================
 /**
  * Matrix specification with named rows and cols.
@@ -112,11 +104,11 @@ public:
      * @param[in] p_col_names    Column names
      * @param[in] p_data         Data of the named matrix
      */
-    explicit FiffNamedMatrix(   fiff_int_t p_nrow,
-                                fiff_int_t p_ncol,
-                                const QStringList& p_row_names,
-                                const QStringList& p_col_names,
-                                const MatrixXd& p_data);
+    explicit FiffNamedMatrix(fiff_int_t p_nrow,
+                             fiff_int_t p_ncol,
+                             const QStringList& p_row_names,
+                             const QStringList& p_col_names,
+                             const Eigen::MatrixXd& p_data);
 
     //=========================================================================================================
     /**
@@ -188,7 +180,7 @@ public:
     fiff_int_t  ncol;       /**< Number of columns */
     QStringList row_names;  /**< Row names */
     QStringList col_names;  /**< Column names */
-    MatrixXd data;          /**< Matrix data */
+    Eigen::MatrixXd data;   /**< Matrix data */
 
 // ### OLD STRUCT ###
 //typedef struct {            /* Matrix specification with a channel list */
@@ -237,7 +229,7 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatri
     out << "\tnrow: " << p_FiffNamedMatrix.nrow << std::endl;
     out << "\tncol: " << p_FiffNamedMatrix.ncol << std::endl;
 
-    MatrixXd data;          /**< Matrix data */
+    Eigen::MatrixXd data;          /**< Matrix data */
 
     out << "\trow_names " << p_FiffNamedMatrix.row_names.size() << ":\n\t";
     if(t_bIsShort)

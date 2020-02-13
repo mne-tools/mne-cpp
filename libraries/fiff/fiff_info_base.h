@@ -148,7 +148,9 @@ public:
      *
      * @return the selector matrix (row Vector)
      */
-    static RowVectorXi pick_channels(const QStringList& ch_names, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList);
+    static Eigen::RowVectorXi pick_channels(const QStringList& ch_names,
+                                            const QStringList& include = defaultQStringList,
+                                            const QStringList& exclude = defaultQStringList);
 
     //=========================================================================================================
     /**
@@ -162,7 +164,7 @@ public:
      *
      * @return Info modified according to sel
      */
-    FiffInfoBase pick_info(const RowVectorXi* sel = NULL) const;
+    FiffInfoBase pick_info(const Eigen::RowVectorXi* sel = NULL) const;
 
     //=========================================================================================================
     /**
@@ -180,7 +182,11 @@ public:
      *
      * @return the selector matrix (row vector)
      */
-    RowVectorXi pick_types(const QString meg, bool eeg = false, bool stim = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+    Eigen::RowVectorXi pick_types(const QString meg,
+                                  bool eeg = false,
+                                  bool stim = false,
+                                  const QStringList& include = defaultQStringList,
+                                  const QStringList& exclude = defaultQStringList) const;
 
     //=========================================================================================================
     /**
@@ -199,11 +205,11 @@ public:
      *
      * @return the selector matrix (row vector)
      */
-    RowVectorXi pick_types(bool meg,
-                           bool eeg = false,
-                           bool stim = false,
-                           const QStringList& include = defaultQStringList,
-                           const QStringList& exclude = defaultQStringList) const;
+    Eigen::RowVectorXi pick_types(bool meg,
+                                  bool eeg = false,
+                                  bool stim = false,
+                                  const QStringList& include = defaultQStringList,
+                                  const QStringList& exclude = defaultQStringList) const;
 
     /**
      * Overloaded == operator to compare an object to this instance.
