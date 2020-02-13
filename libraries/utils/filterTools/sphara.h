@@ -102,7 +102,7 @@ public:
      *
      * @return Returns the final SPHARA operator with dimensions (iOperatorDim,iOperatorDim).
      */
-    static MatrixXd makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct, int skip = 0);
+    static Eigen::MatrixXd makeSpharaProjector(const Eigen::MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct, int skip = 0);
 };
 
 } // NAMESPACE UTILSLIB

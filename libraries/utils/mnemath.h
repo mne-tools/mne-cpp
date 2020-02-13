@@ -124,7 +124,7 @@ public:
 //    /**
 //    * ### MNE toolbox root function ###: Definition of the mne_block_diag function - decoding part
 //    */
-//    static inline MatrixXd extract_block_diag(MatrixXd& A, qint32 n);
+//    static inline Eigen::MatrixXd extract_block_diag(MatrixXd& A, qint32 n);
 
     //=========================================================================================================
     /**

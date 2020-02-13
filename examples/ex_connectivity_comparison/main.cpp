@@ -96,6 +96,8 @@ using namespace FIFFLIB;
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
+using namespace MNELIB;
+using namespace FSLIB;
 
 
 //*************************************************************************************************************

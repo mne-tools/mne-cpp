@@ -134,7 +134,7 @@ public:
      *
      * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
      */
-    void append(const MatrixXd &p_DataSegment);
+    void append(const Eigen::MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
@@ -203,10 +203,10 @@ protected:
     int m_iSensors;
     int m_iBlockIndex;
 
-    MatrixXd m_matCircBuf;
+    Eigen::MatrixXd m_matCircBuf;
 
 public:
-    MatrixXd m_matSpecData;
+    Eigen::MatrixXd m_matSpecData;
     QMutex ReadMutex;
 
     bool m_bSendDataToBuffer;
@@ -227,7 +227,7 @@ inline bool RtNoise::isRunning()
 
 #ifndef metatype_matrix
 #define metatype_matrix
-Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the MatrixXd type. For signal/slot usage.*/
+Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the Eigen::MatrixXd type. For signal/slot usage.*/
 #endif
 
 #endif // RtNoise_H

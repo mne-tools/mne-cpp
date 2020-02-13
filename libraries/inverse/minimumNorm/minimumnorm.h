@@ -65,15 +65,6 @@ namespace INVERSELIB
 //=============================================================================================================
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNELIB;
-using namespace FSLIB;
-
-
 //=============================================================================================================
 /**
  * Minimum norm estimation algorithm ToDo: Paper references.
@@ -96,7 +87,7 @@ public:
      *
      * @return the prepared inverse operator
      */
-    explicit MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, const QString method);
+    explicit MinimumNorm(const MNELIB::MNEInverseOperator &p_inverseOperator, float lambda, const QString method);
 
     //=========================================================================================================
     /**
@@ -109,7 +100,7 @@ public:
      *
      * @return the prepared inverse operator
      */
-    explicit MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
+    explicit MinimumNorm(const MNELIB::MNEInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
 
     virtual ~MinimumNorm(){}
 
@@ -124,9 +115,9 @@ public:
      *
      * @return the calculated source estimation
      */
-    virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
+    virtual MNELIB::MNESourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
+    virtual MNELIB::MNESourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
 
     //=========================================================================================================
     /**
@@ -152,7 +143,7 @@ public:
      *
      * @return the source space corresponding to this inverse operator
      */
-    virtual const MNESourceSpace& getSourceSpace() const;
+    virtual const MNELIB::MNESourceSpace& getSourceSpace() const;
 
     //=========================================================================================================
     /**
@@ -160,7 +151,7 @@ public:
      *
      * @return the prepared inverse operator
      */
-    inline MNEInverseOperator& getPreparedInverseOperator();
+    inline MNELIB::MNEInverseOperator& getPreparedInverseOperator();
 
     //=========================================================================================================
     /**
@@ -193,21 +184,21 @@ public:
      *
      * @return the assembled kernel
      */
-    inline MatrixXd& getKernel();
+    inline Eigen::MatrixXd& getKernel();
 
 private:
-    MNEInverseOperator m_inverseOperator;   /**< The inverse operator */
-    float m_fLambda;                        /**< Regularization parameter */
-    QString m_sMethod;                      /**< Selected method */
-    bool m_bsLORETA;                        /**< Do sLORETA method */
-    bool m_bdSPM;                           /**< Do dSPM method */
+    MNELIB::MNEInverseOperator m_inverseOperator;   /**< The inverse operator */
+    float m_fLambda;                                /**< Regularization parameter */
+    QString m_sMethod;                              /**< Selected method */
+    bool m_bsLORETA;                                /**< Do sLORETA method */
+    bool m_bdSPM;                                   /**< Do dSPM method */
 
-    bool inverseSetup;                      /**< Inverse Setup Calcluated */
-    MNEInverseOperator inv;                 /**< The setup inverse operator */
-    SparseMatrix<double> noise_norm;        /**< The noise normalization */
-    QList<VectorXi> vertno;                 /**< The vertices numbers */
-    Label label;                            /**< The corresponding labels */
-    MatrixXd K;                             /**< Imaging kernel */
+    bool inverseSetup;                              /**< Inverse Setup Calcluated */
+    MNELIB::MNEInverseOperator inv;                 /**< The setup inverse operator */
+    Eigen::SparseMatrix<double> noise_norm;         /**< The noise normalization */
+    QList<Eigen::VectorXi> vertno;                  /**< The vertices numbers */
+    FSLIB::Label label;                             /**< The corresponding labels */
+    Eigen::MatrixXd K;                              /**< Imaging kernel */
 
 };
 
@@ -216,7 +207,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline MatrixXd& MinimumNorm::getKernel()
+inline Eigen::MatrixXd& MinimumNorm::getKernel()
 {
     return K;
 }
@@ -224,7 +215,7 @@ inline MatrixXd& MinimumNorm::getKernel()
 
 //*************************************************************************************************************
 
-inline MNEInverseOperator& MinimumNorm::getPreparedInverseOperator()
+inline MNELIB::MNEInverseOperator& MinimumNorm::getPreparedInverseOperator()
 {
     return inv;
 }
