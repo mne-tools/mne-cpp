@@ -59,14 +59,16 @@ FtBuffProducer::FtBuffProducer(FtBuffer* pFtBuffer)
 
 //*************************************************************************************************************
 
-FtBuffProducer::~FtBuffProducer() {
+FtBuffProducer::~FtBuffProducer()
+{
     delete m_pFtConnector;
 }
 
 //*************************************************************************************************************
 
-void FtBuffProducer::run() {
-    qDebug() << "Running producer..";
+void FtBuffProducer::run()
+{
+    qInfo() << "[FtBuffProducer::run] Running producer..";
 
     while(!m_pFtConnector->connect()){
         QThread::usleep(50000);
@@ -80,7 +82,7 @@ void FtBuffProducer::run() {
         m_pFtConnector->getData();
 
         if (m_pFtConnector->newData()){
-            qDebug() << "Returning mat";
+            qInfo() << "[FtBuffProducer::run] Returning new data matrix.";
             emit newDataAvailable(m_pFtConnector->getMatrix());
             m_pFtConnector->resetEmitData();
         }
@@ -95,13 +97,17 @@ void FtBuffProducer::run() {
     }
 }
 
-void FtBuffProducer::doWork() {
+//*************************************************************************************************************
+
+void FtBuffProducer::doWork()
+{
     run();
 }
 
 //*************************************************************************************************************
 
-void FtBuffProducer::connectToBuffer(QString addr, int port) {
+void FtBuffProducer::connectToBuffer(QString addr, int port)
+{
 //    m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
 //    strcpy(m_pTempAddress, addr.toLocal8Bit().constData());
 
@@ -119,7 +125,8 @@ void FtBuffProducer::connectToBuffer(QString addr, int port) {
 
 //*************************************************************************************************************
 
-bool FtBuffProducer::disconnectFromBuffer() {
+bool FtBuffProducer::disconnectFromBuffer()
+{
     return this->m_pFtBuffer->disconnect();
 }
 
