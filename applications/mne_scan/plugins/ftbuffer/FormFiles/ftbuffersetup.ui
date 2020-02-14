@@ -75,7 +75,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans';&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans';&quot;&gt;This buffer is currently set up to receive data from a neuromag system. To do this, you need a sample .fif file with the same measurement parameters as you will be receiving from the buffer. This file needs to be placed in the folder from where you are running mne_scan. &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans';&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans';&quot;&gt;Make sure you input the correct buffer address and port and hit 'Set Address and Port' &lt;/span&gt;&lt;span style=&quot; font-family:'Sans'; font-weight:600;&quot;&gt;before&lt;/span&gt;&lt;span style=&quot; font-family:'Sans';&quot;&gt; running the plugin.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans';&quot;&gt;Make sure you input the correct buffer address and port and hit 'Set Address/Port + Load Fif Data' &lt;/span&gt;&lt;span style=&quot; font-family:'Sans'; font-weight:600;&quot;&gt;before&lt;/span&gt;&lt;span style=&quot; font-family:'Sans';&quot;&gt; running the plugin.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
@@ -159,7 +159,7 @@ p, li { white-space: pre-wrap; }
         <item row="4" column="0">
          <widget class="QPushButton" name="m_qPushButton_Connect">
           <property name="text">
-           <string>Set Address and Port</string>
+           <string>Set Address/Port + Load Fif Data</string>
           </property>
          </widget>
         </item>

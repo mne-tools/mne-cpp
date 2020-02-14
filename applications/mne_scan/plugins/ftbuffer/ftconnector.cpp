@@ -64,31 +64,22 @@ bool FtConnector::connect() {
 //*************************************************************************************************************
 
 bool FtConnector::getHeader() {
-    qInfo() << "Attepting to get header on thread" << this->thread();
-    qDebug() << "socket on thread" << m_pSocket->thread();
+    qInfo() << "Attepting to get header...";
 
     m_pSocket->readAll(); //Ensure receiving buffer is empty
-
-    qDebug()<< "1";
 
     // Defining parameters to send a get header message to buffer
     messagedef_t messagedef;
     messagedef.bufsize = 0;
     messagedef.command = GET_HDR;
 
-    qDebug()<< "2";
-
     // Send request to buffer
     sendRequest(messagedef);
-
-    qDebug()<< "3";
 
     //Waiting for response.
     while(m_pSocket->bytesAvailable() < sizeof (messagedef_t)) {
         m_pSocket->waitForReadyRead(10);
     }
-
-    qDebug()<< "4";
 
     //Parse return message from buffer
     QBuffer msgBuffer;
@@ -126,37 +117,31 @@ bool FtConnector::parseHeaderDef(QBuffer &readBuffer) {
     char c_chans[sizeof(headerdef.nchans)];
     readBuffer.read(c_chans, sizeof(headerdef.nchans));
     std::memcpy(&headerdef.nchans, c_chans, sizeof(headerdef.nchans));
-    qDebug() << "nchans:" << headerdef.nchans;
 
     //Get nsamples, int32
     char c_samples[sizeof(headerdef.nsamples)];
     readBuffer.read(c_samples, sizeof(headerdef.nsamples));
     std::memcpy(&headerdef.nsamples, c_samples, sizeof(headerdef.nsamples));
-    qDebug() << "nsamples:" << headerdef.nsamples;
 
     //Get nevents, int32
     char c_events[sizeof(headerdef.nevents)];
     readBuffer.read(c_events, sizeof(headerdef.nevents));
     std::memcpy(&headerdef.nevents, c_events, sizeof(headerdef.nevents));
-    qDebug() << "nevents:" << headerdef.nevents;
 
     //Get fsample, float
     char c_freqsamp[sizeof(headerdef.fsample)];
     readBuffer.read(c_freqsamp, sizeof(headerdef.fsample));
     std::memcpy(&headerdef.fsample, c_freqsamp, sizeof(headerdef.fsample));
-    qDebug() << "fsample:" << headerdef.fsample;
 
     //Get data_type, int32
     char c_datatype[sizeof(headerdef.data_type)];
     readBuffer.read(c_datatype, sizeof(headerdef.data_type));
     std::memcpy(&headerdef.data_type, c_datatype, sizeof(headerdef.data_type));
-    qDebug() << "data_type:" << headerdef.data_type;
 
     //Get bufsize, int32
     char c_bufsize[sizeof(headerdef.bufsize)];
     readBuffer.read(c_bufsize, sizeof(headerdef.bufsize));
     std::memcpy(&headerdef.bufsize, c_bufsize, sizeof(headerdef.bufsize));
-    qDebug() << "bufsize:" << headerdef.bufsize;
 
 //        char c_[sizeof(headerdef.)];
 //        readBuffer.read(c_, sizeof(headerdef.));
@@ -182,19 +167,16 @@ int FtConnector::parseMessageDef(QBuffer &readBuffer) {
     char c_version[sizeof(response.version)];
     readBuffer.read(c_version, sizeof(response.version));
     std::memcpy(&response.version, c_version, sizeof(response.version));
-    qDebug() << "Version:" << response.version;
 
     //Get command, int16
     char c_command[sizeof(response.command)];
     readBuffer.read(c_command, sizeof(response.command));
     std::memcpy(&response.command, c_command, sizeof(response.command));
-    qDebug() << "Command:" << response.command;
 
     //Get bufsize, int32
     char c_buffsize[sizeof(response.bufsize)];
     readBuffer.read(c_buffsize, sizeof(response.bufsize));
     std::memcpy(&response.bufsize, c_buffsize, sizeof(response.bufsize));
-    qDebug() << "Bufsize:" << response.bufsize;
 
     return response.bufsize;
 }
@@ -243,7 +225,6 @@ bool FtConnector::getData() {
     QBuffer msgBuffer;
     prepBuffer(msgBuffer, sizeof (messagedef_t));
     int bufsize = parseMessageDef(msgBuffer);
-    qDebug() << "@@@@@@@@@@ Buffsize:" << bufsize;
 
     while(m_pSocket->bytesAvailable() < bufsize) {
         m_pSocket->waitForReadyRead(10);
@@ -300,25 +281,21 @@ int FtConnector::parseDataDef(QBuffer &dataBuffer) {
     char c_chans[sizeof(datadef.nchans)];
     dataBuffer.read(c_chans, sizeof(datadef.nchans));
     std::memcpy(&datadef.nchans, c_chans, sizeof(datadef.nchans));
-    qDebug() << "nchans:" << datadef.nchans;
 
     //Get nsamples, int32
     char c_nsamples[sizeof(datadef.nsamples)];
     dataBuffer.read(c_nsamples, sizeof(datadef.nsamples));
     std::memcpy(&datadef.nsamples, c_nsamples, sizeof(datadef.nsamples));
-    qDebug() << "nsamples:" << datadef.nsamples;
 
     //Get data_type, int32
     char c_datatype[sizeof(datadef.data_type)];
     dataBuffer.read(c_datatype, sizeof(datadef.data_type));
     std::memcpy(&datadef.data_type, c_datatype, sizeof(datadef.data_type));
-    qDebug() << "datatype:" << datadef.data_type;
 
     //Get bufsize, int32
     char c_bufsize[sizeof(datadef.bufsize)];
     dataBuffer.read(c_bufsize, sizeof(datadef.bufsize));
     std::memcpy(&datadef.bufsize, c_bufsize, sizeof(datadef.bufsize));
-    qDebug() << "bufsize:" << datadef.bufsize;
 
 //    if(datadef.nchans != m_iNumChannels) {
 //        qWarning() << "Data has different number of channels than expected.";
@@ -394,7 +371,6 @@ int FtConnector::totalBuffSamples() {
     char csamps[sizeof(samp)];
     dataBuffer.read(csamps, sizeof(samp));
     std::memcpy(&samp, csamps, sizeof(samp));
-    qDebug() << "samp?:" << samp;
 
     return samp;
 

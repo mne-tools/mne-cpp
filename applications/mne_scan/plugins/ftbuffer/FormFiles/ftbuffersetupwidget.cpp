@@ -97,9 +97,7 @@ void FtBufferSetupWidget::showAboutDialog()
 
 void FtBufferSetupWidget::pressedConnect()
 {
-    qDebug() << "ayyy";
     emit connectAtAddr(ui.m_lineEditIP->text(),ui.m_spinBoxPort->value());
-    qDebug() << "lmao";
 }
 
 //*************************************************************************************************************
