@@ -189,7 +189,7 @@ protected:
      * @param[in] coils     The coilset to read the sensor information from.
      *
      */
-    static void create_sensor_set(QList<struct Sensor>& sensors, FWDLIB::FwdCoilSet* coils);
+    static void createSensorSet(QList<struct Sensor>& sensors, FWDLIB::FwdCoilSet* coils);
 
     //=========================================================================================================
 
