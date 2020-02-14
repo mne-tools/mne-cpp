@@ -2,13 +2,12 @@
 /**
 * @file     main.cpp
 * @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
-* @date     01, 2020
+* @version  dev
+* @date     January, 2020
 *
 * @section  LICENSE
 *
-* Copyright (C) 2020, Ruben Dörfel and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2020, Ruben Dörfel. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
