@@ -108,10 +108,6 @@ bool FtBuffer::start() {
     qDebug() << "Starting FtBuffer...";
     m_bIsRunning = true;
 
-    qDebug() << this->thread();
-    QThread::usleep(4000000);
-    QThread::start();
-
     qRegisterMetaType<QPair<int,float>>("QPair<int,float>");
 
     // FtProducer in it's own thread and connect communications signals/slots
@@ -317,7 +313,7 @@ bool FtBuffer::isRunning() {
 //*************************************************************************************************************
 
 void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
-    qDebug() << "Appending matrix";
+    qInfo() << "Appending matrix to plugin output...";
     m_mutex.lock();
     if(m_bIsRunning) {
 //        if (!m_bBuffOutputSet) {
@@ -330,7 +326,7 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
 
     }
     m_mutex.unlock();
-    qDebug() << "Done.";
+    qInfo() << "Done.";
 
 }
 
@@ -339,7 +335,6 @@ void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData) {
 void FtBuffer::setParams(QPair<int,float> val) {
     m_iNumChannels = val.first;
     m_iSampFreq = val.second;
-    qDebug() << "Parameters set";
 }
 
 //*************************************************************************************************************
