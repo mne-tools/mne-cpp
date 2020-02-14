@@ -17,17 +17,14 @@ This plugin adds BrainFlow data acquisition SDK to MNE-SCAN app.
 
 * Make sure that you have brainflow git submodule by typing
 
-    $ git submodule init
-    $ git submodule update
-
-* Build it as a regular Cmake project but for MSVC you need to ensure that you use exactly the same Cmake Generator as for MNE-CPP, also you need to specify MSVC_RUNTIME dynamic(default is static). And specify -DCMAKE_INSTALL_PREFIX=..\installed
-
-To ensure that submodule is downloaded you may need to run:
 ```
 git clone --recursive https://github.com/mne-tools/mne-cpp
 # if you cloned the repo without recursive flag you will need to run
 git submodule update --init
 ```
+
+* Build it as a regular Cmake project but for MSVC you need to ensure that you use exactly the same Cmake Generator as for MNE-CPP, also you need to specify MSVC_RUNTIME dynamic(default is static). And specify -DCMAKE_INSTALL_PREFIX=..\installed
+
 Example of compilation:
 ```
 cd applications\mne_scan\plugins\brainflowboard\brainflow\
