@@ -217,7 +217,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     QList<Sensor> sensorSet;
     megCoils = templates->create_meg_coils(channels,nch,acc,t);
-    create_sensor_set(sensorSet,megCoils);
+    createSensorSet(sensorSet,megCoils);
 
     //Create new projector based on the excluded channels, first exclude the rows then the columns
     MatrixXd matProjectorsRows(innerind.size(),t_matProjectors.cols());
@@ -535,7 +535,7 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
 
 //*************************************************************************************************************
 
-void HPIFit::create_sensor_set(QList<struct Sensor>& sensors, FwdCoilSet* coils){
+void HPIFit::createSensorSet(QList<struct Sensor>& sensors, FwdCoilSet* coils){
     int nchan = coils->ncoil;
     for(int i = 0; i < nchan; i++){
         Sensor s;
