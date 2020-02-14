@@ -30,14 +30,34 @@ For a correct recognition of the EEGoSports device, the operating system compati
 
 `\mne-cpp\bin`
 
-In a last step, the license files which are delivered with the device have to be copied to
+In a last step, for older SDK versions the license files which are delivered with the device have to be copied to
 
 `C:\Users\Username\Documents\Eego`
 
 The license files should be named like `EE225-020032-000001`.
 
+For recent versions of the SDK, this step is not necessary.
+
 After that, the device can be connected to the computer and be switched on and MNE Scan can be started. It is now possible to use the EEGoSports Driver plugin in the MNE Scan environment. By drag & drop, the plugin can be added to the plugin box and connected to other processing items like shown in the following figure.
 
-![](../../images/900px-EEGoSportsGUI.jpg "GUI of the EEGoSports EEG plugin")
+![](../../images/1280px-EEGoSportsGUI.jpg "GUI of the EEGoSports EEG plugin")
 
-The GUI of the EEGoSports EEG plugin allows the adjustment of sample frequency and block size. A FIFF-data-stream is now streame to the real-time display and subsequeny connected plugins.
+The GUI of the EEGoSports EEG plugin allows the adjustment of sample frequency and block size. A FIFF-data-stream is now streamed to the real-time display and subsequeny connected plugins.
+
+Besides the electrode measurements, the FIFF-data-stream additionally contains one channel for the reference electrode, the trigger channel, and the sample count channel.
+
+## Impedance measurements
+
+Selecting the <img src="../../images/impedances.png" alt="impedance widget symbol" width="32"/> symbol opens the widget for impedance measurements.
+
+![](../../images/EEGoSportsImpedanceWidget.jpg "GUI of the EEGoSports EEG plugin")
+
+To correctly display the electrode positions, the correct electrode layout has to be loaded via *Load Layout*. This file should be in the *ELC* format and contain the electrode labels and positions in the order, in which they are transmitted to the amplifier (see amplifier/eeg cap documentation).
+
+At the end of the list of electrodes, the positions of reference and ground electrod should be added with the labels *REF* and *GND*.
+
+Two options exist for the color coding of the impedance values:
+
+For *Threshold*, green color indicates an impedance value below the selected threshold, yellow color an impedance value below double the selected thresold, orange color an impedance value below three times the selected threshold, and dark red color an even higher impedance value.
+
+For *Colormap*, the electrodes impedances are color-coded following a *jet* colormap with the maximum of the colormap at the selected value.
