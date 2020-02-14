@@ -66,6 +66,24 @@ A good commit should follow:
  * Write descriptive commit messages. Make them self-contained, so people do not have to research the historical context to make sense of them.
  * And most importantly: use your brain :)
 
+For better readability, we want to introduce some conventions for PR titles and commit messages. Please place those short terms in front of your message.
+
+| Short | Meaning                                       |
+|-------|-----------------------------------------------|
+| FIX   | bug fix                                       |
+| ENH   | enhancement                                   |
+| MAINT | maintenance commit (refactoring, typos, etc.) |
+| STY   | style fix                                     |
+| DOC   | documentation                                 |
+
+Following examples show how such a commit message could look like.
+```
+ENH: enable cHPI in Neuromag Plugin
+or
+FIX: fix namespace error 
+```
+- ENH and FIX both give information about the contend and intend of a commit and make it therfore easier to navigate and read the commit history.
+
 ## Setup the MNE-CPP QtCreator wizard
 
 The following steps will show you how to setup the MNE-CPP QtCreator wizard. This wizard is of great help to create new C++ classes which are conform with the MNE-CPP coding conventions. This helps streamlining the contribution process.
