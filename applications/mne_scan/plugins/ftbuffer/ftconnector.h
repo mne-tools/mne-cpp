@@ -232,36 +232,71 @@ public:
 private:
 
     /**
-     * @brief sendRequest - sends a formatted message to the buffer. command and bufsize must be set before calling.
+     * @brief sendRequest - sends a formated message to the buffer. command and bufsize must be set before calling.
      * @param messagedef - request structure with the appropriate command and bufszie paramters set.
      */
     void sendRequest(messagedef_t &messagedef);
 
     //=========================================================================================================
+    /**
+     * @brief sendDataSel - sends a formated datasel message, for defining the first and last sample we are requesting from the buffer
+     * @param datasel - formattd first and last sample index we are requesting from the buffer
+     */
     void sendDataSel(datasel_t &datasel);
 
     //=========================================================================================================
+    /**
+     * @brief sendSampleEvents - sensds a formated sampleevents message, used for receving updated sample an event numbers from buffer
+     * @param threshold - buffer will respond once sample/event numbers reach the thresholds
+     */
     void sendSampleEvents(samples_events_t &threshold);
 
     //=========================================================================================================
+    /**
+     * @brief parseHeaderDef - parses headerdef message and saves parameters(channels, frequency, datatype, newsamples)
+     * @param readBuffer - QBuffer with return headerdef_t data from buffer
+     * @return true if successful, false if unsuccessful
+     */
     bool parseHeaderDef(QBuffer &readBuffer);
 
     //=========================================================================================================
+    /**
+     * @brief parseMessageDef - parses messadef and returns bufsize
+     * @param readBuffer - QBuffer with return messagedef_t data from buffer
+     * @return returns messagedef_t.bufsize
+     */
     int parseMessageDef(QBuffer &readBuffer);
 
     //=========================================================================================================
+    /**
+     * @brief parseDataDef - parses datadef and returns bufsize
+     * @param dataBuffer - QBuffer with return datadef_t data from buffer
+     * @return returns datadef_t.bufsize
+     */
     int parseDataDef(QBuffer &dataBuffer);
 
     //=========================================================================================================
-    int parseSampleEvents(QBuffer &seBuffer);
-
-    //=========================================================================================================
+    /**
+     * @brief parseData - parses sample data received from buffer, formates it and saves it to m_pMatEmit;
+     * @param datasampBuffer - QBuffer with return data from buffer
+     * @param bufsize - bufsize of sample data
+     * @return true if successful, false if unsuccessful
+     */
     bool parseData(QBuffer &datasampBuffer, int bufsize);
 
     //=========================================================================================================
+    /**
+     * @brief prepBuffer - Opens Buffer, reads nuBytes from socket and sets index to zero
+     * @param buffer - QBuffer to which daa will be written
+     * @param numBytes - how many bytes to read from socket
+     */
     void prepBuffer(QBuffer &buffer, int numBytes);
 
     //=========================================================================================================
+    /**
+     * @brief totalBuffSamples - returns total amount of samples written to buffer
+     * @return returns total amount of samples written to buffer
+     */
     int totalBuffSamples();
 
 //*************************************************************************************************************
