@@ -57,7 +57,6 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include <ftsrc/ftbuffclient.h>
 #include <ftconnector.h>
 
 //*************************************************************************************************************
@@ -91,7 +90,6 @@ class FtBuffProducer : public QObject
     Q_OBJECT
 
     friend class FtBuffer;
-    //friend class FtBuffClient;
     friend class FtConnector;
     friend class FtBufferSetupWidget;
 
@@ -155,21 +153,24 @@ signals:
     */
     void extendedHeaderChunks(QBuffer* chunkData);
 
-
+    //=========================================================================================================
+    /**
+     * @brief bufferParameters -
+     * @param numChanandFreq - QPair with info abot number of channels and sample frequency
+     */
     void bufferParameters(QPair<int,float> numChanandFreq);
 
+    //=========================================================================================================
+    /**
+     * @brief connecStatus - returs whether connection parameters have been set.
+     * @param connection - wheterher connection parameters have been set
+     */
     void connecStatus(bool connection);
 
 private:
 
     FtBuffer*                       m_pFtBuffer;                /**< Pointer to FtBuffer that created this object. Destination of collected data */
-    //FtBuffClient*                   m_pFtBuffClient;            /**< FtBuffClient object that interfaces with buffer and gets buffer data */
-    FtConnector*                    m_pFtConnector;
-
-    Eigen::MatrixXd                 m_matData;                  /**< Aquired buffer data that will be sent to FtBuffProduer */
-    char*                           m_pTempAddress;             /**< Temporary storage for setting FtBuffClient address */
-
-    bool                            m_bHeaderReady;
+    FtConnector*                    m_pFtConnector;             /**< FtConnectr object that interfaces with buffer and gets buffer data */
 
 };
 

@@ -112,8 +112,6 @@ void FtBuffProducer::connectToBuffer(QString addr, int port) {
     m_pFtConnector->setAddr(addr);
     m_pFtConnector->setPort(port);
 
-    qDebug() << "We got here";
-
     m_pFtBuffer->setupRTMSA();
 
     emit connecStatus(true);
