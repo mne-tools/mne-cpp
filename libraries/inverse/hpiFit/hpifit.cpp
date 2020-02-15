@@ -304,30 +304,32 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         }
     }
     else{
-        Eigen::Matrix4d trans_init = transDevHead.trans.inverse().cast<double>();
-        Eigen::Matrix3d rot;
-        Eigen::RowVector3d transl;
-        for(int r = 0; r < 3; ++r) {
-            for(int c = 0; c < 3 ; ++c) {
-                rot(r,c) = trans_init(r,c);
-                transl(r) = trans_init(r,3);
-            }
-        }
+//        Eigen::Matrix4d trans_init = transDevHead.trans.inverse().cast<double>();
+//        Eigen::Matrix3d rot;
+//        Eigen::RowVector3d transl;
+//        for(int r = 0; r < 3; ++r) {
+//            for(int c = 0; c < 3 ; ++c) {
+//                rot(r,c) = trans_init(r,c);
+//                transl(r) = trans_init(r,3);
+//            }
+//        }
 
-        coilPos = headHPI;
-        rot.transposeInPlace();
-        for(int r = 0; r < 4; ++r) {
-            for(int c = 0; c < 3 ; ++c) {
-                coilPos(r,c) = coilPos.row(r).dot(rot.col(c));
-            }
-        }
+//        coilPos = headHPI;
+//        rot.transposeInPlace();
+//        for(int r = 0; r < 4; ++r) {
+//            for(int c = 0; c < 3 ; ++c) {
+//                coilPos(r,c) = coilPos.row(r).dot(rot.col(c));
+//            }
+//        }
 
-        // apply translation
-        for(int r = 0; r < 4; ++r) {
-            for(int c = 0; c < 3 ; ++c) {
-                coilPos(r,c) = coilPos(r,c) + transl(c);
-            }
-        }
+//        // apply translation
+//        for(int r = 0; r < 4; ++r) {
+//            for(int c = 0; c < 3 ; ++c) {
+//                coilPos(r,c) = coilPos(r,c) + transl(c);
+//            }
+//        }
+        qWarning() << "usng extra";
+        coilPos = transDevHead.apply_inverse_trans(headHPI.cast<float>()).cast<double>();
     }
 
     coil.pos = coilPos;
