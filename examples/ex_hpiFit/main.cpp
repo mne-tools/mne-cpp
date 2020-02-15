@@ -154,17 +154,17 @@ int main(int argc, char *argv[])
     fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
 
     // create time vector that specifies when to fit
-    int N = ceil((last-first)/quantum);
-    RowVectorXf time(N);
-    for(int i = 0; i < N; i++){
-        time(i) = i * dT_sec;
-    }
+//    int N = ceil((last-first)/quantum);
+//    RowVectorXf time(N);
+//    for(int i = 0; i < N; i++){
+//        time(i) = i * dT_sec;
+//    }
 
-//    // Read Quaternion File
-//    Eigen::MatrixXd pos;
-//    qInfo() << "Specify the path to your position file (.txt)";
-//    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/posMax_data_with_movement_chpi.txt");
-//    RowVectorXd time = pos.col(0);
+    // Read Quaternion File
+    Eigen::MatrixXd pos;
+    qInfo() << "Specify the path to your position file (.txt)";
+    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/posMax_data_with_movement_chpi.txt");
+    RowVectorXd time = pos.col(0);
 
     MatrixXd position;       // Position matrix to save quaternions etc.
 
@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
 
     // if debugging files are necessary set bDoDebug = true;
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
-    bool bDoDebug = false;
+    bool bDoDebug = true;
 
     // read and fit
     for(int i = 0; i < time.size(); i++) {
