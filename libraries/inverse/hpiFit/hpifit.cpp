@@ -97,7 +97,7 @@ HPIFit::HPIFit()
 //*************************************************************************************************************
 
 void HPIFit::fitHPI(const MatrixXd& t_mat,
-                    const Eigen::MatrixXd& t_matProjectors,
+                    const MatrixXd& t_matProjectors,
                     FiffCoordTrans& transDevHead,
                     const QVector<int>& vFreqs,
                     QVector<double>& vGof,
@@ -110,16 +110,15 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     if(t_mat.rows() == 0 || t_mat.cols() == 0 ) {
         std::cout<<std::endl<< "HPIFit::fitHPI - No data passed. Returning.";
     }
-
     //Check if projector was passed
     if(t_matProjectors.rows() == 0 || t_matProjectors.cols() == 0 ) {
         std::cout<<std::endl<< "HPIFit::fitHPI - No projector passed. Returning.";
     }
 
-//    vGof.clear();
     // Setup Constructors for Coil Set
     FwdCoilSet* templates = NULL;
     FwdCoilSet* megCoils = NULL;
+
     //struct SensorInfo sensors;
     struct CoilParam coil;
     int numCh = pFiffInfo->nchan;
@@ -138,7 +137,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     }
 
     //Set coil frequencies
-    Eigen::VectorXd coilfreq(numCoils);
+    VectorXd coilfreq(numCoils);
 
     if(vFreqs.size() >= numCoils) {
         for(int i = 0; i < numCoils; ++i) {
@@ -151,14 +150,14 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     }
 
     // Initialize HPI coils location and moment
-    coil.pos = Eigen::MatrixXd::Zero(numCoils,3);
-    coil.mom = Eigen::MatrixXd::Zero(numCoils,3);
-    coil.dpfiterror = Eigen::VectorXd::Zero(numCoils);
-    coil.dpfitnumitr = Eigen::VectorXd::Zero(numCoils);
+    coil.pos = MatrixXd::Zero(numCoils,3);
+    coil.mom = MatrixXd::Zero(numCoils,3);
+    coil.dpfiterror = VectorXd::Zero(numCoils);
+    coil.dpfitnumitr = VectorXd::Zero(numCoils);
 
     // Generate simulated data
-    Eigen::MatrixXd simsig(samLoc,numCoils*2);
-    Eigen::VectorXd time(samLoc);
+    MatrixXd simsig(samLoc,numCoils*2);
+    VectorXd time(samLoc);
 
     for (int i = 0; i < samLoc; ++i) {
         time[i] = i*1.0/samF;
@@ -172,7 +171,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     }
 
     // Create digitized HPI coil position matrix
-    Eigen::MatrixXd headHPI(numCoils,3);
+    MatrixXd headHPI(numCoils,3);
 
     // check the pFiffInfo->dig information. If dig is empty, set the headHPI is 0;
     if (lHPIPoints.size() > 0) {
@@ -231,12 +230,12 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         matProjectorsInnerind.col(i) = matProjectorsRows.col(innerind.at(i));
     }
 
-    Eigen::MatrixXd topo(innerind.size(), numCoils*2);
-    Eigen::MatrixXd amp(innerind.size(), numCoils);
-    Eigen::MatrixXd ampC(innerind.size(), numCoils);
+    MatrixXd topo(innerind.size(), numCoils*2);
+    MatrixXd amp(innerind.size(), numCoils);
+    MatrixXd ampC(innerind.size(), numCoils);
 
     // Get the data from inner layer channels
-    Eigen::MatrixXd innerdata(innerind.size(), t_mat.cols());
+    MatrixXd innerdata(innerind.size(), t_mat.cols());
 
     for(int j = 0; j < innerind.size(); ++j) {
         innerdata.row(j) << t_mat.row(innerind[j]);
@@ -275,22 +274,21 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         for (int i = 0; i < amp.rows(); ++i) {
             if(std::fabs(amp(i,j)) > maxVal) {
                 maxVal = std::fabs(amp(i,j));
-
                 if(chIdx < innerind.size()) {
                     chIdx = innerind.at(i);
                 }
             }
         }
-
         chIdcs(j) = chIdx;
     }
-    double error = std::accumulate(vGof.begin(), vGof.end(), .0) / vGof.size();
+
     //Generate seed point by projection the found channel position 3cm inwards
-    Eigen::MatrixXd coilPos = Eigen::MatrixXd::Zero(numCoils,3);
-    if(transDevHead.trans == Eigen::MatrixXd::Identity(4,4).cast<float>() || error > 0.005){
+    double error = std::accumulate(vGof.begin(), vGof.end(), .0) / vGof.size();
+    MatrixXd coilPos = MatrixXd::Zero(numCoils,3);
+
+    if(transDevHead.trans == MatrixXd::Identity(4,4).cast<float>() || error > 0.003){
         for (int j = 0; j < chIdcs.rows(); ++j) {
             int chIdx = chIdcs(j);
-
             if(chIdx < pFiffInfo->chs.size()) {
                 double x = pFiffInfo->chs.at(chIdcs(j)).chpos.r0[0];
                 double y = pFiffInfo->chs.at(chIdcs(j)).chpos.r0[1];
@@ -300,35 +298,9 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                 coilPos(j,1) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[1] * 0.03 + y;
                 coilPos(j,2) = -1 * pFiffInfo->chs.at(chIdcs(j)).chpos.ez[2] * 0.03 + z;
             }
-            //std::cout << "HPIFit::fitHPI - Coil " << j << " max value index " << chIdx << std::endl;
         }
-    }
-    else{
-//        Eigen::Matrix4d trans_init = transDevHead.trans.inverse().cast<double>();
-//        Eigen::Matrix3d rot;
-//        Eigen::RowVector3d transl;
-//        for(int r = 0; r < 3; ++r) {
-//            for(int c = 0; c < 3 ; ++c) {
-//                rot(r,c) = trans_init(r,c);
-//                transl(r) = trans_init(r,3);
-//            }
-//        }
-
-//        coilPos = headHPI;
-//        rot.transposeInPlace();
-//        for(int r = 0; r < 4; ++r) {
-//            for(int c = 0; c < 3 ; ++c) {
-//                coilPos(r,c) = coilPos.row(r).dot(rot.col(c));
-//            }
-//        }
-
-//        // apply translation
-//        for(int r = 0; r < 4; ++r) {
-//            for(int c = 0; c < 3 ; ++c) {
-//                coilPos(r,c) = coilPos(r,c) + transl(c);
-//            }
-//        }
-        qWarning() << "usng extra";
+        //std::cout << "HPIFit::fitHPI - Coil " << j << " max value index " << chIdx << std::endl;
+    } else {
         coilPos = transDevHead.apply_inverse_trans(headHPI.cast<float>()).cast<double>();
     }
 
@@ -337,24 +309,19 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     // Perform actual localization
     coil = dipfit(coil, sensorSet, amp, numCoils, matProjectorsInnerind);
 
-    Eigen::Matrix4d trans = computeTransformation(headHPI, coil.pos);
+    Matrix4d trans = computeTransformation(headHPI, coil.pos);
     //Eigen::Matrix4d trans = computeTransformation(coil.pos, headHPI);
 
     // Store the final result to fiff info
     // Set final device/head matrix and its inverse to the fiff info
     transDevHead.from = 1;
     transDevHead.to = 4;
-
-    for(int r = 0; r < 4; ++r) {
-        for(int c = 0; c < 4 ; ++c) {
-            transDevHead.trans(r,c) = trans(r,c);
-        }
-    }
+    transDevHead.trans = trans.cast<float>();
 
     // Also store the inverse
     transDevHead.invtrans = transDevHead.trans.inverse();
 
-    //Calculate GOF
+    //Calculate Error
     MatrixXd temp = coil.pos;
     temp.conservativeResize(coil.pos.rows(),coil.pos.cols()+1);
 
@@ -418,14 +385,13 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     }
 }
 
-
 //*************************************************************************************************************
 
 CoilParam HPIFit::dipfit(struct CoilParam coil,
                          const QList<Sensor>& sensorSet,
-                         const Eigen::MatrixXd& data,
+                         const MatrixXd& data,
                          int numCoils,
-                         const Eigen::MatrixXd& t_matProjectors)
+                         const MatrixXd& t_matProjectors)
 {
     //Do this in conncurrent mode
     //Generate QList structure which can be handled by the QConcurrent framework
@@ -466,15 +432,14 @@ CoilParam HPIFit::dipfit(struct CoilParam coil,
     return coil;
 }
 
-
 //*************************************************************************************************************
 
-Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixXd BT)
+Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, MatrixXd BT)
 {
-    Eigen::MatrixXd xdiff, ydiff, zdiff, C, Q;
-    Eigen::Matrix4d transFinal = Eigen::Matrix4d::Identity(4,4);
-    Eigen::Matrix4d Rot = Eigen::Matrix4d::Zero(4,4);
-    Eigen::Matrix4d Trans = Eigen::Matrix4d::Identity(4,4);
+    MatrixXd xdiff, ydiff, zdiff, C, Q;
+    Matrix4d transFinal = Matrix4d::Identity(4,4);
+    Matrix4d Rot = Matrix4d::Zero(4,4);
+    Matrix4d Trans = Matrix4d::Identity(4,4);
     double meanx,meany,meanz,normf;
 
     for(int i = 0; i < 15; ++i) {
@@ -497,7 +462,7 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd NH, Eigen::MatrixX
         // Estimate rotation component
         C = BT.transpose() * NH;
 
-        Eigen::JacobiSVD< Eigen::MatrixXd > svd(C ,Eigen::ComputeThinU | Eigen::ComputeThinV);
+        JacobiSVD< MatrixXd > svd(C ,Eigen::ComputeThinU | ComputeThinV);
 
         Q = svd.matrixU() * svd.matrixV().transpose();
 
@@ -543,9 +508,9 @@ void HPIFit::createSensorSet(QList<struct Sensor>& sensors, FwdCoilSet* coils){
         Sensor s;
         FwdCoil* coil = (coils->coils[i]);
         int np = coil->np;
-        Eigen::MatrixXd rmag = Eigen::MatrixXd::Zero(np,3);
-        Eigen::MatrixXd cosmag = Eigen::MatrixXd::Zero(np,3);
-        Eigen::RowVectorXd w(np);
+        MatrixXd rmag = MatrixXd::Zero(np,3);
+        MatrixXd cosmag = MatrixXd::Zero(np,3);
+        RowVectorXd w(np);
 
         s.r0(0) = coil->r0[0];
         s.r0(1) = coil->r0[1];
@@ -558,7 +523,7 @@ void HPIFit::createSensorSet(QList<struct Sensor>& sensors, FwdCoilSet* coils){
                 cosmag(p,c) = coil->cosmag[p][c];
             }
         }
-        s.tra = Eigen::MatrixXd::Identity(np,np);
+        s.tra = MatrixXd::Identity(np,np);
         s.w = w;
         s.rmag = rmag;
         s.cosmag = cosmag;
