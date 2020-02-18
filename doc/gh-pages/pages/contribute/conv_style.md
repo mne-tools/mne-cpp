@@ -22,9 +22,9 @@ Please make use of the following coding conventions when contributing to MNE-CPP
 Use meaningful variable names and type indicators. Avoid complex as well as condensed expressions. For example:
 
 ```cpp
-    int iNumChs = 306;
-    QString sChName = "MEG0000";
-    void loadTxtFile(const QString& sPath);
+int iNumChs = 306;
+QString sChName = "MEG0000";
+void loadTxtFile(const QString& sPath);
 ```
 
 ## Command Line Outputs
