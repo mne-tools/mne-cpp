@@ -119,8 +119,7 @@ public:
     void prepareSession(BrainFlowInputParams params,
                         std::string streamerParams,
                         int boardId,
-                        int dataType,
-                        int vertScale);
+                        int dataType);
     void configureBoard(std::string config);
     void showSettings();
 
