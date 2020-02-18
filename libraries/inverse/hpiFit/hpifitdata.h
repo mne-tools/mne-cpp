@@ -144,7 +144,7 @@ public:
 
     //=========================================================================================================
     /**
-     * dipfit function is adapted from Fieldtrip Software. It has been heavily edited for use with MNE Scan Software.
+     * dipfit function is adapted from Fieldtrip Software.
      */
     void doDipfitConcurrent();
 
