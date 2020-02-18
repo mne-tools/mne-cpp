@@ -192,6 +192,7 @@ bool FtConnector::parseHeaderDef(QBuffer &readBuffer)
     m_fSampleFreq = headerdef.fsample;
     m_iNumNewSamples = headerdef.nsamples;
     m_iDataType = headerdef.data_type;
+    m_iNeuromagHeader = headerdef.bufsize;
 
     qInfo() << "[FtConnector::parseHeaderDef] Got header parameters.";
 
@@ -521,4 +522,11 @@ bool FtConnector::newData()
 QString FtConnector::getAddr()
 {
     return m_sAddress;
+}
+
+//*************************************************************************************************************
+
+void FtConnector::parseNeuromagHeader(QBuffer &buffer)
+{
+
 }
