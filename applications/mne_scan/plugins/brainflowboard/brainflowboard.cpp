@@ -310,8 +310,7 @@ QWidget* BrainFlowBoard::setupWidget()
 void BrainFlowBoard::prepareSession(BrainFlowInputParams params,
                                     std::string streamerParams,
                                     int boardId,
-                                    int dataType,
-                                    int vertScale)
+                                    int dataType)
 {
     if (m_pBoardShim)
     {
@@ -321,7 +320,6 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params,
         return;
     }
 
-    BoardShim::log_message((int)LogLevels::LEVEL_ERROR, "Vert Scale is %d %d", vertScale);
     QMessageBox msgBox;
     m_iBoardId = boardId;
     m_sStreamerParams = streamerParams;
@@ -471,15 +469,11 @@ void BrainFlowBoard::releaseSession(bool useQmessage)
     delete m_pBoardShim;
     delete[] m_pChannels;
 
-    for (int i = 0; i < m_iNumberChannels; i++)
-    {
-        m_outputConnectors.pop_back();
-    }
-    m_pBoardShim = NULL;
-    m_pChannels = NULL;
+    m_pBoardShim = nullptr;
+    m_pChannels = nullptr;
     m_iBoardId = (int)BoardIds::SYNTHETIC_BOARD;
     m_bIsRunning = false;
-    m_pOutput = NULL;
+    m_pOutput->data()->clear();
     m_iSamplingFreq = 0;
     m_sStreamerParams = "";
     m_iNumberChannels = 0;

@@ -81,14 +81,6 @@ BrainFlowSetupWidget::BrainFlowSetupWidget(BrainFlowBoard *board, QWidget *paren
     ui->boardId->addItem("Cyton Wifi");
     ui->boardId->addItem("Cyton Daisy Wifi");
     ui->boardId->setCurrentIndex(1); // Synthetic board is default
-    // vert scale
-    ui->vertScale->addItem("50");
-    ui->vertScale->addItem("100");
-    ui->vertScale->addItem("200");
-    ui->vertScale->addItem("400");
-    ui->vertScale->addItem("1500");
-    ui->vertScale->addItem("10000");
-    ui->vertScale->setCurrentIndex(4); // 1500 is default, synthetic board amplitude is ~1000
 
     connect(ui->prepareSession, &QPushButton::clicked, this, &BrainFlowSetupWidget::prepareSession);
     connect(ui->releaseSession, &QPushButton::clicked, this, &BrainFlowSetupWidget::releaseSession);
@@ -125,7 +117,6 @@ void BrainFlowSetupWidget::prepareSession()
     std::string streamerParams = ui->streamerParams->text().toStdString();
 
     int dataType = ui->dataType->currentIndex();
-    int vertScale = ui->vertScale->currentText().toInt();
 
     int boardIndex = ui->boardId->currentIndex();
     int boardId = (int)BoardIds::SYNTHETIC_BOARD;;
@@ -157,5 +148,5 @@ void BrainFlowSetupWidget::prepareSession()
             break;
     }
 
-    m_pBrainFlowBoard->prepareSession(params, streamerParams, boardId, dataType, vertScale);
+    m_pBrainFlowBoard->prepareSession(params, streamerParams, boardId, dataType);
 }
