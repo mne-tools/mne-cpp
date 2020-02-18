@@ -2,14 +2,12 @@
 * @file     ftbuffer.cpp
 * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
 *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
+* @version  dev
 * @date     January, 2020
 *
 * @section  LICENSE
 *
-* Copyright (C) 2020, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2020, Lorenz Esch, Gabriel B Motta. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -79,7 +77,7 @@ FtBuffer::FtBuffer()
 
 FtBuffer::~FtBuffer()
 {
-    if(this->isRunning()){
+    if(this->isRunning()) {
         stop();
     }
 }
@@ -364,7 +362,7 @@ void FtBuffer::setupRTMSA()
 
     QFile infile("neuromag2ft.fif");
 
-    if(!infile.open(QIODevice::ReadOnly)){
+    if(!infile.open(QIODevice::ReadOnly)) {
         qWarning() << "[FtBuffer::setupRTMSA] Could not open file. Plugin will not run as expected";
         qInfo() << "[FtBuffer::setupRTMSA] Please verify neuromag2ft.fif is present in bin folder.";
     } else {
@@ -406,7 +404,7 @@ void FtBuffer::parseHeader(QBuffer* chunkData)
 
 //    mynewbuffer.open(QIODevice::ReadWrite);
 
-//    if(!infile.open(QIODevice::ReadOnly)){
+//    if(!infile.open(QIODevice::ReadOnly)) {
 //        qDebug() << "Could not open file";
 //    } else {
 //        mynewbuffer.write(infile.readAll());
@@ -425,7 +423,7 @@ void FtBuffer::parseHeader(QBuffer* chunkData)
 
 //    QFile outfile("mytestoutput.txt");
 
-//    if(!outfile.open(QIODevice::ReadWrite)){
+//    if(!outfile.open(QIODevice::ReadWrite)) {
 //        qDebug() << "Could not open file";
 //    } else {
 //        outfile.write(mynewbuffer.read(mynewbuffer.size()));

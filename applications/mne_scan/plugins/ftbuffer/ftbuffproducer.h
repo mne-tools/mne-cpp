@@ -39,6 +39,13 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <ftconnector.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -51,13 +58,6 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include <ftconnector.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -79,11 +79,11 @@ class FtConnector;
 /**
  * FtBuffProducer
  *
- * Handles communication between FtBuffClient and FtBuffer.
+ * Handles communication between FtConnector and FtBuffer.
  * Meant to be run in a separate thread, all communication is done through slots and signals.
- * Holds an instance of FtBuffClient as a member.
+ * Holds an instance of FtConnector as a member.
  *
- * @brief Handles communication and data transfer between FtBuffClient and FtBuffer
+ * @brief Handles communication and data transfer between FtConnector and FtBuffer
  */
 class FtBuffProducer : public QObject
 {
@@ -107,7 +107,7 @@ public:
 
     //=========================================================================================================
     /**
-    * @brief disconnects the member FtBuffClient from the buffer it is connected to
+    * @brief disconnects the member FtConnector from the buffer it is connected to
     */
     bool disconnectFromBuffer();
 
@@ -121,19 +121,20 @@ public slots:
 
     //=========================================================================================================
     /**
-    * Changes stored address and connects the member FtBuffClient to that address
+    * Changes stored address and connects the member FtConnector to that address
     *
     * @brief connects buffer client to provided address
     */
-    void connectToBuffer(QString addr, int port);
+    void connectToBuffer(QString addr,
+                         int port);
 
 protected:
 
     //=========================================================================================================
     /**
-    * runs getData() on a loop, emiting newDataAvailable with new data from FtuffClient
     *
-    * @brief loops continuously to aquire new data from FtBuffClient and send to FtBuffer
+    *
+    * @brief loops continuously to aquire new data from FtConnector and send to FtBuffer
     */
     virtual void run();
 
@@ -170,6 +171,7 @@ signals:
 private:
 
     FtBuffer*                       m_pFtBuffer;                /**< Pointer to FtBuffer that created this object. Destination of collected data */
+
     FtConnector*                    m_pFtConnector;             /**< FtConnectr object that interfaces with buffer and gets buffer data */
 
 };
