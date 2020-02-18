@@ -70,18 +70,18 @@ void FtBuffProducer::run()
 {
     qInfo() << "[FtBuffProducer::run] Running producer..";
 
-    while(!m_pFtConnector->connect()){
+    while(!m_pFtConnector->connect()) {
         QThread::usleep(50000);
     }
 
-    while(!m_pFtConnector->getHeader()){
+    while(!m_pFtConnector->getHeader()) {
         QThread::usleep(50000);
     }
 
     while (true) {
         m_pFtConnector->getData();
 
-        if (m_pFtConnector->newData()){
+        if (m_pFtConnector->newData()) {
             qInfo() << "[FtBuffProducer::run] Returning new data matrix.";
             emit newDataAvailable(m_pFtConnector->getMatrix());
             m_pFtConnector->resetEmitData();
@@ -90,7 +90,7 @@ void FtBuffProducer::run()
         QThread::usleep(50);
 
         m_pFtBuffer->m_mutex.lock();
-        if (!m_pFtBuffer->isRunning()){
+        if (!m_pFtBuffer->isRunning()) {
             break;
         }
         m_pFtBuffer->m_mutex.unlock();
@@ -106,7 +106,8 @@ void FtBuffProducer::doWork()
 
 //*************************************************************************************************************
 
-void FtBuffProducer::connectToBuffer(QString addr, int port)
+void FtBuffProducer::connectToBuffer(QString addr,
+                                     int port)
 {
 //    m_pTempAddress = new char[(addr.toLocal8Bit().size()) + 1];
 //    strcpy(m_pTempAddress, addr.toLocal8Bit().constData());

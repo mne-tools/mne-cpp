@@ -2,14 +2,12 @@
 * @file     ftbuffer.h
 * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
 *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
+* @version  dev
 * @date     January, 2020
 *
 * @section  LICENSE
 *
-* Copyright (C) 2020, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2020, Lorenz Esch, Gabriel B Motta. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -39,17 +37,6 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT Includes
-//=============================================================================================================
-
-#include <QtWidgets>
-#include <QtCore/QtPlugin>
-#include <QDebug>
-#include <QSharedPointer>
-#include <QThread>
-
-//*************************************************************************************************************
-//=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
@@ -67,6 +54,23 @@
 #include <scMeas/realtimemultisamplearray.h>
 
 #include <fiff/fiff_raw_data.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtWidgets>
+#include <QtCore/QtPlugin>
+#include <QDebug>
+#include <QSharedPointer>
+#include <QThread>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -99,7 +103,6 @@ class FTBUFFER_EXPORT FtBuffer : public SCSHAREDLIB::ISensor
 
     friend class FtBufferSetupWidget;
     friend class FtBuffProducer;
-    friend class FtBuffClient;
 
 public:
 
@@ -236,26 +239,31 @@ protected:
 
 private:
 
-    QSharedPointer<FtBuffProducer>                                                      m_pFtBuffProducer;              /**< Pointer to producer object that handles data from FtBuffClient*/
-    QThread                                                                             m_pProducerThread;              /**< Producer thread for the FtBuffProducer object */
+    int                                                                                 m_iNumChannels;                 /**< Parameter for how many channels expecet from buffer data */
+
+    bool                                                                                m_bIsRunning;                   /**< Whether ftbuffer is running. */
+    bool                                                                                m_bBuffOutputSet;               /**< Whether RTMSA output has been initialized with fiff info */
+    bool                                                                                m_bCustomFiff;                  /**< Whether the buffer has a header with trailing chunk data */
+
+    float                                                                               m_iSampFreq;                    /**< Parameter for sampling rate expected from buffer data */
+
     QMutex                                                                              m_mutex;                        /**< Guards shared data from being accessed at the same time */
 
+    QThread                                                                             m_pProducerThread;              /**< Producer thread for the FtBuffProducer object */
+
+    QAction*                                                                            m_pActionShowYourWidget;        /**< Action used in the displaying of the widget */
+
+    QSharedPointer<FtBuffProducer>                                                      m_pFtBuffProducer;              /**< Pointer to producer object that handles data from FtConnector*/
+
     QSharedPointer<FIFFLIB::FiffInfo>                                                   m_pFiffInfo;                    /**< Fiff measurement info.*/
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>>  m_pRTMSA_BufferOutput;          /**< The RealTimeSampleArray to provide the plugin output data.*/
 
     QSharedPointer<FtBufferYourWidget>                                                  m_pYourWidget;                  /**< Pointer used in the displaying of the widget */
-    QAction*                                                                            m_pActionShowYourWidget;        /**< Action used in the displaying of the widget */
 
     QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagHeadChunkData;       /**< Fiff into parser for header data collected from Neuromag extended header */
     QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagIsoChunkData;        /**< Fiff into parser for isotrak data collected from Neuromag extended header */
 
-    bool                                                                                m_bIsRunning;                   /**< Whether ftbuffer is running. */
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>>  m_pRTMSA_BufferOutput;          /**< The RealTimeSampleArray to provide the plugin output data.*/
 
-    bool                                                                                m_bBuffOutputSet;               /**< Whether RTMSA output has been initialized with fiff info */
-    bool                                                                                m_bCustomFiff;                  /**< Whether the buffer has a header with trailing chunk data */
-
-    int                                                                                 m_iNumChannels;                 /**< Parameter for how many channels expecet from buffer data */
-    float                                                                               m_iSampFreq;                    /**< Parameter for sampling rate expected from buffer data */
 };
 
 }//namespace end brace

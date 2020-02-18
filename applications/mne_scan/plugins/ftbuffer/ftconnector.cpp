@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the definition of the Natus class.
+ * @brief    Contains the definition of the FtConnector class.
  *
  */
 
@@ -75,14 +75,14 @@ FtConnector::~FtConnector()
 bool FtConnector::connect()
 {
     m_pSocket = new QTcpSocket();
-
     m_pSocket->connectToHost(QHostAddress(m_sAddress), m_iPort);
-    int tries = 0;
+    qint8 iTries = 0;
 
-    while (m_pSocket->state() != QAbstractSocket::ConnectedState){
+    //wait for connect max 5 tries, also windows safeguard
+    while (m_pSocket->state() != QAbstractSocket::ConnectedState) {
         m_pSocket->waitForConnected(200);
-        tries ++;
-        if (tries > 5) {
+        iTries ++;
+        if (iTries > 5) {
             break;
         }
     }
@@ -195,6 +195,10 @@ bool FtConnector::parseHeaderDef(QBuffer &readBuffer)
 
     qInfo() << "[FtConnector::parseHeaderDef] Got header parameters.";
 
+    if (m_iDataType != 9) {
+        qCritical() << "Data type not supported. Plugin will not behave correctly.";
+    }
+
     return true;
 }
 
@@ -226,7 +230,7 @@ int FtConnector::parseMessageDef(QBuffer &readBuffer)
 
 void FtConnector::sendRequest(messagedef_t &messagedef)
 {
-    messagedef.version = VERSION;
+    messagedef.version = VERSION; //ftbuffer always expects VERSION == 1
 
     m_pSocket->write(reinterpret_cast<char*>(&messagedef.version), sizeof(messagedef.version));
     m_pSocket->write(reinterpret_cast<char*>(&messagedef.command), sizeof(messagedef.command));
@@ -241,7 +245,6 @@ bool FtConnector::getData()
 
     if (m_iNumNewSamples == m_iNumSamples) {
         // no new unread data in buffer
-        //waits a bit before returning
         return false;
     }
 
@@ -312,7 +315,8 @@ bool FtConnector::setPort(const int &iPort)
 
 //*************************************************************************************************************
 
-void FtConnector::prepBuffer(QBuffer &buffer, int numBytes)
+void FtConnector::prepBuffer(QBuffer &buffer,
+                             int numBytes)
 {
     buffer.open(QIODevice::ReadWrite);
     buffer.write(m_pSocket->read(numBytes));
@@ -386,15 +390,15 @@ int FtConnector::totalBuffSamples()
     m_pSocket->readAll(); //Ensure receiving buffer is empty
 
     messagedef_t messagedef;
-    messagedef.bufsize = 12;
+    messagedef.bufsize = sizeof(samples_events_t) + sizeof (qint32);
     messagedef.command = WAIT_DAT;
 
-    //Set threshold to zero so we always get the data we need.
+    //Set threshold to return more than number samples read.
     samples_events_t threshold;
     threshold.nsamples = m_iNumSamples;
     threshold.nevents = 0xFFFFFFFF;
 
-    //Set timeout for waiting for data (in milliseconds)
+    // timeout for waiting in milliseconds
     qint32 timeout = 20;
 
     sendRequest(messagedef);
@@ -439,9 +443,11 @@ void FtConnector::sendSampleEvents(samples_events_t &threshold)
 
 //*************************************************************************************************************
 
-bool FtConnector::parseData(QBuffer &datasampBuffer, int bufsize)
+bool FtConnector::parseData(QBuffer &datasampBuffer,
+                            int bufsize)
 {
 
+    //start interpreting data as float instead of char
     QByteArray dataArray = datasampBuffer.readAll();
     float* fdata = (float*) dataArray.data();
 
@@ -465,15 +471,16 @@ bool FtConnector::parseData(QBuffer &datasampBuffer, int bufsize)
     int count = 0;
     for (int i = 0; i < int (m_iMsgSamples); i++) {
         for (int j = 0; j < int (m_iNumChannels); j++) {
-                matData(j,i) = fdata[count];
+            matData(j,i) = fdata[count];
             count++;
         }
     }
 
+    //store and flag new data
     m_pMatEmit = new Eigen::MatrixXd(matData.cast<double>());
     m_bNewData = true;
 
-    return true;
+    return m_bNewData;
 }
 
 //*************************************************************************************************************
