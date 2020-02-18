@@ -5,55 +5,52 @@ nav_order: 4
 ---
 # Git Workflow
 
-This part is focused on giving a short overview of git commands that are most likely to cover the general workflow. For further information and more advanced use, please check google.
+This part is focused on giving a short overview of git commands that should cover the general git workflow in MNE-CPP. For further information you can check out this [Git tutorial video](https://www.youtube.com/watch?v=DtLrWCFaG0A&feature=youtu.be).
 
-First steps as desribed in [Build from Source](https://mne-cpp.github.io/pages/install/buildguide.html){:target="_blank" rel="noopener"}:
+The first steps to get started, as described in the [build guide](../install/buildguide.md), are:
 ```
    $ git clone https://github.com/<YourGitUserName>/mne-cpp.git
    $ git remote add upstream https://github.com/mne-tools/mne-cpp.git
    $ git fetch --all 
    $ git rebase upstream/master
 ```
-After that, the general workflow is covered by following steps. For more advanced problems, please consult google. 
 
-- Create new branch from `master`: 
+The general workflow is covered by the following steps:
+- Create a new branch from `master`: 
 ```
-   $ git checkout -b <branch_name> master
+   $ git checkout -b <branchName> master
 ```
-- After you applied changes, check the status to get an overview on changes: 
+- Get the latest changes and [rebase](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase){:target="_blank" rel="noopener"}: 
+```
+   $ git fetch upstream
+   $ git rebase upstream/master
+```
+- Solve [merge conflicts](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line){:target="_blank" rel="noopener"}, if they occure. 
+- Make your changes and check the status: 
 ```
    $ git status
 ```
 - Add unstaged changes (colored in red) to prepare next commit: 
 ```
-   $ git add <changed_file_name>
+   $ git add <changedFileName>
    or
    $ git add --all
 ```
-- Commit the added files (colored in green in status report) and add a meaningfull message about what changed and why (have a look at our [commit policy](https://rdoerfel.github.io/mne-cpp/pages/contribute/conv_style.html){:target="_blank" rel="noopener"} for that: 
+- Commit the added files (colored in green in status report) and add a meaningful message about what changed and why (have a look at our [commit policy](conv_style.md)): 
 ```
-   $ git commit -m "meaningful commit message" 
+   $ git commit -m "Fix: meaningful commit message" 
    or 
    $ git commit --all
 ```
-- If you make small changes that are related to the previous commit, add your changes to the previous commit with: 
+- If you make small changes that are related to the previous commit, you can amend your changes to the previous commit with: 
 ```
-   $ git commit --amend
+   $ git commit -m "Fix: meaningful commit message" --amend
 ```
-- Push your changes to origin (your fork in your GitHub page): 
+- Push your changes to origin (your MNE-CPP fork on GitHub). Pleaes note that a force push via `-f` might be necessary if you rebased: 
 ```
-   $ git push origin <branch_name>
+   $ git push origin <branchName>
+   or
+   $ git push origin <branchName> -f
 ```
-Please check if there are changes in upstream/master (the mne-cpp Github repository) before you open a new Pull Request. If there are changes apply following steps:
 
-- Get latest changes: 
-```
-   $ git fetch --all 
-   $ git fetch upstream/master` 
-```
-- Solve [merge conflicts](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line){:target="_blank" rel="noopener"}, if they occure. 
-- [Rebase](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase){:target="_blank" rel="noopener"} your branch to set all your commits on top of the masters history: 
-```
-   $ git checkout <branch_to_rebase>
-   $ git rebase upstream/master
-```
+
