@@ -121,7 +121,8 @@ private slots:
 
 signals:
 
-    void connectAtAddr(QString Addr, int port);
+    void connectAtAddr(QString Addr,
+                       int port);
 
 private:
 

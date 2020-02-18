@@ -97,12 +97,14 @@ void FtBufferSetupWidget::showAboutDialog()
 
 void FtBufferSetupWidget::pressedConnect()
 {
-    emit connectAtAddr(ui.m_lineEditIP->text(),ui.m_spinBoxPort->value());
+    emit connectAtAddr(ui.m_lineEditIP->text(),
+                       ui.m_spinBoxPort->value());
 }
 
 //*************************************************************************************************************
 
-void FtBufferSetupWidget::isConnected(bool stat) {
+void FtBufferSetupWidget::isConnected(bool stat)
+{
     if (stat) {
         ui.m_qPushButton_Connect->setText("Set");
     }
