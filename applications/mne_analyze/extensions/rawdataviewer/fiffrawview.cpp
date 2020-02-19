@@ -89,6 +89,7 @@ FiffRawView::FiffRawView(QWidget *parent)
 
     //set vertical layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
+    neLayout->setContentsMargins(0, 0, 0, 0);
 
     neLayout->addWidget(m_pTableView);
 
