@@ -45,6 +45,7 @@
 #include "../libs/anShared/Interfaces/IExtension.h"
 #include "../libs/anShared/Management/extensionmanager.h"
 #include "../libs/anShared/Management/statusbar.h"
+#include "multiviewwindow.h"
 
 
 //*************************************************************************************************************
@@ -215,14 +216,37 @@ void MainWindow::createMdiView(QSharedPointer<ExtensionManager> pExtensionManage
         QWidget* pView = pExtension->getView();
         if(pView) {
             //m_pMdiView->addSubWindow(pView);
-            QDockWidget* pDockWidget = new QDockWidget();
+            MultiViewWindow* pDockWidget = new MultiViewWindow();
+            pDockWidget->mdView =m_pMdiView;
             pDockWidget->setWidget(pView);
-            pDockWidget->setWindowFlags(Qt::CustomizeWindowHint |
-                                        Qt::Window | Qt::WindowMinimizeButtonHint |
-                                        Qt::WindowMaximizeButtonHint |
-                                        Qt::WindowCloseButtonHint);
             m_pMdiView->splitterVertical->addWidget(pDockWidget);
             qDebug() << "[MainWindow::createMdiView] Found and added subwindow for " << pExtension->getName();
+
+            QListView *listview = new QListView;
+            QListView *listviewa = new QListView;
+            QListView *listviewv = new QListView;
+            QListView *listviewvx = new QListView();
+
+            MultiViewWindow* pDockWidgeta = new MultiViewWindow();
+            pDockWidgeta->mdView =m_pMdiView;
+            pDockWidgeta->setWidget(listview);
+
+            MultiViewWindow* pDockWidgetb = new MultiViewWindow();
+            pDockWidgetb->mdView =m_pMdiView;
+            pDockWidgetb->setWidget(listviewa);
+
+            MultiViewWindow* pDockWidgetc = new MultiViewWindow();
+            pDockWidgetc->mdView =m_pMdiView;
+            pDockWidgetc->setWidget(listviewv);
+
+            MultiViewWindow* pDockWidgetv = new MultiViewWindow();
+            pDockWidgetv->mdView =m_pMdiView;
+            pDockWidgetv->setWidget(listviewvx);
+
+            m_pMdiView->splitterHorizontal->addWidget(pDockWidgeta);
+            m_pMdiView->splitterHorizontal->addWidget(pDockWidgetb);
+            m_pMdiView->splitterHorizontal->addWidget(pDockWidgetc);
+            m_pMdiView->splitterHorizontal->addWidget(pDockWidgetv);
         }
     }
 
