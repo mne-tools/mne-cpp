@@ -1,16 +1,13 @@
 //=============================================================================================================
 /**
- * @file     mdiview.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ * @file     multiviewwindow.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>
  * @version  dev
- * @date     January, 2017
+ * @date     February, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2017, Christoph Dinh, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -31,17 +28,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MdiView class implementation.
+ * @brief    MultiViewWindow class declaration.
  *
  */
+
+#ifndef MULTIVIEWWINDOW_H
+#define MULTIVIEWWINDOW_H
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
-#include "mdiview.h"
-
-#include <anShared/Interfaces/IStandardView.h>
 
 
 //*************************************************************************************************************
@@ -49,76 +46,64 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QGridLayout>
-#include <QMdiSubWindow>
-#include <QPainter>
-#include <QListView>
 #include <QDockWidget>
-
-#if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
-#include <QPrinter>
-#include <QPrintDialog>
-#endif
+#include <QSharedPointer>
+#include <QPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
-
-using namespace MNEANALYZE;
-using namespace ANSHAREDLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE MNEANALYZE
 //=============================================================================================================
 
-MdiView::MdiView(QWidget *parent)
-: QWidget(parent)
-{
-    QHBoxLayout *layout = new QHBoxLayout;
-    splitterHorizontal = new QSplitter(this);
-    splitterHorizontal->setOrientation(Qt::Horizontal);
-    splitterVertical = new QSplitter(this);
-    splitterVertical->setOrientation(Qt::Vertical);
-    splitterVertical->addWidget(splitterHorizontal);
-    layout->addWidget(splitterVertical);
-
-    this->setLayout(layout);
-}
-
-
-//*************************************************************************************************************
-
-MdiView::~MdiView()
+namespace MNEANALYZE
 {
 
-}
-
-
 //*************************************************************************************************************
+//=============================================================================================================
+// MNEANALYZE FORWARD DECLARATIONS
+//=============================================================================================================
 
-void MdiView::printCurrentSubWindow()
+class MdiView;
+
+//=============================================================================================================
+/**
+ * @brief The MultiViewWindow class inherits from QMdiArea and allows printing of subwindows.
+ */
+class MultiViewWindow : public QDockWidget
 {
-//    if(! currentSubWindow())
-//        return;
+    Q_OBJECT
+public:
+    typedef QSharedPointer<MultiViewWindow> SPtr;            /**< Shared pointer type for MultiViewWindow. */
+    typedef QSharedPointer<const MultiViewWindow> ConstSPtr; /**< Const shared pointer type for MultiViewWindow. */
 
-//#if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
-//    IStandardView *view = qobject_cast<IStandardView *>(currentSubWindow());
-//    // if no standard view -> render widget to printer otherwise call print function
-//    if(! view){
-//        QPrinter printer;
-//        QPrintDialog dialog(&printer, this);
-//        if (dialog.exec() == QDialog::Accepted) {
-//            QPainter painter(&printer);
-//            currentSubWindow()->render(&painter);
-//        }
-//    }
-//    else {
-//        view->print();
-//    }
-//#endif
+    //=========================================================================================================
+    /**
+     * Constructs an MultiViewWindow.
+     */
+    explicit MultiViewWindow(QWidget *parent = 0);
 
-}
+    //=========================================================================================================
+    /**
+     * Destructs an MultiViewWindow.
+     */
+    ~MultiViewWindow();
+
+    void onTopLevelChanged(bool flag);
+
+    QWidget * window;
+    QWidget * oldparent = Q_NULLPTR;
+    MdiView * mdView;
+    bool windowmode;
+private:
+};
+
+}// NAMESPACE
+
+#endif // MULTIVIEWWINDOW_H
