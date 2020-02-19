@@ -49,6 +49,8 @@
 #include <QDockWidget>
 #include <QSharedPointer>
 #include <QPointer>
+#include <QPoint>
+#include <QMouseEvent>
 
 
 //*************************************************************************************************************
@@ -56,6 +58,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace Ui {
+    class MultiViewWindowWidget;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -76,7 +81,7 @@ class MdiView;
 /**
  * @brief The MultiViewWindow class inherits from QMdiArea and allows printing of subwindows.
  */
-class MultiViewWindow : public QDockWidget
+class MultiViewWindow : public QWidget
 {
     Q_OBJECT
 public:
@@ -87,7 +92,7 @@ public:
     /**
      * Constructs an MultiViewWindow.
      */
-    explicit MultiViewWindow(QWidget *parent = 0);
+    explicit MultiViewWindow(QWidget *parent = 0, QWidget* centralWidget = 0, const QString& sName = "");
 
     //=========================================================================================================
     /**
@@ -95,12 +100,26 @@ public:
      */
     ~MultiViewWindow();
 
-    void onTopLevelChanged(bool flag);
+    void maximize();
 
-    QWidget * window;
-    QWidget * oldparent = Q_NULLPTR;
-    MdiView * mdView;
-    bool windowmode;
+    void closeEvent(QCloseEvent *event);
+
+    void mousePressEvent(QMouseEvent *evt)
+    {
+        oldPos = evt->globalPos();
+    }
+
+    void mouseMoveEvent(QMouseEvent *evt)
+    {
+        const QPoint delta = evt->globalPos() - oldPos;
+        move(x()+delta.x(), y()+delta.y());
+        oldPos = evt->globalPos();
+    }
+
+    QWidget * oldparent;
+    Ui::MultiViewWindowWidget* m_pUi;
+
+    QPoint oldPos;
 private:
 };
 

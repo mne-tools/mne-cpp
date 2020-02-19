@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "mdiview.h"
+#include "multiviewwindow.h"
 
 #include <anShared/Interfaces/IStandardView.h>
 
@@ -95,6 +96,23 @@ MdiView::MdiView(QWidget *parent)
 MdiView::~MdiView()
 {
 
+}
+
+//*************************************************************************************************************
+
+void MdiView::addWidgetH(QWidget* pWidget, const QString& sName)
+{
+    MultiViewWindow* pDockWidgeta = new MultiViewWindow(this, pWidget, sName);
+    this->splitterHorizontal->addWidget(pDockWidgeta);
+}
+
+
+//*************************************************************************************************************
+
+void MdiView::addWidgetV(QWidget* pWidget, const QString& sName)
+{
+    MultiViewWindow* pDockWidgeta = new MultiViewWindow(this, pWidget, sName);
+    this->splitterVertical->addWidget(pDockWidgeta);
 }
 
 
