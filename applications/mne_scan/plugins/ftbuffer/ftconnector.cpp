@@ -139,8 +139,6 @@ bool FtConnector::getHeader()
     prepBuffer(hdrBuffer, sizeof (headerdef_t)); // if implementing header chunks: change from sizeof (headerdef) to bufsize
     parseHeaderDef(hdrBuffer);
 
-    m_pSocket->readAll(); //Ensure receiving buffer is empty
-
     return true;
 }
 
@@ -526,7 +524,62 @@ QString FtConnector::getAddr()
 
 //*************************************************************************************************************
 
-void FtConnector::parseNeuromagHeader(QBuffer &buffer)
+void FtConnector::parseNeuromagHeader()
 {
+    qInfo() << "[FtConnector::parseNeuromagHeader] Attepting to get extended header...";
 
+
+
+    QSharedPointer<FIFFLIB::FiffRawData> neuromagData;
+
+    QBuffer neuromagBuffer;
+
+    getHeader();
+
+    QBuffer chunkBuffer;
+    prepBuffer(chunkBuffer, m_iNeuromagHeader);
+
+    bool condition = true;
+
+    while(condition) {
+        char c_type[sizeof(qint32)];
+        chunkBuffer.read(c_type, sizeof(qint32));
+        qint32 type;
+        std::memcpy(&type, c_type, sizeof(qint32));
+
+        qDebug() << "AAAAAAAAAAAAAAA:" << type;
+
+        if (type != 8 ) {
+
+            char c_size[sizeof(qint32)];
+            chunkBuffer.read(c_size, sizeof(qint32));
+            qint32 size;
+            std::memcpy(&size, c_size, sizeof(qint32));
+            qDebug() << "BBBBBBBBBBBBBBB:" << size;
+            char c_rest[size];
+            chunkBuffer.read(c_rest, size);
+        } else {
+            char c_size[sizeof(qint32)];
+            chunkBuffer.read(c_size, sizeof(qint32));
+            qint32 size;
+            std::memcpy(&size, c_size, sizeof(qint32));
+            qDebug() << "BBBBBBBBBBBBBBB:" << size;
+
+            neuromagBuffer.open(QIODevice::ReadWrite);
+            neuromagBuffer.write(chunkBuffer.read(size));
+
+//            neuromagData = QSharedPointer<FIFFLIB::FiffRawData>(new FIFFLIB::FiffRawData(neuromagBuffer));
+
+            condition = false;
+        }
+    }
+
+    QFile outfile("mytestoutput.txt");
+
+    if(!outfile.open(QIODevice::ReadWrite)) {
+        qDebug() << "Could not open file";
+    } else {
+        neuromagBuffer.reset();
+        outfile.write(neuromagBuffer.read(neuromagBuffer.size()));
+    }
 }
