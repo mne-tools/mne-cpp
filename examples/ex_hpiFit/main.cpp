@@ -45,11 +45,15 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_cov.h>
+
 #include <inverse/hpiFit/hpifit.h>
 #include <inverse/hpiFit/hpifitdata.h>
+
 #include <utils/ioutils.h>
 #include <utils/generics/applicationlogger.h>
+
 #include <fwd/fwd_coil_set.h>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
@@ -87,7 +91,8 @@ using namespace Eigen;
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
 
-void write_pos(const float time, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::MatrixXd& position, const QVector<double>& vGoF){
+void write_pos(const float time, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::MatrixXd& position, const QVector<double>& vGoF)
+{
     // Write quaternions and time in position matrix. Format is the same like MaxFilter's .pos files.
     QMatrix3x3 rot;
 
@@ -96,6 +101,7 @@ void write_pos(const float time, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::
             rot(ir,ic) = info->dev_head_t.trans(ir,ic);
         }
     }    
+
     double GoF = std::accumulate(vGoF.begin(), vGoF.end(), .0) / vGoF.size();
     QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
 
@@ -126,7 +132,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("hpiFit Example");
     parser.addHelpOption();
     qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/bin.";
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/raw/data_with_movement_chpi_raw.fif");
 
     parser.addOption(inputOption);
 
@@ -194,7 +200,7 @@ int main(int argc, char *argv[])
 
     // if debugging files are necessary set bDoDebug = true;
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
-    bool bDoDebug = true;
+    bool bDoDebug = false;
 
     // read and fit
     for(int i = 0; i < time.size(); i++) {
