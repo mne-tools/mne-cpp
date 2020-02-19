@@ -98,6 +98,10 @@ public:
      */
     ~MdiView();
 
+    void addWidgetH(QWidget* pWidget, const QString &sName);
+
+    void addWidgetV(QWidget* pWidget, const QString& sName);
+
     //=========================================================================================================
     /**
      * Allows printing of current subwindow.

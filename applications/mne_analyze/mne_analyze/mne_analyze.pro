@@ -113,7 +113,8 @@ HEADERS += \
     mdiview.h \
     analyzecore.h
 
-FORMS +=
+FORMS += \
+    formfiles/multiviewwindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -142,6 +143,9 @@ win32 {
 macx {
     ICON = resources/images/appIcons/mne_analyze.icns
 }
+
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD/formfiles
 
 # Deploy dependencies
 win32:!contains(MNECPP_CONFIG, static) {
