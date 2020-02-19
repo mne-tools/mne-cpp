@@ -45,18 +45,21 @@
 
 #include <cstring>
 
+#include <fiff/fiff_raw_data.h>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QCoreApplication>
-#include <QObject>
-#include <QTcpSocket>
-#include <QHostAddress>
 #include <QtCore/QtPlugin>
+#include <QHostAddress>
+#include <QTcpSocket>
+#include <QObject>
 #include <QBuffer>
 #include <QThread>
+#include <QFile>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -259,6 +262,8 @@ public:
      */
     void resetEmitData();
 
+    void parseNeuromagHeader();
+
 private:
 
     /**
@@ -343,8 +348,6 @@ private:
      * @return returns total amount of samples written to buffer
      */
     int totalBuffSamples();
-
-    void parseNeuromagHeader(QBuffer &buffer);
 
 
     int                 m_iNumSamples;                          /**< Number of samples we've read from the buffer */
