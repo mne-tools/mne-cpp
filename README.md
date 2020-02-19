@@ -45,7 +45,7 @@ If you want to contribute to MNE-CPP you can find all necessary information [her
 Contact
 -------
 
-A list of contact persons can be found [here](https://mne-cpp.github.io/team.html).
+A list of contact persons can be found [here](https://mne-cpp.github.io/contact.html).
 
 License
 -------
@@ -79,4 +79,3 @@ MNE-CPP is **BSD-licenced** (3 clause):
     CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
     OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
