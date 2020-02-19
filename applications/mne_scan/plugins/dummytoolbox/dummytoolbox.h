@@ -64,19 +64,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DummyToolboxPlugin
+// DEFINE NAMESPACE DUMMYTOOLBOXPLUGIN
 //=============================================================================================================
 
 namespace DUMMYTOOLBOXPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace SCSHAREDLIB;
 
 
 //*************************************************************************************************************
@@ -91,7 +83,7 @@ using namespace SCSHAREDLIB;
  *
  * @brief The DummyToolbox class provides a dummy algorithm structure.
  */
-class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
+class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public SCSHAREDLIB::IAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "dummytoolbox.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
@@ -115,12 +107,12 @@ public:
     /**
      * IAlgorithm functions
      */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual QSharedPointer<SCSHAREDLIB::IPlugin> clone() const;
     virtual void init();
     virtual void unload();
     virtual bool start();
     virtual bool stop();
-    virtual IPlugin::PluginType getType() const;
+    virtual SCSHAREDLIB::IPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
 
@@ -150,8 +142,8 @@ private:
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pDummyBuffer;         /**< Holds incoming data.*/
 
-    PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pDummyInput;      /**< The RealTimeMultiSampleArray of the DummyToolbox input.*/
-    PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pDummyOutput;     /**< The RealTimeMultiSampleArray of the DummyToolbox output.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pDummyInput;      /**< The RealTimeMultiSampleArray of the DummyToolbox input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pDummyOutput;     /**< The RealTimeMultiSampleArray of the DummyToolbox output.*/
 
 signals:
     //=========================================================================================================

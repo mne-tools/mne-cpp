@@ -39,17 +39,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include "mne_global.h"
 #include "mne_cluster_info.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
 
 #include <fiff/fiff_types.h>
 #include <fiff/fiff.h>
@@ -57,7 +51,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -79,14 +73,6 @@
 
 namespace MNELIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -151,7 +137,7 @@ public:
      *
      * @return the geometry model
      */
-    MatrixXf& getTriCoords(float p_fScaling = 1.0f);
+    Eigen::MatrixXf& getTriCoords(float p_fScaling = 1.0f);
 
     //=========================================================================================================
     /**
@@ -175,7 +161,7 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    bool transform_hemisphere_to(fiff_int_t dest, const FiffCoordTrans &p_Trans);
+    bool transform_hemisphere_to(FIFFLIB::fiff_int_t dest, const FIFFLIB::FiffCoordTrans &p_Trans);
 
     //=========================================================================================================
     /**
@@ -187,7 +173,7 @@ public:
      *
      * @param[in] p_pStream  The stream to write to.
      */
-    void writeToStream(FiffStream* p_pStream);
+    void writeToStream(FIFFLIB::FiffStream* p_pStream);
 
     //ToDo write(IODevice &)
 
@@ -201,31 +187,31 @@ public:
     friend bool operator== (const MNEHemisphere &a, const MNEHemisphere &b);
 
 public:
-    fiff_int_t type;            /**< Type of the source space: 1 = "surf" or 2 = "vol". ToDo not used yet. */
-    fiff_int_t id;              /**< Id information */
-    fiff_int_t np;              /**< Number of vertices of the whole/original surface used to create the source locations. */
-    fiff_int_t ntri;            /**< Number of available triangles */
-    fiff_int_t coord_frame;     /**< Coil coordinate system definition */
-    MatrixX3f rr;               /**< Vertices of the source space mesh/surface. */
-    MatrixX3f nn;               /**< Normals of the source space mesh/surface. */
-    MatrixX3i tris;             /**< Triangles of the source space mesh/surface. */
-    fiff_int_t nuse;            /**< Number of used dipoles. */
-    VectorXi inuse;             /**< Used source points indicated by 1, 0 otherwise */
-    VectorXi vertno;            /**< Zero based (different to MATLAB) indices of the used vertices/If label based clustered gain matrix vertno contains label IDs*/
-    qint32 nuse_tri;            /**< Number of used triangles. */
-    MatrixX3i use_tris;         /**< Triangle information of the used triangles. */
-    VectorXi nearest;           /**< All indeces mapped to the indeces of the used vertices (using option -cps during mne_setup_source_space) */
-    VectorXd nearest_dist;      /**< Distance to the nearest vertices (using option -cps during mne_setup_source_space). */
-    QList<VectorXi> pinfo;      /**< Patch information (using option -cps during mne_setup_source_space) */
-    VectorXi patch_inds;        /**< List of neighboring vertices in the high resolution triangulation. */
-    float dist_limit;           /**< ToDo... (using option -cps during mne_setup_source_space) */
-    SparseMatrix<double> dist;  /**< ToDo... (using option -cps during mne_setup_source_space) */
-    MatrixX3d tri_cent;         /**< Triangle centers */
-    MatrixX3d tri_nn;           /**< Triangle normals */
-    VectorXd tri_area;          /**< Triangle areas */
-    MatrixX3d use_tri_cent;     /**< Triangle centers of used triangles */
-    MatrixX3d use_tri_nn;       /**< Triangle normals of used triangles */
-    VectorXd use_tri_area;      /**< Triangle areas of used triangles */
+    FIFFLIB::fiff_int_t type;           /**< Type of the source space: 1 = "surf" or 2 = "vol". ToDo not used yet. */
+    FIFFLIB::fiff_int_t id;             /**< Id information */
+    FIFFLIB::fiff_int_t np;             /**< Number of vertices of the whole/original surface used to create the source locations. */
+    FIFFLIB::fiff_int_t ntri;           /**< Number of available triangles */
+    FIFFLIB::fiff_int_t coord_frame;    /**< Coil coordinate system definition */
+    Eigen::MatrixX3f rr;                /**< Vertices of the source space mesh/surface. */
+    Eigen::MatrixX3f nn;                /**< Normals of the source space mesh/surface. */
+    Eigen::MatrixX3i tris;              /**< Triangles of the source space mesh/surface. */
+    FIFFLIB::fiff_int_t nuse;           /**< Number of used dipoles. */
+    Eigen::VectorXi inuse;              /**< Used source points indicated by 1, 0 otherwise */
+    Eigen::VectorXi vertno;             /**< Zero based (different to MATLAB) indices of the used vertices/If label based clustered gain matrix vertno contains label IDs*/
+    qint32 nuse_tri;                    /**< Number of used triangles. */
+    Eigen::MatrixX3i use_tris;          /**< Triangle information of the used triangles. */
+    Eigen::VectorXi nearest;            /**< All indeces mapped to the indeces of the used vertices (using option -cps during mne_setup_source_space) */
+    Eigen::VectorXd nearest_dist;       /**< Distance to the nearest vertices (using option -cps during mne_setup_source_space). */
+    QList<Eigen::VectorXi> pinfo;       /**< Patch information (using option -cps during mne_setup_source_space) */
+    Eigen::VectorXi patch_inds;         /**< List of neighboring vertices in the high resolution triangulation. */
+    float dist_limit;                   /**< ToDo... (using option -cps during mne_setup_source_space) */
+    Eigen::SparseMatrix<double> dist;   /**< ToDo... (using option -cps during mne_setup_source_space) */
+    Eigen::MatrixX3d tri_cent;          /**< Triangle centers */
+    Eigen::MatrixX3d tri_nn;            /**< Triangle normals */
+    Eigen::VectorXd tri_area;           /**< Triangle areas */
+    Eigen::MatrixX3d use_tri_cent;      /**< Triangle centers of used triangles */
+    Eigen::MatrixX3d use_tri_nn;        /**< Triangle normals of used triangles */
+    Eigen::VectorXd use_tri_area;       /**< Triangle areas of used triangles */
 
     QVector<QVector<int> > neighbor_tri;           /**< Vector of neighboring triangles for each vertex */
     QVector<QVector<int> > neighbor_vert;          /**< Vector of neighboring vertices for each vertex */
@@ -233,7 +219,7 @@ public:
     MNEClusterInfo cluster_info; /**< Holds the cluster information. */
 private:
     // Newly added
-    MatrixXf m_TriCoords; /**< Holds the rr tri Matrix transformed to geometry data. */
+    Eigen::MatrixXf m_TriCoords; /**< Holds the rr tri Matrix transformed to geometry data. */
 
 };
 

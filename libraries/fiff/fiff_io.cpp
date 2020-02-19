@@ -51,6 +51,8 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace Eigen;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -119,7 +121,10 @@ bool FiffIO::read(QIODevice& p_IODevice)
     //Search dirTree for specific data types
     if(t_dirTree->has_kind(FIFFB_EVOKED))
         hasEvoked = true;
-    if(t_dirTree->has_kind(FIFFB_RAW_DATA) || t_dirTree->has_kind(FIFFB_PROCESSED_DATA))
+    if(t_dirTree->has_kind(FIFFB_RAW_DATA) ||
+       t_dirTree->has_kind(FIFFB_PROCESSED_DATA) ||
+       t_dirTree->has_kind(FIFFB_CONTINUOUS_DATA) ||
+       t_dirTree->has_kind(FIFFB_SMSH_RAW_DATA))
         hasRaw = true;
    // if(t_Tree.has_kind(FIFFB_MNE_FORWARD_SOLUTION))
    //     hasFwds = true;

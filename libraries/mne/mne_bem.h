@@ -40,27 +40,15 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include "mne_global.h"
 #include "mne_bem_surface.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
 
 #include <algorithm>
 #include <vector>
@@ -163,7 +151,7 @@ public:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem &p_Bem);
+    static bool readFromStream(FIFFLIB::FiffStream::SPtr& p_pStream, bool add_geom, MNEBem &p_Bem);
 
     //=========================================================================================================
     /**
@@ -191,7 +179,7 @@ public:
      *
      * @param[in] p_pStream  The stream to write to.
      */
-    void writeToStream(FiffStream *p_pStream);
+    void writeToStream(FIFFLIB::FiffStream *p_pStream);
 
     //=========================================================================================================
     /**
@@ -240,7 +228,7 @@ public:
      * @param[in]  sLm       3D Landmarks of the source geometry
      * @param[in]  dLm       3D Landmarks of the destination geometry
      */
-    void warp(const MatrixXf &sLm, const MatrixXf &dLm);
+    void warp(const Eigen::MatrixXf &sLm, const Eigen::MatrixXf &dLm);
 
     //=========================================================================================================
     /**
@@ -248,7 +236,7 @@ public:
      *
      * @param[in]  trans     The Transformation Matrix
      */
-    void transform(const FiffCoordTrans& trans);
+    void transform(const FIFFLIB::FiffCoordTrans& trans);
 
     //=========================================================================================================
     /**
@@ -256,7 +244,7 @@ public:
      *
      * @param[in]  trans     The Transformation Matrix
      */
-    void invtransform(const FiffCoordTrans& trans);
+    void invtransform(const FIFFLIB::FiffCoordTrans& trans);
 
 protected:
     //=========================================================================================================
@@ -270,7 +258,7 @@ protected:
      *
      * @return true if succeeded, false otherwise
      */
-    static bool readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Tree, MNEBemSurface& p_BemSurface);
+    static bool readBemSurface(FIFFLIB::FiffStream::SPtr& p_pStream, const FIFFLIB::FiffDirNode::SPtr& p_Tree, MNEBemSurface& p_BemSurface);
 
 private:
     QList<MNEBemSurface> m_qListBemSurface;    /**< List of the BEM Surfaces. */

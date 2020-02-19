@@ -1,9 +1,9 @@
 ---
-title: Coding Conventions and Style Guide
+title: Coding Conventions
 parent: Contribute
 nav_order: 3
 ---
-# Coding Conventions and Style Guide
+# Coding Conventions
 
 ## Naming Conventions
 
@@ -17,20 +17,47 @@ Please make use of the following coding conventions when contributing to MNE-CPP
 |Member variables |`m_typeMeaningfulName` |
 |Local variables 	|`typeMeaningfulName`   |
 
-## Command Line Outputs
-
-Please make use of `qDebug()` for debugging, `qInfo()` for user information and `qWarning()` for user warning purposes. `qFatal()` should only be used to initiate an application stop. Please note that Eigen structures can only be plotted via std::cout.
-
 ## Readability
 
- * Avoid complex and condensed expressions
- * Use meaningful variable names
+Use meaningful variable names and type indicators. Avoid complex as well as condensed expressions. For example:
+
+```cpp
+    int iNumChs = 306;
+    QString sChName = "MEG0000";
+    void loadTxtFile(const QString& sPath);
+```
+
+## Command Line Outputs
+
+Every output should start with `[<ClassName::FunctionName>]`. Please make use of `qDebug()` during development and `qInfo()` for general user information. `qWarning()` should be used to alert about unusual situations which do not lead to a termination of the application. `qCritical()` should only be used if an error was catched which will lead to the application being terminated. For example:
+
+```cpp
+void FileLoader::loadTxtFile(const QString& sPath)
+{
+    qInfo() << "[FileLoader::loadTxtFile] Working on file" << sPath;
+
+    if(!sPath.contains(".txt")) {
+        qWarning() << "[FileLoader::loadTxtFile] The file does not end with .txt."
+    }
+
+    QFile file(sPath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qCritical() << "[FileLoader::loadTxtFile] Unable to open file."
+        return;
+    }
+    ...
+}
+```
+
+| **Please note:** Eigen objects (`MatrixXd`, `VectorXd`, etc.) can only be plotted via `std::cout`.|
 
 ## Documentation
 
- * Please use the DoxyGen style to document your code.
+Please use the DoxyGen style to document your code. For an example see [here](https://github.com/mne-tools/mne-cpp/blob/master/libraries/connectivity/network/network.h).
 
 ## Commit Policy
+
+A good commit should follow: 
 
  * If you add new functions/classes, ensure everything is documented properly.
  * All code should follow the Coding Conventions & Style.

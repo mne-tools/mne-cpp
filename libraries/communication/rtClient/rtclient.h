@@ -39,16 +39,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include "../communication_global.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
 
 #include <fiff/fiff_info.h>
 
@@ -66,7 +60,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -79,14 +73,6 @@
 
 namespace COMMUNICATIONLIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -128,7 +114,7 @@ public:
     /**
      * Request Fiff Info
      */
-    inline FiffInfo::SPtr& getFiffInfo();
+    inline FIFFLIB::FiffInfo::SPtr& getFiffInfo();
 
     //=========================================================================================================
     /**
@@ -156,13 +142,13 @@ protected:
     virtual void run();
 
 private:
-    QMutex      mutex;                  /**< Provides access serialization between threads*/
-    bool        m_bIsConnected;         /**< Is Connected. */
-    bool        m_bIsMeasuring;         /**< Is Measuring. */
-    bool        m_bIsRunning;           /**< Holds whether RtClient is running.*/
-    QString     m_sClientAlias;         /**< The clien alias of the data client */
-    QString     m_sRtServerHostName;    /**< The IP Adress of mne_rt_server.*/
-    FiffInfo::SPtr  m_pFiffInfo;        /**< Fiff measurement info.*/
+    QMutex      mutex;                      /**< Provides access serialization between threads*/
+    bool        m_bIsConnected;             /**< Is Connected. */
+    bool        m_bIsMeasuring;             /**< Is Measuring. */
+    bool        m_bIsRunning;               /**< Holds whether RtClient is running.*/
+    QString     m_sClientAlias;             /**< The clien alias of the data client */
+    QString     m_sRtServerHostName;        /**< The IP Adress of mne_rt_server.*/
+    FIFFLIB::FiffInfo::SPtr  m_pFiffInfo;   /**< Fiff measurement info.*/
 
 signals:
     //=========================================================================================================
@@ -188,7 +174,7 @@ signals:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline FiffInfo::SPtr& RtClient::getFiffInfo()
+inline FIFFLIB::FiffInfo::SPtr& RtClient::getFiffInfo()
 {
     return m_pFiffInfo;
 }

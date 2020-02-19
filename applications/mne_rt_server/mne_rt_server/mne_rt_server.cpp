@@ -43,12 +43,6 @@
 
 #include "IConnector.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -68,7 +62,7 @@
 //=============================================================================================================
 
 using namespace RTSERVER;
-
+using namespace COMMUNICATIONLIB;
 
 const char* connectorDir = "/mne_rt_server_plugins";        /**< holds directory to connectors.*/
 
@@ -83,7 +77,7 @@ MNERTServer::MNERTServer()
 , m_commandServer(this)
 , m_connectorManager(&m_fiffStreamServer, this)
 {
-    qRegisterMetaType<MatrixXf>("MatrixXf");
+    qRegisterMetaType<Eigen::MatrixXf>("MatrixXf");
     qRegisterMetaType<QSharedPointer<Eigen::MatrixXf> >("QSharedPointer<Eigen::MatrixXf>");
 
     //

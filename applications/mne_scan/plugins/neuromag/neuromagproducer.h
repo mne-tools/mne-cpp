@@ -42,13 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
 #include <communication/rtClient/rtdataclient.h>
 
 
@@ -68,14 +61,6 @@
 
 namespace NEUROMAGPLUGIN
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace COMMUNICATIONLIB;
 
 
 //*************************************************************************************************************
@@ -155,11 +140,11 @@ private:
 
     QMutex m_mutex;
 
-    Neuromag*   m_pNeuromag;    /**< Holds a pointer to corresponding Neuromag.*/
+    Neuromag*   m_pNeuromag;        /**< Holds a pointer to corresponding Neuromag.*/
     bool        m_bIsRunning;       /**< Whether NeuromagProducer is running.*/
 
-    QSharedPointer<RtDataClient> m_pRtDataClient;   /**< The data client.*/
-    bool m_bDataClientIsConnected;                  /**< If the data client is connected.*/
+    QSharedPointer<COMMUNICATIONLIB::RtDataClient> m_pRtDataClient;   /**< The data client.*/
+    bool m_bDataClientIsConnected;                                    /**< If the data client is connected.*/
 
     qint32 m_iDataClientId;
 

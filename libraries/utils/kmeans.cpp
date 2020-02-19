@@ -40,12 +40,6 @@
 
 #include "kmeans.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
 #include <math.h>
 #include <iostream>
 #include <algorithm>
@@ -55,7 +49,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
@@ -67,6 +61,7 @@
 //=============================================================================================================
 
 using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -74,7 +69,12 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-KMeans::KMeans(QString distance, QString start, qint32 replicates, QString emptyact, bool online, qint32 maxit)
+KMeans::KMeans(QString distance,
+               QString start,
+               qint32 replicates,
+               QString emptyact,
+               bool online,
+               qint32 maxit)
 : m_sDistance(distance)
 , m_sStart(start)
 , m_iReps(replicates)
@@ -97,7 +97,12 @@ KMeans::KMeans(QString distance, QString start, qint32 replicates, QString empty
 
 //*************************************************************************************************************
 
-bool KMeans::calculate( MatrixXd X, qint32 kClusters, VectorXi& idx, MatrixXd& C, VectorXd& sumD, MatrixXd& D)
+bool KMeans::calculate(MatrixXd X,
+                       qint32 kClusters,
+                       VectorXi& idx,
+                       MatrixXd& C,
+                       VectorXd& sumD,
+                       MatrixXd& D)
 {
     if (kClusters < 1)
         return false;

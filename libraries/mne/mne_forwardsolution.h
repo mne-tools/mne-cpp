@@ -62,7 +62,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -87,25 +87,16 @@ namespace MNELIB
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace UTILSLIB;
-using namespace FIFFLIB;
-
 //=========================================================================================================
 /**
  * Gain matrix output data for one region, used for clustering
  */
 struct RegionDataOut
 {
-    VectorXi    roiIdx;     /**< Region cluster indices */
-    MatrixXd    ctrs;       /**< Cluster centers */
-    VectorXd    sumd;       /**< Sums of the distances to the centroid */
-    MatrixXd    D;          /**< Distances to the centroid */
+    Eigen::VectorXi    roiIdx;     /**< Region cluster indices */
+    Eigen::MatrixXd    ctrs;       /**< Cluster centers */
+    Eigen::VectorXd    sumd;       /**< Sums of the distances to the centroid */
+    Eigen::MatrixXd    D;          /**< Distances to the centroid */
 
     qint32      iLabelIdxOut;   /**< Label ID */
 };
@@ -117,16 +108,16 @@ struct RegionDataOut
  */
 struct RegionData
 {
-    MatrixXd    matRoiG;            /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
-    MatrixXd    matRoiGWhitened;    /**< Reshaped whitened region gain matrix sources x sensors(x,y,z)*/
+    Eigen::MatrixXd    matRoiG;            /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
+    Eigen::MatrixXd    matRoiGWhitened;    /**< Reshaped whitened region gain matrix sources x sensors(x,y,z)*/
     bool        bUseWhitened;       /**< Wheather indeces of whitened gain matrix should be used to calculate centroids */
 
-    MatrixXd    matRoiGOrig;            /**< Region gain matrix sensors x sources(x,y,z)*/
-//    MatrixXd    matRoiGOrigWhitened;    /**< Whitened region gain matrix sensors x sources(x,y,z)*/
+    Eigen::MatrixXd    matRoiGOrig;            /**< Region gain matrix sensors x sources(x,y,z)*/
+//    Eigen::MatrixXd    matRoiGOrigWhitened;    /**< Whitened region gain matrix sensors x sources(x,y,z)*/
 
     qint32      nClusters;      /**< Number of clusters within this region */
 
-    VectorXi    idcs;           /**< Get source space indeces */
+    Eigen::VectorXi    idcs;           /**< Get source space indeces */
     qint32      iLabelIdxIn;    /**< Label ID */
     QString     sDistMeasure;   /**< "cityblock" or "sqeuclidean" */
 
@@ -141,13 +132,13 @@ struct RegionData
         // Kmeans Reduction
         RegionDataOut p_RegionDataOut;
 
-        KMeans t_kMeans(t_sDistMeasure, QString("sample"), 5);
+        UTILSLIB::KMeans t_kMeans(t_sDistMeasure, QString("sample"), 5);
 
         if(bUseWhitened)
         {
             t_kMeans.calculate(this->matRoiGWhitened, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
 
-            MatrixXd newCtrs = MatrixXd::Zero(p_RegionDataOut.ctrs.rows(), p_RegionDataOut.ctrs.cols());
+            Eigen::MatrixXd newCtrs = Eigen::MatrixXd::Zero(p_RegionDataOut.ctrs.rows(), p_RegionDataOut.ctrs.cols());
             for(qint32 c = 0; c < p_RegionDataOut.ctrs.rows(); ++c)
             {
                 qint32 num = 0;
@@ -177,9 +168,9 @@ struct RegionData
 };
 
 
-const static FiffCov defaultCov;
-const static FiffInfo defaultInfo;
-static MatrixXd defaultD;
+const static FIFFLIB::FiffCov defaultCov;
+const static FIFFLIB::FiffInfo defaultInfo;
+static Eigen::MatrixXd defaultD;
 
 
 //=============================================================================================================
@@ -215,8 +206,8 @@ public:
     MNEForwardSolution(QIODevice &p_IODevice,
                        bool force_fixed = false,
                        bool surf_ori = false,
-                       const QStringList& include = defaultQStringList,
-                       const QStringList& exclude = defaultQStringList,
+                       const QStringList& include = FIFFLIB::defaultQStringList,
+                       const QStringList& exclude = FIFFLIB::defaultQStringList,
                        bool bExcludeBads = false);
 
     //=========================================================================================================
@@ -253,11 +244,11 @@ public:
      *
      * @return clustered MNE forward solution
      */
-    MNEForwardSolution cluster_forward_solution(const AnnotationSet &p_AnnotationSet,
+    MNEForwardSolution cluster_forward_solution(const FSLIB::AnnotationSet &p_AnnotationSet,
                                                 qint32 p_iClusterSize,
-                                                MatrixXd& p_D = defaultD,
-                                                const FiffCov &p_pNoise_cov = defaultCov,
-                                                const FiffInfo &p_pInfo = defaultInfo,
+                                                Eigen::MatrixXd& p_D = defaultD,
+                                                const FIFFLIB::FiffCov &p_pNoise_cov = defaultCov,
+                                                const FIFFLIB::FiffInfo &p_pInfo = defaultInfo,
                                                 QString p_sMethod = "cityblock") const;
 
     //=========================================================================================================
@@ -268,7 +259,7 @@ public:
      *
      * @return Orientation priors.
      */
-    FiffCov compute_orient_prior(float loose = 0.2);
+    FIFFLIB::FiffCov compute_orient_prior(float loose = 0.2);
 
     //=========================================================================================================
     /**
@@ -284,13 +275,13 @@ public:
      *
      * @return the depth prior
      */
-    static FiffCov compute_depth_prior(const MatrixXd &Gain,
-                                       const FiffInfo &gain_info,
-                                       bool is_fixed_ori,
-                                       double exp = 0.8,
-                                       double limit = 10.0,
-                                       const MatrixXd &patch_areas = defaultConstMatrixXd,
-                                       bool limit_depth_chs = false);
+    static FIFFLIB::FiffCov compute_depth_prior(const Eigen::MatrixXd &Gain,
+                                                const FIFFLIB::FiffInfo &gain_info,
+                                                bool is_fixed_ori,
+                                                double exp = 0.8,
+                                                double limit = 10.0,
+                                                const Eigen::MatrixXd &patch_areas = FIFFLIB::defaultConstMatrixXd,
+                                                bool limit_depth_chs = false);
 
     //=========================================================================================================
     /**
@@ -327,7 +318,8 @@ public:
      *
      * @return Forward solution restricted to selected channel types.
      */
-    MNEForwardSolution pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+    MNEForwardSolution pick_channels(const QStringList& include = FIFFLIB::defaultQStringList,
+                                     const QStringList& exclude = FIFFLIB::defaultQStringList) const;
 
     //=========================================================================================================
     /**
@@ -337,7 +329,7 @@ public:
      *
      * @return the reduced forward solution
      */
-    MNEForwardSolution pick_regions(const QList<Label> &p_qListLabels) const;
+    MNEForwardSolution pick_regions(const QList<FSLIB::Label> &p_qListLabels) const;
 
     //=========================================================================================================
     /**
@@ -352,7 +344,10 @@ public:
      *
      * @return Forward solution restricted to selected channel types.
      */
-    MNEForwardSolution pick_types(bool meg, bool eeg, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+    MNEForwardSolution pick_types(bool meg,
+                                  bool eeg,
+                                  const QStringList& include = FIFFLIB::defaultQStringList,
+                                  const QStringList& exclude = FIFFLIB::defaultQStringList) const;
 
     //=========================================================================================================
     /**
@@ -367,13 +362,13 @@ public:
      * @param[out] p_outWhitener     Whitener
      * @param[out] p_outNumNonZero   the rank (non zeros)
      */
-    void prepare_forward(const FiffInfo &p_info,
-                         const FiffCov &p_noise_cov,
+    void prepare_forward(const FIFFLIB::FiffInfo &p_info,
+                         const FIFFLIB::FiffCov &p_noise_cov,
                          bool p_pca,
-                         FiffInfo &p_outFwdInfo,
-                         MatrixXd &gain,
-                         FiffCov &p_outNoiseCov,
-                         MatrixXd &p_outWhitener,
+                         FIFFLIB::FiffInfo &p_outFwdInfo,
+                         Eigen::MatrixXd &gain,
+                         FIFFLIB::FiffCov &p_outNoiseCov,
+                         Eigen::MatrixXd &p_outWhitener,
                          qint32 &p_outNumNonZero) const;
 
 //    //=========================================================================================================
@@ -421,12 +416,12 @@ public:
     /**
      *
      */
-    VectorXi tripletSelection(const VectorXi& p_vecIdxSelection) const
+    Eigen::VectorXi tripletSelection(const Eigen::VectorXi& p_vecIdxSelection) const
     {
-        MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);
+        Eigen::MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);
         triSelect.row(1).array() += 1;
         triSelect.row(2).array() += 2;
-        VectorXi retTriSelect(triSelect.cols()*3);
+        Eigen::VectorXi retTriSelect(triSelect.cols()*3);
         for(int i = 0; i < triSelect.cols(); ++i)
             retTriSelect.block(i*3,0,3,1) = triSelect.col(i);
         return retTriSelect;
@@ -453,8 +448,8 @@ public:
                      MNEForwardSolution& fwd,
                      bool force_fixed = false,
                      bool surf_ori = false,
-                     const QStringList& include = defaultQStringList,
-                     const QStringList& exclude = defaultQStringList,
+                     const QStringList& include = FIFFLIB::defaultQStringList,
+                     const QStringList& exclude = FIFFLIB::defaultQStringList,
                      bool bExcludeBads = true);
 
     //ToDo readFromStream
@@ -468,7 +463,7 @@ public:
      *
      * @return reduced MNE forward solution
      */
-    MNEForwardSolution reduce_forward_solution(qint32 p_iNumDipoles, MatrixXd& p_D) const;
+    MNEForwardSolution reduce_forward_solution(qint32 p_iNumDipoles, Eigen::MatrixXd& p_D) const;
 
     //=========================================================================================================
     /**
@@ -477,7 +472,7 @@ public:
      * @param[in, out] G     Gain matrix to be restricted; result is stored in place.
      * @param[in] info       Fiff information
      */
-    static void restrict_gain_matrix(MatrixXd &G, const FiffInfo &info);
+    static void restrict_gain_matrix(Eigen::MatrixXd &G, const FIFFLIB::FiffInfo &info);
 
     //=========================================================================================================
     /**
@@ -514,7 +509,8 @@ public:
      *
      * @return the source position in 3D space
      */
-    MatrixX3f getSourcePositionsByLabel(const QList<Label> &lPickedLabels, const FSLIB::SurfaceSet& tSurfSetInflated);
+    Eigen::MatrixX3f getSourcePositionsByLabel(const QList<FSLIB::Label> &lPickedLabels,
+                                               const FSLIB::SurfaceSet& tSurfSetInflated);
 
 private:
     //=========================================================================================================
@@ -529,21 +525,23 @@ private:
      *
      * @return True if succeeded, false otherwise
      */
-    static bool read_one(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr& p_Node, MNEForwardSolution& one);
+    static bool read_one(FIFFLIB::FiffStream::SPtr& p_pStream,
+                         const FIFFLIB::FiffDirNode::SPtr& p_Node,
+                         MNEForwardSolution& one);
 
 public:
-    FiffInfoBase info;                  /**< light weighted measurement info */
-    fiff_int_t source_ori;              /**< Source orientation: fixed or free */
-    bool surf_ori;                      /**< If surface oriented */
-    fiff_int_t coord_frame;             /**< Coil coordinate system definition */
-    fiff_int_t nsource;                 /**< Number of source dipoles */
-    fiff_int_t nchan;                   /**< Number of channels */
-    FiffNamedMatrix::SDPtr sol;         /**< Forward solution */
-    FiffNamedMatrix::SDPtr sol_grad;    /**< ToDo... */
-    FiffCoordTrans mri_head_t;          /**< MRI head coordinate transformation */
-    MNESourceSpace src;                 /**< Geometric description of the source spaces (hemispheres) */
-    MatrixX3f source_rr;                /**< Source locations */
-    MatrixX3f source_nn;                /**< Source normals (number depends on fixed or free orientation) */
+    FIFFLIB::FiffInfoBase info;                 /**< light weighted measurement info */
+    FIFFLIB::fiff_int_t source_ori;             /**< Source orientation: fixed or free */
+    bool surf_ori;                              /**< If surface oriented */
+    FIFFLIB::fiff_int_t coord_frame;            /**< Coil coordinate system definition */
+    FIFFLIB::fiff_int_t nsource;                /**< Number of source dipoles */
+    FIFFLIB::fiff_int_t nchan;                  /**< Number of channels */
+    FIFFLIB::FiffNamedMatrix::SDPtr sol;        /**< Forward solution */
+    FIFFLIB::FiffNamedMatrix::SDPtr sol_grad;   /**< ToDo... */
+    FIFFLIB::FiffCoordTrans mri_head_t;         /**< MRI head coordinate transformation */
+    MNESourceSpace src;                         /**< Geometric description of the source spaces (hemispheres) */
+    Eigen::MatrixX3f source_rr;                 /**< Source locations */
+    Eigen::MatrixX3f source_nn;                 /**< Source normals (number depends on fixed or free orientation) */
 };
 
 //*************************************************************************************************************

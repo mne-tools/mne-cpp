@@ -50,7 +50,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QMutex>
@@ -63,7 +63,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 
@@ -175,7 +175,7 @@ public:
      *
      * @return the reference to the current info.
      */
-    inline FiffInfo::SPtr info();
+    inline FIFFLIB::FiffInfo::SPtr info();
 
     //=========================================================================================================
     /**
@@ -185,8 +185,8 @@ public:
      * @param [in] p_fiffinfo                the evoked fiff info as shared pointer.
      * @param [in] lResponsibleTriggerTypes  List of all trigger types which lead to the recent emit of a new evoked set.
      */
-    virtual void setValue(const FiffEvokedSet &v,
-                          const FiffInfo::SPtr& p_fiffinfo,
+    virtual void setValue(const FIFFLIB::FiffEvokedSet &v,
+                          const FIFFLIB::FiffInfo::SPtr& p_fiffinfo,
                           const QStringList& lResponsibleTriggerTypes);
 
     //=========================================================================================================
@@ -196,7 +196,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual FiffEvokedSet::SPtr& getValue();
+    virtual FIFFLIB::FiffEvokedSet::SPtr& getValue();
 
     //=========================================================================================================
     /**
@@ -237,7 +237,7 @@ private:
      *
      * @param[in] p_fiffInfo     Info to init from
      */
-    void init(FiffInfo::SPtr p_fiffInfo);
+    void init(FIFFLIB::FiffInfo::SPtr p_fiffInfo);
 
     mutable QMutex                      m_qMutex;           /**< Mutex to ensure thread safety */
 
@@ -329,7 +329,7 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeEvokedSet::chInfo()
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr RealTimeEvokedSet::info()
+inline FIFFLIB::FiffInfo::SPtr RealTimeEvokedSet::info()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo;

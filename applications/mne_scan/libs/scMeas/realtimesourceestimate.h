@@ -56,7 +56,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
@@ -73,16 +73,6 @@
 
 namespace SCMEASLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace FSLIB;
 
 
 //=========================================================================================================
@@ -117,7 +107,7 @@ public:
      *
      * @param[in] annotSet   the annotation set to set
      */
-    inline void setAnnotSet(AnnotationSet::SPtr& annotSet);
+    inline void setAnnotSet(FSLIB::AnnotationSet::SPtr& annotSet);
 
     //=========================================================================================================
     /**
@@ -125,7 +115,7 @@ public:
      *
      * @return the annotation set
      */
-    inline AnnotationSet::SPtr& getAnnotSet();
+    inline FSLIB::AnnotationSet::SPtr& getAnnotSet();
 
     //=========================================================================================================
     /**
@@ -133,7 +123,7 @@ public:
      *
      * @param[in] surfSet   the surface set to set
      */
-    inline void setSurfSet(SurfaceSet::SPtr& surfSet);
+    inline void setSurfSet(FSLIB::SurfaceSet::SPtr& surfSet);
 
     //=========================================================================================================
     /**
@@ -141,7 +131,7 @@ public:
      *
      * @return the surface set
      */
-    inline SurfaceSet::SPtr& getSurfSet();
+    inline FSLIB::SurfaceSet::SPtr& getSurfSet();
 
     //=========================================================================================================
     /**
@@ -149,7 +139,7 @@ public:
      *
      * @param[in] fwdSolution   the forward solution to set
      */
-    inline void setFwdSolution(MNEForwardSolution::SPtr& fwdSolution);
+    inline void setFwdSolution(MNELIB::MNEForwardSolution::SPtr& fwdSolution);
 
     //=========================================================================================================
     /**
@@ -157,7 +147,7 @@ public:
      *
      * @return the forward solution
      */
-    inline MNEForwardSolution::SPtr& getFwdSolution();
+    inline MNELIB::MNEForwardSolution::SPtr& getFwdSolution();
 
     //=========================================================================================================
     /**
@@ -166,7 +156,7 @@ public:
      *
      * @param [in] v the value which is attached to the sample array vector.
      */
-    virtual void setValue(MNESourceEstimate &v);
+    virtual void setValue(MNELIB::MNESourceEstimate &v);
 
     //=========================================================================================================
     /**
@@ -175,7 +165,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual QList<MNESourceEstimate::SPtr>& getValue();
+    virtual QList<MNELIB::MNESourceEstimate::SPtr>& getValue();
 
     //=========================================================================================================
     /**
@@ -191,7 +181,7 @@ public:
      *
      * @param [in] p_fiffInfo the new FiffInfo..
      */
-    void setFiffInfo(FiffInfo::SPtr p_fiffInfo);
+    void setFiffInfo(FIFFLIB::FiffInfo::SPtr p_fiffInfo);
 
     //=========================================================================================================
     /**
@@ -199,7 +189,7 @@ public:
      *
      * @return the current FiffInfo.
      */
-    FiffInfo::SPtr getFiffInfo();
+    FIFFLIB::FiffInfo::SPtr getFiffInfo();
 
     //=========================================================================================================
     /**
@@ -218,18 +208,18 @@ public:
     inline qint32 getSourceEstimateSize() const;
 
 private:
-    mutable QMutex                  m_qMutex;       /**< Mutex to ensure thread safety */
+    mutable QMutex                          m_qMutex;       /**< Mutex to ensure thread safety */
 
-    FiffInfo::SPtr                  m_pFiffInfo;    /**< The Fiff info. */
+    FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;    /**< The Fiff info. */
 
-    AnnotationSet::SPtr             m_pAnnotSet;    /**< Annotation set. */
-    SurfaceSet::SPtr                m_pSurfSet;     /**< Surface set. */
-    MNEForwardSolution::SPtr        m_pFwdSolution; /**< Forward solution. */
+    FSLIB::AnnotationSet::SPtr              m_pAnnotSet;    /**< Annotation set. */
+    FSLIB::SurfaceSet::SPtr                 m_pSurfSet;     /**< Surface set. */
+    MNELIB::MNEForwardSolution::SPtr        m_pFwdSolution; /**< Forward solution. */
 
-    qint32                          m_iSourceEstimateSize;  /**< Sample size of the multi sample array.*/
+    qint32                                  m_iSourceEstimateSize;  /**< Sample size of the multi sample array.*/
 
-    QList<MNESourceEstimate::SPtr>  m_pMNEStc;      /**< The source estimates. */
-    bool                            m_bInitialized; /**< Is initialized */
+    QList<MNELIB::MNESourceEstimate::SPtr>  m_pMNEStc;      /**< The source estimates. */
+    bool                                    m_bInitialized; /**< Is initialized */
 };
 
 
@@ -238,7 +228,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void RealTimeSourceEstimate::setAnnotSet(AnnotationSet::SPtr& annotSet)
+inline void RealTimeSourceEstimate::setAnnotSet(FSLIB::AnnotationSet::SPtr& annotSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pAnnotSet = annotSet;
@@ -247,7 +237,7 @@ inline void RealTimeSourceEstimate::setAnnotSet(AnnotationSet::SPtr& annotSet)
 
 //*************************************************************************************************************
 
-inline AnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
+inline FSLIB::AnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pAnnotSet;
@@ -256,7 +246,7 @@ inline AnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
 
 //*************************************************************************************************************
 
-inline void RealTimeSourceEstimate::setSurfSet(SurfaceSet::SPtr& surfSet)
+inline void RealTimeSourceEstimate::setSurfSet(FSLIB::SurfaceSet::SPtr& surfSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pSurfSet = surfSet;
@@ -265,7 +255,7 @@ inline void RealTimeSourceEstimate::setSurfSet(SurfaceSet::SPtr& surfSet)
 
 //*************************************************************************************************************
 
-inline SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
+inline FSLIB::SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pSurfSet;
@@ -274,7 +264,7 @@ inline SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
 
 //*************************************************************************************************************
 
-inline void RealTimeSourceEstimate::setFwdSolution(MNEForwardSolution::SPtr& fwdSolution)
+inline void RealTimeSourceEstimate::setFwdSolution(MNELIB::MNEForwardSolution::SPtr& fwdSolution)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFwdSolution = fwdSolution;
@@ -283,7 +273,7 @@ inline void RealTimeSourceEstimate::setFwdSolution(MNEForwardSolution::SPtr& fwd
 
 //*************************************************************************************************************
 
-inline MNEForwardSolution::SPtr& RealTimeSourceEstimate::getFwdSolution()
+inline MNELIB::MNEForwardSolution::SPtr& RealTimeSourceEstimate::getFwdSolution()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFwdSolution;
@@ -301,7 +291,7 @@ inline bool RealTimeSourceEstimate::isInitialized() const
 
 //*************************************************************************************************************
 
-inline void RealTimeSourceEstimate::setFiffInfo(FiffInfo::SPtr p_fiffInfo)
+inline void RealTimeSourceEstimate::setFiffInfo(FIFFLIB::FiffInfo::SPtr p_fiffInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFiffInfo = p_fiffInfo;
@@ -310,7 +300,7 @@ inline void RealTimeSourceEstimate::setFiffInfo(FiffInfo::SPtr p_fiffInfo)
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr RealTimeSourceEstimate::getFiffInfo()
+inline FIFFLIB::FiffInfo::SPtr RealTimeSourceEstimate::getFiffInfo()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo;

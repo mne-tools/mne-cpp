@@ -47,7 +47,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
@@ -56,7 +56,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -71,14 +71,6 @@ namespace FSLIB
 {
 
 const static Eigen::MatrixX3i defaultTris(0,3);
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -118,7 +110,11 @@ public:
      * @param[in] p_name         label names
      * @param[in] p_id           label id (optional, default = -1)
      */
-    Label(const VectorXi &p_vertices, const MatrixX3f &p_pos, const VectorXd &p_values, qint32 p_hemi, const QString &p_name, qint32 p_id = -1);
+    Label(const Eigen::VectorXi &p_vertices,
+          const Eigen::MatrixX3f &p_pos,
+          const Eigen::VectorXd &p_values,
+          qint32 p_hemi, const QString &p_name,
+          qint32 p_id = -1);
     
     //=========================================================================================================
     /**
@@ -148,7 +144,7 @@ public:
      *
      * @return the generated tris.
      */
-    MatrixX3i selectTris(const Surface & p_Surface);
+    Eigen::MatrixX3i selectTris(const Surface & p_Surface);
 
     //=========================================================================================================
     /**
@@ -158,7 +154,7 @@ public:
      *
      * @return the generated tris.
      */
-    MatrixX3i selectTris(const MatrixX3i &p_matTris);
+    Eigen::MatrixX3i selectTris(const Eigen::MatrixX3i &p_matTris);
 
     //=========================================================================================================
     /**
@@ -176,18 +172,18 @@ public:
     static bool read(const QString& p_sFileName, Label &p_Label);
 
 public:
-    QString comment;    /**< Comment from the first line of the label file. */
-    VectorXi vertices;  /**< Vertex indices (0 based) */
-    MatrixX3f pos;      /**< Locations in meters */
-    VectorXd values;    /**< Values at the vertices */
-    qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
+    QString comment;            /**< Comment from the first line of the label file. */
+    Eigen::VectorXi vertices;   /**< Vertex indices (0 based) */
+    Eigen::MatrixX3f pos;       /**< Locations in meters */
+    Eigen::VectorXd values;     /**< Values at the vertices */
+    qint32 hemi;                /**< Hemisphere (lh = 0; rh = 1) */
 //    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2) */ Don't mix both hemis - KISS principle
-    QString name;       /**< Name of the label */
-    qint32 label_id;    /**< Label id (optional) */
-//    MatrixX3i tris;     /**< Tris for plotting (optional) */
+    QString name;               /**< Name of the label */
+    qint32 label_id;            /**< Label id (optional) */
+//    Eigen::MatrixX3i tris;     /**< Tris for plotting (optional) */
 
 //    QMap<qint32, VectorXi> vertices;    /**< Vertex indices (0 based) */
-//    QMap<qint32, MatrixX3d> pos;        /**< Locations in meters */
+//    QMap<qint32, Eigen::MatrixX3d> pos;        /**< Locations in meters */
 //    QMap<qint32, VectorXd> values;      /**< Values at the vertices */
 };
 

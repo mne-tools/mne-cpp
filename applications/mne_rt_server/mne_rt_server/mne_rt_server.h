@@ -39,7 +39,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include <communication/rtCommand/commandmanager.h>
@@ -50,7 +50,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -58,7 +58,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QObject>
@@ -72,12 +72,6 @@
 namespace RTSERVER
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace COMMUNICATIONLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -106,7 +100,7 @@ public:
     /**
      * Returns the command manager
      */
-    inline CommandManager& getCommandManager();
+    inline COMMUNICATIONLIB::CommandManager& getCommandManager();
 
     //=========================================================================================================
     /**
@@ -130,16 +124,16 @@ private:
     /**
      * Is called when signal help is executed.
      */
-    void comHelp(Command p_command);
+    void comHelp(COMMUNICATIONLIB::Command p_command);
 
 
 
-    FiffStreamServer    m_fiffStreamServer;     /**< Fiff stream server. */
-    CommandServer       m_commandServer;        /**< Command server. */
+    FiffStreamServer                    m_fiffStreamServer;     /**< Fiff stream server. */
+    CommandServer                       m_commandServer;        /**< Command server. */
 
-    ConnectorManager    m_connectorManager;     /**< Connector manager. */
+    ConnectorManager                    m_connectorManager;     /**< Connector manager. */
 
-    CommandManager      m_commandManager;       /**< The command manager of the mne_rt_server. */
+    COMMUNICATIONLIB::CommandManager    m_commandManager;       /**< The command manager of the mne_rt_server. */
 };
 
 
@@ -148,7 +142,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline CommandManager& MNERTServer::getCommandManager()
+inline COMMUNICATIONLIB::CommandManager& MNERTServer::getCommandManager()
 {
     return m_commandManager;
 }

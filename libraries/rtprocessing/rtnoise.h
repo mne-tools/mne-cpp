@@ -43,20 +43,8 @@
 
 #include "rtprocessing_global.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Generics INCLUDES
-//=============================================================================================================
 
 #include <utils/generics/circularmatrixbuffer.h>
 
@@ -74,7 +62,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -87,16 +75,6 @@
 
 namespace RTPROCESSINGLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace IOBUFFER;
-using namespace FIFFLIB;
 
 
 //=============================================================================================================
@@ -120,7 +98,10 @@ public:
      * @param[in] p_pFiffInfo        Associated Fiff Information
      * @param[in] parent     Parent QObject (optional)
      */
-    explicit RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, qint32 p_dataLen, QObject *parent = 0);
+    explicit RtNoise(qint32 p_iMaxSamples,
+                     FIFFLIB::FiffInfo::SPtr p_pFiffInfo,
+                     qint32 p_dataLen,
+                     QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -134,7 +115,7 @@ public:
      *
      * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
      */
-    void append(const MatrixXd &p_DataSegment);
+    void append(const Eigen::MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
@@ -161,14 +142,10 @@ public:
      */
     virtual bool stop();
 
-signals:
-    //=========================================================================================================
-    /**
-     * Signal which is emitted when a new data Matrix is estimated.
-     *
-     * @param[out]
-     */
-    void SpecCalculated(Eigen::MatrixXd);
+    QMutex ReadMutex;
+
+    Eigen::MatrixXd m_matSpecData;
+    bool m_bSendDataToBuffer;
 
 protected:
     //=========================================================================================================
@@ -181,14 +158,21 @@ protected:
 
     QVector <float> hanning(int N, short itype);
 
+    int m_iNumOfBlocks;
+    int m_iBlockSize;
+    int m_iSensors;
+    int m_iBlockIndex;
+
+    Eigen::MatrixXd m_matCircBuf;
+
 private:
-    QMutex      mutex;                  /**< Provides access serialization between threads*/
+    QMutex      mutex;                              /**< Provides access serialization between threads*/
 
-    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
+    FIFFLIB::FiffInfo::SPtr  m_pFiffInfo;           /**< Holds the fiff measurement information. */
 
-    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
+    bool        m_bIsRunning;                       /**< Holds if real-time Covariance estimation is running.*/
 
-    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
+    IOBUFFER::CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 
     QVector <float> m_fWin;
 
@@ -197,20 +181,14 @@ private:
     qint32 m_iFFTlength;
     qint32 m_dataLength;
 
-protected:
-    int m_iNumOfBlocks;
-    int m_iBlockSize;
-    int m_iSensors;
-    int m_iBlockIndex;
-
-    MatrixXd m_matCircBuf;
-
-public:
-    MatrixXd m_matSpecData;
-    QMutex ReadMutex;
-
-    bool m_bSendDataToBuffer;
-
+signals:
+    //=========================================================================================================
+    /**
+     * Signal which is emitted when a new data Matrix is estimated.
+     *
+     * @param[out]
+     */
+    void SpecCalculated(Eigen::MatrixXd);
 };
 
 //*************************************************************************************************************
@@ -227,7 +205,7 @@ inline bool RtNoise::isRunning()
 
 #ifndef metatype_matrix
 #define metatype_matrix
-Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the MatrixXd type. For signal/slot usage.*/
+Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the Eigen::MatrixXd type. For signal/slot usage.*/
 #endif
 
 #endif // RtNoise_H

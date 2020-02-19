@@ -72,7 +72,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -80,7 +80,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QObject>
@@ -93,14 +93,6 @@
 
 namespace UTILSLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 
 /**
@@ -140,7 +132,11 @@ public:
      * gives a 33 tap high pass filter with 3 dB corner at 0.7 with a transition bandwidth of 0.1
      * The FIR coefficients are placed in FirCoeff, starting at index 0.
      */
-    ParksMcClellan(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType);
+    ParksMcClellan(int NumTaps,
+                   double OmegaC,
+                   double BW,
+                   double ParksWidth,
+                   TPassType PassType);
 
     ~ParksMcClellan();
 
@@ -149,7 +145,11 @@ public:
      * Using nothrow prevents an exception from being thrown. new will instead return NULL.
      * These array are much larger than actually needed. See the notes in the orig fortran file.
      */
-    void init(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType);
+    void init(int NumTaps,
+              double OmegaC,
+              double BW,
+              double ParksWidth,
+              TPassType PassType);
 
     //=========================================================================================================
     /**
@@ -178,7 +178,10 @@ public:
     /**
      * This was added by IowaHills and is used in Remez() in 6 places.
      */
-    bool ErrTest(int k, int Nut, double Comp, double *Err);
+    bool ErrTest(int k,
+                 int Nut,
+                 double Comp,
+                 double *Err);
 
     //=========================================================================================================
     /**
@@ -187,22 +190,22 @@ public:
      */
     void CalcCoefficients();
 
-    RowVectorXd FirCoeff; /**< containt the generated filter coefficients */
+    Eigen::RowVectorXd FirCoeff; /**< containt the generated filter coefficients */
 
 private:
     int HalfTapCount;
-    VectorXi ExchangeIndex;
-    VectorXd LeGrangeD;
-    VectorXd Alpha;
-    VectorXd CosOfGrid;
-    VectorXd DesPlus;
-    VectorXd Coeff;
-    VectorXd Edge;
-    VectorXd BandMag;
-    VectorXd InitWeight;
-    VectorXd DesiredMag;
-    VectorXd Grid;
-    VectorXd Weight;
+    Eigen::VectorXi ExchangeIndex;
+    Eigen::VectorXd LeGrangeD;
+    Eigen::VectorXd Alpha;
+    Eigen::VectorXd CosOfGrid;
+    Eigen::VectorXd DesPlus;
+    Eigen::VectorXd Coeff;
+    Eigen::VectorXd Edge;
+    Eigen::VectorXd BandMag;
+    Eigen::VectorXd InitWeight;
+    Eigen::VectorXd DesiredMag;
+    Eigen::VectorXd Grid;
+    Eigen::VectorXd Weight;
 
     bool InitDone2;
 

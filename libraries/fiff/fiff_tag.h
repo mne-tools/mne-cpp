@@ -100,7 +100,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -129,14 +129,6 @@ namespace FIFFLIB
 
 class FiffStream;
 class FiffDirNode;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-//using namespace SOURCELAB;
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -281,11 +273,20 @@ public:
 
     //=========================================================================================================
     /**
-     * to Float
-     * Fast access; Data are deleted if tag gets deleted, and wise versa
-     *
-     * @return type cast of the tag data pointer
-     */
+    * to Julian
+    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    *
+    * @return type cast of the tag data pointer
+    */
+    inline qint32* toJulian() const;
+
+    //=========================================================================================================
+    /**
+    * to Float
+    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    *
+    * @return type cast of the tag data pointer
+    */
     inline float* toFloat() const;
 
     //=========================================================================================================
@@ -392,7 +393,7 @@ public:
      *
      * @return Integer matrix
      */
-    inline MatrixXi toIntMatrix() const;
+    inline Eigen::MatrixXi toIntMatrix() const;
 
     //=========================================================================================================
     /**
@@ -402,7 +403,7 @@ public:
      *
      * @return the parsed float matrix
      */
-    inline MatrixXf toFloatMatrix() const;
+    inline Eigen::MatrixXf toFloatMatrix() const;
 
     //=========================================================================================================
     /**
@@ -412,7 +413,7 @@ public:
      *
      * @return a sparse double matrix wich is newly created from the parsed float
      */
-    inline SparseMatrix<double> toSparseFloatMatrix() const;
+    inline Eigen::SparseMatrix<double> toSparseFloatMatrix() const;
 
     //
     //from fiff_combat.c
@@ -525,6 +526,24 @@ private:
 
 //    std::complex<double>* m_pComplexDoubleData;
 
+// ### OLD STRUCT ###
+//typedef struct _fiffTagRec {
+//    fiff_int_t  kind;		/**< Tag number.
+//                 *   This defines the meaning of the item */
+//    fiff_int_t  type;		/**< Data type.
+//                 *   This defines the reperentation of the data. */
+//    fiff_int_t  size;		/**< Size of the data.
+//                 *   The size is given in bytes and defines the
+//                 *   total size of the data. */
+//    fiff_int_t  next;		/**< Pointer to the next object.
+//                 *   Zero if the object follows
+//                 *   sequentially in file.
+//                 *   Negative at the end of file */
+//    fiff_data_t *data;		/**< Pointer to the data.
+//                 *   This point to the data read or to be written. */
+//} *fiffTag,fiffTagRec;   /**< FIFF data tag */
+
+
 };
 
 //*************************************************************************************************************
@@ -586,6 +605,19 @@ inline qint32* FiffTag::toInt() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_INT) {
         printf("Expected an integer tag : %d (found data type %d instead)\n",this->kind,this->getType());
+        return NULL;
+    }
+    else
+        return (qint32*)this->data();
+}
+
+
+//*************************************************************************************************************
+
+inline qint32* FiffTag::toJulian() const
+{
+    if(this->isMatrix() || this->getType() != FIFFT_JULIAN) {
+        printf("Expected a julian tag : %d (found data type %d instead)\n",this->kind,this->getType());
         return NULL;
     }
     else
@@ -897,10 +929,10 @@ inline QList< QSharedPointer<FiffDirEntry> > FiffTag::toDirEntry() const
 
 //*************************************************************************************************************
 
-inline MatrixXi FiffTag::toIntMatrix() const
+inline Eigen::MatrixXi FiffTag::toIntMatrix() const
 {
     if(!this->isMatrix() || this->getType() != FIFFT_INT || this->data() == NULL)
-        return MatrixXi();
+        return Eigen::MatrixXi();
 
     qint32 ndim;
     QVector<qint32> dims;
@@ -909,12 +941,12 @@ inline MatrixXi FiffTag::toIntMatrix() const
     if (ndim != 2)
     {
         printf("Only two-dimensional matrices are supported at this time");
-        return MatrixXi();
+        return Eigen::MatrixXi();
     }
 
     //MatrixXd p_Matrix = Map<MatrixXd>( (float*)this->data,p_dims[0], p_dims[1]);
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
-    MatrixXi p_Matrix(Map<MatrixXi>( (int*)this->data(),dims[0], dims[1]));
+    Eigen::MatrixXi p_Matrix(Eigen::Map<Eigen::MatrixXi>( (int*)this->data(),dims[0], dims[1]));
 
     return p_Matrix;
 }
@@ -922,15 +954,15 @@ inline MatrixXi FiffTag::toIntMatrix() const
 
 //*************************************************************************************************************
 
-inline MatrixXf FiffTag::toFloatMatrix() const
+inline Eigen::MatrixXf FiffTag::toFloatMatrix() const
 {
     if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == NULL)
-        return MatrixXf();//NULL;
+        return Eigen::MatrixXf();//NULL;
 
     if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_DENSE)
     {
         printf("Error in FiffTag::toFloatMatrix(): Matrix is not dense!\n");
-        return MatrixXf();//NULL;
+        return Eigen::MatrixXf();//NULL;
     }
 
     qint32 ndim;
@@ -940,11 +972,11 @@ inline MatrixXf FiffTag::toFloatMatrix() const
     if (ndim != 2)
     {
         printf("Only two-dimensional matrices are supported at this time");
-        return MatrixXf();//NULL;
+        return Eigen::MatrixXf();//NULL;
     }
 
     // --> Use copy constructor instead --> slower performance but higher memory management reliability
-    MatrixXf p_Matrix((Map<MatrixXf>( (float*)this->data(),dims[0], dims[1])));
+    Eigen::MatrixXf p_Matrix((Eigen::Map<Eigen::MatrixXf>( (float*)this->data(),dims[0], dims[1])));
 
     return p_Matrix;
 }
@@ -953,15 +985,15 @@ inline MatrixXf FiffTag::toFloatMatrix() const
 //*************************************************************************************************************
 
 
-inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
+inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
 {
     if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == NULL)
-        return SparseMatrix<double>();//NULL;
+        return Eigen::SparseMatrix<double>();//NULL;
 
     if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_CCS && fiff_type_matrix_coding(this->type) != FIFFTS_MC_RCS)
     {
         printf("Error in FiffTag::toSparseFloatMatrix(): Matrix is not sparse!\n");
-        return SparseMatrix<double>();//NULL;
+        return Eigen::SparseMatrix<double>();//NULL;
     }
 
     qint32 ndim;
@@ -971,7 +1003,7 @@ inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
     if (ndim != 2)
     {
         printf("Only two-dimensional matrices are supported at this time");
-        return SparseMatrix<double>();//NULL;
+        return Eigen::SparseMatrix<double>();//NULL;
     }
 
     qint32 nnz = dims[0];
@@ -1025,7 +1057,7 @@ inline SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
 //    for(qint32 i = 0; i < 10; ++i)
 //        std::cout << std::endl << tripletList[offsetTest + i].row() << " " << tripletList[offsetTest + i].col() << " " << tripletList[offsetTest + i].value();
 
-    SparseMatrix<double> p_Matrix(nrow, ncol);
+    Eigen::SparseMatrix<double> p_Matrix(nrow, ncol);
     p_Matrix.setFromTriplets(tripletList.begin(), tripletList.end());
 
     return p_Matrix;

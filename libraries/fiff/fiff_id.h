@@ -48,7 +48,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
@@ -145,7 +145,14 @@ public:
      */
     inline static qint32 storageSize();
 
+    //=========================================================================================================
+    /**
+    * Print mac address in a fashionable manner.
+    */
+    QString toMachidString() const;
+    
     friend bool operator== (const FiffId &f1, const FiffId &f2);
+
 public:
     fiff_int_t version;     /**< File version */
     fiff_int_t machid[2];   /**< Unique machine ID */

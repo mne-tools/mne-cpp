@@ -44,18 +44,12 @@
 #include <utils/mnemath.h>
 #include <fs/label.h>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
 #include <iostream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QFile>
@@ -69,6 +63,8 @@
 using namespace UTILSLIB;
 using namespace FSLIB;
 using namespace MNELIB;
+using namespace Eigen;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -270,7 +266,9 @@ MNESourceSpace MNESourceSpace::pick_regions(const QList<Label> &p_qListLabels) c
 
 //*************************************************************************************************************
 
-bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNESourceSpace& p_SourceSpace)
+bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream,
+                                    bool add_geom,
+                                    MNESourceSpace& p_SourceSpace)
 {
 //    if (p_pSourceSpace != NULL)
 //        delete p_pSourceSpace;

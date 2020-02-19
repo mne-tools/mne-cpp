@@ -37,7 +37,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include "utils_global.h"
@@ -45,7 +45,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -53,7 +53,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
@@ -67,14 +67,6 @@
 
 namespace UTILSLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -104,7 +96,9 @@ public:
      *
      * @return wVert   Vertices of the warped destination geometry
      */
-    MatrixXf calculate(const MatrixXf & sLm, const MatrixXf &dLm, const MatrixXf & sVert);
+    Eigen::MatrixXf calculate(const Eigen::MatrixXf & sLm,
+                              const Eigen::MatrixXf &dLm,
+                              const Eigen::MatrixXf & sVert);
 
     //=========================================================================================================
     /**
@@ -114,7 +108,9 @@ public:
      * @param[in]  dLm       3D Landmarks of the destination geometry
      * @param[in/out] vertList  List of Vertices of the source geometry that are warped to the destination
      */
-    void calculate(const MatrixXf & sLm, const MatrixXf &dLm, QList<MatrixXf> & vertList);
+    void calculate(const Eigen::MatrixXf & sLm,
+                   const Eigen::MatrixXf &dLm,
+                   QList<Eigen::MatrixXf> & vertList);
 
     //=========================================================================================================
     /**
@@ -124,7 +120,7 @@ public:
      *
      * @return electrodes   Matrix with electrode positions
      */
-    MatrixXf readsLm(const QString &electrodeFileName);
+    Eigen::MatrixXf readsLm(const QString &electrodeFileName);
 
 private:
 
@@ -137,7 +133,10 @@ private:
      * @param[out] warpWeight Weighting parameters of the tps warp
      * @param[out] polWeight  Weighting papameters of the polynomial warp
      */
-    bool calcWeighting(const MatrixXf& sLm, const MatrixXf &dLm, MatrixXf& warpWeight, MatrixXf& polWeight);
+    bool calcWeighting(const Eigen::MatrixXf& sLm,
+                       const Eigen::MatrixXf &dLm,
+                       Eigen::MatrixXf& warpWeight,
+                       Eigen::MatrixXf& polWeight);
 
     //=========================================================================================================
     /**
@@ -150,7 +149,10 @@ private:
      *
      * @return Warped Vertices
      */
-    MatrixXf warpVertices(const MatrixXf & sVert, const MatrixXf & sLm, const MatrixXf& warpWeight, const MatrixXf& polWeight);
+    Eigen::MatrixXf warpVertices(const Eigen::MatrixXf & sVert,
+                                 const Eigen::MatrixXf & sLm,
+                                 const Eigen::MatrixXf& warpWeight,
+                                 const Eigen::MatrixXf& polWeight);
 
 };
 

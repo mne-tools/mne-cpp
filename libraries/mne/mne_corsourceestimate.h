@@ -48,7 +48,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/SparseCore>
@@ -56,7 +56,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QList>
@@ -70,14 +70,6 @@
 
 namespace MNELIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -112,7 +104,7 @@ public:
      * @param[in] p_tmin
      * @param[in] p_tstep
      */
-    MNECorSourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep);
+    MNECorSourceEstimate(const Eigen::MatrixXd &p_sol, const Eigen::VectorXi &p_vertices, float p_tmin, float p_tstep);
 
     //=========================================================================================================
     /**
@@ -171,7 +163,7 @@ public:
     MNECorSourceEstimate& operator= (const MNECorSourceEstimate &rhs);
 
 private:
-    SparseMatrix<float> m_matCorrelations;  /**< Upper triangular matrix of shape [n_dipoles x n_dipoles] which contains the dipole correlations. */
+    Eigen::SparseMatrix<float> m_matCorrelations;  /**< Upper triangular matrix of shape [n_dipoles x n_dipoles] which contains the dipole correlations. */
 
 };
 

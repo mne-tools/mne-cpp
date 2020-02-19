@@ -51,7 +51,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
@@ -67,14 +67,6 @@
 
 namespace SCMEASLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
 
 
 //=========================================================================================================
@@ -108,7 +100,7 @@ public:
      *
      * @param[in] p_pFiffInfo     Info to init from
      */
-    void initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo);
+    void initFromFiffInfo(FIFFLIB::FiffInfo::SPtr &p_pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -132,7 +124,7 @@ public:
      *
      * @return the reference to the orig FiffInfo.
      */
-    inline FiffInfo::SPtr& getFiffInfo();
+    inline FIFFLIB::FiffInfo::SPtr& getFiffInfo();
 
     //=========================================================================================================
     /**
@@ -148,7 +140,7 @@ public:
      *
      * @param [in] v the value which is should be distributed.
      */
-    virtual void setValue(MatrixXd& v);
+    virtual void setValue(Eigen::MatrixXd& v);
 
     //=========================================================================================================
     /**
@@ -157,7 +149,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual MatrixXd getValue() const;
+    virtual Eigen::MatrixXd getValue() const;
 
     //=========================================================================================================
     /**
@@ -168,9 +160,9 @@ public:
     inline bool containsValues() const;
 
 private:
-    FiffInfo::SPtr              m_pFiffInfo;   /**< Original Fiff Info if initialized by fiff info. */
+    FIFFLIB::FiffInfo::SPtr         m_pFiffInfo;    /**< Original Fiff Info if initialized by fiff info. */
 
-    MatrixXd                    m_matValue;         /**< The current attached sample vector.*/
+    Eigen::MatrixXd                 m_matValue;     /**< The current attached sample vector.*/
 
     bool m_bIsInit;             /**< If channel info is initialized.*/
     bool m_bContainsValues;     /**< If values are stored.*/
@@ -193,7 +185,7 @@ inline bool RealTimeSpectrum::isInit() const
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr& RealTimeSpectrum::getFiffInfo()
+inline FIFFLIB::FiffInfo::SPtr& RealTimeSpectrum::getFiffInfo()
 {
     return m_pFiffInfo;
 }

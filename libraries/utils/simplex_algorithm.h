@@ -46,7 +46,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -64,7 +64,6 @@
 namespace UTILSLIB
 {
 
-using namespace Eigen;
 
 //=============================================================================================================
 /**
@@ -104,28 +103,27 @@ public:
      * @return True when setup was successful, false otherwise
      */
     template <typename T>
-    static bool simplex_minimize(   Matrix<T,Dynamic,Dynamic>& p,
-                                    Matrix<T,Dynamic, 1>& y,
-                                    T ftol,
-                                    T (*func)(const Matrix<T,Dynamic, 1>& x, const void *user_data),
-                                    const void *user_data,
-                                    int max_eval,
-                                    int &neval,
-                                    int report,
-                                    bool (*report_func)(int loop, const Matrix<T,Dynamic, 1>& fitpar, double fval));
+    static bool simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& p,
+                                 Eigen::Matrix<T,Eigen::Dynamic, 1>& y,
+                                 T ftol,
+                                 T (*func)(const Eigen::Matrix<T,Eigen::Dynamic, 1>& x, const void *user_data),
+                                 const void *user_data,
+                                 int max_eval,
+                                 int &neval,
+                                 int report,
+                                 bool (*report_func)(int loop, const Eigen::Matrix<T,Eigen::Dynamic, 1>& fitpar, double fval));
 
 private:
 
     template <typename T>
-    static T tryit( Matrix<T,Dynamic,Dynamic> &p,
-                    Matrix<T,Dynamic, 1> &y,
-                    Matrix<T,Dynamic, 1> &psum,
-                    T (*func)(  const Matrix<T,Dynamic, 1> &x,
-                                        const void *user_data),                     /* The function to be evaluated */
-                    const void *user_data,                                      /* Data to be passed to the above function in each evaluation */
-                    int   ihi,
-                    int &neval,
-                    T fac);
+    static T tryit(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> &p,
+                   Eigen::Matrix<T,Eigen::Dynamic, 1> &y,
+                   Eigen::Matrix<T,Eigen::Dynamic, 1> &psum,
+                   T (*func)(  const Eigen::Matrix<T,Eigen::Dynamic, 1> &x,const void *user_data),                     /* The function to be evaluated */
+                   const void *user_data,                                      /* Data to be passed to the above function in each evaluation */
+                   int   ihi,
+                   int &neval,
+                   T fac);
 };
 
 
@@ -135,16 +133,21 @@ private:
 //=============================================================================================================
 
 template <typename T>
-bool SimplexAlgorithm::simplex_minimize(   Matrix<T,Dynamic,Dynamic>& p, Matrix<T,Dynamic, 1>& y, T ftol,
-                                T (*func)(const Matrix<T,Dynamic, 1>& x, const void *user_data),
-                                const void *user_data, int max_eval, int &neval, int report,
-                                bool (*report_func)(int loop, const Matrix<T,Dynamic, 1>& fitpar, double fval))
+bool SimplexAlgorithm::simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& p,
+                                        Eigen::Matrix<T,Eigen::Dynamic, 1>& y,
+                                        T ftol,
+                                        T (*func)(const Eigen::Matrix<T,Eigen::Dynamic, 1>& x, const void *user_data),
+                                        const void *user_data,
+                                        int max_eval,
+                                        int &neval,
+                                        int report,
+                                        bool (*report_func)(int loop, const Eigen::Matrix<T,Eigen::Dynamic, 1>& fitpar, double fval))
 {
     int   ndim = p.cols();  /* Number of variables */
     int   i,ilo,ihi,inhi;
     int   mpts = ndim+1;
     T ytry,ysave,rtol;
-    Matrix<T,Dynamic, 1> psum(ndim);
+    Eigen::Matrix<T,Eigen::Dynamic, 1> psum(ndim);
     bool  result = true;
     int   count = 0;
     int   loop  = 1;
@@ -153,7 +156,7 @@ bool SimplexAlgorithm::simplex_minimize(   Matrix<T,Dynamic,Dynamic>& p, Matrix<
     psum = p.colwise().sum();
 
     if (report_func != NULL && report > 0) {
-        report_func(0,static_cast< Matrix<T,Dynamic, 1> >(p.row(0)),-1.0);
+        report_func(0,static_cast< Eigen::Matrix<T,Eigen::Dynamic, 1> >(p.row(0)),-1.0);
     }
 
     for (;;count++,loop++) {
@@ -174,7 +177,7 @@ bool SimplexAlgorithm::simplex_minimize(   Matrix<T,Dynamic,Dynamic>& p, Matrix<
         * Report that we are proceeding...
         */
         if (count == report && report_func != NULL) {
-            if (!report_func(loop,static_cast< Matrix<T,Dynamic, 1> >(p.row(ilo)),y[ilo])) {
+            if (!report_func(loop,static_cast< Eigen::Matrix<T,Eigen::Dynamic, 1> >(p.row(ilo)),y[ilo])) {
                 qCritical("Interation interrupted.");
                 result = false;
                 break;
@@ -214,20 +217,19 @@ bool SimplexAlgorithm::simplex_minimize(   Matrix<T,Dynamic,Dynamic>& p, Matrix<
 //*************************************************************************************************************
 
 template <typename T>
-T SimplexAlgorithm::tryit(  Matrix<T,Dynamic,Dynamic> &p,
-                            Matrix<T,Dynamic, 1> &y,
-                            Matrix<T,Dynamic, 1> &psum,
-                            T (*func)(  const Matrix<T,Dynamic, 1> &x,
-                                    const void *user_data),                     /* The function to be evaluated */
-                            const void *user_data,                                      /* Data to be passed to the above function in each evaluation */
-                            int   ihi,
-                            int &neval,
-                            T fac)
+T SimplexAlgorithm::tryit(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> &p,
+                          Eigen::Matrix<T,Eigen::Dynamic, 1> &y,
+                          Eigen::Matrix<T,Eigen::Dynamic, 1> &psum,
+                          T (*func)(  const Eigen::Matrix<T,Eigen::Dynamic, 1> &x,const void *user_data),                     /* The function to be evaluated */
+                          const void *user_data,                                      /* Data to be passed to the above function in each evaluation */
+                          int   ihi,
+                          int &neval,
+                          T fac)
 {
     int ndim = p.cols();
     T fac1,fac2,ytry;
 
-    Matrix<T,Dynamic, 1> ptry(ndim);
+    Eigen::Matrix<T,Eigen::Dynamic, 1> ptry(ndim);
 
     fac1 = (1.0-fac)/ndim;
     fac2 = fac1-fac;

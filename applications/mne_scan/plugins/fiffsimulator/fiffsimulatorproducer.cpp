@@ -57,6 +57,8 @@
 
 using namespace FIFFSIMULATORPLUGIN;
 using namespace COMMUNICATIONLIB;
+using namespace Eigen;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************

@@ -61,18 +61,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FSLIB
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
 namespace UTILSLIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -113,7 +106,7 @@ public:
      *
      * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggersand corresponding signal values are written to the value of the map.
      */
-    static QMap<int, QList<QPair<int, double> > > detectTriggerFlanksMax(const MatrixXd &data,
+    static QMap<int, QList<QPair<int, double> > > detectTriggerFlanksMax(const Eigen::MatrixXd &data,
                                                                          const QList<int>& lTriggerChannels,
                                                                          int iOffsetIndex,
                                                                          double dThreshold,
@@ -133,7 +126,7 @@ public:
      *
      * @param return     This list holds the found trigger indices and corresponding signal values.
      */
-    static QList<QPair<int,double> > detectTriggerFlanksMax(const MatrixXd &data,
+    static QList<QPair<int,double> > detectTriggerFlanksMax(const Eigen::MatrixXd &data,
                                                             int iTriggerChannelIdx,
                                                             int iOffsetIndex,
                                                             double dThreshold,
@@ -154,7 +147,7 @@ public:
      *
      * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers and corresponding signal values are written to the value of the map.
      */
-    static QMap<int,QList<QPair<int,double> > > detectTriggerFlanksGrad(const MatrixXd &data,
+    static QMap<int,QList<QPair<int,double> > > detectTriggerFlanksGrad(const Eigen::MatrixXd &data,
                                                                         const QList<int>& lTriggerChannels,
                                                                         int iOffsetIndex,
                                                                         double dThreshold,
@@ -176,7 +169,7 @@ public:
      *
      * @param return     This list holds the found trigger indices and corresponding signal values.
      */
-    static QList<QPair<int,double> > detectTriggerFlanksGrad(const MatrixXd &data,
+    static QList<QPair<int,double> > detectTriggerFlanksGrad(const Eigen::MatrixXd &data,
                                                              int iTriggerChannelIdx,
                                                              int iOffsetIndex,
                                                              double dThreshold,

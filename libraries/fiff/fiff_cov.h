@@ -39,7 +39,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include "fiff_global.h"
@@ -50,7 +50,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedDataPointer>
@@ -62,7 +62,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -75,13 +75,6 @@
 
 namespace FIFFLIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 
 //=============================================================================================================
@@ -204,16 +197,16 @@ public:
 
 public:
     fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h */
-    VectorXi    chClass;
+    Eigen::VectorXi chClass;
     bool diag;              /**< If the covariance is stored in a diagonal order. */
     fiff_int_t dim;         /**< Dimension of the covariance (dim x dim). */
     QStringList names;      /**< Channel names. */
-    MatrixXd data;          /**< Covariance data */
+    Eigen::MatrixXd data;   /**< Covariance data */
     QList<FiffProj> projs;  /**< List of available ssp projectors. */
     QStringList bads;       /**< List of bad channels. */
     fiff_int_t nfree;       /**< Number of degrees of freedom. */
-    VectorXd eig;           /**< Vector of eigenvalues. */
-    MatrixXd eigvec;        /**< Matrix of eigenvectors (each row represents an eigenvector). */
+    Eigen::VectorXd eig;    /**< Vector of eigenvalues. */
+    Eigen::MatrixXd eigvec; /**< Matrix of eigenvectors (each row represents an eigenvector). */
 
 // ### OLD STRUCT ###
 // typedef struct {		/* Covariance matrix storage */

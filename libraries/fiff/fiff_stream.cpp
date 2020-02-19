@@ -69,19 +69,13 @@
 #define FALSE 0
 #endif
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
 #include <iostream>
 #include <time.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/LU>
@@ -90,7 +84,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QFile>
@@ -104,6 +98,7 @@
 
 using namespace FIFFLIB;
 using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -315,7 +310,7 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
     //
     //   Read or create the directory tree
     //
-    printf("\nCreating tag directory for %s...", t_sFileName.toUtf8().constData());
+    //printf("\nCreating tag directory for %s...", t_sFileName.toUtf8().constData());
 
     m_dir.clear();
     qint32 dirpos = *t_pTag->toInt();
@@ -1717,6 +1712,8 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
 //                if(raw[i])
 //                    delete raw[i];
             raw = meas->dir_tree_find(FIFFB_SMSH_RAW_DATA);
+            printf("Maxshield data found\n");
+
             if (raw.size() == 0)
             {
                 printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
@@ -3238,18 +3235,18 @@ bool FiffStream::check_beginning(FiffTag::SPtr &p_pTag)
 
     if (p_pTag->kind != FIFF_FILE_ID)
     {
-        printf("Fiff::open: file does not start with a file id tag");//consider throw
+        printf("Fiff::open: file does not start with a file id tag\n");//consider throw
         return false;
     }
 
     if (p_pTag->type != FIFFT_ID_STRUCT)
     {
-        printf("Fiff::open: file does not start with a file id tag");//consider throw
+        printf("Fiff::open: file does not start with a file id tag\n");//consider throw
         return false;
     }
     if (p_pTag->size() != 20)
     {
-        printf("Fiff::open: file does not start with a file id tag");//consider throw
+        printf("Fiff::open: file does not start with a file id tag\n");//consider throw
         return false;
     }
     //do not rewind since the data is contained in the returned tag; -> done for TCP IP reasosn, no rewind possible there

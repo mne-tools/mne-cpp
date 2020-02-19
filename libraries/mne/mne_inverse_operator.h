@@ -47,12 +47,6 @@
 #include "mne_sourcespace.h"
 #include "mne_forwardsolution.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_named_matrix.h>
 #include <fiff/fiff_proj.h>
@@ -64,7 +58,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -72,7 +66,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QList>
@@ -85,7 +79,7 @@
 
 namespace FSLIB
 {
-class Label;
+    class Label;
 }
 
 
@@ -97,15 +91,6 @@ class Label;
 namespace MNELIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FSLIB;
-using namespace FIFFLIB;
-using namespace Eigen;
-
 
 //=========================================================================================================
 /**
@@ -113,10 +98,10 @@ using namespace Eigen;
  */
 struct RegionMTOut
 {
-    VectorXi    roiIdx;     /**< Region cluster indices */
-    MatrixXd    ctrs;       /**< Cluster centers */
-    VectorXd    sumd;       /**< Sums of the distances to the centroid */
-    MatrixXd    D;          /**< Distances to the centroid */
+    Eigen::VectorXi    roiIdx;     /**< Region cluster indices */
+    Eigen::MatrixXd    ctrs;       /**< Cluster centers */
+    Eigen::VectorXd    sumd;       /**< Sums of the distances to the centroid */
+    Eigen::MatrixXd    D;          /**< Distances to the centroid */
 
     qint32      iLabelIdxOut;   /**< Label ID */
 };
@@ -128,11 +113,11 @@ struct RegionMTOut
  */
 struct RegionMT
 {
-    MatrixXd    matRoiMT;           /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
-    MatrixXd    matRoiMTOrig;       /**< Region gain matrix sensors x sources(x,y,z)*/
+    Eigen::MatrixXd    matRoiMT;           /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
+    Eigen::MatrixXd    matRoiMTOrig;       /**< Region gain matrix sensors x sources(x,y,z)*/
 
     qint32      nClusters;      /**< Number of clusters within this region */
-    VectorXi    idcs;           /**< Get source space indeces */
+    Eigen::VectorXi    idcs;           /**< Get source space indeces */
     qint32      iLabelIdxIn;    /**< Label ID */
 
     QString     sDistMeasure;   /**< "cityblock" or "sqeuclidean" */
@@ -148,7 +133,7 @@ struct RegionMT
         // Kmeans Reduction
         RegionMTOut p_RegionMTOut;
 
-        KMeans t_kMeans(t_sDistMeasure, QString("sample"), 5);
+        UTILSLIB::KMeans t_kMeans(t_sDistMeasure, QString("sample"), 5);
 
         t_kMeans.calculate(this->matRoiMT, this->nClusters, p_RegionMTOut.roiIdx, p_RegionMTOut.ctrs, p_RegionMTOut.sumd, p_RegionMTOut.D);
 
@@ -197,9 +182,9 @@ public:
      * @param[in] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
      * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
      */
-    MNEInverseOperator(const FiffInfo &info,
+    MNEInverseOperator(const FIFFLIB::FiffInfo &info,
                        const MNEForwardSolution& forward,
-                       const FiffCov& p_noise_cov,
+                       const FIFFLIB::FiffCov& p_noise_cov,
                        float loose = 0.2f,
                        float depth = 0.8f,
                        bool fixed = false,
@@ -236,7 +221,12 @@ public:
      *
      * @return the assembled kernel
      */
-    bool assemble_kernel(const Label &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno);
+    bool assemble_kernel(const FSLIB::Label &label,
+                         QString method,
+                         bool pick_normal,
+                         Eigen::MatrixXd &K,
+                         Eigen::SparseMatrix<double> &noise_norm,
+                         QList<Eigen::VectorXi> &vertno);
 
     //=========================================================================================================
     /**
@@ -246,7 +236,7 @@ public:
      *
      * @return true when successful, false otherwise
      */
-    bool check_ch_names(const FiffInfo &info) const;
+    bool check_ch_names(const FIFFLIB::FiffInfo &info) const;
 
     //=========================================================================================================
     /**
@@ -259,7 +249,10 @@ public:
      *
      * @return the clustered kernel
      */
-    MatrixXd cluster_kernel(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, QString p_sMethod = "cityblock") const;
+    Eigen::MatrixXd cluster_kernel(const FSLIB::AnnotationSet &p_AnnotationSet,
+                                   qint32 p_iClusterSize,
+                                   Eigen::MatrixXd& p_D,
+                                   QString p_sMethod = "cityblock") const;
 
     //=========================================================================================================
     /**
@@ -267,7 +260,7 @@ public:
      *
      * @return the current kernel
      */
-    inline MatrixXd& getKernel();
+    inline Eigen::MatrixXd& getKernel();
 
     //=========================================================================================================
     /**
@@ -275,7 +268,7 @@ public:
      *
      * @return the current kernel
      */
-    inline MatrixXd getKernel() const;
+    inline Eigen::MatrixXd getKernel() const;
 
     //=========================================================================================================
     /**
@@ -299,7 +292,13 @@ public:
      *
      * @return the assembled inverse operator
      */
-    static MNEInverseOperator make_inverse_operator(const FiffInfo &info, MNEForwardSolution forward, const FiffCov& p_noise_cov, float loose = 0.2f, float depth = 0.8f, bool fixed = false, bool limit_depth_chs = true);
+    static MNEInverseOperator make_inverse_operator(const FIFFLIB::FiffInfo &info,
+                                                    MNEForwardSolution forward,
+                                                    const FIFFLIB::FiffCov& p_noise_cov,
+                                                    float loose = 0.2f,
+                                                    float depth = 0.8f,
+                                                    bool fixed = false,
+                                                    bool limit_depth_chs = true);
 
     //=========================================================================================================
     /**
@@ -316,7 +315,10 @@ public:
      *
      * @return the prepared inverse operator
      */
-    MNEInverseOperator prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA = false) const;
+    MNEInverseOperator prepare_inverse_operator(qint32 nave,
+                                                float lambda2,
+                                                bool dSPM,
+                                                bool sLORETA = false) const;
 
     //=========================================================================================================
     /**
@@ -349,7 +351,7 @@ public:
      *
      * @param[in] p_pStream  The stream to write to.
      */
-    void writeToStream(FiffStream* p_pStream);
+    void writeToStream(FIFFLIB::FiffStream* p_pStream);
 
     //=========================================================================================================
     /**
@@ -363,33 +365,33 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEInverseOperator &p_MNEInverseOperator);
 
 public:
-    FiffInfoBase info;                      /**< light weighted measurement info */
-    fiff_int_t methods;                     /**< MEG, EEG or both */
-    fiff_int_t source_ori;                  /**< Source orientation: f */
-    fiff_int_t nsource;                     /**< Number of source points. */
-    fiff_int_t nchan;                       /**< Number of channels. */
-    fiff_int_t coord_frame;                 /**< Coordinate system definition */
-    MatrixXf  source_nn;                    /**< Source normals. */
-    VectorXd  sing;                         /**< Singular values */
-    bool    eigen_leads_weighted;           /**< If eigen lead are weighted. */
-    FiffNamedMatrix::SDPtr eigen_leads;     /**< Eigen leads */
-    FiffNamedMatrix::SDPtr eigen_fields;    /**< Eigen fields */
-    FiffCov::SDPtr noise_cov;               /**< Noise covariance matrix. */
-    FiffCov::SDPtr source_cov;              /**< Source covariance matrix. */
-    FiffCov::SDPtr orient_prior;            /**< Orientation priors */
-    FiffCov::SDPtr depth_prior;             /**< Depth priors */
-    FiffCov::SDPtr fmri_prior;              /**< fMRI priors */
-    MNESourceSpace src;                     /**< Source Space */
-    FiffCoordTrans mri_head_t;              /**< MRI head coordinate transformation */
-    fiff_int_t nave;                        /**< Number of averages used to regularize the solution. Set to 1 on single Epoch by default.*/
-    QList<FiffProj> projs;                  /**< SSP operator */
-    MatrixXd proj;                          /**< The projector to apply to the data. */
-    MatrixXd whitener;                      /**< Whitens the data */
-    VectorXd reginv;                        /**< The diagonal matrix implementing. regularization and the inverse */
-    SparseMatrix<double> noisenorm;         /**< These are the noise-normalization factors */
+    FIFFLIB::FiffInfoBase info;                     /**< light weighted measurement info */
+    FIFFLIB::fiff_int_t methods;                    /**< MEG, EEG or both */
+    FIFFLIB::fiff_int_t source_ori;                 /**< Source orientation: f */
+    FIFFLIB::fiff_int_t nsource;                    /**< Number of source points. */
+    FIFFLIB::fiff_int_t nchan;                      /**< Number of channels. */
+    FIFFLIB::fiff_int_t coord_frame;                /**< Coordinate system definition */
+    Eigen::MatrixXf  source_nn;                     /**< Source normals. */
+    Eigen::VectorXd  sing;                          /**< Singular values */
+    bool    eigen_leads_weighted;                   /**< If eigen lead are weighted. */
+    FIFFLIB::FiffNamedMatrix::SDPtr eigen_leads;    /**< Eigen leads */
+    FIFFLIB::FiffNamedMatrix::SDPtr eigen_fields;   /**< Eigen fields */
+    FIFFLIB::FiffCov::SDPtr noise_cov;              /**< Noise covariance matrix. */
+    FIFFLIB::FiffCov::SDPtr source_cov;             /**< Source covariance matrix. */
+    FIFFLIB::FiffCov::SDPtr orient_prior;           /**< Orientation priors */
+    FIFFLIB::FiffCov::SDPtr depth_prior;            /**< Depth priors */
+    FIFFLIB::FiffCov::SDPtr fmri_prior;             /**< fMRI priors */
+    MNESourceSpace src;                             /**< Source Space */
+    FIFFLIB::FiffCoordTrans mri_head_t;             /**< MRI head coordinate transformation */
+    FIFFLIB::fiff_int_t nave;                       /**< Number of averages used to regularize the solution. Set to 1 on single Epoch by default.*/
+    QList<FIFFLIB::FiffProj> projs;                 /**< SSP operator */
+    Eigen::MatrixXd proj;                           /**< The projector to apply to the data. */
+    Eigen::MatrixXd whitener;                       /**< Whitens the data */
+    Eigen::VectorXd reginv;                         /**< The diagonal matrix implementing. regularization and the inverse */
+    Eigen::SparseMatrix<double> noisenorm;          /**< These are the noise-normalization factors */
 
 private:
-    MatrixXd m_K;                           /**< Everytime a new kernel is assamebled a copy is stored here */
+    Eigen::MatrixXd m_K;                            /**< Everytime a new kernel is assamebled a copy is stored here */
 };
 
 //*************************************************************************************************************
@@ -397,7 +399,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline MatrixXd& MNEInverseOperator::getKernel()
+inline Eigen::MatrixXd& MNEInverseOperator::getKernel()
 {
     return m_K;
 }
@@ -405,7 +407,7 @@ inline MatrixXd& MNEInverseOperator::getKernel()
 
 //*************************************************************************************************************
 
-inline MatrixXd MNEInverseOperator::getKernel() const
+inline Eigen::MatrixXd MNEInverseOperator::getKernel() const
 {
     return m_K;
 }

@@ -47,7 +47,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
@@ -55,7 +55,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -68,13 +68,6 @@
 
 namespace FSLIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -221,7 +214,7 @@ public:
      *
      * @return the read curvature
      */
-    static VectorXf read_curv(const QString &p_sFileName);
+    static Eigen::VectorXf read_curv(const QString &p_sFileName);
 
     //=========================================================================================================
     /**
@@ -232,7 +225,7 @@ public:
      *
      * @return The computed normals
      */
-    static MatrixX3f compute_normals(const MatrixX3f& rr, const MatrixX3i& tris);
+    static Eigen::MatrixX3f compute_normals(const Eigen::MatrixX3f& rr, const Eigen::MatrixX3i& tris);
 
     //=========================================================================================================
     /**
@@ -240,7 +233,7 @@ public:
      *
      * @return coordinates of vertices
      */
-    inline const MatrixX3f& rr() const;
+    inline const Eigen::MatrixX3f& rr() const;
 
     //=========================================================================================================
     /**
@@ -248,7 +241,7 @@ public:
      *
      * @return triangle descriptions
      */
-    inline const MatrixX3i& tris() const;
+    inline const Eigen::MatrixX3i& tris() const;
 
     //=========================================================================================================
     /**
@@ -256,7 +249,7 @@ public:
      *
      * @return surface normals
      */
-    inline const MatrixX3f& nn() const;
+    inline const Eigen::MatrixX3f& nn() const;
 
     //=========================================================================================================
     /**
@@ -264,7 +257,7 @@ public:
      *
      * @return the FreeSurfer curvature data
      */
-    inline const VectorXf& curv() const;
+    inline const Eigen::VectorXf& curv() const;
 
     //=========================================================================================================
     /**
@@ -272,7 +265,7 @@ public:
      *
      * @return the offset vector
      */
-    inline const Vector3f& offset() const;
+    inline const Eigen::Vector3f& offset() const;
 
     //=========================================================================================================
     /**
@@ -280,7 +273,7 @@ public:
      *
      * @return the offset vector
      */
-    inline Vector3f& offset();
+    inline Eigen::Vector3f& offset();
 
     //=========================================================================================================
     /**
@@ -303,12 +296,12 @@ private:
     QString m_sFileName;    /**< Surface file name. */
     qint32 m_iHemi;         /**< Hemisphere (lh = 0; rh = 1) */
     QString m_sSurf;        /**< Loaded surface (eg. inflated, orig ...) */
-    MatrixX3f m_matRR;      /**< alias verts. Vertex coordinates in meters */
-    MatrixX3i m_matTris;    /**< alias faces. The triangle descriptions */
-    MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
-    VectorXf m_vecCurv;     /**< FreeSurfer curvature data */
+    Eigen::MatrixX3f m_matRR;      /**< alias verts. Vertex coordinates in meters */
+    Eigen::MatrixX3i m_matTris;    /**< alias faces. The triangle descriptions */
+    Eigen::MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
+    Eigen::VectorXf m_vecCurv;     /**< FreeSurfer curvature data */
 
-    Vector3f m_vecOffset; /**< Surface offset */
+    Eigen::Vector3f m_vecOffset; /**< Surface offset */
 };
 
 //*************************************************************************************************************
@@ -340,7 +333,7 @@ inline QString Surface::surf() const
 
 //*************************************************************************************************************
 
-inline const MatrixX3f& Surface::rr() const
+inline const Eigen::MatrixX3f& Surface::rr() const
 {
     return m_matRR;
 }
@@ -348,7 +341,7 @@ inline const MatrixX3f& Surface::rr() const
 
 //*************************************************************************************************************
 
-inline const MatrixX3i& Surface::tris() const
+inline const Eigen::MatrixX3i& Surface::tris() const
 {
     return m_matTris;
 }
@@ -356,7 +349,7 @@ inline const MatrixX3i& Surface::tris() const
 
 //*************************************************************************************************************
 
-inline const MatrixX3f& Surface::nn() const
+inline const Eigen::MatrixX3f& Surface::nn() const
 {
     return m_matNN;
 }
@@ -364,7 +357,7 @@ inline const MatrixX3f& Surface::nn() const
 
 //*************************************************************************************************************
 
-inline const VectorXf& Surface::curv() const
+inline const Eigen::VectorXf& Surface::curv() const
 {
     return m_vecCurv;
 }
@@ -372,7 +365,7 @@ inline const VectorXf& Surface::curv() const
 
 //*************************************************************************************************************
 
-inline const Vector3f& Surface::offset() const
+inline const Eigen::Vector3f& Surface::offset() const
 {
     return m_vecOffset;
 }
@@ -380,7 +373,7 @@ inline const Vector3f& Surface::offset() const
 
 //*************************************************************************************************************
 
-inline Vector3f& Surface::offset()
+inline Eigen::Vector3f& Surface::offset()
 {
     return m_vecOffset;
 }

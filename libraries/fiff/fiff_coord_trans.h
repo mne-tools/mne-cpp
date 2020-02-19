@@ -39,7 +39,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include "fiff_global.h"
@@ -48,7 +48,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QIODevice>
@@ -57,7 +57,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -70,13 +70,6 @@
 
 namespace FIFFLIB
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 
 //=============================================================================================================
@@ -173,7 +166,7 @@ public:
      *
      * @return Transformed coordinates
      */
-    MatrixX3f apply_trans(const MatrixX3f& rr, bool do_move = true) const;
+    Eigen::MatrixX3f apply_trans(const Eigen::MatrixX3f& rr, bool do_move = true) const;
 
     //=========================================================================================================
     /**
@@ -184,7 +177,7 @@ public:
      *
      * @return Transformed coordinates
      */
-    MatrixX3f apply_inverse_trans(const MatrixX3f& rr, bool do_move = true) const;
+    Eigen::MatrixX3f apply_inverse_trans(const Eigen::MatrixX3f& rr, bool do_move = true) const;
 
     //=========================================================================================================
     /**
@@ -212,7 +205,7 @@ public:
      *
      * @return the composed transform
      */
-    static FiffCoordTrans make(int from, int to, const Matrix3f& rot, const VectorXf& move);
+    static FiffCoordTrans make(int from, int to, const Eigen::Matrix3f& rot, const Eigen::VectorXf& move);
 
     //=========================================================================================================
     /**
@@ -251,8 +244,8 @@ public:
 public:
     fiff_int_t  from;   /**< Source coordinate system. */
     fiff_int_t  to;     /**< Destination coordinate system. */
-    Matrix<float, 4,4, DontAlign>   trans;      /**< The forward transform */
-    Matrix<float, 4,4, DontAlign>   invtrans;   /**< The inverse transform */
+    Eigen::Matrix<float, 4,4, Eigen::DontAlign>   trans;      /**< The forward transform */
+    Eigen::Matrix<float, 4,4, Eigen::DontAlign>   invtrans;   /**< The inverse transform */
 
 // ### OLD STRUCT ###
 // Coordinate transformation descriptor

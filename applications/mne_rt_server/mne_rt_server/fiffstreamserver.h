@@ -39,7 +39,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// INCLUDES
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
@@ -62,14 +62,6 @@
 
 namespace RTSERVER
 {
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-using namespace COMMUNICATIONLIB;
 
 
 //*************************************************************************************************************
@@ -123,7 +115,7 @@ public:
 //    void clearClients();
 
 //public slots: --> in Qt 5 not anymore declared as slot
-    void forwardMeasInfo(qint32 ID, const FiffInfo& p_fiffInfo);
+    void forwardMeasInfo(qint32 ID, const FIFFLIB::FiffInfo& p_fiffInfo);
     void forwardRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
 
 signals:
@@ -148,7 +140,7 @@ private:
      *
      * @param[in] p_command  The connector list command.
      */
-    void comClist(Command p_command);
+    void comClist(COMMUNICATIONLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -156,7 +148,7 @@ private:
      *
      * @param[in] p_command  The select connector command.
      */
-    void comMeasinfo(Command p_command);
+    void comMeasinfo(COMMUNICATIONLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -164,7 +156,7 @@ private:
      *
      * @param[in] p_command  The start command.
      */
-    void comStart(Command p_command);//comMeas
+    void comStart(COMMUNICATIONLIB::Command p_command);//comMeas
 
     //=========================================================================================================
     /**
@@ -172,7 +164,7 @@ private:
      *
      * @param[in] p_command  The stop command.
      */
-    void comStop(Command p_command);
+    void comStop(COMMUNICATIONLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -180,7 +172,7 @@ private:
      *
      * @param[in] p_command  The stop all command.
      */
-    void comStopAll(Command p_command);
+    void comStopAll(COMMUNICATIONLIB::Command p_command);
 
     QByteArray parseToId(QString& p_sRawId, qint32& p_iParsedId);
 

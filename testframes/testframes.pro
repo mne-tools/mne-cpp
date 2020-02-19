@@ -60,6 +60,6 @@ SUBDIRS += \
             test_interpolation \
             test_geometryinfo \
             test_spectral_connectivity \
-            test_filtering \
+            test_mne_anonymize
     }
 }

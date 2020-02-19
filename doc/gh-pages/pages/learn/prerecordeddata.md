@@ -9,7 +9,7 @@ nav_order: 1
 Follow these steps to playback recorded data through the MNE Rt Server to MNE Scan.
 
 * Navigate to the `FiffSimulation.cfg` file in your MNE-CPP install directory, e.g., `mne-cpp\bin\resources\mne_rt_server_plugins\FiffSimulation.cfg`.
-* Open the `FiffSimulation.cfg` with a text editor and insert the path and file name of the fif file which you want to stream. For example: `simFile = mne-cpp\bin\MNE-sample-data\MEG\ernoise_rawsample.fif`
+* Open the `FiffSimulation.cfg` with a text editor and insert the path and file name of the fif file which you want to stream. For example: `simFile = ./MNE-sample-data/MEG/sample/ernoise_raw.fif`
 * Save and close the `FiffSimulation.cfg` file
 * Start the mne_rt_server `mne-cpp\bin\mne_rt_server`
 * Start MNE Scan `mne-cpp\bin\mne_scan`

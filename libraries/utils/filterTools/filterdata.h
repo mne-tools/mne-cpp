@@ -59,7 +59,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -67,7 +67,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QString>
@@ -81,14 +81,6 @@
 
 namespace UTILSLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -163,7 +155,9 @@ public:
      *
      * @return the filtered data in form of a RoVecotrXd
      */
-    RowVectorXd applyConvFilter(const RowVectorXd& data, bool keepOverhead = false, CompensateEdgeEffects compensateEdgeEffects = ZeroPad) const;
+    Eigen::RowVectorXd applyConvFilter(const Eigen::RowVectorXd& data,
+                                       bool keepOverhead = false,
+                                       CompensateEdgeEffects compensateEdgeEffects = ZeroPad) const;
 
     /**
      * Applies the current filter to the input data using multiplication in frequency domain. Pro: Fast, good filter parameters Con: Smears in error from future samples. Uses future samples (nor real time capable)
@@ -174,10 +168,10 @@ public:
      *
      * @return the filtered data in form of a RoVecotrXd
      */
-    RowVectorXd applyFFTFilter(const RowVectorXd& data,
-                               bool keepOverhead = false,
-                               CompensateEdgeEffects compensateEdgeEffects = MirrorData)
-                               const;
+    Eigen::RowVectorXd applyFFTFilter(const Eigen::RowVectorXd& data,
+                                      bool keepOverhead = false,
+                                      CompensateEdgeEffects compensateEdgeEffects = MirrorData)
+                                      const;
 
     /**
      * @brief getStringForDesignMethod returns the current design method as a string
@@ -199,23 +193,23 @@ public:
      */
     static FilterData::FilterType getFilterTypeForString(const QString &filerTypeString);
 
-    double          m_sFreq;            /**< the sampling frequency. */
-    int             m_iFilterOrder;     /**< represents the order of the filter instance. */
-    int             m_iFFTlength;       /**< represents the filter length. */
-    double          m_dCenterFreq;      /**< contains center freq of the filter. */
-    double          m_dBandwidth;       /**< contains bandwidth of the filter. */
-    double          m_dParksWidth;      /**< contains the parksmcallen width. */
-
-    double          m_dLowpassFreq;     /**< lowpass freq (higher cut off) of the filter. */
+    double          m_sFreq;                /**< the sampling frequency. */
+    double          m_dCenterFreq;          /**< contains center freq of the filter. */
+    double          m_dBandwidth;           /**< contains bandwidth of the filter. */
+    double          m_dParksWidth;          /**< contains the parksmcallen width. */
+    double          m_dLowpassFreq;         /**< lowpass freq (higher cut off) of the filter. */
     double          m_dHighpassFreq;        /**< lowpass freq (lower cut off) of the filter. */
 
-    QString         m_sName;            /**< contains name of the filter. */
+    int             m_iFilterOrder;         /**< represents the order of the filter instance. */
+    int             m_iFFTlength;           /**< represents the filter length. */
 
-    RowVectorXd     m_dCoeffA;          /**< contains the forward filter coefficient set. */
-    RowVectorXd     m_dCoeffB;          /**< contains the backward filter coefficient set (empty if FIR filter). */
+    QString         m_sName;                /**< contains name of the filter. */
 
-    RowVectorXcd    m_dFFTCoeffA;       /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
-    RowVectorXcd    m_dFFTCoeffB;       /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    Eigen::RowVectorXd     m_dCoeffA;       /**< contains the forward filter coefficient set. */
+    Eigen::RowVectorXd     m_dCoeffB;       /**< contains the backward filter coefficient set (empty if FIR filter). */
+
+    Eigen::RowVectorXcd    m_dFFTCoeffA;    /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
+    Eigen::RowVectorXcd    m_dFFTCoeffB;    /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength. */
 };
 
 //*************************************************************************************************************

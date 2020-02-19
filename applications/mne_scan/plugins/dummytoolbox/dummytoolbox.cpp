@@ -51,6 +51,7 @@ using namespace DUMMYTOOLBOXPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
+using namespace Eigen;
 
 
 //*************************************************************************************************************

@@ -43,12 +43,6 @@
 #include "fiff_tag.h"
 #include <utils/ioutils.h>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
 #include <complex>
 #include <iostream>
 
@@ -532,8 +526,8 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
     switch (tag->type) {
 
     case FIFFT_INT :
-    case FIFFT_JULIAN :
     case FIFFT_UINT :
+    case FIFFT_JULIAN :
         np = tag->size()/sizeof(fiff_int_t);
         for (ithis = (fiff_int_t *)tag->data(), k = 0; k < np; k++, ithis++)
             IOUtils::swap_intp(ithis);

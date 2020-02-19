@@ -43,18 +43,12 @@
 #include "mne_inverse_operator.h"
 #include <fs/label.h>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
 #include <iostream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QFuture>
@@ -63,7 +57,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/SVD>
@@ -76,6 +70,9 @@
 
 using namespace UTILSLIB;
 using namespace MNELIB;
+using namespace FIFFLIB;
+using namespace FSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -173,7 +170,12 @@ MNEInverseOperator::~MNEInverseOperator()
 
 //*************************************************************************************************************
 
-bool MNEInverseOperator::assemble_kernel(const Label &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno)
+bool MNEInverseOperator::assemble_kernel(const Label &label,
+                                         QString method,
+                                         bool pick_normal,
+                                         MatrixXd &K,
+                                         SparseMatrix<double> &noise_norm,
+                                         QList<VectorXi> &vertno)
 {
     MatrixXd t_eigen_leads = this->eigen_leads->data;
     MatrixXd t_source_cov = this->source_cov->data;

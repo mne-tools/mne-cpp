@@ -128,7 +128,7 @@ private:
      *
      * @param[in] p_command  The buffer sample size command.
      */
-    void comBufsize(RTSERVER::Command p_command);
+    void comBufsize(COMMUNICATIONLIB::Command p_command);
 
     //=========================================================================================================
     /**
@@ -136,7 +136,7 @@ private:
      *
      * @param[in] p_command  The buffer sample size command.
      */
-    void comGetBufsize(RTSERVER::Command p_command);
+    void comGetBufsize(COMMUNICATIONLIB::Command p_command);
 
     //=========================================================================================================
     /**

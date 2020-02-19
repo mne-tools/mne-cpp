@@ -66,6 +66,8 @@
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
+using namespace Eigen;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -172,7 +174,7 @@ int main(int argc, char *argv[])
     //   Set up the CTF compensator
     //
     qint32 current_comp = raw.info.get_current_comp();
-    qint32 dest_comp = -1;
+    qint32 dest_comp = 0;
 
     if (current_comp > 0)
         qInfo("Current compensation grade : %d\n",current_comp);

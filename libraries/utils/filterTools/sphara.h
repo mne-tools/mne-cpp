@@ -45,7 +45,7 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
@@ -58,14 +58,6 @@
 
 namespace UTILSLIB
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -102,7 +94,11 @@ public:
      *
      * @return Returns the final SPHARA operator with dimensions (iOperatorDim,iOperatorDim).
      */
-    static MatrixXd makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi& vecIndices, int iOperatorDim, int iNBaseFct, int skip = 0);
+    static Eigen::MatrixXd makeSpharaProjector(const Eigen::MatrixXd& matBaseFct,
+                                               const Eigen::VectorXi& vecIndices,
+                                               int iOperatorDim,
+                                               int iNBaseFct,
+                                               int skip = 0);
 };
 
 } // NAMESPACE UTILSLIB
