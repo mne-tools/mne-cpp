@@ -21,13 +21,13 @@ jobs:
       uses: actions/checkout@v1
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
-      uses: jurplel/install-qt-action@v2
+      uses: ouuan/install-qt-action@v2.3.1
       with:
         version: ${{ matrix.qt }}
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
-      uses: jurplel/install-qt-action@v2
+      uses: ouuan/install-qt-action@v2.3.1
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2017_64
@@ -72,13 +72,13 @@ jobs:
         sudo pip install codecov 
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
-      uses: jurplel/install-qt-action@v2
+      uses: ouuan/install-qt-action@v2.3.1
       with:
         version: 5.14.0
         modules: qtcharts    
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
-      uses: jurplel/install-qt-action@v2
+      uses: ouuan/install-qt-action@v2.3.1
       with:
         version: 5.14.0
         arch: win64_msvc2017_64
@@ -150,7 +150,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: ouuan/install-qt-action@v2.3.1
       with:
         version: 5.6
         modules: qtcharts

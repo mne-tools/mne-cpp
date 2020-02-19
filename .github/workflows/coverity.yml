@@ -10,7 +10,7 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v1
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2
+        uses: ouuan/install-qt-action@v2.3.1
         with:
           version: 5.10.1
           modules: qtcharts

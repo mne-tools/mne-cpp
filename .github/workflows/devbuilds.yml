@@ -46,7 +46,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1  
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: ouuan/install-qt-action@v2.3.1
       with:
         version: 5.14.0
         modules: qtcharts
@@ -87,7 +87,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: ouuan/install-qt-action@v2.3.1
       with:
         version: 5.14.0
         modules: qtcharts
@@ -116,7 +116,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1      
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: ouuan/install-qt-action@v2.3.1
       with:
         version: 5.14.0
         arch: win64_msvc2017_64
@@ -155,7 +155,7 @@ jobs:
       run: |
         sudo pip install codecov 
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: ouuan/install-qt-action@v2.3.1
       with:
         version: 5.14.0
         modules: qtcharts
