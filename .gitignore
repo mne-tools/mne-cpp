@@ -27,11 +27,6 @@
 /applications/mne_scan/plugins/gusbamp/gtec_gUSBamp.h
 /applications/mne_scan/plugins/brainamp/BrainAmpIoCtl.h
 
-# External bsd licensed code
-/applications/mne_scan/plugins/ftbuffer/ftsrc/src/
-/applications/mne_scan/plugins/ftbuffer/ftsrc/cpp/
-
-
 # Installer framework
 /tools/ifw_installer/*
 !linux/
