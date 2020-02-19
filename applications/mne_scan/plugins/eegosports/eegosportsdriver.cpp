@@ -123,7 +123,7 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
 #ifdef _WIN32
         factory factoryObj ("eego-SDK.dll"); // Make sure that eego-SDK.dll resides in the working directory
 #else
-        factory factoryObj ("/home/vorwerkj/git/mne-cpp/lib/libeego-SDK.so"); // Make sure that eego-SDK.dll resides in the working directory
+        factory factoryObj ("libeego-SDK.so"); // Make sure that eego-SDK.dll resides in the working directory
 #endif
 
         m_pAmplifier = factoryObj.getAmplifier(); // Get an amplifier
