@@ -119,6 +119,9 @@ void FtBuffProducer::connectToBuffer(QString addr,
     m_pFtConnector->setAddr(addr);
     m_pFtConnector->setPort(port);
 
+    m_pFtConnector->connect();
+    m_pFtConnector->parseNeuromagHeader();
+
     m_pFtBuffer->setupRTMSA();
 
     emit connecStatus(true);
