@@ -24,7 +24,7 @@ jobs:
       uses: ouuan/install-qt-action@v2.3.1
       with:
         version: ${{ matrix.qt }}
-        aqtversion: "==0.7.1"
+        aqtversion: "==0.7"
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
@@ -32,7 +32,7 @@ jobs:
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2017_64
-        aqtversion: "==0.7.1"
+        aqtversion: "==0.7"
         modules: qtcharts
     - name: Install jom (Windows)
       if: matrix.os == 'windows-2016'
@@ -77,7 +77,7 @@ jobs:
       uses: ouuan/install-qt-action@v2.3.1
       with:
         version: 5.14.1
-        aqtversion: "==0.7.1"
+        aqtversion: "==0.7"
         modules: qtcharts    
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
@@ -85,7 +85,7 @@ jobs:
       with:
         version: 5.14.1
         arch: win64_msvc2017_64
-        aqtversion: "==0.7.1"
+        aqtversion: "==0.7"
         modules: qtcharts
     - name: Install jom (Windows) 
       if: matrix.os == 'windows-2016'
@@ -157,7 +157,7 @@ jobs:
       uses: ouuan/install-qt-action@v2.3.1
       with:
         version: 5.6
-        aqtversion: "==0.7.1"
+        aqtversion: "==0.7"
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
