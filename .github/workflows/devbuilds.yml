@@ -48,7 +48,7 @@ jobs:
     - name: Install Qt
       uses: ouuan/install-qt-action@v2.3.1
       with:
-        version: 5.14.0
+        version: 5.14.1
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |        
@@ -89,7 +89,7 @@ jobs:
     - name: Install Qt
       uses: ouuan/install-qt-action@v2.3.1
       with:
-        version: 5.14.0
+        version: 5.14.1
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |        
@@ -118,7 +118,7 @@ jobs:
     - name: Install Qt
       uses: ouuan/install-qt-action@v2.3.1
       with:
-        version: 5.14.0
+        version: 5.14.1
         arch: win64_msvc2017_64
         modules: qtcharts
     - name: Install jom (Windows)
@@ -157,7 +157,7 @@ jobs:
     - name: Install Qt
       uses: ouuan/install-qt-action@v2.3.1
       with:
-        version: 5.14.0
+        version: 5.14.1
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
