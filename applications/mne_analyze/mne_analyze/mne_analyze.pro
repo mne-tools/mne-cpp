@@ -102,12 +102,14 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    multiviewwindow.cpp \
     mdiview.cpp \
     analyzecore.cpp
 
 HEADERS += \
     info.h \
     mainwindow.h \
+    multiviewwindow.h \
     mdiview.h \
     analyzecore.h
 
