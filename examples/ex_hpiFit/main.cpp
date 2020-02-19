@@ -102,7 +102,7 @@ void write_pos(const float time, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::
         }
     }    
 
-    double GoF = std::accumulate(vGoF.begin(), vGoF.end(), .0) / vGoF.size();
+    double error = std::accumulate(vGoF.begin(), vGoF.end(), .0) / vGoF.size();
     QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
 
     //qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
@@ -116,8 +116,8 @@ void write_pos(const float time, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::
     position(position.rows()-1,4) = info->dev_head_t.trans(0,3);
     position(position.rows()-1,5) = info->dev_head_t.trans(1,3);
     position(position.rows()-1,6) = info->dev_head_t.trans(2,3);
-    position(position.rows()-1,7) = 1-GoF;
-    position(position.rows()-1,8) = GoF;
+    position(position.rows()-1,7) = 1-error;
+    position(position.rows()-1,8) = error;
     position(position.rows()-1,9) = 0;
 }
 
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("hpiFit Example");
     parser.addHelpOption();
     qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/bin.";
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/raw/data_with_movement_chpi_raw.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
     parser.addOption(inputOption);
 
@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
     // Read Quaternion File
     Eigen::MatrixXd pos;
     qInfo() << "Specify the path to your position file (.txt)";
-    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/chpi/pos/posMax_data_with_movement_chpi.txt");
+    UTILSLIB::IOUtils::read_eigen_matrix(pos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
     RowVectorXd time = pos.col(0);
 
     MatrixXd position;       // Position matrix to save quaternions etc.
