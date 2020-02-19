@@ -281,7 +281,7 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
 
     this->read_tag(t_pTag);
     if (t_pTag->kind != FIFF_DIR_POINTER) {
-        printf("Fiff::open: file does have a directory pointer");//consider throw
+        qWarning("Fiff::open: file does have a directory pointer");//consider throw
         this->device()->close();
         return false;
     }
@@ -289,7 +289,7 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
     //
     //   Read or create the directory tree
     //
-    printf("\nCreating tag directory for %s...", t_sFileName.toUtf8().constData());
+    qInfo("\nCreating tag directory for %s...", t_sFileName.toUtf8().constData());
     m_dir.clear();
     qint32 dirpos = *t_pTag->toInt();
     /*
@@ -329,8 +329,6 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
         return false;
     else
         this->m_dirtree->parent.clear();
-
-    printf("[done]\n");
 
     //
     //   Back to the beginning
@@ -445,7 +443,7 @@ bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, 
     QList<FiffDirNode::SPtr> covs = p_Node->dir_tree_find(FIFFB_MNE_COV);
     if (covs.size() == 0)
     {
-        printf("No covariance matrices found");
+        qWarning("No covariance matrices found");
         return false;
     }
     //
@@ -474,7 +472,7 @@ bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, 
             //
             if (!current->find_tag(this, FIFF_MNE_COV_DIM, tag))
             {
-                printf("Covariance matrix dimension not found.\n");
+                qWarning("Covariance matrix dimension not found.\n");
                 return false;
             }
             dim = *tag->toInt();
@@ -488,7 +486,7 @@ bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, 
                 names = FiffStream::split_name_list(tag->toString());
                 if (names.size() != dim)
                 {
-                    printf("Number of names does not match covariance matrix dimension\n");
+                    qWarning("Number of names does not match covariance matrix dimension\n");
                     return false;
                 }
             }
@@ -496,7 +494,7 @@ bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, 
             {
                 if (!current->find_tag(this, FIFF_MNE_COV_DIAG, tag))
                 {
-                    printf("No covariance matrix data found\n");
+                    qWarning("No covariance matrix data found\n");
                     return false;
                 }
                 else
@@ -513,12 +511,12 @@ bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, 
                         cov_diag = Map<VectorXf>(tag->toFloat(),dim).cast<double>();
                     }
                     else {
-                        printf("Illegal data type for covariance matrix\n");
+                        qCritical("Illegal data type for covariance matrix\n");
                         return false;
                     }
 
                     diagmat = true;
-                    printf("\t%d x %d diagonal covariance (kind = %d) found.\n", dim, dim, cov_kind);
+                    qInfo("\t%d x %d diagonal covariance (kind = %d) found.\n", dim, dim, cov_kind);
                 }
             }
             else
@@ -561,7 +559,7 @@ bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, 
                             cov(j,k) = cov(k,j);
 
                     diagmat = false;
-                    printf("\t%d x %d full covariance (kind = %d) found.\n", dim, dim, cov_kind);
+                    qInfo("\t%d x %d full covariance (kind = %d) found.\n", dim, dim, cov_kind);
 
                 }
                 else
@@ -569,7 +567,7 @@ bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, 
                     diagmat = false;
                     qDebug() << "ToDo: FiffStream::read_cov - this needs to be debugged.\n";
                     cov = vals;
-                    printf("\t%d x %d sparse covariance (kind = %d) found.\n", dim, dim, cov_kind);
+                    qInfo("\t%d x %d sparse covariance (kind = %d) found.\n", dim, dim, cov_kind);
                 }
 //MATLAB
 //                    if ~issparse(tag.data)
@@ -648,7 +646,7 @@ bool FiffStream::read_cov(const FiffDirNode::SPtr& p_Node, fiff_int_t cov_kind, 
         }
     }
 
-    printf("Did not find the desired covariance matrix\n");
+    qInfo("Did not find the desired covariance matrix\n");
     return false;
 }
 
@@ -682,7 +680,7 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
         }
         if (!t_pTag)
         {
-            printf("Compensation type not found\n");
+            qWarning("Compensation type not found\n");
             return compdata;
         }
         //
@@ -754,12 +752,12 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
                 }
                 if (count == 0)
                 {
-                    printf("Channel %s is not available in data",mat->col_names.at(col).toUtf8().constData());
+                    qWarning("Channel %s is not available in data",mat->col_names.at(col).toUtf8().constData());
                     return compdata;
                 }
                 else if (count > 1)
                 {
-                    printf("Ambiguous channel %s",mat->col_names.at(col).toUtf8().constData());
+                    qWarning("Ambiguous channel %s",mat->col_names.at(col).toUtf8().constData());
                     return compdata;
                 }
                 col_cals(col,0) = 1.0f/(p_Chs[p].range*p_Chs[p].cal);
@@ -783,12 +781,12 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
 
                 if (count == 0)
                 {
-                    printf("Channel %s is not available in data",mat->row_names.at(row).toUtf8().constData());
+                    qWarning("Channel %s is not available in data",mat->row_names.at(row).toUtf8().constData());
                     return compdata;
                 }
                 else if (count > 1)
                 {
-                    printf("Ambiguous channel %s",mat->row_names.at(row).toUtf8().constData());
+                    qWarning("Ambiguous channel %s",mat->row_names.at(row).toUtf8().constData());
                     return compdata;
                 }
 
@@ -803,7 +801,7 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
     }
 
     if (compdata.size() > 0)
-        printf("\tRead %d compensation matrices\n",compdata.size());
+        qInfo("\tRead %d compensation matrices\n",compdata.size());
 
     return compdata;
 }
@@ -883,7 +881,7 @@ bool FiffStream::read_meas_info_base(const FiffDirNode::SPtr& p_Node, FiffInfoBa
 
     if (parent_meg.size() == 0)
     {
-        printf("No parent MEG information found in operator\n");
+        qWarning("No parent MEG information found in operator\n");
         return false;
     }
 
@@ -926,10 +924,10 @@ bool FiffStream::read_meas_info_base(const FiffDirNode::SPtr& p_Node, FiffInfoBa
         else if (cand.from == FIFFV_MNE_COORD_CTF_HEAD && cand.to == FIFFV_COORD_HEAD)
             p_InfoForward.ctf_head_t = cand;
         else
-            printf("MEG device/head coordinate transformation not found");
+            qWarning("MEG device/head coordinate transformation not found");
     }
     else
-        printf("MEG/head coordinate transformation not found.\n");
+        qWarning("MEG/head coordinate transformation not found.\n");
 
     //
     //   Load the bad channel list
@@ -953,13 +951,13 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
 
     if (meas.size() == 0)
     {
-        printf("Could not find measurement data\n");
+        qWarning("Could not find measurement data\n");
         return false;
     }
     //
     QList<FiffDirNode::SPtr> meas_info = meas[0]->dir_tree_find(FIFFB_MEAS_INFO);
     if (meas_info.count() == 0) {
-        printf("Could not find measurement info\n");
+        qWarning("Could not find measurement info\n");
 //        delete meas[0];
         return false;
     }
@@ -1034,22 +1032,22 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     //
     if (nchan < 0)
     {
-        printf("Number of channels in not defined\n");
+        qWarning("Number of channels in not defined\n");
         return false;
     }
     if (sfreq < 0)
     {
-        printf("Sampling frequency is not defined\n");
+        qWarning("Sampling frequency is not defined\n");
         return false;
     }
     if (chs.size() == 0)
     {
-        printf("Channel information not defined\n");
+        qWarning("Channel information not defined\n");
         return false;
     }
     if (chs.size() != nchan)
     {
-        printf("Incorrect number of channel definitions found\n");
+        qWarning("Incorrect number of channel definitions found\n");
         return false;
     }
 
@@ -1277,7 +1275,7 @@ bool FiffStream::read_named_matrix(const FiffDirNode::SPtr& p_Node, fiff_int_t m
        }
        if (!found_it)
        {
-          printf("Fiff::read_named_matrix: Desired named matrix (kind = %d) not available\n",matkind);
+          qWarning("Fiff::read_named_matrix: Desired named matrix (kind = %d) not available\n",matkind);
           return false;
        }
     }
@@ -1285,7 +1283,7 @@ bool FiffStream::read_named_matrix(const FiffDirNode::SPtr& p_Node, fiff_int_t m
     {
         if (!node->has_tag(matkind))
         {
-            printf("Desired named matrix (kind = %d) not available",matkind);
+            qWarning("Desired named matrix (kind = %d) not available",matkind);
             return false;
         }
     }
@@ -1296,7 +1294,7 @@ bool FiffStream::read_named_matrix(const FiffDirNode::SPtr& p_Node, fiff_int_t m
     //
     if(!node->find_tag(this, matkind, t_pTag))
     {
-        printf("Matrix data missing.\n");
+        qWarning("Matrix data missing.\n");
         return false;
     }
     else
@@ -1312,13 +1310,13 @@ bool FiffStream::read_named_matrix(const FiffDirNode::SPtr& p_Node, fiff_int_t m
     if(node->find_tag(this, FIFF_MNE_NROW, t_pTag))
         if (*t_pTag->toInt() != mat.nrow)
         {
-            printf("Number of rows in matrix data and FIFF_MNE_NROW tag do not match");
+            qWarning("Number of rows in matrix data and FIFF_MNE_NROW tag do not match");
             return false;
         }
     if(node->find_tag(this, FIFF_MNE_NCOL, t_pTag))
         if (*t_pTag->toInt() != mat.ncol)
         {
-            printf("Number of columns in matrix data and FIFF_MNE_NCOL tag do not match");
+            qWarning("Number of columns in matrix data and FIFF_MNE_NCOL tag do not match");
             return false;
         }
 
@@ -1341,12 +1339,12 @@ bool FiffStream::read_named_matrix(const FiffDirNode::SPtr& p_Node, fiff_int_t m
 
     if (mat.row_names.size() != mat.nrow)
     {
-        printf("FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match\n");
+        qWarning("FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match\n");
     }
 
     if (mat.col_names.size() != mat.ncol)
     {
-        printf("FiffStream::read_named_matrix - Number of columns in matrix data and column names do not match\n");
+        qWarning("FiffStream::read_named_matrix - Number of columns in matrix data and column names do not match\n");
     }
 
     return true;
@@ -1398,7 +1396,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirNode::SPtr& p_Node)
                 desc = t_pTag->toString();
             else
             {
-                printf("Projection item description missing\n");
+                qWarning("Projection item description missing\n");
                 return projdata;
             }
         }
@@ -1421,7 +1419,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirNode::SPtr& p_Node)
         }
         else
         {
-            printf("Projection item kind missing");
+            qWarning("Projection item kind missing");
             return projdata;
         }
         t_pFiffDirTreeItem->find_tag(this, FIFF_PROJ_ITEM_NVEC, t_pTag);
@@ -1432,7 +1430,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirNode::SPtr& p_Node)
         }
         else
         {
-            printf("Number of projection vectors not specified\n");
+            qWarning("Number of projection vectors not specified\n");
             return projdata;
         }
         t_pFiffDirTreeItem->find_tag(this, FIFF_PROJ_ITEM_CH_NAME_LIST, t_pTag);
@@ -1443,7 +1441,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirNode::SPtr& p_Node)
         }
         else
         {
-            printf("Projection item channel list missing\n");
+            qWarning("Projection item channel list missing\n");
             return projdata;
         }
         t_pFiffDirTreeItem->find_tag(this, FIFF_PROJ_ITEM_VECTORS, t_pTag);
@@ -1455,7 +1453,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirNode::SPtr& p_Node)
         }
         else
         {
-            printf("Projection item data missing\n");
+            qWarning("Projection item data missing\n");
             return projdata;
         }
         t_pFiffDirTreeItem->find_tag(this, FIFF_MNE_PROJ_ITEM_ACTIVE, t_pTag);
@@ -1467,7 +1465,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirNode::SPtr& p_Node)
 
         if (data.cols() != names.size())
         {
-            printf("Number of channel names does not match the size of data matrix\n");
+            qWarning("Number of channel names does not match the size of data matrix\n");
             return projdata;
         }
 
@@ -1660,7 +1658,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
         t_pStream->setByteOrder(QDataStream::LittleEndian);
     }
 
-    printf("Opening raw data %s...\n",t_sFileName.toUtf8().constData());
+    qInfo("Opening raw data %s...\n",t_sFileName.toUtf8().constData());
 
     if(!t_pStream->open()){
         return false;
@@ -1688,11 +1686,11 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
 //                if(raw[i])
 //                    delete raw[i];
             raw = meas->dir_tree_find(FIFFB_SMSH_RAW_DATA);
-            printf("Maxshield data found\n");
+            qInfo("Maxshield data found\n");
 
             if (raw.size() == 0)
             {
-                printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
+                qWarning("No raw data in %s\n", t_sFileName.toUtf8().constData());
                 return false;
             }
         }
@@ -1700,7 +1698,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
         {
             if (raw.size() == 0)
             {
-                printf("No raw data in %s\n", t_sFileName.toUtf8().constData());
+                qWarning("No raw data in %s\n", t_sFileName.toUtf8().constData());
                 return false;
             }
         }
@@ -1785,7 +1783,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
                     nsamp = ent->size/(4*nchan);
                     break;
                 default:
-                    printf("Cannot handle data buffers of type %d\n",ent->type);
+                    qWarning("Cannot handle data buffers of type %d\n",ent->type);
                     return false;
             }
             //
@@ -1838,11 +1836,11 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     //data->proj       = [];
     //data.comp       = [];
     //
-    printf("\tRange : %d ... %d  =  %9.3f ... %9.3f secs\n",
+    qInfo("\tRange : %d ... %d  =  %9.3f ... %9.3f secs",
            data.first_samp,data.last_samp,
            (double)data.first_samp/data.info.sfreq,
            (double)data.last_samp/data.info.sfreq);
-    printf("Ready.\n");
+    qInfo("Ready.");
     data.file->close();
 
     return true;
@@ -1871,7 +1869,7 @@ FiffStream::SPtr FiffStream::start_file(QIODevice& p_IODevice)
 
     if(!p_pStream->device()->open(QIODevice::WriteOnly))
     {
-        printf("Cannot write to %s\n", t_sFileName.toUtf8().constData());//consider throw
+        qWarning("Cannot write to %s\n", t_sFileName.toUtf8().constData());//consider throw
         FiffStream::SPtr p_pEmptyStream;
         return p_pEmptyStream;
     }
@@ -3045,7 +3043,7 @@ bool FiffStream::write_raw_buffer(const MatrixXd& buf, const RowVectorXd& cals)
 {
     if (buf.rows() != cals.cols())
     {
-        printf("buffer and calibration sizes do not match\n");
+        qWarning("buffer and calibration sizes do not match\n");
         return false;
     }
 
@@ -3068,7 +3066,7 @@ bool FiffStream::write_raw_buffer(const MatrixXd& buf, const RowVectorXd& cals)
 bool FiffStream::write_raw_buffer(const MatrixXd& buf, const SparseMatrix<double>& mult)
 {
     if (buf.rows() != mult.cols()) {
-        printf("buffer and mult sizes do not match\n");
+        qWarning("buffer and mult sizes do not match\n");
         return false;
     }
 
@@ -3176,18 +3174,18 @@ bool FiffStream::check_beginning(FiffTag::SPtr &p_pTag)
 
     if (p_pTag->kind != FIFF_FILE_ID)
     {
-        printf("Fiff::open: file does not start with a file id tag\n");//consider throw
+        qWarning("Fiff::open: file does not start with a file id tag\n");//consider throw
         return false;
     }
 
     if (p_pTag->type != FIFFT_ID_STRUCT)
     {
-        printf("Fiff::open: file does not start with a file id tag\n");//consider throw
+        qWarning("Fiff::open: file does not start with a file id tag\n");//consider throw
         return false;
     }
     if (p_pTag->size() != 20)
     {
-        printf("Fiff::open: file does not start with a file id tag\n");//consider throw
+        qWarning("Fiff::open: file does not start with a file id tag\n");//consider throw
         return false;
     }
     //do not rewind since the data is contained in the returned tag; -> done for TCP IP reasosn, no rewind possible there
