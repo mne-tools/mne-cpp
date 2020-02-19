@@ -45,7 +45,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1  
     - name: Install Qt
-      uses: ouuan/install-qt-action@v2.3.1
+      uses: ouuan/install-qt-action@v2.4.1
       with:
         version: 5.14.1
         aqtversion: "==0.7"
@@ -87,7 +87,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1
     - name: Install Qt
-      uses: ouuan/install-qt-action@v2.3.1
+      uses: ouuan/install-qt-action@v2.4.1
       with:
         version: 5.14.1
         aqtversion: "==0.7"
@@ -117,7 +117,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1      
     - name: Install Qt
-      uses: ouuan/install-qt-action@v2.3.1
+      uses: ouuan/install-qt-action@v2.4.1
       with:
         version: 5.14.1
         arch: win64_msvc2017_64
@@ -157,7 +157,7 @@ jobs:
       run: |
         sudo pip install codecov 
     - name: Install Qt
-      uses: ouuan/install-qt-action@v2.3.1
+      uses: ouuan/install-qt-action@v2.4.1
       with:
         version: 5.14.1
         aqtversion: "==0.7"
