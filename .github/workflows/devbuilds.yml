@@ -49,6 +49,7 @@ jobs:
       uses: ouuan/install-qt-action@v2.3.1
       with:
         version: 5.14.1
+        aqtversion: "==0.7.1"
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |        
@@ -90,6 +91,7 @@ jobs:
       uses: ouuan/install-qt-action@v2.3.1
       with:
         version: 5.14.1
+        aqtversion: "==0.7.1"
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |        
@@ -120,6 +122,7 @@ jobs:
       with:
         version: 5.14.1
         arch: win64_msvc2017_64
+        aqtversion: "==0.7.1"
         modules: qtcharts
     - name: Install jom (Windows)
       run: |
@@ -158,6 +161,7 @@ jobs:
       uses: ouuan/install-qt-action@v2.3.1
       with:
         version: 5.14.1
+        aqtversion: "==0.7.1"
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
