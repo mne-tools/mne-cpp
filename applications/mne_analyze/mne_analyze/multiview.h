@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mdiview.h
+ * @file     multiview.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
@@ -31,18 +31,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MdiView class declaration.
+ * @brief    MultiView class declaration.
  *
  */
 
-#ifndef MDIVIEW_H
-#define MDIVIEW_H
+#ifndef MULTIVIEW_H
+#define MULTIVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -54,12 +53,10 @@
 #include <QPointer>
 #include <QSplitter>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,45 +71,62 @@ namespace MNEANALYZE
 // MNEANALYZE FORWARD DECLARATIONS
 //=============================================================================================================
 
+class MultiViewWindow;
 
 //=============================================================================================================
 /**
- * @brief The MdiView class inherits from QMdiArea and allows printing of subwindows.
+ * @brief The MultiView class inherits from QWidget and provides a view with one vertical and one horizontal
+ *        QSplitter. The horizontal splitter lives in the most upper element of the vertical QSplitter.
  */
-class MdiView : public QWidget
+class MultiView : public QWidget
 {
     Q_OBJECT
+
 public:
-    typedef QSharedPointer<MdiView> SPtr;            /**< Shared pointer type for MdiView. */
-    typedef QSharedPointer<const MdiView> ConstSPtr; /**< Const shared pointer type for MdiView. */
+    typedef QSharedPointer<MultiView> SPtr;            /**< Shared pointer type for MultiView. */
+    typedef QSharedPointer<const MultiView> ConstSPtr; /**< Const shared pointer type for MultiView. */
 
     //=========================================================================================================
     /**
-     * Constructs an MdiView.
+     * Constructs an MultiView.
      */
-    explicit MdiView(QWidget *parent = 0);
+    explicit MultiView(QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
-     * Destructs an MdiView.
+     * Destructs an MultiView.
      */
-    ~MdiView();
-
-    void addWidgetH(QWidget* pWidget, const QString &sName);
-
-    void addWidgetV(QWidget* pWidget, const QString& sName);
+    ~MultiView();
 
     //=========================================================================================================
     /**
-     * Allows printing of current subwindow.
+     * Adds a QWidget to the horizontal QSplitter.
+     *
+     * @param[in] pWidget   The widget to be added.
+     * @param[in] sName     The window title shown in the QSplitter.
+     *
+     * @return Returns a pointer to the added widget in form of a MultiViewWindow.
      */
-    void printCurrentSubWindow();
+    MultiViewWindow* addWidgetH(QWidget* pWidget,
+                                const QString &sName);
 
-    QSplitter *splitterHorizontal;
-    QSplitter *splitterVertical;
+    //=========================================================================================================
+    /**
+     * Adds a QWidget to the vertical QSplitter.
+     *
+     * @param[in] pWidget   The widget to be added.
+     * @param[in] sName     The window title shown in the QSplitter.
+     *
+     * @return Returns a pointer to the added widget in form of a MultiViewWindow.
+     */
+    MultiViewWindow* addWidgetV(QWidget* pWidget,
+                                const QString& sName);
+
 private:
+    QPointer<QSplitter> m_pSplitterHorizontal;      /**< The horizontal QSplitter. */
+    QPointer<QSplitter> m_pSplitterVertical;        /**< The vertical QSplitter. */
 };
 
 }// NAMESPACE
 
-#endif // MDIVIEW_H
+#endif // MULTIVIEW_H

@@ -49,8 +49,6 @@
 #include <QDockWidget>
 #include <QSharedPointer>
 #include <QPointer>
-#include <QPoint>
-#include <QMouseEvent>
 
 
 //*************************************************************************************************************
@@ -58,9 +56,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
-    class MultiViewWindowWidget;
-}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -79,11 +74,12 @@ class MdiView;
 
 //=============================================================================================================
 /**
- * @brief The MultiViewWindow class inherits from QMdiArea and allows printing of subwindows.
+ * @brief The MultiViewWindow class provides sub windows as QDockWidgets which can be detached from the QSplitter.
  */
-class MultiViewWindow : public QWidget
+class MultiViewWindow : public QDockWidget
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<MultiViewWindow> SPtr;            /**< Shared pointer type for MultiViewWindow. */
     typedef QSharedPointer<const MultiViewWindow> ConstSPtr; /**< Const shared pointer type for MultiViewWindow. */
@@ -92,7 +88,7 @@ public:
     /**
      * Constructs an MultiViewWindow.
      */
-    explicit MultiViewWindow(QWidget *parent = 0, QWidget* centralWidget = 0, const QString& sName = "");
+    explicit MultiViewWindow(QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -100,27 +96,13 @@ public:
      */
     ~MultiViewWindow();
 
-    void maximize();
-
-    void closeEvent(QCloseEvent *event);
-
-    void mousePressEvent(QMouseEvent *evt)
-    {
-        oldPos = evt->globalPos();
-    }
-
-    void mouseMoveEvent(QMouseEvent *evt)
-    {
-        const QPoint delta = evt->globalPos() - oldPos;
-        move(x()+delta.x(), y()+delta.y());
-        oldPos = evt->globalPos();
-    }
-
-    QWidget * oldparent;
-    Ui::MultiViewWindowWidget* m_pUi;
-
-    QPoint oldPos;
 private:
+    void onTopLevelChanged(bool bFlag);
+
+    QPointer<QWidget>   m_pFloatingWindow;
+    QPointer<QWidget>   m_pParent;
+
+    bool                m_bWindowMode;
 };
 
 }// NAMESPACE

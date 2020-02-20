@@ -43,8 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mdiview.h"
-
+#include "multiview.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -54,7 +53,6 @@
 #include <QMainWindow>
 #include <QCloseEvent>
 #include <QString>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -73,7 +71,6 @@ namespace ANSHAREDLIB
     class ExtensionManager;
 }
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE MNEANALYZE
@@ -87,6 +84,7 @@ namespace MNEANALYZE
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
+class MultiView;
 
 //=============================================================================================================
 /**
@@ -138,15 +136,12 @@ private:
     void tabifyDockWindows();                                                                   /**< Tabify all dock windows */
     void about();                                                                               /**< Implements about action.*/
 
-    MdiView*                            m_pMdiView;                 /**< The Central MDI View.*/
+    MultiView*                          m_pMultiView;               /**< The central View.*/
 
     QGridLayout*                        m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MdiArea can always fit the size of MainWindow */
 
     // MainWindow actions
     QAction*                            m_pActionExit;              /**< exit application action */
-    QAction*                            m_pActionPrint;             /**< view print action */
-    QAction*                            m_pActionCascade;           /**< view cascade action */
-    QAction*                            m_pActionTile;              /**< view tile action */
     QAction*                            m_pActionAbout;             /**< show about dialog action */
 
     // MainWindow menus

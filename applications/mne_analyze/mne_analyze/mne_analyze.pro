@@ -103,15 +103,15 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     multiviewwindow.cpp \
-    mdiview.cpp \
-    analyzecore.cpp
+    analyzecore.cpp \
+    multiview.cpp
 
 HEADERS += \
     info.h \
     mainwindow.h \
     multiviewwindow.h \
-    mdiview.h \
-    analyzecore.h
+    analyzecore.h \
+    multiview.h
 
 FORMS += \
     formfiles/multiviewwindow.ui
