@@ -10,7 +10,7 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v1
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2
+        uses: ouuan/install-qt-action@ouuan
         with:
           version: 5.10.1
           aqtversion: "==0.7"
