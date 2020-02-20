@@ -102,19 +102,14 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    multiviewwindow.cpp \
     analyzecore.cpp \
-    multiview.cpp
 
 HEADERS += \
     info.h \
     mainwindow.h \
-    multiviewwindow.h \
     analyzecore.h \
-    multiview.h
 
 FORMS += \
-    formfiles/multiviewwindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

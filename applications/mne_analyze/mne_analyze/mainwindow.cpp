@@ -41,12 +41,13 @@
 
 #include "info.h"
 #include "mainwindow.h"
-#include "multiview.h"
-#include "multiviewwindow.h"
 
 #include <anShared/Interfaces/IExtension.h>
 #include <anShared/Management/extensionmanager.h>
 #include <anShared/Management/statusbar.h>
+
+#include <disp/viewers/multiview.h>
+#include <disp/viewers/multiviewwindow.h>
 
 
 //*************************************************************************************************************
@@ -74,6 +75,7 @@
 
 using namespace MNEANALYZE;
 using namespace ANSHAREDLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************

@@ -1,13 +1,16 @@
 //=============================================================================================================
 /**
  * @file     multiview.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
  * @version  dev
- * @date     January, 2020
+ * @date     January, 2017
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2017, Christoph Dinh, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -35,24 +38,29 @@
 #ifndef MULTIVIEW_H
 #define MULTIVIEW_H
 
+//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "../disp_global.h"
 
+//*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QMainWindow>
+#include <QMdiArea>
 #include <QSharedPointer>
 #include <QPointer>
+#include <QSplitter>
 
+//*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
@@ -60,6 +68,7 @@
 namespace DISPLIB
 {
 
+//*************************************************************************************************************
 //=============================================================================================================
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
@@ -68,9 +77,10 @@ class MultiViewWindow;
 
 //=============================================================================================================
 /**
- * @brief The MultiView class inherits from QMainWindow and provides a view which supports dock widgets.
+ * @brief The MultiView class inherits from QWidget and provides a view with one vertical and one horizontal
+ *        QSplitter. The horizontal splitter lives in the most upper element of the vertical QSplitter.
  */
-class DISPSHARED_EXPORT MultiView : public QMainWindow
+class DISPSHARED_EXPORT MultiView : public QWidget
 {
     Q_OBJECT
 
@@ -82,8 +92,7 @@ public:
     /**
      * Constructs an MultiView.
      */
-    explicit MultiView(QWidget *parent = Q_NULLPTR,
-                       Qt::WindowFlags flags = Qt::Widget);
+    explicit MultiView(QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -93,33 +102,31 @@ public:
 
     //=========================================================================================================
     /**
-     * Adds a QWidget to the top docking area.
+     * Adds a QWidget to the horizontal QSplitter.
      *
      * @param[in] pWidget   The widget to be added.
      * @param[in] sName     The window title shown in the QSplitter.
      *
      * @return Returns a pointer to the added widget in form of a MultiViewWindow.
      */
-    MultiViewWindow* addWidgetTop(QWidget* pWidget,
-                                  const QString &sName);
+    MultiViewWindow* addWidgetH(QWidget* pWidget,
+                                const QString &sName);
 
     //=========================================================================================================
     /**
-     * Adds a QWidget to the bottom docking area. Please note that all bottom dock widgets are tabbified by default.
+     * Adds a QWidget to the vertical QSplitter.
      *
      * @param[in] pWidget   The widget to be added.
      * @param[in] sName     The window title shown in the QSplitter.
      *
      * @return Returns a pointer to the added widget in form of a MultiViewWindow.
      */
-    MultiViewWindow* addWidgetBottom(QWidget* pWidget,
-                                     const QString& sName);
+    MultiViewWindow* addWidgetV(QWidget* pWidget,
+                                const QString& sName);
 
 private:
-    QList<MultiViewWindow *> m_lDockWidgets;
-
-signals:
-    void dockLocationChanged(QWidget* pWidget);
+    QPointer<QSplitter> m_pSplitterHorizontal;      /**< The horizontal QSplitter. */
+    QPointer<QSplitter> m_pSplitterVertical;        /**< The vertical QSplitter. */
 };
 
 }// NAMESPACE

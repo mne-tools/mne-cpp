@@ -1,13 +1,16 @@
 //=============================================================================================================
 /**
  * @file     multiview.cpp
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
  * @version  dev
- * @date     January, 2020
+ * @date     January, 2017
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2017, Christoph Dinh, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -31,93 +34,75 @@
  * @brief    MultiView class definition.
  *
  */
+//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "multiview.h"
 #include "multiviewwindow.h"
-#include "rtfiffrawview.h"
-#include "averagelayoutview.h"
-#include "butterflyview.h"
 
+//*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
 #include <QHBoxLayout>
-#include <QDebug>
 
+//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
 
+//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MultiView::MultiView(QWidget *parent,
-                     Qt::WindowFlags flags)
-: QMainWindow(parent, flags)
+MultiView::MultiView(QWidget *parent)
+: QWidget(parent)
 {
-    this->setDockNestingEnabled(true);
-    if(QWidget* pCentralWidget = this->centralWidget()) {
-        pCentralWidget->hide();
-    }
+    QHBoxLayout *layout = new QHBoxLayout;
+    m_pSplitterHorizontal = new QSplitter(this);
+    m_pSplitterHorizontal->setOrientation(Qt::Horizontal);
+    m_pSplitterVertical = new QSplitter(this);
+    m_pSplitterVertical->setOrientation(Qt::Vertical);
+    m_pSplitterVertical->addWidget(m_pSplitterHorizontal);
+    layout->addWidget(m_pSplitterVertical);
+
+    this->setLayout(layout);
 }
 
-//=============================================================================================================
+//*************************************************************************************************************
 
 MultiView::~MultiView()
 {
 }
 
-//=============================================================================================================
+//*************************************************************************************************************
 
-MultiViewWindow* MultiView::addWidgetTop(QWidget* pWidget,
-                                         const QString& sName)
+MultiViewWindow* MultiView::addWidgetH(QWidget* pWidget,
+                                       const QString& sName)
 {
     MultiViewWindow* pDockWidget = new MultiViewWindow();
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
-    pWidget->layout()->setContentsMargins(0,0,0,0);
-    pDockWidget->layout()->setContentsMargins(0,0,0,0);
-
-    this->addDockWidget(Qt::DockWidgetArea::TopDockWidgetArea, pDockWidget);
-
-    connect(pDockWidget, &MultiViewWindow::dockLocationChanged, [=]() {
-        emit dockLocationChanged(pWidget);
-    });
+    this->m_pSplitterHorizontal->addWidget(pDockWidget);
 
     return pDockWidget;
 }
 
-//=============================================================================================================
+//*************************************************************************************************************
 
-MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
-                                            const QString& sName)
+MultiViewWindow* MultiView::addWidgetV(QWidget* pWidget,
+                                       const QString& sName)
 {
     MultiViewWindow* pDockWidget = new MultiViewWindow();
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
-    pWidget->layout()->setContentsMargins(0,0,0,0);
-    pDockWidget->layout()->setContentsMargins(0,0,0,0);
-
-    if(m_lDockWidgets.isEmpty()) {
-        this->addDockWidget(Qt::DockWidgetArea::BottomDockWidgetArea, pDockWidget);
-    }
-
-    for(int i = 0; i < m_lDockWidgets.size(); ++i) {
-        this->tabifyDockWidget(m_lDockWidgets.at(i), pDockWidget);
-    }
-
-    m_lDockWidgets.append(pDockWidget);
-
-    connect(pDockWidget, &MultiViewWindow::dockLocationChanged, [=]() {
-        emit dockLocationChanged(pWidget);
-    });
+    this->m_pSplitterVertical->addWidget(pDockWidget);
 
     return pDockWidget;
 }
