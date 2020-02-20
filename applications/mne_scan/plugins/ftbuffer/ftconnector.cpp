@@ -528,8 +528,6 @@ void FtConnector::parseNeuromagHeader()
 {
     qInfo() << "[FtConnector::parseNeuromagHeader] Attepting to get extended header...";
 
-
-
     QSharedPointer<FIFFLIB::FiffRawData> neuromagData;
 
     QBuffer neuromagBuffer;
@@ -550,12 +548,14 @@ void FtConnector::parseNeuromagHeader()
         qDebug() << "AAAAAAAAAAAAAAA:" << type;
 
         if (type != 8 ) {
+            qint32 size;
 
             char c_size[sizeof(qint32)];
             chunkBuffer.read(c_size, sizeof(qint32));
-            qint32 size;
             std::memcpy(&size, c_size, sizeof(qint32));
+
             qDebug() << "BBBBBBBBBBBBBBB:" << size;
+
             char c_rest[size];
             chunkBuffer.read(c_rest, size);
         } else {
@@ -567,19 +567,20 @@ void FtConnector::parseNeuromagHeader()
 
             neuromagBuffer.open(QIODevice::ReadWrite);
             neuromagBuffer.write(chunkBuffer.read(size));
+            neuromagBuffer.reset();
 
-//            neuromagData = QSharedPointer<FIFFLIB::FiffRawData>(new FIFFLIB::FiffRawData(neuromagBuffer));
+            neuromagData = QSharedPointer<FIFFLIB::FiffRawData>(new FIFFLIB::FiffRawData(neuromagBuffer, true));
 
             condition = false;
         }
     }
 
-    QFile outfile("mytestoutput.txt");
+//    QFile outfile("mytestoutput.txt");
 
-    if(!outfile.open(QIODevice::ReadWrite)) {
-        qDebug() << "Could not open file";
-    } else {
-        neuromagBuffer.reset();
-        outfile.write(neuromagBuffer.read(neuromagBuffer.size()));
-    }
+//    if(!outfile.open(QIODevice::ReadWrite)) {
+//        qDebug() << "Could not open file";
+//    } else {
+//        neuromagBuffer.reset();
+//        outfile.write(neuromagBuffer.read(neuromagBuffer.size()));
+//    }
 }

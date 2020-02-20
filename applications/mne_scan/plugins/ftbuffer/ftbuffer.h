@@ -228,7 +228,7 @@ protected:
     /**
     * @brief setupRTMSA - sets up Fiff info and uses it to initialize m_pRTMSA_BufferOutput
     */
-    void setupRTMSA();
+    bool setupRTMSA();
 
     //=========================================================================================================
     /**
