@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mdiview.cpp
+ * @file     multiview.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MdiView class implementation.
+ * @brief    MultiView class definition.
  *
  */
 //*************************************************************************************************************
@@ -39,28 +39,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mdiview.h"
+#include "multiview.h"
 #include "multiviewwindow.h"
 
 #include <anShared/Interfaces/IStandardView.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QGridLayout>
-#include <QMdiSubWindow>
-#include <QPainter>
-#include <QListView>
-#include <QDockWidget>
-
-#if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
-#include <QPrinter>
-#include <QPrintDialog>
-#endif
-
+#include <QHBoxLayout>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,73 +59,53 @@
 using namespace MNEANALYZE;
 using namespace ANSHAREDLIB;
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MdiView::MdiView(QWidget *parent)
+MultiView::MultiView(QWidget *parent)
 : QWidget(parent)
 {
     QHBoxLayout *layout = new QHBoxLayout;
-    splitterHorizontal = new QSplitter(this);
-    splitterHorizontal->setOrientation(Qt::Horizontal);
-    splitterVertical = new QSplitter(this);
-    splitterVertical->setOrientation(Qt::Vertical);
-    splitterVertical->addWidget(splitterHorizontal);
-    layout->addWidget(splitterVertical);
+    m_pSplitterHorizontal = new QSplitter(this);
+    m_pSplitterHorizontal->setOrientation(Qt::Horizontal);
+    m_pSplitterVertical = new QSplitter(this);
+    m_pSplitterVertical->setOrientation(Qt::Vertical);
+    m_pSplitterVertical->addWidget(m_pSplitterHorizontal);
+    layout->addWidget(m_pSplitterVertical);
 
     this->setLayout(layout);
 }
 
-
 //*************************************************************************************************************
 
-MdiView::~MdiView()
+MultiView::~MultiView()
 {
-
 }
 
 //*************************************************************************************************************
 
-void MdiView::addWidgetH(QWidget* pWidget, const QString& sName)
+MultiViewWindow* MultiView::addWidgetH(QWidget* pWidget,
+                                       const QString& sName)
 {
-    MultiViewWindow* pDockWidgeta = new MultiViewWindow(this, pWidget, sName);
-    this->splitterHorizontal->addWidget(pDockWidgeta);
-}
+    MultiViewWindow* pDockWidget = new MultiViewWindow();
+    pDockWidget->setWindowTitle(sName);
+    pDockWidget->setWidget(pWidget);
+    this->m_pSplitterHorizontal->addWidget(pDockWidget);
 
+    return pDockWidget;
+}
 
 //*************************************************************************************************************
 
-void MdiView::addWidgetV(QWidget* pWidget, const QString& sName)
+MultiViewWindow* MultiView::addWidgetV(QWidget* pWidget,
+                                       const QString& sName)
 {
-    MultiViewWindow* pDockWidgeta = new MultiViewWindow(this, pWidget, sName);
-    this->splitterVertical->addWidget(pDockWidgeta);
-}
+    MultiViewWindow* pDockWidget = new MultiViewWindow();
+    pDockWidget->setWindowTitle(sName);
+    pDockWidget->setWidget(pWidget);
+    this->m_pSplitterVertical->addWidget(pDockWidget);
 
-
-//*************************************************************************************************************
-
-void MdiView::printCurrentSubWindow()
-{
-//    if(! currentSubWindow())
-//        return;
-
-//#if !defined(QT_NO_PRINTER) && !defined(QT_NO_PRINTDIALOG)
-//    IStandardView *view = qobject_cast<IStandardView *>(currentSubWindow());
-//    // if no standard view -> render widget to printer otherwise call print function
-//    if(! view){
-//        QPrinter printer;
-//        QPrintDialog dialog(&printer, this);
-//        if (dialog.exec() == QDialog::Accepted) {
-//            QPainter painter(&printer);
-//            currentSubWindow()->render(&painter);
-//        }
-//    }
-//    else {
-//        view->print();
-//    }
-//#endif
-
+    return pDockWidget;
 }

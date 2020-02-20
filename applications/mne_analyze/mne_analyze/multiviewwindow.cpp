@@ -38,8 +38,7 @@
 //=============================================================================================================
 
 #include "multiviewwindow.h"
-#include "mdiview.h"
-#include "formfiles/ui_multiviewwindow.h"
+#include "multiview.h"
 
 
 //*************************************************************************************************************
@@ -51,7 +50,6 @@
 #include <QListView>
 #include <QDockWidget>
 #include <QDebug>
-#include <QCloseEvent>
 
 
 //*************************************************************************************************************
@@ -67,24 +65,20 @@ using namespace MNEANALYZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MultiViewWindow::MultiViewWindow(QWidget *parent, QWidget *centralWidget, const QString &sName)
-: QWidget(parent)
-, m_pUi(new Ui::MultiViewWindowWidget)
+MultiViewWindow::MultiViewWindow(QWidget *parent)
+: QDockWidget(parent)
+, m_bWindowMode(false)
 {
-    m_pUi->setupUi(this);
-    m_pUi->m_pLabelName->setText(sName);
+    m_pFloatingWindow = new QWidget(this->parentWidget(), Qt::Window);
+    QHBoxLayout *layout = new QHBoxLayout;
+    m_pFloatingWindow->setLayout(layout);
+    m_pFloatingWindow->setWindowFlags(Qt::WindowMinMaxButtonsHint);
+    m_pFloatingWindow->hide();
 
-    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    sizePolicy.setHorizontalStretch(0);
-    sizePolicy.setVerticalStretch(0);
-    sizePolicy.setHeightForWidth(centralWidget->sizePolicy().hasHeightForWidth());
-    centralWidget->setSizePolicy(sizePolicy);
-    m_pUi->gridLayout->addWidget(centralWidget, 1, 0, 1, 4);
+    this->setFeatures(QDockWidget::DockWidgetFloatable);
 
-    //this->setWindowFlag(Qt::FramelessWindowHint, true);
-    this->setWindowFlags(Qt::WindowMinMaxButtonsHint);
-    connect(m_pUi->m_pPushButtonMax, &QPushButton::clicked,
-            this, &MultiViewWindow::maximize);
+    connect(this, &QDockWidget::topLevelChanged,
+            this, &MultiViewWindow::onTopLevelChanged);
 }
 
 
@@ -98,34 +92,20 @@ MultiViewWindow::~MultiViewWindow()
 
 //*************************************************************************************************************
 
-void MultiViewWindow::maximize()
+void MultiViewWindow::onTopLevelChanged(bool bFlag)
 {
-    if(!this->isWindow()) {
-        oldparent = this->parentWidget();
-        this->setParent(Q_NULLPTR);
-        this->setWindowFlag(Qt::Window, true);
-        m_pUi->m_pPushButtonMax->setText("Min.");
-    } else if(oldparent) {
-        this->setParent(oldparent);
-        this->setWindowFlag(Qt::Window, false);
-        m_pUi->m_pPushButtonMax->setText("Max.");
+    Q_UNUSED(bFlag)
 
+    if(!m_bWindowMode) {
+        m_pParent = this->parentWidget();
+        m_pFloatingWindow->layout()->addWidget(this);
+        this->setParent(m_pFloatingWindow);
+        m_pFloatingWindow->show();
+        m_bWindowMode = true;
+    } else if(m_pParent) {
+        m_pFloatingWindow->layout()->removeWidget(this);
+        this->setParent(m_pParent);
+        m_pFloatingWindow->hide();
+        m_bWindowMode = false;
     }
-    this->show();
-}
-
-
-//*************************************************************************************************************
-
-void MultiViewWindow::closeEvent(QCloseEvent *event)
-{
-    if(oldparent) {
-        //this->setParent(oldparent);
-        this->setWindowFlag(Qt::Window, false);
-        m_pUi->m_pPushButtonMax->show();
-        m_pUi->m_pPushButtonClose->show();
-        this->show();
-    }
-
-    event->ignore();
 }

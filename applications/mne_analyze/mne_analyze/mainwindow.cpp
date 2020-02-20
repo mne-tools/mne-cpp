@@ -41,10 +41,12 @@
 
 #include "info.h"
 #include "mainwindow.h"
-#include "mdiview.h"
-#include "../libs/anShared/Interfaces/IExtension.h"
-#include "../libs/anShared/Management/extensionmanager.h"
-#include "../libs/anShared/Management/statusbar.h"
+#include "multiview.h"
+#include "multiviewwindow.h"
+
+#include <anShared/Interfaces/IExtension.h>
+#include <anShared/Management/extensionmanager.h>
+#include <anShared/Management/statusbar.h>
 
 
 //*************************************************************************************************************
@@ -81,7 +83,7 @@ using namespace ANSHAREDLIB;
 
 MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionManager, QWidget *parent)
 : QMainWindow(parent)
-, m_pMdiView(Q_NULLPTR)
+, m_pMultiView(Q_NULLPTR)
 , m_pGridLayout(Q_NULLPTR)
 {
     setWindowState(Qt::WindowMaximized);
@@ -89,10 +91,10 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExtensionM
     setWindowTitle(CInfo::AppNameShort());
 
     if(!pExtensionManager.isNull()) {
-        createDockWindows(pExtensionManager);
-        createMdiView(pExtensionManager);
         createActions();
         createMenus(pExtensionManager);
+        createDockWindows(pExtensionManager);
+        createMdiView(pExtensionManager);
     }
     else {
         qDebug() << "[MainWindow::MainWindow] CRITICAL ! Extension manager is nullptr";
@@ -129,20 +131,6 @@ void MainWindow::createActions()
     m_pActionExit->setStatusTip(tr("Exit the application"));
     connect(m_pActionExit, &QAction::triggered, this, &MainWindow::close);
 
-    //View QMenu
-    m_pActionCascade = new QAction(tr("Cascade"), this);
-    m_pActionCascade->setStatusTip(tr("Cascade the windows in the mdi window"));
-    //connect(m_pActionCascade, &QAction::triggered, this->m_pMdiView, &MdiView::cascadeSubWindows);
-
-    m_pActionTile = new QAction(tr("Tile"), this);
-    m_pActionTile->setStatusTip(tr("Tile the windows in the mdi window"));
-    //connect(m_pActionTile, &QAction::triggered, this->m_pMdiView, &MdiView::tileSubWindows);
-
-    m_pActionPrint = new QAction(tr("Print..."), this);
-    m_pActionPrint->setStatusTip(tr("Prints the current view."));
-    m_pActionPrint->setShortcut(QKeySequence::Print);
-    connect(m_pActionPrint, &QAction::triggered, this->m_pMdiView, &MdiView::printCurrentSubWindow);
-
     //Help QMenu
     m_pActionAbout = new QAction(tr("About"), this);
     m_pActionAbout->setStatusTip(tr("Show the application's About box"));
@@ -158,10 +146,6 @@ void MainWindow::createMenus(QSharedPointer<ANSHAREDLIB::ExtensionManager> pExte
     m_pMenuFile->addAction(m_pActionExit);
 
     m_pMenuView = menuBar()->addMenu(tr("View"));
-    m_pMenuView->addAction(m_pActionCascade);
-    m_pMenuView->addAction(m_pActionTile);
-    m_pMenuView->addSeparator();
-    m_pMenuView->addAction(m_pActionPrint);
 
     menuBar()->addSeparator();
 
@@ -206,31 +190,66 @@ void MainWindow::createDockWindows(QSharedPointer<ANSHAREDLIB::ExtensionManager>
 void MainWindow::createMdiView(QSharedPointer<ExtensionManager> pExtensionManager)
 {
     m_pGridLayout = new QGridLayout(this);
-    m_pMdiView = new MdiView(this);
-    m_pGridLayout->addWidget(m_pMdiView);
-    setCentralWidget(m_pMdiView);
+    m_pMultiView = new MultiView(this);
+    m_pGridLayout->addWidget(m_pMultiView);
+    setCentralWidget(m_pMultiView);
 
     //Add Extension views to mdi
     for(IExtension* pExtension : pExtensionManager->getExtensions()) {
         QWidget* pView = pExtension->getView();
         if(pView) {
-            //m_pMdiView->addSubWindow(pView);
-            m_pMdiView->addWidgetV(pView, "data");
+            MultiViewWindow* pWindow = m_pMultiView->addWidgetV(pView, pExtension->getName());
+
+            QAction* action = new QAction(pExtension->getName(), this);
+            action->setCheckable(true);
+            action->setChecked(true);
+            m_pMenuView->addAction(action);
+            connect(action, &QAction::toggled,
+                    pWindow, &MultiViewWindow::setVisible);
+
             qDebug() << "[MainWindow::createMdiView] Found and added subwindow for " << pExtension->getName();
 
-            QListView *listview = new QListView;
-            QListView *listviewa = new QListView;
-            QListView *listviewv = new QListView;
-            QListView *listviewvx = new QListView;
+//            QListView *listview = new QListView;
+//            QListView *listviewa = new QListView;
+//            QListView *listviewv = new QListView;
+//            QListView *listviewvx = new QListView;
 
-            m_pMdiView->addWidgetH(listview, "a");
-            m_pMdiView->addWidgetH(listviewa, "b");
-            m_pMdiView->addWidgetH(listviewv, "c");
-            m_pMdiView->addWidgetH(listviewvx, "d");
+//            MultiViewWindow* pWindowa = m_pMultiView->addWidgetH(listview, "a");
+//            MultiViewWindow* pWindowb = m_pMultiView->addWidgetH(listviewa, "b");
+//            MultiViewWindow* pWindowc = m_pMultiView->addWidgetH(listviewv, "c");
+//            MultiViewWindow* pWindowd = m_pMultiView->addWidgetH(listviewvx, "d");
+
+//            QAction* actiona = new QAction(pExtension->getName(), this);
+//            actiona->setCheckable(true);
+//            actiona->setChecked(true);
+//            m_pMenuView->addAction(actiona);
+//            connect(actiona, &QAction::toggled,
+//                    pWindowa, &MultiViewWindow::setVisible);
+
+//            QAction* actionb = new QAction(pExtension->getName(), this);
+//            actionb->setCheckable(true);
+//            actionb->setChecked(true);
+//            m_pMenuView->addAction(actionb);
+//            connect(actionb, &QAction::toggled,
+//                    pWindowb, &MultiViewWindow::setVisible);
+
+//            QAction* actionc = new QAction(pExtension->getName(), this);
+//            actionc->setCheckable(true);
+//            actionc->setChecked(true);
+//            m_pMenuView->addAction(actionc);
+//            connect(actionc, &QAction::toggled,
+//                    pWindowc, &MultiViewWindow::setVisible);
+
+//            QAction* actiond = new QAction(pExtension->getName(), this);
+//            actiond->setCheckable(true);
+//            actiond->setChecked(true);
+//            m_pMenuView->addAction(actiond);
+//            connect(actiond, &QAction::toggled,
+//                    pWindowd, &MultiViewWindow::setVisible);
         }
     }
 
-    //m_pMdiView->cascadeSubWindows();
+    //m_pMultiView->cascadeSubWindows();
 }
 
 
