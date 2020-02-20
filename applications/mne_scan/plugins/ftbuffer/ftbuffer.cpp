@@ -352,7 +352,7 @@ void FtBuffer::setParams(QPair<int,float> val)
 
 //*************************************************************************************************************
 
-void FtBuffer::setupRTMSA()
+bool FtBuffer::setupRTMSA()
 {
 
     qInfo() << "[FtBuffer::setupRTMSA] Attempting to set up parameters from .fif file...";
@@ -363,7 +363,7 @@ void FtBuffer::setupRTMSA()
     QFile infile("neuromag2ft.fif");
 
     if(!infile.open(QIODevice::ReadOnly)) {
-        qWarning() << "[FtBuffer::setupRTMSA] Could not open file. Plugin will not run as expected";
+        qWarning() << "[FtBuffer::setupRTMSA] Could not open file.  Plugin output won't be based on local fif parameters.";
         qInfo() << "[FtBuffer::setupRTMSA] Please verify neuromag2ft.fif is present in bin folder.";
     } else {
         qbuffInputSampleFif.write(infile.readAll());
@@ -379,7 +379,9 @@ void FtBuffer::setupRTMSA()
         m_pRTMSA_BufferOutput->data()->setVisibility(true);
 
         qInfo() << "[FtBuffer::setupRTMSA] Done.";
+        return true;
     }
+    return false;
 }
 
 //*************************************************************************************************************

@@ -289,7 +289,7 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
     //
     //   Read or create the directory tree
     //
-    qInfo("\nCreating tag directory for %s...", t_sFileName.toUtf8().constData());
+    qInfo("Creating tag directory for %s...", t_sFileName.toUtf8().constData());
     m_dir.clear();
     qint32 dirpos = *t_pTag->toInt();
     /*
@@ -3128,29 +3128,37 @@ QList<FiffDirEntry::SPtr> FiffStream::make_dir(bool *ok)
     QList<FiffDirEntry::SPtr> dir;
     FiffDirEntry::SPtr t_pFiffDirEntry;
     fiff_long_t pos;
+    qDebug() << "1";
     if(ok) *ok = false;
     /*
      * Start from the very beginning...
      */
+    qDebug() << "2";
     if(!this->device()->seek(SEEK_SET))
         return dir;
+    qDebug() << "3";
     while ((pos = this->read_tag_info(t_pTag)) != -1) {
         /*
         * Check that we haven't run into the directory
         */
+        qDebug() << "4";
         if (t_pTag->kind == FIFF_DIR)
             break;
         /*
         * Put in the new entry
         */
+        qDebug() << "5";
         t_pFiffDirEntry = FiffDirEntry::SPtr(new FiffDirEntry);
         t_pFiffDirEntry->kind = t_pTag->kind;
         t_pFiffDirEntry->type = t_pTag->type;
         t_pFiffDirEntry->size = t_pTag->size();
         t_pFiffDirEntry->pos = (fiff_long_t)pos;
+        qDebug() << "6";
         dir.append(t_pFiffDirEntry);
+        qDebug() << "7";
         if (t_pTag->next < 0)
             break;
+        qDebug() << "8";
     }
     /*
      * Put in the new the terminating entry
@@ -3161,6 +3169,7 @@ QList<FiffDirEntry::SPtr> FiffStream::make_dir(bool *ok)
     t_pFiffDirEntry->size = -1;
     t_pFiffDirEntry->pos  = -1;
     dir.append(t_pFiffDirEntry);
+    qDebug() << "9";
 
     if(ok) *ok = true;
     return dir;
