@@ -111,6 +111,8 @@ SOURCES += \
     viewers/tfsettingsview.cpp \
     viewers/artifactsettingsview.cpp \
     viewers/rtfiffrawview.cpp \
+    viewers/multiviewwindow.cpp \
+    viewers/multiview.cpp \
     viewers/helpers/rtfiffrawviewmodel.cpp \
     viewers/helpers/rtfiffrawviewdelegate.cpp \
     viewers/helpers/evokedsetmodel.cpp \
@@ -157,6 +159,8 @@ HEADERS += \
     viewers/tfsettingsview.h \
     viewers/artifactsettingsview.h \
     viewers/rtfiffrawview.h \
+    viewers/multiviewwindow.h \
+    viewers/multiview.h \
     viewers/helpers/rtfiffrawviewdelegate.h \
     viewers/helpers/rtfiffrawviewmodel.h \
     viewers/helpers/evokedsetmodel.h \
