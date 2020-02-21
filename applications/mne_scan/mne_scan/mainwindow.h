@@ -80,6 +80,13 @@ namespace SCSHAREDLIB
     class DisplayManager;
 }
 
+namespace DISPLIB
+{
+    class MultiView;
+}
+
+
+//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE MNESCAN
 //=============================================================================================================
@@ -168,7 +175,8 @@ private:
     StartUpWidget* m_pStartUpWidget;    /**< holds the StartUpWidget.*/
 
     //Run
-    RunWidget* m_pRunWidget;                            /**< The run widget */
+    //RunWidget* m_pRunWidget;                            /**< The run widget */
+    DISPLIB::MultiView* m_pRunWidget;                            /**< The run widget */
     QShortcut* m_pRunWidgetClose;                       /**< Run widget close shortcut */
     QSharedPointer<SCSHAREDLIB::DisplayManager> m_pDisplayManager;   /**< display manager */
 
