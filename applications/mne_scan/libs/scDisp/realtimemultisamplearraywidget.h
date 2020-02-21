@@ -103,11 +103,11 @@ public:
     /**
      * Constructs a RealTimeMultiSampleArrayWidget which is a child of parent.
      *
-     * @param [in] pRTMSA_New    pointer to real-time multi sample array measurement.
      * @param [in] pTime         pointer to application time.
      * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
-    RealTimeMultiSampleArrayWidget(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> pRTMSA_New, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    RealTimeMultiSampleArrayWidget(QSharedPointer<QTime> &pTime,
+                                   QWidget* parent = 0);
 
     //=========================================================================================================
     /**
@@ -162,7 +162,7 @@ private:
     QSharedPointer<DISPLIB::QuickControlView>               m_pQuickControlView;            /**< quick control widget. */
     QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;            /**< channel info model. */
     QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;        /**< ChannelSelectionView. */
-    QPointer<DISPLIB::RtFiffRawView>                      m_pChannelDataView;             /**< the QTableView being part of the model/view framework of Qt. */
+    QPointer<DISPLIB::RtFiffRawView>                        m_pChannelDataView;             /**< the QTableView being part of the model/view framework of Qt. */
 
     QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
 

@@ -81,13 +81,11 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<RealTimeMultiSampleArray> pRTMSA,
-                                                               QSharedPointer<QTime> &pTime,
+RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<QTime> &pTime,
                                                                QWidget* parent)
 : MeasurementWidget(parent)
-, m_pRTMSA(pRTMSA)
 , m_bInitialized(false)
-, m_iMaxFilterTapSize(0)
+, m_iMaxFilterTapSize(-1)
 {
     Q_UNUSED(pTime)
 
@@ -113,25 +111,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
     addDisplayAction(m_pActionQuickControl);
     m_pActionQuickControl->setVisible(true);
 
-    //Create table view and set layout
-    m_pChannelDataView = new RtFiffRawView(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
-                                             this);
-    m_pChannelDataView->hide();
-
-    // Quick control selection
-    m_pQuickControlView = QuickControlView::SPtr::create(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
-                                                         "RT Display",
-                                                         Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
-                                                         this);
-
-    this->addControlWidgets(m_pQuickControlView,
-                            m_pRTMSA->getControlWidgets());
-
-    QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
-    rtmsaLayout->setContentsMargins(0,0,0,0);
-    rtmsaLayout->addWidget(m_pChannelDataView);
-    this->setLayout(rtmsaLayout);
-
     qRegisterMetaType<QMap<int,QList<QPair<int,double> > > >();
 }
 
@@ -148,19 +127,22 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
 //=============================================================================================================
 
-void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr)
+void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    if(!m_bInitialized) {
-        if(m_pRTMSA->isChInit()) {
-            m_pFiffInfo = m_pRTMSA->info();
+    m_pRTMSA = qSharedPointerDynamicCast<RealTimeMultiSampleArray>(pMeasurement);
 
-            m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().at(m_pRTMSA->getMultiSampleArray().size()-1).cols();
+    if(m_pRTMSA) {
+        if(!m_bInitialized) {
+            if(m_pRTMSA->isChInit() && !m_pRTMSA->getMultiSampleArray().isEmpty()) {
+                m_pFiffInfo = m_pRTMSA->info();
+                m_iMaxFilterTapSize = m_pRTMSA->getMultiSampleArray().first().cols();
 
-            init();
+                init();
+            }
+        } else {
+            //Add data to table view
+            m_pChannelDataView->addData(m_pRTMSA->getMultiSampleArray());
         }
-    } else {
-        //Add data to table view
-        m_pChannelDataView->addData(m_pRTMSA->getMultiSampleArray());
     }
 }
 
@@ -168,7 +150,26 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr)
 
 void RealTimeMultiSampleArrayWidget::init()
 {
-    if(m_pFiffInfo) {
+    if(m_pFiffInfo) {        
+        //Create table view and set layout
+        m_pChannelDataView = new RtFiffRawView(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
+                                               this);
+        m_pChannelDataView->hide();
+
+        QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
+        rtmsaLayout->setContentsMargins(0,0,0,0);
+        rtmsaLayout->addWidget(m_pChannelDataView);
+        this->setLayout(rtmsaLayout);
+
+        // Quick control selection
+        m_pQuickControlView = QuickControlView::SPtr::create(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
+                                                             "RT Display",
+                                                             Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
+                                                             this);
+
+        this->addControlWidgets(m_pQuickControlView,
+                                m_pRTMSA->getControlWidgets());
+
         QSettings settings;
         QString sRTMSAWName = m_pRTMSA->getName();
 
