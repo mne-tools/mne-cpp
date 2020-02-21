@@ -185,7 +185,8 @@ private:
     void initStatusBar();       /**< Creates QToolBar for user interface of MainWindow class. */
     void createPluginDockWindow();                          /**< Creates plugin dock widget.*/
     void createLogDockWindow();                             /**< Creates log dock widget.*/
-    void updatePluginWidget(QSharedPointer<SCSHAREDLIB::IPlugin> pPlugin);                           /**< Sets the plugin widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
+    void updatePluginSetupWidget(QSharedPointer<SCSHAREDLIB::IPlugin> pPlugin);       /**< Sets the plugin setup widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
+    void updateMultiViewWidget(QSharedPointer<SCSHAREDLIB::IPlugin> pPlugin);         /**< Adds the plugin visualization widget to central widget of MainWindow class if the pipeline was started.*/
     void updateConnectionWidget(QSharedPointer<SCSHAREDLIB::PluginConnectorConnection> pConnection); /**< Sets the connection widget to central widget of MainWindow class depending on the current arrow selected in m_pDockWidgetPlugins.*/
     void newConfiguration();            /**< Implements new configuration tasks.*/
     void openConfiguration();           /**< Implements open configuration tasks.*/
@@ -201,7 +202,6 @@ private:
 
     StartUpWidget* m_pStartUpWidget;    /**< holds the StartUpWidget.*/
 
-    bool m_bDisplayMax;                 /**< whether full screen mode is activated.*/
     bool m_bIsRunning;                  /**< whether program/plugins is/are started.*/
 
     DISPLIB::MultiView* m_pRunWidget;                            /**< The run widget */
