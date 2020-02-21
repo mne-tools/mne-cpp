@@ -85,7 +85,6 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pStartUpWidget(new StartUpWidget(this))
 , m_pRunWidget(NULL)
 , m_pDisplayManager(new SCSHAREDLIB::DisplayManager(this))
-, m_bDisplayMax(false)
 , m_bIsRunning(false)
 , m_pToolBar(NULL)
 , m_pDynamicPluginToolBar(NULL)
@@ -503,7 +502,7 @@ void MainWindow::createPluginDockWindow()
     addDockWidget(Qt::LeftDockWidgetArea, m_pPluginGuiDockWidget);
 
     connect(m_pPluginGui, &PluginGui::selectedPluginChanged,
-            this, &MainWindow::updatePluginWidget);
+            this, &MainWindow::updatePluginSetupWidget);
 
     connect(m_pPluginGui, &PluginGui::selectedConnectionChanged,
             this, &MainWindow::updateConnectionWidget);
@@ -535,7 +534,7 @@ void MainWindow::createLogDockWindow()
 
 //*************************************************************************************************************
 
-void MainWindow::updatePluginWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
+void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 {
     m_qListDynamicPluginActions.clear();
     m_qListDynamicDisplayActions.clear();
@@ -548,12 +547,35 @@ void MainWindow::updatePluginWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 
         m_sCurPluginName = pPlugin->getName();
 
-//        //Garbage collecting
-//        if(m_pRunWidget)
-//        {
-//            delete m_pRunWidget;
-//            m_pRunWidget = NULL;
-//        }
+        if(pPlugin.isNull())
+        {
+            QWidget* pWidget = new QWidget;
+            setCentralWidget(pWidget);
+        }
+        else
+        {
+            if(!m_bIsRunning) {
+                setCentralWidget(pPlugin->setupWidget());
+            }
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
+{
+    m_qListDynamicPluginActions.clear();
+    m_qListDynamicDisplayActions.clear();
+    m_qListDynamicDisplayWidgets.clear();
+
+    if(!pPlugin.isNull())
+    {
+        // Add Dynamic Plugin Actions
+        m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
+
+        m_sCurPluginName = pPlugin->getName();
 
         if(pPlugin.isNull())
         {
@@ -582,15 +604,6 @@ void MainWindow::updatePluginWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 
 
                 m_pRunWidget->show();
-
-//                if(m_bDisplayMax)//ToDo send events to main window
-//                {
-//                    m_pRunWidget->showFullScreen();
-//                    //connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
-//                    m_pRunWidgetClose = new QShortcut(QKeySequence(Qt::Key_Escape), m_pRunWidget, SLOT(close()));
-//                }
-//                else
-//                    setCentralWidget(m_pRunWidget);
             }
         }
     }
@@ -657,7 +670,7 @@ void MainWindow::startMeasurement()
     PluginSceneManager::PluginList lPlugin = m_pPluginSceneManager->getPlugins();
 
     for(int i = 0; i < lPlugin.size(); ++i) {
-        updatePluginWidget(lPlugin.at(i));
+        updateMultiViewWidget(lPlugin.at(i));
     }
 
  //   updatePluginWidget(m_pPluginGui->getCurrentPlugin());
@@ -678,7 +691,7 @@ void MainWindow::stopMeasurement()
     uiSetupRunningState(false);
     stopTimer();
 
-    updatePluginWidget(m_pPluginGui->getCurrentPlugin());
+    updatePluginSetupWidget(m_pPluginGui->getCurrentPlugin());
 
 //    PluginManager::stopPlugins();
 
