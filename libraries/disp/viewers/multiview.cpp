@@ -86,6 +86,8 @@ MultiViewWindow* MultiView::addWidgetH(QWidget* pWidget,
     MultiViewWindow* pDockWidget = new MultiViewWindow();
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
+    pWidget->layout()->setContentsMargins(0,0,0,0);
+    pDockWidget->layout()->setContentsMargins(0,0,0,0);
     this->m_pSplitterHorizontal->addWidget(pDockWidget);
 
     return pDockWidget;
@@ -99,6 +101,8 @@ MultiViewWindow* MultiView::addWidgetV(QWidget* pWidget,
     MultiViewWindow* pDockWidget = new MultiViewWindow();
     pDockWidget->setWindowTitle(sName);
     pDockWidget->setWidget(pWidget);
+    pWidget->layout()->setContentsMargins(0,0,0,0);
+    pDockWidget->layout()->setContentsMargins(0,0,0,0);
     this->m_pSplitterVertical->addWidget(pDockWidget);
 
     return pDockWidget;
