@@ -131,12 +131,12 @@ void MainWindow::createActions()
     m_pActionExit = new QAction(tr("Exit"), this);
     m_pActionExit->setShortcuts(QKeySequence::Quit);
     m_pActionExit->setStatusTip(tr("Exit the application"));
-    connect(m_pActionExit, &QAction::triggered, this, &MainWindow::close);
+    connect(m_pActionExit.data(), &QAction::triggered, this, &MainWindow::close);
 
     //Help QMenu
     m_pActionAbout = new QAction(tr("About"), this);
     m_pActionAbout->setStatusTip(tr("Show the application's About box"));
-    connect(m_pActionAbout, &QAction::triggered, this, &MainWindow::about);
+    connect(m_pActionAbout.data(), &QAction::triggered, this, &MainWindow::about);
 }
 
 
