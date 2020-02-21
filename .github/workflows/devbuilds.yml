@@ -37,19 +37,22 @@ jobs:
         git push -f --tag
         # Create new dev_build release
         hub release create -m "Development Builds" dev_build --prerelease
-
   Linux:
     runs-on: ubuntu-16.04
     needs: UpdateDevTag
     
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1  
+      uses: actions/checkout@v1
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
     - name: Install Qt
-      uses: ouuan/install-qt-action@v2.4.1
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
-        aqtversion: "==0.7"
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |        
@@ -64,7 +67,7 @@ jobs:
         sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
         # Creating a directory for linuxdeployqt to create results 
         sudo mkdir -p -m777 mne-cpp
-        # Copying built data to folder for easy packaging 	
+        # Copying built data to folder for easy packaging   
         cp -r ./bin ./lib mne-cpp/
         # linuxdeployqt uses mne_scan binary to resolve dependencies in current directory. 
         cd mne-cpp
@@ -87,11 +90,15 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v1
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
     - name: Install Qt
-      uses: ouuan/install-qt-action@v2.4.1
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
-        aqtversion: "==0.7"
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |        
@@ -116,19 +123,23 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1      
+      uses: actions/checkout@v1
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'      
     - name: Install Qt
-      uses: ouuan/install-qt-action@v2.4.1
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
         arch: win64_msvc2017_64
-        aqtversion: "==0.7"
         modules: qtcharts
     - name: Install jom (Windows)
       run: |
-        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
+        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
@@ -154,14 +165,18 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v1
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
     - name: Install Codecov
       run: |
         sudo pip install codecov 
     - name: Install Qt
-      uses: ouuan/install-qt-action@v2.4.1
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
-        aqtversion: "==0.7"
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
@@ -184,7 +199,6 @@ jobs:
           # Hide codecov output since it corrupts the log too much
           codecov > /dev/null
         done
-
   Doxygen:
     runs-on: ubuntu-latest
     needs: UpdateDevTag
@@ -230,7 +244,6 @@ jobs:
         git add .nojekyll
         git commit --amend -a -m 'Update docu'
         git push -f --all    
-
   gh-pages:
     runs-on: ubuntu-latest
     needs: UpdateDevTag

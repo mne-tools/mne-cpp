@@ -1,0 +1,8 @@
+[submodule "applications/mne_scan/plugins/brainflowboard/brainflow"]
+	path = applications/mne_scan/plugins/brainflowboard/brainflow
+	url = https://github.com/Andrey1994/brainflow
+	branch = master
+[submodule "bin/mne-cpp-test-data"]
+	path = bin/mne-cpp-test-data
+	url = https://github.com/mne-tools/mne-cpp-test-data.git
+	branch = master

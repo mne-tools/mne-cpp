@@ -86,7 +86,6 @@ Natus::Natus()
 , m_pRMTSA_Natus(PluginOutputData<RealTimeMultiSampleArray>::create(this, "Natus", "EEG output data"))
 , m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/natus/")
 {
-    qDebug() << m_qStringResourcePath;
 }
 
 

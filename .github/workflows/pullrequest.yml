@@ -13,33 +13,36 @@ jobs:
       fail-fast: false
       max-parallel: 6
       matrix:
-        qt: [5.14.0, 5.10.1]
+        qt: [5.14.1, 5.10.1]
         os: [ubuntu-16.04, macos-latest, windows-2016]
 
     steps:
     - name: Clone repository
       uses: actions/checkout@v1
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
-      uses: ouuan/install-qt-action@v2.4.1
+      uses: jurplel/install-qt-action@v2
       with:
         version: ${{ matrix.qt }}
-        aqtversion: "==0.7"
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
-      uses: ouuan/install-qt-action@v2.4.1
+      uses: jurplel/install-qt-action@v2
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2017_64
-        aqtversion: "==0.7"
         modules: qtcharts
     - name: Install jom (Windows)
       if: matrix.os == 'windows-2016'
       run: |
-        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
+        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       run: |
@@ -67,32 +70,35 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1
     - name: Clone mne-cpp test data
-      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data      
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
     - name: Install Codecov
       if: matrix.os == 'ubuntu-16.04'
       run: |
         sudo pip install codecov 
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
-      uses: ouuan/install-qt-action@v2.4.1
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
-        aqtversion: "==0.7"
         modules: qtcharts    
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
-      uses: ouuan/install-qt-action@v2.4.1
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
         arch: win64_msvc2017_64
-        aqtversion: "==0.7"
         modules: qtcharts
     - name: Install jom (Windows) 
       if: matrix.os == 'windows-2016'
       run: |
-        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
-        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
-        echo "::add-path::$HOME\jom"
+        Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
+        expand-archive -path "jom.zip" -destinationpath "$HOME\jom"
+        echo "::add-path::$HOME\jom"
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-16.04'
       run: |
@@ -146,24 +152,26 @@ jobs:
       run: |
         cd bin
         Get-ChildItem -Filter test_*.exe | ForEach {Write-Output "" "" Starting $_.Fullname; &$_.Fullname}
-
   MinimalVersion:
     runs-on: ubuntu-16.04
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v1      
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
     - name: Install Qt
-      uses: ouuan/install-qt-action@v2.4.1
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.6
-        aqtversion: "==0.7"
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=minimalVersion
         make -j2
-
   Doxygen:
     runs-on: ubuntu-latest
 
@@ -172,7 +180,7 @@ jobs:
       uses: actions/checkout@v1
     - name: Install Qt Dev Tools, Doxygen and Graphviz
       run: |
-        sudo apt-get update -qq
+        # sudo apt-get update -qq
         sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
     - name: Run Doxygen and package result
       run: |        
