@@ -22,9 +22,9 @@ Please make use of the following coding conventions when contributing to MNE-CPP
 Use meaningful variable names and type indicators. Avoid complex as well as condensed expressions. For example:
 
 ```cpp
-    int iNumChs = 306;
-    QString sChName = "MEG0000";
-    void loadTxtFile(const QString& sPath);
+int iNumChs = 306;
+QString sChName = "MEG0000";
+void loadTxtFile(const QString& sPath);
 ```
 
 ## Command Line Outputs
@@ -65,6 +65,23 @@ A good commit should follow:
  * Commit often! In particular: Make atomic commits. This means that each commit should contain exactly one self-contained change - do not mix unrelated changes, and do not create inconsistent states. Never "hide" unrelated fixes in bigger commits.
  * Write descriptive commit messages. Make them self-contained, so people do not have to research the historical context to make sense of them.
  * And most importantly: use your brain :)
+
+For better readability, we introduced conventions for PR naming and commit messages. This gives a first impression about the content of a commit and improves the commit history's readability. Please use the following identifiers:
+
+| Short | Meaning                                       |
+|-------|-----------------------------------------------|
+| FIX   | bug fix                                       |
+| ENH   | enhancement (new features, etc.)              |
+| MAINT | maintenance commit (refactoring, typos, style fixes, etc.) |
+| DOC   | documentation                                 |
+
+The following examples show how such a commit message could look like.
+```
+FIX: fix namespace error 
+ENH: add cHPI in Neuromag Plugin
+MAINT: improved GithubAction workflow for Linux deployment
+DOC: add documentation for new amplifier in MNE Scan
+```
 
 ## Setup the MNE-CPP QtCreator wizard
 
