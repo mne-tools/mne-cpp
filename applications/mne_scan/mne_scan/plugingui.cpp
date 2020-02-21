@@ -76,7 +76,6 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager, SCSHAREDLIB::Pl
 , m_pGraphicsView(Q_NULLPTR)
 , m_pSensorToolButton(Q_NULLPTR)
 , m_pAlgorithmToolButton(Q_NULLPTR)
-, m_pIOToolButton(Q_NULLPTR)
 , m_pToolBarPlugins(Q_NULLPTR)
 , m_pPointerButton(Q_NULLPTR)
 , m_pLinePointerButton(Q_NULLPTR)
@@ -134,8 +133,6 @@ PluginGui::~PluginGui()
         delete m_pSensorToolButton;
     if(m_pAlgorithmToolButton)
         delete m_pAlgorithmToolButton;
-    if(m_pIOToolButton)
-        delete m_pIOToolButton;
     if(m_pToolBarPlugins)
         delete m_pToolBarPlugins;
     //Pointers Toolbar
@@ -590,22 +587,9 @@ void PluginGui::createToolbars()
     m_pAlgorithmToolButton->setStatusTip(tr("Algorithm Plugins"));
     m_pAlgorithmToolButton->setToolTip(tr("Algorithm Plugins"));
 
-    //IOs
-    m_pIOToolButton = new QToolButton;
-    QMenu *menuIo = new QMenu;
-    for(qint32 i = 0; i < m_pPluginManager->getIOPlugins().size(); ++i)
-        createItemAction(m_pPluginManager->getIOPlugins()[i]->getName(), menuIo);
-
-    m_pIOToolButton->setMenu(menuIo);
-    m_pIOToolButton->setPopupMode(QToolButton::InstantPopup);
-    m_pIOToolButton->setIcon(QIcon(":/images/io.png"));
-    m_pIOToolButton->setStatusTip(tr("I/O Plugins"));
-    m_pIOToolButton->setToolTip(tr("I/O Plugins"));
-
     m_pToolBarPlugins = new QToolBar(tr("Plugins"), this);
     m_pToolBarPlugins->addWidget(m_pSensorToolButton);
     m_pToolBarPlugins->addWidget(m_pAlgorithmToolButton);
-    m_pToolBarPlugins->addWidget(m_pIOToolButton);
 
     m_pToolBarPlugins->setAllowedAreas(Qt::LeftToolBarArea);
     m_pToolBarPlugins->setFloatable(false);

@@ -147,7 +147,6 @@ private:
 
     QToolButton*    m_pSensorToolButton;
     QToolButton*    m_pAlgorithmToolButton;
-    QToolButton*    m_pIOToolButton;
     QToolBar*       m_pToolBarPlugins;
     QActionGroup*   m_pActionGroupPlugins;
 

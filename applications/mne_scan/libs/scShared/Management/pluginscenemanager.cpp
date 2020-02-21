@@ -132,7 +132,6 @@ bool PluginSceneManager::startPlugins()
     if(bFlag)
     {
         startAlgorithmPlugins();
-        startIOPlugins();
     }
 
     return bFlag;
@@ -168,17 +167,6 @@ void PluginSceneManager::startAlgorithmPlugins()
         if((*it)->getType() == IPlugin::_IAlgorithm)
             if(!(*it)->start())
                 qWarning() << "Could not start IAlgorithm: " << (*it)->getName();
-}
-
-//=============================================================================================================
-
-void PluginSceneManager::startIOPlugins()
-{
-    QList<IPlugin::SPtr>::iterator it = m_pluginList.begin();
-    for( ; it != m_pluginList.end(); ++it)
-        if((*it)->getType() == IPlugin::_IIO)
-            if(!(*it)->start())
-                qWarning() << "Could not start IIO: " << (*it)->getName();
 }
 
 //=============================================================================================================
