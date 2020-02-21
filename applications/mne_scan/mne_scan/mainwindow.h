@@ -171,18 +171,6 @@ public:
     void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
 
 private:
-    //StartUp
-    StartUpWidget* m_pStartUpWidget;    /**< holds the StartUpWidget.*/
-
-    //Run
-    //RunWidget* m_pRunWidget;                            /**< The run widget */
-    DISPLIB::MultiView* m_pRunWidget;                            /**< The run widget */
-    QShortcut* m_pRunWidgetClose;                       /**< Run widget close shortcut */
-    QSharedPointer<SCSHAREDLIB::DisplayManager> m_pDisplayManager;   /**< display manager */
-
-    bool m_bDisplayMax;                 /**< whether full screen mode is activated.*/
-    bool m_bIsRunning;                  /**< whether program/plugins is/are started.*/
-
     //=========================================================================================================
     /**
      * Setup the user interface for running mode.
@@ -191,12 +179,34 @@ private:
      */
     void uiSetupRunningState(bool state);
 
-    // Class MainWindow user interface
     void createActions();       /**< Creates all actions for user interface of MainWindow class. */
     void createMenus();         /**< Creates all menus for user interface of MainWindow class. */
     void createToolBars();      /**< Creates all tool bars for user interface of MainWindow class. */
-
     void initStatusBar();       /**< Creates QToolBar for user interface of MainWindow class. */
+    void createPluginDockWindow();                          /**< Creates plugin dock widget.*/
+    void createLogDockWindow();                             /**< Creates log dock widget.*/
+    void updatePluginWidget(QSharedPointer<SCSHAREDLIB::IPlugin> pPlugin);                           /**< Sets the plugin widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
+    void updateConnectionWidget(QSharedPointer<SCSHAREDLIB::PluginConnectorConnection> pConnection); /**< Sets the connection widget to central widget of MainWindow class depending on the current arrow selected in m_pDockWidgetPlugins.*/
+    void newConfiguration();            /**< Implements new configuration tasks.*/
+    void openConfiguration();           /**< Implements open configuration tasks.*/
+    void saveConfiguration();           /**< Implements save configuration tasks.*/
+    void helpContents();                /**< Implements help contents action.*/
+    void about();                       /**< Implements about action.*/
+    void setMinLogLevel();              /**< Sets minimal log level as current log level.*/
+    void setNormalLogLevel();           /**< Sets normal log level as current log level.*/
+    void setMaxLogLevel();              /**< Sets maximal log level as current log level.*/
+    void startMeasurement();            /**< Runs application.*/
+    void stopMeasurement();             /**< Stops application.*/
+    void updateTime();                  /**< Updates m_pTime and is called through timeout() of m_pTimer.*/
+
+    StartUpWidget* m_pStartUpWidget;    /**< holds the StartUpWidget.*/
+
+    bool m_bDisplayMax;                 /**< whether full screen mode is activated.*/
+    bool m_bIsRunning;                  /**< whether program/plugins is/are started.*/
+
+    DISPLIB::MultiView* m_pRunWidget;                            /**< The run widget */
+    QShortcut* m_pRunWidgetClose;                       /**< Run widget close shortcut */
+    QSharedPointer<SCSHAREDLIB::DisplayManager> m_pDisplayManager;   /**< display manager */
 
     QAction*                            m_pActionNewConfig;         /**< new configuration */
     QAction*                            m_pActionOpenConfig;        /**< open configuration */
@@ -213,22 +223,16 @@ private:
 
     QAction*                            m_pActionRun;               /**< run application */
     QAction*                            m_pActionStop;              /**< stop application */
-    QAction*                            m_pActionZoomStd;           /**< standard zoom */
-    QAction*                            m_pActionZoomIn;            /**< zoom in */
-    QAction*                            m_pActionZoomOut;           /**< zoom out */
-    QAction*                            m_pActionDisplayMax;        /**< show full screen mode */
 
     QList< QAction* >                   m_qListDynamicPluginActions;    /**< dynamic plugin actions */
     QList< QAction* >                   m_qListDynamicDisplayActions;   /**< dynamic display actions */
     QList< QWidget* >                   m_qListDynamicDisplayWidgets;   /**< dynamic display widgets */
 
-    //Main Window Menu
     QMenu*                              m_pMenuFile;    /**< Holds the file menu.*/
     QMenu*                              m_pMenuView;    /**< Holds the view menu.*/
     QMenu*                              m_pMenuLgLv;    /**< Holds the log level sub menu.*/
     QMenu*                              m_pMenuHelp;    /**< Holds the help menu.*/
 
-    // Tool Bar
     QToolBar*                           m_pToolBar;                 /**< Holds the tool bar.*/
     QToolBar*                           m_pDynamicPluginToolBar;    /**< Holds the plugin tool bar.*/
     QToolBar*                           m_pDynamicDisplayToolBar;   /**< Holds the display tool bar.*/
@@ -239,16 +243,11 @@ private:
     QSharedPointer<QTime>               m_pTime;            /**< Holds current time output, updated with timeout of timer.*/
     int                                 m_iTimeoutMSec;     /**< Holds milliseconds after which timer timeouts.*/
 
-    void createPluginDockWindow();                          /**< Creates plugin dock widget.*/
-    void createLogDockWindow();                             /**< Creates log dock widget.*/
-
-    //Plugin Management
     QDockWidget*                        m_pPluginGuiDockWidget;         /**< Dock widget which holds the plugin gui. */
     PluginGui*                          m_pPluginGui;
     QSharedPointer<SCSHAREDLIB::PluginManager>       m_pPluginManager;       /**< Holds log dock widget.*/
     QSharedPointer<SCSHAREDLIB::PluginSceneManager>  m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph */
 
-    //Log
     QDockWidget*                        m_pDockWidget_Log;              /**< Holds the dock widget containing the log.*/
     QTextBrowser*                       m_pTextBrowser_Log;             /**< Holds the text browser for the log.*/
 
@@ -256,32 +255,6 @@ private:
 
     QSharedPointer<QWidget>             m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
 
-    void updatePluginWidget(QSharedPointer<SCSHAREDLIB::IPlugin> pPlugin);                           /**< Sets the plugin widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
-
-    void updateConnectionWidget(QSharedPointer<SCSHAREDLIB::PluginConnectorConnection> pConnection); /**< Sets the connection widget to central widget of MainWindow class depending on the current arrow selected in m_pDockWidgetPlugins.*/
-
-private:
-    void newConfiguration();            /**< Implements new configuration tasks.*/
-    void openConfiguration();           /**< Implements open configuration tasks.*/
-    void saveConfiguration();           /**< Implements save configuration tasks.*/
-
-    void helpContents();                /**< Implements help contents action.*/
-
-    void about();                       /**< Implements about action.*/
-
-    void setMinLogLevel();              /**< Sets minimal log level as current log level.*/
-    void setNormalLogLevel();           /**< Sets normal log level as current log level.*/
-    void setMaxLogLevel();              /**< Sets maximal log level as current log level.*/
-
-    void startMeasurement();            /**< Runs application.*/
-    void stopMeasurement();             /**< Stops application.*/
-
-    void zoomStd();                     /**< Implements standard of runWidget.*/
-    void zoomIn();                      /**< Implements zoom in of runWidget.*/
-    void zoomOut();                     /**< Implements zoom out of runWidget.*/
-    void toggleDisplayMax();            /**< Implements show full screen mode of runWidget.*/
-
-    void updateTime();                  /**< Updates m_pTime and is called through timeout() of m_pTimer.*/
 };
 }// NAMESPACE
 

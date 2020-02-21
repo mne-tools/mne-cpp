@@ -43,9 +43,7 @@
 
 #include <disp/viewers/multiview.h>
 
-//GUI
 #include "mainwindow.h"
-#include "runwidget.h"
 #include "startupwidget.h"
 #include "plugingui.h"
 
@@ -406,26 +404,6 @@ void MainWindow::createActions()
     m_pActionStop->setShortcut(tr("F6"));
     m_pActionStop->setStatusTip(tr("Stops (F6) ")+CInfo::AppNameShort());
     connect(m_pActionStop, &QAction::triggered, this, &MainWindow::stopMeasurement);
-
-    m_pActionZoomStd = new QAction(QIcon(":/images/zoomStd.png"), tr("Standard Zoom (Ctrl+0)"), this);
-    m_pActionZoomStd->setShortcut(tr("Ctrl+0"));
-    m_pActionZoomStd->setStatusTip(tr("Sets the standard Zoom (Ctrl+0)"));
-    connect(m_pActionZoomStd, &QAction::triggered, this, &MainWindow::zoomStd);
-
-    m_pActionZoomIn = new QAction(QIcon(":/images/zoomIn.png"), tr("Zoom In ")+QKeySequence(QKeySequence::ZoomIn).toString(), this);
-    m_pActionZoomIn->setShortcuts(QKeySequence::ZoomIn);
-    m_pActionZoomIn->setStatusTip(tr("Zooms in the magnitude ")+QKeySequence(QKeySequence::ZoomIn).toString());
-    connect(m_pActionZoomIn, &QAction::triggered, this, &MainWindow::zoomIn);
-
-    m_pActionZoomOut = new QAction(QIcon(":/images/zoomOut.png"), tr("Zoom Out ")+QKeySequence(QKeySequence::ZoomOut).toString(), this);
-    m_pActionZoomOut->setShortcuts(QKeySequence::ZoomOut);
-    m_pActionZoomOut->setStatusTip(tr("Zooms out the magnitude ")+QKeySequence(QKeySequence::ZoomOut).toString());
-    connect(m_pActionZoomOut, &QAction::triggered, this, &MainWindow::zoomOut);
-
-    m_pActionDisplayMax = new QAction(QIcon(":/images/displayMax.png"), tr("Maximize current Display (F11)"), this);
-    m_pActionDisplayMax->setShortcut(tr("F11"));
-    m_pActionDisplayMax->setStatusTip(tr("Maximizes the current display (F11)"));
-    connect(m_pActionDisplayMax, &QAction::triggered, this, &MainWindow::toggleDisplayMax);
 }
 
 //=============================================================================================================
@@ -467,15 +445,6 @@ void MainWindow::createToolBars()
         m_pActionStop->setEnabled(false);
 
         m_pToolBar->addSeparator();
-
-        m_pToolBar->addAction(m_pActionZoomStd);
-        m_pToolBar->addAction(m_pActionZoomIn);
-        m_pToolBar->addAction(m_pActionZoomOut);
-        m_pToolBar->addAction(m_pActionDisplayMax);
-        m_pActionZoomStd->setEnabled(false);
-        m_pActionZoomIn->setEnabled(false);
-        m_pActionZoomOut->setEnabled(false);
-        m_pActionDisplayMax->setEnabled(false);
 
         m_pToolBar->addSeparator();
 
@@ -722,73 +691,12 @@ void MainWindow::stopMeasurement()
 //    m_pPluginDockWidget->setTogglingEnabled(true);
 }
 
-//=============================================================================================================
-
-void MainWindow::zoomStd()
-{
-    if(m_pRunWidget)
-    {
-        //m_pRunWidget->setStandardZoom();
-        m_pActionZoomStd->setEnabled(false);
-    }
-}
-
-//=============================================================================================================
-
-void MainWindow::zoomIn()
-{
-    if(m_pRunWidget)
-    {
-        //m_pRunWidget->zoomVert(2);
-        m_pActionZoomStd->setEnabled(true);
-    }
-}
-
-//=============================================================================================================
-
-void MainWindow::zoomOut()
-{
-    if(m_pRunWidget)
-    {
-        //m_pRunWidget->zoomVert(0.5);
-        m_pActionZoomStd->setEnabled(true);
-    }
-}
-
-//=============================================================================================================
-
-void MainWindow::toggleDisplayMax()
-{
-
-    m_bDisplayMax = !m_bDisplayMax;
-
-    m_pActionDisplayMax->setEnabled(!m_bDisplayMax);
-
-    updatePluginWidget(m_pPluginGui->getCurrentPlugin());
-}
-
-//=============================================================================================================
+//*************************************************************************************************************
 
 void MainWindow::uiSetupRunningState(bool state)
 {
     m_pActionRun->setEnabled(!state);
     m_pActionStop->setEnabled(state);
-
-    if(state)
-    {
-        m_pActionZoomStd->setEnabled(!state);
-        m_pActionZoomIn->setEnabled(state);
-        m_pActionZoomOut->setEnabled(state);
-        m_pActionDisplayMax->setEnabled(state);
-    }
-    else
-    {
-        m_pActionZoomStd->setEnabled(state);
-        m_pActionZoomIn->setEnabled(state);
-        m_pActionZoomOut->setEnabled(state);
-        m_pActionDisplayMax->setEnabled(state);
-    }
-
     m_bIsRunning = state;
 }
 
