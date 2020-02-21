@@ -446,8 +446,6 @@ void MainWindow::createToolBars()
 
         m_pToolBar->addSeparator();
 
-        m_pToolBar->addSeparator();
-
         m_pLabelTime = new QLabel(this);
         m_pToolBar->addWidget(m_pLabelTime);
         m_pLabelTime->setText(QTime(0, 0).toString());

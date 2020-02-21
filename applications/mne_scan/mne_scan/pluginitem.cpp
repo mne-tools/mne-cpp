@@ -80,10 +80,6 @@ PluginItem::PluginItem(SCSHAREDLIB::IPlugin::SPtr pPlugin, QMenu *contextMenu, Q
             m_qColorContour = QColor(79, 136, 187);
             m_qLinearGradientFace.setColorAt(0, QColor(234, 239, 247));
             break;
-        case SCSHAREDLIB::IPlugin::_IIO:
-            m_qColorContour = QColor(224, 169, 0);
-            m_qLinearGradientFace.setColorAt(0, QColor(255, 244, 231));
-            break;
         default:
             m_qColorContour = QColor(125, 125, 125);
             m_qLinearGradientFace.setColorAt(0, QColor(125, 125, 125));

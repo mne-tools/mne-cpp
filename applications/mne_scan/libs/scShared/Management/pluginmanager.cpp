@@ -193,18 +193,6 @@ void PluginManager::loadPlugins(const QString& dir)
                     qDebug() << "RTAlgorithm " << pAlgorithm->getName() << " loaded.";
                 }
             }
-            // IIO
-            else if(pluginType == IPlugin::_IIO)
-            {
-                IIO* pIO = qobject_cast<IIO*>(pPlugin);
-                if(pIO)
-                {
-                    m_qVecIOPlugins.push_back(pIO);
-                    qDebug() << "RTVisualization " << pIO->getName() << " loaded.";
-                }
-            }
-
-            //ToDo other Plugins - like Visualization
 
         }
 //        else
