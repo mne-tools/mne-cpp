@@ -1,9 +1,9 @@
 name: PullRequest
 
 on:
-  push:
+  pull_request:
     branches:
-    - actions
+    - master
 
 jobs:
   Qt:
@@ -19,12 +19,16 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v1
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       uses: jurplel/install-qt-action@v2
       with:
         version: ${{ matrix.qt }}
-        install-deps: false
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
@@ -66,7 +70,12 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1
     - name: Clone mne-cpp test data
-      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data      
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
     - name: Install Codecov
       if: matrix.os == 'ubuntu-16.04'
       run: |
@@ -76,7 +85,6 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
-        install-deps: false
         modules: qtcharts    
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
@@ -150,12 +158,16 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v1      
+    - name: Install Python 3.7 version
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+        architecture: 'x64'
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
         version: 5.6
-        install-deps: false
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
