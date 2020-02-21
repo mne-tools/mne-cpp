@@ -43,6 +43,8 @@
 
 #include <disp/viewers/multiview.h>
 
+#include <disp/viewers/quickcontrolview.h>
+
 #include "mainwindow.h"
 #include "startupwidget.h"
 #include "plugingui.h"
@@ -111,6 +113,13 @@ MainWindow::MainWindow(QWidget *parent)
     setUnifiedTitleAndToolBarOnMac(false);
 
     m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
+
+
+    // Quick control selection
+    m_pQuickControlView = QuickControlView::SPtr::create(QString("MNESCAN/MainWindow"),
+                                                         "MNE Scan",
+                                                         Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
+                                                         this);
 
     createActions();
     createMenus();

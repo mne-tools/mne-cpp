@@ -83,6 +83,7 @@ namespace SCSHAREDLIB
 namespace DISPLIB
 {
     class MultiView;
+    class QuickControlView;
 }
 
 
@@ -220,6 +221,7 @@ private:
 
     QAction*                            m_pActionHelpContents;      /**< open help contents */
     QAction*                            m_pActionAbout;             /**< show about dialog */
+    QPointer<QAction>                   m_pActionQuickControl;      /**< Show quick control widget. */
 
     QAction*                            m_pActionRun;               /**< run application */
     QAction*                            m_pActionStop;              /**< stop application */
@@ -254,6 +256,7 @@ private:
     LogLevel                            m_eLogLevelCurrent;             /**< Holds the current log level.*/
 
     QSharedPointer<QWidget>             m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
+    QSharedPointer<DISPLIB::QuickControlView>               m_pQuickControlView;            /**< quick control widget. */
 
 };
 }// NAMESPACE
