@@ -90,7 +90,6 @@ public:
     {
         _ISensor,       /**< Type for a sensor plugin. */
         _IAlgorithm,    /**< Type for a real-time algorithm plugin. */
-        _IIO,           /**< Type for a real-time I/O plugin. */
         _PluginSet      /**< Type for a plugin set which holds different types of plugins. */
     };
 
