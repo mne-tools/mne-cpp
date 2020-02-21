@@ -166,8 +166,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
-//=============================================================================================================
-//File QMenu
+
+
+//*************************************************************************************************************
+
 void MainWindow::newConfiguration()
 {
     writeToLog(tr("Invoked <b>File|NewConfiguration</b>"), _LogKndMessage, _LogLvMin);
@@ -205,8 +207,9 @@ void MainWindow::saveConfiguration()
     m_pPluginGui->saveConfig(qFileInfo.path(), qFileInfo.fileName());
 }
 
-//=============================================================================================================
-//Help QMenu
+
+//*************************************************************************************************************
+
 void MainWindow::helpContents()
 {
     writeToLog(tr("Invoked <b>Help|HelpContents</b>"), _LogKndMessage, _LogLvMin);
@@ -562,8 +565,9 @@ void MainWindow::createLogDockWindow()
     m_pMenuView->addAction(m_pDockWidget_Log->toggleViewAction());
 }
 
-//=============================================================================================================
-//Plugin stuff
+
+//*************************************************************************************************************
+
 void MainWindow::updatePluginWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 {
     m_qListDynamicPluginActions.clear();
@@ -595,18 +599,18 @@ void MainWindow::updatePluginWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
                 setCentralWidget(pPlugin->setupWidget());
             else
             {
-                if(pPlugin->getName() == "Fiff Simulator" || pPlugin->getName() == "Noise Reduction") {
+                if(m_sCurPluginName == "Fiff Simulator" || m_sCurPluginName == "Noise Reduction") {
                     m_pRunWidget->addWidgetV(m_pDisplayManager->show(pPlugin->getOutputConnectors(),
                                                                      m_pTime,
                                                                      m_qListDynamicDisplayActions,
                                                                      m_qListDynamicDisplayWidgets),
-                                             pPlugin->getName());
+                                             m_sCurPluginName);
                 } else {
                     m_pRunWidget->addWidgetH(m_pDisplayManager->show(pPlugin->getOutputConnectors(),
                                                                      m_pTime,
                                                                      m_qListDynamicDisplayActions,
                                                                      m_qListDynamicDisplayWidgets),
-                                             pPlugin->getName());
+                                             m_sCurPluginName);
                 }
 
 
@@ -623,11 +627,6 @@ void MainWindow::updatePluginWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
             }
         }
     }
-//    else
-//    {
-//        QWidget* t_pWidgetEmpty = new QWidget;
-//        setCentralWidget(t_pWidgetEmpty);
-//    }
 
     //this->createToolBars();
 }
