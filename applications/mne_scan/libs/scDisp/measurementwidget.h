@@ -169,8 +169,9 @@ protected:
                            const QList<QSharedPointer<QWidget> >& lControlWidgets);
 
 private:
-    QList< QAction* >   m_qListDisplayActions;      /**< List of display actions */
-    QList< QWidget* >   m_qListDisplayWidgets;       /**< List of display widgets to attach to the toolbar */
+    QList< QAction* >   m_qListDisplayActions;          /**< List of display actions */
+    QList< QWidget* >   m_qListDisplayWidgets;          /**< List of display widgets to attach to the toolbar */
+
 };
 
 //=============================================================================================================
