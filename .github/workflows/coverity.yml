@@ -10,10 +10,10 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v1
       - name: Install Qt
-        uses: ouuan/install-qt-action@ouuan
+        uses: jurplel/install-qt-action@v2
         with:
           version: 5.10.1
-          aqtversion: "==0.7.3"
+          install-deps: false
           modules: qtcharts
       - name: Coverity scripts
         run: |

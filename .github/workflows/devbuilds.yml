@@ -46,10 +46,10 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1  
     - name: Install Qt
-      uses: ouuan/install-qt-action@ouuan
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
-        aqtversion: "==0.7.3"
+        install-deps: false
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |        
@@ -88,10 +88,9 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1
     - name: Install Qt
-      uses: ouuan/install-qt-action@ouuan
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
-        aqtversion: "==0.7.3"
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |        
@@ -118,11 +117,10 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v1      
     - name: Install Qt
-      uses: ouuan/install-qt-action@ouuan
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
         arch: win64_msvc2017_64
-        aqtversion: "==0.7.3"
         modules: qtcharts
     - name: Install jom (Windows)
       run: |
@@ -158,10 +156,10 @@ jobs:
       run: |
         sudo pip install codecov 
     - name: Install Qt
-      uses: ouuan/install-qt-action@ouuan
+      uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
-        aqtversion: "==0.7.3"
+        install-deps: false
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
