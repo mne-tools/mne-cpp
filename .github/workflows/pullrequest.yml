@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       max-parallel: 6
       matrix:
-        qt: [5.14.0, 5.10.1]
+        qt: [5.14.1, 5.10.1]
         os: [ubuntu-16.04, macos-latest, windows-2016]
 
     steps:
@@ -24,7 +24,7 @@ jobs:
       uses: ouuan/install-qt-action@ouuan
       with:
         version: ${{ matrix.qt }}
-        aqtversion: "==0.7"
+        aqtversion: "==0.7.3"
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
@@ -32,7 +32,7 @@ jobs:
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2017_64
-        aqtversion: "==0.7"
+        aqtversion: "==0.7.3"
         modules: qtcharts
     - name: Install jom (Windows)
       if: matrix.os == 'windows-2016'
@@ -77,7 +77,7 @@ jobs:
       uses: ouuan/install-qt-action@ouuan
       with:
         version: 5.14.1
-        aqtversion: "==0.7"
+        aqtversion: "==0.7.3"
         modules: qtcharts    
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2016'
@@ -85,7 +85,7 @@ jobs:
       with:
         version: 5.14.1
         arch: win64_msvc2017_64
-        aqtversion: "==0.7"
+        aqtversion: "==0.7.3"
         modules: qtcharts
     - name: Install jom (Windows) 
       if: matrix.os == 'windows-2016'
@@ -157,7 +157,7 @@ jobs:
       uses: ouuan/install-qt-action@ouuan
       with:
         version: 5.6
-        aqtversion: "==0.7"
+        aqtversion: "==0.7.3"
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |

@@ -13,7 +13,7 @@ jobs:
         uses: ouuan/install-qt-action@ouuan
         with:
           version: 5.10.1
-          aqtversion: "==0.7"
+          aqtversion: "==0.7.3"
           modules: qtcharts
       - name: Coverity scripts
         run: |
