@@ -63,10 +63,10 @@ contains(MNECPP_CONFIG, withLsl) {
 
 #Algorithms
 SUBDIRS += \
-    dummytoolbox \
-    rtcmne \
-    rtcmusic \
-    averaging \
-    covariance \
-    noisereduction \
-    neuronalconnectivity \
+#    dummytoolbox \
+#    rtcmne \
+#    rtcmusic \
+#    averaging \
+#    covariance \
+#    noisereduction \
+#    neuronalconnectivity \
