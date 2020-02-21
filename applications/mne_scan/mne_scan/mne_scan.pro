@@ -123,7 +123,6 @@ DESTDIR = $${MNE_BINARY_DIR}
 SOURCES += \
     main.cpp \
     startupwidget.cpp \
-    runwidget.cpp \
     mainsplashscreen.cpp \
     pluginscene.cpp \
     pluginitem.cpp \
@@ -134,7 +133,6 @@ SOURCES += \
 HEADERS += \
     info.h \
     startupwidget.h \
-    runwidget.h \
     mainsplashscreen.h \
     pluginscene.h \
     pluginitem.h \
