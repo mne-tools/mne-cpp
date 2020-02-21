@@ -41,6 +41,8 @@
 #include <scShared/Management/pluginscenemanager.h>
 #include <scShared/Management/displaymanager.h>
 
+#include <disp/viewers/multiview.h>
+
 //GUI
 #include "mainwindow.h"
 #include "runwidget.h"
@@ -67,6 +69,8 @@
 //=============================================================================================================
 
 using namespace MNESCAN;
+using namespace SCSHAREDLIB;
+using namespace DISPLIB;
 
 //=============================================================================================================
 // CONST
@@ -573,12 +577,12 @@ void MainWindow::updatePluginWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 
         m_sCurPluginName = pPlugin->getName();
 
-        //Garbage collecting
-        if(m_pRunWidget)
-        {
-            delete m_pRunWidget;
-            m_pRunWidget = NULL;
-        }
+//        //Garbage collecting
+//        if(m_pRunWidget)
+//        {
+//            delete m_pRunWidget;
+//            m_pRunWidget = NULL;
+//        }
 
         if(pPlugin.isNull())
         {
@@ -591,28 +595,41 @@ void MainWindow::updatePluginWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
                 setCentralWidget(pPlugin->setupWidget());
             else
             {
-                m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime, m_qListDynamicDisplayActions, m_qListDynamicDisplayWidgets));
+                if(pPlugin->getName() == "Fiff Simulator" || pPlugin->getName() == "Noise Reduction") {
+                    m_pRunWidget->addWidgetV(m_pDisplayManager->show(pPlugin->getOutputConnectors(),
+                                                                     m_pTime,
+                                                                     m_qListDynamicDisplayActions,
+                                                                     m_qListDynamicDisplayWidgets),
+                                             pPlugin->getName());
+                } else {
+                    m_pRunWidget->addWidgetH(m_pDisplayManager->show(pPlugin->getOutputConnectors(),
+                                                                     m_pTime,
+                                                                     m_qListDynamicDisplayActions,
+                                                                     m_qListDynamicDisplayWidgets),
+                                             pPlugin->getName());
+                }
+
 
                 m_pRunWidget->show();
 
-                if(m_bDisplayMax)//ToDo send events to main window
-                {
-                    m_pRunWidget->showFullScreen();
-                    connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
-                    m_pRunWidgetClose = new QShortcut(QKeySequence(Qt::Key_Escape), m_pRunWidget, SLOT(close()));
-                }
-                else
-                    setCentralWidget(m_pRunWidget);
+//                if(m_bDisplayMax)//ToDo send events to main window
+//                {
+//                    m_pRunWidget->showFullScreen();
+//                    //connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
+//                    m_pRunWidgetClose = new QShortcut(QKeySequence(Qt::Key_Escape), m_pRunWidget, SLOT(close()));
+//                }
+//                else
+//                    setCentralWidget(m_pRunWidget);
             }
         }
     }
-    else
-    {
-        QWidget* t_pWidgetEmpty = new QWidget;
-        setCentralWidget(t_pWidgetEmpty);
-    }
+//    else
+//    {
+//        QWidget* t_pWidgetEmpty = new QWidget;
+//        setCentralWidget(t_pWidgetEmpty);
+//    }
 
-    this->createToolBars();
+    //this->createToolBars();
 }
 
 //=============================================================================================================
@@ -668,7 +685,16 @@ void MainWindow::startMeasurement()
     uiSetupRunningState(true);
     startTimer(m_iTimeoutMSec);
 
-    updatePluginWidget(m_pPluginGui->getCurrentPlugin());
+    m_pRunWidget = new MultiView(this);
+    setCentralWidget(m_pRunWidget);
+
+    PluginSceneManager::PluginList lPlugin = m_pPluginSceneManager->getPlugins();
+
+    for(int i = 0; i < lPlugin.size(); ++i) {
+        updatePluginWidget(lPlugin.at(i));
+    }
+
+ //   updatePluginWidget(m_pPluginGui->getCurrentPlugin());
 
 //    CentralWidgetShowPlugin();
 }
@@ -703,7 +729,7 @@ void MainWindow::zoomStd()
 {
     if(m_pRunWidget)
     {
-        m_pRunWidget->setStandardZoom();
+        //m_pRunWidget->setStandardZoom();
         m_pActionZoomStd->setEnabled(false);
     }
 }
@@ -714,7 +740,7 @@ void MainWindow::zoomIn()
 {
     if(m_pRunWidget)
     {
-        m_pRunWidget->zoomVert(2);
+        //m_pRunWidget->zoomVert(2);
         m_pActionZoomStd->setEnabled(true);
     }
 }
@@ -725,7 +751,7 @@ void MainWindow::zoomOut()
 {
     if(m_pRunWidget)
     {
-        m_pRunWidget->zoomVert(0.5);
+        //m_pRunWidget->zoomVert(0.5);
         m_pActionZoomStd->setEnabled(true);
     }
 }
