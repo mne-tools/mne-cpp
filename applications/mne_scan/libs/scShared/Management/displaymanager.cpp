@@ -89,7 +89,10 @@ DisplayManager::~DisplayManager()
 
 //=============================================================================================================
 
-QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList, QSharedPointer<QTime>& pT, QList< QAction* >& qListActions, QList< QWidget* >& qListWidgets)
+QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
+                              QSharedPointer<QTime>& pT,
+                              QList< QAction* >& qListActions,
+                              QList< QWidget* >& qListWidgets)
 {
     QWidget* newDisp = new QWidget;
     QVBoxLayout* vboxLayout = new QVBoxLayout;
