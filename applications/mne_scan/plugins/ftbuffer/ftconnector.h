@@ -262,7 +262,7 @@ public:
      */
     void resetEmitData();
 
-    void parseNeuromagHeader();
+    FIFFLIB::FiffInfo parseNeuromagHeader();
 
 private:
 
@@ -367,6 +367,8 @@ private:
     QTcpSocket*         m_pSocket;                              /**< Socket that manages the connection to the ft buffer */
 
     Eigen::MatrixXd*    m_pMatEmit;                             /**< Container to format data to tansmit to FtBuffProducer */
+
+    QSharedPointer<FIFFLIB::FiffRawData> m_pNeuromagData;
 };
 
 }//namespace
