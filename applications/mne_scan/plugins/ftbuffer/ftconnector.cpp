@@ -524,11 +524,11 @@ QString FtConnector::getAddr()
 
 //*************************************************************************************************************
 
-void FtConnector::parseNeuromagHeader()
+FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
 {
     qInfo() << "[FtConnector::parseNeuromagHeader] Attepting to get extended header...";
 
-    QSharedPointer<FIFFLIB::FiffRawData> neuromagData;
+
 
     QBuffer neuromagBuffer;
 
@@ -545,7 +545,7 @@ void FtConnector::parseNeuromagHeader()
         qint32 type;
         std::memcpy(&type, c_type, sizeof(qint32));
 
-        qDebug() << "AAAAAAAAAAAAAAA:" << type;
+        qDebug() << "Found chunk of type:" << type;
 
         if (type != 8 ) {
             qint32 size;
@@ -554,7 +554,7 @@ void FtConnector::parseNeuromagHeader()
             chunkBuffer.read(c_size, sizeof(qint32));
             std::memcpy(&size, c_size, sizeof(qint32));
 
-            qDebug() << "BBBBBBBBBBBBBBB:" << size;
+            qDebug() << "Chunk expected size:" << size;
 
             char c_rest[size];
             chunkBuffer.read(c_rest, size);
@@ -563,17 +563,30 @@ void FtConnector::parseNeuromagHeader()
             chunkBuffer.read(c_size, sizeof(qint32));
             qint32 size;
             std::memcpy(&size, c_size, sizeof(qint32));
-            qDebug() << "BBBBBBBBBBBBBBB:" << size;
+            qDebug() << "Neuromag chunk expected size:" << size;
 
             neuromagBuffer.open(QIODevice::ReadWrite);
             neuromagBuffer.write(chunkBuffer.read(size));
             neuromagBuffer.reset();
+            qDebug() << "Read chunk of size:" << neuromagBuffer.size();
 
-            neuromagData = QSharedPointer<FIFFLIB::FiffRawData>(new FIFFLIB::FiffRawData(neuromagBuffer, true));
+//                QFile outfile("mytestoutput.txt");
+
+//                if(!outfile.open(QIODevice::ReadWrite)) {
+//                    qDebug() << "Could not open file";
+//                } else {
+//                    neuromagBuffer.reset();
+//                    outfile.write(neuromagBuffer.read(neuromagBuffer.size()));
+//                }
+
+            m_pNeuromagData = QSharedPointer<FIFFLIB::FiffRawData>(new FIFFLIB::FiffRawData(neuromagBuffer, true));
 
             condition = false;
         }
+
     }
+
+    return m_pNeuromagData->info;
 
 //    QFile outfile("mytestoutput.txt");
 
