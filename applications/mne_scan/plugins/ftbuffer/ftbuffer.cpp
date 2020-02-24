@@ -386,6 +386,23 @@ bool FtBuffer::setupRTMSA()
 
 //*************************************************************************************************************
 
+bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
+{
+    m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo (FiffInfo));
+
+    m_bCustomFiff = true;
+
+    //Set the RMTSA parameters
+    m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
+    m_pRTMSA_BufferOutput->data()->setVisibility(true);
+
+    qInfo() << "[FtBuffer::setupRTMSA] Done.";
+    return true;
+}
+
+//*************************************************************************************************************
+
 void FtBuffer::parseHeader(QBuffer* chunkData)
 {
 

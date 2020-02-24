@@ -232,6 +232,14 @@ protected:
 
     //=========================================================================================================
     /**
+     * @brief setupRTMSA
+     * @param FiffInfo
+     * @return
+     */
+    bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
+
+    //=========================================================================================================
+    /**
     * @brief parseHeader -
     * @param chunkData - Chunk data from header file
     */
