@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include <QThread>
+#include <QtEndian>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -567,8 +568,62 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
 
             neuromagBuffer.open(QIODevice::ReadWrite);
             neuromagBuffer.write(chunkBuffer.read(size));
+
+            qint32_be i_IntToChar;
+            char c_Char[sizeof (qint32)];
+
+            i_IntToChar = 105;
+            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+            neuromagBuffer.write(c_Char);
+
+            i_IntToChar = 3;
+            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+            neuromagBuffer.write(c_Char);
+
+            i_IntToChar = 4;
+            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+            neuromagBuffer.write(c_Char);
+
+            i_IntToChar = -1;
+            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+            neuromagBuffer.write(c_Char);
+
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+
             neuromagBuffer.reset();
-            qDebug() << "Read chunk of size:" << neuromagBuffer.size();
+            //qDebug() << "Read chunk of size:" << neuromagBuffer.size();
 
 //                QFile outfile("mytestoutput.txt");
 
