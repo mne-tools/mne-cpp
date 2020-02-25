@@ -2829,15 +2829,14 @@ bad : {
 
 //=============================================================================================================
 
+// Align the MEG fiducials to the MRI fiducials
 int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
                                         FiffDigitizerData* mri_dig,
                                         MneMshDisplaySurface* head_surf,
                                         int niter,
                                         int scale_head,
                                         float omit_dist)
-/*
- * Align the MEG fiducials to the MRI fiducials
- */
+
 {
     float           *head_fid[3],*mri_fid[3],**fid;
     int             j,k;
@@ -2845,6 +2844,7 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
     FiffDigitizerData*  dig = NULL;
     float          nasion_weight = 5.0;
     float          scales[3];
+
 
     if (!head_dig) {
         qCritical("MEG head coordinate system digitizer data not available");
@@ -2864,14 +2864,17 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
         }
 
         for (k = 0; k < dig->npoint; k++) {
-            p = dig->points.at(k);
+            p = dig->points[k];
             if (p.kind == FIFFV_POINT_CARDINAL) {
-                if (p.ident == FIFFV_POINT_LPA)
-                    fid[0] = p.r;
-                else if (p.ident == FIFFV_POINT_NASION)
-                    fid[1] = p.r;
-                else if (p.ident == FIFFV_POINT_RPA)
-                    fid[2] = p.r;
+                if (p.ident == FIFFV_POINT_LPA) {
+                    fid[0] = dig->points[k].r;
+                }
+                else if (p.ident == FIFFV_POINT_NASION) {
+                    fid[1] = dig->points[k].r;
+                }
+                else if (p.ident == FIFFV_POINT_RPA) {
+                    fid[2] = dig->points[k].r;
+                }
             }
         }
     }
@@ -2899,9 +2902,8 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
         scale_display_surface(head_surf,scales);
     }
 
-    /*
-     * Initial alignment
-     */
+
+    // Initial alignment
     FREE_17(head_dig->head_mri_t_adj);
     head_dig->head_mri_t_adj = FIFFLIB::FiffCoordTransOld::fiff_make_transform_card(FIFFV_COORD_HEAD,FIFFV_COORD_MRI,
                                                                                     mri_fid[0],mri_fid[1],mri_fid[2]);
@@ -2913,9 +2915,7 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
     if (omit_dist > 0)
         discard_outlier_digitizer_points(head_dig,head_surf,omit_dist);
 
-    /*
-     * Optional iterative refinement
-     */
+    // Optional iterative refinement
     if (niter > 0 && head_surf) {
         for (k = 0; k < niter; k++) {
             if (iterate_alignment_once(head_dig,head_surf,nasion_weight,mri_fid[1],k == niter-1 && niter > 1) == FAIL)
@@ -2935,13 +2935,11 @@ bad :
 
 //=============================================================================================================
 
+// Simple head size fit
 void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
                                         float **mri_fid,
                                         MneMshDisplaySurface* head_surf,
                                         float *scales)
-/*
- * Simple head size fit
- */
 {
     float **dig_rr  = NULL;
     float **head_rr = NULL;
@@ -2951,26 +2949,27 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
     float LR[3],LN[3],len,norm[3],diff[3];
 
     scales[0] = scales[1] = scales[2] = 1.0;
-    if (!dig || !head_surf || !mri_fid)
+    if (!dig || !head_surf || !mri_fid){
         return;
+    }
 
     dig_rr  = MALLOC_17(dig->npoint,float *);
     head_rr = MALLOC_17(head_surf->s->np,float *);
-    /*
-     * Pick only the points with positive z
-     */
-    for (k = 0, ndig = 0; k < dig->npoint; k++)
-        if (dig->points[k].r[Z_17] > 0)
-            dig_rr[ndig++] = dig->points[k].r;
 
-    if (UTILSLIB::Sphere::fit_sphere_to_points(dig_rr,ndig,simplex_size,r0,&Rdig) == FAIL)
+    // Pick only the points with positive z
+    for (k = 0, ndig = 0; k < dig->npoint; k++) {
+        if (dig->points[k].r[Z_17] > 0) {
+            dig_rr[ndig++] = dig->points[k].r;
+        }
+    }
+
+    if (UTILSLIB::Sphere::fit_sphere_to_points(dig_rr,ndig,simplex_size,r0,&Rdig) == FAIL){
         goto out;
+    }
 
     fprintf(stderr,"Polhemus : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rdig);
-    /*
-     * Pick only the points above the fiducial plane
-     */
 
+    // Pick only the points above the fiducial plane
     VEC_DIFF_17(mri_fid[0],mri_fid[2],LR);
     VEC_DIFF_17(mri_fid[0],mri_fid[1],LN);
     CROSS_PRODUCT_17(LR,LN,norm);
@@ -2981,12 +2980,14 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
 
     for (k = 0, nhead = 0; k < head_surf->s->np; k++) {
         VEC_DIFF_17(mri_fid[0],head_surf->s->rr[k],diff);
-        if (VEC_DOT_17(diff,norm) > 0)
+        if (VEC_DOT_17(diff,norm) > 0) {
             head_rr[nhead++] = head_surf->s->rr[k];
+        }
     }
 
-    if (UTILSLIB::Sphere::fit_sphere_to_points(head_rr,nhead,simplex_size,r0,&Rscalp) == FAIL)
+    if (UTILSLIB::Sphere::fit_sphere_to_points(head_rr,nhead,simplex_size,r0,&Rscalp) == FAIL) {
         goto out;
+    }
 
     fprintf(stderr,"Scalp : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rscalp);
 

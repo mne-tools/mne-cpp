@@ -377,7 +377,7 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
         m_vCoilFreqs << 155 << 165 << 190 << 220;
     }
 
-    //alignFiducials(fileName);
+    alignFiducials(fileName);
 
     return lDigPoints;
 }
@@ -406,7 +406,6 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
     QFile t_fileDigDataReference(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
     //FiffDigitizerData* t_digDataReference = new FiffDigitizerData(t_fileDigDataReference);
     QScopedPointer<FiffDigitizerData> t_digDataReference(new FiffDigitizerData(t_fileDigDataReference));
-
     MneSurfaceOrVolume::align_fiducials(t_digData,
                                         t_digDataReference.data(),
                                         surface,
