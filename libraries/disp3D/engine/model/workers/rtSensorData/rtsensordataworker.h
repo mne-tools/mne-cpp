@@ -253,7 +253,6 @@ signals:
      */
     void newRtSmoothedData(const Eigen::MatrixX4f &matColorMatrix);
 };
-
 } // NAMESPACE
 
 #endif //DISP3DLIB_RTSENSORDATAWORKER_H

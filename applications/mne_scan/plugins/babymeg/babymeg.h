@@ -456,7 +456,6 @@ signals:
      */
     void sendCMDDataToSQUIDControl(QByteArray DATA);
 };
-
 } // NAMESPACE
 
 #endif // BABYMEG_H

@@ -58,7 +58,6 @@ using namespace MNESCAN;
 MainSplashScreen::MainSplashScreen (const QPixmap & pixmap, Qt::WindowFlags f)
 : QSplashScreen(pixmap, f)
 {
-
 }
 
 //=============================================================================================================

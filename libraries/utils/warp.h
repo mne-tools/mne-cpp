@@ -143,9 +143,7 @@ private:
                                  const Eigen::MatrixXf & sLm,
                                  const Eigen::MatrixXf& warpWeight,
                                  const Eigen::MatrixXf& polWeight);
-
 };
-
 } // NAMESPACE
 
 #endif // WARP_H

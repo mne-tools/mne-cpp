@@ -155,7 +155,6 @@ private:
     QVector< CircularBuffer_old<_Tp>* >* m_qVecBuffers;
 
     unsigned int    m_uiMaxNumElements;     /**< Holds the maximal number of buffer elements.*/
-
 };
 
 //=============================================================================================================
@@ -192,7 +191,6 @@ void CircularMultiChannelBuffer_old<_Tp>::init()
     for (typename  QVector< CircularBuffer_old<_Tp>* >::iterator i = m_qVecBuffers->begin(); i != m_qVecBuffers->end(); ++i) {
         *i = new  CircularBuffer_old<_Tp>(m_uiMaxNumElements);
     }
-
 }
 
 //=============================================================================================================
@@ -274,7 +272,6 @@ typedef UTILSSHARED_EXPORT CircularMultiChannelBuffer_old<char>                 
 typedef UTILSSHARED_EXPORT CircularMultiChannelBuffer_old<double>                   _double_CircularMultiChannelBuffer_old;			/**< Defines CircularBuffer of double type.*/
 typedef UTILSSHARED_EXPORT CircularMultiChannelBuffer_old< QPair<int, int> >        _int_int_pair_CircularMultiChannelBuffer_old;		/**< Defines CircularBuffer of integer Pair type.*/
 typedef UTILSSHARED_EXPORT CircularMultiChannelBuffer_old< QPair<double, double> >  _double_double_pair_CircularMultiChannelBuffer_old;	/**< Defines CircularBuffer of double Pair type.*/
-
 } // NAMESPACE
 
 #endif // CIRCULARMULTICHANNELBUFFEROLD_H

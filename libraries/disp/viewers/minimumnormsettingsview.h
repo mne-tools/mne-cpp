@@ -158,9 +158,7 @@ signals:
      * @param [in] iTimePoint        The new time point.
      */
     void timePointChanged(int iTimePoint);
-
 };
-
 } // NAMESPACE
 
 #endif // MinimumNormSettingsView_H

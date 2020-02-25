@@ -264,9 +264,7 @@ private:
     QPen        m_penNormalSelectedBad;     /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected.  */
 
     QMap<double,QColor> m_mapTriggerColors; /**< Colors per trigger. */
-
 };
-
 } // NAMESPACE
 
 #endif // RTFIFFRAWVIEWDELEGATE_H

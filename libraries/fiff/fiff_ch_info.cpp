@@ -80,13 +80,11 @@ FiffChInfo::FiffChInfo(const FiffChInfo &p_FiffChInfo)
 , unit_mul(p_FiffChInfo.unit_mul)
 , ch_name(p_FiffChInfo.ch_name)
 {
-
 }
 
 //=============================================================================================================
 
 FiffChInfo::~FiffChInfo()
 {
-
 }
 

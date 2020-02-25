@@ -377,7 +377,6 @@ inline bool SensorDataTreeItem::isDataInit() const
 {
     return m_bIsDataInit;
 }
-
 } // namespace DISP3DLIB
 
 #endif // DISP3DLIB_SENSORDATATREEITEM_H

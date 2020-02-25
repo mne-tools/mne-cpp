@@ -314,7 +314,6 @@ inline QSharedPointer<FIFFLIB::FiffInfo> RealTimeConnectivityEstimate::getFiffIn
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo;
 }
-
 } // NAMESPACE
 
 Q_DECLARE_METATYPE(SCMEASLIB::RealTimeConnectivityEstimate::SPtr)

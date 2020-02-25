@@ -86,7 +86,6 @@ void PluginInputData<T>::notifyCallbackFunction(SCMEASLIB::Measurement::SPtr pMe
         (*m_pFunc)(measurement);
     }
 }
-
 }//Namespace
 
 #endif //PLUGININPUTDATA_CPP

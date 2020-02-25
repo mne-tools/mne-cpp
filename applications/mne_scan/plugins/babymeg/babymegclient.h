@@ -245,7 +245,6 @@ inline bool BabyMEGClient::isConnected() const
 {
     return m_bSocketIsConnected;
 }
-
 } // NAMESPACE
 
 #endif // BABYMEGCLIENT_H

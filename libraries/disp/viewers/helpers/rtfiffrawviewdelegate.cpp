@@ -68,7 +68,6 @@ RtFiffRawViewDelegate::RtFiffRawViewDelegate(QObject *parent)
 , m_iActiveRow(0)
 , m_iUpperItemIndex(0)
 {
-
 }
 
 //=============================================================================================================

@@ -207,13 +207,11 @@ private:
      * @return hanning window
      */
     static Eigen::MatrixXd hanningWindow(int iSignalLength);
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 }//namespace
 
 #endif // SPECTRAL_H

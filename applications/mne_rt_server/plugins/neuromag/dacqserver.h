@@ -132,7 +132,6 @@ private:
     bool                m_bMeasStopRequest;
     bool                m_bSetBuffersizeRequest;
 };
-
 } // NAMESPACE
 
 #endif // DACQSERVER_H

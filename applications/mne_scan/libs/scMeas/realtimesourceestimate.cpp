@@ -63,14 +63,12 @@ RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 , m_bInitialized(false)
 , m_iSourceEstimateSize(1)
 {
-
 }
 
 //=============================================================================================================
 
 RealTimeSourceEstimate::~RealTimeSourceEstimate()
 {
-
 }
 
 //=============================================================================================================

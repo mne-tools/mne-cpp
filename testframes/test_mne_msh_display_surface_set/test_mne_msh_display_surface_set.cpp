@@ -117,7 +117,6 @@ void TestMneMshDisplaySurfaceSet::compareSurface()
         QVERIFY( m_pSurfSetBemLoaded->surfs[0]->s->np == 2562 );
         QVERIFY( m_pSurfSetBemLoaded->surfs[0]->s->ntri == 5120 );
     }
-
 }
 
 //=============================================================================================================

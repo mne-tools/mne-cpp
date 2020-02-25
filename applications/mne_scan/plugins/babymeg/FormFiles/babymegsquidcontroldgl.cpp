@@ -173,7 +173,6 @@ void BabyMEGSQUIDControlDgl::UpdateParaGraph()
         ui->tbw_parameters->item(ro,1+2*co)->setText(tr("%1").arg(m_GUISM.ParaGraph.at(i)));
         ui->tbw_parameters->item(ro,0+2*co)->setText(chanNames.at(i));
     }
-
 }
 
 //=============================================================================================================
@@ -231,7 +230,6 @@ void BabyMEGSQUIDControlDgl::TuneGraphDispProc(MatrixXf tmp)
 
     d_timeplot->setCurveData(0,F);
     d_timeplot->show();
-
 }
 
 //=============================================================================================================
@@ -367,7 +365,6 @@ void BabyMEGSQUIDControlDgl::AdOffset()
     int index;
     index = ui->m_Qsb_offset->value();
     ProcCmd("UPDEADOFFSET",index,"Offset is changed !");
-
 }
 
 //=============================================================================================================
@@ -377,7 +374,6 @@ void BabyMEGSQUIDControlDgl::AdjuBias()
     int index;
     index = ui->m_Qsb_bias->value();
     ProcCmd("UPDEADJUBIAS",index,"Bias is changed !");
-
 }
 
 //=============================================================================================================
@@ -387,7 +383,6 @@ void BabyMEGSQUIDControlDgl::AdjuModu()
     int index;
     index = ui->m_Qsb_mod->value();
     ProcCmd("UPDEADJUMODU",index,"Modulation is changed !");
-
 }
 
 //=============================================================================================================
@@ -635,7 +630,6 @@ void BabyMEGSQUIDControlDgl::InitChannels(QString sReply)
     }
 
     ui->m_Qcb_channel->addItems(chanNames);
-
 }
 
 //=============================================================================================================
@@ -787,7 +781,6 @@ void BabyMEGSQUIDControlDgl::UpdateGUI()
     //std::cout << "Start Update Para Graph ------------------ \n" <<std::endl;
     UpdateParaGraph();
     //std::cout << "End Update Para Graph ------------------ \n" <<std::endl;
-
 }
 
 //=============================================================================================================
@@ -841,7 +834,6 @@ void BabyMEGSQUIDControlDgl::InitGUIConfig(QString sReply)
     if (m_GUISM.ParaGraph.size()>0) m_GUISM.ParaGraph.clear();
     for (int i=0;i<count;i++)
         m_GUISM.ParaGraph.append(tmp[ind+32+i].toFloat());
-
 }
 
 //=============================================================================================================

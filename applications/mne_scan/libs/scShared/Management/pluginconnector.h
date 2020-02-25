@@ -130,7 +130,6 @@ protected:
 private:
     QString m_sName;        /**< Connection name */
     QString m_sDescription; /**< Connection description */
-
 };
 
 //=============================================================================================================
@@ -141,7 +140,6 @@ QString PluginConnector::getName() const
 {
     return m_sName;
 }
-
 } // NAMESPACE
 
 #endif // PLUGINCONNECTOR_H

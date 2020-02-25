@@ -85,7 +85,6 @@ TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* pTMSI, QWidget *parent)
     connect(ui->m_pushButton_saveValues, &QPushButton::released, this, &TMSIImpedanceWidget::saveToFile);
     connect(ui->m_pushButton_Help, &QPushButton::released, this, &TMSIImpedanceWidget::helpDialog);
     //connect(ui->m_verticalSlider_manualImpedanceValue, &QSlider::valueChanged, this, &TMSIImpedanceWidget::setIm);
-
 }
 
 //=============================================================================================================

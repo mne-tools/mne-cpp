@@ -102,7 +102,6 @@ NeuromagSetupWidget::NeuromagSetupWidget(Neuromag* p_pNeuromag, QWidget* parent)
 
 NeuromagSetupWidget::~NeuromagSetupWidget()
 {
-
 }
 
 //=============================================================================================================

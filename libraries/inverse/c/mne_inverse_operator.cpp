@@ -53,13 +53,11 @@ using namespace INVERSELIB;
 
 MneInverseOperator::MneInverseOperator()
 {
-
 }
 
 //=============================================================================================================
 
 MneInverseOperator::~MneInverseOperator()
 {
-
 }
 

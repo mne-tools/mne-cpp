@@ -210,7 +210,6 @@ inline void CommandManager::setStatus(bool status)
 {
     m_bIsActive = status;
 }
-
 } // NAMESPACE
 
 #endif // COMMUNICATIONMANAGER_H

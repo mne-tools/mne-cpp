@@ -153,7 +153,6 @@ private:
     bool m_bIsJson;
 
     QList<QString> m_qListRawParameters;    /**< Raw parameters. Their type is not specified jet.*/
-
 };
 
 //=============================================================================================================
@@ -185,7 +184,6 @@ QList<QString>& RawCommand::pValues()
 {
     return m_qListRawParameters;
 }
-
 } // NAMESPACE
 
 #endif // RAWCOMMAND_H

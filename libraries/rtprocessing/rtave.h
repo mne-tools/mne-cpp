@@ -471,7 +471,6 @@ inline bool RtAveWorker::controlValuesChanged()
 
     return result;
 }
-
 } // NAMESPACE
 
 #endif // RTAVE_H

@@ -221,9 +221,7 @@ private:
     qint16                      m_iBlinkStatus;             /**< flag for recording icon blinking */
     QAction*                    m_pActionStartRecording;    /**< starts to record data */
     QAction*                    m_pActionSetupProject;      /**< shows setup project dialog */
-
 };
-
 } // NAMESPACE
 
 #endif // GUSBAMP_H

@@ -103,7 +103,6 @@ public:
 
     QString m_sName;
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // MNEOPERATOR_H

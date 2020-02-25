@@ -192,7 +192,6 @@ inline bool RtNoise::isRunning()
 {
     return m_bIsRunning;
 }
-
 } // NAMESPACE
 
 #ifndef metatype_matrix

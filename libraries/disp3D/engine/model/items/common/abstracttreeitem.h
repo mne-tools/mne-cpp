@@ -166,7 +166,6 @@ signals:
      */
     void checkStateChanged(const Qt::CheckState& checkState);
 };
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_ABSTRACTTREEITEM_H

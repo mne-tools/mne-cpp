@@ -281,7 +281,6 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
         }
     }
 }
-
 } // NAMESPACE
 
 #endif // BAR_H

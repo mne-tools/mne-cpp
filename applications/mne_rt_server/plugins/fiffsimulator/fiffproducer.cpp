@@ -66,7 +66,6 @@ FiffProducer::FiffProducer(FiffSimulator* p_pFiffSimulator)
 : m_pFiffSimulator(p_pFiffSimulator)
 , m_bIsRunning(false)
 {
-
 }
 
 //=============================================================================================================

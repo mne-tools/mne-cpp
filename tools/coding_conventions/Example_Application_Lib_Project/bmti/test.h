@@ -79,7 +79,6 @@ public:
 private:
     Ui::Test *ui;       /**< Pointer to the qt designer generated ui class.*/
 };
-
 } // NAMESPACE BMTILIB
 
 #endif // TEST_H

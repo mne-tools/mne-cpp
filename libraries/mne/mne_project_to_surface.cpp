@@ -81,7 +81,6 @@ MNEProjectToSurface::MNEProjectToSurface()
 , c(VectorXf::Zero(1))
 , det(VectorXf::Zero(1))
 {
-
 }
 
 //=============================================================================================================

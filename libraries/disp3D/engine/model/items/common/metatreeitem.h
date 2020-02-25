@@ -107,9 +107,7 @@ signals:
      * Emit this signal whenever the data of this item changed.
      */
     void dataChanged(const QVariant& data);
-
 };
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_METATREEITEM_H

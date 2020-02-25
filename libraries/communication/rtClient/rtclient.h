@@ -167,7 +167,6 @@ inline FIFFLIB::FiffInfo::SPtr& RtClient::getFiffInfo()
 {
     return m_pFiffInfo;
 }
-
 } // NAMESPACE
 
 #ifndef metatype_matrixxf

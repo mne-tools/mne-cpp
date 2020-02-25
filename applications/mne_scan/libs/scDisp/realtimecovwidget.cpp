@@ -120,7 +120,6 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC,
 
 RealTimeCovWidget::~RealTimeCovWidget()
 {
-
 }
 
 //=============================================================================================================

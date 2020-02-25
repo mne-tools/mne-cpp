@@ -97,7 +97,6 @@ RtcMusicSetupWidget::RtcMusicSetupWidget(RtcMusic* toolbox, QWidget *parent)
 
 RtcMusicSetupWidget::~RtcMusicSetupWidget()
 {
-
 }
 
 //=============================================================================================================

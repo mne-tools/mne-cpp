@@ -282,7 +282,6 @@ inline bool FiffDirNode::find_tag(QSharedPointer<FiffStream> &p_pStream, fiff_in
 {
     return find_tag(p_pStream.data(), findkind, p_pTag);
 }
-
 } // NAMESPACE
 
 #endif // FIFF_DIR_NODE_H

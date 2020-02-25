@@ -507,7 +507,6 @@ void MainWindow::createToolBars()
         for(qint32 i = 0; i < m_qListDynamicDisplayWidgets.size(); ++i)
             m_pDynamicDisplayToolBar->addWidget(m_qListDynamicDisplayWidgets[i]);
     }
-
 }
 
 //=============================================================================================================
@@ -558,7 +557,6 @@ void MainWindow::createLogDockWindow()
     //dock->setVisible(false);
 
     m_pMenuView->addAction(m_pDockWidget_Log->toggleViewAction());
-
 }
 
 //=============================================================================================================
@@ -732,7 +730,6 @@ void MainWindow::zoomOut()
         m_pRunWidget->zoomVert(0.5);
         m_pActionZoomStd->setEnabled(true);
     }
-
 }
 
 //=============================================================================================================

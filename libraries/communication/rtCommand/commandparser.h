@@ -125,7 +125,6 @@ RawCommand& CommandParser::getRawCommand()
 {
     return m_rawCommand;
 }
-
 } // NAMESPACE
 
 #endif // COMMANDPARSER_H

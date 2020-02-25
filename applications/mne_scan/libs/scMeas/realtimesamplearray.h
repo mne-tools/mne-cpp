@@ -310,7 +310,6 @@ inline const QString& RealTimeSampleArray::getUnit() const
     QMutexLocker locker(&m_qMutex);
     return m_qString_Unit;
 }
-
 } // NAMESPACE
 
 Q_DECLARE_METATYPE(SCMEASLIB::RealTimeSampleArray::SPtr)

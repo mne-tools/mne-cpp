@@ -177,7 +177,6 @@ signals:
      */
     void newInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 };
-
 } // NAMESPACE
 
 #endif //DISP3DLIB_RTSENSORINTERPOLATIONMATWORKER_H

@@ -55,7 +55,6 @@ TMSIImpedanceScene::TMSIImpedanceScene(QGraphicsView* view, QObject* parent)
 , m_bRightMouseKeyPressed(false)
 , m_qvView(view)
 {
-
 }
 
 //=============================================================================================================

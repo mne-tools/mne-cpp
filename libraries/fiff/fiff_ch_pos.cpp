@@ -80,6 +80,5 @@ FiffChPos::FiffChPos(const FiffChPos &p_FiffChPos)
 
 FiffChPos::~FiffChPos()
 {
-
 }
 

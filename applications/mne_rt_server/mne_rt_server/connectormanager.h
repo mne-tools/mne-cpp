@@ -205,7 +205,6 @@ inline const QVector<IConnector*>& ConnectorManager::getConnectors()
 {
     return s_vecConnectors;
 }
-
 } // NAMESPACE
 
 #endif // CONNECTORMANAGER_H

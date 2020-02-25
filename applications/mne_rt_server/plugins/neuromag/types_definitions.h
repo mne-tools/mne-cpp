@@ -146,7 +146,6 @@ typedef struct {
 } dacqDataMessageRec,*dacqDataMessage;
 
 #define DATA_MESS_SIZE sizeof(dacqDataMessageRec)
-
 }
 
 #endif // TYPESDEFINITIONS_H

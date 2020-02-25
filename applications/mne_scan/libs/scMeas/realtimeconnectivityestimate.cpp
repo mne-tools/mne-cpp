@@ -72,7 +72,6 @@ RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject *parent)
 , m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))
 , m_bInitialized(false)
 {
-
 }
 
 //=============================================================================================================

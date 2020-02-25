@@ -274,9 +274,7 @@ private:
     void toggleDisplayMax();            /**< Implements show full screen mode of runWidget.*/
 
     void updateTime();                  /**< Updates m_pTime and is called through timeout() of m_pTimer.*/
-
 };
-
 }// NAMESPACE
 
 #endif // MAINWINDOW_H

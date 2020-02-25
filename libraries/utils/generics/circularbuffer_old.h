@@ -151,7 +151,6 @@ CircularBuffer_old<_Tp>::CircularBuffer_old(unsigned int uiMaxNumElements)
 , m_pFreeElements(new QSemaphore(m_uiMaxNumElements))
 , m_pUsedElements(new QSemaphore(0))
 {
-
 }
 
 //=============================================================================================================
@@ -244,7 +243,6 @@ typedef UTILSSHARED_EXPORT _double_CircularBuffer_old                   DummyBuf
 typedef UTILSSHARED_EXPORT _double_CircularBuffer_old                   WaveletBuffer_old;       /**< Defines WaveletBuffer of type _double_CircularBuffer.*/
 typedef UTILSSHARED_EXPORT _double_CircularBuffer_old                   FilterBuffer_old;        /**< Defines FilterBuffer of type _double_CircularBuffer.*/
 typedef UTILSSHARED_EXPORT _double_CircularBuffer_old                   GaborParticleBuffer_old; /**< Defines GaborParticleBuffer of type _double_CircularBuffer.*/
-
 } // NAMESPACE
 
 #endif // CIRCULARBUFFEROLD_H

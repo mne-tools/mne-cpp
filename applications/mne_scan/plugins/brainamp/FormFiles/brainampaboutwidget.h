@@ -89,7 +89,6 @@ public:
 private:
     Ui::BrainAMPAboutWidgetClass ui;    /**< Holds the user interface for the BrainAMPAboutWidgetClass.*/
 };
-
 } // NAMESPACE
 
 #endif // BRAINAMPABOUTWIDGET_H

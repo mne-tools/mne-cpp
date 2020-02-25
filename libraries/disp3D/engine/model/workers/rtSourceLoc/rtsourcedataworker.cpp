@@ -175,7 +175,6 @@ void RtSourceDataWorker::setInterpolationMatrixLeft(QSharedPointer<Eigen::Sparse
 void RtSourceDataWorker::setInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRight)
 {
     m_lHemiVisualizationInfo[1].pMatInterpolationMatrix = pMatInterpolationMatrixRight;
-
 }
 
 //=============================================================================================================

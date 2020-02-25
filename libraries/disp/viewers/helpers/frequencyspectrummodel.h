@@ -347,7 +347,6 @@ inline qint32 FrequencySpectrumModel::getUpperFrqBound() const
 {
     return m_iUpperFrqIdx;
 }
-
 } // NAMESPACE
 
 #ifndef metatype_rowvectorxd

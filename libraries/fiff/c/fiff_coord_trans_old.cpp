@@ -353,7 +353,6 @@ static int get_fval_20(FILE *in, float *fval)
 
 FiffCoordTransOld::FiffCoordTransOld()
 {
-
 }
 
 //=============================================================================================================
@@ -415,7 +414,6 @@ FiffCoordTransOld::FiffCoordTransOld(int from, int to, float rot[3][3], float mo
 
 FiffCoordTransOld::~FiffCoordTransOld()
 {
-
 }
 
 //=============================================================================================================

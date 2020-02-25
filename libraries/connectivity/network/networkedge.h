@@ -196,7 +196,6 @@ protected:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-
 } // namespace CONNECTIVITYLIB
 
 #endif // NETWORKEDGE_H

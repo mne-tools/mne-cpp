@@ -125,9 +125,7 @@ public:
                              const FSLIB::AnnotationSet& tAnnotSet);
 
 protected:
-
 };
-
 } // NAMESPACE
 
 #endif // DISP3DLIB_SOURCEESTIMATEVIEW_H

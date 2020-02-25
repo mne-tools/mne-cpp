@@ -328,7 +328,6 @@ signals:
     void newConnectivityResultAvailable(const QString& sSubject,
                                         const QString& sMeasurement,
                                         const Network& tNetworkData);
-
 };
 
 #endif // CONNECTIVITYSETTINGSMANAGER_H

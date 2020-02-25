@@ -156,7 +156,6 @@ private:
             const FIFFLIB::FiffDirNode::SPtr& dir,
             const FIFFLIB::fiff_int_t def_coord_frame, MNESurface::SPtr& surf);
 };
-
 } // NAMESPACE
 
 #endif // MNE_SURFACE_H

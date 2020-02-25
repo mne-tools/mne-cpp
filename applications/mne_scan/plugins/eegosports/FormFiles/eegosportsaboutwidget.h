@@ -92,7 +92,6 @@ public:
 private:
     Ui::EEGoSportsAboutWidgetClass m_ui;    /**< Holds the user interface for the EEGoSportsAboutWidgetClass.*/
 };
-
 } // NAMESPACE
 
 #endif // EEGOSPORTSABOUTWIDGET_H

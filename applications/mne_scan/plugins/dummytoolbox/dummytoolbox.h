@@ -143,7 +143,6 @@ signals:
      */
     void fiffInfoAvailable();
 };
-
 } // NAMESPACE
 
 #endif // DUMMYTOOLBOX_H

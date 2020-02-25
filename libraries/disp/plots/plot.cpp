@@ -78,7 +78,6 @@ Plot::Plot(VectorXd &p_dVec, QWidget *parent)
 
 Plot::~Plot()
 {
-
 }
 
 //=============================================================================================================
@@ -176,6 +175,5 @@ void Plot::paintEvent(QPaintEvent *event)
         //Draw title & axes
         Graph::drawLabels(t_qSizePlot.width(), t_qSizePlot.height());
     }
-
 }
 

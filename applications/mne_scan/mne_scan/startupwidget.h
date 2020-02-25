@@ -91,7 +91,6 @@ public:
 private:
     QLabel* m_pLabel_Info;      /**< Holds the start up widget label. */
 };
-
 }//NAMESPACE
 
 #endif // STARTUPWIDGET_H

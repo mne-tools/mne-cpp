@@ -146,7 +146,6 @@ private:
     GUSBAmp*                        m_pGUSBAmp;         /**< a pointer to corresponding GUSBAmp.*/
     Ui::GUSBAmpSetupProjectWidget*  ui;                 /**< the user interface for the GUSBAmpSetupProjectWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // GUSBAMPSETUPPROJECTWIDGET.H

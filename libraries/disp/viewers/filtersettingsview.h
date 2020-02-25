@@ -149,7 +149,6 @@ protected:
 signals:
     void filterActivationChanged(bool activated);
 };
-
 } // NAMESPACE
 
 #endif // FILTERSETTINGSVIEW_H

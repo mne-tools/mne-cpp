@@ -146,7 +146,6 @@ protected:
 
     bool                                                m_bInitialized;         /**< Whether init was processed successfully. */
 };
-
 } // NAMESPACE
 
 #endif // REALTIMESOURCEESTIMATEWIDGET_H

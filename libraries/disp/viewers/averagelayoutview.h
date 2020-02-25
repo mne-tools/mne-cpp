@@ -203,7 +203,6 @@ protected:
     QSharedPointer<QMap<QString, bool> >                        m_qMapAverageActivation;    /**< Average activation status. */
     QMap<qint32,float>                                          m_scaleMap;                 /**< The current scaling map. */
 };
-
 } // NAMESPACE
 
 #endif // AVERAGELAYOUTVIEW_H

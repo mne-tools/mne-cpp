@@ -186,9 +186,7 @@ private:
     float                       m_AccelerationFactor;   /**< Acceleration factor to simulate different sampling rates. */
     float                       m_TrueSamplingRate;     /**< The true sampling rate of the fif file. */
     bool                        m_bIsRunning;           /**< Flag whether the producer is running.*/
-
 };
-
 } // NAMESPACE
 
 #endif // FIFFSIMULATOR_H

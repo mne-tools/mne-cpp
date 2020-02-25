@@ -89,7 +89,6 @@ public:
 private:
     Ui::NeuromagAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // NEUROMAGABOUTWIDGET_H

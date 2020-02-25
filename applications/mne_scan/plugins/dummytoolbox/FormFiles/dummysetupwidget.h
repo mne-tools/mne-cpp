@@ -112,7 +112,6 @@ private:
 
     Ui::DummySetupWidgetClass* m_pUi;	/**< Holds the user interface for the DummySetupWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // DUMMYSETUPWIDGET_H

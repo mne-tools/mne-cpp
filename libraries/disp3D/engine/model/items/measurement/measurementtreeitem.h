@@ -242,9 +242,7 @@ protected:
     QPointer<EcdDataTreeItem>       m_EcdDataTreeItem;          /**< The rt dipole fit data item of this item. */
 
 signals:
-
 };
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_MEASUREMENTTREEITEM_H

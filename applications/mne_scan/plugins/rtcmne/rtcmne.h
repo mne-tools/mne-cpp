@@ -278,7 +278,6 @@ signals:
      */
     void clusteringFinished();
 };
-
 } // NAMESPACE
 
 #endif // RTCMNE_H

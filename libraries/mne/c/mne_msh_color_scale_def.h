@@ -106,13 +106,11 @@ public:
 //  float tc_mult;			             /* Multiply the scales by this value for timecourses */
 //  int   relative;		                     /* Are fthresh and fmid relative to the maximum value over the surface? */
 //} *mshColorScaleDef,mshColorScaleDefRec;
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // NAMESPACE MNELIB
 
 #endif // MNEMSHCOLORSCALEDEF_H

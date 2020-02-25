@@ -67,5 +67,4 @@ NeuromagAboutWidget::NeuromagAboutWidget(QWidget *parent)
 
 NeuromagAboutWidget::~NeuromagAboutWidget()
 {
-
 }

@@ -194,7 +194,6 @@ private:
 signals:
     void windowSizeChanged(int iWindowSize);
 };
-
 } // NAMESPACE SCDISPLIB
 
 #endif // REALTIMEEVOKEDSETWIDGET_H

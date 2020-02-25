@@ -333,7 +333,6 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_Fif
     }
     return out;
 }
-
 } // NAMESPACE
 
 #ifndef metatype_fiffcovsptr

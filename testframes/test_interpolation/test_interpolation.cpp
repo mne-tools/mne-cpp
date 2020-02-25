@@ -99,7 +99,6 @@ private:
 
 TestInterpolation::TestInterpolation()
 {
-
 }
 
 //=============================================================================================================
@@ -248,7 +247,6 @@ void TestInterpolation::testEmptyInputsForWeightMatrix()
 
 void TestInterpolation::cleanupTestCase()
 {
-
 }
 
 //=============================================================================================================

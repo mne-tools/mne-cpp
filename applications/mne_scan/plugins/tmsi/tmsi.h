@@ -270,9 +270,7 @@ private:
 
     QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
     qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
-
 };
-
 } // NAMESPACE
 
 #endif // TMSI_H

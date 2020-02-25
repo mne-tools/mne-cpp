@@ -221,7 +221,6 @@ inline bool RtCmdClient::hasCommand(const QString &p_sCommand) const
 {
     return m_commandManager.hasCommand(p_sCommand);
 }
-
 } // NAMESPACE
 
 #endif // RTCMDCLIENT_H

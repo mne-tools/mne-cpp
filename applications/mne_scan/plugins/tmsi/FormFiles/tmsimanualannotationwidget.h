@@ -100,7 +100,6 @@ private:
 
     virtual void  keyPressEvent(QKeyEvent *event);
 };
-
 } // NAMESPACE
 
 #endif // TMSIMANUALANNOTATIONWIDGET_H

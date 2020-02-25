@@ -162,7 +162,6 @@ inline bool IAlgorithm::multiInstanceAllowed() const
 {
     return true;
 }
-
 } // NAMESPACE
 
 Q_DECLARE_INTERFACE(SCSHAREDLIB::IAlgorithm, "scsharedlib/1.0")

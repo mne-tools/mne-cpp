@@ -401,7 +401,6 @@ protected:
     QPointer<GpuInterpolationItem>      m_pInterpolationItemRightGPU;       /**< This item manages all 3d rendering and calculations for the right hemisphere. */
 
 signals:
-
 };
 
 //=============================================================================================================
@@ -412,7 +411,6 @@ inline bool MneDataTreeItem::isDataInit() const
 {
     return m_bIsDataInit;
 }
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_MNEESTIMATTREEITEM_H

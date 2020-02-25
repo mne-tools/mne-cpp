@@ -314,7 +314,6 @@ signals:
      */
     void filterChannelTypeChanged(const QString& channelType);
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // FILTERDESIGNVIEW_H

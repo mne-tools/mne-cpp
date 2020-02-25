@@ -90,7 +90,6 @@ private:
     BrainFlowBoard *m_pBrainFlowBoard;
     Ui::BrainFlowStreamingWidget *ui;
 };
-
 }
 
 #endif // BRAINFLOWSTREAMINGWIDGET_H

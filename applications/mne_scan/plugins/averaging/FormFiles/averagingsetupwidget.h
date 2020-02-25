@@ -107,7 +107,6 @@ private:
 
     Ui::AveragingSetupWidgetClass ui;   /**< Holds the user interface for the AveragingSetupWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // AVERAGINGSETUPWIDGET_H

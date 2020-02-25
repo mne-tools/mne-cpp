@@ -430,7 +430,6 @@ protected:
     QStandardItem*                   m_pRootItem;            /**< The root item of the tree model. */
     QPointer<Qt3DCore::QEntity>      m_pModelEntity;         /**< The parent 3D entity for this model. */
 };
-
 } // NAMESPACE
 
 #endif // DISP3DLIB_DATA3DTREEMODEL_H

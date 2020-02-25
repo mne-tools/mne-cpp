@@ -107,9 +107,7 @@ private:
     PluginConnectorConnection*  m_pPluginConnectorConnection;   /**< a pointer to corresponding PluginConnectorConnection.*/
 
     QMap<QString, QComboBox*> m_qMapSenderToReceiverConnections;/**< To each output a possible list of inputs. */
-
 };
-
 } // NAMESPACE
 
 #endif // PLUGINCONNECTORCONNECTIONWIDGET_H

@@ -179,7 +179,6 @@ signals:
      */
     void compSelectionChanged(int to);
 };
-
 } // NAMESPACE
 
 #endif // COMPENSATORVIEW_H

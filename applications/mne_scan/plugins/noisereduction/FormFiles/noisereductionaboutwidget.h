@@ -86,7 +86,6 @@ private:
 
     Ui::NoiseReductionAboutWidgetClass ui;		/**< Holds the user interface for the NoiseReductionAboutWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // NOISEREDUCTIONABOUTWIDGET_H

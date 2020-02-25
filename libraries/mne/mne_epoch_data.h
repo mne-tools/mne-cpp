@@ -141,7 +141,6 @@ public:
     float               tmax;           /**< New end time of the data (cannot exceed data duration). */
     bool                bReject;        /**< Whether this epoch is to be rejected */
 };
-
 } // NAMESPACE
 
 #endif // MNE_EPOCH_DATA_H

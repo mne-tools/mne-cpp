@@ -103,7 +103,6 @@ private:
     FiffSimulator*  m_pFiffSimulator;   /**< Holds a pointer to corresponding FiffSimulator.*/
     bool            m_bIsRunning;       /**< Holds whether ECGProducer is running.*/
 };
-
 } // NAMESPACE
 
 #endif // FIFFPRODUCER_H

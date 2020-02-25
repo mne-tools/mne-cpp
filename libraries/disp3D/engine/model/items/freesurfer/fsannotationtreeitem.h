@@ -130,7 +130,6 @@ signals:
      */
     void annotationVisibiltyChanged(bool isVisible);
 };
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_FSANNOTATIONTREEITEM_H

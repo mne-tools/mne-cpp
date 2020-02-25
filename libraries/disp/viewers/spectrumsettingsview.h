@@ -108,7 +108,6 @@ public:
     QPointer<QSlider>   m_pSliderLowerBound;    /**< Lower bound frequency */
     QPointer<QSlider>   m_pSliderUpperBound;    /**< Upper bound frequency */
 };
-
 } // NAMESPACE
 
 #endif // SPECTRUMSETTINGSVIEW_H

@@ -894,7 +894,6 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_NATIVE_ENDIAN     0        /**< This refers to the byte order in the current system */
 #define FIFFV_LITTLE_ENDIAN     1        /**< The little-endian (Intel) byte order */
 #define FIFFV_BIG_ENDIAN        2        /**< The big-endian (Motorola) byte order */
-
 } // NAMESPACE
 
 #endif // FIFF_FILE_H

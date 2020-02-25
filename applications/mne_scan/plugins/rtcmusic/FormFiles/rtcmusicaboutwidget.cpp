@@ -59,5 +59,4 @@ RtcMusicAboutWidget::RtcMusicAboutWidget(QWidget *parent)
 
 RtcMusicAboutWidget::~RtcMusicAboutWidget()
 {
-
 }

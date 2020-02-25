@@ -117,7 +117,6 @@ void RunWidget::zoomVert(float factor)
         size.setWidth(m_pScrollArea->size().width()-20);
 
     m_pScrollArea->widget()->resize((int)(size.width()),(int)(size.height()*factor));
-
 }
 
 //=============================================================================================================

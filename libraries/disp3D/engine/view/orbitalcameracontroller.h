@@ -146,7 +146,6 @@ float OrbitalCameraController::distance(const QVector3D &firstPoint, const QVect
 {
     return (secondPoint - firstPoint).length();
 }
-
 } // namespace DISP3DLIB
 
 #endif // DISP3DLIB_ORBITALCAMERACONTROLLER_H

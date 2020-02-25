@@ -783,7 +783,6 @@ inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
     else
         return 0;
 }
-
 } // NAMESPACE
 
 #ifndef metatype_rowvectorpair

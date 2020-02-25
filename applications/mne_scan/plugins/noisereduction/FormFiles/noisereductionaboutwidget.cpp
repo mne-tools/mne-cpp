@@ -59,5 +59,4 @@ NoiseReductionAboutWidget::NoiseReductionAboutWidget(QWidget *parent)
 
 NoiseReductionAboutWidget::~NoiseReductionAboutWidget()
 {
-
 }

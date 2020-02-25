@@ -84,9 +84,7 @@ public:
 private:
 
     Ui::NeuronalConnectivityAboutWidgetClass ui;		/**< Holds the user interface for the NeuronalConnectivityAboutWidget.*/
-
 };
-
 } // NAMESPACE
 
 #endif // NEURONALCONNECTIVITYABOUTWIDGET_H

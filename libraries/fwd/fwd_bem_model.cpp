@@ -444,7 +444,6 @@ FwdBemModel::FwdBemModel()
 ,use_ip_approach(false)
 ,ip_approach_limit(FWD_BEM_IP_APPROACH_LIMIT)
 {
-
 }
 
 //=============================================================================================================

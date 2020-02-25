@@ -120,7 +120,6 @@ void RtCovWorker::doWork(const RtCovInput &inputData)
     } else {
         qDebug() << "RtCovWorker::doWork - Number of samples equals zero. Regularization not possible. Returning without result.";
     }
-
 }
 
 //=============================================================================================================

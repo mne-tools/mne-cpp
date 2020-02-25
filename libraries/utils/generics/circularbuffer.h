@@ -172,7 +172,6 @@ CircularBuffer<_Tp>::CircularBuffer(unsigned int uiMaxNumElements)
 , m_pUsedElements(new QSemaphore(0))
 , m_bPause(false)
 {
-
 }
 
 //=============================================================================================================
@@ -313,7 +312,6 @@ typedef UTILSSHARED_EXPORT _double_CircularBuffer                   dBuffer;    
 typedef UTILSSHARED_EXPORT _int_CircularBuffer                      iBuffer;             /**< Short for _int_CircularBuffer.*/
 typedef UTILSSHARED_EXPORT _char_CircularBuffer                     cBuffer;             /**< Short for _char_CircularBuffer.*/
 typedef UTILSSHARED_EXPORT _double_CircularBuffer                   MEGBuffer;           /**< Defines MEGBuffer of type _double_CircularBuffer.*/
-
 } // NAMESPACE
 
 #endif // CIRCULARBUFFER_H

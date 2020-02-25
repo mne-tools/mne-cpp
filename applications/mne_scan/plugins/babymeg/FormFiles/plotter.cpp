@@ -235,7 +235,6 @@ void Plotter::drawGrid(QPainter *painter)
 
     drawRotatedText(painter, rect.left()-80, rect.bottom()-40, settings.ylabel);
     painter->drawRect(rect.adjusted(0,0,-1,-1));
-
 }
 
 //=============================================================================================================

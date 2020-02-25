@@ -156,7 +156,6 @@ private:
     QString                             m_qString_Name;     /**< Name of the Measurement */
     bool                                m_bVisibility;      /**< Visibility status */
     QList<QSharedPointer<QWidget> >     m_lControlWidgets;  /**< The control widgets, which should be added to the corresponding real-time visualization. */
-
 };
 
 //=============================================================================================================
@@ -224,7 +223,6 @@ inline QList<QSharedPointer<QWidget> > Measurement::getControlWidgets()
     QMutexLocker locker(&m_qMutex);
     return m_lControlWidgets;
 }
-
 } //NAMESPACE
 
 Q_DECLARE_METATYPE(SCMEASLIB::Measurement::SPtr)

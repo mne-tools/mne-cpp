@@ -155,7 +155,6 @@ inline bool ISensor::multiInstanceAllowed() const
 {
     return false;
 }
-
 } //NAMESPACE
 
 Q_DECLARE_INTERFACE(SCSHAREDLIB::ISensor, "scsharedlib/1.0")

@@ -298,7 +298,6 @@ inline bool operator== (const FiffNamedMatrix &a, const FiffNamedMatrix &b)
             a.col_names == b.col_names &&
             a.data.isApprox(b.data, 0.0001));
 }
-
 } // NAMESPACE
 
 #endif // FIFF_SOLUTION_H

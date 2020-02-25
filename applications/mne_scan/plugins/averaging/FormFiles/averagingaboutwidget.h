@@ -85,9 +85,7 @@ public:
 private:
 
     Ui::AveragingAboutWidgetClass ui;		/**< Holds the user interface for the AveragingAboutWidget.*/
-
 };
-
 } // NAMESPACE
 
 #endif // AVERAGINGABOUTWIDGET_H

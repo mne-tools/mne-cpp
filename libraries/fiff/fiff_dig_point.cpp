@@ -79,5 +79,4 @@ FiffDigPoint::FiffDigPoint(const FiffDigPoint& p_FiffDigPoint)
 
 FiffDigPoint::~FiffDigPoint()
 {
-
 }

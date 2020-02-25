@@ -67,12 +67,10 @@ FilterThreadArg::FilterThreadArg()
 ,filtered   (NULL)
 ,stat       (FAIL)
 {
-
 }
 
 //=============================================================================================================
 
 FilterThreadArg::~FilterThreadArg()
 {
-
 }
