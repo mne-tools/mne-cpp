@@ -1664,7 +1664,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
         return false;
     }
 
-
+    qDebug() << "AAA";
     //
     //   Read the measurement info
     //
@@ -1673,6 +1673,11 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     if(!t_pStream->read_meas_info(t_pStream->dirtree(), info, meas))
         return false;
 
+    if(is_littleEndian) {
+        data.info = info;
+        return true;
+    }
+    qDebug() << "BBB";
     //
     //   Locate the data of interest
     //
@@ -1703,6 +1708,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
             }
         }
     }
+    qDebug() << "CCC";
     //
     //   Set up the output structure
     //
@@ -1716,24 +1722,26 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     //
     //   Process the directory
     //
-
+    qDebug() << "DDD";
     QList<FiffDirEntry::SPtr> dir = raw[0]->dir;
     fiff_int_t nent = raw[0]->nent();
     fiff_int_t nchan = info.nchan;
     fiff_int_t first = 0;
     fiff_int_t first_samp = 0;
     fiff_int_t first_skip = 0;
+    qDebug() << "EEE" << dir[first]->kind;
     //
     //  Get first sample tag if it is there
     //
     FiffTag::SPtr t_pTag;
     if (dir[first]->kind == FIFF_FIRST_SAMPLE)
     {
+        qDebug() << "In";
         t_pStream->read_tag(t_pTag, dir[first]->pos);
         first_samp = *t_pTag->toInt();
         ++first;
     }
-
+    qDebug() << "Out";
     //
     //  Omit initial skip
     //
@@ -3141,24 +3149,22 @@ QList<FiffDirEntry::SPtr> FiffStream::make_dir(bool *ok)
         /*
         * Check that we haven't run into the directory
         */
-        qDebug() << "4";
         if (t_pTag->kind == FIFF_DIR)
             break;
         /*
         * Put in the new entry
         */
-        qDebug() << "5";
         t_pFiffDirEntry = FiffDirEntry::SPtr(new FiffDirEntry);
         t_pFiffDirEntry->kind = t_pTag->kind;
         t_pFiffDirEntry->type = t_pTag->type;
         t_pFiffDirEntry->size = t_pTag->size();
         t_pFiffDirEntry->pos = (fiff_long_t)pos;
-        qDebug() << "6";
+
+        qDebug() << "Kind: " << t_pTag->kind << "| Type:" << t_pTag->type << "| Size" << t_pTag->size() << "| Next:" << t_pTag->next;
+
         dir.append(t_pFiffDirEntry);
-        qDebug() << "7";
         if (t_pTag->next < 0)
             break;
-        qDebug() << "8";
     }
     /*
      * Put in the new the terminating entry
