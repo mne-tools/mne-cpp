@@ -116,11 +116,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     // Quick control selection
-    m_pQuickControlView = QuickControlView::SPtr::create(QString("MNESCAN/MainWindow"),
+    m_pQuickControlView = new QuickControlView (QString("MNESCAN/MainWindow"),
                                                          "MNE Scan",
                                                          Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
                                                          this);
-
     createActions();
     createMenus();
     createToolBars();
@@ -412,6 +411,15 @@ void MainWindow::createActions()
     m_pActionStop->setShortcut(tr("F6"));
     m_pActionStop->setStatusTip(tr("Stops (F6) ")+CInfo::AppNameShort());
     connect(m_pActionStop, &QAction::triggered, this, &MainWindow::stopMeasurement);
+
+    //Display Toolbar
+    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
+    m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
+    m_pActionQuickControl->setCheckable(true);
+    connect(m_pActionQuickControl.data(), &QAction::toggled,
+            m_pQuickControlView.data(), &QuickControlView::setVisible);
+    m_qListDynamicDisplayActions.append(m_pActionQuickControl);
+    m_pActionQuickControl->setVisible(false);
 }
 
 //=============================================================================================================
@@ -617,7 +625,7 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
         }
     }
 
-    //this->createToolBars();
+    this->createToolBars();
 }
 
 //=============================================================================================================
@@ -669,6 +677,8 @@ void MainWindow::startMeasurement()
         return;
     }
 
+    m_pActionQuickControl->setVisible(true);
+
     m_pPluginGui->uiSetupRunningState(true);
     uiSetupRunningState(true);
     startTimer(m_iTimeoutMSec);
@@ -695,6 +705,8 @@ void MainWindow::stopMeasurement()
 
     m_pPluginSceneManager->stopPlugins();
     m_pDisplayManager->clean();
+
+    m_pActionQuickControl->setVisible(false);
 
     m_pPluginGui->uiSetupRunningState(false);
     uiSetupRunningState(false);
