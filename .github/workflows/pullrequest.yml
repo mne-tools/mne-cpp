@@ -24,6 +24,9 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'
+    - name: Install Git submodules
+      run: |
+        git submodule update --init
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
       uses: jurplel/install-qt-action@v2
@@ -48,6 +51,19 @@ jobs:
       run: |
         qmake -r MNECPP_CONFIG+=noTests
         make -j2
+    - name: Configure and Compile BrainFlow package and submodule (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-16.04') || (matrix.os == 'macos-latest')
+      run: |
+        cd applications/mne_scan/plugins/brainflowboard/brainflow
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=../installed ..
+        make
+        make install
+        cd ..
+        qmake
+        make -j2
+        cp -r ./brainflow/installed/lib/* ../../../bin/
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2016'
       run: |
@@ -56,6 +72,21 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noTests
         jom -j2
+    - name: Configure and Compile BrainFlow package and submodule (Windows)
+      if: matrix.os == 'windows-2016'
+      run: |
+        # Setup VS compiler
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        cd applications\mne_scan\plugins\brainflowboard\brainflow
+        mkdir build
+        cd build
+        cmake -G "Visual Studio 14 2015 Win64" -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX=..\installed ..
+        cmake --build . --target install --config Release
+        cd ..
+        qmake
+        jom -j2
+        cp -r .\brainflow\installed\lib\* ..\..\..\bin\
                         
   Tests:
     runs-on: ${{ matrix.os }}
