@@ -50,11 +50,9 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_cov.h>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -64,7 +62,6 @@
 #include <QDebug>
 #include <QMutexLocker>
 #include <QtWidgets>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -77,7 +74,6 @@ using namespace IOBUFFER;
 using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -98,7 +94,6 @@ Covariance::Covariance()
 //    m_pActionShowAdjustment->setVisible(false);
 }
 
-
 //=============================================================================================================
 
 Covariance::~Covariance()
@@ -107,7 +102,6 @@ Covariance::~Covariance()
         stop();
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> Covariance::clone() const
@@ -115,7 +109,6 @@ QSharedPointer<IPlugin> Covariance::clone() const
     QSharedPointer<Covariance> pCovarianceClone(new Covariance);
     return pCovarianceClone;
 }
-
 
 //=============================================================================================================
 
@@ -135,7 +128,6 @@ void Covariance::init()
     m_outputConnectors.append(m_pCovarianceOutput);
 }
 
-
 //=============================================================================================================
 
 void Covariance::unload()
@@ -144,7 +136,6 @@ void Covariance::unload()
     QSettings settings;
     settings.setValue(QString("Plugin/%1/estimationSamples").arg(this->getName()), m_iEstimationSamples);
 }
-
 
 //=============================================================================================================
 
@@ -163,7 +154,6 @@ bool Covariance::start()
     return true;
 }
 
-
 //=============================================================================================================
 
 bool Covariance::stop()
@@ -174,7 +164,6 @@ bool Covariance::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType Covariance::getType() const
@@ -182,14 +171,12 @@ IPlugin::PluginType Covariance::getType() const
     return _IAlgorithm;
 }
 
-
 //=============================================================================================================
 
 QString Covariance::getName() const
 {
     return "Covariance";
 }
-
 
 //=============================================================================================================
 
@@ -199,7 +186,6 @@ void Covariance::showCovarianceWidget()
     m_pCovarianceWidget->show();
 }
 
-
 //=============================================================================================================
 
 QWidget* Covariance::setupWidget()
@@ -207,7 +193,6 @@ QWidget* Covariance::setupWidget()
     CovarianceSetupWidget* setupWidget = new CovarianceSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
-
 
 //=============================================================================================================
 
@@ -229,7 +214,6 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                     this, &Covariance::appendCovariance);
         }
 
-
         if(m_bProcessData) {
             MatrixXd t_mat;
 
@@ -241,7 +225,6 @@ void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     }
 }
 
-
 //=============================================================================================================
 
 void Covariance::appendCovariance(const FiffCov& p_pCovariance)
@@ -249,7 +232,6 @@ void Covariance::appendCovariance(const FiffCov& p_pCovariance)
     QMutexLocker locker(&mutex);
     m_qVecCovData.push_back(p_pCovariance);
 }
-
 
 //=============================================================================================================
 
@@ -260,7 +242,6 @@ void Covariance::changeSamples(qint32 samples)
         m_pRtCov->setSamples(m_iEstimationSamples);
     }
 }
-
 
 //=============================================================================================================
 

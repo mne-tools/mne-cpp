@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -45,9 +44,7 @@
 
 #include <QFile>
 
-
 #include <Eigen/Dense>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -59,7 +56,6 @@ using namespace FIFFLIB;
 
 
 
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -67,7 +63,6 @@ using namespace FIFFLIB;
 #ifndef FALSE
 #define FALSE 0
 #endif
-
 
 #ifndef FAIL
 #define FAIL -1
@@ -78,15 +73,12 @@ using namespace FIFFLIB;
 #endif
 
 
-
 #define X_20 0
 #define Y_20 1
 #define Z_20 2
 
 
-
 #define FREE_20(x) if ((char *)(x) != NULL) free((char *)(x))
-
 
 #define MALLOC_20(x,t) (t *)malloc((x)*sizeof(t))
 
@@ -155,7 +147,6 @@ void mne_free_cmatrix_20(float **m)
 }
 
 #define MIN_20(a,b) ((a) < (b) ? (a) : (b))
-
 
 //float
 Eigen::MatrixXf toFloatEigenMatrix_20(float **mat, const int m, const int n)
@@ -266,7 +257,6 @@ float **mne_matt_mat_mult_20 (float **m1,float **m2,int d1,int d2,int d3)
   return result;
 }
 
-
 static void skip_comments(FILE *in)
 
 {
@@ -285,7 +275,6 @@ static void skip_comments(FILE *in)
     }
 }
 
-
 static int whitespace(int c)
 
 {
@@ -303,7 +292,6 @@ static int whitespace_quote(int c, int inquote)
     else
         return (c == '\t' || c == '\n' || c == ' ');
 }
-
 
 static char *next_word_20(FILE *in)
 
@@ -341,7 +329,6 @@ static char *next_word_20(FILE *in)
     return next;
 }
 
-
 static int get_fval_20(FILE *in, float *fval)
 {
     char *next = next_word_20(in);
@@ -360,7 +347,6 @@ static int get_fval_20(FILE *in, float *fval)
 
 
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -369,7 +355,6 @@ FiffCoordTransOld::FiffCoordTransOld()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -387,7 +372,6 @@ FiffCoordTransOld::FiffCoordTransOld(const FiffCoordTransOld &p_FiffCoordTransOl
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -412,7 +396,6 @@ FiffCoordTransOld *FiffCoordTransOld::catenate(FiffCoordTransOld *t1, FiffCoordT
     return (t);
 }
 
-
 //=============================================================================================================
 
 FiffCoordTransOld::FiffCoordTransOld(int from, int to, float rot[3][3], float move[3])
@@ -428,14 +411,12 @@ FiffCoordTransOld::FiffCoordTransOld(int from, int to, float rot[3][3], float mo
     add_inverse(this);
 }
 
-
 //=============================================================================================================
 
 FiffCoordTransOld::~FiffCoordTransOld()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -463,7 +444,6 @@ int FiffCoordTransOld::add_inverse(FiffCoordTransOld *t)
     return OK;
 }
 
-
 //=============================================================================================================
 
 FiffCoordTransOld *FiffCoordTransOld::fiff_invert_transform() const
@@ -484,7 +464,6 @@ FiffCoordTransOld *FiffCoordTransOld::fiff_invert_transform() const
     return (ti);
 }
 
-
 //=============================================================================================================
 
 void FiffCoordTransOld::fiff_coord_trans(float r[], const FiffCoordTransOld *t, int do_move)
@@ -503,7 +482,6 @@ void FiffCoordTransOld::fiff_coord_trans(float r[], const FiffCoordTransOld *t, 
     for (j = 0; j < 3; j++)
         r[j] = res[j];
 }
-
 
 //=============================================================================================================
 
@@ -570,7 +548,6 @@ FiffCoordTransOld *FiffCoordTransOld::fiff_combine_transforms(int from, int to, 
     return (t);
 }
 
-
 //=============================================================================================================
 
 void FiffCoordTransOld::fiff_coord_trans_inv(float r[], FiffCoordTransOld *t, int do_move)
@@ -589,7 +566,6 @@ void FiffCoordTransOld::fiff_coord_trans_inv(float r[], FiffCoordTransOld *t, in
     for (j = 0; j < 3; j++)
         r[j] = res[j];
 }
-
 
 //=============================================================================================================
 
@@ -626,7 +602,6 @@ const char *FiffCoordTransOld::mne_coord_frame_name(int frame)
     return frames[k].name;
 }
 
-
 //=============================================================================================================
 
 void FiffCoordTransOld::mne_print_coord_transform_label(FILE *log, char *label, FiffCoordTransOld *t)
@@ -652,14 +627,12 @@ void FiffCoordTransOld::mne_print_coord_transform_label(FILE *log, char *label, 
     }
 }
 
-
 //=============================================================================================================
 
 void FiffCoordTransOld::mne_print_coord_transform(FILE *log, FiffCoordTransOld *t)
 {
     mne_print_coord_transform_label(log,NULL,t);
 }
-
 
 //=============================================================================================================
 
@@ -670,7 +643,6 @@ FiffCoordTransOld *FiffCoordTransOld::mne_read_transform(const QString &name, in
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
-
 
     FiffCoordTransOld* res = NULL;
     //    fiffFile       in = NULL;
@@ -723,7 +695,6 @@ out : {
     return res;
 }
 
-
 //=============================================================================================================
 
 FiffCoordTransOld *FiffCoordTransOld::mne_read_transform_from_node(FiffStream::SPtr &stream, const FiffDirNode::SPtr &node, int from, int to)
@@ -770,7 +741,6 @@ out : {
     }
 }
 
-
 //=============================================================================================================
 
 FiffCoordTransOld *FiffCoordTransOld::mne_read_mri_transform(const QString &name)
@@ -781,7 +751,6 @@ FiffCoordTransOld *FiffCoordTransOld::mne_read_mri_transform(const QString &name
     return mne_read_transform(name,FIFFV_COORD_MRI,FIFFV_COORD_HEAD);
 }
 
-
 //=============================================================================================================
 
 FiffCoordTransOld *FiffCoordTransOld::mne_read_meas_transform(const QString &name)
@@ -791,7 +760,6 @@ FiffCoordTransOld *FiffCoordTransOld::mne_read_meas_transform(const QString &nam
 {
     return mne_read_transform(name,FIFFV_COORD_DEVICE,FIFFV_COORD_HEAD);
 }
-
 
 //=============================================================================================================
 
@@ -845,14 +813,12 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 FiffCoordTransOld *FiffCoordTransOld::mne_read_FShead2mri_transform(char *name)
 {
     return mne_read_transform_ascii(name,FIFFV_COORD_HEAD,FIFFV_COORD_MRI);
 }
-
 
 //=============================================================================================================
 
@@ -864,7 +830,6 @@ FiffCoordTransOld *FiffCoordTransOld::mne_identity_transform(int from, int to)
     float move[] = { 0.0, 0.0, 0.0 };
     return new FiffCoordTransOld(from,to,rot,move);
 }
-
 
 //=============================================================================================================
 
@@ -918,7 +883,6 @@ FiffCoordTransOld * FiffCoordTransOld::fiff_make_transform_card (int from,int to
 
     return (t);
 }
-
 
 //=============================================================================================================
 
@@ -1047,7 +1011,6 @@ FiffCoordTransOld* FiffCoordTransOld::procrustes_align(int   from_frame,  /* The
         return NULL;
     }
 }
-
 
 //=============================================================================================================
 

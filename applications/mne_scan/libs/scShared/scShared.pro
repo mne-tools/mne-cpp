@@ -118,7 +118,6 @@ HEADERS += \
     Management/pluginscenemanager.h \
     Management/displaymanager.h
 
-
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}

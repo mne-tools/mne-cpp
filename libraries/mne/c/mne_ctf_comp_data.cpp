@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -44,11 +43,9 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_tag.h>
 
-
 #include <QFile>
 
 #include <Eigen/Core>
-
 
 #ifndef TRUE
 #define TRUE 1
@@ -66,12 +63,9 @@
 #define OK 0
 #endif
 
-
 #define MALLOC_31(x,t) (t *)malloc((x)*sizeof(t))
 
-
 #define FREE_31(x) if ((char *)(x) != NULL) free((char *)(x))
-
 
 #define MNE_CTFV_COMP_UNKNOWN -1
 #define MNE_CTFV_COMP_NONE    0
@@ -81,7 +75,6 @@
 #define MNE_CTFV_COMP_G2OI    0x47324f49
 #define MNE_CTFV_COMP_G3OI    0x47334f49
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -89,7 +82,6 @@
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -108,7 +100,6 @@ MneCTFCompData::MneCTFCompData()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -132,7 +123,6 @@ MneCTFCompData::MneCTFCompData(const MneCTFCompData& comp)
     postsel    = new FiffSparseMatrix(*comp.postsel);
 }
 
-
 //=============================================================================================================
 
 MneCTFCompData::~MneCTFCompData()
@@ -147,7 +137,6 @@ MneCTFCompData::~MneCTFCompData()
     FREE_31(postsel_data);
     FREE_31(comp_data);
 }
-
 
 //=============================================================================================================
 

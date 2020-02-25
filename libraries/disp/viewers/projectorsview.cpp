@@ -40,7 +40,6 @@
 
 #include <fiff/fiff_proj.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -50,11 +49,9 @@
 #include <QFrame>
 #include <QSettings>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -62,7 +59,6 @@
 
 using namespace DISPLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -83,7 +79,6 @@ ProjectorsView::ProjectorsView(const QString& sSettingsPath,
     redrawGUI();
 }
 
-
 //=============================================================================================================
 
 ProjectorsView::~ProjectorsView()
@@ -91,14 +86,12 @@ ProjectorsView::~ProjectorsView()
     saveSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 QList<FIFFLIB::FiffProj> ProjectorsView::getProjectors() const
 {
     return m_pProjs;
 }
-
 
 //=============================================================================================================
 
@@ -116,7 +109,6 @@ void ProjectorsView::setProjectors(const QList<FIFFLIB::FiffProj>& projs)
 
     redrawGUI();
 }
-
 
 //=============================================================================================================
 
@@ -169,7 +161,6 @@ void ProjectorsView::redrawGUI()
     onCheckProjStatusChanged();
 }
 
-
 //=============================================================================================================
 
 void ProjectorsView::saveSettings(const QString& settingsPath)
@@ -191,7 +182,6 @@ void ProjectorsView::saveSettings(const QString& settingsPath)
     settings.endGroup();
 }
 
-
 //=============================================================================================================
 
 void ProjectorsView::loadSettings(const QString& settingsPath)
@@ -210,7 +200,6 @@ void ProjectorsView::loadSettings(const QString& settingsPath)
     }
     settings.endGroup();
 }
-
 
 //=============================================================================================================
 
@@ -236,7 +225,6 @@ void ProjectorsView::onEnableDisableAllProj(bool status)
 
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 

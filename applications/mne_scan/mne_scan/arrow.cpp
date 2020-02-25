@@ -43,20 +43,17 @@
 #include <QPen>
 #include <QPainter>
 
-
 //=============================================================================================================
 // CONSTS
 //=============================================================================================================
 
 const qreal Pi = 3.14;
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNESCAN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -75,7 +72,6 @@ Arrow::Arrow(PluginItem *startItem, PluginItem *endItem, SCSHAREDLIB::PluginConn
     setPen(QPen(m_qColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 }
 
-
 //=============================================================================================================
 
 QRectF Arrow::boundingRect() const
@@ -88,7 +84,6 @@ QRectF Arrow::boundingRect() const
         .adjusted(-extra, -extra, extra, extra);
 }
 
-
 //=============================================================================================================
 
 QPainterPath Arrow::shape() const
@@ -98,7 +93,6 @@ QPainterPath Arrow::shape() const
     return path;
 }
 
-
 //=============================================================================================================
 
 void Arrow::updatePosition()
@@ -106,7 +100,6 @@ void Arrow::updatePosition()
     QLineF line(mapFromItem(m_StartItem, 0, 0), mapFromItem(m_EndItem, 0, 0));
     setLine(line);
 }
-
 
 //=============================================================================================================
 
@@ -123,7 +116,6 @@ void Arrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     painter->setBrush(m_qColor);
 
     painter->setRenderHint(QPainter::Antialiasing);
-
 
     QLineF centerLine(m_StartItem->pos(), m_EndItem->pos());
     QPolygonF endPolygon = m_EndItem->polygon();

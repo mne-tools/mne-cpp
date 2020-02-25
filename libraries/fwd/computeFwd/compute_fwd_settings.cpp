@@ -4,26 +4,21 @@
 
 #include <stdio.h>
 
-
 using namespace Eigen;
 using namespace FWDLIB;
-
 
 
 #define X 0
 #define Y 1
 #define Z 2
 
-
 #ifndef PROGRAM_VERSION
 #define PROGRAM_VERSION     "2.10"
 #endif
 
-
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
-
 
 
 
@@ -35,7 +30,6 @@ ComputeFwdSettings::ComputeFwdSettings()
 {
     initMembers();
 }
-
 
 //=============================================================================================================
 
@@ -52,14 +46,12 @@ ComputeFwdSettings::ComputeFwdSettings(int *argc,char **argv)
     checkIntegrity();
 }
 
-
 //=============================================================================================================
 
 ComputeFwdSettings::~ComputeFwdSettings()
 {
     //ToDo Garbage collection
 }
-
 
 //=============================================================================================================
 
@@ -89,7 +81,6 @@ void ComputeFwdSettings::checkIntegrity()
     }
 }
 
-
 //=============================================================================================================
 
 void ComputeFwdSettings::initMembers()
@@ -113,7 +104,6 @@ void ComputeFwdSettings::initMembers()
     use_equiv_eeg = true;     
     use_threads = true;
 }
-
 
 //=============================================================================================================
 
@@ -148,7 +138,6 @@ void ComputeFwdSettings::usage(char *name)
     exit(1);
 }
 
-
 //=============================================================================================================
 
 QString ComputeFwdSettings::build_command_line(QString old, QString new_item)
@@ -161,7 +150,6 @@ QString ComputeFwdSettings::build_command_line(QString old, QString new_item)
     }
     return old;
 }
-
 
 //=============================================================================================================
 
@@ -179,7 +167,6 @@ bool ComputeFwdSettings::check_unrecognized_args(int argc, char **argv)
     }
     return true;
 }
-
 
 //=============================================================================================================
 

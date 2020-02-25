@@ -48,7 +48,6 @@
 #include <deque>
 #include <stdarg.h>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -56,7 +55,6 @@
 using namespace GUSBAMPPLUGIN;
 using namespace Eigen;
 using namespace std;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -101,14 +99,12 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 
 }
 
-
 //=============================================================================================================
 
 GUSBAmpDriver::~GUSBAmpDriver()
 {
     //qDebug() << "GUSBAmpDriver::~GUSBAmpDriver()" << endl;
 }
-
 
 //=============================================================================================================
 
@@ -295,7 +291,6 @@ bool GUSBAmpDriver::initDevice()
     }
 }
 
-
 //=============================================================================================================
 
 bool GUSBAmpDriver::uninitDevice()
@@ -350,7 +345,6 @@ bool GUSBAmpDriver::uninitDevice()
     qDebug() << "Plugin GUSBAmp - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -421,7 +415,6 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
     return true;
 }
 
-
 //=============================================================================================================
 
 bool GUSBAmpDriver::setSerials(vector<QString> &list)
@@ -464,7 +457,6 @@ bool GUSBAmpDriver::setSerials(vector<QString> &list)
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -533,7 +525,6 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
 
 }
 
-
 //=============================================================================================================
 
 bool GUSBAmpDriver::setChannels(vector<int> &list)
@@ -578,14 +569,12 @@ bool GUSBAmpDriver::setChannels(vector<int> &list)
     return true;
 }
 
-
 //=============================================================================================================
 
 vector<int> GUSBAmpDriver::getSizeOfSampleMatrix(void)
 {
     return m_sizeOfMatrix;
 }
-
 
 //=============================================================================================================
 

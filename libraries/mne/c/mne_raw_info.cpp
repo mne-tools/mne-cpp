@@ -48,7 +48,6 @@
 
 
 
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -58,13 +57,10 @@
 #endif
 
 
-
 #define FREE_33(x) if ((char *)(x) != NULL) free((char *)(x))
 
 
-
 #define MALLOC_33(x,t) (t *)malloc((x)*sizeof(t))
-
 
 
 
@@ -76,7 +72,6 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -85,7 +80,6 @@ MneRawInfo::MneRawInfo()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -96,7 +90,6 @@ MneRawInfo::~MneRawInfo()
 //    FREE_33(this->rawDir);
     FREE_33(this->id);
 }
-
 
 //=============================================================================================================
 
@@ -115,7 +108,6 @@ FiffDirNode::SPtr MneRawInfo::find_meas(const FiffDirNode::SPtr &node)
     }
     return (tmp_node);
 }
-
 
 //=============================================================================================================
 
@@ -139,7 +131,6 @@ FiffDirNode::SPtr MneRawInfo::find_meas_info(const FiffDirNode::SPtr &node)
     return empty_node;
 }
 
-
 //=============================================================================================================
 
 FiffDirNode::SPtr MneRawInfo::find_raw(const FiffDirNode::SPtr &node)
@@ -160,7 +151,6 @@ FiffDirNode::SPtr MneRawInfo::find_raw(const FiffDirNode::SPtr &node)
     return raw;
 }
 
-
 //=============================================================================================================
 
 FiffDirNode::SPtr MneRawInfo::find_maxshield(const FiffDirNode::SPtr &node)
@@ -173,7 +163,6 @@ FiffDirNode::SPtr MneRawInfo::find_maxshield(const FiffDirNode::SPtr &node)
         raw = temp[0];
     return (raw);
 }
-
 
 //=============================================================================================================
 
@@ -390,7 +379,6 @@ bad : {
         return (-1);
     }
 }
-
 
 //=============================================================================================================
 

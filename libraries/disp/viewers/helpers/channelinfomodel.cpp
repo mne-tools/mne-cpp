@@ -42,18 +42,15 @@
 
 #include <fiff/fiff_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QVector3D>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -62,7 +59,6 @@
 using namespace DISPLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -75,7 +71,6 @@ ChannelInfoModel::ChannelInfoModel(FiffInfo::SPtr& pFiffInfo, QObject *parent)
     setFiffInfo(m_pFiffInfo);
 }
 
-
 //=============================================================================================================
 
 ChannelInfoModel::ChannelInfoModel(QObject *parent)
@@ -83,7 +78,6 @@ ChannelInfoModel::ChannelInfoModel(QObject *parent)
 , m_pFiffInfo(FiffInfo::SPtr(new FiffInfo))
 {
 }
-
 
 //=============================================================================================================
 
@@ -96,14 +90,12 @@ int ChannelInfoModel::rowCount(const QModelIndex & /*parent*/) const
         return 0;
 }
 
-
 //=============================================================================================================
 
 int ChannelInfoModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 13;
 }
-
 
 //=============================================================================================================
 
@@ -183,7 +175,6 @@ QVariant ChannelInfoModel::headerData(int section, Qt::Orientation orientation, 
 
     return QVariant();
 }
-
 
 //=============================================================================================================
 
@@ -498,7 +489,6 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-
 //=============================================================================================================
 
 bool ChannelInfoModel::insertRows(int position, int span, const QModelIndex & parent)
@@ -509,7 +499,6 @@ bool ChannelInfoModel::insertRows(int position, int span, const QModelIndex & pa
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -522,7 +511,6 @@ bool ChannelInfoModel::removeRows(int position, int span, const QModelIndex & pa
     return true;
 }
 
-
 //=============================================================================================================
 
 Qt::ItemFlags ChannelInfoModel::flags(const QModelIndex & index) const
@@ -530,7 +518,6 @@ Qt::ItemFlags ChannelInfoModel::flags(const QModelIndex & index) const
     Q_UNUSED(index);
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable /*| Qt::ItemIsEditable*/;
 }
-
 
 //=============================================================================================================
 
@@ -542,7 +529,6 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -561,7 +547,6 @@ void ChannelInfoModel::setFiffInfo(FiffInfo::SPtr& pFiffInfo)
     emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
 }
 
-
 //=============================================================================================================
 
 void ChannelInfoModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators)
@@ -574,7 +559,6 @@ void ChannelInfoModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MN
 
     emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
 }
-
 
 //=============================================================================================================
 
@@ -593,7 +577,6 @@ void ChannelInfoModel::layoutChanged(const QMap<QString,QPointF> &layoutMap)
     emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
 }
 
-
 //=============================================================================================================
 
 const QStringList & ChannelInfoModel::getMappedChannelsList()
@@ -602,14 +585,12 @@ const QStringList & ChannelInfoModel::getMappedChannelsList()
     return m_mappedLayoutChNames;
 }
 
-
 //=============================================================================================================
 
 int ChannelInfoModel::getIndexFromOrigChName(QString chName)
 {
     return m_pFiffInfo->ch_names.indexOf(chName);
 }
-
 
 //=============================================================================================================
 
@@ -618,14 +599,12 @@ int ChannelInfoModel::getIndexFromMappedChName(QString chName)
     return m_mappedLayoutChNames.indexOf(chName);
 }
 
-
 //=============================================================================================================
 
 QStringList ChannelInfoModel::getBadChannelList()
 {
     return m_pFiffInfo->bads;
 }
-
 
 //=============================================================================================================
 
@@ -668,7 +647,6 @@ void ChannelInfoModel::mapLayoutToChannels()
 
     emit channelsMappedToLayout(m_mappedLayoutChNames);
 }
-
 
 //=============================================================================================================
 

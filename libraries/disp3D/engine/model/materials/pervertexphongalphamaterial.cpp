@@ -32,13 +32,11 @@
  * @brief    PerVertexPhongAlphaMaterial class definition
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "pervertexphongalphamaterial.h"
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -47,14 +45,12 @@
 #include <Qt3DRender/qshaderprogram.h>
 #include <QUrl>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISP3DLIB;
 using namespace Qt3DRender;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -68,7 +64,6 @@ PerVertexPhongAlphaMaterial::PerVertexPhongAlphaMaterial(bool bUseSortPolicy, QN
     init();
     setShaderCode();
 }
-
 
 //=============================================================================================================
 
@@ -84,6 +79,5 @@ void PerVertexPhongAlphaMaterial::setShaderCode()
     addShaderToRenderPass(QStringLiteral("pVertexGL2RenderPass"), m_pVertexES2Shader);
     addShaderToRenderPass(QStringLiteral("pVertexES2RenderPass"), m_pVertexES2Shader);
 }
-
 
 //=============================================================================================================

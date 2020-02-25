@@ -45,18 +45,15 @@
 #include <mne/mne_bem.h>
 #include <fiff/fiff_ch_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -66,7 +63,6 @@ using namespace FSLIB;
 using namespace MNELIB;
 using namespace DISP3DLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -78,7 +74,6 @@ SensorSetTreeItem::SensorSetTreeItem(int iType, const QString& text)
     initItem();
 }
 
-
 //=============================================================================================================
 
 void SensorSetTreeItem::initItem()
@@ -88,7 +83,6 @@ void SensorSetTreeItem::initItem()
     this->setCheckState(Qt::Checked);
     this->setToolTip("Sensor item");
 }
-
 
 //=============================================================================================================
 
@@ -160,7 +154,6 @@ void SensorSetTreeItem::addData(const MNEBem &tSensor,
     }
 }
 
-
 //=============================================================================================================
 
 void SensorSetTreeItem::setTransform(const Qt3DCore::QTransform& transform)
@@ -169,7 +162,6 @@ void SensorSetTreeItem::setTransform(const Qt3DCore::QTransform& transform)
         m_pRenderable3DEntity->setTransform(transform);
     }
 }
-
 
 //=============================================================================================================
 
@@ -180,7 +172,6 @@ void SensorSetTreeItem::setTransform(const FiffCoordTrans& transform, bool bAppl
     }
 }
 
-
 //=============================================================================================================
 
 void SensorSetTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
@@ -189,7 +180,6 @@ void SensorSetTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
         m_pRenderable3DEntity->applyTransform(transform);
     }
 }
-
 
 //=============================================================================================================
 

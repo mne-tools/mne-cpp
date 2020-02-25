@@ -39,25 +39,21 @@
 #include "abstract3Dtreeitem.h"
 #include "../common/metatreeitem.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <Qt3DExtras/QPhongMaterial>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISP3DLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -70,7 +66,6 @@ Abstract3DTreeItem::Abstract3DTreeItem(QEntity* p3DEntityParent, int iType, cons
 {
     initItem();
 }
-
 
 //=============================================================================================================
 
@@ -169,7 +164,6 @@ void Abstract3DTreeItem::initItem()
                 this, &Abstract3DTreeItem::onCheckStateChanged);
 }
 
-
 //=============================================================================================================
 
 void Abstract3DTreeItem::setData(const QVariant& value, int role)
@@ -184,14 +178,12 @@ void Abstract3DTreeItem::setData(const QVariant& value, int role)
     }
 }
 
-
 //=============================================================================================================
 
 int Abstract3DTreeItem::type() const
 {
     return m_iType;
 }
-
 
 //=============================================================================================================
 
@@ -212,7 +204,6 @@ QList<QStandardItem*> Abstract3DTreeItem::findChildren(int type)
     return itemList;
 }
 
-
 //=============================================================================================================
 
 QList<QStandardItem*> Abstract3DTreeItem::findChildren(const QString& text)
@@ -232,7 +223,6 @@ QList<QStandardItem*> Abstract3DTreeItem::findChildren(const QString& text)
     return itemList;
 }
 
-
 //=============================================================================================================
 
 Abstract3DTreeItem& Abstract3DTreeItem::operator<<(Abstract3DTreeItem* newItem)
@@ -242,7 +232,6 @@ Abstract3DTreeItem& Abstract3DTreeItem::operator<<(Abstract3DTreeItem* newItem)
     return *this;
 }
 
-
 //=============================================================================================================
 
 Abstract3DTreeItem& Abstract3DTreeItem::operator<<(Abstract3DTreeItem& newItem)
@@ -251,7 +240,6 @@ Abstract3DTreeItem& Abstract3DTreeItem::operator<<(Abstract3DTreeItem& newItem)
 
     return *this;
 }
-
 
 //=============================================================================================================
 
@@ -269,7 +257,6 @@ Eigen::MatrixX4f Abstract3DTreeItem::createVertColor(int numVert, const QColor& 
     return matColor;
 }
 
-
 //=============================================================================================================
 
 void Abstract3DTreeItem::setAlpha(float fAlpha)
@@ -279,7 +266,6 @@ void Abstract3DTreeItem::setAlpha(float fAlpha)
 
     onAlphaChanged(data);
 }
-
 
 //=============================================================================================================
 
@@ -294,7 +280,6 @@ void Abstract3DTreeItem::onCheckStateChanged(const Qt::CheckState& checkState)
     this->setVisible(checkState == Qt::Unchecked ? false : true);
 }
 
-
 //=============================================================================================================
 
 void Abstract3DTreeItem::onTranslationXChanged(const QVariant& fTransX)
@@ -305,7 +290,6 @@ void Abstract3DTreeItem::onTranslationXChanged(const QVariant& fTransX)
         this->setPosition(position);
     }
 }
-
 
 //=============================================================================================================
 
@@ -318,7 +302,6 @@ void Abstract3DTreeItem::onTranslationYChanged(const QVariant& fTransY)
     }
 }
 
-
 //=============================================================================================================
 
 void Abstract3DTreeItem::onTranslationZChanged(const QVariant& fTransZ)
@@ -330,7 +313,6 @@ void Abstract3DTreeItem::onTranslationZChanged(const QVariant& fTransZ)
     }
 }
 
-
 //=============================================================================================================
 
 void Abstract3DTreeItem::onScaleChanged(const QVariant& fScale)
@@ -340,7 +322,6 @@ void Abstract3DTreeItem::onScaleChanged(const QVariant& fScale)
     }
 }
 
-
 //=============================================================================================================
 
 void Abstract3DTreeItem::onColorChanged(const QVariant& color)
@@ -348,7 +329,6 @@ void Abstract3DTreeItem::onColorChanged(const QVariant& color)
     //ka = ambient for standard QT materials, overlaod onColorchanged() if you use your own materials (i.e. fssurfacetreeitem)
     this->setMaterialParameter(color, "ka");
 }
-
 
 //=============================================================================================================
 

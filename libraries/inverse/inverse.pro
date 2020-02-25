@@ -91,7 +91,6 @@ SOURCES += \
     hpiFit/hpifit.cpp \
     hpiFit/hpifitdata.cpp
 
-
 HEADERS +=\
     inverse_global.h \
     IInverseAlgorithm.h \

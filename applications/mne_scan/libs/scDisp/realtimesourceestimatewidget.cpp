@@ -47,7 +47,6 @@
 #include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
 #include <disp3D/viewers/sourceestimateview.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -55,13 +54,11 @@
 #include <QGridLayout>
 #include <QVector3D>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -72,7 +69,6 @@ using namespace DISP3DLIB;
 using namespace DISPLIB;
 using namespace SCMEASLIB;
 using namespace MNELIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -110,7 +106,6 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
     getData();
 }
 
-
 //=============================================================================================================
 
 RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
@@ -120,14 +115,12 @@ RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
     }
 }
 
-
 //=============================================================================================================
 
 void RealTimeSourceEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     getData();
 }
-
 
 //=============================================================================================================
 
@@ -168,14 +161,12 @@ void RealTimeSourceEstimateWidget::getData()
     }
 }
 
-
 //=============================================================================================================
 
 void RealTimeSourceEstimateWidget::init()
 {
     m_bInitialized = true;
 }
-
 
 //=============================================================================================================
 

@@ -40,7 +40,6 @@
 
 #include "mne_sourceestimate.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -50,7 +49,6 @@
 #include <QSharedPointer>
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -58,7 +56,6 @@
 using namespace MNELIB;
 using namespace FSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -69,7 +66,6 @@ MNESourceEstimate::MNESourceEstimate()
 , tstep(-1)
 {
 }
-
 
 //=============================================================================================================
 
@@ -82,7 +78,6 @@ MNESourceEstimate::MNESourceEstimate(const MatrixXd &p_sol, const VectorXi &p_ve
     this->update_times();
 }
 
-
 //=============================================================================================================
 
 MNESourceEstimate::MNESourceEstimate(const MNESourceEstimate& p_SourceEstimate)
@@ -94,7 +89,6 @@ MNESourceEstimate::MNESourceEstimate(const MNESourceEstimate& p_SourceEstimate)
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -109,7 +103,6 @@ MNESourceEstimate::MNESourceEstimate(QIODevice &p_IODevice)
     }
 }
 
-
 //=============================================================================================================
 
 void MNESourceEstimate::clear()
@@ -120,7 +113,6 @@ void MNESourceEstimate::clear()
     tmin = 0;
     tstep = 0;
 }
-
 
 //=============================================================================================================
 
@@ -140,7 +132,6 @@ MNESourceEstimate MNESourceEstimate::reduce(qint32 start, qint32 n)
 
     return p_sourceEstimateReduced;
 }
-
 
 //=============================================================================================================
 
@@ -199,7 +190,6 @@ bool MNESourceEstimate::read(QIODevice &p_IODevice, MNESourceEstimate& p_stc)
     return true;
 }
 
-
 //=============================================================================================================
 
 bool MNESourceEstimate::write(QIODevice &p_IODevice)
@@ -247,7 +237,6 @@ bool MNESourceEstimate::write(QIODevice &p_IODevice)
     return true;
 }
 
-
 //=============================================================================================================
 
 void MNESourceEstimate::update_times()
@@ -262,7 +251,6 @@ void MNESourceEstimate::update_times()
     else
         this->times = RowVectorXf();
 }
-
 
 //=============================================================================================================
 
@@ -280,14 +268,12 @@ MNESourceEstimate& MNESourceEstimate::operator= (const MNESourceEstimate &rhs)
     return *this;
 }
 
-
 //=============================================================================================================
 
 int MNESourceEstimate::samples() const
 {
     return data.cols();
 }
-
 
 //=============================================================================================================
 

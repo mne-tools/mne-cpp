@@ -47,7 +47,6 @@
 
 #include "../eegosports.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -58,13 +57,11 @@
 #include <QDate>
 #include <QMessageBox>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace EEGOSPORTSPLUGIN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -99,14 +96,12 @@ EEGoSportsImpedanceWidget::EEGoSportsImpedanceWidget(EEGoSports* pEEGoSports, QW
 
 }
 
-
 //=============================================================================================================
 
 EEGoSportsImpedanceWidget::~EEGoSportsImpedanceWidget()
 {
     delete m_pUi;
 }
-
 
 //=============================================================================================================
 
@@ -177,7 +172,6 @@ void EEGoSportsImpedanceWidget::updateGraphicScene(const VectorXd& matValue)
     m_qGScene->update(m_qGScene->itemsBoundingRect());
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsImpedanceWidget::initGraphicScene()
@@ -213,7 +207,6 @@ void EEGoSportsImpedanceWidget::initGraphicScene()
     m_pUi->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsImpedanceWidget::addElectrodeItem(const QString& electrodeName, const QVector2D& position)
@@ -222,7 +215,6 @@ void EEGoSportsImpedanceWidget::addElectrodeItem(const QString& electrodeName, c
     item->setPos(QPointF(position.x(), position.y()));
     m_qGScene->addItem(item);
 }
-
 
 //=============================================================================================================
 
@@ -243,7 +235,6 @@ void EEGoSportsImpedanceWidget::startImpedanceMeasurement()
     }
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsImpedanceWidget::stopImpedanceMeasurement()
@@ -258,7 +249,6 @@ void EEGoSportsImpedanceWidget::stopImpedanceMeasurement()
     else
         m_pEEGoSports->m_bCheckImpedances = true;
 }
-
 
 //=============================================================================================================
 
@@ -300,7 +290,6 @@ void EEGoSportsImpedanceWidget::takeScreenshot()
     }
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsImpedanceWidget::loadLayout()
@@ -339,7 +328,6 @@ void EEGoSportsImpedanceWidget::loadLayout()
     m_pUi->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsImpedanceWidget::closeEvent(QCloseEvent *event)
@@ -351,14 +339,12 @@ void EEGoSportsImpedanceWidget::closeEvent(QCloseEvent *event)
         stopImpedanceMeasurement();
 }
 
-
 //=============================================================================================================
 
 bool EEGoSportsImpedanceWidget::compareChannelIndex(EEGoSportsElectrodeItem* a, EEGoSportsElectrodeItem* b)
 {
     return a->getChannelIndex() < b->getChannelIndex();
 }
-
 
 //=============================================================================================================
 
@@ -393,7 +379,6 @@ void EEGoSportsImpedanceWidget::saveToFile()
 
     outputFileStream.close();
 }
-
 
 //=============================================================================================================
 

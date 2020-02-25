@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -45,7 +44,6 @@
 #include <fiff/fiff_types.h>
 
 #include <iostream>
-
 
 #ifndef TRUE
 #define TRUE 1
@@ -63,17 +61,13 @@
 #define OK 0
 #endif
 
-
 #define X_60 0
 #define Y_60 1
 #define Z_60 2
 
-
 #define MALLOC_60(x,t) (t *)malloc((x)*sizeof(t))
 
-
 #define ALLOC_CMATRIX_60(x,y) mne_cmatrix_60((x),(y))
-
 
 
 #define FREE_60(x) if ((char *)(x) != NULL) free((char *)(x))
@@ -87,7 +81,6 @@ void mne_free_cmatrix_60 (float **m)
         FREE_60(m);
     }
 }
-
 
 static void matrix_error_60 (int kind, int nr, int nc)
 {
@@ -105,7 +98,6 @@ static void matrix_error_60 (int kind, int nr, int nc)
     exit(1);
 }
 
-
 float **mne_cmatrix_60 (int nr,int nc)
 {
     int i;
@@ -122,7 +114,6 @@ float **mne_cmatrix_60 (int nr,int nc)
     return m;
 }
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -131,7 +122,6 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace FWDLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -151,7 +141,6 @@ FwdCompData::FwdCompData()
 
 }
 
-
 //=============================================================================================================
 
 FwdCompData::~FwdCompData()
@@ -168,7 +157,6 @@ FwdCompData::~FwdCompData()
         this->client_free(this->client);
 
 }
-
 
 //=============================================================================================================
 
@@ -209,7 +197,6 @@ int FwdCompData::fwd_comp_field(float *rd, float *Q, FwdCoilSet *coils, float *r
     return MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil);
 }
 
-
 //=============================================================================================================
 
 void FwdCompData::fwd_free_comp_data(void *d)
@@ -233,7 +220,6 @@ void FwdCompData::fwd_free_comp_data(void *d)
         delete(comp);
     return;
 }
-
 
 //=============================================================================================================
 
@@ -282,7 +268,6 @@ int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set,
     return res;
 }
 
-
 //=============================================================================================================
 
 FwdCompData *FwdCompData::fwd_make_comp_data(MneCTFCompDataSet *set,
@@ -328,7 +313,6 @@ FwdCompData *FwdCompData::fwd_make_comp_data(MneCTFCompDataSet *set,
     }
 }
 
-
 //=============================================================================================================
 
 int FwdCompData::fwd_comp_field_vec(float *rd, FwdCoilSet *coils, float **res, void *client)
@@ -372,7 +356,6 @@ int FwdCompData::fwd_comp_field_vec(float *rd, FwdCoilSet *coils, float **res, v
     }
     return OK;
 }
-
 
 //=============================================================================================================
 

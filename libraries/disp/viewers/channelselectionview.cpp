@@ -50,7 +50,6 @@
 
 #include <fiff/fiff.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -65,11 +64,9 @@
 #include <QDesktopWidget>
 #include <QKeyEvent>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -78,7 +75,6 @@
 using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -107,7 +103,6 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
     setCurrentlyMappedFiffChannels(m_pChannelInfoModel->getMappedChannelsList());
 }
 
-
 //=============================================================================================================
 
 ChannelSelectionView::~ChannelSelectionView()
@@ -116,7 +111,6 @@ ChannelSelectionView::~ChannelSelectionView()
 
     delete ui;
 }
-
 
 //=============================================================================================================
 
@@ -136,7 +130,6 @@ void ChannelSelectionView::initListWidgets()
                 this, &ChannelSelectionView::updateDataView);
 }
 
-
 //=============================================================================================================
 
 void ChannelSelectionView::initSelectionSceneView()
@@ -148,7 +141,6 @@ void ChannelSelectionView::initSelectionSceneView()
     connect(m_pSelectionScene, &QGraphicsScene::selectionChanged,
                 this, &ChannelSelectionView::updateUserDefinedChannelsList);
 }
-
 
 //=============================================================================================================
 
@@ -179,7 +171,6 @@ void ChannelSelectionView::initComboBoxes()
     loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/selectionGroups/"));
 }
 
-
 //=============================================================================================================
 
 void ChannelSelectionView::initButtons()
@@ -194,7 +185,6 @@ void ChannelSelectionView::initButtons()
                 this, &ChannelSelectionView::onBtnAddToSelectionGroups);
 }
 
-
 //=============================================================================================================
 
 void ChannelSelectionView::initCheckBoxes()
@@ -202,7 +192,6 @@ void ChannelSelectionView::initCheckBoxes()
     connect(ui->m_checkBox_showBadChannelsAsRed, &QCheckBox::clicked,
                 this, &ChannelSelectionView::updateBadChannels);
 }
-
 
 //=============================================================================================================
 
@@ -234,7 +223,6 @@ void ChannelSelectionView::setCurrentlyMappedFiffChannels(const QStringList &map
     updateSelectionGroupsList(getItemForChName(ui->m_listWidget_selectionGroups, "All"), new QListWidgetItem());
 }
 
-
 //=============================================================================================================
 
 void ChannelSelectionView::highlightChannels(QModelIndexList channelIndexList)
@@ -258,7 +246,6 @@ void ChannelSelectionView::highlightChannels(QModelIndexList channelIndexList)
     m_pSelectionScene->update();
 }
 
-
 //=============================================================================================================
 
 void ChannelSelectionView::selectChannels(QStringList channelList)
@@ -275,7 +262,6 @@ void ChannelSelectionView::selectChannels(QStringList channelList)
 
     m_pSelectionScene->update();
 }
-
 
 //=============================================================================================================
 
@@ -299,7 +285,6 @@ QStringList ChannelSelectionView::getSelectedChannels()
     return selectedChannels;
 }
 
-
 //=============================================================================================================
 
 QListWidgetItem* ChannelSelectionView::getItemForChName(QListWidget* listWidget,
@@ -312,14 +297,12 @@ QListWidgetItem* ChannelSelectionView::getItemForChName(QListWidget* listWidget,
     return new QListWidgetItem();
 }
 
-
 //=============================================================================================================
 
 const QMap<QString,QPointF>& ChannelSelectionView::getLayoutMap()
 {
     return m_layoutMap;
 }
-
 
 //=============================================================================================================
 
@@ -330,14 +313,12 @@ void ChannelSelectionView::newFiffFileLoaded(QSharedPointer<FiffInfo> &pFiffInfo
     loadLayout(ui->m_comboBox_layoutFile->currentText());
 }
 
-
 //=============================================================================================================
 
 QString ChannelSelectionView::getCurrentLayoutFile()
 {
     return ui->m_comboBox_layoutFile->currentText();
 }
-
 
 //=============================================================================================================
 
@@ -347,7 +328,6 @@ void ChannelSelectionView::setCurrentLayoutFile(QString currentLayoutFile)
 
     updateBadChannels();
 }
-
 
 //=============================================================================================================
 
@@ -375,7 +355,6 @@ void ChannelSelectionView::updateBadChannels()
 
     updateSceneItems();
 }
-
 
 //=============================================================================================================
 
@@ -423,7 +402,6 @@ void ChannelSelectionView::updateDataView()
     }
 }
 
-
 //=============================================================================================================
 
 void ChannelSelectionView::saveSettings(const QString& settingsPath)
@@ -437,7 +415,6 @@ void ChannelSelectionView::saveSettings(const QString& settingsPath)
     settings.setValue(settingsPath + QString("/selectedLayoutFile"), getCurrentLayoutFile());
     settings.setValue(settingsPath + QString("/channelSelectionViewPos"), this->pos());
 }
-
 
 //=============================================================================================================
 
@@ -460,7 +437,6 @@ void ChannelSelectionView::loadSettings(const QString& settingsPath)
         move(pos);
     }
 }
-
 
 //=============================================================================================================
 
@@ -541,7 +517,6 @@ bool ChannelSelectionView::loadLayout(QString path)
     return state;
 }
 
-
 //=============================================================================================================
 
 bool ChannelSelectionView::loadSelectionGroups(QString path)
@@ -603,7 +578,6 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
     return state;
 }
 
-
 //=============================================================================================================
 
 void ChannelSelectionView::cleanUpMEGChannels()
@@ -630,7 +604,6 @@ void ChannelSelectionView::cleanUpMEGChannels()
     }
 }
 
-
 //=============================================================================================================
 
 void ChannelSelectionView::updateSelectionGroupsList(QListWidgetItem* current, QListWidgetItem* previous)
@@ -656,7 +629,6 @@ void ChannelSelectionView::updateSelectionGroupsList(QListWidgetItem* current, Q
     updateDataView();
 }
 
-
 //=============================================================================================================
 
 void ChannelSelectionView::updateSceneItems()
@@ -668,7 +640,6 @@ void ChannelSelectionView::updateSceneItems()
 
     m_pSelectionScene->hideItems(visibleItems);
 }
-
 
 //=============================================================================================================
 
@@ -688,7 +659,6 @@ void ChannelSelectionView::updateUserDefinedChannelsList()
     updateDataView();
 }
 
-
 //=============================================================================================================
 
 void ChannelSelectionView::onBtnLoadUserSelection()
@@ -703,7 +673,6 @@ void ChannelSelectionView::onBtnLoadUserSelection()
 
     loadSelectionGroups(path);
 }
-
 
 //=============================================================================================================
 
@@ -727,7 +696,6 @@ void ChannelSelectionView::onBtnSaveUserSelection()
     }
 }
 
-
 //=============================================================================================================
 
 void ChannelSelectionView::onBtnAddToSelectionGroups()
@@ -740,7 +708,6 @@ void ChannelSelectionView::onBtnAddToSelectionGroups()
     ui->m_listWidget_selectionGroups->insertItem(ui->m_listWidget_selectionGroups->count(), ui->m_lineEdit_selectionGroupName->text());
 }
 
-
 //=============================================================================================================
 
 void ChannelSelectionView::onComboBoxLayoutChanged()
@@ -749,7 +716,6 @@ void ChannelSelectionView::onComboBoxLayoutChanged()
     loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/2DLayouts/"));
     updateBadChannels();
 }
-
 
 //=============================================================================================================
 
@@ -760,7 +726,6 @@ void ChannelSelectionView::resizeEvent(QResizeEvent* event)
     //Fit scene in view
     //ui->m_graphicsView_layoutPlot->fitInView(m_pSelectionScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
-
 
 //=============================================================================================================
 

@@ -33,7 +33,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -48,7 +47,6 @@
 
 #include <mne/mne_bem.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -57,13 +55,11 @@
 #include <QGeometryRenderer>
 #include <Qt3DCore/QTransform>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -74,11 +70,9 @@ using namespace FIFFLIB;
 using namespace DISP3DLIB;
 using namespace MNELIB;
 
-
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -95,14 +89,12 @@ SensorDataTreeItem::SensorDataTreeItem(int iType,
     initItem();
 }
 
-
 //=============================================================================================================
 
 SensorDataTreeItem::~SensorDataTreeItem()
 {
     m_pSensorRtDataWorkController->deleteLater();
 }
-
 
 //=============================================================================================================
 
@@ -213,7 +205,6 @@ void SensorDataTreeItem::initData(const MNEBemSurface &bemSurface,
     m_bIsDataInit = true;
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::addData(const MatrixXd &tSensorData)
@@ -266,7 +257,6 @@ void SensorDataTreeItem::addData(const MatrixXd &tSensorData)
     }
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::setLoopState(bool bState)
@@ -282,7 +272,6 @@ void SensorDataTreeItem::setLoopState(bool bState)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -300,7 +289,6 @@ void SensorDataTreeItem::setStreamingState(bool bState)
     }
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::setTimeInterval(int iMSec)
@@ -316,7 +304,6 @@ void SensorDataTreeItem::setTimeInterval(int iMSec)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -334,7 +321,6 @@ void SensorDataTreeItem::setNumberAverages(int iNumberAverages)
     }
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::setColormapType(const QString& sColormap)
@@ -350,7 +336,6 @@ void SensorDataTreeItem::setColormapType(const QString& sColormap)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -371,7 +356,6 @@ void SensorDataTreeItem::setThresholds(const QVector3D& vecThresholds)
     }
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::setCancelDistance(double dCancelDist)
@@ -387,7 +371,6 @@ void SensorDataTreeItem::setCancelDistance(double dCancelDist)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -405,7 +388,6 @@ void SensorDataTreeItem::setInterpolationFunction(const QString &sInterpolationF
     }
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::setSFreq(const double dSFreq)
@@ -414,7 +396,6 @@ void SensorDataTreeItem::setSFreq(const double dSFreq)
         m_pSensorRtDataWorkController->setSFreq(dSFreq);
     }
 }
-
 
 //=============================================================================================================
 
@@ -432,7 +413,6 @@ void SensorDataTreeItem::setBadChannels(const FIFFLIB::FiffInfo &info)
     }
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::setTransform(const Qt3DCore::QTransform& transform)
@@ -445,7 +425,6 @@ void SensorDataTreeItem::setTransform(const Qt3DCore::QTransform& transform)
         m_pInterpolationItemCPU->setTransform(transform);
     }
 }
-
 
 //=============================================================================================================
 
@@ -460,7 +439,6 @@ void SensorDataTreeItem::setTransform(const FiffCoordTrans& transform, bool bApp
     }
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
@@ -474,7 +452,6 @@ void SensorDataTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
     }
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::applyTransform(const FiffCoordTrans& transform, bool bApplyInverse)
@@ -487,7 +464,6 @@ void SensorDataTreeItem::applyTransform(const FiffCoordTrans& transform, bool bA
         m_pInterpolationItemCPU->applyTransform(transform, bApplyInverse);
     }
 }
-
 
 //=============================================================================================================
 
@@ -586,7 +562,6 @@ void SensorDataTreeItem::initItem()
             this, &SensorDataTreeItem::onInterpolationFunctionChanged);
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::onNewInterpolationMatrixAvailable(QSharedPointer<SparseMatrix<float> > pMatInterpolationMatrixLeftHemi)
@@ -596,7 +571,6 @@ void SensorDataTreeItem::onNewInterpolationMatrixAvailable(QSharedPointer<Sparse
         m_pInterpolationItemGPU->setInterpolationMatrix(pMatInterpolationMatrixLeftHemi);
     }
 }
-
 
 //=============================================================================================================
 
@@ -608,7 +582,6 @@ void SensorDataTreeItem::onNewRtRawDataAvailable(const VectorXd &vecDataVector)
     }
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::onNewRtSmoothedDataAvailable(const MatrixX4f &matColorMatrix)
@@ -618,7 +591,6 @@ void SensorDataTreeItem::onNewRtSmoothedDataAvailable(const MatrixX4f &matColorM
         m_pInterpolationItemCPU->setVertColor(matColorMatrix);
     }
 }
-
 
 //=============================================================================================================
 
@@ -632,7 +604,6 @@ void SensorDataTreeItem::onStreamingStateChanged(const Qt::CheckState &checkStat
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -651,7 +622,6 @@ void SensorDataTreeItem::onColormapTypeChanged(const QVariant &sColormapType)
     }
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::onTimeIntervalChanged(const QVariant &iMSec)
@@ -662,7 +632,6 @@ void SensorDataTreeItem::onTimeIntervalChanged(const QVariant &iMSec)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -681,7 +650,6 @@ void SensorDataTreeItem::onDataThresholdChanged(const QVariant &vecThresholds)
     }
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::onLoopStateChanged(const Qt::CheckState &checkState)
@@ -695,7 +663,6 @@ void SensorDataTreeItem::onLoopStateChanged(const Qt::CheckState &checkState)
     }
 }
 
-
 //=============================================================================================================
 
 void SensorDataTreeItem::onNumberAveragesChanged(const QVariant &iNumAvr)
@@ -706,7 +673,6 @@ void SensorDataTreeItem::onNumberAveragesChanged(const QVariant &iNumAvr)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -719,7 +685,6 @@ void SensorDataTreeItem::onCancelDistanceChanged(const QVariant &dCancelDist)
         }
     }
 }
-
 
 //=============================================================================================================
 

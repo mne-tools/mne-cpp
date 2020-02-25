@@ -40,14 +40,12 @@
 
 #include "eegosportsimpedancescene.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace EEGOSPORTSPLUGIN;
 using namespace std;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -61,7 +59,6 @@ EEGoSportsImpedanceScene::EEGoSportsImpedanceScene(QGraphicsView* view, QObject*
 
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsImpedanceScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
@@ -71,7 +68,6 @@ void EEGoSportsImpedanceScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
     QGraphicsScene::mousePressEvent(event);
 }
-
 
 //=============================================================================================================
 
@@ -91,7 +87,6 @@ void EEGoSportsImpedanceScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     QGraphicsScene::mouseMoveEvent(event);
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsImpedanceScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
@@ -101,7 +96,6 @@ void EEGoSportsImpedanceScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event
 
     QGraphicsScene::mouseReleaseEvent(event);
 }
-
 
 //=============================================================================================================
 

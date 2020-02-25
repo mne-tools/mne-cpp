@@ -40,13 +40,11 @@
 #include "imagesc.h"
 #include "helpers/colormap.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QPainter>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -54,7 +52,6 @@
 
 using namespace DISPLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -68,7 +65,6 @@ ImageSc::ImageSc(QWidget *parent)
     init();
 }
 
-
 //=============================================================================================================
 
 ImageSc::ImageSc(MatrixXd &p_dMat, QWidget *parent)
@@ -79,7 +75,6 @@ ImageSc::ImageSc(MatrixXd &p_dMat, QWidget *parent)
     init();
     updateData(p_dMat);
 }
-
 
 //=============================================================================================================
 
@@ -92,7 +87,6 @@ ImageSc::ImageSc(MatrixXf &p_fMat, QWidget *parent)
     updateData(p_fMat);
 }
 
-
 //=============================================================================================================
 
 ImageSc::ImageSc(MatrixXi &p_iMat, QWidget *parent)
@@ -104,7 +98,6 @@ ImageSc::ImageSc(MatrixXi &p_iMat, QWidget *parent)
     updateData(p_iMat);
 }
 
-
 //=============================================================================================================
 
 ImageSc::~ImageSc()
@@ -114,7 +107,6 @@ ImageSc::~ImageSc()
     if(m_pPixmapColorbar)
         delete m_pPixmapColorbar;
 }
-
 
 //=============================================================================================================
 
@@ -139,7 +131,6 @@ void ImageSc::init()
     m_iColorbarGradSteps = 200;
 }
 
-
 //=============================================================================================================
 
 void ImageSc::updateData(MatrixXd &p_dMat)
@@ -160,7 +151,6 @@ void ImageSc::updateData(MatrixXd &p_dMat)
     }
 }
 
-
 //=============================================================================================================
 
 void ImageSc::updateData(MatrixXf &p_fMat)
@@ -169,7 +159,6 @@ void ImageSc::updateData(MatrixXf &p_fMat)
     updateData(t_dMat);
 }
 
-
 //=============================================================================================================
 
 void ImageSc::updateData(MatrixXi &p_iMat)
@@ -177,7 +166,6 @@ void ImageSc::updateData(MatrixXi &p_iMat)
     MatrixXd t_dMat = p_iMat.cast<double>();
     updateData(t_dMat);
 }
-
 
 //=============================================================================================================
 
@@ -218,7 +206,6 @@ void ImageSc::updateMaps()
         }
         m_pPixmapColorbar = new QPixmap(QPixmap::fromImage(t_qImageColorbar));
 
-
         // --Scale Values--
         m_qVecScaleValues.clear();
 
@@ -251,7 +238,6 @@ void ImageSc::updateMaps()
     }
 }
 
-
 //=============================================================================================================
 
 void ImageSc::setColorMap(const QString &p_sColorMap)
@@ -260,7 +246,6 @@ void ImageSc::setColorMap(const QString &p_sColorMap)
 
     updateMaps();
 }
-
 
 //=============================================================================================================
 

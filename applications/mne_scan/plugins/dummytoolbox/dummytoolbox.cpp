@@ -40,7 +40,6 @@
 
 #include "dummytoolbox.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -50,7 +49,6 @@ using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace IOBUFFER;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -71,7 +69,6 @@ DummyToolbox::DummyToolbox()
     addPluginAction(m_pActionShowYourWidget);
 }
 
-
 //=============================================================================================================
 
 DummyToolbox::~DummyToolbox()
@@ -80,7 +77,6 @@ DummyToolbox::~DummyToolbox()
         stop();
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> DummyToolbox::clone() const
@@ -88,7 +84,6 @@ QSharedPointer<IPlugin> DummyToolbox::clone() const
     QSharedPointer<DummyToolbox> pDummyToolboxClone(new DummyToolbox);
     return pDummyToolboxClone;
 }
-
 
 //=============================================================================================================
 
@@ -109,14 +104,12 @@ void DummyToolbox::init()
         m_pDummyBuffer = CircularMatrixBuffer<double>::SPtr();
 }
 
-
 //=============================================================================================================
 
 void DummyToolbox::unload()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -134,7 +127,6 @@ bool DummyToolbox::start()
     return true;
 }
 
-
 //=============================================================================================================
 
 bool DummyToolbox::stop()
@@ -149,14 +141,12 @@ bool DummyToolbox::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType DummyToolbox::getType() const
 {
     return _IAlgorithm;
 }
-
 
 //=============================================================================================================
 
@@ -165,7 +155,6 @@ QString DummyToolbox::getName() const
     return "Dummy Toolbox";
 }
 
-
 //=============================================================================================================
 
 QWidget* DummyToolbox::setupWidget()
@@ -173,7 +162,6 @@ QWidget* DummyToolbox::setupWidget()
     DummySetupWidget* setupWidget = new DummySetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
-
 
 //=============================================================================================================
 
@@ -207,7 +195,6 @@ void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 }
 
 
-
 //=============================================================================================================
 
 void DummyToolbox::run()
@@ -230,7 +217,6 @@ void DummyToolbox::run()
         m_pDummyOutput->data()->setValue(t_mat);
     }
 }
-
 
 //=============================================================================================================
 

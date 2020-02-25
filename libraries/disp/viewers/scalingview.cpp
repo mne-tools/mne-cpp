@@ -40,7 +40,6 @@
 
 #include <fiff/fiff_constants.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,11 +50,9 @@
 #include <QSlider>
 #include <QSettings>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -63,7 +60,6 @@
 
 using namespace DISPLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -106,7 +102,6 @@ ScalingView::ScalingView(const QString& sSettingsPath,
     redrawGUI();
 }
 
-
 //=============================================================================================================
 
 ScalingView::~ScalingView()
@@ -114,14 +109,12 @@ ScalingView::~ScalingView()
     saveSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 QMap<qint32,float> ScalingView::getScaleMap() const
 {
     return m_qMapChScaling;
 }
-
 
 //=============================================================================================================
 
@@ -131,7 +124,6 @@ void ScalingView::setScaleMap(const QMap<qint32,float>& qMapChScaling)
 
     redrawGUI();
 }
-
 
 //=============================================================================================================
 
@@ -307,7 +299,6 @@ void ScalingView::redrawGUI()
                 this,&ScalingView::onUpdateSliderScaling);
         t_pGridLayout->addWidget(t_pHorizontalSlider,i+1,1,1,1);
 
-
         i+=2;
     }
 
@@ -348,7 +339,6 @@ void ScalingView::redrawGUI()
     this->setLayout(t_pGridLayout);
 }
 
-
 //=============================================================================================================
 
 void ScalingView::saveSettings(const QString& settingsPath)
@@ -384,7 +374,6 @@ void ScalingView::saveSettings(const QString& settingsPath)
     }
 }
 
-
 //=============================================================================================================
 
 void ScalingView::loadSettings(const QString& settingsPath)
@@ -413,7 +402,6 @@ void ScalingView::loadSettings(const QString& settingsPath)
     val = settings.value(settingsPath + QString("/scaleMISC"), 1e-3f).toFloat();
     m_qMapChScaling.insert(FIFFV_MISC_CH, val);
 }
-
 
 //=============================================================================================================
 
@@ -481,7 +469,6 @@ void ScalingView::onUpdateSpinBoxScaling(double value)
 
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 

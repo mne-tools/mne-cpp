@@ -40,7 +40,6 @@
 
 #include "ui_fiffrawviewsettings.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -49,18 +48,15 @@
 #include <QSettings>
 #include <QDebug>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -82,14 +78,12 @@ FiffRawViewSettings::FiffRawViewSettings(const QString &sSettingsPath,
     loadSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 FiffRawViewSettings::~FiffRawViewSettings()
 {
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 
@@ -152,7 +146,6 @@ void FiffRawViewSettings::setWidgetList(const QStringList& lVisibleWidgets)
     this->adjustSize();
 }
 
-
 //=============================================================================================================
 
 void FiffRawViewSettings::setWindowSize(int windowSize)
@@ -161,7 +154,6 @@ void FiffRawViewSettings::setWindowSize(int windowSize)
 
     timeWindowChanged(windowSize);
 }
-
 
 //=============================================================================================================
 
@@ -172,7 +164,6 @@ void FiffRawViewSettings::setZoom(double zoomFactor)
     zoomChanged(zoomFactor);
 }
 
-
 //=============================================================================================================
 
 int FiffRawViewSettings::getDistanceTimeSpacer()
@@ -180,14 +171,12 @@ int FiffRawViewSettings::getDistanceTimeSpacer()
     return ui->m_comboBox_distaceTimeSpacer->currentText().toInt();
 }
 
-
 //=============================================================================================================
 
 void FiffRawViewSettings::setDistanceTimeSpacer(int value)
 {
     ui->m_comboBox_distaceTimeSpacer->setCurrentText(QString::number(value));
 }
-
 
 //=============================================================================================================
 
@@ -198,7 +187,6 @@ void FiffRawViewSettings::setBackgroundColor(const QColor& backgroundColor)
     m_colCurrentBackgroundColor = backgroundColor;
 }
 
-
 //=============================================================================================================
 
 void FiffRawViewSettings::setSignalColor(const QColor& signalColor)
@@ -208,14 +196,12 @@ void FiffRawViewSettings::setSignalColor(const QColor& signalColor)
     m_colCurrentSignalColor = signalColor;
 }
 
-
 //=============================================================================================================
 
 const QColor& FiffRawViewSettings::getSignalColor()
 {
     return m_colCurrentSignalColor;
 }
-
 
 //=============================================================================================================
 
@@ -224,7 +210,6 @@ const QColor& FiffRawViewSettings::getBackgroundColor()
     return m_colCurrentBackgroundColor;
 }
 
-
 //=============================================================================================================
 
 double FiffRawViewSettings::getZoom()
@@ -232,14 +217,12 @@ double FiffRawViewSettings::getZoom()
     return ui->m_doubleSpinBox_numberVisibleChannels->value();
 }
 
-
 //=============================================================================================================
 
 int FiffRawViewSettings::getWindowSize()
 {
     return ui->m_spinBox_windowSize->value();
 }
-
 
 //=============================================================================================================
 
@@ -258,7 +241,6 @@ void FiffRawViewSettings::saveSettings(const QString& settingsPath)
     settings.setValue(settingsPath + QString("/distanceTimeSpacer"), getDistanceTimeSpacer());
 }
 
-
 //=============================================================================================================
 
 void FiffRawViewSettings::loadSettings(const QString& settingsPath)
@@ -276,7 +258,6 @@ void FiffRawViewSettings::loadSettings(const QString& settingsPath)
     setBackgroundColor(settings.value(settingsPath + QString("/backgroundColor"), color).value<QColor>());
     setDistanceTimeSpacer(settings.value(settingsPath + QString("/distanceTimeSpacer"), 1000).toInt());
 }
-
 
 //=============================================================================================================
 
@@ -304,7 +285,6 @@ void FiffRawViewSettings::onDistanceTimeSpacerChanged(qint32 value)
 
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 
@@ -342,7 +322,6 @@ void FiffRawViewSettings::onViewColorButtonClicked()
     saveSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 void FiffRawViewSettings::onTimeWindowChanged(int value)
@@ -352,7 +331,6 @@ void FiffRawViewSettings::onTimeWindowChanged(int value)
     saveSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 void FiffRawViewSettings::onZoomChanged(double value)
@@ -361,7 +339,6 @@ void FiffRawViewSettings::onZoomChanged(double value)
 
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 

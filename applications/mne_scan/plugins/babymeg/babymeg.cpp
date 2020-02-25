@@ -54,7 +54,6 @@
 #include <scMeas/realtimemultisamplearray.h>
 #include <disp3D/viewers/hpiview.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -62,11 +61,9 @@
 #include <QQuaternion>
 #include <QFile>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -81,7 +78,6 @@ using namespace DISP3DLIB;
 using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -156,7 +152,6 @@ BabyMEG::BabyMEG()
     }
 }
 
-
 //=============================================================================================================
 
 BabyMEG::~BabyMEG()
@@ -171,7 +166,6 @@ BabyMEG::~BabyMEG()
     }
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> BabyMEG::clone() const
@@ -179,7 +173,6 @@ QSharedPointer<IPlugin> BabyMEG::clone() const
     QSharedPointer<BabyMEG> pBabyMEGClone(new BabyMEG());
     return pBabyMEGClone;
 }
-
 
 //=============================================================================================================
 
@@ -245,14 +238,12 @@ void BabyMEG::init()
             this, &BabyMEG::initConnector);
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::unload()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -261,7 +252,6 @@ void BabyMEG::clear()
     m_pFiffInfo.reset();
     m_iBufferSize = -1;
 }
-
 
 //=============================================================================================================
 
@@ -285,7 +275,6 @@ bool BabyMEG::start()
     return true;
 }
 
-
 //=============================================================================================================
 
 bool BabyMEG::stop()
@@ -308,7 +297,6 @@ bool BabyMEG::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType BabyMEG::getType() const
@@ -316,14 +304,12 @@ IPlugin::PluginType BabyMEG::getType() const
     return _ISensor;
 }
 
-
 //=============================================================================================================
 
 QString BabyMEG::getName() const
 {
     return "BabyMEG";
 }
-
 
 //=============================================================================================================
 
@@ -336,7 +322,6 @@ QWidget* BabyMEG::setupWidget()
 
     return widget;
 }
-
 
 //=============================================================================================================
 
@@ -389,7 +374,6 @@ void BabyMEG::run()
     }
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::initConnector()
@@ -419,7 +403,6 @@ void BabyMEG::initConnector()
         m_lTriggerChannelIndices.append(m_pFiffInfo->ch_names.indexOf("TRG008"));
     }
 }
-
 
 //=============================================================================================================
 
@@ -467,7 +450,6 @@ void BabyMEG::setFiffInfo(const FiffInfo& p_FiffInfo)
     emit fiffInfoAvailable();
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::setFiffData(QByteArray data)
@@ -486,7 +468,6 @@ void BabyMEG::setFiffData(QByteArray data)
     for(qint32 i = 0; i < rows*cols; ++i)
         IOUtils::swap_floatp(rawData.data()+i);
 
-
     if(m_bIsRunning)
     {
         if(!m_pRawMatrixBuffer)
@@ -498,7 +479,6 @@ void BabyMEG::setFiffData(QByteArray data)
     emit dataToSquidCtrlGUI(rawData);
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::setCMDData(QByteArray DATA)
@@ -508,7 +488,6 @@ void BabyMEG::setCMDData(QByteArray DATA)
     emit sendCMDDataToSQUIDControl(DATA);
     qDebug()<<"Data has been received.";
 }
-
 
 //=============================================================================================================
 
@@ -542,7 +521,6 @@ void BabyMEG::setFiffGainInfo(QStringList GainInfo)
 
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::comFLL(QString t_sFLLControlCommand)
@@ -557,7 +535,6 @@ void BabyMEG::comFLL(QString t_sFLLControlCommand)
     m_pMyClientComm->SendCommandToBabyMEGShortConnection(SC);
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::updateFiffInfo()
@@ -570,7 +547,6 @@ void BabyMEG::updateFiffInfo()
     //m_pActionRecordFile->setEnabled(true);
 
 }
-
 
 //=============================================================================================================
 
@@ -595,7 +571,6 @@ void BabyMEG::showHPIDialog()
     }
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::updateHPI(const MatrixXf& matData)
@@ -604,7 +579,6 @@ void BabyMEG::updateHPI(const MatrixXf& matData)
         m_pHPIWidget->setData(this->calibrate(matData));
     }
 }
-
 
 //=============================================================================================================
 
@@ -650,14 +624,12 @@ void BabyMEG::doContinousHPI(MatrixXf& matData)
     }
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::onContinousHPIToggled(bool bDoContinousHPI)
 {
     m_bDoContinousHPI = bDoContinousHPI;
 }
-
 
 //=============================================================================================================
 
@@ -670,7 +642,6 @@ void BabyMEG::setRecordingTimerChanged(int timeMSecs)
     m_iRecordingMSeconds = timeMSecs;
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::setRecordingTimerStateChanged(bool state)
@@ -678,14 +649,12 @@ void BabyMEG::setRecordingTimerStateChanged(bool state)
     m_bUseRecordTimer = state;
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::setFileName(const QString& sFileName)
 {
     m_sRecordFile = sFileName;
 }
-
 
 //=============================================================================================================
 
@@ -695,7 +664,6 @@ void BabyMEG::showProjectDialog()
         m_pProjectSettingsView->show();
     }
 }
-
 
 //=============================================================================================================
 
@@ -712,7 +680,6 @@ void BabyMEG::showSqdCtrlDialog()
         m_pSQUIDCtrlDlg->Init();
     }
 }
-
 
 //=============================================================================================================
 
@@ -749,7 +716,6 @@ void BabyMEG::splitRecordingFile()
     fiff_int_t first = 0;
     m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
 }
-
 
 //=============================================================================================================
 
@@ -791,7 +757,6 @@ void BabyMEG::toggleRecordingFile()
             if(ret == QMessageBox::No)
                 return;
         }
-
 
         //Initiate the stream for writing to the fif file
         if(m_pProjectSettingsView) {
@@ -839,7 +804,6 @@ void BabyMEG::toggleRecordingFile()
     }
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::createDigTrig(MatrixXf& data)
@@ -874,7 +838,6 @@ void BabyMEG::createDigTrig(MatrixXf& data)
     }
 }
 
-
 //=============================================================================================================
 
 MatrixXd BabyMEG::calibrate(const MatrixXf& data)
@@ -888,7 +851,6 @@ MatrixXd BabyMEG::calibrate(const MatrixXf& data)
 
     return one;
 }
-
 
 //=============================================================================================================
 
@@ -927,7 +889,6 @@ bool BabyMEG::readProjectors()
     return true;
 }
 
-
 //=============================================================================================================
 
 bool BabyMEG::readCompensators()
@@ -960,7 +921,6 @@ bool BabyMEG::readCompensators()
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -1009,7 +969,6 @@ bool BabyMEG::readBadChannels()
     return true;
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::changeRecordingButton()
@@ -1023,12 +982,10 @@ void BabyMEG::changeRecordingButton()
     }
 }
 
-
 //=============================================================================================================
 
 void BabyMEG::onRecordingRemainingTimeChange()
 {
     m_pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
 }
-
 

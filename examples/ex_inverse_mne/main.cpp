@@ -33,7 +33,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -41,7 +40,6 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
-
 
 //=============================================================================================================
 // MNE INCLUDES
@@ -63,7 +61,6 @@
 #include <QtCore/QCoreApplication>
 #include <QCommandLineParser>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -72,7 +69,6 @@ using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace INVERSELIB;
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // MAIN
@@ -146,7 +142,6 @@ int main(int argc, char *argv[])
     std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
     printf("tmin = %f s\n", sourceEstimate.tmin);
     printf("tstep = %f s\n", sourceEstimate.tstep);
-
 
     if(!t_sFileNameStc.isEmpty())
     {

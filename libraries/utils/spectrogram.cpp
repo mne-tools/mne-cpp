@@ -37,14 +37,12 @@
 
 #include "spectrogram.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -55,14 +53,12 @@
 #include <QThread>
 #include <QtConcurrent>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace UTILSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -105,7 +101,6 @@ MatrixXd Spectrogram::makeSpectrogram(VectorXd signal, qint32 windowSize = 0)
     return resultMat.result();
 }
 
-
 //=============================================================================================================
 
 VectorXd Spectrogram::gaussWindow(qint32 sample_count, qreal scale, quint32 translation)
@@ -120,7 +115,6 @@ VectorXd Spectrogram::gaussWindow(qint32 sample_count, qreal scale, quint32 tran
 
     return gauss;
 }
-
 
 //=============================================================================================================
 
@@ -153,7 +147,6 @@ MatrixXd Spectrogram::compute(const SpectogramInputData& inputData)
 
     return tf_matrix;
 }
-
 
 //=============================================================================================================
 

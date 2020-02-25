@@ -45,13 +45,11 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QFile>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -63,7 +61,6 @@ using namespace MNELIB;
 using namespace Eigen;
 using namespace FIFFLIB;
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -71,7 +68,6 @@ using namespace FIFFLIB;
 MNESourceSpace::MNESourceSpace()
 {
 }
-
 
 //=============================================================================================================
 
@@ -81,7 +77,6 @@ MNESourceSpace::MNESourceSpace(const MNESourceSpace &p_MNESourceSpace)
 
 }
 
-
 //=============================================================================================================
 
 MNESourceSpace::~MNESourceSpace()
@@ -89,14 +84,12 @@ MNESourceSpace::~MNESourceSpace()
 
 }
 
-
 //=============================================================================================================
 
 void MNESourceSpace::clear()
 {
     m_qListHemispheres.clear();
 }
-
 
 //=============================================================================================================
 
@@ -107,7 +100,6 @@ QList<VectorXi> MNESourceSpace::get_vertno() const
         p_vertices.push_back(m_qListHemispheres[i].vertno);
     return p_vertices;
 }
-
 
 //=============================================================================================================
 
@@ -166,7 +158,6 @@ QList<VectorXi> MNESourceSpace::label_src_vertno_sel(const Label &p_label, Vecto
 
     return vertno;
 }
-
 
 //=============================================================================================================
 
@@ -259,7 +250,6 @@ MNESourceSpace MNESourceSpace::pick_regions(const QList<Label> &p_qListLabels) c
     return selectedSrc;
 }
 
-
 //=============================================================================================================
 
 bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream,
@@ -269,7 +259,6 @@ bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream,
 //    if (p_pSourceSpace != NULL)
 //        delete p_pSourceSpace;
     p_SourceSpace = MNESourceSpace();
-
 
     //
     //   Open the file, create directory
@@ -323,7 +312,6 @@ bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream,
     return true;
 }
 
-
 //=============================================================================================================
 
 qint32 MNESourceSpace::find_source_space_hemi(MNEHemisphere& p_Hemisphere)
@@ -339,7 +327,6 @@ qint32 MNESourceSpace::find_source_space_hemi(MNEHemisphere& p_Hemisphere)
     return hemi;
 }
 
-
 //=============================================================================================================
 
 bool MNESourceSpace::transform_source_space_to(fiff_int_t dest, FiffCoordTrans& trans)
@@ -354,7 +341,6 @@ bool MNESourceSpace::transform_source_space_to(fiff_int_t dest, FiffCoordTrans& 
     }
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -382,7 +368,6 @@ bool MNESourceSpace::read_source_space(FiffStream::SPtr& p_pStream, const FiffDi
 //        qDebug() << "Number of vertice; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
     p_Hemisphere.np = *t_pTag->toInt();
 
-
     //=====================================================================
     if(!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NTRI, t_pTag))
     {
@@ -396,7 +381,6 @@ bool MNESourceSpace::read_source_space(FiffStream::SPtr& p_pStream, const FiffDi
         p_Hemisphere.ntri = *t_pTag->toInt();
     }
 //        qDebug() << "Number of Tris; type:" << t_pTag->getType() << "value:" << *t_pTag->toInt();
-
 
     //=====================================================================
     if(!p_Tree->find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag))
@@ -431,7 +415,6 @@ bool MNESourceSpace::read_source_space(FiffStream::SPtr& p_pStream, const FiffDi
     }
 //        qDebug() << "Source Space Points; type:" << t_pTag->getType();
 
-
     //=====================================================================
     if(!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag))
     {
@@ -450,7 +433,6 @@ bool MNESourceSpace::read_source_space(FiffStream::SPtr& p_pStream, const FiffDi
         return false;
     }
 //        qDebug() << "Source Space Normals; type:" << t_pTag->getType();
-
 
     //=====================================================================
     if (p_Hemisphere.ntri > 0)
@@ -487,7 +469,6 @@ bool MNESourceSpace::read_source_space(FiffStream::SPtr& p_pStream, const FiffDi
         p_Hemisphere.tris = p_defaultMatrix;
     }
 //        qDebug() << "Triangles; type:" << t_pTag->getType() << "rows:" << p_Hemisphere.tris.rows() << "cols:" << p_Hemisphere.tris.cols();
-
 
     //
     //   Which vertices are active
@@ -593,7 +574,6 @@ bool MNESourceSpace::read_source_space(FiffStream::SPtr& p_pStream, const FiffDi
     return true;
 }
 
-
 //=============================================================================================================
 
 bool MNESourceSpace::patch_info(MNEHemisphere &p_Hemisphere)//VectorXi& nearest, QList<VectorXi>& pinfo)
@@ -667,7 +647,6 @@ bool MNESourceSpace::patch_info(MNEHemisphere &p_Hemisphere)//VectorXi& nearest,
     return true;
 }
 
-
 //=============================================================================================================
 
 bool MNESourceSpace::complete_source_space_info(MNEHemisphere& p_Hemisphere)
@@ -714,10 +693,8 @@ bool MNESourceSpace::complete_source_space_info(MNEHemisphere& p_Hemisphere)
         p_Hemisphere.tri_area(i) = size/2.0f;
         p_Hemisphere.tri_nn.row(i) /= size;
 
-
     }
     printf("[done]\n");
-
 
 //        qDebug() << "p_Hemisphere.tri_cent:" << p_Hemisphere.tri_cent(0,0) << p_Hemisphere.tri_cent(0,1) << p_Hemisphere.tri_cent(0,2);
 //        qDebug() << "p_Hemisphere.tri_cent:" << p_Hemisphere.tri_cent(2,0) << p_Hemisphere.tri_cent(2,1) << p_Hemisphere.tri_cent(2,2);
@@ -734,7 +711,6 @@ bool MNESourceSpace::complete_source_space_info(MNEHemisphere& p_Hemisphere)
         p_Hemisphere.use_tri_cent = MatrixX3d::Zero(p_Hemisphere.nuse_tri,3);
         p_Hemisphere.use_tri_nn = MatrixX3d::Zero(p_Hemisphere.nuse_tri,3);
         p_Hemisphere.use_tri_area = VectorXd::Zero(p_Hemisphere.nuse_tri);
-
 
         for (qint32 i = 0; i < p_Hemisphere.nuse_tri; ++i)
         {
@@ -782,7 +758,6 @@ bool MNESourceSpace::complete_source_space_info(MNEHemisphere& p_Hemisphere)
     return true;
 }
 
-
 //=============================================================================================================
 
 void MNESourceSpace::writeToStream(FiffStream* p_pStream)
@@ -798,7 +773,6 @@ void MNESourceSpace::writeToStream(FiffStream* p_pStream)
     printf("\t%d source spaces written\n", m_qListHemispheres.size());
 }
 
-
 //=============================================================================================================
 
 MNEHemisphere& MNESourceSpace::operator[] (qint32 idx)
@@ -812,7 +786,6 @@ MNEHemisphere& MNESourceSpace::operator[] (qint32 idx)
     }
 }
 
-
 //=============================================================================================================
 
 const MNEHemisphere& MNESourceSpace::operator[] (qint32 idx) const
@@ -825,7 +798,6 @@ const MNEHemisphere& MNESourceSpace::operator[] (qint32 idx) const
         return m_qListHemispheres[m_qListHemispheres.size()-1];
     }
 }
-
 
 //=============================================================================================================
 
@@ -841,7 +813,6 @@ MNEHemisphere& MNESourceSpace::operator[] (QString idt)
         return m_qListHemispheres[0];
     }
 }
-
 
 //=============================================================================================================
 

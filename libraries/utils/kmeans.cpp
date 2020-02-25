@@ -45,13 +45,11 @@
 #include <vector>
 #include <time.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -59,7 +57,6 @@
 
 using namespace UTILSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -89,7 +86,6 @@ KMeans::KMeans(QString distance,
     if (m_iReps < 1)
         m_iReps = 1;
 }
-
 
 //=============================================================================================================
 
@@ -327,7 +323,6 @@ bool KMeans::calculate(MatrixXd X,
     return true;
 }
 
-
 //=============================================================================================================
 
 bool KMeans::batchUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
@@ -345,7 +340,6 @@ bool KMeans::batchUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
     previdx = VectorXi::Zero(n);
 
     prevtotsumD = std::numeric_limits<double>::max();//max double
-
 
     MatrixXd D = MatrixXd::Zero(X.rows(), k);
 
@@ -515,7 +509,6 @@ bool KMeans::batchUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
 } // nested function
 
 
-
 //=============================================================================================================
 
 bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
@@ -681,7 +674,6 @@ bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
 
                 VectorXi sgn = 1 - 2 * mbrs.array(); // -1 for members, 1 for nonmembers
 
-
                 double A = (double)m[i] * normC(i,0);
                 double B = pow(((double)m[i] * normC(i,0)),2);
 
@@ -689,7 +681,6 @@ bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
                         (A - (B + 2 * sgn.cast<double>().array() * m[i] * XCi.array() + 1).sqrt());
 
                 std::cout << "Del.col(i)\n" << Del.col(i) << std::endl;
-
 
 
 //                Del(:,i) = 1 + sgn .*...
@@ -799,7 +790,6 @@ bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
         m( nidx[0] ) = m( nidx[0] ) + 1;
         m( oidx ) = m( oidx ) - 1;
 
-
         if (m_sDistance.compare("sqeuclidean") == 0)
         {
             C.row(nidx[0]) = C.row(nidx[0]).array() + (X.row(moved[0]) - C.row(nidx[0])).array() / m[nidx[0]];
@@ -829,7 +819,6 @@ bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
                 }
                 for(qint32 j = 0; j < Xsorted.cols(); ++j)
                     std::sort(Xsorted.col(j).data(),Xsorted.col(j).data()+Xsorted.rows());
-
 
                 qint32 nn = floor(0.5*m[i])-1;
                 if ((m[i] % 2) == 0)
@@ -878,7 +867,6 @@ bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
     return converged;
 
 } // nested function
-
 
 //=============================================================================================================
 //DISTFUN Calculate point to cluster centroid distances.
@@ -935,7 +923,6 @@ MatrixXd KMeans::distfun(const MatrixXd& X, MatrixXd& C)//, qint32 iter)
 //end
     return D;
 } // function
-
 
 //=============================================================================================================
 //GCENTROIDS Centroids and counts stratified by group.
@@ -1014,7 +1001,6 @@ void KMeans::gcentroids(const MatrixXd& X, const VectorXi& index, const VectorXi
         }
     }
 }// function
-
 
 //=============================================================================================================
 

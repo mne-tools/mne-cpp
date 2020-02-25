@@ -42,7 +42,6 @@
 #include "gusbamp.h"
 #include "gusbampdriver.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -50,7 +49,6 @@
 using namespace GUSBAMPPLUGIN;
 using namespace IOBUFFER;
 using namespace std;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -69,14 +67,12 @@ GUSBAmpProducer::GUSBAmpProducer(GUSBAmp* pGUSBAmp)
     m_vSerials[0]= "UB-2015.05.16";
 }
 
-
 //=============================================================================================================
 
 GUSBAmpProducer::~GUSBAmpProducer()
 {
     //qDebug() << "GUSBAmpProducer::~GUSBAmpProducer()" << endl;
 }
-
 
 //=============================================================================================================
 
@@ -100,7 +96,6 @@ void GUSBAmpProducer::start(vector<QString> &serials, vector<int> channels, int 
         m_bIsRunning = false;
 }
 
-
 //=============================================================================================================
 
 void GUSBAmpProducer::stop()
@@ -120,7 +115,6 @@ void GUSBAmpProducer::stop()
 
 }
 
-
 //=============================================================================================================
 
 void GUSBAmpProducer::run()
@@ -135,7 +129,6 @@ void GUSBAmpProducer::run()
             m_pGUSBAmp->m_pRawMatrixBuffer_In->push(&matRawBuffer);
     }
 }
-
 
 //=============================================================================================================
 

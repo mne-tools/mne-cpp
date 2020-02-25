@@ -216,7 +216,6 @@ namespace FIFFLIB
  * functions to test type properties.
  */
 
-
 #define FIFFC_MAJOR_VERSION 1L
 #define FIFFC_MINOR_VERSION 3L
 
@@ -270,7 +269,6 @@ namespace FIFFLIB
 #define FIFFTS_MC_CCS         0x00100000
 #define FIFFTS_MC_RCS         0x00200000
 
-
 #define FIFFT_MATRIX           (FIFFTS_FS_MATRIX | FIFFTS_MC_DENSE)
 #define FIFFT_CCS_MATRIX       (FIFFTS_FS_MATRIX | FIFFTS_MC_CCS)
 #define FIFFT_RCS_MATRIX       (FIFFTS_FS_MATRIX | FIFFTS_MC_RCS)
@@ -280,7 +278,6 @@ namespace FIFFLIB
 #define FIFFT_MATRIX_DOUBLE    (FIFFT_MATRIX | FIFFT_DOUBLE)
 #define FIFFT_CCS_MATRIX_FLOAT (FIFFT_CCS_MATRIX | FIFFT_FLOAT)
 #define FIFFT_RCS_MATRIX_FLOAT (FIFFT_RCS_MATRIX | FIFFT_FLOAT)
-
 
 #define FIFFM_MESSAGE_GROUP(x) ((x) / 100 == 0)
 
@@ -346,7 +343,6 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 /* reserverd                 119 */            
 #define FIFF_REF_BLOCK_ID    120
 
-
 /*
  * Megacq saves the parameters in these tags
  */
@@ -386,7 +382,6 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFB_SMSH_RAW_DATA   119         /**< SmartShield raw data */
 #define FIFFB_SMSH_ASPECT     120         /**< SmartShield averaged data */
 #define FIFFB_HPI_SUBSYSTEM   121         /**< HPI subsystem */
-
 
 /*
  * MRI
@@ -435,7 +430,6 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFB_SSS_BASES           505     /**< SSS bases */
 
 #define FIFFB_SMARTSHIELD         510     /**< SmartShield data */
-
 
 /*
  * Different aspects of data
@@ -741,7 +735,6 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFF_BEM_SURF_CURVS         3108    /**< float  surface node first principal curvature unit vectors (nnode,3) */
 #define FIFF_BEM_SURF_CURV_VALUES   3109    /**< float  the two curvature values (nnode,2) */
 
-
 #define FIFF_BEM_POT_SOLUTION       3110    /**< float ** The solution matrix */
 #define FIFF_BEM_APPROX             3111    /**< int    approximation method, see below */
 #define FIFF_BEM_COORD_FRAME        3112    /**< The coordinate frame of the model */
@@ -870,7 +863,6 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFF_INDEX_KIND              5001
 #define FIFF_INDEX                   5002
 
-
 /*======================================================================
  * Enumerated types used as tag values.
  *
@@ -888,7 +880,6 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
  */
 #define FIFFV_PROJ_BY_COMPLEMENT     0
 #define FIFFV_PROJ_BY_SPACE          1
-
 
 /*
  * Volume types used in FIFF_VOL_TYPE

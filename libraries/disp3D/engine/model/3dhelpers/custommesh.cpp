@@ -39,7 +39,6 @@
 
 #include "custommesh.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,11 +50,9 @@
 #include <Qt3DRender/QAttribute>
 #include <Qt3DRender/QBuffer>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -63,7 +60,6 @@
 
 using namespace DISP3DLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -75,7 +71,6 @@ CustomMesh::CustomMesh()
 {
     init();
 }
-
 
 //=============================================================================================================
 
@@ -95,7 +90,6 @@ CustomMesh::CustomMesh(const MatrixX3f& tMatVert,
                 tMatColors,
                 primitiveType);
 }
-
 
 //=============================================================================================================
 
@@ -149,7 +143,6 @@ void CustomMesh::init()
     m_pCustomGeometry->addAttribute(m_pIndexAttribute);
 }
 
-
 //=============================================================================================================
 
 CustomMesh::~CustomMesh()
@@ -164,7 +157,6 @@ CustomMesh::~CustomMesh()
     m_pNormalAttribute->deleteLater();
     m_pColorAttribute->deleteLater();
 }
-
 
 //=============================================================================================================
 
@@ -190,7 +182,6 @@ void CustomMesh::setColor(const Eigen::MatrixX4f& tMatColors)
     m_pColorAttribute->setCount(tMatColors.rows());
 }
 
-
 //=============================================================================================================
 
 void CustomMesh::setNormals(const Eigen::MatrixX3f& tMatNorm)
@@ -213,7 +204,6 @@ void CustomMesh::setNormals(const Eigen::MatrixX3f& tMatNorm)
     m_pNormalAttribute->setCount(tMatNorm.rows());
 }
 
-
 //=============================================================================================================
 
 void CustomMesh::setVertex(const Eigen::MatrixX3f& tMatVert)
@@ -234,7 +224,6 @@ void CustomMesh::setVertex(const Eigen::MatrixX3f& tMatVert)
     //m_pVertexAttribute->setBuffer(m_pVertexDataBuffer);
     m_pVertexAttribute->setCount(tMatVert.rows());
 }
-
 
 //=============================================================================================================
 
@@ -264,7 +253,6 @@ void CustomMesh::setIndex(const Eigen::MatrixXi& tMatTris)
     this->setVertexCount(tMatTris.rows()*3);
 }
 
-
 //=============================================================================================================
 
 void CustomMesh::setMeshData(const MatrixX3f& tMatVert,
@@ -287,7 +275,6 @@ void CustomMesh::setMeshData(const MatrixX3f& tMatVert,
     ////    //this->setFirstVertex(0);
     ////    this->setFirstInstance(0);
 }
-
 
 //=============================================================================================================
 

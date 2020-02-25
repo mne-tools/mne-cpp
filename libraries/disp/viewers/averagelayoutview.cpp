@@ -46,7 +46,6 @@
 
 #include <fiff/fiff_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -61,14 +60,12 @@
     #include <QOpenGLWidget>
 #endif
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -103,14 +100,12 @@ AverageLayoutView::AverageLayoutView(QWidget *parent,
     this->setLayout(neLayout);
 }
 
-
 //=============================================================================================================
 
 void AverageLayoutView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
 {
     m_pChannelInfoModel = pChannelInfoModel;
 }
-
 
 //=============================================================================================================
 
@@ -121,7 +116,6 @@ void AverageLayoutView::setEvokedSetModel(QSharedPointer<EvokedSetModel> &pEvoke
 
     m_pEvokedSetModel = pEvokedSetModel;
 }
-
 
 //=============================================================================================================
 
@@ -137,7 +131,6 @@ void AverageLayoutView::setBackgroundColor(const QColor& backgroundColor)
     m_pAverageScene->setBackgroundBrush(backgroundBrush);
 }
 
-
 //=============================================================================================================
 
 QColor AverageLayoutView::getBackgroundColor()
@@ -149,7 +142,6 @@ QColor AverageLayoutView::getBackgroundColor()
 
     return m_pAverageScene->backgroundBrush().color();
 }
-
 
 //=============================================================================================================
 
@@ -179,7 +171,6 @@ void AverageLayoutView::takeScreenshot(const QString& fileName)
     }
 }
 
-
 //=============================================================================================================
 
 void AverageLayoutView::setScaleMap(const QMap<qint32,float> &scaleMap)
@@ -194,7 +185,6 @@ void AverageLayoutView::setScaleMap(const QMap<qint32,float> &scaleMap)
     updateData();
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<QMap<QString, QColor> > AverageLayoutView::getAverageColor() const
@@ -202,14 +192,12 @@ QSharedPointer<QMap<QString, QColor> > AverageLayoutView::getAverageColor() cons
     return m_qMapAverageColor;
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<QMap<QString, bool> > AverageLayoutView::getAverageActivation() const
 {
     return m_qMapAverageActivation;
 }
-
 
 //=============================================================================================================
 
@@ -224,7 +212,6 @@ void AverageLayoutView::setAverageColor(const QSharedPointer<QMap<QString, QColo
     m_pAverageScene->setColorPerAverage(m_qMapAverageColor);
 }
 
-
 //=============================================================================================================
 
 void AverageLayoutView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
@@ -237,7 +224,6 @@ void AverageLayoutView::setAverageActivation(const QSharedPointer<QMap<QString, 
     m_qMapAverageActivation = qMapAverageActivation;
     m_pAverageScene->setActivationPerAverage(qMapAverageActivation);
 }
-
 
 //=============================================================================================================
 
@@ -256,7 +242,6 @@ void AverageLayoutView::channelSelectionManagerChanged(const QList<QGraphicsItem
     setScaleMap(m_scaleMap);
     updateData();
 }
-
 
 //=============================================================================================================
 

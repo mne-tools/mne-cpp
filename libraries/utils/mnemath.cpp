@@ -39,13 +39,11 @@
 
 #include "mnemath.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Eigen>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -53,14 +51,12 @@
 
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace UTILSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -87,7 +83,6 @@ VectorXd* MNEMath::combine_xyz(const VectorXd& vec)
     return comb;
 }
 
-
 //=============================================================================================================
 
 double MNEMath::getConditionNumber(const MatrixXd& A, VectorXd &s)
@@ -100,7 +95,6 @@ double MNEMath::getConditionNumber(const MatrixXd& A, VectorXd &s)
     return c;
 }
 
-
 //=============================================================================================================
 
 double MNEMath::getConditionSlope(const MatrixXd& A, VectorXd &s)
@@ -112,7 +106,6 @@ double MNEMath::getConditionSlope(const MatrixXd& A, VectorXd &s)
 
     return c;
 }
-
 
 //=============================================================================================================
 
@@ -141,7 +134,6 @@ void MNEMath::get_whitener(MatrixXd &A, bool pca, QString ch_type, VectorXd &eig
         eigvec = eigvec.block(eigvec.rows()-rnk, 0, rnk, eigvec.cols());
     }
 }
-
 
 //=============================================================================================================
 
@@ -177,12 +169,10 @@ VectorXi MNEMath::intersect(const VectorXi &v1, const VectorXi &v2, VectorXi &id
     return p_res;
 }
 
-
 //=============================================================================================================
 
 //    static inline MatrixXd extract_block_diag(MatrixXd& A, qint32 n)
 //    {
-
 
 //        //
 //        // Principal Investigators and Developers:
@@ -212,7 +202,6 @@ VectorXi MNEMath::intersect(const VectorXi &v1, const VectorXi &v2, VectorXi &id
 //        //   Matti Hamalainen
 //        //   2006
 
-
 //          [mA,na] = size(A);		% matrix always has na columns
 //          % how many entries in the first column?
 //          bdn = na/n;			% number of blocks
@@ -227,7 +216,6 @@ VectorXi MNEMath::intersect(const VectorXi &v1, const VectorXi &v2, VectorXi &id
 
 //          i = i(:); 			% row indices foreach sparse bd
 
-
 //          j = [0:mA:(mA*(na-1))];
 //          j = j(ones(ma,1),:);
 //          j = j(:);
@@ -238,7 +226,6 @@ VectorXi MNEMath::intersect(const VectorXi &v1, const VectorXi &v2, VectorXi &id
 //          bd = reshape(bd,ma,na);	% full matrix
 
 //    }
-
 
 //=============================================================================================================
 
@@ -261,7 +248,6 @@ bool MNEMath::issparse(VectorXd &v)
     return false;
 }
 
-
 //=============================================================================================================
 
 MatrixXd MNEMath::legendre(qint32 n, const VectorXd &X, QString normalize)
@@ -278,7 +264,6 @@ MatrixXd MNEMath::legendre(qint32 n, const VectorXd &X, QString normalize)
 
     return y;
 }
-
 
 //=============================================================================================================
 
@@ -319,7 +304,6 @@ SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd &A, qint32 n)
     return bd;
 }
 
-
 //=============================================================================================================
 
 int MNEMath::nchoose2(int n)
@@ -331,7 +315,6 @@ int MNEMath::nchoose2(int n)
 
     return t_iNumOfCombination;
 }
-
 
 //=============================================================================================================
 
@@ -346,7 +329,6 @@ qint32 MNEMath::rank(const MatrixXd& A, double tol)
         sum += s[i] > t_dMax ? 1 : 0;
     return sum;
 }
-
 
 //=============================================================================================================
 

@@ -46,13 +46,11 @@
 #include "mne_named_matrix.h"
 #include <fiff/c/fiff_sparse_matrix.h>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,7 +58,6 @@
 
 #include <QSharedPointer>
 #include <QList>
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -74,7 +71,6 @@ namespace MNELIB
 //=============================================================================================================
 
 class MneCTFCompData;
-
 
 //=============================================================================================================
 /**
@@ -109,9 +105,7 @@ public:
      */
     ~MneCTFCompDataSet();
 
-
     static MneCTFCompDataSet* mne_read_ctf_comp_data(const QString& name);
-
 
 
     static int mne_make_ctf_comp(MneCTFCompDataSet* set,        /* The available compensation data */
@@ -122,12 +116,9 @@ public:
 
 
 
-
     static int mne_set_ctf_comp(QList<FIFFLIB::FiffChInfo> &chs,
                          int        nch,
                          int        comp);
-
-
 
 
 
@@ -142,9 +133,6 @@ public:
 
 
 
-
-
-
     static int mne_apply_ctf_comp_t(MneCTFCompDataSet* set,     /* The compensation data */
                              int               do_it,
                              float             **data,  /* The data to process (channel by channel) */
@@ -152,9 +140,7 @@ public:
                              int               ns);
 
 
-
     static int mne_get_ctf_comp(const QList<FIFFLIB::FiffChInfo>& chs,int nch);
-
 
 
 
@@ -164,9 +150,7 @@ public:
     static int mne_map_ctf_comp_kind(int grad);
 
 
-
     static const char *mne_explain_ctf_comp(int kind);
-
 
 
 
@@ -258,14 +242,12 @@ public:
     //    }
     //}
 
-
     static int mne_ctf_set_compensation(MneCTFCompDataSet* set,            /* The compensation data */
                                  int compensate_to,  /* What is the desired compensation to achieve */
                                  QList<FIFFLIB::FiffChInfo>& chs,            /* The channels to compensate */
                                  int nchan,          /* How many? */
                                  QList<FIFFLIB::FiffChInfo> comp_chs,       /* Maybe a different set, defaults to the same */
                                  int ncomp_chan);
-
 
 
 

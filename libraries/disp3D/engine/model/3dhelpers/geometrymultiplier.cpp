@@ -33,7 +33,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -58,7 +57,6 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -66,11 +64,9 @@
 using namespace DISP3DLIB;
 using namespace Qt3DRender;
 
-
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -88,7 +84,6 @@ GeometryMultiplier::GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGe
     init();
 }
 
-
 //=============================================================================================================
 
 GeometryMultiplier::~GeometryMultiplier()
@@ -100,7 +95,6 @@ GeometryMultiplier::~GeometryMultiplier()
     m_pColorAttribute->deleteLater();
 }
 
-
 //=============================================================================================================#
 
 void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansform)
@@ -110,7 +104,6 @@ void GeometryMultiplier::setTransforms(const QVector<QMatrix4x4> &tInstanceTansf
 
     this->setInstanceCount(tInstanceTansform.size());
 }
-
 
 //=============================================================================================================#
 
@@ -128,7 +121,6 @@ void GeometryMultiplier::setColors(const QVector<QColor> &tInstanceColors)
 
     this->setInstanceCount(tInstanceColors.size());
 }
-
 
 //=============================================================================================================
 
@@ -175,7 +167,6 @@ void GeometryMultiplier::init()
     this->setGeometry(m_pGeometry.data());
 }
 
-
 //=============================================================================================================
 
 QByteArray GeometryMultiplier::buildTransformBuffer(const QVector<QMatrix4x4> &tInstanceTransform)
@@ -200,7 +191,6 @@ QByteArray GeometryMultiplier::buildTransformBuffer(const QVector<QMatrix4x4> &t
 
     return bufferData;
 }
-
 
 //=============================================================================================================
 

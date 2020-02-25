@@ -47,7 +47,6 @@
 
 using namespace TMSIPLUGIN;
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -80,7 +79,6 @@ TMSISetupProjectWidget::TMSISetupProjectWidget(TMSI* pTMSI, QWidget *parent)
             this, &TMSISetupProjectWidget::changeQLineEdits);
 }
 
-
 //=============================================================================================================
 
 TMSISetupProjectWidget::~TMSISetupProjectWidget()
@@ -108,7 +106,6 @@ void TMSISetupProjectWidget::initGui()
     generateFilePath();
 }
 
-
 //=============================================================================================================
 
 void TMSISetupProjectWidget::addProject()
@@ -125,7 +122,6 @@ void TMSISetupProjectWidget::addProject()
     ui->m_qComboBox_ProjectSelection->addItem(list.at(list.size()-1));
     ui->m_qComboBox_ProjectSelection->setCurrentIndex(ui->m_qComboBox_ProjectSelection->count()-1);
 }
-
 
 //=============================================================================================================
 
@@ -144,7 +140,6 @@ void TMSISetupProjectWidget::addSubject()
     ui->m_qComboBox_SubjectSelection->setCurrentIndex(ui->m_qComboBox_SubjectSelection->count()-1);
 }
 
-
 //=============================================================================================================
 
 void TMSISetupProjectWidget::changeOutputFile()
@@ -162,7 +157,6 @@ void TMSISetupProjectWidget::changeOutputFile()
     m_pTMSI->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
 }
 
-
 //=============================================================================================================
 
 void TMSISetupProjectWidget::changeCap()
@@ -178,7 +172,6 @@ void TMSISetupProjectWidget::changeCap()
     ui->m_qLineEdit_EEGCap->setText(path);
     m_pTMSI->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
 }
-
 
 //=============================================================================================================
 
@@ -201,7 +194,6 @@ void TMSISetupProjectWidget::generateFilePath(int index)
     ui->m_qLineEdit_FiffRecordFile->setText(resourcePath);
     m_pTMSI->m_sOutputFilePath = resourcePath;
 }
-
 
 //=============================================================================================================
 

@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -44,7 +43,6 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -52,7 +50,6 @@
 using namespace Eigen;
 using namespace MNELIB;
 using namespace FIFFLIB;
-
 
 #define MALLOC_14(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC_14(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
@@ -76,7 +73,6 @@ static void matrix_error_14(int kind, int nr, int nc)
 }
 
 
-
 float **mne_cmatrix_14(int nr,int nc)
 
 {
@@ -95,11 +91,9 @@ float **mne_cmatrix_14(int nr,int nc)
 }
 
 
-
 #define FREE_14(x) if ((char *)(x) != NULL) free((char *)(x))
 
 #define FREE_CMATRIX_14(m) mne_free_cmatrix_14((m))
-
 
 void mne_free_cmatrix_14 (float **m)
 {
@@ -108,7 +102,6 @@ void mne_free_cmatrix_14 (float **m)
         FREE_14(m);
     }
 }
-
 
 
 void fromFloatEigenMatrix_14(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
@@ -124,7 +117,6 @@ void fromFloatEigenMatrix_14(const Eigen::MatrixXf& from_mat, float **& to_mat)
 }
 
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -138,7 +130,6 @@ MneNamedMatrix::MneNamedMatrix()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -158,14 +149,12 @@ MneNamedMatrix::MneNamedMatrix(const MneNamedMatrix &p_MneNamedMatrix)
     this->data = res->data;
 }
 
-
 //=============================================================================================================
 
 MneNamedMatrix::~MneNamedMatrix()
 {
     FREE_CMATRIX_14(data);
 }
-
 
 //=============================================================================================================
 
@@ -183,7 +172,6 @@ MneNamedMatrix *MneNamedMatrix::build_named_matrix(int nrow,
     mat->data    = data;
     return mat;
 }
-
 
 //=============================================================================================================
 
@@ -281,7 +269,6 @@ bad : {
         return NULL;
     }
 }
-
 
 //=============================================================================================================
 

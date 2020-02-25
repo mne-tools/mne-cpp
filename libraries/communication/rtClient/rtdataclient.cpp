@@ -41,7 +41,6 @@
 #include "rtdataclient.h"
 #include <fiff/fiff_file.h>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -49,7 +48,6 @@
 using namespace COMMUNICATIONLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -62,14 +60,12 @@ RtDataClient::RtDataClient(QObject *parent)
     getClientId();
 }
 
-
 //=============================================================================================================
 
 void RtDataClient::connectToHost(const QString& p_sRtServerHostName)
 {
     QTcpSocket::connectToHost(p_sRtServerHostName, 4218);
 }
-
 
 //=============================================================================================================
 
@@ -78,7 +74,6 @@ void RtDataClient::disconnectFromHost()
     QTcpSocket::disconnectFromHost();
     m_clientID = -1;
 }
-
 
 //=============================================================================================================
 
@@ -102,7 +97,6 @@ qint32 RtDataClient::getClientId()
     }
     return m_clientID;
 }
-
 
 //=============================================================================================================
 
@@ -353,7 +347,6 @@ FiffInfo::SPtr RtDataClient::readInfo()
     return p_pFiffInfo;
 }
 
-
 //=============================================================================================================
 
 void RtDataClient::readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int_t& kind)
@@ -378,7 +371,6 @@ void RtDataClient::readRawBuffer(qint32 p_nChannels, MatrixXf& data, fiff_int_t&
 //        else
 //            data = tag.data;
 }
-
 
 //=============================================================================================================
 

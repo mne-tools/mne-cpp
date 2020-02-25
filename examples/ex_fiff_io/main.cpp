@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -57,7 +56,6 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -92,7 +90,6 @@ int main(int argc, char *argv[])
 //    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-no-filter-ave.fif"));
 //    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"));
 //    t_listSampleFilesIn.append(new QFile(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif"));
-
 
     FiffIO p_fiffIO(t_listSampleFilesIn);
 

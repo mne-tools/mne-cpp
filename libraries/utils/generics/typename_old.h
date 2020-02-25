@@ -36,7 +36,6 @@
 #ifndef TYPENAMEOLD_H
 #define TYPENAMEOLD_H
 
-
 #define DECLARE_TYPE_NAME(x) template<> const char *typename<x>::name = #x;	/**< Macro to declare types.*/
 #define GET_TYPE_NAME(x) (CTypeName<typeof(x)>::name)						/**< Macro returns the name of the type.*/
 
@@ -55,6 +54,5 @@ template <typename T> class CTypeName {
 public:
     static const char *name;	/**< Holds the variable type by name.*/
 };
-
 
 #endif // TYPENAMEOLD_H

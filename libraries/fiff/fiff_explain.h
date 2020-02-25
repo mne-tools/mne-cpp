@@ -44,7 +44,6 @@
 #include "fiff_types.h"
 #include "fiff_file.h"
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
 //=============================================================================================================
@@ -60,7 +59,6 @@ typedef struct {
   int kind;         /* What is this explanation good for? */
   const char *text;
 } _fiffExp;
-
 
 //=============================================================================================================
 // DEFINE STATIC METHODS
@@ -219,7 +217,6 @@ static _fiffExp _fiff_explanations[] = {
   { FIFF_DACQ_STIM,                "acq. stim seq. " },
   { -1,NULL} };
 
-
 //=============================================================================================================
 
 static _fiffExp _fiff_block_explanations[] = {
@@ -254,7 +251,6 @@ static _fiffExp _fiff_block_explanations[] = {
   { FIFFB_VOL_INFO,       "volume info   " },
   { FIFFB_INDEX,          "index         " },
   { -1,                   NULL} };
-
 
 //=============================================================================================================
 
@@ -316,7 +312,6 @@ static _fiffExp _fiff_unit_mul_explanations[] = {
   { FIFF_UNITM_F, "f" },
   { FIFF_UNITM_A, "a" },
   {-1, NULL }};
-
 
 } // NAMESPACE
 

@@ -40,25 +40,21 @@
 
 #include "ui_tfsettingsview.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSettings>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -86,7 +82,6 @@ TfSettingsView::TfSettingsView(const QString& sSettingsPath,
     this->setMaximumWidth(330);
 }
 
-
 //=============================================================================================================
 
 TfSettingsView::~TfSettingsView()
@@ -95,7 +90,6 @@ TfSettingsView::~TfSettingsView()
 
     delete ui;
 }
-
 
 //=============================================================================================================
 
@@ -108,7 +102,6 @@ void TfSettingsView::saveSettings(const QString& settingsPath)
     QSettings settings;
 }
 
-
 //=============================================================================================================
 
 void TfSettingsView::loadSettings(const QString& settingsPath)
@@ -120,7 +113,6 @@ void TfSettingsView::loadSettings(const QString& settingsPath)
     QSettings settings;
 }
 
-
 //=============================================================================================================
 
 void TfSettingsView::onNumberTrialRowChanged()
@@ -128,5 +120,4 @@ void TfSettingsView::onNumberTrialRowChanged()
     emit numberTrialRowChanged(ui->m_spinBox_trialNumber->value(), ui->m_spinBox_rowNumber->value());
     saveSettings(m_sSettingsPath);
 }
-
 

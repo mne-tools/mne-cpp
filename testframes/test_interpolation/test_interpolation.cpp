@@ -39,7 +39,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -49,7 +48,6 @@
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 #include <string>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -65,7 +63,6 @@ using namespace DISP3DLIB;
 using namespace MNELIB;
 using namespace Eigen;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 /**
@@ -157,7 +154,6 @@ void TestInterpolation::initTestCase()
     }
 }
 
-
 //=============================================================================================================
 
 void TestInterpolation::testDimensionsForInterpolation()
@@ -182,7 +178,6 @@ void TestInterpolation::testDimensionsForInterpolation()
     QVERIFY(testInterpolatedSignal.rows() == smallSurface.rr.rows());
     QVERIFY(testInterpolatedSignal.cols() == 1);
 }
-
 
 //=============================================================================================================
 

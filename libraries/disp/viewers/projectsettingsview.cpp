@@ -41,7 +41,6 @@
 
 #include "ui_projectsettingsview.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -52,18 +51,15 @@
 #include <QMessageBox>
 #include <QTime>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -137,14 +133,12 @@ ProjectSettingsView::ProjectSettingsView(const QString& sDataPath,
     ui->m_qPushButtonDeleteSubject->hide();
 }
 
-
 //=============================================================================================================
 
 ProjectSettingsView::~ProjectSettingsView()
 {
     delete ui;
 }
-
 
 //=============================================================================================================
 
@@ -163,7 +157,6 @@ void ProjectSettingsView::setRecordingElapsedTime(int mSecsElapsed)
     ui->m_label_timePassed->setText(passedTimeFinal.toString());
 }
 
-
 //=============================================================================================================
 
 QString ProjectSettingsView::getCurrentFileName()
@@ -173,7 +166,6 @@ QString ProjectSettingsView::getCurrentFileName()
 
     return m_sFileName;
 }
-
 
 //=============================================================================================================
 
@@ -217,7 +209,6 @@ void ProjectSettingsView::deleteSubject()
     }
 }
 
-
 //=============================================================================================================
 
 void ProjectSettingsView::deleteProject()
@@ -260,7 +251,6 @@ void ProjectSettingsView::deleteProject()
     }
 }
 
-
 //=============================================================================================================
 
 void ProjectSettingsView::addProject()
@@ -280,7 +270,6 @@ void ProjectSettingsView::addProject()
         scanForProjects();
     }
 }
-
 
 //=============================================================================================================
 
@@ -304,7 +293,6 @@ void ProjectSettingsView::addSubject()
     }
 }
 
-
 //=============================================================================================================
 
 void ProjectSettingsView::paradigmChanged(const QString &sNewParadigm)
@@ -313,7 +301,6 @@ void ProjectSettingsView::paradigmChanged(const QString &sNewParadigm)
     emit newParadigm(m_sCurrentParadigm);
     updateFileName();
 }
-
 
 //=============================================================================================================
 
@@ -334,7 +321,6 @@ void ProjectSettingsView::scanForProjects()
     ui->m_qComboBox_ProjectSelection->insertItems(0,m_sListProjects);
     ui->m_qComboBox_ProjectSelection->setCurrentIndex(ui->m_qComboBox_ProjectSelection->findText(m_sCurrentProject));
 }
-
 
 //=============================================================================================================
 
@@ -364,7 +350,6 @@ void ProjectSettingsView::scanForSubjects()
     }
 }
 
-
 //=============================================================================================================
 
 void ProjectSettingsView::selectNewProject(const QString &sNewProject)
@@ -376,7 +361,6 @@ void ProjectSettingsView::selectNewProject(const QString &sNewProject)
     updateFileName();
 }
 
-
 //=============================================================================================================
 
 void ProjectSettingsView::selectNewSubject(const QString &sNewSubject)
@@ -386,7 +370,6 @@ void ProjectSettingsView::selectNewSubject(const QString &sNewSubject)
 
     updateFileName();
 }
-
 
 //=============================================================================================================
 
@@ -412,7 +395,6 @@ void ProjectSettingsView::updateFileName(bool currentTime)
     ui->m_qLineEditFileName->setText(m_sFileName);
 }
 
-
 //=============================================================================================================
 
 void ProjectSettingsView::onTimeChanged()
@@ -429,7 +411,6 @@ void ProjectSettingsView::onTimeChanged()
 
     emit timerChanged(m_iRecordingTime);
 }
-
 
 //=============================================================================================================
 

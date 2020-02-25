@@ -36,7 +36,6 @@
 #ifndef REALTIMESOURCEESTIMATE_H
 #define REALTIMESOURCEESTIMATE_H
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -52,7 +51,6 @@
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_forwardsolution.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -63,14 +61,12 @@
 #include <QMutex>
 #include <QMutexLocker>
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE SCMEASLIB
 //=============================================================================================================
 
 namespace SCMEASLIB
 {
-
 
 //=========================================================================================================
 /**
@@ -219,7 +215,6 @@ private:
     bool                                    m_bInitialized; /**< Is initialized */
 };
 
-
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
@@ -230,7 +225,6 @@ inline void RealTimeSourceEstimate::setAnnotSet(FSLIB::AnnotationSet::SPtr& anno
     m_pAnnotSet = annotSet;
 }
 
-
 //=============================================================================================================
 
 inline FSLIB::AnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
@@ -238,7 +232,6 @@ inline FSLIB::AnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
     QMutexLocker locker(&m_qMutex);
     return m_pAnnotSet;
 }
-
 
 //=============================================================================================================
 
@@ -248,7 +241,6 @@ inline void RealTimeSourceEstimate::setSurfSet(FSLIB::SurfaceSet::SPtr& surfSet)
     m_pSurfSet = surfSet;
 }
 
-
 //=============================================================================================================
 
 inline FSLIB::SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
@@ -256,7 +248,6 @@ inline FSLIB::SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
     QMutexLocker locker(&m_qMutex);
     return m_pSurfSet;
 }
-
 
 //=============================================================================================================
 
@@ -266,7 +257,6 @@ inline void RealTimeSourceEstimate::setFwdSolution(MNELIB::MNEForwardSolution::S
     m_pFwdSolution = fwdSolution;
 }
 
-
 //=============================================================================================================
 
 inline MNELIB::MNEForwardSolution::SPtr& RealTimeSourceEstimate::getFwdSolution()
@@ -274,7 +264,6 @@ inline MNELIB::MNEForwardSolution::SPtr& RealTimeSourceEstimate::getFwdSolution(
     QMutexLocker locker(&m_qMutex);
     return m_pFwdSolution;
 }
-
 
 //=============================================================================================================
 
@@ -284,7 +273,6 @@ inline bool RealTimeSourceEstimate::isInitialized() const
     return m_bInitialized;
 }
 
-
 //=============================================================================================================
 
 inline void RealTimeSourceEstimate::setFiffInfo(FIFFLIB::FiffInfo::SPtr p_fiffInfo)
@@ -293,7 +281,6 @@ inline void RealTimeSourceEstimate::setFiffInfo(FIFFLIB::FiffInfo::SPtr p_fiffIn
     m_pFiffInfo = p_fiffInfo;
 }
 
-
 //=============================================================================================================
 
 inline FIFFLIB::FiffInfo::SPtr RealTimeSourceEstimate::getFiffInfo()
@@ -301,7 +288,6 @@ inline FIFFLIB::FiffInfo::SPtr RealTimeSourceEstimate::getFiffInfo()
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo;
 }
-
 
 //=============================================================================================================
 
@@ -314,7 +300,6 @@ inline void RealTimeSourceEstimate::setSourceEstimateSize(qint32 iSourceEstimate
 //    else
         m_iSourceEstimateSize = iSourceEstimateSize;
 }
-
 
 //=============================================================================================================
 

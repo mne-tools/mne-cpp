@@ -82,7 +82,6 @@ namespace FIFFLIB
 #define FIFFV_DIPOLE_WAVE_CH   1000	   /* Dipole time curve */
 #define FIFFV_GOODNESS_FIT_CH  1001	   /* Goodness of fit */
 
-
 #define FIFFM_CHPOS(x) &((x)->chpos)
 
 /*

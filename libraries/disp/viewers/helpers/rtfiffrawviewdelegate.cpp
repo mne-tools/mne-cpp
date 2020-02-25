@@ -41,25 +41,21 @@
 
 #include "rtfiffrawviewmodel.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QPainter>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -74,7 +70,6 @@ RtFiffRawViewDelegate::RtFiffRawViewDelegate(QObject *parent)
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -104,7 +99,6 @@ void RtFiffRawViewDelegate::initPainterPaths(const QAbstractTableModel *model)
     m_penNormalBad = QPen(Qt::darkBlue, 0.1, Qt::SolidLine);
     m_penNormalSelectedBad = QPen(Qt::red, 1, Qt::SolidLine);
 }
-
 
 //=============================================================================================================
 
@@ -254,7 +248,6 @@ void createPaths(const QModelIndex &index,
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -435,7 +428,6 @@ void RtFiffRawViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     }
 }
 
-
 //=============================================================================================================
 
 QSize RtFiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -455,10 +447,8 @@ QSize RtFiffRawViewDelegate::sizeHint(const QStyleOptionViewItem &option, const 
         break;
     }
 
-
     return size;
 }
-
 
 //=============================================================================================================
 
@@ -468,7 +458,6 @@ void RtFiffRawViewDelegate::markerMoved(QPoint position, int activeRow)
     m_iActiveRow = activeRow;
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewDelegate::setSignalColor(const QColor& signalColor)
@@ -477,7 +466,6 @@ void RtFiffRawViewDelegate::setSignalColor(const QColor& signalColor)
     m_penNormalBad.setColor(signalColor);
 }
 
-
 //=============================================================================================================
 
 QColor RtFiffRawViewDelegate::getSignalColor()
@@ -485,14 +473,12 @@ QColor RtFiffRawViewDelegate::getSignalColor()
     return m_penNormal.color();
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewDelegate::setUpperItemIndex(int iUpperItemIndex)
 {
     m_iUpperItemIndex = iUpperItemIndex;
 }
-
 
 //=============================================================================================================
 
@@ -618,7 +604,6 @@ void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
     }
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewDelegate::createCurrentPositionMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const
@@ -635,7 +620,6 @@ void RtFiffRawViewDelegate::createCurrentPositionMarkerPath(const QModelIndex &i
     path.moveTo(currentSampleIndex,yStart);
     path.lineTo(currentSampleIndex,yEnd);
 }
-
 
 //=============================================================================================================
 
@@ -661,7 +645,6 @@ void RtFiffRawViewDelegate::createGridPath(const QModelIndex &index, const QStyl
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -690,7 +673,6 @@ void RtFiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index, cons
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -757,7 +739,6 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter *painter,
     }
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewDelegate::createTriggerThresholdPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data, QPointF &textPosition) const
@@ -787,7 +768,6 @@ void RtFiffRawViewDelegate::createTriggerThresholdPath(const QModelIndex &index,
 
     textPosition = QPointF(option.rect.topLeft().x()+5, option.rect.topLeft().y()+option.rect.height()/2+dScaleY*triggerThreshold-5);
 }
-
 
 //=============================================================================================================
 

@@ -6,7 +6,6 @@
 #include "command.h"
 #include "commandmanager.h"
 
-
 //=============================================================================================================
 // Qt Includes
 //=============================================================================================================
@@ -15,13 +14,11 @@
 #include <QString>
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace COMMUNICATIONLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -35,7 +32,6 @@ Command::Command(bool p_bIsJson, QObject *parent)
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -61,7 +57,6 @@ Command::Command(const QString &p_sCommand, const QJsonObject &p_qCommandDescrip
     }
 }
 
-
 //=============================================================================================================
 
 Command::Command(const QString &p_sCommand, const QString &p_sDescription, bool p_bIsJson, QObject *parent)
@@ -72,7 +67,6 @@ Command::Command(const QString &p_sCommand, const QString &p_sDescription, bool 
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -89,7 +83,6 @@ Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
     for(qint32 i = 0; i < p_qListParamValues.size(); ++i)
         m_qListParamDescriptions.append("");
 }
-
 
 //=============================================================================================================
 
@@ -131,13 +124,11 @@ Command::Command(const Command &p_Command)
 
 }
 
-
 //=============================================================================================================
 
 Command::~Command()
 {
 }
-
 
 //=============================================================================================================
 
@@ -145,7 +136,6 @@ void Command::execute()
 {
     emit this->executed(*this);
 }
-
 
 //=============================================================================================================
 
@@ -158,7 +148,6 @@ void Command::reply(const QString &p_sReply)
     }
 }
 
-
 //=============================================================================================================
 
 void Command::send()
@@ -169,7 +158,6 @@ void Command::send()
         emit t_commandManager->triggered(*this);
     }
 }
-
 
 //=============================================================================================================
 
@@ -190,7 +178,6 @@ QJsonObject Command::toJsonObject() const
 
     return p_jsonCommandObject;
 }
-
 
 //=============================================================================================================
 
@@ -214,7 +201,6 @@ QStringList Command::toStringList() const
     return p_stringCommandList;
 }
 
-
 //=============================================================================================================
 
 QString Command::toStringReadySend() const
@@ -236,7 +222,6 @@ QString Command::toStringReadySend() const
     return p_stringCommand;
 }
 
-
 //=============================================================================================================
 
 Command& Command::operator= (const Command &rhs)
@@ -253,7 +238,6 @@ Command& Command::operator= (const Command &rhs)
     return *this;
 }
 
-
 //=============================================================================================================
 
 QVariant& Command::operator[] (const QString &key)
@@ -264,7 +248,6 @@ QVariant& Command::operator[] (const QString &key)
         return defaultVariant;
 }
 
-
 //=============================================================================================================
 
 QVariant& Command::operator[] (qint32 idx)
@@ -274,7 +257,6 @@ QVariant& Command::operator[] (qint32 idx)
     else
         return defaultVariant;
 }
-
 
 //=============================================================================================================
 

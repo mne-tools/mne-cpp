@@ -64,7 +64,6 @@ using namespace MNELIB;
 using namespace Eigen;
 using namespace FIFFLIB;
 
-
 //=============================================================================================================
 /**
  * DECLARE CLASS TestGeometryInfo
@@ -95,13 +94,11 @@ private:
     QVector<int> smallSubset;
 };
 
-
 //=============================================================================================================
 
 TestGeometryInfo::TestGeometryInfo() {
 
 }
-
 
 //=============================================================================================================
 void TestGeometryInfo::initTestCase() {
@@ -141,7 +138,6 @@ void TestGeometryInfo::initTestCase() {
     }
 }
 
-
 //=============================================================================================================
 
 void TestGeometryInfo::testBadChannelFiltering() {
@@ -179,7 +175,6 @@ void TestGeometryInfo::testBadChannelFiltering() {
     }
 }
 
-
 //=============================================================================================================
 
 void TestGeometryInfo::testEmptyInputsForProjecting() {
@@ -189,7 +184,6 @@ void TestGeometryInfo::testEmptyInputsForProjecting() {
     QVERIFY(emptyMapping.size() == 0);
 }
 
-
 //=============================================================================================================
 
 void TestGeometryInfo::testEmptyInputsForSCDC() {
@@ -198,7 +192,6 @@ void TestGeometryInfo::testEmptyInputsForSCDC() {
     QVERIFY(distTable->rows() == distTable->cols());
 }
 
-
 //=============================================================================================================
 
 void TestGeometryInfo::testDimensionsForSCDC() {
@@ -206,7 +199,6 @@ void TestGeometryInfo::testDimensionsForSCDC() {
     QVERIFY(distTable->rows() == smallSurface.rr.rows());
     QVERIFY(distTable->cols() == smallSubset.size());
 }
-
 
 //=============================================================================================================
 

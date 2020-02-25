@@ -32,7 +32,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -40,13 +39,11 @@
 #include "brainflowstreamingwidget.h"
 #include "ui_brainflowstreamingwidget.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace BRAINFLOWBOARDPLUGIN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -61,14 +58,12 @@ BrainFlowStreamingWidget::BrainFlowStreamingWidget(BrainFlowBoard *board, QWidge
     connect(ui->sendToBoard, &QPushButton::clicked, this, &BrainFlowStreamingWidget::configureBoard);
 }
 
-
 //=============================================================================================================
 
 void BrainFlowStreamingWidget::configureBoard()
 {
     m_pBrainFlowBoard->configureBoard(ui->stringToSend->text().toStdString());
 }
-
 
 //=============================================================================================================
 

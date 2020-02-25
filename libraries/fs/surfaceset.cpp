@@ -40,13 +40,11 @@
 
 #include "surfaceset.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QStringList>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -54,7 +52,6 @@
 
 using namespace FSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -64,7 +61,6 @@ SurfaceSet::SurfaceSet()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -87,7 +83,6 @@ SurfaceSet::SurfaceSet(const QString &subject_id, qint32 hemi, const QString &su
     calcOffset();
 }
 
-
 //=============================================================================================================
 
 SurfaceSet::SurfaceSet(const QString &path, qint32 hemi, const QString &surf)
@@ -109,7 +104,6 @@ SurfaceSet::SurfaceSet(const QString &path, qint32 hemi, const QString &surf)
     calcOffset();
 }
 
-
 //=============================================================================================================
 
 SurfaceSet::SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface)
@@ -127,7 +121,6 @@ SurfaceSet::SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface)
     calcOffset();
 }
 
-
 //=============================================================================================================
 
 SurfaceSet::SurfaceSet(const QString& p_sLHFileName, const QString& p_sRHFileName)
@@ -137,13 +130,11 @@ SurfaceSet::SurfaceSet(const QString& p_sLHFileName, const QString& p_sRHFileNam
         *this = t_SurfaceSet;
 }
 
-
 //=============================================================================================================
 
 SurfaceSet::~SurfaceSet()
 {
 }
-
 
 //=============================================================================================================
 
@@ -151,7 +142,6 @@ void SurfaceSet::clear()
 {
     m_qMapSurfs.clear();
 }
-
 
 //=============================================================================================================
 
@@ -165,7 +155,6 @@ void SurfaceSet::insert(const Surface& p_Surface)
 
     m_qMapSurfs.insert(hemi, p_Surface);
 }
-
 
 //=============================================================================================================
 
@@ -195,7 +184,6 @@ bool SurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileName
     return true;
 }
 
-
 //=============================================================================================================
 
 const Surface& SurfaceSet::operator[] (qint32 idx) const
@@ -210,7 +198,6 @@ const Surface& SurfaceSet::operator[] (qint32 idx) const
         return m_qMapSurfs.find(0).value();
     }
 }
-
 
 //=============================================================================================================
 
@@ -227,7 +214,6 @@ Surface& SurfaceSet::operator[] (qint32 idx)
     }
 }
 
-
 //=============================================================================================================
 
 const Surface& SurfaceSet::operator[] (QString idt) const
@@ -243,7 +229,6 @@ const Surface& SurfaceSet::operator[] (QString idt) const
     }
 }
 
-
 //=============================================================================================================
 
 Surface& SurfaceSet::operator[] (QString idt)
@@ -258,7 +243,6 @@ Surface& SurfaceSet::operator[] (QString idt)
         return m_qMapSurfs.find(0).value();
     }
 }
-
 
 //=============================================================================================================
 

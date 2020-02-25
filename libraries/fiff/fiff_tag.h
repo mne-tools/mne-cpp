@@ -76,7 +76,6 @@
 #define NATIVE_ENDIAN    FIFFV_BIG_ENDIAN
 #endif
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -95,14 +94,12 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -114,7 +111,6 @@
 #include <QSharedPointer>
 #include <QVector>
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
 //=============================================================================================================
@@ -124,7 +120,6 @@ namespace FIFFLIB
 
 class FiffStream;
 class FiffDirNode;
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -362,7 +357,6 @@ public:
      */
     inline FiffChInfo toChInfo() const;
 
-
 //    //=========================================================================================================
 //    /**
 //    * to fiff OLD PACK
@@ -376,7 +370,6 @@ public:
      * @return List of directory entry descriptors
      */
     inline QList< QSharedPointer<FiffDirEntry> > toDirEntry() const;
-
 
     //
     // MATRIX
@@ -500,7 +493,6 @@ public:
      */
     static fiff_int_t fiff_type_matrix_coding(fiff_int_t type);
 
-
 public:
     fiff_int_t  kind;       /**< Tag number.
                              *   This defines the meaning of the item */
@@ -537,13 +529,11 @@ private:
 //                 *   This point to the data read or to be written. */
 //} *fiffTag,fiffTagRec;   /**< FIFF data tag */
 
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // Simple types
@@ -557,7 +547,6 @@ inline quint8* FiffTag::toByte() const
         return (quint8*)this->data();
 }
 
-
 //=============================================================================================================
 
 inline quint16* FiffTag::toUnsignedShort() const
@@ -567,7 +556,6 @@ inline quint16* FiffTag::toUnsignedShort() const
     else
         return (quint16*)this->data();
 }
-
 
 //=============================================================================================================
 
@@ -579,7 +567,6 @@ inline qint16* FiffTag::toShort() const
         return (qint16*)this->data();
 }
 
-
 //=============================================================================================================
 
 inline quint32* FiffTag::toUnsignedInt() const
@@ -589,7 +576,6 @@ inline quint32* FiffTag::toUnsignedInt() const
     else
         return (quint32*)this->data();
 }
-
 
 //=============================================================================================================
 
@@ -603,7 +589,6 @@ inline qint32* FiffTag::toInt() const
         return (qint32*)this->data();
 }
 
-
 //=============================================================================================================
 
 inline qint32* FiffTag::toJulian() const
@@ -616,7 +601,6 @@ inline qint32* FiffTag::toJulian() const
         return (qint32*)this->data();
 }
 
-
 //=============================================================================================================
 
 inline float* FiffTag::toFloat() const
@@ -626,7 +610,6 @@ inline float* FiffTag::toFloat() const
     else
         return (float*)this->data();
 }
-
 
 //=============================================================================================================
 
@@ -638,7 +621,6 @@ inline double* FiffTag::toDouble() const
         return (double*)this->data();
 }
 
-
 //=============================================================================================================
 
 inline QString FiffTag::toString() const
@@ -649,7 +631,6 @@ inline QString FiffTag::toString() const
         return *this;
 }
 
-
 //=============================================================================================================
 
 inline qint16* FiffTag::toDauPack16() const
@@ -659,7 +640,6 @@ inline qint16* FiffTag::toDauPack16() const
     else
         return (qint16*)this->data();
 }
-
 
 //=============================================================================================================
 
@@ -676,7 +656,6 @@ inline qint16* FiffTag::toDauPack16() const
 //    }
 //    return m_pComplexFloatData;
 //}
-
 
 //=============================================================================================================
 
@@ -717,7 +696,6 @@ inline FiffId FiffTag::toFiffID() const
     }
 }
 
-
 //=============================================================================================================
 
 inline FiffDigPoint FiffTag::toDigPoint() const
@@ -743,7 +721,6 @@ inline FiffDigPoint FiffTag::toDigPoint() const
         return t_fiffDigPoint;
     }
 }
-
 
 //=============================================================================================================
 
@@ -784,7 +761,6 @@ inline FiffCoordTrans FiffTag::toCoordTrans() const
         return p_FiffCoordTrans;
     }
 }
-
 
 //=========================================================================================================
 /**
@@ -874,7 +850,6 @@ inline FiffChInfo FiffTag::toChInfo() const
     }
 }
 
-
 //    //=========================================================================================================
 //    /**
 //    * to fiff OLD PACK
@@ -882,9 +857,7 @@ inline FiffChInfo FiffTag::toChInfo() const
 //    inline fiff_coord_trans_t toCoordTrans() const
 //    {
 
-
 //    }
-
 
 
 //=============================================================================================================
@@ -911,7 +884,6 @@ inline QList< QSharedPointer<FiffDirEntry> > FiffTag::toDirEntry() const
     }
     return p_ListFiffDir;
 }
-
 
 //=============================================================================================================
 // MATRIX
@@ -940,7 +912,6 @@ inline Eigen::MatrixXi FiffTag::toIntMatrix() const
 
     return p_Matrix;
 }
-
 
 //=============================================================================================================
 
@@ -971,9 +942,7 @@ inline Eigen::MatrixXf FiffTag::toFloatMatrix() const
     return p_Matrix;
 }
 
-
 //=============================================================================================================
-
 
 inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
 {

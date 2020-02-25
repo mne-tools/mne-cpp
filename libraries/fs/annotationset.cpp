@@ -44,14 +44,12 @@
 #include <QFile>
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -61,7 +59,6 @@ AnnotationSet::AnnotationSet()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -83,7 +80,6 @@ AnnotationSet::AnnotationSet(const QString &subject_id, qint32 hemi, const QStri
 
 }
 
-
 //=============================================================================================================
 
 AnnotationSet::AnnotationSet(const QString &path, qint32 hemi, const QString &atlas)
@@ -103,7 +99,6 @@ AnnotationSet::AnnotationSet(const QString &path, qint32 hemi, const QString &at
     }
 }
 
-
 //=============================================================================================================
 
 AnnotationSet::AnnotationSet(const Annotation& p_LHAnnotation, const Annotation& p_RHAnnotation)
@@ -120,7 +115,6 @@ AnnotationSet::AnnotationSet(const Annotation& p_LHAnnotation, const Annotation&
 
 }
 
-
 //=============================================================================================================
 
 AnnotationSet::AnnotationSet(const QString& p_sLHFileName, const QString& p_sRHFileName)
@@ -130,14 +124,12 @@ AnnotationSet::AnnotationSet(const QString& p_sLHFileName, const QString& p_sRHF
         *this = t_AnnotationSet;
 }
 
-
 //=============================================================================================================
 
 void AnnotationSet::clear()
 {
     m_qMapAnnots.clear();
 }
-
 
 //=============================================================================================================
 
@@ -151,7 +143,6 @@ void AnnotationSet::insert(const Annotation& p_Annotation)
 
     m_qMapAnnots.insert(hemi, p_Annotation);
 }
-
 
 //=============================================================================================================
 
@@ -179,7 +170,6 @@ bool AnnotationSet::read(const QString& p_sLHFileName, const QString& p_sRHFileN
     return true;
 }
 
-
 //=============================================================================================================
 
 bool AnnotationSet::toLabels(const SurfaceSet &p_surfSet,
@@ -194,7 +184,6 @@ bool AnnotationSet::toLabels(const SurfaceSet &p_surfSet,
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -211,7 +200,6 @@ Annotation& AnnotationSet::operator[] (qint32 idx)
     }
 }
 
-
 //=============================================================================================================
 
 const Annotation AnnotationSet::operator[] (qint32 idx) const
@@ -227,7 +215,6 @@ const Annotation AnnotationSet::operator[] (qint32 idx) const
     }
 }
 
-
 //=============================================================================================================
 
 Annotation& AnnotationSet::operator[] (QString idt)
@@ -242,7 +229,6 @@ Annotation& AnnotationSet::operator[] (QString idt)
         return m_qMapAnnots[0];
     }
 }
-
 
 //=============================================================================================================
 

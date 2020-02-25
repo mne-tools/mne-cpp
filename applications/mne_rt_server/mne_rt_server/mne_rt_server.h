@@ -46,13 +46,11 @@
 #include "commandserver.h"
 #include "fiffstreamserver.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,14 +58,12 @@
 
 #include <QObject>
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
 //=============================================================================================================
 
 namespace RTSERVER
 {
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -122,7 +118,6 @@ private:
     void comHelp(COMMUNICATIONLIB::Command p_command);
 
 
-
     FiffStreamServer                    m_fiffStreamServer;     /**< Fiff stream server. */
     CommandServer                       m_commandServer;        /**< Command server. */
 
@@ -130,7 +125,6 @@ private:
 
     COMMUNICATIONLIB::CommandManager    m_commandManager;       /**< The command manager of the mne_rt_server. */
 };
-
 
 //=============================================================================================================
 // INLINE DEFINITIONS
@@ -140,7 +134,6 @@ inline COMMUNICATIONLIB::CommandManager& MNERTServer::getCommandManager()
 {
     return m_commandManager;
 }
-
 
 } // NAMESPACE
 

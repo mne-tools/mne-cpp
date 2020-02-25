@@ -55,7 +55,6 @@
 #include <mne/mne_sourceestimate.h>
 #include <mne/mne_forwardsolution.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -64,13 +63,11 @@
 #include <Qt3DExtras/QCylinderGeometry>
 #include <Qt3DCore/QTransform>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -82,7 +79,6 @@ using namespace DISP3DLIB;
 using namespace CONNECTIVITYLIB;
 using namespace DISPLIB;
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -92,7 +88,6 @@ NetworkTreeItem::NetworkTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, 
 {
     initItem();
 }
-
 
 //=============================================================================================================
 
@@ -142,7 +137,6 @@ void NetworkTreeItem::initItem()
 //    this->setMaterial(pNetworkMaterial);
 }
 
-
 //=============================================================================================================
 
 void NetworkTreeItem::addData(const Network& tNetworkData)
@@ -167,7 +161,6 @@ void NetworkTreeItem::addData(const Network& tNetworkData)
     }
 }
 
-
 //=============================================================================================================
 
 void NetworkTreeItem::setThresholds(const QVector3D& vecThresholds)
@@ -183,7 +176,6 @@ void NetworkTreeItem::setThresholds(const QVector3D& vecThresholds)
     }
 }
 
-
 //=============================================================================================================
 
 void NetworkTreeItem::onNetworkThresholdChanged(const QVariant& vecThresholds)
@@ -193,7 +185,6 @@ void NetworkTreeItem::onNetworkThresholdChanged(const QVariant& vecThresholds)
         addData(tNetwork);
     }
 }
-
 
 //=============================================================================================================
 
@@ -224,7 +215,6 @@ void NetworkTreeItem::onColorChanged(const QVariant& color)
     }
 }
 
-
 //=============================================================================================================
 
 void NetworkTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
@@ -245,7 +235,6 @@ void NetworkTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
     }
 }
 
-
 //=============================================================================================================
 
 void NetworkTreeItem::plotNetwork(const Network& tNetworkData)
@@ -254,7 +243,6 @@ void NetworkTreeItem::plotNetwork(const Network& tNetworkData)
     plotNodes(tNetworkData);
     plotEdges(tNetworkData);
 }
-
 
 //=============================================================================================================
 
@@ -335,7 +323,6 @@ void NetworkTreeItem::plotNodes(const Network& tNetworkData)
     m_pNodes->setTransforms(vTransforms);
     m_pNodes->setColors(vColorsNodes);
 }
-
 
 //=============================================================================================================
 
@@ -443,5 +430,4 @@ void NetworkTreeItem::plotEdges(const Network &tNetworkData)
     m_pEdges->setTransforms(vTransformsEdges);
     m_pEdges->setColors(vColorsEdges);
 }
-
 

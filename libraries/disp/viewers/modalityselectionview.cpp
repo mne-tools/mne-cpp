@@ -39,7 +39,6 @@
 
 #include "modalityselectionview.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -50,18 +49,15 @@
 #include <QSettings>
 #include <QMapIterator>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -104,7 +100,6 @@ ModalitySelectionView::ModalitySelectionView(const QList<FIFFLIB::FiffChInfo>& l
     redrawGUI();
 }
 
-
 //=============================================================================================================
 
 ModalitySelectionView::~ModalitySelectionView()
@@ -112,14 +107,12 @@ ModalitySelectionView::~ModalitySelectionView()
     saveSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 QMap<QString, bool> ModalitySelectionView::getModalityMap()
 {
     return m_modalityMap;
 }
-
 
 //=============================================================================================================
 
@@ -129,7 +122,6 @@ void ModalitySelectionView::setModalityMap(const QMap<QString, bool> &modalityMa
 
     redrawGUI();
 }
-
 
 //=============================================================================================================
 
@@ -170,7 +162,6 @@ void ModalitySelectionView::redrawGUI()
     this->setLayout(topLayout);
 }
 
-
 //=============================================================================================================
 
 void ModalitySelectionView::saveSettings(const QString& settingsPath)
@@ -201,7 +192,6 @@ void ModalitySelectionView::saveSettings(const QString& settingsPath)
     }
 }
 
-
 //=============================================================================================================
 
 void ModalitySelectionView::loadSettings(const QString& settingsPath)
@@ -230,7 +220,6 @@ void ModalitySelectionView::loadSettings(const QString& settingsPath)
     flag = settings.value(settingsPath + QString("/modalityMISC"), true).toBool();
     m_modalityMap.insert("MISC", flag);
 }
-
 
 //=============================================================================================================
 

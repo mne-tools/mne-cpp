@@ -46,7 +46,6 @@
 
 #include <stdlib.h>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -54,7 +53,6 @@
 using namespace RTSERVER;
 using namespace FIFFLIB;
 using namespace COMMUNICATIONLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -67,14 +65,12 @@ FiffStreamServer::FiffStreamServer(QObject *parent)
 
 }
 
-
 //=============================================================================================================
 
 FiffStreamServer::~FiffStreamServer()
 {
     emit closeFiffStreamServer();
 }
-
 
 //=============================================================================================================
 
@@ -95,7 +91,6 @@ void FiffStreamServer::comClist(Command p_command)
     Q_UNUSED(p_command);
 }
 
-
 //=============================================================================================================
 
 void FiffStreamServer::comMeasinfo(Command p_command)
@@ -113,7 +108,6 @@ void FiffStreamServer::comMeasinfo(Command p_command)
         qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["measinfo"].reply(str);
     }
 }
-
 
 //=============================================================================================================
 
@@ -134,7 +128,6 @@ void FiffStreamServer::comStart(Command p_command)
     qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["start"].reply(t_sOutput);
 }
 
-
 //=============================================================================================================
 
 void FiffStreamServer::comStop(Command p_command)
@@ -154,7 +147,6 @@ void FiffStreamServer::comStop(Command p_command)
     qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["stop"].reply(t_sOutput);
 }
 
-
 //=============================================================================================================
 
 void FiffStreamServer::comStopAll(Command p_command)
@@ -165,7 +157,6 @@ void FiffStreamServer::comStopAll(Command p_command)
 
     Q_UNUSED(p_command);
 }
-
 
 //=============================================================================================================
 
@@ -186,7 +177,6 @@ void FiffStreamServer::connectCommands()
 //    t_pMNERTServer->getCommandManager().connectSlot(QString("stop"), this, &FiffStreamServer::comStop);
 //    t_pMNERTServer->getCommandManager().connectSlot(QString("stop-all"), this, &FiffStreamServer::comStopAll);
 }
-
 
 ////=============================================================================================================
 
@@ -298,7 +288,6 @@ void FiffStreamServer::connectCommands()
 //    return success;
 //}
 
-
 //=============================================================================================================
 
 QByteArray FiffStreamServer::parseToId(QString& p_sRawId, qint32& p_iParsedId)
@@ -343,7 +332,6 @@ QByteArray FiffStreamServer::parseToId(QString& p_sRawId, qint32& p_iParsedId)
     return t_blockCmdIdInfo;
 }
 
-
 //=============================================================================================================
 
 //void FiffStreamServer::clearClients()
@@ -357,7 +345,6 @@ QByteArray FiffStreamServer::parseToId(QString& p_sRawId, qint32& p_iParsedId)
 //    m_qClientList.clear();
 //}
 
-
 //=============================================================================================================
 
 void FiffStreamServer::forwardMeasInfo(qint32 ID, const FiffInfo& p_fiffInfo)
@@ -365,14 +352,12 @@ void FiffStreamServer::forwardMeasInfo(qint32 ID, const FiffInfo& p_fiffInfo)
     emit remitMeasInfo(ID, p_fiffInfo);
 }
 
-
 //=============================================================================================================
 //ToDo increase preformance --> try inline
 void FiffStreamServer::forwardRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData)
 {
     emit remitRawBuffer(m_pMatRawData);
 }
-
 
 //=============================================================================================================
 

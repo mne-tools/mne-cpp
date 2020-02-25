@@ -40,13 +40,11 @@
 #include "plugininputconnector.h"
 #include "../Interfaces/IPlugin.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace SCSHAREDLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -57,7 +55,6 @@ PluginInputConnector::PluginInputConnector(IPlugin *parent, const QString &name,
 {
 }
 
-
 //=============================================================================================================
 
 bool PluginInputConnector::isInputConnector() const
@@ -65,14 +62,12 @@ bool PluginInputConnector::isInputConnector() const
     return true;
 }
 
-
 //=============================================================================================================
 
 bool PluginInputConnector::isOutputConnector() const
 {
     return false;
 }
-
 
 //=============================================================================================================
 

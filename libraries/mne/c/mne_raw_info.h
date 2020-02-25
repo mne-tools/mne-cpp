@@ -47,13 +47,11 @@
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_stream.h>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -61,7 +59,6 @@
 
 #include <QSharedPointer>
 #include <QList>
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -73,7 +70,6 @@ namespace MNELIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 //=============================================================================================================
 /**
@@ -103,7 +99,6 @@ public:
 
 
 
-
     //============================= read_ch_info.c =============================
 
     static FIFFLIB::FiffDirNode::SPtr find_meas (const FIFFLIB::FiffDirNode::SPtr& node);
@@ -113,7 +108,6 @@ public:
     static FIFFLIB::FiffDirNode::SPtr find_raw (const FIFFLIB::FiffDirNode::SPtr& node);
 
     static FIFFLIB::FiffDirNode::SPtr find_maxshield (const FIFFLIB::FiffDirNode::SPtr& node);
-
 
 
 
@@ -131,12 +125,7 @@ public:
                                                                                   (head <-> device) */
                               FIFFLIB::fiffTime *start_time);
 
-
     static int mne_load_raw_info(const QString& name,int allow_maxshield,MneRawInfo* *infop);
-
-
-
-
 
 
 
@@ -174,7 +163,6 @@ public:
                                                      *       FIFF_NOP
                                                      */
     int           ndir;       /**< Number of tags in the above directory */
-
 
 
 //// ### OLD STRUCT ###

@@ -39,18 +39,15 @@
 #include "ui_control3dview.h"
 #include "control3dview.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QMenu>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,13 +57,11 @@
 #include <QStandardItemModel>
 #include <QColorDialog>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -95,7 +90,6 @@ Control3DView::Control3DView(QWidget* parent,
     connect(ui->m_treeView_loadedData, &QWidget::customContextMenuRequested,
             this, &Control3DView::onCustomContextMenuRequested);
 }
-
 
 //=============================================================================================================
 
@@ -140,14 +134,12 @@ void Control3DView::setFlags(const QStringList& slFlags)
     }
 }
 
-
 //=============================================================================================================
 
 Control3DView::~Control3DView()
 {
     delete ui;
 }
-
 
 //=============================================================================================================
 
@@ -158,7 +150,6 @@ void Control3DView::setDelegate(QStyledItemDelegate *pItemDelegate)
     ui->m_treeView_loadedData->setHeaderHidden(false);
     ui->m_treeView_loadedData->setEditTriggers(QAbstractItemView::CurrentChanged);
 }
-
 
 //=============================================================================================================
 
@@ -171,7 +162,6 @@ void Control3DView::setModel(QStandardItemModel* pDataTreeModel)
     //ui->m_treeView_loadedData->setColumnHidden(1, true);
 }
 
-
 //=============================================================================================================
 
 void Control3DView::onTreeViewHeaderHide()
@@ -182,7 +172,6 @@ void Control3DView::onTreeViewHeaderHide()
         ui->m_treeView_loadedData->setHeaderHidden(false);
     }
 }
-
 
 //=============================================================================================================
 
@@ -195,14 +184,12 @@ void Control3DView::onTreeViewDescriptionHide()
     }
 }
 
-
 //=============================================================================================================
 
 void Control3DView::onOpacityChange(qint32 value)
 {
     this->setWindowOpacity(1/(100.0/value));
 }
-
 
 //=============================================================================================================
 
@@ -221,7 +208,6 @@ void Control3DView::onSceneColorPicker()
     //Set color of button new new scene color
     ui->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentSceneColor.red()).arg(m_colCurrentSceneColor.green()).arg(m_colCurrentSceneColor.blue()));
 }
-
 
 //=============================================================================================================
 
@@ -243,7 +229,6 @@ void Control3DView::onCustomContextMenuRequested(QPoint pos)
     menu->popup(ui->m_treeView_loadedData->viewport()->mapToGlobal(pos));
 }
 
-
 //=============================================================================================================
 
 void Control3DView::onAlwaysOnTop(bool state)
@@ -264,14 +249,12 @@ void Control3DView::onSceneColorChanged(const QColor& color)
     emit sceneColorChanged(color);
 }
 
-
 //=============================================================================================================
 
 void Control3DView::onShowFullScreen(bool checked)
 {
     emit showFullScreen(checked);
 }
-
 
 //=============================================================================================================
 
@@ -280,14 +263,12 @@ void Control3DView::onRotationClicked(bool checked)
     emit rotationChanged(checked);
 }
 
-
 //=============================================================================================================
 
 void Control3DView::onCoordAxisClicked(bool checked)
 {
     emit showCoordAxis(checked);
 }
-
 
 //=============================================================================================================
 
@@ -307,14 +288,12 @@ void Control3DView::onLightColorPicker()
     ui->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentLightColor.red()).arg(m_colCurrentLightColor.green()).arg(m_colCurrentLightColor.blue()));
 }
 
-
 //=============================================================================================================
 
 void Control3DView::onLightColorChanged(const QColor &color)
 {
     emit lightColorChanged(color);
 }
-
 
 //=============================================================================================================
 

@@ -36,7 +36,6 @@
 #ifndef RTFIFFRAWVIEWMODEL_H
 #define RTFIFFRAWVIEWMODEL_H
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -47,7 +46,6 @@
 #include <fiff/fiff_proj.h>
 #include <utils/filterTools/filterdata.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -56,14 +54,12 @@
 #include <QSharedPointer>
 #include <QColor>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -77,7 +73,6 @@ namespace UTILSLIB {
     class FilterData;
 }
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
@@ -85,11 +80,9 @@ namespace UTILSLIB {
 namespace DISPLIB
 {
 
-
 //=============================================================================================================
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE TYPEDEFS
@@ -97,7 +90,6 @@ namespace DISPLIB
 
 typedef QPair<const double*,qint32> RowVectorPair;
 typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> MatrixXdR;
-
 
 //=============================================================================================================
 /**
@@ -636,7 +628,6 @@ signals:
     void triggerDetected(int numberDetectedTriggers, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 };
 
-
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
@@ -645,7 +636,6 @@ inline qint32 RtFiffRawViewModel::getMaxSamples() const
 {
     return m_iMaxSamples;
 }
-
 
 //=============================================================================================================
 
@@ -662,7 +652,6 @@ inline qint32 RtFiffRawViewModel::getCurrentSampleIndex() const
     return m_iCurrentSample;
 }
 
-
 //=============================================================================================================
 
 inline double RtFiffRawViewModel::getLastBlockFirstValue(int row) const
@@ -676,14 +665,12 @@ inline double RtFiffRawViewModel::getLastBlockFirstValue(int row) const
     return m_vecLastBlockFirstValuesRaw[row];
 }
 
-
 //=============================================================================================================
 
 inline const QMap<qint32,qint32>& RtFiffRawViewModel::getIdxSelMap() const
 {
     return m_qMapIdxRowSelection;
 }
-
 
 //=============================================================================================================
 
@@ -692,7 +679,6 @@ inline qint32 RtFiffRawViewModel::numVLines() const
     return (m_iT - 1);
 }
 
-
 //=============================================================================================================
 
 inline bool RtFiffRawViewModel::isFreezed() const
@@ -700,14 +686,12 @@ inline bool RtFiffRawViewModel::isFreezed() const
     return m_bIsFreezed;
 }
 
-
 //=============================================================================================================
 
 inline const QMap< qint32,float >& RtFiffRawViewModel::getScaling() const
 {
     return m_qMapChScaling;
 }
-
 
 //=============================================================================================================
 
@@ -720,7 +704,6 @@ inline QMap<double, QColor> RtFiffRawViewModel::getTriggerColor() const
     QMap<double, QColor> map;
     return map;
 }
-
 
 //=============================================================================================================
 
@@ -738,7 +721,6 @@ inline QList<QPair<int,double> >  RtFiffRawViewModel::getDetectedTriggers() cons
         return triggerIndices;
 }
 
-
 //=============================================================================================================
 
 inline QList<QPair<int,double> > RtFiffRawViewModel::getDetectedTriggersOld() const
@@ -755,7 +737,6 @@ inline QList<QPair<int,double> > RtFiffRawViewModel::getDetectedTriggersOld() co
         return triggerIndices;
 }
 
-
 //=============================================================================================================
 
 inline int RtFiffRawViewModel::getNumberOfTimeSpacers() const
@@ -764,14 +745,12 @@ inline int RtFiffRawViewModel::getNumberOfTimeSpacers() const
     return ((1000)/m_iDistanceTimerSpacer)-1;
 }
 
-
 //=============================================================================================================
 
 inline double RtFiffRawViewModel::getTriggerThreshold() const
 {
     return m_dTriggerThreshold;
 }
-
 
 //=============================================================================================================
 
@@ -780,7 +759,6 @@ inline QString RtFiffRawViewModel::getTriggerName() const
     return m_sCurrentTriggerCh;
 }
 
-
 //=============================================================================================================
 
 inline int RtFiffRawViewModel::getCurrentTriggerIndex() const
@@ -788,14 +766,12 @@ inline int RtFiffRawViewModel::getCurrentTriggerIndex() const
     return m_iCurrentTriggerChIndex;
 }
 
-
 //=============================================================================================================
 
 inline bool RtFiffRawViewModel::triggerDetectionActive() const
 {
     return m_bTriggerDetectionActive;
 }
-
 
 //=============================================================================================================
 
@@ -806,7 +782,6 @@ inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
     else
         return 0;
 }
-
 
 } // NAMESPACE
 

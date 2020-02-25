@@ -41,14 +41,12 @@
 
 #include "eegosportselectrodeitem.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace EEGOSPORTSPLUGIN;
 using namespace std;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -66,14 +64,12 @@ EEGoSportsElectrodeItem::EEGoSportsElectrodeItem(const QString& electrodeName,
 {
 }
 
-
 //=============================================================================================================
 
 QRectF EEGoSportsElectrodeItem::boundingRect() const
 {
     return QRectF(-25, -35, 50, 70);
 }
-
 
 //=============================================================================================================
 
@@ -112,14 +108,12 @@ void EEGoSportsElectrodeItem::paint(QPainter *painter, const QStyleOptionGraphic
     this->setPos(m_qpElectrodePosition);
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsElectrodeItem::setColor(const QColor& electrodeColor)
 {
     m_cElectrodeColor = electrodeColor;
 }
-
 
 //=============================================================================================================
 
@@ -128,14 +122,12 @@ QString EEGoSportsElectrodeItem::getElectrodeName()
     return m_sElectrodeName;
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsElectrodeItem::setImpedanceValue(double impedanceValue)
 {
     m_dImpedanceValue = impedanceValue;
 }
-
 
 //=============================================================================================================
 
@@ -144,7 +136,6 @@ double EEGoSportsElectrodeItem::getImpedanceValue()
     return m_dImpedanceValue;
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsElectrodeItem::setPosition(const QPointF& newPosition)
@@ -152,14 +143,12 @@ void EEGoSportsElectrodeItem::setPosition(const QPointF& newPosition)
     m_qpElectrodePosition = newPosition;
 }
 
-
 //=============================================================================================================
 
 QPointF EEGoSportsElectrodeItem::getPosition()
 {
     return m_qpElectrodePosition;
 }
-
 
 //=============================================================================================================
 

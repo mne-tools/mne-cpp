@@ -64,7 +64,6 @@
 
 #include <QPropertyAnimation>
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -72,13 +71,11 @@
 #include <iostream>
 #include <mne/mne.h>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNELIB;
-
 
 //=============================================================================================================
 // MAIN
@@ -87,7 +84,6 @@ using namespace MNELIB;
 int main(int argc, char* argv[])
 {
     QGuiApplication app(argc, argv);
-
 
 
     QFile t_fileForwardSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
@@ -151,7 +147,6 @@ int main(int argc, char* argv[])
 
     int num_positions = t_ForwardSolution.src[0].rr.rows();
 
-
     // 4 distinct vertices
     QByteArray vertexBufferData;
     vertexBufferData.resize(num_positions * (3 + 3 + 3) * sizeof(float));
@@ -161,7 +156,6 @@ int main(int argc, char* argv[])
     QVector3D blue(0.0f, 0.0f, 1.0f);
 
     QVector<QVector3D> vertices;
-
 
     int color_debug_count = 0;
     //This is obsolete GoTo 1:
@@ -200,7 +194,6 @@ int main(int argc, char* argv[])
     qDebug() << "tri rows: " << t_ForwardSolution.src[0].tris.rows() << "; cols:" << t_ForwardSolution.src[0].tris.cols();
 
     int num_tri_elements = t_ForwardSolution.src[0].tris.rows() * t_ForwardSolution.src[0].tris.cols();
-
 
     // Indices (12)
     QByteArray indexBufferData;
@@ -285,13 +278,10 @@ int main(int argc, char* argv[])
     customMeshEntity->addComponent(transform);
     customMeshEntity->addComponent(material);
 
-
     rootEntity->addComponent(frameGraph);
 
     engine.setRootEntity(rootEntity);
     view.show();
-
-
 
 
 
@@ -349,7 +339,6 @@ int main(int argc, char* argv[])
 //        rawVertexArray[idx++] = v.z();
 //    }
 
-
 //    // Indices (12)
 //    QByteArray indexBufferData;
 //    indexBufferData.resize(4 * 3 * sizeof(ushort));
@@ -374,7 +363,6 @@ int main(int argc, char* argv[])
 
 //    vertexDataBuffer->setData(vertexBufferData);
 //    indexDataBuffer->setData(indexBufferData);
-
 
 //    // Attributes
 //    Qt3D::QAttribute *positionAttribute = new Qt3D::QAttribute();

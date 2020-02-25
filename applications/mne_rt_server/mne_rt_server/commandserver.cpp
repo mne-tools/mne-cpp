@@ -52,14 +52,12 @@
 #include <stdlib.h>
 #include <iostream>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace RTSERVER;
 using namespace COMMUNICATIONLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -73,14 +71,12 @@ CommandServer::CommandServer(QObject *parent)
     QObject::connect(&m_commandParser, &CommandParser::response, this, &CommandServer::prepareReply);
 }
 
-
 //=============================================================================================================
 
 CommandServer::~CommandServer()
 {
     emit closeCommandThreads();
 }
-
 
 //=============================================================================================================
 
@@ -100,7 +96,6 @@ void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
         emit replyCommand(t_blockReply, p_iThreadID);
     }
 }
-
 
 //=============================================================================================================
 
@@ -124,7 +119,6 @@ void CommandServer::incomingConnection(qintptr socketDescriptor)
     t_pCommandThread->start();
 }
 
-
 //=============================================================================================================
 
 void CommandServer::registerCommandManager(CommandManager &p_commandManager)
@@ -135,7 +129,6 @@ void CommandServer::registerCommandManager(CommandManager &p_commandManager)
 //    p_commandManager.registerResponseChannel(&m_commandParser, &CommandParser::response);
     QObject::connect(&p_commandManager, &CommandManager::response, &m_commandParser, &CommandParser::response);
 }
-
 
 //=============================================================================================================
 

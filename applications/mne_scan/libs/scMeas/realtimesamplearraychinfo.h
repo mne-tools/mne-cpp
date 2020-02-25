@@ -44,7 +44,6 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_types.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -52,14 +51,12 @@
 #include <QSharedPointer>
 #include <QString>
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE SCMEASLIB
 //=============================================================================================================
 
 namespace SCMEASLIB
 {
-
 
 //=========================================================================================================
 /**
@@ -190,7 +187,6 @@ private:
     FIFFLIB::fiff_int_t m_iCoilType;        /**< What kind of coil. */
 };
 
-
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
@@ -200,14 +196,12 @@ inline void RealTimeSampleArrayChInfo::setChannelName(QString p_qStringChName)
     m_qStringChName = p_qStringChName;
 }
 
-
 //=============================================================================================================
 
 inline QString RealTimeSampleArrayChInfo::getChannelName() const
 {
     return m_qStringChName;
 }
-
 
 //=============================================================================================================
 
@@ -216,14 +210,12 @@ inline void RealTimeSampleArrayChInfo::setKind(qint32 p_iKind)
     m_iKind = p_iKind;
 }
 
-
 //=============================================================================================================
 
 inline qint32 RealTimeSampleArrayChInfo::getKind() const
 {
     return m_iKind;
 }
-
 
 //=============================================================================================================
 
@@ -232,14 +224,12 @@ inline void RealTimeSampleArrayChInfo::setMinValue(double minValue)
     m_dMinValue = minValue;
 }
 
-
 //=============================================================================================================
 
 inline double RealTimeSampleArrayChInfo::getMinValue() const
 {
     return m_dMinValue;
 }
-
 
 //=============================================================================================================
 
@@ -249,14 +239,12 @@ inline void RealTimeSampleArrayChInfo::setMaxValue(double maxValue)
         m_dMaxValue = maxValue;
 }
 
-
 //=============================================================================================================
 
 inline double RealTimeSampleArrayChInfo::getMaxValue() const
 {
     return m_dMaxValue;
 }
-
 
 //=============================================================================================================
 
@@ -265,7 +253,6 @@ inline void RealTimeSampleArrayChInfo::setUnit(FIFFLIB::fiff_int_t unit)
     m_iUnit = unit;
 }
 
-
 //=============================================================================================================
 
 inline FIFFLIB::fiff_int_t RealTimeSampleArrayChInfo::getUnit() const
@@ -273,14 +260,12 @@ inline FIFFLIB::fiff_int_t RealTimeSampleArrayChInfo::getUnit() const
     return m_iUnit;
 }
 
-
 //=============================================================================================================
 
 inline void RealTimeSampleArrayChInfo::setCoil(FIFFLIB::fiff_int_t coil)
 {
     m_iCoilType = coil;
 }
-
 
 //=============================================================================================================
 

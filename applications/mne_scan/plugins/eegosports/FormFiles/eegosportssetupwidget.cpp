@@ -42,18 +42,15 @@
 #include "eegosportsaboutwidget.h"
 #include "../eegosports.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace EEGOSPORTSPLUGIN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -92,14 +89,12 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
     }
 }
 
-
 //=============================================================================================================
 
 EEGoSportsSetupWidget::~EEGoSportsSetupWidget()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -113,7 +108,6 @@ void EEGoSportsSetupWidget::initGui()
     ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pEEGoSports->m_bWriteDriverDebugToFile);
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsSetupWidget::setDeviceSamplingProperties()
@@ -122,14 +116,12 @@ void EEGoSportsSetupWidget::setDeviceSamplingProperties()
     m_pEEGoSports->m_iSamplesPerBlock = ui.m_spinBox_BlockSize->value();
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsSetupWidget::setWriteToFile()
 {
     m_pEEGoSports->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
 }
-
 
 //=============================================================================================================
 

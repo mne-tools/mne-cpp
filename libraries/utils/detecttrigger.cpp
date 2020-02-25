@@ -40,7 +40,6 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -48,14 +47,12 @@
 #include <QMapIterator>
 #include <QTime>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace Eigen;
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -65,7 +62,6 @@ DetectTrigger::DetectTrigger()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -120,7 +116,6 @@ QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksMax(const
     return qMapDetectedTrigger;
 }
 
-
 //=============================================================================================================
 
 QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &data,
@@ -164,7 +159,6 @@ QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksMax(const MatrixXd &
 
     return lDetectedTriggers;
 }
-
 
 //=============================================================================================================
 
@@ -233,7 +227,6 @@ QMap<int,QList<QPair<int,double> > > DetectTrigger::detectTriggerFlanksGrad(cons
     return qMapDetectedTrigger;
 }
 
-
 //=============================================================================================================
 
 QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd &data,
@@ -291,6 +284,5 @@ QList<QPair<int,double> > DetectTrigger::detectTriggerFlanksGrad(const MatrixXd 
 
     return lDetectedTriggers;
 }
-
 
 

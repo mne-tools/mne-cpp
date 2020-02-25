@@ -39,13 +39,11 @@
 
 #include "pluginscenemanager.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace SCSHAREDLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -56,14 +54,12 @@ PluginSceneManager::PluginSceneManager(QObject *parent)
 {
 }
 
-
 //=============================================================================================================
 
 PluginSceneManager::~PluginSceneManager()
 {
     clear();
 }
-
 
 //=============================================================================================================
 
@@ -104,7 +100,6 @@ bool PluginSceneManager::addPlugin(const IPlugin* pPlugin, IPlugin::SPtr &pAdded
     return false;
 }
 
-
 //=============================================================================================================
 
 bool PluginSceneManager::removePlugin(const IPlugin::SPtr pPlugin)
@@ -127,7 +122,6 @@ bool PluginSceneManager::removePlugin(const IPlugin::SPtr pPlugin)
         return false;
 }
 
-
 //=============================================================================================================
 
 bool PluginSceneManager::startPlugins()
@@ -143,7 +137,6 @@ bool PluginSceneManager::startPlugins()
 
     return bFlag;
 }
-
 
 //=============================================================================================================
 
@@ -166,7 +159,6 @@ bool PluginSceneManager::startSensorPlugins()
     return bFlag;
 }
 
-
 //=============================================================================================================
 
 void PluginSceneManager::startAlgorithmPlugins()
@@ -178,7 +170,6 @@ void PluginSceneManager::startAlgorithmPlugins()
                 qWarning() << "Could not start IAlgorithm: " << (*it)->getName();
 }
 
-
 //=============================================================================================================
 
 void PluginSceneManager::startIOPlugins()
@@ -189,7 +180,6 @@ void PluginSceneManager::startIOPlugins()
             if(!(*it)->start())
                 qWarning() << "Could not start IIO: " << (*it)->getName();
 }
-
 
 //=============================================================================================================
 
@@ -209,7 +199,6 @@ void PluginSceneManager::stopPlugins()
             if(!(*it)->stop())
                 qWarning() << "Could not stop IPlugin: " << (*it)->getName();
 }
-
 
 //=============================================================================================================
 

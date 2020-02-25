@@ -46,7 +46,6 @@
 #include <fs/surfaceset.h>
 #include <mne/mne_forwardsolution.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -55,7 +54,6 @@
 #include <QFileDialog>
 #include <QtConcurrent>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -63,7 +61,6 @@
 using namespace RTCMNEPLUGIN;
 using namespace MNELIB;
 using namespace FSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -96,14 +93,12 @@ RtcMneSetupWidget::RtcMneSetupWidget(RtcMne* toolbox, QWidget *parent)
     connect(ui.m_qPushButonStartClustering, &QPushButton::released, this, &RtcMneSetupWidget::clusteringTriggered);
 }
 
-
 //=============================================================================================================
 
 RtcMneSetupWidget::~RtcMneSetupWidget()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -113,7 +108,6 @@ void RtcMneSetupWidget::setClusteringState()
     ui.m_qPushButonStartClustering->setText("Clustering...");
 }
 
-
 //=============================================================================================================
 
 void RtcMneSetupWidget::setSetupState()
@@ -121,7 +115,6 @@ void RtcMneSetupWidget::setSetupState()
     ui.m_qPushButonStartClustering->setEnabled(true);
     ui.m_qPushButonStartClustering->setText("Start Clustering");
 }
-
 
 //=============================================================================================================
 
@@ -131,7 +124,6 @@ void RtcMneSetupWidget::clusteringTriggered()
     QFuture<void> future = QtConcurrent::run(m_pMNE, &RtcMne::doClustering);
 }
 
-
 //=============================================================================================================
 
 void RtcMneSetupWidget::showAboutDialog()
@@ -139,7 +131,6 @@ void RtcMneSetupWidget::showAboutDialog()
     RtcMneAboutWidget aboutDialog(this);
     aboutDialog.exec();
 }
-
 
 //=============================================================================================================
 
@@ -160,7 +151,6 @@ void RtcMneSetupWidget::showFwdFileDialog()
         m_pMNE->m_pFwd = t_pFwd;
     }
 }
-
 
 //=============================================================================================================
 
@@ -191,7 +181,6 @@ void RtcMneSetupWidget::showAtlasDirDialog()
         ui.m_qLabel_atlasStat->setText("not loaded");
     }
 }
-
 
 //=============================================================================================================
 

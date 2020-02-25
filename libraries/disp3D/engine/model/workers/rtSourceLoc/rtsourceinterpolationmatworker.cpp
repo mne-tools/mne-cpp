@@ -43,16 +43,13 @@
 #include "../../../../helpers/interpolation/interpolation.h"
 #include "../../items/common/types.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -62,7 +59,6 @@ using namespace DISP3DLIB;
 using namespace MNELIB;
 using namespace Eigen;
 using namespace FSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -79,7 +75,6 @@ RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker()
     m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;
     m_lInterpolationData.matDistanceMatrix = QSharedPointer<MatrixXd>(new MatrixXd());
 }
-
 
 //=============================================================================================================
 
@@ -114,7 +109,6 @@ void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString &sIn
     }
 }
 
-
 //=============================================================================================================
 
 void RtSourceInterpolationMatWorker::setVisualizationType(int iVisType)
@@ -125,7 +119,6 @@ void RtSourceInterpolationMatWorker::setVisualizationType(int iVisType)
         emitMatrix();
     }
 }
-
 
 //=============================================================================================================
 
@@ -143,7 +136,6 @@ void RtSourceInterpolationMatWorker::setCancelDistance(double dCancelDist)
 
     emitMatrix();
 }
-
 
 //=============================================================================================================
 
@@ -169,7 +161,6 @@ void RtSourceInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f
         emit newInterpolationMatrixCalculated(m_pMatInterpolationMat);
     }
 }
-
 
 //=============================================================================================================
 
@@ -200,7 +191,6 @@ void RtSourceInterpolationMatWorker::setAnnotationInfo(const Eigen::VectorXi &ve
     }
 }
 
-
 //=============================================================================================================
 
 void RtSourceInterpolationMatWorker::calculateInterpolationOperator()
@@ -222,7 +212,6 @@ void RtSourceInterpolationMatWorker::calculateInterpolationOperator()
                                                                    m_lInterpolationData.interpolationFunction,
                                                                    m_lInterpolationData.dCancelDistance);
     }
-
 
 //=============================================================================================================
 
@@ -253,7 +242,6 @@ void RtSourceInterpolationMatWorker::calculateAnnotationOperator()
         }
     }
 }
-
 
 //=============================================================================================================
 

@@ -53,7 +53,6 @@ class QWidget;
 class QPolygonF;
 
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE MNESCAN
 //=============================================================================================================
@@ -62,7 +61,6 @@ namespace MNESCAN
 {
 
 class Arrow;
-
 
 
 class PluginItem : public QGraphicsPolygonItem

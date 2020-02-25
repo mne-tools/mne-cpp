@@ -85,7 +85,6 @@ CONFIG(debug, debug|release) {
 
 TEMPLATE = app
 
-
 SOURCES += \
         main.cpp \
 

@@ -45,7 +45,6 @@
 #include "fiffstreamserver.h"
 #include "mne_rt_commands.h"
 
-
 //=============================================================================================================
 // Fiff INCLUDES
 //=============================================================================================================
@@ -54,13 +53,11 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_tag.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtNetwork>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -69,7 +66,6 @@
 using namespace UTILSLIB;
 using namespace RTSERVER;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -85,7 +81,6 @@ FiffStreamThread::FiffStreamThread(qint32 id, int socketDescriptor, QObject *par
 {
 }
 
-
 //=============================================================================================================
 
 FiffStreamThread::~FiffStreamThread()
@@ -98,7 +93,6 @@ FiffStreamThread::~FiffStreamThread()
     m_bIsRunning = false;
     QThread::wait();
 }
-
 
 //=============================================================================================================
 
@@ -117,7 +111,6 @@ void FiffStreamThread::startMeas(qint32 ID)
     }
 }
 
-
 //=============================================================================================================
 
 void FiffStreamThread::stopMeas(qint32 ID)
@@ -134,7 +127,6 @@ void FiffStreamThread::stopMeas(qint32 ID)
         m_qMutex.unlock();
     }
 }
-
 
 //=============================================================================================================
 
@@ -173,7 +165,6 @@ void FiffStreamThread::parseCommand(FiffTag::SPtr p_pTag)
     }
 }
 
-
 //=============================================================================================================
 
 void FiffStreamThread::sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData)
@@ -196,7 +187,6 @@ void FiffStreamThread::sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawDa
 //    }
 }
 
-
 //=============================================================================================================
 
 //void FiffStreamThread::sendData(QTcpSocket& p_qTcpSocket)
@@ -215,7 +205,6 @@ void FiffStreamThread::sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawDa
 //        m_qMutex.unlock();
 //    }
 //}
-
 
 //=============================================================================================================
 
@@ -242,7 +231,6 @@ void FiffStreamThread::sendMeasurementInfo(qint32 ID, const FiffInfo& p_fiffInfo
     }
 }
 
-
 //=============================================================================================================
 
 void FiffStreamThread::writeClientId()
@@ -251,7 +239,6 @@ void FiffStreamThread::writeClientId()
 
     t_FiffStreamOut.write_int(FIFF_MNE_RT_CLIENT_ID, &m_iDataClientId);
 }
-
 
 //=============================================================================================================
 
@@ -288,7 +275,6 @@ void FiffStreamThread::writeClientId()
 //        }
 //    }
 //}
-
 
 //=============================================================================================================
 

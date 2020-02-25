@@ -43,7 +43,6 @@
 #include <omp.h>
 #endif
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -51,7 +50,6 @@
 using namespace INVERSELIB;
 using namespace MNELIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -62,7 +60,6 @@ PwlRapMusic::PwlRapMusic()
 {
 }
 
-
 //=============================================================================================================
 
 PwlRapMusic::PwlRapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
@@ -72,14 +69,12 @@ PwlRapMusic::PwlRapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, 
     init(p_pFwd, p_bSparsed, p_iN, p_dThr);
 }
 
-
 //=============================================================================================================
 
 PwlRapMusic::~PwlRapMusic()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -88,7 +83,6 @@ const char* PwlRapMusic::getName() const
     return "Powell RAP MUSIC";
 }
 
-
 //=============================================================================================================
 
 MNESourceEstimate PwlRapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal)
@@ -96,14 +90,12 @@ MNESourceEstimate PwlRapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, 
     return RapMusic::calculateInverse(p_fiffEvoked, pick_normal);
 }
 
-
 //=============================================================================================================
 
 MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd &data, float tmin, float tstep) const
 {
     return RapMusic::calculateInverse(data, tmin, tstep);
 }
-
 
 //=============================================================================================================
 
@@ -283,7 +275,6 @@ MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
                 t_iIdx2 = m_ppPairIdxCombinations[t_iMaxIdx]->x2;
             }
 
-
             //set new index
             if(t_iIdx1 == t_iCurrentRow)
                 t_iCurrentRow = t_iIdx2;
@@ -298,7 +289,6 @@ MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
 
         float t_fSubcorrElapsedTime = ( (float)(end_subcorr-start_subcorr) / (float)CLOCKS_PER_SEC ) * 1000.0f;
         std::cout << "Time Elapsed: " << t_fSubcorrElapsedTime << " ms" << std::endl;
-
 
         // (Idx+1) because of MATLAB positions -> starting with 1 not with 0
         std::cout << "Iteration: " << r+1 << " of " << t_iMaxSearch
@@ -352,7 +342,6 @@ MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
     return p_SourceEstimate;
 }
 
-
 //=============================================================================================================
 
 int PwlRapMusic::PowellOffset(int p_iRow, int p_iNumPoints)
@@ -361,7 +350,6 @@ int PwlRapMusic::PowellOffset(int p_iRow, int p_iNumPoints)
     return p_iRow*p_iNumPoints - (( (p_iRow-1)*p_iRow) / 2); //triangular series 1 3 6 10 ... = (num_pairs*(num_pairs+1))/2
 
 }
-
 
 //=============================================================================================================
 
@@ -373,11 +361,9 @@ void PwlRapMusic::PowellIdxVec(int p_iRow, int p_iNumPoints, Eigen::VectorXi& p_
     //
     //     p_pVecElements = new int(p_iNumPoints);
 
-
     //col combination index
     for(int i = 0; i <= p_iRow; ++i)//=p_iNumPoints-1
         p_pVecElements(i) = PwlRapMusic::PowellOffset(i+1,p_iNumPoints)-(p_iNumPoints-p_iRow);
-
 
     //row combination index
     int off = PwlRapMusic::PowellOffset(p_iRow,p_iNumPoints);

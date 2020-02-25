@@ -42,18 +42,15 @@
 
 #include <fiff/fiff_evoked_set.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSettings>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -61,7 +58,6 @@
 
 using namespace DISPLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -85,14 +81,12 @@ AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
     redrawGUI();
 }
 
-
 //=============================================================================================================
 
 AveragingSettingsView::~AveragingSettingsView()
 {
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 
@@ -116,14 +110,12 @@ void AveragingSettingsView::setStimChannels(const QMap<QString,int>& mapStimChsI
     }
 }
 
-
 //=============================================================================================================
 
 QString AveragingSettingsView::getCurrentStimCh()
 {
     return m_sCurrentStimChan;
 }
-
 
 //=============================================================================================================
 
@@ -132,14 +124,12 @@ bool AveragingSettingsView::getDoBaselineCorrection()
     return m_bDoBaselineCorrection;
 }
 
-
 //=============================================================================================================
 
 int AveragingSettingsView::getNumAverages()
 {
     return m_iNumAverages;
 }
-
 
 //=============================================================================================================
 
@@ -148,14 +138,12 @@ int AveragingSettingsView::getBaselineFromSeconds()
     return m_iBaselineFromSeconds;
 }
 
-
 //=============================================================================================================
 
 int AveragingSettingsView::getBaselineToSeconds()
 {
     return m_iBaselineToSeconds;
 }
-
 
 //=============================================================================================================
 
@@ -164,7 +152,6 @@ int AveragingSettingsView::getPreStimSeconds()
     return m_iPreStimSeconds;
 }
 
-
 //=============================================================================================================
 
 int AveragingSettingsView::getPostStimSeconds()
@@ -172,14 +159,12 @@ int AveragingSettingsView::getPostStimSeconds()
     return m_iPostStimSeconds;
 }
 
-
 //=============================================================================================================
 
 int AveragingSettingsView::getStimChannelIdx()
 {
     return ui->m_pComboBoxChSelection->currentData().toInt();
 }
-
 
 //=============================================================================================================
 
@@ -238,7 +223,6 @@ void AveragingSettingsView::redrawGUI()
     ui->m_groupBox_detectedTrials->hide();
 }
 
-
 //=============================================================================================================
 
 void AveragingSettingsView::setDetectedEpochs(const FiffEvokedSet& evokedSet)
@@ -276,7 +260,6 @@ void AveragingSettingsView::setDetectedEpochs(const FiffEvokedSet& evokedSet)
     ui->m_groupBox_detectedTrials->setLayout(topLayout);
 }
 
-
 //=============================================================================================================
 
 void AveragingSettingsView::saveSettings(const QString& settingsPath)
@@ -296,7 +279,6 @@ void AveragingSettingsView::saveSettings(const QString& settingsPath)
     settings.setValue(settingsPath + QString("/baselineToSeconds"), m_iBaselineToSeconds);
     settings.setValue(settingsPath + QString("/doBaselineCorrection"), m_bDoBaselineCorrection);
 }
-
 
 //=============================================================================================================
 
@@ -327,7 +309,6 @@ void AveragingSettingsView::loadSettings(const QString& settingsPath)
     m_bDoBaselineCorrection = settings.value(settingsPath + QString("/doBaselineCorrection"), false).toBool();
 }
 
-
 //=============================================================================================================
 
 void AveragingSettingsView::onChangePreStim()
@@ -342,7 +323,6 @@ void AveragingSettingsView::onChangePreStim()
 
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 
@@ -359,7 +339,6 @@ void AveragingSettingsView::onChangePostStim()
     saveSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 void AveragingSettingsView::onChangeBaselineFrom()
@@ -373,7 +352,6 @@ void AveragingSettingsView::onChangeBaselineFrom()
 
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 
@@ -389,7 +367,6 @@ void AveragingSettingsView::onChangeBaselineTo()
     saveSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 void AveragingSettingsView::onChangeNumAverages()
@@ -400,7 +377,6 @@ void AveragingSettingsView::onChangeNumAverages()
 
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 

@@ -40,13 +40,11 @@
 //=============================================================================================================
 
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <qglobal.h>
-
 
 //=============================================================================================================
 // TYPEDEFS Primitive building blocks:
@@ -54,7 +52,6 @@
 
 typedef qint32      fiff_int_t_REF;
 typedef float       fiff_float_t_REF;
-
 
 //=============================================================================================================
 // REFERENCES
@@ -69,6 +66,5 @@ typedef struct _fiffCoordTransRec_REF {
     fiff_float_t_REF    invrot[3][3];           /**< The inverse transform (rotation part) */
     fiff_float_t_REF    invmove[3];             /**< The inverse transform (translation part) */
 } *fiffCoordTrans_REF, fiffCoordTransRec_REF;   /**< Coordinate transformation descriptor */
-
 
 #endif // FIFFTYPESREF_H

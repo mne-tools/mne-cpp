@@ -39,7 +39,6 @@
 
 #include "runwidget.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -48,7 +47,6 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QDebug>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -78,7 +76,6 @@ RunWidget::RunWidget(QWidget *dispWidget, QWidget *parent)
     //setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 }
 
-
 //=============================================================================================================
 
 RunWidget::~RunWidget()
@@ -92,7 +89,6 @@ RunWidget::~RunWidget()
 //        delete m_pScrollArea;
 }
 
-
 //=============================================================================================================
 
 int RunWidget::addTab(QWidget* page, const QString& label)
@@ -100,14 +96,12 @@ int RunWidget::addTab(QWidget* page, const QString& label)
     return m_pTabWidgetMain->addTab(page, label);
 }
 
-
 //=============================================================================================================
 
 void RunWidget::setStandardZoom()
 {
     m_pScrollArea->setWidgetResizable(true);
 }
-
 
 //=============================================================================================================
 
@@ -126,7 +120,6 @@ void RunWidget::zoomVert(float factor)
 
 }
 
-
 //=============================================================================================================
 
 void RunWidget::resizeEvent(QResizeEvent* )
@@ -143,7 +136,6 @@ void RunWidget::resizeEvent(QResizeEvent* )
         m_pScrollArea->widget()->resize(size.width(),size.height());
     }
 }
-
 
 //=============================================================================================================
 

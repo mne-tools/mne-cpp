@@ -45,13 +45,11 @@
 #include "fwd_eeg_sphere_layer.h"
 #include "fwd_coil_set.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,8 +58,6 @@
 #include <QSharedPointer>
 #include <QList>
 #include <QDebug>
-
-
 
 
 
@@ -81,14 +77,12 @@ typedef struct {
     int    nterms;
 } *fitUser,fitUserRec;
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE FWDLIB
 //=============================================================================================================
 
 namespace FWDLIB
 {
-
 
 //=============================================================================================================
 /**
@@ -127,7 +121,6 @@ public:
                                                          const Eigen::VectorXf& rads,
                                                          const Eigen::VectorXf& sigmas);
 
-
     //=========================================================================================================
     /**
      * Destroys the Electric Current Dipole description
@@ -152,10 +145,7 @@ public:
 
 
 
-
-
     static fitUser new_fit_user(int nfit, int nterms);
-
 
 
 
@@ -170,7 +160,6 @@ public:
      * @return       the weighting factor for n
      */
     double fwd_eeg_get_multi_sphere_model_coeff(int n);
-
 
 
 
@@ -198,13 +187,11 @@ public:
 
 
 
-
     static int fwd_eeg_multi_spherepot_coil1(float *rd,    /* Dipole position */
                       float      *Q,                /* Dipole moment */
                       FwdCoilSet* els,              /* Electrode positions */
                       float      *Vval,             /* The potential values */
                       void       *client);
-
 
 
 
@@ -258,8 +245,6 @@ public:
 
 
 
-
-
     static int fwd_eeg_spherepot_grad_coil( float        *rd,      /* The dipole location */
                                             float        Q[],      /* The dipole components (xyz) */
                                             FwdCoilSet*  coils,    /* The coil definitions */
@@ -268,7 +253,6 @@ public:
                                             float        ygrad[],  /* the dipole position coordinates */
                                             float        zgrad[],
                                             void         *client);
-
 
 
     //=========================================================================================================
@@ -291,7 +275,6 @@ public:
      */
     static int fwd_eeg_spherepot( float *rd, float *Q, float **el, int neeg, Eigen::VectorXf& Vval, void *client);
 
-
     //=========================================================================================================
     /**
      * fwd_multi_spherepot.c
@@ -308,7 +291,6 @@ public:
      * @return true when successful
      */
     static int fwd_eeg_spherepot_coil(float *rd, float *Q, FwdCoilSet* els, float *Vval, void *client);
-
 
     //=========================================================================================================
     /**
@@ -328,13 +310,9 @@ public:
 
 
 
-
-
-
     // fwd_fit_berg_scherg.c
 
     static void compose_linear_fitting_data(const Eigen::VectorXd& mu,fitUser u);
-
 
     // fwd_fit_berg_scherg.c
     /*
@@ -344,14 +322,12 @@ public:
     static double compute_linear_parameters(const Eigen::VectorXd& mu, Eigen::VectorXd& lambda, fitUser u);
 
 
-
     // fwd_fit_berg_scherg.c
     /*
           * Evaluate the residual sum of squares fit for one set of
           * mu values
           */
     static double one_step (const Eigen::VectorXd& mu, const void *user_data);
-
 
     /*
           * This routine fits the Berg-Scherg equivalent spherical model
@@ -364,13 +340,11 @@ public:
                                 float &rv);
 
 
-
 /**< Number of layers */
     int   nlayer() const
     {
         return layers.size();
     }
-
 
 public:
     QString                     name;   /**< Textual identifier */
@@ -403,11 +377,9 @@ public:
 
 };
 
-
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 
 } // NAMESPACE FWDLIB
 

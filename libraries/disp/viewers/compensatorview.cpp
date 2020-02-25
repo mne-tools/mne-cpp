@@ -40,7 +40,6 @@
 
 #include <fiff/fiff_ctf_comp.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,11 +50,9 @@
 #include <QSettings>
 #include <QDebug>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -63,7 +60,6 @@
 
 using namespace DISPLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -84,7 +80,6 @@ CompensatorView::CompensatorView(const QString& sSettingsPath,
     redrawGUI();
 }
 
-
 //=============================================================================================================
 
 CompensatorView::~CompensatorView()
@@ -92,14 +87,12 @@ CompensatorView::~CompensatorView()
     saveSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 QList<FIFFLIB::FiffCtfComp> CompensatorView::getCompensators() const
 {
     return m_pComps;
 }
-
 
 //=============================================================================================================
 
@@ -116,14 +109,12 @@ void CompensatorView::setCompensators(const QList<FIFFLIB::FiffCtfComp>& comps)
     redrawGUI();
 }
 
-
 //=============================================================================================================
 
 int CompensatorView::getLastTo() const
 {
     return m_iLastTo;
 }
-
 
 //=============================================================================================================
 
@@ -156,7 +147,6 @@ void CompensatorView::redrawGUI()
     this->setLayout(topLayout);
 }
 
-
 //=============================================================================================================
 
 void CompensatorView::saveSettings(const QString& settingsPath)
@@ -178,7 +168,6 @@ void CompensatorView::saveSettings(const QString& settingsPath)
     settings.endGroup();
 }
 
-
 //=============================================================================================================
 
 void CompensatorView::loadSettings(const QString& settingsPath)
@@ -198,7 +187,6 @@ void CompensatorView::loadSettings(const QString& settingsPath)
 
     settings.endGroup();
 }
-
 
 //=============================================================================================================
 

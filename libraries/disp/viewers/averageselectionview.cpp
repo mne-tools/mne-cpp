@@ -41,7 +41,6 @@
 
 #include <fiff/fiff_evoked_set.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -55,13 +54,11 @@
 #include <QSettings>
 #include <QPointer>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include<Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -69,7 +66,6 @@
 
 using namespace DISPLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -92,14 +88,12 @@ AverageSelectionView::AverageSelectionView(const QString& sSettingsPath,
     redrawGUI();
 }
 
-
 //=============================================================================================================
 
 AverageSelectionView::~AverageSelectionView()
 {
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 
@@ -108,14 +102,12 @@ QSharedPointer<QMap<QString, QColor> > AverageSelectionView::getAverageColor() c
     return m_qMapAverageColor;
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<QMap<QString, bool> > AverageSelectionView::getAverageActivation() const
 {
     return m_qMapAverageActivation;
 }
-
 
 //=============================================================================================================
 
@@ -125,7 +117,6 @@ void AverageSelectionView::setAverageColor(const QSharedPointer<QMap<QString, QC
     redrawGUI();
 }
 
-
 //=============================================================================================================
 
 void AverageSelectionView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
@@ -133,7 +124,6 @@ void AverageSelectionView::setAverageActivation(const QSharedPointer<QMap<QStrin
     m_qMapAverageActivation = qMapAverageActivation;
     redrawGUI();
 }
-
 
 //=============================================================================================================
 
@@ -162,7 +152,6 @@ void AverageSelectionView::saveSettings(const QString& settingsPath)
     settings.endGroup();
 }
 
-
 //=============================================================================================================
 
 void AverageSelectionView::loadSettings(const QString& settingsPath)
@@ -187,7 +176,6 @@ void AverageSelectionView::loadSettings(const QString& settingsPath)
     }
     settings.endGroup();
 }
-
 
 //=============================================================================================================
 
@@ -242,7 +230,6 @@ void AverageSelectionView::redrawGUI()
 
     this->setLayout(topLayout);
 }
-
 
 //=============================================================================================================
 

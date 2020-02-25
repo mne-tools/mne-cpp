@@ -41,7 +41,6 @@
 
 #include <sstream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -49,13 +48,11 @@
 #include <QDebug>
 #include <QListWidgetItem>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace LSLADAPTERPLUGIN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -71,7 +68,6 @@ LSLAdapterSetup::LSLAdapterSetup(int initialBlockSize, QWidget* parent)
     // copy start value for block size into UI:
     ui.blockSizeEdit->setText(QString::number(initialBlockSize));
 }
-
 
 //=============================================================================================================
 
@@ -106,7 +102,6 @@ void LSLAdapterSetup::onLSLScanResults(const QVector<lsl::stream_info>& vStreamI
     updateTextFields();
 }
 
-
 //=============================================================================================================
 
 void LSLAdapterSetup::on_refreshAvailableStreams_released()
@@ -114,7 +109,6 @@ void LSLAdapterSetup::on_refreshAvailableStreams_released()
     // simply pass on to LSL Adapter
     emit refreshAvailableStreams();
 }
-
 
 //=============================================================================================================
 
@@ -134,7 +128,6 @@ void LSLAdapterSetup::on_listLSLStreams_itemDoubleClicked(QListWidgetItem *pItem
     }
 }
 
-
 //=============================================================================================================
 
 void LSLAdapterSetup::updateTextFields()
@@ -147,7 +140,6 @@ void LSLAdapterSetup::updateTextFields()
     }
     ui.currentStreamDescription->setStyleSheet("font: bold");
 }
-
 
 //=============================================================================================================
 

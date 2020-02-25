@@ -45,7 +45,6 @@
 
 #include <utils/mnemath.h>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -53,7 +52,6 @@
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -69,7 +67,6 @@ FiffEvoked::FiffEvoked()
 
 }
 
-
 //=============================================================================================================
 
 FiffEvoked::FiffEvoked(QIODevice& p_IODevice, QVariant setno, QPair<QVariant,QVariant> t_baseline, bool proj, fiff_int_t p_aspect_kind)
@@ -82,7 +79,6 @@ FiffEvoked::FiffEvoked(QIODevice& p_IODevice, QVariant setno, QPair<QVariant,QVa
         return;
     }
 }
-
 
 //=============================================================================================================
 
@@ -101,14 +97,12 @@ FiffEvoked::FiffEvoked(const FiffEvoked& p_FiffEvoked)
 
 }
 
-
 //=============================================================================================================
 
 FiffEvoked::~FiffEvoked()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -124,7 +118,6 @@ void FiffEvoked::clear()
     data = MatrixXd();
     proj = MatrixXd();
 }
-
 
 //=============================================================================================================
 
@@ -165,7 +158,6 @@ FiffEvoked FiffEvoked::pick_channels(const QStringList& include, const QStringLi
 
     return res;
 }
-
 
 //=============================================================================================================
 
@@ -493,7 +485,6 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     return true;
 }
 
-
 //=============================================================================================================
 
 void FiffEvoked::setInfo(FiffInfo &p_info, bool proj)
@@ -528,7 +519,6 @@ void FiffEvoked::setInfo(FiffInfo &p_info, bool proj)
     }
 }
 
-
 //=============================================================================================================
 
 FiffEvoked & FiffEvoked::operator+=(const MatrixXd &newData)
@@ -555,7 +545,6 @@ FiffEvoked & FiffEvoked::operator+=(const MatrixXd &newData)
 
     return *this;
 }
-
 
 //=============================================================================================================
 

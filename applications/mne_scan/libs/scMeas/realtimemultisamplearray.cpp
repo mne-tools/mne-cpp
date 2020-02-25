@@ -41,13 +41,11 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -56,7 +54,6 @@
 using namespace SCMEASLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -71,14 +68,12 @@ RealTimeMultiSampleArray::RealTimeMultiSampleArray(QObject *parent)
     m_slDisplayFlag << "compensators" << "projections" << "filter" << "view" << "triggerdetection" << "scaling" << "sphara" << "colors";
 }
 
-
 //=============================================================================================================
 
 RealTimeMultiSampleArray::~RealTimeMultiSampleArray()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -98,7 +93,6 @@ void RealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
 //        m_qListChInfo.append(initChInfo);
 //    }
 }
-
 
 //=============================================================================================================
 
@@ -232,7 +226,6 @@ void RealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 
     m_bChInfoIsInit = true;
 }
-
 
 //=============================================================================================================
 

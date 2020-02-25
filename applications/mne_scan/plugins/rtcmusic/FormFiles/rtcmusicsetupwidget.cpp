@@ -46,7 +46,6 @@
 #include <fs/surfaceset.h>
 #include <mne/mne_forwardsolution.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -55,7 +54,6 @@
 #include <QFileDialog>
 #include <QtConcurrent>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -63,7 +61,6 @@
 using namespace RTCMUSICPLUGIN;
 using namespace MNELIB;
 using namespace FSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -96,14 +93,12 @@ RtcMusicSetupWidget::RtcMusicSetupWidget(RtcMusic* toolbox, QWidget *parent)
     connect(ui.m_qPushButonStartClustering, &QPushButton::released, this, &RtcMusicSetupWidget::clusteringTriggered);
 }
 
-
 //=============================================================================================================
 
 RtcMusicSetupWidget::~RtcMusicSetupWidget()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -113,7 +108,6 @@ void RtcMusicSetupWidget::setClusteringState()
     ui.m_qPushButonStartClustering->setText("Clustering...");
 }
 
-
 //=============================================================================================================
 
 void RtcMusicSetupWidget::setSetupState()
@@ -121,7 +115,6 @@ void RtcMusicSetupWidget::setSetupState()
     ui.m_qPushButonStartClustering->setEnabled(true);
     ui.m_qPushButonStartClustering->setText("Start Clustering");
 }
-
 
 //=============================================================================================================
 
@@ -131,7 +124,6 @@ void RtcMusicSetupWidget::clusteringTriggered()
     QFuture<void> future = QtConcurrent::run(m_pRtcMusic, &RtcMusic::doClustering);
 }
 
-
 //=============================================================================================================
 
 void RtcMusicSetupWidget::showAboutDialog()
@@ -139,7 +131,6 @@ void RtcMusicSetupWidget::showAboutDialog()
     RtcMusicAboutWidget aboutDialog(this);
     aboutDialog.exec();
 }
-
 
 //=============================================================================================================
 
@@ -160,7 +151,6 @@ void RtcMusicSetupWidget::showFwdFileDialog()
         m_pRtcMusic->m_pFwd = t_pFwd;
     }
 }
-
 
 //=============================================================================================================
 
@@ -191,7 +181,6 @@ void RtcMusicSetupWidget::showAtlasDirDialog()
         ui.m_qLabel_atlasStat->setText("not loaded");
     }
 }
-
 
 //=============================================================================================================
 

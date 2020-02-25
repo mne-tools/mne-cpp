@@ -37,23 +37,19 @@
 
 #include "abstracttreeitem.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISP3DLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -66,7 +62,6 @@ AbstractTreeItem::AbstractTreeItem(int iType, const QString& text)
     initItem();
 }
 
-
 //=============================================================================================================
 
 void AbstractTreeItem::initItem()
@@ -77,7 +72,6 @@ void AbstractTreeItem::initItem()
     connect(this, &AbstractTreeItem::checkStateChanged,
          this, &AbstractTreeItem::onCheckStateChanged);
 }
-
 
 //=============================================================================================================
 
@@ -93,14 +87,12 @@ void AbstractTreeItem::setData(const QVariant& value, int role)
     }
 }
 
-
 //=============================================================================================================
 
 int AbstractTreeItem::type() const
 {
     return m_iType;
 }
-
 
 //=============================================================================================================
 
@@ -114,7 +106,6 @@ void AbstractTreeItem::addItemWithDescription(QStandardItem* pItemParent,
         pItemParent->appendRow(list);
     }
 }
-
 
 //=============================================================================================================
 
@@ -135,7 +126,6 @@ QList<QStandardItem*> AbstractTreeItem::findChildren(int type)
     return itemList;
 }
 
-
 //=============================================================================================================
 
 QList<QStandardItem*> AbstractTreeItem::findChildren(const QString& text)
@@ -155,7 +145,6 @@ QList<QStandardItem*> AbstractTreeItem::findChildren(const QString& text)
     return itemList;
 }
 
-
 //=============================================================================================================
 
 AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem* newItem)
@@ -165,7 +154,6 @@ AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem* newItem)
     return *this;
 }
 
-
 //=============================================================================================================
 
 AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem& newItem)
@@ -174,7 +162,6 @@ AbstractTreeItem& AbstractTreeItem::operator<<(AbstractTreeItem& newItem)
 
     return *this;
 }
-
 
 //=============================================================================================================
 

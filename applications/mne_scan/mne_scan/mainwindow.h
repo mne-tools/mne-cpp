@@ -36,13 +36,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "info.h"
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -56,7 +54,6 @@
 #include <QContextMenuEvent>
 #include <QSharedPointer>
 #include <QShortcut>
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -83,14 +80,12 @@ namespace SCSHAREDLIB
     class DisplayManager;
 }
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE MNESCAN
 //=============================================================================================================
 
 namespace MNESCAN
 {
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -100,7 +95,6 @@ class StartUpWidget;
 class PluginGui;
 class RunWidget;
 class PluginDockWidget;
-
 
 //=============================================================================================================
 /**
@@ -256,7 +250,6 @@ private:
     void updatePluginWidget(QSharedPointer<SCSHAREDLIB::IPlugin> pPlugin);                           /**< Sets the plugin widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
 
     void updateConnectionWidget(QSharedPointer<SCSHAREDLIB::PluginConnectorConnection> pConnection); /**< Sets the connection widget to central widget of MainWindow class depending on the current arrow selected in m_pDockWidgetPlugins.*/
-
 
 private:
     void newConfiguration();            /**< Implements new configuration tasks.*/

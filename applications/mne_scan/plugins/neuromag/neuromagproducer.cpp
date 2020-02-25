@@ -42,7 +42,6 @@
 
 #include <communication/rtClient/rtcmdclient.h>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -52,7 +51,6 @@ using namespace IOBUFFER;
 using namespace COMMUNICATIONLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -69,14 +67,12 @@ NeuromagProducer::NeuromagProducer(Neuromag* p_pNeuromag)
 {
 }
 
-
 //=============================================================================================================
 
 NeuromagProducer::~NeuromagProducer()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -115,7 +111,6 @@ void NeuromagProducer::connectDataClient(QString p_sRtSeverIP)
     }
 }
 
-
 //=============================================================================================================
 
 void NeuromagProducer::disconnectDataClient()
@@ -131,7 +126,6 @@ void NeuromagProducer::disconnectDataClient()
         emit dataConnectionChanged(m_bDataClientIsConnected);
     }
 }
-
 
 //=============================================================================================================
 
@@ -159,7 +153,6 @@ void NeuromagProducer::stop()
 //    if(this->isRunning())
 //        QThread::wait();
 }
-
 
 //=============================================================================================================
 

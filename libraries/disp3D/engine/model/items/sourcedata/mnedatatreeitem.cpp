@@ -51,7 +51,6 @@
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -59,13 +58,11 @@
 #include <QVector3D>
 #include <Qt3DCore/QEntity>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -76,7 +73,6 @@ using namespace MNELIB;
 using namespace DISP3DLIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -92,14 +88,12 @@ MneDataTreeItem::MneDataTreeItem(int iType,
     initItem();
 }
 
-
 //=============================================================================================================
 
 MneDataTreeItem::~MneDataTreeItem()
 {
     m_pRtSourceDataController->deleteLater();
 }
-
 
 //=============================================================================================================
 
@@ -207,7 +201,6 @@ void MneDataTreeItem::initItem()
     data.setValue(QString("Cubic"));
     pInterpolationFunction->setData(data, MetaTreeItemRoles::InterpolationFunction);
 }
-
 
 //=============================================================================================================
 
@@ -413,7 +406,6 @@ void MneDataTreeItem::initData(const MNEForwardSolution& tForwardSolution,
     m_bIsDataInit = true;
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
@@ -434,7 +426,6 @@ void MneDataTreeItem::addData(const MNESourceEstimate& tSourceEstimate)
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::setLoopState(bool state)
@@ -450,7 +441,6 @@ void MneDataTreeItem::setLoopState(bool state)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -468,7 +458,6 @@ void MneDataTreeItem::setStreamingState(bool state)
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::setTimeInterval(int iMSec)
@@ -484,7 +473,6 @@ void MneDataTreeItem::setTimeInterval(int iMSec)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -502,7 +490,6 @@ void MneDataTreeItem::setNumberAverages(int iNumberAverages)
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::setColormapType(const QString& sColormap)
@@ -519,7 +506,6 @@ void MneDataTreeItem::setColormapType(const QString& sColormap)
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::setVisualizationType(const QString& sVisualizationType)
@@ -535,7 +521,6 @@ void MneDataTreeItem::setVisualizationType(const QString& sVisualizationType)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -556,7 +541,6 @@ void MneDataTreeItem::setThresholds(const QVector3D& vecThresholds)
     }
 }
 
-
 //=============================================================================================================
 
 //void MneDataTreeItem::setCancelDistance(double dCancelDist)
@@ -572,7 +556,6 @@ void MneDataTreeItem::setThresholds(const QVector3D& vecThresholds)
 //        }
 //    }
 //}
-
 
 //=============================================================================================================
 
@@ -590,7 +573,6 @@ void MneDataTreeItem::setInterpolationFunction(const QString &sInterpolationFunc
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::setSFreq(const double dSFreq)
@@ -599,7 +581,6 @@ void MneDataTreeItem::setSFreq(const double dSFreq)
         m_pRtSourceDataController->setSFreq(dSFreq);
     }
 }
-
 
 //=============================================================================================================
 
@@ -618,7 +599,6 @@ void MneDataTreeItem::setAlpha(float fAlpha)
         m_pInterpolationItemRightGPU->setAlpha(fAlpha);
     }
 }
-
 
 //=============================================================================================================
 
@@ -641,7 +621,6 @@ void MneDataTreeItem::setTransform(const Qt3DCore::QTransform& transform)
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::setTransform(const FiffCoordTrans& transform, bool bApplyInverse)
@@ -662,7 +641,6 @@ void MneDataTreeItem::setTransform(const FiffCoordTrans& transform, bool bApplyI
         m_pInterpolationItemRightGPU->setTransform(transform, bApplyInverse);
     }
 }
-
 
 //=============================================================================================================
 
@@ -685,7 +663,6 @@ void MneDataTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::applyTransform(const FiffCoordTrans& transform, bool bApplyInverse)
@@ -707,7 +684,6 @@ void MneDataTreeItem::applyTransform(const FiffCoordTrans& transform, bool bAppl
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState)
@@ -720,7 +696,6 @@ void MneDataTreeItem::onCheckStateWorkerChanged(const Qt::CheckState& checkState
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -736,7 +711,6 @@ void MneDataTreeItem::onNewRtSmoothedDataAvailable(const Eigen::MatrixX4f &matCo
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::onNewInterpolationMatrixLeftAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi)
@@ -747,7 +721,6 @@ void MneDataTreeItem::onNewInterpolationMatrixLeftAvailable(QSharedPointer<Eigen
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::onNewInterpolationMatrixRightAvailable(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRightHemi)
@@ -757,7 +730,6 @@ void MneDataTreeItem::onNewInterpolationMatrixRightAvailable(QSharedPointer<Eige
         m_pInterpolationItemRightGPU->setInterpolationMatrix(pMatInterpolationMatrixRightHemi);
     }
 }
-
 
 //=============================================================================================================
 
@@ -772,7 +744,6 @@ void MneDataTreeItem::onNewRtRawData(const Eigen::VectorXd &vecDataVectorLeftHem
         m_pInterpolationItemRightGPU->addNewRtData(vecDataVectorRightHemi.cast<float>());
     }
 }
-
 
 //=============================================================================================================
 
@@ -795,7 +766,6 @@ void MneDataTreeItem::onColormapTypeChanged(const QVariant& sColormapType)
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
@@ -806,7 +776,6 @@ void MneDataTreeItem::onTimeIntervalChanged(const QVariant& iMSec)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -829,7 +798,6 @@ void MneDataTreeItem::onDataThresholdChanged(const QVariant& vecThresholds)
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
@@ -847,7 +815,6 @@ void MneDataTreeItem::onVisualizationTypeChanged(const QVariant& sVisType)
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& checkState)
@@ -861,7 +828,6 @@ void MneDataTreeItem::onCheckStateLoopedStateChanged(const Qt::CheckState& check
     }
 }
 
-
 //=============================================================================================================
 
 void MneDataTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
@@ -872,7 +838,6 @@ void MneDataTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -885,7 +850,6 @@ void MneDataTreeItem::onNumberAveragesChanged(const QVariant& iNumAvr)
 //        }
 //    }
 //}
-
 
 //=============================================================================================================
 

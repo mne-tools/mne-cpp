@@ -42,7 +42,6 @@
 
 #include "scmeas_global.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,7 +50,6 @@
 #include <QSharedPointer>
 #include <QMutex>
 #include <QMutexLocker>
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE SCMEASLIB
@@ -160,7 +158,6 @@ private:
 
 };
 
-
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
@@ -171,7 +168,6 @@ inline const QString& Measurement::getName() const
     return m_qString_Name;
 }
 
-
 //=============================================================================================================
 
 inline void Measurement::setType(int type)
@@ -179,7 +175,6 @@ inline void Measurement::setType(int type)
     QMutexLocker locker(&m_qMutex);
     m_iMetaTypeId = type;
 }
-
 
 //=============================================================================================================
 
@@ -189,7 +184,6 @@ inline void Measurement::setName(const QString& name)
     m_qString_Name = name;
 }
 
-
 //=============================================================================================================
 
 inline bool Measurement::isVisible() const
@@ -197,7 +191,6 @@ inline bool Measurement::isVisible() const
     QMutexLocker locker(&m_qMutex);
     return m_bVisibility;
 }
-
 
 //=============================================================================================================
 
@@ -207,7 +200,6 @@ inline void Measurement::setVisibility(bool visibility)
     m_bVisibility = visibility;
 }
 
-
 //=============================================================================================================
 
 inline int Measurement::type() const
@@ -216,7 +208,6 @@ inline int Measurement::type() const
     return m_iMetaTypeId;
 }
 
-
 //=============================================================================================================
 
 inline void Measurement::addControlWidget(QSharedPointer<QWidget> pWidget)
@@ -224,7 +215,6 @@ inline void Measurement::addControlWidget(QSharedPointer<QWidget> pWidget)
     QMutexLocker locker(&m_qMutex);
     m_lControlWidgets << pWidget;
 }
-
 
 //=============================================================================================================
 

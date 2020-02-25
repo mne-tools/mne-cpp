@@ -41,11 +41,9 @@
 
 #include <time.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -53,7 +51,6 @@
 
 using namespace SCMEASLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -68,14 +65,12 @@ RealTimeEvokedSet::RealTimeEvokedSet(QObject *parent)
 
 }
 
-
 //=============================================================================================================
 
 RealTimeEvokedSet::~RealTimeEvokedSet()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -116,7 +111,6 @@ void RealTimeEvokedSet::init(FiffInfo::SPtr p_fiffInfo)
     }
 }
 
-
 //=============================================================================================================
 
 FiffEvokedSet::SPtr& RealTimeEvokedSet::getValue()
@@ -125,7 +119,6 @@ FiffEvokedSet::SPtr& RealTimeEvokedSet::getValue()
     return m_pFiffEvokedSet;
 }
 
-
 //=============================================================================================================
 
 const QStringList& RealTimeEvokedSet::getResponsibleTriggerTypes()
@@ -133,7 +126,6 @@ const QStringList& RealTimeEvokedSet::getResponsibleTriggerTypes()
     QMutexLocker locker(&m_qMutex);
     return m_lResponsibleTriggerTypes;
 }
-
 
 //=============================================================================================================
 
@@ -172,6 +164,5 @@ void RealTimeEvokedSet::setValue(const FiffEvokedSet &v,
 
     emit notify();
 }
-
 
 //=============================================================================================================

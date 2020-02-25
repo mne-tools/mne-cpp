@@ -45,11 +45,9 @@
 #include "../../materials/shownormalsmaterial.h"
 #include "../../3dhelpers/custommesh.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -57,14 +55,12 @@
 
 #include <Eigen/Core>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISP3DLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -78,14 +74,12 @@ AbstractMeshTreeItem::AbstractMeshTreeItem(QEntity* p3DEntityParent, int iType, 
     initItem();
 }
 
-
 //=============================================================================================================
 
 QPointer<CustomMesh> AbstractMeshTreeItem::getCustomMesh()
 {
     return m_pCustomMesh;
 }
-
 
 //=============================================================================================================
 
@@ -96,7 +90,6 @@ void AbstractMeshTreeItem::setVertColor(const MatrixX4f& vertColor)
 
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
-
 
 //=============================================================================================================
 
@@ -171,7 +164,6 @@ void AbstractMeshTreeItem::initItem()
     this->addComponent(m_pCustomMesh);
 }
 
-
 //=============================================================================================================
 
 void AbstractMeshTreeItem::setData(const QVariant& value, int role)
@@ -189,7 +181,6 @@ void AbstractMeshTreeItem::setData(const QVariant& value, int role)
             break;
     }
 }
-
 
 //=============================================================================================================
 
@@ -209,7 +200,6 @@ void AbstractMeshTreeItem::setMaterial(Qt3DRender::QMaterial* pMaterial)
     m_pMaterial = pMaterial;
     this->addComponent(m_pMaterial);
 }
-
 
 //=============================================================================================================
 
@@ -232,14 +222,12 @@ void AbstractMeshTreeItem::setMeshData(const MatrixX3f& tMatVert,
     }
 }
 
-
 //=============================================================================================================
 
 void AbstractMeshTreeItem::onSurfaceTessInnerChanged(const QVariant& fTessInner)
 {
     this->setMaterialParameter(fTessInner.toFloat(), "innerTess");
 }
-
 
 //=============================================================================================================
 
@@ -248,14 +236,12 @@ void AbstractMeshTreeItem::onSurfaceTessOuterChanged(const QVariant& fTessOuter)
     this->setMaterialParameter(fTessOuter.toFloat(), "outerTess");
 }
 
-
 //=============================================================================================================
 
 void AbstractMeshTreeItem::onSurfaceTriangleScaleChanged(const QVariant& fTriangleScale)
 {
     this->setMaterialParameter(fTriangleScale.toFloat(), "triangleScale");
 }
-
 
 //=============================================================================================================
 
@@ -268,7 +254,6 @@ void AbstractMeshTreeItem::onColorChanged(const QVariant& color)
     data.setValue(matNewVertColor);
     this->setData(data, Data3DTreeModelItemRoles::SurfaceCurrentColorVert);
 }
-
 
 //=============================================================================================================
 

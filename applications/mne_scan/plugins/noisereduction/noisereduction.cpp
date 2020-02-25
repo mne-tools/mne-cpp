@@ -53,16 +53,13 @@
 
 #include "FormFiles/noisereductionsetupwidget.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -77,7 +74,6 @@ using namespace RTPROCESSINGLIB;
 using namespace FIFFLIB;
 using namespace SCSHAREDLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -111,7 +107,6 @@ NoiseReduction::NoiseReduction()
     }
 }
 
-
 //=============================================================================================================
 
 NoiseReduction::~NoiseReduction()
@@ -121,7 +116,6 @@ NoiseReduction::~NoiseReduction()
     }
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> NoiseReduction::clone() const
@@ -129,7 +123,6 @@ QSharedPointer<IPlugin> NoiseReduction::clone() const
     QSharedPointer<NoiseReduction> pNoiseReductionClone(new NoiseReduction);
     return pNoiseReductionClone;
 }
-
 
 //=============================================================================================================
 
@@ -197,14 +190,12 @@ void NoiseReduction::init()
     }
 }
 
-
 //=============================================================================================================
 
 void NoiseReduction::unload()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -222,7 +213,6 @@ bool NoiseReduction::start()
     return true;
 }
 
-
 //=============================================================================================================
 
 bool NoiseReduction::stop()
@@ -237,14 +227,12 @@ bool NoiseReduction::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType NoiseReduction::getType() const
 {
     return _IAlgorithm;
 }
-
 
 //=============================================================================================================
 
@@ -253,7 +241,6 @@ QString NoiseReduction::getName() const
     return "Noise Reduction";
 }
 
-
 //=============================================================================================================
 
 QWidget* NoiseReduction::setupWidget()
@@ -261,7 +248,6 @@ QWidget* NoiseReduction::setupWidget()
     NoiseReductionSetupWidget* setupWidget = new NoiseReductionSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
-
 
 //=============================================================================================================
 
@@ -319,7 +305,6 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     }
 }
 
-
 //=============================================================================================================
 
 void NoiseReduction::setSpharaActive(bool state)
@@ -328,7 +313,6 @@ void NoiseReduction::setSpharaActive(bool state)
     m_bSpharaActive = state;
     m_mutex.unlock();
 }
-
 
 //=============================================================================================================
 
@@ -344,7 +328,6 @@ void NoiseReduction::setSpharaOptions(const QString& sSytemType,
 
     createSpharaOperator();
 }
-
 
 //=============================================================================================================
 
@@ -403,7 +386,6 @@ void NoiseReduction::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
     }
 }
 
-
 //=============================================================================================================
 
 void NoiseReduction::updateCompensator(int to)
@@ -459,7 +441,6 @@ void NoiseReduction::updateCompensator(int to)
     }
 }
 
-
 //=============================================================================================================
 
 void NoiseReduction::setFilterChannelType(QString sType)
@@ -486,7 +467,6 @@ void NoiseReduction::setFilterChannelType(QString sType)
     }
 }
 
-
 //=============================================================================================================
 
 void NoiseReduction::setFilter(const FilterData& filterData)
@@ -499,14 +479,12 @@ void NoiseReduction::setFilter(const FilterData& filterData)
     }
 }
 
-
 //=============================================================================================================
 
 void NoiseReduction::setFilterActive(bool state)
 {
     m_bFilterActivated = state;
 }
-
 
 //=============================================================================================================
 
@@ -564,7 +542,6 @@ void NoiseReduction::initSphara()
 //    qDebug()<<"NoiseReduction::createSpharaOperator - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
 //    qDebug()<<"NoiseReduction::createSpharaOperator - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterFull.rows()<<m_matSpharaBabyMEGOuterFull.cols();
 }
-
 
 //=============================================================================================================
 
@@ -646,7 +623,6 @@ void NoiseReduction::createSpharaOperator()
 
     m_mutex.unlock();
 }
-
 
 //=============================================================================================================
 

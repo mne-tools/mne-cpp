@@ -49,7 +49,6 @@
 
 #include <iostream>
 
-
 #define USENEW 1
 
 //=============================================================================================================
@@ -183,7 +182,6 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
     emit response(t_sReply);
 }
 
-
 //=============================================================================================================
 
 qint32 RtCmdClient::requestBufsize()
@@ -216,7 +214,6 @@ qint32 RtCmdClient::requestBufsize()
     return -1;
 }
 
-
 //=============================================================================================================
 
 void RtCmdClient::requestCommands()
@@ -245,7 +242,6 @@ void RtCmdClient::requestCommands()
     else
         qCritical() << "Unable to parse JSON response: " << error.errorString();
 }
-
 
 //=============================================================================================================
 
@@ -294,7 +290,6 @@ qint32 RtCmdClient::requestConnectors(QMap<qint32, QString> &p_qMapConnectors)
 
     return p_iActiveId;
 }
-
 
 ////=============================================================================================================
 

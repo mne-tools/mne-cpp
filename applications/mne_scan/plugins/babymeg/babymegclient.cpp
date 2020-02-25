@@ -40,7 +40,6 @@
 
 #include "babymegclient.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -49,13 +48,11 @@
 #include <QtNetwork>
 #include <QtEndian>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace BABYMEGPLUGIN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -94,7 +91,6 @@ BabyMEGClient::BabyMEGClient(int myPort, QObject *parent)
 
 }
 
-
 //=============================================================================================================
 
 BabyMEGClient::~BabyMEGClient()
@@ -102,14 +98,12 @@ BabyMEGClient::~BabyMEGClient()
     delete tcpSocket;   // added 5.31.2013
 }
 
-
 //=============================================================================================================
 
 void BabyMEGClient::SetInfo(QSharedPointer<BabyMEGInfo> pInfo)
 {
     myBabyMEGInfo = pInfo;
 }
-
 
 //=============================================================================================================
 
@@ -129,7 +123,6 @@ void BabyMEGClient::DisplayError(int socketError, const QString &message)
     }
 }
 
-
 //=============================================================================================================
 
 int BabyMEGClient::MGH_LM_Byte2Int(QByteArray b)
@@ -146,7 +139,6 @@ int BabyMEGClient::MGH_LM_Byte2Int(QByteArray b)
     return value;
 }
 
-
 //=============================================================================================================
 
 QByteArray BabyMEGClient::MGH_LM_Int2Byte(int a)
@@ -162,7 +154,6 @@ QByteArray BabyMEGClient::MGH_LM_Int2Byte(int a)
     }
     return b;
 }
-
 
 //=============================================================================================================
 
@@ -182,7 +173,6 @@ double BabyMEGClient::MGH_LM_Byte2Double(QByteArray b)
     return value;
 }
 
-
 //=============================================================================================================
 
 void BabyMEGClient::HescDisplay(double a)
@@ -190,7 +180,6 @@ void BabyMEGClient::HescDisplay(double a)
     QByteArray data = QByteArray::fromRawData((char *)&a,8);
     qDebug() << data.toHex();
 }
-
 
 //=============================================================================================================
 
@@ -232,7 +221,6 @@ void BabyMEGClient::ConnectToBabyMEG()
     return;
 }
 
-
 //=============================================================================================================
 
 void BabyMEGClient::DisConnectBabyMEG()
@@ -240,7 +228,6 @@ void BabyMEGClient::DisConnectBabyMEG()
     if(m_bSocketIsConnected && tcpSocket->state()==QAbstractSocket::ConnectedState)
         SendCommand("QUIT");
 }
-
 
 //=============================================================================================================
 
@@ -281,7 +268,6 @@ void BabyMEGClient::SendCommandToBabyMEGShortConnection(QByteArray s)
 
 }
 
-
 //=============================================================================================================
 
 void BabyMEGClient::SendCommandToBabyMEG()
@@ -303,7 +289,6 @@ void BabyMEGClient::SendCommandToBabyMEG()
     }
 
 }
-
 
 //=============================================================================================================
 
@@ -331,7 +316,6 @@ void BabyMEGClient::ReadToBuffer()
     handleBuffer();
     return;
 }
-
 
 //=============================================================================================================
 
@@ -450,7 +434,6 @@ void BabyMEGClient::handleBuffer()
 
 }
 
-
 //=============================================================================================================
 
 void BabyMEGClient::DispatchDataPackage(int tmp)
@@ -469,7 +452,6 @@ void BabyMEGClient::DispatchDataPackage(int tmp)
 
     ReadNextBlock(tmp);
 }
-
 
 //=============================================================================================================
 
@@ -513,7 +495,6 @@ void BabyMEGClient::ReadNextBlock(int tmp)
     DLEN1.clear();
 }
 
-
 //=============================================================================================================
 
 void BabyMEGClient::SendCommand(QString s)
@@ -553,7 +534,6 @@ void BabyMEGClient::SendCommand(QString s)
         }
 //    sleep(1);
 }
-
 
 //=============================================================================================================
 

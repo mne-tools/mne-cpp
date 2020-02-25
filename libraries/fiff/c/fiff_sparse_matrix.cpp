@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -43,13 +42,11 @@
 #include <fiff/fiff_file.h>
 #include <fiff/fiff_types.h>
 
-
 #define MALLOC_18(x,t) (t *)malloc((x)*sizeof(t))
 
 #define REALLOC_18(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
 #define FREE_18(x) if ((char *)(x) != NULL) free((char *)(x))
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -58,13 +55,6 @@
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace FIFFLIB;
-
-
-
-
-
-
-
 
 
 
@@ -90,12 +80,10 @@ fiff_int_t fiff_type_base(fiff_int_t type)
     return type & FIFFTS_BASE_MASK;
 }
 
-
 fiff_int_t fiff_type_fundamental(fiff_int_t type)
 {
     return type & FIFFTS_FS_MASK;
 }
-
 
 fiff_int_t fiff_type_matrix_coding(fiff_int_t type)
 {
@@ -104,9 +92,7 @@ fiff_int_t fiff_type_matrix_coding(fiff_int_t type)
 
 
 
-
 //============================= fiff_matrix.c =============================
-
 
 int *fiff_get_matrix_dims(FiffTag::SPtr& tag)
 /*
@@ -173,8 +159,6 @@ int *fiff_get_matrix_dims(FiffTag::SPtr& tag)
 
 
 
-
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -190,7 +174,6 @@ FiffSparseMatrix::FiffSparseMatrix()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -221,7 +204,6 @@ FiffSparseMatrix::FiffSparseMatrix(const FiffSparseMatrix &mat)
     memcpy(data,mat.data,size);
 }
 
-
 //=============================================================================================================
 
 FiffSparseMatrix::~FiffSparseMatrix()
@@ -230,14 +212,12 @@ FiffSparseMatrix::~FiffSparseMatrix()
         FREE_18(data);
 }
 
-
 //=============================================================================================================
 
 fiff_int_t *FiffSparseMatrix::fiff_get_matrix_sparse_dims(FiffTag::SPtr &tag)
 {
     return fiff_get_matrix_dims(tag);
 }
-
 
 //=============================================================================================================
 
@@ -302,7 +282,6 @@ FiffSparseMatrix *FiffSparseMatrix::fiff_get_float_sparse_matrix(FiffTag::SPtr &
     return res;
 }
 
-
 //=============================================================================================================
 
 FiffSparseMatrix *FiffSparseMatrix::create_sparse_rcs(int nrow, int ncol, int *nnz, int **colindex, float **vals) 	     /* The nonzero elements on each row
@@ -366,7 +345,6 @@ bad : {
         return NULL;
     }
 }
-
 
 //=============================================================================================================
 

@@ -39,7 +39,6 @@
 
 #include "layoutscene.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -50,13 +49,11 @@
 #include <QScrollBar>
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -76,7 +73,6 @@ LayoutScene::LayoutScene(QGraphicsView* view,
     m_qvView->installEventFilter(this);
 }
 
-
 //=============================================================================================================
 
 void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
@@ -93,7 +89,6 @@ void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
     }
 }
 
-
 //=============================================================================================================
 
 void LayoutScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent)
@@ -103,7 +98,6 @@ void LayoutScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent)
 
     QGraphicsScene::mouseDoubleClickEvent(mouseEvent);
 }
-
 
 //=============================================================================================================
 
@@ -131,7 +125,6 @@ void LayoutScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsScene::mousePressEvent(mouseEvent);
 }
 
-
 //=============================================================================================================
 
 void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -148,7 +141,6 @@ void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
     QGraphicsScene::mouseMoveEvent(mouseEvent);
 }
-
 
 //=============================================================================================================
 
@@ -188,7 +180,6 @@ void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 
-
 //=============================================================================================================
 
 void LayoutScene::keyPressEvent(QKeyEvent *keyEvent)
@@ -199,7 +190,6 @@ void LayoutScene::keyPressEvent(QKeyEvent *keyEvent)
     QGraphicsScene::keyPressEvent(keyEvent);
 }
 
-
 //=============================================================================================================
 
 void LayoutScene::keyReleaseEvent(QKeyEvent *keyEvent)
@@ -209,7 +199,6 @@ void LayoutScene::keyReleaseEvent(QKeyEvent *keyEvent)
 
     QGraphicsScene::keyReleaseEvent(keyEvent);
 }
-
 
 //=============================================================================================================
 
@@ -244,7 +233,6 @@ bool LayoutScene::gestureEvent(QGestureEvent *event)
     return true;
 }
 
-
 //=============================================================================================================
 
 void LayoutScene::panTriggered(QPanGesture *gesture)
@@ -257,7 +245,6 @@ void LayoutScene::panTriggered(QPanGesture *gesture)
     m_qvView->horizontalScrollBar()->setValue(m_qvView->horizontalScrollBar()->value() + delta.x());
 }
 
-
 //=============================================================================================================
 
 void LayoutScene::pinchTriggered(QPinchGesture *gesture)
@@ -267,7 +254,6 @@ void LayoutScene::pinchTriggered(QPinchGesture *gesture)
     m_qvView->setTransformationAnchor(QGraphicsView::NoAnchor);
     m_qvView->scale(gesture->scaleFactor(), gesture->scaleFactor());
 }
-
 
 //=============================================================================================================
 

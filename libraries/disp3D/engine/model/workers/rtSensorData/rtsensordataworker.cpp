@@ -41,7 +41,6 @@
 #include "../../../../helpers/interpolation/interpolation.h"
 #include "../../items/common/abstractmeshtreeitem.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -50,13 +49,11 @@
 #include <QDebug>
 #include <QElapsedTimer>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -66,7 +63,6 @@ using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace DISPLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -81,7 +77,6 @@ RtSensorDataWorker::RtSensorDataWorker()
 , m_pMatInterpolationMatrix(QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>()))
 {
 }
-
 
 //=============================================================================================================
 
@@ -105,7 +100,6 @@ void RtSensorDataWorker::addData(const MatrixXd& data)
     m_lDataLoopQ = m_lDataQ;
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataWorker::setNumberVertices(int iNumberVerts)
@@ -115,7 +109,6 @@ void RtSensorDataWorker::setNumberVertices(int iNumberVerts)
     m_lVisualizationInfo.matOriginalVertColor = AbstractMeshTreeItem::createVertColor(iNumberVerts);
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataWorker::setNumberAverages(int iNumAvr)
@@ -123,14 +116,12 @@ void RtSensorDataWorker::setNumberAverages(int iNumAvr)
     m_iAverageSamples = iNumAvr;
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataWorker::setStreamSmoothedData(bool bStreamSmoothedData)
 {
     m_bStreamSmoothedData = bStreamSmoothedData;
 }
-
 
 //=============================================================================================================
 
@@ -140,7 +131,6 @@ void RtSensorDataWorker::setColormapType(const QString& sColormapType)
     m_lVisualizationInfo.sColormapType = sColormapType;
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataWorker::setThresholds(const QVector3D& vecThresholds)
@@ -149,14 +139,12 @@ void RtSensorDataWorker::setThresholds(const QVector3D& vecThresholds)
     m_lVisualizationInfo.dThresholdZ = vecThresholds.z();
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataWorker::setLoopState(bool bLoopState)
 {
     m_bIsLooping = bLoopState;
 }
-
 
 //=============================================================================================================
 
@@ -165,13 +153,11 @@ void RtSensorDataWorker::setSFreq(const double dSFreq)
     m_dSFreq = dSFreq;
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataWorker::setInterpolationMatrix(QSharedPointer<SparseMatrix<float> > pMatInterpolationMatrix) {
     m_pMatInterpolationMatrix = pMatInterpolationMatrix;
 }
-
 
 //=============================================================================================================
 
@@ -242,7 +228,6 @@ void RtSensorDataWorker::streamData()
     //qDebug()<<"RtSensorDataWorker::streamData - m_lDataQ.size()"<<m_lDataQ.size();
 }
 
-
 //=============================================================================================================
 
 MatrixX4f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vecSensorValues)
@@ -269,7 +254,6 @@ MatrixX4f RtSensorDataWorker::generateColorsFromSensorValues(const VectorXd& vec
 
     return m_lVisualizationInfo.matFinalVertColor;
 }
-
 
 //=============================================================================================================
 

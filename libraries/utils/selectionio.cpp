@@ -41,7 +41,6 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,13 +50,11 @@
 #include <QFile>
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -66,7 +63,6 @@ using namespace UTILSLIB;
 SelectionIO::SelectionIO()
 {
 }
-
 
 //=============================================================================================================
 
@@ -114,7 +110,6 @@ bool SelectionIO::readMNESelFile(QString path, QMap<QString,QStringList> &select
     return true;
 }
 
-
 //=============================================================================================================
 
 bool SelectionIO::readBrainstormMonFile(QString path, QMap<QString,QStringList> &selectionMap)
@@ -155,7 +150,6 @@ bool SelectionIO::readBrainstormMonFile(QString path, QMap<QString,QStringList> 
     return true;
 }
 
-
 //=============================================================================================================
 
 bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> &selectionMap)
@@ -189,7 +183,6 @@ bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> 
 
     return true;
 }
-
 
 //=============================================================================================================
 

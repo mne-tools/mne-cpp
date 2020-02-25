@@ -7,11 +7,9 @@
 #include <string.h>
 #include <QScopedPointer>
 
-
 using namespace INVERSELIB;
 using namespace MNELIB;
 using namespace FWDLIB;
-
 
 
 
@@ -22,7 +20,6 @@ using namespace FWDLIB;
 #define strncasecmp _strnicmp
 #endif
 
-
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
@@ -30,7 +27,6 @@ using namespace FWDLIB;
 #ifndef PROGRAM_VERSION
 #define PROGRAM_VERSION     "1.00"
 #endif
-
 
 #ifndef FAIL
 #define FAIL -1
@@ -48,19 +44,15 @@ using namespace FWDLIB;
 #define FALSE 0
 #endif
 
-
 #define BIG_TIME 1e6
 
 #define SEG_LEN 10.0
 
-
 #define EPS_VALUES 0.05
-
 
 //=============================================================================================================
 // STATIC DEFINITIONS ToDo make members
 //=============================================================================================================
-
 
 #define MALLOC(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
@@ -69,7 +61,6 @@ using namespace FWDLIB;
 #define ALLOC_CMATRIX(x,y) mne_cmatrix((x),(y))
 
 #define FREE_CMATRIX(m) mne_free_cmatrix((m))
-
 
 static void matrix_error(int kind, int nr, int nc)
 
@@ -87,7 +78,6 @@ static void matrix_error(int kind, int nr, int nc)
     printf("Cannot continue. Sorry.\n");
     exit(1);
 }
-
 
 
 float **mne_cmatrix (int nr,int nc)
@@ -108,7 +98,6 @@ float **mne_cmatrix (int nr,int nc)
 }
 
 
-
 void mne_free_cmatrix (float **m)
 {
     if (m) {
@@ -116,9 +105,6 @@ void mne_free_cmatrix (float **m)
         FREE(m);
     }
 }
-
-
-
 
 
 
@@ -159,9 +145,7 @@ void mne_free_cmatrix (float **m)
 //}
 
 
-
 //============================= misc_util.c =============================
-
 
 
 //============================= mne_named_matrix.c =============================
@@ -183,7 +167,6 @@ void mne_free_name_list(char **list, int nlist)
     FREE(list);
     return;
 }
-
 
 //============================= mne_ch_selections.c =============================
 
@@ -208,7 +191,6 @@ static mneChSelection new_ch_selection()
     return newsel;
 }
 
-
 mneChSelection mne_ch_selection_these(const QString& selname, const QStringList& names, int nch)
 /*
  * Give an explicit list of interesting channels
@@ -230,7 +212,6 @@ mneChSelection mne_ch_selection_these(const QString& selname, const QStringList&
 }
 
 
-
 static void omit_spaces(QStringList names, int nnames)
 
 {
@@ -242,8 +223,6 @@ static void omit_spaces(QStringList names, int nnames)
     }
     return;
 }
-
-
 
 
 
@@ -340,7 +319,6 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
         fprintf(stderr,"Selection %c%s%c has %d matched derived channels.\n",'"',sel->name.toUtf8().constData(),'"',sel->nderiv);
     return nch;
 }
-
 
 
 //============================= mne_get_values.c =============================
@@ -473,7 +451,6 @@ int mne_get_values_from_data (float time,         /* Interesting time point */
 }
 
 
-
 int mne_get_values_from_data_ch (float time,      /* Interesting time point */
                                  float integ,	  /* Time integration */
                                  float **data,	  /* The data values (channel by channel) */
@@ -591,10 +568,6 @@ int mne_get_values_from_data_ch (float time,      /* Interesting time point */
 
 
 
-
-
-
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -603,7 +576,6 @@ DipoleFit::DipoleFit(DipoleFitSettings* p_settings)
 : settings(p_settings)
 {
 }
-
 
 //=============================================================================================================
 //todo split in initFit where the settings are handed over and the actual fit
@@ -719,7 +691,6 @@ ECDSet DipoleFit::calculateFit() const
     fprintf (stderr,"\n---- Fitting : %7.1f ... %7.1f ms (step: %6.1f ms integ: %6.1f ms)\n\n",
              1000*settings->tmin,1000*settings->tmax,1000*settings->tstep,1000*settings->integ);
 
-
     if (raw) {
         if (fit_dipoles_raw(settings->measname,raw,sel,fit_data,guess.take(),settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose) == FAIL)
             goto out;
@@ -730,12 +701,10 @@ ECDSet DipoleFit::calculateFit() const
     }
     printf("%d dipoles fitted\n",set.size());
 
-
 out : {
         return set;
     }
 }
-
 
 //=============================================================================================================
 
@@ -779,7 +748,6 @@ int DipoleFit::fit_dipoles( const QString& dataname, MneMeasData* data, DipoleFi
     p_set = set;
     return OK;
 }
-
 
 //=============================================================================================================
 
@@ -853,7 +821,6 @@ bad : {
         return FAIL;
     }
 }
-
 
 //=============================================================================================================
 

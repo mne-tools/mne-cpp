@@ -43,13 +43,11 @@
 #include "spectral.h"
 #include "math.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <unsupported/Eigen/FFT>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,14 +57,12 @@
 #include <QtConcurrent>
 #include <QVector>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace UTILSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -97,7 +93,6 @@ MatrixXcd Spectral::computeTaperedSpectraRow(const RowVectorXd &vecData,
 
     return matTapSpectrum;
 }
-
 
 //=============================================================================================================
 
@@ -170,7 +165,6 @@ QVector<MatrixXcd> Spectral::computeTaperedSpectraMatrix(const MatrixXd &matData
     return finalResult;
 }
 
-
 //=============================================================================================================
 
 MatrixXcd Spectral::compute(const TaperedSpectraInputData& inputData)
@@ -181,7 +175,6 @@ MatrixXcd Spectral::compute(const TaperedSpectraInputData& inputData)
                                     inputData.iNfft);
 }
 
-
 //=============================================================================================================
 
 void Spectral::reduce(QVector<MatrixXcd>& finalData,
@@ -190,7 +183,6 @@ void Spectral::reduce(QVector<MatrixXcd>& finalData,
     //qDebug() << "Spectral::reduce";
     finalData.append(resultData);
 }
-
 
 //=============================================================================================================
 
@@ -217,7 +209,6 @@ Eigen::RowVectorXd Spectral::psdFromTaperedSpectra(const Eigen::MatrixXcd &matTa
 
     return vecPsd;
 }
-
 
 //=============================================================================================================
 
@@ -273,7 +264,6 @@ Eigen::RowVectorXcd Spectral::csdFromTaperedSpectra(const Eigen::MatrixXcd &vecT
     return vecCsd;
 }
 
-
 //=============================================================================================================
 
 VectorXd Spectral::calculateFFTFreqs(int iNfft, double dSampFreq)
@@ -287,7 +277,6 @@ VectorXd Spectral::calculateFFTFreqs(int iNfft, double dSampFreq)
     }
     return vecFFTFreqs;
 }
-
 
 //=============================================================================================================
 
@@ -306,7 +295,6 @@ QPair<MatrixXd, VectorXd> Spectral::generateTapers(int iSignalLength, const QStr
     }
     return pairOut;
 }
-
 
 //=============================================================================================================
 

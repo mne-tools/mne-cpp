@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -62,7 +61,6 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -70,7 +68,6 @@
 #include <QApplication>
 #include <QSet>
 #include <QCommandLineParser>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -82,7 +79,6 @@ using namespace FIFFLIB;
 using namespace INVERSELIB;
 using namespace DISP3DLIB;
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // MAIN
@@ -134,7 +130,6 @@ int main(int argc, char *argv[])
     parser.addOption(hemiOption);
     parser.addOption(inSamplesOption);
     parser.addOption(keepCompOption);
-
 
     parser.process(a);
 
@@ -306,7 +301,6 @@ int main(int argc, char *argv[])
     sourceEstimate.tmin = tmin;
     sourceEstimate.tstep = tstep;
 
-
     bool first = true;
     bool last = false;
 
@@ -332,7 +326,6 @@ int main(int argc, char *argv[])
         }
         else
             measData = data.block(0, curSample, t_iNumSensors, samplesStcWindow);
-
 
         curSample += (samplesStcWindow - t_iSamplesOverlap);
         if(first)

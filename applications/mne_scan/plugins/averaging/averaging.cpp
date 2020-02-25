@@ -48,11 +48,9 @@
 
 #include <rtprocessing/rtave.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -66,7 +64,6 @@ using namespace FIFFLIB;
 using namespace DISPLIB;
 using namespace RTPROCESSINGLIB;
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -77,7 +74,6 @@ Averaging::Averaging()
 {
 }
 
-
 //=============================================================================================================
 
 Averaging::~Averaging()
@@ -85,7 +81,6 @@ Averaging::~Averaging()
     if(this->isRunning())
         stop();
 }
-
 
 //=============================================================================================================
 
@@ -95,13 +90,11 @@ QSharedPointer<IPlugin> Averaging::clone() const
     return pAveragingClone;
 }
 
-
 //=============================================================================================================
 
 void Averaging::unload()
 {
 }
-
 
 //=============================================================================================================
 
@@ -120,7 +113,6 @@ bool Averaging::start()
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -142,14 +134,12 @@ bool Averaging::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType Averaging::getType() const
 {
     return _IAlgorithm;
 }
-
 
 //=============================================================================================================
 
@@ -158,7 +148,6 @@ QString Averaging::getName() const
     return "Averaging";
 }
 
-
 //=============================================================================================================
 
 QWidget* Averaging::setupWidget()
@@ -166,7 +155,6 @@ QWidget* Averaging::setupWidget()
     AveragingSetupWidget* setupWidget = new AveragingSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
-
 
 //=============================================================================================================
 
@@ -210,7 +198,6 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -259,7 +246,6 @@ void Averaging::init()
     m_pAveragingOutput->data()->addControlWidget(m_pArtifactSettingsView);
 }
 
-
 //=============================================================================================================
 
 void Averaging::onChangeNumAverages(qint32 numAve)
@@ -269,7 +255,6 @@ void Averaging::onChangeNumAverages(qint32 numAve)
         m_pRtAve->setAverageNumber(numAve);
     }
 }
-
 
 //=============================================================================================================
 
@@ -281,7 +266,6 @@ void Averaging::onChangeStimChannel(const QString& sStimCh)
         m_pRtAve->setTriggerChIndx(m_mapStimChsIndexNames[sStimCh]);
     }
 }
-
 
 //=============================================================================================================
 
@@ -304,7 +288,6 @@ void Averaging::onChangePreStim(qint32 mseconds)
     }
 }
 
-
 //=============================================================================================================
 
 void Averaging::onChangePostStim(qint32 mseconds)
@@ -322,7 +305,6 @@ void Averaging::onChangePostStim(qint32 mseconds)
     }
 }
 
-
 //=============================================================================================================
 
 void Averaging::onChangeArtifactThreshold(const QMap<QString,double>& mapThresholds)
@@ -333,7 +315,6 @@ void Averaging::onChangeArtifactThreshold(const QMap<QString,double>& mapThresho
         m_pRtAve->setArtifactReduction(mapThresholds);
     }
 }
-
 
 //=============================================================================================================
 
@@ -352,7 +333,6 @@ void Averaging::onChangeBaselineFrom(qint32 fromMSeconds)
     }
 }
 
-
 //=============================================================================================================
 
 void Averaging::onChangeBaselineTo(qint32 toMSeconds)
@@ -370,7 +350,6 @@ void Averaging::onChangeBaselineTo(qint32 toMSeconds)
     }
 }
 
-
 //=============================================================================================================
 
 void Averaging::onChangeBaselineActive(bool state)
@@ -380,7 +359,6 @@ void Averaging::onChangeBaselineActive(bool state)
         m_pRtAve->setBaselineActive(state);
     }
 }
-
 
 //=============================================================================================================
 
@@ -398,7 +376,6 @@ void Averaging::appendEvoked(const FIFFLIB::FiffEvokedSet& evokedSet,
     m_qMutex.unlock();
 }
 
-
 //=============================================================================================================
 
 void Averaging::onResetAverage(bool state)
@@ -410,7 +387,6 @@ void Averaging::onResetAverage(bool state)
         m_pRtAve->reset();
     }
 }
-
 
 //=============================================================================================================
 

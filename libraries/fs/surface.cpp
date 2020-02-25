@@ -43,7 +43,6 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -52,7 +51,6 @@
 #include <QDataStream>
 #include <QTextStream>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -60,7 +58,6 @@
 using namespace UTILSLIB;
 using namespace FSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -75,7 +72,6 @@ Surface::Surface()
 {
 }
 
-
 //=============================================================================================================
 
 Surface::Surface(const QString& p_sFile)
@@ -87,7 +83,6 @@ Surface::Surface(const QString& p_sFile)
 {
     Surface::read(p_sFile, *this);
 }
-
 
 //=============================================================================================================
 
@@ -101,7 +96,6 @@ Surface::Surface(const QString &subject_id, qint32 hemi, const QString &surf, co
     Surface::read(subject_id, hemi, surf, subjects_dir, *this);
 }
 
-
 //=============================================================================================================
 
 Surface::Surface(const QString &path, qint32 hemi, const QString &surf)
@@ -114,13 +108,11 @@ Surface::Surface(const QString &path, qint32 hemi, const QString &surf)
     Surface::read(path, hemi, surf, *this);
 }
 
-
 //=============================================================================================================
 
 Surface::~Surface()
 {
 }
-
 
 //=============================================================================================================
 
@@ -135,7 +127,6 @@ void Surface::clear()
     m_matNN.resize(0,3);
     m_vecCurv.resize(0);
 }
-
 
 //=============================================================================================================
 
@@ -188,7 +179,6 @@ MatrixX3f Surface::compute_normals(const MatrixX3f& rr, const MatrixX3i& tris)
     return nn;
 }
 
-
 //=============================================================================================================
 
 bool Surface::read(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, Surface &p_Surface, bool p_bLoadCurvature)
@@ -201,7 +191,6 @@ bool Surface::read(const QString &subject_id, qint32 hemi, const QString &surf, 
     return read(p_sFile, p_Surface, p_bLoadCurvature);
 }
 
-
 //=============================================================================================================
 
 bool Surface::read(const QString &path, qint32 hemi, const QString &surf, Surface &p_Surface, bool p_bLoadCurvature)
@@ -213,7 +202,6 @@ bool Surface::read(const QString &path, qint32 hemi, const QString &surf, Surfac
 
     return read(p_sFile, p_Surface, p_bLoadCurvature);
 }
-
 
 //=============================================================================================================
 
@@ -416,7 +404,6 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
 
     return true;
 }
-
 
 //=============================================================================================================
 

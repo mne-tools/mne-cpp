@@ -62,7 +62,6 @@
 
 #include <disp/viewers/control3dview.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -74,11 +73,9 @@
 #include <Qt3DCore/QTransform>
 #include <QScopedPointer>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -90,7 +87,6 @@ using namespace DISPLIB;
 using namespace MNELIB;
 using namespace RTPROCESSINGLIB;
 using namespace INVERSELIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -218,14 +214,12 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
             this, &HpiView::onNewFittingResultAvailable);
 }
 
-
 //=============================================================================================================
 
 HpiView::~HpiView()
 {
     delete ui;
 }
-
 
 //=============================================================================================================
 
@@ -245,14 +239,12 @@ void HpiView::setData(const Eigen::MatrixXd& matData)
     }
 }
 
-
 //=============================================================================================================
 
 QVector<double> HpiView::getGOF()
 {
     return m_vGof;
 }
-
 
 //=============================================================================================================
 
@@ -261,14 +253,12 @@ bool HpiView::wasLastFitOk()
     return m_bLastFitGood;
 }
 
-
 //=============================================================================================================
 
 void HpiView::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
 }
-
 
 //=============================================================================================================
 
@@ -309,7 +299,6 @@ void HpiView::updateProjections()
     m_pRtHPI->setProjectionMatrix(m_matProjectors);
 }
 
-
 //=============================================================================================================
 
 bool HpiView::hpiLoaded()
@@ -320,7 +309,6 @@ bool HpiView::hpiLoaded()
 
     return false;
 }
-
 
 //=============================================================================================================
 
@@ -394,7 +382,6 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
     return lDigPoints;
 }
 
-
 //=============================================================================================================
 
 void HpiView::alignFiducials(const QString& fileNameDigData)
@@ -452,7 +439,6 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
     std::cout<<std::endl<<"move:"<<std::endl<<t_digData->head_mri_t_adj->move;
 }
 
-
 //=============================================================================================================
 
 void HpiView::onNewFittingResultAvailable(const RTPROCESSINGLIB::FittingResult& fitResult)
@@ -461,7 +447,6 @@ void HpiView::onNewFittingResultAvailable(const RTPROCESSINGLIB::FittingResult& 
 
     storeResults(fitResult.devHeadTrans, fitResult.fittedCoils);
 }
-
 
 //=============================================================================================================
 
@@ -487,7 +472,6 @@ void HpiView::onBtnDoSingleFit()
         m_pRtHPI->append(m_matValue);
     }
 }
-
 
 //=============================================================================================================
 
@@ -521,7 +505,6 @@ void HpiView::onBtnLoadPolhemusFile()
     }
 }
 
-
 //=============================================================================================================
 
 void HpiView::onFreqsChanged()
@@ -534,7 +517,6 @@ void HpiView::onFreqsChanged()
 
     m_pRtHPI->setCoilFrequencies(m_vCoilFreqs);
 }
-
 
 //=============================================================================================================
 
@@ -559,14 +541,12 @@ void HpiView::onDoContinousHPI()
     emit continousHPIToggled(ui->m_checkBox_continousHPI->isChecked());
 }
 
-
 //=============================================================================================================
 
 void HpiView::onContinousHPIMaxDistChanged()
 {
     m_dMaxHpiFitError = ui->m_doubleSpinBox_maxHPIContinousDist->value() * 0.001;
 }
-
 
 //=============================================================================================================
 
@@ -577,7 +557,6 @@ void HpiView::onSSPCompUsageChanged()
 
     updateProjections();
 }
-
 
 //=============================================================================================================
 
@@ -617,7 +596,6 @@ void HpiView::updateErrorLabels()
     }
 }
 
-
 //=============================================================================================================
 
 void HpiView::updateTransLabels()
@@ -645,7 +623,6 @@ void HpiView::updateTransLabels()
     ui->m_label_mat32->setText(QString::number(devHeadTrans.trans(3,2),'f',4));
     ui->m_label_mat33->setText(QString::number(devHeadTrans.trans(3,3),'f',4));
 }
-
 
 //=============================================================================================================
 
@@ -682,7 +659,6 @@ void HpiView::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPoin
 
     update3DView();
 }
-
 
 //=============================================================================================================
 

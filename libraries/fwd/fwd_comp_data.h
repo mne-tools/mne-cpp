@@ -44,20 +44,17 @@
 #include "fwd_global.h"
 #include "fwd_types.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -80,7 +77,6 @@ namespace FWDLIB
 //=============================================================================================================
 
 class FwdCoilSet;
-
 
 //=============================================================================================================
 /**
@@ -109,19 +105,15 @@ public:
     ~FwdCompData();
 
 
-
     //============================= fwd_comp.c =============================
 
-
     static int fwd_comp_field(float *rd,float *Q, FwdCoilSet* coils, float *res, void *client);
-
 
     /*
      * Routines to implement the reference channel compensation in field computations
      */
 
     static void fwd_free_comp_data(void *d);
-
 
     static int fwd_make_ctf_comp_coils(MNELIB::MneCTFCompDataSet* set,          /* The available compensation data */
                                        FwdCoilSet*        coils,        /* The main coil set */
@@ -141,7 +133,6 @@ public:
     static int fwd_comp_field_grad(float *rd,float *Q, FwdCoilSet* coils,
                 float *res, float *xgrad, float *ygrad, float *zgrad,
                 void *client);
-
 
 
 

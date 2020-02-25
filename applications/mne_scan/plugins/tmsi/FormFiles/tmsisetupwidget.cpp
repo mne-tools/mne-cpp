@@ -41,20 +41,17 @@
 #include "tmsiaboutwidget.h"
 #include "../tmsi.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace TMSIPLUGIN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -127,14 +124,12 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     }
 }
 
-
 //=============================================================================================================
 
 TMSISetupWidget::~TMSISetupWidget()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -164,7 +159,6 @@ void TMSISetupWidget::initGui()
     ui.m_checkBox_EnableKeyboardTrigger->setChecked(m_pTMSI->m_bUseKeyboardTrigger);
 }
 
-
 //=============================================================================================================
 
 void TMSISetupWidget::setDeviceSamplingProperties()
@@ -181,14 +175,12 @@ void TMSISetupWidget::setDeviceSamplingProperties()
     m_pTMSI->m_bUseCommonAverage = ui.m_checkBox_UseCommonAverage->isChecked();
 }
 
-
 //=============================================================================================================
 
 void TMSISetupWidget::setPreprocessing()
 {
     m_pTMSI->m_bUseFiltering = ui.m_checkBox_UseFiltering->isChecked();
 }
-
 
 //=============================================================================================================
 
@@ -197,14 +189,12 @@ void TMSISetupWidget::setPostprocessing()
     m_pTMSI->m_bUseFFT = ui.m_checkBox_UseFFT->isChecked();
 }
 
-
 //=============================================================================================================
 
 void TMSISetupWidget::setWriteToFile()
 {
     m_pTMSI->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
 }
-
 
 //=============================================================================================================
 
@@ -213,14 +203,12 @@ void TMSISetupWidget::setSplitFile(bool state)
     m_pTMSI->m_bSplitFile = state;
 }
 
-
 //=============================================================================================================
 
 void TMSISetupWidget::setSplitFileSize(qint32 value)
 {
     m_pTMSI->m_iSplitFileSizeMs = value;
 }
-
 
 //=============================================================================================================
 
@@ -230,7 +218,6 @@ void TMSISetupWidget::setTriggerProperties()
     m_pTMSI->m_bBeepTrigger = ui.m_checkBox_EnableBeep->isChecked();
     m_pTMSI->m_bUseKeyboardTrigger = ui.m_checkBox_EnableKeyboardTrigger->isChecked();
 }
-
 
 //=============================================================================================================
 

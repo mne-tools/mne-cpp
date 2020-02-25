@@ -414,7 +414,6 @@ typedef struct {
 //  mneProjOp      proj;		          /* The associated projection operator */
 //} *mneInverseOperator,mneInverseOperatorRec;
 
-
 typedef struct {		/* For storing the wdata */
   int   id;			/* Surface id these data belong to */
   int   kind;			/* What kind of data */
@@ -466,7 +465,6 @@ typedef struct {
 //  int           ndir;		/* Number of tags in the above
 //				 * directory */
 //} mneRawInfoRec, *mneRawInfo;
-
 
 typedef struct {		/* Spatiotemporal map */
   int kind;			/* What kind of data */
@@ -568,7 +566,6 @@ typedef struct {
 //  int   comp_status;		/* For raw buffers: compensation status */
 //} *mneRawBufDef,mneRawBufDefRec;
 
-
 /*
  * CTF compensation stuff
  */
@@ -618,7 +615,6 @@ typedef struct {		        /* A collection of derivations */
   int      nderiv;		        /* How many? */
   mneDeriv *derivs;			/* Pointers to the items */
 } *mneDerivSet,mneDerivSetRec;
-
 
 typedef struct {			/* A comprehensive raw data structure */
   char             *filename;           /* This is our file */
@@ -723,7 +719,6 @@ typedef struct {		 /* Measurement data representation in MNE calculations */
   int                nset;	 /* How many */
   mneMeasDataSet     current;	 /* Which is the current one */
 } *mneMeasData,mneMeasDataRec;
-
 
 typedef struct {		/* Identifier for the automatic parcellation */
   char  *name;			/* Name of this area */

@@ -43,7 +43,6 @@
 #include "helpers/evokedsetmodel.h"
 #include "helpers/channelinfomodel.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -53,13 +52,11 @@
 #include <QSvgGenerator>
 #include <QSurfaceFormat>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -89,7 +86,6 @@ ButterflyView::ButterflyView(QWidget *parent, Qt::WindowFlags f)
 //    this->setFormat(fmt);
 }
 
-
 //=============================================================================================================
 
 void ButterflyView::setEvokedSetModel(QSharedPointer<EvokedSetModel> model)
@@ -99,7 +95,6 @@ void ButterflyView::setEvokedSetModel(QSharedPointer<EvokedSetModel> model)
     connect(m_pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
             this, &ButterflyView::dataUpdate);
 }
-
 
 //=============================================================================================================
 
@@ -114,14 +109,12 @@ void ButterflyView::dataUpdate()
     update();
 }
 
-
 //=============================================================================================================
 
 QMap<QString, bool> ButterflyView::getModalityMap()
 {
     return m_modalityMap;
 }
-
 
 //=============================================================================================================
 
@@ -131,7 +124,6 @@ void ButterflyView::setModalityMap(const QMap<QString, bool> &modalityMap)
     update();
 }
 
-
 //=============================================================================================================
 
 void ButterflyView::setScaleMap(const QMap<qint32,float> &scaleMap)
@@ -139,7 +131,6 @@ void ButterflyView::setScaleMap(const QMap<qint32,float> &scaleMap)
     m_scaleMap = scaleMap;    
     update();
 }
-
 
 //=============================================================================================================
 
@@ -149,14 +140,12 @@ void ButterflyView::setSelectedChannels(const QList<int> &selectedChannels)
     update();
 }
 
-
 //=============================================================================================================
 
 void ButterflyView::updateView()
 {
     update();
 }
-
 
 //=============================================================================================================
 
@@ -166,14 +155,12 @@ void ButterflyView::setBackgroundColor(const QColor& backgroundColor)
     update();
 }
 
-
 //=============================================================================================================
 
 const QColor& ButterflyView::getBackgroundColor()
 {
     return m_colCurrentBackgroundColor;
 }
-
 
 //=============================================================================================================
 
@@ -199,7 +186,6 @@ void ButterflyView::takeScreenshot(const QString& fileName)
     }
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<QMap<QString, QColor> > ButterflyView::getAverageColor() const
@@ -207,14 +193,12 @@ QSharedPointer<QMap<QString, QColor> > ButterflyView::getAverageColor() const
     return m_qMapAverageColor;
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<QMap<QString, bool> > ButterflyView::getAverageActivation() const
 {
     return m_qMapAverageActivation;
 }
-
 
 //=============================================================================================================
 
@@ -224,7 +208,6 @@ void ButterflyView::setAverageColor(const QSharedPointer<QMap<QString, QColor> >
     update();
 }
 
-
 //=============================================================================================================
 
 void ButterflyView::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
@@ -233,14 +216,12 @@ void ButterflyView::setAverageActivation(const QSharedPointer<QMap<QString, bool
     update();
 }
 
-
 //=============================================================================================================
 
 void ButterflyView::setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel)
 {
     m_pChannelInfoModel = pChannelInfoModel;
 }
-
 
 //=============================================================================================================
 
@@ -258,7 +239,6 @@ void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels
 
     setSelectedChannels(selectedChannelsIndexes);
 }
-
 
 //=============================================================================================================
 
@@ -440,7 +420,6 @@ void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels
     return QWidget::paintEvent(event);
 #endif
 }
-
 
 //=============================================================================================================
 

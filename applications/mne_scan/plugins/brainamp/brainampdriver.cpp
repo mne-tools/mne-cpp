@@ -45,14 +45,12 @@
 #include <io.h>
 #include <vector>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace BRAINAMPPLUGIN;
 using namespace std;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -72,13 +70,11 @@ BrainAMPDriver::BrainAMPDriver(BrainAMPProducer* pBrainAmpProducer)
 {
 }
 
-
 //=============================================================================================================
 
 BrainAMPDriver::~BrainAMPDriver()
 {
 }
-
 
 //=============================================================================================================
 
@@ -168,7 +164,6 @@ bool BrainAMPDriver::initDevice(int iSamplesPerBlock,
     return true;
 }
 
-
 //=============================================================================================================
 
 bool BrainAMPDriver::openDevice()
@@ -220,7 +215,6 @@ int BrainAMPDriver::findAmplifiers()
     return nAmps;
 }
 
-
 //=============================================================================================================
 
 bool BrainAMPDriver::uninitDevice()
@@ -241,7 +235,6 @@ bool BrainAMPDriver::uninitDevice()
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -297,7 +290,6 @@ bool BrainAMPDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
             //Sleep(1);
             continue; //jumps to end of while statement
         }
-
 
         //Transform into matrix structure
         int counter = 0;

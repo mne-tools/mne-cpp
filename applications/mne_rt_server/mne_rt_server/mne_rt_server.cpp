@@ -45,14 +45,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtNetwork>
 #include <QDebug>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -62,7 +60,6 @@ using namespace RTSERVER;
 using namespace COMMUNICATIONLIB;
 
 const char* connectorDir = "/mne_rt_server_plugins";        /**< holds directory to connectors.*/
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -146,7 +143,6 @@ MNERTServer::MNERTServer()
     printf("mne_rt_server is running on\n\tIP:\t\t%s\n\tcommand port:\t%d\n\tfiff data port:\t%d\n\n",ipAddress.toUtf8().constData(), m_commandServer.serverPort(), m_fiffStreamServer.serverPort());
 }
 
-
 //=============================================================================================================
 
 MNERTServer::~MNERTServer()
@@ -154,14 +150,12 @@ MNERTServer::~MNERTServer()
     qDebug() << "MNERTServer destructed";
 }
 
-
 //=============================================================================================================
 
 void MNERTServer::comClose()
 {
     emit closeServer();
 }
-
 
 //=============================================================================================================
 
@@ -204,7 +198,6 @@ void MNERTServer::comHelp(Command p_command)
     QJsonObject t_qJsonObjectRoot;
     t_qJsonObjectRoot.insert("commands", t_qJsonObjectCommands);
     QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
-
 
     if(!t_bCommandIsJson)
     {
@@ -270,7 +263,6 @@ void MNERTServer::comHelp(Command p_command)
     else
         m_commandManager["help"].reply(p_qJsonDocument.toJson());
 }
-
 
 //=============================================================================================================
 

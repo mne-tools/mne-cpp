@@ -65,13 +65,11 @@
 
 #include "parksmcclellan.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <qmath.h>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -79,7 +77,6 @@
 
 using namespace UTILSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINES
@@ -90,7 +87,6 @@ using namespace Eigen;
 #define M_2PI  6.28318530717958647692
 #define ITRMAX 50             // Max Number of Iterations. Some filters require as many as 45 iterations.
 #define MIN_TEST_VAL 1.0E-6   // Min value used in LeGrangeInterp and GEE
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -114,7 +110,6 @@ ParksMcClellan::ParksMcClellan()
 {
 }
 
-
 //=============================================================================================================
 
 ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
@@ -136,7 +131,6 @@ ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double Par
     FirCoeff = RowVectorXd::Zero(NumTaps);
     init(NumTaps, OmegaC, BW, ParksWidth, PassType);
 }
-
 
 //=============================================================================================================
 
@@ -240,7 +234,6 @@ void ParksMcClellan::init(int NumTaps, double OmegaC, double BW, double ParksWid
     CalcParkCoeff2(NumBands, NumTaps);
 }
 
-
 //=============================================================================================================
 
 void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
@@ -324,7 +317,6 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
         Coeff[HalfTapCount] = 0.5 * Alpha[1] + 0.25 * Alpha[2];
     }
 
-
     // Output section.
     for(j=1; j<=HalfTapCount; j++) FirCoeff[j-1] = Coeff[j];
     if(OddNumTaps)
@@ -333,7 +325,6 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
         for(j=1; j<=HalfTapCount; j++ )FirCoeff[HalfTapCount+j-1] = Coeff[HalfTapCount-j+1];
 
     FirCoeff.conservativeResize(TapCount);
-
 
     // Parks2Label was on my application's main form.
     // These replace the original Ouch() function
@@ -348,7 +339,6 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
         //TopForm->Parks2Label->Caption = UnicodeString(NumIterations) + " Iterations";
     }
 }
-
 
 //=============================================================================================================
 
@@ -553,7 +543,6 @@ int ParksMcClellan::Remez2(int GridIndex)
     }  // end if(LUCK == 1 || LUCK == 2)
 
 
-
     KN = ExchangeIndex[HalfTapCount+2];
     for(j=1; j<=HalfTapCount; j++)
     {
@@ -564,7 +553,6 @@ int ParksMcClellan::Remez2(int GridIndex)
 
     return(NITER);
 }
-
 
 //=============================================================================================================
 
@@ -586,7 +574,6 @@ double ParksMcClellan::LeGrangeInterp2(int K, int N, int M) // D
   }
  return(1.0/Dee);
 }
-
 
 //=============================================================================================================
 
@@ -618,7 +605,6 @@ double ParksMcClellan::GEE2(int K, int N)
  return(P/Dee);
 }
 
-
 //=============================================================================================================
 
 bool ParksMcClellan::ErrTest(int k, int Nut, double Comp, double *Err)
@@ -628,7 +614,6 @@ bool ParksMcClellan::ErrTest(int k, int Nut, double Comp, double *Err)
  if((double)Nut * *Err - Comp <= 0.0) return(true);
  else return(false);
 }
-
 
 //=============================================================================================================
 

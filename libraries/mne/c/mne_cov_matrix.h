@@ -43,13 +43,11 @@
 
 #include "../mne_global.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -57,7 +55,6 @@
 
 #include <QSharedPointer>
 #include <QStringList>
-
 
 
 
@@ -71,8 +68,6 @@
 
 
 
-
-
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -81,7 +76,6 @@ namespace FIFFLIB
 {
     class FiffSparseMatrix;
 }
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -96,7 +90,6 @@ namespace MNELIB
 
 class MneProjOp;
 class MneSssData;
-
 
 //=============================================================================================================
 /**
@@ -125,10 +118,7 @@ public:
     ~MneCovMatrix();
 
 
-
     static MneCovMatrix* mne_dup_cov(MneCovMatrix* c);
-
-
 
 
 
@@ -140,7 +130,6 @@ public:
         return new MneCovMatrix(kind,ncov,names,cov,NULL,NULL);
     }
 
-
     static MneCovMatrix* mne_new_cov_diag(int    kind,
                                   int    ncov,
                                   const QStringList& names,
@@ -149,7 +138,6 @@ public:
         return new MneCovMatrix(kind,ncov,names,NULL,cov_diag,NULL);
     }
 
-
     static MneCovMatrix* mne_new_cov_sparse(    int kind,
                                                 int ncov,
                                                 const QStringList& names,
@@ -157,7 +145,6 @@ public:
     {
         return new MneCovMatrix(kind,ncov,names,NULL,NULL,cov_sparse);
     }
-
 
     static MneCovMatrix* mne_new_cov(   int kind,
                                         int ncov,
@@ -170,14 +157,10 @@ public:
 
 
 
-
     static int mne_is_diag_cov(MneCovMatrix* c);
 
 
-
     static int mne_add_inv_cov(MneCovMatrix* c);
-
-
 
 
 
@@ -190,16 +173,9 @@ public:
 
 
 
-
-
-
     static int mne_decompose_eigen_cov_small(MneCovMatrix* c,float p_small, int use_rank);
 
-
     static int mne_decompose_eigen_cov(MneCovMatrix* c);
-
-
-
 
 
 
@@ -210,7 +186,6 @@ public:
 private:
 
     static int mne_lt_packed_index(int j, int k);
-
 
 
 

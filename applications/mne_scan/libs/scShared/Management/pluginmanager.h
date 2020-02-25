@@ -41,7 +41,6 @@
 
 #include "../scshared_global.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -49,14 +48,12 @@
 #include <QVector>
 #include <QPluginLoader>
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE SCSHAREDLIB
 //=============================================================================================================
 
 namespace SCSHAREDLIB
 {
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -66,7 +63,6 @@ class IPlugin;
 class ISensor;
 class IAlgorithm;
 class IIO;
-
 
 //=============================================================================================================
 /**
@@ -149,7 +145,6 @@ public:
      */
     inline const QVector<IIO*>& getIOPlugins();
 
-
 private:
     QVector<IPlugin*>    m_qVecPlugins;             /**< Vector of all plugins. */
 
@@ -158,7 +153,6 @@ private:
     QVector<IIO*>        m_qVecIOPlugins;           /**< Vector of all IIO plugins. */
 
 };
-
 
 //=============================================================================================================
 // INLINE DEFINITIONS
@@ -169,7 +163,6 @@ inline const QVector<IPlugin*>& PluginManager::getPlugins()
     return m_qVecPlugins;
 }
 
-
 //=============================================================================================================
 
 inline const QVector<ISensor*>& PluginManager::getSensorPlugins()
@@ -177,14 +170,12 @@ inline const QVector<ISensor*>& PluginManager::getSensorPlugins()
     return m_qVecSensorPlugins;
 }
 
-
 //=============================================================================================================
 
 inline const QVector<IAlgorithm*>& PluginManager::getAlgorithmPlugins()
 {
     return m_qVecAlgorithmPlugins;
 }
-
 
 //=============================================================================================================
 

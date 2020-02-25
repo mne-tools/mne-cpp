@@ -45,7 +45,6 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -55,14 +54,12 @@
 #include <QMutex>
 #include <QSharedPointer>
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
 //=============================================================================================================
 
 namespace RTSERVER
 {
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -83,7 +80,6 @@ public:
     inline QString getAlias();
 
 //    void deactivateRawBufferSending();
-
 
     void parseCommand(QSharedPointer<FIFFLIB::FiffTag> p_pTag);
 
@@ -118,18 +114,15 @@ private:
 //    void readProc(QTcpSocket& p_qTcpSocket);
 };
 
-
 inline qint32 FiffStreamThread::getID()
 {
     return m_iDataClientId;
 }
 
-
 inline QString FiffStreamThread::getAlias()
 {
     return m_sDataClientAlias;
 }
-
 
 } // NAMESPACE
 

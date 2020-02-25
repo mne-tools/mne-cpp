@@ -34,13 +34,11 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "fwd_eeg_sphere_model_set.h"
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -49,12 +47,9 @@
 #include <QString>
 #include <QFile>
 
-
 #include <Eigen/Core>
 
-
 using namespace Eigen;
-
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -70,7 +65,6 @@ using namespace Eigen;
 #define MAXLINE 500
 
 
-
 #ifndef FAIL
 #define FAIL -1
 #endif
@@ -80,21 +74,17 @@ using namespace Eigen;
 #endif
 
 
-
 #define SEP ":\n\r"
-
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FWDLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -104,7 +94,6 @@ FwdEegSphereModelSet::FwdEegSphereModelSet()
 {
 }
 
-
 ////=============================================================================================================
 
 //FwdEegSphereModelSet::FwdEegSphereModelSet(const FwdEegSphereModelSet &p_FwdEegSphereModelSet)
@@ -112,7 +101,6 @@ FwdEegSphereModelSet::FwdEegSphereModelSet()
 //{
 
 //}
-
 
 //=============================================================================================================
 
@@ -122,7 +110,6 @@ FwdEegSphereModelSet::~FwdEegSphereModelSet()
         delete this->models[k];
 }
 
-
 //=============================================================================================================
 
 //void FwdEegSphereModelSet::fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s)
@@ -131,10 +118,8 @@ FwdEegSphereModelSet::~FwdEegSphereModelSet()
 //    if (!s)
 //        return;
 
-
 //    return;
 //}
-
 
 //=============================================================================================================
 
@@ -144,7 +129,6 @@ FwdEegSphereModelSet::~FwdEegSphereModelSet()
 
 //    return s;
 //}
-
 
 //=============================================================================================================
 
@@ -156,7 +140,6 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(FwdE
     s->models.append(m);
     return s;
 }
-
 
 //=============================================================================================================
 //fwd_eeg_sphere_models.c
@@ -171,7 +154,6 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(Fwd
     return FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(s,FwdEegSphereModel::fwd_create_eeg_sphere_model("Default",
                                                                          def_nlayer,def_unit_rads,def_sigmas));
 }
-
 
 //=============================================================================================================
 //fwd_eeg_sphere_models.c
@@ -195,7 +177,6 @@ FwdEegSphereModelSet* FwdEegSphereModelSet::fwd_load_eeg_sphere_models(const QSt
     QFile t_file(filename);
     if (!t_file.isReadable())	/* Never mind about an unaccesible file */
         return now;
-
 
     if ((fp = fopen(filename.toUtf8().data(),"r")) == NULL) {
         printf(filename.toUtf8().data());
@@ -250,7 +231,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 //fwd_eeg_sphere_models.c
 FwdEegSphereModel* FwdEegSphereModelSet::fwd_select_eeg_sphere_model(const QString& p_sName)
@@ -277,7 +257,6 @@ FwdEegSphereModel* FwdEegSphereModelSet::fwd_select_eeg_sphere_model(const QStri
     return NULL;
 }
 
-
 //=============================================================================================================
 //dipole_fit_setup.c
 void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
@@ -300,15 +279,12 @@ void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
 
 
 
-
-
 ////=============================================================================================================
 
 //void FwdEegSphereModelSet::addFwdEegSphereModel(const FwdEegSphereModel &p_FwdEegSphereModel)
 //{
 //    m_qListModels.append(p_FwdEegSphereModel);
 //}
-
 
 ////=============================================================================================================
 
@@ -322,7 +298,6 @@ void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
 //    return m_qListModels[idx];
 //}
 
-
 ////=============================================================================================================
 
 //FwdEegSphereModel& FwdEegSphereModelSet::operator[] (qint32 idx)
@@ -334,7 +309,6 @@ void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
 //    }
 //    return m_qListModels[idx];
 //}
-
 
 ////=============================================================================================================
 

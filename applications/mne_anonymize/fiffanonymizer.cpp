@@ -36,7 +36,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -45,16 +44,13 @@
 
 #include <fiff/fiff_dir_entry.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -63,11 +59,9 @@
 using namespace MNEANONYMIZE;
 using namespace FIFFLIB;
 
-
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -118,7 +112,6 @@ FiffAnonymizer::FiffAnonymizer()
     m_pOutDir = QSharedPointer<QVector<FiffDirEntry> >(new QVector<FiffDirEntry>);
 }
 
-
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
@@ -162,7 +155,6 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
     m_pBlockTypeList = QSharedPointer<QStack<int32_t> >(new QStack<int32_t>(*obj.m_pBlockTypeList));
     m_pOutDir = QSharedPointer<QVector<FiffDirEntry> >(new QVector<FiffDirEntry>);
 }
-
 
 //=============================================================================================================
 
@@ -208,14 +200,12 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer &&obj)
     m_pOutDir.swap(obj.m_pOutDir);
 }
 
-
 //=============================================================================================================
 
 QString FiffAnonymizer::getDefaultString()
 {
     return m_sDefaultString;
 }
-
 
 //=============================================================================================================
 
@@ -224,14 +214,12 @@ QDateTime FiffAnonymizer::getDefaultDate()
     return m_dateDefaultDate;
 }
 
-
 //=============================================================================================================
 
 QDateTime FiffAnonymizer::getMeasurementDate()
 {
     return m_dateMeasurmentDate;
 }
-
 
 //=============================================================================================================
 
@@ -240,14 +228,12 @@ bool FiffAnonymizer::getUseMeasurementDayOffset()
     return m_bUseMeasurementDayOffset;
 }
 
-
 //=============================================================================================================
 
 int  FiffAnonymizer::getIntMeasurementDayOffset()
 {
     return m_iMeasurementDayOffset;
 }
-
 
 //=============================================================================================================
 
@@ -256,7 +242,6 @@ QDateTime FiffAnonymizer::getSubjectBirthday()
     return m_dateSubjectBirthday;
 }
 
-
 //=============================================================================================================
 
 bool FiffAnonymizer::getUseSubjectBirthdayOffset()
@@ -264,14 +249,12 @@ bool FiffAnonymizer::getUseSubjectBirthdayOffset()
     return m_bUseSubjectBirthdayOffset;
 }
 
-
 //=============================================================================================================
 
 int  FiffAnonymizer::getIntSubjectBirthdayOffset()
 {
     return m_iSubjectBirthdayOffset;
 }
-
 
 //=============================================================================================================
 
@@ -281,14 +264,12 @@ void FiffAnonymizer::getDefaultMAC(fiff_int_t (&mac)[2])
     mac[1] = m_BDfltMAC[1];
 }
 
-
 //=============================================================================================================
 
 int FiffAnonymizer::getDefaultSubjectId()
 {
     return m_iDfltSubjectId;
 }
-
 
 //=============================================================================================================
 
@@ -297,14 +278,12 @@ QString FiffAnonymizer::getDefaultSubjectFirstName()
     return m_sSubjectFirstName;
 }
 
-
 //=============================================================================================================
 
 QString FiffAnonymizer::getDefaultSubjectMidName()
 {
     return m_sSubjectMidName;
 }
-
 
 //=============================================================================================================
 
@@ -313,14 +292,12 @@ QString FiffAnonymizer::getDefaultSubjectLastName()
     return m_sSubjectLastName;
 }
 
-
 //=============================================================================================================
 
 int FiffAnonymizer::getDefaultSubjectWeight()
 {
     return m_iSubjectWeight;
 }
-
 
 //=============================================================================================================
 
@@ -329,14 +306,12 @@ int FiffAnonymizer::getDefaultSubjectHeight()
     return m_iSubjectHeight;
 }
 
-
 //=============================================================================================================
 
 QString FiffAnonymizer::getDefaultSubjectComment()
 {
     return m_sSubjectComment;
 }
-
 
 //=============================================================================================================
 
@@ -345,14 +320,12 @@ QString FiffAnonymizer::getDefaultSubjectHisId()
     return m_sSubjectHisId;
 }
 
-
 //=============================================================================================================
 
 int FiffAnonymizer::getDefaultProjectId()
 {
     return m_iProjectId;
 }
-
 
 //=============================================================================================================
 
@@ -361,14 +334,12 @@ QString FiffAnonymizer::getDefaultProjectName()
     return m_sProjectName;
 }
 
-
 //=============================================================================================================
 
 QString FiffAnonymizer::getDefaultProjectAim()
 {
     return m_sProjectAim;
 }
-
 
 //=============================================================================================================
 
@@ -377,14 +348,12 @@ QString FiffAnonymizer::getDefaultProjectPersons()
     return m_sProjectPersons;
 }
 
-
 //=============================================================================================================
 
 QString FiffAnonymizer::getDefaultProjectComment()
 {
     return m_sProjectComment;
 }
-
 
 //=============================================================================================================
 
@@ -393,14 +362,12 @@ bool FiffAnonymizer::getBruteMode()
     return m_bBruteMode;
 }
 
-
 //=============================================================================================================
 
 bool FiffAnonymizer::getDeleteInputFileAfter()
 {
     return m_bDeleteInputFileAfter;
 }
-
 
 //=============================================================================================================
 
@@ -409,14 +376,12 @@ bool FiffAnonymizer::getDeleteInputFileConfirmation()
     return m_bDeleteInputFileConfirmation;
 }
 
-
 //=============================================================================================================
 
 bool FiffAnonymizer::getInputFileDeleted()
 {
     return m_bInputFileDeleted;
 }
-
 
 //=============================================================================================================
 
@@ -425,14 +390,12 @@ bool FiffAnonymizer::getInOutFileNamesEqual()
     return m_bInOutFileNamesEqual;
 }
 
-
 //=============================================================================================================
 
 bool FiffAnonymizer::getOutputFileRenamed()
 {
     return m_bOutputFileRenamed;
 }
-
 
 //=============================================================================================================
 
@@ -441,14 +404,12 @@ QString FiffAnonymizer::getFileNameIn()
     return m_sFileNameIn;
 }
 
-
 //=============================================================================================================
 
 QString FiffAnonymizer::getsFileNameOut()
 {
     return m_sFileNameOut;
 }
-
 
 //=============================================================================================================
 
@@ -585,7 +546,6 @@ int FiffAnonymizer::anonymizeFile()
     return 0;
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::updateBlockTypeList(FiffTag::SPtr pTag)
@@ -598,7 +558,6 @@ void FiffAnonymizer::updateBlockTypeList(FiffTag::SPtr pTag)
         m_pBlockTypeList->pop();
     }
 }
-
 
 //=============================================================================================================
 
@@ -617,7 +576,6 @@ bool FiffAnonymizer::checkValidFiffFormatVersion(FiffTag::SPtr pTag)
     return true;
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::addEntryToDir(FiffTag::SPtr pTag,
@@ -631,7 +589,6 @@ void FiffAnonymizer::addEntryToDir(FiffTag::SPtr pTag,
     m_pOutDir->append(t_dirEntry);
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::addFinalEntryToDir()
@@ -643,7 +600,6 @@ void FiffAnonymizer::addFinalEntryToDir()
     t_dirEntry.pos  = -1;
     m_pOutDir->append(t_dirEntry);
 }
-
 
 //=============================================================================================================
 
@@ -669,7 +625,6 @@ void FiffAnonymizer::dir2tag(FiffTag::SPtr pTag)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -697,7 +652,6 @@ void FiffAnonymizer::writeDirectory(FiffStream* stream,
     }
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::updatePointer(FiffStream* stream,
@@ -714,7 +668,6 @@ void FiffAnonymizer::updatePointer(FiffStream* stream,
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -741,7 +694,6 @@ bool FiffAnonymizer::checkDeleteInputFile()
 
     return false;
 }
-
 
 //=============================================================================================================
 
@@ -1002,7 +954,6 @@ int FiffAnonymizer::censorTag(FiffTag::SPtr outTag,
     return sizeDiff;
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::setFileIn(const QString &sFileIn)
@@ -1010,7 +961,6 @@ void FiffAnonymizer::setFileIn(const QString &sFileIn)
     m_sFileNameIn = sFileIn;
     m_fFileIn.setFileName(sFileIn);
 }
-
 
 //=============================================================================================================
 
@@ -1029,14 +979,12 @@ void FiffAnonymizer::setFileOut(const QString &sFileOut)
     m_fFileOut.setFileName(m_sFileNameOut);
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::setVerboseMode(bool bFlag)
 {
     m_bVerboseMode = bFlag;
 }
-
 
 //=============================================================================================================
 
@@ -1045,7 +993,6 @@ bool FiffAnonymizer::getVerboseMode()
     return m_bVerboseMode;
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::setBruteMode(bool bFlag)
@@ -1053,14 +1000,12 @@ void FiffAnonymizer::setBruteMode(bool bFlag)
     m_bBruteMode = bFlag;
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::setMeasurementDay(const QString& sMeasDay)
 {
     m_dateMeasurmentDate = QDateTime(QDate::fromString(sMeasDay),QTime(1,1,0));
 }
-
 
 //=============================================================================================================
 
@@ -1070,14 +1015,12 @@ void FiffAnonymizer::setMeasurementDayOffset(int iMeasDayOffset)
     m_iMeasurementDayOffset = iMeasDayOffset;
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::setSubjectBirthday(const QString& sSubjBirthday)
 {
     m_dateSubjectBirthday = QDateTime(QDate::fromString(sSubjBirthday),QTime(1, 1, 0));
 }
-
 
 //=============================================================================================================
 
@@ -1087,7 +1030,6 @@ void FiffAnonymizer::setSubjectBirthdayOffset(int iSubjBirthdayOffset)
     m_iSubjectBirthdayOffset = iSubjBirthdayOffset;
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::setDeleteInputFileAfter(bool bFlag)
@@ -1095,14 +1037,12 @@ void FiffAnonymizer::setDeleteInputFileAfter(bool bFlag)
     m_bDeleteInputFileAfter = bFlag;
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::setDeleteInputFileAfterConfirmation(bool bFlag)
 {
     m_bDeleteInputFileConfirmation = bFlag;
 }
-
 
 //=============================================================================================================
 
@@ -1120,7 +1060,6 @@ QString FiffAnonymizer::generateRandomFileName()
     return randomFileName.append(".fif");
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::deleteInputFile()
@@ -1128,7 +1067,6 @@ void FiffAnonymizer::deleteInputFile()
     m_bInputFileDeleted = m_fFileIn.remove();
     printIfVerbose("Input file deleted.");
 }
-
 
 //=============================================================================================================
 
@@ -1164,7 +1102,6 @@ bool FiffAnonymizer::checkRenameOutputFile()
     return false;
 }
 
-
 //=============================================================================================================
 
 void FiffAnonymizer::renameOutputFileAsInputFile()
@@ -1173,7 +1110,6 @@ void FiffAnonymizer::renameOutputFileAsInputFile()
     m_bOutputFileRenamed = true;
     printIfVerbose("Output file named: " + m_sFileNameOut + " --> renamed as: " + m_sFileNameIn);
 }
-
 
 //=============================================================================================================
 

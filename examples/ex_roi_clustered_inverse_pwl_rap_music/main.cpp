@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -59,7 +58,6 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -67,7 +65,6 @@
 #include <QApplication>
 #include <QSet>
 #include <QCommandLineParser>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -79,7 +76,6 @@ using namespace FIFFLIB;
 using namespace INVERSELIB;
 using namespace DISP3DLIB;
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // MAIN
@@ -293,7 +289,6 @@ int main(int argc, char *argv[])
     //
     MNEForwardSolution t_clusteredFwd = t_SelectFwd.cluster_forward_solution(t_annotationSet, 20);//t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
 
-
     //
     // Compute inverse solution
     //
@@ -325,7 +320,6 @@ int main(int argc, char *argv[])
     sourceEstimate.tmin = tmin;
     sourceEstimate.tstep = tstep;
 
-
     bool first = true;
     bool last = false;
 
@@ -351,7 +345,6 @@ int main(int argc, char *argv[])
         }
         else
             measData = data.block(0, curSample, t_iNumSensors, samplesStcWindow);
-
 
         curSample += (samplesStcWindow - t_iSamplesOverlap);
         if(first)

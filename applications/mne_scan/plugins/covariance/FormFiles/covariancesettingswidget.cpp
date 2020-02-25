@@ -6,13 +6,11 @@
 #include <QSpinBox>
 #include <QLabel>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace COVARIANCEPLUGIN;
-
 
 CovarianceSettingsWidget::CovarianceSettingsWidget(Covariance *toolbox, QWidget *parent)
 : QWidget(parent)

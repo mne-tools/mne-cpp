@@ -57,7 +57,6 @@
 
 #include <utils/filterTools/filterdata.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -69,7 +68,6 @@
 #include <QDir>
 #include <QSettings>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -78,7 +76,6 @@ using namespace SCDISPLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -138,7 +135,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Re
     qRegisterMetaType<QMap<int,QList<QPair<int,double> > > >();
 }
 
-
 //=============================================================================================================
 
 RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
@@ -149,7 +145,6 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
         settings.setValue(QString("RTMSAW/%1/showHideBad").arg(m_pRTMSA->getName()), m_pChannelDataView->getBadChannelHideStatus());
     }
 }
-
 
 //=============================================================================================================
 
@@ -168,7 +163,6 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr)
         m_pChannelDataView->addData(m_pRTMSA->getMultiSampleArray());
     }
 }
-
 
 //=============================================================================================================
 
@@ -332,7 +326,6 @@ void RealTimeMultiSampleArrayWidget::init()
     }
 }
 
-
 //=============================================================================================================
 
 void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
@@ -345,7 +338,6 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
     }
 }
 
-
 //=============================================================================================================
 
 void RealTimeMultiSampleArrayWidget::showQuickControlView()
@@ -357,7 +349,6 @@ void RealTimeMultiSampleArrayWidget::showQuickControlView()
         m_pQuickControlView->show();
     }
 }
-
 
 //=============================================================================================================
 
@@ -382,7 +373,6 @@ void RealTimeMultiSampleArrayWidget::onMakeScreenshot(const QString& imageType)
     m_pChannelDataView->takeScreenshot(fileName);
 }
 
-
 //=============================================================================================================
 
 void RealTimeMultiSampleArrayWidget::onHideBadChannels()
@@ -399,5 +389,4 @@ void RealTimeMultiSampleArrayWidget::onHideBadChannels()
         m_pActionHideBad->setStatusTip(tr("Show all bad channels"));
     }
 }
-
 

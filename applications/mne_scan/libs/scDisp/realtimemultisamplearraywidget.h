@@ -36,7 +36,6 @@
 #ifndef REALTIMEMULTISAMPLEARRAYWIDGET_H
 #define REALTIMEMULTISAMPLEARRAYWIDGET_H
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -44,13 +43,11 @@
 #include "scdisp_global.h"
 #include "measurementwidget.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,7 +56,6 @@
 #include <QSharedPointer>
 #include <QPointer>
 #include <QMap>
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -81,7 +77,6 @@ namespace SCMEASLIB{
     class RealTimeMultiSampleArray;
 }
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE SCDISPLIB
 //=============================================================================================================
@@ -89,11 +84,9 @@ namespace SCMEASLIB{
 namespace SCDISPLIB
 {
 
-
 //=============================================================================================================
 // SCDISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 //=============================================================================================================
 /**
@@ -170,7 +163,6 @@ private:
     QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;            /**< channel info model. */
     QSharedPointer<DISPLIB::ChannelSelectionView>           m_pChannelSelectionView;        /**< ChannelSelectionView. */
     QPointer<DISPLIB::RtFiffRawView>                      m_pChannelDataView;             /**< the QTableView being part of the model/view framework of Qt. */
-
 
     QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
 

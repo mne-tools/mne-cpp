@@ -40,7 +40,6 @@
 
 #include <fiff/fiff_ch_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -53,11 +52,9 @@
 #include <QSpinBox>
 #include <QDebug>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -65,7 +62,6 @@
 
 using namespace DISPLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -88,14 +84,12 @@ ArtifactSettingsView::ArtifactSettingsView(const QString& sSettingsPath,
     redrawGUI();
 }
 
-
 //=============================================================================================================
 
 ArtifactSettingsView::~ArtifactSettingsView()
 {
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 
@@ -107,14 +101,12 @@ void ArtifactSettingsView::setChInfo(const QList<FIFFLIB::FiffChInfo>& fiffChInf
     onChangeArtifactThreshold();
 }
 
-
 //=============================================================================================================
 
 QMap<QString,double> ArtifactSettingsView::getThresholdMap()
 {
     return m_mapThresholds;
 }
-
 
 //=============================================================================================================
 
@@ -126,7 +118,6 @@ void ArtifactSettingsView::setThresholdMap(const QMap<QString,double>& mapThresh
     onChangeArtifactThreshold();
 }
 
-
 //=============================================================================================================
 
 bool ArtifactSettingsView::getDoArtifactThresholdRejection()
@@ -137,7 +128,6 @@ bool ArtifactSettingsView::getDoArtifactThresholdRejection()
 
     return false;
 }
-
 
 //=============================================================================================================
 
@@ -214,7 +204,6 @@ void ArtifactSettingsView::redrawGUI()
     }
 }
 
-
 //=============================================================================================================
 
 void ArtifactSettingsView::saveSettings(const QString& settingsPath)
@@ -244,7 +233,6 @@ void ArtifactSettingsView::saveSettings(const QString& settingsPath)
     }
     settings.endGroup();
 }
-
 
 //=============================================================================================================
 
@@ -293,7 +281,6 @@ void ArtifactSettingsView::loadSettings(const QString& settingsPath)
     }
     settings.endGroup();
 }
-
 
 //=============================================================================================================
 

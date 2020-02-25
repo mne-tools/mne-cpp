@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -52,7 +51,6 @@
 #include <QFile>
 
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -63,7 +61,6 @@ using namespace MNELIB;
 using namespace INVERSELIB;
 
 
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -72,7 +69,6 @@ using namespace INVERSELIB;
 #define FALSE 0
 #endif
 
-
 #ifndef FAIL
 #define FAIL -1
 #endif
@@ -80,7 +76,6 @@ using namespace INVERSELIB;
 #ifndef OK
 #define OK 0
 #endif
-
 
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -92,10 +87,8 @@ using namespace INVERSELIB;
 
 
 
-
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
-
 
 
 
@@ -103,15 +96,12 @@ using namespace INVERSELIB;
 #define REALLOC_9(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
 
-
 #define FREE_9(x) if ((char *)(x) != NULL) free((char *)(x))
-
 
 
 #define ALLOC_CMATRIX_9(x,y) mne_cmatrix_9((x),(y))
 
 #define FREE_CMATRIX_9(m) mne_free_cmatrix_9((m))
-
 
 
 
@@ -128,7 +118,6 @@ void fromFloatEigenMatrix_9(const Eigen::MatrixXf& from_mat, float **& to_mat)
 }
 
 
-
 void mne_free_cmatrix_9 (float **m)
 {
     if (m) {
@@ -136,7 +125,6 @@ void mne_free_cmatrix_9 (float **m)
         FREE_9(m);
     }
 }
-
 
 
 static void matrix_error_9(int kind, int nr, int nc)
@@ -155,8 +143,6 @@ static void matrix_error_9(int kind, int nr, int nc)
     printf("Cannot continue. Sorry.\n");
     exit(1);
 }
-
-
 
 
 
@@ -179,7 +165,6 @@ float **mne_cmatrix_9(int nr,int nc)
 
 
 
-
 typedef struct {
     int   size;		        /* Size of this buffer in floats */
     float *data;			/* The allocated buffer */
@@ -191,7 +176,6 @@ typedef struct {
     int        nbuf;
     int        next;
 } *ringBuf_9,ringBufRec_9;
-
 
 void mne_free_ring_buffer_9(void *thisp)
 
@@ -210,9 +194,7 @@ void mne_free_ring_buffer_9(void *thisp)
 }
 
 
-
 //============================= mne_events.c =============================
-
 
 void mne_free_event_9(mneEvent e)
 {
@@ -222,7 +204,6 @@ void mne_free_event_9(mneEvent e)
     FREE_9(e);
     return;
 }
-
 
 void mne_free_event_list_9(mneEventList list)
 
@@ -236,8 +217,6 @@ void mne_free_event_list_9(mneEventList list)
     FREE_9(list);
     return;
 }
-
-
 
 
 
@@ -257,9 +236,7 @@ void mne_free_sparse_named_matrix_9(mneSparseNamedMatrix mat)
     return;
 }
 
-
 //============================= mne_raw_routines.c =============================
-
 
 
 
@@ -281,7 +258,6 @@ void mne_ch_selection_free_9(mneChSelection s)
 
 
 
-
 void mne_string_to_name_list_9(const QString& s, QStringList& listp,int &nlistp)
 /*
  * Convert a colon-separated list into a string array
@@ -297,7 +273,6 @@ void mne_string_to_name_list_9(const QString& s, QStringList& listp,int &nlistp)
     nlistp = list.size();
     return;
 }
-
 
 QString mne_name_list_to_string_9(const QStringList& list)
 /*
@@ -333,7 +308,6 @@ QString mne_channel_names_to_string_9(const QList<FIFFLIB::FiffChInfo>& chs,
     return res;
 }
 
-
 void mne_channel_names_to_name_list_9(const QList<FIFFLIB::FiffChInfo>& chs,
                                       int nch,
                                       QStringList& listp,
@@ -345,8 +319,6 @@ void mne_channel_names_to_name_list_9(const QList<FIFFLIB::FiffChInfo>& chs,
     mne_string_to_name_list_9(s,listp,nlistp);
     return;
 }
-
-
 
 
 
@@ -368,7 +340,6 @@ static FiffDirNode::SPtr find_meas_9 (const FiffDirNode::SPtr& node)
     }
     return (tmp_node);
 }
-
 
 
 static FiffDirNode::SPtr find_meas_info_9 (const FiffDirNode::SPtr& node)
@@ -393,12 +364,9 @@ static FiffDirNode::SPtr find_meas_info_9 (const FiffDirNode::SPtr& node)
 
 
 
-
 //============================= mne_read_evoked.c =============================
 
-
 #define MAXDATE 100
-
 
 static FiffDirNode::SPtr find_evoked (const FiffDirNode::SPtr& node)
 /*
@@ -414,7 +382,6 @@ static FiffDirNode::SPtr find_evoked (const FiffDirNode::SPtr& node)
     }
     return (tmp_node);
 }
-
 
 
 static QString get_comment (  FiffStream::SPtr& stream,
@@ -514,8 +481,6 @@ static char *get_meas_date (    FiffStream::SPtr& stream,const FiffDirNode::SPtr
     }
     return res;
 }
-
-
 
 
 
@@ -694,7 +659,6 @@ bad : {
 
 
 
-
 static int find_between (   FiffStream::SPtr& stream,
                             const FiffDirNode::SPtr& low_node,
                             const FiffDirNode::SPtr& high_node,
@@ -737,8 +701,6 @@ static int find_between (   FiffStream::SPtr& stream,
     }
     return (FIFF_OK);
 }
-
-
 
 
 
@@ -864,7 +826,6 @@ out : {
     }
 }
 
-
 static int get_evoked_optional( FiffStream::SPtr& stream,
                                 const FiffDirNode::SPtr& node, /* The directory node containing our data */
                                 int *nchan,	 /* Number of channels */
@@ -938,8 +899,6 @@ out : {
 
 
 
-
-
 static void unpack_data(double offset,
                         double scale,
                         short *packed,
@@ -951,7 +910,6 @@ static void unpack_data(double offset,
         orig[k] = scale * packed[k] + offset;
     return;
 }
-
 
 static float **get_epochs ( FiffStream::SPtr& stream,       /* This is our file */
                             const FiffDirNode::SPtr& node,  /* The interesting node */
@@ -1034,11 +992,6 @@ bad : {
         return (NULL);
     }
 }
-
-
-
-
-
 
 
 
@@ -1135,7 +1088,6 @@ int mne_find_evoked_types_comments (    FiffStream::SPtr& stream,
     }
 }
 
-
 QList<FiffDirNode::SPtr> mne_find_evoked ( FiffStream::SPtr& stream, QStringList* commentsp)
 /* Optionally return the compiled comments here */
 {
@@ -1143,8 +1095,6 @@ QList<FiffDirNode::SPtr> mne_find_evoked ( FiffStream::SPtr& stream, QStringList
     mne_find_evoked_types_comments(stream,evoked,NULL,commentsp);
     return evoked;
 }
-
-
 
 
 
@@ -1193,7 +1143,6 @@ static void remove_artefacts (float *resp,
     }
     return;
 }
-
 
 
 
@@ -1376,7 +1325,6 @@ out : {
     }
 }
 
-
 //============================= mne_inverse_io.c =============================
 
 #define MAXBUF 200
@@ -1405,11 +1353,6 @@ char *mne_format_file_id (fiffId id)
 
 
 
-
-
-
-
-
 int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
                                     QList<FiffChInfo>& megp,	 /* MEG channels */
                                     int            *nmegp,
@@ -1426,7 +1369,6 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
-
 
     QList<FiffChInfo> chs;
     int        nchan = 0;
@@ -1576,8 +1518,6 @@ bad : {
 
 
 
-
-
 int mne_read_bad_channel_list_from_node_9(  FiffStream::SPtr& stream,
                                             const FiffDirNode::SPtr& pNode, QStringList& listp, int& nlistp)
 {
@@ -1630,9 +1570,6 @@ int mne_read_bad_channel_list_9(const QString& name, QStringList& listp, int& nl
 
 
 
-
-
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -1658,7 +1595,6 @@ MneMeasData::MneMeasData()
     meas_date.secs = 0;
     meas_date.usecs = 0;
 }
-
 
 //=============================================================================================================
 
@@ -1688,7 +1624,6 @@ MneMeasData::~MneMeasData()
 
     return;
 }
-
 
 //=============================================================================================================
 
@@ -1749,7 +1684,6 @@ void MneMeasData::adjust_baselines(float bmin, float bmax)
     }
     return;
 }
-
 
 //=============================================================================================================
 
@@ -2042,7 +1976,6 @@ out : {
         return res;
     }
 }
-
 
 //=============================================================================================================
 

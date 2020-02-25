@@ -47,7 +47,6 @@
 #include "startupwidget.h"
 #include "plugingui.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -63,20 +62,17 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNESCAN;
 
-
 //=============================================================================================================
 // CONST
 //=============================================================================================================
 
 const char* pluginDir = "/mne_scan_plugins";        /**< holds path to plugins.*/
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -129,7 +125,6 @@ MainWindow::MainWindow(QWidget *parent)
     initStatusBar();
 }
 
-
 //=============================================================================================================
 
 MainWindow::~MainWindow()
@@ -152,7 +147,6 @@ MainWindow::~MainWindow()
         delete m_pDynamicDisplayToolBar;
 }
 
-
 //=============================================================================================================
 
 void MainWindow::clear()
@@ -160,7 +154,6 @@ void MainWindow::clear()
     if(m_bIsRunning)
         this->stopMeasurement();
 }
-
 
 //=============================================================================================================
 
@@ -170,7 +163,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 }
 
 
-
 //=============================================================================================================
 //File QMenu
 void MainWindow::newConfiguration()
@@ -178,7 +170,6 @@ void MainWindow::newConfiguration()
     writeToLog(tr("Invoked <b>File|NewConfiguration</b>"), _LogKndMessage, _LogLvMin);
     m_pPluginGui->clearScene();
 }
-
 
 //=============================================================================================================
 
@@ -194,7 +185,6 @@ void MainWindow::openConfiguration()
     QFileInfo qFileInfo(path);
     m_pPluginGui->loadConfig(qFileInfo.path(), qFileInfo.fileName());
 }
-
 
 //=============================================================================================================
 
@@ -212,14 +202,12 @@ void MainWindow::saveConfiguration()
     m_pPluginGui->saveConfig(qFileInfo.path(), qFileInfo.fileName());
 }
 
-
 //=============================================================================================================
 //Help QMenu
 void MainWindow::helpContents()
 {
     writeToLog(tr("Invoked <b>Help|HelpContents</b>"), _LogKndMessage, _LogLvMin);
 }
-
 
 //=============================================================================================================
 
@@ -313,7 +301,6 @@ void MainWindow::about()
 //            " POSSIBILITY OF SUCH DAMAGE."));
 }
 
-
 //=============================================================================================================
 
 void MainWindow::setMinLogLevel()
@@ -322,7 +309,6 @@ void MainWindow::setMinLogLevel()
     m_eLogLevelCurrent = _LogLvMin;
 }
 
-
 //=============================================================================================================
 
 void MainWindow::setNormalLogLevel()
@@ -330,7 +316,6 @@ void MainWindow::setNormalLogLevel()
     writeToLog(tr("normal log level set"), _LogKndMessage, _LogLvMin);
     m_eLogLevelCurrent = _LogLvNormal;
 }
-
 
 //=============================================================================================================
 
@@ -437,7 +422,6 @@ void MainWindow::createActions()
     connect(m_pActionDisplayMax, &QAction::triggered, this, &MainWindow::toggleDisplayMax);
 }
 
-
 //=============================================================================================================
 
 void MainWindow::createMenus()
@@ -463,7 +447,6 @@ void MainWindow::createMenus()
     m_pMenuHelp->addSeparator();
     m_pMenuHelp->addAction(m_pActionAbout);
 }
-
 
 //=============================================================================================================
 
@@ -527,14 +510,12 @@ void MainWindow::createToolBars()
 
 }
 
-
 //=============================================================================================================
 
 void MainWindow::initStatusBar()
 {
     statusBar()->showMessage(tr("Ready"));
 }
-
 
 //=============================================================================================================
 
@@ -558,7 +539,6 @@ void MainWindow::createPluginDockWindow()
     m_pMenuView->addAction(m_pPluginGuiDockWidget->toggleViewAction());
 }
 
-
 //=============================================================================================================
 
 void MainWindow::createLogDockWindow()
@@ -580,7 +560,6 @@ void MainWindow::createLogDockWindow()
     m_pMenuView->addAction(m_pDockWidget_Log->toggleViewAction());
 
 }
-
 
 //=============================================================================================================
 //Plugin stuff
@@ -639,7 +618,6 @@ void MainWindow::updatePluginWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
     this->createToolBars();
 }
 
-
 //=============================================================================================================
 
 void MainWindow::updateConnectionWidget(SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection)
@@ -647,7 +625,6 @@ void MainWindow::updateConnectionWidget(SCSHAREDLIB::PluginConnectorConnection::
     QWidget* pWidget = pConnection->setupWidget();
     setCentralWidget(pWidget);
 }
-
 
 //=============================================================================================================
 
@@ -678,7 +655,6 @@ void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl
     }
 }
 
-
 //=============================================================================================================
 
 void MainWindow::startMeasurement()
@@ -700,7 +676,6 @@ void MainWindow::startMeasurement()
 //    CentralWidgetShowPlugin();
 }
 
-
 //=============================================================================================================
 
 void MainWindow::stopMeasurement()
@@ -710,13 +685,11 @@ void MainWindow::stopMeasurement()
     m_pPluginSceneManager->stopPlugins();
     m_pDisplayManager->clean();
 
-
     m_pPluginGui->uiSetupRunningState(false);
     uiSetupRunningState(false);
     stopTimer();
 
     updatePluginWidget(m_pPluginGui->getCurrentPlugin());
-
 
 
 //    PluginManager::stopPlugins();
@@ -727,7 +700,6 @@ void MainWindow::stopMeasurement()
 
 //    m_pPluginDockWidget->setTogglingEnabled(true);
 }
-
 
 //=============================================================================================================
 
@@ -740,7 +712,6 @@ void MainWindow::zoomStd()
     }
 }
 
-
 //=============================================================================================================
 
 void MainWindow::zoomIn()
@@ -751,7 +722,6 @@ void MainWindow::zoomIn()
         m_pActionZoomStd->setEnabled(true);
     }
 }
-
 
 //=============================================================================================================
 
@@ -765,7 +735,6 @@ void MainWindow::zoomOut()
 
 }
 
-
 //=============================================================================================================
 
 void MainWindow::toggleDisplayMax()
@@ -777,7 +746,6 @@ void MainWindow::toggleDisplayMax()
 
     updatePluginWidget(m_pPluginGui->getCurrentPlugin());
 }
-
 
 //=============================================================================================================
 
@@ -805,7 +773,6 @@ void MainWindow::uiSetupRunningState(bool state)
 }
 
 
-
 //=============================================================================================================
 
 void MainWindow::startTimer(int msec)
@@ -818,14 +785,12 @@ void MainWindow::startTimer(int msec)
     m_pLabelTime->setText(strTime);
 }
 
-
 //=============================================================================================================
 
 void MainWindow::stopTimer()
 {
     disconnect(m_pTimer.data(), &QTimer::timeout, this, &MainWindow::updateTime);
 }
-
 
 //=============================================================================================================
 

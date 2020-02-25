@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -50,7 +49,6 @@
 #include <Eigen/Core>
 
 
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -58,7 +56,6 @@
 #ifndef FALSE
 #define FALSE 0
 #endif
-
 
 
 
@@ -72,11 +69,9 @@
 
 
 
-
 #define MALLOC_23(x,t) (t *)malloc((x)*sizeof(t))
 
 #define REALLOC_23(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-
 
 
 #define FREE_23(x) if ((char *)(x) != NULL) free((char *)(x))
@@ -92,9 +87,7 @@ void mne_free_cmatrix_23 (float **m)
 }
 
 
-
 #define ALLOC_CMATRIX_23(x,y) mne_cmatrix_23((x),(y))
-
 
 
 static void matrix_error_23(int kind, int nr, int nc)
@@ -114,7 +107,6 @@ static void matrix_error_23(int kind, int nr, int nc)
     exit(1);
 }
 
-
 float **mne_cmatrix_23(int nr,int nc)
 
 {
@@ -131,8 +123,6 @@ float **mne_cmatrix_23(int nr,int nc)
         m[i] = whole + i*nc;
     return m;
 }
-
-
 
 
 
@@ -158,9 +148,7 @@ float mne_dot_vectors_23 (float *v1,
 }
 
 
-
 //============================= mne_named_matrix.c =============================
-
 
 
 void mne_string_to_name_list_23(const QString& s, QStringList& listp,int &nlistp)
@@ -180,7 +168,6 @@ void mne_string_to_name_list_23(const QString& s, QStringList& listp,int &nlistp
 }
 
 
-
 void fromFloatEigenMatrix_23(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
 {
     for ( int i = 0; i < m; ++i)
@@ -192,7 +179,6 @@ void fromFloatEigenMatrix_23(const Eigen::MatrixXf& from_mat, float **& to_mat)
 {
     fromFloatEigenMatrix_23(from_mat, to_mat, from_mat.rows(), from_mat.cols());
 }
-
 
 QString mne_name_list_to_string_23(const QStringList& list)
 /*
@@ -212,7 +198,6 @@ QString mne_name_list_to_string_23(const QStringList& list)
     return res;
 }
 
-
 QString mne_channel_names_to_string_23(const QList<FIFFLIB::FiffChInfo>& chs, int nch)
 /*
  * Make a colon-separated string out of channel names
@@ -230,7 +215,6 @@ QString mne_channel_names_to_string_23(const QList<FIFFLIB::FiffChInfo>& chs, in
 
 
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -238,7 +222,6 @@ QString mne_channel_names_to_string_23(const QList<FIFFLIB::FiffChInfo>& chs, in
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -254,7 +237,6 @@ MneProjOp::MneProjOp()
 
 }
 
-
 //=============================================================================================================
 
 MneProjOp::~MneProjOp()
@@ -267,7 +249,6 @@ MneProjOp::~MneProjOp()
     // mne_free_proj_op_proj
 
 }
-
 
 //=============================================================================================================
 
@@ -285,7 +266,6 @@ void MneProjOp::mne_free_proj_op_proj(MneProjOp *op)
 
     return;
 }
-
 
 //=============================================================================================================
 
@@ -308,7 +288,6 @@ MneProjOp *MneProjOp::mne_proj_op_combine(MneProjOp *to, MneProjOp *from)
     }
     return to;
 }
-
 
 //=============================================================================================================
 
@@ -360,14 +339,12 @@ void MneProjOp::mne_proj_op_add_item_act(MneProjOp *op, MneNamedMatrix *vecs, in
     return;
 }
 
-
 //=============================================================================================================
 
 void MneProjOp::mne_proj_op_add_item(MneProjOp *op, MneNamedMatrix *vecs, int kind, const QString& desc)
 {
     mne_proj_op_add_item_act(op, vecs, kind, desc, TRUE);
 }
-
 
 //=============================================================================================================
 
@@ -390,7 +367,6 @@ MneProjOp *MneProjOp::mne_dup_proj_op(MneProjOp *op)
     }
     return dup;
 }
-
 
 //=============================================================================================================
 
@@ -432,7 +408,6 @@ MneProjOp *MneProjOp::mne_proj_op_average_eeg_ref(const QList<FiffChInfo>& chs, 
     return op;
 }
 
-
 //=============================================================================================================
 
 int MneProjOp::mne_proj_op_affect(MneProjOp *op, const QStringList& list, int nlist)
@@ -450,7 +425,6 @@ int MneProjOp::mne_proj_op_affect(MneProjOp *op, const QStringList& list, int nl
     return naff;
 }
 
-
 //=============================================================================================================
 
 int MneProjOp::mne_proj_op_affect_chs(MneProjOp *op, const QList<FiffChInfo>& chs, int nch)
@@ -460,7 +434,6 @@ int MneProjOp::mne_proj_op_affect_chs(MneProjOp *op, const QList<FiffChInfo>& ch
     QStringList list;
     int  nlist;
 
-
     if (nch == 0)
         return FALSE;
     ch_string = mne_channel_names_to_string_23(chs,nch);
@@ -469,7 +442,6 @@ int MneProjOp::mne_proj_op_affect_chs(MneProjOp *op, const QList<FiffChInfo>& ch
     list.clear();
     return res;
 }
-
 
 //=============================================================================================================
 
@@ -517,7 +489,6 @@ int MneProjOp::mne_proj_op_proj_vector(MneProjOp *op, float *vec, int nvec, int 
     }
     return OK;
 }
-
 
 //=============================================================================================================
 
@@ -674,7 +645,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 MneProjOp *MneProjOp::mne_read_proj_op(const QString &name)
@@ -694,7 +664,6 @@ MneProjOp *MneProjOp::mne_read_proj_op(const QString &name)
 
     return res;
 }
-
 
 //=============================================================================================================
 
@@ -753,7 +722,6 @@ void MneProjOp::mne_proj_op_report_data(FILE *out, const char *tag, MneProjOp *o
     }
     return;
 }
-
 
 //=============================================================================================================
 
