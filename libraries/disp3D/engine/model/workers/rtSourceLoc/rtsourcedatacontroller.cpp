@@ -32,7 +32,6 @@
  *
  */
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -44,7 +43,6 @@
 #include <fs/label.h>
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -52,7 +50,6 @@
 #include <QDebug>
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -60,7 +57,6 @@
 #include <Eigen/Core>
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -70,7 +66,6 @@ using namespace Eigen;
 using namespace FSLIB;
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -182,7 +177,7 @@ RtSourceDataController::RtSourceDataController()
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 RtSourceDataController::~RtSourceDataController()
 {
@@ -195,7 +190,7 @@ RtSourceDataController::~RtSourceDataController()
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setStreamingState(bool bStreamingState)
 {
@@ -207,7 +202,7 @@ void RtSourceDataController::setStreamingState(bool bStreamingState)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setInterpolationFunction(const QString &sInterpolationFunction)
 {
@@ -215,7 +210,7 @@ void RtSourceDataController::setInterpolationFunction(const QString &sInterpolat
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setLoopState(bool bLoopState)
 {
@@ -223,7 +218,7 @@ void RtSourceDataController::setLoopState(bool bLoopState)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setCancelDistance(double dCancelDist)
 {
@@ -231,7 +226,7 @@ void RtSourceDataController::setCancelDistance(double dCancelDist)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setTimeInterval(int iMSec)
 {
@@ -245,7 +240,7 @@ void RtSourceDataController::setTimeInterval(int iMSec)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setInterpolationInfo(const MatrixX3f &matVerticesLeft,
                                                   const MatrixX3f &matVerticesRight,
@@ -274,7 +269,7 @@ void RtSourceDataController::setInterpolationInfo(const MatrixX3f &matVerticesLe
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setSurfaceColor(const MatrixX4f &matColorLeft,
                                              const MatrixX4f &matColorRight)
@@ -284,7 +279,7 @@ void RtSourceDataController::setSurfaceColor(const MatrixX4f &matColorLeft,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setAnnotationInfo(const VectorXi &vecLabelIdsLeftHemi,
                                                const VectorXi &vecLabelIdsRightHemi,
@@ -303,7 +298,7 @@ void RtSourceDataController::setAnnotationInfo(const VectorXi &vecLabelIdsLeftHe
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setThresholds(const QVector3D &vecThresholds)
 {
@@ -311,7 +306,7 @@ void RtSourceDataController::setThresholds(const QVector3D &vecThresholds)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setVisualizationType(int iVisType)
 {
@@ -319,7 +314,7 @@ void RtSourceDataController::setVisualizationType(int iVisType)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setColormapType(const QString &sColormapType)
 {
@@ -327,7 +322,7 @@ void RtSourceDataController::setColormapType(const QString &sColormapType)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setNumberAverages(int iNumAvr)
 {
@@ -335,7 +330,7 @@ void RtSourceDataController::setNumberAverages(int iNumAvr)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setSFreq(double dSFreq)
 {
@@ -343,7 +338,7 @@ void RtSourceDataController::setSFreq(double dSFreq)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::setStreamSmoothedData(bool bStreamSmoothedData)
 {
@@ -351,7 +346,7 @@ void RtSourceDataController::setStreamSmoothedData(bool bStreamSmoothedData)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::addData(const MatrixXd& data)
 {
@@ -359,7 +354,7 @@ void RtSourceDataController::addData(const MatrixXd& data)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::onNewRtRawData(const VectorXd &vecDataVectorLeftHemi,
                                             const VectorXd &vecDataVectorRightHemi)
@@ -369,7 +364,7 @@ void RtSourceDataController::onNewRtRawData(const VectorXd &vecDataVectorLeftHem
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::onNewSmoothedRtRawData(const MatrixX4f &matColorMatrixLeftHemi,
                                                     const MatrixX4f &matColorMatrixRightHemi)
@@ -379,7 +374,7 @@ void RtSourceDataController::onNewSmoothedRtRawData(const MatrixX4f &matColorMat
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::onNewInterpolationMatrixLeftCalculated(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi)
 {
@@ -387,7 +382,7 @@ void RtSourceDataController::onNewInterpolationMatrixLeftCalculated(QSharedPoint
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void RtSourceDataController::onNewInterpolationMatrixRightCalculated(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixRightHemi)
 {

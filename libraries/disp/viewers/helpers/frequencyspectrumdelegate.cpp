@@ -33,7 +33,6 @@
  *
  */
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -45,7 +44,6 @@
 #include <fiff/fiff_info.h>
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -54,7 +52,6 @@
 #include <QTableView>
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -63,7 +60,6 @@ using namespace DISPLIB;
 using namespace Eigen;
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -83,7 +79,7 @@ FrequencySpectrumDelegate::FrequencySpectrumDelegate(QTableView* m_pTableView,QO
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FrequencySpectrumDelegate::setScaleType(qint8 ScaleType)
 {
@@ -91,7 +87,7 @@ void FrequencySpectrumDelegate::setScaleType(qint8 ScaleType)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
@@ -178,7 +174,7 @@ void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewI
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 QSize FrequencySpectrumDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
@@ -202,7 +198,7 @@ QSize FrequencySpectrumDelegate::sizeHint(const QStyleOptionViewItem &option, co
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FrequencySpectrumDelegate::rcvMouseLoc(int tableview_row, int mousex, int mousey, QRect visRect)
 {
@@ -222,7 +218,7 @@ void FrequencySpectrumDelegate::rcvMouseLoc(int tableview_row, int mousex, int m
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FrequencySpectrumDelegate::capturePoint(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data, QPainter *painter) const
 {
@@ -321,7 +317,7 @@ void FrequencySpectrumDelegate::capturePoint(const QModelIndex &index, const QSt
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FrequencySpectrumDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const
 {
@@ -368,7 +364,7 @@ void FrequencySpectrumDelegate::createPlotPath(const QModelIndex &index, const Q
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FrequencySpectrumDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const
 {
@@ -422,7 +418,7 @@ void FrequencySpectrumDelegate::createGridPath(const QModelIndex &index, const Q
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FrequencySpectrumDelegate::createGridTick(const QModelIndex &index, const QStyleOptionViewItem &option,  QPainter *painter) const
 {
