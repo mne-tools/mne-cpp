@@ -222,6 +222,7 @@ void TestFitHPI::compareTranslation()
 }
 
 //=============================================================================================================
+
 void TestFitHPI::compareRotation()
 {
     MatrixXd diff = MatrixXd::Zero(ref_pos.rows(),3);
@@ -238,6 +239,7 @@ void TestFitHPI::compareRotation()
 }
 
 //=============================================================================================================
+
 void TestFitHPI::compareTime()
 {
     MatrixXd diff = MatrixXd::Zero(ref_pos.rows(),1);
