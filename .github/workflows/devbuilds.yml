@@ -72,7 +72,7 @@ jobs:
     - name: Compile and configure BrainFlow plugin
       run: |
         cd applications/mne_scan/plugins/brainflowboard
-        qmake
+        qmake -r
         make -j2
         cp -r ./brainflow/installed/lib/* ../../../bin/
     - name: Package binaries
@@ -135,7 +135,7 @@ jobs:
     - name: Compile and configure BrainFlow plugin
       run: |
         cd applications/mne_scan/plugins/brainflowboard
-        qmake
+        qmake -r
         make -j2
         cp -r ./brainflow/installed/lib/* ../../../bin/
     - name: Package binaries
@@ -197,7 +197,7 @@ jobs:
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         cd applications\mne_scan\plugins\brainflowboard
-        qmake
+        qmake -r
         jom -j2
         cp -r .\brainflow\installed\lib\* ..\..\..\bin\
     - name: Package binaries
