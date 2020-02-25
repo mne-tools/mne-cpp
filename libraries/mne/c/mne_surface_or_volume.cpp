@@ -35,7 +35,6 @@
  */
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -81,7 +80,6 @@
 
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -343,7 +341,6 @@ void mne_sort_nearest_by_nearest(MneNearest* points, int npoint)
 
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -354,7 +351,7 @@ MneSurfaceOrVolume::MneSurfaceOrVolume()
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneSurfaceOrVolume::~MneSurfaceOrVolume()
 {
@@ -413,7 +410,7 @@ MneSurfaceOrVolume::~MneSurfaceOrVolume()
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 double MneSurfaceOrVolume::solid_angle(float *from, MneTriangle* tri)	/* ...to this triangle */
 /*
@@ -441,7 +438,7 @@ double MneSurfaceOrVolume::solid_angle(float *from, MneTriangle* tri)	/* ...to t
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 double MneSurfaceOrVolume::sum_solids(float *from, MneSurfaceOld* surf)
 {
@@ -455,7 +452,7 @@ double MneSurfaceOrVolume::sum_solids(float *from, MneSurfaceOld* surf)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOld* surf, float limit, FiffCoordTransOld* mri_head_t, MneSourceSpaceOld* *spaces, int nspace, FILE *filtered)   /* Provide a list of filtered points here */
 /*
@@ -547,7 +544,7 @@ int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOld* surf, float limi
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_add_patch_stats(MneSourceSpaceOld* s)
 {
@@ -640,7 +637,7 @@ bad : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::rearrange_source_space(MneSourceSpaceOld* s)
 {
@@ -666,7 +663,7 @@ void MneSurfaceOrVolume::rearrange_source_space(MneSourceSpaceOld* s)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void *MneSurfaceOrVolume::filter_source_space(void *arg)
 {
@@ -734,7 +731,7 @@ void *MneSurfaceOrVolume::filter_source_space(void *arg)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoordTransOld *mri_head_t, MneSourceSpaceOld* *spaces, int nspace, FILE *filtered, bool use_threads)                    /* Use multiple threads if possible? */
 /*
@@ -818,7 +815,7 @@ int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoo
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneSourceSpaceOld* MneSurfaceOrVolume::make_volume_source_space(MneSurfaceOld* surf, float grid, float exclude, float mindist)
 /*
@@ -1083,7 +1080,7 @@ bad : {
 
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneSourceSpaceOld* MneSurfaceOrVolume::mne_new_source_space(int np)
 /*
@@ -1155,7 +1152,7 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_new_source_space(int np)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneSurfaceOld* MneSurfaceOrVolume::read_bem_surface(const QString &name, int which, int add_geometry, float *sigmap)          /* Conductivity? */
 {
@@ -1163,7 +1160,7 @@ MneSurfaceOld* MneSurfaceOrVolume::read_bem_surface(const QString &name, int whi
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneSurfaceOld* MneSurfaceOrVolume::mne_read_bem_surface2(char *name, int  which, int  add_geometry, float *sigmap)
 {
@@ -1171,7 +1168,7 @@ MneSurfaceOld* MneSurfaceOrVolume::mne_read_bem_surface2(char *name, int  which,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneSurfaceOld* MneSurfaceOrVolume::read_bem_surface(const QString &name, int which, int add_geometry, float *sigmap, bool check_too_many_neighbors)
 /*
@@ -1332,7 +1329,7 @@ bad : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::mne_triangle_coords(float *r, MneSurfaceOld* s, int tri, float *x, float *y, float *z)
 /*
@@ -1364,7 +1361,7 @@ void MneSurfaceOrVolume::mne_triangle_coords(float *r, MneSurfaceOld* s, int tri
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::nearest_triangle_point(float *r, MneSurfaceOld* s, void *user, int tri, float *x, float *y, float *z)
 /*
@@ -1479,7 +1476,7 @@ int MneSurfaceOrVolume::nearest_triangle_point(float *r, MneSurfaceOld* s, void 
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::project_to_triangle(MneSurfaceOld* s, int tri, float p, float q, float *r)
 {
@@ -1495,7 +1492,7 @@ void MneSurfaceOrVolume::project_to_triangle(MneSurfaceOld* s, int tri, float p,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_nearest_triangle_point(float *r, MneSurfaceOld* s, int tri, float *x, float *y, float *z)
 /*
@@ -1506,7 +1503,7 @@ int MneSurfaceOrVolume::mne_nearest_triangle_point(float *r, MneSurfaceOld* s, i
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_project_to_surface(MneSurfaceOld* s, void *proj_data, float *r, int project_it, float *distp)
 /*
@@ -1539,7 +1536,7 @@ int MneSurfaceOrVolume::mne_project_to_surface(MneSurfaceOld* s, void *proj_data
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::mne_project_to_triangle(MneSurfaceOld* s,
                                                  int        best,
@@ -1558,7 +1555,7 @@ void MneSurfaceOrVolume::mne_project_to_triangle(MneSurfaceOld* s,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::mne_find_closest_on_surface_approx(MneSurfaceOld* s, float **r, int np, int *nearest, float *dist, int nstep)
 /*
@@ -1588,7 +1585,7 @@ void MneSurfaceOrVolume::mne_find_closest_on_surface_approx(MneSurfaceOld* s, fl
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::decide_search_restriction(MneSurfaceOld* s,
                                                    MneProjData*   p,
@@ -1658,7 +1655,7 @@ void MneSurfaceOrVolume::decide_search_restriction(MneSurfaceOld* s,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::activate_neighbors(MneSurfaceOld* s, int start, int *act, int nstep)
 /*
@@ -1679,7 +1676,7 @@ void MneSurfaceOrVolume::activate_neighbors(MneSurfaceOld* s, int start, int *ac
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpaceOld* **spacesp, int *nspacep)
 /*
@@ -2012,7 +2009,7 @@ bad : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::mne_source_space_update_inuse(MneSourceSpaceOld* s, int *new_inuse)
 /*
@@ -2045,7 +2042,7 @@ void MneSurfaceOrVolume::mne_source_space_update_inuse(MneSourceSpaceOld* s, int
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_is_left_hemi_source_space(MneSourceSpaceOld* s)
 /*
@@ -2064,7 +2061,7 @@ int MneSurfaceOrVolume::mne_is_left_hemi_source_space(MneSourceSpaceOld* s)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_transform_source_space(MneSourceSpaceOld* ss, FiffCoordTransOld *t)
 /*
@@ -2093,7 +2090,7 @@ int MneSurfaceOrVolume::mne_transform_source_space(MneSourceSpaceOld* ss, FiffCo
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_transform_source_spaces_to(int coord_frame, FiffCoordTransOld *t, MneSourceSpaceOld* *spaces, int nspace)
 /*
@@ -2135,7 +2132,7 @@ int MneSurfaceOrVolume::mne_transform_source_spaces_to(int coord_frame, FiffCoor
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::enable_all_sources(MneSourceSpaceOld* s)
 {
@@ -2147,7 +2144,7 @@ void MneSurfaceOrVolume::enable_all_sources(MneSourceSpaceOld* s)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 #define LH_LABEL_TAG "-lh.label"
 #define RH_LABEL_TAG "-rh.label"
@@ -2234,7 +2231,7 @@ bad : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_find_sources_in_label(char *label, MneSourceSpaceOld* s, int off, int **selp, int *nselp)	    /* How many selected? */
 /*
@@ -2308,7 +2305,7 @@ out : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_read_label(const QString& label, char **commentp, int **selp, int *nselp)	    /* How many? */
 /*
@@ -2391,7 +2388,7 @@ out : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_write_label(char *label, char *comment, int *sel, int nsel, float **rr)	    /* Locations of the nodes in MRI coords */
 /*
@@ -2436,7 +2433,7 @@ out : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::mne_add_triangle_data(MneSourceSpaceOld* s)
 /*
@@ -2492,7 +2489,7 @@ void MneSurfaceOrVolume::mne_add_triangle_data(MneSourceSpaceOld* s)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::mne_compute_cm(float **rr, int np, float *cm)
 /*
@@ -2515,7 +2512,7 @@ void MneSurfaceOrVolume::mne_compute_cm(float **rr, int np, float *cm)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::mne_compute_surface_cm(MneSurfaceOld *s)
 /*
@@ -2530,7 +2527,7 @@ void MneSurfaceOrVolume::mne_compute_surface_cm(MneSurfaceOld *s)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::calculate_vertex_distances(MneSourceSpaceOld* s)
 {
@@ -2567,7 +2564,7 @@ void MneSurfaceOrVolume::calculate_vertex_distances(MneSourceSpaceOld* s)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_add_vertex_normals(MneSourceSpaceOld* s)
 {
@@ -2612,7 +2609,7 @@ int MneSurfaceOrVolume::mne_add_vertex_normals(MneSourceSpaceOld* s)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::add_geometry_info(MneSourceSpaceOld* s, int do_normals, int *border, int check_too_many_neighbors)
 /*
@@ -2840,7 +2837,7 @@ int MneSurfaceOrVolume::add_geometry_info(MneSourceSpaceOld* s, int do_normals, 
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_source_space_add_geometry_info(MneSourceSpaceOld* s, int do_normals)
 {
@@ -2848,7 +2845,7 @@ int MneSurfaceOrVolume::mne_source_space_add_geometry_info(MneSourceSpaceOld* s,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_source_space_add_geometry_info2(MneSourceSpaceOld* s, int do_normals)
 
@@ -2857,7 +2854,7 @@ int MneSurfaceOrVolume::mne_source_space_add_geometry_info2(MneSourceSpaceOld* s
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_label_area(char *label, MneSourceSpaceOld* s, float *areap)     /* Return the area here */
 /*
@@ -2898,7 +2895,7 @@ bad : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
                                         FiffDigitizerData* mri_dig,
@@ -3005,7 +3002,7 @@ bad :
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
                                         float **mri_fid,
@@ -3072,7 +3069,7 @@ out : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerData* d,
                                                          MneMshDisplaySurface* head,
@@ -3105,7 +3102,7 @@ int MneSurfaceOrVolume::discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerD
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerData* dig, MneMshDisplaySurface* head,
                                                        int do_all, int do_approx)
@@ -3192,7 +3189,7 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	   /* The digitizer data */
                                                MneMshDisplaySurface* head, /* The head surface */
@@ -3280,7 +3277,7 @@ out : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 float MneSurfaceOrVolume::rms_digitizer_distance(FIFFLIB::FiffDigitizerData* dig, MneMshDisplaySurface* head)
 {
@@ -3300,7 +3297,7 @@ float MneSurfaceOrVolume::rms_digitizer_distance(FIFFLIB::FiffDigitizerData* dig
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::scale_display_surface(MneMshDisplaySurface* surf,
                                                float *scales)
@@ -3324,7 +3321,7 @@ void MneSurfaceOrVolume::scale_display_surface(MneMshDisplaySurface* surf,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MneSurfaceOrVolume::add_uniform_curv(MneSurfaceOld *s)
 {
@@ -3340,7 +3337,7 @@ void MneSurfaceOrVolume::add_uniform_curv(MneSurfaceOld *s)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 char * MneSurfaceOrVolume::mne_compose_surf_name(const char *subj,
                                                  const char *name,
@@ -3375,7 +3372,7 @@ char * MneSurfaceOrVolume::mne_compose_surf_name(const char *subj,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface(char *surf_file,
                                                         char *curv_file)
@@ -3384,7 +3381,7 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface(char *surf_file,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneSourceSpaceOld* MneSurfaceOrVolume::mne_load_surface_geom(char *surf_file,
                                                              char *curv_file,
@@ -3468,7 +3465,7 @@ bad : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
                                                int   *nvertp,
@@ -3688,7 +3685,7 @@ bad : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
                                                 float **curvsp,
@@ -3785,7 +3782,7 @@ bad : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::check_quad(float **rr)
 
@@ -3808,7 +3805,7 @@ int MneSurfaceOrVolume::check_quad(float **rr)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::check_vertex(int no, int maxno)
 
@@ -3821,7 +3818,7 @@ int MneSurfaceOrVolume::check_vertex(int no, int maxno)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneVolGeom* MneSurfaceOrVolume::mne_get_volume_geom_from_tag(void *tagsp)
 {
@@ -3843,7 +3840,7 @@ MneVolGeom* MneSurfaceOrVolume::mne_get_volume_geom_from_tag(void *tagsp)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneVolGeom* MneSurfaceOrVolume::mne_dup_vol_geom(MneVolGeom* g)
 {
@@ -3857,7 +3854,7 @@ MneVolGeom* MneSurfaceOrVolume::mne_dup_vol_geom(MneVolGeom* g)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_read_mgh_tags(FILE *fp, void **tagsp)
 /*
@@ -3881,7 +3878,7 @@ int MneSurfaceOrVolume::mne_read_mgh_tags(FILE *fp, void **tagsp)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::read_next_tag(FILE *fp, int *tagp, long long *lenp, unsigned char **datap)
 /*
@@ -3923,7 +3920,7 @@ int MneSurfaceOrVolume::read_next_tag(FILE *fp, int *tagp, long long *lenp, unsi
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::read_tag_data(FILE *fp, int tag, long long nbytes, unsigned char **val, long long *nbytesp)
 /*
@@ -3970,7 +3967,7 @@ int MneSurfaceOrVolume::read_tag_data(FILE *fp, int tag, long long nbytes, unsig
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneMghTagGroup* MneSurfaceOrVolume::mne_add_mgh_tag_to_group(MneMghTagGroup* g, int tag, long long len, unsigned char *data)
 {
@@ -3988,7 +3985,7 @@ MneMghTagGroup* MneSurfaceOrVolume::mne_add_mgh_tag_to_group(MneMghTagGroup* g, 
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneVolGeom* MneSurfaceOrVolume::read_vol_geom(FILE *fp)
 /*
@@ -4077,7 +4074,7 @@ MneVolGeom* MneSurfaceOrVolume::read_vol_geom(FILE *fp)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
 /*
@@ -4099,7 +4096,7 @@ int MneSurfaceOrVolume::mne_read_int3(FILE *in, int *ival)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_read_int(FILE *in, qint32 *ival)
 /*
@@ -4119,7 +4116,7 @@ int MneSurfaceOrVolume::mne_read_int(FILE *in, qint32 *ival)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_read_int2(FILE *in, int *ival)
 /*
@@ -4139,7 +4136,7 @@ int MneSurfaceOrVolume::mne_read_int2(FILE *in, int *ival)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_read_float(FILE *in, float *fval)
 /*
@@ -4159,7 +4156,7 @@ int MneSurfaceOrVolume::mne_read_float(FILE *in, float *fval)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int MneSurfaceOrVolume::mne_read_long(FILE *in, long long *lval)
 /*
@@ -4179,7 +4176,7 @@ int MneSurfaceOrVolume::mne_read_long(FILE *in, long long *lval)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 char *MneSurfaceOrVolume::mne_strdup(const char *s)
 {
