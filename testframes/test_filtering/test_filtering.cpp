@@ -211,7 +211,6 @@ void TestFiffRFR::compareData()
     int length = first_filtered.cols()-int(order/2);
     MatrixXd data_diff = first_filtered.block(0,int(order/2),first_filtered.rows(),length) - ref_filtered.block(0,int(order/2),ref_filtered.rows(),length);
     QVERIFY( data_diff.sum() < epsilon );
-
 }
 
 //=============================================================================================================
@@ -220,7 +219,6 @@ void TestFiffRFR::compareTimes()
 {
     MatrixXd times_diff = first_in_times - ref_in_times;
     QVERIFY( times_diff.sum() < epsilon );
-
 }
 
 void TestFiffRFR::cleanupTestCase()

@@ -100,9 +100,7 @@ private:
      * Updates position of all electrodes in the scene.
      */
     void scaleElectrodePositions(double scaleFactor);
-
 };
-
 } // NAMESPACE
 
 #endif // TMSIIMPEDANCESCENE_H

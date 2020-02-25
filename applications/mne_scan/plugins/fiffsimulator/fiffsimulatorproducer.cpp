@@ -74,7 +74,6 @@ FiffSimulatorProducer::FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator)
 
 FiffSimulatorProducer::~FiffSimulatorProducer()
 {
-
 }
 
 //=============================================================================================================

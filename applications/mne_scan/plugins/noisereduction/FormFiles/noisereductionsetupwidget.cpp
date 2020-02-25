@@ -68,7 +68,6 @@ NoiseReductionSetupWidget::NoiseReductionSetupWidget(NoiseReduction* toolbox, QW
 
 NoiseReductionSetupWidget::~NoiseReductionSetupWidget()
 {
-
 }
 
 //=============================================================================================================

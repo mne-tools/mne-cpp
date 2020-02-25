@@ -308,7 +308,6 @@ qint32 RealTimeSourceEstimate::getSourceEstimateSize() const
     QMutexLocker locker(&m_qMutex);
     return m_iSourceEstimateSize;
 }
-
 } // NAMESPACE
 
 Q_DECLARE_METATYPE(SCMEASLIB::RealTimeSourceEstimate::SPtr)

@@ -98,7 +98,6 @@ FiffEvokedSet::FiffEvokedSet(const FiffEvokedSet& p_FiffEvokedSet)
 
 FiffEvokedSet::~FiffEvokedSet()
 {
-
 }
 
 //=============================================================================================================

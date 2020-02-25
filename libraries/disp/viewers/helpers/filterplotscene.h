@@ -141,7 +141,6 @@ protected:
     int             m_iCutOffMarkerWidth;           /**< cut off marker width. */
     int             m_iPlotLength;                  /**< Length of current filter impulse response plot. */
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // FILTERPLOTSCENE_H

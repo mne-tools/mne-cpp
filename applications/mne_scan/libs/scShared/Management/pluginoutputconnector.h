@@ -99,9 +99,7 @@ public:
 
 signals:
     void notify(SCMEASLIB::Measurement::SPtr);
-
 };
-
 } // NAMESPACE
 
 #endif // PLUGINOUTPUTCONNECTOR_H

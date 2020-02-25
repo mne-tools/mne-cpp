@@ -138,13 +138,11 @@ public:
     static void PowellIdxVec(int p_iRow, int p_iNumPoints, Eigen::VectorXi& p_pVecElements);
 
     virtual const char* getName() const;
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } //NAMESPACE
 
 #endif // PWLRAPMUSIC_H

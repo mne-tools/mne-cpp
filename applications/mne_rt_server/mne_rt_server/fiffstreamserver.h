@@ -170,7 +170,6 @@ private:
 
     QMap<qint32, FiffStreamThread*> m_qClientList;
     qint32                          m_iNextClientId;
-
 };
 
 //=============================================================================================================
@@ -181,7 +180,6 @@ FiffStreamThread* FiffStreamServer::getClient(qint32 id)
 {
     return m_qClientList[id];
 }
-
 } // NAMESPACE
 
 #endif //FIFFSTREAMSERVER_H

@@ -97,7 +97,6 @@ RtcMneSetupWidget::RtcMneSetupWidget(RtcMne* toolbox, QWidget *parent)
 
 RtcMneSetupWidget::~RtcMneSetupWidget()
 {
-
 }
 
 //=============================================================================================================

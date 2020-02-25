@@ -60,5 +60,4 @@ GUSBAmpAboutWidget::GUSBAmpAboutWidget(QWidget *parent)
 
 GUSBAmpAboutWidget::~GUSBAmpAboutWidget()
 {
-
 }

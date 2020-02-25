@@ -361,7 +361,6 @@ inline QList<QVariant>& Command::pValues()
 {
     return m_qListParamValues;
 }
-
 } // NAMESPACE
 
 #endif // COMMAND_H

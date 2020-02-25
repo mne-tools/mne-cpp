@@ -273,7 +273,6 @@ inline FIFFLIB::fiff_int_t RealTimeSampleArrayChInfo::getCoil() const
 {
     return m_iCoilType;
 }
-
 } // NAMESPACE
 
 #endif // REALTIMESAMPLEARRAYCHINFO_H

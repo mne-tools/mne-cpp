@@ -335,7 +335,6 @@ inline QPair<qint32,qint32> RealTimeEvokedSet::getBaselineInfo()
 {
     return m_pairBaseline;
 }
-
 } // NAMESPACE
 
 Q_DECLARE_METATYPE(SCMEASLIB::RealTimeEvokedSet::SPtr)

@@ -124,13 +124,11 @@ public:
 //      int   nfree;        /* Degrees of freedom for the above */
 //      int   neval;        /* Number of function evaluations required for this fit */
 //    } *ecd,ecdRec;        /* One ECD */
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // NAMESPACE INVERSELIB
 
 #endif // ECD_H

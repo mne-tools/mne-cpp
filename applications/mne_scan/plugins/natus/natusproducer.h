@@ -124,7 +124,6 @@ signals:
      */
     void newDataAvailable(const Eigen::MatrixXd &matData);
 };
-
 } // NAMESPACE
 
 #endif // NATUSPRODUCER_H

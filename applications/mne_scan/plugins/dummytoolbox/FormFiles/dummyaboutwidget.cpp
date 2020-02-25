@@ -60,5 +60,4 @@ DummyAboutWidget::DummyAboutWidget(QWidget *parent)
 
 DummyAboutWidget::~DummyAboutWidget()
 {
-
 }

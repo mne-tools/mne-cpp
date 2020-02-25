@@ -231,7 +231,6 @@ public:
 //{
 //    return m_qListModels.size();
 //}
-
 } // NAMESPACE FWDLIB
 
 #endif // FWDEEGSPHEREMODELSET_H

@@ -902,9 +902,7 @@ private:
 //    char        *ext_file_name; /**< Name of the file holding the external data */
 //    FILE        *ext_fd;        /**< The file descriptor of the above file if open  */
 //} *fiffFile,fiffFileRec;        /**< FIFF file handle. fiff_open() returns this. */
-
 };
-
 } // NAMESPACE
 
 #endif // FIFF_STREAM_H

@@ -107,7 +107,6 @@ private:
 
     Ui::CovarianceSetupWidgetClass ui;   /**< Holds the user interface for the CovarianceSetupWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // COVARIANCESETUPWIDGET_H

@@ -121,7 +121,6 @@ protected:
      */
     virtual void initItem() override;
 };
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_BEMSURFACETREEITEM_H

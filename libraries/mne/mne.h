@@ -512,7 +512,6 @@ public:
         mat.transpose_named_matrix();
     }
 };
-
 } // NAMESPACE
 
 #endif // MNE_H

@@ -335,9 +335,7 @@ signals:
      * Emitted when fiffInfo is available
      */
     void fiffInfoAvailable();
-
 };
-
 } // NAMESPACE
 
 #endif // NEUROMAG_H

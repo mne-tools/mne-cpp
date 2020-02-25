@@ -93,7 +93,6 @@ public:
 private:
     Ui::TMSIAboutWidgetClass ui;    /**< Holds the user interface for the TMSIAboutWidgetClass.*/
 };
-
 } // NAMESPACE
 
 #endif // TMSIABOUTWIDGET_H

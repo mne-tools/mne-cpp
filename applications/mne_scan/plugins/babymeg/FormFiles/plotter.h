@@ -141,9 +141,7 @@ private:
     bool                            rubberBandIsShown;
     QRect                           rubberBandRect;
     QPixmap                         pixmap;
-
 };
-
 } // NAMESPACE
 
 #endif // PLOTTER_H

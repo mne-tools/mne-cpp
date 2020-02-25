@@ -169,9 +169,7 @@ signals:
      * Emit this signal whenever the user changes the projections.
      */
     void projSelectionChanged(const QList<FIFFLIB::FiffProj>& projs);
-
 };
-
 } // NAMESPACE
 
 #endif // PROJECTORSVIEW_H

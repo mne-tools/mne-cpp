@@ -162,7 +162,6 @@ public:
         return QString("%1.%2.%3-%4").arg(MajorVersion()).arg(MinorVersion()).arg(RevisionVersion()).arg(BuildVersion());
     }
 };
-
 } //NAMESPACE
 
 #endif // INFO_H

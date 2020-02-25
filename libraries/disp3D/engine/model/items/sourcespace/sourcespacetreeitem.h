@@ -124,7 +124,6 @@ protected:
      */
     void initItem();
 };
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_SOURCESPACETREEITEM_H

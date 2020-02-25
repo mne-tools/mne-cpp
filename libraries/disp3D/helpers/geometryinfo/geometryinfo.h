@@ -201,7 +201,6 @@ inline double GeometryInfo::squared(double dBase)
 {
     return dBase * dBase;
 }
-
 } // namespace GEOMETRYINFO
 
 #endif // DISP3DLIB_GEOMETRYINFO_H

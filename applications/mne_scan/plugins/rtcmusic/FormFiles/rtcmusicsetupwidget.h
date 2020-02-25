@@ -142,7 +142,6 @@ private:
 
     Ui::RtcMusicSetupWidgetClass ui;   /**< Holds the user interface for the DummySetupWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // RTCMUSICSETUPWIDGET_H

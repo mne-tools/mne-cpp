@@ -277,6 +277,5 @@ signals:
      */
     void continousHPIToggled(bool state);
 };
-
 } //NAMESPACE
 #endif // HPIVIEW_H

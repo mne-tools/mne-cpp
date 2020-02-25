@@ -110,9 +110,7 @@ signals:
 public slots:
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
-
 };
-
 } // NAMESPACE
 
 #endif // PLUGININPUTCONNECTOR_H

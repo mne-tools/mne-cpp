@@ -192,7 +192,6 @@ private:
 
     std::ofstream               m_outputFileStream;             /**< fstream for writing the driver debug informations to a txt file.*/
 };
-
 } // NAMESPACE
 
 #endif // EEGOSPORTSDRIVER_H

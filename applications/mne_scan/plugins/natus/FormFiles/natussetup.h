@@ -122,7 +122,6 @@ private:
     Natus*                  m_pNatus;          /**< A pointer to corresponding Natus.*/
     Ui::NatusSetupWidget    ui;                /**< The user interface for the NatusSetup.*/
 };
-
 } // NAMESPACE
 
 #endif // NATUSSETUP_H

@@ -143,7 +143,6 @@ private:
     bool m_bFlagInfoRequest;    /**< Read Fiff Info flag */
     bool m_bFlagMeasuring;      /**< Read Fiff raw Buffers */
 };
-
 } // NAMESPACE
 
 #endif // NEUROMAGPRODUCER_H

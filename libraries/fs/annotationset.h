@@ -244,7 +244,6 @@ public:
 
 private:
     QMap<qint32, Annotation> m_qMapAnnots;   /**< Hemisphere annotations (lh = 0; rh = 1). */
-
 };
 
 //=============================================================================================================
@@ -269,7 +268,6 @@ inline qint32 AnnotationSet::size() const
 {
     return m_qMapAnnots.size();
 }
-
 } // NAMESPACE
 
 #endif // ANNOTATION_SET_H

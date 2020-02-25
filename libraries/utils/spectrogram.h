@@ -111,7 +111,6 @@ private:
     static void reduce(Eigen::MatrixXd &resultData,
                        const Eigen::MatrixXd &data);
 };
-
 }//namespace
 
 #endif // SPECTROGRAM_H

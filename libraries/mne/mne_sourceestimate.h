@@ -219,7 +219,6 @@ inline bool MNESourceEstimate::isEmpty() const
 {
     return tstep == -1;
 }
-
 } //NAMESPACE
 
 #endif // MNESOURCEESTIMATE_H

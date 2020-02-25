@@ -58,5 +58,4 @@ NeuronalConnectivityAboutWidget::NeuronalConnectivityAboutWidget(QWidget *parent
 
 NeuronalConnectivityAboutWidget::~NeuronalConnectivityAboutWidget()
 {
-
 }

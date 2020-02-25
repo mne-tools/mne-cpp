@@ -341,7 +341,6 @@ inline bool operator== (const MNESourceSpace &a, const MNESourceSpace &b)
 {
     return (a.m_qListHemispheres == b.m_qListHemispheres);
 }
-
 } // NAMESPACE
 
 #endif // MNE_SOURCESPACE_H

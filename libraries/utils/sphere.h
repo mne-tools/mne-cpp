@@ -193,7 +193,6 @@ private:
      */
     static float opt_rad(const Eigen::VectorXf &r0, const fitUserNew user);
 };
-
 } // NAMESPACE
 
 #endif // SPHERE_H

@@ -101,7 +101,6 @@ private:
 
     Ui::NeuronalConnectivitySetupWidgetClass ui;        /**< Holds the user interface for the NeuronalConnectivitySetupWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // NEURONALCONNECTIVITYSETUPWIDGET_H

@@ -146,9 +146,7 @@ private:
     int             m_iID;
     quint32         m_uiBufferSampleSize;       /**< Sample size of the buffer */
     bool            m_bIsRunning;
-
 };
-
 } // NAMESPACE
 
 #endif // NEUROMAG_H

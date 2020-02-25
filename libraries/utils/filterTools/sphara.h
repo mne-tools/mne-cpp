@@ -92,7 +92,6 @@ public:
                                                int iNBaseFct,
                                                int skip = 0);
 };
-
 } // NAMESPACE UTILSLIB
 
 #endif // SPHARA_H

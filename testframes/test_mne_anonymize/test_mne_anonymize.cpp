@@ -589,7 +589,6 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
 
 void TestMneAnonymize::cleanupTestCase()
 {
-
 }
 
 //=============================================================================================================

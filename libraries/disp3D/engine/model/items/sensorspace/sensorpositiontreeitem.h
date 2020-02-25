@@ -156,7 +156,6 @@ protected:
     QPointer<GeometryMultiplier>                    m_pEEGSensors;                     /**< The EEG sensors. */
     QSharedPointer<Qt3DExtras::QSphereGeometry>     m_pEEGSensorGeometry;              /**< The EEG sensor geometry. */
 };
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_SENSORPOSITIONTREEITEM_H

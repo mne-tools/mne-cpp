@@ -51,12 +51,10 @@ using namespace MNELIB;
 
 MneMshColorScaleDef::MneMshColorScaleDef()
 {
-
 }
 
 //=============================================================================================================
 
 MneMshColorScaleDef::~MneMshColorScaleDef()
 {
-
 }

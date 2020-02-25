@@ -286,7 +286,6 @@ signals:
      */
     void takeScreenshotChanged();
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // DISPLIB_CONTROL3DVIEW_H

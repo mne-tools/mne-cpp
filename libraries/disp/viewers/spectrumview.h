@@ -154,7 +154,6 @@ signals:
                       int y,
                       QRect visRect);
 };
-
 } // NAMESPACE
 
 #endif // SPECTRUMVIEW_H

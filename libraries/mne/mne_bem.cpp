@@ -76,7 +76,6 @@ MNEBem::MNEBem()
 MNEBem::MNEBem(const MNEBem &p_MNEBem)
 : m_qListBemSurface(p_MNEBem.m_qListBemSurface)
 {
-
 }
 
 //=============================================================================================================
@@ -101,7 +100,6 @@ MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNEBem &p_MNEBem
 
 MNEBem::~MNEBem()
 {
-
 }
 
 //=============================================================================================================

@@ -73,7 +73,6 @@ PwlRapMusic::PwlRapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, 
 
 PwlRapMusic::~PwlRapMusic()
 {
-
 }
 
 //=============================================================================================================
@@ -348,7 +347,6 @@ int PwlRapMusic::PowellOffset(int p_iRow, int p_iNumPoints)
 {
 
     return p_iRow*p_iNumPoints - (( (p_iRow-1)*p_iRow) / 2); //triangular series 1 3 6 10 ... = (num_pairs*(num_pairs+1))/2
-
 }
 
 //=============================================================================================================

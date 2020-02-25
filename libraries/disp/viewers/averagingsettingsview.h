@@ -173,9 +173,7 @@ signals:
     void changeBaselineActive(bool state);
     void resetAverage(bool state);
     void changeAverageMode(qint32 index);
-
 };
-
 } // NAMESPACE
 
 #endif // AVERAGINGSETTINGSVIEW_H

@@ -171,7 +171,6 @@ protected:
 private:
     QList< QAction* >   m_qListDisplayActions;      /**< List of display actions */
     QList< QWidget* >   m_qListDisplayWidgets;       /**< List of display widgets to attach to the toolbar */
-
 };
 
 //=============================================================================================================
@@ -203,7 +202,6 @@ inline void MeasurementWidget::addDisplayWidget(QWidget* pWidget)
 {
     m_qListDisplayWidgets.append(pWidget);
 }
-
 } //NAMESPACE
 
 #endif // NEWMEASUREMENTWIDGET_H

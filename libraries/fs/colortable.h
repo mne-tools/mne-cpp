@@ -143,7 +143,6 @@ inline Eigen::MatrixX4i Colortable::getRGBAs() const
 
     return p_matRGBAs;
 }
-
 } // NAMESPACE
 
 #endif // COLORTABLE_H

@@ -73,7 +73,6 @@ DummySetupWidget::DummySetupWidget(DummyToolbox* toolbox, QWidget *parent)
 
 DummySetupWidget::~DummySetupWidget()
 {
-
 }
 
 //=============================================================================================================

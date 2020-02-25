@@ -73,7 +73,6 @@ LSLAdapterProducer::LSLAdapterProducer(QSharedPointer<PluginOutputData<RealTimeM
 , m_vBufferedSamples()
 , m_pRTMSA(pRTMSA)
 {
-
 }
 
 //=============================================================================================================

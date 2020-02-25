@@ -55,7 +55,6 @@ FiffRawDir::FiffRawDir()
 , last(-1)
 , nsamp(-1)
 {
-
 }
 
 //=============================================================================================================
@@ -66,12 +65,10 @@ FiffRawDir::FiffRawDir(const FiffRawDir &p_FiffRawDir)
 , last(p_FiffRawDir.last)
 , nsamp(p_FiffRawDir.nsamp)
 {
-
 }
 
 //=============================================================================================================
 
 FiffRawDir::~FiffRawDir()
 {
-
 }

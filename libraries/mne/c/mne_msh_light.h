@@ -114,13 +114,11 @@ public:
 //      float pos[3];			/* Where is the light? */
 //      float diff[3];		/* Diffuse intensity */
 //    } *mshLight,mshLightRec;	/* We are only using diffuse lights here */
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // NAMESPACE MNELIB
 
 #endif // MNEMSHLIGHT_H

@@ -199,7 +199,6 @@ CircularMatrixBuffer<_Tp>::CircularMatrixBuffer(unsigned int uiMaxNumMatrices, u
 , m_pUsedElements(new QSemaphore(0))
 , m_bPause(false)
 {
-
 }
 
 //=============================================================================================================
@@ -262,7 +261,6 @@ inline unsigned int CircularMatrixBuffer<_Tp>::mapIndex(int& index)
     int AuxIndex;
     AuxIndex = ++index;
     return index = AuxIndex % m_uiMaxNumElements;
-
 }
 
 //=============================================================================================================
@@ -365,7 +363,6 @@ typedef UTILSSHARED_EXPORT CircularMatrixBuffer<char>                    _char_C
 typedef UTILSSHARED_EXPORT CircularMatrixBuffer<double>                  _double_CircularMatrixBuffer;              /**< Defines CircularMatrixBuffer of double type.*/
 
 typedef UTILSSHARED_EXPORT _float_CircularMatrixBuffer                   RawMatrixBuffer;                           /**< Defines RawMatrixBuffer of type _float_CircularMatrixBuffer.*/
-
 } // NAMESPACE
 
 #endif // CIRCULARMATRIXBUFFER_H

@@ -452,7 +452,6 @@ signals:
 
     void channelMarkingChanged();
 };
-
 } // NAMESPACE
 
 #endif // RTFIFFRAWVIEW_H

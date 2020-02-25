@@ -173,7 +173,6 @@ private:
     bool                                                    m_bInitialized;                 /**< Is Initialized */
     qint32                                                  m_iMaxFilterTapSize;            /**< Maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
  };
-
 } // NAMESPACE SCDISPLIB
 
 #endif // REALTIMEMULTISAMPLEARRAYWIDGET_H

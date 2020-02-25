@@ -130,9 +130,7 @@ private:
     Ui::FiffSimulatorSetupWidgetClass ui;   /**< the user interface for the MneRtClientSetupWidget.*/
 
     bool m_bIsInit;                         /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
-
 };
-
 } // NAMESPACE
 
 #endif // FIFFSIMULATORSETUPWIDGET_H

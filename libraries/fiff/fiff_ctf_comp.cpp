@@ -69,14 +69,12 @@ FiffCtfComp::FiffCtfComp(const FiffCtfComp &p_FiffCtfComp)
 , colcals(p_FiffCtfComp.colcals)
 , data(p_FiffCtfComp.data)
 {
-
 }
 
 //=============================================================================================================
 
 FiffCtfComp::~FiffCtfComp()
 {
-
 }
 
 //=============================================================================================================

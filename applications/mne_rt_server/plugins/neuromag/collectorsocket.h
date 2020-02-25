@@ -155,7 +155,6 @@ private:
     QString     m_sCollectorHost;
     bool        m_bIsMeasuring;
 };
-
 } // NAMESPACE
 
 #endif // COLLECTORSOCKET_H

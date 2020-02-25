@@ -351,7 +351,6 @@ inline QString Annotation::fileName() const
 {
     return m_sFileName;
 }
-
 } // NAMESPACE
 
 #endif // ANNOTATION_H

@@ -283,9 +283,7 @@ signals:
      * @param[out] imageType     The current image type: png, svg.
      */
     void makeScreenshot(const QString& imageType);
-
 };
-
 } // NAMESPACE
 
 #endif // FIFFRAWVIEWSETTINGS_H

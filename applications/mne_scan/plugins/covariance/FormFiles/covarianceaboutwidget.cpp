@@ -59,5 +59,4 @@ CovarianceAboutWidget::CovarianceAboutWidget(QWidget *parent)
 
 CovarianceAboutWidget::~CovarianceAboutWidget()
 {
-
 }

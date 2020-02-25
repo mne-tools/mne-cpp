@@ -144,7 +144,6 @@ private:
      */
     void changeQLineEdits();
 };
-
 } // NAMESPACE
 
 #endif // TMSISETUPPROJECTWIDGET_H

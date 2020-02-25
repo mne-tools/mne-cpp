@@ -84,7 +84,6 @@ void PluginOutputData<T>::update()
 {
     emit notify(qSharedPointerDynamicCast<SCMEASLIB::Measurement>(m_pMeasurement));
 }
-
 }//Namespace
 
 #endif //PLUGINOUTPUTDATA_CPP

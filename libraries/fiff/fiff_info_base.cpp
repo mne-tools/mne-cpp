@@ -79,7 +79,6 @@ FiffInfoBase::FiffInfoBase(const FiffInfoBase& p_FiffInfoBase)
 
 FiffInfoBase::~FiffInfoBase()
 {
-
 }
 
 //=============================================================================================================

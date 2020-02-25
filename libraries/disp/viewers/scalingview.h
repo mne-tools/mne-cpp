@@ -166,9 +166,7 @@ signals:
      * Emit this signal whenever the scaling sliders or spin boxes changed.
      */
     void scalingChanged(const QMap<qint32, float>& scalingMap);
-
 };
-
 } // NAMESPACE
 
 #endif // SCALINGVIEW_H

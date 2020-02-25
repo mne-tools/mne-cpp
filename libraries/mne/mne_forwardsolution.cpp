@@ -92,7 +92,6 @@ MNEForwardSolution::MNEForwardSolution()
 , source_rr(MatrixX3f::Zero(0,3))
 , source_nn(MatrixX3f::Zero(0,3))
 {
-
 }
 
 //=============================================================================================================
@@ -133,14 +132,12 @@ MNEForwardSolution::MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSol
 , source_rr(p_MNEForwardSolution.source_rr)
 , source_nn(p_MNEForwardSolution.source_nn)
 {
-
 }
 
 //=============================================================================================================
 
 MNEForwardSolution::~MNEForwardSolution()
 {
-
 }
 
 //=============================================================================================================

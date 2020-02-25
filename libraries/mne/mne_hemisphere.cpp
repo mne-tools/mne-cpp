@@ -122,7 +122,6 @@ MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
 
 MNEHemisphere::~MNEHemisphere()
 {
-
 }
 
 //=============================================================================================================

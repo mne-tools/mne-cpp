@@ -64,7 +64,6 @@ CommandThread::CommandThread(int socketDescriptor, qint32 p_iId, QObject *parent
 , m_bIsRunning(false)
 , m_iThreadID(p_iId)
 {
-
 }
 
 //=============================================================================================================

@@ -142,7 +142,6 @@ protected:
 
     virtual void resizeEvent(QResizeEvent *event);
 };
-
 } // NAMESPACE
 
 #endif // TFPLOT_H

@@ -97,9 +97,7 @@ protected:
      * AbstractTreeItem functions
      */
     void initItem();
-
 };
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_SUBJECTTREEITEM_H

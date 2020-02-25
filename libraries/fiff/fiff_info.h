@@ -282,7 +282,6 @@ inline void FiffInfo::set_current_comp(fiff_int_t value)
 {
     this->chs = set_current_comp(this->chs, value);
 }
-
 } // NAMESPACE
 
 #endif // FIFF_INFO_H

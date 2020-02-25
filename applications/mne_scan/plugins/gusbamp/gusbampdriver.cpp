@@ -96,7 +96,6 @@ GUSBAmpDriver::GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer)
 
     //setting Sample parameters and Number of Scans
     setSampleRate(1200);
-
 }
 
 //=============================================================================================================
@@ -522,7 +521,6 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
     refreshSizeOutputMatrix();
     //cout <<"sample rate [HZ]: \t" <<  m_iSampleRateHz << "\n" << "number of scans [/]:\t" << m_iNumberOfScans << "\n";
     return true;
-
 }
 
 //=============================================================================================================

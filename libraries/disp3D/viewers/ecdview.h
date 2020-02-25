@@ -99,7 +99,6 @@ public:
 
 protected:
 };
-
 } // NAMESPACE
 
 #endif // DISP3DLIB_ECDVIEW_H

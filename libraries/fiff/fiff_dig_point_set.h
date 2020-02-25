@@ -232,7 +232,6 @@ protected:
 
 private:
     QList<FiffDigPoint> m_qListDigPoint;    /**< List of digitizer Points. */
-
 };
 
 //=============================================================================================================
@@ -257,7 +256,6 @@ inline qint32 FiffDigPointSet::size() const
 {
     return m_qListDigPoint.size();
 }
-
 } // namespace FIFFLIB
 
 #endif // FIFFLIB_FIFF_DIG_POINT_SET_H

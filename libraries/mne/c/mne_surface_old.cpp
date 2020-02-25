@@ -53,12 +53,10 @@ using namespace MNELIB;
 
 MneSurfaceOld::MneSurfaceOld()
 {
-
 }
 
 //=============================================================================================================
 
 MneSurfaceOld::~MneSurfaceOld()
 {
-
 }

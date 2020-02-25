@@ -96,7 +96,6 @@ protected:
 
 protected:
 };
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_DATA3DTREEDELEGATE_H

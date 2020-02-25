@@ -71,7 +71,6 @@ AveragingSetupWidget::AveragingSetupWidget(Averaging* toolbox, QWidget *parent)
 
 AveragingSetupWidget::~AveragingSetupWidget()
 {
-
 }
 
 //=============================================================================================================

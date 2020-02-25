@@ -91,7 +91,6 @@ private:
     BrainFlowBoard *m_pBrainFlowBoard;
     Ui::BrainFlowSetupWidget *ui;
 };
-
 }
 
 #endif // BRAINFLOWSETUPWIDGET_H
