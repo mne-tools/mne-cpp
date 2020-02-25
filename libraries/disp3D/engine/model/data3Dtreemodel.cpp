@@ -35,7 +35,6 @@
  *
  */
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -60,7 +59,6 @@
 #include <fiff/fiff_dig_point_set.h>
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -71,13 +69,11 @@
 #include <QGLFormat>
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -91,7 +87,6 @@ using namespace Eigen;
 using namespace FIFFLIB;
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -107,7 +102,7 @@ Data3DTreeModel::Data3DTreeModel(QObject* parent)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 QVariant Data3DTreeModel::data(const QModelIndex& index,
                                int role) const
@@ -124,7 +119,7 @@ QVariant Data3DTreeModel::data(const QModelIndex& index,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int Data3DTreeModel::columnCount(const QModelIndex &parent) const
 {
@@ -134,7 +129,7 @@ int Data3DTreeModel::columnCount(const QModelIndex &parent) const
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 QVariant Data3DTreeModel::headerData(int section, Qt::Orientation orientation,
                                      int role) const
@@ -154,7 +149,7 @@ QVariant Data3DTreeModel::headerData(int section, Qt::Orientation orientation,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 Qt::ItemFlags Data3DTreeModel::flags(const QModelIndex &index) const
 {
@@ -167,7 +162,7 @@ Qt::ItemFlags Data3DTreeModel::flags(const QModelIndex &index) const
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& sSubject,
                                                          const QString& sMriSetName,
@@ -188,7 +183,7 @@ QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& sSubject
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject,
                                                const QString& sMriSetName,
@@ -216,7 +211,7 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 QList<SourceSpaceTreeItem*> Data3DTreeModel::addSourceSpace(const QString& sSubject,
                                                             const QString& sMeasurementSetName,
@@ -243,7 +238,7 @@ QList<SourceSpaceTreeItem*> Data3DTreeModel::addSourceSpace(const QString& sSubj
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 QList<SourceSpaceTreeItem*> Data3DTreeModel::addForwardSolution(const QString& sSubject,
                                                                 const QString& sMeasurementSetName,
@@ -253,7 +248,7 @@ QList<SourceSpaceTreeItem*> Data3DTreeModel::addForwardSolution(const QString& s
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 MneDataTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
                                                 const QString& sMeasurementSetName,
@@ -303,7 +298,7 @@ MneDataTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject,
                                                    const QString& sSet,
@@ -332,7 +327,7 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& sSubject,
                                                              const QString& sMeasurementSetName,
@@ -350,7 +345,7 @@ QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& sSub
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject,
                                                       const QString& sMeasurementSetName,
@@ -378,7 +373,7 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject,
                                          const QString& sBemSetName,
@@ -405,7 +400,7 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
                                                      const QString& sSensorSetName,
@@ -438,7 +433,7 @@ SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 SensorSetTreeItem* Data3DTreeModel::addEegSensorInfo(const QString& sSubject,
                                                      const QString& sSensorSetName,
@@ -473,7 +468,7 @@ SensorSetTreeItem* Data3DTreeModel::addEegSensorInfo(const QString& sSubject,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& sSubject,
                                                         const QString& sMeasurementSetName,
@@ -500,7 +495,7 @@ DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& sSubject,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
                                                    const QString& sMeasurementSetName,
@@ -550,7 +545,7 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 QPointer<Qt3DCore::QEntity> Data3DTreeModel::getRootEntity()
 {
@@ -558,7 +553,7 @@ QPointer<Qt3DCore::QEntity> Data3DTreeModel::getRootEntity()
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 SubjectTreeItem* Data3DTreeModel::addSubject(const QString& sSubject)
 {
@@ -581,7 +576,7 @@ SubjectTreeItem* Data3DTreeModel::addSubject(const QString& sSubject)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void Data3DTreeModel::initMetatypes()
 {

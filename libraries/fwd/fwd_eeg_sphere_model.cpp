@@ -34,7 +34,6 @@
  *
  */
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -57,7 +56,6 @@
 
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -232,7 +230,6 @@ static int         terms = 0;       /* These statistics may be useful */
 static int         eval = 0;
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -251,7 +248,7 @@ FwdEegSphereModel::FwdEegSphereModel()
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel)
 {
@@ -283,7 +280,7 @@ FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereMode
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const QString& name,
                                                      int nlayer,
@@ -321,14 +318,14 @@ FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const QString&
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 FwdEegSphereModel::~FwdEegSphereModel()
 {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 FwdEegSphereModel* FwdEegSphereModel::setup_eeg_sphere_model(const QString& eeg_model_file, QString eeg_model_name, float eeg_sphere_rad)
 {
@@ -360,7 +357,7 @@ bad : {
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 fitUser FwdEegSphereModel::new_fit_user(int nfit, int nterms)
 
@@ -380,7 +377,7 @@ fitUser FwdEegSphereModel::new_fit_user(int nfit, int nterms)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 // fwd_multi_spherepot.c
 double FwdEegSphereModel::fwd_eeg_get_multi_sphere_model_coeff(int n)
 {
@@ -486,7 +483,7 @@ double FwdEegSphereModel::fwd_eeg_get_multi_sphere_model_coeff(int n)
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 // fwd_multi_spherepot.c
 void FwdEegSphereModel::next_legen(int n, double x, double *p0, double *p01, double *p1, double *p11)        /* Input: P1(n-2) Output: P1(n-1) */
 /*
@@ -521,7 +518,7 @@ void FwdEegSphereModel::next_legen(int n, double x, double *p0, double *p01, dou
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FwdEegSphereModel::calc_pot_components(double beta, double cgamma, double *Vrp, double *Vtp, const Eigen::VectorXd& fn, int nterms)
 {
@@ -551,7 +548,7 @@ void FwdEegSphereModel::calc_pot_components(double beta, double cgamma, double *
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 // fwd_multi_spherepot.c
 int FwdEegSphereModel::fwd_eeg_multi_spherepot(float *rd, float *Q, float **el, int neeg, float *Vval, void *client)	  /* The model definition */
 /*
@@ -679,7 +676,7 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot(float *rd, float *Q, float **el, 
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 // fwd_multi_spherepot.c
 int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(float *rd, float *Q, FwdCoilSet *els, float *Vval, void *client)           /* Client data will be the sphere model definition */
 /*
@@ -717,7 +714,7 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(float *rd, float *Q, FwdCoi
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 // fwd_multi_spherepot.c
 bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, float   **el, int neeg, float **Vval_vec, void *client)
 {
@@ -830,7 +827,7 @@ bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, float   **el, int ne
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 // fwd_multi_spherepot.c
 int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(float *rd, FwdCoilSet* els, float **Vval_vec, void *client)
 {
@@ -864,7 +861,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(float *rd, FwdCoilSet* els, fl
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(float *rd, float Q[], FwdCoilSet *coils, float Vval[], float xgrad[], float ygrad[], float zgrad[], void *client)  /* Client data to be passed to some foward modelling routines */
 /*
@@ -905,7 +902,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(float *rd, float Q[], FwdCoil
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 // fwd_multi_spherepot.c
 int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole position */
                                             float   *Q,	 /* Dipole moment */
@@ -1023,7 +1020,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 // fwd_multi_spherepot.c
 int FwdEegSphereModel::fwd_eeg_spherepot_coil(  float *rd, float *Q, FwdCoilSet* els, float *Vval, void *client)
 {
@@ -1054,7 +1051,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(  float *rd, float *Q, FwdCoilSet*
 
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 // fwd_eeg_sphere_models.c
 bool FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, bool fit_berg_scherg, int nfit)
 {
