@@ -120,7 +120,7 @@ OTHER_FILES += \
     neuromag.json
 
 unix:!macx {
-    # === Unix ===
+    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
 

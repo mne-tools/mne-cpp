@@ -98,7 +98,7 @@ UI_DIR = $${PWD}
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
 unix:!macx {
-    # === Unix ===
+    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
 

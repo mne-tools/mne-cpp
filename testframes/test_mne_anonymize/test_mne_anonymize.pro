@@ -85,7 +85,7 @@ win32 {
 }
 
 unix:!macx {
-    # === Unix ===
+    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 
