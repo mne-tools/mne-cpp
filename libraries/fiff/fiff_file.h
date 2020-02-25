@@ -584,8 +584,9 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 
 /**< Special values used in the project tags. */
 
-#define FIFFV_SEX_MALE   1
-#define FIFFV_SEX_FEMALE 2
+#define FIFFV_SEX_UNKNOWN   0
+#define FIFFV_SEX_MALE      1
+#define FIFFV_SEX_FEMALE    2
 
 #define FIFFV_HAND_RIGHT        1
 #define FIFFV_HAND_LEFT         2
