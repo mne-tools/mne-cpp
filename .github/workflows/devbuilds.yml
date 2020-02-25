@@ -172,6 +172,8 @@ jobs:
         version: 5.14.1
         arch: win64_msvc2017_64
         modules: qtcharts
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.0
     - name: Install jom (Windows)
       run: |
         Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile .\jom.zip
