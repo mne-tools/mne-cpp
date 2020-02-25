@@ -7,7 +7,7 @@ nav_order: 2
 
 This is the quickest way to get MNE-CPP up and running on your machine:
 
-* Download the latest version of MNE-CPP. 
+* Download the latest version of MNE-CPP.
 
 &nbsp; &nbsp; &nbsp; &nbsp; [Windows](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-windows-x86_64.zip){: .btn .btn-green } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-linux-x86_64.tar.gz){: .btn .btn-green } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-macos-x86_64.tar.gz){: .btn .btn-green }
 
