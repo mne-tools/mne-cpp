@@ -70,6 +70,7 @@ class TMSI;
 class TMSISetupWidget : public QWidget
 {
     Q_OBJECT
+
 public:
 
     //=========================================================================================================

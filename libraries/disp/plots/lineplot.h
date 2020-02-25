@@ -81,6 +81,7 @@ namespace DISPLIB
 class DISPSHARED_EXPORT LinePlot : public QtCharts::QChartView
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<LinePlot> SPtr;            /**< Shared pointer type for LinePlot. */
     typedef QSharedPointer<const LinePlot> ConstSPtr; /**< Const shared pointer type for LinePlot. */

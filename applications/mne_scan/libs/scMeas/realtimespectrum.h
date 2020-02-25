@@ -71,6 +71,7 @@ namespace SCMEASLIB
 class SCMEASSHARED_EXPORT RealTimeSpectrum : public Measurement
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<RealTimeSpectrum> SPtr;               /**< Shared pointer type for RealTimeSpectrum. */
     typedef QSharedPointer<const RealTimeSpectrum> ConstSPtr;    /**< Const shared pointer type for RealTimeSpectrum. */

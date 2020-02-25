@@ -119,6 +119,7 @@ signals:
 class RTPROCESINGSHARED_EXPORT RtInvOp : public QObject
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<RtInvOp> SPtr;             /**< Shared pointer type for RtInvOp. */
     typedef QSharedPointer<const RtInvOp> ConstSPtr;  /**< Const shared pointer type for RtInvOp. */

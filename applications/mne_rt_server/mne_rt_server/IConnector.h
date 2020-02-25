@@ -98,6 +98,7 @@ enum ConnectorID
 class IConnector : public QThread
 {
     Q_OBJECT
+
 public:
     //=========================================================================================================
     /**

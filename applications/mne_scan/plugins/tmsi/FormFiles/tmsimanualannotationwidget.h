@@ -68,6 +68,7 @@ class TMSI;
 class TMSIManualAnnotationWidget : public QWidget
 {
     Q_OBJECT
+
 public:
     //=========================================================================================================
     /**

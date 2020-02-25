@@ -72,6 +72,7 @@ namespace SCMEASLIB
 class SCMEASSHARED_EXPORT RealTimeMultiSampleArray : public Measurement
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<RealTimeMultiSampleArray> SPtr;               /**< Shared pointer type for RealTimeMultiSampleArray. */
     typedef QSharedPointer<const RealTimeMultiSampleArray> ConstSPtr;    /**< Const shared pointer type for RealTimeMultiSampleArray. */

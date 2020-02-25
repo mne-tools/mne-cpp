@@ -67,6 +67,7 @@ namespace SCSHAREDLIB
 class SCSHAREDSHARED_EXPORT PluginSceneManager : public QObject
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<PluginSceneManager> SPtr;            /**< Shared pointer type for PluginSceneManager. */
     typedef QSharedPointer<const PluginSceneManager> ConstSPtr; /**< Const shared pointer type for PluginSceneManager. */

@@ -72,6 +72,7 @@ class IPlugin;
 class SCSHAREDSHARED_EXPORT PluginConnector : public QObject
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<PluginConnector> SPtr;               /**< Shared pointer type for PluginConnector. */
     typedef QSharedPointer<const PluginConnector> ConstSPtr;    /**< Const shared pointer type for PluginConnector. */

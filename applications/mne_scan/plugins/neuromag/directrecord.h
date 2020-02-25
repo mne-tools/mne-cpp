@@ -40,6 +40,7 @@
 class DirectRecord : public QThread
 {
     Q_OBJECT
+
 public:
 
     explicit DirectRecord();

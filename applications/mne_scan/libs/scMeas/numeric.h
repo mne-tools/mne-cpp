@@ -67,6 +67,7 @@ namespace SCMEASLIB
 class SCMEASSHARED_EXPORT Numeric : public Measurement
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<Numeric> SPtr;               /**< Shared pointer type for Numeric. */
     typedef QSharedPointer<const Numeric> ConstSPtr;    /**< Const shared pointer type for Numeric. */

@@ -100,6 +100,7 @@ typedef Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> Matr
 class DISPSHARED_EXPORT RtFiffRawViewModel : public QAbstractTableModel
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<RtFiffRawViewModel> SPtr;              /**< Shared pointer type for RtFiffRawViewModel. */
     typedef QSharedPointer<const RtFiffRawViewModel> ConstSPtr;   /**< Const shared pointer type for RtFiffRawViewModel. */

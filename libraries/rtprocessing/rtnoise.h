@@ -79,6 +79,7 @@ namespace RTPROCESSINGLIB
 class RTPROCESINGSHARED_EXPORT RtNoise : public QThread
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<RtNoise> SPtr;             /**< Shared pointer type for RtNoise. */
     typedef QSharedPointer<const RtNoise> ConstSPtr;  /**< Const shared pointer type for RtNoise. */

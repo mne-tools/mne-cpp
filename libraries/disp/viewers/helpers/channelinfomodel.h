@@ -100,6 +100,7 @@ namespace ChannelInfoModelRoles
 class DISPSHARED_EXPORT ChannelInfoModel : public QAbstractTableModel
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<ChannelInfoModel> SPtr;              /**< Shared pointer type for ChannelInfoModel. */
     typedef QSharedPointer<const ChannelInfoModel> ConstSPtr;   /**< Const shared pointer type for ChannelInfoModel. */

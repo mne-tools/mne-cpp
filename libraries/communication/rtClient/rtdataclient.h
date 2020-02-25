@@ -71,6 +71,7 @@ namespace COMMUNICATIONLIB
 class COMMUNICATIONSHARED_EXPORT RtDataClient : public QTcpSocket
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<RtDataClient> SPtr;               /**< Shared pointer type for RtDataClient. */
     typedef QSharedPointer<const RtDataClient> ConstSPtr;    /**< Const shared pointer type for RtDataClient. */

@@ -70,6 +70,7 @@ class PluginConnectorConnection;
 class SCSHAREDSHARED_EXPORT PluginConnectorConnectionWidget : public QWidget
 {
     Q_OBJECT
+
 public:
 
     //=========================================================================================================

@@ -92,6 +92,7 @@ enum Tool
 class SCDISPSHARED_EXPORT MeasurementWidget : public QWidget
 {
     Q_OBJECT
+
 public:
 
     //=========================================================================================================
