@@ -61,7 +61,7 @@ jobs:
         make
         make install
         cd ..
-        qmake
+        qmake -r
         make -j2
         cp -r ./brainflow/installed/lib/* ../../../bin/
     - name: Configure and compile MNE-CPP (Windows)
@@ -84,7 +84,7 @@ jobs:
         cmake -G "Visual Studio 14 2015 Win64" -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX=..\installed ..
         cmake --build . --target install --config Release
         cd ..
-        qmake
+        qmake -r
         jom -j2
         cp -r .\brainflow\installed\lib\* ..\..\..\bin\
                         
