@@ -54,6 +54,7 @@
 #include <QContextMenuEvent>
 #include <QSharedPointer>
 #include <QShortcut>
+#include <QPointer>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -256,7 +257,7 @@ private:
     LogLevel                            m_eLogLevelCurrent;             /**< Holds the current log level.*/
 
     QSharedPointer<QWidget>             m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
-    QSharedPointer<DISPLIB::QuickControlView>               m_pQuickControlView;            /**< quick control widget. */
+    QPointer<DISPLIB::QuickControlView>               m_pQuickControlView;            /**< quick control widget. */
 
 };
 }// NAMESPACE

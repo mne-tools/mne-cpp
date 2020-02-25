@@ -118,7 +118,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
         }
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >())
         {
-            QSharedPointer<RealTimeMultiSampleArray>* pRealTimeMultiSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >()->data();
             RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(pT, newDisp);
 
             qListActions.append(rtmsaWidget->getDisplayActions());
