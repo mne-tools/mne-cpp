@@ -103,6 +103,7 @@ bool FiffIO::setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirNode::SPtr
 }
 
 //=============================================================================================================
+
 bool FiffIO::read(QIODevice& p_IODevice)
 {
     //Read dirTree from fiff data (raw,evoked,fwds,cov)
