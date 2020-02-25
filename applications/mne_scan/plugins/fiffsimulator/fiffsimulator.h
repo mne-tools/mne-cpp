@@ -78,7 +78,7 @@ namespace FIFFSIMULATORPLUGIN
 {
 
 //=============================================================================================================
-// FORWARD DECLARATIONS FIFFSIMULATORPLUGIN
+// FIFFSIMULATORPLUGIN FORWARD DECLARATIONS 
 //=============================================================================================================
 
 class FiffSimulatorProducer;

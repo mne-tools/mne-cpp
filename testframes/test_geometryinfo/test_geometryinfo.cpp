@@ -101,6 +101,7 @@ TestGeometryInfo::TestGeometryInfo() {
 }
 
 //=============================================================================================================
+
 void TestGeometryInfo::initTestCase() {
     //acquire real surface data
     QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif");
