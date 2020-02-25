@@ -146,9 +146,3 @@ int TMSIElectrodeItem::getChannelIndex()
     return m_iChannelIndex;
 }
 
-
-
-
-
-
-

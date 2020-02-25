@@ -82,8 +82,6 @@ static float Qz[] = {0.0,0.0,1.0};
 #define OK 0
 #endif
 
-
-
 #define X_40 0
 #define Y_40 1
 #define Z_40 2
@@ -100,7 +98,6 @@ static float Qz[] = {0.0,0.0,1.0};
     (to)[Z_40] = (from)[Z_40];\
     }
 
-
 #define VEC_DOT_40(x,y) ((x)[X_40]*(y)[X_40] + (x)[Y_40]*(y)[Y_40] + (x)[Z_40]*(y)[Z_40])
 
 #define VEC_LEN_40(x) sqrt(VEC_DOT_40(x,x))
@@ -111,8 +108,6 @@ static float Qz[] = {0.0,0.0,1.0};
     (xy)[Z_40] =   (x)[X_40]*(y)[Y_40]-(y)[X_40]*(x)[Y_40];\
     }
 
-
-
 #define MALLOC_40(x,t) (t *)malloc((x)*sizeof(t))
 
 #define ALLOC_CMATRIX_40(x,y) mne_cmatrix_40((x),(y))
@@ -120,8 +115,6 @@ static float Qz[] = {0.0,0.0,1.0};
 #define FREE_40(x) if ((char *)(x) != NULL) free((char *)(x))
 
 #define FREE_CMATRIX_40(m) mne_free_cmatrix_40((m))
-
-
 
 void mne_free_cmatrix_40 (float **m)
 {
@@ -148,7 +141,6 @@ static void matrix_error_40(int kind, int nr, int nc)
     exit(1);
 }
 
-
 float **mne_cmatrix_40 (int nr,int nc)
 
 {
@@ -165,8 +157,6 @@ float **mne_cmatrix_40 (int nr,int nc)
         m[i] = whole + i*nc;
     return m;
 }
-
-
 
 //float
 Eigen::MatrixXf toFloatEigenMatrix_40(float **mat, const int m, const int n)
@@ -192,10 +182,6 @@ void fromFloatEigenMatrix_40(const Eigen::MatrixXf& from_mat, float **& to_mat)
     fromFloatEigenMatrix_40(from_mat, to_mat, from_mat.rows(), from_mat.cols());
 }
 
-
-
-
-
 float **mne_lu_invert_40(float **mat,int dim)
 /*
       * Invert a matrix using the LU decomposition from
@@ -207,9 +193,6 @@ float **mne_lu_invert_40(float **mat,int dim)
     fromFloatEigenMatrix_40(eigen_mat_inv, mat);
     return mat;
 }
-
-
-
 
 void mne_transpose_square_40(float **mat, int n)
 /*
@@ -227,7 +210,6 @@ void mne_transpose_square_40(float **mat, int n)
         }
     return;
 }
-
 
 float mne_dot_vectors_40(float *v1,
                        float *v2,
@@ -247,8 +229,6 @@ float mne_dot_vectors_40(float *v1,
     return res;
 #endif
 }
-
-
 
 void mne_add_scaled_vector_to_40(float *v1,float scale, float *v2,int nn)
 
@@ -340,8 +320,6 @@ float **mne_mat_mat_mult_40 (float **m1,
 #endif
 }
 
-
-
 static struct {
     int  kind;
     const QString name;
@@ -359,7 +337,6 @@ static struct {
 
 #define BEM_SUFFIX     "-bem.fif"
 #define BEM_SOL_SUFFIX "-bem-sol.fif"
-
 
 //============================= misc_util.c =============================
 
@@ -412,8 +389,6 @@ const QString mne_coord_frame_name_40(int frame)
     }
     return frames[k].name;
 }
-
-
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -103,16 +103,10 @@ public:
      */
     ~MneCTFCompData();
 
-
-
     static int mne_calibrate_ctf_comp(MneCTFCompData*       one,
                                       const QList<FIFFLIB::FiffChInfo> &chs,
                                       int            nch,
                                       int            do_it);
-
-
-
-
 
 public:
     int             kind;                   /* The compensation kind (CTF) */

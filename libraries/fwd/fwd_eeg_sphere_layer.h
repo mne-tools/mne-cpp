@@ -106,7 +106,6 @@ public:
             return false;
     }
 
-
 public:
     float rad;          /**< The actual rads */
     float rel_rad;      /**< Relative rads */

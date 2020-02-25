@@ -53,7 +53,6 @@
 #include "mne_deriv.h"
 #include "mne_types.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -104,17 +103,11 @@ public:
      */
     ~MneRawData();
 
-
-
     static void mne_raw_add_filter_response(MneRawData* data, int *highpass_effective);
-
 
     static void setup_filter_bufs(MneRawData* data);
 
-
-
     static int load_one_buffer(MneRawData* data, MneRawBufDef* buf);
-
 
     static int compensate_buffer(MneRawData* data, MneRawBufDef* buf);
 
@@ -131,7 +124,6 @@ public:
                                float          **picked);
 
     static int load_one_filt_buf(MneRawData* data, MneRawBufDef* buf);
-
 
     static int mne_raw_pick_data_filt(MneRawData*    data,
                                mneChSelection sel,

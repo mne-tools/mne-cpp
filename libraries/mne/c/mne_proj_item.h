@@ -68,7 +68,6 @@ namespace MNELIB
 
 class MneNamedMatrix;
 
-
 //=============================================================================================================
 /**
  * Implements an MNE Projection Item (Replaces *mneProjItem,mneProjItemRec; struct of MNE-C mne_types.h).
@@ -95,9 +94,7 @@ public:
      */
     ~MneProjItem();
 
-
     static int mne_proj_item_affect(MneProjItem* it, const QStringList& list, int nlist);
-
 
 public:
     MneNamedMatrix* vecs;           /**< The original projection vectors */

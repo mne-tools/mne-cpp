@@ -50,7 +50,6 @@
 
 #include <QFile>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -59,7 +58,6 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace INVERSELIB;
-
 
 #ifndef TRUE
 #define TRUE 1
@@ -77,7 +75,6 @@ using namespace INVERSELIB;
 #define OK 0
 #endif
 
-
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
@@ -85,25 +82,17 @@ using namespace INVERSELIB;
 #define strncasecmp _strnicmp
 #endif
 
-
-
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
-
-
 
 #define MALLOC_9(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC_9(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
-
 #define FREE_9(x) if ((char *)(x) != NULL) free((char *)(x))
-
 
 #define ALLOC_CMATRIX_9(x,y) mne_cmatrix_9((x),(y))
 
 #define FREE_CMATRIX_9(m) mne_free_cmatrix_9((m))
-
-
 
 void fromFloatEigenMatrix_9(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
 {
@@ -117,7 +106,6 @@ void fromFloatEigenMatrix_9(const Eigen::MatrixXf& from_mat, float **& to_mat)
     fromFloatEigenMatrix_9(from_mat, to_mat, from_mat.rows(), from_mat.cols());
 }
 
-
 void mne_free_cmatrix_9 (float **m)
 {
     if (m) {
@@ -125,7 +113,6 @@ void mne_free_cmatrix_9 (float **m)
         FREE_9(m);
     }
 }
-
 
 static void matrix_error_9(int kind, int nr, int nc)
 
@@ -144,8 +131,6 @@ static void matrix_error_9(int kind, int nr, int nc)
     exit(1);
 }
 
-
-
 float **mne_cmatrix_9(int nr,int nc)
 
 {
@@ -162,8 +147,6 @@ float **mne_cmatrix_9(int nr,int nc)
         m[i] = whole + i*nc;
     return m;
 }
-
-
 
 typedef struct {
     int   size;		        /* Size of this buffer in floats */
@@ -193,7 +176,6 @@ void mne_free_ring_buffer_9(void *thisp)
     return;
 }
 
-
 //============================= mne_events.c =============================
 
 void mne_free_event_9(mneEvent e)
@@ -218,9 +200,6 @@ void mne_free_event_list_9(mneEventList list)
     return;
 }
 
-
-
-
 void mne_free_sparse_named_matrix_9(mneSparseNamedMatrix mat)
 /*
       * Free the matrix and all the data from within
@@ -238,8 +217,6 @@ void mne_free_sparse_named_matrix_9(mneSparseNamedMatrix mat)
 
 //============================= mne_raw_routines.c =============================
 
-
-
 void mne_ch_selection_free_9(mneChSelection s)
 
 {
@@ -255,8 +232,6 @@ void mne_ch_selection_free_9(mneChSelection s)
     FREE_9(s);
     return;
 }
-
-
 
 void mne_string_to_name_list_9(const QString& s, QStringList& listp,int &nlistp)
 /*
@@ -320,9 +295,6 @@ void mne_channel_names_to_name_list_9(const QList<FIFFLIB::FiffChInfo>& chs,
     return;
 }
 
-
-
-
 //============================= read_ch_info.c =============================
 
 static FiffDirNode::SPtr find_meas_9 (const FiffDirNode::SPtr& node)
@@ -340,7 +312,6 @@ static FiffDirNode::SPtr find_meas_9 (const FiffDirNode::SPtr& node)
     }
     return (tmp_node);
 }
-
 
 static FiffDirNode::SPtr find_meas_info_9 (const FiffDirNode::SPtr& node)
 /*
@@ -362,8 +333,6 @@ static FiffDirNode::SPtr find_meas_info_9 (const FiffDirNode::SPtr& node)
     return empty_node;
 }
 
-
-
 //============================= mne_read_evoked.c =============================
 
 #define MAXDATE 100
@@ -382,7 +351,6 @@ static FiffDirNode::SPtr find_evoked (const FiffDirNode::SPtr& node)
     }
     return (tmp_node);
 }
-
 
 static QString get_comment (  FiffStream::SPtr& stream,
                               const FiffDirNode::SPtr& start)
@@ -481,8 +449,6 @@ static char *get_meas_date (    FiffStream::SPtr& stream,const FiffDirNode::SPtr
     }
     return res;
 }
-
-
 
 static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are reading */
                             const FiffDirNode::SPtr& node,  /* The directory node containing our data */
@@ -657,8 +623,6 @@ bad : {
     }
 }
 
-
-
 static int find_between (   FiffStream::SPtr& stream,
                             const FiffDirNode::SPtr& low_node,
                             const FiffDirNode::SPtr& high_node,
@@ -701,10 +665,6 @@ static int find_between (   FiffStream::SPtr& stream,
     }
     return (FIFF_OK);
 }
-
-
-
-
 
 static int get_evoked_essentials (FiffStream::SPtr& stream,         /* This is our file */
                                   const FiffDirNode::SPtr& node,    /* The interesting node */
@@ -896,9 +856,6 @@ out : {
     }
 }
 
-
-
-
 static void unpack_data(double offset,
                         double scale,
                         short *packed,
@@ -992,15 +949,6 @@ bad : {
         return (NULL);
     }
 }
-
-
-
-
-
-
-
-
-
 
 int mne_find_evoked_types_comments (    FiffStream::SPtr& stream,
                                         QList<FiffDirNode::SPtr>& nodesp,
@@ -1096,8 +1044,6 @@ QList<FiffDirNode::SPtr> mne_find_evoked ( FiffStream::SPtr& stream, QStringList
     return evoked;
 }
 
-
-
 static void remove_artefacts (float *resp,
                               int   nsamp,
                               int   *artefs,
@@ -1143,8 +1089,6 @@ static void remove_artefacts (float *resp,
     }
     return;
 }
-
-
 
 int mne_read_evoked(const QString& name,        /* Name of the file */
                     int        setno,           /* Which data set */
@@ -1345,14 +1289,6 @@ char *mne_format_file_id (fiffId id)
     return s;
 }
 
-
-
-
-
-
-
-
-
 int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
                                     QList<FiffChInfo>& megp,	 /* MEG channels */
                                     int            *nmegp,
@@ -1516,8 +1452,6 @@ bad : {
     }
 }
 
-
-
 int mne_read_bad_channel_list_from_node_9(  FiffStream::SPtr& stream,
                                             const FiffDirNode::SPtr& pNode, QStringList& listp, int& nlistp)
 {
@@ -1565,10 +1499,6 @@ int mne_read_bad_channel_list_9(const QString& name, QStringList& listp, int& nl
 
     return res;
 }
-
-
-
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

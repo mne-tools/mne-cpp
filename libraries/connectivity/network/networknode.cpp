@@ -359,4 +359,3 @@ void NetworkNode::append(QSharedPointer<NetworkEdge> newEdge)
     }
 }
 
-

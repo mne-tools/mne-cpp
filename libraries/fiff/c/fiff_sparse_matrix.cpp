@@ -56,19 +56,6 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace FIFFLIB;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 //============================= fiff_type_spec.h =============================
 
 /*
@@ -89,8 +76,6 @@ fiff_int_t fiff_type_matrix_coding(fiff_int_t type)
 {
     return type & FIFFTS_MC_MASK;
 }
-
-
 
 //============================= fiff_matrix.c =============================
 
@@ -156,8 +141,6 @@ int *fiff_get_matrix_dims(FiffTag::SPtr& tag)
     }
     return res;
 }
-
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

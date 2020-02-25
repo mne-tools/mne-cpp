@@ -43,7 +43,6 @@
 #include "mne_proj_item.h"
 #include "mne_proj_op.h"
 
-
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
 
@@ -55,7 +54,6 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
 
-
 #ifndef FAIL
 #define FAIL -1
 #endif
@@ -64,7 +62,6 @@ using namespace MNELIB;
 #define OK 0
 #endif
 
-
 #define MALLOC_30(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC_30(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
@@ -72,7 +69,6 @@ using namespace MNELIB;
 
 #define FREE_CMATRIX_30(m) mne_free_cmatrix_30((m))
 #define FREE_DCMATRIX_30(m) mne_free_dcmatrix_30((m))
-
 
 void mne_free_cmatrix_30 (float **m)
 {
@@ -91,13 +87,9 @@ void mne_free_dcmatrix_30 (double **m)
     }
 }
 
-
-
 #define ALLOC_CMATRIX_30(x,y) mne_cmatrix_30((x),(y))
 
 #define ALLOC_DCMATRIX_30(x,y) mne_dmatrix_30((x),(y))
-
-
 
 static void matrix_error_30(int kind, int nr, int nc)
 
@@ -116,8 +108,6 @@ static void matrix_error_30(int kind, int nr, int nc)
     exit(1);
 }
 
-
-
 float **mne_cmatrix_30(int nr,int nc)
 
 {
@@ -135,7 +125,6 @@ float **mne_cmatrix_30(int nr,int nc)
     return m;
 }
 
-
 double **mne_dmatrix_30(int nr, int nc)
 
 {
@@ -152,8 +141,6 @@ double **mne_dmatrix_30(int nr, int nc)
         m[i] = whole + i*nc;
     return m;
 }
-
-
 
 //============================= mne_decompose.c =============================
 
@@ -242,10 +229,6 @@ int mne_decompose_eigen (double *mat,
         return -1;
 }
 
-
-
-
-
 double **mne_dmatt_dmat_mult2 (double **m1,double **m2, int d1,int d2,int d3)
 /* Matrix multiplication
       * result(d1 x d3) = m1(d2 x d1)^T * m2(d2 x d3) */
@@ -276,8 +259,6 @@ double **mne_dmatt_dmat_mult2 (double **m1,double **m2, int d1,int d2,int d3)
     return result;
 #endif
 }
-
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

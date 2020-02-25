@@ -44,11 +44,8 @@
 
 #include <Eigen/Core>
 
-
-
 #define _USE_MATH_DEFINES
 #include <math.h>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -57,8 +54,6 @@
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
-
-
 
 #ifndef TRUE
 #define TRUE 1
@@ -79,9 +74,7 @@ using namespace MNELIB;
 #define MALLOC_36(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC_36(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
-
 #define ALLOC_CMATRIX_36(x,y) mne_cmatrix_36((x),(y))
-
 
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf
@@ -89,8 +82,6 @@ using namespace MNELIB;
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 #endif
-
-
 
 static void matrix_error(int kind, int nr, int nc)
 
@@ -126,15 +117,9 @@ float **mne_cmatrix_36(int nr,int nc)
     return m;
 }
 
-
-
-
-
 #define FREE_36(x) if ((char *)(x) != NULL) free((char *)(x))
 
 #define FREE_CMATRIX_36(m) mne_free_cmatrix_36((m))
-
-
 
 void mne_free_cmatrix_36 (float **m)
 {
@@ -143,9 +128,6 @@ void mne_free_cmatrix_36 (float **m)
         FREE_36(m);
     }
 }
-
-
-
 
 typedef struct {
     int   size;		        /* Size of this buffer in floats */
@@ -158,7 +140,6 @@ typedef struct {
     int        nbuf;
     int        next;
 } *ringBuf_36,ringBufRec_36;
-
 
 void mne_free_ring_buffer_36(void *thisp)
 
@@ -198,7 +179,6 @@ void mne_free_event_list_36(mneEventList list)
     return;
 }
 
-
 void mne_free_name_list_36(char **list, int nlist)
 /*
  * Free a name list array
@@ -217,11 +197,7 @@ void mne_free_name_list_36(char **list, int nlist)
     return;
 }
 
-
-
-
 //============================= misc_util.c =============================
-
 
 void mne_string_to_name_list(const QString& s, QStringList& listp,int &nlistp)
 /*
@@ -238,11 +214,6 @@ void mne_string_to_name_list(const QString& s, QStringList& listp,int &nlistp)
     nlistp = list.size();
     return;
 }
-
-
-
-
-
 
 QString mne_name_list_to_string(const QStringList& list)
 /*
@@ -278,7 +249,6 @@ QString mne_channel_names_to_string(const QList<FIFFLIB::FiffChInfo>& chs,
     return res;
 }
 
-
 void mne_channel_names_to_name_list(const QList<FIFFLIB::FiffChInfo>& chs,
                                     int nch,
                                     QStringList& listp,
@@ -289,10 +259,6 @@ void mne_channel_names_to_name_list(const QList<FIFFLIB::FiffChInfo>& chs,
     mne_string_to_name_list(s,listp,nlistp);
     return;
 }
-
-
-
-
 
 //============================= mne_apply_filter.c =============================
 
@@ -349,10 +315,6 @@ int mne_compare_filters(mneFilterDef f1,
         return 0;
 }
 
-
-
-
-
 //============================= mne_fft.c =============================
 
 void mne_fft_ana(float *data,int np, float **precalcp)
@@ -407,10 +369,6 @@ void mne_fft_syn(float *data,int np, float **precalcp)
         FREE_36(precalc);
     return;
 }
-
-
-
-
 
 int mne_apply_filter(mneFilterDef filter, void *datap, float *data, int ns, int zero_pad, float dc_offset, int kind)
 /*
@@ -482,8 +440,6 @@ int mne_apply_filter(mneFilterDef filter, void *datap, float *data, int ns, int 
 
     return OK;
 }
-
-
 
 void mne_create_filter_response(mneFilterDef    filter,
                                 float           sfreq,
@@ -597,8 +553,6 @@ void mne_create_filter_response(mneFilterDef    filter,
     return;
 }
 
-
-
 //============================= mne_ringbuffer.c =============================
 
 typedef struct {
@@ -689,10 +643,7 @@ void mne_allocate_from_ring(void *ringp, int nrow, int ncol, float ***res)
     return;
 }
 
-
-
 //============================= mne_raw_routines.c =============================
-
 
 int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
                           FiffStream::SPtr& stream,
@@ -790,10 +741,6 @@ bad : {
     }
 }
 
-
-
-
-
 //============================= mne_process_bads.c =============================
 
 int mne_read_bad_channel_list_from_node(FiffStream::SPtr& stream,
@@ -844,10 +791,6 @@ int mne_read_bad_channel_list(const QString& name, QStringList& listp, int& nlis
     return res;
 }
 
-
-
-
-
 int  mne_sparse_vec_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
                           float           *vector, /* Vector to be multiplied */
                           float           *res)    /* Result of the multiplication */
@@ -878,8 +821,6 @@ int  mne_sparse_vec_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
         return -1;
     }
 }
-
-
 
 int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
                           float           **mult,  /* Matrix to be multiplied */
@@ -918,15 +859,9 @@ int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
     return 0;
 }
 
-
-
-
-
-
 #define APPROX_RING_BUF_SIZE (600*1024*1024)
 
 static int approx_ring_buf_size = APPROX_RING_BUF_SIZE;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

@@ -72,7 +72,6 @@ static void matrix_error_14(int kind, int nr, int nc)
     exit(1);
 }
 
-
 float **mne_cmatrix_14(int nr,int nc)
 
 {
@@ -90,7 +89,6 @@ float **mne_cmatrix_14(int nr,int nc)
     return m;
 }
 
-
 #define FREE_14(x) if ((char *)(x) != NULL) free((char *)(x))
 
 #define FREE_CMATRIX_14(m) mne_free_cmatrix_14((m))
@@ -103,7 +101,6 @@ void mne_free_cmatrix_14 (float **m)
     }
 }
 
-
 void fromFloatEigenMatrix_14(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
 {
     for ( int i = 0; i < m; ++i)
@@ -115,7 +112,6 @@ void fromFloatEigenMatrix_14(const Eigen::MatrixXf& from_mat, float **& to_mat)
 {
     fromFloatEigenMatrix_14(from_mat, to_mat, from_mat.rows(), from_mat.cols());
 }
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

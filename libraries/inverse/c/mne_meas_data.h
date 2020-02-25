@@ -136,8 +136,6 @@ public:
                                    const QStringList&   namesp,   /* Yet another option: explicit name list */
                                    int                  nnamesp);
 
-
-
 public:
     QString                 filename;  /* The source file name */
     FIFFLIB::fiffId         meas_id;    /* The id from the measurement file */

@@ -116,7 +116,6 @@ public:
      */
     GuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, DipoleFitData* f, char *guess_save_name);
 
-
     //=========================================================================================================
     /**
      * Destroys the Guess Data description
