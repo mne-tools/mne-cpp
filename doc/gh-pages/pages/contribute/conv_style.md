@@ -5,7 +5,7 @@ nav_order: 3
 ---
 # Coding Conventions
 
-## Naming Conventions
+## Naming
 
 Please make use of the following coding conventions when contributing to MNE-CPP:
 
@@ -17,7 +17,7 @@ Please make use of the following coding conventions when contributing to MNE-CPP
 |Member variables |`m_typeMeaningfulName` |
 |Local variables 	|`typeMeaningfulName`   |
 
-## Readability
+## Readability and Documentation
 
 Use meaningful variable names and type indicators. Avoid complex as well as condensed expressions. For example:
 
@@ -27,27 +27,31 @@ QString sChName = "MEG0000";
 void loadTxtFile(const QString& sPath);
 ```
 
-In general, try to make your code match the one around it, e.g., indentations, use of linebreaks, etc. Always align your function parameters in .h and .cpp files, for example:
+In general, try to make your code match the one around it, e.g., indentations, use of linebreaks, etc. Please use the DoxyGen style to document your code, as seen [here](https://github.com/mne-tools/mne-cpp/blob/master/libraries/connectivity/network/network.h). Always align your function parameters in .h and .cpp files, for example:
 
 ```cpp
 //=========================================================================================================
 /**
- * Constructs a NetworkEdge object.
+ * Constructs a FileLoader object.
  *
- * @param[in]  iValueA          Describe value iValueA.
- * @param[in]  fValueB          Describe value fValueB.
- * @param[in]  matValueC        Describe value matValueC.
- * 
- * @return Describe return value.
+ * @param[in]  iOpenMode            The open mode. 0=ReadWrite, 1=WriteOnly, 1=ReadOnly 
+ * @param[in]  bSkipEmptyLines      Whether to skip empty lines.
+ * @param[in]  sCommentIdentifier   String to identify comments. Default is empty which 
+ *                                  results in comments being read as normal lines.
  */
-int NetworkEdge(int iValueA,
-                float fValueB,
-                const Eigen::MatrixXd& matValueC);
+FileLoader(int iOpenMode,
+           bool bSkipEmptyLines,
+           const QString& sCommentIdentifier = "");
 ```
 
-## Documentation
+## Add the MNE-CPP Wizards to QtCreator
 
-Please use the DoxyGen style to document your code. For an example see [here](https://github.com/mne-tools/mne-cpp/blob/master/libraries/connectivity/network/network.h). 
+The following steps will show you how to setup the MNE-CPP QtCreator wizard. This wizard is of great help to create new C++ classes which are conform with the MNE-CPP coding conventions. This helps streamlining the contribution process.
+
+ 1. Navigate to your MNE-CPP repository `\tools\wizards`
+ 2. Copy the `mnecpp` folder to your QtCreator installation folder `\share\qtcreator\templates\wizards\`. Usually QtCreator is installed in your Qt distribution's `\Tools` folder, e.g., `<QtFolder>\Tools\QtCreator\share\qtcreator\templates\wizards`.
+ 3. Restart QtCreator.
+ 4. Now you should be able to right click on the project where you want to add a new class and see the MNE-CPP category appear in the wizard.
 
 ## Command Line Outputs
 
@@ -93,7 +97,7 @@ For better readability, we introduced conventions for PR naming and commit messa
 | MAINT | maintenance commit (refactoring, typos, style fixes, etc.) |
 | DOC   | documentation                                 |
 
-The following examples show how such a commit message could look like.
+The following examples show how such commit messages could look like:
 ```
 FIX: fix namespace error 
 ENH: add cHPI in Neuromag Plugin
@@ -101,16 +105,7 @@ MAINT: improved GithubAction workflow for Linux deployment
 DOC: add documentation for new amplifier in MNE Scan
 ```
 
-## Setup the MNE-CPP QtCreator wizard
-
-The following steps will show you how to setup the MNE-CPP QtCreator wizard. This wizard is of great help to create new C++ classes which are conform with the MNE-CPP coding conventions. This helps streamlining the contribution process.
-
- 1. Navigate to your MNE-CPP repository `\tools\wizards`
- 2. Copy the `mnecpp` folder to your QtCreator installation folder `\share\qtcreator\templates\wizards\`. Usually QtCreator is installed in your Qt distribution's `\Tools` folder, e.g., `<QtFolder>\Tools\QtCreator\share\qtcreator\templates\wizards`.
- 3. Restart QtCreator.
- 4. Now you should be able to right click on the project where you want to add a new class and see the MNE-CPP category appear in the wizard.
-
-## Add MNE-CPP documentation to QtCreator
+## Add the MNE-CPP Documentation to QtCreator
 
 You can display external documentation in the Help mode, which you can open via pressing the F1 key. To augment or replace the documentation that ships with Qt Creator and Qt:
 
