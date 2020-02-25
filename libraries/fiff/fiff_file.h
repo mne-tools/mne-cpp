@@ -587,8 +587,9 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_SEX_MALE   1
 #define FIFFV_SEX_FEMALE 2
 
-#define FIFFV_HAND_RIGHT 1
-#define FIFFV_HAND_LEFT  2
+#define FIFFV_HAND_RIGHT        1
+#define FIFFV_HAND_LEFT         2
+#define FIFFV_HAND_AMBIDEXTROUS 3
 
 /*
  * Event list saving...
