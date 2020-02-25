@@ -105,6 +105,7 @@ class PluginDockWidget;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<MainWindow> SPtr;               /**< Shared pointer type for MainWindow. */
     typedef QSharedPointer<const MainWindow> ConstSPtr;    /**< Const shared pointer type for MainWindow. */

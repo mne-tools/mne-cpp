@@ -86,6 +86,7 @@ namespace BABYMEGPLUGIN
 class BABYMEGSHARED_EXPORT BabyMEGInfo : public QObject
 {
     Q_OBJECT
+
 public:
     //=========================================================================================================
     /**

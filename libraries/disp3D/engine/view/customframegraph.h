@@ -100,6 +100,7 @@ namespace DISP3DLIB {
 class DISP3DSHARED_EXPORT CustomFrameGraph : public Qt3DRender::QViewport
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<CustomFrameGraph> SPtr;            /**< Shared pointer type for CustomFrameGraph. */
     typedef QSharedPointer<const CustomFrameGraph> ConstSPtr; /**< Const shared pointer type for CustomFrameGraph. */

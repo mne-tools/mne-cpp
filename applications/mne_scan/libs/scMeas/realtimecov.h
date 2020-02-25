@@ -73,6 +73,7 @@ namespace SCMEASLIB
 class SCMEASSHARED_EXPORT RealTimeCov : public Measurement
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<RealTimeCov> SPtr;               /**< Shared pointer type for RealTimeCov. */
     typedef QSharedPointer<const RealTimeCov> ConstSPtr;    /**< Const shared pointer type for RealTimeCov. */

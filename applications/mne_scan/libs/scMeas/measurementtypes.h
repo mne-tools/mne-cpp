@@ -63,6 +63,7 @@ namespace SCMEASLIB
 class SCMEASSHARED_EXPORT MeasurementTypes : public QObject
 {
     Q_OBJECT
+
 public:
     //=========================================================================================================
     /**

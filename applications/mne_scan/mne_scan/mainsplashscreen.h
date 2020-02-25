@@ -70,6 +70,7 @@ namespace MNESCAN
 class MainSplashScreen : public QSplashScreen
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<MainSplashScreen> SPtr;               /**< Shared pointer type for MainSplashScreen. */
     typedef QSharedPointer<const MainSplashScreen> ConstSPtr;    /**< Const shared pointer type for MainSplashScreen. */

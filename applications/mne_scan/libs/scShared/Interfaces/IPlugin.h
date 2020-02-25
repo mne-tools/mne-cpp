@@ -81,6 +81,7 @@ namespace SCSHAREDLIB
 class IPlugin : public QThread
 {
 //    Q_OBJECT
+
 public:
     //=========================================================================================================
     /**

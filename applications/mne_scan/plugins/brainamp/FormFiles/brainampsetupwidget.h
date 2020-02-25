@@ -70,6 +70,7 @@ class BrainAMP;
 class BrainAMPSetupWidget : public QWidget
 {
     Q_OBJECT
+
 public:
 
     //=========================================================================================================

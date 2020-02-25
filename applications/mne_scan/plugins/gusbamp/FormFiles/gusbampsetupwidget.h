@@ -66,6 +66,7 @@ class GUSBAmp;
 class GUSBAmpSetupWidget : public QWidget
 {
     Q_OBJECT
+
 public:
 
     //=========================================================================================================

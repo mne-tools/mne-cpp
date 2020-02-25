@@ -65,6 +65,7 @@ namespace COMMUNICATIONLIB
 class COMMUNICATIONSHARED_EXPORT CommandParser : public QObject, public Subject
 {
     Q_OBJECT
+
 public:
 
     //=========================================================================================================
