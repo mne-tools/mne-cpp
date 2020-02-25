@@ -63,7 +63,7 @@ jobs:
         cd ../..
         qmake -makefile brainflowboard.pro
         make -j2
-        cp -r ./brainflow/installed/lib/* ../../../bin/
+        cp -a ./brainflow/installed/lib/. ../../../bin/
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2016'
       run: |
@@ -86,7 +86,7 @@ jobs:
         cd ..\..
         qmake -makefile brainflowboard.pro
         jom -j2
-        cp -r .\brainflow\installed\lib\* ..\..\..\bin\
+        cp -a .\brainflow\installed\lib\. ..\..\..\bin\
                         
   Tests:
     runs-on: ${{ matrix.os }}
