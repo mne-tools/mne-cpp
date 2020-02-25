@@ -39,14 +39,12 @@
 
 #include "tmsiimpedancescene.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace TMSIPLUGIN;
 using namespace std;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -117,5 +115,4 @@ void TMSIImpedanceScene::scaleElectrodePositions(double scaleFactor)
 
     this->update(this->sceneRect());
 }
-
 

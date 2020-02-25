@@ -35,7 +35,6 @@
 #ifndef REALTIMECONNECTIVITYESTIMATE_H
 #define REALTIMECONNECTIVITYESTIMATE_H
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -43,16 +42,13 @@
 #include "scmeas_global.h"
 #include "measurement.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -76,14 +72,12 @@ namespace FSLIB {
     class AnnotationSet;
 }
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE SCMEASLIB
 //=============================================================================================================
 
 namespace SCMEASLIB
 {
-
 
 //=========================================================================================================
 /**
@@ -231,7 +225,6 @@ private:
     bool                                        m_bInitialized;     /**< Is initialized */
 };
 
-
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
@@ -242,7 +235,6 @@ inline void RealTimeConnectivityEstimate::setAnnotSet(const QSharedPointer<FSLIB
     m_pAnnotSet = annotSet;
 }
 
-
 //=============================================================================================================
 
 inline QSharedPointer<FSLIB::AnnotationSet>& RealTimeConnectivityEstimate::getAnnotSet()
@@ -250,7 +242,6 @@ inline QSharedPointer<FSLIB::AnnotationSet>& RealTimeConnectivityEstimate::getAn
     QMutexLocker locker(&m_qMutex);
     return m_pAnnotSet;
 }
-
 
 //=============================================================================================================
 
@@ -260,7 +251,6 @@ inline void RealTimeConnectivityEstimate::setSensorSurface(const QSharedPointer<
     m_pSensorSurface = annotSet;
 }
 
-
 //=============================================================================================================
 
 inline QSharedPointer<MNELIB::MNEBem>& RealTimeConnectivityEstimate::getSensorSurface()
@@ -268,7 +258,6 @@ inline QSharedPointer<MNELIB::MNEBem>& RealTimeConnectivityEstimate::getSensorSu
     QMutexLocker locker(&m_qMutex);
     return m_pSensorSurface;
 }
-
 
 //=============================================================================================================
 
@@ -278,7 +267,6 @@ inline void RealTimeConnectivityEstimate::setSurfSet(const QSharedPointer<FSLIB:
     m_pSurfSet = surfSet;
 }
 
-
 //=============================================================================================================
 
 inline QSharedPointer<FSLIB::SurfaceSet>& RealTimeConnectivityEstimate::getSurfSet()
@@ -286,7 +274,6 @@ inline QSharedPointer<FSLIB::SurfaceSet>& RealTimeConnectivityEstimate::getSurfS
     QMutexLocker locker(&m_qMutex);
     return m_pSurfSet;
 }
-
 
 //=============================================================================================================
 
@@ -296,7 +283,6 @@ inline void RealTimeConnectivityEstimate::setFwdSolution(const QSharedPointer<MN
     m_pFwdSolution = fwdSolution;
 }
 
-
 //=============================================================================================================
 
 inline QSharedPointer<MNELIB::MNEForwardSolution>& RealTimeConnectivityEstimate::getFwdSolution()
@@ -304,7 +290,6 @@ inline QSharedPointer<MNELIB::MNEForwardSolution>& RealTimeConnectivityEstimate:
     QMutexLocker locker(&m_qMutex);
     return m_pFwdSolution;
 }
-
 
 //=============================================================================================================
 
@@ -314,7 +299,6 @@ inline bool RealTimeConnectivityEstimate::isInitialized() const
     return m_bInitialized;
 }
 
-
 //=============================================================================================================
 
 inline void RealTimeConnectivityEstimate::setFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo>& p_fiffInfo)
@@ -323,7 +307,6 @@ inline void RealTimeConnectivityEstimate::setFiffInfo(const QSharedPointer<FIFFL
     m_pFiffInfo = p_fiffInfo;
 }
 
-
 //=============================================================================================================
 
 inline QSharedPointer<FIFFLIB::FiffInfo> RealTimeConnectivityEstimate::getFiffInfo()
@@ -331,7 +314,6 @@ inline QSharedPointer<FIFFLIB::FiffInfo> RealTimeConnectivityEstimate::getFiffIn
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo;
 }
-
 
 } // NAMESPACE
 

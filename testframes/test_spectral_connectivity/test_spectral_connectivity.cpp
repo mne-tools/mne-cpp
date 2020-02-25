@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -52,20 +51,17 @@
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtTest>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -74,7 +70,6 @@
 using namespace Eigen;
 using namespace CONNECTIVITYLIB;
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 /**
@@ -111,14 +106,12 @@ private:
     ConnectivitySettings m_connectivitySettings;
 };
 
-
 //=============================================================================================================
 
 TestSpectralConnectivity::TestSpectralConnectivity()
 : epsilon(0.0000000001)
 {
 }
-
 
 //=============================================================================================================
 
@@ -133,7 +126,6 @@ void TestSpectralConnectivity::initTestCase()
     m_connectivitySettings.setWindowType("hanning");
     m_connectivitySettings.append(matDataList);
 }
-
 
 //=============================================================================================================
 
@@ -160,7 +152,6 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     //*********************************************************************************************************
     compareConnectivity();
 }
-
 
 //=============================================================================================================
 
@@ -189,7 +180,6 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     compareConnectivity();
 }
 
-
 //=============================================================================================================
 
 void TestSpectralConnectivity::spectralConnectivityPLV()
@@ -216,7 +206,6 @@ void TestSpectralConnectivity::spectralConnectivityPLV()
 
     compareConnectivity();
 }
-
 
 //=============================================================================================================
 
@@ -245,7 +234,6 @@ void TestSpectralConnectivity::spectralConnectivityPLI()
     compareConnectivity();
 }
 
-
 //=============================================================================================================
 
 void TestSpectralConnectivity::spectralConnectivityPLI2()
@@ -272,7 +260,6 @@ void TestSpectralConnectivity::spectralConnectivityPLI2()
 
     compareConnectivity();
 }
-
 
 //=============================================================================================================
 
@@ -301,7 +288,6 @@ void TestSpectralConnectivity::spectralConnectivityWPLI()
     compareConnectivity();
 }
 
-
 //=============================================================================================================
 
 void TestSpectralConnectivity::spectralConnectivityWPLI2()
@@ -328,7 +314,6 @@ void TestSpectralConnectivity::spectralConnectivityWPLI2()
 
     compareConnectivity();
 }
-
 
 //=============================================================================================================
 
@@ -358,7 +343,6 @@ void TestSpectralConnectivity::spectralConnectivityXCOR()
     compareConnectivity();
 }
 
-
 //=============================================================================================================
 
 QList<MatrixXd> TestSpectralConnectivity::readConnectivityData()
@@ -376,7 +360,6 @@ QList<MatrixXd> TestSpectralConnectivity::readConnectivityData()
 
     return matDataList;
 }
-
 
 //=============================================================================================================
 
@@ -397,13 +380,11 @@ void TestSpectralConnectivity::compareConnectivity()
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Spectral Connectivities Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
 
-
 //=============================================================================================================
 
 void TestSpectralConnectivity::cleanupTestCase()
 {
 }
-
 
 //=============================================================================================================
 // MAIN

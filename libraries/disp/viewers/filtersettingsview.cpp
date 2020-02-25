@@ -40,7 +40,6 @@
 
 #include "filterdesignview.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -50,11 +49,9 @@
 #include <QPushButton>
 #include <QSettings>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -116,7 +113,6 @@ FilterSettingsView::~FilterSettingsView()
     saveSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<FilterDesignView> FilterSettingsView::getFilterView()
@@ -124,14 +120,12 @@ QSharedPointer<FilterDesignView> FilterSettingsView::getFilterView()
     return m_pFilterView;
 }
 
-
 //=============================================================================================================
 
 bool FilterSettingsView::getFilterActive()
 {
     return m_pCheckBox->isChecked();
 }
-
 
 //=============================================================================================================
 
@@ -146,7 +140,6 @@ void FilterSettingsView::saveSettings(const QString& settingsPath)
     settings.setValue(settingsPath + QString("/filterActivated"), m_pCheckBox->isChecked());
 }
 
-
 //=============================================================================================================
 
 void FilterSettingsView::loadSettings(const QString& settingsPath)
@@ -160,7 +153,6 @@ void FilterSettingsView::loadSettings(const QString& settingsPath)
     m_pCheckBox->setChecked(settings.value(settingsPath + QString("/filterActivated"), false).toBool());
 }
 
-
 //=============================================================================================================
 
 void FilterSettingsView::onShowFilterView()
@@ -172,7 +164,6 @@ void FilterSettingsView::onShowFilterView()
         m_pFilterView->show();
     }
 }
-
 
 //=============================================================================================================
 

@@ -47,13 +47,11 @@
 #include "../fiff_stream.h"
 #include "../fiff_dir_node.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -61,12 +59,10 @@
 
 #include <QSharedPointer>
 
-
 namespace FIFFLIB
 {
 class FiffTag;
 }
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -93,7 +89,6 @@ public:
      */
     FiffCoordTransOld();
 
-
     //=========================================================================================================
     /**
      * Copy constructor.
@@ -105,9 +100,7 @@ public:
 
 
 
-
     static FiffCoordTransOld* catenate(FiffCoordTransOld* t1,FiffCoordTransOld* t2);
-
 
 
 
@@ -119,7 +112,6 @@ public:
      */
     FiffCoordTransOld(int from,int to,float rot[3][3],float move[3]);
 
-
     //=========================================================================================================
     /**
      * Destroys the FiffCoordTransOld
@@ -128,33 +120,25 @@ public:
     ~FiffCoordTransOld();
 
 
-
     //============================= make_volume_source_space.c =============================
-
 
     /*
      * Add inverse transform to an existing one
      */
     static int add_inverse(FiffCoordTransOld* t);
 
-
     //============================= fiff_trans.c =============================
     FiffCoordTransOld* fiff_invert_transform () const;
 
-
     static void fiff_coord_trans (float r[3], const FiffCoordTransOld* t,int do_move);
-
 
     static FiffCoordTransOld* fiff_combine_transforms (int from,int to,FiffCoordTransOld* t1,FiffCoordTransOld* t2);
 
-
     static void fiff_coord_trans_inv (float r[3],FiffCoordTransOld* t,int do_move);
-
 
     //============================= mne_coord_transforms.c =============================
 
     static const char *mne_coord_frame_name(int frame);
-
 
     static void mne_print_coord_transform_label(FILE *log,char *label, FiffCoordTransOld* t);
 
@@ -162,29 +146,21 @@ public:
 
 
 
-
-
     static FiffCoordTransOld* mne_read_transform(const QString& name,int from, int to);
-
 
     static FiffCoordTransOld* mne_read_transform_from_node(//fiffFile in,
                                                            FIFFLIB::FiffStream::SPtr& stream,
                                                            const FIFFLIB::FiffDirNode::SPtr& node,
                                                            int from, int to);
 
-
     static FiffCoordTransOld* mne_read_mri_transform(const QString& name);
-
 
     static FiffCoordTransOld* mne_read_meas_transform(const QString& name);
 
 
-
     static FiffCoordTransOld* mne_read_transform_ascii(char *name, int from, int to);
 
-
     static FiffCoordTransOld* mne_read_FShead2mri_transform(char *name);
-
 
 
     static FiffCoordTransOld* mne_identity_transform(int from, int to);

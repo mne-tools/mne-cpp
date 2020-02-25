@@ -50,13 +50,11 @@
 #include <fwd/fwd_bem_model.h>
 #include "dipole_forward.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -68,7 +66,6 @@
 #define COLUMN_NORM_NONE 0	    /* No column normalization requested */
 #define COLUMN_NORM_COMP 1	    /* Componentwise normalization */
 #define COLUMN_NORM_LOC  2	    /* Dipole locationwise normalization */
-
 
 /*
  * These are the type definitions for dipole fitting
@@ -91,7 +88,6 @@ typedef struct {
 
 
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
 //=============================================================================================================
@@ -105,7 +101,6 @@ namespace INVERSELIB
 
 class GuessData;
 class ECD;
-
 
 
 //=============================================================================================================
@@ -135,12 +130,9 @@ public:
 
 
 
-
     //============================= dipole_fit_setup.c =============================
 
-
     static int setup_forward_model(DipoleFitData* d, MNELIB::MneCTFCompDataSet* comp_data, FWDLIB::FwdCoilSet* comp_coils);
-
 
 
 
@@ -150,7 +142,6 @@ public:
                                      float      mag_std,
                                      float      eeg_std);
 
-
     //ToDo  move to mneProjOp class
     static int make_projection(const QList<QString>& projnames,
                                const QList<FIFFLIB::FiffChInfo>& chs,
@@ -158,9 +149,7 @@ public:
                                MNELIB::MneProjOp*  *res);
 
 
-
     static int scale_noise_cov(DipoleFitData* f,int nave);
-
 
 
 
@@ -168,10 +157,7 @@ public:
 
 
 
-
     static int select_dipole_fit_noise_cov(DipoleFitData* f, mshMegEegData d);
-
-
 
 
 
@@ -195,7 +181,6 @@ public:
                                             int   include_eeg);
 
 
-
     //=========================================================================================================
     /**
      * Fit a single dipole to the given data
@@ -211,7 +196,6 @@ public:
     static bool fit_one(DipoleFitData* fit, GuessData* guess, float time, float *B, int verbose, ECD& res);
 
 
-
 //============================= dipole_forward.c
 
     static int compute_dipole_field(DipoleFitData* d, float *rd, int whiten, float **fwd);
@@ -221,8 +205,6 @@ public:
     static DipoleForward* dipole_forward_one(DipoleFitData* d,
                                      float         *rd,
                                      DipoleForward* old);
-
-
 
 
 
@@ -302,7 +284,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 
 } //NAMESPACE
 

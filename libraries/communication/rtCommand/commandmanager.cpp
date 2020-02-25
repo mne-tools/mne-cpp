@@ -6,7 +6,6 @@
 #include "commandmanager.h"
 #include "rawcommand.h"
 
-
 //=============================================================================================================
 // Qt Includes
 //=============================================================================================================
@@ -16,13 +15,11 @@
 #include <QJsonObject>
 #include <QStringList>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace COMMUNICATIONLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -34,7 +31,6 @@ CommandManager::CommandManager(bool p_bIsActive, QObject *parent)
 {
     init();
 }
-
 
 //=============================================================================================================
 
@@ -49,7 +45,6 @@ CommandManager::CommandManager(const QByteArray &p_qByteArrayJsonDoc, bool p_bIs
     insert(m_jsonDocumentOrigin);
 }
 
-
 //=============================================================================================================
 
 CommandManager::CommandManager(const QJsonDocument &p_jsonDoc, bool p_bIsActive, QObject *parent)
@@ -62,7 +57,6 @@ CommandManager::CommandManager(const QJsonDocument &p_jsonDoc, bool p_bIsActive,
     insert(m_jsonDocumentOrigin);
 }
 
-
 //=============================================================================================================
 
 CommandManager::~CommandManager()
@@ -72,9 +66,7 @@ CommandManager::~CommandManager()
 
     //Remove commands which where inserted into the static command list
 
-
 }
-
 
 //=============================================================================================================
 
@@ -83,14 +75,12 @@ void CommandManager::clear()
     m_qMapCommands.clear();
 }
 
-
 //=============================================================================================================
 
 void CommandManager::init()
 {
 
 }
-
 
 //=============================================================================================================
 //ToDo connect all commands inserted in this class by default.
@@ -116,7 +106,6 @@ void CommandManager::insert(const QJsonDocument &p_jsonDocument)
     emit commandMapChanged();
 }
 
-
 //=============================================================================================================
 
 void CommandManager::insert(const QString &p_sKey, const QString &p_sDescription)
@@ -124,7 +113,6 @@ void CommandManager::insert(const QString &p_sKey, const QString &p_sDescription
     Command t_command(p_sKey, p_sDescription, false, this);
     insert(p_sKey, t_command);
 }
-
 
 //=============================================================================================================
 
@@ -135,7 +123,6 @@ void CommandManager::insert(const QString &p_sKey, const Command &p_command)
     m_qMapCommands.insert(p_sKey, t_command);
     emit commandMapChanged();
 }
-
 
 //=============================================================================================================
 
@@ -175,14 +162,12 @@ void CommandManager::update(Subject* p_pSubject)
     }
 }
 
-
 //=============================================================================================================
 
 Command& CommandManager::operator[] (const QString &key)
 {
     return m_qMapCommands[key];
 }
-
 
 //=============================================================================================================
 

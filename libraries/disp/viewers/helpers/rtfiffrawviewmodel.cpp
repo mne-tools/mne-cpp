@@ -33,7 +33,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -48,7 +47,6 @@
 #include <utils/ioutils.h>
 #include <utils/filterTools/sphara.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -58,11 +56,9 @@
 #include <QtConcurrent>
 #include <QFuture>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -72,7 +68,6 @@ using namespace DISPLIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -122,14 +117,12 @@ int RtFiffRawViewModel::rowCount(const QModelIndex & /*parent*/) const
 //        return 0;
 }
 
-
 //=============================================================================================================
 
 int RtFiffRawViewModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 3;
 }
-
 
 //=============================================================================================================
 
@@ -196,7 +189,6 @@ QVariant RtFiffRawViewModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-
 //=============================================================================================================
 
 QVariant RtFiffRawViewModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -228,7 +220,6 @@ QVariant RtFiffRawViewModel::headerData(int section, Qt::Orientation orientation
 
     return QVariant();
 }
-
 
 //=============================================================================================================
 
@@ -289,7 +280,6 @@ void RtFiffRawViewModel::initSphara()
     qDebug()<<"RtFiffRawViewModel::initSphara - Read VectorView mag matrix "<<m_matSpharaVVMagLoaded.rows()<<m_matSpharaVVMagLoaded.cols()<<"and grad matrix"<<m_matSpharaVVGradLoaded.rows()<<m_matSpharaVVGradLoaded.cols();
     qDebug()<<"RtFiffRawViewModel::initSphara - Read BabyMEG inner layer matrix "<<m_matSpharaBabyMEGInnerLoaded.rows()<<m_matSpharaBabyMEGInnerLoaded.cols()<<"and outer layer matrix"<<m_matSpharaBabyMEGOuterLoaded.rows()<<m_matSpharaBabyMEGOuterLoaded.cols();
 }
-
 
 //=============================================================================================================
 
@@ -368,7 +358,6 @@ void RtFiffRawViewModel::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &p_pFiffI
     }
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
@@ -399,7 +388,6 @@ void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
     endResetModel();
 }
 
-
 //=============================================================================================================
 
 MatrixXd RtFiffRawViewModel::getLastBlock()
@@ -410,7 +398,6 @@ MatrixXd RtFiffRawViewModel::getLastBlock()
 
     return m_matDataRaw.block(0, m_iCurrentSample-m_iCurrentBlockSize, m_matDataRaw.rows(), m_iCurrentBlockSize);
 }
-
 
 //=============================================================================================================
 
@@ -566,7 +553,6 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd> &data)
     emit dataChanged(topLeft, bottomRight, roles);
 }
 
-
 //=============================================================================================================
 
 fiff_int_t RtFiffRawViewModel::getKind(qint32 row) const
@@ -578,7 +564,6 @@ fiff_int_t RtFiffRawViewModel::getKind(qint32 row) const
 
     return 0;
 }
-
 
 //=============================================================================================================
 
@@ -592,7 +577,6 @@ fiff_int_t RtFiffRawViewModel::getUnit(qint32 row) const
     return FIFF_UNIT_NONE;
 }
 
-
 //=============================================================================================================
 
 fiff_int_t RtFiffRawViewModel::getCoil(qint32 row) const
@@ -604,7 +588,6 @@ fiff_int_t RtFiffRawViewModel::getCoil(qint32 row) const
 
     return FIFFV_COIL_NONE;
 }
-
 
 //=============================================================================================================
 
@@ -627,7 +610,6 @@ void RtFiffRawViewModel::selectRows(const QList<qint32> &selection)
     endResetModel();
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::hideRows(const QList<qint32> &selection)
@@ -645,7 +627,6 @@ void RtFiffRawViewModel::hideRows(const QList<qint32> &selection)
     endResetModel();
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::resetSelection()
@@ -660,7 +641,6 @@ void RtFiffRawViewModel::resetSelection()
 
     endResetModel();
 }
-
 
 //=============================================================================================================
 
@@ -685,7 +665,6 @@ void RtFiffRawViewModel::toggleFreeze(const QModelIndex &)
     emit dataChanged(topLeft, bottomRight, roles);
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
@@ -694,7 +673,6 @@ void RtFiffRawViewModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
     m_qMapChScaling = p_qMapChScaling;
     endResetModel();
 }
-
 
 //=============================================================================================================
 
@@ -756,7 +734,6 @@ void RtFiffRawViewModel::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
     }
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::updateCompensator(int to)
@@ -811,14 +788,12 @@ void RtFiffRawViewModel::updateCompensator(int to)
     }
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::updateSpharaActivation(bool state)
 {
     m_bSpharaActivated = state;
 }
-
 
 //=============================================================================================================
 
@@ -899,7 +874,6 @@ void RtFiffRawViewModel::updateSpharaOptions(const QString& sSytemType, int nBas
     }
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::setFilter(QList<FilterData> filterData)
@@ -922,7 +896,6 @@ void RtFiffRawViewModel::setFilter(QList<FilterData> filterData)
     //filterDataBlock();
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::setFilterActive(bool state)
@@ -930,14 +903,12 @@ void RtFiffRawViewModel::setFilterActive(bool state)
     m_bPerformFiltering = state;
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::setBackgroundColor(const QColor& color)
 {
     m_colBackground = color;
 }
-
 
 //=============================================================================================================
 
@@ -977,7 +948,6 @@ void RtFiffRawViewModel::setFilterChannelType(QString channelType)
     //Filter all visible data channels at once
     //filterDataBlock();
 }
-
 
 //=============================================================================================================
 
@@ -1020,7 +990,6 @@ void RtFiffRawViewModel::createFilterChannelList(QStringList channelNames)
     //filterDataBlock();
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::markChBad(QModelIndex ch, bool status)
@@ -1047,7 +1016,6 @@ void RtFiffRawViewModel::markChBad(QModelIndex ch, bool status)
 
     emit dataChanged(ch,ch);
 }
-
 
 //=============================================================================================================
 
@@ -1076,7 +1044,6 @@ void RtFiffRawViewModel::triggerInfoChanged(const QMap<double, QColor>& colorMap
     m_sCurrentTriggerCh = triggerCh;
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::distanceTimeSpacerChanged(int value)
@@ -1088,14 +1055,12 @@ void RtFiffRawViewModel::distanceTimeSpacerChanged(int value)
     }
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::resetTriggerCounter()
 {
     m_iDetectedTriggers = 0;
 }
-
 
 //=============================================================================================================
 
@@ -1122,7 +1087,6 @@ void RtFiffRawViewModel::markChBad(QModelIndexList chlist, bool status)
     m_vecBadIdcs = FiffInfoBase::pick_channels(m_pFiffInfo->ch_names, m_pFiffInfo->bads, emptyExclude);
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawViewModel::doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
@@ -1132,7 +1096,6 @@ void RtFiffRawViewModel::doFilterPerChannelRTMSA(QPair<QList<FilterData>,QPair<i
         channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
 }
-
 
 //=============================================================================================================
 
@@ -1204,7 +1167,6 @@ void RtFiffRawViewModel::filterDataBlock()
 
     //std::cout<<"END RtFiffRawViewModel::filterDataBlock"<<std::endl;
 }
-
 
 //=============================================================================================================
 
@@ -1321,7 +1283,6 @@ void RtFiffRawViewModel::filterDataBlock(const MatrixXd &data, int iDataIndex)
 
     //std::cout<<"END RtFiffRawViewModel::filterDataBlock"<<std::endl;
 }
-
 
 //=============================================================================================================
 

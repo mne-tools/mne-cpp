@@ -41,16 +41,13 @@
 
 #include <fiff/fiff_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -59,7 +56,6 @@
 using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -77,7 +73,6 @@ FrequencySpectrumModel::FrequencySpectrumModel(QObject *parent)
 {
 }
 
-
 //=============================================================================================================
 
 int FrequencySpectrumModel::rowCount(const QModelIndex & /*parent*/) const
@@ -88,14 +83,12 @@ int FrequencySpectrumModel::rowCount(const QModelIndex & /*parent*/) const
         return 0;
 }
 
-
 //=============================================================================================================
 
 int FrequencySpectrumModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 2;
 }
-
 
 //=============================================================================================================
 
@@ -111,7 +104,6 @@ QVariant FrequencySpectrumModel::data(const QModelIndex &index, int role) const
         if(index.column() == 0 && role == Qt::DisplayRole)
             if(m_pFiffInfo)
                 return QVariant(m_pFiffInfo->chs[r].ch_name);
-
 
         //******** second column (data plot) ********
         if(index.column()==1) {
@@ -158,7 +150,6 @@ QVariant FrequencySpectrumModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-
 //=============================================================================================================
 
 QVariant FrequencySpectrumModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -191,7 +182,6 @@ QVariant FrequencySpectrumModel::headerData(int section, Qt::Orientation orienta
     return QVariant();
 }
 
-
 //=============================================================================================================
 
 void FrequencySpectrumModel::setInfo(FiffInfo::SPtr &info)
@@ -202,7 +192,6 @@ void FrequencySpectrumModel::setInfo(FiffInfo::SPtr &info)
 
     resetSelection();
 }
-
 
 //=============================================================================================================
 
@@ -241,7 +230,6 @@ void FrequencySpectrumModel::addData(const MatrixXd &data)
         m_iLowerFrqIdx = 0;
         m_iUpperFrqIdx = m_vecFreqScale.size()-1;
 
-
         m_bInitialized = true;
     }
 
@@ -251,7 +239,6 @@ void FrequencySpectrumModel::addData(const MatrixXd &data)
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }
-
 
 //=============================================================================================================
 
@@ -276,7 +263,6 @@ void FrequencySpectrumModel::selectRows(const QList<qint32> &selection)
     endResetModel();
 }
 
-
 //=============================================================================================================
 
 void FrequencySpectrumModel::resetSelection()
@@ -290,7 +276,6 @@ void FrequencySpectrumModel::resetSelection()
 
     endResetModel();
 }
-
 
 //=============================================================================================================
 
@@ -309,7 +294,6 @@ void FrequencySpectrumModel::toggleFreeze(const QModelIndex & index)
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }
-
 
 //=============================================================================================================
 

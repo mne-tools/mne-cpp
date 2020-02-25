@@ -36,7 +36,6 @@
 #ifndef REALTIMEMULTISAMPLEARRAY_H
 #define REALTIMEMULTISAMPLEARRAY_H
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -46,7 +45,6 @@
 #include "realtimesamplearraychinfo.h"
 
 #include <fiff/fiff_info.h>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -58,14 +56,12 @@
 #include <QMutex>
 #include <QMutexLocker>
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE SCMEASLIB
 //=============================================================================================================
 
 namespace SCMEASLIB
 {
-
 
 //=========================================================================================================
 /**
@@ -241,7 +237,6 @@ private:
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
 };
 
-
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
@@ -252,7 +247,6 @@ inline void RealTimeMultiSampleArray::clear()
     m_matSamples.clear();
 }
 
-
 //=============================================================================================================
 
 inline bool RealTimeMultiSampleArray::isChInit() const
@@ -260,7 +254,6 @@ inline bool RealTimeMultiSampleArray::isChInit() const
     QMutexLocker locker(&m_qMutex);
     return m_bChInfoIsInit;
 }
-
 
 //=============================================================================================================
 
@@ -270,7 +263,6 @@ inline const QString& RealTimeMultiSampleArray::getXMLLayoutFile() const
     return m_sXMLLayoutFile;
 }
 
-
 //=============================================================================================================
 
 inline void RealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
@@ -278,7 +270,6 @@ inline void RealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
     QMutexLocker locker(&m_qMutex);
     m_sXMLLayoutFile = layout;
 }
-
 
 //=============================================================================================================
 
@@ -288,7 +279,6 @@ inline void RealTimeMultiSampleArray::setDisplayFlags(const QStringList& slFlags
     m_slDisplayFlag = slFlags;
 }
 
-
 //=============================================================================================================
 
 inline const QStringList& RealTimeMultiSampleArray::getDisplayFlags()
@@ -296,7 +286,6 @@ inline const QStringList& RealTimeMultiSampleArray::getDisplayFlags()
     QMutexLocker locker(&m_qMutex);
     return m_slDisplayFlag;
 }
-
 
 //=============================================================================================================
 
@@ -306,7 +295,6 @@ inline void RealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
     m_dSamplingRate = dSamplingRate;
 }
 
-
 //=============================================================================================================
 
 inline double RealTimeMultiSampleArray::getSamplingRate() const
@@ -314,7 +302,6 @@ inline double RealTimeMultiSampleArray::getSamplingRate() const
     QMutexLocker locker(&m_qMutex);
     return m_dSamplingRate;
 }
-
 
 //=============================================================================================================
 
@@ -324,7 +311,6 @@ inline unsigned int RealTimeMultiSampleArray::getNumChannels() const
     return m_qListChInfo.size();
 }
 
-
 //=============================================================================================================
 
 inline QList<RealTimeSampleArrayChInfo>& RealTimeMultiSampleArray::chInfo()
@@ -333,7 +319,6 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeMultiSampleArray::chInfo()
     return m_qListChInfo;
 }
 
-
 //=============================================================================================================
 
 inline FIFFLIB::FiffInfo::SPtr& RealTimeMultiSampleArray::info()
@@ -341,7 +326,6 @@ inline FIFFLIB::FiffInfo::SPtr& RealTimeMultiSampleArray::info()
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo_orig;
 }
-
 
 //=============================================================================================================
 
@@ -355,7 +339,6 @@ inline void RealTimeMultiSampleArray::setMultiArraySize(qint32 iMultiArraySize)
         m_iMultiArraySize = iMultiArraySize;
 }
 
-
 //=============================================================================================================
 
 qint32 RealTimeMultiSampleArray::getMultiArraySize() const
@@ -363,7 +346,6 @@ qint32 RealTimeMultiSampleArray::getMultiArraySize() const
     QMutexLocker locker(&m_qMutex);
     return m_iMultiArraySize;
 }
-
 
 //=============================================================================================================
 

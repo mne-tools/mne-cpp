@@ -44,7 +44,6 @@
 #include <fiff/fiff.h>
 #include <scMeas/realtimemultisamplearray.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -52,11 +51,9 @@
 #include <QListWidgetItem>
 #include <QtConcurrent>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -67,14 +64,12 @@ using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace FIFFLIB;
 
-
 //=============================================================================================================
 // METATYPES
 //=============================================================================================================
 
 Q_DECLARE_METATYPE(lsl::stream_info);
 Q_DECLARE_METATYPE(QVector<lsl::stream_info>);
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -99,7 +94,6 @@ LSLAdapter::LSLAdapter()
     qRegisterMetaType<QVector<lsl::stream_info>>("QVector<lsl::stream_info>");
 }
 
-
 //=============================================================================================================
 
 LSLAdapter::~LSLAdapter()
@@ -110,14 +104,12 @@ LSLAdapter::~LSLAdapter()
     m_producerThread.deleteLater();
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> LSLAdapter::clone() const
 {
     return qSharedPointerCast<IPlugin>(QSharedPointer<LSLAdapter>(new LSLAdapter()));
 }
-
 
 //=============================================================================================================
 
@@ -151,7 +143,6 @@ void LSLAdapter::init()
     // load filtering settings etc.
 }
 
-
 //=============================================================================================================
 
 void LSLAdapter::unload()
@@ -164,7 +155,6 @@ void LSLAdapter::unload()
 
     // save filtering settings etc.
 }
-
 
 //=============================================================================================================
 
@@ -198,7 +188,6 @@ bool LSLAdapter::start()
     }
 }
 
-
 //=============================================================================================================
 
 bool LSLAdapter::stop()
@@ -214,7 +203,6 @@ bool LSLAdapter::stop()
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -240,14 +228,12 @@ QWidget* LSLAdapter::setupWidget()
     return temp;
 }
 
-
 //=============================================================================================================
 
 void LSLAdapter::run()
 {
     // producer has access to the RTMSA and publishes the blocks on its own, so there is nothing left to do here.
 }
-
 
 //=============================================================================================================
 
@@ -259,7 +245,6 @@ void LSLAdapter::onRefreshAvailableStreams()
         m_updateStreamsFutureWatcher.setFuture(future);
     }
 }
-
 
 //=============================================================================================================
 
@@ -294,7 +279,6 @@ void LSLAdapter::onLSLStreamScanReady()
     emit updatedAvailableLSLStreams(m_vAvailableStreams, m_currentStream);
 }
 
-
 //=============================================================================================================
 
 QVector<lsl::stream_info> LSLAdapter::scanAvailableLSLStreams()
@@ -312,9 +296,7 @@ QVector<lsl::stream_info> LSLAdapter::scanAvailableLSLStreams()
     return vAvailableStreams;
 }
 
-
 //=============================================================================================================
-
 
 void LSLAdapter::onStreamSelectionChanged(const lsl::stream_info& newStream)
 {
@@ -322,7 +304,6 @@ void LSLAdapter::onStreamSelectionChanged(const lsl::stream_info& newStream)
     m_bHasValidStream = true;
     m_currentStream = newStream;
 }
-
 
 //=============================================================================================================
 
@@ -421,7 +402,6 @@ void LSLAdapter::prepareFiffInfo(const lsl::stream_info &stream)
         return;
     }
 }
-
 
 //=============================================================================================================
 

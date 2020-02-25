@@ -42,7 +42,6 @@
 
 #include "../../disp3D_global.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -50,7 +49,6 @@
 #include <Qt3DExtras/Qt3DWindow>
 #include <QVector3D>
 #include <QPointer>
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -63,7 +61,6 @@ namespace Qt3DRender {
     class QRenderCaptureReply;
 }
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
 //=============================================================================================================
@@ -71,14 +68,12 @@ namespace Qt3DRender {
 namespace DISP3DLIB
 {
 
-
 //=============================================================================================================
 // DISP3DLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Data3DTreeModel;
 class CustomFrameGraph;
-
 
 //=============================================================================================================
 /**
@@ -191,7 +186,6 @@ protected:
      * @param[in] pObject         The parent of the children to be rotated.
      */
     void startModelRotationRecursive(QObject* pObject);
-
 
     QPointer<Qt3DCore::QEntity>                 m_pRootEntity;                  /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>                 m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */

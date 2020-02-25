@@ -55,7 +55,6 @@
 
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -63,7 +62,6 @@
 using namespace EEGOSPORTSPLUGIN;
 using namespace eemagine::sdk;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -85,13 +83,11 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
     m_bDllLoaded = true;
 }
 
-
 //=============================================================================================================
 
 EEGoSportsDriver::~EEGoSportsDriver()
 {
 }
-
 
 //=============================================================================================================
 
@@ -163,7 +159,6 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
     return true;
 }
 
-
 //=============================================================================================================
 
 bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
@@ -204,7 +199,6 @@ bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
     return true;
 }
 
-
 //=============================================================================================================
 
 bool EEGoSportsDriver::uninitDevice()
@@ -243,7 +237,6 @@ bool EEGoSportsDriver::uninitDevice()
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -318,14 +311,12 @@ bool EEGoSportsDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
     return true;
 }
 
-
 //=============================================================================================================
 
 uint EEGoSportsDriver::getNumberOfChannels()
 {
     return m_uiNumberOfChannels;
 }
-
 
 //=============================================================================================================
 
@@ -334,14 +325,12 @@ uint EEGoSportsDriver::getNumberOfEEGChannels()
     return m_uiNumberOfEEGChannels;
 }
 
-
 //=============================================================================================================
 
 uint EEGoSportsDriver::getNumberOfBipolarChannels()
 {
     return m_uiNumberOfBipolarChannels;
 }
-
 
 //=============================================================================================================
 

@@ -40,7 +40,6 @@
 
 #include "helpers/colormap.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -50,11 +49,9 @@
 #include <QtCharts/QChartView>
 #include <QDebug>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -62,7 +59,6 @@
 
 using namespace DISPLIB;
 using namespace QtCharts;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -88,7 +84,6 @@ Spline::Spline(QWidget* parent, const QString& title)
     layout->addWidget(chartView, 0, 0);
     this->setLayout(layout);
 }
-
 
 //=============================================================================================================
 
@@ -175,7 +170,6 @@ void Spline::mousePressEvent(QMouseEvent *event)
         setColorMap(m_colorMap);
     }
 }
-
 
 //=============================================================================================================
 
@@ -269,7 +263,6 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
     setColorMap(m_colorMap);
 }
 
-
 //=============================================================================================================
 
 void Spline::updateThreshold(QLineSeries* lineSeries)
@@ -295,7 +288,6 @@ void Spline::updateThreshold(QLineSeries* lineSeries)
     m_pChart->legend()->markers().at(m_pChart->legend()->markers().size()-1)->setVisible(false);
     m_pChart->createDefaultAxes();
 }
-
 
 //=============================================================================================================
 
@@ -327,7 +319,6 @@ void Spline::setColorMap(const QString& colorMap)
     m_pChart->setPlotAreaBackgroundVisible(true);
 }
 
-
 //=============================================================================================================
 
 const QVector3D& Spline::getThreshold()
@@ -345,7 +336,6 @@ const QVector3D& Spline::getThreshold()
     m_vecReturnVector = correctionDisplayTrueValue(originalVector, "down");
     return m_vecReturnVector;
 }
-
 
 //=============================================================================================================
 

@@ -48,13 +48,11 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dir_node.h>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -62,7 +60,6 @@
 
 #include <QSharedPointer>
 #include <QList>
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -76,7 +73,6 @@ namespace MNELIB
 //=============================================================================================================
 
 class MneProjItem;
-
 
 //=============================================================================================================
 /**
@@ -112,7 +108,6 @@ public:
     static void mne_free_proj_op_proj(MneProjOp* op);
 
 
-
     // mne_lin_proj.c
     static MneProjOp* mne_proj_op_combine(MneProjOp* to, MneProjOp* from);
 
@@ -128,15 +123,11 @@ public:
     // mne_lin_proj.c
     static MneProjOp* mne_proj_op_average_eeg_ref(const QList<FIFFLIB::FiffChInfo>& chs, int nch);
 
-
     static int mne_proj_op_affect(MneProjOp* op, const QStringList& list, int nlist);
-
 
     static int mne_proj_op_affect_chs(MneProjOp* op, const QList<FIFFLIB::FiffChInfo> &chs, int nch);
 
-
     static int mne_proj_op_proj_vector(MneProjOp* op, float *vec, int nvec, int do_complement);
-
 
 
     //============================= mne_lin_proj_io.c =============================
@@ -147,15 +138,9 @@ public:
 
     static MneProjOp* mne_read_proj_op(const QString& name);
 
-
     static void mne_proj_op_report_data(FILE *out,const char *tag, MneProjOp* op, int list_data, char **exclude, int nexclude);
 
-
     static void mne_proj_op_report(FILE *out,const char *tag, MneProjOp* op);
-
-
-
-
 
 
 

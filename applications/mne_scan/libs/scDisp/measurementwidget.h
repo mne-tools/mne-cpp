@@ -44,13 +44,11 @@
 
 #include <scMeas/measurement.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QWidget>
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -60,14 +58,12 @@ namespace DISPLIB {
     class QuickControlView;
 }
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE SCDISPLIB
 //=============================================================================================================
 
 namespace SCDISPLIB
 {
-
 
 //=============================================================================================================
 // SCDISPLIB FORWARD DECLARATIONS
@@ -86,7 +82,6 @@ enum Tool
     Freeze     = 0,       /**< Freezing tool. */
     Annotation = 1        /**< Annotation tool. */
 };
-
 
 //=============================================================================================================
 /**
@@ -187,14 +182,12 @@ QList< QAction* > MeasurementWidget::getDisplayActions()
     return m_qListDisplayActions;
 }
 
-
 //=============================================================================================================
 
 QList< QWidget* > MeasurementWidget::getDisplayWidgets()
 {
     return m_qListDisplayWidgets;
 }
-
 
 //=============================================================================================================
 
@@ -203,14 +196,12 @@ inline void MeasurementWidget::addDisplayAction(QAction* pAction)
     m_qListDisplayActions.append(pAction);
 }
 
-
 //=============================================================================================================
 
 inline void MeasurementWidget::addDisplayWidget(QWidget* pWidget)
 {
     m_qListDisplayWidgets.append(pWidget);
 }
-
 
 } //NAMESPACE
 

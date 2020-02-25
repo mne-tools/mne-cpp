@@ -41,7 +41,6 @@
 
 #include <fiff/fiff_types.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -50,18 +49,15 @@
 #include <QDebug>
 #include <QStaticText>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -87,14 +83,12 @@ AverageSceneItem::AverageSceneItem(const QString& channelName,
     m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
 }
 
-
 //=============================================================================================================
 
 QRectF AverageSceneItem::boundingRect() const
 {
     return m_rectBoundingRect;
 }
-
 
 //=============================================================================================================
 
@@ -105,7 +99,6 @@ void AverageSceneItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     emit sceneUpdateRequested();
 }
 
-
 //=============================================================================================================
 
 void AverageSceneItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -114,7 +107,6 @@ void AverageSceneItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     m_iFontTextSize = 15;
     emit sceneUpdateRequested();
 }
-
 
 //=============================================================================================================
 
@@ -167,7 +159,6 @@ void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 //    painter->drawRect(this->boundingRect());
 //    painter->restore();
 }
-
 
 //=============================================================================================================
 
@@ -289,7 +280,6 @@ void AverageSceneItem::paintAveragePath(QPainter *painter)
     }
 }
 
-
 //=============================================================================================================
 
 void AverageSceneItem::paintStimLine(QPainter *painter)
@@ -324,5 +314,4 @@ void AverageSceneItem::paintStimLine(QPainter *painter)
 
     painter->drawPath(path);
 }
-
 

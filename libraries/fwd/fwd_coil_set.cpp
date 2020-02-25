@@ -43,13 +43,11 @@
 
 #include <fiff/fiff_ch_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -60,10 +58,8 @@ using namespace FIFFLIB;
 using namespace FWDLIB;
 
 
-
 #define MAXWORD 1000
 #define BIG 0.5
-
 
 
 #ifndef TRUE
@@ -73,7 +69,6 @@ using namespace FWDLIB;
 #ifndef FALSE
 #define FALSE 0
 #endif
-
 
 #ifndef FAIL
 #define FAIL -1
@@ -85,7 +80,6 @@ using namespace FWDLIB;
 
 
 
-
 #define MALLOC_6(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC_6(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 #define FREE_6(x) if ((char *)(x) != NULL) free((char *)(x))
@@ -94,12 +88,9 @@ using namespace FWDLIB;
 
 
 
-
-
 #define X_6 0
 #define Y_6 1
 #define Z_6 2
-
 
 
 #define VEC_DOT_6(x,y) ((x)[X_6]*(y)[X_6] + (x)[Y_6]*(y)[Y_6] + (x)[Z_6]*(y)[Z_6])
@@ -110,8 +101,6 @@ using namespace FWDLIB;
     (to)[Y_6] = (from)[Y_6];\
     (to)[Z_6] = (from)[Z_6];\
     }
-
-
 
 
 
@@ -132,7 +121,6 @@ static void skip_comments(FILE *in)
         }
     }
 }
-
 
 static int whitespace(int c)
 
@@ -224,7 +212,6 @@ static int get_fval(FILE *in, float *fval)
 
 
 
-
 static void normalize(float *rr)
 /*
       * Scale vector to unit length
@@ -285,9 +272,6 @@ static FwdCoil* fwd_add_coil_to_set(FwdCoilSet* set,
 
 
 
-
-
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -301,13 +285,11 @@ FwdCoilSet::FwdCoilSet()
     user_data_free = NULL;
 }
 
-
 //=============================================================================================================
 
 //FwdCoilSet::FwdCoilSet(const FwdCoilSet& p_FwdCoilSet)
 //{
 //}
-
 
 //=============================================================================================================
 
@@ -319,7 +301,6 @@ FwdCoilSet::~FwdCoilSet()
 
     this->fwd_free_coil_set_user_data();
 }
-
 
 //=============================================================================================================
 
@@ -391,7 +372,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 FwdCoilSet *FwdCoilSet::create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
@@ -419,7 +399,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 FwdCoilSet *FwdCoilSet::create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
@@ -445,7 +424,6 @@ bad : {
         return NULL;
     }
 }
-
 
 //=============================================================================================================
 
@@ -537,7 +515,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 FwdCoilSet* FwdCoilSet::dup_coil_set(const FiffCoordTransOld* t) const
@@ -581,7 +558,6 @@ FwdCoilSet* FwdCoilSet::dup_coil_set(const FiffCoordTransOld* t) const
     return res;
 }
 
-
 //=============================================================================================================
 
 bool FwdCoilSet::is_planar_coil_type(int type) const
@@ -593,7 +569,6 @@ bool FwdCoilSet::is_planar_coil_type(int type) const
             return this->coils[k]->coil_class == FWD_COILC_PLANAR_GRAD;
     return false;
 }
-
 
 //=============================================================================================================
 
@@ -609,7 +584,6 @@ bool FwdCoilSet::is_axial_coil_type(int type) const
     return false;
 }
 
-
 //=============================================================================================================
 
 bool FwdCoilSet::is_magnetometer_coil_type(int type) const
@@ -621,7 +595,6 @@ bool FwdCoilSet::is_magnetometer_coil_type(int type) const
             return this->coils[k]->coil_class == FWD_COILC_MAG;
     return false;
 }
-
 
 //=============================================================================================================
 

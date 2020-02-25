@@ -46,7 +46,6 @@
 #include <QSharedPointer>
 
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE SCSHAREDLIB
 //=============================================================================================================
@@ -62,7 +61,6 @@ public:
 
     typedef QSharedPointer<PluginInputData> SPtr;               /**< Shared pointer type for PluginInputData. */
     typedef QSharedPointer<const PluginInputData> ConstSPtr;    /**< Const shared pointer type for PluginInputData. */
-
 
     //=========================================================================================================
     /**

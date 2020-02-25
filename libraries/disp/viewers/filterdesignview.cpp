@@ -48,7 +48,6 @@
 
 #include <fiff/fiff_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -67,7 +66,6 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -75,7 +73,6 @@
 using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -101,7 +98,6 @@ FilterDesignView::FilterDesignView(const QString& sSettingsPath,
     loadSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 FilterDesignView::~FilterDesignView()
@@ -110,7 +106,6 @@ FilterDesignView::~FilterDesignView()
 
     delete ui;
 }
-
 
 //=============================================================================================================
 
@@ -138,7 +133,6 @@ void FilterDesignView::init(double dSFreq)
     updateFilterPlot();
 }
 
-
 //=============================================================================================================
 
 void FilterDesignView::setWindowSize(int iWindowSize)
@@ -152,7 +146,6 @@ void FilterDesignView::setWindowSize(int iWindowSize)
 
     //ui->m_spinBox_filterTaps->setValue(m_iWindowSize);
 }
-
 
 //=============================================================================================================
 
@@ -173,7 +166,6 @@ void FilterDesignView::setMaxFilterTaps(int iMaxNumberFilterTaps)
     filterParametersChanged();
 }
 
-
 //=============================================================================================================
 
 void FilterDesignView::setSamplingRate(double dSamplingRate)
@@ -188,7 +180,6 @@ void FilterDesignView::setSamplingRate(double dSamplingRate)
         ui->m_doubleSpinBox_lowpass->setValue(m_dSFreq/2);
     }
 }
-
 
 //=============================================================================================================
 
@@ -231,7 +222,6 @@ void FilterDesignView::setFilterParameters(double hp,
     filterParametersChanged();
 }
 
-
 //=============================================================================================================
 
 FilterData FilterDesignView::getCurrentFilter()
@@ -239,14 +229,12 @@ FilterData FilterDesignView::getCurrentFilter()
     return m_filterData;
 }
 
-
 //=============================================================================================================
 
 QString FilterDesignView::getChannelType()
 {
     return ui->m_comboBox_filterApplyTo->currentText();
 }
-
 
 //=============================================================================================================
 
@@ -267,7 +255,6 @@ void FilterDesignView::saveSettings(const QString& settingsPath)
     settings.setValue(settingsPath + QString("/filterChannelType"), getChannelType());
     settings.setValue(settingsPath + QString("/FilterDesignViewPos"), this->pos());
 }
-
 
 //=============================================================================================================
 
@@ -298,7 +285,6 @@ void FilterDesignView::loadSettings(const QString& settingsPath)
     }
 }
 
-
 //=============================================================================================================
 
 void FilterDesignView::initSpinBoxes()
@@ -325,7 +311,6 @@ void FilterDesignView::initSpinBoxes()
     ui->m_doubleSpinBox_transitionband->installEventFilter(this);
 }
 
-
 //=============================================================================================================
 
 void FilterDesignView::initButtons()
@@ -339,7 +324,6 @@ void FilterDesignView::initButtons()
     connect(ui->m_pushButton_loadFilter,&QPushButton::released,
                 this,&FilterDesignView::onBtnLoadFilter);
 }
-
 
 //=============================================================================================================
 
@@ -367,7 +351,6 @@ void FilterDesignView::initComboBoxes()
     ui->m_comboBox_filterApplyTo->setCurrentIndex(1);
 }
 
-
 //=============================================================================================================
 
 void FilterDesignView::initFilterPlot()
@@ -379,7 +362,6 @@ void FilterDesignView::initFilterPlot()
     updateFilterPlot();
 }
 
-
 //=============================================================================================================
 
 void FilterDesignView::resizeEvent(QResizeEvent* event)
@@ -387,7 +369,6 @@ void FilterDesignView::resizeEvent(QResizeEvent* event)
     Q_UNUSED(event);
     ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
-
 
 //=============================================================================================================
 
@@ -402,7 +383,6 @@ void FilterDesignView::keyPressEvent(QKeyEvent * event)
     }
 }
 
-
 //=============================================================================================================
 
 void FilterDesignView::updateFilterPlot()
@@ -415,7 +395,6 @@ void FilterDesignView::updateFilterPlot()
 
     ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
-
 
 //=============================================================================================================
 
@@ -475,7 +454,6 @@ void FilterDesignView::changeStateSpinBoxes(int currentIndex)
 
     filterParametersChanged();
 }
-
 
 //=============================================================================================================
 
@@ -575,14 +553,12 @@ void FilterDesignView::filterParametersChanged()
     updateFilterPlot();
 }
 
-
 //=============================================================================================================
 
 void FilterDesignView::onSpinBoxFilterChannelType(const QString& channelType)
 {
     emit filterChannelTypeChanged(channelType);
 }
-
 
 //=============================================================================================================
 
@@ -621,7 +597,6 @@ void FilterDesignView::onBtnExportFilterPlot()
     }
 }
 
-
 //=============================================================================================================
 
 void FilterDesignView::onBtnExportFilterCoefficients()
@@ -648,7 +623,6 @@ void FilterDesignView::onBtnExportFilterCoefficients()
 
     FilterIO::writeFilter(fileName, filterWriteTemp);
 }
-
 
 //=============================================================================================================
 

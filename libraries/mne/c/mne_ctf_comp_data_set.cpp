@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -48,16 +47,13 @@
 
 #include <fiff/fiff_types.h>
 
-
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QFile>
-
 
 
 #ifndef TRUE
@@ -69,7 +65,6 @@
 #endif
 
 
-
 #ifndef FAIL
 #define FAIL -1
 #endif
@@ -78,18 +73,13 @@
 #define OK 0
 #endif
 
-
 #define MALLOC_32(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC_32(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
-
 #define FREE_32(x) if ((char *)(x) != NULL) free((char *)(x))
-
 
 #define FREE_CMATRIX_32(m) mne_free_cmatrix_32((m))
 #define ALLOC_CMATRIX_32(x,y) mne_cmatrix_32((x),(y))
-
-
 
 
 
@@ -128,7 +118,6 @@ float **mne_cmatrix_32(int nr,int nc)
     return m;
 }
 
-
 void mne_free_cmatrix_32 (float **m)
 {
     if (m) {
@@ -140,8 +129,6 @@ void mne_free_cmatrix_32 (float **m)
 
 
 
-
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -149,11 +136,6 @@ void mne_free_cmatrix_32 (float **m)
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
-
-
-
-
-
 
 
 
@@ -331,7 +313,6 @@ bad : {
 }
 
 
-
 #define MNE_CTFV_COMP_UNKNOWN -1
 #define MNE_CTFV_COMP_NONE    0
 #define MNE_CTFV_COMP_G1BR    0x47314252
@@ -351,7 +332,6 @@ static struct {
 { MNE_CTFV_COMP_UNKNOWN, MNE_CTFV_COMP_UNKNOWN }};
 
 
-
 int mne_unmap_ctf_comp_kind(int ctf_comp)
 
 {
@@ -362,10 +342,6 @@ int mne_unmap_ctf_comp_kind(int ctf_comp)
             return compMap[k].grad_comp;
     return ctf_comp;
 }
-
-
-
-
 
 
 
@@ -478,8 +454,6 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
 
 
 
-
-
 int  mne_sparse_mat_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
                           float           **mult,  /* Matrix to be multiplied */
                           int             ncol,	   /* How many columns in the above */
@@ -520,8 +494,6 @@ int  mne_sparse_mat_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
 
 
 
-
-
 float **mne_mat_mat_mult_32 (float **m1,float **m2,int d1,int d2,int d3)
 /* Matrix multiplication
       * result(d1 x d3) = m1(d1 x d2) * m2(d2 x d3) */
@@ -551,8 +523,6 @@ float **mne_mat_mat_mult_32 (float **m1,float **m2,int d1,int d2,int d3)
     return (result);
 #endif
 }
-
-
 
 
 
@@ -588,7 +558,6 @@ int  mne_sparse_vec_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
 }
 
 
-
 float mne_dot_vectors_32 (float *v1,
                        float *v2,
                        int   nn)
@@ -610,7 +579,6 @@ float mne_dot_vectors_32 (float *v1,
 
 
 
-
 void mne_mat_vec_mult2_32 (float **m,float *v,float *result, int d1,int d2)
 /*
       * Matrix multiplication
@@ -627,7 +595,6 @@ void mne_mat_vec_mult2_32 (float **m,float *v,float *result, int d1,int d2)
 
 
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -640,7 +607,6 @@ MneCTFCompDataSet::MneCTFCompDataSet()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -661,7 +627,6 @@ MneCTFCompDataSet::MneCTFCompDataSet(const MneCTFCompDataSet &set)
         this->current = new MneCTFCompData(*set.current);
 }
 
-
 //=============================================================================================================
 
 MneCTFCompDataSet::~MneCTFCompDataSet()
@@ -674,7 +639,6 @@ MneCTFCompDataSet::~MneCTFCompDataSet()
     if(current)
         delete current;
 }
-
 
 //=============================================================================================================
 
@@ -800,7 +764,6 @@ good : {
         return set;
     }
 }
-
 
 //=============================================================================================================
 
@@ -977,7 +940,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 int MneCTFCompDataSet::mne_set_ctf_comp(QList<FIFFLIB::FiffChInfo>& chs,
@@ -999,7 +961,6 @@ int MneCTFCompDataSet::mne_set_ctf_comp(QList<FIFFLIB::FiffChInfo>& chs,
             mne_explain_ctf_comp(mne_map_ctf_comp_kind(comp)),nset);
     return nset;
 }
-
 
 //=============================================================================================================
 
@@ -1091,7 +1052,6 @@ int MneCTFCompDataSet::mne_apply_ctf_comp(MneCTFCompDataSet *set, int do_it, flo
     return OK;
 }
 
-
 //=============================================================================================================
 
 int MneCTFCompDataSet::mne_apply_ctf_comp_t(MneCTFCompDataSet *set, int do_it, float **data, int ndata, int ns)      /* Number of samples */
@@ -1182,7 +1142,6 @@ int MneCTFCompDataSet::mne_apply_ctf_comp_t(MneCTFCompDataSet *set, int do_it, f
     return OK;
 }
 
-
 //=============================================================================================================
 
 int MneCTFCompDataSet::mne_get_ctf_comp(const QList<FIFFLIB::FiffChInfo> &chs, int nch)
@@ -1207,7 +1166,6 @@ int MneCTFCompDataSet::mne_get_ctf_comp(const QList<FIFFLIB::FiffChInfo> &chs, i
     return res;
 }
 
-
 //=============================================================================================================
 
 int MneCTFCompDataSet::mne_map_ctf_comp_kind(int grad)
@@ -1222,7 +1180,6 @@ int MneCTFCompDataSet::mne_map_ctf_comp_kind(int grad)
             return compMap[k].ctf_comp;
     return grad;
 }
-
 
 //=============================================================================================================
 
@@ -1244,7 +1201,6 @@ const char *MneCTFCompDataSet::mne_explain_ctf_comp(int kind)
             return explain[k].expl;
     return explain[k].expl;
 }
-
 
 //=============================================================================================================
 

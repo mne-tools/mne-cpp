@@ -59,13 +59,11 @@
 
 #include <utils/filterTools/filterdata.h>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -82,7 +80,6 @@
 #include <QSettings>
 #include <QEvent>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -92,7 +89,6 @@ using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -175,7 +171,6 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     m_bHideBadChannels = false;
 }
 
-
 //=============================================================================================================
 
 RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
@@ -192,14 +187,12 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
     }
 }
 
-
 //=============================================================================================================
 
 void RealTimeEvokedSetWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     getData();
 }
-
 
 //=============================================================================================================
 
@@ -226,7 +219,6 @@ void RealTimeEvokedSetWidget::getData()
         m_pEvokedSetModel->setEvokedSet(pEvokedSet);
     }
 }
-
 
 //=============================================================================================================
 
@@ -416,7 +408,6 @@ void RealTimeEvokedSetWidget::init()
     }
 }
 
-
 //=============================================================================================================
 
 void RealTimeEvokedSetWidget::showSensorSelectionWidget()
@@ -428,7 +419,6 @@ void RealTimeEvokedSetWidget::showSensorSelectionWidget()
     m_pChannelSelectionView->show();
 }
 
-
 //=============================================================================================================
 
 void RealTimeEvokedSetWidget::showQuickControlWidget()
@@ -436,7 +426,6 @@ void RealTimeEvokedSetWidget::showQuickControlWidget()
     m_pQuickControlView->raise();
     m_pQuickControlView->show();
 }
-
 
 //=============================================================================================================
 
@@ -471,7 +460,6 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
 
     m_pButterflyView->takeScreenshot(fileName);
 }
-
 
 //=============================================================================================================
 

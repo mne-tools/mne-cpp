@@ -40,16 +40,13 @@
 #include "../../../../helpers/geometryinfo/geometryinfo.h"
 #include "../../../../helpers/interpolation/interpolation.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -59,7 +56,6 @@ using namespace DISP3DLIB;
 using namespace MNELIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -72,7 +68,6 @@ RtSensorInterpolationMatWorker::RtSensorInterpolationMatWorker()
     m_lInterpolationData.interpolationFunction = DISP3DLIB::Interpolation::cubic;
     m_lInterpolationData.matDistanceMatrix = QSharedPointer<MatrixXd>(new MatrixXd());
 }
-
 
 //=============================================================================================================
 
@@ -97,7 +92,6 @@ void RtSensorInterpolationMatWorker::setInterpolationFunction(const QString &sIn
     }
 }
 
-
 //=============================================================================================================
 
 void RtSensorInterpolationMatWorker::setCancelDistance(double dCancelDist)
@@ -107,7 +101,6 @@ void RtSensorInterpolationMatWorker::setCancelDistance(double dCancelDist)
     //recalculate everything because parameters changed
     calculateInterpolationOperator();
 }
-
 
 //=============================================================================================================
 
@@ -150,7 +143,6 @@ void RtSensorInterpolationMatWorker::setInterpolationInfo(const Eigen::MatrixX3f
     calculateInterpolationOperator();
 }
 
-
 //=============================================================================================================
 
 void RtSensorInterpolationMatWorker::setBadChannels(const FiffInfo& info)
@@ -183,7 +175,6 @@ void RtSensorInterpolationMatWorker::setBadChannels(const FiffInfo& info)
     emitMatrix();
 }
 
-
 //=============================================================================================================
 
 void RtSensorInterpolationMatWorker::calculateInterpolationOperator()
@@ -206,7 +197,6 @@ void RtSensorInterpolationMatWorker::calculateInterpolationOperator()
 
     emitMatrix();
 }
-
 
 //=============================================================================================================
 

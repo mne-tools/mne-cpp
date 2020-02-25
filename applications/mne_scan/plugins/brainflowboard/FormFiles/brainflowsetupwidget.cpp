@@ -43,13 +43,11 @@
 
 #include "board_shim.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace BRAINFLOWBOARDPLUGIN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -83,7 +81,6 @@ BrainFlowSetupWidget::BrainFlowSetupWidget(BrainFlowBoard *board, QWidget *paren
     connect(ui->releaseSession, &QPushButton::clicked, this, &BrainFlowSetupWidget::releaseSession);
 }
 
-
 //=============================================================================================================
 
 BrainFlowSetupWidget::~BrainFlowSetupWidget()
@@ -91,14 +88,12 @@ BrainFlowSetupWidget::~BrainFlowSetupWidget()
     delete ui;
 }
 
-
 //=============================================================================================================
 
 void BrainFlowSetupWidget::releaseSession()
 {
     m_pBrainFlowBoard->releaseSession();
 }
-
 
 //=============================================================================================================
 

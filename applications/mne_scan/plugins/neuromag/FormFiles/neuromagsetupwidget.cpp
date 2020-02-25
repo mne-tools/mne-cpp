@@ -45,7 +45,6 @@
 #include <communication/rtClient/rtcmdclient.h>
 #include <fiff/fiff_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -54,13 +53,11 @@
 #include <QDebug>
 #include <QComboBox>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace NEUROMAGPLUGIN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -101,7 +98,6 @@ NeuromagSetupWidget::NeuromagSetupWidget(Neuromag* p_pNeuromag, QWidget* parent)
     this->init();
 }
 
-
 //=============================================================================================================
 
 NeuromagSetupWidget::~NeuromagSetupWidget()
@@ -109,14 +105,12 @@ NeuromagSetupWidget::~NeuromagSetupWidget()
 
 }
 
-
 //=============================================================================================================
 
 void NeuromagSetupWidget::init()
 {
     cmdConnectionChanged(m_pNeuromag->m_bCmdClientIsConnected);
 }
-
 
 //=============================================================================================================
 
@@ -131,7 +125,6 @@ void NeuromagSetupWidget::bufferSizeEdited()
         ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pNeuromag->m_iBufferSize));
 }
 
-
 //=============================================================================================================
 
 void NeuromagSetupWidget::pressedConnect()
@@ -145,7 +138,6 @@ void NeuromagSetupWidget::pressedConnect()
     }
 }
 
-
 //=============================================================================================================
 
 void NeuromagSetupWidget::pressedSendCLI()
@@ -158,7 +150,6 @@ void NeuromagSetupWidget::pressedSendCLI()
     }
 }
 
-
 //=============================================================================================================
 
 void NeuromagSetupWidget::printToLog(QString logMsg)
@@ -169,7 +160,6 @@ void NeuromagSetupWidget::printToLog(QString logMsg)
     c.movePosition(QTextCursor::End);
     ui.m_qTextBrowser_ServerMessage->setTextCursor(c);
 }
-
 
 //=============================================================================================================
 
@@ -236,7 +226,6 @@ void NeuromagSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
     }
 }
 
-
 //=============================================================================================================
 
 void NeuromagSetupWidget::fiffInfoReceived()
@@ -244,7 +233,6 @@ void NeuromagSetupWidget::fiffInfoReceived()
     if(m_pNeuromag->m_pFiffInfo)
         this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pNeuromag->m_pFiffInfo->sfreq));
 }
-
 
 //=============================================================================================================
 

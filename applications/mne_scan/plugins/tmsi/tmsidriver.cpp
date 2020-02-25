@@ -40,13 +40,11 @@
 #include "tmsidriver.h"
 #include "tmsiproducer.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace TMSIPLUGIN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -117,14 +115,12 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
     cout << "Plugin TMSI - INFO - TMSIDriver() - Successfully loaded all DLL functions" << endl;
 }
 
-
 //=============================================================================================================
 
 TMSIDriver::~TMSIDriver()
 {
     //cout << "TMSIDriver::~TMSIDriver()" << endl;
 }
-
 
 //=============================================================================================================
 
@@ -302,7 +298,6 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     return true;
 }
 
-
 //=============================================================================================================
 
 bool TMSIDriver::uninitDevice()
@@ -354,7 +349,6 @@ bool TMSIDriver::uninitDevice()
     cout << "Plugin TMSI - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
     return true;
 }
-
 
 //=============================================================================================================
 

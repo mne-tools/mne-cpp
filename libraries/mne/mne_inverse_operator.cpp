@@ -44,7 +44,6 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -52,13 +51,11 @@
 #include <QFuture>
 #include <QtConcurrent>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/SVD>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -69,7 +66,6 @@ using namespace MNELIB;
 using namespace FIFFLIB;
 using namespace FSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -95,7 +91,6 @@ MNEInverseOperator::MNEInverseOperator()
     qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }
 
-
 //=============================================================================================================
 
 MNEInverseOperator::MNEInverseOperator(QIODevice& p_IODevice)
@@ -104,7 +99,6 @@ MNEInverseOperator::MNEInverseOperator(QIODevice& p_IODevice)
     qRegisterMetaType<QSharedPointer<MNELIB::MNEInverseOperator> >("QSharedPointer<MNELIB::MNEInverseOperator>");
     qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }
-
 
 //=============================================================================================================
 
@@ -120,7 +114,6 @@ MNEInverseOperator::MNEInverseOperator(const FiffInfo &info,
     qRegisterMetaType<QSharedPointer<MNELIB::MNEInverseOperator> >("QSharedPointer<MNELIB::MNEInverseOperator>");
     qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }
-
 
 //=============================================================================================================
 
@@ -154,14 +147,12 @@ MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOpe
     qRegisterMetaType<MNELIB::MNEInverseOperator>("MNELIB::MNEInverseOperator");
 }
 
-
 //=============================================================================================================
 
 MNEInverseOperator::~MNEInverseOperator()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -223,7 +214,6 @@ bool MNEInverseOperator::assemble_kernel(const Label &label,
             }
             src_sel = src_sel_new;
         }
-
 
         for(qint32 i = 0; i < src_sel.size(); ++i)
         {
@@ -313,7 +303,6 @@ bool MNEInverseOperator::assemble_kernel(const Label &label,
     return true;
 }
 
-
 //=============================================================================================================
 
 bool MNEInverseOperator::check_ch_names(const FiffInfo &info) const
@@ -359,7 +348,6 @@ bool MNEInverseOperator::check_ch_names(const FiffInfo &info) const
     return true;
 }
 
-
 //=============================================================================================================
 
 MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, QString p_sMethod) const
@@ -402,7 +390,6 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
 //        t_G_Whitened = p_outWhitener*t_G_Whitened;
 //        t_bUseWhitened = true;
 //    }
-
 
 
     //
@@ -510,7 +497,6 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
             }
         }
 
-
         //
         // Calculate clusters
         //
@@ -575,7 +561,6 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
 
             }
 
-
             //
             // Assign partial G to new LeadField
             //
@@ -624,7 +609,6 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
         printf("[done]\n");
     }
 
-
     //
     // Cluster operator D (sources x clusters)
     //
@@ -660,7 +644,6 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
 //            std::cout << "idx_sel]:\n" << idx_sel << std::endl;
 
 
-
             double selectWeight = 1.0/idx_sel.size();
             if(this->isFixedOrient())
             {
@@ -694,7 +677,6 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
 
     return p_outMT;
 }
-
 
 //=============================================================================================================
 
@@ -940,7 +922,6 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
     return p_MNEInverseOperator;
 }
 
-
 //=============================================================================================================
 
 MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA) const
@@ -1114,7 +1095,6 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
 
     return inv;
 }
-
 
 //=============================================================================================================
 
@@ -1361,7 +1341,6 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     return true;
 }
 
-
 //=============================================================================================================
 
 void MNEInverseOperator::write(QIODevice &p_IODevice)
@@ -1375,7 +1354,6 @@ void MNEInverseOperator::write(QIODevice &p_IODevice)
     printf("Write inverse operator decomposition in %s...", t_pStream->streamName().toUtf8().constData());
     this->writeToStream(t_pStream.data());
 }
-
 
 //=============================================================================================================
 

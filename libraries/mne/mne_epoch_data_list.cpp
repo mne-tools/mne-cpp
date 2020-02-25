@@ -43,7 +43,6 @@
 
 #include <utils/mnemath.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,7 +50,6 @@
 #include <QPointer>
 #include <QtConcurrent>
 #include <QDebug>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -62,7 +60,6 @@ using namespace MNELIB;
 using namespace UTILSLIB;
 using namespace Eigen;
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -71,7 +68,6 @@ MNEEpochDataList::MNEEpochDataList()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -83,7 +79,6 @@ MNEEpochDataList::~MNEEpochDataList()
 //            delete (*i);
 //    }
 }
-
 
 //=============================================================================================================
 
@@ -180,7 +175,6 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
     return data;
 }
 
-
 //=============================================================================================================
 
 FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_t last, VectorXi sel, bool proj)
@@ -236,7 +230,6 @@ FiffEvoked MNEEpochDataList::average(FiffInfo& info, fiff_int_t first, fiff_int_
     return p_evoked;
 }
 
-
 //=============================================================================================================
 
 void MNEEpochDataList::applyBaselineCorrection(QPair<QVariant, QVariant>& baseline)
@@ -247,7 +240,6 @@ void MNEEpochDataList::applyBaselineCorrection(QPair<QVariant, QVariant>& baseli
         i.next()->applyBaselineCorrection(baseline);
     }
 }
-
 
 //=============================================================================================================
 
@@ -261,7 +253,6 @@ void MNEEpochDataList::dropRejected()
     }
 }
 
-
 //=============================================================================================================
 
 void MNEEpochDataList::pick_channels(const RowVectorXi& sel)
@@ -271,7 +262,6 @@ void MNEEpochDataList::pick_channels(const RowVectorXi& sel)
         i.next()->pick_channels(sel);
     }
 }
-
 
 //=============================================================================================================
 
@@ -359,7 +349,6 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
 
     return bReject;
 }
-
 
 //=============================================================================================================
 

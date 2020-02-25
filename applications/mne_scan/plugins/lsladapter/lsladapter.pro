@@ -108,7 +108,6 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
-
 win32 {
     INCLUDEPATH += C:/LSL/include/
 }
@@ -116,7 +115,6 @@ win32 {
 unix:!macx {
     INCLUDEPATH += /usr/local/LSL/include
 }
-
 
 OTHER_FILES += lsladapter.json
 

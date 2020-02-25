@@ -40,25 +40,21 @@
 
 #include "ui_connectivitysettingsview.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSettings>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -107,7 +103,6 @@ ConnectivitySettingsView::ConnectivitySettingsView(const QString& sSettingsPath,
     this->setMaximumWidth(330);
 }
 
-
 //=============================================================================================================
 
 ConnectivitySettingsView::~ConnectivitySettingsView()
@@ -116,7 +111,6 @@ ConnectivitySettingsView::~ConnectivitySettingsView()
 
     delete ui;
 }
-
 
 //=============================================================================================================
 
@@ -129,14 +123,12 @@ void ConnectivitySettingsView::setTriggerTypes(const QStringList& lTriggerTypes)
     }
 }
 
-
 //=============================================================================================================
 
 void ConnectivitySettingsView::setNumberTrials(int iNumberTrials)
 {
     ui->m_spinBox_numberTrials->setValue(iNumberTrials);
 }
-
 
 //=============================================================================================================
 
@@ -145,14 +137,12 @@ QString ConnectivitySettingsView::getConnectivityMetric()
     return ui->m_comboBox_method->currentText();
 }
 
-
 //=============================================================================================================
 
 QString ConnectivitySettingsView::getWindowType()
 {
     return ui->m_comboBox_windowType->currentText();
 }
-
 
 //=============================================================================================================
 
@@ -161,14 +151,12 @@ int ConnectivitySettingsView::getNumberTrials()
     return ui->m_spinBox_numberTrials->value();
 }
 
-
 //=============================================================================================================
 
 QString ConnectivitySettingsView::getTriggerType()
 {
     return ui->m_comboBox_triggerType->currentText();
 }
-
 
 //=============================================================================================================
 
@@ -177,14 +165,12 @@ double ConnectivitySettingsView::getLowerFreq()
     return ui->m_spinBox_freqLow->value();
 }
 
-
 //=============================================================================================================
 
 double ConnectivitySettingsView::getUpperFreq()
 {
     return ui->m_spinBox_freqHigh->value();
 }
-
 
 //=============================================================================================================
 
@@ -203,7 +189,6 @@ void ConnectivitySettingsView::saveSettings(const QString& settingsPath)
     settings.setValue(settingsPath + QString("/connFreqLow"), ui->m_spinBox_freqLow->value());
     settings.setValue(settingsPath + QString("/connFreqHigh"), ui->m_spinBox_freqHigh->value());
 }
-
 
 //=============================================================================================================
 
@@ -224,7 +209,6 @@ void ConnectivitySettingsView::loadSettings(const QString& settingsPath)
     ui->m_spinBox_freqHigh->setValue(settings.value(settingsPath + QString("/connFreqHigh"), 13.0).toDouble());
 }
 
-
 //=============================================================================================================
 
 void ConnectivitySettingsView::onMetricChanged(const QString& sMetric)
@@ -233,7 +217,6 @@ void ConnectivitySettingsView::onMetricChanged(const QString& sMetric)
     saveSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 void ConnectivitySettingsView::onWindowTypeChanged(const QString& sWindowType)
@@ -241,7 +224,6 @@ void ConnectivitySettingsView::onWindowTypeChanged(const QString& sWindowType)
     emit windowTypeChanged(sWindowType);
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 
@@ -257,7 +239,6 @@ void ConnectivitySettingsView::onNumberTrialsChanged()
     saveSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 void ConnectivitySettingsView::onTriggerTypeChanged(const QString& sTriggerType)
@@ -265,7 +246,6 @@ void ConnectivitySettingsView::onTriggerTypeChanged(const QString& sTriggerType)
     emit triggerTypeChanged(sTriggerType);
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 

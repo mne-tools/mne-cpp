@@ -48,13 +48,11 @@
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_tag.h>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -62,7 +60,6 @@
 
 #include <QSharedPointer>
 #include <QString>
-
 
 
 #define FWD_BEM_UNKNOWN           -1
@@ -74,7 +71,6 @@
 #define FWD_BEM_LIN_FIELD_SIMPLE    1
 #define FWD_BEM_LIN_FIELD_FERGUSON  2
 #define FWD_BEM_LIN_FIELD_URANKAR   3
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -101,7 +97,6 @@ namespace FWDLIB
 //=============================================================================================================
 
 class FwdEegSphereModel;
-
 
 //=============================================================================================================
 /**
@@ -138,8 +133,6 @@ public:
 
 
 
-
-
 //char *fwd_bem_make_bem_name(char *name)
 ///*
 // * Make a standard BEM file name
@@ -158,9 +151,7 @@ public:
 //    return s2;
 //}
 
-
     static QString fwd_bem_make_bem_sol_name(const QString& name);
-
 
 
     //============================= fwd_bem_model.c =============================
@@ -176,7 +167,6 @@ public:
      */
     // Refactored: fwd_bem_find_surface (fwd_bem_model.c)
     MNELIB::MneSurfaceOld* fwd_bem_find_surface(int kind);
-
 
     static FwdBemModel* fwd_bem_load_surfaces(const QString& name,
                                       int  *kinds,
@@ -230,7 +220,6 @@ public:
                                     int   *ntri);
 
     static float **fwd_bem_homog_solution (float **solids,int ntri);
-
 
     static void fwd_bem_ip_modify_solution(float **solution,    /* The original solution */
                                     float **ip_solution,        /* The isolated problem solution */
@@ -385,7 +374,6 @@ public:
     static int fwd_bem_specify_coils(FwdBemModel* m,
                               FwdCoilSet*  coils);
 
-
     #define MAG_FACTOR 1e-7         /* \mu_0/4\pi */
 
     static void fwd_bem_lin_field_calc(float       *rd,
@@ -408,19 +396,16 @@ public:
                         float       *ygrad,
                         float       *zgrad);
 
-
     static float fwd_bem_inf_field_der(float *rd,      /* Dipole position */
                        float *Q,	   /* Dipole moment */
                        float *rp,	   /* Field point */
                        float *dir,     /* Which field component */
                        float *comp);
 
-
     static float fwd_bem_inf_pot_der (float *rd,   /* Dipole position */
                                float *Q,    /* Dipole moment */
                                float *rp,   /* Potential point */
                                float *comp);
-
 
     static void fwd_bem_lin_field_grad_calc(float       *rd,
                                             float       *Q,
@@ -429,7 +414,6 @@ public:
                                             float       *xgrad,
                                             float       *ygrad,
                                             float       *zgrad);
-
 
     static int fwd_bem_field(float       *rd,	/* Dipole position */
                       float       *Q,	/* Dipole orientation */
@@ -472,7 +456,6 @@ public:
                                     bool                use_threads, /* Parallelize with threads? */
                                     MNELIB::MneNamedMatrix*     *resp,       /* The results */
                                     MNELIB::MneNamedMatrix*     *resp_grad);
-
 
     //============================= fwd_spherefield.c =============================
     // TODO location of these functions need to be checked -> evtl moving to more suitable space
@@ -559,11 +542,9 @@ public:
 //} *FwdBemModel*,FwdBemModel*Rec;      /* Holds the BEM model definition */
 };
 
-
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 
 } // NAMESPACE FWDLIB
 

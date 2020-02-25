@@ -48,7 +48,6 @@
 #include <scShared/Interfaces/IAlgorithm.h>
 #include <scShared/Interfaces/IIO.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -60,13 +59,11 @@
 #include <QDir>
 #include <QSettings>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNESCAN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -121,7 +118,6 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager, SCSHAREDLIB::Pl
     m_pGraphicsView->ensureVisible(m_pPluginScene->itemsBoundingRect());
 }
 
-
 //=============================================================================================================
 
 PluginGui::~PluginGui()
@@ -157,7 +153,6 @@ PluginGui::~PluginGui()
         delete m_pGraphicsView;
 }
 
-
 //=============================================================================================================
 
 void PluginGui::clearScene()
@@ -175,7 +170,6 @@ void PluginGui::clearScene()
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -291,7 +285,6 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
     }
 }
 
-
 //=============================================================================================================
 
 void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
@@ -355,7 +348,6 @@ void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
     out << xml;
 }
 
-
 //=============================================================================================================
 
 void PluginGui::uiSetupRunningState(bool state)
@@ -373,7 +365,6 @@ void PluginGui::uiSetupRunningState(bool state)
         deleteAction->setEnabled(true);
     }
 }
-
 
 //=============================================================================================================
 
@@ -410,7 +401,6 @@ bool PluginGui::removePlugin(SCSHAREDLIB::IPlugin::SPtr pPlugin)
     return bRemoved;
 }
 
-
 //=============================================================================================================
 
 void PluginGui::actionGroupTriggered(QAction* action)
@@ -418,7 +408,6 @@ void PluginGui::actionGroupTriggered(QAction* action)
     m_pPluginScene->setActionPluginItem(action);
     m_pPluginScene->setMode(PluginScene::InsertPluginItem);
 }
-
 
 //=============================================================================================================
 
@@ -428,7 +417,6 @@ void PluginGui::itemInserted(PluginItem *item)
     m_pButtonGroupPointers->button(int(PluginScene::MovePluginItem))->setChecked(true);
     m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 }
-
 
 //=============================================================================================================
 
@@ -459,7 +447,6 @@ void PluginGui::newItemSelected()
         emit selectedConnectionChanged(m_pCurrentConnection);
     }
 }
-
 
 //=============================================================================================================
 
@@ -494,14 +481,12 @@ void PluginGui::deleteItem()
      }
 }
 
-
 //=============================================================================================================
 
 void PluginGui::pointerGroupClicked(int)
 {
     m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 }
-
 
 //=============================================================================================================
 
@@ -521,7 +506,6 @@ void PluginGui::bringToFront()
     selectedItem->setZValue(zValue);
 }
 
-
 //=============================================================================================================
 
 void PluginGui::sendToBack()
@@ -539,7 +523,6 @@ void PluginGui::sendToBack()
     }
     selectedItem->setZValue(zValue);
 }
-
 
 //=============================================================================================================
 
@@ -562,7 +545,6 @@ void PluginGui::createActions()
     connect(sendBackAction, &QAction::triggered, this, &PluginGui::sendToBack);
 }
 
-
 //=============================================================================================================
 
 void PluginGui::createMenuItem()
@@ -573,7 +555,6 @@ void PluginGui::createMenuItem()
     m_pMenuItem->addAction(toFrontAction);
     m_pMenuItem->addAction(sendBackAction);
 }
-
 
 //=============================================================================================================
 
@@ -679,7 +660,6 @@ void PluginGui::createToolbars()
 
     addToolBar(Qt::LeftToolBarArea, m_pToolBarItem);
 }
-
 
 //=============================================================================================================
 

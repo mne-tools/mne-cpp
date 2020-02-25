@@ -43,13 +43,11 @@
 #include <fiff/fiff_ch_info.h>
 #include <stdio.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -59,13 +57,10 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace FWDLIB;
 
-
 #define MALLOC_5(x,t) (t *)malloc((x)*sizeof(t))
-
 
 #define FREE_5(x) if ((char *)(x) != NULL) free((char *)(x))
 #define FREE_CMATRIX_5(m) mne_free_cmatrix_5((m))
-
 
 #define ALLOC_CMATRIX_5(x,y) mne_cmatrix_5((x),(y))
 
@@ -73,17 +68,14 @@ using namespace FWDLIB;
 #define Y_5 1
 #define Z_5 2
 
-
 #define VEC_DOT_5(x,y) ((x)[X_5]*(y)[X_5] + (x)[Y_5]*(y)[Y_5] + (x)[Z_5]*(y)[Z_5])
 #define VEC_LEN_5(x) sqrt(VEC_DOT_5(x,x))
-
 
 #define VEC_COPY_5(to,from) {\
     (to)[X_5] = (from)[X_5];\
     (to)[Y_5] = (from)[Y_5];\
     (to)[Z_5] = (from)[Z_5];\
     }
-
 
 static void matrix_error_5(int kind, int nr, int nc)
 
@@ -101,7 +93,6 @@ static void matrix_error_5(int kind, int nr, int nc)
     printf("Cannot continue. Sorry.\n");
     exit(1);
 }
-
 
 float **mne_cmatrix_5(int nr,int nc)
 
@@ -128,7 +119,6 @@ void mne_free_cmatrix_5 (float **m)
     }
 }
 
-
 static void normalize_5(float *rr)
 /*
       * Scale vector to unit length
@@ -142,7 +132,6 @@ static void normalize_5(float *rr)
     }
     return;
 }
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -171,7 +160,6 @@ FwdCoil::FwdCoil(int p_np)
     ey[1] = 1.0;
     ez[2] = 1.0;
 }
-
 
 //=============================================================================================================
 
@@ -205,7 +193,6 @@ FwdCoil::FwdCoil(const FwdCoil& p_FwdCoil)
     this->coord_frame = p_FwdCoil.coord_frame;
 }
 
-
 //=============================================================================================================
 
 FwdCoil::~FwdCoil()
@@ -214,7 +201,6 @@ FwdCoil::~FwdCoil()
     FREE_CMATRIX_5(cosmag);
     FREE_5(w);
 }
-
 
 //=============================================================================================================
 
@@ -277,7 +263,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 bool FwdCoil::is_axial_coil() const
@@ -287,7 +272,6 @@ bool FwdCoil::is_axial_coil() const
             this->coil_class == FWD_COILC_AXIAL_GRAD2);
 }
 
-
 //=============================================================================================================
 
 bool FwdCoil::is_magnetometer_coil() const
@@ -295,14 +279,12 @@ bool FwdCoil::is_magnetometer_coil() const
     return this->coil_class == FWD_COILC_MAG;
 }
 
-
 //=============================================================================================================
 
 bool FwdCoil::is_planar_coil() const
 {
     return this->coil_class == FWD_COILC_PLANAR_GRAD;
 }
-
 
 //=============================================================================================================
 

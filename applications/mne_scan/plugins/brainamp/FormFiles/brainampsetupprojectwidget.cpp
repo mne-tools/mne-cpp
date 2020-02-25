@@ -46,7 +46,6 @@
 #include <utils/layoutloader.h>
 #include <utils/layoutmaker.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -54,11 +53,9 @@
 #include <QFileDialog>
 #include <QDate>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -66,7 +63,6 @@
 
 using namespace BRAINAMPPLUGIN;
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -115,14 +111,12 @@ BrainAMPSetupProjectWidget::BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP, QWid
     initGui();
 }
 
-
 //=============================================================================================================
 
 BrainAMPSetupProjectWidget::~BrainAMPSetupProjectWidget()
 {
     delete ui;
 }
-
 
 //=============================================================================================================
 
@@ -164,7 +158,6 @@ void BrainAMPSetupProjectWidget::initGui()
         changeCardinalMode("Use electrode shift");
     }
 }
-
 
 //=============================================================================================================
 
@@ -209,7 +202,6 @@ void BrainAMPSetupProjectWidget::changeCardinalMode(const QString& text)
     this->adjustSize();
 }
 
-
 //=============================================================================================================
 
 void BrainAMPSetupProjectWidget::onCardinalComboBoxChanged()
@@ -223,7 +215,6 @@ void BrainAMPSetupProjectWidget::onCardinalComboBoxChanged()
 
     emit cardinalPointsChanged(sLPA, dLPAShift, sRPA, dRPAShift, sNasion, dNasionShift);
 }
-
 
 //=============================================================================================================
 
@@ -248,7 +239,6 @@ void BrainAMPSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath)
     ui->m_comboBox_Nasion->addItems(elcChannelNames);
 }
 
-
 //=============================================================================================================
 
 void BrainAMPSetupProjectWidget::addProject()
@@ -266,7 +256,6 @@ void BrainAMPSetupProjectWidget::addProject()
     ui->m_qComboBox_ProjectSelection->setCurrentIndex(ui->m_qComboBox_ProjectSelection->count()-1);
 }
 
-
 //=============================================================================================================
 
 void BrainAMPSetupProjectWidget::addSubject()
@@ -283,7 +272,6 @@ void BrainAMPSetupProjectWidget::addSubject()
     ui->m_qComboBox_SubjectSelection->addItem(list.at(list.size()-1));
     ui->m_qComboBox_SubjectSelection->setCurrentIndex(ui->m_qComboBox_SubjectSelection->count()-1);
 }
-
 
 //=============================================================================================================
 
@@ -303,7 +291,6 @@ void BrainAMPSetupProjectWidget::changeOutputFile()
     m_pBrainAMP->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
 }
 
-
 //=============================================================================================================
 
 void BrainAMPSetupProjectWidget::changeCap()
@@ -321,7 +308,6 @@ void BrainAMPSetupProjectWidget::changeCap()
     m_pBrainAMP->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
 }
 
-
 //=============================================================================================================
 
 void BrainAMPSetupProjectWidget::changeCardinalFile()
@@ -337,7 +323,6 @@ void BrainAMPSetupProjectWidget::changeCardinalFile()
     ui->m_lineEdit_cardinalFile->setText(path);
     m_pBrainAMP->m_sCardinalFilePath = ui->m_lineEdit_cardinalFile->text();
 }
-
 
 //=============================================================================================================
 
@@ -360,7 +345,6 @@ void BrainAMPSetupProjectWidget::generateFilePath(int index)
     ui->m_qLineEdit_FiffRecordFile->setText(resourcePath);
     m_pBrainAMP->m_sOutputFilePath = resourcePath;
 }
-
 
 //=============================================================================================================
 

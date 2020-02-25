@@ -45,11 +45,9 @@
 
 #include <disp/viewers/connectivitysettingsview.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -58,7 +56,6 @@
 using namespace DISP3DLIB;
 using namespace DISPLIB;
 using namespace CONNECTIVITYLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -74,13 +71,11 @@ NetworkView::NetworkView(QWidget* parent,
     this->setQuickControlWidgets(lWidgets);
 }
 
-
 //=============================================================================================================
 
 NetworkView::~NetworkView()
 {
 }
-
 
 //=============================================================================================================
 
@@ -94,7 +89,6 @@ QList<NetworkTreeItem*> NetworkView::addData(const QString& sSubject,
                                                tNetworkData);
 }
 
-
 //=============================================================================================================
 
 NetworkTreeItem* NetworkView::addData(const QString& sSubject,
@@ -106,7 +100,6 @@ NetworkTreeItem* NetworkView::addData(const QString& sSubject,
                                                sMeasurementSetName,
                                                tNetworkData);
 }
-
 
 //=============================================================================================================
 

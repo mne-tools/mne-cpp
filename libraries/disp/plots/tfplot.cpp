@@ -39,7 +39,6 @@
 
 #include "helpers/colormap.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -49,18 +48,15 @@
 #include <QGraphicsPixmapItem>
 #include <QDebug>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -101,7 +97,6 @@ TFplot::TFplot(Eigen::MatrixXd tf_matrix,
     calc_plot(zoomed_tf_matrix, sample_rate, cmap, lower_frq, upper_frq);
 }
 
-
 //=============================================================================================================
 
 TFplot::TFplot(Eigen::MatrixXd tf_matrix,
@@ -110,7 +105,6 @@ TFplot::TFplot(Eigen::MatrixXd tf_matrix,
 {   
     calc_plot(tf_matrix, sample_rate, cmap, 0, 0);
 }
-
 
 //=============================================================================================================
 
@@ -270,7 +264,6 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
 
     qreal scale_y = qreal(tf_pixmap->boundingRect().height()) / qreal(y_axis_values.length()-1);
 
-
     for(qint32 i = 0; i < y_axis_values.length(); i++) {
        y_axis_values.at(i)->setPos( -y_axis_values.last()->boundingRect().width()
                                     -0.5*y_axis_lines.last()->boundingRect().width()
@@ -301,12 +294,10 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
     axis_one_item->setPos( 1 + coeffs_item->boundingRect().width(), 0);
     //end coeffs picture
 
-
     view->fitInView(layout->contentsRect(),Qt::KeepAspectRatio);
     layout->addWidget(view);
     this->setLayout(layout);
 }
-
 
 //=============================================================================================================
 

@@ -42,7 +42,6 @@
 
 #include <fiff/fiff_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,11 +50,9 @@
 #include <QPalette>
 #include <QSettings>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -63,7 +60,6 @@
 
 using namespace DISPLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -83,7 +79,6 @@ TriggerDetectionView::TriggerDetectionView(const QString& sSettingsPath,
     this->setMaximumWidth(330);
 }
 
-
 //=============================================================================================================
 
 TriggerDetectionView::~TriggerDetectionView()
@@ -92,7 +87,6 @@ TriggerDetectionView::~TriggerDetectionView()
 
     delete ui;
 }
-
 
 //=============================================================================================================
 
@@ -139,7 +133,6 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
     }
 }
 
-
 //=============================================================================================================
 
 void TriggerDetectionView::setNumberDetectedTriggersAndTypes(int numberDetections, const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers)
@@ -160,7 +153,6 @@ void TriggerDetectionView::setNumberDetectedTriggersAndTypes(int numberDetection
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -185,7 +177,6 @@ void TriggerDetectionView::saveSettings(const QString& settingsPath)
     }
     settings.endGroup();
 }
-
 
 //=============================================================================================================
 
@@ -213,7 +204,6 @@ void TriggerDetectionView::loadSettings(const QString& settingsPath)
     onTriggerInfoChanged();
 }
 
-
 //=============================================================================================================
 
 void TriggerDetectionView::onTriggerInfoChanged()
@@ -225,7 +215,6 @@ void TriggerDetectionView::onTriggerInfoChanged()
 
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 
@@ -246,7 +235,6 @@ void TriggerDetectionView::onRealTimeTriggerColorChanged(bool state)
     onTriggerInfoChanged();
 }
 
-
 //=============================================================================================================
 
 void TriggerDetectionView::onRealTimeTriggerColorTypeChanged(const QString &value)
@@ -257,7 +245,6 @@ void TriggerDetectionView::onRealTimeTriggerColorTypeChanged(const QString &valu
     ui->m_pushButton_triggerColor->setPalette(*palette1);
     ui->m_pushButton_triggerColor->update();
 }
-
 
 //=============================================================================================================
 

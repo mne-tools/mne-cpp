@@ -46,10 +46,8 @@
 
 
 
-
 #define _USE_MATH_DEFINES
 #include <math.h>
-
 
 
 //=============================================================================================================
@@ -62,7 +60,6 @@ using namespace MNELIB;
 
 
 
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -70,7 +67,6 @@ using namespace MNELIB;
 #ifndef FALSE
 #define FALSE 0
 #endif
-
 
 #ifndef FAIL
 #define FAIL -1
@@ -80,14 +76,11 @@ using namespace MNELIB;
 #define OK 0
 #endif
 
-
 #define MALLOC_36(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC_36(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
 
-
 #define ALLOC_CMATRIX_36(x,y) mne_cmatrix_36((x),(y))
-
 
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -96,8 +89,6 @@ using namespace MNELIB;
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 #endif
-
-
 
 
 
@@ -117,7 +108,6 @@ static void matrix_error(int kind, int nr, int nc)
     printf("Cannot continue. Sorry.\n");
     exit(1);
 }
-
 
 float **mne_cmatrix_36(int nr,int nc)
 
@@ -140,13 +130,9 @@ float **mne_cmatrix_36(int nr,int nc)
 
 
 
-
-
 #define FREE_36(x) if ((char *)(x) != NULL) free((char *)(x))
 
-
 #define FREE_CMATRIX_36(m) mne_free_cmatrix_36((m))
-
 
 
 
@@ -157,8 +143,6 @@ void mne_free_cmatrix_36 (float **m)
         FREE_36(m);
     }
 }
-
-
 
 
 
@@ -176,7 +160,6 @@ typedef struct {
 } *ringBuf_36,ringBufRec_36;
 
 
-
 void mne_free_ring_buffer_36(void *thisp)
 
 {
@@ -192,7 +175,6 @@ void mne_free_ring_buffer_36(void *thisp)
     FREE_36(this_buf);
     return;
 }
-
 
 void mne_free_event(mneEvent e)
 {
@@ -217,7 +199,6 @@ void mne_free_event_list_36(mneEventList list)
 }
 
 
-
 void mne_free_name_list_36(char **list, int nlist)
 /*
  * Free a name list array
@@ -239,10 +220,7 @@ void mne_free_name_list_36(char **list, int nlist)
 
 
 
-
-
 //============================= misc_util.c =============================
-
 
 
 void mne_string_to_name_list(const QString& s, QStringList& listp,int &nlistp)
@@ -260,9 +238,6 @@ void mne_string_to_name_list(const QString& s, QStringList& listp,int &nlistp)
     nlistp = list.size();
     return;
 }
-
-
-
 
 
 
@@ -287,7 +262,6 @@ QString mne_name_list_to_string(const QStringList& list)
     return res;
 }
 
-
 QString mne_channel_names_to_string(const QList<FIFFLIB::FiffChInfo>& chs,
                                     int nch)
 /*
@@ -305,7 +279,6 @@ QString mne_channel_names_to_string(const QList<FIFFLIB::FiffChInfo>& chs,
 }
 
 
-
 void mne_channel_names_to_name_list(const QList<FIFFLIB::FiffChInfo>& chs,
                                     int nch,
                                     QStringList& listp,
@@ -321,10 +294,7 @@ void mne_channel_names_to_name_list(const QList<FIFFLIB::FiffChInfo>& chs,
 
 
 
-
-
 //============================= mne_apply_filter.c =============================
-
 
 typedef struct {
     float *freq_resp;		/* Frequency response */
@@ -383,11 +353,7 @@ int mne_compare_filters(mneFilterDef f1,
 
 
 
-
-
-
 //============================= mne_fft.c =============================
-
 
 void mne_fft_ana(float *data,int np, float **precalcp)
 /*
@@ -411,7 +377,6 @@ void mne_fft_ana(float *data,int np, float **precalcp)
         FREE_36(precalc);
     return;
 }
-
 
 void mne_fft_syn(float *data,int np, float **precalcp)
 /*
@@ -442,8 +407,6 @@ void mne_fft_syn(float *data,int np, float **precalcp)
         FREE_36(precalc);
     return;
 }
-
-
 
 
 
@@ -519,8 +482,6 @@ int mne_apply_filter(mneFilterDef filter, void *datap, float *data, int ns, int 
 
     return OK;
 }
-
-
 
 
 
@@ -638,8 +599,6 @@ void mne_create_filter_response(mneFilterDef    filter,
 
 
 
-
-
 //============================= mne_ringbuffer.c =============================
 
 typedef struct {
@@ -653,7 +612,6 @@ typedef struct {
     int        nbuf;
     int        next;
 } *ringBuf,ringBufRec;
-
 
 void mne_free_ring_buffer(void *thisp)
 
@@ -733,9 +691,7 @@ void mne_allocate_from_ring(void *ringp, int nrow, int ncol, float ***res)
 
 
 
-
 //============================= mne_raw_routines.c =============================
-
 
 
 int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
@@ -838,8 +794,6 @@ bad : {
 
 
 
-
-
 //============================= mne_process_bads.c =============================
 
 int mne_read_bad_channel_list_from_node(FiffStream::SPtr& stream,
@@ -894,9 +848,6 @@ int mne_read_bad_channel_list(const QString& name, QStringList& listp, int& nlis
 
 
 
-
-
-
 int  mne_sparse_vec_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
                           float           *vector, /* Vector to be multiplied */
                           float           *res)    /* Result of the multiplication */
@@ -927,8 +878,6 @@ int  mne_sparse_vec_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
         return -1;
     }
 }
-
-
 
 
 
@@ -974,13 +923,9 @@ int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
 
 
 
-
-
-
 #define APPROX_RING_BUF_SIZE (600*1024*1024)
 
 static int approx_ring_buf_size = APPROX_RING_BUF_SIZE;
-
 
 
 //=============================================================================================================
@@ -1021,7 +966,6 @@ MneRawData::MneRawData()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -1064,7 +1008,6 @@ MneRawData::~MneRawData()
     FREE_36(this->deriv_offsets);
 }
 
-
 //=============================================================================================================
 
 void MneRawData::mne_raw_add_filter_response(MneRawData *data, int *highpass_effective)
@@ -1095,7 +1038,6 @@ void MneRawData::mne_raw_add_filter_response(MneRawData *data, int *highpass_eff
                                &data->filter_data_free,
                                highpass_effective);
 }
-
 
 //=============================================================================================================
 
@@ -1156,7 +1098,6 @@ void MneRawData::setup_filter_bufs(MneRawData *data)
     return;
 }
 
-
 //=============================================================================================================
 
 int MneRawData::load_one_buffer(MneRawData *data, MneRawBufDef *buf)
@@ -1193,7 +1134,6 @@ int MneRawData::load_one_buffer(MneRawData *data, MneRawBufDef *buf)
     buf->comp_status = data->comp_file;
     return OK;
 }
-
 
 //=============================================================================================================
 
@@ -1245,7 +1185,6 @@ int MneRawData::compensate_buffer(MneRawData *data, MneRawBufDef *buf)
 bad :
     return FAIL;
 }
-
 
 //=============================================================================================================
 
@@ -1399,7 +1338,6 @@ int MneRawData::mne_raw_pick_data(MneRawData *data, mneChSelection sel, int firs
     return OK;
 }
 
-
 //=============================================================================================================
 
 int MneRawData::mne_raw_pick_data_proj(MneRawData *data, mneChSelection sel, int firsts, int ns, float **picked)
@@ -1529,7 +1467,6 @@ int MneRawData::mne_raw_pick_data_proj(MneRawData *data, mneChSelection sel, int
     return OK;
 }
 
-
 //=============================================================================================================
 
 int MneRawData::load_one_filt_buf(MneRawData *data, MneRawBufDef *buf)
@@ -1567,7 +1504,6 @@ int MneRawData::load_one_filt_buf(MneRawData *data, MneRawBufDef *buf)
     buf->valid = res == OK;
     return res;
 }
-
 
 //=============================================================================================================
 
@@ -1786,7 +1722,6 @@ bad : {
         return FAIL;
     }
 }
-
 
 //=============================================================================================================
 
@@ -2074,7 +2009,6 @@ bad : {
         return NULL;
     }
 }
-
 
 //=============================================================================================================
 

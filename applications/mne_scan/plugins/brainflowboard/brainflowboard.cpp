@@ -48,7 +48,6 @@
 
 #include <scMeas/realtimemultisamplearray.h>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -57,7 +56,6 @@ using namespace BRAINFLOWBOARDPLUGIN;
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -84,14 +82,12 @@ BrainFlowBoard::BrainFlowBoard()
     m_outputConnectors.append(m_pOutput);
 }
 
-
 //=============================================================================================================
 
 BrainFlowBoard::~BrainFlowBoard()
 {
     releaseSession(false);
 }
-
 
 //=============================================================================================================
 
@@ -101,7 +97,6 @@ void BrainFlowBoard::showSettings()
     widget->show();
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> BrainFlowBoard::clone() const
@@ -109,7 +104,6 @@ QSharedPointer<IPlugin> BrainFlowBoard::clone() const
     QSharedPointer<BrainFlowBoard> pClone(new BrainFlowBoard());
     return pClone;
 }
-
 
 //=============================================================================================================
 
@@ -119,13 +113,11 @@ void BrainFlowBoard::init()
     BoardShim::enable_dev_board_logger();
 }
 
-
 //=============================================================================================================
 
 void BrainFlowBoard::unload()
 {
 }
-
 
 //=============================================================================================================
 
@@ -234,7 +226,6 @@ void BrainFlowBoard::setUpFiffInfo()
     m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
 }
 
-
 //=============================================================================================================
 
 bool BrainFlowBoard::start()
@@ -260,7 +251,6 @@ bool BrainFlowBoard::start()
     return true;
 }
 
-
 //=============================================================================================================
 
 bool BrainFlowBoard::stop()
@@ -276,14 +266,12 @@ bool BrainFlowBoard::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType BrainFlowBoard::getType() const
 {
     return _ISensor;
 }
-
 
 //=============================================================================================================
 
@@ -292,7 +280,6 @@ QString BrainFlowBoard::getName() const
     return "BrainFlow Board Plugin";
 }
 
-
 //=============================================================================================================
 
 QWidget* BrainFlowBoard::setupWidget()
@@ -300,7 +287,6 @@ QWidget* BrainFlowBoard::setupWidget()
     BrainFlowSetupWidget* widget = new BrainFlowSetupWidget(this);
     return widget;
 }
-
 
 //=============================================================================================================
 
@@ -367,7 +353,6 @@ void BrainFlowBoard::prepareSession(BrainFlowInputParams params,
     msgBox.exec();
 }
 
-
 //=============================================================================================================
 
 void BrainFlowBoard::configureBoard(std::string config)
@@ -390,7 +375,6 @@ void BrainFlowBoard::configureBoard(std::string config)
     }
     msgBox.exec();
 }
-
 
 //=============================================================================================================
 
@@ -450,7 +434,6 @@ void BrainFlowBoard::run()
         m_pOutput->data()->setValue(matrix);
     }
 }
-
 
 //=============================================================================================================
 

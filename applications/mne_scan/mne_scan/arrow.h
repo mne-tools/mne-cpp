@@ -42,14 +42,12 @@
 #include "pluginitem.h"
 #include <scShared/Management/pluginconnectorconnection.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
 #include <QGraphicsLineItem>
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -61,7 +59,6 @@ class QGraphicsScene;
 class QRectF;
 class QGraphicsSceneMouseEvent;
 class QPainterPath;
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNESCAN

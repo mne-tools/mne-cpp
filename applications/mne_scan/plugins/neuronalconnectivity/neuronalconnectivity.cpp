@@ -56,16 +56,13 @@
 
 #include <disp/viewers/connectivitysettingsview.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -82,7 +79,6 @@ using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 using namespace FSLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -105,7 +101,6 @@ NeuronalConnectivity::NeuronalConnectivity()
     AbstractMetric::m_iNumberBinAmount = 100;
 }
 
-
 //=============================================================================================================
 
 NeuronalConnectivity::~NeuronalConnectivity()
@@ -115,7 +110,6 @@ NeuronalConnectivity::~NeuronalConnectivity()
     }
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> NeuronalConnectivity::clone() const
@@ -123,7 +117,6 @@ QSharedPointer<IPlugin> NeuronalConnectivity::clone() const
     QSharedPointer<NeuronalConnectivity> pNeuronalConnectivityClone(new NeuronalConnectivity);
     return pNeuronalConnectivityClone;
 }
-
 
 //=============================================================================================================
 
@@ -176,14 +169,12 @@ void NeuronalConnectivity::init()
     m_pCircularNetworkBuffer = QSharedPointer<CircularBuffer<CONNECTIVITYLIB::Network> >(new CircularBuffer<CONNECTIVITYLIB::Network>(10));
 }
 
-
 //=============================================================================================================
 
 void NeuronalConnectivity::unload()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -202,7 +193,6 @@ bool NeuronalConnectivity::start()
     return true;
 }
 
-
 //=============================================================================================================
 
 bool NeuronalConnectivity::stop()
@@ -212,14 +202,12 @@ bool NeuronalConnectivity::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType NeuronalConnectivity::getType() const
 {
     return _IAlgorithm;
 }
-
 
 //=============================================================================================================
 
@@ -228,7 +216,6 @@ QString NeuronalConnectivity::getName() const
     return "Connectivity";
 }
 
-
 //=============================================================================================================
 
 QWidget* NeuronalConnectivity::setupWidget()
@@ -236,7 +223,6 @@ QWidget* NeuronalConnectivity::setupWidget()
     NeuronalConnectivitySetupWidget* setupWidget = new NeuronalConnectivitySetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
-
 
 //=============================================================================================================
 
@@ -298,7 +284,6 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
         m_pRtConnectivity->append(m_connectivitySettings);
     }
 }
-
 
 //=============================================================================================================
 
@@ -367,7 +352,6 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -456,7 +440,6 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
     }
 }
 
-
 //=============================================================================================================
 
 void NeuronalConnectivity::generateNodeVertices()
@@ -497,7 +480,6 @@ void NeuronalConnectivity::generateNodeVertices()
     m_connectivitySettings.clearAllData();
 }
 
-
 //=============================================================================================================
 
 void NeuronalConnectivity::run()
@@ -533,7 +515,6 @@ void NeuronalConnectivity::run()
     }
 }
 
-
 //=============================================================================================================
 
 void NeuronalConnectivity::onNewConnectivityResultAvailable(const QList<Network>& connectivityResults,
@@ -547,7 +528,6 @@ void NeuronalConnectivity::onNewConnectivityResultAvailable(const QList<Network>
         m_pCircularNetworkBuffer->push(connectivityResults.at(i));
     }
 }
-
 
 //=============================================================================================================
 
@@ -565,14 +545,12 @@ void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
     }
 }
 
-
 //=============================================================================================================
 
 void NeuronalConnectivity::onNumberTrialsChanged(int iNumberTrials)
 {
     m_iNumberAverages = iNumberTrials;
 }
-
 
 //=============================================================================================================
 
@@ -584,7 +562,6 @@ void NeuronalConnectivity::onWindowTypeChanged(const QString& windowType)
     }
 }
 
-
 //=============================================================================================================
 
 void NeuronalConnectivity::onTriggerTypeChanged(const QString& triggerType)
@@ -594,7 +571,6 @@ void NeuronalConnectivity::onTriggerTypeChanged(const QString& triggerType)
         m_sAvrType = triggerType;
     }
 }
-
 
 //=============================================================================================================
 

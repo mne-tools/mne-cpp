@@ -45,7 +45,6 @@
 
 #include <utils/mnemath.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -56,11 +55,9 @@
 #include <QPushButton>
 #include <QDebug>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -71,7 +68,6 @@ using namespace DISP3DLIB;
 using namespace DISPLIB;
 using namespace Eigen;
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -80,7 +76,6 @@ Data3DTreeDelegate::Data3DTreeDelegate(QObject* parent)
 : QStyledItemDelegate(parent)
 {
 }
-
 
 //=============================================================================================================
 
@@ -317,7 +312,6 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
     return QStyledItemDelegate::createEditor(parent, option, index);
 }
 
-
 //=============================================================================================================
 
 void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
@@ -398,7 +392,6 @@ void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -618,7 +611,6 @@ void Data3DTreeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
     }
 }
 
-
 //=============================================================================================================
 
 void Data3DTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem &option, const QModelIndex& index) const
@@ -626,7 +618,6 @@ void Data3DTreeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptio
     QStyledItemDelegate::updateEditorGeometry(editor, option, index);
     //editor->setGeometry(option.rect);
 }
-
 
 //=============================================================================================================
 
@@ -636,6 +627,5 @@ void Data3DTreeDelegate::onEditorEdited()
         emit commitData(editor);
     }
 }
-
 
 

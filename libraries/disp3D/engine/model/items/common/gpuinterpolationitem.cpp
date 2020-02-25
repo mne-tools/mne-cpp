@@ -33,7 +33,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -41,7 +40,6 @@
 #include "gpuinterpolationitem.h"
 #include "../../materials/gpuinterpolationmaterial.h"
 #include "../../3dhelpers/custommesh.h"
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -54,11 +52,9 @@
 #include <Qt3DRender/QGeometryRenderer>
 #include <Qt3DRender/QBuffer>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -69,11 +65,9 @@ using namespace Qt3DRender;
 using namespace Qt3DCore;
 using namespace Eigen;
 
-
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -90,7 +84,6 @@ GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, i
 {
 }
 
-
 //=============================================================================================================
 
 GpuInterpolationItem::~GpuInterpolationItem()
@@ -99,7 +92,6 @@ GpuInterpolationItem::~GpuInterpolationItem()
     delete m_pOutputColorBuffer;
     delete m_pSignalDataBuffer;
 }
-
 
 //=============================================================================================================
 
@@ -149,7 +141,6 @@ void GpuInterpolationItem::initData(const MatrixX3f &matVertices,
 
     m_bIsDataInit = true;
 }
-
 
 //=============================================================================================================
 
@@ -213,7 +204,6 @@ void GpuInterpolationItem::setInterpolationMatrix(QSharedPointer<Eigen::SparseMa
     qDebug("GpuInterpolationItem::setInterpolationMatrix - finished");
 }
 
-
 //=============================================================================================================
 
 void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
@@ -237,7 +227,6 @@ void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
     m_pSignalDataBuffer->setData(bufferData);
 }
 
-
 //=============================================================================================================
 
 void GpuInterpolationItem::setThresholds(const QVector3D &tVecThresholds)
@@ -245,7 +234,6 @@ void GpuInterpolationItem::setThresholds(const QVector3D &tVecThresholds)
     this->setMaterialParameter(QVariant::fromValue(tVecThresholds.x()), QStringLiteral("fThresholdX"));
     this->setMaterialParameter(QVariant::fromValue(tVecThresholds.z()), QStringLiteral("fThresholdZ"));
 }
-
 
 //=============================================================================================================
 
@@ -264,7 +252,6 @@ void GpuInterpolationItem::setColormapType(const QString &tColormapType)
 
     this->setMaterialParameter(QVariant::fromValue(colorMapId), QStringLiteral("ColormapType"));
 }
-
 
 //=============================================================================================================
 
@@ -297,7 +284,6 @@ QByteArray GpuInterpolationItem::buildInterpolationMatrixBuffer(QSharedPointer<E
 
     return bufferData;
 }
-
 
 //=============================================================================================================
 

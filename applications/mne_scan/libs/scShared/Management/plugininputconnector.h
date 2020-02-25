@@ -45,13 +45,11 @@
 
 #include <scMeas/measurement.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE SCSHAREDLIB
@@ -105,13 +103,11 @@ public:
      */
     virtual bool isOutputConnector() const;
 
-
 signals:
     void notify(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 public slots:
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
-
 
 
 };

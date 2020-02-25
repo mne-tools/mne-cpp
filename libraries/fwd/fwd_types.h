@@ -12,7 +12,6 @@
 
 #include <mne/c/mne_ctf_comp_data_set.h>
 
-
 typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
 
 /*
@@ -22,7 +21,6 @@ typedef int (*fwdFieldFunc)(float *rd,float *Q,FWDLIB::FwdCoilSet* coils,float *
 typedef int (*fwdVecFieldFunc)(float *rd,FWDLIB::FwdCoilSet* coils,float **res,void *client);
 typedef int (*fwdFieldGradFunc)(float *rd,float *Q,FWDLIB::FwdCoilSet* coils, float *res,
                                 float *xgrad, float *ygrad, float *zgrad, void *client);
-
 
 
 //#define FWD_BEM_UNKNOWN           -1

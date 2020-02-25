@@ -44,7 +44,6 @@
 
 #include "utils_global.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -53,18 +52,15 @@
 #include <Eigen/SparseCore>
 #include <Eigen/SVD>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QVariant>
 
-
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
@@ -73,11 +69,9 @@
 namespace UTILSLIB
 {
 
-
 //=============================================================================================================
 // UTILSLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 //=============================================================================================================
 /**
@@ -425,7 +419,6 @@ Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v, bool desc)
     return idx;
 }
 
-
 //=============================================================================================================
 
 template<typename T>
@@ -445,7 +438,6 @@ Eigen::VectorXi MNEMath::sort(Eigen::Matrix<T, Eigen::Dynamic, 1> &v_prime, Eige
     return idx;
 }
 
-
 //=============================================================================================================
 
 template<typename T>
@@ -464,7 +456,6 @@ std::vector<Eigen::Triplet<T> > MNEMath::sortrows(const std::vector<Eigen::Tripl
     return p_ASorted;
 }
 
-
 //=============================================================================================================
 
 template<typename T>
@@ -472,7 +463,6 @@ inline bool MNEMath::compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs, 
 {
     return lhs.second > rhs.second;
 }
-
 
 //=============================================================================================================
 
@@ -482,7 +472,6 @@ inline bool MNEMath::compareIdxValuePairSmallerThan( const std::pair<int,T>& lhs
     return lhs.second < rhs.second;
 }
 
-
 //=============================================================================================================
 
 template<typename T>
@@ -490,7 +479,6 @@ inline bool MNEMath::compareTripletFirstEntry( const Eigen::Triplet<T>& lhs, con
 {
     return lhs.row() < rhs.row();
 }
-
 
 //=============================================================================================================
 
@@ -500,7 +488,6 @@ inline bool MNEMath::compareTripletSecondEntry( const Eigen::Triplet<T>& lhs, co
     return lhs.col() < rhs.col();
 }
 
-
 //=============================================================================================================
 
 template<typename T>
@@ -508,7 +495,6 @@ inline double MNEMath::log2( const T d)
 {
     return log(d)/log(2);
 }
-
 
 //=============================================================================================================
 
@@ -526,7 +512,6 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matRawData,
     MNEMath::histcounts(matrixName, bMakeSymmetrical, iClassAmount, vecResultClassLimits, vecResultFrequency, dGlobalMin, dGlobalMax);
 }
 
-
 //=============================================================================================================
 
 template<typename T>
@@ -542,7 +527,6 @@ void MNEMath::histcounts(const Eigen::Matrix<T, 1, Eigen::Dynamic>& matRawData,
     matrixName.row(0)= matRawData;
     MNEMath::histcounts(matrixName, bMakeSymmetrical, iClassAmount, vecResultClassLimits, vecResultFrequency, dGlobalMin, dGlobalMax);
 }
-
 
 //=============================================================================================================
 
@@ -651,7 +635,6 @@ void MNEMath::histcounts(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>&
         }
     }
 }
-
 
 //=============================================================================================================
 

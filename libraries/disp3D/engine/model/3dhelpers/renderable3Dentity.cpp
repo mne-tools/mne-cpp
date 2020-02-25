@@ -39,7 +39,6 @@
 
 #include "renderable3Dentity.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -48,11 +47,9 @@
 
 #include <fiff/fiff_coord_trans.h>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -67,7 +64,6 @@
 #include <Qt3DRender/QEffect>
 #include <Qt3DRender/QParameter>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -77,7 +73,6 @@ using namespace Eigen;
 using namespace Qt3DCore;
 using namespace FIFFLIB;
 using namespace Qt3DRender;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -92,14 +87,12 @@ Renderable3DEntity::Renderable3DEntity(Qt3DCore::QEntity* parent)
 {
 }
 
-
 //=============================================================================================================
 
 Renderable3DEntity::~Renderable3DEntity()
 {
     //releaseNode(this);
 }
-
 
 ////=============================================================================================================
 
@@ -122,7 +115,6 @@ Renderable3DEntity::~Renderable3DEntity()
 //    }
 //}
 
-
 //=============================================================================================================
 
 void Renderable3DEntity::setTransform(const Qt3DCore::QTransform& transform)
@@ -134,7 +126,6 @@ void Renderable3DEntity::setTransform(const Qt3DCore::QTransform& transform)
 
     m_pTransform->setMatrix(transform.matrix());
 }
-
 
 //=============================================================================================================
 
@@ -188,7 +179,6 @@ void Renderable3DEntity::setTransform(const FiffCoordTrans& transform, bool bApp
     m_pTransform->setMatrix(transform3d.matrix());
 }
 
-
 //=============================================================================================================
 
 void Renderable3DEntity::applyTransform(const Qt3DCore::QTransform& transform)
@@ -200,7 +190,6 @@ void Renderable3DEntity::applyTransform(const Qt3DCore::QTransform& transform)
 
     m_pTransform->setMatrix(transform.matrix() * m_pTransform->matrix());
 }
-
 
 
 
@@ -256,14 +245,12 @@ void Renderable3DEntity::applyTransform(const FiffCoordTrans& transform, bool bA
     m_pTransform->setMatrix(transform3d.matrix() * m_pTransform->matrix());
 }
 
-
 //=============================================================================================================
 
 float Renderable3DEntity::scaleValue() const
 {
     return m_fScale;
 }
-
 
 //=============================================================================================================
 
@@ -272,14 +259,12 @@ float Renderable3DEntity::rotX() const
     return m_fRotX;
 }
 
-
 //=============================================================================================================
 
 float Renderable3DEntity::rotY() const
 {
     return m_fRotY;
 }
-
 
 //=============================================================================================================
 
@@ -288,14 +273,12 @@ float Renderable3DEntity::rotZ() const
     return m_fRotZ;
 }
 
-
 //=============================================================================================================
 
 QVector3D Renderable3DEntity::position() const
 {
     return m_position;
 }
-
 
 //=============================================================================================================
 
@@ -310,7 +293,6 @@ void Renderable3DEntity::setRotX(float rotX)
     updateTransform();
 }
 
-
 //=============================================================================================================
 
 void Renderable3DEntity::setRotY(float rotY)
@@ -323,7 +305,6 @@ void Renderable3DEntity::setRotY(float rotY)
     emit rotYChanged(rotY);
     updateTransform();
 }
-
 
 //=============================================================================================================
 
@@ -338,7 +319,6 @@ void Renderable3DEntity::setRotZ(float rotZ)
     updateTransform();
 }
 
-
 //=============================================================================================================
 
 void Renderable3DEntity::setPosition(QVector3D position)
@@ -352,7 +332,6 @@ void Renderable3DEntity::setPosition(QVector3D position)
     updateTransform();
 }
 
-
 //=============================================================================================================
 
 void Renderable3DEntity::setVisible(bool state)
@@ -362,7 +341,6 @@ void Renderable3DEntity::setVisible(bool state)
     }
     this->setEnabled(state);
 }
-
 
 //=============================================================================================================
 
@@ -377,7 +355,6 @@ void Renderable3DEntity::setScale(float scale)
     updateTransform();
 }
 
-
 //=============================================================================================================
 
 void Renderable3DEntity::setMaterialParameter(const QVariant &data,
@@ -385,7 +362,6 @@ void Renderable3DEntity::setMaterialParameter(const QVariant &data,
 {
     setMaterialParameterRecursive(this, data, sParameterName);
 }
-
 
 //=============================================================================================================
 
@@ -395,7 +371,6 @@ QVariant Renderable3DEntity::getMaterialParameter(const QString &sParameterName)
 
     return resultPair.second;
 }
-
 
 //=============================================================================================================
 
@@ -413,7 +388,6 @@ void Renderable3DEntity::setMaterialParameterRecursive(QObject * pObject,
         setMaterialParameterRecursive(pObject->children().at(i), data, sParameterName);
     }
 }
-
 
 //=============================================================================================================
 
@@ -436,7 +410,6 @@ QPair<bool, QVariant> Renderable3DEntity::getMaterialParameterRecursive(QObject 
 
     return QPair<bool, QVariant>(false, QVariant());
 }
-
 
 //=============================================================================================================
 

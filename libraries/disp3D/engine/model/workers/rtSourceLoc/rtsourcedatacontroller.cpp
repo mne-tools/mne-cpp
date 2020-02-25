@@ -42,20 +42,17 @@
 
 #include <fs/label.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -64,7 +61,6 @@
 using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace FSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -176,7 +172,6 @@ RtSourceDataController::RtSourceDataController()
        m_rtInterpolationRightWorkerThread.start();
 }
 
-
 //=============================================================================================================
 
 RtSourceDataController::~RtSourceDataController()
@@ -189,7 +184,6 @@ RtSourceDataController::~RtSourceDataController()
     m_rtInterpolationRightWorkerThread.wait();
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataController::setStreamingState(bool bStreamingState)
@@ -201,14 +195,12 @@ void RtSourceDataController::setStreamingState(bool bStreamingState)
     }
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataController::setInterpolationFunction(const QString &sInterpolationFunction)
 {
     emit interpolationFunctionChanged(sInterpolationFunction);
 }
-
 
 //=============================================================================================================
 
@@ -217,14 +209,12 @@ void RtSourceDataController::setLoopState(bool bLoopState)
     emit loopStateChanged(bLoopState);
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataController::setCancelDistance(double dCancelDist)
 {
     emit cancelDistanceChanged(dCancelDist);
 }
-
 
 //=============================================================================================================
 
@@ -238,7 +228,6 @@ void RtSourceDataController::setTimeInterval(int iMSec)
     m_iMSecInterval = iMSec;
     m_timer.setInterval(m_iMSecInterval);
 }
-
 
 //=============================================================================================================
 
@@ -268,7 +257,6 @@ void RtSourceDataController::setInterpolationInfo(const MatrixX3f &matVerticesLe
                                        vecMappedSubsetRight);
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataController::setSurfaceColor(const MatrixX4f &matColorLeft,
@@ -277,7 +265,6 @@ void RtSourceDataController::setSurfaceColor(const MatrixX4f &matColorLeft,
     emit surfaceColorChanged(matColorLeft,
                              matColorRight);
 }
-
 
 //=============================================================================================================
 
@@ -297,14 +284,12 @@ void RtSourceDataController::setAnnotationInfo(const VectorXi &vecLabelIdsLeftHe
                                     vecVertNoRight);
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataController::setThresholds(const QVector3D &vecThresholds)
 {
     emit thresholdsChanged(vecThresholds);
 }
-
 
 //=============================================================================================================
 
@@ -313,14 +298,12 @@ void RtSourceDataController::setVisualizationType(int iVisType)
     emit visualizationTypeChanged(iVisType);
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataController::setColormapType(const QString &sColormapType)
 {
     emit colormapTypeChanged(sColormapType);
 }
-
 
 //=============================================================================================================
 
@@ -329,14 +312,12 @@ void RtSourceDataController::setNumberAverages(int iNumAvr)
     emit numberAveragesChanged(iNumAvr);
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataController::setSFreq(double dSFreq)
 {
     emit sFreqChanged(dSFreq);
 }
-
 
 //=============================================================================================================
 
@@ -345,14 +326,12 @@ void RtSourceDataController::setStreamSmoothedData(bool bStreamSmoothedData)
     emit streamSmoothedDataChanged(bStreamSmoothedData);
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataController::addData(const MatrixXd& data)
 {
     emit rawDataChanged(data);
 }
-
 
 //=============================================================================================================
 
@@ -363,7 +342,6 @@ void RtSourceDataController::onNewRtRawData(const VectorXd &vecDataVectorLeftHem
                                vecDataVectorRightHemi);
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataController::onNewSmoothedRtRawData(const MatrixX4f &matColorMatrixLeftHemi,
@@ -373,14 +351,12 @@ void RtSourceDataController::onNewSmoothedRtRawData(const MatrixX4f &matColorMat
                                     matColorMatrixRightHemi);
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataController::onNewInterpolationMatrixLeftCalculated(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeftHemi)
 {
     emit newInterpolationMatrixLeftAvailable(pMatInterpolationMatrixLeftHemi);
 }
-
 
 //=============================================================================================================
 

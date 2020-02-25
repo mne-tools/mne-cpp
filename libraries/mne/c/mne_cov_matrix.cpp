@@ -44,10 +44,8 @@
 #include "mne_proj_op.h"
 
 
-
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -56,7 +54,6 @@
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
-
 
 
 #ifndef FAIL
@@ -68,16 +65,13 @@ using namespace MNELIB;
 #endif
 
 
-
 #define MALLOC_30(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC_30(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-
 
 #define FREE_30(x) if ((char *)(x) != NULL) free((char *)(x))
 
 #define FREE_CMATRIX_30(m) mne_free_cmatrix_30((m))
 #define FREE_DCMATRIX_30(m) mne_free_dcmatrix_30((m))
-
 
 
 void mne_free_cmatrix_30 (float **m)
@@ -87,7 +81,6 @@ void mne_free_cmatrix_30 (float **m)
         FREE_30(m);
     }
 }
-
 
 void mne_free_dcmatrix_30 (double **m)
 
@@ -100,13 +93,9 @@ void mne_free_dcmatrix_30 (double **m)
 
 
 
-
 #define ALLOC_CMATRIX_30(x,y) mne_cmatrix_30((x),(y))
 
-
 #define ALLOC_DCMATRIX_30(x,y) mne_dmatrix_30((x),(y))
-
-
 
 
 
@@ -129,7 +118,6 @@ static void matrix_error_30(int kind, int nr, int nc)
 
 
 
-
 float **mne_cmatrix_30(int nr,int nc)
 
 {
@@ -146,7 +134,6 @@ float **mne_cmatrix_30(int nr,int nc)
         m[i] = whole + i*nc;
     return m;
 }
-
 
 
 double **mne_dmatrix_30(int nr, int nc)
@@ -168,9 +155,7 @@ double **mne_dmatrix_30(int nr, int nc)
 
 
 
-
 //============================= mne_decompose.c =============================
-
 
 int mne_decompose_eigen (double *mat,
                          double *lambda,
@@ -210,7 +195,6 @@ int mne_decompose_eigen (double *mat,
     for (k = 0; k < np; k++)
         dmat[k] = mat[k]*scale;
 //    dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);
-
 
 // dspev workaround begin
     MatrixXd dmat_tmp = MatrixXd::Zero(dim,dim);
@@ -262,8 +246,6 @@ int mne_decompose_eigen (double *mat,
 
 
 
-
-
 double **mne_dmatt_dmat_mult2 (double **m1,double **m2, int d1,int d2,int d3)
 /* Matrix multiplication
       * result(d1 x d3) = m1(d2 x d1)^T * m2(d2 x d3) */
@@ -294,7 +276,6 @@ double **mne_dmatt_dmat_mult2 (double **m1,double **m2, int d1,int d2,int d3)
     return result;
 #endif
 }
-
 
 
 
@@ -329,7 +310,6 @@ MneCovMatrix::MneCovMatrix(int p_kind,
 
 }
 
-
 //=============================================================================================================
 
 MneCovMatrix::~MneCovMatrix()
@@ -350,7 +330,6 @@ MneCovMatrix::~MneCovMatrix()
         delete sss;
     bads.clear();
 }
-
 
 //=============================================================================================================
 
@@ -393,14 +372,12 @@ MneCovMatrix *MneCovMatrix::mne_dup_cov(MneCovMatrix *c)
     return res;
 }
 
-
 //=============================================================================================================
 
 int MneCovMatrix::mne_is_diag_cov(MneCovMatrix *c)
 {
     return c->cov_diag != NULL;
 }
-
 
 //=============================================================================================================
 
@@ -425,7 +402,6 @@ int MneCovMatrix::mne_add_inv_cov(MneCovMatrix *c)
     }
     return OK;
 }
-
 
 //=============================================================================================================
 
@@ -553,7 +529,6 @@ int MneCovMatrix::condition_cov(MneCovMatrix *c, float rank_threshold, int use_r
     return res;
 }
 
-
 //=============================================================================================================
 
 int MneCovMatrix::mne_decompose_eigen_cov_small(MneCovMatrix *c, float p_small, int use_rank)
@@ -626,7 +601,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 int MneCovMatrix::mne_decompose_eigen_cov(MneCovMatrix *c)
@@ -634,7 +608,6 @@ int MneCovMatrix::mne_decompose_eigen_cov(MneCovMatrix *c)
 {
     return mne_decompose_eigen_cov_small(c,-1.0,-1);
 }
-
 
 //=============================================================================================================
 

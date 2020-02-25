@@ -45,20 +45,17 @@
 
 #include <utils/mnemath.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QPair>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/SVD>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -67,7 +64,6 @@
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -82,7 +78,6 @@ FiffCov::FiffCov()
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov> >("QSharedPointer<FIFFLIB::FiffCov>");
     qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
-
 
 //=============================================================================================================
 
@@ -107,7 +102,6 @@ FiffCov::FiffCov(QIODevice &p_IODevice)
     qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
-
 //=============================================================================================================
 
 FiffCov::FiffCov(const FiffCov &p_FiffCov)
@@ -127,13 +121,11 @@ FiffCov::FiffCov(const FiffCov &p_FiffCov)
     qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
 }
 
-
 //=============================================================================================================
 
 FiffCov::~FiffCov()
 {
 }
-
 
 //=============================================================================================================
 
@@ -150,7 +142,6 @@ void FiffCov::clear()
     eig = VectorXd();
     eigvec = MatrixXd();
 }
-
 
 //=============================================================================================================
 
@@ -179,7 +170,6 @@ FiffCov FiffCov::pick_channels(const QStringList &p_include, const QStringList &
 
     return res;
 }
-
 
 //=============================================================================================================
 
@@ -328,7 +318,6 @@ FiffCov FiffCov::prepare_noise_cov(const FiffInfo &p_Info, const QStringList &p_
     return p_NoiseCov;
 }
 
-
 //=============================================================================================================
 
 FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_fRegGrad, double p_fRegEeg, bool p_bProj, QStringList p_exclude) const
@@ -467,7 +456,6 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
     return cov;
 }
-
 
 //=============================================================================================================
 

@@ -55,7 +55,6 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -68,14 +67,12 @@
 #include <QCoreApplication>
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace RTSERVER;
 using namespace COMMUNICATIONLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -88,7 +85,6 @@ ConnectorManager::ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObjec
 
 }
 
-
 //=============================================================================================================
 
 ConnectorManager::~ConnectorManager()
@@ -97,7 +93,6 @@ ConnectorManager::~ConnectorManager()
     for( ; it != s_vecConnectors.end(); ++it)
         delete (*it);
 }
-
 
 //=============================================================================================================
 
@@ -113,7 +108,6 @@ void ConnectorManager::clearConnectorActivation()
     }
 }
 
-
 //=============================================================================================================
 
 void ConnectorManager::comConlist(Command p_command)
@@ -128,7 +122,6 @@ void ConnectorManager::comConlist(Command p_command)
         t_pMNERTServer->getCommandManager()["conlist"].reply(this->getConnectorList(true));
 
 }
-
 
 //=============================================================================================================
 
@@ -154,7 +147,6 @@ void ConnectorManager::comSelcon(Command p_command)
 
 }
 
-
 //=============================================================================================================
 
 void ConnectorManager::comStart(Command p_command)//comMeas
@@ -165,7 +157,6 @@ void ConnectorManager::comStart(Command p_command)//comMeas
     Q_UNUSED(p_command);
 }
 
-
 //=============================================================================================================
 
 void ConnectorManager::comStopAll(Command p_command)
@@ -175,7 +166,6 @@ void ConnectorManager::comStopAll(Command p_command)
 
     Q_UNUSED(p_command);
 }
-
 
 //=============================================================================================================
 
@@ -222,7 +212,6 @@ void ConnectorManager::connectActiveConnector()
         printf("Error: Can't connect, no connector active!\n");
     }
 }
-
 
 //=============================================================================================================
 
@@ -273,7 +262,6 @@ void ConnectorManager::disconnectActiveConnector()
     }
 }
 
-
 //=============================================================================================================
 
 IConnector* ConnectorManager::getActiveConnector()
@@ -287,7 +275,6 @@ IConnector* ConnectorManager::getActiveConnector()
 
     return NULL;
 }
-
 
 //=============================================================================================================
 
@@ -353,7 +340,6 @@ void ConnectorManager::connectCommands()
     QObject::connect(&t_pMNERTServer->getCommandManager()["start"], &Command::executed, this, &ConnectorManager::comStart);
     QObject::connect(&t_pMNERTServer->getCommandManager()["stop-all"], &Command::executed, this, &ConnectorManager::comStopAll);
 }
-
 
 //=============================================================================================================
 
@@ -491,7 +477,6 @@ void ConnectorManager::loadConnectors(const QString& dir)
     printf("%s", getConnectorList().data());
 }
 
-
 //=============================================================================================================
 
 QByteArray ConnectorManager::setActiveConnector(qint32 ID)
@@ -539,7 +524,6 @@ QByteArray ConnectorManager::setActiveConnector(qint32 ID)
 
     return p_blockClientList;
 }
-
 
 //=============================================================================================================
 // STATIC DEFINITIONS

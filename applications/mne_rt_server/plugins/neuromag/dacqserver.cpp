@@ -46,11 +46,9 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -60,7 +58,6 @@ using namespace NEUROMAGRTSERVERPLUGIN;
 using namespace IOBUFFER;
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -77,13 +74,11 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag, QObject * parent)
 {
 }
 
-
 //=============================================================================================================
 
 DacqServer::~DacqServer()
 {
 }
-
 
 //=============================================================================================================
 
@@ -251,7 +246,6 @@ bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
     return true;
 }
 
-
 //=============================================================================================================
 
 void DacqServer::run()
@@ -305,7 +299,6 @@ void DacqServer::run()
         printf("Could not connect!\r\n");//dacq_log("Could not connect!\n");
         return;//(2);
     }
-
 
     // Mainloop
 //    printf("Will scale up MEG mags by %g, grads by %g and EEG data by %g\n",
@@ -370,7 +363,6 @@ void DacqServer::run()
             nchan = m_pNeuromag->m_info.nchan;
             sfreq = m_pNeuromag->m_info.sfreq;
         }
-
 
         switch(t_pTag->kind)
         {

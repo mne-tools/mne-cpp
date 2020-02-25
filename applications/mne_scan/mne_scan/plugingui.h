@@ -52,7 +52,6 @@
 #include <QMainWindow>
 #include <QMap>
 
-
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -68,14 +67,12 @@ class QToolButton;
 class QAbstractButton;
 class QGraphicsView;
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE MNESCAN
 //=============================================================================================================
 
 namespace MNESCAN
 {
-
 
 class PluginGui : public QMainWindow
 {
@@ -109,7 +106,6 @@ public:
      * @param [in] sFileName     The file name to store the configuration to.
      */
     void saveConfig(const QString& sPath, const QString& sFileName);
-
 
     inline SCSHAREDLIB::IPlugin::SPtr getCurrentPlugin();
 

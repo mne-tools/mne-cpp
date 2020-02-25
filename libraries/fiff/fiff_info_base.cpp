@@ -42,14 +42,12 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -60,7 +58,6 @@ FiffInfoBase::FiffInfoBase()
 , nchan(-1)
 {
 }
-
 
 //=============================================================================================================
 
@@ -78,14 +75,12 @@ FiffInfoBase::FiffInfoBase(const FiffInfoBase& p_FiffInfoBase)
         chs.append(p_FiffInfoBase.chs[i]);
 }
 
-
 //=============================================================================================================
 
 FiffInfoBase::~FiffInfoBase()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -121,7 +116,6 @@ QString FiffInfoBase::channel_type(qint32 idx) const
     return "";
 }
 
-
 //=============================================================================================================
 
 void FiffInfoBase::clear()
@@ -135,7 +129,6 @@ void FiffInfoBase::clear()
     ctf_head_t.clear();
     bads.clear();
 }
-
 
 //=============================================================================================================
 
@@ -193,7 +186,6 @@ RowVectorXi FiffInfoBase::pick_types(const QString meg, bool eeg, bool stim, con
     return sel;
 }
 
-
 //=============================================================================================================
 
 RowVectorXi FiffInfoBase::pick_types(bool meg, bool eeg, bool stim, const QStringList& include, const QStringList& exclude) const
@@ -203,7 +195,6 @@ RowVectorXi FiffInfoBase::pick_types(bool meg, bool eeg, bool stim, const QStrin
     else
         return this->pick_types(QString(""), eeg, stim, include, exclude);
 }
-
 
 //=============================================================================================================
 
@@ -230,7 +221,6 @@ RowVectorXi FiffInfoBase::pick_channels(const QStringList& ch_names, const QStri
     sel.conservativeResize(count);
     return sel;
 }
-
 
 //=============================================================================================================
 

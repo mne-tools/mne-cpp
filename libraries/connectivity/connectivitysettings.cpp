@@ -32,7 +32,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -43,7 +42,6 @@
 #include <fs/surfaceset.h>
 #include <fiff/fiff_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -52,11 +50,9 @@
 #include <QElapsedTimer>
 #include <QDebug>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -68,11 +64,9 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace FSLIB;
 
-
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -87,7 +81,6 @@ ConnectivitySettings::ConnectivitySettings()
     qRegisterMetaType<CONNECTIVITYLIB::ConnectivitySettings>("CONNECTIVITYLIB::ConnectivitySettings");
 }
 
-
 //*******************************************************************************************************
 
 void ConnectivitySettings::clearAllData() 
@@ -96,7 +89,6 @@ void ConnectivitySettings::clearAllData()
 
     clearIntermediateData();
 }
-
 
 //*******************************************************************************************************
 
@@ -120,7 +112,6 @@ void ConnectivitySettings::clearIntermediateData()
     m_intermediateSumData.vecPairCsdImagSqrdSum.clear();
 }
 
-
 //*******************************************************************************************************
 
 void ConnectivitySettings::append(const QList<MatrixXd>& matInputData)
@@ -129,7 +120,6 @@ void ConnectivitySettings::append(const QList<MatrixXd>& matInputData)
         this->append(matInputData.at(i));
     }
 }
-
 
 //*******************************************************************************************************
 
@@ -141,14 +131,12 @@ void ConnectivitySettings::append(const MatrixXd& matInputData)
     m_trialData.append(tempData);
 }
 
-
 //*******************************************************************************************************
 
 void ConnectivitySettings::append(const ConnectivitySettings::IntermediateTrialData& inputData)
 {
     m_trialData.append(inputData);
 }
-
 
 //*******************************************************************************************************
 
@@ -157,7 +145,6 @@ const ConnectivitySettings::IntermediateTrialData& ConnectivitySettings::at(int 
     return m_trialData.at(i);
 }
 
-
 //*******************************************************************************************************
 
 int ConnectivitySettings::size() const
@@ -165,14 +152,12 @@ int ConnectivitySettings::size() const
     return m_trialData.size();
 }
 
-
 //*******************************************************************************************************
 
 bool ConnectivitySettings::isEmpty() const
 {
     return m_trialData.isEmpty();
 }
-
 
 //*******************************************************************************************************
 
@@ -225,7 +210,6 @@ void ConnectivitySettings::removeFirst(int iAmount)
 //    timer.restart();
 }
 
-
 //*******************************************************************************************************
 
 void ConnectivitySettings::removeLast(int iAmount)
@@ -272,12 +256,10 @@ void ConnectivitySettings::removeLast(int iAmount)
         m_trialData.removeLast();
     }
 
-
 //    iTime = timer.elapsed();
 //    qDebug() << "ConnectivitySettings::removeLast" << iTime;
 //    timer.restart();
 }
-
 
 //*******************************************************************************************************
 
@@ -286,14 +268,12 @@ void ConnectivitySettings::setConnectivityMethods(const QStringList& sConnectivi
     m_sConnectivityMethods = sConnectivityMethods;
 }
 
-
 //*******************************************************************************************************
 
 const QStringList& ConnectivitySettings::getConnectivityMethods() const
 {
     return m_sConnectivityMethods;
 }
-
 
 //*******************************************************************************************************
 
@@ -312,14 +292,12 @@ void ConnectivitySettings::setSamplingFrequency(int iSFreq)
     }
 }
 
-
 //*******************************************************************************************************
 
 int ConnectivitySettings::getSamplingFrequency() const
 {
     return m_fSFreq;
 }
-
 
 //*******************************************************************************************************
 
@@ -336,14 +314,12 @@ void ConnectivitySettings::setFFTSize(int iNfft)
 
 }
 
-
 //*******************************************************************************************************
 
 int ConnectivitySettings::getFFTSize() const
 {
     return m_iNfft;
 }
-
 
 //*******************************************************************************************************
 
@@ -355,14 +331,12 @@ void ConnectivitySettings::setWindowType(const QString& sWindowType)
     m_sWindowType = sWindowType;
 }
 
-
 //*******************************************************************************************************
 
 const QString& ConnectivitySettings::getWindowType() const
 {
     return m_sWindowType;
 }
-
 
 //*******************************************************************************************************
 
@@ -382,7 +356,6 @@ void ConnectivitySettings::setNodePositions(const FiffInfo& fiffInfo,
         }
     }
 }
-
 
 //*******************************************************************************************************
 
@@ -417,14 +390,12 @@ void ConnectivitySettings::setNodePositions(const MNEForwardSolution& forwardSol
     m_matNodePositions << matNodeVertLeft, matNodeVertRight;
 }
 
-
 //*******************************************************************************************************
 
 void ConnectivitySettings::setNodePositions(const MatrixX3f& matNodePositions)
 {
     m_matNodePositions = matNodePositions;
 }
-
 
 //*******************************************************************************************************
 
@@ -433,14 +404,12 @@ const MatrixX3f& ConnectivitySettings::getNodePositions() const
     return m_matNodePositions;
 }
 
-
 //*******************************************************************************************************
 
 QList<ConnectivitySettings::IntermediateTrialData>& ConnectivitySettings::getTrialData()
 {
     return m_trialData;
 }
-
 
 //*******************************************************************************************************
 

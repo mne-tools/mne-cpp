@@ -40,7 +40,6 @@
 
 #include "dipole_forward.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -49,10 +48,8 @@ using namespace Eigen;
 using namespace INVERSELIB;
 
 
-
 #define FREE_CMATRIX_4(m) mne_free_cmatrix_4((m))
 #define FREE_4(x) if ((char *)(x) != NULL) free((char *)(x))
-
 
 
 
@@ -63,9 +60,6 @@ void mne_free_cmatrix_4 (float **m)
         FREE_4(m);
     }
 }
-
-
-
 
 
 
@@ -90,13 +84,11 @@ DipoleForward::DipoleForward()
 
 }
 
-
 ////=============================================================================================================
 
 //DipoleForward::DipoleForward(const DipoleForward& p_DipoleForward)
 //{
 //}
-
 
 //=============================================================================================================
 

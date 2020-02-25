@@ -45,13 +45,11 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QAction>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNESCAN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -70,14 +68,12 @@ PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui)
     m_qColorLine = QColor(65,113,156);
 }
 
-
 //=============================================================================================================
 
 PluginScene::~PluginScene()
 {
     this->clear();
 }
-
 
 //=============================================================================================================
 
@@ -139,7 +135,6 @@ bool PluginScene::insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::IPlugin:
 //    return true;//DEBUG
 }
 
-
 //=============================================================================================================
 
 void PluginScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -152,7 +147,6 @@ void PluginScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsScene::mousePressEvent(mouseEvent);
 }
 
-
 //=============================================================================================================
 
 void PluginScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -164,7 +158,6 @@ void PluginScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
         QGraphicsScene::mouseMoveEvent(mouseEvent);
     }
 }
-
 
 //=============================================================================================================
 
@@ -203,13 +196,11 @@ void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 arrow->updatePosition();
             }
 
-
         }
     }
     line = 0;
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
-
 
 ////=============================================================================================================
 

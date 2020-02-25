@@ -45,13 +45,11 @@
 //#include "fiff_proj.h"
 //#include "fiff_info.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -63,7 +61,6 @@ FiffDirNode::FiffDirNode()
 , parent(NULL)
 {
 }
-
 
 //=============================================================================================================
 
@@ -79,7 +76,6 @@ FiffDirNode::FiffDirNode(const FiffDirNode* p_FiffDirTree)
 
 }
 
-
 //=============================================================================================================
 
 FiffDirNode::~FiffDirNode()
@@ -89,7 +85,6 @@ FiffDirNode::~FiffDirNode()
     //        if (*i)
     //            delete *i;
 }
-
 
 //=============================================================================================================
 
@@ -177,7 +172,6 @@ bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId& in_id, 
     return true;
 }
 
-
 //=============================================================================================================
 
 QList<FiffDirNode::SPtr> FiffDirNode::dir_tree_find(fiff_int_t p_kind) const
@@ -192,7 +186,6 @@ QList<FiffDirNode::SPtr> FiffDirNode::dir_tree_find(fiff_int_t p_kind) const
 
     return nodes;
 }
-
 
 //=============================================================================================================
 
@@ -212,7 +205,6 @@ bool FiffDirNode::find_tag(FiffStream* p_pStream, fiff_int_t findkind, FiffTag::
     return false;
 }
 
-
 //=============================================================================================================
 
 bool FiffDirNode::has_tag(fiff_int_t findkind)
@@ -222,7 +214,6 @@ bool FiffDirNode::has_tag(fiff_int_t findkind)
             return true;
     return false;
 }
-
 
 //=============================================================================================================
 
@@ -238,7 +229,6 @@ bool FiffDirNode::has_kind(fiff_int_t p_kind) const
 
     return false;
 }
-
 
 //=============================================================================================================
 
@@ -282,7 +272,6 @@ void FiffDirNode::print(int indent) const
     printf ("}\n");
 }
 
-
 //=============================================================================================================
 
 void FiffDirNode::explain_block(int kind)
@@ -295,7 +284,6 @@ void FiffDirNode::explain_block(int kind)
     }
     printf ("Cannot explain: %d",kind);
 }
-
 
 //=============================================================================================================
 
@@ -311,7 +299,6 @@ void FiffDirNode::explain(int kind)
     printf ("Cannot explain: %d",kind);
 }
 
-
 //=============================================================================================================
 
 const char *FiffDirNode::get_tag_explanation(int kind)
@@ -324,14 +311,12 @@ const char *FiffDirNode::get_tag_explanation(int kind)
     return "unknown";
 }
 
-
 //=============================================================================================================
 
 fiff_int_t FiffDirNode::nent() const
 {
     return dir.size();
 }
-
 
 //=============================================================================================================
 

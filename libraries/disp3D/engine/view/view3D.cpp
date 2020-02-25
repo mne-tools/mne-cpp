@@ -46,7 +46,6 @@
 #include "../model/materials/geometrymultipliermaterial.h"
 #include "orbitalcameracontroller.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -67,7 +66,6 @@
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DRender/QRenderSettings>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -76,7 +74,6 @@ using namespace MNELIB;
 using namespace DISP3DLIB;
 using namespace FSLIB;
 using namespace CONNECTIVITYLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -115,7 +112,6 @@ View3D::View3D()
     createCoordSystem(m_pRootEntity);
     toggleCoordAxis(false);
 }
-
 
 //=============================================================================================================
 
@@ -156,14 +152,12 @@ void View3D::initLight()
     }
 }
 
-
 //=============================================================================================================
 
 void View3D::setModel(QSharedPointer<Data3DTreeModel> pModel)
 {
     pModel->getRootEntity()->setParent(m_p3DObjectsEntity);
 }
-
 
 //=============================================================================================================
 
@@ -172,14 +166,12 @@ void View3D::setSceneColor(const QColor& colSceneColor)
     m_pFrameGraph->setClearColor(colSceneColor);
 }
 
-
 //=============================================================================================================
 
 void View3D::toggleCoordAxis(bool checked)
 {
     m_pCoordSysEntity->setEnabled(checked);
 }
-
 
 //=============================================================================================================
 
@@ -193,7 +185,6 @@ void View3D::showFullScreen(bool checked)
     }
 }
 
-
 //=============================================================================================================
 
 void View3D::setLightColor(const QColor &color)
@@ -203,7 +194,6 @@ void View3D::setLightColor(const QColor &color)
     }
 }
 
-
 //=============================================================================================================
 
 void View3D::setLightIntensity(double value)
@@ -212,7 +202,6 @@ void View3D::setLightIntensity(double value)
         m_lLightSources.at(i)->setIntensity(value);
     }
 }
-
 
 //=============================================================================================================
 
@@ -233,7 +222,6 @@ void View3D::takeScreenshot()
     QObject::connect(m_pScreenCaptureReply.data(), &Qt3DRender::QRenderCaptureReply::completed,
                      this, &View3D::saveScreenshot);
 }
-
 
 //=============================================================================================================
 
@@ -257,7 +245,6 @@ void View3D::saveScreenshot()
     delete m_pScreenCaptureReply;
 }
 
-
 //=============================================================================================================
 
 void View3D::keyPressEvent(QKeyEvent* e)
@@ -268,7 +255,6 @@ void View3D::keyPressEvent(QKeyEvent* e)
 
     Qt3DWindow::keyPressEvent(e);
 }
-
 
 //=============================================================================================================
 
@@ -321,7 +307,6 @@ void View3D::createCoordSystem(Qt3DCore::QEntity* parent)
     m_pCoordSysEntity->addComponent(pCoordSysMaterial);
 }
 
-
 //=============================================================================================================
 
 void View3D::startModelRotationRecursive(QObject* pObject)
@@ -341,7 +326,6 @@ void View3D::startModelRotationRecursive(QObject* pObject)
         startModelRotationRecursive(pObject->children().at(i));
     }
 }
-
 
 //=============================================================================================================
 

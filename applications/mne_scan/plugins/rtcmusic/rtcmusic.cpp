@@ -41,7 +41,6 @@
 
 #include "FormFiles/rtcmusicsetupwidget.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -49,7 +48,6 @@
 #include <QtCore/QtPlugin>
 #include <QtConcurrent>
 #include <QDebug>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -62,7 +60,6 @@ using namespace SCSHAREDLIB;
 using namespace MNELIB;
 using namespace INVERSELIB;
 using namespace FSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -82,7 +79,6 @@ RtcMusic::RtcMusic()
 
 }
 
-
 //=============================================================================================================
 
 RtcMusic::~RtcMusic()
@@ -91,7 +87,6 @@ RtcMusic::~RtcMusic()
         stop();
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> RtcMusic::clone() const
@@ -99,7 +94,6 @@ QSharedPointer<IPlugin> RtcMusic::clone() const
     QSharedPointer<RtcMusic> pRtcMusicClone(new RtcMusic());
     return pRtcMusicClone;
 }
-
 
 //=============================================================================================================
 // Creating required display instances and set configurations
@@ -129,14 +123,12 @@ void RtcMusic::init()
     QFuture<void> future = QtConcurrent::run(this, &RtcMusic::doClustering);
 }
 
-
 //=============================================================================================================
 
 void RtcMusic::unload()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -161,7 +153,6 @@ void RtcMusic::calcFiffInfo()
 
 }
 
-
 //=============================================================================================================
 
 void RtcMusic::doClustering()
@@ -176,7 +167,6 @@ void RtcMusic::doClustering()
     finishedClustering();
 }
 
-
 //=============================================================================================================
 
 void RtcMusic::finishedClustering()
@@ -188,7 +178,6 @@ void RtcMusic::finishedClustering()
 
     emit clusteringFinished();
 }
-
 
 //=============================================================================================================
 
@@ -207,7 +196,6 @@ bool RtcMusic::start()
     else
         return false;
 }
-
 
 //=============================================================================================================
 
@@ -233,7 +221,6 @@ bool RtcMusic::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType RtcMusic::getType() const
@@ -241,14 +228,12 @@ IPlugin::PluginType RtcMusic::getType() const
     return _IAlgorithm;
 }
 
-
 //=============================================================================================================
 
 QString RtcMusic::getName() const
 {
     return "RTC-MUSIC";
 }
-
 
 //=============================================================================================================
 
@@ -264,7 +249,6 @@ QWidget* RtcMusic::setupWidget()
 
     return setupWidget;
 }
-
 
 //=============================================================================================================
 
@@ -284,7 +268,6 @@ void RtcMusic::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_qVecFiffEvoked.push_back(pRTE->getValue()->pick_channels(m_qListPickChannels));
     }
 }
-
 
 //=============================================================================================================
 

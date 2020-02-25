@@ -45,7 +45,6 @@
 #include <fiff/fiff_info.h>
 #include <communication/rtClient/rtcmdclient.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -54,13 +53,11 @@
 #include <QDebug>
 #include <QComboBox>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FIFFSIMULATORPLUGIN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -95,7 +92,6 @@ FiffSimulatorSetupWidget::FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulat
     this->init();
 }
 
-
 //=============================================================================================================
 
 FiffSimulatorSetupWidget::~FiffSimulatorSetupWidget()
@@ -103,14 +99,12 @@ FiffSimulatorSetupWidget::~FiffSimulatorSetupWidget()
 
 }
 
-
 //=============================================================================================================
 
 void FiffSimulatorSetupWidget::init()
 {
     cmdConnectionChanged(m_pFiffSimulator->m_bCmdClientIsConnected);
 }
-
 
 //=============================================================================================================
 
@@ -125,7 +119,6 @@ void FiffSimulatorSetupWidget::bufferSizeEdited()
         ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pFiffSimulator->m_iBufferSize));
 }
 
-
 //=============================================================================================================
 
 void FiffSimulatorSetupWidget::pressedConnect()
@@ -139,7 +132,6 @@ void FiffSimulatorSetupWidget::pressedConnect()
     }
 }
 
-
 //=============================================================================================================
 
 void FiffSimulatorSetupWidget::pressedSendCLI()
@@ -152,7 +144,6 @@ void FiffSimulatorSetupWidget::pressedSendCLI()
     }
 }
 
-
 //=============================================================================================================
 
 void FiffSimulatorSetupWidget::printToLog(QString logMsg)
@@ -163,7 +154,6 @@ void FiffSimulatorSetupWidget::printToLog(QString logMsg)
     c.movePosition(QTextCursor::End);
     ui.m_qTextBrowser_ServerMessage->setTextCursor(c);
 }
-
 
 //=============================================================================================================
 
@@ -230,7 +220,6 @@ void FiffSimulatorSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
     }
 }
 
-
 //=============================================================================================================
 
 void FiffSimulatorSetupWidget::fiffInfoReceived()
@@ -238,7 +227,6 @@ void FiffSimulatorSetupWidget::fiffInfoReceived()
     if(m_pFiffSimulator->m_pFiffInfo)
         this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pFiffSimulator->m_pFiffInfo->sfreq));
 }
-
 
 //=============================================================================================================
 

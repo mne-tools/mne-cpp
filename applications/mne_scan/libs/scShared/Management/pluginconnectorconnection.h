@@ -45,7 +45,6 @@
 #include "plugininputconnector.h"
 #include "pluginoutputconnector.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -53,7 +52,6 @@
 #include <QObject>
 #include <QMetaObject>
 #include <QSharedPointer>
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE SCSHAREDLIB
@@ -76,7 +74,6 @@ enum ConnectorDataType
     _RTSE,      /**< Real-Time Source Estimate */
     _None,      /**< None */
 };
-
 
 //=============================================================================================================
 /**
@@ -155,7 +152,6 @@ inline QSharedPointer<PluginConnectorConnection> PluginConnectorConnection::crea
     return pPluginConnectorConnection;
 }
 
-
 //=============================================================================================================
 
 inline IPlugin::SPtr& PluginConnectorConnection::getSender()
@@ -163,14 +159,12 @@ inline IPlugin::SPtr& PluginConnectorConnection::getSender()
     return m_pSender;
 }
 
-
 //=============================================================================================================
 
 inline IPlugin::SPtr& PluginConnectorConnection::getReceiver()
 {
     return m_pReceiver;
 }
-
 
 //=============================================================================================================
 

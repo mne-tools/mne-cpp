@@ -45,7 +45,6 @@
 #include <utils/filterTools/filterdata.h>
 #include <fiff/fiff_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -63,7 +62,6 @@
     #include <QOpenGLWidget>
 #endif
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -72,7 +70,6 @@ using namespace DISPLIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -109,14 +106,12 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
     loadSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 RtFiffRawView::~RtFiffRawView()
 {
     saveSettings(m_sSettingsPath);
 }
-
 
 //=============================================================================================================
 
@@ -174,7 +169,6 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
             this, &RtFiffRawView::visibleRowsChanged);
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawView::addData(const QList<Eigen::MatrixXd> &data)
@@ -182,14 +176,12 @@ void RtFiffRawView::addData(const QList<Eigen::MatrixXd> &data)
     m_pModel->addData(data);
 }
 
-
 //=============================================================================================================
 
 MatrixXd RtFiffRawView::getLastBlock()
 {
     return m_pModel->getLastBlock();
 }
-
 
 //=============================================================================================================
 
@@ -203,7 +195,6 @@ bool RtFiffRawView::eventFilter(QObject *object, QEvent *event)
 
     return QWidget::eventFilter(object, event);
 }
-
 
 //=============================================================================================================
 
@@ -221,7 +212,6 @@ void RtFiffRawView::setBackgroundColor(const QColor& backgroundColor)
 //    m_pTableView->viewport()->setBackgroundRole(QPalette::Window);
 }
 
-
 //=============================================================================================================
 
 QColor RtFiffRawView::getBackgroundColor()
@@ -229,14 +219,12 @@ QColor RtFiffRawView::getBackgroundColor()
     return m_backgroundColor;
 }
 
-
 //=============================================================================================================
 
 QMap<qint32, float> RtFiffRawView::getScalingMap()
 {
     return m_qMapChScaling;
 }
-
 
 //=============================================================================================================
 
@@ -246,7 +234,6 @@ void RtFiffRawView::setScalingMap(const QMap<qint32, float>& scaleMap)
     m_pModel->setScaling(scaleMap);
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawView::setSignalColor(const QColor& signalColor)
@@ -254,14 +241,12 @@ void RtFiffRawView::setSignalColor(const QColor& signalColor)
     m_pDelegate->setSignalColor(signalColor);
 }
 
-
 //=============================================================================================================
 
 QColor RtFiffRawView::getSignalColor()
 {
     return m_pDelegate->getSignalColor();
 }
-
 
 //=============================================================================================================
 
@@ -286,14 +271,12 @@ void RtFiffRawView::hideBadChannels()
     //visibleRowsChanged();
 }
 
-
 //=============================================================================================================
 
 bool RtFiffRawView::getBadChannelHideStatus()
 {
     return m_bHideBadChannels;
 }
-
 
 //=============================================================================================================
 
@@ -317,7 +300,6 @@ void RtFiffRawView::showSelectedChannelsOnly(const QStringList &selectedChannels
     //visibleRowsChanged();
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawView::setZoom(double zoomFac)
@@ -327,14 +309,12 @@ void RtFiffRawView::setZoom(double zoomFac)
     m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
 }
 
-
 //=============================================================================================================
 
 double RtFiffRawView::getZoom()
 {
     return m_fZoomFactor;
 }
-
 
 //=============================================================================================================
 
@@ -345,14 +325,12 @@ void RtFiffRawView::setWindowSize(int T)
     m_pModel->setSamplingInfo(m_fSamplingRate, T);
 }
 
-
 //=============================================================================================================
 
 int RtFiffRawView::getWindowSize()
 {
     return m_iT;
 }
-
 
 //=============================================================================================================
 
@@ -381,14 +359,12 @@ void RtFiffRawView::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
     m_pModel->updateProjection(projs);
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawView::updateCompensator(int to)
 {
     m_pModel->updateCompensator(to);
 }
-
 
 //=============================================================================================================
 
@@ -397,14 +373,12 @@ void RtFiffRawView::updateSpharaActivation(bool state)
     m_pModel->updateSpharaActivation(state);
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawView::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
 {
     m_pModel->updateSpharaOptions(sSytemType, nBaseFctsFirst, nBaseFctsSecond);
 }
-
 
 //=============================================================================================================
 
@@ -413,7 +387,6 @@ void RtFiffRawView::setFilter(const FilterData& filterData)
     m_pModel->setFilter(QList<FilterData>() << filterData);
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawView::setFilterActive(bool state)
@@ -421,14 +394,12 @@ void RtFiffRawView::setFilterActive(bool state)
     m_pModel->setFilterActive(state);
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawView::setFilterChannelType(const QString &channelType)
 {
     m_pModel->setFilterChannelType(channelType);
 }
-
 
 //=============================================================================================================
 
@@ -440,7 +411,6 @@ void RtFiffRawView::triggerInfoChanged(const QMap<double, QColor>& colorMap,
     m_pModel->triggerInfoChanged(colorMap, active, triggerCh, threshold);
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawView::setDistanceTimeSpacer(int value)
@@ -449,7 +419,6 @@ void RtFiffRawView::setDistanceTimeSpacer(int value)
     m_pModel->distanceTimeSpacerChanged(value);
 }
 
-
 //=============================================================================================================
 
 int RtFiffRawView::getDistanceTimeSpacer()
@@ -457,14 +426,12 @@ int RtFiffRawView::getDistanceTimeSpacer()
     return m_iDistanceTimeSpacer;
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawView::resetTriggerCounter()
 {
     m_pModel->resetTriggerCounter();
 }
-
 
 //=============================================================================================================
 
@@ -477,7 +444,6 @@ void RtFiffRawView::saveSettings(const QString& settingsPath)
     QSettings settings;
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawView::loadSettings(const QString& settingsPath)
@@ -488,7 +454,6 @@ void RtFiffRawView::loadSettings(const QString& settingsPath)
 
     QSettings settings;
 }
-
 
 //=============================================================================================================
 
@@ -540,7 +505,6 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawView::applySelection()
@@ -561,7 +525,6 @@ void RtFiffRawView::applySelection()
     //m_pModel->selectRows(m_qListCurrentSelection);
 }
 
-
 //=============================================================================================================
 
 void RtFiffRawView::hideSelection()
@@ -573,7 +536,6 @@ void RtFiffRawView::hideSelection()
     //Update the visible channel list which are to be filtered
     //visibleRowsChanged();
 }
-
 
 //=============================================================================================================
 
@@ -593,7 +555,6 @@ void RtFiffRawView::resetSelection()
     //Update the visible channel list which are to be filtered
     //visibleRowsChanged();
 }
-
 
 //=============================================================================================================
 
@@ -627,7 +588,6 @@ void RtFiffRawView::visibleRowsChanged()
 
     //qDebug() <<"RtFiffRawView::visibleRowsChanged - from "<< from << " to" << to;
 }
-
 
 //=============================================================================================================
 

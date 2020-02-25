@@ -43,7 +43,6 @@
 
 #include <fiff/fiff_tag.h>
 
-
 //=============================================================================================================
 // UNIX INCLUDES
 //=============================================================================================================
@@ -64,7 +63,6 @@
 using namespace NEUROMAGRTSERVERPLUGIN;
 using namespace FIFFLIB;
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -84,7 +82,6 @@ ShmemSocket::ShmemSocket(QObject *parent)
     nfilt = 0;              /* How many are they */
 }
 
-
 //=============================================================================================================
 
 ShmemSocket::~ShmemSocket()
@@ -92,7 +89,6 @@ ShmemSocket::~ShmemSocket()
     delete[] filter_kinds;
     free (filename);
 }
-
 
 //=============================================================================================================
 // client_socket.c
@@ -112,7 +108,6 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
     dacqShmBlock  shmBlock;
     dacqShmClient shmClient;
     int           k;
-
 
     long read_loc = 0;
 
@@ -265,7 +260,6 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
     return (OK);
 }
 
-
 //=============================================================================================================
 
 FILE *ShmemSocket::open_fif (char *name)
@@ -283,7 +277,6 @@ FILE *ShmemSocket::open_fif (char *name)
 
     return (fd);
 }
-
 
 //=============================================================================================================
 
@@ -303,7 +296,6 @@ int ShmemSocket::read_fif (FILE   *fd, long   pos, size_t size, char   *data)
     }
     return (OK);
 }
-
 
 //=============================================================================================================
 
@@ -362,7 +354,6 @@ bool ShmemSocket::connect_client ()
     }
 }
 
-
 //=============================================================================================================
 
 int ShmemSocket::disconnect_client ()
@@ -377,7 +368,6 @@ int ShmemSocket::disconnect_client ()
     }
     return (result);
 }
-
 
 //=============================================================================================================
 
@@ -397,14 +387,12 @@ void ShmemSocket::set_data_filter (int *kinds, int nkind)
     return;
 }
 
-
 //=============================================================================================================
 
 void ShmemSocket::close_socket ()
 {
     int sock = m_iShmemSock;
     int id = m_iShmemId;
-
 
     char    client_path[200];   /* This our path */
 
@@ -421,7 +409,6 @@ void ShmemSocket::close_socket ()
     //dacq_log ("Connection closed.\n");
     printf ("Connection closed.\r\n");
 }
-
 
 //=============================================================================================================
 
@@ -464,7 +451,6 @@ int ShmemSocket::connect_disconnect (int sock,int id)
     }
 }
 
-
 //=============================================================================================================
 
 int ShmemSocket::interesting_data (int kind)
@@ -475,7 +461,6 @@ int ShmemSocket::interesting_data (int kind)
             return (0);
     return (1);
 }
-
 
 //=============================================================================================================
 // shmem.c
@@ -488,7 +473,6 @@ dacqShmBlock ShmemSocket::get_shmem()
   else
     return(shmptr);
 }
-
 
 //=============================================================================================================
 
@@ -511,7 +495,6 @@ int ShmemSocket::init_shmem()
     }
     return (0);
 }
-
 
 //=============================================================================================================
 

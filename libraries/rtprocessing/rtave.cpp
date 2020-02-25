@@ -33,7 +33,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -46,18 +45,15 @@
 #include <utils/detecttrigger.h>
 #include <utils/mnemath.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -68,7 +64,6 @@ using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
 using namespace MNELIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS RtAveWorker
@@ -106,7 +101,6 @@ RtAveWorker::RtAveWorker(quint32 numAverages,
     }
 }
 
-
 //=============================================================================================================
 
 void RtAveWorker::doWork(const MatrixXd& rawSegment)
@@ -121,7 +115,6 @@ void RtAveWorker::doWork(const MatrixXd& rawSegment)
 
     doAveraging(rawSegment);
 }
-
 
 //=============================================================================================================
 
@@ -153,7 +146,6 @@ void RtAveWorker::setAverageNumber(qint32 numAve)
     m_iNumAverages = numAve;
 }
 
-
 //=============================================================================================================
 
 void RtAveWorker::setPreStim(qint32 samples, qint32 secs)
@@ -162,7 +154,6 @@ void RtAveWorker::setPreStim(qint32 samples, qint32 secs)
 
     m_iNewPreStimSamples = samples;
 }
-
 
 //=============================================================================================================
 
@@ -173,14 +164,12 @@ void RtAveWorker::setPostStim(qint32 samples, qint32 secs)
     m_iNewPostStimSamples = samples;
 }
 
-
 //=============================================================================================================
 
 void RtAveWorker::setTriggerChIndx(qint32 idx)
 {
     m_iNewTriggerIndex = idx;
 }
-
 
 //=============================================================================================================
 
@@ -194,7 +183,6 @@ void RtAveWorker::setArtifactReduction(const QMap<QString, double> &mapThreshold
 
     m_mapThresholds = mapThresholds;
 }
-
 
 //=============================================================================================================
 
@@ -213,7 +201,6 @@ void RtAveWorker::setBaselineActive(bool activate)
     }
 }
 
-
 //=============================================================================================================
 
 void RtAveWorker::setBaselineFrom(int fromSamp, int fromMSec)
@@ -226,7 +213,6 @@ void RtAveWorker::setBaselineFrom(int fromSamp, int fromMSec)
     }
 }
 
-
 //=============================================================================================================
 
 void RtAveWorker::setBaselineTo(int toSamp, int toMSec)
@@ -238,7 +224,6 @@ void RtAveWorker::setBaselineTo(int toSamp, int toMSec)
         m_stimEvokedSet.evoked[i].baseline.second = QVariant(QString::number(float(toMSec)/1000));
     }
 }
-
 
 //=============================================================================================================
 
@@ -348,7 +333,6 @@ void RtAveWorker::doAveraging(const MatrixXd& rawSegment)
     //qDebug()<<"RtAveWorker::doAveraging() - time for procesing"<<time.elapsed();
 }
 
-
 //=============================================================================================================
 
 void RtAveWorker::emitEvoked(double dTriggerType, QStringList& lResponsibleTriggerTypes)
@@ -372,7 +356,6 @@ void RtAveWorker::emitEvoked(double dTriggerType, QStringList& lResponsibleTrigg
 //    qDebug()<<"RtAveWorker::emitEvoked() - m_mapStimAve[dTriggerType].size():" << m_mapStimAve[dTriggerType].size();
 }
 
-
 //=============================================================================================================
 
 void RtAveWorker::fillBackBuffer(const MatrixXd &data, double dTriggerType)
@@ -387,7 +370,6 @@ void RtAveWorker::fillBackBuffer(const MatrixXd &data, double dTriggerType)
 
     m_mapMatDataPostIdx[dTriggerType] += iResidualCols;
 }
-
 
 //=============================================================================================================
 
@@ -430,7 +412,6 @@ void RtAveWorker::fillFrontBuffer(const MatrixXd &data, double dTriggerType)
     }
 }
 
-
 //=============================================================================================================
 
 void RtAveWorker::mergeData(double dTriggerType)
@@ -468,7 +449,6 @@ void RtAveWorker::mergeData(double dTriggerType)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -535,7 +515,6 @@ void RtAveWorker::generateEvoked(double dTriggerType)
     }
 }
 
-
 //=============================================================================================================
 
 void RtAveWorker::reset()
@@ -556,7 +535,6 @@ void RtAveWorker::reset()
     m_mapMatDataPostIdx.clear();
     m_mapFillingBackBuffer.clear();
 }
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS RtAve
@@ -614,7 +592,6 @@ RtAve::RtAve(quint32 numAverages,
     m_workerThread.start();
 }
 
-
 //=============================================================================================================
 
 RtAve::~RtAve()
@@ -622,14 +599,12 @@ RtAve::~RtAve()
     stop();
 }
 
-
 //=============================================================================================================
 
 void RtAve::append(const MatrixXd &data)
 {
     emit operate(data);
 }
-
 
 //=============================================================================================================
 
@@ -639,7 +614,6 @@ void RtAve::handleResults(const FiffEvokedSet& evokedStimSet,
     emit evokedStim(evokedStimSet,
                     lResponsibleTriggerTypes);
 }
-
 
 //=============================================================================================================
 
@@ -693,7 +667,6 @@ void RtAve::restart(quint32 numAverages,
     m_workerThread.start();
 }
 
-
 //=============================================================================================================
 
 void RtAve::stop()
@@ -703,14 +676,12 @@ void RtAve::stop()
     m_workerThread.wait();
 }
 
-
 //=============================================================================================================
 
 void RtAve::setAverageNumber(qint32 numAve)
 {
     emit averageNumberChanged(numAve);
 }
-
 
 //=============================================================================================================
 
@@ -722,7 +693,6 @@ void RtAve::setPreStim(qint32 samples, qint32 secs)
                                secs);
 }
 
-
 //=============================================================================================================
 
 void RtAve::setPostStim(qint32 samples, qint32 secs)
@@ -733,14 +703,12 @@ void RtAve::setPostStim(qint32 samples, qint32 secs)
                                 secs);
 }
 
-
 //=============================================================================================================
 
 void RtAve::setTriggerChIndx(qint32 idx)
 {
     emit averageTriggerChIdxChanged(idx);
 }
-
 
 //=============================================================================================================
 
@@ -749,14 +717,12 @@ void RtAve::setArtifactReduction(const QMap<QString,double>& mapThresholds)
     emit averageArtifactReductionChanged(mapThresholds);
 }
 
-
 //=============================================================================================================
 
 void RtAve::setBaselineActive(bool activate)
 {
     emit averageBaselineActiveChanged(activate);
 }
-
 
 //=============================================================================================================
 
@@ -766,7 +732,6 @@ void RtAve::setBaselineFrom(int fromSamp, int fromMSec)
                                     fromMSec);
 }
 
-
 //=============================================================================================================
 
 void RtAve::setBaselineTo(int toSamp, int toMSec)
@@ -774,7 +739,6 @@ void RtAve::setBaselineTo(int toSamp, int toMSec)
     emit averageBaselineToChanged(toSamp,
                                   toMSec);
 }
-
 
 //=============================================================================================================
 

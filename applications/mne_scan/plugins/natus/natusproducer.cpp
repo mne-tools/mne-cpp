@@ -41,7 +41,6 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -54,14 +53,12 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace NATUSPLUGIN;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -84,7 +81,6 @@ NatusProducer::NatusProducer(int iBlockSize, int iChannelSize, QObject *parent)
     m_fChannelSize = 0;
 }
 
-
 //=============================================================================================================
 
 void NatusProducer::readPendingDatagrams()
@@ -95,7 +91,6 @@ void NatusProducer::readPendingDatagrams()
         processDatagram(datagram);
     }
 }
-
 
 //=============================================================================================================
 
@@ -141,7 +136,6 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
             matData(i,j) = fData[itr++]/10e06;
         }
     }
-
 
     if(m_iMatDataSampleIterator+matData.cols() <= m_matData.cols()) {
         m_matData.block(0, m_iMatDataSampleIterator, matData.rows(), matData.cols()) = matData.cast<double>();

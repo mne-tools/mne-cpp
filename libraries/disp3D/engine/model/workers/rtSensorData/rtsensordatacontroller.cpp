@@ -40,18 +40,15 @@
 #include "rtsensorinterpolationmatworker.h"
 #include "rtsensordataworker.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -60,7 +57,6 @@
 using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -139,7 +135,6 @@ RtSensorDataController::RtSensorDataController()
        m_rtInterpolationWorkerThread.start();
 }
 
-
 //=============================================================================================================
 
 RtSensorDataController::~RtSensorDataController()
@@ -149,7 +144,6 @@ RtSensorDataController::~RtSensorDataController()
     m_rtInterpolationWorkerThread.quit();
     m_rtInterpolationWorkerThread.wait();
 }
-
 
 //=============================================================================================================
 
@@ -162,14 +156,12 @@ void RtSensorDataController::setStreamingState(bool bStreamingState)
     }
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataController::setInterpolationFunction(const QString &sInterpolationFunction)
 {
     emit interpolationFunctionChanged(sInterpolationFunction);
 }
-
 
 //=============================================================================================================
 
@@ -178,14 +170,12 @@ void RtSensorDataController::setLoopState(bool bLoopState)
     emit loopStateChanged(bLoopState);
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataController::setCancelDistance(double dCancelDist)
 {
     emit cancelDistanceChanged(dCancelDist);
 }
-
 
 //=============================================================================================================
 
@@ -199,7 +189,6 @@ void RtSensorDataController::setTimeInterval(int iMSec)
     m_iMSecInterval = iMSec;
     m_timer.setInterval(m_iMSecInterval);
 }
-
 
 //=============================================================================================================
 
@@ -218,14 +207,12 @@ void RtSensorDataController::setInterpolationInfo(const Eigen::MatrixX3f &matVer
                                   iSensorType);
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataController::setThresholds(const QVector3D &vecThresholds)
 {
     emit thresholdsChanged(vecThresholds);
 }
-
 
 //=============================================================================================================
 
@@ -234,14 +221,12 @@ void RtSensorDataController::setColormapType(const QString &sColormapType)
     emit colormapTypeChanged(sColormapType);
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataController::setNumberAverages(int iNumAvr)
 {
     emit numberAveragesChanged(iNumAvr);
 }
-
 
 //=============================================================================================================
 
@@ -250,14 +235,12 @@ void RtSensorDataController::setSFreq(double dSFreq)
     emit sFreqChanged(dSFreq);
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataController::setBadChannels(const FiffInfo &info)
 {
     emit badChannelsChanged(info);
 }
-
 
 //=============================================================================================================
 
@@ -266,14 +249,12 @@ void RtSensorDataController::setStreamSmoothedData(bool bStreamSmoothedData)
     emit streamSmoothedDataChanged(bStreamSmoothedData);
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataController::addData(const MatrixXd& data)
 {
     emit rawDataChanged(data);
 }
-
 
 //=============================================================================================================
 
@@ -282,14 +263,12 @@ void RtSensorDataController::onNewRtRawData(const VectorXd &vecDataVector)
     emit newRtRawDataAvailable(vecDataVector);
 }
 
-
 //=============================================================================================================
 
 void RtSensorDataController::onNewSmoothedRtRawData(const MatrixX4f &matColorMatrix)
 {
     emit newRtSmoothedDataAvailable(matColorMatrix);
 }
-
 
 //=============================================================================================================
 

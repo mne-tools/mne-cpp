@@ -41,14 +41,12 @@
 #include "gusbamp.h"
 #include "gusbampproducer.h"   
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtCore/QtPlugin>
 #include <QDebug>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -59,7 +57,6 @@ using namespace SCMEASLIB;
 using namespace GUSBAMPPLUGIN;
 using namespace IOBUFFER;
 using namespace std;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -96,7 +93,6 @@ GUSBAmp::GUSBAmp()
 
 }
 
-
 //=============================================================================================================
 
 GUSBAmp::~GUSBAmp()
@@ -108,7 +104,6 @@ GUSBAmp::~GUSBAmp()
         this->stop();
     }
 }
-
 
 //=============================================================================================================
 
@@ -191,7 +186,6 @@ void GUSBAmp::setUpFiffInfo()
     m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> GUSBAmp::clone() const
@@ -199,7 +193,6 @@ QSharedPointer<IPlugin> GUSBAmp::clone() const
     QSharedPointer<GUSBAmp> pGUSBAmpClone(new GUSBAmp());
     return pGUSBAmpClone;
 }
-
 
 //=============================================================================================================
 
@@ -221,14 +214,12 @@ void GUSBAmp::init()
     m_bIsRunning = false;
 }
 
-
 //=============================================================================================================
 
 void GUSBAmp::unload()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -241,7 +232,6 @@ bool GUSBAmp::start()
 
     //get the values from the GUI and start GUSBAmpProducer
     m_pGUSBAmpProducer->start(m_vSerials, m_viChannelsToAcquire, m_iSampleRate);
-
 
     //after device was started: ask for size of SampleMatrix to set the buffer matrix (bevor setUpFiffInfo() is started)
     m_viSizeOfSampleMatrix = m_pGUSBAmpProducer->getSizeOfSampleMatrix();
@@ -273,7 +263,6 @@ bool GUSBAmp::start()
     }
 }
 
-
 //=============================================================================================================
 
 bool GUSBAmp::stop()
@@ -294,7 +283,6 @@ bool GUSBAmp::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType GUSBAmp::getType() const
@@ -302,14 +290,12 @@ IPlugin::PluginType GUSBAmp::getType() const
     return _ISensor;
 }
 
-
 //=============================================================================================================
 
 QString GUSBAmp::getName() const
 {
     return "GUSBAmp EEG";
 }
-
 
 //=============================================================================================================
 
@@ -322,7 +308,6 @@ QWidget* GUSBAmp::setupWidget()
 
     return pWidget;
 }
-
 
 //=============================================================================================================
 
@@ -368,7 +353,6 @@ void GUSBAmp::run()
     }
 }
 
-
 //=============================================================================================================
 
 void GUSBAmp::splitRecordingFile()
@@ -401,7 +385,6 @@ void GUSBAmp::splitRecordingFile()
     m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
 }
 
-
 //=============================================================================================================
 
 void GUSBAmp::showSetupProjectDialog()
@@ -418,7 +401,6 @@ void GUSBAmp::showSetupProjectDialog()
         m_pGUSBampSetupProjectWidget->raise();
     }
 }
-
 
 //=============================================================================================================
 
@@ -488,7 +470,6 @@ void GUSBAmp::showStartRecording()
     }
 }
 
-
 //=============================================================================================================
 
 void GUSBAmp::changeRecordingButton()
@@ -504,7 +485,6 @@ void GUSBAmp::changeRecordingButton()
         m_iBlinkStatus = 0;
     }
 }
-
 
 //=============================================================================================================
 

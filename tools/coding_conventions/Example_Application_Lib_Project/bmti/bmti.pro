@@ -72,11 +72,9 @@ SOURCES += \
     test.cpp \
     mainwindow.cpp
 
-
 HEADERS += bmti_global.h \
     test.h \
     mainwindow.h
-
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

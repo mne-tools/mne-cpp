@@ -44,7 +44,6 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -54,14 +53,12 @@
 #include <QDataStream>
 #include <QFileInfo>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -75,7 +72,6 @@ Annotation::Annotation()
 
 }
 
-
 //=============================================================================================================
 
 Annotation::Annotation(const QString& p_sFileName)
@@ -85,7 +81,6 @@ Annotation::Annotation(const QString& p_sFileName)
     Annotation::read(m_sFileName, t_Annotation);
      *this = t_Annotation;
 }
-
 
 //=============================================================================================================
 
@@ -97,7 +92,6 @@ Annotation::Annotation(const QString &subject_id, qint32 hemi, const QString &at
     Annotation::read(subject_id, hemi, atlas, subjects_dir, *this);
 }
 
-
 //=============================================================================================================
 
 Annotation::Annotation(const QString &path, qint32 hemi, const QString &atlas)
@@ -108,14 +102,12 @@ Annotation::Annotation(const QString &path, qint32 hemi, const QString &atlas)
     Annotation::read(path, hemi, atlas, *this);
 }
 
-
 //=============================================================================================================
 
 Annotation::~Annotation()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -126,7 +118,6 @@ void Annotation::clear()
     m_LabelIds = VectorXi::Zero(0);
     m_Colortable.clear();
 }
-
 
 //=============================================================================================================
 
@@ -140,7 +131,6 @@ bool Annotation::read(const QString &subject_id, qint32 hemi, const QString &atl
     return read(p_sFile, p_Annotation);
 }
 
-
 //=============================================================================================================
 
 bool Annotation::read(const QString &path, qint32 hemi, const QString &atlas, Annotation &p_Annotation)
@@ -152,7 +142,6 @@ bool Annotation::read(const QString &path, qint32 hemi, const QString &atlas, An
 
     return read(p_sFile, p_Annotation);
 }
-
 
 //=============================================================================================================
 
@@ -302,7 +291,6 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
     return true;
 }
 
-
 //=============================================================================================================
 
 bool Annotation::toLabels(const Surface &p_surf,
@@ -412,7 +400,6 @@ bool Annotation::toLabels(const Surface &p_surf,
 //# convert tuples to lists
 //labels = list(labels)
 //label_colors = list(label_colors)
-
 
     printf("[done]\n");
 

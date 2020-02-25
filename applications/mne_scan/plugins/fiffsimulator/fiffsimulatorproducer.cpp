@@ -40,13 +40,11 @@
 #include "fiffsimulatorproducer.h"
 #include "fiffsimulator.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QMutexLocker>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -56,7 +54,6 @@ using namespace FIFFSIMULATORPLUGIN;
 using namespace COMMUNICATIONLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -73,14 +70,12 @@ FiffSimulatorProducer::FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator)
 {
 }
 
-
 //=============================================================================================================
 
 FiffSimulatorProducer::~FiffSimulatorProducer()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -119,7 +114,6 @@ void FiffSimulatorProducer::connectDataClient(QString p_sRtSeverIP)
     }
 }
 
-
 //=============================================================================================================
 
 void FiffSimulatorProducer::disconnectDataClient()
@@ -135,7 +129,6 @@ void FiffSimulatorProducer::disconnectDataClient()
         emit dataConnectionChanged(m_bDataClientIsConnected);
     }
 }
-
 
 //=============================================================================================================
 
@@ -163,7 +156,6 @@ void FiffSimulatorProducer::stop()
 //    if(this->isRunning())
 //        QThread::wait();
 }
-
 
 //=============================================================================================================
 
