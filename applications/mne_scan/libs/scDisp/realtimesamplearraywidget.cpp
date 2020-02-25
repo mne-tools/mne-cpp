@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -46,7 +45,6 @@
 #include <scMeas/realtimesamplearray.h>
 #include <math.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -57,14 +55,12 @@
 #include <QTime>
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace SCDISPLIB;
 using namespace SCMEASLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -111,7 +107,6 @@ RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(QSharedPointer<RealTimeSamp
     setMouseTracking(true);
 }
 
-
 //=============================================================================================================
 
 RealTimeSampleArrayWidget::~RealTimeSampleArrayWidget()
@@ -121,13 +116,11 @@ RealTimeSampleArrayWidget::~RealTimeSampleArrayWidget()
     RealTimeSampleArrayWidget::s_listSamplingRates.clear();
 }
 
-
 //=============================================================================================================
 
 void RealTimeSampleArrayWidget::actualize()
 {
     m_dPosY = ui.m_qFrame->pos().y()+0.5*ui.m_qFrame->height();
-
 
     // Compute scaling factor
     m_fScaleFactor = ui.m_qFrame->height()/static_cast<float>(m_pRTSA->getMaxValue()-m_pRTSA->getMinValue());
@@ -159,14 +152,12 @@ void RealTimeSampleArrayWidget::actualize()
 //        pRTSAW->m_dSampleWidth = dMax/pRTSAW->m_pRTSA->getSamplingRate();
 }
 
-
 //=============================================================================================================
 
 void RealTimeSampleArrayWidget::stopAnnotation()
 {
     m_bToolInUse = !m_bToolInUse;
 }
-
 
 //=============================================================================================================
 
@@ -177,7 +168,6 @@ void RealTimeSampleArrayWidget::maxValueChanged(double maxValue)
     actualize();
 }
 
-
 //=============================================================================================================
 
 void RealTimeSampleArrayWidget::minValueChanged(double minValue)
@@ -186,7 +176,6 @@ void RealTimeSampleArrayWidget::minValueChanged(double minValue)
 //    ui.m_qLabel_MinValue->setText(QString::number(minValue));
     actualize();
 }
-
 
 //=============================================================================================================
 
@@ -231,7 +220,6 @@ void RealTimeSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr)
         qWarning() << "RealTimeSampleArrayWidget::update; getArraySize():" << m_pRTSA->getArraySize() << "getSampleArray():" << m_pRTSA->getSampleArray().size();
 }
 
-
 //=============================================================================================================
 
 void RealTimeSampleArrayWidget::init()
@@ -242,7 +230,6 @@ void RealTimeSampleArrayWidget::init()
 
     m_dMinValue_init = m_pRTSA->getMinValue();
     m_dMaxValue_init = m_pRTSA->getMaxValue();
-
 
     // Set drawing start position in X and Y direction
     m_dPosX = ui.m_qFrame->pos().x()+1;
@@ -257,13 +244,11 @@ void RealTimeSampleArrayWidget::init()
     actualize();
 }
 
-
 //=============================================================================================================
 
 void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
-
 
 //    //=============================================================================================================
 //    //=============================================================================================================
@@ -272,7 +257,6 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
 //
 //    painter.setBrush(Qt::white);
 //    painter.drawRect(0, 0, width(), height());
-
 
     painter.setPen(QPen(Qt::gray, 1, Qt::DashLine));
 
@@ -295,7 +279,6 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
         dActualPosX = m_dPosX+i*dNumPixelsX;
         painter.drawLine((int)dActualPosX, usPosY, (int)dActualPosX, usPosY+usHeight);
     }
-
 
     //=============================================================================================================
     //=============================================================================================================
@@ -327,7 +310,6 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
     painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
     painter.setRenderHint(QPainter::Antialiasing);
 
-
     //=============================================================================================================
     //=============================================================================================================
     // Draw real time curve respectively frozen curve
@@ -344,7 +326,6 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
             painter.drawPath(m_qPainterPath);
         m_qMutex.unlock();
     }
-
 
     //=============================================================================================================
     //=============================================================================================================
@@ -444,7 +425,6 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
         int iEndY   = m_qPointMouseEndPosition.y();
         int iStartY = m_qPointMouseStartPosition.y();
 
-
         // Compute pixel difference
         double iPixelDifferenceX = static_cast<double>(std::abs(iStartX - iEndX));
         double iPixelDifferenceY = static_cast<double>(std::abs(iStartY - iEndY));
@@ -498,7 +478,6 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
             end.setX(usPosX+usWidth); end.setY(iEndY);//iStartY + 5);
             painter.drawLine(start, end);
 
-
             // Compute text position
             if(iEndY > iStartY)
                 iEndY = iEndY + 1;
@@ -514,7 +493,6 @@ void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -541,7 +519,6 @@ void RealTimeSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
     }
 }
 
-
 //=============================================================================================================
 
 void RealTimeSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
@@ -549,7 +526,6 @@ void RealTimeSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
     if(m_bMeasurement || m_bScaling)
         m_qPointMouseEndPosition = mouseEvent->pos();
 }
-
 
 //=============================================================================================================
 
@@ -559,7 +535,6 @@ void RealTimeSampleArrayWidget::mouseReleaseEvent(QMouseEvent*)
     m_bPosition = true;
     m_bScaling = false;
 }
-
 
 //=============================================================================================================
 
@@ -581,7 +556,6 @@ void RealTimeSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
 
     m_bToolInUse = !m_bToolInUse;
 }
-
 
 //=============================================================================================================
 
@@ -614,7 +588,6 @@ void RealTimeSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
     connect( m_pTimerToolDisplay.data(), SIGNAL(timeout()), ui.m_qLabel_Tool, SLOT(hide()));
     m_pTimerToolDisplay->start(2000);
 }
-
 
 //=============================================================================================================
 // STATIC DEFINITIONS

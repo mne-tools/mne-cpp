@@ -42,7 +42,6 @@
 
 #include "../../disp_global.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,18 +50,15 @@
 #include <QColor>
 #include <QVector>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
 
-
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
@@ -332,7 +328,6 @@ const Eigen::MatrixX3i m_matViridrisData = (Eigen::MatrixX3i(256,3) << 68, 1, 84
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-
 //=============================================================================================================
 /**
  * Provides diffenrent color maps like Jet,...
@@ -458,7 +453,6 @@ public:
      * @return the corresponding Cool RGB
      */
     static QRgb valueToViridisNegated(double v);
-
 
 protected:
     //=========================================================================================================
@@ -729,7 +723,6 @@ inline QRgb ColorMap::valueToColor(double v, const QString& sMap)
     return valueToJet(v);
 }
 
-
 //=============================================================================================================
 
 inline QRgb ColorMap::valueToJet(double v)
@@ -737,7 +730,6 @@ inline QRgb ColorMap::valueToJet(double v)
     QRgb p_qRgb = qRgb(jetR(v), jetG(v), jetB(v));
     return p_qRgb;
 }
-
 
 //=============================================================================================================
 
@@ -747,7 +739,6 @@ inline QRgb ColorMap::valueToHot(double v)
     return p_qRgb;
 }
 
-
 //=============================================================================================================
 
 inline QRgb ColorMap::valueToHotNegative1(double v)
@@ -755,7 +746,6 @@ inline QRgb ColorMap::valueToHotNegative1(double v)
     QRgb p_qRgb = qRgb(hotRNeg1(v), hotGNeg1(v), hotBNeg1(v));
     return p_qRgb;
 }
-
 
 //=============================================================================================================
 
@@ -765,7 +755,6 @@ inline QRgb ColorMap::valueToHotNegative2(double v)
     return p_qRgb;
 }
 
-
 //=============================================================================================================
 
 inline QRgb ColorMap::valueToBone(double v)
@@ -773,7 +762,6 @@ inline QRgb ColorMap::valueToBone(double v)
     QRgb p_qRgb = qRgb(boneR(v), boneG(v), boneB(v));
     return p_qRgb;
 }
-
 
 //=============================================================================================================
 
@@ -783,7 +771,6 @@ inline QRgb ColorMap::valueToRedBlue(double v)
     return p_qRgb;
 }
 
-
 //=============================================================================================================
 
 inline QRgb ColorMap::valueToCool(double v)
@@ -791,7 +778,6 @@ inline QRgb ColorMap::valueToCool(double v)
     QRgb p_qRgb = qRgb(coolR(v), coolG(v), coolB(v));
     return p_qRgb;
 }
-
 
 //=============================================================================================================
 
@@ -805,7 +791,6 @@ inline QRgb ColorMap::valueToViridis(double v)
     return p_qRgb;
 }
 
-
 //=============================================================================================================
 
 inline QRgb ColorMap::valueToViridisNegated(double v)
@@ -817,7 +802,6 @@ inline QRgb ColorMap::valueToViridisNegated(double v)
     QRgb p_qRgb = qRgb(m_matViridrisData(255-(uint)v*255,0), m_matViridrisData(255-(uint)v*255,1), m_matViridrisData(255-(uint)v*255,2));
     return p_qRgb;
 }
-
 
 } // NAMESPACE
 

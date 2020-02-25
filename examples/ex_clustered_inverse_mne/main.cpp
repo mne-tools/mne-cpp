@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -58,7 +57,6 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -67,7 +65,6 @@
 #include <QCommandLineParser>
 #include <QSet>
 #include <QVector3D>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -80,7 +77,6 @@ using namespace INVERSELIB;
 using namespace DISP3DLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // MAIN
@@ -252,14 +248,12 @@ int main(int argc, char *argv[])
     double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
     double t_dConditionNumberClustered = MNEMath::getConditionNumber(t_clusteredFwd.sol->data, s);
 
-
     std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
     std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;
 
     std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
 
     std::cout << "Clustered ForwardSolution" << t_clusteredFwd.sol->data.block(0,0,10,10) << std::endl;
-
 
 //    double t_dConditionNumberMags = MNEMath::getConditionNumber(mags, s);
 //    double t_dConditionNumberMagsClustered = MNEMath::getConditionNumber(magsClustered, s);
@@ -272,7 +266,6 @@ int main(int argc, char *argv[])
 
 //    std::cout << "Condition Number Gradiometers:\n" << t_dConditionNumberGrads << std::endl;
 //    std::cout << "Clustered Condition Number Gradiometers:\n" << t_dConditionNumberGradsClustered << std::endl;
-
 
     //Source Estimate end
     //########################################################################################

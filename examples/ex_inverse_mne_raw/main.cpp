@@ -35,7 +35,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -43,7 +42,6 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
-
 
 //=============================================================================================================
 // MNE INCLUDES
@@ -94,7 +92,6 @@ using namespace DISP3DLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
 
-
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
@@ -129,11 +126,9 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
     QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
 
-
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
-
 
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
 
@@ -146,11 +141,9 @@ int main(int argc, char *argv[])
     QCommandLineOption invFileOutOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
     QCommandLineOption stcFileOutOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
 
-
     QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
     QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "true");
     QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "0");
-
 
     parser.addOption(inputOption);
     parser.addOption(surfOption);
@@ -492,7 +485,6 @@ int main(int argc, char *argv[])
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
     evoked.applyBaselineCorrection(baseline);
 
-
     //########################################################################################
     // Source Estimate
 
@@ -557,14 +549,12 @@ int main(int argc, char *argv[])
     qDebug() << "Sampling frequency" << raw.info.sfreq;
     qDebug() << "Number of Steps" << sourceEstimate.data.cols();
 
-
     VectorXd s;
 
     double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
 
     std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
     std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
-
 
     //Source Estimate end
     //########################################################################################

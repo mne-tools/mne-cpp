@@ -44,13 +44,11 @@
 #include "../mne_global.h"
 #include <mne/c/mne_types.h>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,7 +57,6 @@
 #include <QSharedPointer>
 #include <QStringList>
 #include <QDebug>
-
 
 //============================= mne_fiff.h =============================
 
@@ -78,7 +75,6 @@
 
 #define TAG_OLD_SURF_GEOM           20
 
-
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -86,7 +82,6 @@
 namespace FIFFLIB {
     class FiffDigitizerData;
 }
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -109,7 +104,6 @@ class MneMshDisplaySurface;
 class MneProjData;
 class MneMghTagGroup;
 
-
 //=============================================================================================================
 /**
  * Implements MNE Surface or Volume (Replaces *mneSurfaceOrVolume,mneSurfaceOrVolumeRec; struct of MNE-C mne_types.h).
@@ -130,7 +124,6 @@ public:
 //    typedef MneSurfaceOrVolume MneCSurface; //TODO create a derived class
     //typedef mneSurfaceOrVolume mneVolume;
 
-
     //=========================================================================================================
     /**
      * Constructs the MNE Surface or Volume
@@ -144,14 +137,12 @@ public:
      */
     virtual ~MneSurfaceOrVolume();
 
-
     //============================= make_filter_source_sapces.c =============================
 
     static double solid_angle (float       *from,	/* From this point... */
                                MNELIB::MneTriangle* tri);
 
     static double sum_solids(float *from, MneSurfaceOld* surf);
-
 
     static int mne_filter_source_spaces(MneSurfaceOld* surf,  /* The bounding surface must be provided */
                                         float limit,                                   /* Minimum allowed distance from the surface */
@@ -163,7 +154,6 @@ public:
     //============================= mne_patches.c =============================
 
     static int mne_add_patch_stats(MneSourceSpaceOld* s);
-
 
     //============================= filter_source_sapces.c =============================
 
@@ -209,7 +199,6 @@ public:
                                           int  add_geometry,      /* Add the geometry information */
                                           float *sigmap,          /* Conductivity? */
                                           bool   check_too_many_neighbors);
-
 
 
     //============================= mne_project_to_surface.c =============================
@@ -266,7 +255,6 @@ public:
                                       MneSourceSpaceOld* **spacesp, /* These are the results */
                                       int            *nspacep);
 
-
     static void mne_source_space_update_inuse(MneSourceSpaceOld* s,
                                               int *new_inuse);
 
@@ -289,7 +277,6 @@ public:
                                           int            nspace,
                                           const QStringList& labels,
                                           int            nlabel);
-
 
     //============================= mne_labels.c =============================
     //TODO Move to separate label class

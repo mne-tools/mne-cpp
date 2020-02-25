@@ -44,14 +44,12 @@
 #include <QDataStream>
 #include <QSharedPointer>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNELIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -62,14 +60,12 @@ MNECorSourceEstimate::MNECorSourceEstimate()
 {
 }
 
-
 //=============================================================================================================
 
 MNECorSourceEstimate::MNECorSourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep)
 : MNESourceEstimate(p_sol, p_vertices, p_tmin, p_tstep)
 {
 }
-
 
 //=============================================================================================================
 
@@ -79,14 +75,12 @@ MNECorSourceEstimate::MNECorSourceEstimate(const MNECorSourceEstimate& p_SourceE
 
 }
 
-
 //=============================================================================================================
 
 MNECorSourceEstimate::MNECorSourceEstimate(QIODevice &p_IODevice)
 : MNESourceEstimate(p_IODevice)
 {
 }
-
 
 //=============================================================================================================
 
@@ -96,7 +90,6 @@ void MNECorSourceEstimate::clear()
 
 }
 
-
 //=============================================================================================================
 
 bool MNECorSourceEstimate::read(QIODevice &p_IODevice, MNECorSourceEstimate& p_stc)
@@ -104,14 +97,12 @@ bool MNECorSourceEstimate::read(QIODevice &p_IODevice, MNECorSourceEstimate& p_s
     return MNESourceEstimate::read(p_IODevice, p_stc);
 }
 
-
 //=============================================================================================================
 
 bool MNECorSourceEstimate::write(QIODevice &p_IODevice)
 {
     return MNESourceEstimate::write(p_IODevice);
 }
-
 
 //=============================================================================================================
 

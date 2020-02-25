@@ -58,7 +58,6 @@
 #include <unistd.h>
 #endif
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -69,7 +68,6 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QDir>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -82,7 +80,6 @@ using namespace IOBUFFER;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -120,7 +117,6 @@ EEGoSports::EEGoSports()
     addPluginAction(m_pActionImpedance);
 }
 
-
 //=============================================================================================================
 
 EEGoSports::~EEGoSports()
@@ -147,7 +143,6 @@ EEGoSports::~EEGoSports()
     settings.setValue(QString("EEGOSPORTS/useElectrodeshiftMode"), m_bUseElectrodeShiftMode);
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> EEGoSports::clone() const
@@ -155,7 +150,6 @@ QSharedPointer<IPlugin> EEGoSports::clone() const
     QSharedPointer<EEGoSports> pEEGoSportsClone(new EEGoSports());
     return pEEGoSportsClone;
 }
-
 
 //=============================================================================================================
 
@@ -196,14 +190,12 @@ void EEGoSports::init()
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 }
 
-
 //=============================================================================================================
 
 void EEGoSports::unload()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -573,7 +565,6 @@ void EEGoSports::setUpFiffInfo()
     m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
 }
 
-
 //=============================================================================================================
 
 void EEGoSports::setNumberOfChannels(int iNumberOfChannels, int iNumberOfEEGChannels, int iNumberOfBipolarChannels)
@@ -582,7 +573,6 @@ void EEGoSports::setNumberOfChannels(int iNumberOfChannels, int iNumberOfEEGChan
     m_iNumberOfEEGChannels = iNumberOfEEGChannels;
     m_iNumberOfBipolarChannels = iNumberOfBipolarChannels;
 }
-
 
 //=============================================================================================================
 
@@ -627,7 +617,6 @@ bool EEGoSports::start()
     }
 }
 
-
 //=============================================================================================================
 
 bool EEGoSports::stop()
@@ -645,7 +634,6 @@ bool EEGoSports::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 void EEGoSports::setSampleData(MatrixXd &matRawBuffer)
@@ -655,7 +643,6 @@ void EEGoSports::setSampleData(MatrixXd &matRawBuffer)
     m_mutex.unlock();
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType EEGoSports::getType() const
@@ -663,14 +650,12 @@ IPlugin::PluginType EEGoSports::getType() const
     return _ISensor;
 }
 
-
 //=============================================================================================================
 
 QString EEGoSports::getName() const
 {
     return "EEGoSports EEG";
 }
-
 
 //=============================================================================================================
 
@@ -684,7 +669,6 @@ QWidget* EEGoSports::setupWidget()
     return widget;
 }
 
-
 //=============================================================================================================
 
 void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion)
@@ -697,7 +681,6 @@ void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const 
     m_sRPA = sRPA;
     m_sNasion = sNasion;
 }
-
 
 //=============================================================================================================
 
@@ -720,7 +703,6 @@ void EEGoSports::showImpedanceDialog()
     }
 }
 
-
 //=============================================================================================================
 
 void EEGoSports::showSetupProjectDialog()
@@ -739,7 +721,6 @@ void EEGoSports::showSetupProjectDialog()
         m_pEEGoSportsSetupProjectWidget->raise();
     }
 }
-
 
 //=============================================================================================================
 
@@ -801,7 +782,6 @@ void EEGoSports::showStartRecording()
     }
 }
 
-
 //=============================================================================================================
 
 void EEGoSports::changeRecordingButton()
@@ -814,7 +794,6 @@ void EEGoSports::changeRecordingButton()
         m_iBlinkStatus = 0;
     }
 }
-
 
 //=============================================================================================================
 

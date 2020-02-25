@@ -40,7 +40,6 @@
 
 #include "digitizersettreeitem.h"
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -53,18 +52,15 @@
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_coord_trans.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <Qt3DCore/QTransform>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -73,11 +69,9 @@
 using namespace DISP3DLIB;
 using namespace FIFFLIB;
 
-
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -89,7 +83,6 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(int iType, const QString& text)
     initItem();
 }
 
-
 //=============================================================================================================
 
 void DigitizerSetTreeItem::initItem()
@@ -99,7 +92,6 @@ void DigitizerSetTreeItem::initItem()
     this->setCheckState(Qt::Checked);
     this->setToolTip("Digitizer set item");
 }
-
 
 //=============================================================================================================
 
@@ -117,7 +109,6 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     QList<FIFFLIB::FiffDigPoint> tHpi;
     QList<FIFFLIB::FiffDigPoint> tEeg;
     QList<FIFFLIB::FiffDigPoint> tExtra;
-
 
     for(int i = 0; i < tDigitizer.size(); ++i){
 
@@ -333,7 +324,6 @@ void DigitizerSetTreeItem::addData(const FIFFLIB::FiffDigPointSet& tDigitizer, Q
     }
 }
 
-
 //=============================================================================================================
 
 void DigitizerSetTreeItem::setTransform(const Qt3DCore::QTransform& transform)
@@ -342,7 +332,6 @@ void DigitizerSetTreeItem::setTransform(const Qt3DCore::QTransform& transform)
         m_pRenderable3DEntity->setTransform(transform);
     }
 }
-
 
 //=============================================================================================================
 
@@ -353,7 +342,6 @@ void DigitizerSetTreeItem::setTransform(const FiffCoordTrans& transform, bool bA
     }
 }
 
-
 //=============================================================================================================
 
 void DigitizerSetTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
@@ -362,7 +350,6 @@ void DigitizerSetTreeItem::applyTransform(const Qt3DCore::QTransform& transform)
         m_pRenderable3DEntity->applyTransform(transform);
     }
 }
-
 
 //=============================================================================================================
 

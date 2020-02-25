@@ -46,7 +46,6 @@
 
 #include <communication/rtCommand/command.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -55,7 +54,6 @@
 #include <QFile>
 #include <QCoreApplication>
 #include <QDebug>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -67,7 +65,6 @@ using namespace RTSERVER;
 using namespace IOBUFFER;
 using namespace COMMUNICATIONLIB;
 
-
 //=============================================================================================================
 // DEFINE MEMBER CONSTANTS
 //=============================================================================================================
@@ -77,7 +74,6 @@ const QString FiffSimulator::Commands::GETBUFSIZE   = "getbufsize";
 const QString FiffSimulator::Commands::ACCEL        = "accel";
 const QString FiffSimulator::Commands::GETACCEL     = "getaccel";
 const QString FiffSimulator::Commands::SIMFILE      = "simfile";
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -95,7 +91,6 @@ FiffSimulator::FiffSimulator()
     this->init();
 }
 
-
 //=============================================================================================================
 
 FiffSimulator::~FiffSimulator()
@@ -106,7 +101,6 @@ FiffSimulator::~FiffSimulator()
     delete m_pFiffProducer;
     delete m_pRawMatrixBuffer;
 }
-
 
 //=============================================================================================================
 
@@ -140,7 +134,6 @@ void FiffSimulator::comBufsize(Command p_command)
         m_commandManager[Commands::BUFSIZE].reply("Buffer size not set\r\n");
     }
 }
-
 
 //=============================================================================================================
 
@@ -260,7 +253,6 @@ void FiffSimulator::comSimfile(Command p_command)
     }
 }
 
-
 //=============================================================================================================
 
 void FiffSimulator::connectCommandManager()
@@ -273,7 +265,6 @@ void FiffSimulator::connectCommandManager()
     QObject::connect(&m_commandManager[Commands::SIMFILE], &Command::executed, this, &FiffSimulator::comSimfile);
 }
 
-
 //=============================================================================================================
 
 ConnectorID FiffSimulator::getConnectorID() const
@@ -281,14 +272,12 @@ ConnectorID FiffSimulator::getConnectorID() const
     return _FIFFSIMULATOR;
 }
 
-
 //=============================================================================================================
 
 const char* FiffSimulator::getName() const
 {
     return "Fiff File Simulator";
 }
-
 
 //=============================================================================================================
 
@@ -332,7 +321,6 @@ void FiffSimulator::init()
         m_pRawMatrixBuffer = new RawMatrixBuffer(RAW_BUFFFER_SIZE, m_RawInfo.info.nchan, this->m_uiBufferSampleSize);
 }
 
-
 //=============================================================================================================
 
 bool FiffSimulator::start()
@@ -347,7 +335,6 @@ bool FiffSimulator::start()
     return true;
 }
 
-
 //=============================================================================================================
 
 bool FiffSimulator::stop()
@@ -358,7 +345,6 @@ bool FiffSimulator::stop()
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -371,7 +357,6 @@ void FiffSimulator::info(qint32 ID)
     if(!m_RawInfo.isEmpty())
         emit remitMeasInfo(ID, m_RawInfo.info);
 }
-
 
 //=============================================================================================================
 
@@ -410,7 +395,6 @@ bool FiffSimulator::readRawInfo()
 //    //    MatrixXi picks = Fiff::pick_types(m_RawInfo.info, want_meg, want_eeg, want_stim, include, m_RawInfo.info.bads);
 //        MatrixXi picks = m_RawInfo.info.pick_types(want_meg, want_eeg, want_stim, include, m_RawInfo.info.bads); //Prefer member function
 
-
 //        //
 //        //   Set up projection
 //        //
@@ -431,7 +415,6 @@ bool FiffSimulator::readRawInfo()
 //            //
 //    //        fiff_int_t nproj = MNE::make_projector_info(m_RawInfo.info, m_RawInfo.proj); Using the member function instead
 //            fiff_int_t nproj = m_RawInfo.info.make_projector_info(m_RawInfo.proj);
-
 
 //    //        qDebug() << m_RawInfo.proj.data->data.rows();
 //    //        qDebug() << m_RawInfo.proj.data->data.cols();
@@ -488,7 +471,6 @@ bool FiffSimulator::readRawInfo()
 
     return true;
 }
-
 
 //=============================================================================================================
 

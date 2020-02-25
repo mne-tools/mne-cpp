@@ -48,18 +48,15 @@
 #include <fs/label.h>
 #include <fs/surface.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -68,7 +65,6 @@
 using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace FSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -80,7 +76,6 @@ FsSurfaceTreeItem::FsSurfaceTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iTy
 {
     initItem();
 }
-
 
 //=============================================================================================================
 
@@ -126,7 +121,6 @@ void FsSurfaceTreeItem::initItem()
 
     this->setAlpha(1.0f);
 }
-
 
 //=============================================================================================================
 
@@ -177,7 +171,6 @@ void FsSurfaceTreeItem::addData(const Surface& tSurface)
 //    itemSurfPath->setData(data, MetaTreeItemRoles::SurfaceFilePath);
 }
 
-
 //=============================================================================================================
 
 void FsSurfaceTreeItem::onAnnotationVisibilityChanged(bool isVisible)
@@ -190,7 +183,6 @@ void FsSurfaceTreeItem::onAnnotationVisibilityChanged(bool isVisible)
 
     onColorInfoOriginOrCurvColorChanged();
 }
-
 
 //=============================================================================================================
 
@@ -217,7 +209,6 @@ MatrixX4f FsSurfaceTreeItem::createCurvatureVertColor(const VectorXf& curvature,
 
     return colors;
 }
-
 
 //=============================================================================================================
 

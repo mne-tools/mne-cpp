@@ -47,7 +47,6 @@
 #include <scMeas/realtimemultisamplearray.h>
 #include <disp3D/viewers/hpiview.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -59,7 +58,6 @@
 #include <QList>
 
 #include <QDebug>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -73,7 +71,6 @@ using namespace SCMEASLIB;
 using namespace COMMUNICATIONLIB;
 using namespace DISP3DLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -99,7 +96,6 @@ FiffSimulator::FiffSimulator()
     addPluginAction(m_pActionComputeHPI);
 }
 
-
 //=============================================================================================================
 
 FiffSimulator::~FiffSimulator()
@@ -107,7 +103,6 @@ FiffSimulator::~FiffSimulator()
     if(m_pFiffSimulatorProducer->isRunning() || this->isRunning())
         stop();
 }
-
 
 //=============================================================================================================
 
@@ -118,7 +113,6 @@ void FiffSimulator::clear()
     m_iBufferSize = -1;
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> FiffSimulator::clone() const
@@ -126,7 +120,6 @@ QSharedPointer<IPlugin> FiffSimulator::clone() const
     QSharedPointer<FiffSimulator> pFiffSimulatorClone(new FiffSimulator());
     return pFiffSimulatorClone;
 }
-
 
 //=============================================================================================================
 
@@ -147,14 +140,12 @@ void FiffSimulator::init()
     this->connectCmdClient();
 }
 
-
 //=============================================================================================================
 
 void FiffSimulator::unload()
 {
     qDebug() << "void FiffSimulator::unload()";
 }
-
 
 //=============================================================================================================
 
@@ -195,7 +186,6 @@ bool FiffSimulator::start()
         return false;
 }
 
-
 //=============================================================================================================
 
 bool FiffSimulator::stop()
@@ -226,7 +216,6 @@ bool FiffSimulator::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType FiffSimulator::getType() const
@@ -234,14 +223,12 @@ IPlugin::PluginType FiffSimulator::getType() const
     return _ISensor;
 }
 
-
 //=============================================================================================================
 
 QString FiffSimulator::getName() const
 {
     return "Fiff Simulator";
 }
-
 
 //=============================================================================================================
 
@@ -251,7 +238,6 @@ QWidget* FiffSimulator::setupWidget()
 
     return widget;
 }
-
 
 //=============================================================================================================
 
@@ -281,7 +267,6 @@ void FiffSimulator::run()
     }
 }
 
-
 //=============================================================================================================
 
 void FiffSimulator::initConnector()
@@ -294,7 +279,6 @@ void FiffSimulator::initConnector()
         m_pRTMSA_FiffSimulator->data()->setXMLLayoutFile(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/FiffSimulator/VectorViewSimLayout.xml");
     }
 }
-
 
 //=============================================================================================================
 
@@ -334,7 +318,6 @@ void FiffSimulator::changeConnector(qint32 p_iNewConnectorId)
         emit cmdConnectionChanged(m_bCmdClientIsConnected);
     }
 }
-
 
 //=============================================================================================================
 
@@ -392,7 +375,6 @@ void FiffSimulator::connectCmdClient()
     }
 }
 
-
 //=============================================================================================================
 
 void FiffSimulator::disconnectCmdClient()
@@ -407,7 +389,6 @@ void FiffSimulator::disconnectCmdClient()
         emit cmdConnectionChanged(m_bCmdClientIsConnected);
     }
 }
-
 
 //=============================================================================================================
 
@@ -429,7 +410,6 @@ void FiffSimulator::requestInfo()
         qWarning() << "FiffSimulatorProducer is not connected!";
     }
 }
-
 
 //=============================================================================================================
 
@@ -454,7 +434,6 @@ void FiffSimulator::showHPIDialog()
     }
 }
 
-
 //=============================================================================================================
 
 void FiffSimulator::updateHPI(const MatrixXf& matData)
@@ -464,7 +443,6 @@ void FiffSimulator::updateHPI(const MatrixXf& matData)
         m_pHPIWidget->setData(matData.cast<double>());
     }
 }
-
 
 //=============================================================================================================
 
@@ -502,7 +480,6 @@ void FiffSimulator::doContinousHPI(MatrixXf& matData)
         }
     }
 }
-
 
 //=============================================================================================================
 

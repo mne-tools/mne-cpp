@@ -41,13 +41,11 @@
 #include "ui_gusbampsetupprojectwidget.h"
 #include "../gusbamp.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace GUSBAMPPLUGIN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -80,14 +78,12 @@ GUSBAmpSetupProjectWidget::GUSBAmpSetupProjectWidget(GUSBAmp* pGUSBAmp, QWidget 
             this, &GUSBAmpSetupProjectWidget::changeQLineEdits);
 }
 
-
 //=============================================================================================================
 
 GUSBAmpSetupProjectWidget::~GUSBAmpSetupProjectWidget()
 {
     delete ui;
 }
-
 
 //=============================================================================================================
 
@@ -109,7 +105,6 @@ void GUSBAmpSetupProjectWidget::initGui()
     generateFilePath();
 }
 
-
 //=============================================================================================================
 
 void GUSBAmpSetupProjectWidget::addProject()
@@ -127,7 +122,6 @@ void GUSBAmpSetupProjectWidget::addProject()
     ui->m_qComboBox_ProjectSelection->setCurrentIndex(ui->m_qComboBox_ProjectSelection->count()-1);
 }
 
-
 //=============================================================================================================
 
 void GUSBAmpSetupProjectWidget::addSubject()
@@ -144,7 +138,6 @@ void GUSBAmpSetupProjectWidget::addSubject()
     ui->m_qComboBox_SubjectSelection->addItem(list.at(list.size()-1));
     ui->m_qComboBox_SubjectSelection->setCurrentIndex(ui->m_qComboBox_SubjectSelection->count()-1);
 }
-
 
 //=============================================================================================================
 
@@ -164,7 +157,6 @@ void GUSBAmpSetupProjectWidget::changeOutputFile()
     m_pGUSBAmp->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
 }
 
-
 //=============================================================================================================
 
 void GUSBAmpSetupProjectWidget::changeCap()
@@ -181,7 +173,6 @@ void GUSBAmpSetupProjectWidget::changeCap()
     ui->m_qLineEdit_EEGCap->setText(path);
     //m_pGUSBAmp->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
 }
-
 
 //=============================================================================================================
 
@@ -204,7 +195,6 @@ void GUSBAmpSetupProjectWidget::generateFilePath(int index)
     ui->m_qLineEdit_FiffRecordFile->setText(resourcePath);
     m_pGUSBAmp->m_sOutputFilePath = resourcePath;
 }
-
 
 //=============================================================================================================
 

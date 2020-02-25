@@ -41,7 +41,6 @@
 #include "mne_bem_surface.h"
 #include <fstream>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -49,7 +48,6 @@
 using namespace MNELIB;
 using namespace Eigen;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -69,7 +67,6 @@ MNEBemSurface::MNEBemSurface()
 , tri_area(VectorXd::Zero(0))
 {
 }
-
 
 //=============================================================================================================
 
@@ -91,14 +88,12 @@ MNEBemSurface::MNEBemSurface(const MNEBemSurface& p_MNEBemSurface)
     //*m_pGeometryData = *p_MNEBemSurface.m_pGeometryData;
 }
 
-
 //=============================================================================================================
 
 MNEBemSurface::~MNEBemSurface()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -116,7 +111,6 @@ void MNEBemSurface::clear()
     tri_nn = MatrixX3d::Zero(0,3);
     tri_area = VectorXd::Zero(0);
 }
-
 
 //=============================================================================================================
 
@@ -181,7 +175,6 @@ bool MNEBemSurface::addTriangleData()
     return true;
 }
 
-
 //=============================================================================================================
 
 bool MNEBemSurface::add_geometry_info()
@@ -229,7 +222,6 @@ bool MNEBemSurface::add_geometry_info()
     return true;
 }
 
-
 //=============================================================================================================
 
 bool MNEBemSurface::addVertexNormals()
@@ -265,7 +257,6 @@ bool MNEBemSurface::addVertexNormals()
 return true;
 }
 
-
 //=============================================================================================================
 
 void MNEBemSurface::writeToStream(FiffStream *p_pStream)
@@ -283,7 +274,6 @@ void MNEBemSurface::writeToStream(FiffStream *p_pStream)
         p_pStream->write_int_matrix(FIFF_BEM_SURF_TRIANGLES, this->tris.array() + 1);
     p_pStream->write_float_matrix(FIFF_BEM_SURF_NORMALS, this->nn);
 }
-
 
 //=============================================================================================================
 

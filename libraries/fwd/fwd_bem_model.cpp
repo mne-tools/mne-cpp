@@ -62,11 +62,9 @@
 
 #include <Eigen/Dense>
 
-
 static float Qx[] = {1.0,0.0,0.0};
 static float Qy[] = {0.0,1.0,0.0};
 static float Qz[] = {0.0,0.0,1.0};
-
 
 #ifndef TRUE
 #define TRUE 1
@@ -86,12 +84,9 @@ static float Qz[] = {0.0,0.0,1.0};
 
 
 
-
-
 #define X_40 0
 #define Y_40 1
 #define Z_40 2
-
 
 #define VEC_DIFF_40(from,to,diff) {\
     (diff)[X_40] = (to)[X_40] - (from)[X_40];\
@@ -99,13 +94,11 @@ static float Qz[] = {0.0,0.0,1.0};
     (diff)[Z_40] = (to)[Z_40] - (from)[Z_40];\
     }
 
-
 #define VEC_COPY_40(to,from) {\
     (to)[X_40] = (from)[X_40];\
     (to)[Y_40] = (from)[Y_40];\
     (to)[Z_40] = (from)[Z_40];\
     }
-
 
 
 #define VEC_DOT_40(x,y) ((x)[X_40]*(y)[X_40] + (x)[Y_40]*(y)[Y_40] + (x)[Z_40]*(y)[Z_40])
@@ -120,7 +113,6 @@ static float Qz[] = {0.0,0.0,1.0};
 
 
 
-
 #define MALLOC_40(x,t) (t *)malloc((x)*sizeof(t))
 
 #define ALLOC_CMATRIX_40(x,y) mne_cmatrix_40((x),(y))
@@ -131,7 +123,6 @@ static float Qz[] = {0.0,0.0,1.0};
 
 
 
-
 void mne_free_cmatrix_40 (float **m)
 {
     if (m) {
@@ -139,7 +130,6 @@ void mne_free_cmatrix_40 (float **m)
         FREE_40(m);
     }
 }
-
 
 static void matrix_error_40(int kind, int nr, int nc)
 
@@ -159,7 +149,6 @@ static void matrix_error_40(int kind, int nr, int nc)
 }
 
 
-
 float **mne_cmatrix_40 (int nr,int nc)
 
 {
@@ -176,8 +165,6 @@ float **mne_cmatrix_40 (int nr,int nc)
         m[i] = whole + i*nc;
     return m;
 }
-
-
 
 
 
@@ -209,9 +196,6 @@ void fromFloatEigenMatrix_40(const Eigen::MatrixXf& from_mat, float **& to_mat)
 
 
 
-
-
-
 float **mne_lu_invert_40(float **mat,int dim)
 /*
       * Invert a matrix using the LU decomposition from
@@ -223,8 +207,6 @@ float **mne_lu_invert_40(float **mat,int dim)
     fromFloatEigenMatrix_40(eigen_mat_inv, mat);
     return mat;
 }
-
-
 
 
 
@@ -245,7 +227,6 @@ void mne_transpose_square_40(float **mat, int n)
         }
     return;
 }
-
 
 
 float mne_dot_vectors_40(float *v1,
@@ -269,8 +250,6 @@ float mne_dot_vectors_40(float *v1,
 
 
 
-
-
 void mne_add_scaled_vector_to_40(float *v1,float scale, float *v2,int nn)
 
 {
@@ -285,7 +264,6 @@ void mne_add_scaled_vector_to_40(float *v1,float scale, float *v2,int nn)
 #endif
     return;
 }
-
 
 void mne_scale_vector_40(double scale,float *v,int   nn)
 
@@ -364,7 +342,6 @@ float **mne_mat_mat_mult_40 (float **m1,
 
 
 
-
 static struct {
     int  kind;
     const QString name;
@@ -373,7 +350,6 @@ static struct {
 { FIFFV_BEM_SURF_ID_HEAD  , "scalp" },
 { -1                      , "unknown" } };
 
-
 static struct {
     int  method;
     const QString name;
@@ -381,10 +357,8 @@ static struct {
 { FWD_BEM_LINEAR_COLL   , "linear collocation" },
 { -1                    , "unknown" } };
 
-
 #define BEM_SUFFIX     "-bem.fif"
 #define BEM_SOL_SUFFIX "-bem-sol.fif"
-
 
 
 //============================= misc_util.c =============================
@@ -409,7 +383,6 @@ typedef struct {
     int frame;
     const QString name;
 } frameNameRec_40;
-
 
 const QString mne_coord_frame_name_40(int frame)
 
@@ -442,8 +415,6 @@ const QString mne_coord_frame_name_40(int frame)
 
 
 
-
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -452,7 +423,6 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace FWDLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -477,7 +447,6 @@ FwdBemModel::FwdBemModel()
 
 }
 
-
 //=============================================================================================================
 
 FwdBemModel::~FwdBemModel()
@@ -495,7 +464,6 @@ FwdBemModel::~FwdBemModel()
     this->fwd_bem_free_solution();
 }
 
-
 //=============================================================================================================
 
 void FwdBemModel::fwd_bem_free_solution()
@@ -508,7 +476,6 @@ void FwdBemModel::fwd_bem_free_solution()
 
     return;
 }
-
 
 //=============================================================================================================
 
@@ -526,7 +493,6 @@ QString FwdBemModel::fwd_bem_make_bem_sol_name(const QString& name)
     return s2;
 }
 
-
 //=============================================================================================================
 
 const QString& FwdBemModel::fwd_bem_explain_surface(int kind)
@@ -539,7 +505,6 @@ const QString& FwdBemModel::fwd_bem_explain_surface(int kind)
 
     return surf_expl[k].name;
 }
-
 
 //=============================================================================================================
 
@@ -554,7 +519,6 @@ const QString& FwdBemModel::fwd_bem_explain_method(int method)
 
     return method_expl[k].name;
 }
-
 
 //=============================================================================================================
 
@@ -575,7 +539,6 @@ int FwdBemModel::get_int(FiffStream::SPtr &stream, const FiffDirNode::SPtr &node
     return FAIL;
 }
 
-
 //=============================================================================================================
 
 MneSurfaceOld *FwdBemModel::fwd_bem_find_surface(int kind)
@@ -590,7 +553,6 @@ MneSurfaceOld *FwdBemModel::fwd_bem_find_surface(int kind)
     printf("Desired surface (%d = %s) not found.", kind,fwd_bem_explain_surface(kind).toUtf8().constData());
     return NULL;
 }
-
 
 //=============================================================================================================
 
@@ -674,7 +636,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 FwdBemModel *FwdBemModel::fwd_bem_load_homog_surface(const QString &name)
@@ -688,7 +649,6 @@ FwdBemModel *FwdBemModel::fwd_bem_load_homog_surface(const QString &name)
     return fwd_bem_load_surfaces(name,kinds,nkind);
 }
 
-
 //=============================================================================================================
 
 FwdBemModel *FwdBemModel::fwd_bem_load_three_layer_surfaces(const QString &name)
@@ -701,7 +661,6 @@ FwdBemModel *FwdBemModel::fwd_bem_load_three_layer_surfaces(const QString &name)
 
     return fwd_bem_load_surfaces(name,kinds,nkind);
 }
-
 
 //=============================================================================================================
 
@@ -806,7 +765,6 @@ not_found : {
     }
 }
 
-
 //=============================================================================================================
 
 int FwdBemModel::fwd_bem_set_head_mri_t(FwdBemModel *m, FiffCoordTransOld *t)
@@ -831,7 +789,6 @@ int FwdBemModel::fwd_bem_set_head_mri_t(FwdBemModel *m, FiffCoordTransOld *t)
         return FAIL;
     }
 }
-
 
 //=============================================================================================================
 
@@ -905,7 +862,6 @@ out : {
     }
 }
 
-
 //=============================================================================================================
 
 double FwdBemModel::calc_beta(double *rk, double *rk1)
@@ -922,7 +878,6 @@ double FwdBemModel::calc_beta(double *rk, double *rk1)
               (VEC_LEN_40(rk1)*size + VEC_DOT_40(rk1,rkk1)))/size;
     return (res);
 }
-
 
 //=============================================================================================================
 
@@ -1031,7 +986,6 @@ void FwdBemModel::lin_pot_coeff(float *from, MneTriangle* to, double omega[])	/*
     return;
 }
 
-
 //=============================================================================================================
 
 void FwdBemModel::correct_auto_elements(MneSurfaceOld *surf, float **mat)
@@ -1102,7 +1056,6 @@ void FwdBemModel::correct_auto_elements(MneSurfaceOld *surf, float **mat)
 #endif
     return;
 }
-
 
 //=============================================================================================================
 
@@ -1181,7 +1134,6 @@ float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
     return(mat);
 }
 
-
 //=============================================================================================================
 
 int FwdBemModel::fwd_bem_linear_collocation_solution(FwdBemModel *m)
@@ -1245,7 +1197,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 float **FwdBemModel::fwd_bem_multi_solution(float **solids, float **gamma, int nsurf, int *ntri)       /* Number of triangles or nodes on each surface */
@@ -1286,7 +1237,6 @@ float **FwdBemModel::fwd_bem_multi_solution(float **solids, float **gamma, int n
     return (mne_lu_invert_40(solids,ntot));
 }
 
-
 //=============================================================================================================
 
 float **FwdBemModel::fwd_bem_homog_solution(float **solids, int ntri)
@@ -1299,7 +1249,6 @@ float **FwdBemModel::fwd_bem_homog_solution(float **solids, int ntri)
 {
     return fwd_bem_multi_solution (solids,NULL,1,&ntri);
 }
-
 
 //=============================================================================================================
 
@@ -1377,7 +1326,6 @@ void FwdBemModel::fwd_bem_ip_modify_solution(float **solution, float **ip_soluti
     return;
 }
 
-
 //=============================================================================================================
 
 int FwdBemModel::fwd_bem_check_solids(float **angles, int ntri1, int ntri2, float desired)
@@ -1412,7 +1360,6 @@ int FwdBemModel::fwd_bem_check_solids(float **angles, int ntri1, int ntri2, floa
     FREE_40(sums);
     return res;
 }
-
 
 //=============================================================================================================
 
@@ -1471,7 +1418,6 @@ float **FwdBemModel::fwd_bem_solid_angles(const QList<MneSurfaceOld*>& surfs)
     FREE_40(sub_solids);
     return (solids);
 }
-
 
 //=============================================================================================================
 
@@ -1534,7 +1480,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 int FwdBemModel::fwd_bem_compute_solution(FwdBemModel *m, int bem_method)
@@ -1555,7 +1500,6 @@ int FwdBemModel::fwd_bem_compute_solution(FwdBemModel *m, int bem_method)
     printf ("Unknown BEM method: %d\n",bem_method);
     return FAIL;
 }
-
 
 //=============================================================================================================
 
@@ -1591,7 +1535,6 @@ int FwdBemModel::fwd_bem_load_recompute_solution(const QString& name, int bem_me
     return fwd_bem_compute_solution(m,bem_method);
 }
 
-
 //=============================================================================================================
 
 float FwdBemModel::fwd_bem_inf_field(float *rd, float *Q, float *rp, float *dir)     /* Which field component */
@@ -1609,7 +1552,6 @@ float FwdBemModel::fwd_bem_inf_field(float *rd, float *Q, float *rp, float *dir)
     return (VEC_DOT_40(cross,dir)/(diff2*sqrt(diff2)));
 }
 
-
 //=============================================================================================================
 
 float FwdBemModel::fwd_bem_inf_pot(float *rd, float *Q, float *rp)	/* Potential point */
@@ -1623,7 +1565,6 @@ float FwdBemModel::fwd_bem_inf_pot(float *rd, float *Q, float *rp)	/* Potential 
     diff2 = VEC_DOT_40(diff,diff);
     return (VEC_DOT_40(Q,diff)/(4.0*M_PI*diff2*sqrt(diff2)));
 }
-
 
 //=============================================================================================================
 
@@ -1721,7 +1662,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 void FwdBemModel::fwd_bem_pot_grad_calc(float *rd, float *Q, FwdBemModel* m, FwdCoilSet* els, int all_surfs, float *xgrad, float *ygrad, float *zgrad)
@@ -1784,7 +1724,6 @@ void FwdBemModel::fwd_bem_pot_grad_calc(float *rd, float *Q, FwdBemModel* m, Fwd
     return;
 }
 
-
 //=============================================================================================================
 
 void FwdBemModel::fwd_bem_lin_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdCoilSet *els, int all_surfs, float *pot)              /* Put the result here */
@@ -1831,7 +1770,6 @@ void FwdBemModel::fwd_bem_lin_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdC
         pot[k] = mne_dot_vectors_40(solution[k],v0,m->nsol);
     return;
 }
-
 
 //=============================================================================================================
 
@@ -1896,7 +1834,6 @@ void FwdBemModel::fwd_bem_lin_pot_grad_calc(float *rd, float *Q, FwdBemModel *m,
     return;
 }
 
-
 //=============================================================================================================
 
 void FwdBemModel::fwd_bem_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdCoilSet *els, int all_surfs, float *pot)
@@ -1943,7 +1880,6 @@ void FwdBemModel::fwd_bem_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdCoilS
     return;
 }
 
-
 //=============================================================================================================
 
 int FwdBemModel::fwd_bem_pot_els(float *rd, float *Q, FwdCoilSet *els, float *pot, void *client) /* The model */
@@ -1976,7 +1912,6 @@ int FwdBemModel::fwd_bem_pot_els(float *rd, float *Q, FwdCoilSet *els, float *po
     }
     return OK;
 }
-
 
 //=============================================================================================================
 
@@ -2017,7 +1952,6 @@ int FwdBemModel::fwd_bem_pot_grad_els(float *rd, float *Q, FwdCoilSet *els, floa
     return OK;
 }
 
-
 //=============================================================================================================
 
 #define ARSINH(x) log((x) + sqrt(1.0+(x)*(x)))
@@ -2047,7 +1981,6 @@ void FwdBemModel::calc_f(double *xx, double *yy, double *f0, double *fx, double 
     }
 }
 
-
 //=============================================================================================================
 
 void FwdBemModel::calc_magic(double u, double z, double A, double B, double *beta, double *D)
@@ -2062,7 +1995,6 @@ void FwdBemModel::calc_magic(double u, double z, double A, double B, double *bet
     beta[1] = (A*B + B2*u)/sqrt(A*A + B2*z*z);
     beta[2] = (B*z*z - A*u)/(z*(*D));
 }
-
 
 //=============================================================================================================
 
@@ -2179,7 +2111,6 @@ void FwdBemModel::field_integrals(float *from, MneTriangle* to, double *I1p, dou
     return;
 }
 
-
 //=============================================================================================================
 
 double FwdBemModel::one_field_coeff(float *dest, float *normal, MneTriangle* tri)
@@ -2215,7 +2146,6 @@ double FwdBemModel::one_field_coeff(float *dest, float *normal, MneTriangle* tri
             coeff[k] = coeff[k] + yy[j][k]*bbeta[j];
     return (VEC_DOT_40(coeff,normal));
 }
-
 
 //=============================================================================================================
 
@@ -2290,7 +2220,6 @@ float **FwdBemModel::fwd_bem_field_coeff(FwdBemModel *m, FwdCoilSet *coils)	/* G
     return coeff;
 }
 
-
 //=============================================================================================================
 
 double FwdBemModel::calc_gamma(double *rk, double *rk1)
@@ -2306,7 +2235,6 @@ double FwdBemModel::calc_gamma(double *rk, double *rk1)
               (VEC_LEN_40(rk)*size + VEC_DOT_40(rk,rkk1)))/size;
     return (res);
 }
-
 
 //=============================================================================================================
 
@@ -2377,7 +2305,6 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_ferg(float *dest, float *dir, MneT
     return;
 }
 
-
 //=============================================================================================================
 
 void FwdBemModel::fwd_bem_one_lin_field_coeff_uran(float *dest, float *dir, MneTriangle* tri, double *res)	/* The results */
@@ -2410,7 +2337,6 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_uran(float *dest, float *dir, MneT
     return;
 }
 
-
 //=============================================================================================================
 
 void FwdBemModel::fwd_bem_one_lin_field_coeff_simple(float *dest, float *normal, MneTriangle* source, double *res)     /* The result for each triangle node */
@@ -2424,7 +2350,6 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_simple(float *dest, float *normal,
     int   k;
     float *rr[3];
 
-
     rr[0] = source->r1;
     rr[1] = source->r2;
     rr[2] = source->r3;
@@ -2437,7 +2362,6 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_simple(float *dest, float *normal,
     }
     return;
 }
-
 
 //=============================================================================================================
 
@@ -2540,7 +2464,6 @@ float **FwdBemModel::fwd_bem_lin_field_coeff(FwdBemModel *m, FwdCoilSet *coils, 
     return (coeff);
 }
 
-
 //=============================================================================================================
 
 int FwdBemModel::fwd_bem_specify_coils(FwdBemModel *m, FwdCoilSet *coils)
@@ -2591,7 +2514,6 @@ bad : {
 
     }
 }
-
 
 //=============================================================================================================
 
@@ -2655,7 +2577,6 @@ void FwdBemModel::fwd_bem_lin_field_calc(float *rd, float *Q, FwdCoilSet *coils,
     return;
 }
 
-
 //=============================================================================================================
 
 void FwdBemModel::fwd_bem_field_calc(float *rd, float *Q, FwdCoilSet *coils, FwdBemModel *m, float *B)
@@ -2717,7 +2638,6 @@ void FwdBemModel::fwd_bem_field_calc(float *rd, float *Q, FwdCoilSet *coils, Fwd
         B[k] = MAG_FACTOR*B[k];
     return;
 }
-
 
 //=============================================================================================================
 
@@ -2798,7 +2718,6 @@ void FwdBemModel::fwd_bem_field_grad_calc(float *rd, float *Q, FwdCoilSet* coils
     return;
 }
 
-
 //=============================================================================================================
 
 float FwdBemModel::fwd_bem_inf_field_der(float *rd, float *Q, float *rp, float *dir, float *comp)	   /* Which gradient component */
@@ -2820,7 +2739,6 @@ float FwdBemModel::fwd_bem_inf_field_der(float *rd, float *Q, float *rp, float *
     return res;
 }
 
-
 //=============================================================================================================
 
 float FwdBemModel::fwd_bem_inf_pot_der(float *rd, float *Q, float *rp, float *comp) /* Which gradient component */
@@ -2841,7 +2759,6 @@ float FwdBemModel::fwd_bem_inf_pot_der(float *rd, float *Q, float *rp, float *co
     res = 3*VEC_DOT_40(Q,diff)*VEC_DOT_40(comp,diff)/diff5 - VEC_DOT_40(comp,Q)/diff3;
     return (res/(4.0*M_PI));
 }
-
 
 //=============================================================================================================
 
@@ -2923,7 +2840,6 @@ void FwdBemModel::fwd_bem_lin_field_grad_calc(float *rd, float *Q, FwdCoilSet *c
     return;
 }
 
-
 //=============================================================================================================
 
 int FwdBemModel::fwd_bem_field(float *rd, float *Q, FwdCoilSet *coils, float *B, void *client)  /* The model */
@@ -2954,7 +2870,6 @@ int FwdBemModel::fwd_bem_field(float *rd, float *Q, FwdCoilSet *coils, float *B,
     }
     return OK;
 }
-
 
 //=============================================================================================================
 
@@ -3019,7 +2934,6 @@ int FwdBemModel::fwd_bem_field_grad(float *rd,
 
     return OK;
 }
-
 
 //=============================================================================================================
 
@@ -3194,7 +3108,6 @@ bad : {
         return NULL;
     }
 }
-
 
 //=============================================================================================================
 
@@ -3413,7 +3326,6 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
     if(comp)
         delete comp;
 
-
      *resp = MneNamedMatrix::build_named_matrix(fixed_ori ? nsource : 3*nsource,
                                                nmeg,
                                                emptyList,
@@ -3437,7 +3349,6 @@ bad : {
         return FAIL;
     }
 }
-
 
 //=============================================================================================================
 
@@ -3615,7 +3526,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 #define EPS   1e-5   /* Points closer to origin than this many
@@ -3723,7 +3633,6 @@ int FwdBemModel::fwd_sphere_field(float *rd, float Q[], FwdCoilSet *coils, float
     }
     return OK;          /* Happy conclusion: this works always */
 }
-
 
 //=============================================================================================================
 
@@ -3835,7 +3744,6 @@ int FwdBemModel::fwd_sphere_field_vec(float *rd, FwdCoilSet *coils, float **Bval
     }
     return OK;			/* Happy conclusion: this works always */
 }
-
 
 //=============================================================================================================
 
@@ -3999,7 +3907,6 @@ int FwdBemModel::fwd_sphere_field_grad(float *rd, float Q[], FwdCoilSet *coils, 
     return OK;			/* Happy conclusion: this works always */
 }
 
-
 //=============================================================================================================
 
 int FwdBemModel::fwd_mag_dipole_field(float *rm, float M[], FwdCoilSet *coils, float Bval[], void *client)	/* Client data will be the sphere model origin */
@@ -4010,7 +3917,6 @@ int FwdBemModel::fwd_mag_dipole_field(float *rm, float M[], FwdCoilSet *coils, f
     int     j,k,np;
     FwdCoil* this_coil;
     float   sum,diff[3],dist,dist2,dist5,*dir;
-
 
     for (k = 0; k < coils->ncoil; k++) {
         this_coil = coils->coils[k];
@@ -4037,7 +3943,6 @@ int FwdBemModel::fwd_mag_dipole_field(float *rm, float M[], FwdCoilSet *coils, f
     return OK;
 }
 
-
 //=============================================================================================================
 
 int FwdBemModel::fwd_mag_dipole_field_vec(float *rm, FwdCoilSet *coils, float **Bval, void *client)     /* Client data will be the sphere model origin */
@@ -4049,7 +3954,6 @@ int FwdBemModel::fwd_mag_dipole_field_vec(float *rm, FwdCoilSet *coils, float **
     int     j,k,p,np;
     FwdCoil* this_coil;
     float   sum[3],diff[3],dist,dist2,dist5,*dir;
-
 
     for (k = 0; k < coils->ncoil; k++) {
         this_coil = coils->coils[k];

@@ -33,13 +33,11 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "abstractphongalphamaterial.h"
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -54,11 +52,9 @@
 #include <QFilterKey>
 #include <Qt3DRender/qgraphicsapifilter.h>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -67,11 +63,9 @@
 using namespace DISP3DLIB;
 using namespace Qt3DRender;
 
-
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -95,7 +89,6 @@ AbstractPhongAlphaMaterial::AbstractPhongAlphaMaterial(bool bUseSortPolicy, QNod
     onAlphaChanged(m_pAlphaParameter->value());
 }
 
-
 //=============================================================================================================
 
 float AbstractPhongAlphaMaterial::alpha() const
@@ -103,14 +96,12 @@ float AbstractPhongAlphaMaterial::alpha() const
     return m_pAlphaParameter->value().toFloat();
 }
 
-
 //=============================================================================================================
 
 void AbstractPhongAlphaMaterial::setAlpha(float fAlpha)
 {
     m_pAlphaParameter->setValue(fAlpha);
 }
-
 
 //=============================================================================================================
 
@@ -165,7 +156,6 @@ void AbstractPhongAlphaMaterial::init()
     this->setEffect(m_pEffect);
 }
 
-
 //=============================================================================================================
 
 void AbstractPhongAlphaMaterial::addShaderToRenderPass(const QString &sObjectName, QShaderProgram *pShaderProgramm)
@@ -177,7 +167,6 @@ void AbstractPhongAlphaMaterial::addShaderToRenderPass(const QString &sObjectNam
         qDebug() << "AbstractPhongAlphaMaterial::addShaderToRenderPass: Renderpass " << sObjectName <<  " not found!";
     }
 }
-
 
 //=============================================================================================================
 
@@ -198,6 +187,5 @@ void AbstractPhongAlphaMaterial::onAlphaChanged(const QVariant &fAlpha)
         }
     }
 }
-
 
 //=============================================================================================================

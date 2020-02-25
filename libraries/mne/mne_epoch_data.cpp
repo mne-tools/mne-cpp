@@ -42,7 +42,6 @@
 
 #include <utils/mnemath.h>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -50,7 +49,6 @@
 using namespace MNELIB;
 using namespace Eigen;
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -64,7 +62,6 @@ MNEEpochData::MNEEpochData()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -85,7 +82,6 @@ MNEEpochData::~MNEEpochData()
 
 }
 
-
 //=============================================================================================================
 
 void MNEEpochData::applyBaselineCorrection(QPair<QVariant, QVariant>& baseline)
@@ -94,7 +90,6 @@ void MNEEpochData::applyBaselineCorrection(QPair<QVariant, QVariant>& baseline)
     RowVectorXf times = RowVectorXf::LinSpaced(this->epoch.cols(), this->tmin, this->tmax);
     this->epoch = MNEMath::rescale(this->epoch, times, baseline, QString("mean"));
 }
-
 
 //=============================================================================================================
 

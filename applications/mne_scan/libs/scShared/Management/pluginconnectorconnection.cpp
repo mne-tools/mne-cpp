@@ -47,14 +47,12 @@
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimesourceestimate.h>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -68,14 +66,12 @@ PluginConnectorConnection::PluginConnectorConnection(IPlugin::SPtr sender, IPlug
     createConnection();
 }
 
-
 //=============================================================================================================
 
 PluginConnectorConnection::~PluginConnectorConnection()
 {
     clearConnection();
 }
-
 
 //=============================================================================================================
 
@@ -87,7 +83,6 @@ void PluginConnectorConnection::clearConnection()
 
     m_qHashConnections.clear();
 }
-
 
 //=============================================================================================================
 
@@ -176,7 +171,6 @@ bool PluginConnectorConnection::createConnection()
     return bConnected;
 }
 
-
 //=============================================================================================================
 
 ConnectorDataType PluginConnectorConnection::getDataType(QSharedPointer<PluginConnector> pPluginConnector)
@@ -208,7 +202,6 @@ ConnectorDataType PluginConnectorConnection::getDataType(QSharedPointer<PluginCo
 
     return ConnectorDataType::_None;
 }
-
 
 //=============================================================================================================
 

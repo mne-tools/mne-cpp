@@ -71,7 +71,6 @@
 #include <QtConcurrent>
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -87,7 +86,6 @@ using namespace IOBUFFER;
 using namespace MNELIB;
 using namespace FSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -111,7 +109,6 @@ RtcMne::RtcMne()
 
 }
 
-
 //=============================================================================================================
 
 RtcMne::~RtcMne()
@@ -122,7 +119,6 @@ RtcMne::~RtcMne()
         stop();
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> RtcMne::clone() const
@@ -130,7 +126,6 @@ QSharedPointer<IPlugin> RtcMne::clone() const
     QSharedPointer<RtcMne> pRtcMneClone(new RtcMne());
     return pRtcMneClone;
 }
-
 
 //=============================================================================================================
 
@@ -181,14 +176,12 @@ void RtcMne::init()
     m_pRTSEOutput->data()->setFwdSolution(m_pClusteredFwd);
 }
 
-
 //=============================================================================================================
 
 void RtcMne::unload()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -285,7 +278,6 @@ void RtcMne::calcFiffInfo()
     }
 }
 
-
 //=============================================================================================================
 
 void RtcMne::doClustering()
@@ -303,7 +295,6 @@ void RtcMne::doClustering()
     finishedClustering();
 }
 
-
 //=============================================================================================================
 
 void RtcMne::finishedClustering()
@@ -315,7 +306,6 @@ void RtcMne::finishedClustering()
 
     emit clusteringFinished();
 }
-
 
 //=============================================================================================================
 
@@ -333,7 +323,6 @@ bool RtcMne::start()
         return false;
     }
 }
-
 
 //=============================================================================================================
 
@@ -356,7 +345,6 @@ bool RtcMne::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType RtcMne::getType() const
@@ -364,14 +352,12 @@ IPlugin::PluginType RtcMne::getType() const
     return _IAlgorithm;
 }
 
-
 //=============================================================================================================
 
 QString RtcMne::getName() const
 {
     return "RTC-MNE";
 }
-
 
 //=============================================================================================================
 
@@ -389,7 +375,6 @@ QWidget* RtcMne::setupWidget()
 
     return setupWidget;
 }
-
 
 //=============================================================================================================
 
@@ -434,7 +419,6 @@ void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
     }
 }
 
-
 //=============================================================================================================
 
 void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
@@ -460,7 +444,6 @@ void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
     }
 }
-
 
 //=============================================================================================================
 
@@ -507,7 +490,6 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
     }
 }
 
-
 //=============================================================================================================
 
 void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
@@ -525,7 +507,6 @@ void RtcMne::updateInvOp(const MNEInverseOperator& invOp)
     // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
     m_pMinimumNorm->doInverseSetup(1,true);
 }
-
 
 //=============================================================================================================
 
@@ -546,14 +527,12 @@ void RtcMne::onMethodChanged(const QString& method)
     }
 }
 
-
 //=============================================================================================================
 
 void RtcMne::onTriggerTypeChanged(const QString& triggerType)
 {
     m_sAvrType = triggerType;
 }
-
 
 //=============================================================================================================
 
@@ -569,7 +548,6 @@ void RtcMne::onTimePointValueChanged(int iTimePointMs)
         }
     }
 }
-
 
 //=============================================================================================================
 

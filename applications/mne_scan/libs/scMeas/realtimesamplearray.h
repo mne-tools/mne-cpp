@@ -43,7 +43,6 @@
 #include "scmeas_global.h"
 #include "measurement.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -53,14 +52,12 @@
 #include <QMutex>
 #include <QMutexLocker>
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE SCMEASLIB
 //=============================================================================================================
 
 namespace SCMEASLIB
 {
-
 
 //=========================================================================================================
 /**
@@ -213,7 +210,6 @@ private:
     QVector<double>     m_vecSamples;       /**< Holds the sample array vector.*/
 };
 
-
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
@@ -230,7 +226,6 @@ inline void RealTimeSampleArray::setMinValue(double minValue)
     m_dMinValue = minValue;
 }
 
-
 //=============================================================================================================
 
 inline double RealTimeSampleArray::getMinValue() const
@@ -238,7 +233,6 @@ inline double RealTimeSampleArray::getMinValue() const
     QMutexLocker locker(&m_qMutex);
     return m_dMinValue;
 }
-
 
 //=============================================================================================================
 
@@ -248,7 +242,6 @@ inline void RealTimeSampleArray::setMaxValue(double maxValue)
     m_dMaxValue = maxValue;
 }
 
-
 //=============================================================================================================
 
 inline double RealTimeSampleArray::getMaxValue() const
@@ -256,7 +249,6 @@ inline double RealTimeSampleArray::getMaxValue() const
     QMutexLocker locker(&m_qMutex);
     return m_dMaxValue;
 }
-
 
 //=============================================================================================================
 
@@ -266,7 +258,6 @@ inline void RealTimeSampleArray::setSamplingRate(double dSamplingRate)
     m_dSamplingRate = dSamplingRate;
 }
 
-
 //=============================================================================================================
 
 inline double RealTimeSampleArray::getSamplingRate() const
@@ -274,7 +265,6 @@ inline double RealTimeSampleArray::getSamplingRate() const
     QMutexLocker locker(&m_qMutex);
     return m_dSamplingRate;
 }
-
 
 //=============================================================================================================
 
@@ -288,7 +278,6 @@ inline void RealTimeSampleArray::setArraySize(unsigned char ucArraySize)
         m_ucArraySize = ucArraySize;
 }
 
-
 //=============================================================================================================
 
 unsigned char RealTimeSampleArray::getArraySize() const
@@ -296,7 +285,6 @@ unsigned char RealTimeSampleArray::getArraySize() const
     QMutexLocker locker(&m_qMutex);
     return m_ucArraySize;
 }
-
 
 //=============================================================================================================
 
@@ -306,7 +294,6 @@ inline const QVector<double>& RealTimeSampleArray::getSampleArray()
     return m_vecSamples;
 }
 
-
 //=============================================================================================================
 
 inline void RealTimeSampleArray::setUnit(const QString& unit)
@@ -314,7 +301,6 @@ inline void RealTimeSampleArray::setUnit(const QString& unit)
     QMutexLocker locker(&m_qMutex);
     m_qString_Unit = unit;
 }
-
 
 //=============================================================================================================
 

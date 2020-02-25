@@ -42,7 +42,6 @@
 #include "../../../../helpers/interpolation/interpolation.h"
 #include "../../items/common/abstractmeshtreeitem.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -52,13 +51,11 @@
 #include <QElapsedTimer>
 #include <QtConcurrent>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -68,7 +65,6 @@ using namespace DISP3DLIB;
 using namespace Eigen;
 using namespace DISPLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -88,7 +84,6 @@ RtSourceDataWorker::RtSourceDataWorker()
     rightHemiInfo.pMatInterpolationMatrix = QSharedPointer<SparseMatrix<float> >(new SparseMatrix<float>());
     m_lHemiVisualizationInfo << leftHemiInfo << rightHemiInfo;
 }
-
 
 //=============================================================================================================
 
@@ -112,7 +107,6 @@ void RtSourceDataWorker::addData(const MatrixXd& data)
     m_lDataLoopQ = m_lDataQ;
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataWorker::setSurfaceColor(const MatrixX4f &matColorLeft,
@@ -122,7 +116,6 @@ void RtSourceDataWorker::setSurfaceColor(const MatrixX4f &matColorLeft,
     m_lHemiVisualizationInfo[1].matOriginalVertColor = matColorRight;
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataWorker::setNumberAverages(int iNumAvr)
@@ -130,14 +123,12 @@ void RtSourceDataWorker::setNumberAverages(int iNumAvr)
     m_iAverageSamples = iNumAvr;
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataWorker::setStreamSmoothedData(bool bStreamSmoothedData)
 {
     m_bStreamSmoothedData = bStreamSmoothedData;
 }
-
 
 //=============================================================================================================
 
@@ -147,7 +138,6 @@ void RtSourceDataWorker::setColormapType(const QString& sColormapType)
     m_lHemiVisualizationInfo[0].sColormapType = sColormapType;
     m_lHemiVisualizationInfo[1].sColormapType = sColormapType;
 }
-
 
 //=============================================================================================================
 
@@ -159,14 +149,12 @@ void RtSourceDataWorker::setThresholds(const QVector3D& vecThresholds)
     m_lHemiVisualizationInfo[1].dThresholdZ = vecThresholds.z();
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataWorker::setLoopState(bool bLoopState)
 {
     m_bIsLooping = bLoopState;
 }
-
 
 //=============================================================================================================
 
@@ -175,14 +163,12 @@ void RtSourceDataWorker::setSFreq(const double dSFreq)
     m_dSFreq = dSFreq;
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataWorker::setInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrixLeft)
 {
     m_lHemiVisualizationInfo[0].pMatInterpolationMatrix = pMatInterpolationMatrixLeft;
 }
-
 
 //=============================================================================================================
 
@@ -191,7 +177,6 @@ void RtSourceDataWorker::setInterpolationMatrixRight(QSharedPointer<Eigen::Spars
     m_lHemiVisualizationInfo[1].pMatInterpolationMatrix = pMatInterpolationMatrixRight;
 
 }
-
 
 //=============================================================================================================
 
@@ -277,7 +262,6 @@ void RtSourceDataWorker::streamData()
     //qDebug()<<"RtSourceDataWorker::streamData - time.elapsed()" << time.elapsed();
 }
 
-
 //=============================================================================================================
 
 void RtSourceDataWorker::generateColorsFromSensorValues(VisualizationInfo &visualizationInfoHemi)
@@ -301,7 +285,6 @@ void RtSourceDataWorker::generateColorsFromSensorValues(VisualizationInfo &visua
                                  visualizationInfoHemi.functionHandlerColorMap,
                                  visualizationInfoHemi.sColormapType);
 }
-
 
 //=============================================================================================================
 

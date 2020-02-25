@@ -39,7 +39,6 @@
 
 #include "filterplotscene.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -47,11 +46,9 @@
 #include <QGraphicsPathItem>
 #include <QDebug>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -60,7 +57,6 @@
 using namespace DISPLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -82,7 +78,6 @@ FilterPlotScene::FilterPlotScene(QGraphicsView *view, QObject *parent)
 {
     m_iMaxMagnitude = 100*m_iScalingFactor;
 }
-
 
 //=============================================================================================================
 
@@ -109,7 +104,6 @@ void FilterPlotScene::updateFilter(const FilterData& operatorFilter,
     //Plot the magnitude diagram
     plotMagnitudeDiagram(samplingFreq, operatorFilter.m_sName);
 }
-
 
 //=============================================================================================================
 
@@ -211,7 +205,6 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq, QString filtername)
     }
 }
 
-
 //=============================================================================================================
 
 void FilterPlotScene::plotFilterFrequencyResponse()
@@ -259,7 +252,6 @@ void FilterPlotScene::plotFilterFrequencyResponse()
     //Clear old and plot new filter path
     m_pGraphicsItemPath = addPath(path, pen);
 }
-
 
 //=============================================================================================================
 

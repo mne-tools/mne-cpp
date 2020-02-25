@@ -44,7 +44,6 @@
 #include <communication/rtCommand/commandparser.h>
 #include <communication/rtCommand/commandmanager.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -52,14 +51,12 @@
 #include <QStringList>
 #include <QTcpServer>
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
 //=============================================================================================================
 
 namespace RTSERVER
 {
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -155,7 +152,6 @@ private:
 //    QMultiMap<QString, qint32> m_qMultiMapCommandThreadID;//This is need when commands are processed by different threads; currently its only one command per time processed by one thread --> m_iCurrentCommandThreadID
     qint32 m_iCurrentCommandThreadID;   /**< Command Thread ID of the current command. */
 };
-
 
 //=============================================================================================================
 // INLINE DEFINITIONS

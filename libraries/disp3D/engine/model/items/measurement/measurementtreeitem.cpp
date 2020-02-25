@@ -68,18 +68,15 @@
 
 #include <inverse/dipoleFit/ecd_set.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -93,7 +90,6 @@ using namespace CONNECTIVITYLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -105,7 +101,6 @@ MeasurementTreeItem::MeasurementTreeItem(int iType,
     initItem();
 }
 
-
 //=============================================================================================================
 
 void MeasurementTreeItem::initItem()
@@ -115,7 +110,6 @@ void MeasurementTreeItem::initItem()
     this->setCheckState(Qt::Checked);
     this->setToolTip("Measurement item");
 }
-
 
 //=============================================================================================================
 
@@ -159,7 +153,6 @@ QList<SourceSpaceTreeItem*> MeasurementTreeItem::addData(const MNESourceSpace& t
     return pReturnItem;
 }
 
-
 //=============================================================================================================
 
 MneDataTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSourceEstimate,
@@ -198,7 +191,6 @@ MneDataTreeItem* MeasurementTreeItem::addData(const MNESourceEstimate& tSourceEs
 
     return Q_NULLPTR;
 }
-
 
 //=============================================================================================================
 
@@ -270,7 +262,6 @@ SensorDataTreeItem *MeasurementTreeItem::addData(const MatrixXd &tSensorData,
     return Q_NULLPTR;
 }
 
-
 //=============================================================================================================
 
 EcdDataTreeItem* MeasurementTreeItem::addData(const ECDSet& pECDSet,
@@ -305,7 +296,6 @@ EcdDataTreeItem* MeasurementTreeItem::addData(const ECDSet& pECDSet,
     return Q_NULLPTR;
 }
 
-
 //=============================================================================================================
 
 DigitizerSetTreeItem* MeasurementTreeItem::addData(const FiffDigPointSet& tDigitizer,
@@ -339,7 +329,6 @@ DigitizerSetTreeItem* MeasurementTreeItem::addData(const FiffDigPointSet& tDigit
 
     return Q_NULLPTR;
 }
-
 
 //=============================================================================================================
 

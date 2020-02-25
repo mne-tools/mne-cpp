@@ -40,16 +40,13 @@
 
 #include "babymeginfo.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -57,7 +54,6 @@
 
 using namespace BABYMEGPLUGIN;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -170,7 +166,6 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
     lm_ch_coiltype.clear();
     lm_ch_calicoef.clear();
     lm_ch_gain.clear();
-
 
     // parse the information for each channel
     for(qint32 k =0; k<sList.size(); k++)
@@ -387,7 +382,6 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
             break;
         }
 
-
         /*  Add the coiltrans for each sensor */
         /* x-axis normal vector */
         t_ch.coil_trans(0,0) = t_ch.chpos.ex[0];
@@ -434,7 +428,6 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Infg(QByteArray cmdstr)
 
     lm_ch_names.clear();
     lm_ch_gain.clear();
-
 
     // parse the information for each channel
     for(qint32 k =0; k<sList.size(); k++)
@@ -488,7 +481,6 @@ void BabyMEGInfo::MGH_LM_Parse_Para_Infg(QByteArray cmdstr)
         //qDebug()<<"cmdstr"<<cmdstr;
         // Start to acquire the channel's name and channel's scale
         MGH_LM_Get_Channel_Infg(cmdstr);
-
 
         //emit gain info
         emit GainInfoUpdate(lm_ch_gain);

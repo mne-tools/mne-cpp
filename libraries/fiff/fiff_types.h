@@ -37,20 +37,17 @@
 #ifndef FIFF_TYPES_H
 #define FIFF_TYPES_H
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "fiff_constants.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,7 +57,6 @@
 #include <QStringList>
 #include <QPair>
 #include <QVariant>
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -79,7 +75,6 @@ const static QPair<QVariant,QVariant> defaultVariantPair;
 
 typedef Eigen::Matrix<qint16, Eigen::Dynamic, Eigen::Dynamic> MatrixDau16;
 typedef Eigen::Matrix<short, Eigen::Dynamic, Eigen::Dynamic> MatrixShort;
-
 
 //=============================================================================================================
 // TYPEDEFS Primitive building blocks:
@@ -101,7 +96,6 @@ typedef qint16               fiff_dau_pack16_t;
 typedef qint32               fiff_julian_t;
 typedef char                 fiff_data_t; //unsig char instead of void -> avoid void in C++ cause of its undefined behaviour using delete -> this can happen during lots of casting
 
-
 //=============================================================================================================
 // TYPEDEFS Structured types:
 //=============================================================================================================
@@ -112,7 +106,6 @@ typedef struct _fiffTimeRec {
  fiff_int_t secs;           /**< GMT time in seconds since epoch */
  fiff_int_t usecs;          /**< Fraction of seconds in microseconds */
 } *fiffTime, fiffTimeRec;   /**< Accurate time stamps used in FIFF files.*/
-
 
 /** Structure representing digitized strings. */
 
@@ -125,7 +118,6 @@ typedef struct _fiffTimeRec {
 
 //typedef fiffDigStringRec fiff_dig_string_t;
 
-
 /*
  * The layered sphere model
  */
@@ -136,7 +128,6 @@ typedef struct _fiffTimeRec {
 // fiff_int_t   id;		/**< Id # of this layer (see below) */
 // fiff_float_t rad;		/**< Radius of this layer (m) */
 //} *fiffLayer, fiffLayerRec;      /**< Layer descriptor for a layered sphere model */
-
 
 //=============================================================================================================
 // TYPEDEF Following types are used by the fiff library. They are not used within the files.:
@@ -165,7 +156,6 @@ typedef struct _fiffTimeRec {
 // fiff_int_t to_state;          /**< to state */
 //} *fiffEventBits, fiffEventBitsRec;
 
-
 /** Structure for hpi coil */
 
 //typedef struct _fiff_hpi_coil {
@@ -190,11 +180,9 @@ typedef struct _fiff_data_ref {
     fiff_long_t     offset;     /**< Offset to the data in the external file  */
 } *fiffDataRef,fiffDataRefRec;
 
-
 //=============================================================================================================
 /// Outdated STUFF!!!!!!!!!!!!!!!!!!!!! ToDo Remove
 //=============================================================================================================
-
 
 /// ToDo Old implementation use new fiff_tag.h instead
 /**
@@ -237,7 +225,6 @@ typedef fiffIdRec fiff_id_t;
 
 
 
-
 /// ToDo Old implementation use new fiff_dir_entry.h instead
 /** Directories are composed of these structures. */
 
@@ -255,7 +242,6 @@ typedef struct _fiffDirEntryRec {
 typedef fiffDirEntryRec fiff_dir_entry_t;
 
 
-
 /// ToDo Old implementation
 /** Digitization point description */
 
@@ -267,17 +253,13 @@ typedef struct _fiffDigPointRec {
  fiff_float_t r[3];		 /**< Point location */
 } *fiffDigPoint,fiffDigPointRec; /**< Digitization point description */
 
-
 /** Structure representing digitized strings. */
-
 
 //typedef fiffDigPointRec  fiff_dig_point_t;
 //typedef fiffDigStringRec fiff_dig_string_t;
 
 
-
 /// ToDo Old implementation
-
 
 /*----------------------------------------------------------------------
  * Following types are used by the fiff library. They are not used
@@ -304,7 +286,6 @@ typedef struct _fiffDigPointRec {
 // int                 nchild;	 /**< Number of child nodes */
 //} fiffDirNodeRec,*fiffDirNode; 	 /**< Directory tree structure used by the fiff library routines. */
 
-
 /// ToDo Old implementation
 /** FIFF file handle returned by fiff_open(). */
 
@@ -320,7 +301,6 @@ typedef struct _fiffDigPointRec {
 //  char        *ext_file_name;	/**< Name of the file holding the external data */
 //  FILE        *ext_fd;		/**< The file descriptor of the above file if open  */
 //} *fiffFile,fiffFileRec;	/**< FIFF file handle. fiff_open() returns this. */
-
 
 
 /// ToDo Old implementation use new fiff_coord_trans.h instead
@@ -339,7 +319,6 @@ typedef struct _fiffDigPointRec {
 
 /// ToDo Old implementation use new fiff_info.h instead
 
-
 /** Measurement channel position and coil type. */
 
 //typedef struct _fiffChPosRec {
@@ -351,7 +330,6 @@ typedef struct _fiffDigPointRec {
 //} fiffChPosRec,*fiffChPos;      /**< Measurement channel position and coil type */
 
 //typedef fiffChPosRec fiff_ch_pos_t;
-
 
 ///** Description of one channel */
 
@@ -371,7 +349,6 @@ typedef struct _fiffDigPointRec {
 //typedef fiffChInfoRec fiff_ch_info_t;
 
 #define FIFFM_CHPOS(x) &((x)->chpos)
-
 
 
 }//NAMESPACE

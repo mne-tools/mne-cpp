@@ -39,7 +39,6 @@
 
 #include "plot.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -47,14 +46,12 @@
 #include <QPoint>
 #include <QPainter>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -67,7 +64,6 @@ Plot::Plot(QWidget *parent)
     init();
 }
 
-
 //=============================================================================================================
 
 Plot::Plot(VectorXd &p_dVec, QWidget *parent)
@@ -78,14 +74,12 @@ Plot::Plot(VectorXd &p_dVec, QWidget *parent)
     updateData(p_dVec);
 }
 
-
 //=============================================================================================================
 
 Plot::~Plot()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -101,7 +95,6 @@ void Plot::init()
     m_dMinY = 0;
     m_dMaxY = 0;
 }
-
 
 //=============================================================================================================
 
@@ -133,7 +126,6 @@ void Plot::updateData(VectorXd &p_dVec)
     }
 }
 
-
 //=============================================================================================================
 
 void Plot::paintEvent(QPaintEvent *event)
@@ -144,7 +136,6 @@ void Plot::paintEvent(QPaintEvent *event)
     if (m_qListVecPointFPaths.size() > 0)
     {
         QPoint t_qPointTopLeft(m_iBorderLeftRight,m_iBorderTopBottom);
-
 
         QSize t_qSizePlot = m_qSizeWidget;
 
@@ -181,7 +172,6 @@ void Plot::paintEvent(QPaintEvent *event)
                 painter.drawLine(*(it-1), *it);
         }
         painter.restore();
-
 
         //Draw title & axes
         Graph::drawLabels(t_qSizePlot.width(), t_qSizePlot.height());

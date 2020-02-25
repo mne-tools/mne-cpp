@@ -34,7 +34,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -62,7 +61,6 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -70,7 +68,6 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QVector3D>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -82,7 +79,6 @@ using namespace FIFFLIB;
 using namespace INVERSELIB;
 using namespace UTILSLIB;
 using namespace DISP3DLIB;
-
 
 //=============================================================================================================
 // MAIN
@@ -175,7 +171,6 @@ int main(int argc, char *argv[])
 
 //    std::cout << "Size " << t_clusteredFwd.sol->data.rows() << " x " << t_clusteredFwd.sol->data.cols() << std::endl;
 //    std::cout << "Clustered Fwd:\n" << t_clusteredFwd.sol->data.row(0) << std::endl;
-
 
     PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 

@@ -33,7 +33,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -47,18 +46,15 @@
 
 #include <limits>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -68,11 +64,9 @@ using namespace CONNECTIVITYLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
 
-
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -93,7 +87,6 @@ Network::Network(const QString& sConnectivityMethod,
     qRegisterMetaType<QList<CONNECTIVITYLIB::Network> >("QList<CONNECTIVITYLIB::Network>");
     qRegisterMetaType<QList<CONNECTIVITYLIB::Network::SPtr> >("QList<CONNECTIVITYLIB::Network::SPtr>");
 }
-
 
 //=============================================================================================================
 
@@ -118,7 +111,6 @@ MatrixXd Network::getFullConnectivityMatrix(bool bGetMirroredVersion) const
     //IOUtils::write_eigen_matrix(matDist,"eigen.txt");
     return matDist;
 }
-
 
 //=============================================================================================================
 
@@ -151,14 +143,12 @@ const QList<NetworkEdge::SPtr>& Network::getFullEdges() const
     return m_lFullEdges;
 }
 
-
 //=============================================================================================================
 
 const QList<NetworkEdge::SPtr>& Network::getThresholdedEdges() const
 {
     return m_lThresholdedEdges;
 }
-
 
 //=============================================================================================================
 
@@ -167,14 +157,12 @@ const QList<NetworkNode::SPtr>& Network::getNodes() const
     return m_lNodes;
 }
 
-
 //=============================================================================================================
 
 NetworkNode::SPtr Network::getNodeAt(int i)
 {
     return m_lNodes.at(i);
 }
-
 
 //=============================================================================================================
 
@@ -189,7 +177,6 @@ qint16 Network::getFullDistribution() const
     return distribution;
 }
 
-
 //=============================================================================================================
 
 qint16 Network::getThresholdedDistribution() const
@@ -203,14 +190,12 @@ qint16 Network::getThresholdedDistribution() const
     return distribution;
 }
 
-
 //=============================================================================================================
 
 void Network::setConnectivityMethod(const QString& sConnectivityMethod)
 {
     m_sConnectivityMethod = sConnectivityMethod;
 }
-
 
 //=============================================================================================================
 
@@ -219,7 +204,6 @@ QString Network::getConnectivityMethod() const
     return m_sConnectivityMethod;
 }
 
-
 //=============================================================================================================
 
 QPair<double, double> Network::getMinMaxFullWeights() const
@@ -227,14 +211,12 @@ QPair<double, double> Network::getMinMaxFullWeights() const
     return m_minMaxFullWeights;
 }
 
-
 //=============================================================================================================
 
 QPair<double, double> Network::getMinMaxThresholdedWeights() const
 {
     return m_minMaxThresholdedWeights;
 }
-
 
 //=============================================================================================================
 
@@ -254,7 +236,6 @@ QPair<int,int> Network::getMinMaxFullDegrees() const
     return QPair<int,int>(minDegree,maxDegree);
 }
 
-
 //=============================================================================================================
 
 QPair<int,int> Network::getMinMaxThresholdedDegrees() const
@@ -272,7 +253,6 @@ QPair<int,int> Network::getMinMaxThresholdedDegrees() const
 
     return QPair<int,int>(minDegree,maxDegree);
 }
-
 
 //=============================================================================================================
 
@@ -292,7 +272,6 @@ QPair<int,int> Network::getMinMaxFullIndegrees() const
     return QPair<int,int>(minDegree,maxDegree);
 }
 
-
 //=============================================================================================================
 
 QPair<int,int> Network::getMinMaxThresholdedIndegrees() const
@@ -310,7 +289,6 @@ QPair<int,int> Network::getMinMaxThresholdedIndegrees() const
 
     return QPair<int,int>(minDegree,maxDegree);
 }
-
 
 //=============================================================================================================
 
@@ -330,7 +308,6 @@ QPair<int,int> Network::getMinMaxFullOutdegrees() const
     return QPair<int,int>(minDegree,maxDegree);
 }
 
-
 //=============================================================================================================
 
 QPair<int,int> Network::getMinMaxThresholdedOutdegrees() const
@@ -348,7 +325,6 @@ QPair<int,int> Network::getMinMaxThresholdedOutdegrees() const
 
     return QPair<int,int>(minDegree,maxDegree);
 }
-
 
 //=============================================================================================================
 
@@ -370,14 +346,12 @@ void Network::setThreshold(double dThreshold)
     m_minMaxThresholdedWeights.second = m_minMaxFullWeights.second;
 }
 
-
 //=============================================================================================================
 
 double Network::getThreshold()
 {
     return m_dThreshold;
 }
-
 
 //=============================================================================================================
 
@@ -425,14 +399,12 @@ void Network::setFrequencyRange(float fLowerFreq, float fUpperFreq)
     }
 }
 
-
 //=============================================================================================================
 
 const QPair<float,float>& Network::getFrequencyRange() const
 {
     return m_minMaxFrequency;
 }
-
 
 //=============================================================================================================
 
@@ -454,14 +426,12 @@ void Network::append(NetworkEdge::SPtr newEdge)
     }
 }
 
-
 //=============================================================================================================
 
 void Network::append(NetworkNode::SPtr newNode)
 {
     m_lNodes << newNode;
 }
-
 
 //=============================================================================================================
 
@@ -473,7 +443,6 @@ bool Network::isEmpty() const
 
     return false;
 }
-
 
 //=============================================================================================================
 
@@ -496,14 +465,12 @@ void Network::normalize()
     m_minMaxThresholdedWeights.second = 1.0;
 }
 
-
 //=============================================================================================================
 
 VisualizationInfo Network::getVisualizationInfo() const
 {
     return m_visualizationInfo;
 }
-
 
 //=============================================================================================================
 
@@ -512,14 +479,12 @@ void Network::setVisualizationInfo(const VisualizationInfo& visualizationInfo)
     m_visualizationInfo = visualizationInfo;
 }
 
-
 //=============================================================================================================
 
 float Network::getSamplingFrequency() const
 {
     return m_fSFreq;
 }
-
 
 //=============================================================================================================
 
@@ -528,14 +493,12 @@ void Network::setSamplingFrequency(float fSFreq)
     m_fSFreq = fSFreq;
 }
 
-
 //=============================================================================================================
 
 int Network::getUsedFreqBins() const
 {
     return m_iNumberFreqBins;
 }
-
 
 //=============================================================================================================
 
@@ -544,14 +507,12 @@ void Network::setUsedFreqBins(int iNumberFreqBins)
     m_iNumberFreqBins = iNumberFreqBins;
 }
 
-
 //=============================================================================================================
 
 void Network::setFFTSize(int iFFTSize)
 {
     m_iFFTSize = iFFTSize;
 }
-
 
 //=============================================================================================================
 

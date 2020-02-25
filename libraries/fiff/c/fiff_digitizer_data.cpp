@@ -64,13 +64,11 @@ void mne_free_cmatrix_43(float **m)
     }
 }
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -92,7 +90,6 @@ FiffDigitizerData::FiffDigitizerData()
 {
 }
 
-
 //=============================================================================================================
 
 FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerData)
@@ -111,7 +108,6 @@ FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerDat
 , dist_valid(p_FiffDigitizerData.dist_valid)
 {
 }
-
 
 //=============================================================================================================
 
@@ -153,7 +149,6 @@ FiffDigitizerData::FiffDigitizerData(QIODevice &p_IODevice)
         t_pStream->close();
     }
 }
-
 
 //=============================================================================================================
 

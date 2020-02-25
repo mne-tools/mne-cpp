@@ -43,7 +43,6 @@
 
 #include <fiff/fiff_info.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,14 +50,12 @@
 #include <QPainter>
 #include <QTableView>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -78,14 +75,12 @@ FrequencySpectrumDelegate::FrequencySpectrumDelegate(QTableView* m_pTableView,QO
     m_tableview->setMouseTracking(true);
 }
 
-
 //=============================================================================================================
 
 void FrequencySpectrumDelegate::setScaleType(qint8 ScaleType)
 {
     m_iScaleType = ScaleType;
 }
-
 
 //=============================================================================================================
 
@@ -126,7 +121,6 @@ void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewI
             QVariant variant = index.model()->data(index,Qt::DisplayRole);
             RowVectorXd data = variant.value< RowVectorXd >();
 
-
             const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
 
             if(data.size() > 0)
@@ -148,7 +142,6 @@ void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewI
                 painter->setPen(pen);
                 painter->drawPath(path);
                 painter->restore();
-
 
                 //Plot data path
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
@@ -173,7 +166,6 @@ void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewI
     }
 }
 
-
 //=============================================================================================================
 
 QSize FrequencySpectrumDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -193,10 +185,8 @@ QSize FrequencySpectrumDelegate::sizeHint(const QStyleOptionViewItem &option, co
         break;
     }
 
-
     return size;
 }
-
 
 //=============================================================================================================
 
@@ -212,11 +202,9 @@ void FrequencySpectrumDelegate::rcvMouseLoc(int tableview_row, int mousex, int m
 
     m_x_rate = (float)m_mousex/(float)m_visRect.width();
 
-
     m_tableview->viewport()->repaint();
     }
 }
-
 
 //=============================================================================================================
 
@@ -235,7 +223,6 @@ void FrequencySpectrumDelegate::capturePoint(const QModelIndex &index, const QSt
 
     qint32 lowerIdx = t_pModel->getLowerFrqBound();
     qint32 upperIdx = t_pModel->getUpperFrqBound();
-
 
     //qint32 numbins = vecFreqScale.size();//  data.size();
 
@@ -265,7 +252,6 @@ void FrequencySpectrumDelegate::capturePoint(const QModelIndex &index, const QSt
 
     int iPosX = m_mousex;
     int iPosY = m_mousey;
-
 
     if(iPosX>usPosX && iPosX < usPosX+usWidth && iPosY > (usPosY - usHeight) && iPosY < usPosY )
     {
@@ -316,7 +302,6 @@ void FrequencySpectrumDelegate::capturePoint(const QModelIndex &index, const QSt
     }//correct row to plot
 }
 
-
 //=============================================================================================================
 
 void FrequencySpectrumDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const
@@ -362,7 +347,6 @@ void FrequencySpectrumDelegate::createPlotPath(const QModelIndex &index, const Q
         path.lineTo(qSamplePosition);
     }
 }
-
 
 //=============================================================================================================
 
@@ -416,7 +400,6 @@ void FrequencySpectrumDelegate::createGridPath(const QModelIndex &index, const Q
 
     }
 }
-
 
 //=============================================================================================================
 

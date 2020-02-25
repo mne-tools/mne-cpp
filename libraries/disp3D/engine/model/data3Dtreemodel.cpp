@@ -58,7 +58,6 @@
 
 #include <fiff/fiff_dig_point_set.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -68,11 +67,9 @@
 #include <QSurfaceFormat>
 #include <QGLFormat>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -85,7 +82,6 @@ using namespace INVERSELIB;
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -100,7 +96,6 @@ Data3DTreeModel::Data3DTreeModel(QObject* parent)
 
     initMetatypes();
 }
-
 
 //=============================================================================================================
 
@@ -118,7 +113,6 @@ QVariant Data3DTreeModel::data(const QModelIndex& index,
     return QStandardItemModel::data(index, role);
 }
 
-
 //=============================================================================================================
 
 int Data3DTreeModel::columnCount(const QModelIndex &parent) const
@@ -127,7 +121,6 @@ int Data3DTreeModel::columnCount(const QModelIndex &parent) const
     // Return 2 to activate item description in tree view
     return 1;
 }
-
 
 //=============================================================================================================
 
@@ -148,7 +141,6 @@ QVariant Data3DTreeModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-
 //=============================================================================================================
 
 Qt::ItemFlags Data3DTreeModel::flags(const QModelIndex &index) const
@@ -160,7 +152,6 @@ Qt::ItemFlags Data3DTreeModel::flags(const QModelIndex &index) const
 
     return QStandardItemModel::flags(index);
 }
-
 
 //=============================================================================================================
 
@@ -181,7 +172,6 @@ QList<FsSurfaceTreeItem*> Data3DTreeModel::addSurfaceSet(const QString& sSubject
 
     return returnItemList;
 }
-
 
 //=============================================================================================================
 
@@ -210,7 +200,6 @@ FsSurfaceTreeItem* Data3DTreeModel::addSurface(const QString& subject,
     return pReturnItem;
 }
 
-
 //=============================================================================================================
 
 QList<SourceSpaceTreeItem*> Data3DTreeModel::addSourceSpace(const QString& sSubject,
@@ -237,7 +226,6 @@ QList<SourceSpaceTreeItem*> Data3DTreeModel::addSourceSpace(const QString& sSubj
     return pReturnItem;
 }
 
-
 //=============================================================================================================
 
 QList<SourceSpaceTreeItem*> Data3DTreeModel::addForwardSolution(const QString& sSubject,
@@ -246,7 +234,6 @@ QList<SourceSpaceTreeItem*> Data3DTreeModel::addForwardSolution(const QString& s
 {
     return this->addSourceSpace(sSubject, sMeasurementSetName, forwardSolution.src);
 }
-
 
 //=============================================================================================================
 
@@ -297,7 +284,6 @@ MneDataTreeItem* Data3DTreeModel::addSourceData(const QString& sSubject,
     return pReturnItem;
 }
 
-
 //=============================================================================================================
 
 EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject,
@@ -326,7 +312,6 @@ EcdDataTreeItem* Data3DTreeModel::addDipoleFitData(const QString& sSubject,
     return pReturnItem;
 }
 
-
 //=============================================================================================================
 
 QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& sSubject,
@@ -343,7 +328,6 @@ QList<NetworkTreeItem*> Data3DTreeModel::addConnectivityData(const QString& sSub
 
     return returnList;
 }
-
 
 //=============================================================================================================
 
@@ -372,7 +356,6 @@ NetworkTreeItem* Data3DTreeModel::addConnectivityData(const QString& sSubject,
     return pReturnItem;
 }
 
-
 //=============================================================================================================
 
 BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject,
@@ -398,7 +381,6 @@ BemTreeItem* Data3DTreeModel::addBemData(const QString& sSubject,
 
     return pReturnItem;
 }
-
 
 //=============================================================================================================
 
@@ -431,7 +413,6 @@ SensorSetTreeItem* Data3DTreeModel::addMegSensorInfo(const QString& sSubject,
 
     return pReturnItem;
 }
-
 
 //=============================================================================================================
 
@@ -467,7 +448,6 @@ SensorSetTreeItem* Data3DTreeModel::addEegSensorInfo(const QString& sSubject,
     return pReturnItem;
 }
 
-
 //=============================================================================================================
 
 DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& sSubject,
@@ -493,7 +473,6 @@ DigitizerSetTreeItem* Data3DTreeModel::addDigitizerData(const QString& sSubject,
 
     return pReturnItem;
 }
-
 
 //=============================================================================================================
 
@@ -544,14 +523,12 @@ SensorDataTreeItem* Data3DTreeModel::addSensorData(const QString& sSubject,
     return pReturnItem;
 }
 
-
 //=============================================================================================================
 
 QPointer<Qt3DCore::QEntity> Data3DTreeModel::getRootEntity()
 {
     return m_pModelEntity;
 }
-
 
 //=============================================================================================================
 
@@ -574,7 +551,6 @@ SubjectTreeItem* Data3DTreeModel::addSubject(const QString& sSubject)
 
     return pReturnItem;
 }
-
 
 //=============================================================================================================
 

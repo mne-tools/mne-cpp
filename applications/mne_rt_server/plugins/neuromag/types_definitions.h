@@ -37,14 +37,12 @@
 #ifndef TYPESDEFINITIONS_H
 #define TYPESDEFINITIONS_H
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE NEUROMAGRTSERVERPLUGIN
 //=============================================================================================================
 
 namespace NEUROMAGRTSERVERPLUGIN
 {
-
 
 //=============================================================================================================
 // DEFINES
@@ -70,7 +68,6 @@ namespace NEUROMAGRTSERVERPLUGIN
 #define DACQ_CMD_MONITOR  "moni"
 #define DACQ_CMD_HELP     "help"
 #define DACQ_CMD_QUIT     "quit"
-
 
 
 
@@ -103,7 +100,6 @@ namespace NEUROMAGRTSERVERPLUGIN
 
 //typedef int socklen_t;
 
-
 //
 // dacq_shmem.h
 //
@@ -135,7 +131,6 @@ typedef struct {
 } *dacqShmBlock,dacqShmBlockRec;
 
 #define SHM_SIZE SHM_NUM_BLOCKS*sizeof(dacqShmBlockRec)
-
 
 
 //

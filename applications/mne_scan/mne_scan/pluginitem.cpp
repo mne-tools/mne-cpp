@@ -44,13 +44,11 @@
 #include <QMenu>
 #include <QPainter>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNESCAN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -99,7 +97,6 @@ PluginItem::PluginItem(SCSHAREDLIB::IPlugin::SPtr pPlugin, QMenu *contextMenu, Q
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
 }
 
-
 //=============================================================================================================
 
 PluginItem::~PluginItem()
@@ -107,13 +104,11 @@ PluginItem::~PluginItem()
     m_pPlugin->unload();
 }
 
-
 //=============================================================================================================
 
 void PluginItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
     QGraphicsPolygonItem::paint(painter, option, widget);
-
 
     painter->setPen(QPen(m_qColorContour, 1));
 
@@ -138,7 +133,6 @@ void PluginItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * opti
 
 }
 
-
 //=============================================================================================================
 
 void PluginItem::removeArrow(Arrow *arrow)
@@ -148,7 +142,6 @@ void PluginItem::removeArrow(Arrow *arrow)
     if (index != -1)
         arrows.removeAt(index);
 }
-
 
 //=============================================================================================================
 
@@ -162,14 +155,12 @@ void PluginItem::removeArrows()
     }
 }
 
-
 //=============================================================================================================
 
 void PluginItem::addArrow(Arrow *arrow)
 {
     arrows.append(arrow);
 }
-
 
 //=============================================================================================================
 
@@ -188,7 +179,6 @@ QPixmap PluginItem::image() const
     return pixmap;
 }
 
-
 //=============================================================================================================
 
 void PluginItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -197,7 +187,6 @@ void PluginItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     setSelected(true);
     m_contextMenu->exec(event->screenPos());
 }
-
 
 //=============================================================================================================
 

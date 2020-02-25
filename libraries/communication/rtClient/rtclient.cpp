@@ -42,7 +42,6 @@
 #include "rtcmdclient.h"
 #include "rtdataclient.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -50,7 +49,6 @@
 using namespace COMMUNICATIONLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -66,7 +64,6 @@ RtClient::RtClient(QString p_sRtServerHostname, QString p_sClientAlias, QObject 
 {
 }
 
-
 //=============================================================================================================
 
 RtClient::~RtClient()
@@ -74,14 +71,12 @@ RtClient::~RtClient()
     stop();
 }
 
-
 //=============================================================================================================
 
 bool RtClient::getConnectionStatus()
 {
     return m_bIsConnected;
 }
-
 
 //=============================================================================================================
 
@@ -92,7 +87,6 @@ bool RtClient::stop()
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -160,7 +154,6 @@ void RtClient::run()
 //    t_cmdClient.waitForDataAvailable(1000);
 //    qDebug() << t_cmdClient.readAvailableData();
 
-
     // read meas info
     t_cmdClient["measinfo"].pValues()[0].setValue(clientId);
     t_cmdClient["measinfo"].send();
@@ -175,7 +168,6 @@ void RtClient::run()
     {
 
 //        while(m_bIsMeasuring)
-
 
         t_dataClient.readRawBuffer(m_pFiffInfo->nchan, t_matRawBuffer, kind);
 

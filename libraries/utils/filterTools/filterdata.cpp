@@ -53,7 +53,6 @@
 
 #include <QDebug>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -70,7 +69,6 @@
 
 using namespace UTILSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 
@@ -89,7 +87,6 @@ FilterData::FilterData()
 {
     designFilter();
 }
-
 
 //=============================================================================================================
 
@@ -118,7 +115,6 @@ FilterData::FilterData(QString unique_name,
 
     designFilter();
 }
-
 
 //=============================================================================================================
 
@@ -208,7 +204,6 @@ void FilterData::designFilter()
 
 }
 
-
 //=============================================================================================================
 
 void FilterData::fftTransformCoeffs()
@@ -229,7 +224,6 @@ void FilterData::fftTransformCoeffs()
     m_dFFTCoeffA = RowVectorXcd::Zero(m_iFFTlength);
     fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);
 }
-
 
 //=============================================================================================================
 
@@ -270,7 +264,6 @@ RowVectorXd FilterData::applyConvFilter(const RowVectorXd& data, bool keepOverhe
 
     return t_filteredTime.head(data.cols()+m_dCoeffA.cols());
 }
-
 
 //=============================================================================================================
 
@@ -331,7 +324,6 @@ RowVectorXd FilterData::applyFFTFilter(const RowVectorXd& data, bool keepOverhea
     return t_filteredTime.head(data.cols()+m_dCoeffA.cols());
 }
 
-
 //=============================================================================================================
 
 QString FilterData::getStringForDesignMethod(const FilterData::DesignMethod &designMethod)
@@ -349,7 +341,6 @@ QString FilterData::getStringForDesignMethod(const FilterData::DesignMethod &des
 
     return designMethodString;
 }
-
 
 //=============================================================================================================
 
@@ -372,7 +363,6 @@ QString FilterData::getStringForFilterType(const FilterData::FilterType &filterT
     return filterTypeString;
 }
 
-
 //=============================================================================================================
 
 FilterData::DesignMethod FilterData::getDesignMethodForString(const QString &designMethodString)
@@ -390,7 +380,6 @@ FilterData::DesignMethod FilterData::getDesignMethodForString(const QString &des
 
     return designMethod;
 }
-
 
 //=============================================================================================================
 

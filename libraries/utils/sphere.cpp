@@ -40,7 +40,6 @@
 #include "sphere.h"
 #include "simplex_algorithm.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -49,14 +48,12 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace UTILSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -67,7 +64,6 @@ Sphere::Sphere(const Vector3f& center, float radius)
 , m_r(radius)
 {
 }
-
 
 //=============================================================================================================
 
@@ -109,7 +105,6 @@ Sphere Sphere::fit_sphere(const MatrixX3f& points)
     return Sphere(center, r);
 }
 
-
 //=============================================================================================================
 
 Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
@@ -122,7 +117,6 @@ Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
 
     return Sphere(Vector3f(), 0.0f);
 }
-
 
 //=============================================================================================================
 
@@ -211,7 +205,6 @@ bool Sphere::fit_sphere_to_points(const MatrixXf &rr, float simplex_size, Vector
     return true;
 }
 
-
 //=============================================================================================================
 
 bool Sphere::report_func(int loop, const VectorXf &fitpar, double fval)
@@ -226,7 +219,6 @@ bool Sphere::report_func(int loop, const VectorXf &fitpar, double fval)
     return true;
 }
 
-
 //=============================================================================================================
 
 void Sphere::calculate_cm_ave_dist(const MatrixXf &rr, VectorXf &cm, float &avep)
@@ -235,7 +227,6 @@ void Sphere::calculate_cm_ave_dist(const MatrixXf &rr, VectorXf &cm, float &avep
     MatrixXf diff = rr.rowwise() - cm.transpose();
     avep = diff.rowwise().norm().mean();
 }
-
 
 //=============================================================================================================
 
@@ -256,7 +247,6 @@ MatrixXf Sphere::make_initial_simplex(const VectorXf &pars, float size)
 
     return simplex;
 }
-
 
 //=============================================================================================================
 
@@ -284,7 +274,6 @@ float Sphere::fit_eval(const VectorXf &fitpar, const void  *user_data)
 
     return F;
 }
-
 
 //=============================================================================================================
 

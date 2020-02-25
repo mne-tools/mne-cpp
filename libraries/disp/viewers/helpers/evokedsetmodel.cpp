@@ -41,7 +41,6 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_evoked_set.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,11 +50,9 @@
 #include <QPair>
 #include <QColor>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -65,7 +62,6 @@ using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -87,13 +83,11 @@ EvokedSetModel::EvokedSetModel(QObject *parent)
 {
 }
 
-
 //=============================================================================================================
 
 EvokedSetModel::~EvokedSetModel()
 {
 }
-
 
 //=============================================================================================================
 //virtual functions
@@ -106,14 +100,12 @@ int EvokedSetModel::rowCount(const QModelIndex & /*parent*/) const
     return 0;
 }
 
-
 //=============================================================================================================
 
 int EvokedSetModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 3;
 }
-
 
 //=============================================================================================================
 
@@ -256,7 +248,6 @@ QVariant EvokedSetModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-
 //=============================================================================================================
 
 QVariant EvokedSetModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -290,7 +281,6 @@ QVariant EvokedSetModel::headerData(int section, Qt::Orientation orientation, in
     return QVariant();
 }
 
-
 //=============================================================================================================
 
 void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> pEvokedSet)
@@ -303,7 +293,6 @@ void EvokedSetModel::setEvokedSet(QSharedPointer<FiffEvokedSet> pEvokedSet)
 
     updateData();
 }
-
 
 //=============================================================================================================
 
@@ -355,7 +344,6 @@ void EvokedSetModel::init()
 
     m_bIsInit = true;
 }
-
 
 //=============================================================================================================
 
@@ -464,14 +452,12 @@ void EvokedSetModel::updateData()
     emit dataChanged(topLeft, bottomRight, roles);
 }
 
-
 //=============================================================================================================
 
 void EvokedSetModel::setFilterActive(bool state)
 {
     m_bPerformFiltering = state;
 }
-
 
 //=============================================================================================================
 
@@ -480,14 +466,12 @@ QSharedPointer<QMap<QString, QColor> > EvokedSetModel::getAverageColor() const
     return m_qMapAverageColor;
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<QMap<QString, bool> > EvokedSetModel::getAverageActivation() const
 {
     return m_qMapAverageActivation;
 }
-
 
 //=============================================================================================================
 
@@ -496,14 +480,12 @@ void EvokedSetModel::setAverageColor(const QSharedPointer<QMap<QString, QColor> 
     m_qMapAverageColor = qMapAverageColor;
 }
 
-
 //=============================================================================================================
 
 void EvokedSetModel::setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation)
 {
     m_qMapAverageActivation = qMapAverageActivation;
 }
-
 
 //=============================================================================================================
 
@@ -516,7 +498,6 @@ fiff_int_t EvokedSetModel::getKind(qint32 row) const
 
     return 0;
 }
-
 
 //=============================================================================================================
 
@@ -532,7 +513,6 @@ bool EvokedSetModel::getIsChannelBad(qint32 row) const
     return bIsBad;
 }
 
-
 //=============================================================================================================
 
 fiff_int_t EvokedSetModel::getUnit(qint32 row) const
@@ -544,7 +524,6 @@ fiff_int_t EvokedSetModel::getUnit(qint32 row) const
 
     return FIFF_UNIT_NONE;
 }
-
 
 //=============================================================================================================
 
@@ -558,14 +537,12 @@ fiff_int_t EvokedSetModel::getCoil(qint32 row) const
     return FIFFV_COIL_NONE;
 }
 
-
 //=============================================================================================================
 
 bool EvokedSetModel::isInit() const
 {
     return m_bIsInit;
 }
-
 
 //=============================================================================================================
 
@@ -580,7 +557,6 @@ qint32 EvokedSetModel::getNumSamples() const
     return m_bIsInit ? iNumSamples : 0;
 }
 
-
 //=============================================================================================================
 
 QVariant EvokedSetModel::data(int row, int column, int role) const
@@ -588,14 +564,12 @@ QVariant EvokedSetModel::data(int row, int column, int role) const
     return data(index(row, column), role);
 }
 
-
 //=============================================================================================================
 
 const QMap<qint32,qint32>& EvokedSetModel::getIdxSelMap() const
 {
     return m_qMapIdxRowSelection;
 }
-
 
 //=============================================================================================================
 
@@ -609,7 +583,6 @@ qint32 EvokedSetModel::numVLines() const
 
     return (qint32)(iNumSamples/m_fSps) - 1;
 }
-
 
 //=============================================================================================================
 
@@ -637,7 +610,6 @@ qint32 EvokedSetModel::getNumPreStimSamples() const
     return iPreSamples;
 }
 
-
 //=============================================================================================================
 
 float EvokedSetModel::getSamplingFrequency() const
@@ -645,14 +617,12 @@ float EvokedSetModel::getSamplingFrequency() const
     return m_fSps;
 }
 
-
 //=============================================================================================================
 
 bool EvokedSetModel::isFreezed() const
 {
     return m_bIsFreezed;
 }
-
 
 //=============================================================================================================
 
@@ -668,7 +638,6 @@ int EvokedSetModel::getNumberOfTimeSpacers() const
     return floor((iNumSamples/m_fSps)*10);
 }
 
-
 //=============================================================================================================
 
 QPair<QVariant,QVariant> EvokedSetModel::getBaselineInfo() const
@@ -677,14 +646,12 @@ QPair<QVariant,QVariant> EvokedSetModel::getBaselineInfo() const
     return m_pairBaseline;
 }
 
-
 //=============================================================================================================
 
 int EvokedSetModel::getNumAverages() const
 {
     return m_matData.size();
 }
-
 
 //=============================================================================================================
 
@@ -711,7 +678,6 @@ void EvokedSetModel::selectRows(const QList<qint32> &selection)
     endResetModel();
 }
 
-
 //=============================================================================================================
 
 void EvokedSetModel::resetSelection()
@@ -730,7 +696,6 @@ void EvokedSetModel::resetSelection()
 
     endResetModel();
 }
-
 
 //=============================================================================================================
 
@@ -801,7 +766,6 @@ void EvokedSetModel::updateProjection(const QList<FiffProj>& projs)
     }
 }
 
-
 //=============================================================================================================
 
 void EvokedSetModel::updateCompensator(int to)
@@ -861,7 +825,6 @@ void EvokedSetModel::updateCompensator(int to)
     }
 }
 
-
 //=============================================================================================================
 
 void EvokedSetModel::toggleFreeze()
@@ -880,7 +843,6 @@ void EvokedSetModel::toggleFreeze()
     emit dataChanged(topLeft, bottomRight, roles);
 }
 
-
 //=============================================================================================================
 
 void EvokedSetModel::setFilter(const FilterData& filterData)
@@ -898,7 +860,6 @@ void EvokedSetModel::setFilter(const FilterData& filterData)
     //Filter all visible data channels at once
     //filterDataBlock();
 }
-
 
 //=============================================================================================================
 
@@ -943,7 +904,6 @@ void EvokedSetModel::setFilterChannelType(QString channelType)
     //filterDataBlock();
 }
 
-
 //=============================================================================================================
 
 void EvokedSetModel::createFilterChannelList(QStringList channelNames)
@@ -987,7 +947,6 @@ void EvokedSetModel::createFilterChannelList(QStringList channelNames)
     //filterDataBlock();
 }
 
-
 //=============================================================================================================
 
 void doFilterPerChannelRTESet(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &channelDataTime)
@@ -997,7 +956,6 @@ void doFilterPerChannelRTESet(QPair<QList<FilterData>,QPair<int,RowVectorXd> > &
         channelDataTime.second.second = channelDataTime.first.at(i).applyFFTFilter(channelDataTime.second.second, true, FilterData::ZeroPad); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
 }
-
 
 //=============================================================================================================
 

@@ -44,7 +44,6 @@
 
 #include <utils/layoutloader.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -52,14 +51,12 @@
 #include <QFileDialog>
 #include <QDate>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace EEGOSPORTSPLUGIN;
 using namespace UTILSLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -108,14 +105,12 @@ EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSpor
     initGui();
 }
 
-
 //=============================================================================================================
 
 EEGoSportsSetupProjectWidget::~EEGoSportsSetupProjectWidget()
 {
     delete m_pUi;
 }
-
 
 //=============================================================================================================
 
@@ -157,7 +152,6 @@ void EEGoSportsSetupProjectWidget::initGui()
         changeCardinalMode("Use electrode shift");
     }
 }
-
 
 //=============================================================================================================
 
@@ -202,7 +196,6 @@ void EEGoSportsSetupProjectWidget::changeCardinalMode(const QString& text)
     this->adjustSize();
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged()
@@ -216,7 +209,6 @@ void EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged()
 
     emit cardinalPointsChanged(sLPA, dLPAShift, sRPA, dRPAShift, sNasion, dNasionShift);
 }
-
 
 //=============================================================================================================
 
@@ -241,7 +233,6 @@ void EEGoSportsSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath
     m_pUi->m_comboBox_Nasion->addItems(elcChannelNames);
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsSetupProjectWidget::addProject()
@@ -259,7 +250,6 @@ void EEGoSportsSetupProjectWidget::addProject()
     m_pUi->m_qComboBox_ProjectSelection->setCurrentIndex(m_pUi->m_qComboBox_ProjectSelection->count()-1);
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsSetupProjectWidget::addSubject()
@@ -276,7 +266,6 @@ void EEGoSportsSetupProjectWidget::addSubject()
     m_pUi->m_qComboBox_SubjectSelection->addItem(list.at(list.size()-1));
     m_pUi->m_qComboBox_SubjectSelection->setCurrentIndex(m_pUi->m_qComboBox_SubjectSelection->count()-1);
 }
-
 
 //=============================================================================================================
 
@@ -296,7 +285,6 @@ void EEGoSportsSetupProjectWidget::changeOutputFile()
     m_pEEGoSports->m_sOutputFilePath = m_pUi->m_qLineEdit_FiffRecordFile->text();
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsSetupProjectWidget::changeCap()
@@ -314,7 +302,6 @@ void EEGoSportsSetupProjectWidget::changeCap()
     m_pEEGoSports->m_sElcFilePath = m_pUi->m_qLineEdit_EEGCap->text();
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsSetupProjectWidget::changeCardinalFile()
@@ -330,7 +317,6 @@ void EEGoSportsSetupProjectWidget::changeCardinalFile()
     m_pUi->m_lineEdit_cardinalFile->setText(path);
     m_pEEGoSports->m_sCardinalFilePath = m_pUi->m_lineEdit_cardinalFile->text();
 }
-
 
 //=============================================================================================================
 
@@ -353,7 +339,6 @@ void EEGoSportsSetupProjectWidget::generateFilePath(int index)
     m_pUi->m_qLineEdit_FiffRecordFile->setText(resourcePath);
     m_pEEGoSports->m_sOutputFilePath = resourcePath;
 }
-
 
 //=============================================================================================================
 

@@ -48,16 +48,13 @@
 #include <fiff/fiff.h>
 #include <scMeas/realtimemultisamplearray.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -69,7 +66,6 @@ using namespace SCMEASLIB;
 using namespace IOBUFFER;
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -102,7 +98,6 @@ BrainAMP::BrainAMP()
     addPluginAction(m_pActionStartRecording);
 }
 
-
 //=============================================================================================================
 
 BrainAMP::~BrainAMP()
@@ -130,7 +125,6 @@ BrainAMP::~BrainAMP()
     settings.setValue(QString("BRAINAMP/useElectrodeshiftMode"), m_bUseElectrodeShiftMode);
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<IPlugin> BrainAMP::clone() const
@@ -138,7 +132,6 @@ QSharedPointer<IPlugin> BrainAMP::clone() const
     QSharedPointer<BrainAMP> pBrainAMPClone(new BrainAMP());
     return pBrainAMPClone;
 }
-
 
 //=============================================================================================================
 
@@ -176,14 +169,12 @@ void BrainAMP::init()
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 }
 
-
 //=============================================================================================================
 
 void BrainAMP::unload()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -297,7 +288,6 @@ void BrainAMP::setUpFiffInfo()
     m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
 }
 
-
 //=============================================================================================================
 
 bool BrainAMP::start()
@@ -337,7 +327,6 @@ bool BrainAMP::start()
     }
 }
 
-
 //=============================================================================================================
 
 bool BrainAMP::stop()
@@ -360,7 +349,6 @@ bool BrainAMP::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 void BrainAMP::setSampleData(MatrixXd &matRawBuffer)
@@ -370,7 +358,6 @@ void BrainAMP::setSampleData(MatrixXd &matRawBuffer)
     m_mutex.unlock();
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType BrainAMP::getType() const
@@ -378,14 +365,12 @@ IPlugin::PluginType BrainAMP::getType() const
     return _ISensor;
 }
 
-
 //=============================================================================================================
 
 QString BrainAMP::getName() const
 {
     return "BrainAMP EEG";
 }
-
 
 //=============================================================================================================
 
@@ -399,7 +384,6 @@ QWidget* BrainAMP::setupWidget()
     return widget;
 }
 
-
 //=============================================================================================================
 
 void BrainAMP::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion)
@@ -412,7 +396,6 @@ void BrainAMP::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const QS
     m_sRPA = sRPA;
     m_sNasion = sNasion;
 }
-
 
 //=============================================================================================================
 
@@ -457,7 +440,6 @@ void BrainAMP::run()
     //std::cout<<"EXITING - BrainAMP::run()"<<std::endl;
 }
 
-
 //=============================================================================================================
 
 void BrainAMP::showSetupProjectDialog()
@@ -477,7 +459,6 @@ void BrainAMP::showSetupProjectDialog()
         m_pBrainAMPSetupProjectWidget->raise();
     }
 }
-
 
 //=============================================================================================================
 
@@ -545,7 +526,6 @@ void BrainAMP::showStartRecording()
     }
 }
 
-
 //=============================================================================================================
 
 void BrainAMP::changeRecordingButton()
@@ -562,7 +542,6 @@ void BrainAMP::changeRecordingButton()
     }
 }
 
-
 //=============================================================================================================
 
 bool BrainAMP::dirExists(const std::string& dirName_in)
@@ -576,5 +555,4 @@ bool BrainAMP::dirExists(const std::string& dirName_in)
 
     return false;    // this is not a directory!
 }
-
 

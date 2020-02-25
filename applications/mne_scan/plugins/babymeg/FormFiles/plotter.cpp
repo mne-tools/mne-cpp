@@ -41,25 +41,21 @@
 
 #include <cmath>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QStylePainter>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace BABYMEGPLUGIN;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -85,7 +81,6 @@ Plotter::Plotter(QWidget *parent)
     setPlotSettings(PlotSettings());
 }
 
-
 //=============================================================================================================
 
 void Plotter::setPlotSettings(const PlotSettings &settings)
@@ -97,7 +92,6 @@ void Plotter::setPlotSettings(const PlotSettings &settings)
 //    zoomOutButton->hide();
     refreshPixmap();
 }
-
 
 //=============================================================================================================
 
@@ -112,7 +106,6 @@ void Plotter::setPlotSettings(const PlotSettings &settings)
 //    }
 //}
 
-
 //=============================================================================================================
 
 //void Plotter::zoomIn()
@@ -126,7 +119,6 @@ void Plotter::setPlotSettings(const PlotSettings &settings)
 //    }
 //}
 
-
 //=============================================================================================================
 
 void Plotter::setCurveData(int id, const QVector<QPointF> &data)
@@ -134,7 +126,6 @@ void Plotter::setCurveData(int id, const QVector<QPointF> &data)
     curveMap[id] = data;
     refreshPixmap();
 }
-
 
 //=============================================================================================================
 
@@ -144,7 +135,6 @@ void Plotter::clearCurve(int id)
     refreshPixmap();
 }
 
-
 //=============================================================================================================
 
 QSize Plotter::minimumSizeHint() const
@@ -152,14 +142,12 @@ QSize Plotter::minimumSizeHint() const
     return QSize(6*Margin,4*Margin);
 }
 
-
 //=============================================================================================================
 
 QSize Plotter::sizeHint() const
 {
     return QSize(12*Margin, 8*Margin);
 }
-
 
 //=============================================================================================================
 
@@ -182,7 +170,6 @@ void Plotter::paintEvent(QPaintEvent * /*event*/)
 //    }
 }
 
-
 //=============================================================================================================
 
 void Plotter::resizeEvent(QResizeEvent * /*event*/)
@@ -194,7 +181,6 @@ void Plotter::resizeEvent(QResizeEvent * /*event*/)
     refreshPixmap();
 }
 
-
 //=============================================================================================================
 
 void Plotter::refreshPixmap()
@@ -202,14 +188,12 @@ void Plotter::refreshPixmap()
     pixmap = QPixmap(size());
     //pixmap.fill(this, 0, 0);
 
-
     QPainter painter(&pixmap);
     painter.initFrom(this);
     drawGrid(&painter);
     drawCurve(&painter);
     update();
 }
-
 
 //=============================================================================================================
 
@@ -235,7 +219,6 @@ void Plotter::drawGrid(QPainter *painter)
 
     painter->drawText(rect.left(),rect.bottom()+20,rect.width(),20,Qt::AlignCenter, settings.xlabel);
 
-
     for(int j=0; j<=settings.numYTicks;++j)
     {
         int y = rect.bottom() - (j*(rect.height()-1)/settings.numYTicks);
@@ -255,7 +238,6 @@ void Plotter::drawGrid(QPainter *painter)
 
 }
 
-
 //=============================================================================================================
 
 void Plotter::drawRotatedText(QPainter *painter, int x, int y, const QString &text)
@@ -266,7 +248,6 @@ void Plotter::drawRotatedText(QPainter *painter, int x, int y, const QString &te
     painter->drawText(0, 0, text);
     painter->restore();
 }
-
 
 //=============================================================================================================
 
@@ -297,7 +278,6 @@ void Plotter::drawCurve(QPainter *painter)
     }
 }
 
-
 //=============================================================================================================
 
 PlotSettings::PlotSettings()
@@ -310,7 +290,6 @@ PlotSettings::PlotSettings()
     maxY = 10.0;
     numYTicks = 5;
 }
-
 
 //=============================================================================================================
 

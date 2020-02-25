@@ -40,7 +40,6 @@
 
 #include "mne_hemisphere.h"
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -48,7 +47,6 @@
 using namespace MNELIB;
 using namespace Eigen;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -83,7 +81,6 @@ MNEHemisphere::MNEHemisphere()
 //, m_pGeometryData(NULL)
 {
 }
-
 
 //=============================================================================================================
 
@@ -121,14 +118,12 @@ MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
     //*m_pGeometryData = *p_MNEHemisphere.m_pGeometryData;
 }
 
-
 //=============================================================================================================
 
 MNEHemisphere::~MNEHemisphere()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -177,7 +172,6 @@ bool MNEHemisphere::add_geometry_info()
     return true;
 }
 
-
 //=============================================================================================================
 
 void MNEHemisphere::clear()
@@ -216,7 +210,6 @@ void MNEHemisphere::clear()
     m_TriCoords = MatrixXf();
 }
 
-
 //=============================================================================================================
 
 MatrixXf& MNEHemisphere::getTriCoords(float p_fScaling)
@@ -236,7 +229,6 @@ MatrixXf& MNEHemisphere::getTriCoords(float p_fScaling)
 
     return m_TriCoords;
 }
-
 
 //=============================================================================================================
 
@@ -271,7 +263,6 @@ bool MNEHemisphere::transform_hemisphere_to(fiff_int_t dest, const FiffCoordTran
 
     return true;
 }
-
 
 //=============================================================================================================
 //ToDo
@@ -358,7 +349,6 @@ void MNEHemisphere::writeToStream(FiffStream* p_pStream)
         p_pStream->write_float(FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, &this->dist_limit); //p_pStream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_DIST_LIMIT, this->dist_limit);
     }
 }
-
 
 ////=============================================================================================================
 

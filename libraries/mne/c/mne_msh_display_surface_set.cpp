@@ -33,7 +33,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -49,7 +48,6 @@
 #include "mne_msh_eyes.h"
 
 #include <fiff/c/fiff_coord_trans_set.h>
-
 
 #define MALLOC_47(x,t) (t *)malloc((x)*sizeof(t))
 
@@ -105,20 +103,17 @@ static int         ndefault         = 8;
 
 static MNELIB::MneMshLightSet* custom_lights = Q_NULLPTR;
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <qmath.h>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNELIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -203,7 +198,6 @@ MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet(int nsurf)
     text_color[2] = 1.0;
 }
 
-
 //=============================================================================================================
 
 MneMshDisplaySurfaceSet::~MneMshDisplaySurfaceSet()
@@ -230,7 +224,6 @@ MneMshDisplaySurfaceSet::~MneMshDisplaySurfaceSet()
     if (user_data_free)
         user_data_free(user_data);
 }
-
 
 //=============================================================================================================
 
@@ -341,7 +334,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 void MneMshDisplaySurfaceSet::decide_surface_extent(MneMshDisplaySurface* surf,
@@ -384,7 +376,6 @@ void MneMshDisplaySurfaceSet::decide_surface_extent(MneMshDisplaySurface* surf,
     return;
 }
 
-
 //=============================================================================================================
 
 void MneMshDisplaySurfaceSet::decide_curv_display(const char *name,
@@ -401,7 +392,6 @@ void MneMshDisplaySurfaceSet::decide_curv_display(const char *name,
   */
     return;
 }
-
 
 //=============================================================================================================
 
@@ -464,7 +454,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 void MneMshDisplaySurfaceSet::add_replace_display_surface(MneMshDisplaySurfaceSet* surfs,
@@ -507,7 +496,6 @@ void MneMshDisplaySurfaceSet::add_replace_display_surface(MneMshDisplaySurfaceSe
     }
     return;
 }
-
 
 //=============================================================================================================
 
@@ -557,7 +545,6 @@ void MneMshDisplaySurfaceSet::setup_curvature_colors(MneMshDisplaySurface* surf)
     return;
 }
 
-
 //=============================================================================================================
 
 void MneMshDisplaySurfaceSet::apply_left_right_eyes(MneMshDisplaySurfaceSet* surfs)
@@ -597,7 +584,6 @@ void MneMshDisplaySurfaceSet::apply_left_right_eyes(MneMshDisplaySurfaceSet* sur
     return;
 }
 
-
 //=============================================================================================================
 
 void MneMshDisplaySurfaceSet::apply_left_eyes(MneMshDisplaySurfaceSet* surfs)
@@ -620,7 +606,6 @@ void MneMshDisplaySurfaceSet::apply_left_eyes(MneMshDisplaySurfaceSet* surfs)
     return;
 }
 
-
 //=============================================================================================================
 
 void MneMshDisplaySurfaceSet::setup_current_surface_lights(MneMshDisplaySurfaceSet* surfs)
@@ -631,7 +616,6 @@ void MneMshDisplaySurfaceSet::setup_current_surface_lights(MneMshDisplaySurfaceS
     setup_these_surface_lights(surfs,custom_lights);
     return;
 }
-
 
 //=============================================================================================================
 
@@ -658,7 +642,6 @@ void MneMshDisplaySurfaceSet::initialize_custom_lights()
     }
 }
 
-
 //=============================================================================================================
 
 MneMshLightSet* MneMshDisplaySurfaceSet::dup_light_set(MneMshLightSet* s)
@@ -676,7 +659,6 @@ MneMshLightSet* MneMshDisplaySurfaceSet::dup_light_set(MneMshLightSet* s)
     }
     return res;
 }
-
 
 //=============================================================================================================
 

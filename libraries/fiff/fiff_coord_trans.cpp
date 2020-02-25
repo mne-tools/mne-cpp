@@ -46,13 +46,11 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Dense>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -60,7 +58,6 @@
 
 using namespace FIFFLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -73,7 +70,6 @@ FiffCoordTrans::FiffCoordTrans()
 , invtrans(MatrixXf::Identity(4,4))
 {
 }
-
 
 //=============================================================================================================
 
@@ -90,7 +86,6 @@ FiffCoordTrans::FiffCoordTrans(QIODevice &p_IODevice)
     }
 }
 
-
 //=============================================================================================================
 
 FiffCoordTrans::FiffCoordTrans(const FiffCoordTrans &p_FiffCoordTrans)
@@ -101,13 +96,11 @@ FiffCoordTrans::FiffCoordTrans(const FiffCoordTrans &p_FiffCoordTrans)
 {
 }
 
-
 //=============================================================================================================
 
 FiffCoordTrans::~FiffCoordTrans()
 {
 }
-
 
 //=============================================================================================================
 
@@ -118,7 +111,6 @@ void FiffCoordTrans::clear()
     trans.setIdentity();
     invtrans.setIdentity();
 }
-
 
 //=============================================================================================================
 
@@ -132,7 +124,6 @@ bool FiffCoordTrans::invert_transform()
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -166,7 +157,6 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
     return success;
 }
 
-
 //=============================================================================================================
 
 MatrixX3f FiffCoordTrans::apply_trans(const MatrixX3f& rr, bool do_move) const
@@ -176,7 +166,6 @@ MatrixX3f FiffCoordTrans::apply_trans(const MatrixX3f& rr, bool do_move) const
     return rr_ones*trans.block<3,4>(0,0).transpose();
 }
 
-
 //=============================================================================================================
 
 MatrixX3f FiffCoordTrans::apply_inverse_trans(const MatrixX3f& rr, bool do_move) const
@@ -185,7 +174,6 @@ MatrixX3f FiffCoordTrans::apply_inverse_trans(const MatrixX3f& rr, bool do_move)
     rr_ones.block(0,0,rr.rows(),3) = rr;
     return rr_ones*invtrans.block<3,4>(0,0).transpose();
 }
-
 
 //=============================================================================================================
 
@@ -211,7 +199,6 @@ QString FiffCoordTrans::frame_name (int frame)
     }
 }
 
-
 //=============================================================================================================
 
 FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix3f& rot, const VectorXf& move)
@@ -231,7 +218,6 @@ FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix3f& rot, const
     return t;
 }
 
-
 //=============================================================================================================
 
 bool FiffCoordTrans::addInverse(FiffCoordTrans &t)
@@ -239,7 +225,6 @@ bool FiffCoordTrans::addInverse(FiffCoordTrans &t)
     t.invtrans = t.trans.inverse().eval();
     return true;
 }
-
 
 //=============================================================================================================
 

@@ -54,13 +54,11 @@
 #include "mne_types.h"
 
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -68,7 +66,6 @@
 
 #include <QSharedPointer>
 #include <QList>
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -80,7 +77,6 @@ namespace MNELIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 //=============================================================================================================
 /**
@@ -110,30 +106,23 @@ public:
 
 
 
-
-
     static void mne_raw_add_filter_response(MneRawData* data, int *highpass_effective);
-
 
 
     static void setup_filter_bufs(MneRawData* data);
 
 
 
-
     static int load_one_buffer(MneRawData* data, MneRawBufDef* buf);
 
 
-
     static int compensate_buffer(MneRawData* data, MneRawBufDef* buf);
-
 
     static int mne_raw_pick_data(MneRawData*    data,
                           mneChSelection sel,
                           int            firsts,
                           int            ns,
                           float          **picked);
-
 
     static int mne_raw_pick_data_proj(MneRawData*    data,
                                mneChSelection sel,
@@ -144,19 +133,15 @@ public:
     static int load_one_filt_buf(MneRawData* data, MneRawBufDef* buf);
 
 
-
     static int mne_raw_pick_data_filt(MneRawData*    data,
                                mneChSelection sel,
                                int            firsts,
                                int            ns,
                                float          **picked);
 
-
     static MneRawData* mne_raw_open_file_comp(const QString& name, int omit_skip, int allow_maxshield, mneFilterDef filter, int comp_set);
 
-
     static MneRawData* mne_raw_open_file(const QString& name, int omit_skip, int allow_maxshield, mneFilterDef filter);
-
 
 public:
     QString         filename;             /* This is our file */

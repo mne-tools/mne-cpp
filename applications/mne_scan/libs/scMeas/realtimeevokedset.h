@@ -35,7 +35,6 @@
 #ifndef REALTIMEEVOKEDSET_H
 #define REALTIMEEVOKEDSET_H
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -45,7 +44,6 @@
 #include "realtimesamplearraychinfo.h"
 
 #include <fiff/fiff_evoked_set.h>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -58,16 +56,13 @@
 #include <QList>
 #include <QColor>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE SCMEASLIB
@@ -76,11 +71,9 @@
 namespace SCMEASLIB
 {
 
-
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
 
 //=========================================================================================================
 /**
@@ -254,7 +247,6 @@ private:
     QPair<qint32,qint32>                m_pairBaseline;     /**< Baseline information min max.*/
 };
 
-
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
@@ -265,7 +257,6 @@ inline const QString& RealTimeEvokedSet::getXMLLayoutFile() const
     return m_sXMLLayoutFile;
 }
 
-
 //=============================================================================================================
 
 inline void RealTimeEvokedSet::setXMLLayoutFile(const QString& layout)
@@ -273,7 +264,6 @@ inline void RealTimeEvokedSet::setXMLLayoutFile(const QString& layout)
     QMutexLocker locker(&m_qMutex);
     m_sXMLLayoutFile = layout;
 }
-
 
 //=============================================================================================================
 
@@ -283,7 +273,6 @@ inline unsigned int RealTimeEvokedSet::getNumChannels() const
     return m_pFiffEvokedSet->info.nchan;
 }
 
-
 //=============================================================================================================
 
 inline qint32 RealTimeEvokedSet::getNumPreStimSamples() const
@@ -291,7 +280,6 @@ inline qint32 RealTimeEvokedSet::getNumPreStimSamples() const
     QMutexLocker locker(&m_qMutex);
     return m_iPreStimSamples;
 }
-
 
 //=============================================================================================================
 
@@ -301,7 +289,6 @@ inline void RealTimeEvokedSet::setNumPreStimSamples(qint32 samples)
     m_iPreStimSamples = samples;
 }
 
-
 //=============================================================================================================
 
 inline QList<QColor>& RealTimeEvokedSet::chColor()
@@ -309,7 +296,6 @@ inline QList<QColor>& RealTimeEvokedSet::chColor()
     QMutexLocker locker(&m_qMutex);
     return m_qListChColors;
 }
-
 
 //=============================================================================================================
 
@@ -319,7 +305,6 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeEvokedSet::chInfo()
     return m_qListChInfo;
 }
 
-
 //=============================================================================================================
 
 inline FIFFLIB::FiffInfo::SPtr RealTimeEvokedSet::info()
@@ -327,7 +312,6 @@ inline FIFFLIB::FiffInfo::SPtr RealTimeEvokedSet::info()
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo;
 }
-
 
 //=============================================================================================================
 
@@ -337,14 +321,12 @@ inline bool RealTimeEvokedSet::isInitialized() const
     return m_bInitialized;
 }
 
-
 //=============================================================================================================
 
 inline void RealTimeEvokedSet::setBaselineInfo(QPair<qint32,qint32> info)
 {
     m_pairBaseline = info;
 }
-
 
 //=============================================================================================================
 

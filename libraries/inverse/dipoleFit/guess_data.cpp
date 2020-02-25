@@ -49,7 +49,6 @@
 
 #include <QFile>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -59,7 +58,6 @@ using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace FWDLIB;
 using namespace INVERSELIB;
-
 
 //ToDo remove later on
 #ifndef TRUE
@@ -81,12 +79,9 @@ using namespace INVERSELIB;
 
 
 
-
-
 #define X_16 0
 #define Y_16 1
 #define Z_16 2
-
 
 #define VEC_COPY_16(to,from) {\
     (to)[X_16] = (from)[X_16];\
@@ -95,13 +90,11 @@ using namespace INVERSELIB;
     }
 
 
-
 #define MALLOC_16(x,t) (t *)malloc((x)*sizeof(t))
 
 #define REALLOC_16(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
 #define ALLOC_CMATRIX_16(x,y) mne_cmatrix_16((x),(y))
-
 
 
 static void matrix_error_16(int kind, int nr, int nc)
@@ -120,7 +113,6 @@ static void matrix_error_16(int kind, int nr, int nc)
     printf("Cannot continue. Sorry.\n");
     exit(1);
 }
-
 
 float **mne_cmatrix_16(int nr,int nc)
 
@@ -141,7 +133,6 @@ float **mne_cmatrix_16(int nr,int nc)
 
 
 
-
 #define FREE_16(x) if ((char *)(x) != NULL) free((char *)(x))
 #define FREE_CMATRIX_16(m) mne_free_cmatrix_16((m))
 
@@ -152,9 +143,6 @@ void mne_free_cmatrix_16 (float **m)
         FREE_16(m);
     }
 }
-
-
-
 
 
 
@@ -172,7 +160,6 @@ void fromFloatEigenMatrix_16(const Eigen::MatrixXf& from_mat, float **& to_mat)
     fromFloatEigenMatrix_16(from_mat, to_mat, from_mat.rows(), from_mat.cols());
 }
 
-
 //int
 void fromIntEigenMatrix_16(const Eigen::MatrixXi& from_mat, int **&to_mat, const int m, const int n)
 {
@@ -186,7 +173,6 @@ void fromIntEigenMatrix_16(const Eigen::MatrixXi& from_mat, int **&to_mat)
     fromIntEigenMatrix_16(from_mat, to_mat, from_mat.rows(), from_mat.cols());
 }
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -199,13 +185,11 @@ GuessData::GuessData()
 
 }
 
-
 //=============================================================================================================
 
 //GuessData::GuessData(const GuessData& p_GuessData)
 //{
 //}
-
 
 //=============================================================================================================
 
@@ -306,7 +290,6 @@ bad : {
 //        return NULL;
     }
 }
-
 
 //=============================================================================================================
 
@@ -411,7 +394,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 GuessData::~GuessData()
@@ -424,7 +406,6 @@ GuessData::~GuessData()
     }
     return;
 }
-
 
 //=============================================================================================================
 

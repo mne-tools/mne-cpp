@@ -32,7 +32,6 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -41,16 +40,13 @@
 
 #include "networkedge.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -59,11 +55,9 @@
 using namespace CONNECTIVITYLIB;
 using namespace Eigen;
 
-
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -76,14 +70,12 @@ NetworkNode::NetworkNode(qint16 iId, const RowVectorXf& vecVert)
 {
 }
 
-
 //=============================================================================================================
 
 const QList<QSharedPointer<NetworkEdge> >& NetworkNode::getFullEdges() const
 {
     return m_lEdges;
 }
-
 
 //=============================================================================================================
 
@@ -100,7 +92,6 @@ QList<QSharedPointer<NetworkEdge> > NetworkNode::getThresholdedEdges() const
     return edgeList;
 }
 
-
 //=============================================================================================================
 
 QList<QSharedPointer<NetworkEdge> > NetworkNode::getFullEdgesIn() const
@@ -115,7 +106,6 @@ QList<QSharedPointer<NetworkEdge> > NetworkNode::getFullEdgesIn() const
 
     return edgeList;
 }
-
 
 //=============================================================================================================
 
@@ -132,7 +122,6 @@ QList<QSharedPointer<NetworkEdge> > NetworkNode::getThresholdedEdgesIn() const
     return edgeList;
 }
 
-
 //=============================================================================================================
 
 QList<QSharedPointer<NetworkEdge> > NetworkNode::getFullEdgesOut() const
@@ -147,7 +136,6 @@ QList<QSharedPointer<NetworkEdge> > NetworkNode::getFullEdgesOut() const
 
     return edgeList;
 }
-
 
 //=============================================================================================================
 
@@ -164,14 +152,12 @@ QList<QSharedPointer<NetworkEdge> > NetworkNode::getThresholdedEdgesOut() const
     return edgeList;
 }
 
-
 //=============================================================================================================
 
 const RowVectorXf& NetworkNode::getVert() const
 {
     return m_vecVert;
 }
-
 
 //=============================================================================================================
 
@@ -180,14 +166,12 @@ qint16 NetworkNode::getId() const
     return m_iId;
 }
 
-
 //=============================================================================================================
 
 qint16 NetworkNode::getFullDegree() const
 {
     return m_lEdges.size();
 }
-
 
 //=============================================================================================================
 
@@ -204,7 +188,6 @@ qint16 NetworkNode::getThresholdedDegree() const
     return degree;
 }
 
-
 //=============================================================================================================
 
 qint16 NetworkNode::getFullIndegree() const
@@ -219,7 +202,6 @@ qint16 NetworkNode::getFullIndegree() const
 
     return degree;
 }
-
 
 //=============================================================================================================
 
@@ -236,7 +218,6 @@ qint16 NetworkNode::getThresholdedIndegree() const
     return degree;
 }
 
-
 //=============================================================================================================
 
 qint16 NetworkNode::getFullOutdegree() const
@@ -251,7 +232,6 @@ qint16 NetworkNode::getFullOutdegree() const
 
     return degree;
 }
-
 
 //=============================================================================================================
 
@@ -268,7 +248,6 @@ qint16 NetworkNode::getThresholdedOutdegree() const
     return degree;
 }
 
-
 //=============================================================================================================
 
 double NetworkNode::getFullStrength() const
@@ -281,7 +260,6 @@ double NetworkNode::getFullStrength() const
 
     return dStrength;
 }
-
 
 //=============================================================================================================
 
@@ -298,7 +276,6 @@ double NetworkNode::getThresholdedStrength() const
     return dStrength;
 }
 
-
 //=============================================================================================================
 
 double NetworkNode::getFullInstrength() const
@@ -313,7 +290,6 @@ double NetworkNode::getFullInstrength() const
 
     return dStrength;
 }
-
 
 //=============================================================================================================
 
@@ -330,7 +306,6 @@ double NetworkNode::getThresholdedInstrength() const
     return dStrength;
 }
 
-
 //=============================================================================================================
 
 double NetworkNode::getFullOutstrength() const
@@ -345,7 +320,6 @@ double NetworkNode::getFullOutstrength() const
 
     return dStrength;
 }
-
 
 //=============================================================================================================
 
@@ -362,7 +336,6 @@ double NetworkNode::getThresholdedOutstrength() const
     return dStrength;
 }
 
-
 //=============================================================================================================
 
 void NetworkNode::setHubStatus(bool bIsHub)
@@ -370,14 +343,12 @@ void NetworkNode::setHubStatus(bool bIsHub)
     m_bIsHub = bIsHub;
 }
 
-
 //=============================================================================================================
 
 bool NetworkNode::getHubStatus() const
 {
     return m_bIsHub;
 }
-
 
 //=============================================================================================================
 
@@ -387,6 +358,5 @@ void NetworkNode::append(QSharedPointer<NetworkEdge> newEdge)
         m_lEdges << newEdge;
     }
 }
-
 
 

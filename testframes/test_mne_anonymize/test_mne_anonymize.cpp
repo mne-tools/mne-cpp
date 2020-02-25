@@ -33,14 +33,12 @@
 *
 */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "../applications/mne_anonymize/fiffanonymizer.h"
 #include "../applications/mne_anonymize/settingscontroller.h"
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -50,14 +48,12 @@
 #include <QProcess>
 #include <QScopedPointer>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FIFFLIB;
 using namespace MNEANONYMIZE;
-
 
 //=============================================================================================================
 /**
@@ -95,20 +91,17 @@ private:
                     QString testArg="blank");
 };
 
-
 //=============================================================================================================
 
 TestMneAnonymize::TestMneAnonymize()
 {
 }
 
-
 //=============================================================================================================
 
 void TestMneAnonymize::initTestCase()
 {
 }
-
 
 //=============================================================================================================
 
@@ -136,7 +129,6 @@ void TestMneAnonymize::testDefaultOutput()
 
     QFile::remove(sFileOut);
 }
-
 
 //=============================================================================================================
 
@@ -176,7 +168,6 @@ void TestMneAnonymize::testMultipleInputs()
     QFile::remove(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_B_raw_anonymized.fif");
 }
 
-
 //=============================================================================================================
 
 void TestMneAnonymize::testDeleteInputFile()
@@ -209,7 +200,6 @@ void TestMneAnonymize::testDeleteInputFile()
     QFile::remove(sFileOutTest);
 }
 
-
 //=============================================================================================================
 
 void TestMneAnonymize::testInplace()
@@ -239,7 +229,6 @@ void TestMneAnonymize::testInplace()
 
     QFile::remove(sFileOutTest);
 }
-
 
 //=============================================================================================================
 
@@ -271,7 +260,6 @@ void TestMneAnonymize::testInplaceAndDeleteInFile()
     QFile::remove(sFileOutTest);
 }
 
-
 //=============================================================================================================
 
 void TestMneAnonymize::testDefaultAnonymizationOfTags()
@@ -300,7 +288,6 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
 
     verifyTags(outStream);
 }
-
 
 //=============================================================================================================
 
@@ -335,7 +322,6 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
     verifyTags(outStream, "SubjBirthdayOffset");
 }
 
-
 //=============================================================================================================
 
 void TestMneAnonymize::compareMeasureDateOffsetOption()
@@ -369,7 +355,6 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
 
     verifyTags(outStream, "MeasDateOffset");
 }
-
 
 //=============================================================================================================
 
@@ -600,7 +585,6 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
     }
 }
 
-
 //=============================================================================================================
 
 void TestMneAnonymize::cleanupTestCase()
@@ -608,11 +592,9 @@ void TestMneAnonymize::cleanupTestCase()
 
 }
 
-
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-
 
 QTEST_GUILESS_MAIN(TestMneAnonymize)
 #include "test_mne_anonymize.moc"

@@ -40,7 +40,6 @@
 
 #include "quickcontrolview.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,13 +50,11 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -88,7 +85,6 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
     loadSettings(m_sSettingsPath);
 }
 
-
 //=============================================================================================================
 
 QuickControlView::~QuickControlView()
@@ -105,7 +101,6 @@ QuickControlView::~QuickControlView()
     delete ui;
 }
 
-
 //=============================================================================================================
 
 void QuickControlView::addWidget(QSharedPointer<QWidget> pWidget)
@@ -117,7 +112,6 @@ void QuickControlView::addWidget(QSharedPointer<QWidget> pWidget)
     addWidget(pWidget.data());
 }
 
-
 //=============================================================================================================
 
 void QuickControlView::addWidget(QWidget* pWidget)
@@ -126,7 +120,6 @@ void QuickControlView::addWidget(QWidget* pWidget)
                                  ui->m_gridLayout_groupBoxes->rowCount(),
                                  0);
 }
-
 
 //=============================================================================================================
 
@@ -139,7 +132,6 @@ void QuickControlView::addGroupBox(QSharedPointer<QWidget> pWidget,
 
     addGroupBox(pWidget.data(), sGroupBoxName);
 }
-
 
 //=============================================================================================================
 
@@ -160,7 +152,6 @@ void QuickControlView::addGroupBox(QWidget* pWidget,
                                  0);
 }
 
-
 //=============================================================================================================
 
 void QuickControlView::addGroupBoxWithTabs(QSharedPointer<QWidget> pWidget,
@@ -172,7 +163,6 @@ void QuickControlView::addGroupBoxWithTabs(QSharedPointer<QWidget> pWidget,
     addGroupBoxWithTabs(pWidget.data(), sGroupBoxName, sTabName);
 
 }
-
 
 //=============================================================================================================
 
@@ -206,7 +196,6 @@ void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,
     }
 }
 
-
 //=============================================================================================================
 
 void QuickControlView::setOpacityValue(int opactiy)
@@ -216,14 +205,12 @@ void QuickControlView::setOpacityValue(int opactiy)
     onOpacityChange(opactiy);
 }
 
-
 //=============================================================================================================
 
 int QuickControlView::getOpacityValue()
 {
     return ui->m_horizontalSlider_opacity->value();
 }
-
 
 //=============================================================================================================
 
@@ -233,7 +220,6 @@ void QuickControlView::setVisiblityHideOpacityClose(bool bVisibility)
     ui->m_horizontalSlider_opacity->setVisible(bVisibility);
     ui->m_label_opacity->setVisible(bVisibility);
 }
-
 
 //=============================================================================================================
 
@@ -248,7 +234,6 @@ void QuickControlView::saveSettings(const QString& settingsPath)
     settings.setValue(settingsPath + QString("/QuickControlViewOpacity"), getOpacityValue());
     settings.setValue(settingsPath + QString("/QuickControlViewPos"), this->pos());
 }
-
 
 //=============================================================================================================
 
@@ -271,7 +256,6 @@ void QuickControlView::loadSettings(const QString& settingsPath)
         move(pos);
     }
 }
-
 
 //=============================================================================================================
 

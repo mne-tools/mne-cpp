@@ -39,7 +39,6 @@
 
 #include "globalobj.h"
 
-
 //--- Global Queue for IPC (socket )
 QQueue<Eigen::MatrixXf *> g_queue;
 int g_maxlen = 40;
@@ -88,8 +87,6 @@ float  fs;
 int    nChn;
 float pscale;
 
-
 //--- Global Filter Setting
 gFilter m_gFilter;
-
 

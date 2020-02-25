@@ -52,7 +52,6 @@
 #include <communication/rtClient/rtcmdclient.h>
 #include <disp3D/viewers/hpiview.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -60,7 +59,6 @@
 #include <QDir>
 #include <QSettings>
 #include <QMessageBox>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -76,7 +74,6 @@ using namespace DISPLIB;
 using namespace DISP3DLIB;
 using namespace COMMUNICATIONLIB;
 using namespace Eigen;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -133,7 +130,6 @@ Neuromag::Neuromag()
             this, &Neuromag::onRecordingRemainingTimeChange);
 }
 
-
 //=============================================================================================================
 
 Neuromag::~Neuromag()
@@ -141,7 +137,6 @@ Neuromag::~Neuromag()
     if(m_pNeuromagProducer->isRunning() || this->isRunning())
         stop();
 }
-
 
 //=============================================================================================================
 
@@ -151,7 +146,6 @@ void Neuromag::clear()
     m_iBufferSize = -1;
 }
 
-
 //=============================================================================================================
 
 QSharedPointer<SCSHAREDLIB::IPlugin> Neuromag::clone() const
@@ -159,7 +153,6 @@ QSharedPointer<SCSHAREDLIB::IPlugin> Neuromag::clone() const
     QSharedPointer<Neuromag> pNeuromagClone(new Neuromag());
     return pNeuromagClone;
 }
-
 
 //=============================================================================================================
 
@@ -209,14 +202,12 @@ void Neuromag::init()
     this->connectCmdClient();
 }
 
-
 //=============================================================================================================
 
 void Neuromag::unload()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -226,7 +217,6 @@ void Neuromag::showProjectDialog()
         m_pProjectSettingsView->show();
     }
 }
-
 
 //=============================================================================================================
 
@@ -260,7 +250,6 @@ void Neuromag::splitRecordingFile()
     fiff_int_t first = 0;
     m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
 }
-
 
 //=============================================================================================================
 
@@ -347,7 +336,6 @@ void Neuromag::toggleRecordingFile()
     }
 }
 
-
 //=============================================================================================================
 
 void Neuromag::setRecordingTimerChanged(int timeMSecs)
@@ -360,14 +348,12 @@ void Neuromag::setRecordingTimerChanged(int timeMSecs)
     m_iRecordingMSeconds = timeMSecs;
 }
 
-
 //=============================================================================================================
 
 void Neuromag::setRecordingTimerStateChanged(bool state)
 {
     m_bUseRecordTimer = state;
 }
-
 
 //=============================================================================================================
 
@@ -403,7 +389,6 @@ void Neuromag::changeConnector(qint32 p_iNewConnectorId)
         emit cmdConnectionChanged(m_bCmdClientIsConnected);
     }
 }
-
 
 //=============================================================================================================
 
@@ -452,7 +437,6 @@ bool Neuromag::start()
     }
 }
 
-
 //=============================================================================================================
 
 bool Neuromag::stop()
@@ -480,7 +464,6 @@ bool Neuromag::stop()
     return true;
 }
 
-
 //=============================================================================================================
 
 IPlugin::PluginType Neuromag::getType() const
@@ -488,14 +471,12 @@ IPlugin::PluginType Neuromag::getType() const
     return _ISensor;
 }
 
-
 //=============================================================================================================
 
 QString Neuromag::getName() const
 {
     return "Neuromag";
 }
-
 
 //=============================================================================================================
 
@@ -505,7 +486,6 @@ QWidget* Neuromag::setupWidget()
 
     return widget;
 }
-
 
 //=============================================================================================================
 
@@ -546,7 +526,6 @@ bool Neuromag::readProjectors()
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -608,7 +587,6 @@ void Neuromag::connectCmdClient()
     }
 }
 
-
 //=============================================================================================================
 
 void Neuromag::disconnectCmdClient()
@@ -623,7 +601,6 @@ void Neuromag::disconnectCmdClient()
         emit cmdConnectionChanged(m_bCmdClientIsConnected);
     }
 }
-
 
 //=============================================================================================================
 
@@ -645,7 +622,6 @@ void Neuromag::requestInfo()
     else
         qWarning() << "NeuromagProducer is not connected!";
 }
-
 
 //=============================================================================================================
 
@@ -687,7 +663,6 @@ void Neuromag::run()
     }
 }
 
-
 //=============================================================================================================
 
 MatrixXd Neuromag::calibrate(const MatrixXf& data)
@@ -702,7 +677,6 @@ MatrixXd Neuromag::calibrate(const MatrixXf& data)
     return one;
 }
 
-
 //=============================================================================================================
 
 void Neuromag::changeRecordingButton()
@@ -716,14 +690,12 @@ void Neuromag::changeRecordingButton()
     }
 }
 
-
 //=============================================================================================================
 
 void Neuromag::onRecordingRemainingTimeChange()
 {
     m_pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
 }
-
 
 //=============================================================================================================
 
@@ -762,7 +734,6 @@ void Neuromag::initConnector()
     }
 }
 
-
 //=============================================================================================================
 
 void Neuromag::showHPIDialog()
@@ -783,7 +754,6 @@ void Neuromag::showHPIDialog()
         }
     }
 }
-
 
 //=============================================================================================================
 

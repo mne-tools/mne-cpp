@@ -45,13 +45,11 @@
 #include "../fiff_types.h"
 #include "../fiff_tag.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -60,14 +58,12 @@
 #include <QSharedPointer>
 #include <QDebug>
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
 //=============================================================================================================
 
 namespace FIFFLIB
 {
-
 
 //=============================================================================================================
 /**
@@ -103,7 +99,6 @@ public:
      */
     ~FiffSparseMatrix();
 
-
     //============================= fiff_sparse.c =============================
     /*
      * Interpret dimensions and nz from matrix data
@@ -115,7 +110,6 @@ public:
      */
     static FIFFLIB::FiffSparseMatrix* fiff_get_float_sparse_matrix(FIFFLIB::FiffTag::SPtr& tag);
 
-
     //============================= mne_sparse_matop.c =============================
 
     //Refactored: mne_create_sparse_rcs
@@ -125,10 +119,7 @@ public:
                                                             int **colindex, /* Column indices of non-zero elements on each row */
                                                             float **vals);
 
-
     FIFFLIB::FiffSparseMatrix* mne_add_upper_triangle_rcs();
-
-
 
 
 

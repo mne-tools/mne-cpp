@@ -40,20 +40,15 @@
 
 #include "utils/simplex_algorithm.h"
 
-
 #include "fwd_eeg_sphere_model.h"
 #include "fwd_eeg_sphere_model_set.h"
 
-
 #include <QtAlgorithms>
-
 
 #include <qmath.h>
 
-
 #include <Eigen/Core>
 #include <Eigen/Dense>
-
 
 
 //=============================================================================================================
@@ -63,7 +58,6 @@
 using namespace Eigen;
 using namespace UTILSLIB;
 using namespace FWDLIB;
-
 
 
 #define MIN_1(a,b) ((a) < (b) ? (a) : (b))
@@ -86,20 +80,17 @@ using namespace FWDLIB;
     (diff)[Z_1] = (to)[Z_1] - (from)[Z_1];\
     }
 
-
 #define VEC_COPY_1(to,from) {\
     (to)[X_1] = (from)[X_1];\
     (to)[Y_1] = (from)[Y_1];\
     (to)[Z_1] = (from)[Z_1];\
     }
 
-
 #define CROSS_PRODUCT_1(x,y,xy) {\
     (xy)[X_1] =   (x)[Y_1]*(y)[Z_1]-(y)[Y_1]*(x)[Z_1];\
     (xy)[Y_1] = -((x)[X_1]*(y)[Z_1]-(y)[X_1]*(x)[Z_1]);\
     (xy)[Z_1] =   (x)[X_1]*(y)[Y_1]-(y)[X_1]*(x)[Y_1];\
     }
-
 
 
 #define MALLOC_1(x,t) (t *)malloc((x)*sizeof(t))
@@ -109,18 +100,15 @@ using namespace FWDLIB;
 #define FREE(x) if ((char *)(x) != NULL) free((char *)(x))
 
 
-
 #define ALLOC_DCMATRIX_1(x,y) mne_dmatrix_1((x),(y))
 #define FREE_DCMATRIX_1(m) mne_free_dcmatrix_1((m))
 
 #define ALLOC_CMATRIX_1(x,y) mne_cmatrix_1((x),(y))
 
-
 /*
  * float matrices
  */
 #define FREE_CMATRIX_1(m) mne_free_cmatrix_1((m))
-
 
 
 #ifndef TRUE
@@ -131,7 +119,6 @@ using namespace FWDLIB;
 #define FALSE 0
 #endif
 
-
 #ifndef FAIL
 #define FAIL -1
 #endif
@@ -139,7 +126,6 @@ using namespace FWDLIB;
 #ifndef OK
 #define OK 0
 #endif
-
 
 
 
@@ -161,7 +147,6 @@ static void matrix_error_1(int kind, int nr, int nc)
 }
 
 
-
 float **mne_cmatrix_1(int nr,int nc)
 
 {
@@ -178,7 +163,6 @@ float **mne_cmatrix_1(int nr,int nc)
         m[i] = whole + i*nc;
     return m;
 }
-
 
 double **mne_dmatrix_1(int nr, int nc)
 
@@ -197,7 +181,6 @@ double **mne_dmatrix_1(int nr, int nc)
     return m;
 }
 
-
 void mne_free_cmatrix_1 (float **m)
 {
     if (m) {
@@ -205,7 +188,6 @@ void mne_free_cmatrix_1 (float **m)
         free(m);
     }
 }
-
 
 
 void mne_free_dcmatrix_1 (double **m)
@@ -219,16 +201,13 @@ void mne_free_dcmatrix_1 (double **m)
 
 
 
-
 #define MAXTERMS 1000
 #define EPS      1e-10
 #define SIN_EPS  1e-3
 
 
-
 static int         terms = 0;       /* These statistics may be useful */
 static int         eval = 0;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -246,7 +225,6 @@ FwdEegSphereModel::FwdEegSphereModel()
     r0[1] = 0.0;
     r0[2] = 0.0;
 }
-
 
 //=============================================================================================================
 
@@ -278,7 +256,6 @@ FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereMode
     }
     this->scale_pos = p_FwdEegSphereModel.scale_pos;
 }
-
 
 //=============================================================================================================
 
@@ -317,13 +294,11 @@ FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const QString&
     return new_model;
 }
 
-
 //=============================================================================================================
 
 FwdEegSphereModel::~FwdEegSphereModel()
 {
 }
-
 
 //=============================================================================================================
 
@@ -356,7 +331,6 @@ bad : {
     }
 }
 
-
 //=============================================================================================================
 
 fitUser FwdEegSphereModel::new_fit_user(int nfit, int nterms)
@@ -375,7 +349,6 @@ fitUser FwdEegSphereModel::new_fit_user(int nfit, int nterms)
     u->nterms = nterms;
     return u;
 }
-
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
@@ -482,7 +455,6 @@ double FwdEegSphereModel::fwd_eeg_get_multi_sphere_model_coeff(int n)
     return n*div/(n*M(1,1) + n1*M(1,0));
 }
 
-
 //=============================================================================================================
 // fwd_multi_spherepot.c
 void FwdEegSphereModel::next_legen(int n, double x, double *p0, double *p01, double *p1, double *p11)        /* Input: P1(n-2) Output: P1(n-1) */
@@ -517,7 +489,6 @@ void FwdEegSphereModel::next_legen(int n, double x, double *p0, double *p01, dou
     return;
 }
 
-
 //=============================================================================================================
 
 void FwdEegSphereModel::calc_pot_components(double beta, double cgamma, double *Vrp, double *Vtp, const Eigen::VectorXd& fn, int nterms)
@@ -546,7 +517,6 @@ void FwdEegSphereModel::calc_pot_components(double beta, double cgamma, double *
      *Vtp = Vt;
     return;
 }
-
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
@@ -675,7 +645,6 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot(float *rd, float *Q, float **el, 
     return OK;
 }
 
-
 //=============================================================================================================
 // fwd_multi_spherepot.c
 int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(float *rd, float *Q, FwdCoilSet *els, float *Vval, void *client)           /* Client data will be the sphere model definition */
@@ -712,7 +681,6 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(float *rd, float *Q, FwdCoi
     FREE(vval_one);
     return OK;
 }
-
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
@@ -826,7 +794,6 @@ bool FwdEegSphereModel::fwd_eeg_spherepot_vec( float   *rd, float   **el, int ne
     return true;
 }
 
-
 //=============================================================================================================
 // fwd_multi_spherepot.c
 int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(float *rd, FwdCoilSet* els, float **Vval_vec, void *client)
@@ -859,7 +826,6 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(float *rd, FwdCoilSet* els, fl
     FREE_CMATRIX_1(vval_one);
     return OK;
 }
-
 
 //=============================================================================================================
 
@@ -900,7 +866,6 @@ int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(float *rd, float Q[], FwdCoil
     }
     return OK;
 }
-
 
 //=============================================================================================================
 // fwd_multi_spherepot.c
@@ -1019,7 +984,6 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   float   *rd,       /* Dipole positio
     return OK;
 }
 
-
 //=============================================================================================================
 // fwd_multi_spherepot.c
 int FwdEegSphereModel::fwd_eeg_spherepot_coil(  float *rd, float *Q, FwdCoilSet* els, float *Vval, void *client)
@@ -1048,7 +1012,6 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(  float *rd, float *Q, FwdCoilSet*
     }
     return OK;
 }
-
 
 
 //=============================================================================================================
@@ -1085,10 +1048,6 @@ bool FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, bool fit_berg_sche
 
 
 
-
-
-
-
 Eigen::MatrixXd toDoubleEigenMatrix(double **mat, const int m, const int n)
 {
     Eigen::MatrixXd eigen_mat(m,n);
@@ -1099,7 +1058,6 @@ Eigen::MatrixXd toDoubleEigenMatrix(double **mat, const int m, const int n)
 
     return eigen_mat;
 }
-
 
 
 void fromDoubleEigenMatrix(const Eigen::MatrixXd& from_mat, double **to_mat, const int m, const int n)
@@ -1124,8 +1082,6 @@ void fromDoubleEigenVector(const Eigen::VectorXd& from_vec, double *to_vec)
 {
     fromDoubleEigenVector(from_vec, to_vec, from_vec.size());
 }
-
-
 
 
 
@@ -1194,7 +1150,6 @@ static int c_dsvd(double **mat,		/* The matrix */
 //============================= fwd_fit_berg_scherg.c
 
 
-
 //============================= fwd_fit_berg_scherg.c
 typedef struct {
     double lambda;		/* Magnitude for the apparent dipole */
@@ -1239,7 +1194,6 @@ static void sort_parameters(VectorXd& mu,VectorXd& lambda,int nfit)
     return;
 }
 
-
 //============================= fwd_fit_berg_scherg.c
 static bool report_fit(int    loop,
                       const VectorXd &fitpar,
@@ -1266,7 +1220,6 @@ static MatrixXd get_initial_simplex(const VectorXd &pars,
 
     MatrixXd simplex = MatrixXd::Zero(npar+1,npar);
 
-
     simplex.rowwise() += pars.transpose();
 
     for (int k = 1; k < npar+1; k++)
@@ -1274,14 +1227,6 @@ static MatrixXd get_initial_simplex(const VectorXd &pars,
 
     return simplex;
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -1315,7 +1260,6 @@ void FwdEegSphereModel::compose_linear_fitting_data(const VectorXd& mu,fitUser u
             u->M[k][p] = u->w[k]*(pow(mu[p+1],k1)-mu1n);
     }
 }
-
 
 
 
@@ -1361,7 +1305,6 @@ double FwdEegSphereModel::compute_linear_parameters(const VectorXd& mu,
 
 
 
-
 // fwd_fit_berg_scherg.c
 double FwdEegSphereModel::one_step (const VectorXd& mu, const void *user_data)
 /*
@@ -1400,8 +1343,6 @@ double FwdEegSphereModel::one_step (const VectorXd& mu, const void *user_data)
    */
     return dot_dvectors(u->resi,u->resi,u->nterms-1);
 }
-
-
 
 
 

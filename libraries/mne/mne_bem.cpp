@@ -47,13 +47,11 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QFile>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -65,7 +63,6 @@ using namespace MNELIB;
 using namespace FIFFLIB;
 using namespace Eigen;
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -74,7 +71,6 @@ MNEBem::MNEBem()
 {
 }
 
-
 //=============================================================================================================
 
 MNEBem::MNEBem(const MNEBem &p_MNEBem)
@@ -82,7 +78,6 @@ MNEBem::MNEBem(const MNEBem &p_MNEBem)
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -102,7 +97,6 @@ MNEBem::MNEBem(QIODevice &p_IODevice)   //const MNEBem &p_MNEBem
 //    bool testStream =t_pStream->device()->isOpen();
 }
 
-
 //=============================================================================================================
 
 MNEBem::~MNEBem()
@@ -116,7 +110,6 @@ void MNEBem::clear()
 {
     m_qListBemSurface.clear();
 }
-
 
 //=============================================================================================================
 
@@ -146,7 +139,6 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem& 
     //
     //   Find all BEM surfaces
     //
-
 
     QList<FiffDirNode::SPtr> bem = p_pStream->dirtree()->dir_tree_find(FIFFB_BEM);
     if(bem.isEmpty())
@@ -194,7 +186,6 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem& 
     }
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -367,7 +358,6 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     return true;
 }
 
-
 //=============================================================================================================
 
 void MNEBem::write(QIODevice &p_IODevice)
@@ -381,7 +371,6 @@ void MNEBem::write(QIODevice &p_IODevice)
     printf("Write BEM surface in %s...\n", t_pStream->streamName().toUtf8().constData());
     this->writeToStream(t_pStream.data());
 }
-
 
 //=============================================================================================================
 
@@ -401,7 +390,6 @@ void MNEBem::writeToStream(FiffStream* p_pStream)
     p_pStream->end_file();
 }
 
-
 //=============================================================================================================
 
 const MNEBemSurface& MNEBem::operator[] (qint32 idx) const
@@ -413,7 +401,6 @@ const MNEBemSurface& MNEBem::operator[] (qint32 idx) const
     }
     return m_qListBemSurface[idx];
 }
-
 
 //=============================================================================================================
 
@@ -427,7 +414,6 @@ MNEBemSurface& MNEBem::operator[] (qint32 idx)
     return m_qListBemSurface[idx];
 }
 
-
 //=============================================================================================================
 
 MNEBem &MNEBem::operator<<(const MNEBemSurface &surf)
@@ -436,7 +422,6 @@ MNEBem &MNEBem::operator<<(const MNEBemSurface &surf)
     return *this;
 }
 
-
 //=============================================================================================================
 
 MNEBem &MNEBem::operator<<(const MNEBemSurface *surf)
@@ -444,7 +429,6 @@ MNEBem &MNEBem::operator<<(const MNEBemSurface *surf)
     this->m_qListBemSurface.append(*surf);
     return *this;
 }
-
 
 //=============================================================================================================
 
@@ -466,7 +450,6 @@ void MNEBem::warp(const MatrixXf & sLm, const MatrixXf &dLm)
     return;
 }
 
-
 //=============================================================================================================
 
 void MNEBem::transform(const FiffCoordTrans& trans)
@@ -480,7 +463,6 @@ void MNEBem::transform(const FiffCoordTrans& trans)
     }
     return;
 }
-
 
 //=============================================================================================================
 

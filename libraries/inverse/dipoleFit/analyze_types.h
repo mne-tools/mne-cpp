@@ -67,7 +67,6 @@
 #include <mne/c/mne_msh_color_scale_def.h>
 #include <mne/c/mne_surface_patch.h>
 
-
 typedef struct {
   float  megmin,megmax;             /* MEG gradiometer vertical scale [T/m] */
   float  megaxmult;                 /* Multiplier for the magnetometer scaling [m] */
@@ -418,7 +417,6 @@ typedef struct {
 //  FIFFLIB::FiffCoordTransOld*    MNI_tal_tal_ltz_t; /* Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0) */
 //} *coordTransSet,coordTransSetRec;
 
-
 //typedef struct {		       /* Set of display surfaces */
 //  char              *subj;	       /* The name of the subject */
 //  char              *morph_subj;       /* The subject we are morphing to */
@@ -475,15 +473,6 @@ typedef struct {
   float       max_coil_move;	/* Average coil movement scale */
   float       max_velocity;	/* Angular velocity scale */
 } *contHpiDataSet, contHpiDataSetRec;
-
-
-
-
-
-
-
-
-
 
 
 

@@ -44,20 +44,17 @@
 #include "fwd_global.h"
 #include "fwd_types.h"
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -80,7 +77,6 @@ namespace FWDLIB
 //=============================================================================================================
 
 class FwdCoilSet;
-
 
 //=============================================================================================================
 /**
@@ -108,17 +104,13 @@ public:
      */
     ~FwdThreadArg();
 
-
     static FwdThreadArg* create_eeg_multi_thread_duplicate(FwdThreadArg* one, bool bem_model);
 
     static void free_eeg_multi_thread_duplicate(FwdThreadArg* one,bool bem_model);
 
-
     static FwdThreadArg* create_meg_multi_thread_duplicate(FwdThreadArg* one, bool bem_model);
 
-
     static void free_meg_multi_thread_duplicate(FwdThreadArg* one,bool bem_model);
-
 
 
 public:

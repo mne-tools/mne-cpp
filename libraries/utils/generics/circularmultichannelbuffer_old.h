@@ -36,20 +36,17 @@
 #ifndef CIRCULARMULTICHANNELBUFFEROLD_H
 #define CIRCULARMULTICHANNELBUFFEROLD_H
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "circularbuffer_old.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QVector>
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE IOBUFFER
@@ -58,11 +55,9 @@
 namespace IOBUFFER
 {
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
-
 
 //=============================================================================================================
 /**
@@ -150,7 +145,6 @@ public:
      */
     inline int numChannels();
 
-
     //=========================================================================================================
     /**
      * Clears the buffer.
@@ -162,9 +156,7 @@ private:
 
     unsigned int    m_uiMaxNumElements;     /**< Holds the maximal number of buffer elements.*/
 
-
 };
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -179,7 +171,6 @@ CircularMultiChannelBuffer_old<_Tp>::CircularMultiChannelBuffer_old(unsigned int
     init();
 }
 
-
 //=============================================================================================================
 
 template<typename _Tp>
@@ -188,7 +179,6 @@ CircularMultiChannelBuffer_old<_Tp>::~CircularMultiChannelBuffer_old()
     clear();
     delete m_qVecBuffers;
 }
-
 
 //=============================================================================================================
 
@@ -199,13 +189,11 @@ void CircularMultiChannelBuffer_old<_Tp>::init()
 //     for (int i = 0; i < uiNumChannels; i++)
 //         m_qVecBuffers.push_back( new  CircularBuffer<_Tp>(m_uiMaxNumElements) );
 
-
     for (typename  QVector< CircularBuffer_old<_Tp>* >::iterator i = m_qVecBuffers->begin(); i != m_qVecBuffers->end(); ++i) {
         *i = new  CircularBuffer_old<_Tp>(m_uiMaxNumElements);
     }
 
 }
-
 
 //=============================================================================================================
 
@@ -215,7 +203,6 @@ inline int CircularMultiChannelBuffer_old<_Tp>::numChannels()
     return m_qVecBuffers->size();
 }
 
-
 //=============================================================================================================
 
 template<typename _Tp>
@@ -223,7 +210,6 @@ inline void CircularMultiChannelBuffer_old<_Tp>::push(unsigned int uiChannel, co
 {
     m_qVecBuffers[uiChannel]->push(pArray, size);
 }
-
 
 //=============================================================================================================
 
@@ -233,7 +219,6 @@ inline void CircularMultiChannelBuffer_old<_Tp>::push(unsigned int uiChannel, co
     (*m_qVecBuffers)[uiChannel]->push(newElement);
 }
 
-
 //=============================================================================================================
 
 template<typename _Tp>
@@ -242,7 +227,6 @@ inline void CircularMultiChannelBuffer_old<_Tp>::push(const QVector<_Tp>& newEle
     for(int i = 0; i < newElements.size(); ++i)
         (*m_qVecBuffers)[i]->push(newElements[i]);
 }
-
 
 //=============================================================================================================
 
@@ -258,7 +242,6 @@ inline QVector<_Tp> CircularMultiChannelBuffer_old<_Tp>::pop()
     return elements;
 }
 
-
 //=============================================================================================================
 
 template<typename _Tp>
@@ -266,7 +249,6 @@ inline _Tp CircularMultiChannelBuffer_old<_Tp>::pop(unsigned int uiNumChannels)
 {
         return (*m_qVecBuffers)[uiNumChannels]->pop();
 }
-
 
 //=============================================================================================================
 
@@ -278,7 +260,6 @@ void CircularMultiChannelBuffer_old<_Tp>::clear()
         *i = NULL;
     }
 }
-
 
 //=============================================================================================================
 // TYPEDEF

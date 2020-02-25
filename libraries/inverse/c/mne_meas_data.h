@@ -47,13 +47,11 @@
 #include <mne/c/mne_types.h>
 #include <mne/c/mne_raw_data.h>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -61,7 +59,6 @@
 
 #include <QSharedPointer>
 #include <QDebug>
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -71,7 +68,6 @@ namespace MNELIB
 {
     class MneNamedMatrix;
 }
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
@@ -123,7 +119,6 @@ public:
      */
     void adjust_baselines(float bmin, float bmax);
 
-
     //============================= mne_read_data.c =============================
 
     static MneMeasData* mne_read_meas_data_add(const QString&       name,       /* Name of the measurement file */
@@ -134,14 +129,12 @@ public:
                                        int                  nnamesp,
                                        MneMeasData*          add_to);
 
-
     static MneMeasData* mne_read_meas_data(const QString&       name,       /* Name of the measurement file */
                                    int                  set,        /* Which data set */
                                    MneInverseOperator*  op,         /* For consistency checks */
                                    MNELIB::MneNamedMatrix*      fwd,        /* Another option for consistency checks */
                                    const QStringList&   namesp,   /* Yet another option: explicit name list */
                                    int                  nnamesp);
-
 
 
 

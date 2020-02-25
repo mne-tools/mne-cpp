@@ -45,13 +45,11 @@
 
 #include <iostream>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -62,7 +60,6 @@ using namespace MNELIB;
 using namespace INVERSELIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -85,7 +82,6 @@ MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lamb
     this->setRegularization(lambda);
     this->setMethod(dSPM, sLORETA);
 }
-
 
 //=============================================================================================================
 
@@ -182,7 +178,6 @@ MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, 
 //    return SourceEstimate(sol, t_qListVertices, tmin, tstep);
 }
 
-
 //=============================================================================================================
 
 MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal) const
@@ -199,7 +194,6 @@ MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin
     }
 
     MatrixXd sol = K * data; //apply imaging kernel
-
 
     if (inv.source_ori == FIFFV_MNE_FREE_ORI && pick_normal == false)
     {
@@ -240,7 +234,6 @@ MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin
 
 }
 
-
 //=============================================================================================================
 
 void MinimumNorm::doInverseSetup(qint32 nave, bool pick_normal)
@@ -258,14 +251,12 @@ void MinimumNorm::doInverseSetup(qint32 nave, bool pick_normal)
     inverseSetup = true;
 }
 
-
 //=============================================================================================================
 
 const char* MinimumNorm::getName() const
 {
     return "Minimum Norm Estimate";
 }
-
 
 //=============================================================================================================
 
@@ -294,7 +285,6 @@ void MinimumNorm::setMethod(QString method)
     printf("\tSet minimum norm method to %s.\n", method.toUtf8().constData());
 }
 
-
 //=============================================================================================================
 
 void MinimumNorm::setMethod(bool dSPM, bool sLORETA)
@@ -318,7 +308,6 @@ void MinimumNorm::setMethod(bool dSPM, bool sLORETA)
 
     }
 }
-
 
 //=============================================================================================================
 

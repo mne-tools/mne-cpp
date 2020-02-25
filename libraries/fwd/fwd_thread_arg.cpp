@@ -45,7 +45,6 @@
 #include "fwd_bem_model.h"
 #include "fwd_comp_data.h"
 
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -62,12 +61,9 @@
 #define OK 0
 #endif
 
-
 #define FREE_80(x) if ((char *)(x) != NULL) free((char *)(x))
 
-
 #define FREE_CMATRIX_80(m) mne_free_cmatrix_80((m))
-
 
 void mne_free_cmatrix_80 (float **m)
 {
@@ -78,7 +74,6 @@ void mne_free_cmatrix_80 (float **m)
 }
 
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -86,7 +81,6 @@ void mne_free_cmatrix_80 (float **m)
 using namespace Eigen;
 using namespace FWDLIB;
 using namespace MNELIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -109,14 +103,12 @@ FwdThreadArg::FwdThreadArg()
 
 }
 
-
 //=============================================================================================================
 
 FwdThreadArg::~FwdThreadArg()
 {
 
 }
-
 
 //=============================================================================================================
 
@@ -140,7 +132,6 @@ FwdThreadArg *FwdThreadArg::create_eeg_multi_thread_duplicate(FwdThreadArg *one,
     return res;
 }
 
-
 //=============================================================================================================
 
 void FwdThreadArg::free_eeg_multi_thread_duplicate(FwdThreadArg *one, bool bem_model)
@@ -158,7 +149,6 @@ void FwdThreadArg::free_eeg_multi_thread_duplicate(FwdThreadArg *one, bool bem_m
     if(one)
         delete one;
 }
-
 
 //=============================================================================================================
 
@@ -189,7 +179,6 @@ FwdThreadArg *FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg* one,
     }
     return res;
 }
-
 
 //=============================================================================================================
 

@@ -45,7 +45,6 @@
 #include "../../3dhelpers/geometrymultiplier.h"
 #include "../../materials/geometrymultipliermaterial.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -63,13 +62,11 @@
 #include <QMatrix4x4>
 #include <QRandomGenerator>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -78,7 +75,6 @@
 using namespace Eigen;
 using namespace INVERSELIB;
 using namespace DISP3DLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -90,7 +86,6 @@ EcdDataTreeItem::EcdDataTreeItem(Qt3DCore::QEntity *p3DEntityParent, int iType, 
     initItem();
 }
 
-
 //=============================================================================================================
 
 void EcdDataTreeItem::initItem()
@@ -100,7 +95,6 @@ void EcdDataTreeItem::initItem()
     this->setCheckState(Qt::Checked);
     this->setToolTip("Dipole fit data");
 }
-
 
 //=============================================================================================================
 
@@ -118,7 +112,6 @@ void EcdDataTreeItem::addData(const ECDSet& pECDSet)
     //Plot dipole moment
     plotDipoles(pECDSet);
 }
-
 
 //=============================================================================================================
 
@@ -184,5 +177,4 @@ void EcdDataTreeItem::plotDipoles(const ECDSet& tECDSet)
     pMaterial->setAlpha(1.0f);
     this->addComponent(pMaterial);
 }
-
 

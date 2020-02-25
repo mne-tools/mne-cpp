@@ -40,13 +40,11 @@
 #include "pluginconnectorconnectionwidget.h"
 #include "pluginconnectorconnection.h"
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include <QGridLayout>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -54,11 +52,9 @@
 
 using namespace SCSHAREDLIB;
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
-
 
 PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnectorConnection* pPluginConnectorConnection, QWidget *parent)
 : QWidget(parent)
@@ -76,7 +72,6 @@ PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnector
 
     m_pLabel = new QLabel(tr("Connector Connection: ")+sSender+" -> "+sReceiver, this);
     m_pLabel->setStyleSheet("border: 0px; font-size: 14px; font-weight: bold;");
-
 
     qint32 curRow = 0;
 
@@ -132,14 +127,12 @@ PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnector
     this->setLayout(layout);
 }
 
-
 //=============================================================================================================
 
 PluginConnectorConnectionWidget::~PluginConnectorConnectionWidget()
 {
     m_qMapSenderToReceiverConnections.clear();
 }
-
 
 //=============================================================================================================
 
@@ -159,7 +152,6 @@ void PluginConnectorConnectionWidget::updateReceiver(const QString &p_sCurrentRe
         {
             t_sCurrentSender = it.key();
             t_qComboBox = it.value();
-
 
             qint32 i = 0;
             for(i = 0; i < m_pPluginConnectorConnection->m_pSender->getOutputConnectors().size(); ++i)

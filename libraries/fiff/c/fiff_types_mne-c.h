@@ -103,7 +103,6 @@ typedef __int16 int16_t;
 typedef unsigned __int16 uint16_t;
 #endif
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -130,13 +129,11 @@ typedef qint16               fiff_dau_pack16_t;
 typedef qint64               fiff_julian_t;
 typedef char                 fiff_data_t; //unsig char instead of void -> avoid void in C++ cause of its undefined behaviour using delete -> this can happen during lots of casting
 
-
 /*----------------------------------------------------------------------
  * 
  * Primitive building blocks:
  *
  *---------------------------------------------------------------------*/
-
 
 /*----------------------------------------------------------------------
  *
@@ -180,7 +177,6 @@ typedef struct _fiffTimeRec {
  fiff_int_t usecs;          /**< Fraction of seconds in microseconds */
 } *fiffTime, fiffTimeRec;   /**< Accurate time stamps used in FIFF files.*/
 
-
 /** Structure representing digitized strings. */
 
 typedef struct _fiffDigStringRec {
@@ -200,7 +196,6 @@ typedef struct _fiff_event_bits {
  fiff_int_t to_mask;           /**< to mask */
  fiff_int_t to_state;          /**< to state */
 } *fiffEventBits, fiffEventBitsRec;
-
 
 /**
  * A file ID.
@@ -290,13 +285,11 @@ typedef fiffChPosRec fiff_ch_pos_t;
 #define FIFFV_COIL_VV_MAG_T2          3023  /**< Vectorview SQ20483-A magnetometer */
 #define FIFFV_COIL_VV_MAG_T3          3024  /**< Vectorview SQ20950N magnetometer */
 
-
 #define FIFFV_COIL_MAGNES_MAG         4001  /**< Magnes WH magnetometer */
 #define FIFFV_COIL_MAGNES_GRAD        4002  /**< Magnes WH gradiometer  */
 #define FIFFV_COIL_CTF_GRAD           5001  /**< CTF axial gradiometer */
 
 #define FIFFM_IS_VV_COIL(c) ((c)/1000 == 3)
-
 
 /** Description of one channel */
 
@@ -320,7 +313,6 @@ typedef fiffChPosRec fiff_ch_pos_t;
 /*
  * Units of measurement
  */
-
 
 #define FIFF_UNIT_NONE -1
 /*
@@ -385,7 +377,6 @@ typedef fiffChPosRec fiff_ch_pos_t;
 #define FIFF_UNITM_F  -15
 #define FIFF_UNITM_A  -18
 
-
 /** Directories are composed of these structures. */
 
 typedef struct _fiffDirEntryRec {
@@ -411,9 +402,7 @@ typedef struct _fiffDigPointRec {
  fiff_float_t r[3];		 /**< Point location */
 } *fiffDigPoint,fiffDigPointRec; /**< Digitization point description */
 
-
 /** Structure representing digitized strings. */
-
 
 typedef fiffDigPointRec  fiff_dig_point_t;
 typedef fiffDigStringRec fiff_dig_string_t;
@@ -522,7 +511,6 @@ typedef fiffCoordTransRec fiff_coord_trans_t;
 // int                 nchild;	 /**< Number of child nodes */
 //} fiffDirNodeRec,*fiffDirNode; 	 /**< Directory tree structure used by the fiff library routines. */
 
-
 /** FIFF file handle returned by fiff_open(). */
 
 //typedef struct _fiffFileRec {
@@ -537,7 +525,6 @@ typedef fiffCoordTransRec fiff_coord_trans_t;
 //  char        *ext_file_name;	/**< Name of the file holding the external data */
 //  FILE        *ext_fd;		/**< The file descriptor of the above file if open  */
 //} *fiffFile,fiffFileRec;	/**< FIFF file handle. fiff_open() returns this. */
-
 
 /** Structure for sparse matrices */
 
@@ -555,7 +542,6 @@ typedef fiffSparseMatrixRec  fiff_sparse_matrix_t;
 
 /** Structure for event bits */
 
-
 /** Structure for hpi coil */
 
 typedef struct _fiff_hpi_coil {
@@ -571,14 +557,12 @@ typedef struct _fiff_hpi_subsys {
  fiffHpiCoil  coils;           /**< hpi coils */
 } *fiffHpiSubsys, fiffHpiSubsysRec;
 
-
 typedef struct _fiff_data_ref {
     fiff_int_t      type;       /**< Type of the data */
     fiff_int_t      endian;     /**< Are the data in the little or big endian byte order */
     fiff_long_t     size;       /**< Size of the data, can be over 2 GB  */
     fiff_long_t     offset;     /**< Offset to the data in the external file  */
 } *fiffDataRef,fiffDataRefRec;
-
 
 
 #endif

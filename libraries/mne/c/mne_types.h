@@ -124,11 +124,9 @@
 
 #include <QStringList>
 
-
 #if defined(__cplusplus) 
 extern "C" {
 #endif
-
 
 //namespace MNELIB {
 //    class MneSurfaceOrVolume {
@@ -142,7 +140,6 @@ extern "C" {
 //    }
 
 //}
-
 
 ///*
 // * Complex data
@@ -442,7 +439,6 @@ typedef struct {            /* Vector specification with a channel list */
 //  MNELIB::MneProjOp*    proj;           /* The associated projection operator */
 //} *mneInverseOperator,mneInverseOperatorRec;
 
-
 //typedef struct {		/* For storing the wdata */
 //  int   id;			/* Surface id these data belong to */
 //  int   kind;			/* What kind of data */
@@ -494,7 +490,6 @@ typedef struct {            /* Vector specification with a channel list */
 //  int           ndir;		/* Number of tags in the above
 //				 * directory */
 //} mneRawInfoRec, *mneRawInfo;
-
 
 //typedef struct {		/* Spatiotemporal map */
 //  int kind;			/* What kind of data */
@@ -599,7 +594,6 @@ typedef struct {
 //  int   comp_status;		/* For raw buffers: compensation status */
 //} *mneRawBufDef,mneRawBufDefRec;
 
-
 /*
  * CTF compensation stuff
  */
@@ -648,7 +642,6 @@ typedef struct {
 //  int      nderiv;		        /* How many? */
 //  mneDeriv *derivs;			/* Pointers to the items */
 //} *mneDerivSet,mneDerivSetRec;
-
 
 //typedef struct {			/* A comprehensive raw data structure */
 //  char             *filename;           /* This is our file */
@@ -755,7 +748,6 @@ typedef struct {
 //  int                nset;	 /* How many */
 //  MNELIB::MneMeasDataSet*     current;	 /* Which is the current one */
 //} *mneMeasData,mneMeasDataRec;
-
 
 //typedef struct {		/* Identifier for the automatic parcellation */
 //  char  *name;			/* Name of this area */

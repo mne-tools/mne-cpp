@@ -75,7 +75,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Inverse
 }
 
-
 SOURCES += \
     test_dipole_fit.cpp
 

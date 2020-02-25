@@ -57,11 +57,9 @@
 #include <QtAlgorithms>
 #include <QtSvg/QSvgGenerator>
 
-
 namespace Ui {
 class TMSIImpedanceWidget;
 }
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE TMSIPLUGIN
@@ -69,7 +67,6 @@ class TMSIImpedanceWidget;
 
 namespace TMSIPLUGIN
 {
-
 
 //=============================================================================================================
 // USED NAMESPACES

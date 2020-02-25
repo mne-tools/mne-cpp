@@ -43,7 +43,6 @@
 #include "../Interfaces/IPlugin.h"
 #include "pluginconnectorconnection.h"
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -51,7 +50,6 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QList>
-
 
 //=============================================================================================================
 // DEFINE NAMESPACE SCSHAREDLIB
@@ -152,7 +150,6 @@ public:
     void clear();
 
 signals:
-
 
 private:
     PluginList m_pluginList;    /**< List of plugins associated with this set. */

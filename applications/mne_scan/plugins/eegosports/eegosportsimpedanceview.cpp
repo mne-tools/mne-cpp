@@ -34,13 +34,11 @@
  *
  */
 
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "eegosportsimpedanceview.h"
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -48,7 +46,6 @@
 
 using namespace EEGOSPORTSPLUGIN;
 using namespace std;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -74,7 +71,6 @@ EEGoSportsImpedanceView::EEGoSportsImpedanceView(QWidget *parent)
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsImpedanceView::wheelEvent(QWheelEvent* event)
@@ -89,7 +85,6 @@ void EEGoSportsImpedanceView::wheelEvent(QWheelEvent* event)
     //QGraphicsView::wheelEvent(event);
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsImpedanceView::resizeEvent(QResizeEvent* event)
@@ -99,7 +94,6 @@ void EEGoSportsImpedanceView::resizeEvent(QResizeEvent* event)
 
     QGraphicsView::resizeEvent(event);
 }
-
 
 //=============================================================================================================
 

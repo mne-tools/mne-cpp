@@ -49,18 +49,15 @@
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QGridLayout>
 
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -71,7 +68,6 @@ using namespace DISP3DLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace CONNECTIVITYLIB;
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -107,7 +103,6 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
     this->setLayout(mainLayoutView);
 }
 
-
 //=============================================================================================================
 
 RealTimeConnectivityEstimateWidget::~RealTimeConnectivityEstimateWidget()
@@ -117,14 +112,12 @@ RealTimeConnectivityEstimateWidget::~RealTimeConnectivityEstimateWidget()
     }
 }
 
-
 //=============================================================================================================
 
 void RealTimeConnectivityEstimateWidget::update(SCMEASLIB::Measurement::SPtr)
 {
     getData();
 }
-
 
 //=============================================================================================================
 
@@ -184,14 +177,12 @@ void RealTimeConnectivityEstimateWidget::getData()
     }
 }
 
-
 //=============================================================================================================
 
 void RealTimeConnectivityEstimateWidget::init()
 {
     m_bInitialized = true;
 }
-
 
 //=============================================================================================================
 
