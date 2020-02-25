@@ -60,6 +60,7 @@ namespace SCSHAREDLIB
 class SCSHAREDSHARED_EXPORT PluginOutputConnector : public PluginConnector
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<PluginOutputConnector> SPtr;               /**< Shared pointer type for PluginOutputConnector. */
     typedef QSharedPointer<const PluginOutputConnector> ConstSPtr;    /**< Const shared pointer type for PluginOutputConnector. */

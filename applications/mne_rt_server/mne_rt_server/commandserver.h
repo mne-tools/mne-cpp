@@ -71,6 +71,7 @@ namespace RTSERVER
 class CommandServer : public QTcpServer
 {
     Q_OBJECT
+
 public:
 
     //=========================================================================================================

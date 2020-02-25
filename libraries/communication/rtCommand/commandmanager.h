@@ -40,6 +40,7 @@ namespace COMMUNICATIONLIB
 class COMMUNICATIONSHARED_EXPORT CommandManager : public QObject, public IObserver
 {
     Q_OBJECT
+
 public:
     explicit CommandManager(bool p_bIsActive = true, QObject *parent = 0);
 

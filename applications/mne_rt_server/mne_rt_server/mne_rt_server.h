@@ -78,6 +78,7 @@ namespace RTSERVER
 class MNERTServer : public QObject
 {
     Q_OBJECT
+
 public:
     MNERTServer();
 

@@ -84,6 +84,7 @@ namespace SCMEASLIB
 class SCMEASSHARED_EXPORT RealTimeEvokedSet : public Measurement
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<RealTimeEvokedSet> SPtr;               /**< Shared pointer type for RealTimeEvokedSet. */
     typedef QSharedPointer<const RealTimeEvokedSet> ConstSPtr;    /**< Const shared pointer type for RealTimeEvokedSet. */

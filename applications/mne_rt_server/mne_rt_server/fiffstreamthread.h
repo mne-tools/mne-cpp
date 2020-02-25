@@ -68,6 +68,7 @@ namespace RTSERVER
 class FiffStreamThread : public QThread
 {
     Q_OBJECT
+
 public:
     FiffStreamThread(qint32 id, int socketDescriptor, QObject *parent);
 

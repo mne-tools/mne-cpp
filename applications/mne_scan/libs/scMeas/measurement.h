@@ -61,6 +61,7 @@ namespace SCMEASLIB
 class SCMEASSHARED_EXPORT Measurement : public QObject
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<Measurement> SPtr;               /**< Shared pointer type for Measurement. */
     typedef QSharedPointer<const Measurement> ConstSPtr;    /**< Const shared pointer type for Measurement. */

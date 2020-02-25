@@ -80,6 +80,7 @@ namespace COMMUNICATIONLIB
 class COMMUNICATIONSHARED_EXPORT RtClient : public QThread
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<RtClient> SPtr;               /**< Shared pointer type for MNERtClient. */
     typedef QSharedPointer<const RtClient> ConstSPtr;    /**< Const shared pointer type for MNERtClient. */

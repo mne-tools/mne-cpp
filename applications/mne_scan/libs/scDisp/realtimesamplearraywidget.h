@@ -81,6 +81,7 @@ namespace SCDISPLIB
 class SCDISPSHARED_EXPORT RealTimeSampleArrayWidget : public MeasurementWidget
 {
     Q_OBJECT
+
 public:
     //=========================================================================================================
     /**

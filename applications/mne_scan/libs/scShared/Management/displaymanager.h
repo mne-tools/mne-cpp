@@ -76,6 +76,7 @@ namespace SCSHAREDLIB
 class SCSHAREDSHARED_EXPORT DisplayManager : public QObject
 {
     Q_OBJECT
+
 public:
     typedef QSharedPointer<DisplayManager> SPtr;               /**< Shared pointer type for DisplayManager. */
     typedef QSharedPointer<const DisplayManager> ConstSPtr;    /**< Const shared pointer type for DisplayManager. */
