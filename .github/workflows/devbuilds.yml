@@ -49,15 +49,32 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'
+    - name: Install Git submodules
+      run: |
+        git submodule update --init
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
         modules: qtcharts
     - name: Configure and compile MNE-CPP
-      run: |        
+      run: |
         qmake -r MNECPP_CONFIG+=noTests
         make -j2 
+    - name: Compile BrainFlow submodule
+      run: |
+        cd applications/mne_scan/plugins/brainflowboard/brainflow
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=../installed ..
+        make
+        make install
+    - name: Compile and configure BrainFlow plugin
+      run: |
+        cd applications/mne_scan/plugins/brainflowboard
+        qmake
+        make -j2
+        cp -r ./brainflow/installed/lib/* ../../../bin/
     - name: Package binaries
       run: |
         # Install libxkbcommon so linuxdeployqt can find it
@@ -95,15 +112,32 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'
+    - name: Install Git submodules
+      run: |
+        git submodule update --init
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
         version: 5.14.1
         modules: qtcharts
     - name: Configure and compile MNE-CPP
-      run: |        
+      run: |
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples
         make -j2
+    - name: Compile BrainFlow submodule
+      run: |
+        cd applications/mne_scan/plugins/brainflowboard/brainflow
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=../installed ..
+        make
+        make install
+    - name: Compile and configure BrainFlow plugin
+      run: |
+        cd applications/mne_scan/plugins/brainflowboard
+        qmake
+        make -j2
+        cp -r ./brainflow/installed/lib/* ../../../bin/
     - name: Package binaries
       run: |
         # Creating archive of all macos deployed applications
@@ -128,7 +162,10 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: '3.7'
-        architecture: 'x64'      
+        architecture: 'x64'   
+    - name: Install Git submodules
+      run: |
+        git submodule update --init
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -146,6 +183,23 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -r MNECPP_CONFIG+=noTests
         jom -j2
+    - name: Compile BrainFlow submodule
+      run: |
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        cd applications\mne_scan\plugins\brainflowboard\brainflow
+        mkdir build
+        cd build
+        cmake -G "Visual Studio 14 2015 Win64" -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX=..\installed ..
+        cmake --build . --target install --config Release
+    - name: Compile and configure BrainFlow plugin
+      run: |
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        cd applications\mne_scan\plugins\brainflowboard
+        qmake
+        jom -j2
+        cp -r .\brainflow\installed\lib\* ..\..\..\bin\
     - name: Package binaries
       run: |
         7z a mne-cpp-windows-x86_64.zip ./bin
@@ -211,7 +265,7 @@ jobs:
         sudo apt-get update -qq
         sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
     - name: Run Doxygen and package result
-      run: |        
+      run: |
         cd doc/doxygen
         doxygen mne-cpp_doxyfile
     - name: Setup Github credentials
@@ -227,7 +281,7 @@ jobs:
         tag: dev_build
         overwrite: true
     - name: Update documentation at Github pages
-      run: |    
+      run: |
         cd doc/doxygen
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE
