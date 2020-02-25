@@ -40,6 +40,9 @@
 #include "sphere.h"
 #include "simplex_algorithm.h"
 
+#include <QDebug>
+
+//*************************************************************************************************************
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -132,9 +135,8 @@ bool Sphere::fit_sphere_to_points(float **rr, int np, float simplex_size, float 
         rr_eigen(k, 2) = rr[k][2];
     }
 
-    if(rr_eigen.rows() > 0) {
+    if(rr_eigen.rows() < 0) {
         std::cout << "Sphere::fit_sphere_to_points - No points were passed." << std::endl;
-
         return false;
     }
 
