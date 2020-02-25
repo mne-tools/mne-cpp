@@ -224,9 +224,7 @@ public:
 
 protected:
     GUSBAmpProducer*       m_pGUSBAmpProducer;      /**< A pointer to the corresponding GUSBAmpProducer class.*/
-
 };
-
 } // NAMESPACE
 
 #endif // GUSBAMPDRIVER_H

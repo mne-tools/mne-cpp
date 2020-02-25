@@ -113,7 +113,6 @@ void TestFiffCov::initTestCase()
     covResult.diag = 0;
     covResult.dim = 366;
     covResult.nfree = 15972;
-
 }
 
 //=============================================================================================================

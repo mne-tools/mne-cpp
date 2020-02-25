@@ -112,7 +112,6 @@ QByteArray BabyMEGInfo::MGH_LM_Get_Field(QByteArray cmdstr)
     }
 
     return cmdstr.mid(bPos,ePos-bPos);
-
 }
 
 //=============================================================================================================
@@ -136,7 +135,6 @@ QStringList BabyMEGInfo::MGH_LM_Exact_Single_Channel_Info(QByteArray cmdstr)
     }
 
     return sList;
-
 }
 
 //=============================================================================================================

@@ -110,9 +110,7 @@ public:
      * @param [in] selectionMap holds the map to which the read selection groups are stored.
      */
     static bool writeBrainstormMonFiles(QString path, const QMap<QString,QStringList> &selectionMap);
-
 };
-
 } // NAMESPACE
 
 #endif // SELECTIONIO_H

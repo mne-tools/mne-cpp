@@ -197,7 +197,6 @@ signals:
     void SendDataPackage(QByteArray DATA);
     void SendCMDPackage(QByteArray DATA);
     void GainInfoUpdate(QStringList);
-
 };
 
 //=============================================================================================================
@@ -208,7 +207,6 @@ inline FIFFLIB::FiffInfo BabyMEGInfo::getFiffInfo() const
 {
     return m_FiffInfo;
 }
-
 } // NAMESPACE
 
 #endif // BABYMEGINFO_H

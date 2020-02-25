@@ -55,14 +55,12 @@ using namespace DISPLIB;
 MeasurementWidget::MeasurementWidget(QWidget* parent)
 : QWidget(parent)
 {
-
 }
 
 //=============================================================================================================
 
 MeasurementWidget::~MeasurementWidget()
 {
-
 }
 
 //=============================================================================================================

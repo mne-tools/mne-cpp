@@ -82,7 +82,6 @@ signals:
 public slots:
     
 };
-
 } //NAMESPACE
 
 #endif // MEASUREMENTTYPES_H

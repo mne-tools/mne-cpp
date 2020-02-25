@@ -181,7 +181,6 @@ signals:
      */
     void cardinalPointsChanged(const QString& sLPA, double dLPA, const QString& sRPA, double dRPA, const QString& sNasion, double dNasion);
 };
-
 } // NAMESPACE
 
 #endif // BRAINAMPSETUPPROJECTWIDGET_H

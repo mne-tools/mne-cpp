@@ -132,9 +132,7 @@ private:
     QString             m_sFilePath;            /**< path of the file of written data */
     std::vector<QString>     m_vSerials;             /**< vector with the serial numbers of the devices*/
     std::vector<int>         m_viSizeOfSampleMatrix; /**< size of the sample matrix [rows columns] */
-
 };
-
 } // NAMESPACE
 
 #endif // GUSBAMPPRODUCER_H

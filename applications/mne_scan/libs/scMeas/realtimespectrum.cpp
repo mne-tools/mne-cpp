@@ -69,7 +69,6 @@ RealTimeSpectrum::RealTimeSpectrum(QObject *parent)
 
 RealTimeSpectrum::~RealTimeSpectrum()
 {
-
 }
 
 //=============================================================================================================
@@ -86,7 +85,6 @@ void RealTimeSpectrum::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 void RealTimeSpectrum::initScaleType(qint8 ScaleType)
 {
     m_xScaleType = ScaleType;
-
 }
 
 //=============================================================================================================

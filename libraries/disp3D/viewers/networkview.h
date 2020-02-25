@@ -133,9 +133,7 @@ public:
 
 protected:
     QSharedPointer<DISPLIB::ConnectivitySettingsView>       m_pConnectivitySettingsView;    /** The connectivity settings view. */
-
 };
-
 } // NAMESPACE
 
 #endif // DISP3DLIB_NETWORKVIEW_H

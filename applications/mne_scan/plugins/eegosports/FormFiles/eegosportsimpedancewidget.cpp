@@ -93,7 +93,6 @@ EEGoSportsImpedanceWidget::EEGoSportsImpedanceWidget(EEGoSports* pEEGoSports, QW
     connect(m_pUi->m_pushButton_saveValues, &QPushButton::released, this, &EEGoSportsImpedanceWidget::saveToFile);
     connect(m_pUi->m_pushButton_Help, &QPushButton::released, this, &EEGoSportsImpedanceWidget::helpDialog);
     //connect(m_pUi->m_verticalSlider_manualImpedanceValue, &QSlider::valueChanged, this, &EEGoSportsImpedanceWidget::setIm);
-
 }
 
 //=============================================================================================================

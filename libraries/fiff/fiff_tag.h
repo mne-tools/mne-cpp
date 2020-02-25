@@ -528,7 +528,6 @@ private:
 //    fiff_data_t *data;		/**< Pointer to the data.
 //                 *   This point to the data read or to be written. */
 //} *fiffTag,fiffTagRec;   /**< FIFF data tag */
-
 };
 
 //=============================================================================================================
@@ -1021,7 +1020,6 @@ inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
 
     return p_Matrix;
 }
-
 } // NAMESPACE
 
 #endif // FIFF_TAG_H

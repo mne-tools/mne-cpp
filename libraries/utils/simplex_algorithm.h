@@ -239,7 +239,6 @@ T SimplexAlgorithm::tryit(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> &p,
 
     return ytry;
 }
-
 } //NAMESPACE
 
 #undef ALPHA

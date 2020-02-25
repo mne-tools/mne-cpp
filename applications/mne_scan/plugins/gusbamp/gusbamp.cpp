@@ -90,7 +90,6 @@ GUSBAmp::GUSBAmp()
     m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
     connect(m_pActionStartRecording, &QAction::triggered, this, &GUSBAmp::showStartRecording);
     addPluginAction(m_pActionStartRecording);
-
 }
 
 //=============================================================================================================
@@ -218,7 +217,6 @@ void GUSBAmp::init()
 
 void GUSBAmp::unload()
 {
-
 }
 
 //=============================================================================================================

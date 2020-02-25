@@ -136,9 +136,7 @@ private:
     QSharedPointer<TMSIDriver>  m_pTMSIDriver;      /**< A pointer to the corresponding TMSI driver class.*/
 
     bool                        m_bIsRunning;       /**< Whether TMSIProducer is running.*/
-
 };
-
 } // NAMESPACE
 
 #endif // TMSIPRODUCER_H

@@ -150,7 +150,6 @@ inline bool operator== (const FiffChPos &a, const FiffChPos &b)
             a.ey.isApprox(b.ey, 0.0001f) &&
             a.ez.isApprox(b.ez, 0.0001f));
 }
-
 } // NAMESPACE
 
 #endif // FIFF_CH_POS_H

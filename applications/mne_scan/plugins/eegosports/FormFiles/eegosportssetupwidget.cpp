@@ -93,7 +93,6 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
 
 EEGoSportsSetupWidget::~EEGoSportsSetupWidget()
 {
-
 }
 
 //=============================================================================================================

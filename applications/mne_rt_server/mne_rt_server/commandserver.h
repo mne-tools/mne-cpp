@@ -162,7 +162,6 @@ inline COMMUNICATIONLIB::CommandParser& CommandServer::getCommandParser()
 {
     return m_commandParser;
 }
-
 } // NAMESPACE
 
 #endif //INSTRUCTIONSERVER_H

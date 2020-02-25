@@ -57,7 +57,6 @@ FwdEegSphereLayer::FwdEegSphereLayer()
 , rel_rad(0.0f)
 , sigma(0.0f)
 {
-
 }
 
 //=============================================================================================================
@@ -73,5 +72,4 @@ FwdEegSphereLayer::FwdEegSphereLayer()
 
 FwdEegSphereLayer::~FwdEegSphereLayer()
 {
-
 }

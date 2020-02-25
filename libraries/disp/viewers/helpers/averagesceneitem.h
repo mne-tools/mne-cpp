@@ -146,7 +146,6 @@ signals:
      */
     void sceneUpdateRequested();
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // AVERAGESCENEITEM_H

@@ -242,7 +242,6 @@ inline void IPlugin::addPluginAction(QAction* pAction)
 //{
 //    m_qListPluginWidgets.append(pWidget);
 //}
-
 } //Namespace
 
 Q_DECLARE_INTERFACE(SCSHAREDLIB::IPlugin, "scsharedlib/1.0")

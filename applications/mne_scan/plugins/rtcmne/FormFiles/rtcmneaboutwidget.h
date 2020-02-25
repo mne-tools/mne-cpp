@@ -85,9 +85,7 @@ public:
 private:
 
     Ui::RtcMneAboutWidgetClass ui;		/**< Holds the user interface for the RtcMneAboutWidget.*/
-
 };
-
 } // NAMESPACE
 
 #endif // RTCMNEABOUTWIDGET_H

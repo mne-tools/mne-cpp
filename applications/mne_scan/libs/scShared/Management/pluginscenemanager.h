@@ -167,7 +167,6 @@ inline PluginSceneManager::PluginList& PluginSceneManager::getPlugins()
 {
     return m_pluginList;
 }
-
 } //Namespace
 
 #endif // PLUGINSCENEMANAGER_H

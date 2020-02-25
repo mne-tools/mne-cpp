@@ -154,13 +154,11 @@ public:
 
 private:
     Eigen::SparseMatrix<float> m_matCorrelations;  /**< Upper triangular matrix of shape [n_dipoles x n_dipoles] which contains the dipole correlations. */
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } //NAMESPACE
 
 #endif // MNECORSOURCEESTIMATE_H

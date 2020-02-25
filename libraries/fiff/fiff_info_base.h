@@ -245,7 +245,6 @@ inline bool operator== (const FiffInfoBase &a, const FiffInfoBase &b)
             a.dev_head_t == b.dev_head_t &&
             a.ctf_head_t == b.ctf_head_t);
 }
-
 } // NAMESPACE
 
 #endif // FIFF_INFO_BASE_H

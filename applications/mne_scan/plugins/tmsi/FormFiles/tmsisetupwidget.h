@@ -158,7 +158,6 @@ private:
 
     Ui::TMSISetupClass  ui;                      /**< the user interface for the TMSISetupWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // TMSISETUPWIDGET_H

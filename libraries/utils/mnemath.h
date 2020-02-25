@@ -648,7 +648,6 @@ Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> MNEMath::pinv(const Eigen::Matr
 }
 
 //=============================================================================================================
-
 } // NAMESPACE
 
 #endif // MNEMATH_H

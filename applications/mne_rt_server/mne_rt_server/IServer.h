@@ -97,7 +97,6 @@ public:
 private:
     QMap<quint8, QThread*> m_qClientList;
     quint8          m_iNextClientId;
-
 };
 
 //=============================================================================================================
@@ -131,7 +130,6 @@ void IServer::clearClients()
     }
     m_qClientList.clear();
 }
-
 
 } //Namespace
 

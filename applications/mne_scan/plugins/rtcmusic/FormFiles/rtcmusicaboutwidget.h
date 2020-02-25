@@ -85,9 +85,7 @@ public:
 private:
 
     Ui::RtcMusicAboutWidgetClass ui;		/**< Holds the user interface for the RtcMusicAboutWidget.*/
-
 };
-
 } // NAMESPACE
 
 #endif // RTCMUSICABOUTWIDGET_H

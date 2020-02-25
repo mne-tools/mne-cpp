@@ -168,7 +168,6 @@ protected:
 
     QList<qint32>                           m_qListSelChannel;                      /**< The channel list generated from the selected modalities */
 };
-
 } // NAMESPACE
 
 #endif // REALTIMECOVWIDGET_H

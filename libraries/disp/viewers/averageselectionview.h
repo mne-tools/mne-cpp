@@ -182,7 +182,6 @@ signals:
      */
     void newAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 };
-
 } // NAMESPACE
 
 #endif // AVERAGESELECTIONVIEW_H

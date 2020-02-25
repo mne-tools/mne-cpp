@@ -146,13 +146,11 @@ private:
 
     bool check_unrecognized_args(int argc, char **argv);
     bool check_args (int *argc,char **argv);
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } //NAMESPACE
 
 #endif // COMPUTEFWDSETTINGS_H

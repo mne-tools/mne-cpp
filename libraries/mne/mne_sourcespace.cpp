@@ -74,14 +74,12 @@ MNESourceSpace::MNESourceSpace()
 MNESourceSpace::MNESourceSpace(const MNESourceSpace &p_MNESourceSpace)
 : m_qListHemispheres(p_MNESourceSpace.m_qListHemispheres)
 {
-
 }
 
 //=============================================================================================================
 
 MNESourceSpace::~MNESourceSpace()
 {
-
 }
 
 //=============================================================================================================

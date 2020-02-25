@@ -194,7 +194,6 @@ private:
 
 //    RealTimeSourceEstimate::SPtr m_pRTSE_MNE; /**< Source Estimate output channel. */
 };
-
 } // NAMESPACE
 
 #endif // RTCMUSIC_H

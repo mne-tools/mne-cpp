@@ -171,9 +171,7 @@ private:
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeCov> >              m_pCovarianceOutput;    /**< The RealTimeCov of the Covariance output.*/
 
 signals:
-
 };
-
 } // NAMESPACE
 
 #endif // COVARIANCE_H

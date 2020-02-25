@@ -151,7 +151,6 @@ private:
     QVector<ISensor*>    m_qVecSensorPlugins;       /**< Vector of all ISensor plugins. */
     QVector<IAlgorithm*> m_qVecAlgorithmPlugins;    /**< Vector of all IAlgorithm plugins. */
     QVector<IIO*>        m_qVecIOPlugins;           /**< Vector of all IIO plugins. */
-
 };
 
 //=============================================================================================================
@@ -183,7 +182,6 @@ inline const QVector<IIO*>& PluginManager::getIOPlugins()
 {
     return m_qVecIOPlugins;
 }
-
 } // NAMESPACE
 
 #endif // PLUGINMANAGER_H

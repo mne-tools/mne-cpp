@@ -168,9 +168,7 @@ private:
      * Open a help dialog.
      */
     void helpDialog();
-
 };
-
 } // NAMESPACE
 
 #endif // TMSIIMPEDANCEWIDGET_H

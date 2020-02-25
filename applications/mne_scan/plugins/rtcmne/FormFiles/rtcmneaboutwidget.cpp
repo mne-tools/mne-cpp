@@ -59,5 +59,4 @@ RtcMneAboutWidget::RtcMneAboutWidget(QWidget *parent)
 
 RtcMneAboutWidget::~RtcMneAboutWidget()
 {
-
 }

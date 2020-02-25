@@ -198,7 +198,6 @@ private:
     float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
     qint8       m_iScaleType;       /**< scale type */
 };
-
 } // NAMESPACE
 
 #endif // FREQUENCYSPECTRUMDELEGATE_H

@@ -136,7 +136,6 @@ private:
 
     QList<SelectionSceneItem*>      m_lSelectedChannelItems;        /**< Holds the selected channels from the selection manager.*/
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // AverageScene_H

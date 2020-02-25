@@ -142,7 +142,6 @@ private:
 
     Ui::RtcMneSetupWidgetClass ui;   /**< Holds the user interface for the RtcMneSetupWidgetClass.*/
 };
-
 } // NAMESPACE
 
 #endif // RTCMNESETUPWIDGET_H

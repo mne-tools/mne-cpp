@@ -193,7 +193,6 @@ protected:
 
     int                                 m_iNumVert;                 /**< The total number of set vertices. */
 };
-
 } // NAMESPACE
 
 #endif // DISP3DLIB_CUSTOMMESH_H

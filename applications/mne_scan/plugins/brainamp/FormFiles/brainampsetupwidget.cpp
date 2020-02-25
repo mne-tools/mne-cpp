@@ -91,7 +91,6 @@ BrainAMPSetupWidget::BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget* parent)
 
 BrainAMPSetupWidget::~BrainAMPSetupWidget()
 {
-
 }
 
 //=============================================================================================================

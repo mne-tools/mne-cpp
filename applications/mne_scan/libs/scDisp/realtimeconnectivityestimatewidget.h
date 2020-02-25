@@ -155,7 +155,6 @@ protected:
 
     QPointer<QAction>                                           m_pActionQuickControl;  /**< Show quick control widget. */
 };
-
 } // NAMESPACE
 
 #endif // REALTIMECONNECTIVITYESTIMATEWIDGET_H

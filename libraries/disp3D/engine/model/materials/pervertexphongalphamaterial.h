@@ -108,7 +108,6 @@ private:
     QPointer<Qt3DRender::QShaderProgram>    m_pVertexES2Shader;         /**< Shader program for OpenGL version ES2.0. */
     QPointer<Qt3DRender::QShaderProgram>    m_pVertexGL3Shader;         /**< Shader program for OpenGL version 3. */
 };
-
 } // namespace DISP3DLIB
 
 #endif // DISP3DLIB_PERVERTEXPHONGALPHAMATERIAL_H

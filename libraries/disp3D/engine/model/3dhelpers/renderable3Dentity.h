@@ -339,9 +339,7 @@ signals:
      * @param[in] position     The position/translation value.
      */
     void positionChanged(QVector3D position);
-
 };
-
 } // NAMESPACE
 
 #endif // DISP3DLIB_RENDERABLE3DENTITY_H

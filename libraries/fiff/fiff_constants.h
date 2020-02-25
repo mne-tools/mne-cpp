@@ -485,7 +485,6 @@ namespace FIFFLIB
 #define FIFFV_MNE_COORD_FS_TAL_GTZ  2004           /**< FreeSurfer Talairach coordinates (MNI z > 0)*/
 #define FIFFV_MNE_COORD_FS_TAL_LTZ  2005           /**< FreeSurfer Talairach coordinates (MNI z < 0)*/
 #define FIFFV_MNE_COORD_FS_TAL      2006           /**< FreeSurfer Talairach coordinates*/
-
 } // NAMESPACE
 
 #endif // FIFF_CONSTANTS_H

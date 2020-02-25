@@ -367,7 +367,6 @@ private:
     PSETMEASURINGMODE   m_oFpSetMeasuringMode;
     PGETERRORCODE       m_oFpGetErrorCode;
 };
-
 } // NAMESPACE
 
 #endif // TMSIDRIVER_H

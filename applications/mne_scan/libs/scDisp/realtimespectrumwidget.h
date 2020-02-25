@@ -157,9 +157,7 @@ private:
     float m_fUpperFrqBound;         /**< Upper frequency bound */
 
     bool m_bInitialized;            /**< Is Initialized */
-
 };
-
 } // NAMESPACE
 
 #endif // FREQUENCYSPECTRUMWIDGET_H

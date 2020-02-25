@@ -128,7 +128,6 @@ inline QSharedPointer<T> &PluginOutputData<T>::data()
 {
     return m_pMeasurement;
 }
-
 } // NAMESPACE
 
 //Make the template definition visible to compiler in the first point of instantiation

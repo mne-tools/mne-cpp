@@ -72,7 +72,6 @@ public:
      * Executes the ICommand.
      */
     virtual void execute() = 0;
-
 };
 
 //Invoker

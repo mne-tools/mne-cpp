@@ -191,7 +191,6 @@ inline bool operator== (const FiffId &a, const FiffId &b)
             a.time.secs == b.time.secs &&
             a.time.usecs == b.time.usecs);
 }
-
 } // NAMESPACE
 
 #endif // FIFF_ID_H

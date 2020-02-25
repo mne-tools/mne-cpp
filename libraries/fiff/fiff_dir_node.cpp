@@ -73,7 +73,6 @@ FiffDirNode::FiffDirNode(const FiffDirNode* p_FiffDirTree)
 , parent(p_FiffDirTree->parent)
 , children(p_FiffDirTree->children)
 {
-
 }
 
 //=============================================================================================================

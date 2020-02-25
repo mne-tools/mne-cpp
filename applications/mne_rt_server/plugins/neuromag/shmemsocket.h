@@ -216,7 +216,6 @@ private:
 
     FILE*           read_fd;
 };
-
 } // NAMESPACE
 
 #endif // SHMEMSOCKET_H

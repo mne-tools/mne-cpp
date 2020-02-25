@@ -246,7 +246,6 @@ private:
 
 signals:
 };
-
 } // NAMESPACE
 
 #endif // AVERAGING_H

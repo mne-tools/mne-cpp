@@ -277,7 +277,6 @@ private:
 
 signals:
 };
-
 } // NAMESPACE
 
 #endif // NOISEREDUCTION_H

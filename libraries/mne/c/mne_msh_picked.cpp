@@ -51,12 +51,10 @@ using namespace MNELIB;
 
 MneMshPicked::MneMshPicked()
 {
-
 }
 
 //=============================================================================================================
 
 MneMshPicked::~MneMshPicked()
 {
-
 }

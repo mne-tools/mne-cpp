@@ -72,7 +72,6 @@ RealTimeMultiSampleArray::RealTimeMultiSampleArray(QObject *parent)
 
 RealTimeMultiSampleArray::~RealTimeMultiSampleArray()
 {
-
 }
 
 //=============================================================================================================

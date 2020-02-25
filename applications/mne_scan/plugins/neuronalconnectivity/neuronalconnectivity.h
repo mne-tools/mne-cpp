@@ -263,7 +263,6 @@ private:
 
     CONNECTIVITYLIB::Network    m_currentConnectivityResult;    /**< The current connectivity result.*/
 };
-
 } // NAMESPACE
 
 #endif // NEURONALCONNECTIVITY_H

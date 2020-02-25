@@ -185,7 +185,6 @@ inline bool Label::isEmpty() const
 {
     return this->hemi == -1;
 }
-
 } // NAMESPACE
 
 #ifndef metatype_label

@@ -71,7 +71,6 @@ CovarianceSetupWidget::CovarianceSetupWidget(Covariance* toolbox, QWidget *paren
 
 CovarianceSetupWidget::~CovarianceSetupWidget()
 {
-
 }
 
 //=============================================================================================================

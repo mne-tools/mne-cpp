@@ -169,7 +169,6 @@ inline bool LSLAdapterProducer::isRunning() const
 {
     return m_bIsRunning;
 }
-
 } // NAMESPACE
 
 #endif // LSLADAPTERPRODUCER_H

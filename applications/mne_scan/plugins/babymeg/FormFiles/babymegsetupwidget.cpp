@@ -97,7 +97,6 @@ BabyMEGSetupWidget::BabyMEGSetupWidget(BabyMEG* p_pBabyMEG, QWidget* parent)
 
 BabyMEGSetupWidget::~BabyMEGSetupWidget()
 {
-
 }
 
 //=============================================================================================================

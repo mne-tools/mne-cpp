@@ -152,7 +152,6 @@ protected:
     QSharedPointer<DISPLIB::Control3DView>              m_pControl3DView;       /**< The Disp3D control. */
     QPointer<DISPLIB::QuickControlView>                 m_pQuickControlView;    /**< The quick control view. */
 };
-
 } // NAMESPACE
 
 #endif // DISP3DLIB_ABSTRACTVIEW_H

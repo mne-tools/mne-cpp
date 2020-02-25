@@ -87,7 +87,6 @@ MNESourceEstimate::MNESourceEstimate(const MNESourceEstimate& p_SourceEstimate)
 , tmin(p_SourceEstimate.tmin)
 , tstep(p_SourceEstimate.tstep)
 {
-
 }
 
 //=============================================================================================================

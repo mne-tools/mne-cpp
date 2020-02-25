@@ -80,7 +80,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Connectivity \
             -lMNE$${MNE_LIB_VERSION}RtProcessing \
             -lMNE$${MNE_LIB_VERSION}Disp \
-
 }
 
 SOURCES += \

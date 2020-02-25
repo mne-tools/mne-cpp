@@ -255,7 +255,6 @@ inline bool LSLAdapter::isValid(const lsl::stream_info& s)
     // stream with nonempty ID and name should be valid
     return (s.uid().empty() == false && s.name().empty() == false);
 }
-
 } // NAMESPACE
 
 #endif // LSLADAPTER_H

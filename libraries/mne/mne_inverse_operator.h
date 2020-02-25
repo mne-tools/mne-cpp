@@ -422,7 +422,6 @@ inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEInverseOpera
 
     return out;
 }
-
 } // NAMESPACE
 
 #ifndef metatype_mneinverseoperatorsptr

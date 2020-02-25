@@ -173,7 +173,6 @@ public:
 
     static void checkChThreshold(ArtifactRejectionData& inputData);
 };
-
 } // NAMESPACE
 
 #endif // MNE_EPOCH_DATA_LIST_H

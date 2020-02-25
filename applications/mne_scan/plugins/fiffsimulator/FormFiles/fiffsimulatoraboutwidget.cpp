@@ -64,5 +64,4 @@ FiffSimulatorAboutWidget::FiffSimulatorAboutWidget(QWidget *parent)
 
 FiffSimulatorAboutWidget::~FiffSimulatorAboutWidget()
 {
-
 }

@@ -193,7 +193,6 @@ inline bool RealTimeSpectrum::containsValues() const
 {
     return m_bContainsValues;
 }
-
 } // NAMESPACE
 
 Q_DECLARE_METATYPE(SCMEASLIB::RealTimeSpectrum::SPtr)

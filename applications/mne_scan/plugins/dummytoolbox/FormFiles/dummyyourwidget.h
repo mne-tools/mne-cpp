@@ -89,7 +89,6 @@ public:
 private:
     Ui::DummyYourToolbarWidget* ui;        /**< The UI class specified in the designer. */
 };
-
 }   //namespace
 
 #endif // DUMMYYOURWIDGET_H

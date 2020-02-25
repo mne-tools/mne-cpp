@@ -92,7 +92,6 @@ MNEBemSurface::MNEBemSurface(const MNEBemSurface& p_MNEBemSurface)
 
 MNEBemSurface::~MNEBemSurface()
 {
-
 }
 
 //=============================================================================================================

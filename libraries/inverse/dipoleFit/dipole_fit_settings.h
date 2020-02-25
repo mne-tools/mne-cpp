@@ -183,13 +183,11 @@ private:
     void usage(char *name);
     bool check_unrecognized_args(int argc, char **argv);
     bool check_args (int *argc,char **argv);
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } //NAMESPACE
 
 #endif // DIPOLEFITSETTINGS_H

@@ -673,5 +673,4 @@ void ParksMcClellan::CalcCoefficients()
   {
    Alpha[j] = 2.0 * Alpha[j] * OneOverNumTaps;
   }
-
 }

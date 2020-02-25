@@ -56,7 +56,6 @@ EEGoSportsImpedanceScene::EEGoSportsImpedanceScene(QGraphicsView* view, QObject*
 , m_bRightMouseKeyPressed(false)
 , m_qvView(view)
 {
-
 }
 
 //=============================================================================================================

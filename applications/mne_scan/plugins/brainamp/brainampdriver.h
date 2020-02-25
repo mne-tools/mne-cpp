@@ -177,9 +177,7 @@ private:
     int                         DriverVersion;                      /**< Driver version.*/
 
     BA_SETUP                    Setup;                              /**< Setup structure.*/
-
 };
-
 } // NAMESPACE
 
 #endif // BRAINAMPDRIVER_H

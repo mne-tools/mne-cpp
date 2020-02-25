@@ -85,7 +85,6 @@ public:
 private:
     Ui::GUSBAmpAboutWidgetClass ui;    /**< Holds the user interface for the GUSBAmpAboutWidgetClass.*/
 };
-
 } // NAMESPACE
 
 #endif // GUSBAMPABOUTWIDGET_H

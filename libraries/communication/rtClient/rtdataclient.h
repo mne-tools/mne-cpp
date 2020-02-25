@@ -142,7 +142,6 @@ signals:
 public slots:
     
 };
-
 } // NAMESPACE
 
 #endif // RTDATACLIENT_H

@@ -183,13 +183,11 @@ protected:
 
     IntermediateSumData             m_intermediateSumData;          /**< The intermediate sum data holds data calculated over all trials as a whole. */
     QList<IntermediateTrialData>    m_trialData;                    /**< The trial data holds the actual and intermediate data calcualted for each trial. */
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // namespace CONNECTIVITYLIB
 
 #ifndef metatype_connectivitysettings

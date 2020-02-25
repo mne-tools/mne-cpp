@@ -155,7 +155,6 @@ struct RegionData
 
         return p_RegionDataOut;
     }
-
 };
 
 const static FIFFLIB::FiffCov defaultCov;
@@ -588,7 +587,6 @@ inline bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b
             a.source_rr.isApprox(b.source_rr, 0.0001f) &&
             a.source_nn.isApprox(b.source_nn, 0.0001f));
 }
-
 } // NAMESPACE
 
 #endif // MNE_FORWARDSOLUTION_H

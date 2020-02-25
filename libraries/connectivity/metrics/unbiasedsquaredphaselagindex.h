@@ -138,13 +138,11 @@ protected:
      */
     static void computeUSPLI(ConnectivitySettings &connectivitySettings,
                              Network& finalNetwork);
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // namespace CONNECTIVITYLIB
 
 #endif // UNBIASEDSQUAREDPHASELAGINDEX_H

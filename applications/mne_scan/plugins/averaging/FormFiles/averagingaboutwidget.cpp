@@ -59,5 +59,4 @@ AveragingAboutWidget::AveragingAboutWidget(QWidget *parent)
 
 AveragingAboutWidget::~AveragingAboutWidget()
 {
-
 }

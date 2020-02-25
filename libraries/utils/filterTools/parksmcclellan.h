@@ -200,9 +200,7 @@ private:
     Eigen::VectorXd Weight;
 
     bool InitDone2;
-
 };
-
 } // NAMESPACE UTILSLIB
 
 #endif // PARKSMCCLELLAN_H

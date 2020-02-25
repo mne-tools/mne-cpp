@@ -79,9 +79,7 @@ private:
 
     QMutex m_qMutex;
     QString m_qSendData;
-
 };
-
 } // NAMESPACE
 
 #endif //COMMANDTHREAD_H

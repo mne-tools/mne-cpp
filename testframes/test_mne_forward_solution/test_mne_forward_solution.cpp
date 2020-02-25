@@ -80,7 +80,6 @@ private:
 
     QSharedPointer<MNEForwardSolution> m_pFwdMEGEEGRead;
     QSharedPointer<MNEForwardSolution> m_pFwdMEGEEGRef;
-
 };
 
 //=============================================================================================================
@@ -94,7 +93,6 @@ TestMneForwardSolution::TestMneForwardSolution()
 
 void TestMneForwardSolution::initTestCase()
 {
-
 }
 
 //=============================================================================================================

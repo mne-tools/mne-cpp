@@ -210,7 +210,6 @@ public:
 private:
     // Newly added
     Eigen::MatrixXf m_TriCoords; /**< Holds the rr tri Matrix transformed to geometry data. */
-
 };
 
 //=============================================================================================================
@@ -265,7 +264,6 @@ inline bool operator== (const MNEHemisphere &a, const MNEHemisphere &b)
             a.cluster_info == b.cluster_info &&
             a.m_TriCoords.isApprox(b.m_TriCoords, 0.0001f));
 }
-
 } // NAMESPACE
 
 #endif // MNE_HEMISPHERE_H

@@ -149,7 +149,6 @@ private:
     bool        m_bDraggable;       /**< Flag specifying whether this widget is draggable. */
     bool        m_bMousePressed;       /**< Flag specifying whether this widget is draggable. */
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // DRAGGABLEFRAMELESSWIDGET_H

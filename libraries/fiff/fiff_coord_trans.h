@@ -271,7 +271,6 @@ inline bool operator== (const FiffCoordTrans &a, const FiffCoordTrans &b)
             a.trans.isApprox(b.trans, 0.0001f) &&
             a.invtrans.isApprox(b.invtrans, 0.0001f));
 }
-
 } // NAMESPACE
 
 #endif // FIFF_COORD_TRANS_H

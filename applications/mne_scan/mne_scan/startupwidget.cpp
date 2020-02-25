@@ -85,5 +85,4 @@ StartUpWidget::StartUpWidget(QWidget *parent)
 
 StartUpWidget::~StartUpWidget()
 {
-
 }

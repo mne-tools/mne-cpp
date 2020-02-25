@@ -112,7 +112,6 @@ void GUSBAmpProducer::stop()
 
     //Unitialise device only after the thread stopped
     m_pGUSBAmpDriver->uninitDevice();
-
 }
 
 //=============================================================================================================

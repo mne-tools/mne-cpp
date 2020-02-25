@@ -52,7 +52,6 @@ Dipole<T>::Dipole()
 , m_dLength(1)
 , m_dFrequency(0)
 {
-
 }
 
 //=============================================================================================================
@@ -60,9 +59,7 @@ Dipole<T>::Dipole()
 template <class T>
 Dipole<T>::~Dipole()
 {
-
 }
-
 }//Namespace
 
 #endif //DIPOLE_SOURCES

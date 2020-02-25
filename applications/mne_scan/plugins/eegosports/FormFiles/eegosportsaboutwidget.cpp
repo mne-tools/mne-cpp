@@ -65,5 +65,4 @@ EEGoSportsAboutWidget::EEGoSportsAboutWidget(QWidget *parent)
 
 EEGoSportsAboutWidget::~EEGoSportsAboutWidget()
 {
-
 }

@@ -362,7 +362,6 @@ void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic,
         }
     }
 }
-
 } // NAMESPACE
 
 #endif // SPLINE_H

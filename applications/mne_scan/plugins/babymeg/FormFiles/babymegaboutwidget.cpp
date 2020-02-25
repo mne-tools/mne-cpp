@@ -68,5 +68,4 @@ BabyMEGAboutWidget::BabyMEGAboutWidget(QWidget *parent)
 
 BabyMEGAboutWidget::~BabyMEGAboutWidget()
 {
-
 }

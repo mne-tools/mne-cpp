@@ -97,7 +97,6 @@ public:
     fiff_int_t          last;   /**< last sample */
     fiff_int_t          nsamp;  /**< Number of samples */
 };
-
 } // NAMESPACE
 
 #endif // FIFF_RAW_DIR_H

@@ -138,13 +138,11 @@ protected:
      */
     static void computeWPLI(ConnectivitySettings &connectivitySettings,
                             Network& finalNetwork);
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // namespace CONNECTIVITYLIB
 
 #endif // WEIGHTEDPHASELAGINDEX_H

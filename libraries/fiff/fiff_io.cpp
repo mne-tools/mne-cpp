@@ -176,7 +176,6 @@ bool FiffIO::write(QIODevice& p_IODevice, const fiff_int_t type, const fiff_int_
     }
 
     return true;
-
 }
 
 //=============================================================================================================
@@ -214,7 +213,6 @@ bool FiffIO::write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) 
     }
 
     return true;
-
 }
 
 //=============================================================================================================

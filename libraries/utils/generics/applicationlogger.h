@@ -77,6 +77,5 @@ public:
 
 private:
 };
-
 }
 #endif // APPLICATIONLOGGER_H

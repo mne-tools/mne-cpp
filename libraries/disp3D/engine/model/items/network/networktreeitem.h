@@ -198,13 +198,11 @@ private:
     QPointer<QEntity>                               m_pEdgeEntity;                  /**< The network edge entity. */
     QSharedPointer<Qt3DExtras::QCylinderGeometry>   m_pEdgesGeometry;               /**< The network geomtries for edges. */
     QPointer<GeometryMultiplier>                    m_pEdges;                       /**< The geometry multiplier for edges. */
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_NETWORKTREEITEM_H

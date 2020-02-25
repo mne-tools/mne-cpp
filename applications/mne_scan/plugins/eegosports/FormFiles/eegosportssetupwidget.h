@@ -122,7 +122,6 @@ private:
 
     Ui::EEGoSportsSetupClass  ui;                      /**< the user interface for the EEGoSportsSetupWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // EEGOSPORTSSETUPWIDGET_H

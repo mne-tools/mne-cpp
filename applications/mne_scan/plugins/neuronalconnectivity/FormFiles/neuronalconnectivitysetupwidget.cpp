@@ -68,7 +68,6 @@ NeuronalConnectivitySetupWidget::NeuronalConnectivitySetupWidget(NeuronalConnect
 
 NeuronalConnectivitySetupWidget::~NeuronalConnectivitySetupWidget()
 {
-
 }
 
 //=============================================================================================================

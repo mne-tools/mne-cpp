@@ -49,7 +49,6 @@ private:
     Covariance* m_pCovarianceToolbox;
     QSpinBox* m_pSpinBoxNumSamples;
 };
-
 } // NAMESPACE
 
 #endif // COVARIANCESETTINGSWIDGET_H

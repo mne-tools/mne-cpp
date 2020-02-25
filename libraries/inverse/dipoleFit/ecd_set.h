@@ -194,7 +194,6 @@ inline qint32 ECDSet::size() const
 {
     return m_qListDips.size();
 }
-
 } // NAMESPACE INVERSELIB
 
 #ifndef metatype_ecdset

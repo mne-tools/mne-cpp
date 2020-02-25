@@ -149,7 +149,6 @@ inline bool RealTimeCov::isInitialized() const
     QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
 }
-
 } // NAMESPACE
 
 Q_DECLARE_METATYPE(SCMEASLIB::RealTimeCov::SPtr)

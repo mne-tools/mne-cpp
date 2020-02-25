@@ -62,7 +62,6 @@ FiffStreamServer::FiffStreamServer(QObject *parent)
 : QTcpServer(parent)
 , m_iNextClientId(0)
 {
-
 }
 
 //=============================================================================================================

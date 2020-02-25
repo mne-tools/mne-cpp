@@ -130,7 +130,6 @@ inline qint32 FiffDirEntry::storageSize()
 {
     return 16;
 }
-
 } // NAMESPACE
 
 #endif // FIFF_DIR_ENTRY_H

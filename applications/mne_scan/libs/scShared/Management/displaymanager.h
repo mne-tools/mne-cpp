@@ -114,9 +114,7 @@ public:
 
 private:
     QList<QMetaObject::Connection>   m_pListWidgetConnections;       /**< all widget connections.*/
-
 };
-
 } // NAMESPACE
 
 #endif // DISPLAYMANAGER_H

@@ -271,7 +271,6 @@ inline qint32 MNEBem::size() const
 {
     return m_qListBemSurface.size();
 }
-
 } // NAMESPACE
 
 #endif // MNE_BEM_H

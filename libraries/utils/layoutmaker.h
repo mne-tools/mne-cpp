@@ -125,9 +125,7 @@ private:
                       float *r,
                       float *theta,
                       float *phi);
-
 };
-
 } //NAMESPACE
 
 #endif // LAYOUTMAKER_H

@@ -88,7 +88,6 @@ RtNoise::RtNoise(qint32 p_iMaxSamples,
     m_fWin = hanning(m_iFFTlength,0);
 
     qDebug()<<"Hanning window is created.";
-
 }
 
 //=============================================================================================================
@@ -301,6 +300,5 @@ void RtNoise::run()
         }
 
     }
-
 }
 

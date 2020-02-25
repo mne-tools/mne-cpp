@@ -110,7 +110,6 @@ protected:
 
 private:
     callback_function m_pFunc;  /**< registered callback function */
-
 };
 
 //=============================================================================================================
@@ -123,7 +122,6 @@ inline QSharedPointer< PluginInputData<T> > PluginInputData<T>::create(IPlugin *
     QSharedPointer< PluginInputData<T> > pPluginInputData(new PluginInputData<T>(parent, name, descr));
     return pPluginInputData;
 }
-
 } // NAMESPACE
 
 //Make the template definition visible to compiler in the first point of instantiation

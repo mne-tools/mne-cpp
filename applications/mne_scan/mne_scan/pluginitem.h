@@ -101,7 +101,6 @@ private:
     QMenu *m_contextMenu;
     QList<Arrow *> arrows;
 };
-
 } //NAMESPACE
 
 #endif // PLUGINITEM_H

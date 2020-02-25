@@ -129,7 +129,6 @@ private:
     BrainAMP*               m_pBrainAMP;            /**< a pointer to corresponding BrainAMP.*/
     Ui::BrainAMPSetupClass  ui;                     /**< the user interface for the BrainAMPSetupWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // BRAINAMPSETUPWIDGET_H

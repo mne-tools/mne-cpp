@@ -170,6 +170,5 @@ MneSourceSpaceOld::MneSourceSpaceOld(int np)
 
 MneSourceSpaceOld::~MneSourceSpaceOld()
 {
-
 }
 

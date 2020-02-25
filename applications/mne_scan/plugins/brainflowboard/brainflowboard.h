@@ -132,7 +132,6 @@ private:
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pOutput;
     QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;        /**< Fiff measurement info.*/
 };
-
 }
 
 #endif // BRAINFLOWBOARD_H

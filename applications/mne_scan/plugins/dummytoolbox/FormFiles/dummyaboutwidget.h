@@ -85,9 +85,7 @@ public:
 private:
 
     Ui::DummyAboutWidgetClass ui;		/**< Holds the user interface for the DummyAboutWidget.*/
-
 };
-
 } // NAMESPACE
 
 #endif // DUMMYABOUTWIDGET_H

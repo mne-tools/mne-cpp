@@ -127,7 +127,6 @@ public:
      */
     virtual const MNELIB::MNESourceSpace& getSourceSpace() const = 0;
 };
-
 } //NAMESPACE
 
 #endif // IINVERSEALGORITHM_H

@@ -399,7 +399,6 @@ inline RapMusic::MatrixXT RapMusic::makeSquareMat(const MatrixXT& p_matF)
 
     return p_matF*mat;
 }
-
 } //NAMESPACE
 
 #endif // RAPMUSIC_H

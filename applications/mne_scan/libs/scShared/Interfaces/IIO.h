@@ -174,7 +174,6 @@ inline void IIO::setRTRecordDirName(const QString& dirName)
 {
     m_RTRecordDirName = dirName;
 }
-
 } // NAMESPACE
 
 Q_DECLARE_INTERFACE(SCSHAREDLIB::IIO, "scsharedlib/1.0")

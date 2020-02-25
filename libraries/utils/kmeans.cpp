@@ -865,7 +865,6 @@ bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
     } // phase two
 
     return converged;
-
 } // nested function
 
 //=============================================================================================================

@@ -187,7 +187,6 @@ void RealTimeSpectrumWidget::initSettingsWidget()
         m_pSpectrumSettingsView->m_pSliderUpperBound->setMaximum((qint32)(m_pFS->getFiffInfo()->sfreq/2)*1000);
         m_pSpectrumSettingsView->m_pSliderUpperBound->setValue((qint32)(m_fUpperFrqBound*1000));
     }
-
 }
 
 //=============================================================================================================

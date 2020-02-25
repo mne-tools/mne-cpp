@@ -57,7 +57,6 @@ using namespace Eigen;
 
 AnnotationSet::AnnotationSet()
 {
-
 }
 
 //=============================================================================================================
@@ -77,7 +76,6 @@ AnnotationSet::AnnotationSet(const QString &subject_id, qint32 hemi, const QStri
         if(Annotation::read(subject_id, 1, atlas, subjects_dir, t_Annotation))
             insert(t_Annotation);
     }
-
 }
 
 //=============================================================================================================
@@ -112,7 +110,6 @@ AnnotationSet::AnnotationSet(const Annotation& p_LHAnnotation, const Annotation&
         m_qMapAnnots.insert(1, p_RHAnnotation);
     else
         qWarning("Right hemisphere id is not 1. RH annotation not assigned!");
-
 }
 
 //=============================================================================================================

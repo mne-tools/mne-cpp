@@ -62,12 +62,10 @@ RealTimeSampleArrayChInfo::RealTimeSampleArrayChInfo()
 , m_iUnit(FIFF_UNIT_NONE)
 , m_iCoilType(FIFFV_COIL_NONE)
 {
-
 }
 
 //=============================================================================================================
 
 RealTimeSampleArrayChInfo::~RealTimeSampleArrayChInfo()
 {
-
 }

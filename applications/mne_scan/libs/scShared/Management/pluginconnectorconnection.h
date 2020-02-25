@@ -172,7 +172,6 @@ inline bool PluginConnectorConnection::isConnected()
 {
     return m_qHashConnections.size() > 0 ? true : false;
 }
-
 } // NAMESPACE
 
 #endif // PLUGINCONNECTORCONNECTION_H

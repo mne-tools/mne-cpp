@@ -119,7 +119,6 @@ private:
     QPointer<Qt3DRender::QRenderPass>               m_pVertexGL3RenderPass;
     QPointer<Qt3DRender::QShaderProgram>            m_pVertexGL3Shader;
 };
-
 } // namespace DISP3DLIB
 
 #endif // DISP3DLIB_SHOWNORMALSMATERIAL_H

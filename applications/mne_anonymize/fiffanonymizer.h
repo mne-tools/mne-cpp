@@ -626,7 +626,6 @@ inline void FiffAnonymizer::printIfVerbose(const QString& str)
         qInfo() << str;
     }
 }
-
 }
 
 #endif // MNEANONYMIZE

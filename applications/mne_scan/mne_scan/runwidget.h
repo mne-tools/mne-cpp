@@ -139,9 +139,7 @@ private:
     QTabWidget*     m_pTabWidgetMain;   /**< Holds the tab widget. */
 
     QScrollArea*    m_pScrollArea;      /**< Holds the scroll area inside the display tab. */
-
 };
-
 }//NAMESPACE
 
 #endif // RUNDWIDGET_H

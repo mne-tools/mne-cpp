@@ -257,7 +257,6 @@ signals:
      */
     void fiffInfoAvailable();
 };
-
 } // NAMESPACE
 
 #endif // FIFFSIMULATOR_H

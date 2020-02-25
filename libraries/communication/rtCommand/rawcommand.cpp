@@ -73,7 +73,6 @@ RawCommand::RawCommand(const RawCommand &p_rawCommand)
 , m_bIsJson(p_rawCommand.m_bIsJson)
 , m_qListRawParameters(p_rawCommand.m_qListRawParameters)
 {
-
 }
 
 //=============================================================================================================

@@ -171,7 +171,6 @@ inline SCSHAREDLIB::IPlugin::SPtr PluginGui::getCurrentPlugin()
 {
     return m_pCurrentPlugin;
 }
-
 } //NAMESPACE
 
 #endif // PLUGINGUI_H

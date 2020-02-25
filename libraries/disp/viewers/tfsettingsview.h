@@ -136,9 +136,7 @@ signals:
      * @param [in] iNumberRow        The new row number.
      */
     void numberTrialRowChanged(int iNumberTrial, int iNumberRow);
-
 };
-
 } // NAMESPACE
 
 #endif // CONNECTIVITYSETTINGSVIEW_H

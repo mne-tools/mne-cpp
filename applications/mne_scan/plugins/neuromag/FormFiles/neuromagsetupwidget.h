@@ -127,7 +127,6 @@ private:
 
     bool                            m_bIsInit;      /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
 };
-
 } // NAMESPACE
 
 #endif // NEUROMAGSETUPWIDGET_H

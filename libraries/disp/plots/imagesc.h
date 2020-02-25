@@ -197,13 +197,11 @@ protected:
     QPen                m_qPenColorbar;             /**< Colorbar pen */
 
     QRgb                (*pColorMapper)(double, const QString&);    /**< Function pointer to current colormap */
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // NAMESPACE
 
 #endif // IMAGESC_H

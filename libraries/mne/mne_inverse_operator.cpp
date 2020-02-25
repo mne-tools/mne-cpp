@@ -151,7 +151,6 @@ MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOpe
 
 MNEInverseOperator::~MNEInverseOperator()
 {
-
 }
 
 //=============================================================================================================

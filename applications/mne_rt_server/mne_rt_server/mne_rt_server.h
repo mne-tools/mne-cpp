@@ -135,7 +135,6 @@ inline COMMUNICATIONLIB::CommandManager& MNERTServer::getCommandManager()
 {
     return m_commandManager;
 }
-
 } // NAMESPACE
 
 #ifndef metatype_matrixxf

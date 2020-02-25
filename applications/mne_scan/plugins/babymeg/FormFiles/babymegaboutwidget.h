@@ -94,7 +94,6 @@ public:
 private:
     Ui::BabyMEGAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // BABYMEGABOUTWIDGET_H

@@ -2915,7 +2915,6 @@ out : {
         }
         return res;
     }
-
 }
 
 
@@ -3308,7 +3307,6 @@ void mne_revert_to_diag_cov(MneCovMatrix* c)
                 FREE_3(c->lambda); c->lambda = NULL;
     FREE_CMATRIX_3(c->eigen); c->eigen = NULL;
     return;
-
 }
 
 

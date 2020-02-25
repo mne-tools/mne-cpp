@@ -131,9 +131,7 @@ private:
     double  m_dFrequency;
 
     //TGreensFunction* green;
-
 };
-
 } // NAMESPACE
 
 //TypeDefs

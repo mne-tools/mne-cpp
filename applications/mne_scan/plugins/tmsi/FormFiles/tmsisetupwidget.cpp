@@ -128,7 +128,6 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
 
 TMSISetupWidget::~TMSISetupWidget()
 {
-
 }
 
 //=============================================================================================================

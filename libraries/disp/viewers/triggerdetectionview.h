@@ -181,9 +181,7 @@ signals:
      * Emit this signal whenever the trigger infomration changed.
      */
     void triggerInfoChanged(const QMap<double, QColor>& value, bool active, const QString& triggerCh, double threshold);
-
 };
-
 } // NAMESPACE
 
 #endif // TRIGGERDETECTIONVIEW_H

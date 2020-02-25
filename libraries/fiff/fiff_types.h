@@ -350,7 +350,6 @@ typedef struct _fiffDigPointRec {
 
 #define FIFFM_CHPOS(x) &((x)->chpos)
 
-
 }//NAMESPACE
 
 #endif // FIFF_TYPES_H

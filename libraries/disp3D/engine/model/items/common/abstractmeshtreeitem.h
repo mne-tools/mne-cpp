@@ -201,7 +201,6 @@ protected:
 
 signals:
 };
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_ABSTRACTMESHTREEITEM_H

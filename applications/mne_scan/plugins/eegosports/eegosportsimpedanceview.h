@@ -94,7 +94,6 @@ private:
      */
     void mouseDoubleClickEvent(QMouseEvent* event);
 };
-
 } // NAMESPACE
 
 #endif // EEGOSPORTSIMPEDANCEVIEW_H

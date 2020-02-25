@@ -178,9 +178,7 @@ protected:
     bool                            m_bDragMode;                    /**< Flag whether the drag mode is activated.*/
     //bool                            m_bExtendedSelectionMode;       /**< Flag whether the extended selection mode.*/
     QPointF                         m_mousePressPosition;           /**< The current mouse press location.*/
-
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // LAYOUTSCENE_H

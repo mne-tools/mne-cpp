@@ -71,7 +71,6 @@ NeuromagProducer::NeuromagProducer(Neuromag* p_pNeuromag)
 
 NeuromagProducer::~NeuromagProducer()
 {
-
 }
 
 //=============================================================================================================

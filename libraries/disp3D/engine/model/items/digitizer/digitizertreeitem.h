@@ -123,7 +123,6 @@ protected:
 
     QPointer<GeometryMultiplier>    m_pSphereMesh;
 };
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_DIGITIZERTREEITEM_H

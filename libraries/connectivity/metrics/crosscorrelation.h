@@ -118,13 +118,11 @@ protected:
                         QMutex& mutex,
                         int iNfft,
                         const QPair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // namespace CONNECTIVITYLIB
 
 #endif // CROSSCORRELATION_H

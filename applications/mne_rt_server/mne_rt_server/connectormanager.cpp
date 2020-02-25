@@ -82,7 +82,6 @@ ConnectorManager::ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObjec
 : QPluginLoader(parent)
 , m_pFiffStreamServer(p_pFiffStreamServer)
 {
-
 }
 
 //=============================================================================================================
@@ -120,7 +119,6 @@ void ConnectorManager::comConlist(Command p_command)
         t_pMNERTServer->getCommandManager()["conlist"].reply(this->getConnectorList());
     else
         t_pMNERTServer->getCommandManager()["conlist"].reply(this->getConnectorList(true));
-
 }
 
 //=============================================================================================================
@@ -144,7 +142,6 @@ void ConnectorManager::comSelcon(Command p_command)
         else
             qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["selcon"].reply(this->getConnectorList(true));
     }
-
 }
 
 //=============================================================================================================

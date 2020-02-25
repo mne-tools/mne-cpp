@@ -132,7 +132,6 @@ signals:
     void newSubject(const QString& sCurrentSubject);
     void newParadigm(const QString& sCurrentParadigm);
 };
-
 } // NAMESPACE
 
 #endif // PROJECTSETTINGSVIEW_H

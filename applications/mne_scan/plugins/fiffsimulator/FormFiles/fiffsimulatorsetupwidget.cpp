@@ -96,7 +96,6 @@ FiffSimulatorSetupWidget::FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulat
 
 FiffSimulatorSetupWidget::~FiffSimulatorSetupWidget()
 {
-
 }
 
 //=============================================================================================================

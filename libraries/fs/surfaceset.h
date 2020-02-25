@@ -269,7 +269,6 @@ inline qint32 SurfaceSet::size() const
 {
     return m_qMapSurfs.size();
 }
-
 } // NAMESPACE
 
 #endif // SURFACESET_H

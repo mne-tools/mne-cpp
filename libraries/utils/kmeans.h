@@ -205,9 +205,7 @@ private:
     double prevtotsumD;     /**< Sum of centroid distances of the previous iteration */
 
     Eigen::VectorXi previdx;/**< Previous point cluster indeces */
-
 };
-
 } // NAMESPACE
 
 #endif // KMEANS_H

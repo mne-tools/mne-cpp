@@ -231,7 +231,6 @@ MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin
 //        t_qListVertices.push_back(inv.src[h].vertno);
 
     return MNESourceEstimate(sol, p_vecVertices, tmin, tstep);
-
 }
 
 //=============================================================================================================

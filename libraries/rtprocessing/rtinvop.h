@@ -190,13 +190,11 @@ signals:
      * @param[in] inputData  The new covariance estimation.
      */
     void operate(const RtInvOpInput &inputData);
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // NAMESPACE
 
 #endif // RTINV_H

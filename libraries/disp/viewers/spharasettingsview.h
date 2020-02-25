@@ -126,9 +126,7 @@ signals:
      * Emit this signal whenever the user changes the SPHARA operator.
      */
     void spharaOptionsChanged(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond);
-
 };
-
 } // NAMESPACE
 
 #endif // SPHARASETTINGSVIEW_H

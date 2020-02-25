@@ -229,13 +229,11 @@ signals:
      * @param[in] inputData  The new batch of stored data.
      */
     void operate(const RtCovInput &inputData);
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // NAMESPACE
 
 #endif // RTCOV_H

@@ -88,7 +88,6 @@ BabyMEGClient::BabyMEGClient(int myPort, QObject *parent)
     DataAcqStartFlag = false;
     numBlock = 0;
     DataACK = false;
-
 }
 
 //=============================================================================================================
@@ -265,7 +264,6 @@ void BabyMEGClient::SendCommandToBabyMEGShortConnection(QByteArray s)
             qDebug()<<"Connect state is abnormal:"<<tcpSocket->state();
         }
     }
-
 }
 
 //=============================================================================================================
@@ -287,7 +285,6 @@ void BabyMEGClient::SendCommandToBabyMEG()
         tcpSocket->waitForBytesWritten();
         m_qMutex.unlock();
     }
-
 }
 
 //=============================================================================================================
@@ -431,7 +428,6 @@ void BabyMEGClient::handleBuffer()
             }
         }
     }// buffer is not empty and larger than 8 bytes
-
 }
 
 //=============================================================================================================
@@ -539,5 +535,4 @@ void BabyMEGClient::SendCommand(QString s)
 
 void BabyMEGClient::run()
 {
-
 }

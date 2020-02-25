@@ -212,7 +212,6 @@ inline static QStringList listFilesMatchingPatternName(const QString &fileName)
 
     return listOfFilteredFiles;
 }
-
 } // namespace MNEANONYMIZE
 
 #endif // MNEANONYMIZE_SETTINGSCONTROLLER_H

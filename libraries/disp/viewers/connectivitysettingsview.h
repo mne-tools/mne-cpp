@@ -263,9 +263,7 @@ signals:
      * @param [in] fFreqHigh       The new higher frequency band.
      */
     void freqBandChanged(float fFreqLow, float fFreqHigh);
-
 };
-
 } // NAMESPACE
 
 #endif // CONNECTIVITYSETTINGSVIEW_H

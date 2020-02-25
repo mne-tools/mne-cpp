@@ -201,7 +201,6 @@ void FilterData::designFilter()
             m_dHighpassFreq = (m_dCenterFreq - m_dBandwidth/2)*(m_sFreq/2);
         break;
     }
-
 }
 
 //=============================================================================================================

@@ -208,7 +208,6 @@ signals:
      */
     void channelsMappedToLayout(const QStringList &mappedLayoutChNames);
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // CHANNELINFOMODEL_H

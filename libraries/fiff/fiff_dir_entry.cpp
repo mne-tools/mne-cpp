@@ -56,7 +56,6 @@ FiffDirEntry::FiffDirEntry()
 , size(-1)
 , pos(-1)
 {
-
 }
 
 //=============================================================================================================
@@ -67,12 +66,10 @@ FiffDirEntry::FiffDirEntry(const FiffDirEntry& p_FiffDirEntry)
 , size(p_FiffDirEntry.size)
 , pos(p_FiffDirEntry.pos)
 {
-
 }
 
 //=============================================================================================================
 
 FiffDirEntry::~FiffDirEntry()
 {
-
 }

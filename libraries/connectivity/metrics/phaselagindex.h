@@ -138,13 +138,11 @@ protected:
      */
     static void computePLI(ConnectivitySettings &connectivitySettings,
                           Network& finalNetwork);
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // namespace CONNECTIVITYLIB
 
 #endif // PHASELAGINDEX_H

@@ -106,7 +106,6 @@ public:
 
     int         m_iChannelTypeMode;     /**< The channel type mode. */
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // SelectionScene_H

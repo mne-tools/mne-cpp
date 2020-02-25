@@ -84,7 +84,6 @@ using namespace SCSHAREDLIB;
 PluginManager::PluginManager(QObject *parent)
 : QPluginLoader(parent)
 {
-
 }
 
 //=============================================================================================================

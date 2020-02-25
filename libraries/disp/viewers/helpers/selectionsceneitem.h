@@ -109,7 +109,6 @@ public:
     bool        m_bHighlightItem;           /**< Whether this item is to be highlighted.*/
     bool        m_bIsBadChannel;            /**< Whether this item is a bad channel.*/
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // SELECTIONSCENEITEM_H

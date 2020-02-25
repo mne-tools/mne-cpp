@@ -84,7 +84,6 @@ FiffNamedMatrix::FiffNamedMatrix(const FiffNamedMatrix& p_FiffNamedMatrix)
 
 FiffNamedMatrix::~FiffNamedMatrix()
 {
-
 }
 
 //=============================================================================================================

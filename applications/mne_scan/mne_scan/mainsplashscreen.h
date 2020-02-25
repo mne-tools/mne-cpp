@@ -88,9 +88,7 @@ public:
      * Destroys the MainSplashScreen.
      */
     virtual ~MainSplashScreen ();
-
 };
-
 }// NAMESPACE
 
 #endif // MAINSPLASHSCREEN_H

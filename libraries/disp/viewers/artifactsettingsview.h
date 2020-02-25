@@ -153,9 +153,7 @@ protected:
 
 signals:
     void changeArtifactThreshold(const QMap<QString,double>& mapThresholds);
-
 };
-
 } // NAMESPACE
 
 #endif // ARTIFACTSETTINGSVIEW_H

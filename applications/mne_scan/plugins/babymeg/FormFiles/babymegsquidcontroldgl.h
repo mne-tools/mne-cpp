@@ -249,7 +249,6 @@ signals:
     void SCStart();
     void SCStop();
 };
-
 } //NAMESPACE
 
 #endif // BABYMEGSQUIDCONTROLDGL_H

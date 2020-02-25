@@ -802,7 +802,6 @@ inline QRgb ColorMap::valueToViridisNegated(double v)
     QRgb p_qRgb = qRgb(m_matViridrisData(255-(uint)v*255,0), m_matViridrisData(255-(uint)v*255,1), m_matViridrisData(255-(uint)v*255,2));
     return p_qRgb;
 }
-
 } // NAMESPACE
 
 #endif // COLORMAP_H

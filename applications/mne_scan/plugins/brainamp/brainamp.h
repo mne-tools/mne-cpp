@@ -262,9 +262,7 @@ private:
     QList<Eigen::MatrixXd>              m_qListReceivedSamples;             /**< list with alle the received samples in form of differentley sized matrices. */
 
     QMutex                              m_mutex;
-
 };
-
 } // NAMESPACE
 
 #endif // BRAINAMP_H

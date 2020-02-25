@@ -64,5 +64,4 @@ TMSIAboutWidget::TMSIAboutWidget(QWidget *parent)
 
 TMSIAboutWidget::~TMSIAboutWidget()
 {
-
 }

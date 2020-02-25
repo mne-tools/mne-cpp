@@ -72,7 +72,6 @@ MNECorSourceEstimate::MNECorSourceEstimate(const MatrixXd &p_sol, const VectorXi
 MNECorSourceEstimate::MNECorSourceEstimate(const MNECorSourceEstimate& p_SourceEstimate)
 : MNESourceEstimate(p_SourceEstimate)
 {
-
 }
 
 //=============================================================================================================
@@ -87,7 +86,6 @@ MNECorSourceEstimate::MNECorSourceEstimate(QIODevice &p_IODevice)
 void MNECorSourceEstimate::clear()
 {
     MNESourceEstimate::clear();
-
 }
 
 //=============================================================================================================

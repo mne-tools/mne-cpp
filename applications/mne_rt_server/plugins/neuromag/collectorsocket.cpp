@@ -61,7 +61,6 @@ CollectorSocket::CollectorSocket(QObject *parent)
 , m_sCollectorHost(QHostAddress(QHostAddress::LocalHost).toString())
 , m_bIsMeasuring(false)
 {
-
 }
 
 //=============================================================================================================

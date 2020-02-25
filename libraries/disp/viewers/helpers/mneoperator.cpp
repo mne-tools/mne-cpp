@@ -75,5 +75,4 @@ MNEOperator::MNEOperator(OperatorType type)
 
 MNEOperator::~MNEOperator()
 {
-
 }

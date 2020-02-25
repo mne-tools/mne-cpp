@@ -198,9 +198,7 @@ protected:
 
     QList<QPointer<QPropertyAnimation> >  m_lPropertyAnimations;         /**< The animations for each 3D object. */
     QList<QPointer<Qt3DRender::QPointLight> >  m_lLightSources;          /**< The light sources. */
-
 };
-
 } // NAMESPACE
 
 #endif // DISP3DLIB_VIEW3D_H

@@ -137,7 +137,6 @@ signals:
      */
     void blockSizeChanged(const int newBlockSize);
 };
-
 } // NAMESPACE
 
 #endif // LSLADAPTERSETUP_H

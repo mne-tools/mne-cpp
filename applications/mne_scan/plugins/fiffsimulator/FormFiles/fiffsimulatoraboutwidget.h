@@ -93,7 +93,6 @@ public:
 private:
     Ui::FiffSimulatorAboutWidgetClass ui;    /**< Holds the user interface for the FiffSimulatorAboutWidget.*/
 };
-
 } // NAMESPACE
 
 #endif // FIFFSIMULATORABOUTWIDGET_H

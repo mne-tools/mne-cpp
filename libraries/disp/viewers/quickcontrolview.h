@@ -230,9 +230,7 @@ private:
     QList<QSharedPointer<QWidget> >                     m_lControlWidgets;              /**< The quick control view widgets. Please note that these are managed elsewhere. */
 
 signals:
-
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // QUICKCONTROLVIEW_H

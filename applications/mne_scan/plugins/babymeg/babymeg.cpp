@@ -242,7 +242,6 @@ void BabyMEG::init()
 
 void BabyMEG::unload()
 {
-
 }
 
 //=============================================================================================================
@@ -518,7 +517,6 @@ void BabyMEG::setFiffGainInfo(QStringList GainInfo)
         m_sparseMatCals = SparseMatrix<double>(m_pFiffInfo->nchan, m_pFiffInfo->nchan);
         m_sparseMatCals.setFromTriplets(tripletList.begin(), tripletList.end());
     }
-
 }
 
 //=============================================================================================================
@@ -545,7 +543,6 @@ void BabyMEG::updateFiffInfo()
     //sleep(0.5);
 
     //m_pActionRecordFile->setEnabled(true);
-
 }
 
 //=============================================================================================================

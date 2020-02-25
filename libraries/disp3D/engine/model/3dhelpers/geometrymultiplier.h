@@ -175,13 +175,11 @@ private:
     QPointer<Qt3DRender::QAttribute>                m_pTransformAttribute;
 
     QPointer<Qt3DRender::QAttribute>                m_pColorAttribute;
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // namespace DISP3DLIB
 
 #endif // DISP3DLIB_GEOMETRYMULTIPLIER_H

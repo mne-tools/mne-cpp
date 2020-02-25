@@ -173,7 +173,6 @@ inline bool operator== (const FiffChInfo &a, const FiffChInfo &b)
             a.eeg_loc.isApprox(b.eeg_loc, 0.0001f),
             a.coord_frame == b.coord_frame);
 }
-
 } // NAMESPACE
 
 #endif // FIFF_CH_INFO_H

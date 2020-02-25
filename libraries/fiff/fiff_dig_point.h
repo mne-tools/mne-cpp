@@ -126,7 +126,6 @@ inline qint32 FiffDigPoint::storageSize()
 {
     return 20;
 }
-
 } // NAMESPACE
 
 #endif // FIFF_DIG_POINT_H

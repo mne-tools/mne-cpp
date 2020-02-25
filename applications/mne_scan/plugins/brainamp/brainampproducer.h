@@ -127,7 +127,6 @@ private:
 
     bool                                m_bIsRunning;           /**< Whether BrainAMPProducer is running.*/
 };
-
 } // NAMESPACE
 
 #endif // BRAINAMPPRODUCER_H

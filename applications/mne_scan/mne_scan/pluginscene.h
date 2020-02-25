@@ -152,7 +152,6 @@ void PluginScene::setActionPluginItem(QAction* pAction)
 {
     m_pActionPluginItem = pAction;
 }
-
 } //NAMESPACE
 
 #endif // PLUGINSCENE_H

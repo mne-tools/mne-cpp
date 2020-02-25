@@ -123,7 +123,6 @@ private:
     QPointer<Qt3DRender::QRenderPass>               m_pVertexGL4RenderPass;
     QPointer<Qt3DRender::QShaderProgram>            m_pVertexGL4Shader;
 };
-
 } // namespace DISP3DLIB
 
 #endif // DISP3DLIB_PERVERTEXTESSPHONGALPHAMATERIAL_H

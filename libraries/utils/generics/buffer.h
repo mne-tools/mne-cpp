@@ -85,7 +85,6 @@ public:
 
 private:
     const char* m_cTypeId;  /**< Holds the RTTI type_id.*/
-
 };
 
 //=============================================================================================================
@@ -96,7 +95,6 @@ inline const char*  Buffer::getTypeId()
 {
     return m_cTypeId;
 }
-
 }//NAMESPACE
 
 #endif // BUFFEROLD_H

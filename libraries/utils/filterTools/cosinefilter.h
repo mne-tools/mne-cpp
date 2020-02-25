@@ -102,7 +102,6 @@ public:
 
     int             m_iFilterOrder;
 };
-
 } // NAMESPACE UTILSLIB
 
 #endif // COSINEFILTER_H

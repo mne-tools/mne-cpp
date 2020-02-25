@@ -374,13 +374,11 @@ public:
 //      int    nfit;        /* How many? */
 //      int    scale_pos;   /* Scale the positions to the surface of the sphere? */
 //    } *fwdEegSphereModel,fwdEegSphereModelRec;
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // NAMESPACE FWDLIB
 
 #endif // FWDEEGSPHEREMODEL_H

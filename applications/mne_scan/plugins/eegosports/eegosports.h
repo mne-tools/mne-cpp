@@ -286,9 +286,7 @@ private:
     qint16                              m_iBlinkStatus;                     /**< Flag for recording icon blinking */
 
     QList<Eigen::MatrixXd>              m_qListReceivedSamples;             /**< List with alle the received samples in form of differentley sized matrices. */
-
 };
-
 } // NAMESPACE
 
 #endif // EEGOSPORTS_H

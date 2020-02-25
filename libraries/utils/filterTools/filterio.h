@@ -108,9 +108,7 @@ public:
     static bool writeFilter(const QString &path, const FilterData &filter);
 
 private:
-
 };
-
 } // NAMESPACE
 
 #endif // FILTERIO_H

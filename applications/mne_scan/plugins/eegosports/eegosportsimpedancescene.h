@@ -104,7 +104,6 @@ private:
     bool            m_bRightMouseKeyPressed;        /**< Whether the right mouse button was pressed.*/
     QGraphicsView*  m_qvView;                       /**< Holds the view which visualizes this scene.*/
 };
-
 } // NAMESPACE
 
 #endif // EEGOSPORTSIMPEDANCESCENE_H

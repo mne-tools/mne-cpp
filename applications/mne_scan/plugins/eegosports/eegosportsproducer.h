@@ -141,9 +141,7 @@ private:
     bool                                m_bMeasureImpedance;        /**< Whether it is an impedance measurement.*/
     bool                                m_bIsRunning;               /**< Whether EEGoSportsProducer is running.*/
     bool                                m_bIsConnected;             /**< Whether EEGoSportsProducer is connected to device.*/
-
 };
-
 } // NAMESPACE
 
 #endif // EEGOSPORTSPRODUCER_H

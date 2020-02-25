@@ -97,7 +97,6 @@ private:
     QColor m_qColor;
     QPolygonF arrowHead;
 };
-
 } //NAMESPACE
 
 #endif // ARROW_H

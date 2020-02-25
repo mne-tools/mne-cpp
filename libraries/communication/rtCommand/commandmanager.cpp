@@ -65,7 +65,6 @@ CommandManager::~CommandManager()
 //    this->disconnectAll();
 
     //Remove commands which where inserted into the static command list
-
 }
 
 //=============================================================================================================
@@ -79,7 +78,6 @@ void CommandManager::clear()
 
 void CommandManager::init()
 {
-
 }
 
 //=============================================================================================================

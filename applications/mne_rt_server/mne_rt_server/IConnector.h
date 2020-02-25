@@ -247,7 +247,6 @@ inline void IConnector::setStatus(bool status)
     m_bIsActive = status;
     m_commandManager.setStatus(status);
 }
-
 } //Namespace
 
 #ifndef IConnector_iid

@@ -110,7 +110,6 @@ public:
     Eigen::MatrixXd colcals;        /**< Colum calibrations. */
     FiffNamedMatrix::SDPtr data;    /**< Compensation data. */
 };
-
 } // NAMESPACE
 
 #endif // FIFF_CTF_COMP_H

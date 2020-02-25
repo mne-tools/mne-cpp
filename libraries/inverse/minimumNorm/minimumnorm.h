@@ -194,7 +194,6 @@ private:
     QList<Eigen::VectorXi> vertno;                  /**< The vertices numbers */
     FSLIB::Label label;                             /**< The corresponding labels */
     Eigen::MatrixXd K;                              /**< Imaging kernel */
-
 };
 
 //=============================================================================================================
@@ -212,7 +211,6 @@ inline MNELIB::MNEInverseOperator& MinimumNorm::getPreparedInverseOperator()
 {
     return inv;
 }
-
 } //NAMESPACE
 
 #endif // MINIMUMNORM_H

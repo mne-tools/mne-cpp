@@ -164,9 +164,7 @@ protected:
     void initItem();
 
     QPointer<Renderable3DEntity>      m_pRenderable3DEntity;           /**< This item holds all renderable items. */
-
 };
-
 } //NAMESPACE DISP3DLIB
 
 #endif // DISP3DLIB_SENSORSETTREEITEM_H

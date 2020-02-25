@@ -85,9 +85,7 @@ public:
 private:
 
     Ui::CovarianceAboutWidgetClass ui;		/**< Holds the user interface for the CovarianceAboutWidget.*/
-
 };
-
 } // NAMESPACE
 
 #endif // COVARIANCEABOUTWIDGET_H

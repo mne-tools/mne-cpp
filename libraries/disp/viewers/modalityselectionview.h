@@ -161,9 +161,7 @@ signals:
      * Emit this signal whenever the user changed the modality.
      */
     void modalitiesChanged(const QMap<QString, bool>& modalityMap);
-
 };
-
 } // NAMESPACE
 
 #endif // MODALITYSELECTIONVIEW_H

@@ -30,7 +30,6 @@ Command::Command(bool p_bIsJson, QObject *parent)
 , m_sDescription("")
 , m_bIsJson(p_bIsJson)
 {
-
 }
 
 //=============================================================================================================
@@ -65,7 +64,6 @@ Command::Command(const QString &p_sCommand, const QString &p_sDescription, bool 
 , m_sDescription(p_sDescription)
 , m_bIsJson(p_bIsJson)
 {
-
 }
 
 //=============================================================================================================
@@ -107,7 +105,6 @@ Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
         printf("error: description vector hasn't the same size like parameter map.\n");
         return;
     }
-
 }
 
 //=============================================================================================================
@@ -121,7 +118,6 @@ Command::Command(const Command &p_Command)
 , m_qListParamDescriptions(p_Command.m_qListParamDescriptions)
 , m_bIsJson(p_Command.m_bIsJson)
 {
-
 }
 
 //=============================================================================================================

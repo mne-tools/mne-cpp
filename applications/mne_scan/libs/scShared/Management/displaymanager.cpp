@@ -78,7 +78,6 @@ using namespace SCMEASLIB;
 DisplayManager::DisplayManager(QObject* parent)
 : QObject(parent)
 {
-
 }
 
 //=============================================================================================================

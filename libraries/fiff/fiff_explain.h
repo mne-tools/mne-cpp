@@ -312,7 +312,6 @@ static _fiffExp _fiff_unit_mul_explanations[] = {
   { FIFF_UNITM_F, "f" },
   { FIFF_UNITM_A, "a" },
   {-1, NULL }};
-
 } // NAMESPACE
 
 #endif // FIFF_EXPLAIN_H

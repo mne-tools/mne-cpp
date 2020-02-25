@@ -171,7 +171,6 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffProj &p_Fi
     out << "\tdata:\n\t" << *p_FiffProj.data.data() << std::endl;
     return out;
 }
-
 } // NAMESPACE
 
 #endif // FIFF_PROJ_H

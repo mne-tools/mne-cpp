@@ -62,14 +62,12 @@ RealTimeEvokedSet::RealTimeEvokedSet(QObject *parent)
 , m_bInitialized(false)
 , m_iPreStimSamples(0)
 {
-
 }
 
 //=============================================================================================================
 
 RealTimeEvokedSet::~RealTimeEvokedSet()
 {
-
 }
 
 //=============================================================================================================

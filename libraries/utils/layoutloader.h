@@ -112,9 +112,7 @@ public:
                                 QMap<QString, QPointF> &channelData);
 
 private:
-
 };
-
 } // NAMESPACE
 
 #endif // LAYOUTLOADER_H

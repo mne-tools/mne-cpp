@@ -278,13 +278,11 @@ public:
 //      void              *user;	      /* User data for anything we need */
 //      fitUserFreeFunc   user_free;	      /* Function to free the above */
 //    } *dipoleFitData,dipoleFitDataRec;
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } //NAMESPACE
 
 #endif // DIPOLEFITDATA_H

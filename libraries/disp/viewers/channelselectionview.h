@@ -378,7 +378,6 @@ signals:
      */
     void loadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
 };
-
 } // NAMESPACE DISPLIB
 
 #endif // CHANNELSELECTIONVIEW_H

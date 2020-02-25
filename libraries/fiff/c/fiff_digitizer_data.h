@@ -140,13 +140,11 @@ public:
 //      float          **closest_point;           /* Closest vertex locations on the head surface */
 //      int            dist_valid;                /* Are the above data valid at this point? */
 //    } *digitizerData,digitizerDataRec;
-
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
 } // NAMESPACE
 
 #endif // FIFF_DIGITIZER_DATA_H

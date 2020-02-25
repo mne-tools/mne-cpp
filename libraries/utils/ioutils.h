@@ -376,7 +376,6 @@ bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
 
     return true;
 }
-
 } // NAMESPACE
 
 #endif // IOUTILS_H

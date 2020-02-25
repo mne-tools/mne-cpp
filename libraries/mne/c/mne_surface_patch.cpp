@@ -83,7 +83,6 @@ MneSurfacePatch::MneSurfacePatch(int np)
      flat  = FALSE;
      user_data = Q_NULLPTR;
      user_data_free = Q_NULLPTR;
-
 }
 
 //=============================================================================================================

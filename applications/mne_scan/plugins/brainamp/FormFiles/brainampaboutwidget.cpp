@@ -63,5 +63,4 @@ BrainAMPAboutWidget::BrainAMPAboutWidget(QWidget *parent)
 
 BrainAMPAboutWidget::~BrainAMPAboutWidget()
 {
-
 }

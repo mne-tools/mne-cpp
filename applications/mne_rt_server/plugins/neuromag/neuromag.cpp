@@ -136,7 +136,6 @@ void Neuromag::connectCommandManager()
     //Connect slots
     QObject::connect(&m_commandManager["bufsize"], &Command::executed, this, &Neuromag::comBufsize);
     QObject::connect(&m_commandManager["getbufsize"], &Command::executed, this, &Neuromag::comGetBufsize);
-
 }
 
 //=============================================================================================================
@@ -157,7 +156,6 @@ const char* Neuromag::getName() const
 
 void Neuromag::init()
 {
-
 }
 
 //=============================================================================================================

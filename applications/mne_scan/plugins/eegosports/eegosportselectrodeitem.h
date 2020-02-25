@@ -146,7 +146,6 @@ private:
     double      m_dImpedanceValue;          /**< Holds the current electrode impedance value.*/
     int         m_iChannelIndex;            /**< Holds the corresonding channel index.*/
 };
-
 } // NAMESPACE
 
 #endif // EEGOSPORTSELECTRODEITEM_H

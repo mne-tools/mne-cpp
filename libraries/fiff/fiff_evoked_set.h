@@ -184,7 +184,6 @@ public:
     FiffInfo             info;   /**< FIFF measurement information */
     QList<FiffEvoked>    evoked; /**< List of Fiff Evoked Data */
 };
-
 } // NAMESPACE
 
 #ifndef metatype_fiffevokedset

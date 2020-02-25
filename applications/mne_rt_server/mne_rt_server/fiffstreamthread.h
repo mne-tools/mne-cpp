@@ -124,7 +124,6 @@ inline QString FiffStreamThread::getAlias()
 {
     return m_sDataClientAlias;
 }
-
 } // NAMESPACE
 
 #endif //FIFFSTREAMTHREAD_H

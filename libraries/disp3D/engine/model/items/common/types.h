@@ -178,7 +178,6 @@ namespace Data3DTreeModelItemRoles
                     InterpolationBased = Qt::UserRole + 110,
                     AnnotationBased = Qt::UserRole + 111};
 }
-
 } //NAMESPACE DISP3DLIB
 
 // Metatype declaration for correct QVariant usage

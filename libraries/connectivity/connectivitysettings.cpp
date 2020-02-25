@@ -311,7 +311,6 @@ void ConnectivitySettings::setFFTSize(int iNfft)
 
     m_iNfft = iNfft;
     m_fFreqResolution = m_fSFreq/m_iNfft;
-
 }
 
 //*******************************************************************************************************

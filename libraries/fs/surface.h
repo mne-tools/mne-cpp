@@ -372,7 +372,6 @@ inline QString Surface::fileName() const
 {
     return m_sFileName;
 }
-
 } // NAMESPACE
 
 #endif // SURFACE_H
