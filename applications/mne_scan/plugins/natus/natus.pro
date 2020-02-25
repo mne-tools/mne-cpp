@@ -111,7 +111,7 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
 unix:!macx {
-    # === Unix ===
+    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
 

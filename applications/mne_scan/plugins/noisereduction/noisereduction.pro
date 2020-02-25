@@ -124,7 +124,7 @@ RESOURCES += \
     noisereduction.qrc
 
 unix:!macx {
-    # === Unix ===
+    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
 

@@ -98,7 +98,7 @@ win32:!contains(MNECPP_CONFIG, static) {
 }
 
 unix:!macx {
-    # === Unix ===
+    # Unix
     QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 
