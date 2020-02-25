@@ -1,9 +1,9 @@
 ---
-title: Improving the Documentation
+title: Contributing to the Website
 parent: Contribute
 nav_order: 2
 ---
-# Improving the Documentation
+# Contributing to the Website
 
 This page shows you how to contribute to MNE-CPP's website. The easiest way to make changes to the documentation and check them before you do a pull request is to follow the steps below.
 

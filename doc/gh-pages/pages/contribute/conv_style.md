@@ -27,6 +27,28 @@ QString sChName = "MEG0000";
 void loadTxtFile(const QString& sPath);
 ```
 
+In general, try to make your code match the one around it, e.g., indentations, use of linebreaks, etc. Always align your function parameters in .h and .cpp files, for example:
+
+```cpp
+//=========================================================================================================
+/**
+ * Constructs a NetworkEdge object.
+ *
+ * @param[in]  iValueA          Describe value iValueA.
+ * @param[in]  fValueB          Describe value fValueB.
+ * @param[in]  matValueC        Describe value matValueC.
+ * 
+ * @return Describe return value.
+ */
+int NetworkEdge(int iValueA,
+                float fValueB,
+                const Eigen::MatrixXd& matValueC);
+```
+
+## Documentation
+
+Please use the DoxyGen style to document your code. For an example see [here](https://github.com/mne-tools/mne-cpp/blob/master/libraries/connectivity/network/network.h). 
+
 ## Command Line Outputs
 
 Every output should start with `[<ClassName::FunctionName>]`. Please make use of `qDebug()` during development and `qInfo()` for general user information. `qWarning()` should be used to alert about unusual situations which do not lead to a termination of the application. `qCritical()` should only be used if an error was catched which will lead to the application being terminated. For example:
@@ -50,10 +72,6 @@ void FileLoader::loadTxtFile(const QString& sPath)
 ```
 
 | **Please note:** Eigen objects (`MatrixXd`, `VectorXd`, etc.) can only be plotted via `std::cout`.|
-
-## Documentation
-
-Please use the DoxyGen style to document your code. For an example see [here](https://github.com/mne-tools/mne-cpp/blob/master/libraries/connectivity/network/network.h).
 
 ## Commit Policy
 
@@ -87,8 +105,8 @@ DOC: add documentation for new amplifier in MNE Scan
 
 The following steps will show you how to setup the MNE-CPP QtCreator wizard. This wizard is of great help to create new C++ classes which are conform with the MNE-CPP coding conventions. This helps streamlining the contribution process.
 
- 1. Navigate to your MNE-CPP repository `\tools\coding_conventions\qtCreator_wizard`
- 2. Copy the MNE-CPP folder to your QtCreator installation folder `\share\qtcreator\templates\wizards\`. Usually QtCreator is installed in your Qt distribution's `\Tools` folder, e.g., `<QtFolder>\Tools\QtCreator\share\qtcreator\templates\wizards`.
+ 1. Navigate to your MNE-CPP repository `\tools\wizards`
+ 2. Copy the `mnecpp` folder to your QtCreator installation folder `\share\qtcreator\templates\wizards\`. Usually QtCreator is installed in your Qt distribution's `\Tools` folder, e.g., `<QtFolder>\Tools\QtCreator\share\qtcreator\templates\wizards`.
  3. Restart QtCreator.
  4. Now you should be able to right click on the project where you want to add a new class and see the MNE-CPP category appear in the wizard.
 
