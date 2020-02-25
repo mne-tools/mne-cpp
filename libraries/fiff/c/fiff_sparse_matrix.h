@@ -121,9 +121,6 @@ public:
 
     FIFFLIB::FiffSparseMatrix* mne_add_upper_triangle_rcs();
 
-
-
-
 public:
     FIFFLIB::fiff_int_t   coding;    /**< coding (storage) type of the sparse matrix */
     FIFFLIB::fiff_int_t   m;         /**< m rows */

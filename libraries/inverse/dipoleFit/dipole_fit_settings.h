@@ -57,7 +57,6 @@
 #include <QSharedPointer>
 #include <QStringList>
 
-
 #define BIG_TIME 1e6
 
 #ifndef MNEFILTERDEF

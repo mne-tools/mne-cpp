@@ -104,7 +104,3 @@ MatrixXd Sphara::makeSpharaProjector(const MatrixXd& matBaseFct, const VectorXi&
     return matSpharaOperator;
 }
 
-
-
-
-

@@ -223,8 +223,6 @@ typedef struct _fiffIdRec {
 
 typedef fiffIdRec fiff_id_t;
 
-
-
 /// ToDo Old implementation use new fiff_dir_entry.h instead
 /** Directories are composed of these structures. */
 
@@ -241,7 +239,6 @@ typedef struct _fiffDirEntryRec {
 
 typedef fiffDirEntryRec fiff_dir_entry_t;
 
-
 /// ToDo Old implementation
 /** Digitization point description */
 
@@ -257,7 +254,6 @@ typedef struct _fiffDigPointRec {
 
 //typedef fiffDigPointRec  fiff_dig_point_t;
 //typedef fiffDigStringRec fiff_dig_string_t;
-
 
 /// ToDo Old implementation
 
@@ -301,7 +297,6 @@ typedef struct _fiffDigPointRec {
 //  char        *ext_file_name;	/**< Name of the file holding the external data */
 //  FILE        *ext_fd;		/**< The file descriptor of the above file if open  */
 //} *fiffFile,fiffFileRec;	/**< FIFF file handle. fiff_open() returns this. */
-
 
 /// ToDo Old implementation use new fiff_coord_trans.h instead
 /** Coordinate transformation descriptor */

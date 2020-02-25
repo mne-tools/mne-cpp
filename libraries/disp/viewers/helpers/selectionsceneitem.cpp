@@ -143,11 +143,3 @@ void SelectionSceneItem::paint(QPainter *painter,
     painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
 }
 
-
-
-
-
-
-
-
-

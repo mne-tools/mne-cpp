@@ -858,7 +858,6 @@ inline FiffChInfo FiffTag::toChInfo() const
 
 //    }
 
-
 //=============================================================================================================
 
 inline QList< QSharedPointer<FiffDirEntry> > FiffTag::toDirEntry() const

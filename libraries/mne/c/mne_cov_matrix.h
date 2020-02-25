@@ -56,8 +56,6 @@
 #include <QSharedPointer>
 #include <QStringList>
 
-
-
 /*
  * The class field in mneCovMatrix can have these values
  */
@@ -65,8 +63,6 @@
 #define MNE_COV_CH_MEG_MAG   0  /* Axial gradiometer or magnetometer [T] */
 #define MNE_COV_CH_MEG_GRAD  1  /* Planar gradiometer [T/m] */
 #define MNE_COV_CH_EEG       2  /* EEG [V] */
-
-
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -117,10 +113,7 @@ public:
      */
     ~MneCovMatrix();
 
-
     static MneCovMatrix* mne_dup_cov(MneCovMatrix* c);
-
-
 
     static MneCovMatrix* mne_new_cov_dense(int    kind,
                                    int    ncov,
@@ -155,39 +148,19 @@ public:
         return new MneCovMatrix(kind,ncov,names,cov,cov_diag,NULL);
     }
 
-
-
     static int mne_is_diag_cov(MneCovMatrix* c);
-
 
     static int mne_add_inv_cov(MneCovMatrix* c);
 
-
-
-
-
     static int condition_cov(MneCovMatrix* c, float rank_threshold, int use_rank);
-
-
-
-
-
 
     static int mne_decompose_eigen_cov_small(MneCovMatrix* c,float p_small, int use_rank);
 
     static int mne_decompose_eigen_cov(MneCovMatrix* c);
 
-
-
-
-
-
-
 private:
 
     static int mne_lt_packed_index(int j, int k);
-
-
 
 public:
     int         kind;                           /* Sensor or source covariance */

@@ -474,21 +474,4 @@ typedef struct {
   float       max_velocity;	/* Angular velocity scale */
 } *contHpiDataSet, contHpiDataSetRec;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #endif

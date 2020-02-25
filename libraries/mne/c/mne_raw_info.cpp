@@ -46,8 +46,6 @@
 
 #include <QFile>
 
-
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -56,13 +54,9 @@
 #define FALSE 0
 #endif
 
-
 #define FREE_33(x) if ((char *)(x) != NULL) free((char *)(x))
 
-
 #define MALLOC_33(x,t) (t *)malloc((x)*sizeof(t))
-
-
 
 //=============================================================================================================
 // USED NAMESPACES

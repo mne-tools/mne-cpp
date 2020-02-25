@@ -98,11 +98,7 @@ public:
      */
     FiffCoordTransOld(const FiffCoordTransOld& p_FiffCoordTransOld);
 
-
-
     static FiffCoordTransOld* catenate(FiffCoordTransOld* t1,FiffCoordTransOld* t2);
-
-
 
     //=========================================================================================================
     /**
@@ -118,7 +114,6 @@ public:
      * Refactored:  (.c)
      */
     ~FiffCoordTransOld();
-
 
     //============================= make_volume_source_space.c =============================
 
@@ -144,8 +139,6 @@ public:
 
     static void mne_print_coord_transform(FILE *log, FiffCoordTransOld* t);
 
-
-
     static FiffCoordTransOld* mne_read_transform(const QString& name,int from, int to);
 
     static FiffCoordTransOld* mne_read_transform_from_node(//fiffFile in,
@@ -157,11 +150,9 @@ public:
 
     static FiffCoordTransOld* mne_read_meas_transform(const QString& name);
 
-
     static FiffCoordTransOld* mne_read_transform_ascii(char *name, int from, int to);
 
     static FiffCoordTransOld* mne_read_FShead2mri_transform(char *name);
-
 
     static FiffCoordTransOld* mne_identity_transform(int from, int to);
 

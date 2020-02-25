@@ -455,4 +455,3 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& pos,
     return x;
 }
 
-

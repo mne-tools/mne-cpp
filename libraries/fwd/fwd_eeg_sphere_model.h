@@ -59,8 +59,6 @@
 #include <QList>
 #include <QDebug>
 
-
-
 /*
  * This is the beginning of the specific code
  */
@@ -141,13 +139,7 @@ public:
      */
     static FwdEegSphereModel* setup_eeg_sphere_model(const QString& eeg_model_file, QString eeg_model_name, float eeg_sphere_rad);
 
-
-
-
-
     static fitUser new_fit_user(int nfit, int nterms);
-
-
 
     //=========================================================================================================
     /**
@@ -160,8 +152,6 @@ public:
      * @return       the weighting factor for n
      */
     double fwd_eeg_get_multi_sphere_model_coeff(int n);
-
-
 
     static void next_legen (int n,
                 double x,
@@ -185,15 +175,11 @@ public:
                        float   *Vval,         /* The potential values */
                        void    *client);
 
-
-
     static int fwd_eeg_multi_spherepot_coil1(float *rd,    /* Dipole position */
                       float      *Q,                /* Dipole moment */
                       FwdCoilSet* els,              /* Electrode positions */
                       float      *Vval,             /* The potential values */
                       void       *client);
-
-
 
     //=========================================================================================================
     /**
@@ -242,9 +228,6 @@ public:
      */
     static int fwd_eeg_spherepot_coil_vec(float *rd, FwdCoilSet* els, float **Vval_vec, void *client);
 
-
-
-
     static int fwd_eeg_spherepot_grad_coil( float        *rd,      /* The dipole location */
                                             float        Q[],      /* The dipole components (xyz) */
                                             FwdCoilSet*  coils,    /* The coil definitions */
@@ -253,7 +236,6 @@ public:
                                             float        ygrad[],  /* the dipole position coordinates */
                                             float        zgrad[],
                                             void         *client);
-
 
     //=========================================================================================================
     /**
@@ -306,10 +288,6 @@ public:
      */
     bool fwd_setup_eeg_sphere_model(float rad, bool fit_berg_scherg, int nfit);
 
-
-
-
-
     // fwd_fit_berg_scherg.c
 
     static void compose_linear_fitting_data(const Eigen::VectorXd& mu,fitUser u);
@@ -320,7 +298,6 @@ public:
           * Return the corresponding RV
           */
     static double compute_linear_parameters(const Eigen::VectorXd& mu, Eigen::VectorXd& lambda, fitUser u);
-
 
     // fwd_fit_berg_scherg.c
     /*
@@ -338,7 +315,6 @@ public:
                                                                                         * when fitting the parameters */
                                 int   nfit,	               /* Number of equivalent dipoles to fit */
                                 float &rv);
-
 
 /**< Number of layers */
     int   nlayer() const

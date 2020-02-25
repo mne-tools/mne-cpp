@@ -193,7 +193,6 @@ void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     }
 }
 
-
 //=============================================================================================================
 
 void DummyToolbox::run()

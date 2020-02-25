@@ -76,7 +76,6 @@
 #include <unistd.h>
 #endif
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -247,7 +246,6 @@ void fromFloatEigenMatrix_17(const Eigen::MatrixXf& from_mat, float **& to_mat)
     fromFloatEigenMatrix_17(from_mat, to_mat, from_mat.rows(), from_mat.cols());
 }
 
-
 void fromIntEigenMatrix_17(const Eigen::MatrixXi& from_mat, int **&to_mat, const int m, const int n)
 {
     for ( int i = 0; i < m; ++i)
@@ -290,8 +288,6 @@ static FiffCoordTransOld* make_voxel_ras_trans(float *r0,
     return t;
 }
 
-
-
 static int comp_points1(const void *vp1,const void *vp2)
 
 {
@@ -327,8 +323,6 @@ void mne_sort_nearest_by_nearest(MneNearest* points, int npoint)
         qsort(points,npoint,sizeof(MneNearest),comp_points1);
     return;
 }
-
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -1053,8 +1047,6 @@ bad : {
         return NULL;
     }
 }
-
-
 
 //=============================================================================================================
 

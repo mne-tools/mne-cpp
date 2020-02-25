@@ -86,8 +86,6 @@ typedef struct {
   mneUserFreeFunc eeg_client_free;
 } *dipoleFitFuncs,dipoleFitFuncsRec;
 
-
-
 //=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
 //=============================================================================================================
@@ -101,7 +99,6 @@ namespace INVERSELIB
 
 class GuessData;
 class ECD;
-
 
 //=============================================================================================================
 /**
@@ -128,13 +125,9 @@ public:
      */
     virtual ~DipoleFitData();
 
-
-
     //============================= dipole_fit_setup.c =============================
 
     static int setup_forward_model(DipoleFitData* d, MNELIB::MneCTFCompDataSet* comp_data, FWDLIB::FwdCoilSet* comp_coils);
-
-
 
     static MNELIB::MneCovMatrix* ad_hoc_noise(FWDLIB::FwdCoilSet* meg,          /* Channel name lists to define which channels are gradiometers */
                                      FWDLIB::FwdCoilSet* eeg,
@@ -148,18 +141,11 @@ public:
                                int        nch,
                                MNELIB::MneProjOp*  *res);
 
-
     static int scale_noise_cov(DipoleFitData* f,int nave);
-
-
 
     static int scale_dipole_fit_noise_cov(DipoleFitData* f,int nave);
 
-
-
     static int select_dipole_fit_noise_cov(DipoleFitData* f, mshMegEegData d);
-
-
 
     static DipoleFitData* setup_dipole_fit_data(   const QString& mriname,         /**< This gives the MRI/head transform */
                                             const QString& measname,        /**< This gives the MEG/head transform and sensor locations */
@@ -180,7 +166,6 @@ public:
                                             int   include_meg,              /**< Include MEG in the fitting? */
                                             int   include_eeg);
 
-
     //=========================================================================================================
     /**
      * Fit a single dipole to the given data
@@ -195,7 +180,6 @@ public:
      */
     static bool fit_one(DipoleFitData* fit, GuessData* guess, float time, float *B, int verbose, ECD& res);
 
-
 //============================= dipole_forward.c
 
     static int compute_dipole_field(DipoleFitData* d, float *rd, int whiten, float **fwd);
@@ -205,10 +189,6 @@ public:
     static DipoleForward* dipole_forward_one(DipoleFitData* d,
                                      float         *rd,
                                      DipoleForward* old);
-
-
-
-
 
 public:
       FIFFLIB::FiffCoordTransOld*    mri_head_t; /**< MRI <-> head coordinate transformation */

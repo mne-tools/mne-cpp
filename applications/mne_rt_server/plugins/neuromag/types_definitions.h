@@ -69,8 +69,6 @@ namespace NEUROMAGRTSERVERPLUGIN
 #define DACQ_CMD_HELP     "help"
 #define DACQ_CMD_QUIT     "quit"
 
-
-
 #define COLLECTOR_PORT    11122         //"collector"
 #define COLLECTOR_PASS    "homunculus122"
 #define COLLECTOR_BUFS    32768
@@ -131,7 +129,6 @@ typedef struct {
 } *dacqShmBlock,dacqShmBlockRec;
 
 #define SHM_SIZE SHM_NUM_BLOCKS*sizeof(dacqShmBlockRec)
-
 
 //
 // data_message.h

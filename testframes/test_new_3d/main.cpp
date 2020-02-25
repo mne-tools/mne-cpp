@@ -85,7 +85,6 @@ int main(int argc, char* argv[])
 {
     QGuiApplication app(argc, argv);
 
-
     QFile t_fileForwardSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     MNEForwardSolution t_ForwardSolution(t_fileForwardSolution);
 
@@ -282,8 +281,6 @@ int main(int argc, char* argv[])
 
     engine.setRootEntity(rootEntity);
     view.show();
-
-
 
 //    // vec3 for position
 //    // vec3 for colors

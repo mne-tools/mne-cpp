@@ -628,4 +628,3 @@ void Data3DTreeDelegate::onEditorEdited()
     }
 }
 
-

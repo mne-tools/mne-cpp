@@ -74,8 +74,6 @@ namespace MNESCAN
 
 class PluginGui;
 
-
-
 class PluginScene : public QGraphicsScene
 {
     Q_OBJECT

@@ -200,7 +200,6 @@ public:
                                           float *sigmap,          /* Conductivity? */
                                           bool   check_too_many_neighbors);
 
-
     //============================= mne_project_to_surface.c =============================
 
     static void mne_triangle_coords(float       *r,       /* Location of a point */

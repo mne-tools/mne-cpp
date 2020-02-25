@@ -104,7 +104,6 @@ public:
      */
     ~FwdCompData();
 
-
     //============================= fwd_comp.c =============================
 
     static int fwd_comp_field(float *rd,float *Q, FwdCoilSet* coils, float *res, void *client);
@@ -133,8 +132,6 @@ public:
     static int fwd_comp_field_grad(float *rd,float *Q, FwdCoilSet* coils,
                 float *res, float *xgrad, float *ygrad, float *zgrad,
                 void *client);
-
-
 
 public:
     MNELIB::MneCTFCompDataSet*  set;        /* The compensation data set */

@@ -11,8 +11,6 @@ using namespace INVERSELIB;
 using namespace MNELIB;
 using namespace FWDLIB;
 
-
-
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
@@ -79,7 +77,6 @@ static void matrix_error(int kind, int nr, int nc)
     exit(1);
 }
 
-
 float **mne_cmatrix (int nr,int nc)
 
 {
@@ -97,7 +94,6 @@ float **mne_cmatrix (int nr,int nc)
     return m;
 }
 
-
 void mne_free_cmatrix (float **m)
 {
     if (m) {
@@ -105,10 +101,6 @@ void mne_free_cmatrix (float **m)
         FREE(m);
     }
 }
-
-
-
-
 
 //char *mne_compose_mne_name(const char *path, const char *filename)
 ///*
@@ -144,9 +136,7 @@ void mne_free_cmatrix (float **m)
 //    return res;
 //}
 
-
 //============================= misc_util.c =============================
-
 
 //============================= mne_named_matrix.c =============================
 
@@ -211,7 +201,6 @@ mneChSelection mne_ch_selection_these(const QString& selname, const QStringList&
     return sel;
 }
 
-
 static void omit_spaces(QStringList names, int nnames)
 
 {
@@ -223,8 +212,6 @@ static void omit_spaces(QStringList names, int nnames)
     }
     return;
 }
-
-
 
 int mne_ch_selection_assign_chs(mneChSelection sel,
                                 MneRawData*     data)
@@ -319,7 +306,6 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
         fprintf(stderr,"Selection %c%s%c has %d matched derived channels.\n",'"',sel->name.toUtf8().constData(),'"',sel->nderiv);
     return nch;
 }
-
 
 //============================= mne_get_values.c =============================
 
@@ -450,7 +436,6 @@ int mne_get_values_from_data (float time,         /* Interesting time point */
     return (0);
 }
 
-
 int mne_get_values_from_data_ch (float time,      /* Interesting time point */
                                  float integ,	  /* Time integration */
                                  float **data,	  /* The data values (channel by channel) */
@@ -560,13 +545,6 @@ int mne_get_values_from_data_ch (float time,      /* Interesting time point */
     }
     return (0);
 }
-
-
-
-
-
-
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

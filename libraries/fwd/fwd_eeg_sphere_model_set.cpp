@@ -64,7 +64,6 @@ using namespace Eigen;
 
 #define MAXLINE 500
 
-
 #ifndef FAIL
 #define FAIL -1
 #endif
@@ -72,7 +71,6 @@ using namespace Eigen;
 #ifndef OK
 #define OK 0
 #endif
-
 
 #define SEP ":\n\r"
 
@@ -275,9 +273,6 @@ void FwdEegSphereModelSet::fwd_list_eeg_sphere_models(FILE *f)
         fprintf(f,"\n");
     }
 }
-
-
-
 
 ////=============================================================================================================
 

@@ -390,7 +390,6 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
 //        t_bUseWhitened = true;
 //    }
 
-
     //
     // Assemble input data
     //
@@ -641,7 +640,6 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
             idx_sel.array() += hemiOffset;
 
 //            std::cout << "idx_sel]:\n" << idx_sel << std::endl;
-
 
             double selectWeight = 1.0/idx_sel.size();
             if(this->isFixedOrient())

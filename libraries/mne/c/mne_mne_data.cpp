@@ -47,7 +47,6 @@
 using namespace Eigen;
 using namespace MNELIB;
 
-
 #define FREE_7(x) if ((char *)(x) != NULL) free((char *)(x))
 
 #define FREE_CMATRIX_7(m) mne_free_cmatrix_7((m))
@@ -59,7 +58,6 @@ void mne_free_cmatrix_7 (float **m)
         FREE_7(m);
     }
 }
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

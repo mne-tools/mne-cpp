@@ -162,7 +162,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
-
 //=============================================================================================================
 //File QMenu
 void MainWindow::newConfiguration()
@@ -689,7 +688,6 @@ void MainWindow::stopMeasurement()
 
     updatePluginWidget(m_pPluginGui->getCurrentPlugin());
 
-
 //    PluginManager::stopPlugins();
 
 //    Connector::disconnectMeasurementWidgets(m_pListCurrentDisplayPlugins);//was before stopPlugins();
@@ -768,7 +766,6 @@ void MainWindow::uiSetupRunningState(bool state)
 
     m_bIsRunning = state;
 }
-
 
 //=============================================================================================================
 

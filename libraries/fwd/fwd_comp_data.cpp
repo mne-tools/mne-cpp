@@ -69,7 +69,6 @@
 
 #define ALLOC_CMATRIX_60(x,y) mne_cmatrix_60((x),(y))
 
-
 #define FREE_60(x) if ((char *)(x) != NULL) free((char *)(x))
 
 #define FREE_CMATRIX_60(m) mne_free_cmatrix_60((m))

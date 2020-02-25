@@ -54,8 +54,6 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace FIFFLIB;
 
-
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -72,11 +70,9 @@ using namespace FIFFLIB;
 #define OK 0
 #endif
 
-
 #define X_20 0
 #define Y_20 1
 #define Z_20 2
-
 
 #define FREE_20(x) if ((char *)(x) != NULL) free((char *)(x))
 
@@ -344,8 +340,6 @@ static int get_fval_20(FILE *in, float *fval)
     FREE_20(next);
     return OK;
 }
-
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

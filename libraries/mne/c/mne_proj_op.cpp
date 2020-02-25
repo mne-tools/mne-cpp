@@ -48,7 +48,6 @@
 
 #include <Eigen/Core>
 
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -56,8 +55,6 @@
 #ifndef FALSE
 #define FALSE 0
 #endif
-
-
 
 #ifndef FAIL
 #define FAIL -1
@@ -67,12 +64,9 @@
 #define OK 0
 #endif
 
-
-
 #define MALLOC_23(x,t) (t *)malloc((x)*sizeof(t))
 
 #define REALLOC_23(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-
 
 #define FREE_23(x) if ((char *)(x) != NULL) free((char *)(x))
 
@@ -86,9 +80,7 @@ void mne_free_cmatrix_23 (float **m)
     }
 }
 
-
 #define ALLOC_CMATRIX_23(x,y) mne_cmatrix_23((x),(y))
-
 
 static void matrix_error_23(int kind, int nr, int nc)
 
@@ -124,10 +116,6 @@ float **mne_cmatrix_23(int nr,int nc)
     return m;
 }
 
-
-
-
-
 float mne_dot_vectors_23 (float *v1,
                        float *v2,
                        int   nn)
@@ -147,9 +135,7 @@ float mne_dot_vectors_23 (float *v1,
 #endif
 }
 
-
 //============================= mne_named_matrix.c =============================
-
 
 void mne_string_to_name_list_23(const QString& s, QStringList& listp,int &nlistp)
 /*
@@ -166,7 +152,6 @@ void mne_string_to_name_list_23(const QString& s, QStringList& listp,int &nlistp
     nlistp = list.size();
     return;
 }
-
 
 void fromFloatEigenMatrix_23(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
 {
@@ -212,8 +197,6 @@ QString mne_channel_names_to_string_23(const QList<FIFFLIB::FiffChInfo>& chs, in
     res = mne_name_list_to_string_23(names);
     return res;
 }
-
-
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -119,7 +119,6 @@ public:
 
 signals:
 
-
 protected:
     IPlugin* m_pPlugin;  /**< Plugin to which connector belongs to */
 

@@ -508,7 +508,6 @@ bool KMeans::batchUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
     return converged;
 } // nested function
 
-
 //=============================================================================================================
 
 bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
@@ -681,7 +680,6 @@ bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
                         (A - (B + 2 * sgn.cast<double>().array() * m[i] * XCi.array() + 1).sqrt());
 
                 std::cout << "Del.col(i)\n" << Del.col(i) << std::endl;
-
 
 //                Del(:,i) = 1 + sgn .*...
 //                      (m(i).*normC(i) - sqrt((m(i).*normC(i)).^2 + 2.*sgn.*m(i).*XCi + 1));

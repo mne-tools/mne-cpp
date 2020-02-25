@@ -57,7 +57,6 @@
 
 #include <QSharedPointer>
 
-
 typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
 
 //=============================================================================================================

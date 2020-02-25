@@ -42,7 +42,6 @@ using namespace MNELIB;
 #define OK 0
 #endif
 
-
 #define X_41 0
 #define Y_41 1
 #define Z_41 2
@@ -59,7 +58,6 @@ using namespace MNELIB;
     (to)[Y_41] = (from)[Y_41];\
     (to)[Z_41] = (from)[Z_41];\
     }
-
 
 #define VEC_DOT_41(x,y) ((x)[X_41]*(y)[X_41] + (x)[Y_41]*(y)[Y_41] + (x)[Z_41]*(y)[Z_41])
 
@@ -118,7 +116,6 @@ int **mne_imatrix_41(int nr,int nc)
     return m;
 }
 
-
 void mne_free_cmatrix_41 (float **m)
 {
     if (m) {
@@ -135,8 +132,6 @@ void mne_free_icmatrix_41 (int **m)
         FREE_41(m);
     }
 }
-
-
 
 fiffId get_file_id(const QString& name)
 {
@@ -326,7 +321,6 @@ bad : {
     }
 }
 
-
 int mne_check_chinfo(const QList<FiffChInfo>& chs,
                      int nch)
 /*
@@ -441,10 +435,6 @@ void write_coord_trans_old(FiffStream::SPtr& t_pStream, const FiffCoordTransOld*
         *t_pStream << (float)trans->invmove[r];
 }
 
-
-
-
-
 static int **make_file_triangle_list_41(int **tris, int ntri)
 /*
       * In the file the numbering starts from one
@@ -458,13 +448,6 @@ static int **make_file_triangle_list_41(int **tris, int ntri)
             res[j][k] = tris[j][k]+1;
     return res;
 }
-
-
-
-
-
-
-
 
 void mne_write_bad_channel_list_new(FiffStream::SPtr& t_pStream, const QStringList& t_badList)//FILE *out, char **list, int nlist)
 {
@@ -505,8 +488,6 @@ void mne_write_bad_channel_list_new(FiffStream::SPtr& t_pStream, const QStringLi
     //    FREE(names);
     //    return OK;
 }
-
-
 
 void fiff_write_float_matrix_old (  FiffStream::SPtr& t_pStream,    /* Destination file name */
                                     int          kind,              /* What kind of tag */
@@ -816,7 +797,6 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
 //    }
 }
 
-
 static int comp_points2(const void *vp1,const void *vp2)
 
 {
@@ -838,10 +818,6 @@ void mne_sort_nearest_by_vertex(MneNearest* points, int npoint)
         qsort(points,npoint,sizeof(MneNearest),comp_points2);
     return;
 }
-
-
-
-
 
 FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
                                         int ncol,           /* Number of columns */
@@ -910,7 +886,6 @@ bad : {
     }
 }
 
-
 FiffSparseMatrix* mne_pick_lower_triangle_rcs(FiffSparseMatrix* mat)
 /*
  * Fill in upper triangle with the lower triangle values
@@ -971,9 +946,6 @@ out : {
         return res;
     }
 }
-
-
-
 
 static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* ss, int selected_only)
 /*
@@ -1102,10 +1074,6 @@ out : {
         return res;
     }
 }
-
-
-
-
 
 int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* ss,bool selected_only)
 {
@@ -1296,8 +1264,6 @@ bad : {
     }
 }
 
-
-
 QString mne_name_list_to_string_41(const QStringList& list)
 /*
  * Convert a string array to a colon-separated string
@@ -1346,8 +1312,6 @@ int mne_write_named_matrix( FiffStream::SPtr& t_pStream,
 bad :
     return FIFF_FAIL;
 }
-
-
 
 bool fiff_put_dir (FiffStream::SPtr& t_pStream, const QList<FiffDirEntry::SPtr>& dir)
 /*
@@ -1404,8 +1368,6 @@ bool fiff_put_dir (FiffStream::SPtr& t_pStream, const QList<FiffDirEntry::SPtr>&
     printf ("Could not find place for directory!\n");
     return false;
 }
-
-
 
 //============================= write_solution.c =============================
 
@@ -1631,7 +1593,6 @@ bad : {
         return false;
     }
 }
-
 
 /*
  * Process the environment information

@@ -41,7 +41,6 @@
 #include "mne_proj_item.h"
 #include "mne_types.h"
 
-
 #define FREE_21(x) if ((char *)(x) != NULL) free((char *)(x))
 
 #ifndef TRUE
@@ -51,8 +50,6 @@
 #ifndef FALSE
 #define FALSE 0
 #endif
-
-
 
 //=============================================================================================================
 // USED NAMESPACES

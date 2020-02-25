@@ -55,7 +55,6 @@
 
 #include <QFile>
 
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -63,7 +62,6 @@
 #ifndef FALSE
 #define FALSE 0
 #endif
-
 
 #ifndef FAIL
 #define FAIL -1
@@ -80,9 +78,6 @@
 
 #define FREE_CMATRIX_32(m) mne_free_cmatrix_32((m))
 #define ALLOC_CMATRIX_32(x,y) mne_cmatrix_32((x),(y))
-
-
-
 
 static void matrix_error_32(int kind, int nr, int nc)
 
@@ -126,9 +121,6 @@ void mne_free_cmatrix_32 (float **m)
     }
 }
 
-
-
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -136,15 +128,6 @@ void mne_free_cmatrix_32 (float **m)
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
-
-
-
-
-
-
-
-
-
 
 //============================= mne_read_forward_solution.c =============================
 
@@ -312,7 +295,6 @@ bad : {
     }
 }
 
-
 #define MNE_CTFV_COMP_UNKNOWN -1
 #define MNE_CTFV_COMP_NONE    0
 #define MNE_CTFV_COMP_G1BR    0x47314252
@@ -331,7 +313,6 @@ static struct {
 { MNE_4DV_COMP1,         MNE_4DV_COMP1 },             /* One-to-one mapping for 4D data */
 { MNE_CTFV_COMP_UNKNOWN, MNE_CTFV_COMP_UNKNOWN }};
 
-
 int mne_unmap_ctf_comp_kind(int ctf_comp)
 
 {
@@ -342,14 +323,6 @@ int mne_unmap_ctf_comp_kind(int ctf_comp)
             return compMap[k].grad_comp;
     return ctf_comp;
 }
-
-
-
-
-
-
-
-
 
 FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matrix to be converted */
                                       int   nrow,           /* Number of rows in the dense matrix */
@@ -451,9 +424,6 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
     return sparse;
 }
 
-
-
-
 int  mne_sparse_mat_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
                           float           **mult,  /* Matrix to be multiplied */
                           int             ncol,	   /* How many columns in the above */
@@ -491,9 +461,6 @@ int  mne_sparse_mat_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
     return 0;
 }
 
-
-
-
 float **mne_mat_mat_mult_32 (float **m1,float **m2,int d1,int d2,int d3)
 /* Matrix multiplication
       * result(d1 x d3) = m1(d1 x d2) * m2(d2 x d3) */
@@ -523,8 +490,6 @@ float **mne_mat_mat_mult_32 (float **m1,float **m2,int d1,int d2,int d3)
     return (result);
 #endif
 }
-
-
 
 int  mne_sparse_vec_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
                           float           *vector, /* Vector to be multiplied */
@@ -557,7 +522,6 @@ int  mne_sparse_vec_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
     }
 }
 
-
 float mne_dot_vectors_32 (float *v1,
                        float *v2,
                        int   nn)
@@ -577,8 +541,6 @@ float mne_dot_vectors_32 (float *v1,
 #endif
 }
 
-
-
 void mne_mat_vec_mult2_32 (float **m,float *v,float *result, int d1,int d2)
 /*
       * Matrix multiplication
@@ -592,8 +554,6 @@ void mne_mat_vec_mult2_32 (float **m,float *v,float *result, int d1,int d2)
         result[j] = mne_dot_vectors_32 (m[j],v,d2);
     return;
 }
-
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

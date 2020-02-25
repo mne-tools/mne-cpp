@@ -190,8 +190,6 @@ private:
      */
     void comStopAll(COMMUNICATIONLIB::Command p_command);
 
-
-
     static QVector<IConnector*> s_vecConnectors;       /**< Holds vector of all plugins. */
 
     FiffStreamServer* m_pFiffStreamServer;

@@ -112,7 +112,6 @@ public:
 
     static void free_meg_multi_thread_duplicate(FwdThreadArg* one,bool bem_model);
 
-
 public:
     float               **res;             /* Destination for the solution */
     float               **res_grad;        /* Gradient result */

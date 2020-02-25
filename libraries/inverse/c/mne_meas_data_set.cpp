@@ -51,8 +51,6 @@ using namespace Eigen;
 using namespace INVERSELIB;
 using namespace FIFFLIB;
 
-
-
 #define FREE_8(x) if ((char *)(x) != NULL) free((char *)(x))
 
 #define FREE_CMATRIX_8(m) mne_free_cmatrix_8((m))
@@ -64,7 +62,6 @@ void mne_free_cmatrix_8 (float **m)
         FREE_8(m);
     }
 }
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

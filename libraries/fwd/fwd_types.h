@@ -22,7 +22,6 @@ typedef int (*fwdVecFieldFunc)(float *rd,FWDLIB::FwdCoilSet* coils,float **res,v
 typedef int (*fwdFieldGradFunc)(float *rd,float *Q,FWDLIB::FwdCoilSet* coils, float *res,
                                 float *xgrad, float *ygrad, float *zgrad, void *client);
 
-
 //#define FWD_BEM_UNKNOWN           -1
 //#define FWD_BEM_CONSTANT_COLL     1
 //#define FWD_BEM_LINEAR_COLL       2

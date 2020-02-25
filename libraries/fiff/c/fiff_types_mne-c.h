@@ -564,5 +564,4 @@ typedef struct _fiff_data_ref {
     fiff_long_t     offset;     /**< Offset to the data in the external file  */
 } *fiffDataRef,fiffDataRefRec;
 
-
 #endif

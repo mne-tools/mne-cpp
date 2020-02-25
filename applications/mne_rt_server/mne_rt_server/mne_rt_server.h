@@ -118,7 +118,6 @@ private:
      */
     void comHelp(COMMUNICATIONLIB::Command p_command);
 
-
     FiffStreamServer                    m_fiffStreamServer;     /**< Fiff stream server. */
     CommandServer                       m_commandServer;        /**< Command server. */
 

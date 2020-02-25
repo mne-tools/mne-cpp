@@ -57,10 +57,8 @@ using namespace Eigen;
 using namespace FIFFLIB;
 using namespace FWDLIB;
 
-
 #define MAXWORD 1000
 #define BIG 0.5
-
 
 #ifndef TRUE
 #define TRUE 1
@@ -78,20 +76,15 @@ using namespace FWDLIB;
 #define OK 0
 #endif
 
-
-
 #define MALLOC_6(x,t) (t *)malloc((x)*sizeof(t))
 #define REALLOC_6(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 #define FREE_6(x) if ((char *)(x) != NULL) free((char *)(x))
 
 #define FIFFV_COORD_UNKNOWN     0
 
-
-
 #define X_6 0
 #define Y_6 1
 #define Z_6 2
-
 
 #define VEC_DOT_6(x,y) ((x)[X_6]*(y)[X_6] + (x)[Y_6]*(y)[Y_6] + (x)[Z_6]*(y)[Z_6])
 #define VEC_LEN_6(x) sqrt(VEC_DOT_6(x,x))
@@ -101,8 +94,6 @@ using namespace FWDLIB;
     (to)[Y_6] = (from)[Y_6];\
     (to)[Z_6] = (from)[Z_6];\
     }
-
-
 
 static void skip_comments(FILE *in)
 
@@ -210,8 +201,6 @@ static int get_fval(FILE *in, float *fval)
     return OK;
 }
 
-
-
 static void normalize(float *rr)
 /*
       * Scale vector to unit length
@@ -267,10 +256,6 @@ static FwdCoil* fwd_add_coil_to_set(FwdCoilSet* set,
         def->desc = desc;
     return def;
 }
-
-
-
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
