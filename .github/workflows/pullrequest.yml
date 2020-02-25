@@ -60,7 +60,7 @@ jobs:
         cmake -DCMAKE_INSTALL_PREFIX=../installed ..
         make
         make install
-        cd ..
+        cd ../..
         qmake -makefile brainflowboard.pro
         make -j2
         cp -r ./brainflow/installed/lib/* ../../../bin/
@@ -83,7 +83,7 @@ jobs:
         cd build
         cmake -G "Visual Studio 14 2015 Win64" -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX=..\installed ..
         cmake --build . --target install --config Release
-        cd ..
+        cd ..\..
         qmake -makefile brainflowboard.pro
         jom -j2
         cp -r .\brainflow\installed\lib\* ..\..\..\bin\
