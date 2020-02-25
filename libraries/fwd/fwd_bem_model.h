@@ -61,7 +61,6 @@
 #include <QSharedPointer>
 #include <QString>
 
-
 #define FWD_BEM_UNKNOWN           -1
 #define FWD_BEM_CONSTANT_COLL     1
 #define FWD_BEM_LINEAR_COLL       2
@@ -131,8 +130,6 @@ public:
      */
     void fwd_bem_free_solution();
 
-
-
 //char *fwd_bem_make_bem_name(char *name)
 ///*
 // * Make a standard BEM file name
@@ -152,7 +149,6 @@ public:
 //}
 
     static QString fwd_bem_make_bem_sol_name(const QString& name);
-
 
     //============================= fwd_bem_model.c =============================
 

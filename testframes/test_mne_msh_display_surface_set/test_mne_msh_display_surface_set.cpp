@@ -89,7 +89,6 @@ TestMneMshDisplaySurfaceSet::TestMneMshDisplaySurfaceSet()
 {
 }
 
-
 //=============================================================================================================
 
 void TestMneMshDisplaySurfaceSet::initTestCase()

@@ -50,7 +50,6 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -58,7 +57,6 @@
 using namespace Eigen;
 using namespace UTILSLIB;
 using namespace FWDLIB;
-
 
 #define MIN_1(a,b) ((a) < (b) ? (a) : (b))
 
@@ -92,13 +90,11 @@ using namespace FWDLIB;
     (xy)[Z_1] =   (x)[X_1]*(y)[Y_1]-(y)[X_1]*(x)[Y_1];\
     }
 
-
 #define MALLOC_1(x,t) (t *)malloc((x)*sizeof(t))
 
 #define REALLOC_1(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
 #define FREE(x) if ((char *)(x) != NULL) free((char *)(x))
-
 
 #define ALLOC_DCMATRIX_1(x,y) mne_dmatrix_1((x),(y))
 #define FREE_DCMATRIX_1(m) mne_free_dcmatrix_1((m))
@@ -109,7 +105,6 @@ using namespace FWDLIB;
  * float matrices
  */
 #define FREE_CMATRIX_1(m) mne_free_cmatrix_1((m))
-
 
 #ifndef TRUE
 #define TRUE 1
@@ -127,8 +122,6 @@ using namespace FWDLIB;
 #define OK 0
 #endif
 
-
-
 static void matrix_error_1(int kind, int nr, int nc)
 
 {
@@ -145,7 +138,6 @@ static void matrix_error_1(int kind, int nr, int nc)
     printf("Cannot continue. Sorry.\n");
     exit(1);
 }
-
 
 float **mne_cmatrix_1(int nr,int nc)
 
@@ -189,7 +181,6 @@ void mne_free_cmatrix_1 (float **m)
     }
 }
 
-
 void mne_free_dcmatrix_1 (double **m)
 
 {
@@ -199,12 +190,9 @@ void mne_free_dcmatrix_1 (double **m)
     }
 }
 
-
-
 #define MAXTERMS 1000
 #define EPS      1e-10
 #define SIN_EPS  1e-3
-
 
 static int         terms = 0;       /* These statistics may be useful */
 static int         eval = 0;
@@ -1013,7 +1001,6 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(  float *rd, float *Q, FwdCoilSet*
     return OK;
 }
 
-
 //=============================================================================================================
 // fwd_eeg_sphere_models.c
 bool FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, bool fit_berg_scherg, int nfit)
@@ -1042,12 +1029,6 @@ bool FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, bool fit_berg_sche
     return true;
 }
 
-
-
-
-
-
-
 Eigen::MatrixXd toDoubleEigenMatrix(double **mat, const int m, const int n)
 {
     Eigen::MatrixXd eigen_mat(m,n);
@@ -1058,7 +1039,6 @@ Eigen::MatrixXd toDoubleEigenMatrix(double **mat, const int m, const int n)
 
     return eigen_mat;
 }
-
 
 void fromDoubleEigenMatrix(const Eigen::MatrixXd& from_mat, double **to_mat, const int m, const int n)
 {
@@ -1082,10 +1062,6 @@ void fromDoubleEigenVector(const Eigen::VectorXd& from_vec, double *to_vec)
 {
     fromDoubleEigenVector(from_vec, to_vec, from_vec.size());
 }
-
-
-
-
 
 //============================= fwd_fit_berg_scherg.c
 static double dot_dvectors (double *v1,
@@ -1148,7 +1124,6 @@ static int c_dsvd(double **mat,		/* The matrix */
  */
 
 //============================= fwd_fit_berg_scherg.c
-
 
 //============================= fwd_fit_berg_scherg.c
 typedef struct {
@@ -1228,22 +1203,6 @@ static MatrixXd get_initial_simplex(const VectorXd &pars,
     return simplex;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void FwdEegSphereModel::compose_linear_fitting_data(const VectorXd& mu,fitUser u)
 {
     double mu1n,k1;
@@ -1260,8 +1219,6 @@ void FwdEegSphereModel::compose_linear_fitting_data(const VectorXd& mu,fitUser u
             u->M[k][p] = u->w[k]*(pow(mu[p+1],k1)-mu1n);
     }
 }
-
-
 
 // fwd_fit_berg_scherg.c
 double FwdEegSphereModel::compute_linear_parameters(const VectorXd& mu,
@@ -1303,8 +1260,6 @@ double FwdEegSphereModel::compute_linear_parameters(const VectorXd& mu,
     return dot_dvectors(u->resi,u->resi,u->nterms-1)/dot_dvectors(u->y,u->y,u->nterms-1);
 }
 
-
-
 // fwd_fit_berg_scherg.c
 double FwdEegSphereModel::one_step (const VectorXd& mu, const void *user_data)
 /*
@@ -1343,9 +1298,6 @@ double FwdEegSphereModel::one_step (const VectorXd& mu, const void *user_data)
    */
     return dot_dvectors(u->resi,u->resi,u->nterms-1);
 }
-
-
-
 
 // fwd_fit_berg_scherg.c
 bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Number of terms to use in the series expansion

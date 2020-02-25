@@ -97,8 +97,6 @@ public:
      */
     ~MneRawInfo();
 
-
-
     //============================= read_ch_info.c =============================
 
     static FIFFLIB::FiffDirNode::SPtr find_meas (const FIFFLIB::FiffDirNode::SPtr& node);
@@ -108,8 +106,6 @@ public:
     static FIFFLIB::FiffDirNode::SPtr find_raw (const FIFFLIB::FiffDirNode::SPtr& node);
 
     static FIFFLIB::FiffDirNode::SPtr find_maxshield (const FIFFLIB::FiffDirNode::SPtr& node);
-
-
 
     static int get_meas_info (//fiffFile file,	 /* The file we are reading */
                               FIFFLIB::FiffStream::SPtr& stream,
@@ -126,14 +122,6 @@ public:
                               FIFFLIB::fiffTime *start_time);
 
     static int mne_load_raw_info(const QString& name,int allow_maxshield,MneRawInfo* *infop);
-
-
-
-
-
-
-
-
 
 public:
     QString             filename;      /**< The name of the file this comes from */
@@ -163,7 +151,6 @@ public:
                                                      *       FIFF_NOP
                                                      */
     int           ndir;       /**< Number of tags in the above directory */
-
 
 //// ### OLD STRUCT ###
 //typedef struct {        /**< Information about raw data in fiff file */

@@ -108,7 +108,6 @@ public:
 //    //ToDo move to destructor
 //    static void fwd_free_eeg_sphere_model_set(FwdEegSphereModelSet* s);
 
-
 //    static FwdEegSphereModelSet* fwd_new_eeg_sphere_model_set();
 
     /*

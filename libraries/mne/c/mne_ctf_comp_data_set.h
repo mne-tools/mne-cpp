@@ -107,20 +107,15 @@ public:
 
     static MneCTFCompDataSet* mne_read_ctf_comp_data(const QString& name);
 
-
     static int mne_make_ctf_comp(MneCTFCompDataSet* set,        /* The available compensation data */
                           const QList<FIFFLIB::FiffChInfo>& chs,        /* Channels to compensate These may contain channels other than those requiring compensation */
                           int nch,        /* How many of these */
                           QList<FIFFLIB::FiffChInfo> compchs,    /* The compensation input channels These may contain channels other than the MEG compensation channels */
                           int ncomp);
 
-
-
     static int mne_set_ctf_comp(QList<FIFFLIB::FiffChInfo> &chs,
                          int        nch,
                          int        comp);
-
-
 
     static int mne_apply_ctf_comp(MneCTFCompDataSet*   set,        /* The compensation data */
                            int                  do_it,
@@ -129,30 +124,20 @@ public:
                            float                *compdata,  /* Data containing the compensation channels */
                            int                  ncompdata);
 
-
-
-
-
     static int mne_apply_ctf_comp_t(MneCTFCompDataSet* set,     /* The compensation data */
                              int               do_it,
                              float             **data,  /* The data to process (channel by channel) */
                              int               ndata,
                              int               ns);
 
-
     static int mne_get_ctf_comp(const QList<FIFFLIB::FiffChInfo>& chs,int nch);
-
-
 
     /*
      * Mapping from simple integer orders to the mysterious CTF compensation numbers
      */
     static int mne_map_ctf_comp_kind(int grad);
 
-
     static const char *mne_explain_ctf_comp(int kind);
-
-
 
     //int mne_ctf_compensate_to(mneCTFcompDataSet set,            /* The compensation data */
     //                          int               compensate_to,  /* What is the desired compensation to achieve */
@@ -248,8 +233,6 @@ public:
                                  int nchan,          /* How many? */
                                  QList<FIFFLIB::FiffChInfo> comp_chs,       /* Maybe a different set, defaults to the same */
                                  int ncomp_chan);
-
-
 
 public:
     QList<MneCTFCompData*> comps;   /* All available compensation data sets */

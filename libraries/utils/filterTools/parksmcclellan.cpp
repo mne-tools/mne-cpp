@@ -542,7 +542,6 @@ int ParksMcClellan::Remez2(int GridIndex)
         if(NITER++ < ITRMAX) goto TOP_LINE;
     }  // end if(LUCK == 1 || LUCK == 2)
 
-
     KN = ExchangeIndex[HalfTapCount+2];
     for(j=1; j<=HalfTapCount; j++)
     {

@@ -21,17 +21,14 @@
 #include <QCoreApplication>
 #include <QDebug>
 
-
 #define _USE_MATH_DEFINES
 #include <math.h>
-
 
 using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace FWDLIB;
 using namespace INVERSELIB;
-
 
 //============================= ctf_types.h =============================
 
@@ -51,8 +48,6 @@ using namespace INVERSELIB;
 #define FIFFV_COIL_CTF_OFFDIAG_REF_GRAD 5004
 #endif
 
-
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -69,7 +64,6 @@ using namespace INVERSELIB;
 #define OK 0
 #endif
 
-
 #define X_3 0
 #define Y_3 1
 #define Z_3 2
@@ -83,14 +77,10 @@ using namespace INVERSELIB;
  */
 #define ALLOC_FLOAT_3(x) MALLOC_3(x,float)
 
-
-
 #define ALLOC_DCMATRIX_3(x,y) mne_dmatrix_3((x),(y))
 #define ALLOC_CMATRIX_3(x,y) mne_cmatrix_3((x),(y))
 #define FREE_CMATRIX_3(m) mne_free_cmatrix_3((m))
 #define FREE_DCMATRIX_3(m) mne_free_dcmatrix_3((m))
-
-
 
 static void matrix_error_3(int kind, int nr, int nc)
 
@@ -109,7 +99,6 @@ static void matrix_error_3(int kind, int nr, int nc)
     exit(1);
 }
 
-
 float **mne_cmatrix_3 (int nr,int nc)
 
 {
@@ -127,8 +116,6 @@ float **mne_cmatrix_3 (int nr,int nc)
     return m;
 }
 
-
-
 double **mne_dmatrix_3(int nr, int nc)
 
 {
@@ -145,7 +132,6 @@ double **mne_dmatrix_3(int nr, int nc)
         m[i] = whole + i*nc;
     return m;
 }
-
 
 void mne_free_dcmatrix_3 (double **m)
 
@@ -184,17 +170,9 @@ void mne_free_dcmatrix_3 (double **m)
     (xy)[Z_3] =   (x)[X_3]*(y)[Y_3]-(y)[X_3]*(x)[Y_3];\
     }
 
-
-
-
-
 //============================= mne_matop.c =============================
 
-
-
 #define MIN_3(a,b) ((a) < (b) ? (a) : (b))
-
-
 
 void mne_transpose_square_3(float **mat, int n)
 /*
@@ -212,7 +190,6 @@ void mne_transpose_square_3(float **mat, int n)
         }
     return;
 }
-
 
 float mne_dot_vectors_3(float *v1,
                        float *v2,
@@ -233,7 +210,6 @@ float mne_dot_vectors_3(float *v1,
 #endif
 }
 
-
 void mne_add_scaled_vector_to_3(float *v1,float scale, float *v2,int nn)
 
 {
@@ -248,10 +224,6 @@ void mne_add_scaled_vector_to_3(float *v1,float scale, float *v2,int nn)
 #endif
     return;
 }
-
-
-
-
 
 double **mne_dmatt_dmat_mult2_3 (double **m1,double **m2, int d1,int d2,int d3)
 /* Matrix multiplication
@@ -284,10 +256,6 @@ double **mne_dmatt_dmat_mult2_3 (double **m1,double **m2, int d1,int d2,int d3)
 #endif
 }
 
-
-
-
-
 float **mne_mat_mat_mult_3 (float **m1,float **m2,int d1,int d2,int d3)
 /* Matrix multiplication
       * result(d1 x d3) = m1(d1 x d2) * m2(d2 x d3) */
@@ -317,8 +285,6 @@ float **mne_mat_mat_mult_3 (float **m1,float **m2,int d1,int d2,int d3)
     return (result);
 #endif
 }
-
-
 
 void mne_mat_vec_mult2_3(float **m,float *v,float *result, int d1,int d2)
 /*
@@ -388,18 +354,7 @@ void mne_string_to_name_list_3(const QString& s, QStringList& listp,int &nlistp)
     return;
 }
 
-
-
-
-
-
-
-
-
 //============================= mne_sparse_matop.c =============================
-
-
-
 
 FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense matrix to be converted */
                                       int   nrow,           /* Number of rows in the dense matrix */
@@ -501,21 +456,6 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
     return sparse;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 typedef struct {
     float          limit;
     int            report_dim;
@@ -524,16 +464,11 @@ typedef struct {
     DipoleForward*  fwd;
 } *fitDipUser,fitDipUserRec;
 
-
-
 int mne_is_diag_cov_3(MneCovMatrix* c)
 
 {
     return c->cov_diag != NULL;
 }
-
-
-
 
 void mne_scale_vector_3 (double scale,float *v,int   nn)
 
@@ -548,11 +483,6 @@ void mne_scale_vector_3 (double scale,float *v,int   nn)
         v[k] = v[k]*scale;
 #endif
 }
-
-
-
-
-
 
 //float
 Eigen::MatrixXf toFloatEigenMatrix_3(float **mat, const int m, const int n)
@@ -578,15 +508,11 @@ void fromFloatEigenMatrix_3(const Eigen::MatrixXf& from_mat, float **& to_mat)
     fromFloatEigenMatrix_3(from_mat, to_mat, from_mat.rows(), from_mat.cols());
 }
 
-
-
 void fromFloatEigenVector_3(const Eigen::VectorXf& from_vec, float *to_vec, const int n)
 {
     for ( int i = 0; i < n; ++i)
         to_vec[i] = from_vec[i];
 }
-
-
 
 float **mne_lu_invert_3(float **mat,int dim)
 /*
@@ -600,14 +526,6 @@ float **mne_lu_invert_3(float **mat,int dim)
     return mat;
 }
 
-
-
-
-
-
-
-
-
 void mne_free_cmatrix_3 (float **m)
 {
     if (m) {
@@ -615,9 +533,6 @@ void mne_free_cmatrix_3 (float **m)
         FREE_3(m);
     }
 }
-
-
-
 
 int mne_svd_3(float **mat,	/* The matrix */
             int   m,int n,	/* m rows n columns */
@@ -663,9 +578,6 @@ int mne_svd_3(float **mat,	/* The matrix */
     //  return info;
 }
 
-
-
-
 void mne_free_cov_3(MneCovMatrix* c)
 /*
  * Free a covariance matrix and all its data
@@ -691,12 +603,6 @@ void mne_free_cov_3(MneCovMatrix* c)
     FREE_3(c);
     return;
 }
-
-
-
-
-
-
 
 #define EPS_3 0.05
 
@@ -827,14 +733,6 @@ int mne_get_values_from_data_3 (float time,         /* Interesting time point */
     return (0);
 }
 
-
-
-
-
-
-
-
-
 //============================= mne_decompose.c =============================
 
 int mne_decompose_eigen_3(double *mat,
@@ -922,24 +820,11 @@ int mne_decompose_eigen_3(double *mat,
         return -1;
 }
 
-
-
 //============================= mne_cov_matrix.c =============================
-
-
-
 
 /*
  * Routines for handling the covariance matrices
  */
-
-
-
-
-
-
-
-
 
 static int mne_lt_packed_index_3(int j, int k)
 
@@ -950,19 +835,9 @@ static int mne_lt_packed_index_3(int j, int k)
         return j + k*(k+1)/2;
 }
 
-
-
-
 /*
  * Handle the linear projection operators
  */
-
-
-
-
-
-
-
 
 int mne_add_inv_cov_3(MneCovMatrix* c)
 /*
@@ -985,14 +860,6 @@ int mne_add_inv_cov_3(MneCovMatrix* c)
     }
     return OK;
 }
-
-
-
-
-
-
-
-
 
 static int condition_cov_3(MneCovMatrix* c, float rank_threshold, int use_rank)
 
@@ -1119,14 +986,6 @@ static int condition_cov_3(MneCovMatrix* c, float rank_threshold, int use_rank)
     return res;
 }
 
-
-
-
-
-
-
-
-
 static int check_cov_data(double *vals, int nval)
 
 {
@@ -1141,14 +1000,6 @@ static int check_cov_data(double *vals, int nval)
     }
     return OK;
 }
-
-
-
-
-
-
-
-
 
 int mne_classify_channels_cov(MneCovMatrix* cov,
                               const QList<FiffChInfo>& chs,
@@ -1194,10 +1045,6 @@ bad : {
         return FAIL;
     }
 }
-
-
-
-
 
 static int mne_decompose_eigen_cov_small_3(MneCovMatrix* c,float small, int use_rank)
 /*
@@ -1275,9 +1122,6 @@ int mne_decompose_eigen_cov_3(MneCovMatrix* c)
     return mne_decompose_eigen_cov_small_3(c,-1.0,-1);
 }
 
-
-
-
 //============================= mne_whiten.c =============================
 
 int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, MneCovMatrix* C)
@@ -1338,13 +1182,6 @@ int mne_whiten_one_data(float *data, float *whitened_data, int nchan, MneCovMatr
     return mne_whiten_data(datap,whitened_datap,1,nchan,C);
 }
 
-
-
-
-
-
-
-
 //=============================================================================================================
 //============================= dipole_fit_setup.c =============================
 static void free_dipole_fit_funcs(dipoleFitFuncs f)
@@ -1361,10 +1198,6 @@ static void free_dipole_fit_funcs(dipoleFitFuncs f)
     FREE_3(f);
     return;
 }
-
-
-
-
 
 //static void regularize_cov(MneCovMatrix* c,       /* The matrix to regularize */
 //                           float        *regs,   /* Regularization values to apply (fractions of the
@@ -1471,8 +1304,6 @@ void mne_regularize_cov(MneCovMatrix* c,       /* The matrix to regularize */
     return;
 }
 
-
-
 //============================= dipole_fit_setup.c =============================
 
 static dipoleFitFuncs new_dipole_fit_funcs()
@@ -1491,8 +1322,6 @@ static dipoleFitFuncs new_dipole_fit_funcs()
 
     return f;
 }
-
-
 
 //============================= mne_simplex_fit.c =============================
 
@@ -1633,8 +1462,6 @@ int mne_simplex_minimize(float **p,		                              /* The initia
 #undef ALPHA
 #undef BETA
 #undef GAMMA
-
-
 
 //============================= fit_sphere.c =============================
 
@@ -1820,8 +1647,6 @@ out : {
     }
 }
 
-
-
 //============================= mne_lin_proj.c =============================
 
 void mne_proj_op_report_data_3(FILE *out,const char *tag, MneProjOp* op, int list_data,
@@ -1885,24 +1710,6 @@ void mne_proj_op_report_3(FILE *out,const char *tag, MneProjOp* op)
 {
     mne_proj_op_report_data_3(out,tag,op, FALSE, NULL, 0);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //============================= mne_named_vector.c =============================
 
@@ -2095,8 +1902,6 @@ bad : {
     }
 }
 
-
-
 MneProjOp* mne_read_proj_op_3(const QString& name)
 
 {
@@ -2116,10 +1921,6 @@ MneProjOp* mne_read_proj_op_3(const QString& name)
     return res;
 }
 
-
-
-
-
 int mne_proj_op_chs_3(MneProjOp* op, const QStringList& list, int nlist)
 
 {
@@ -2137,9 +1938,6 @@ int mne_proj_op_chs_3(MneProjOp* op, const QStringList& list, int nlist)
     return OK;
 }
 
-
-
-
 static void clear_these(float *data, const QStringList& names, int nnames, const QString& start)
 
 {
@@ -2148,7 +1946,6 @@ static void clear_these(float *data, const QStringList& names, int nnames, const
         if (names[k].contains(start))//strstr(names[k],start) == names[k])
             data[k] = 0.0;
 }
-
 
 #define USE_LIMIT   1e-5
 #define SMALL_VALUE 1e-4
@@ -2398,10 +2195,6 @@ int mne_proj_op_make_proj(MneProjOp* op)
     return mne_proj_op_make_proj_bad(op,NULL,0);
 }
 
-
-
-
-
 //============================= mne_read_forward_solution.c =============================
 
 int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
@@ -2561,7 +2354,6 @@ bad : {
     }
 }
 
-
 //============================= data.c =============================
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -2586,7 +2378,6 @@ int is_selected_in_data(mshMegEegData d, const QString& ch_name)
         }
     return issel;
 }
-
 
 //============================= mne_process_bads.c =============================
 
@@ -2653,8 +2444,6 @@ bad : {
     }
 }
 
-
-
 int mne_read_bad_channel_list_from_node_3(FiffStream::SPtr& stream,
                                           const FiffDirNode::SPtr& pNode,
                                           QStringList& listp,
@@ -2704,15 +2493,6 @@ int mne_read_bad_channel_list_3(const QString& name, QStringList& listp, int& nl
 
     return res;
 }
-
-
-
-
-
-
-
-
-
 
 MneCovMatrix* mne_read_cov(const QString& name,int kind)
 /*
@@ -2917,10 +2697,6 @@ out : {
     }
 }
 
-
-
-
-
 //============================= mne_coord_transforms.c =============================
 
 typedef struct {
@@ -2957,8 +2733,6 @@ const char *mne_coord_frame_name_3(int frame)
     return frames[k].name;
 }
 
-
-
 //============================= mne_read_process_forward_solution.c =============================
 
 void mne_merge_channels(const QList<FiffChInfo>& chs1,
@@ -2986,8 +2760,6 @@ void mne_merge_channels(const QList<FiffChInfo>& chs1,
 
 //============================= read_ch_info.c =============================
 
-
-
 static FiffDirNode::SPtr find_meas_3 (const FiffDirNode::SPtr& node)
 /*
       * Find corresponding meas node
@@ -3003,7 +2775,6 @@ static FiffDirNode::SPtr find_meas_3 (const FiffDirNode::SPtr& node)
     }
     return (tmp_node);
 }
-
 
 static FiffDirNode::SPtr find_meas_info_3 (const FiffDirNode::SPtr& node)
 /*
@@ -3024,7 +2795,6 @@ static FiffDirNode::SPtr find_meas_info_3 (const FiffDirNode::SPtr& node)
             return (tmp_node->children[k]);
     return empty_node;
 }
-
 
 static int get_all_chs (//fiffFile file,	        /* The file we are reading */
                         FiffStream::SPtr& stream,
@@ -3114,8 +2884,6 @@ bad : {
     }
 }
 
-
-
 static int read_ch_info(const QString&  name,
                         QList<FiffChInfo>& chsp,
                         int             *nchanp,
@@ -3162,16 +2930,12 @@ bad : {
     }
 }
 
-
-
 #define TOO_CLOSE 1e-4
 
 static int at_origin (const Eigen::Vector3f& rr)
 {
     return (rr.norm() < TOO_CLOSE);
 }
-
-
 
 static int is_valid_eeg_ch(const FiffChInfo& ch)
 /*
@@ -3188,10 +2952,6 @@ static int is_valid_eeg_ch(const FiffChInfo& ch)
     return FALSE;
 }
 
-
-
-
-
 static int accept_ch(const FiffChInfo& ch,
                      const QStringList& bads,
                      int        nbad)
@@ -3203,10 +2963,6 @@ static int accept_ch(const FiffChInfo& ch,
             return FALSE;
     return TRUE;
 }
-
-
-
-
 
 int read_meg_eeg_ch_info(const QString& name,       /* Input file */
                          int        do_meg,         /* Use MEG */
@@ -3274,12 +3030,6 @@ bad : {
     }
 }
 
-
-
-
-
-
-
 void mne_revert_to_diag_cov(MneCovMatrix* c)
 /*
  * Pick the diagonal elements of the full covariance matrix
@@ -3308,9 +3058,6 @@ void mne_revert_to_diag_cov(MneCovMatrix* c)
     FREE_CMATRIX_3(c->eigen); c->eigen = NULL;
     return;
 }
-
-
-
 
 MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c,
                                     const QStringList& new_names,
@@ -3418,7 +3165,6 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c,
     return res;
 }
 
-
 int mne_proj_op_proj_dvector(MneProjOp* op, double *vec, int nch, int do_complement)
 /*
  * Apply projection operator to a vector (doubles)
@@ -3460,8 +3206,6 @@ int mne_proj_op_proj_dvector(MneProjOp* op, double *vec, int nch, int do_complem
     return OK;
 }
 
-
-
 int mne_name_list_match(const QStringList& list1, int nlist1,
                         const QStringList& list2, int nlist2)
 /*
@@ -3481,7 +3225,6 @@ int mne_name_list_match(const QStringList& list1, int nlist1,
     return 0;
 }
 
-
 void mne_transpose_dsquare(double **mat, int n)
 /*
       * In-place transpose of a square matrix
@@ -3498,7 +3241,6 @@ void mne_transpose_dsquare(double **mat, int n)
         }
     return;
 }
-
 
 int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
 /*
@@ -3569,7 +3311,6 @@ int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
     c->nproj = MneProjOp::mne_proj_op_affect(op,c->names,c->ncov);
     return OK;
 }
-
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -4607,10 +4348,6 @@ static float fit_eval(float *rd,int npar,void *user)
     return fuser->B2-Bm2;
 }
 
-
-
-
-
 static int find_best_guess(float     *B,         /* The whitened data */
                            int       nch,
                            GuessData* guess,	 /* Guesses */
@@ -4652,13 +4389,6 @@ static int find_best_guess(float     *B,         /* The whitened data */
      *goodp = good;
     return OK;
 }
-
-
-
-
-
-
-
 
 static float **make_initial_dipole_simplex(float  *r0,
                                            float  size)
@@ -4709,13 +4439,6 @@ static int report_func(int     loop,
 
     return OK;
 }
-
-
-
-
-
-
-
 
 static int fit_Q(DipoleFitData* fit,	     /* The fit data */
                  float *B,		     /* Measurement */
@@ -4771,13 +4494,6 @@ static float rtol(float *vals,int nval)
     return 2.0*(maxv-minv)/(maxv+minv);
 }
 
-
-
-
-
-
-
-
 /*
  * This routine comes from Numerical recipes
  */
@@ -4818,11 +4534,6 @@ static float tryf (float **p,
     FREE_3(ptry);
     return ytry;
 }
-
-
-
-
-
 
 int simplex_minimize(float **p,		                              /* The initial simplex */
                      float *y,		                              /* Function values at the vertices */
@@ -5057,13 +4768,6 @@ bad : {
         return false;
     }
 }
-
-
-
-
-
-
-
 
 //=============================================================================================================
 

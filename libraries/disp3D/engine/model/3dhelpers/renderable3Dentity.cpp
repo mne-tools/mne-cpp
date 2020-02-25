@@ -191,8 +191,6 @@ void Renderable3DEntity::applyTransform(const Qt3DCore::QTransform& transform)
     m_pTransform->setMatrix(transform.matrix() * m_pTransform->matrix());
 }
 
-
-
 //=============================================================================================================
 
 void Renderable3DEntity::applyTransform(const FiffCoordTrans& transform, bool bApplyInverse)

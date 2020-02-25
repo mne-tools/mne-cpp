@@ -106,7 +106,6 @@ public:
      */
     static void calculate_normal_stats(MneSourceSpaceOld* s, MnePatchInfo* p);
 
-
 public:
     int   vert;         /* Which vertex does this apply to */
     int   *memb_vert;   /* Which vertices constitute the patch? */

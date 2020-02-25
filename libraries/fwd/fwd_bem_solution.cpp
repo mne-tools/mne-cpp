@@ -46,8 +46,6 @@
 
 #define FREE_CMATRIX_42(m) mne_free_cmatrix_42((m))
 
-
-
 void mne_free_cmatrix_42(float **m)
 {
     if (m) {
@@ -55,8 +53,6 @@ void mne_free_cmatrix_42(float **m)
         FREE_42(m);
     }
 }
-
-
 
 //=============================================================================================================
 // USED NAMESPACES

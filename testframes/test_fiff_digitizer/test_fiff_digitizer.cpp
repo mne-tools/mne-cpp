@@ -90,7 +90,6 @@ TestFiffDigitizer::TestFiffDigitizer()
 {
 }
 
-
 //=============================================================================================================
 
 void TestFiffDigitizer::initTestCase()

@@ -76,9 +76,6 @@ using namespace INVERSELIB;
 #define OK 0
 #endif
 
-
-
-
 #define X_16 0
 #define Y_16 1
 #define Z_16 2
@@ -89,13 +86,11 @@ using namespace INVERSELIB;
     (to)[Z_16] = (from)[Z_16];\
     }
 
-
 #define MALLOC_16(x,t) (t *)malloc((x)*sizeof(t))
 
 #define REALLOC_16(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
 #define ALLOC_CMATRIX_16(x,y) mne_cmatrix_16((x),(y))
-
 
 static void matrix_error_16(int kind, int nr, int nc)
 
@@ -131,8 +126,6 @@ float **mne_cmatrix_16(int nr,int nc)
     return m;
 }
 
-
-
 #define FREE_16(x) if ((char *)(x) != NULL) free((char *)(x))
 #define FREE_CMATRIX_16(m) mne_free_cmatrix_16((m))
 
@@ -143,10 +136,6 @@ void mne_free_cmatrix_16 (float **m)
         FREE_16(m);
     }
 }
-
-
-
-
 
 void fromFloatEigenMatrix_16(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
 {

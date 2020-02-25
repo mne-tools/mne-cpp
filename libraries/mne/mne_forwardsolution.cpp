@@ -455,7 +455,6 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
                     // Option 2 label ID
                     p_fwdOut.src[h].vertno[count] = p_fwdOut.src[h].cluster_info.clusterLabelIds[count];
 
-
 //                    //vertices
 //                    std::cout << this->src[h].vertno[sel_idx] << ", ";
 
@@ -509,7 +508,6 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
             idx_sel.array() += hemiOffset;
 
 //            std::cout << "idx_sel]:\n" << idx_sel << std::endl;
-
 
             double selectWeight = 1.0/idx_sel.size();
             if(this->isFixedOrient())

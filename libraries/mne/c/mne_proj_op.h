@@ -107,7 +107,6 @@ public:
      */
     static void mne_free_proj_op_proj(MneProjOp* op);
 
-
     // mne_lin_proj.c
     static MneProjOp* mne_proj_op_combine(MneProjOp* to, MneProjOp* from);
 
@@ -129,7 +128,6 @@ public:
 
     static int mne_proj_op_proj_vector(MneProjOp* op, float *vec, int nvec, int do_complement);
 
-
     //============================= mne_lin_proj_io.c =============================
 
     static MneProjOp* mne_read_proj_op_from_node(//fiffFile in,
@@ -141,12 +139,6 @@ public:
     static void mne_proj_op_report_data(FILE *out,const char *tag, MneProjOp* op, int list_data, char **exclude, int nexclude);
 
     static void mne_proj_op_report(FILE *out,const char *tag, MneProjOp* op);
-
-
-
-
-
-
 
 public:
     QList<MNELIB::MneProjItem*> items;  /* The projection items */

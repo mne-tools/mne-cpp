@@ -64,8 +64,6 @@ struct DipolePair
     T m_vCorrelation;     /**< Correlation of the dipole pair. */
 };
 
-
-
 //=============================================================================================================
 /**
  * DECLARE CLASS Dipoles

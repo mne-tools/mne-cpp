@@ -40,8 +40,6 @@
 
 #include "mne_deriv.h"
 
-
-
 #define FREE_15(x) if ((char *)(x) != NULL) free((char *)(x))
 
 void mne_free_name_list_15(char **list, int nlist)

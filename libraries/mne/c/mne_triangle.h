@@ -95,7 +95,6 @@ public:
 
     static void add_triangle_data(MneTriangle* tri);
 
-
 public:
     int   *vert;            /* Triangle vertices (pointers to the itris member of the associated mneSurface) */
     float *r1,*r2,*r3;      /* Triangle vertex locations (pointers to the rr member of the associated mneSurface) */

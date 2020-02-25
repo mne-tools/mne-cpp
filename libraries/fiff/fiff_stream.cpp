@@ -1472,7 +1472,6 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirNode::SPtr& p_Node)
             return projdata;
         }
 
-
         //
         //   create a named matrix for the data
         //

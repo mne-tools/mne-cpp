@@ -68,7 +68,6 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-
 //=============================================================================================================
 /**
  * Correlated source estimation which holds results of MNE-CPP inverse routines, which estimate the correlation too
