@@ -115,6 +115,7 @@ bool FtBuffer::start()
     qRegisterMetaType<QPair<int,float>>("QPair<int,float>");
 
     // FtProducer in it's own thread and connect communications signals/slots
+    m_pFtBuffProducer->m_pFtConnector->m_pSocket->moveToThread(&m_pProducerThread);
     m_pFtBuffProducer->m_pFtConnector->moveToThread(&m_pProducerThread);
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);

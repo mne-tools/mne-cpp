@@ -67,9 +67,9 @@ FtConnector::FtConnector()
 
 FtConnector::~FtConnector()
 {
-    disconnect();
+    //disconnect();
     delete m_pSocket;
-    m_pSocket = Q_NULLPTR;
+    //m_pSocket = Q_NULLPTR;
 }
 
 //*************************************************************************************************************
@@ -278,7 +278,7 @@ bool FtConnector::getData()
     QBuffer msgBuffer;
     prepBuffer(msgBuffer, sizeof (messagedef_t));
     int bufsize = parseMessageDef(msgBuffer);
-    qDebug() << "2";
+    qDebug() << "2," << bufsize;
     //Waiting for response.
     while(m_pSocket->bytesAvailable() < bufsize) {
         m_pSocket->waitForReadyRead(10);

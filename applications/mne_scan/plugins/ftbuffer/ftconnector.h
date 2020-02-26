@@ -153,6 +153,8 @@ class FtConnector : public QObject
     Q_OBJECT
 
     friend class FtBufferSetupWidget;
+    friend class FtBuffer;
+    friend class FtBuffProducer;
 
 public:
 
