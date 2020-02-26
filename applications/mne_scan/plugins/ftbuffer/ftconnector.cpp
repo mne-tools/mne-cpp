@@ -273,22 +273,22 @@ bool FtConnector::getData()
     while(m_pSocket->bytesAvailable() < sizeof (messagedef_t)) {
         m_pSocket->waitForReadyRead(10);
     }
-
+    qDebug() << "1";
     //Parse return message from buffer
     QBuffer msgBuffer;
     prepBuffer(msgBuffer, sizeof (messagedef_t));
     int bufsize = parseMessageDef(msgBuffer);
-
+    qDebug() << "2";
     //Waiting for response.
     while(m_pSocket->bytesAvailable() < bufsize) {
         m_pSocket->waitForReadyRead(10);
     }
-
+    qDebug() << "3";
     //Parse return data def from buffer
     QBuffer datadefBuffer;
     prepBuffer(datadefBuffer, sizeof (datadef_t));
     bufsize = parseDataDef(datadefBuffer);
-
+    qDebug() << "4";
     //Parse actual data from buffer
     QBuffer datasampBuffer;
     prepBuffer(datasampBuffer, bufsize);
@@ -554,7 +554,7 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
 
         qDebug() << "Found chunk of type:" << type;
 
-        if (type != 8 ) {
+        if (type < 8) {
             qint32 size;
 
             char c_size[sizeof(qint32)];
@@ -565,7 +565,7 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
 
             char c_rest[size];
             chunkBuffer.read(c_rest, size);
-        } else {
+        } else if(type == 8) {
             char c_size[sizeof(qint32)];
             chunkBuffer.read(c_size, sizeof(qint32));
             qint32 size;
@@ -639,6 +639,10 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
 //                    neuromagBuffer.reset();
 //                    outfile.write(neuromagBuffer.read(neuromagBuffer.size()));
 //                }
+        } else {
+            qCritical() << "Unable to recongine chunk data. Plugin behavior undefined";
+            FIFFLIB::FiffInfo defaultInfo;
+            return defaultInfo;
         }
 
     }
