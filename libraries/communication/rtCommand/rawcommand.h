@@ -69,6 +69,7 @@ namespace COMMUNICATIONLIB
 class COMMUNICATIONSHARED_EXPORT RawCommand : public QObject, public ICommand
 {
 Q_OBJECT
+
 public:
 
     //=========================================================================================================

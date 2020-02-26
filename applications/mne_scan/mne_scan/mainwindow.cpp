@@ -114,7 +114,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
 
-
     // Quick control selection
     m_pQuickControlView = new QuickControlView (QString("MNESCAN/MainWindow"),
                                                          "MNE Scan",
@@ -171,9 +170,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
-
-
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MainWindow::newConfiguration()
 {
@@ -212,8 +209,7 @@ void MainWindow::saveConfiguration()
     m_pPluginGui->saveConfig(qFileInfo.path(), qFileInfo.fileName());
 }
 
-
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MainWindow::helpContents()
 {
@@ -548,8 +544,7 @@ void MainWindow::createLogDockWindow()
     m_pMenuView->addAction(m_pDockWidget_Log->toggleViewAction());
 }
 
-
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 {
@@ -578,8 +573,7 @@ void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
     }
 }
 
-
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 {
@@ -618,7 +612,6 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
                                                                      m_qListDynamicDisplayWidgets),
                                              m_sCurPluginName);
                 }
-
 
                 m_pRunWidget->show();
             }
@@ -723,7 +716,7 @@ void MainWindow::stopMeasurement()
 //    m_pPluginDockWidget->setTogglingEnabled(true);
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void MainWindow::uiSetupRunningState(bool state)
 {
