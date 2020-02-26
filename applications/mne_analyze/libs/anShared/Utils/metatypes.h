@@ -42,7 +42,6 @@
 #include "../Management/event.h"
 #include "../Model/fiffrawviewmodel.h"
 
-
 // IMPORTANT: You must also use qRegisterMetaTypes in AnalyzeCore::registerMetatypes to use custom types in QObject::connect() calls.
 Q_DECLARE_METATYPE(Eigen::Vector3f);
 Q_DECLARE_METATYPE(Eigen::Vector3i);
