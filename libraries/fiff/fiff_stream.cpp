@@ -1664,7 +1664,6 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
         return false;
     }
 
-    qDebug() << "AAA";
     //
     //   Read the measurement info
     //
@@ -1673,11 +1672,6 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     if(!t_pStream->read_meas_info(t_pStream->dirtree(), info, meas))
         return false;
 
-    if(is_littleEndian) {
-        data.info = info;
-        return true;
-    }
-    qDebug() << "BBB";
     //
     //   Locate the data of interest
     //
@@ -1708,7 +1702,6 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
             }
         }
     }
-    qDebug() << "CCC";
     //
     //   Set up the output structure
     //
@@ -1722,26 +1715,22 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool a
     //
     //   Process the directory
     //
-    qDebug() << "DDD";
     QList<FiffDirEntry::SPtr> dir = raw[0]->dir;
     fiff_int_t nent = raw[0]->nent();
     fiff_int_t nchan = info.nchan;
     fiff_int_t first = 0;
     fiff_int_t first_samp = 0;
     fiff_int_t first_skip = 0;
-    qDebug() << "EEE" << dir[first]->kind;
     //
     //  Get first sample tag if it is there
     //
     FiffTag::SPtr t_pTag;
     if (dir[first]->kind == FIFF_FIRST_SAMPLE)
     {
-        qDebug() << "In";
         t_pStream->read_tag(t_pTag, dir[first]->pos);
         first_samp = *t_pTag->toInt();
         ++first;
     }
-    qDebug() << "Out";
     //
     //  Omit initial skip
     //
@@ -3136,15 +3125,12 @@ QList<FiffDirEntry::SPtr> FiffStream::make_dir(bool *ok)
     QList<FiffDirEntry::SPtr> dir;
     FiffDirEntry::SPtr t_pFiffDirEntry;
     fiff_long_t pos;
-    qDebug() << "1";
     if(ok) *ok = false;
     /*
      * Start from the very beginning...
      */
-    qDebug() << "2";
     if(!this->device()->seek(SEEK_SET))
         return dir;
-    qDebug() << "3";
     while ((pos = this->read_tag_info(t_pTag)) != -1) {
         /*
         * Check that we haven't run into the directory
@@ -3175,7 +3161,6 @@ QList<FiffDirEntry::SPtr> FiffStream::make_dir(bool *ok)
     t_pFiffDirEntry->size = -1;
     t_pFiffDirEntry->pos  = -1;
     dir.append(t_pFiffDirEntry);
-    qDebug() << "9";
 
     if(ok) *ok = true;
     return dir;
