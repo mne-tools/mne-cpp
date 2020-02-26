@@ -107,5 +107,11 @@ void FtBufferSetupWidget::isConnected(bool stat)
 {
     if (stat) {
         ui.m_qPushButton_Connect->setText("Set");
+    } else {
+        qWarning() << "[FtBufferSetupWidget::isConnected] Unable to find relevant fiff info.";
+
+        QMessageBox msgBox;
+        msgBox.setText("Unable to find relevant fiff info. Is there header data in the buffer or a fiff file in your bin folder?");
+        msgBox.exec();
     }
 }
