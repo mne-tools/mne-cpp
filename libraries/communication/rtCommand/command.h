@@ -77,6 +77,7 @@ static QVariant defaultVariant;
 class COMMUNICATIONSHARED_EXPORT Command: public QObject, public ICommand
 {
 Q_OBJECT
+
 public:
     typedef QSharedPointer<Command> SPtr;
     typedef QSharedPointer<const Command> ConstSPtr;
