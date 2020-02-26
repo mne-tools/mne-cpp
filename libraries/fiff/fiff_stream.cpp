@@ -3146,7 +3146,7 @@ QList<FiffDirEntry::SPtr> FiffStream::make_dir(bool *ok)
         t_pFiffDirEntry->size = t_pTag->size();
         t_pFiffDirEntry->pos = (fiff_long_t)pos;
 
-        qDebug() << "Kind: " << t_pTag->kind << "| Type:" << t_pTag->type << "| Size" << t_pTag->size() << "| Next:" << t_pTag->next;
+        //qDebug() << "Kind: " << t_pTag->kind << "| Type:" << t_pTag->type << "| Size" << t_pTag->size() << "| Next:" << t_pTag->next;
 
         dir.append(t_pFiffDirEntry);
         if (t_pTag->next < 0)

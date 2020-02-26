@@ -247,7 +247,6 @@ void FtConnector::sendRequest(messagedef_t &messagedef)
 
 bool FtConnector::getData()
 {
-    echoStatus();
     m_iNumNewSamples = totalBuffSamples();
 
     if (m_iNumNewSamples == m_iNumSamples) {
@@ -289,10 +288,6 @@ bool FtConnector::getData()
     QBuffer datadefBuffer;
     prepBuffer(datadefBuffer, sizeof (datadef_t));
     bufsize = parseDataDef(datadefBuffer);
-
-    if(bufsize == 0) {
-        qDebug() << "Hey there :)";
-    }
 
     //Parse actual data from buffer
     QBuffer datasampBuffer;
@@ -414,20 +409,19 @@ int FtConnector::totalBuffSamples()
 
     sendRequest(messagedef);
     sendSampleEvents(threshold);
-    qDebug() << "1";
+
     m_pSocket->write(reinterpret_cast<char*>(&timeout), sizeof (qint32));
 
     //Waiting for response.
     while(m_pSocket->bytesAvailable() < sizeof (messagedef_t)) {
         m_pSocket->waitForReadyRead(10);
     }
-    qDebug() << "2";
+
     //Parse return message from buffer
     QBuffer msgBuffer;
     prepBuffer(msgBuffer, sizeof (messagedef_t));
     parseMessageDef(msgBuffer);
 
-    qDebug() << "3";
     //Waiting for response.
     while(m_pSocket->bytesAvailable() < sizeof (samples_events_t)) {
         m_pSocket->waitForReadyRead(10);
@@ -619,6 +613,8 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
                 FIFFLIB::FiffInfo defaultInfo;
                 return defaultInfo;
             }
+
+            qDebug() << "Freq:" << FifInfo.sfreq;
 
             return FifInfo;
 
