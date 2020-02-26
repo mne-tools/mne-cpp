@@ -103,6 +103,7 @@ class FTBUFFER_EXPORT FtBuffer : public SCSHAREDLIB::ISensor
 
     friend class FtBufferSetupWidget;
     friend class FtBuffProducer;
+    friend class FtConnector;
 
 public:
 
