@@ -69,12 +69,18 @@ FtConnector::~FtConnector()
 {
     disconnect();
     delete m_pSocket;
+    m_pSocket = Q_NULLPTR;
 }
 
 //*************************************************************************************************************
 
 bool FtConnector::connect()
 {
+    if(m_pSocket != Q_NULLPTR) {
+        delete m_pSocket;
+        m_pSocket = Q_NULLPTR;
+    }
+
     m_pSocket = new QTcpSocket();
     m_pSocket->connectToHost(QHostAddress(m_sAddress), m_iPort);
     qint8 iTries = 0;
@@ -241,6 +247,7 @@ void FtConnector::sendRequest(messagedef_t &messagedef)
 
 bool FtConnector::getData()
 {
+    echoStatus();
     m_iNumNewSamples = totalBuffSamples();
 
     if (m_iNumNewSamples == m_iNumSamples) {
@@ -282,6 +289,10 @@ bool FtConnector::getData()
     QBuffer datadefBuffer;
     prepBuffer(datadefBuffer, sizeof (datadef_t));
     bufsize = parseDataDef(datadefBuffer);
+
+    if(bufsize == 0) {
+        qDebug() << "Hey there :)";
+    }
 
     //Parse actual data from buffer
     QBuffer datasampBuffer;
@@ -403,19 +414,20 @@ int FtConnector::totalBuffSamples()
 
     sendRequest(messagedef);
     sendSampleEvents(threshold);
-
+    qDebug() << "1";
     m_pSocket->write(reinterpret_cast<char*>(&timeout), sizeof (qint32));
 
     //Waiting for response.
     while(m_pSocket->bytesAvailable() < sizeof (messagedef_t)) {
         m_pSocket->waitForReadyRead(10);
     }
-
+    qDebug() << "2";
     //Parse return message from buffer
     QBuffer msgBuffer;
     prepBuffer(msgBuffer, sizeof (messagedef_t));
     parseMessageDef(msgBuffer);
 
+    qDebug() << "3";
     //Waiting for response.
     while(m_pSocket->bytesAvailable() < sizeof (samples_events_t)) {
         m_pSocket->waitForReadyRead(10);
@@ -572,15 +584,7 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
             qint32_be i_IntToChar;
             char c_Char[sizeof (qint32)];
 
-            i_IntToChar = 105;
-            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-            neuromagBuffer.write(c_Char);
-
-            i_IntToChar = 3;
-            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-            neuromagBuffer.write(c_Char);
-
-            i_IntToChar = 4;
+            i_IntToChar = -1;
             memcpy(c_Char, &i_IntToChar, sizeof(qint32));
             neuromagBuffer.write(c_Char);
 
@@ -588,42 +592,48 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
             memcpy(c_Char, &i_IntToChar, sizeof(qint32));
             neuromagBuffer.write(c_Char);
 
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
+            i_IntToChar = -1;
+            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+            neuromagBuffer.write(c_Char);
 
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
-
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
-
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
+            i_IntToChar = -1;
+            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+            neuromagBuffer.write(c_Char);
 
             neuromagBuffer.reset();
-            //qDebug() << "Read chunk of size:" << neuromagBuffer.size();
+
+            FIFFLIB::FiffStream::SPtr pStream(new FIFFLIB::FiffStream(&neuromagBuffer));
+            pStream->setByteOrder(QDataStream::LittleEndian);
+
+            if(!pStream->open()) {
+                qCritical() << "Unable to open neuromag fiff data. Plugin behavior undefined";
+                FIFFLIB::FiffInfo defaultInfo;
+                return defaultInfo;
+            }
+
+            FIFFLIB::FiffInfo FifInfo;
+            FIFFLIB::FiffDirNode::SPtr DirNode;
+
+            if(!pStream->read_meas_info(pStream->dirtree(), FifInfo, DirNode)) {
+                qCritical() << "Unable to parse neuromag fiff data. Plugin behavior undefined";
+                FIFFLIB::FiffInfo defaultInfo;
+                return defaultInfo;
+            }
+
+            return FifInfo;
+
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
+//            i_IntToChar = -1;
+//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
+//            neuromagBuffer.write(c_Char);
 
 //                QFile outfile("mytestoutput.txt");
 
@@ -633,15 +643,10 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
 //                    neuromagBuffer.reset();
 //                    outfile.write(neuromagBuffer.read(neuromagBuffer.size()));
 //                }
-
-            m_pNeuromagData = QSharedPointer<FIFFLIB::FiffRawData>(new FIFFLIB::FiffRawData(neuromagBuffer, true));
-
-            condition = false;
         }
 
     }
 
-    return m_pNeuromagData->info;
 
 //    QFile outfile("mytestoutput.txt");
 

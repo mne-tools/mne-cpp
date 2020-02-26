@@ -378,7 +378,7 @@ bool FtBuffer::setupRTMSA()
         m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
         m_pRTMSA_BufferOutput->data()->setVisibility(true);
 
-        qInfo() << "[FtBuffer::setupRTMSA] Done.";
+        qInfo() << "[FtBuffer::setupRTMSA] Successfully acquired fif info from file.";
         return true;
     }
     return false;
@@ -388,6 +388,11 @@ bool FtBuffer::setupRTMSA()
 
 bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
 {
+    //Check for FiffInfo that has not changed its default values and return early
+    if (FiffInfo.sfreq < 0) {
+        return false;
+    }
+
     m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo (FiffInfo));
 
     m_bCustomFiff = true;
@@ -397,7 +402,7 @@ bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
     m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
     m_pRTMSA_BufferOutput->data()->setVisibility(true);
 
-    qInfo() << "[FtBuffer::setupRTMSA] Done.";
+    qInfo() << "[FtBuffer::setupRTMSA] Successfully aquired fif info from buffer.";
     return true;
 }
 
