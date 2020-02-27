@@ -106,6 +106,14 @@ FiffSimulator::~FiffSimulator()
 
 //=============================================================================================================
 
+QList<QPointer<QWidget> > FiffSimulator::getControlWidgets()
+{
+    // Return empty list since we do not have any control parameters for the FissSimulator during the ongoing measurement.
+    return QList<QPointer<QWidget> >();
+}
+
+//=============================================================================================================
+
 void FiffSimulator::clear()
 {
     QMutexLocker locker(&m_qMutex);
