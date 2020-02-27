@@ -40,12 +40,6 @@ jobs:
         version: ${{ matrix.qt }}
         arch: win64_msvc2017_64
         modules: qtcharts
-    - name: Add msbuild to PATH
-      if: matrix.os == 'windows-2016'
-    # doesnt work with windows-2016
-    # uses: microsoft/setup-msbuild@v1.0.0
-      run: |
-        echo "::add-path::C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin\"
     - name: Install jom (Windows)
       if: matrix.os == 'windows-2016'
       run: |
