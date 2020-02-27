@@ -232,6 +232,17 @@ protected:
      */
     void update3DView();
 
+    //=========================================================================================================
+    /**
+     * Computes the transformation matrix between two sets of 3D points.
+     *
+     * @param[in] NH     The first set of input 3D points (row-wise order).
+     * @param[in] BT     The second set of input 3D points (row-wise order).
+     *
+     * @return Returns the transformation matrix.
+     */
+    static Eigen::Matrix4f computeTransformation(Eigen::MatrixXf NH, Eigen::MatrixXf BT);
+
 //    //=========================================================================================================
 //    /**
 //    * Align the MEG fiducials to the MRI fiducials.
@@ -263,6 +274,7 @@ protected:
 
     QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadKid;          /**< The BEM head model for a kid. */
     QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadAdult;        /**< The BEM head model for an adult. */
+    QPointer<DISP3DLIB::BemTreeItem>            m_pBemHeadAvr;          /**< TThe fsaverage BEM head model. */
 
     QPointer<DISP3DLIB::DigitizerSetTreeItem>   m_pTrackedDigitizer;    /**< The 3D item pointing to the tracked digitizers. */
 
