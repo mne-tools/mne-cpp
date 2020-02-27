@@ -567,8 +567,10 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
             std::memcpy(&iSize, cSize, sizeof(qint32));
 
             //read rest of chunk (to clear buffer to read next chunk)
-            char cRest[iSize];
+            char* cRest;
+            cRest = new char[sizeof(char) * iSize + 1];
             chunkBuffer.read(cRest, iSize);
+            delete cRest;
         } else if(iType == 8) { // Header we care about, FT_CHUNK_NEUROMAG_HEADER = 8
             qint32 iSize;
             char cSize[sizeof(qint32)];
