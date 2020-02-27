@@ -106,7 +106,7 @@ void PluginManager::loadPlugins(const QString& dir)
     lObjects << new NEUROMAGPLUGIN::Neuromag;
     lObjects << new BABYMEGPLUGIN::BabyMEG;
     lObjects << new NATUSPLUGIN::Natus;
-    //lObjects << new FTBUFFERPLUGIN::FtBuffer;
+    lObjects << new FTBUFFERPLUGIN::FtBuffer;
     //lObjects << new GUSBAMPPLUGIN::GUSBAmp;
     //lObjects << new EEGOSPORTSPLUGIN::EEGoSports;
     //lObjects << new BRAINAMPPLUGIN::BrainAMP;
