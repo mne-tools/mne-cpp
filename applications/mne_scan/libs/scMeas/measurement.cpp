@@ -51,7 +51,8 @@ using namespace SCMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Measurement::Measurement(int type, QObject *parent)
+Measurement::Measurement(int type,
+                         QObject *parent)
 : QObject(parent)
 , m_iMetaTypeId(type)
 , m_bVisibility(true)

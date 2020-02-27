@@ -151,6 +151,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns a list containing the control widgets for this plugin. The control widgets can be used to change
+     * parameters in the plugin scope during the ongoing measurement. Please note that the plugin does not has
+     * ownership of the QWidgets.
+     *
+     * @return A list containting the plugin's control widgets
+     */
+    virtual QList<QPointer<QWidget> > getControlWidgets() = 0;
+
+    //=========================================================================================================
+    /**
      * Returns the plugin type.
      * Pure virtual method.
      *
