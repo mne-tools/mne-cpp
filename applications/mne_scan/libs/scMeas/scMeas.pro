@@ -73,7 +73,6 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     realtimesourceestimate.cpp \
     realtimeconnectivityestimate.cpp \
-    realtimesamplearray.cpp \
     realtimemultisamplearray.cpp \
     realtimesamplearraychinfo.cpp \
     numeric.cpp \
@@ -87,7 +86,6 @@ HEADERS += \
     scmeas_global.h \
     realtimesourceestimate.h \
     realtimeconnectivityestimate.h \
-    realtimesamplearray.h \
     realtimemultisamplearray.h \
     realtimesamplearraychinfo.h \
     numeric.h \

@@ -39,7 +39,6 @@
 
 #include "displaymanager.h"
 
-#include <scDisp/realtimesamplearraywidget.h>
 #include <scDisp/realtimemultisamplearraywidget.h>
 #include <scDisp/realtimesourceestimatewidget.h>
 #include <scDisp/realtimeconnectivityestimatewidget.h>
@@ -47,7 +46,6 @@
 #include <scDisp/realtimecovwidget.h>
 #include <scDisp/realtimespectrumwidget.h>
 
-#include <scMeas/realtimesamplearray.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
@@ -102,21 +100,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
     foreach (QSharedPointer< PluginOutputConnector > pPluginOutputConnector, outputConnectorList)
     {
-        if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSampleArray> >())
-        {
-            QSharedPointer<RealTimeSampleArray>* pRealTimeSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSampleArray> >()->data();
-            RealTimeSampleArrayWidget* rtsaWidget = new RealTimeSampleArrayWidget(*pRealTimeSampleArray, pT, newDisp);
-
-            qListActions.append(rtsaWidget->getDisplayActions());
-            qListWidgets.append(rtsaWidget->getDisplayWidgets());
-
-            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtsaWidget, &RealTimeSampleArrayWidget::update, Qt::BlockingQueuedConnection);
-
-            vboxLayout->addWidget(rtsaWidget);
-            rtsaWidget->init();
-        }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >())
+        if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >())
         {
             RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(pT, newDisp);
 
