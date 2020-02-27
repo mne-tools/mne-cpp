@@ -369,6 +369,7 @@ private:
 
     Eigen::MatrixXd*                        m_pMatEmit;                             /**< Container to format data to tansmit to FtBuffProducer */
 };
+
 }//namespace end bracket
 
 #endif // FTCONNECTOR_H
