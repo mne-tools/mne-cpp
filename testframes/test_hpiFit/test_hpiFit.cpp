@@ -111,7 +111,8 @@ TestFitHPI::TestFitHPI()
 
 //=============================================================================================================
 
-void write_pos(const float time, const int index, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::MatrixXd& position){
+void write_pos(const float time, const int index, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::MatrixXd& position)
+{
     // Write quaternions and time in position matrix. Format is the same as in maxfilter .pos files, but we only write quaternions and time. So column 7,8,9 are not used
     QMatrix3x3 rot;
 
@@ -143,7 +144,7 @@ void TestFitHPI::initTestCase()
     QFileInfo t_fileInInfo(t_fileIn);
     QDir().mkdir(t_fileInInfo.path());
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read and HPI fit  >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read Raw and HPI fit  >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     // Setup for reading the raw data
     FiffRawData raw;
@@ -174,7 +175,7 @@ void TestFitHPI::initTestCase()
     FiffDigPointSet fittedPointSet;
     Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
-    bool bDoDebug = false;
+    bool bDoDebug = true;
 
     for(int i = 0; i < ref_pos.rows(); i++) {
         from = first + ref_pos(i,0)*pFiffInfo->sfreq;
