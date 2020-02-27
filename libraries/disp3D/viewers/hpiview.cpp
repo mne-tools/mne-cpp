@@ -60,6 +60,8 @@
 #include <mne/c/mne_surface_or_volume.h>
 #include <mne/mne_bem.h>
 
+#include <utils/sphere.h>
+
 #include <disp/viewers/control3dview.h>
 
 //=============================================================================================================
@@ -89,6 +91,7 @@ using namespace DISPLIB;
 using namespace MNELIB;
 using namespace RTPROCESSINGLIB;
 using namespace INVERSELIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 //*************************************************************************************************************
@@ -397,8 +400,6 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
 
     Eigen::MatrixXf sLm(3,3);
     Eigen::MatrixXf dLm(3,3);
-//    QFile t_fileSample(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    FiffDigPointSet t_digAvr(t_fileSample);
 
     for(int i = 0; i < t_digAvr.size(); i++){
         if(t_digAvr[i].kind == FIFFV_POINT_CARDINAL/* || t_digAvr[i].kind ==  FIFFV_POINT_HPI*/){
@@ -415,11 +416,30 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
             dLm(i,2) = t_digSet[i].r[2];
         }
     }
+
     qDebug() << "sLm";
     std::cout << sLm << std::endl;
     qDebug() << "dLm";
     std::cout << dLm << std::endl;
 
+    // compute scaling
+    float simplex_size = 2e-2;
+    float sR;
+    float dR;
+    VectorXf sr0(3);
+    VectorXf dr0(3);
+    qDebug() << "a";
+    Sphere::fit_sphere_to_points(sLm,simplex_size,sr0,sR);
+    Sphere::fit_sphere_to_points(dLm,simplex_size,dr0,dR);
+    qDebug("Tracked : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*dr0[0],1000*dr0[1],1000*dr0[2],1000*dR);
+    qDebug("Average : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*sr0[0],1000*sr0[1],1000*sr0[2],1000*sR);
+    float scale = dR/sR;
+    qDebug() << "Scale: " << scale;
+
+    // apply scaling
+    sLm *= scale;
+
+    // compute transformation
     Matrix4f trans = computeTransformation(dLm, sLm);
     qDebug() << "trans";
     std::cout << trans << std::endl;
@@ -443,7 +463,6 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
 
 //    qDebug() << "vScale: " ;
 //    std::cout << vScale << std::endl;
-//    qDebug() << "Scale: " << scale;
 
     Qt3DCore::QTransform transform;
     QMatrix4x4 mat;
@@ -456,6 +475,14 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
 
     pDigItem->setTransform(transform);
 
+    for(int i = 0; i < t_digAvr.size(); i++){
+        if(t_digAvr[i].kind == FIFFV_POINT_CARDINAL/* || t_digAvr[i].kind ==  FIFFV_POINT_HPI*/){
+        sLm(i,0) = t_digAvr[i].r[0];
+        sLm(i,1) = t_digAvr[i].r[1];
+        sLm(i,2) = t_digAvr[i].r[2];
+        }
+    }
+
     //Update Average head surface
     QList<QStandardItem*> itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
     for(int j = 0; j < itemList.size(); ++j) {
@@ -463,7 +490,7 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
             //If it is the kid's model scale it
             pBemItem->setTransform(transAvr);
             pBemItem->setTransform(transform);
-            //pBemItem->setScale(scale);
+            pBemItem->setScale(scale);
         }
     }
 
