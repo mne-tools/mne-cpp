@@ -73,7 +73,8 @@ public:
      * @param[in] type       the QMetaType id of the Measurement.
      * @param[in] parent     the parent object
      */
-    explicit Measurement(int type = QMetaType::UnknownType, QObject *parent = 0);
+    explicit Measurement(int type = QMetaType::UnknownType,
+                         QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -121,23 +122,6 @@ public:
      */
     inline int type() const;
 
-    //=========================================================================================================
-    /**
-     * Add a control widget to this measurement. Use this in order to obtain a connection of GUI elements between
-     * MNE Scan plugins and the corresponding real-time visualization widget.
-     *
-     * @param pWidget    The control widget, which should be added to the corresponding real-time visualization
-     */
-    inline void addControlWidget(QSharedPointer<QWidget> pWidget);
-
-    //=========================================================================================================
-    /**
-     * Returns a list containing the control widgets, which should be added to the corresponding real-time visualization.
-     *
-     * @return A list containting the control widgets
-     */
-    inline QList<QSharedPointer<QWidget> > getControlWidgets();
-
 signals:
     void notify();
 
@@ -155,7 +139,6 @@ private:
     int                                 m_iMetaTypeId;      /**< QMetaType id of the Measurement */
     QString                             m_qString_Name;     /**< Name of the Measurement */
     bool                                m_bVisibility;      /**< Visibility status */
-    QList<QSharedPointer<QWidget> >     m_lControlWidgets;  /**< The control widgets, which should be added to the corresponding real-time visualization. */
 };
 
 //=============================================================================================================
@@ -208,21 +191,6 @@ inline int Measurement::type() const
     return m_iMetaTypeId;
 }
 
-//=============================================================================================================
-
-inline void Measurement::addControlWidget(QSharedPointer<QWidget> pWidget)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_lControlWidgets << pWidget;
-}
-
-//=============================================================================================================
-
-inline QList<QSharedPointer<QWidget> > Measurement::getControlWidgets()
-{
-    QMutexLocker locker(&m_qMutex);
-    return m_lControlWidgets;
-}
 } //NAMESPACE
 
 Q_DECLARE_METATYPE(SCMEASLIB::Measurement::SPtr)
