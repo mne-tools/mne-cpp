@@ -89,7 +89,6 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     measurementwidget.cpp \
     realtimemultisamplearraywidget.cpp \
-    realtimesamplearraywidget.cpp \
     realtimeevokedsetwidget.cpp \
     realtimecovwidget.cpp \
     realtimespectrumwidget.cpp \
@@ -100,7 +99,6 @@ HEADERS += \
     scdisp_global.h \
     measurementwidget.h \
     realtimemultisamplearraywidget.h \
-    realtimesamplearraywidget.h \
     realtimeevokedsetwidget.h \
     realtimecovwidget.h \
     realtimespectrumwidget.h \
@@ -108,7 +106,6 @@ HEADERS += \
     realtimeconnectivityestimatewidget.h \
 
 FORMS += \
-    formfiles/realtimesamplearraywidget.ui \
 
 RESOURCES += \
     scDisp.qrc

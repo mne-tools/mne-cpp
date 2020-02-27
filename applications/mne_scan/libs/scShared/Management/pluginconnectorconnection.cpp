@@ -41,7 +41,6 @@
 #include "pluginconnectorconnectionwidget.h"
 
 #include <scMeas/numeric.h>
-#include <scMeas/realtimesamplearray.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimecov.h>
@@ -101,17 +100,6 @@ bool PluginConnectorConnection::createConnection()
         {
             //ToDo make this auto connection more fancy
             // < --- Type Check --- >
-
-            //Cast to RealTimeSampleArray
-            QSharedPointer< PluginOutputData<RealTimeSampleArray> > senderRTSA = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeSampleArray> >();
-            QSharedPointer< PluginInputData<RealTimeSampleArray> > receiverRTSA = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeSampleArray> >();
-            if(senderRTSA && receiverRTSA)
-            {
-                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(), m_pReceiver->getInputConnectors()[j]->getName()), connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
-                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
-                bConnected = true;
-                break;
-            }
 
             //Cast to RealTimeMultiSampleArray
             QSharedPointer< PluginOutputData<RealTimeMultiSampleArray> > senderRTMSA = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >();
@@ -175,10 +163,10 @@ bool PluginConnectorConnection::createConnection()
 
 ConnectorDataType PluginConnectorConnection::getDataType(QSharedPointer<PluginConnector> pPluginConnector)
 {
-    QSharedPointer< PluginOutputData<SCMEASLIB::RealTimeSampleArray> > RTSA_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::RealTimeSampleArray> >();
-    QSharedPointer< PluginInputData<SCMEASLIB::RealTimeSampleArray> > RTSA_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeSampleArray> >();
-    if(RTSA_Out || RTSA_In)
-        return ConnectorDataType::_RTSA;
+    QSharedPointer< PluginOutputData<SCMEASLIB::RealTimeEvokedSet> > RTES_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::RealTimeEvokedSet> >();
+    QSharedPointer< PluginInputData<SCMEASLIB::RealTimeEvokedSet> > RTES_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeEvokedSet> >();
+    if(RTES_Out || RTES_In)
+        return ConnectorDataType::_RTES;
 
     QSharedPointer< PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > RTMSA_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >();
     QSharedPointer< PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> > RTMSA_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >();

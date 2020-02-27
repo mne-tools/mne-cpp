@@ -155,8 +155,8 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
                                                                    Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
                                                                    this);
 
-    this->addControlWidgets(m_pQuickControlView,
-                            m_pRTESet->getControlWidgets());
+//    this->addControlWidgets(m_pQuickControlView,
+//                            m_pRTESet->getControlWidgets());
 
     //set layouts
     this->setLayout(m_pRTESetLayout);

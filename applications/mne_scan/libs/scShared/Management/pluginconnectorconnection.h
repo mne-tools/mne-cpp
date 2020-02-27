@@ -68,8 +68,7 @@ enum ConnectorDataType
 {
     _N,         /**< Numeric */
     _RTMSA,     /**< Real-Time Multi Sample Array */
-    _RTSA,      /**< Real-Time Sample Array */
-    _RTE,       /**< Real-Time Evoked */
+    _RTES,      /**< Real-Time Evoked Set */
     _RTC,       /**< Real-Time Covariance */
     _RTSE,      /**< Real-Time Source Estimate */
     _None,      /**< None */

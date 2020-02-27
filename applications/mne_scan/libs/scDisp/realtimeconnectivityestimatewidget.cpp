@@ -89,8 +89,8 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
     addDisplayAction(m_pActionQuickControl);
     m_pActionQuickControl->setVisible(true);
 
-    QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTCE->getControlWidgets();
-    m_pAbstractView->setQuickControlWidgets(lControlWidgets);
+    //QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTCE->getControlWidgets();
+    //m_pAbstractView->setQuickControlWidgets(lControlWidgets);
 
     m_pQuickControlView = m_pAbstractView->getQuickControl();
     m_pQuickControlView->setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
