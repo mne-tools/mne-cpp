@@ -157,10 +157,7 @@ int main(int argc, char *argv[])
 
     // create time vector that specifies when to fit
     int N = ceil((last-first)/quantum);
-    RowVectorXf time(N);
-    for(int i = 0; i < N; i++){
-        time(i) = i * dT_sec;
-    }
+    RowVectorXf time = RowVectorXf::LinSpaced(N, 0, N-1) * dT_sec;
 
     // To fit at specific times outcommend the following block
 //    // Read Quaternion File
