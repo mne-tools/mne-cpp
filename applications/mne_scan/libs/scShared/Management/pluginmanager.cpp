@@ -49,7 +49,7 @@
 #include <../plugins/neuromag/neuromag.h>
 #include <../plugins/babymeg/babymeg.h>
 #include <../plugins/natus/natus.h>
-//#include <../plugins/ftbuffer/ftbuffer.h>
+#include <../plugins/ftbuffer/ftbuffer.h>
 //#include <../plugins/gusbamp/gusbamp.h>
 //#include <../plugins/eegosports/eegosports.h>
 //#include <../plugins/brainamp/brainamp.h>

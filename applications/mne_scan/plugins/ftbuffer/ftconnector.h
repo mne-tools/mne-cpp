@@ -356,13 +356,13 @@ private:
     int                                     m_iNumChannels;                         /**< Number of channels in the buffer data */
     int                                     m_iDataType;                            /**< Type of data in the buffer */
     int                                     m_iNeuromagHeader;                      /**< Size of neuromag header chunk */
-    int                                     m_iPort             = 1972;             /**< Port where the ft bufferis found */
+    int                                     m_iPort;                                /**< Port where the ft bufferis found */
 
     bool                                    m_bNewData;                             /**< Indicate whether we've received new data */
 
     float                                   m_fSampleFreq;                          /**< Sampling frequency of data in the buffer */
 
-    QString                                 m_sAddress          = "127.0.0.1";      /**< Address where the ft buffer is found */
+    QString                                 m_sAddress;                             /**< Address where the ft buffer is found */
 
     QTcpSocket*                             m_pSocket;                              /**< Socket that manages the connection to the ft buffer */
 
