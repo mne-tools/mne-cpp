@@ -2,14 +2,12 @@
 /**
 * @file     ftbuffersetupwidget.h
 * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
+* @version  dev
 * @date     Janurary, 2020
 *
 * @section  LICENSE
 *
-* Copyright (C) 2020, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2020, Gabriel B Motta. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,14 +28,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the declaration of the FtBufferSetupWidget class.
 *
 */
 
 #ifndef FTBUFFERSETUPWIDGET_H
 #define FTBUFFERSETUPWIDGET_H
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -48,14 +45,12 @@
 #include "../ftbuffproducer.h"
 #include "../ftconnector.h"
 
-//*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
 
-//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE FtBufferPlugin
 //=============================================================================================================
@@ -63,7 +58,6 @@
 namespace FTBUFFERPLUGIN
 {
 
-//*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -74,10 +68,10 @@ class FtConnector;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FtBufferSetupWidget
-*
-* @brief The FtBufferSetupWidget class provides the FtBuffer configuration window.
-*/
+ * DECLARE CLASS FtBufferSetupWidget
+ *
+ * @brief The FtBufferSetupWidget class provides the FtBuffer configuration window.
+ */
 class FtBufferSetupWidget : public QWidget
 {
     Q_OBJECT
@@ -86,41 +80,48 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FtBufferSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding FtBuffer.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FtBufferSetupWidget becomes a window. If parent is another widget, FtBufferSetupWidget becomes a child window inside parent. FtBufferSetupWidget is deleted when its parent is deleted.
-    */
+     * Constructs a FtBufferSetupWidget which is a child of parent.
+     *
+     * @param [in] toolbox  a pointer to the corresponding FtBuffer.
+     * @param [in] parent   pointer to parent widget; If parent is 0, the new FtBufferSetupWidget becomes a window. If parent is another widget, FtBufferSetupWidget becomes a child window inside parent. FtBufferSetupWidget is deleted when its parent is deleted.
+     */
     FtBufferSetupWidget(FtBuffer* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FtBufferSetupWidget.
-    * All FtBufferSetupWidget's children are deleted first. The application exits if FtBufferSetupWidget is the main widget.
-    */
+     * Destroys the FtBufferSetupWidget.
+     * All FtBufferSetupWidget's children are deleted first. The application exits if FtBufferSetupWidget is the main widget.
+     */
     ~FtBufferSetupWidget();
 
 private slots:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
-    */
+     * Shows the About Dialog
+     */
     void showAboutDialog();
 
     //=========================================================================================================
     /**
-    * Connects buffer client to address currently stored in client, or disconnects if already connected.
-    * Also changes button text to indicate whether clicking it will connect of disocnnect client.
-    * To-do: add change address.
-    * @brief attempts to connect/disconnect member buffer client to buffer
-    */
+     * Attempts to connect to and receive fiff data from buffer. As a backup tried to read from local file.
+     */
     void pressedConnect();
 
+    /**
+     * Updates window depending on whether connection was successful
+     *
+     * @param[in] stat  Whether connection and retrieval of fiff data was successful
+     */
     void isConnected(bool stat);
 
 signals:
 
+    /**
+     * Sends a singal with the cooresponding port and address information
+     *
+     * @param[in] Addr  An IP address where a buffer is hosted
+     * @param[in] port  The port where the buffer is hosted
+     */
     void connectAtAddr(QString Addr,
                        int port);
 
