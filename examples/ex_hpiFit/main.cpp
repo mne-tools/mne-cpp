@@ -98,7 +98,7 @@ void write_pos(const float time, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::
         }
     }    
 
-    double error = std::accumulate(vGoF.begin(), vGoF.end(), .0) / vGoF.size();
+    // double error = std::accumulate(vGoF.begin(), vGoF.end(), .0) / vGoF.size();
     QQuaternion quatHPI = QQuaternion::fromRotationMatrix(rot);
 
     //qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z " << std::endl;
@@ -112,8 +112,8 @@ void write_pos(const float time, QSharedPointer<FIFFLIB::FiffInfo> info, Eigen::
     position(position.rows()-1,4) = info->dev_head_t.trans(0,3);
     position(position.rows()-1,5) = info->dev_head_t.trans(1,3);
     position(position.rows()-1,6) = info->dev_head_t.trans(2,3);
-    position(position.rows()-1,7) = 1-error;
-    position(position.rows()-1,8) = error;
+    position(position.rows()-1,7) = 0;
+    position(position.rows()-1,8) = 0;
     position(position.rows()-1,9) = 0;
 }
 
