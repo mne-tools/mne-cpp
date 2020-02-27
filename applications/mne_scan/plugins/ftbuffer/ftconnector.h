@@ -152,19 +152,19 @@ class FtConnector : public QObject
 public:
     //=========================================================================================================
     /**
-     * @brief FtConnector constructs an object of the FtConnector class. Only initializes variables to zero.
+     * FtConnector constructs an object of the FtConnector class. Only initializes variables to zero.
      */
     FtConnector();
 
     //=========================================================================================================
     /**
-     * @brief ~FtConnector destroys and object of the FtConnector class. Disconnects and deletes m_pSocket.
+     * ~FtConnector destroys and object of the FtConnector class. Disconnects and deletes m_pSocket.
      */
     ~FtConnector();
 
     //=========================================================================================================
     /**
-     * @brief Connects to buffer at address m_sAddress and port m_iPort
+     * Connects to buffer at address m_sAddress and port m_iPort
      *
      * @return true if successful, false if unsuccessful
      */
@@ -172,7 +172,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Disconnects m_pSocket
+     * Disconnects m_pSocket
      *
      * @return true if successful, false if unsuccessful
      */
@@ -180,7 +180,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Requests and receives header data from buffer, saves relevant parameters internally.
+     * Requests and receives header data from buffer, saves relevant parameters internally.
      *
      * @return true if successful, false if unsuccessful
      */
@@ -188,7 +188,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Requests and receives data from buffer, parses it, and stores it in m_pMatEmit
+     * equests and receives data from buffer, parses it, and stores it in m_pMatEmit
      *
      * @return true if successful, false if unsuccessful
      */
@@ -196,7 +196,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Gets address currently stored in private member m_sAddress
+     * Gets address currently stored in private member m_sAddress
      *
      * @return returns m_sAddress
      */
@@ -204,9 +204,9 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Sets private member m_sAddress to a new address
+     * Sets private member m_sAddress to a new address
      *
-     * @param sNewAddress - a QString with an address (not checked to se if valid)
+     * @param[in] sNewAddress   A QString with an address (not checked to se if valid)
      *
      * @return true if successful, false if unsuccessful
      */
@@ -214,7 +214,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Gets port numbr currently stored in private member m_iPort
+     * Gets port numbr currently stored in private member m_iPort
      *
      * @return returns m_iPort
      */
@@ -222,9 +222,9 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Sets private member m_iPort to a new port number
+     * Sets private member m_iPort to a new port number
      *
-     * @param iPort - an int with a new desired port number
+     * @param[in] iPort     An int with a new desired port number
      *
      * @return true if successful, false if unsuccessful
      */
@@ -232,13 +232,13 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Prints relevant class data to terminal. Useful for debugging.
+     * Prints relevant class data to terminal. Useful for debugging.
      */
     void echoStatus();
 
     //=========================================================================================================
     /**
-     * @brief Returns member m_pMatEmit, newest buffer data formatted as an Eigen MatrixXd
+     * Returns member m_pMatEmit, newest buffer data formatted as an Eigen MatrixXd
      *
      * @return returns m_pMatEmit
      */
@@ -246,21 +246,22 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Returns m_bNewData, whether or not new data has been read from buffer
+     * Returns whether or not new data has been read from buffer
      *
-     * @return returns m_bNewData
+     * @return returns m_bNewData, flag of whether there is new data
      */
     bool newData();
 
     //=========================================================================================================
     /**
-     * @brief Sets m_bNewData to false, deletes m_pMatEmit
+     * Sets m_bNewData to false, deletes m_pMatEmit
      */
     void resetEmitData();
 
     //=========================================================================================================
     /**
-     * @brief Parses the extended header chunk with neuromag data and gets the relevant fiff info
+     * Parses the extended header chunk with neuromag data and gets the relevant fiff info
+     *
      * @return returns the FiffInfo from the parsed fif file from the neuromag header chunk
      */
     FIFFLIB::FiffInfo parseNeuromagHeader();
@@ -268,33 +269,33 @@ public:
 private:
     //=========================================================================================================
     /**
-     * @brief Sends a formated message to the buffer. command and bufsize must be set before calling.
+     * Sends a formated message to the buffer. command and bufsize must be set before calling.
      *
-     * @param messagedef - request structure with the appropriate command and bufszie paramters set.
+     * @param[in] messagedef    request structure with the appropriate command and bufszie paramters set.
      */
     void sendRequest(messagedef_t &messagedef);
 
     //=========================================================================================================
     /**
-     * @brief Sends a formated datasel message, for defining the first and last sample we are requesting from the buffer
+     * Sends a formated datasel message, for defining the first and last sample we are requesting from the buffer
      *
-     * @param datasel - formattd first and last sample index we are requesting from the buffer
+     * @param[in] datasel   Formattd first and last sample index we are requesting from the buffer
      */
     void sendDataSel(datasel_t &datasel);
 
     //=========================================================================================================
     /**
-     * @brief Sends a formated sampleevents message, used for receving updated sample an event numbers from buffer
+     * Sends a formated sampleevents message, used for receving updated sample an event numbers from buffer
      *
-     * @param threshold - buffer will respond once sample/event numbers reach the thresholds
+     * @param[in] threshold     Buffer will respond once sample/event numbers reach the thresholds
      */
     void sendSampleEvents(samples_events_t &threshold);
 
     //=========================================================================================================
     /**
-     * @brief Parses headerdef message and saves parameters(channels, frequency, datatype, newsamples)
+     * Parses headerdef message and saves parameters(channels, frequency, datatype, newsamples)
      *
-     * @param readBuffer - QBuffer with return headerdef_t data from buffer
+     * @param[in] readBuffer    QBuffer with return headerdef_t data from buffer
      *
      * @return true if successful, false if unsuccessful
      */
@@ -302,9 +303,9 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief Parses messadef and returns bufsize
+     * Parses messadef and returns bufsize
      *
-     * @param readBuffer - QBuffer with return messagedef_t data from buffer
+     * @param[in] readBuffer    QBuffer with return messagedef_t data from buffer
      *
      * @return returns messagedef_t.bufsize
      */
@@ -312,9 +313,9 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief Parses datadef and returns bufsize
+     * Parses datadef and returns bufsize
      *
-     * @param dataBuffer - QBuffer with return datadef_t data from buffer
+     * @param[in] dataBuffer    QBuffer with return datadef_t data from buffer
      *
      * @return returns datadef_t.bufsize
      */
@@ -322,10 +323,10 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief Parses sample data received from buffer, formates it and saves it to m_pMatEmit;
+     * Parses sample data received from buffer, formates it and saves it to m_pMatEmit;
      *
-     * @param datasampBuffer - QBuffer with return data from buffer
-     * @param bufsize - bufsize of sample data
+     * @param[in] datasampBuffer    QBuffer with return data from buffer
+     * @param[in] bufsize           Buffer size of sample data
      *
      * @return true if successful, false if unsuccessful
      */
@@ -336,15 +337,15 @@ private:
     /**
      * @brief Opens Buffer, reads numBytes from socket and sets index to zero
      *
-     * @param buffer - QBuffer to which daa will be written
-     * @param numBytes - how many bytes to read from socket
+     * @param[out] buffer       QBuffer to which daa will be written
+     * @param[in] numBytes      How many bytes to read from socket
      */
     void prepBuffer(QBuffer &buffer,
                     int numBytes);
 
     //=========================================================================================================
     /**
-     * @brief Returns total amount of samples written to buffer
+     * Returns total amount of samples written to buffer
      *
      * @return returns total amount of samples written to buffer
      */

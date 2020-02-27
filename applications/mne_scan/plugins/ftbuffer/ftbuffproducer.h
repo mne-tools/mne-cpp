@@ -1,15 +1,14 @@
+//=============================================================================================================
 /**
 * @file     ftbuffproducer.h
 * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
 *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
+* @version  dev
 * @date     January, 2020
 *
 * @section  LICENSE
 *
-* Copyright (C) 2020, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2020, Gabriel B Motta and Lorenz Esch. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -90,58 +89,61 @@ class FtBuffProducer : public QObject
 public:
     //=========================================================================================================
     /**
-    * @brief Creates instance of FtBuffProducer that holds a poiter to an instance of FtBuffer
-    */
+     * Creates instance of FtBuffProducer that holds a poiter to an instance of FtBuffer
+     */
     FtBuffProducer(FtBuffer* pFtBuffer);
 
     //=========================================================================================================
     /**
-    * @brief Destroys an instance of FtBuffProducer
-    */
+     * Destroys an instance of FtBuffProducer
+     */
     ~FtBuffProducer();
 
     //=========================================================================================================
     /**
-    * @brief disconnects the member FtConnector from the buffer it is connected to
-    */
+     * Disconnects the member FtConnector from the buffer it is connected to
+     */
     bool disconnectFromBuffer();
 
 public slots:
     //=========================================================================================================
     /**
-    * @brief doWork - runs run()
-    */
+     * Runs the producer calss run() function
+     */
     void doWork();
 
     //=========================================================================================================
     /**
-    * Changes stored address and connects the member FtConnector to that address
-    *
-    * @brief connects buffer client to provided address
-    */
+     * Connects to the buffer at a given address. Tries to setup buffer output
+     *
+     * @param[in] addr  IP address where the buffer is hosted
+     * @param[in] port  Port where the buffer is hosted
+     */
     void connectToBuffer(QString addr,
                          int port);
 
 protected:
     //=========================================================================================================
     /**
-    * @brief loops continuously to aquire new data from FtConnector and send to FtBuffer
-    */
+     * Loops continuously to aquire new data from FtConnector and send to FtBuffer
+     */
     virtual void run();
 
 signals:
 
     //=========================================================================================================
     /**
-    * @brief newDataAvailable - Sends new buffer data
-    * @param matData - formated data from buffer
-    */
+     * Sends new buffer data formatted as an Eigen Matrix
+     *
+     * @param[in] matData   Formated data from buffer
+     */
     void newDataAvailable(const Eigen::MatrixXd &matData);
 
     //=========================================================================================================
     /**
-     * @brief connecStatus - returs whether connection parameters have been set.
-     * @param connection - wheterher connection parameters have been set
+     * Sends whether connection parameters have been set.
+     *
+     * @param[in] connection    Wheterher connection parameters have been set
      */
     void connecStatus(bool connection);
 
