@@ -1,5 +1,5 @@
 ---
-title: MNE-SCAN FieldTrip Buffer Plugin
+title: MNE-SCAN FieldTrip Buffer
 parent: Develop
 nav_order: 7
 ---
