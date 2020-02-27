@@ -104,8 +104,6 @@ void ApplicationLogger::customLogWriter(QtMsgType type,
         // Enable colored output for
         // Set output mode to handle virtual terminal sequences
         HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-        DWORD dwMode = 0;
-        dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     #endif
 
     switch (type) {
