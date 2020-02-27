@@ -34,21 +34,18 @@
  *
  */
 
-
 #ifndef FTCONNECTOR_H
 #define FTCONNECTOR_H
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include <cstring>
 
-#include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_tag.h>
+#include <fiff/fiff_raw_data.h>
 
-//*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -62,14 +59,12 @@
 #include <QThread>
 #include <QFile>
 
-//*************************************************************************************************************
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
 
-//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE FTBUFFERPLUGIN
 //=============================================================================================================
@@ -77,9 +72,8 @@
 namespace FTBUFFERPLUGIN
 {
 
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINITIONS
+// DEFINITION MACROS
 //=============================================================================================================
 
 #define VERSION    (qint16)0x0001
@@ -104,9 +98,8 @@ namespace FTBUFFERPLUGIN
 #define PUT_DAT_NORESPONSE (qint16)0x0502 /* decimal 1282 */
 #define PUT_EVT_NORESPONSE (qint16)0x0503 /* decimal 1283 */
 
-//*************************************************************************************************************
 //=============================================================================================================
-// FIELDTRIP MESSAGE STRUCTS
+// STRUCT DEFINITIONS
 //=============================================================================================================
 
 typedef struct {
@@ -146,7 +139,7 @@ typedef struct {
     qint32 nevents;
 } samples_events_t;
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 class FtConnector : public QObject
 {
@@ -157,21 +150,21 @@ class FtConnector : public QObject
     friend class FtBuffProducer;
 
 public:
-
+    //=========================================================================================================
     /**
-     * @brief FtConnector - constructor of the FtConnector class. Only initializes variables to zero.
+     * @brief FtConnector constructs an object of the FtConnector class. Only initializes variables to zero.
      */
     FtConnector();
 
     //=========================================================================================================
     /**
-     * @brief ~FtConnector - desctructor of the FtConnector class. Disconnects and deletes m_pSocket.
+     * @brief ~FtConnector destroys and object of the FtConnector class. Disconnects and deletes m_pSocket.
      */
     ~FtConnector();
 
     //=========================================================================================================
     /**
-     * @brief connect - connects to buffer at address m_sAddress and port m_iPort
+     * @brief Connects to buffer at address m_sAddress and port m_iPort
      *
      * @return true if successful, false if unsuccessful
      */
@@ -179,7 +172,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief disconnect - disconnects m_pSocket
+     * @brief Disconnects m_pSocket
      *
      * @return true if successful, false if unsuccessful
      */
@@ -187,7 +180,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief getHeader - requests and receives header data from buffer, saves relevant parameters internally.
+     * @brief Requests and receives header data from buffer, saves relevant parameters internally.
      *
      * @return true if successful, false if unsuccessful
      */
@@ -195,7 +188,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief getData - requests and receives data from buffer, parses it, and stores it in m_pMatEmit
+     * @brief Requests and receives data from buffer, parses it, and stores it in m_pMatEmit
      *
      * @return true if successful, false if unsuccessful
      */
@@ -203,7 +196,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief getAddr - gets address currently stored in m_sAddress
+     * @brief Gets address currently stored in private member m_sAddress
      *
      * @return returns m_sAddress
      */
@@ -211,7 +204,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief setAddr - sets m_sAddress to a new address
+     * @brief Sets private member m_sAddress to a new address
      *
      * @param sNewAddress - a QString with an address (not checked to se if valid)
      *
@@ -221,7 +214,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief getPort - gets port numbr currently stored in m_iPort
+     * @brief Gets port numbr currently stored in private member m_iPort
      *
      * @return returns m_iPort
      */
@@ -229,7 +222,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief setPort - sets m_iPort to a new port number
+     * @brief Sets private member m_iPort to a new port number
      *
      * @param iPort - an int with a new desired port number
      *
@@ -239,13 +232,13 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief echoStatus prints relevant class data to terminal. Useful for debugging.
+     * @brief Prints relevant class data to terminal. Useful for debugging.
      */
     void echoStatus();
 
     //=========================================================================================================
     /**
-     * @brief getMatrix returns m_pMatEmit, newest buffer data formatted as an Eigen MatrixXd
+     * @brief Returns member m_pMatEmit, newest buffer data formatted as an Eigen MatrixXd
      *
      * @return returns m_pMatEmit
      */
@@ -253,7 +246,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief newData returns m_bNewData whether or not new data has been read from buffer
+     * @brief Returns m_bNewData, whether or not new data has been read from buffer
      *
      * @return returns m_bNewData
      */
@@ -261,21 +254,21 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief resetEmitData sets m_bNewData to false, deletes m_pMatEmit
+     * @brief Sets m_bNewData to false, deletes m_pMatEmit
      */
     void resetEmitData();
 
     //=========================================================================================================
     /**
-     * @brief parseNeuromagHeader parses the extended header chunk with neuromag data and gets the relevant fiff info
+     * @brief Parses the extended header chunk with neuromag data and gets the relevant fiff info
      * @return returns the FiffInfo from the parsed fif file from the neuromag header chunk
      */
     FIFFLIB::FiffInfo parseNeuromagHeader();
 
 private:
-
+    //=========================================================================================================
     /**
-     * @brief sendRequest sends a formated message to the buffer. command and bufsize must be set before calling.
+     * @brief Sends a formated message to the buffer. command and bufsize must be set before calling.
      *
      * @param messagedef - request structure with the appropriate command and bufszie paramters set.
      */
@@ -283,7 +276,7 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief sendDataSel sends a formated datasel message, for defining the first and last sample we are requesting from the buffer
+     * @brief Sends a formated datasel message, for defining the first and last sample we are requesting from the buffer
      *
      * @param datasel - formattd first and last sample index we are requesting from the buffer
      */
@@ -291,7 +284,7 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief sendSampleEvents sends a formated sampleevents message, used for receving updated sample an event numbers from buffer
+     * @brief Sends a formated sampleevents message, used for receving updated sample an event numbers from buffer
      *
      * @param threshold - buffer will respond once sample/event numbers reach the thresholds
      */
@@ -299,7 +292,7 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief parseHeaderDef parses headerdef message and saves parameters(channels, frequency, datatype, newsamples)
+     * @brief Parses headerdef message and saves parameters(channels, frequency, datatype, newsamples)
      *
      * @param readBuffer - QBuffer with return headerdef_t data from buffer
      *
@@ -309,7 +302,7 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief parseMessageDef parses messadef and returns bufsize
+     * @brief Parses messadef and returns bufsize
      *
      * @param readBuffer - QBuffer with return messagedef_t data from buffer
      *
@@ -319,7 +312,7 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief parseDataDef parses datadef and returns bufsize
+     * @brief Parses datadef and returns bufsize
      *
      * @param dataBuffer - QBuffer with return datadef_t data from buffer
      *
@@ -329,7 +322,7 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief parseData parses sample data received from buffer, formates it and saves it to m_pMatEmit;
+     * @brief Parses sample data received from buffer, formates it and saves it to m_pMatEmit;
      *
      * @param datasampBuffer - QBuffer with return data from buffer
      * @param bufsize - bufsize of sample data
@@ -341,7 +334,7 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief prepBuffer opens Buffer, reads nuBytes from socket and sets index to zero
+     * @brief Opens Buffer, reads numBytes from socket and sets index to zero
      *
      * @param buffer - QBuffer to which daa will be written
      * @param numBytes - how many bytes to read from socket
@@ -351,12 +344,11 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief totalBuffSamples returns total amount of samples written to buffer
+     * @brief Returns total amount of samples written to buffer
      *
      * @return returns total amount of samples written to buffer
      */
     int totalBuffSamples();
-
 
     int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer */
     int                                     m_iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer */
@@ -375,10 +367,7 @@ private:
     QTcpSocket*                             m_pSocket;                              /**< Socket that manages the connection to the ft buffer */
 
     Eigen::MatrixXd*                        m_pMatEmit;                             /**< Container to format data to tansmit to FtBuffProducer */
-
-    QSharedPointer<FIFFLIB::FiffRawData>    m_pNeuromagData;                        /**< Storage for Fiff data for parsing neuromag header chink and extracting relevant fiff info */
 };
-
-}//namespace
+}//namespace end bracket
 
 #endif // FTCONNECTOR_H
