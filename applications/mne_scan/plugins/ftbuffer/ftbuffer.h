@@ -1,3 +1,4 @@
+//=============================================================================================================
 /**
 * @file     ftbuffer.h
 * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
@@ -35,7 +36,6 @@
 #ifndef FTBUFFER_H
 #define FTBUFFER_H
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -101,124 +101,126 @@ class FTBUFFER_EXPORT FtBuffer : public SCSHAREDLIB::ISensor
 public:
     //=========================================================================================================
     /**
-     * @brief FtBuffer creates an instance of FtBuffer
+     * Creates an instance of FtBuffer
      */
     FtBuffer();
 
     //=========================================================================================================
     /**
-     * @brief ~FtBuffer destroys an instace of FtBuffer
+     * Destroys an instace of FtBuffer
      */
     ~FtBuffer();
 
     //=========================================================================================================
     /**
-    * Clone the plugin
-    */
+     * Clone the plugin
+     */
     virtual QSharedPointer<IPlugin> clone() const;
 
     //=========================================================================================================
     /**
-    * Initializes the plugin.
-    */
+     * Initializes the plugin.
+     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
-    */
+     * Is called when plugin is detached of the stage. Can be used to safe settings.
+     */
     virtual void unload();
 
     //=========================================================================================================
     /**
-    * Starts the ISensor.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return true if success, false otherwise
-    */
+     * Starts the ISensor.
+     * Pure virtual method inherited by IModule.
+     *
+     * @return true if success, false otherwise
+     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Stops the ISensor.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return true if success, false otherwise
-    */
+     * Stops the ISensor.
+     * Pure virtual method inherited by IModule.
+     *
+     * @return true if success, false otherwise
+     */
     virtual bool stop();
 
     //=========================================================================================================
     /**
-    * Returns the plugin type.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return type of the ISensor
-    */
+     * Returns the plugin type.
+     * Pure virtual method inherited by IModule.
+     *
+     * @return type of the ISensor
+     */
     virtual PluginType getType() const;
 
     //=========================================================================================================
     /**
-    * Returns the plugin name.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the name of the ISensor.
-    */
+     * Returns the plugin name.
+     * Pure virtual method inherited by IModule.
+     *
+     * @return the name of the ISensor.
+     */
     virtual QString getName() const;
 
     //=========================================================================================================
     /**
-    * Returns the set up widget for configuration of ISensor.
-    * Pure virtual method inherited by IModule.
-    *
-    * @return the setup widget.
-    */
+     * Returns the set up widget for configuration of ISensor.
+     * Pure virtual method inherited by IModule.
+     *
+     * @return the setup widget.
+     */
     virtual QWidget* setupWidget();
 
     //=========================================================================================================
     /**
-    * @brief isRunning - True if buffer plugin is running, false if it's not
-    * @return Bool. True - running, False - not running
-    */
+     * Whether the plugin is currenlty running.
+     *
+     * @return True - running, False - not running
+     */
     bool isRunning();
 
 signals:
     //=========================================================================================================
     /**
-    * @brief sends signal to FtBuffProducer to start data aquisition
-    */
+     * Sends signal to FtBuffProducer to start data aquisition
+     */
     void workCommand();
 
 protected:
     //=========================================================================================================
     /**
-    * @brief run - gets extecuted after start(), currently does nothing
-    */
+     * Gets extecuted after start(), currently does nothing
+     */
     virtual void run();
 
     //=========================================================================================================
     /**
-    * @brief showYourWidget - used in displaying the ftbuffer widget
-    */
+     * Used in displaying the ftbuffer widget
+     */
     void showYourWidget();
 
     //=========================================================================================================
     /**
-    * @brief onNewDataAvailable - receives new data from producer, publishes to plugin output rtmsa
-    * @param matData - new data from FtBuffProducer
-    */
+     * Receives new data from producer, publishes to plugin output rtmsa
+     *
+     * @param[in] matData   New data from FtBuffProducer
+     */
     void onNewDataAvailable(const Eigen::MatrixXd &matData);
 
     //=========================================================================================================
     /**
-    * @brief setupRTMSA - sets up Fiff info and uses it to initialize m_pRTMSA_BufferOutput
-    */
+     * Sets up Fiff info from and uses it to initialize m_pRTMSA_BufferOutput
+     */
     bool setupRTMSA();
 
     //=========================================================================================================
     /**
-     * @brief setupRTMSA
-     * @param FiffInfo
-     * @return
+     * Sets up Fiff info from passed FiffInfo and uses it to initialize m_pRTMSA_BufferOutput
+     *
+     * @param[in] FiffInfo  FiffInfo used to set up buffer output
      */
     bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
 

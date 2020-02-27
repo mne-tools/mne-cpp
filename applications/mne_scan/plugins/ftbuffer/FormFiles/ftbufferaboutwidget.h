@@ -2,14 +2,12 @@
 /**
 * @file     ftbufferaboutwidget.h
 * @author   Gabriel B. Motta <gbmotta@mgh.harvard.edu>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
-* @version  1.0
+* @version  dev
 * @date     January, 2020
 *
 * @section  LICENSE
 *
-* Copyright (C) 2020, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2020, Gabriel B. Motta. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -38,7 +36,6 @@
 #define FTBUFFERABOUTWIDGET_H
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -46,15 +43,12 @@
 #include "../ui_ftbufferabout.h"
 
 
-//*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
 
-
-//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE FtBufferToolboxPlugin
 //=============================================================================================================
@@ -62,13 +56,12 @@
 namespace FTBUFFERPLUGIN
 {
 
-
 //=============================================================================================================
 /**
-* DECLARE CLASS FtBufferAboutWidget
-*
-* @brief The FtBufferAboutWidget class provides the about dialog for the FtBufferToolbox.
-*/
+ * DECLARE CLASS FtBufferAboutWidget
+ *
+ * @brief The FtBufferAboutWidget class provides the about dialog for the FtBufferToolbox.
+ */
 class FtBufferAboutWidget : public QDialog
 {
     Q_OBJECT
@@ -77,17 +70,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FtBufferAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FtBufferAboutWidget becomes a window. If parent is another widget, FtBufferAboutWidget becomes a child window inside parent. FtBufferAboutWidget is deleted when its parent is deleted.
-    */
+     * Constructs a FtBufferAboutWidget dialog which is a child of parent.
+     *
+     * @param [in] parent pointer to parent widget; If parent is 0, the new FtBufferAboutWidget becomes a window. If parent is another widget, FtBufferAboutWidget becomes a child window inside parent. FtBufferAboutWidget is deleted when its parent is deleted.
+     */
     FtBufferAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FtBufferAboutWidget.
-    * All FtBufferAboutWidget's children are deleted first. The application exits if FtBufferAboutWidget is the main widget.
-    */
+     * Destroys the FtBufferAboutWidget.
+     * All FtBufferAboutWidget's children are deleted first. The application exits if FtBufferAboutWidget is the main widget.
+     */
     ~FtBufferAboutWidget();
 
 private:
