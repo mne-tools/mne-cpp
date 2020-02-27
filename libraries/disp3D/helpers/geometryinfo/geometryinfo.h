@@ -128,10 +128,11 @@ public:
      * @param[in] matVertices            Holds all vertex information that is needed.
      * @param[in] vecSensorPositions     Each sensor postion in saved in an Eigen vector with x, y & z coord.
      *
-     * @return                           Output vector where the vector index position represents the id of the sensor and the int in each cell is the vertex it is mapped to
+     * @return                           Output vector where the vector index position represents the id of the sensor
+     *                                   and the int in each cell is the vertex it is mapped to
      */
     static QVector<int> projectSensors(const Eigen::MatrixX3f &matVertices,
-                                          const QVector<Eigen::Vector3f> &vecSensorPositions);
+                                       const QVector<Eigen::Vector3f> &vecSensorPositions);
 
     //=========================================================================================================
     /**
@@ -144,8 +145,8 @@ public:
      * @return Vector of bad channel indices.
      */
     static QVector<int> filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
-                                             const FIFFLIB::FiffInfo& fiffInfo,
-                                             qint32 iSensorType);
+                                          const FIFFLIB::FiffInfo& fiffInfo,
+                                          qint32 iSensorType);
 
 protected:
     //=========================================================================================================
@@ -169,8 +170,8 @@ protected:
      * @return                       A vector of nearest vertex IDs that corresponds to the subvector between the two iterators
      */
     static QVector<int> nearestNeighbor(const Eigen::MatrixX3f &matVertices,
-                                           QVector<Eigen::Vector3f>::const_iterator itSensorBegin,
-                                           QVector<Eigen::Vector3f>::const_iterator itSensorEnd);
+                                        QVector<Eigen::Vector3f>::const_iterator itSensorBegin,
+                                        QVector<Eigen::Vector3f>::const_iterator itSensorEnd);
 
     //=========================================================================================================
     /**
