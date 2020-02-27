@@ -76,7 +76,9 @@
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
+#include <Eigen/Dense>
 
+//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -87,7 +89,9 @@ using namespace DISPLIB;
 using namespace MNELIB;
 using namespace RTPROCESSINGLIB;
 using namespace INVERSELIB;
+using namespace Eigen;
 
+//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -198,6 +202,11 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
     MNEBem t_BemHeadAdult(t_fileHeadAdult);
     m_pBemHeadAdult = m_pData3DModel->addBemData("Head", "Adult", t_BemHeadAdult);
     m_pBemHeadAdult->setCheckState(Qt::Unchecked);
+
+    QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif");;
+    MNEBem t_BemHeadAvr(t_fileHeadAvr);
+    m_pBemHeadAvr = m_pData3DModel->addBemData("Head", "Average", t_BemHeadAvr);
+    m_pBemHeadAvr->setCheckState(Qt::Unchecked);
 
     //Always on top
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -352,6 +361,9 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
     m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Head", "Tracked", t_digSetWithoutAdditional);
     //m_pData3DModel->addDigitizerData("Head", "Tracked", t_digSetWithoutAdditional);
 
+    QFile file (QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-trans.fif");
+    FiffCoordTrans transAvr(file);
+
     //Set loaded number of digitizers
     ui->m_label_numberLoadedCoils->setNum(numHPI);
     ui->m_label_numberLoadedDigitizers->setNum(numDig);
@@ -374,10 +386,86 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
         ui->m_spinBox_freqCoil4->show();
 
         m_vCoilFreqs.clear();
-        m_vCoilFreqs << 155 << 165 << 190 << 220;
+        m_vCoilFreqs << 155 << 165 << 190 << 200;
     }
 
-    alignFiducials(fileName);
+    // read fsaverage fiducials
+    QFile t_fileDigAvr(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
+    FiffDigPointSet t_digAvr(t_fileDigAvr);
+    //t_digAvr.applyTransform(transAvr);
+    DigitizerSetTreeItem* pDigItem = m_pData3DModel->addDigitizerData("Head", "avr", t_digAvr);
+
+    Eigen::MatrixXf sLm(3,3);
+    Eigen::MatrixXf dLm(3,3);
+//    QFile t_fileSample(QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    FiffDigPointSet t_digAvr(t_fileSample);
+
+    for(int i = 0; i < t_digAvr.size(); i++){
+        if(t_digAvr[i].kind == FIFFV_POINT_CARDINAL/* || t_digAvr[i].kind ==  FIFFV_POINT_HPI*/){
+        sLm(i,0) = t_digAvr[i].r[0];
+        sLm(i,1) = t_digAvr[i].r[1];
+        sLm(i,2) = t_digAvr[i].r[2];
+        }
+    }
+
+    for(int i = 0; i < t_digSet.size(); i++){
+        if(t_digSet[i].kind == FIFFV_POINT_CARDINAL/* || t_digSet[i].kind ==  FIFFV_POINT_HPI*/) {
+            dLm(i,0) = t_digSet[i].r[0];
+            dLm(i,1) = t_digSet[i].r[1];
+            dLm(i,2) = t_digSet[i].r[2];
+        }
+    }
+    qDebug() << "sLm";
+    std::cout << sLm << std::endl;
+    qDebug() << "dLm";
+    std::cout << dLm << std::endl;
+
+    Matrix4f trans = computeTransformation(dLm, sLm);
+    qDebug() << "trans";
+    std::cout << trans << std::endl;
+    MatrixXf temp = sLm;
+    temp.conservativeResize(sLm.rows(),sLm.cols()+1);
+    temp.block(0,3,3,1).setOnes();
+    temp.transposeInPlace();
+    MatrixXf tSLm = trans * temp;
+    sLm = tSLm.block(0,0,3,3);
+
+    qDebug() << "tsLm";
+    std::cout << sLm << std::endl;
+
+//    RowVector3f vScale(3);
+
+//    vScale(0) = dLm.row(0).norm() / sLm.row(0).norm();
+//    vScale(1) = dLm.row(1).norm() / sLm.row(1).norm();
+//    vScale(2) = dLm.row(2).norm() / sLm.row(2).norm();
+
+//    float scale = vScale.mean();
+
+//    qDebug() << "vScale: " ;
+//    std::cout << vScale << std::endl;
+//    qDebug() << "Scale: " << scale;
+
+    Qt3DCore::QTransform transform;
+    QMatrix4x4 mat;
+    for(int r = 0; r < 4; ++r) {
+        for(int c = 0; c < 4; ++c) {
+            mat(r,c) = trans(r,c);
+        }
+    }
+    transform.setMatrix(mat);
+
+    pDigItem->setTransform(transform);
+
+    //Update Average head surface
+    QList<QStandardItem*> itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+    for(int j = 0; j < itemList.size(); ++j) {
+        if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+            //If it is the kid's model scale it
+            pBemItem->setTransform(transAvr);
+            pBemItem->setTransform(transform);
+            //pBemItem->setScale(scale);
+        }
+    }
 
     return lDigPoints;
 }
@@ -392,18 +480,22 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
 
     //Calculate the alignment of the fiducials
     MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
+    QFile t_fileHeadAvr (QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif");
     MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet,
                                              QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif",
                                              FIFFV_BEM_SURF_ID_HEAD,
                                              "head",
                                              1,
                                              1);
+
     MneMshDisplaySurface* surface = pMneMshDisplaySurfaceSet->surfs[0];
 
+    // fid from .fif file with digitizers
     QFile t_fileDigData(fileNameDigData);
     FiffDigitizerData* t_digData = new FiffDigitizerData(t_fileDigData);
 
     QFile t_fileDigDataReference(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
+
     //FiffDigitizerData* t_digDataReference = new FiffDigitizerData(t_fileDigDataReference);
     QScopedPointer<FiffDigitizerData> t_digDataReference(new FiffDigitizerData(t_fileDigDataReference));
     MneSurfaceOrVolume::align_fiducials(t_digData,
@@ -436,6 +528,7 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
 
     std::cout<<"rot:"<<std::endl<<t_digData->head_mri_t_adj->rot;
     std::cout<<std::endl<<"move:"<<std::endl<<t_digData->head_mri_t_adj->move;
+
 }
 
 //=============================================================================================================
@@ -478,7 +571,7 @@ void HpiView::onBtnLoadPolhemusFile()
 {
     //Get file location
     QString fileName_HPI = QFileDialog::getOpenFileName(this,
-            tr("Open digitizer file"), "", tr("Fiff file (*.fif)"));
+            tr("Open digitizer file"),QCoreApplication::applicationDirPath() + "MNE-sample-data/chpi/raw" , tr("Fiff file (*.fif)"));
 
     if(!fileName_HPI.isEmpty()) {
         ui->m_lineEdit_filePath->setText(fileName_HPI);
@@ -687,7 +780,7 @@ void HpiView::update3DView()
         itemList = m_pBemHeadAdult->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
         for(int j = 0; j < itemList.size(); ++j) {
             if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                pBemItem->setTransform(transform);
+                pBemItem->setTransform( transform);
             }
         }
 
@@ -701,4 +794,72 @@ void HpiView::update3DView()
             }
         }
     }
+}
+
+//*************************************************************************************************************
+
+Eigen::Matrix4f HpiView::computeTransformation(Eigen::MatrixXf NH, MatrixXf BT)
+{
+    MatrixXf xdiff, ydiff, zdiff, C, Q;
+    Matrix4f transFinal = Matrix4f::Identity(4,4);
+    Matrix4f Rot = Matrix4f::Zero(4,4);
+    Matrix4f Trans = Matrix4f::Identity(4,4);
+    double meanx,meany,meanz,normf;
+
+    for(int i = 0; i < 15; ++i) {
+        // Calculate mean translation for all points -> centroid of both data sets
+        xdiff = NH.col(0) - BT.col(0);
+        ydiff = NH.col(1) - BT.col(1);
+        zdiff = NH.col(2) - BT.col(2);
+
+        meanx = xdiff.mean();
+        meany = ydiff.mean();
+        meanz = zdiff.mean();
+
+        // Apply translation -> bring both data sets to the same center location
+        for (int j = 0; j < BT.rows(); ++j) {
+            BT(j,0) = BT(j,0) + meanx;
+            BT(j,1) = BT(j,1) + meany;
+            BT(j,2) = BT(j,2) + meanz;
+        }
+
+        // Estimate rotation component
+        C = BT.transpose() * NH;
+
+        JacobiSVD< MatrixXf > svd(C ,Eigen::ComputeThinU | ComputeThinV);
+
+        Q = svd.matrixU() * svd.matrixV().transpose();
+
+        //Handle special reflection case
+        if(Q.determinant() < 0) {
+            Q(0,2) = Q(0,2) * -1;
+            Q(1,2) = Q(1,2) * -1;
+            Q(2,2) = Q(2,2) * -1;
+        }
+
+        // Apply rotation on translated points
+        BT = BT * Q;
+
+        // Calculate GOF
+        normf = (NH.transpose()-BT.transpose()).norm();
+
+        // Store rotation part to transformation matrix
+        Rot(3,3) = 1;
+        for(int j = 0; j < 3; ++j) {
+            for(int k = 0; k < 3; ++k) {
+                Rot(j,k) = Q(k,j);
+            }
+        }
+
+        // Store translation part to transformation matrix
+        Trans(0,3) = meanx;
+        Trans(1,3) = meany;
+        Trans(2,3) = meanz;
+
+        // Safe rotation and translation to final matrix for next iteration step
+        // This step is safe to do since we change one of the input point sets (BT)
+        // ToDo: Replace this for loop with a least square solution process
+        transFinal = Rot * Trans * transFinal;
+    }
+    return transFinal;
 }
