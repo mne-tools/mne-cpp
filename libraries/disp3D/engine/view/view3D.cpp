@@ -142,10 +142,11 @@ void View3D::initLight()
 
         m_lLightSources.append(pPointLight);
 
+        Qt3DExtras::QSphereMesh* lightSphere = new Qt3DExtras::QSphereMesh(pLightEntity);
+        lightSphere->setRadius(0.1f);
+        pLightEntity->addComponent(lightSphere);
+
         //Uncomment the following to visualize the light sources for debugging:
-//        Qt3DExtras::QSphereMesh* lightSphere = new Qt3DExtras::QSphereMesh(pLightEntity);
-//        lightSphere->setRadius(0.1f);
-//        pLightEntity->addComponent(lightSphere);
 //        Qt3DExtras::QPhongMaterial* material = new Qt3DExtras::QPhongMaterial(pLightEntity);
 //        material->setAmbient(lightColor);
 //        pLightEntity->addComponent(material);
