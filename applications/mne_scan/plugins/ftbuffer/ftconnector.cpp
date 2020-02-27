@@ -162,7 +162,6 @@ bool FtConnector::getHeader()
 
 bool FtConnector::parseHeaderDef(QBuffer &readBuffer)
 {
-
     //Start parsing header parameters
     qInfo() << "[FtConnector::parseHeaderDef] Got header data. Parsing...";
     headerdef_t headerdef;
