@@ -83,7 +83,7 @@ jobs:
         cd ..\..
         qmake -makefile brainflowboard.pro
         jom -j2
-        cp -a .\brainflow\installed\lib\. ..\..\..\bin\
+        xcopy .\brainflow\installed\lib ..\..\..\bin
                         
   Tests:
     runs-on: ${{ matrix.os }}
