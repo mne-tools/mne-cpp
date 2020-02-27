@@ -167,9 +167,6 @@ void RealTimeMultiSampleArrayWidget::init()
                                                              Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
                                                              this);
 
-        this->addControlWidgets(m_pQuickControlView,
-                                m_pRTMSA->getControlWidgets());
-
         QSettings settings;
         QString sRTMSAWName = m_pRTMSA->getName();
 
@@ -205,7 +202,7 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
         //Init quick control widget
-        QStringList slFlags = m_pRTMSA->getDisplayFlags();
+        QStringList slFlags;
 
         // Quick control scaling
         if(slFlags.contains("scaling")) {
