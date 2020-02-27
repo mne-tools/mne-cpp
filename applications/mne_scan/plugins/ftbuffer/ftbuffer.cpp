@@ -32,38 +32,46 @@
 *
 */
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ftbuffer.h"
-#include "ftbuffproducer.h"
 #include <iostream>
 
-//*************************************************************************************************************
+#include "ftbuffer.h"
+#include "ftbuffproducer.h"
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCSHAREDLIB;
 using namespace FTBUFFERPLUGIN;
+using namespace SCSHAREDLIB;
 using namespace SCMEASLIB;
-using namespace Eigen;
 using namespace FIFFLIB;
+using namespace Eigen;
 
-//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
 FtBuffer::FtBuffer()
 : m_bIsRunning(false)
 , m_pFtBuffProducer(QSharedPointer<FtBuffProducer>::create(this))
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
-, m_bBuffOutputSet(false)
-, m_bCustomFiff(false)
 {
     qInfo() << "[FtBuffer::FtBufer] Object created.";
 
+    //Sets up GUI and GUI connections
     m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("FieldTrip Buffer Widget"),this);
     m_pActionShowYourWidget->setShortcut(tr("F12"));
     m_pActionShowYourWidget->setStatusTip(tr("FieldTrip Buffer Widget"));
@@ -73,7 +81,7 @@ FtBuffer::FtBuffer()
     addPluginAction(m_pActionShowYourWidget);
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 FtBuffer::~FtBuffer()
 {
@@ -82,7 +90,7 @@ FtBuffer::~FtBuffer()
     }
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 QSharedPointer<IPlugin> FtBuffer::clone() const
 {
@@ -90,7 +98,7 @@ QSharedPointer<IPlugin> FtBuffer::clone() const
     return pFtBufferClone;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FtBuffer::init()
 {
@@ -98,30 +106,28 @@ void FtBuffer::init()
     m_outputConnectors.append(m_pRTMSA_BufferOutput);
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FtBuffer::unload()
 {
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtBuffer::start()
 {
-
     qInfo() << "[FtBuffer::start] Starting FtBuffer...";
     m_bIsRunning = true;
 
-    qRegisterMetaType<QPair<int,float>>("QPair<int,float>");
-
-    // FtProducer in it's own thread and connect communications signals/slots
+    //Move relevant objects to new thread
     m_pFtBuffProducer->m_pFtConnector->m_pSocket->moveToThread(&m_pProducerThread);
     m_pFtBuffProducer->m_pFtConnector->moveToThread(&m_pProducerThread);
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
+
+    //Connect signals to communicate with new thread
     connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
-    connect(m_pFtBuffProducer.data(), &FtBuffProducer::extendedHeaderChunks, this, &FtBuffer::parseHeader, Qt::DirectConnection);
     connect(this, &FtBuffer::workCommand, m_pFtBuffProducer.data(),&FtBuffProducer::doWork);
-    connect(m_pFtBuffProducer.data(), &FtBuffProducer::bufferParameters, this, &FtBuffer::setParams, Qt::DirectConnection);
+
     m_pProducerThread.start();
 
     qInfo() << "[FtBuffer::start] Producer thread created, sending work command...";
@@ -130,11 +136,10 @@ bool FtBuffer::start()
     return true;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtBuffer::stop()
 {
-
     qInfo() << "[FtBuffer::stop] Stopping...";
 
     m_mutex.lock();
@@ -147,29 +152,29 @@ bool FtBuffer::stop()
     m_pProducerThread.quit();
     m_pProducerThread.wait();
 
-
     //Reset ftproducer and sample received list
     m_pFtBuffProducer.clear();
     m_pFtBuffProducer = QSharedPointer<FtBuffProducer>::create(this);
 
+    qInfo() << "[FtBuffer::stop] Stoped.";
     return true;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 IPlugin::PluginType FtBuffer::getType() const
 {
     return _ISensor;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 QString FtBuffer::getName() const
 {
     return "FtBuffer";
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 QWidget* FtBuffer::setupWidget()
 {
@@ -177,13 +182,13 @@ QWidget* FtBuffer::setupWidget()
     return setupWidget;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FtBuffer::run()
 {
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FtBuffer::showYourWidget()
 {
@@ -191,171 +196,34 @@ void FtBuffer::showYourWidget()
     m_pYourWidget->show();
 }
 
-//*************************************************************************************************************
-
-void FtBuffer::setUpFiffInfo()
-{
-    //
-    //Clear old fiff info data
-    //
-    m_pFiffInfo->clear();
-
-
-    if (m_bCustomFiff) {
-        //
-        //Set number of channels, sampling frequency and high/-lowpass
-        //
-        qInfo() << "Custom Fiff";
-        m_pFiffInfo->nchan = m_iNumChannels;
-        m_pFiffInfo->sfreq = m_iSampFreq;
-        m_pFiffInfo->highpass = 0.001f;
-        m_pFiffInfo->lowpass = m_iSampFreq/2;
-    } else {
-        //
-        //Set number of channels, sampling frequency and high/-lowpass
-        //
-        qInfo() << "Default Fiff";
-        m_pFiffInfo->nchan = m_iNumChannels;
-        m_pFiffInfo->sfreq = m_iSampFreq;
-        m_pFiffInfo->highpass = 0.001f;
-        m_pFiffInfo->lowpass = m_iSampFreq/2;
-    }
-
-    //
-    //Set up the channel info
-    //
-    QStringList QSLChNames;
-    m_pFiffInfo->chs.clear();
-
-    for(int i = 0; i < m_pFiffInfo->nchan; ++i)
-    {
-        //Create information for each channel
-        QString sChType;
-        FiffChInfo fChInfo;
-
-//        //EEG Channels
-//        if(i <= m_pFiffInfo->nchan-2)
-//        {
-            //Set channel name
-            sChType = QString("CH. ");
-            if(i<10) {
-                sChType.append("00");
-            }
-
-            if(i>=10 && i<100) {
-                sChType.append("0");
-            }
-
-            fChInfo.ch_name = sChType.append(sChType.number(i));
-
-            //Set channel type
-            fChInfo.kind = FIFFV_EEG_CH;
-
-            //Set logno
-            fChInfo.logNo = i;
-
-            //Set coord frame
-            fChInfo.coord_frame = FIFFV_COORD_HEAD;
-
-            //Set unit
-            fChInfo.unit = FIFF_UNIT_V;
-
-            //Set EEG electrode location - Convert from mm to m
-            fChInfo.eeg_loc(0,0) = 0;
-            fChInfo.eeg_loc(1,0) = 0;
-            fChInfo.eeg_loc(2,0) = 0;
-
-            //Set EEG electrode direction - Convert from mm to m
-            fChInfo.eeg_loc(0,1) = 0;
-            fChInfo.eeg_loc(1,1) = 0;
-            fChInfo.eeg_loc(2,1) = 0;
-
-            //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
-            fChInfo.chpos.r0(0) = 0;
-            fChInfo.chpos.r0(1) = 0;
-            fChInfo.chpos.r0(2) = 0;
-
-            fChInfo.chpos.ex(0) = 1;
-            fChInfo.chpos.ex(1) = 0;
-            fChInfo.chpos.ex(2) = 0;
-
-            fChInfo.chpos.ey(0) = 0;
-            fChInfo.chpos.ey(1) = 1;
-            fChInfo.chpos.ey(2) = 0;
-
-            fChInfo.chpos.ez(0) = 0;
-            fChInfo.chpos.ez(1) = 0;
-            fChInfo.chpos.ez(2) = 1;
-//        }
-
-//        //Digital input channel
-//        if(i == m_pFiffInfo->nchan-1)
-//        {
-//            //Set channel type
-//            fChInfo.kind = FIFFV_STIM_CH;
-
-//            sChType = QString("STIM");
-//            fChInfo.ch_name = sChType;
-//        }
-
-        QSLChNames << sChType;
-
-        m_pFiffInfo->chs.append(fChInfo);
-    }
-
-    //Set channel names in fiff_info_base
-    m_pFiffInfo->ch_names = QSLChNames;
-
-    //
-    //Set head projection
-    //
-    m_pFiffInfo->dev_head_t.from = FIFFV_COORD_DEVICE;
-    m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
-    m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
-    m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
-}
-
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtBuffer::isRunning()
 {
     return m_bIsRunning;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData)
 {
     qInfo() << "[FtBuffer::onNewDataAvailable] Appending matrix to plugin output...";
+
     m_mutex.lock();
+
     if(m_bIsRunning) {
-//        if (!m_bBuffOutputSet) {
-//            qDebug() << "Setting up buffer output";
-//            setupRTMSA();
-//            m_bBuffOutputSet = true;
-//        }
         m_pRTMSA_BufferOutput->data()->setValue(matData);
-        //std::cout << matData.col(0);
-
     }
+
     m_mutex.unlock();
+
     qInfo() << "[FtBuffer::onNewDataAvailable] Done.";
-
 }
 
-//*************************************************************************************************************
-
-void FtBuffer::setParams(QPair<int,float> val)
-{
-    m_iNumChannels = val.first;
-    m_iSampFreq = val.second;
-}
-
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtBuffer::setupRTMSA()
 {
-
     qInfo() << "[FtBuffer::setupRTMSA] Attempting to set up parameters from .fif file...";
 
     QBuffer qbuffInputSampleFif;
@@ -364,15 +232,12 @@ bool FtBuffer::setupRTMSA()
     QFile infile("neuromag2ft.fif");
 
     if(!infile.open(QIODevice::ReadOnly)) {
-        qWarning() << "[FtBuffer::setupRTMSA] Could not open file.  Plugin output won't be based on local fif parameters.";
-        qInfo() << "[FtBuffer::setupRTMSA] Please verify neuromag2ft.fif is present in bin folder.";
+        qInfo() << "[FtBuffer::setupRTMSA] Could not open file.  Plugin output won't be based on local fif parameters.";
     } else {
         qbuffInputSampleFif.write(infile.readAll());
 
         m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(qbuffInputSampleFif));
         m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo (m_pNeuromagHeadChunkData->info));
-
-        m_bCustomFiff = true;
 
         //Set the RMTSA parameters
         m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
@@ -385,7 +250,7 @@ bool FtBuffer::setupRTMSA()
     return false;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
 {
@@ -396,8 +261,6 @@ bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
 
     m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo (FiffInfo));
 
-    m_bCustomFiff = true;
-
     //Set the RMTSA parameters
     m_pRTMSA_BufferOutput->data()->initFromFiffInfo(m_pFiffInfo);
     m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
@@ -406,57 +269,3 @@ bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
     qInfo() << "[FtBuffer::setupRTMSA] Successfully aquired fif info from buffer.";
     return true;
 }
-
-//*************************************************************************************************************
-
-void FtBuffer::parseHeader(QBuffer* chunkData)
-{
-
-    qInfo() << "Chunk data received";
-
-
-//    char ch;
-//    chunkData->open(QBuffer::ReadWrite);
-    qInfo() << "Data buffer of size" << chunkData->size();
-//    qDebug() << "test read:" << chunkData->getChar(&ch) << ch
-//                             << chunkData->getChar(&ch) << ch
-//                             << chunkData->getChar(&ch) << ch;
-
-
-//    QFile infile("neuromag2ft.fif");
-
-//    QBuffer mynewbuffer;
-
-//    mynewbuffer.open(QIODevice::ReadWrite);
-
-//    if(!infile.open(QIODevice::ReadOnly)) {
-//        qDebug() << "Could not open file";
-//    } else {
-//        mynewbuffer.write(infile.readAll());
-//    }
-
-//    qDebug() << "My new buffer of size" << mynewbuffer.size();
-
-////    mynewbuffer.seek(0);
-
-//    m_pNeuromagHeadChunkData = QSharedPointer<FIFFLIB::FiffRawData>(new FiffRawData(mynewbuffer));
-
-//    //qDebug() << "Buffer fed to FiffRawData, now buffer of size" << chunkData->size();
-
-//    m_bCustomFiff = true;
-
-
-//    QFile outfile("mytestoutput.txt");
-
-//    if(!outfile.open(QIODevice::ReadWrite)) {
-//        qDebug() << "Could not open file";
-//    } else {
-//        outfile.write(mynewbuffer.read(mynewbuffer.size()));
-//    }
-
-//    outfile.close();
-
-//    chunkData->close();
-}
-
-//*************************************************************************************************************

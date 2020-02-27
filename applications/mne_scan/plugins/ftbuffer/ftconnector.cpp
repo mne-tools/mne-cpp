@@ -32,10 +32,12 @@
  *
  */
 
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
 #include "ftconnector.h"
 
-//*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -43,27 +45,32 @@
 #include <QThread>
 #include <QtEndian>
 
-//*************************************************************************************************************
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FTBUFFERPLUGIN;
 
-//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
 FtConnector::FtConnector()
-:m_pSocket(Q_NULLPTR)
-,m_iNumChannels(0)
-,m_fSampleFreq(0)
-,m_iNumSamples(0)
+:m_iNumSamples(0)
 ,m_iNumNewSamples(0)
+,m_iNumChannels(0)
 ,m_bNewData(false)
+,m_fSampleFreq(0)
+,m_pSocket(Q_NULLPTR)
 {
     qInfo() << "[FtConnector::FtConnector] Object created.";
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 FtConnector::~FtConnector()
 {
@@ -72,7 +79,7 @@ FtConnector::~FtConnector()
     //m_pSocket = Q_NULLPTR;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtConnector::connect()
 {
@@ -105,7 +112,7 @@ bool FtConnector::connect()
     }
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtConnector::getHeader()
 {
@@ -149,7 +156,7 @@ bool FtConnector::getHeader()
     return true;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtConnector::parseHeaderDef(QBuffer &readBuffer)
 {
@@ -208,7 +215,7 @@ bool FtConnector::parseHeaderDef(QBuffer &readBuffer)
     return true;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int FtConnector::parseMessageDef(QBuffer &readBuffer)
 {
@@ -232,18 +239,18 @@ int FtConnector::parseMessageDef(QBuffer &readBuffer)
     return response.bufsize;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FtConnector::sendRequest(messagedef_t &messagedef)
 {
-    messagedef.version = VERSION; //ftbuffer always expects VERSION == 1
+    messagedef.version = VERSION; //we only use VERSION == 1
 
     m_pSocket->write(reinterpret_cast<char*>(&messagedef.version), sizeof(messagedef.version));
     m_pSocket->write(reinterpret_cast<char*>(&messagedef.command), sizeof(messagedef.command));
     m_pSocket->write(reinterpret_cast<char*>(&messagedef.bufsize), sizeof(messagedef.bufsize));
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtConnector::getData()
 {
@@ -273,22 +280,22 @@ bool FtConnector::getData()
     while(m_pSocket->bytesAvailable() < sizeof (messagedef_t)) {
         m_pSocket->waitForReadyRead(10);
     }
-    qDebug() << "1";
+
     //Parse return message from buffer
     QBuffer msgBuffer;
     prepBuffer(msgBuffer, sizeof (messagedef_t));
     int bufsize = parseMessageDef(msgBuffer);
-    qDebug() << "2," << bufsize;
+
     //Waiting for response.
     while(m_pSocket->bytesAvailable() < bufsize) {
         m_pSocket->waitForReadyRead(10);
     }
-    qDebug() << "3";
+
     //Parse return data def from buffer
     QBuffer datadefBuffer;
     prepBuffer(datadefBuffer, sizeof (datadef_t));
     bufsize = parseDataDef(datadefBuffer);
-    qDebug() << "4";
+
     //Parse actual data from buffer
     QBuffer datasampBuffer;
     prepBuffer(datasampBuffer, bufsize);
@@ -302,24 +309,26 @@ bool FtConnector::getData()
     return true;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtConnector::setAddr(const QString &sNewAddress)
 {
     m_sAddress.clear();
     m_sAddress.append(sNewAddress);
+
     return true;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtConnector::setPort(const int &iPort)
 {
     m_iPort = iPort;
+
     return true;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FtConnector::prepBuffer(QBuffer &buffer,
                              int numBytes)
@@ -329,7 +338,7 @@ void FtConnector::prepBuffer(QBuffer &buffer,
     buffer.reset(); //Start reading from beggining of buffer
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int FtConnector::parseDataDef(QBuffer &dataBuffer)
 {
@@ -366,7 +375,7 @@ int FtConnector::parseDataDef(QBuffer &dataBuffer)
     return datadef.bufsize;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FtConnector::sendDataSel(datasel_t &datasel)
 {
@@ -374,7 +383,7 @@ void FtConnector::sendDataSel(datasel_t &datasel)
     m_pSocket->write(reinterpret_cast<char*>(&datasel.endsample), sizeof(datasel.endsample));
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FtConnector::echoStatus()
 {
@@ -389,7 +398,7 @@ void FtConnector::echoStatus()
     qInfo() << "|================================";
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 int FtConnector::totalBuffSamples()
 {
@@ -409,7 +418,6 @@ int FtConnector::totalBuffSamples()
 
     sendRequest(messagedef);
     sendSampleEvents(threshold);
-
     m_pSocket->write(reinterpret_cast<char*>(&timeout), sizeof (qint32));
 
     //Waiting for response.
@@ -439,7 +447,7 @@ int FtConnector::totalBuffSamples()
     return iNumSamp;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FtConnector::sendSampleEvents(samples_events_t &threshold)
 {
@@ -447,12 +455,11 @@ void FtConnector::sendSampleEvents(samples_events_t &threshold)
     m_pSocket->write(reinterpret_cast<char*>(&threshold.nevents), sizeof(threshold.nevents));
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtConnector::parseData(QBuffer &datasampBuffer,
                             int bufsize)
 {
-
     //start interpreting data as float instead of char
     QByteArray dataArray = datasampBuffer.readAll();
     float* fdata = (float*) dataArray.data();
@@ -489,7 +496,7 @@ bool FtConnector::parseData(QBuffer &datasampBuffer,
     return m_bNewData;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 void FtConnector::resetEmitData()
 {
@@ -498,7 +505,7 @@ void FtConnector::resetEmitData()
     m_pMatEmit = Q_NULLPTR;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtConnector::disconnect()
 {
@@ -508,97 +515,96 @@ bool FtConnector::disconnect()
     return true;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 Eigen::MatrixXd FtConnector::getMatrix()
 {
     return *m_pMatEmit;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 bool FtConnector::newData()
 {
     return m_bNewData;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 QString FtConnector::getAddr()
 {
     return m_sAddress;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
 FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
 {
     qInfo() << "[FtConnector::parseNeuromagHeader] Attepting to get extended header...";
 
-
-
+    QBuffer chunkBuffer;
     QBuffer neuromagBuffer;
 
     getHeader();
 
-    QBuffer chunkBuffer;
     prepBuffer(chunkBuffer, m_iNeuromagHeader);
 
     bool condition = true;
 
     while(condition) {
-        char c_type[sizeof(qint32)];
-        chunkBuffer.read(c_type, sizeof(qint32));
-        qint32 type;
-        std::memcpy(&type, c_type, sizeof(qint32));
+        qint32 iType;
+        char cType[sizeof(qint32)];
+        chunkBuffer.read(cType, sizeof(qint32));
+        std::memcpy(&iType, cType, sizeof(qint32));
 
-        qDebug() << "Found chunk of type:" << type;
+        //Headers we don't care about
+        if(iType < 8) {
+            qint32 iSize;
+            char cSize[sizeof(qint32)];
 
-        if (type < 8) {
-            qint32 size;
+            //read size of chunk
+            chunkBuffer.read(cSize, sizeof(qint32));
+            std::memcpy(&iSize, cSize, sizeof(qint32));
 
-            char c_size[sizeof(qint32)];
-            chunkBuffer.read(c_size, sizeof(qint32));
-            std::memcpy(&size, c_size, sizeof(qint32));
+            //read rest of chunk (to clear buffer to read next chunk)
+            char cRest[iSize];
+            chunkBuffer.read(cRest, iSize);
+        } else if(iType == 8) { // Header we care about, FT_CHUNK_NEUROMAG_HEADER = 8
+            qint32 iSize;
+            char cSize[sizeof(qint32)];
 
-            qDebug() << "Chunk expected size:" << size;
+            //read size of chunk
+            chunkBuffer.read(cSize, sizeof(qint32));
+            std::memcpy(&iSize, cSize, sizeof(qint32));
 
-            char c_rest[size];
-            chunkBuffer.read(c_rest, size);
-        } else if(type == 8) {
-            char c_size[sizeof(qint32)];
-            chunkBuffer.read(c_size, sizeof(qint32));
-            qint32 size;
-            std::memcpy(&size, c_size, sizeof(qint32));
-            qDebug() << "Neuromag chunk expected size:" << size;
-
+            //Read relevant chunk info
             neuromagBuffer.open(QIODevice::ReadWrite);
-            neuromagBuffer.write(chunkBuffer.read(size));
+            neuromagBuffer.write(chunkBuffer.read(iSize));
 
-            qint32_be i_IntToChar;
-            char c_Char[sizeof (qint32)];
+            qint32_be iIntToChar;
+            char cCharFromInt[sizeof (qint32)];
 
-            i_IntToChar = -1;
-            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-            neuromagBuffer.write(c_Char);
-
-            i_IntToChar = -1;
-            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-            neuromagBuffer.write(c_Char);
-
-            i_IntToChar = -1;
-            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-            neuromagBuffer.write(c_Char);
-
-            i_IntToChar = -1;
-            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-            neuromagBuffer.write(c_Char);
+            //Append read info with -1 to have a Fiff tag with 'next' == -1
+            iIntToChar = -1;
+            memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
+            neuromagBuffer.write(cCharFromInt);
+            iIntToChar = -1;
+            memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
+            neuromagBuffer.write(cCharFromInt);
+            iIntToChar = -1;
+            memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
+            neuromagBuffer.write(cCharFromInt);
+            iIntToChar = -1;
+            memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
+            neuromagBuffer.write(cCharFromInt);
 
             neuromagBuffer.reset();
 
+            //Format data into Little endian FiffStream so we can read it with the fiff library
             FIFFLIB::FiffStream::SPtr pStream(new FIFFLIB::FiffStream(&neuromagBuffer));
             pStream->setByteOrder(QDataStream::LittleEndian);
 
+            //Opens and created a dir tree (this is why we had to append -1)
             if(!pStream->open()) {
                 qCritical() << "Unable to open neuromag fiff data. Plugin behavior undefined";
                 FIFFLIB::FiffInfo defaultInfo;
@@ -608,52 +614,21 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
             FIFFLIB::FiffInfo FifInfo;
             FIFFLIB::FiffDirNode::SPtr DirNode;
 
+            //Get Fiff info we care about
             if(!pStream->read_meas_info(pStream->dirtree(), FifInfo, DirNode)) {
                 qCritical() << "Unable to parse neuromag fiff data. Plugin behavior undefined";
                 FIFFLIB::FiffInfo defaultInfo;
                 return defaultInfo;
             }
 
-            qDebug() << "Freq:" << FifInfo.sfreq;
-
-            return FifInfo;
-
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
-//            i_IntToChar = -1;
-//            memcpy(c_Char, &i_IntToChar, sizeof(qint32));
-//            neuromagBuffer.write(c_Char);
-
-//                QFile outfile("mytestoutput.txt");
-
-//                if(!outfile.open(QIODevice::ReadWrite)) {
-//                    qDebug() << "Could not open file";
-//                } else {
-//                    neuromagBuffer.reset();
-//                    outfile.write(neuromagBuffer.read(neuromagBuffer.size()));
-//                }
+            return FifInfo; //Returns this if all went well
         } else {
             qCritical() << "Unable to recongine chunk data. Plugin behavior undefined";
             FIFFLIB::FiffInfo defaultInfo;
             return defaultInfo;
         }
-
     }
-
-
-//    QFile outfile("mytestoutput.txt");
-
-//    if(!outfile.open(QIODevice::ReadWrite)) {
-//        qDebug() << "Could not open file";
-//    } else {
-//        neuromagBuffer.reset();
-//        outfile.write(neuromagBuffer.read(neuromagBuffer.size()));
-//    }
+    //Should never be reached, but returns default fiffinfo for safety
+    FIFFLIB::FiffInfo defaultInfo;
+    return defaultInfo;
 }

@@ -55,7 +55,6 @@
 
 #include <fiff/fiff_raw_data.h>
 
-//*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -66,22 +65,18 @@
 #include <QSharedPointer>
 #include <QThread>
 
-//*************************************************************************************************************
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE FTBUFFERPLUGIN
 //=============================================================================================================
 
 namespace FTBUFFERPLUGIN {
 
-//*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATION
+// FTBUFFERPLUGIN FORWARD DECLARATION
 //=============================================================================================================
 
 class FtBuffProducer;
@@ -96,9 +91,7 @@ class FtBuffProducer;
 class FTBUFFER_EXPORT FtBuffer : public SCSHAREDLIB::ISensor
 {
     Q_OBJECT
-
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "ftbuffer.json")
-
     Q_INTERFACES(SCSHAREDLIB::ISensor)
 
     friend class FtBufferSetupWidget;
@@ -106,12 +99,18 @@ class FTBUFFER_EXPORT FtBuffer : public SCSHAREDLIB::ISensor
     friend class FtConnector;
 
 public:
-
+    //=========================================================================================================
+    /**
+     * @brief FtBuffer creates an instance of FtBuffer
+     */
     FtBuffer();
 
+    //=========================================================================================================
+    /**
+     * @brief ~FtBuffer destroys an instace of FtBuffer
+     */
     ~FtBuffer();
 
-    //ISENSOR Functions
     //=========================================================================================================
     /**
     * Clone the plugin
@@ -177,27 +176,12 @@ public:
 
     //=========================================================================================================
     /**
-    * @brief setUpFiffInfo - Sets the parameters for the plugin output data stream
-    */
-    void setUpFiffInfo();
-
-    //=========================================================================================================
-    /**
     * @brief isRunning - True if buffer plugin is running, false if it's not
     * @return Bool. True - running, False - not running
     */
     bool isRunning();
 
-    //=========================================================================================================
-    /**
-    * @brief setParams - sets the frequency and # of channels expected for the buffer client
-    * @param freq - sampling frequency
-    * @param chan - number of channels
-    */
-    void setParams(QPair<int,float> val);
-
 signals:
-
     //=========================================================================================================
     /**
     * @brief sends signal to FtBuffProducer to start data aquisition
@@ -205,7 +189,6 @@ signals:
     void workCommand();
 
 protected:
-
     //=========================================================================================================
     /**
     * @brief run - gets extecuted after start(), currently does nothing
@@ -239,22 +222,9 @@ protected:
      */
     bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
 
-    //=========================================================================================================
-    /**
-    * @brief parseHeader -
-    * @param chunkData - Chunk data from header file
-    */
-    void parseHeader(QBuffer* chunkData);
-
 private:
 
-    int                                                                                 m_iNumChannels;                 /**< Parameter for how many channels expecet from buffer data */
-
     bool                                                                                m_bIsRunning;                   /**< Whether ftbuffer is running. */
-    bool                                                                                m_bBuffOutputSet;               /**< Whether RTMSA output has been initialized with fiff info */
-    bool                                                                                m_bCustomFiff;                  /**< Whether the buffer has a header with trailing chunk data */
-
-    float                                                                               m_iSampFreq;                    /**< Parameter for sampling rate expected from buffer data */
 
     QMutex                                                                              m_mutex;                        /**< Guards shared data from being accessed at the same time */
 
@@ -269,12 +239,10 @@ private:
     QSharedPointer<FtBufferYourWidget>                                                  m_pYourWidget;                  /**< Pointer used in the displaying of the widget */
 
     QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagHeadChunkData;       /**< Fiff into parser for header data collected from Neuromag extended header */
-    QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagIsoChunkData;        /**< Fiff into parser for isotrak data collected from Neuromag extended header */
 
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>>  m_pRTMSA_BufferOutput;          /**< The RealTimeSampleArray to provide the plugin output data.*/
 
 };
-
 }//namespace end brace
 
 #endif // FTBUFFER_H
