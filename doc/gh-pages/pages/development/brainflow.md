@@ -10,8 +10,8 @@ This plugin adds BrainFlow data acquisition SDK to MNE Scan app.
 
 **Links:**
 
-* [BrainFlow Docs](https://brainflow.readthedocs.io/en/stable/)
-* [BrainFlow Repo](https://github.com/Andrey1994/brainflow)
+* [BrainFlow Docs](https://brainflow.readthedocs.io/en/stable/){:target="_blank" rel="noopener"}
+* [BrainFlow Repo](https://github.com/Andrey1994/brainflow){:target="_blank" rel="noopener"}
 
 ## Compilation of BrainFlow submodule
 
