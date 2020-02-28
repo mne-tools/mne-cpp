@@ -145,7 +145,7 @@ QPointer<QuickControlView> AbstractView::getQuickControl()
 
 //=============================================================================================================
 
-void AbstractView::setQuickControlWidgets(const QList<QSharedPointer<QWidget> >& lControlWidgets)
+void AbstractView::setQuickControlWidgets(const QList<QWidget*>& lControlWidgets)
 {
     if(m_pQuickControlView) {
         for(int i = 0; i < lControlWidgets.size(); i++) {

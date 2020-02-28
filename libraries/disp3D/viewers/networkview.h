@@ -129,10 +129,10 @@ public:
                              const QString& sMeasurementSetName,
                              const CONNECTIVITYLIB::Network& tNetworkData);
 
-    QSharedPointer<DISPLIB::ConnectivitySettingsView> getConnectivitySettingsView();
+    QPointer<DISPLIB::ConnectivitySettingsView> getConnectivitySettingsView();
 
 protected:
-    QSharedPointer<DISPLIB::ConnectivitySettingsView>       m_pConnectivitySettingsView;    /** The connectivity settings view. */
+    QPointer<DISPLIB::ConnectivitySettingsView>       m_pConnectivitySettingsView;    /** The connectivity settings view. */
 };
 } // NAMESPACE
 

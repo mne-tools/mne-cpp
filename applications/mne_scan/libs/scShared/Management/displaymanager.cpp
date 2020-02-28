@@ -90,7 +90,7 @@ DisplayManager::~DisplayManager()
 QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
                               QSharedPointer<QTime>& pT,
                               QList< QAction* >& qListActions,
-                              QList< QWidget* >& qListWidgets)
+                              QList< QWidget* >& qListControlWidgets)
 {
     QWidget* newDisp = new QWidget;
     QVBoxLayout* vboxLayout = new QVBoxLayout;
@@ -105,7 +105,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(pT, newDisp);
 
             qListActions.append(rtmsaWidget->getDisplayActions());
-            qListWidgets.append(rtmsaWidget->getDisplayWidgets());
+            qListControlWidgets.append(rtmsaWidget->getControlWidgets());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtmsaWidget, &RealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);
@@ -119,7 +119,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             RealTimeSourceEstimateWidget* rtseWidget = new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, newDisp);//new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, pT, newDisp);
 
             qListActions.append(rtseWidget->getDisplayActions());
-            qListWidgets.append(rtseWidget->getDisplayWidgets());
+            qListControlWidgets.append(rtseWidget->getControlWidgets());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtseWidget, &RealTimeSourceEstimateWidget::update, Qt::BlockingQueuedConnection);
@@ -133,7 +133,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             RealTimeConnectivityEstimateWidget* rtseWidget = new RealTimeConnectivityEstimateWidget(*pRealTimeConnectivityEstimate, newDisp);//new RealTimeConnectivityEstimateWidget(*pRealTimeConnectivityEstimate, pT, newDisp);
 
             qListActions.append(rtseWidget->getDisplayActions());
-            qListWidgets.append(rtseWidget->getDisplayWidgets());
+            qListControlWidgets.append(rtseWidget->getControlWidgets());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtseWidget, &RealTimeConnectivityEstimateWidget::update, Qt::BlockingQueuedConnection);
@@ -148,7 +148,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             RealTimeEvokedSetWidget* rtesWidget = new RealTimeEvokedSetWidget(*pRealTimeEvokedSet, pT, newDisp);
 
             qListActions.append(rtesWidget->getDisplayActions());
-            qListWidgets.append(rtesWidget->getDisplayWidgets());
+            qListControlWidgets.append(rtesWidget->getControlWidgets());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtesWidget, &RealTimeEvokedSetWidget::update, Qt::BlockingQueuedConnection);
@@ -163,7 +163,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             RealTimeCovWidget* rtcWidget = new RealTimeCovWidget(*pRealTimeCov, pT, newDisp);
 
             qListActions.append(rtcWidget->getDisplayActions());
-            qListWidgets.append(rtcWidget->getDisplayWidgets());
+            qListControlWidgets.append(rtcWidget->getControlWidgets());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtcWidget, &RealTimeCovWidget::update, Qt::BlockingQueuedConnection);
@@ -178,7 +178,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             RealTimeSpectrumWidget* fsWidget = new RealTimeSpectrumWidget(*pRealTimeSpectrum, pT, newDisp);
 
             qListActions.append(fsWidget->getDisplayActions());
-            qListWidgets.append(fsWidget->getDisplayWidgets());
+            qListControlWidgets.append(fsWidget->getControlWidgets());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     fsWidget, &RealTimeSpectrumWidget::update, Qt::BlockingQueuedConnection);

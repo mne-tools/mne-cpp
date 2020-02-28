@@ -89,13 +89,6 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
 
 QuickControlView::~QuickControlView()
 {
-    //Move parentship to 0 pointer because we want to manage the control widgets from elsewhere
-    for(int i = 0; i < m_lControlWidgets.size(); i++) {
-        if(m_lControlWidgets.at(i)) {
-            m_lControlWidgets.at(i)->setParent(0);
-        }
-    }
-
     saveSettings(m_sSettingsPath);
 
     delete ui;
@@ -103,13 +96,30 @@ QuickControlView::~QuickControlView()
 
 //=============================================================================================================
 
-void QuickControlView::addWidget(QSharedPointer<QWidget> pWidget)
+void QuickControlView::addWidgets(const QList<QWidget*>& lWidgets)
 {
-    //Store a reference here so we can unparent them in the destructor. Unparenting is needed because we do not want
-    //to mix the memory management of QObject and QSharedPointer
-    m_lControlWidgets << pWidget;
+    for(int i = 0; i < lWidgets.size(); ++i) {
+        QString sObjectName = lWidgets.at(i)->objectName();
 
-    addWidget(pWidget.data());
+        if(sObjectName.contains("widget_", Qt::CaseInsensitive)) {
+            this->addWidget(lWidgets.at(i));
+        }
+
+        if(sObjectName.contains("group_", Qt::CaseInsensitive)) {
+            if(sObjectName.contains("group_tab_", Qt::CaseInsensitive)) {
+                sObjectName.remove("group_tab_");
+                QStringList sList = sObjectName.split("_");
+                if(sList.size() >= 2) {
+                    this->addGroupBoxWithTabs(lWidgets.at(i), sList.at(0), sList.at(1));
+                } else {
+                    this->addGroupBoxWithTabs(lWidgets.at(i), "", sObjectName);
+                }
+            } else {
+                sObjectName.remove("group_");
+                this->addGroupBox(lWidgets.at(i), sObjectName);
+            }
+        }
+    }
 }
 
 //=============================================================================================================
@@ -119,18 +129,6 @@ void QuickControlView::addWidget(QWidget* pWidget)
     ui->m_gridLayout_groupBoxes->addWidget(pWidget,
                                  ui->m_gridLayout_groupBoxes->rowCount(),
                                  0);
-}
-
-//=============================================================================================================
-
-void QuickControlView::addGroupBox(QSharedPointer<QWidget> pWidget,
-                                   const QString& sGroupBoxName)
-{
-    //Store a reference here so we can unparent them in the destructor. Unparenting is needed because we do not want
-    //to mix the memory management of QObject and QSharedPointer
-    m_lControlWidgets << pWidget;
-
-    addGroupBox(pWidget.data(), sGroupBoxName);
 }
 
 //=============================================================================================================
@@ -150,17 +148,6 @@ void QuickControlView::addGroupBox(QWidget* pWidget,
     ui->m_gridLayout_groupBoxes->addWidget(pGroupBox,
                                  ui->m_gridLayout_groupBoxes->rowCount(),
                                  0);
-}
-
-//=============================================================================================================
-
-void QuickControlView::addGroupBoxWithTabs(QSharedPointer<QWidget> pWidget,
-                                           const QString& sGroupBoxName,
-                                           const QString& sTabName)
-{
-    m_lControlWidgets << pWidget;
-
-    addGroupBoxWithTabs(pWidget.data(), sGroupBoxName, sTabName);
 }
 
 //=============================================================================================================
