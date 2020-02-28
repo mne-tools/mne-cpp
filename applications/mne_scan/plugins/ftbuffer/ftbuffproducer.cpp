@@ -100,11 +100,9 @@ void FtBuffProducer::run()
 
         QThread::usleep(50);
 
-        m_pFtBuffer->m_mutex.lock();
         if (!m_pFtBuffer->isRunning()) {
             break;
         }
-        m_pFtBuffer->m_mutex.unlock();
     }
 }
 

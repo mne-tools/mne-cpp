@@ -118,7 +118,7 @@ bool FtConnector::connect()
 
 bool FtConnector::getHeader()
 {
-    qInfo() << "[FtConnector::getHeader] Attepting to get header...";
+    qInfo() << "[FtConnector::getHeader] Attempting to get header...";
 
     m_pSocket->readAll(); //Ensure receiving buffer is empty
 
@@ -539,7 +539,7 @@ QString FtConnector::getAddr()
 
 FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
 {
-    qInfo() << "[FtConnector::parseNeuromagHeader] Attepting to get extended header...";
+    qInfo() << "[FtConnector::parseNeuromagHeader] Attempting to get extended header...";
 
     QBuffer chunkBuffer;
     QBuffer neuromagBuffer;
