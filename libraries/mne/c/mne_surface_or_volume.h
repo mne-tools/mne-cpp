@@ -327,7 +327,8 @@ public:
                                MneMshDisplaySurface* head_surf,
                                int niter,
                                int scale_head,
-                               float omit_dist);
+                               float omit_dist,
+                               float *scales);
 
     static void get_head_scale(FIFFLIB::FiffDigitizerData* dig,
                                    float **mri_fid,

@@ -164,7 +164,7 @@ bool Sphere::fit_sphere_to_points(const MatrixXf &rr, float simplex_size, Vector
      */
     fitUserRecNew user;
     float      ftol            = 1e-5f;
-    int        max_eval        = 500;
+    int        max_eval        = 3500;
     int        report_interval = -1;
     int        neval;
     MatrixXf   init_simplex;

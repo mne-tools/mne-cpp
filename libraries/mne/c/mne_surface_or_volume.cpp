@@ -2835,7 +2835,8 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
                                         MneMshDisplaySurface* head_surf,
                                         int niter,
                                         int scale_head,
-                                        float omit_dist)
+                                        float omit_dist,
+                                        float *scales)
 
 {
     float           *head_fid[3],*mri_fid[3],**fid;
@@ -2843,7 +2844,7 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
     FiffDigPoint    p;
     FiffDigitizerData*  dig = NULL;
     float          nasion_weight = 5.0;
-    float          scales[3];
+
 
 
     if (!head_dig) {
