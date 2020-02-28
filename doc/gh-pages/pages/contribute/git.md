@@ -5,7 +5,7 @@ nav_order: 4
 ---
 # Git Workflow
 
-This part is focused on giving a short overview of git commands that should cover the general git workflow in MNE-CPP. For further information you can check out this [Git tutorial video](https://www.youtube.com/watch?v=DtLrWCFaG0A&feature=youtu.be).
+This part is focused on giving a short overview of git commands that should cover the general git workflow in MNE-CPP. For further information you can check out this [Git tutorial video](https://www.youtube.com/watch?v=DtLrWCFaG0A&feature=youtu.be){:target="_blank" rel="noopener"}.
 
 The first steps to get started, as described in the [build guide](../install/buildguide.md), are:
 ```
