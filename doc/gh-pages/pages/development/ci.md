@@ -5,7 +5,7 @@ nav_order: 2
 ---
 # CI (Continuous Integration) Pipeline
 
-Everytime a merge to mne-tools/mne-cpp:master occurs the [devbuild workflow in Github Actions](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/devbuilds.yml){:target="_blank" rel="noopener"} is triggered. This workflow builds, solves for dependencies, packages and distributes the last commited version to our [development release](https://github.com/mne-tools/mne-cpp/releases){:target="_blank" rel="noopener"}. 
+Everytime a merge to mne-tools/mne-cpp:master occurs the [devbuild workflow in GitHub Actions](https://github.com/mne-tools/mne-cpp/blob/master/.github/workflows/devbuilds.yml){:target="_blank" rel="noopener"} is triggered. This workflow builds, solves for dependencies, packages and distributes the last commited version to our [development release](https://github.com/mne-tools/mne-cpp/releases){:target="_blank" rel="noopener"}. 
 
 New development takes place on master until the developers decide it is time for a new stable release. At that point we merge the current master branch into the stable branch, ask developers and users to test the stable branch, and once we have rough consensus we create a new release on GitHub.
 

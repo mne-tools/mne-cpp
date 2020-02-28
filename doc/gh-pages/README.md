@@ -8,7 +8,7 @@ Reading the documentation for both of these is recommended.
 
 ### How the website is structured
 
-Github pages allows for the use of remote themes, meaning none of the theme-specific html and css are hosted here.
+GitHub pages allows for the use of remote themes, meaning none of the theme-specific html and css are hosted here.
 
 Pages are inside the `pages` folder. Each is a markdown file, allowing for the use of [markdown syntax](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) for creating the pages. These files get converted to html behind the scenes, so embedding html in the `.md` files works.
 
