@@ -101,7 +101,7 @@ The following examples show how such commit messages could look like:
 ```
 FIX: fix namespace error 
 ENH: add cHPI in Neuromag Plugin
-MAINT: improved GithubAction workflow for Linux deployment
+MAINT: improved GitHubAction workflow for Linux deployment
 DOC: add documentation for new amplifier in MNE Scan
 ```
 

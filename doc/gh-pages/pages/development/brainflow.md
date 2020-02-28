@@ -6,7 +6,7 @@ nav_order: 5
 ---
 # BrainFlow
 
-This plugin adds BrainFlow data acquisition SDK to MNE-SCAN app.
+This plugin adds BrainFlow data acquisition SDK to MNE Scan app.
 
 **Links:**
 
@@ -38,7 +38,7 @@ cd ..
 ## BrainFlowBoard plugin setup
 
 * After steps above make sure that you have brainflowboard uncommented in plugins.pro
-* Build MNE-SCAN application
+* Build MNE Scan application
 * BrainFlow has several dynamic libraries and JSON file which must be in your search path before you run BrainFlow based app, so you need to copypaste BoardController.dll DataHandler.dll and brainflow_boards.json to your executable folder from brainflow\installed\lib
 
 ## BrainFlowBoard plugin UI
