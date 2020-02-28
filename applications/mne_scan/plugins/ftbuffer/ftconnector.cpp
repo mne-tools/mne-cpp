@@ -635,3 +635,10 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
     FIFFLIB::FiffInfo defaultInfo;
     return defaultInfo;
 }
+
+//=============================================================================================================
+
+void FtConnector::catchUpToBuffer()
+{
+    m_iNumSamples = totalBuffSamples();
+}

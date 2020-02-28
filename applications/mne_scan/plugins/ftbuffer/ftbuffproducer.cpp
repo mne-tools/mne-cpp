@@ -85,6 +85,8 @@ void FtBuffProducer::run()
         QThread::usleep(50000);
     }
 
+    m_pFtConnector->catchUpToBuffer();
+
     while (true) {
         m_pFtConnector->getData();
 

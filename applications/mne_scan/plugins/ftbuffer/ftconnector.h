@@ -266,6 +266,12 @@ public:
      */
     FIFFLIB::FiffInfo parseNeuromagHeader();
 
+    //=========================================================================================================
+    /**
+     * Gets the current number of samples in the buffer and stores it in m_iNumSamples
+     */
+    void catchUpToBuffer();
+
 private:
     //=========================================================================================================
     /**
