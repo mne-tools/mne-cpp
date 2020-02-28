@@ -12,11 +12,11 @@ The plugin interface with a FieldTrip Buffer running at a given address. It does
 
 1. Download FieldTrip `neuromag2ft`
 
-   Download the fieldtrip source code on your acquisition computer, either from their [website](http://www.fieldtriptoolbox.org/download/) or their [GitHub page](https://github.com/fieldtrip/fieldtrip). We are interested in the executable `neuromag2ft`, which will serve as both our buffer host and interface to push data to the buffer.
+   Download the fieldtrip source code on your acquisition computer, either from their [website](http://www.fieldtriptoolbox.org/download/){:target="_blank" rel="noopener"} or their [GitHub page](https://github.com/fieldtrip/fieldtrip){:target="_blank" rel="noopener"}. We are interested in the executable `neuromag2ft`, which will serve as both our buffer host and interface to push data to the buffer.
 
 2. Get `neuromag2ft` set up
 
-   We will need to be able to run `neuromag2ft` on the acquisition computer for the Neuromag. Depending on your system, you might have to build it locally. You can do so by running the makefile in `/realtime/src/acquisition/neuromag/` with the command `make`. If in doubt, follow the [documentation](http://www.fieldtriptoolbox.org/development/realtime/neuromag/) on the fieldtrip buffer website.
+   We will need to be able to run `neuromag2ft` on the acquisition computer for the Neuromag. Depending on your system, you might have to build it locally. You can do so by running the makefile in `/realtime/src/acquisition/neuromag/` with the command `make`. If in doubt, follow the [documentation](http://www.fieldtriptoolbox.org/development/realtime/neuromag/){:target="_blank" rel="noopener"} on the fieldtrip buffer website.
 
 3. Run `neuromag2ft`
 
