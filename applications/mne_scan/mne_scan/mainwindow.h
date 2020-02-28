@@ -227,7 +227,7 @@ private:
 
     QList< QAction* >                   m_qListDynamicPluginActions;    /**< dynamic plugin actions */
     QList< QAction* >                   m_qListDynamicDisplayActions;   /**< dynamic display actions */
-    QList< QWidget* >                   m_qListDynamicDisplayWidgets;   /**< dynamic display widgets */
+    QList< QWidget* >                   m_qListDynamicControlWidgets;   /**< dynamic display widgets */
 
     QMenu*                              m_pMenuFile;    /**< Holds the file menu.*/
     QMenu*                              m_pMenuView;    /**< Holds the view menu.*/

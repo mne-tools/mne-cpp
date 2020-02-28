@@ -201,126 +201,129 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
-        //Init quick control widget
-        QStringList slFlags;
-
-        // Quick control scaling
-        if(slFlags.contains("scaling")) {
-            ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName),
-                                                        m_pFiffInfo->chs);
-            m_pQuickControlView->addGroupBox(pScalingView, "Scaling");
-
-            connect(pScalingView, &ScalingView::scalingChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::setScalingMap);
-
-            m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
-        }
-
-        // Quick control projectors
-        if(slFlags.contains("projections")) {
-            ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTMSAW/%1").arg(sRTMSAWName));
-            m_pQuickControlView->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP");
-
-            connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::updateProjection);
-
-            pProjectorsView->setProjectors(m_pFiffInfo->projs);
-        }
-
-        // Quick control compensators
-        if(slFlags.contains("compensators")) {
-            CompensatorView* pCompensatorView = new CompensatorView(QString("RTMSAW/%1").arg(sRTMSAWName));
-            m_pQuickControlView->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp");
-
-            connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::updateCompensator);
-
-            pCompensatorView->setCompensators(m_pFiffInfo->comps);
-        }
-
-        // Quick control filter
-        if(slFlags.contains("filter")) {
-            FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTMSAW/%1").arg(sRTMSAWName));
-            m_pQuickControlView->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter");
-
-            connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::setFilterChannelType);
-
-            connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::setFilter);
-
-            connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::setFilterActive);
-
-            m_pChannelDataView->setFilterActive(pFilterSettingsView->getFilterActive());
-            m_pChannelDataView->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
-            pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
-            pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
-            pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
-        }
-
-        // Quick control SPHARA settings
-        if(slFlags.contains("sphara")) {
-            SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
-            m_pQuickControlView->addGroupBoxWithTabs(pSpharaSettingsView, "Noise", "SPHARA");
-
-            connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::updateSpharaActivation);
-
-            connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::updateSpharaOptions);
-        }
-
-        // Quick control channel data settings
-        if(slFlags.contains("view")) {
-            FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("RTMSAW/%1").arg(sRTMSAWName));
-            pChannelDataSettingsView->setWidgetList();
-            m_pQuickControlView->addGroupBoxWithTabs(pChannelDataSettingsView, "Other", "View");
-
-            connect(pChannelDataSettingsView, &FiffRawViewSettings::signalColorChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::setSignalColor);
-
-            connect(pChannelDataSettingsView, &FiffRawViewSettings::backgroundColorChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::setBackgroundColor);
-
-            connect(pChannelDataSettingsView, &FiffRawViewSettings::zoomChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::setZoom);
-
-            connect(pChannelDataSettingsView, &FiffRawViewSettings::timeWindowChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::setWindowSize);
-
-            connect(pChannelDataSettingsView, &FiffRawViewSettings::distanceTimeSpacerChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::setDistanceTimeSpacer);
-
-            connect(pChannelDataSettingsView, &FiffRawViewSettings::makeScreenshot,
-                    this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
-
-            m_pChannelDataView->setZoom(pChannelDataSettingsView->getZoom());
-            m_pChannelDataView->setWindowSize(pChannelDataSettingsView->getWindowSize());
-            m_pChannelDataView->setDistanceTimeSpacer(pChannelDataSettingsView->getDistanceTimeSpacer());
-            m_pChannelDataView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
-            m_pChannelDataView->setSignalColor(pChannelDataSettingsView->getSignalColor());
-        }
-
-        // Quick control trigger detection settings
-        if(slFlags.contains("triggerdetection")) {
-            TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView(QString("RTMSAW/%1").arg(sRTMSAWName));
-            m_pQuickControlView->addGroupBoxWithTabs(pTriggerDetectionView, "Other", "Triggers");
-
-            connect(pTriggerDetectionView, &TriggerDetectionView::triggerInfoChanged,
-                    m_pChannelDataView.data(), &RtFiffRawView::triggerInfoChanged);
-
-            connect(pTriggerDetectionView, &TriggerDetectionView::resetTriggerCounter,
-                    m_pChannelDataView.data(), &RtFiffRawView::resetTriggerCounter);
-
-            connect(m_pChannelDataView.data(), &RtFiffRawView::triggerDetected,
-                    pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
-
-            pTriggerDetectionView->init(m_pFiffInfo);
-        }
-
         //Initialized
         m_bInitialized = true;
+    }
+}
+
+//=============================================================================================================
+
+QList<QWidget*> RealTimeMultiSampleArrayWidget::getControlWidgets()
+{
+    if(m_pFiffInfo && m_bInitialized) {
+        QSettings settings;
+        QString sRTMSAWName = m_pRTMSA->getName();
+
+        //Init quick control widget
+        QList<QWidget*> lControlWidgets;
+
+        // Quick control scaling
+        ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName),
+                                                    m_pFiffInfo->chs);
+        pScalingView->setObjectName("widget_Scaling");
+        lControlWidgets.append(pScalingView);
+
+        connect(pScalingView, &ScalingView::scalingChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::setScalingMap);
+
+        m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
+
+        // Quick control projectors
+        ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTMSAW/%1").arg(sRTMSAWName));
+        pProjectorsView->setObjectName("group_tab_Noise_SSP");
+        lControlWidgets.append(pProjectorsView);
+
+        connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::updateProjection);
+
+        pProjectorsView->setProjectors(m_pFiffInfo->projs);
+
+        // Quick control compensators
+        CompensatorView* pCompensatorView = new CompensatorView(QString("RTMSAW/%1").arg(sRTMSAWName));
+        pCompensatorView->setObjectName("group_tab_Noise_Comp");
+        lControlWidgets.append(pCompensatorView);
+
+        connect(pCompensatorView, &CompensatorView::compSelectionChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::updateCompensator);
+
+        pCompensatorView->setCompensators(m_pFiffInfo->comps);
+
+        // Quick control filter
+        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTMSAW/%1").arg(sRTMSAWName));
+        pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
+        lControlWidgets.append(pFilterSettingsView);
+
+        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::setFilterChannelType);
+
+        connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::setFilter);
+
+        connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::setFilterActive);
+
+        m_pChannelDataView->setFilterActive(pFilterSettingsView->getFilterActive());
+        m_pChannelDataView->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
+        pFilterSettingsView->getFilterView()->setWindowSize(m_iMaxFilterTapSize);
+        pFilterSettingsView->getFilterView()->setMaxFilterTaps(m_iMaxFilterTapSize);
+        pFilterSettingsView->getFilterView()->init(m_pFiffInfo->sfreq);
+
+        // Quick control SPHARA settings
+        SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView();
+        pSpharaSettingsView->setObjectName("group_tab_Noise_SPHARA");
+        lControlWidgets.append(pSpharaSettingsView);
+
+        connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaActivation);
+
+        connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaOptions);
+
+        // Quick control channel data settings
+        FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("RTMSAW/%1").arg(sRTMSAWName));
+        pChannelDataSettingsView->setWidgetList();
+        pChannelDataSettingsView->setObjectName("group_tab_Other_View");
+        lControlWidgets.append(pChannelDataSettingsView);
+
+        connect(pChannelDataSettingsView, &FiffRawViewSettings::signalColorChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::setSignalColor);
+
+        connect(pChannelDataSettingsView, &FiffRawViewSettings::backgroundColorChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::setBackgroundColor);
+
+        connect(pChannelDataSettingsView, &FiffRawViewSettings::zoomChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::setZoom);
+
+        connect(pChannelDataSettingsView, &FiffRawViewSettings::timeWindowChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::setWindowSize);
+
+        connect(pChannelDataSettingsView, &FiffRawViewSettings::distanceTimeSpacerChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::setDistanceTimeSpacer);
+
+        connect(pChannelDataSettingsView, &FiffRawViewSettings::makeScreenshot,
+                this, &RealTimeMultiSampleArrayWidget::onMakeScreenshot);
+
+        m_pChannelDataView->setZoom(pChannelDataSettingsView->getZoom());
+        m_pChannelDataView->setWindowSize(pChannelDataSettingsView->getWindowSize());
+        m_pChannelDataView->setDistanceTimeSpacer(pChannelDataSettingsView->getDistanceTimeSpacer());
+        m_pChannelDataView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
+        m_pChannelDataView->setSignalColor(pChannelDataSettingsView->getSignalColor());
+
+        // Quick control trigger detection settings
+        TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView(QString("RTMSAW/%1").arg(sRTMSAWName));
+        pTriggerDetectionView->setObjectName("group_tab_Other_Triggers");
+        lControlWidgets.append(pTriggerDetectionView);
+
+        connect(pTriggerDetectionView, &TriggerDetectionView::triggerInfoChanged,
+                m_pChannelDataView.data(), &RtFiffRawView::triggerInfoChanged);
+
+        connect(pTriggerDetectionView, &TriggerDetectionView::resetTriggerCounter,
+                m_pChannelDataView.data(), &RtFiffRawView::resetTriggerCounter);
+
+        connect(m_pChannelDataView.data(), &RtFiffRawView::triggerDetected,
+                pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
+
+        pTriggerDetectionView->init(m_pFiffInfo);
     }
 }
 
