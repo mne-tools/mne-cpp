@@ -129,6 +129,14 @@ public:
      */
     virtual void init();
 
+    //=========================================================================================================
+    /**
+     * A list of display widgets for the current measurement widget.
+     *
+     * @return a list of display widgets
+     */
+    virtual QList<QWidget*> getControlWidgets();
+
 private:
     //=========================================================================================================
     /**
