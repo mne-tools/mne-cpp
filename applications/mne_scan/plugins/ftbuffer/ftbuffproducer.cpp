@@ -87,12 +87,13 @@ void FtBuffProducer::run()
 
     m_pFtConnector->catchUpToBuffer();
 
+    qInfo() << "[FtBuffProducer::run] Connected to buffer and ready to receive data.";
+
     while (true) {
         m_pFtConnector->getData();
 
         //Sends up new data when FtConnector flags new data
         if (m_pFtConnector->newData()) {
-            qInfo() << "[FtBuffProducer::run] Returning new data matrix.";
             emit newDataAvailable(m_pFtConnector->getMatrix());
             m_pFtConnector->resetEmitData();
         }
