@@ -196,16 +196,6 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
     BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
     pVVItem->setCheckState(Qt::Unchecked);
 
-    QFile t_fileHeadKid(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
-    MNEBem t_BemHeadKid(t_fileHeadKid);
-    m_pBemHeadKid = m_pData3DModel->addBemData("Head", "Child", t_BemHeadKid);
-    m_pBemHeadKid->setCheckState(Qt::Unchecked);
-
-    QFile t_fileHeadAdult(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
-    MNEBem t_BemHeadAdult(t_fileHeadAdult);
-    m_pBemHeadAdult = m_pData3DModel->addBemData("Head", "Adult", t_BemHeadAdult);
-    m_pBemHeadAdult->setCheckState(Qt::Unchecked);
-
     QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif");;
     MNEBem t_BemHeadAvr(t_fileHeadAvr);
     m_pBemHeadAvr = m_pData3DModel->addBemData("Head", "Average", t_BemHeadAvr);
@@ -215,7 +205,7 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
 
     //Init coil freqs
-    m_vCoilFreqs << 155 << 165 << 190 << 220;
+    m_vCoilFreqs << 155 << 165 << 190 << 200;
 
     //Init data
     m_matValue.resize(0,0);
@@ -389,116 +379,9 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
         m_vCoilFreqs << 155 << 165 << 190 << 200;
     }
 
-    // read fsaverage fiducials
-    QFile t_fileDigAvr(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
-    FiffDigPointSet t_digAvr(t_fileDigAvr);
-
-    //t_digAvr.applyTransform(transAvr);
-    DigitizerSetTreeItem* pDigItem = m_pData3DModel->addDigitizerData("Head", "avr", t_digAvr);
-
-    // read mri-head transformation for average head
-    QFile file (QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-trans.fif");
-    FiffCoordTrans transAvr(file);
-
-    // write fiducials to Eigen
-    Eigen::MatrixXf sLm(3,3);
-    Eigen::MatrixXf dLm(3,3);
-
-    for(int i = 0; i < t_digAvr.size(); i++){
-        if(t_digAvr[i].kind == FIFFV_POINT_CARDINAL/* || t_digAvr[i].kind ==  FIFFV_POINT_HPI*/){
-        sLm(i,0) = t_digAvr[i].r[0];
-        sLm(i,1) = t_digAvr[i].r[1];
-        sLm(i,2) = t_digAvr[i].r[2];
-        }
-    }
-
-    for(int i = 0; i < t_digSet.size(); i++){
-        if(t_digSet[i].kind == FIFFV_POINT_CARDINAL/* || t_digSet[i].kind ==  FIFFV_POINT_HPI*/) {
-            dLm(i,0) = t_digSet[i].r[0];
-            dLm(i,1) = t_digSet[i].r[1];
-            dLm(i,2) = t_digSet[i].r[2];
-        }
-    }
-
-    qDebug() << "sLm";
-    std::cout << sLm << std::endl;
-    qDebug() << "dLm";
-    std::cout << dLm << std::endl;
-
-//    RowVector3f vScale(3);
-
-//    vScale(0) = dLm.row(0).norm() / sLm.row(0).norm();
-//    vScale(1) = dLm.row(1).norm() / sLm.row(1).norm();
-//    vScale(2) = dLm.row(2).norm() / sLm.row(2).norm();
-
-//    qDebug() << "vScale: " ;
-//    std::cout << vScale << std::endl;
-
-//    float scale = vScale.mean();
-
-
-//    // compute transformation
-//    Matrix4f trans = computeTransformation(dLm, sLm);
-//    qDebug() << "trans";
-//    std::cout << trans << std::endl;
-//    MatrixXf temp = sLm;
-//    temp.conservativeResize(sLm.rows(),sLm.cols()+1);
-//    temp.block(0,3,3,1).setOnes();
-//    temp.transposeInPlace();
-//    MatrixXf tSLm = trans * temp;
-//    sLm = tSLm.block(0,0,3,3);
-
-//    // compute scaling
-//    float simplex_size = 2e-2;
-//    float sR;
-//    float dR;
-//    VectorXf sr0(3);
-//    VectorXf dr0(3);
-//    dr0 << 0,0,0;
-//    qDebug() << "a";
-//    Sphere::fit_sphere_to_points(dLm,simplex_size,dr0,dR);
-//    Sphere::fit_sphere_to_points(sLm,simplex_size,sr0,sR);
-//    qDebug("Tracked : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*dr0[0],1000*dr0[1],1000*dr0[2],1000*dR);
-//    qDebug("Average : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*sr0[0],1000*sr0[1],1000*sr0[2],1000*sR);
-//    float scale = dR/sR;
-//    qDebug() << "Scale: " << scale;
-
-//    //  apply scaling
-//    sLm *= scale;
-
-//    qDebug() << "tsLm";
-//    std::cout << sLm << std::endl;
-
-//    Qt3DCore::QTransform transform;
-//    QMatrix4x4 mat;
-//    for(int r = 0; r < 4; ++r) {
-//        for(int c = 0; c < 4; ++c) {
-//            mat(r,c) = trans(r,c);
-//        }
-//    }
-//    transform.setMatrix(mat);
-
-//    pDigItem->setTransform(transform);
-
-//    for(int i = 0; i < t_digAvr.size(); i++){
-//        if(t_digAvr[i].kind == FIFFV_POINT_CARDINAL/* || t_digAvr[i].kind ==  FIFFV_POINT_HPI*/){
-//        sLm(i,0) = t_digAvr[i].r[0];
-//        sLm(i,1) = t_digAvr[i].r[1];
-//        sLm(i,2) = t_digAvr[i].r[2];
-//        }
-//    }
-
-//    //Update Average head surface
-//    QList<QStandardItem*> itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
-//    for(int j = 0; j < itemList.size(); ++j) {
-//        if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-//            //If it is the kid's model scale it
-////            pBemItem->setScale(scale);
-//            pBemItem->setTransform(transAvr);
-//            pBemItem->setTransform(transform);
-//        }
-//    }
+    // align fiducials and scale average head
     alignFiducials(fileName);
+
     return lDigPoints;
 }
 
@@ -559,22 +442,18 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
             pDigItem->setTransform(transform);
         }
     }
+
     QFile file (QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-trans.fif");
     FiffCoordTrans transAvr(file);
 
     QList<QStandardItem*> itemListB = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
     for(int j = 0; j < itemListB.size(); ++j) {
         if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemListB.at(j))) {
-            //If it is the kid's model scale it
-//            pBemItem->setScale(scale);
             pBemItem->applyTransform(transAvr, true);
             pBemItem->applyTransform(transform);
             pBemItem->setScale(scales[0]);
         }
     }
-
-    std::cout<<"rot:"<<std::endl<<t_digData->head_mri_t_adj->rot;
-    std::cout<<std::endl<<"move:"<<std::endl<<t_digData->head_mri_t_adj->move;
 
     delete surface;
     delete pMneMshDisplaySurfaceSet;
@@ -620,7 +499,7 @@ void HpiView::onBtnLoadPolhemusFile()
 {
     //Get file location
     QString fileName_HPI = QFileDialog::getOpenFileName(this,
-            tr("Open digitizer file"),QCoreApplication::applicationDirPath() + "MNE-sample-data/chpi/raw" , tr("Fiff file (*.fif)"));
+            tr("Open digitizer file"),"", tr("Fiff file (*.fif)"));
 
     if(!fileName_HPI.isEmpty()) {
         ui->m_lineEdit_filePath->setText(fileName_HPI);
@@ -805,7 +684,7 @@ void HpiView::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPoin
 
 void HpiView::update3DView()
 {
-    if(m_pTrackedDigitizer && m_pFiffInfo && m_pBemHeadAdult && m_pBemHeadKid) {
+    if(m_pTrackedDigitizer && m_pFiffInfo && m_pBemHeadAvr) {
         //Prepare new transform
         QMatrix4x4 mat;
         for(int r = 0; r < 4; ++r) {
@@ -825,21 +704,11 @@ void HpiView::update3DView()
             }
         }
 
-        //Update adult head surface
-        itemList = m_pBemHeadAdult->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
-        for(int j = 0; j < itemList.size(); ++j) {
-            if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                pBemItem->setTransform( transform);
-            }
-        }
-
-        //Update kid's head surface
-        itemList = m_pBemHeadKid->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
-        for(int j = 0; j < itemList.size(); ++j) {
-            if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                //If it is the kid's model scale it
+        // Update average head
+        QList<QStandardItem*> itemListB = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
+        for(int j = 0; j < itemListB.size(); ++j) {
+            if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemListB.at(j))) {
                 pBemItem->setTransform(transform);
-                pBemItem->setScale(0.65f);
             }
         }
     }
