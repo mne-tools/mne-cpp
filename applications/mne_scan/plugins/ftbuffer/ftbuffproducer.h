@@ -127,7 +127,7 @@ protected:
     /**
      * Loops continuously to aquire new data from FtConnector and send to FtBuffer
      */
-    virtual void run();
+    virtual void runMainLoop();
 
 signals:
     //=========================================================================================================

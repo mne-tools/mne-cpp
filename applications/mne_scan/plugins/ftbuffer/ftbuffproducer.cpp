@@ -73,9 +73,9 @@ FtBuffProducer::~FtBuffProducer()
 
 //=============================================================================================================
 
-void FtBuffProducer::run()
+void FtBuffProducer::runMainLoop()
 {
-    qInfo() << "[FtBuffProducer::run] Running producer..";
+    qInfo() << "[FtBuffProducer::runMainLoop] Running producer...";
 
     while(!m_pFtConnector->connect()) {
         QThread::usleep(50000);
@@ -87,7 +87,7 @@ void FtBuffProducer::run()
 
     m_pFtConnector->catchUpToBuffer();
 
-    qInfo() << "[FtBuffProducer::run] Connected to buffer and ready to receive data.";
+    qInfo() << "[FtBuffProducer::runMainLoop] Connected to buffer and ready to receive data.";
 
     while (true) {
         m_pFtConnector->getData();
@@ -110,7 +110,7 @@ void FtBuffProducer::run()
 
 void FtBuffProducer::doWork()
 {
-    run();
+    runMainLoop();
 }
 
 //=============================================================================================================
