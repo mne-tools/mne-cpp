@@ -262,7 +262,6 @@ bool FtConnector::getData()
         return false;
     }
 
-    qInfo() << "[FtConnector::getData] Attempting to get data...";
     m_pSocket->readAll(); //Ensure receiving buffer is empty
 
     // Get data message + data selection params
@@ -343,7 +342,6 @@ void FtConnector::prepBuffer(QBuffer &buffer,
 
 int FtConnector::parseDataDef(QBuffer &dataBuffer)
 {
-    qInfo() << "[FtConnector::parseDataDef] Got datadef, parsing...";
     datadef_t datadef;
 
     //Get nchans, int32
