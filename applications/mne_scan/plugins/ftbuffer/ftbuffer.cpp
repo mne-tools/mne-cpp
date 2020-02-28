@@ -71,15 +71,6 @@ FtBuffer::FtBuffer()
 , m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
 {
     qInfo() << "[FtBuffer::FtBufer] Object created.";
-
-    //Sets up GUI and GUI connections
-    m_pActionShowYourWidget = new QAction(QIcon(":/images/options.png"), tr("FieldTrip Buffer Widget"),this);
-    m_pActionShowYourWidget->setShortcut(tr("F12"));
-    m_pActionShowYourWidget->setStatusTip(tr("FieldTrip Buffer Widget"));
-
-    connect(m_pActionShowYourWidget, &QAction::triggered, this, &FtBuffer::showYourWidget);
-
-    addPluginAction(m_pActionShowYourWidget);
 }
 
 //=============================================================================================================
@@ -187,14 +178,6 @@ QWidget* FtBuffer::setupWidget()
 
 void FtBuffer::run()
 {
-}
-
-//=============================================================================================================
-
-void FtBuffer::showYourWidget()
-{
-    m_pYourWidget = FtBufferYourWidget::SPtr(new FtBufferYourWidget());
-    m_pYourWidget->show();
 }
 
 //=============================================================================================================
