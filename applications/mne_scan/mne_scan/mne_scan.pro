@@ -51,7 +51,6 @@ contains(MNECPP_CONFIG, static) {
     LIBS += -L$${MNE_BINARY_DIR}/mne_scan_plugins
     QTPLUGIN += ecgsimulator
     QTPLUGIN += fiffsimulator
-    QTPLUGIN += neuromag
     QTPLUGIN += babymeg
     QTPLUGIN += triggercontrol
     QTPLUGIN += natus

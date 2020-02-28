@@ -46,7 +46,6 @@
 
 #ifdef STATICLIB
 #include <../plugins/fiffsimulator/fiffsimulator.h>
-#include <../plugins/neuromag/neuromag.h>
 #include <../plugins/babymeg/babymeg.h>
 #include <../plugins/natus/natus.h>
 #include <../plugins/ftbuffer/ftbuffer.h>
@@ -103,7 +102,6 @@ void PluginManager::loadPlugins(const QString& dir)
     // In case of a static build we have to load plugins manually.
     QList<QObject*> lObjects;
     lObjects << new FIFFSIMULATORPLUGIN::FiffSimulator;
-    lObjects << new NEUROMAGPLUGIN::Neuromag;
     lObjects << new BABYMEGPLUGIN::BabyMEG;
     lObjects << new NATUSPLUGIN::Natus;
     lObjects << new FTBUFFERPLUGIN::FtBuffer;
