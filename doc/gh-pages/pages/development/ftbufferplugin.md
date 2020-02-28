@@ -24,7 +24,7 @@ The plugin interface with a FieldTrip Buffer running at a given address. It does
 
 4. Start data collection
 
-   Start collecting data and ensure it is being sent into the buffer thorugh neuromag2ft.
+   Start collecting data and ensure it is being sent into the buffer through neuromag2ft. It is important that nuromag2ft already be running before data collection starts, otherwise neuromag2ft will not work.
 
 5. Set up plugin:
 
@@ -32,6 +32,6 @@ The plugin interface with a FieldTrip Buffer running at a given address. It does
 
 6. Receive data:
 
-   In MNE-Scan, click the green start button on the top left to start the plugin. This has to be done after the data collection starts. For best results, have the client plugin running soon after measurement starts.
+   In MNE-Scan, click the green start button on the top left to start the plugin.
 
 -------------------
