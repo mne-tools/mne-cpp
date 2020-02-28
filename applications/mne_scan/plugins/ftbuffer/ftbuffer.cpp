@@ -145,6 +145,8 @@ bool FtBuffer::stop()
 
     m_pRTMSA_BufferOutput->data()->clear();
 
+    m_bIsConfigured = false;
+
     //stops separate producer/client thread
     m_pProducerThread.quit();
     m_pProducerThread.wait();
