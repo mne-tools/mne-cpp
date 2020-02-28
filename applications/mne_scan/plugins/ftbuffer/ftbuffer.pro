@@ -79,7 +79,6 @@ SOURCES += \
     ftbuffer.cpp \
     FormFiles/ftbuffersetupwidget.cpp \
     FormFiles/ftbufferaboutwidget.cpp \
-    FormFiles/ftbufferyourwidget.cpp \
     ftbuffproducer.cpp \
     ftconnector.cpp \
 
@@ -88,14 +87,12 @@ HEADERS += \
     ftbuffer.h \
     FormFiles/ftbuffersetupwidget.h \
     FormFiles/ftbufferaboutwidget.h \
-    FormFiles/ftbufferyourwidget.h \
     ftbuffproducer.h \
     ftconnector.h \
 
 FORMS += \
     FormFiles/ftbuffersetup.ui \
     FormFiles/ftbufferabout.ui \
-    FormFiles/ftbufferyourtoolbarwidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
