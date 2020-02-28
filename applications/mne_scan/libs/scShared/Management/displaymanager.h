@@ -104,7 +104,10 @@ public:
      *
      * @return a pointer to the widget containing all measurement widgets.
      */
-    QWidget* show(IPlugin::OutputConnectorList &outputConnectorList, QSharedPointer<QTime>& pT, QList< QAction* >& qListActions, QList< QWidget* >& qListWidgets);
+    QWidget* show(IPlugin::OutputConnectorList &outputConnectorList,
+                  QSharedPointer<QTime>& pT,
+                  QList<QAction*>& qListActions,
+                  QList<QWidget*>& qListControlWidgets);
 
     //=========================================================================================================
     /**

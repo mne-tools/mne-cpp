@@ -94,7 +94,6 @@ class SCDISPSHARED_EXPORT MeasurementWidget : public QWidget
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
      * Constructs a MeasurementWidget which is a child of parent.
@@ -131,7 +130,7 @@ public:
      *
      * @return a list of display actions
      */
-    inline QList< QAction* > getDisplayActions();
+    inline QList<QAction*> getDisplayActions();
 
     //=========================================================================================================
     /**
@@ -139,7 +138,7 @@ public:
      *
      * @return a list of display widgets
      */
-    inline QList< QWidget* > getDisplayWidgets();
+    inline QList<QWidget*> getControlWidgets();
 
 protected:
     //=========================================================================================================
@@ -156,17 +155,7 @@ protected:
      *
      * @param [in] pWidget  pointer to the widget to be added to the measurement widget
      */
-    inline void addDisplayWidget(QWidget* pWidget);
-
-    //=========================================================================================================
-    /**
-     * Adds control widgets to a QuickControlView based on their set objects names
-     *
-     * @param [in] pQuickControlView  The quick control view to add the control widgets to
-     * @param [in] lControlWidgets  The control widgets
-     */
-    void addControlWidgets(QSharedPointer<DISPLIB::QuickControlView> pQuickControlView,
-                           const QList<QSharedPointer<QWidget> >& lControlWidgets);
+    inline void addControlWidget(QWidget* pWidget);
 
 private:
     QList< QAction* >   m_qListDisplayActions;          /**< List of display actions */
@@ -178,14 +167,14 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-QList< QAction* > MeasurementWidget::getDisplayActions()
+QList<QAction*> MeasurementWidget::getDisplayActions()
 {
     return m_qListDisplayActions;
 }
 
 //=============================================================================================================
 
-QList< QWidget* > MeasurementWidget::getDisplayWidgets()
+QList<QWidget*> MeasurementWidget::getControlWidgets()
 {
     return m_qListDisplayWidgets;
 }
@@ -199,7 +188,7 @@ inline void MeasurementWidget::addDisplayAction(QAction* pAction)
 
 //=============================================================================================================
 
-inline void MeasurementWidget::addDisplayWidget(QWidget* pWidget)
+inline void MeasurementWidget::addControlWidget(QWidget* pWidget)
 {
     m_qListDisplayWidgets.append(pWidget);
 }

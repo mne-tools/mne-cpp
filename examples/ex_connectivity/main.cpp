@@ -428,8 +428,8 @@ int main(int argc, char *argv[])
                                                                                     //pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
                                                                                 }});
 
-    TfSettingsView::SPtr pTfSettingsView = TfSettingsView::SPtr::create();
-    QList<QSharedPointer<QWidget> > lWidgets;
+    QPointer<TfSettingsView> pTfSettingsView = new TfSettingsView();
+    QList<QWidget*> lWidgets;
     lWidgets << pTfSettingsView;
 
     QObject::connect(pTfSettingsView.data(), &TfSettingsView::numberTrialRowChanged,
@@ -462,7 +462,7 @@ int main(int argc, char *argv[])
                                                       t_sensorSurfaceVV,
                                                       raw.info.bads);
     } else {
-        MinimumNormSettingsView::SPtr pMinimumNormSettingsView = MinimumNormSettingsView::SPtr::create();
+        QPointer<MinimumNormSettingsView> pMinimumNormSettingsView = new MinimumNormSettingsView();
         lWidgets << pMinimumNormSettingsView;
 
         QObject::connect(pMinimumNormSettingsView.data(), &MinimumNormSettingsView::timePointChanged,
