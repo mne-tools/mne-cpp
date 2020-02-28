@@ -66,6 +66,7 @@ using namespace Eigen;
 
 FtBuffer::FtBuffer()
 : m_bIsRunning(false)
+, m_bIsConfigured(false)
 , m_pFtBuffProducer(QSharedPointer<FtBuffProducer>::create(this))
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_pRTMSA_BufferOutput(PluginOutputData<RealTimeMultiSampleArray>::create(this, "FtBuffer", "Output data"))
@@ -108,6 +109,10 @@ void FtBuffer::unload()
 
 bool FtBuffer::start()
 {
+    if (!m_bIsConfigured) {
+        return false;
+    }
+
     qInfo() << "[FtBuffer::start] Starting FtBuffer...";
     m_bIsRunning = true;
 
@@ -229,7 +234,7 @@ bool FtBuffer::setupRTMSA()
         m_pRTMSA_BufferOutput->data()->setVisibility(true);
 
         qInfo() << "[FtBuffer::setupRTMSA] Successfully acquired fif info from file.";
-        return true;
+        return m_bIsConfigured = true;
     }
     return false;
 }
@@ -251,5 +256,5 @@ bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
     m_pRTMSA_BufferOutput->data()->setVisibility(true);
 
     qInfo() << "[FtBuffer::setupRTMSA] Successfully aquired fif info from buffer.";
-    return true;
+    return m_bIsConfigured = true;
 }
