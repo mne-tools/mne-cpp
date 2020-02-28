@@ -52,7 +52,6 @@ contains(MNECPP_CONFIG, static) {
     DEFINES += STATICLIB
     LIBS += -L$${MNE_BINARY_DIR}/mne_scan_plugins
     QTPLUGIN += fiffsimulator
-    QTPLUGIN += neuromag
     QTPLUGIN += babymeg
     QTPLUGIN += natus
 #    QTPLUGIN += gusbamp

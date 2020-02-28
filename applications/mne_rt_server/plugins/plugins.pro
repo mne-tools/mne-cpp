@@ -40,9 +40,3 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     fiffsimulator \
-
-# Build Neuromag Plugin only for Unix Systems - cause of unix specific shmem commands
-unix:!macx{
-    SUBDIRS += \
-        neuromag
-}

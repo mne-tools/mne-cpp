@@ -78,8 +78,6 @@ namespace RTSERVER
 enum ConnectorID
 {
     _FIFFSIMULATOR = 1,                 /**< Connector id of the FIFF file simulator. */
-    _NEUROMAG = _FIFFSIMULATOR + 1,     /**< Connector id of the Neuromag connector. */
-    _BABYMEG = _NEUROMAG + 1,           /**< Connector id of the BabyMEG connector. */
     _default = -1                       /**< Default connector id. */
 };
 
