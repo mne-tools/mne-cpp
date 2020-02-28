@@ -44,7 +44,6 @@ TEMPLATE = subdirs
 SUBDIRS += \
     fiffsimulator \
     ftbuffer \
-    neuromag \
     babymeg \
     natus \
 #    brainflowboard \       # Build guide -> https://mne-cpp.github.io/pages/development/brainflow.html

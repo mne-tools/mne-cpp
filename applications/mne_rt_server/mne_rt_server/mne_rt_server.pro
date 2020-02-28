@@ -58,7 +58,6 @@ contains(MNECPP_CONFIG, static) {
     DEFINES += STATICLIB
     LIBS += -L$${MNE_BINARY_DIR}/mne_rt_server_plugins
     QTPLUGIN += FiffSimulator \
-#    QTPLUGIN += Neuromag \
 } else {
     CONFIG += shared
 }

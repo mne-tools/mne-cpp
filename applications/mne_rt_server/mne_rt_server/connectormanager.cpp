@@ -50,7 +50,6 @@
 
 #ifdef STATICLIB
 #include <../plugins/fiffsimulator/fiffsimulator.h>
-#include <../plugins/neuromag/neuromag.h>
 #endif
 
 #include <iostream>
@@ -348,14 +347,11 @@ void ConnectorManager::loadConnectors(const QString& dir)
     Q_UNUSED(dir)
 
     // In case of a static build we have to load plugins manually.
-    // Neuromag is commented out since this plugin is only built on MEG acq computers.
     QList<QObject*> lObjects;
     lObjects << new FIFFSIMULATORRTSERVERPLUGIN::FiffSimulator;
-    //lObjects << new NEUROMAGRTSERVERPLUGIN::Neuromag;
 
     QStringList lJSONFiles;
     lJSONFiles << QCoreApplication::applicationDirPath() + "/resources/mne_rt_server_plugins/fiffsimulator.json";
-    //lJSONFiles << QCoreApplication::applicationDirPath() + "/resources/mne_rt_server_plugins/neuromag.json";
 
     for(int i = 0; i < lObjects.size(); ++i) {
         IConnector* t_pIConnector = qobject_cast<IConnector*>(lObjects[i]);
