@@ -236,7 +236,6 @@ private:
 
     QToolBar*                           m_pToolBar;                 /**< Holds the tool bar.*/
     QToolBar*                           m_pDynamicPluginToolBar;    /**< Holds the plugin tool bar.*/
-    QToolBar*                           m_pDynamicDisplayToolBar;   /**< Holds the display tool bar.*/
     QString                             m_sCurPluginName;           /**< The name which corresponds to the current selected plugin */
 
     QLabel*                             m_pLabelTime;      /**< Holds the display label for the running time.*/
@@ -255,7 +254,7 @@ private:
     LogLevel                            m_eLogLevelCurrent;             /**< Holds the current log level.*/
 
     QSharedPointer<QWidget>             m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
-    QPointer<DISPLIB::QuickControlView>               m_pQuickControlView;            /**< quick control widget. */
+    QPointer<DISPLIB::QuickControlView> m_pQuickControlView;            /**< quick control widget. */
 
 };
 }// NAMESPACE

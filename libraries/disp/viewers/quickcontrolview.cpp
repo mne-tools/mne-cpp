@@ -96,6 +96,13 @@ QuickControlView::~QuickControlView()
 
 //=============================================================================================================
 
+void QuickControlView::clear()
+{
+    qDeleteAll(this->findChildren<QWidget*>("", Qt::FindDirectChildrenOnly));
+}
+
+//=============================================================================================================
+
 void QuickControlView::addWidgets(const QList<QWidget*>& lWidgets)
 {
     for(int i = 0; i < lWidgets.size(); ++i) {
