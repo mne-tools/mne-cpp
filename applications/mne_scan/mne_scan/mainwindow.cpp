@@ -90,7 +90,6 @@ MainWindow::MainWindow(QWidget *parent)
 , m_bIsRunning(false)
 , m_pToolBar(NULL)
 , m_pDynamicPluginToolBar(NULL)
-, m_pDynamicDisplayToolBar(NULL)
 , m_pLabelTime(NULL)
 , m_pTimer(NULL)
 , m_pTime(new QTime(0, 0))
@@ -116,9 +115,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Quick control selection
     m_pQuickControlView = new QuickControlView (QString("MNESCAN/MainWindow"),
-                                                         "MNE Scan",
-                                                         Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
-                                                         this);
+                                                        "MNE Scan",
+                                                        Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
+                                                        this);
     createActions();
     createMenus();
     createToolBars();
@@ -150,9 +149,6 @@ MainWindow::~MainWindow()
 
     if(m_pDynamicPluginToolBar)
         delete m_pDynamicPluginToolBar;
-
-    if(m_pDynamicDisplayToolBar)
-        delete m_pDynamicDisplayToolBar;
 }
 
 //=============================================================================================================
@@ -449,8 +445,7 @@ void MainWindow::createMenus()
 void MainWindow::createToolBars()
 {
     //Control
-    if(!m_pToolBar)
-    {
+    if(!m_pToolBar) {
         m_pToolBar = addToolBar(tr("Control"));
         m_pToolBar->addAction(m_pActionRun);
         m_pToolBar->addAction(m_pActionStop);
@@ -464,33 +459,23 @@ void MainWindow::createToolBars()
     }
 
     //Plugin
-    if(m_pDynamicPluginToolBar)
-    {
+    if(m_pDynamicPluginToolBar) {
         removeToolBar(m_pDynamicPluginToolBar);
         delete m_pDynamicPluginToolBar;
         m_pDynamicPluginToolBar = NULL;
     }
-    if(m_qListDynamicPluginActions.size() > 0)
-    {
+
+    if(m_qListDynamicPluginActions.size() > 0) {
         m_pDynamicPluginToolBar = addToolBar(m_sCurPluginName + tr("Control"));
-        for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i)
+        for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i) {
             m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
+        }
     }
 
-    //Display
-    if(m_pDynamicDisplayToolBar)
-    {
-        removeToolBar(m_pDynamicDisplayToolBar);
-        delete m_pDynamicDisplayToolBar;
-        m_pDynamicDisplayToolBar = NULL;
-    }
-    if(m_qListDynamicDisplayActions.size() > 0 || m_qListDynamicControlWidgets.size() > 0)
-    {
-        m_pDynamicDisplayToolBar = addToolBar(tr("Display"));
-        for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i)
-            m_pDynamicDisplayToolBar->addAction(m_qListDynamicDisplayActions[i]);
-        for(qint32 i = 0; i < m_qListDynamicControlWidgets.size(); ++i)
-            m_pDynamicDisplayToolBar->addWidget(m_qListDynamicControlWidgets[i]);
+    //Quick Control Widget
+    if(m_pQuickControlView) {
+        m_pQuickControlView->clear();
+        m_pQuickControlView->addWidgets(m_qListDynamicControlWidgets);
     }
 }
 

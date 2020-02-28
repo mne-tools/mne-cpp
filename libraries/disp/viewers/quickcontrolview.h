@@ -108,6 +108,12 @@ public:
 
     //=========================================================================================================
     /**
+     * Clear this widget by removing all of its child widgets.
+     */
+    void clear();
+
+    //=========================================================================================================
+    /**
      * Adds control widgets to a QuickControlView based on their set objects names. Takes ownership of the QWidgets.
      *
      * @param [in] lControlWidgets  The control widgets
