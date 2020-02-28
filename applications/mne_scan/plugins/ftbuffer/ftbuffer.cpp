@@ -114,7 +114,9 @@ bool FtBuffer::start()
     }
 
     qInfo() << "[FtBuffer::start] Starting FtBuffer...";
+    m_mutex.lock();
     m_bIsRunning = true;
+    m_mutex.unlock();
 
     //Move relevant objects to new thread
     m_pFtBuffProducer->m_pFtConnector->m_pSocket->moveToThread(&m_pProducerThread);
@@ -122,8 +124,10 @@ bool FtBuffer::start()
     m_pFtBuffProducer->moveToThread(&m_pProducerThread);
 
     //Connect signals to communicate with new thread
-    connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable, this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
-    connect(this, &FtBuffer::workCommand, m_pFtBuffProducer.data(),&FtBuffProducer::doWork);
+    connect(m_pFtBuffProducer.data(), &FtBuffProducer::newDataAvailable,
+            this, &FtBuffer::onNewDataAvailable, Qt::DirectConnection);
+    connect(this, &FtBuffer::workCommand,
+            m_pFtBuffProducer.data(), &FtBuffProducer::doWork);
 
     m_pProducerThread.start();
 
@@ -191,6 +195,7 @@ void FtBuffer::run()
 
 bool FtBuffer::isRunning()
 {
+    QMutexLocker locker(&m_mutex);
     return m_bIsRunning;
 }
 
@@ -198,17 +203,11 @@ bool FtBuffer::isRunning()
 
 void FtBuffer::onNewDataAvailable(const Eigen::MatrixXd &matData)
 {
-    qInfo() << "[FtBuffer::onNewDataAvailable] Appending matrix to plugin output...";
-
-    m_mutex.lock();
+    QMutexLocker locker(&m_mutex);
 
     if(m_bIsRunning) {
         m_pRTMSA_BufferOutput->data()->setValue(matData);
     }
-
-    m_mutex.unlock();
-
-    qInfo() << "[FtBuffer::onNewDataAvailable] Done.";
 }
 
 //=============================================================================================================
@@ -257,6 +256,6 @@ bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
     m_pRTMSA_BufferOutput->data()->setMultiArraySize(1);
     m_pRTMSA_BufferOutput->data()->setVisibility(true);
 
-    qInfo() << "[FtBuffer::setupRTMSA] Successfully aquired fif info from buffer.";
+    qInfo() << "[FtBuffer::setupRTMSA] Successfully acquired fif info from buffer.";
     return m_bIsConfigured = true;
 }
