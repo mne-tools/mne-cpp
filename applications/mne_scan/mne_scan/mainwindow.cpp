@@ -484,13 +484,13 @@ void MainWindow::createToolBars()
         delete m_pDynamicDisplayToolBar;
         m_pDynamicDisplayToolBar = NULL;
     }
-    if(m_qListDynamicDisplayActions.size() > 0 || m_qListDynamicDisplayWidgets.size() > 0)
+    if(m_qListDynamicDisplayActions.size() > 0 || m_qListDynamicControlWidgets.size() > 0)
     {
         m_pDynamicDisplayToolBar = addToolBar(tr("Display"));
         for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i)
             m_pDynamicDisplayToolBar->addAction(m_qListDynamicDisplayActions[i]);
-        for(qint32 i = 0; i < m_qListDynamicDisplayWidgets.size(); ++i)
-            m_pDynamicDisplayToolBar->addWidget(m_qListDynamicDisplayWidgets[i]);
+        for(qint32 i = 0; i < m_qListDynamicControlWidgets.size(); ++i)
+            m_pDynamicDisplayToolBar->addWidget(m_qListDynamicControlWidgets[i]);
     }
 }
 
@@ -550,7 +550,7 @@ void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 {
     m_qListDynamicPluginActions.clear();
     m_qListDynamicDisplayActions.clear();
-    m_qListDynamicDisplayWidgets.clear();
+    m_qListDynamicControlWidgets.clear();
 
     if(!pPlugin.isNull())
     {
@@ -579,7 +579,7 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 {
     m_qListDynamicPluginActions.clear();
     m_qListDynamicDisplayActions.clear();
-    m_qListDynamicDisplayWidgets.clear();
+    m_qListDynamicControlWidgets.clear();
 
     if(!pPlugin.isNull())
     {
@@ -603,13 +603,13 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
                     m_pRunWidget->addWidgetV(m_pDisplayManager->show(pPlugin->getOutputConnectors(),
                                                                      m_pTime,
                                                                      m_qListDynamicDisplayActions,
-                                                                     m_qListDynamicDisplayWidgets),
+                                                                     m_qListDynamicControlWidgets),
                                              m_sCurPluginName);
                 } else {
                     m_pRunWidget->addWidgetH(m_pDisplayManager->show(pPlugin->getOutputConnectors(),
                                                                      m_pTime,
                                                                      m_qListDynamicDisplayActions,
-                                                                     m_qListDynamicDisplayWidgets),
+                                                                     m_qListDynamicControlWidgets),
                                              m_sCurPluginName);
                 }
 

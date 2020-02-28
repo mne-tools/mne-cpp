@@ -138,7 +138,7 @@ public:
      *
      * @return a list of display widgets
      */
-    inline QList<QWidget*> getControlWidgets();
+    virtual QList<QWidget*> getControlWidgets() = 0;
 
 protected:
     //=========================================================================================================
@@ -149,17 +149,8 @@ protected:
      */
     inline void addDisplayAction(QAction* pAction);
 
-    //=========================================================================================================
-    /**
-     * Adds a display widgetto the current measurement widget, which is attached to the toolbar
-     *
-     * @param [in] pWidget  pointer to the widget to be added to the measurement widget
-     */
-    inline void addControlWidget(QWidget* pWidget);
-
 private:
     QList< QAction* >   m_qListDisplayActions;          /**< List of display actions */
-    QList< QWidget* >   m_qListDisplayWidgets;          /**< List of display widgets to attach to the toolbar */
 
 };
 
@@ -174,24 +165,11 @@ QList<QAction*> MeasurementWidget::getDisplayActions()
 
 //=============================================================================================================
 
-QList<QWidget*> MeasurementWidget::getControlWidgets()
-{
-    return m_qListDisplayWidgets;
-}
-
-//=============================================================================================================
-
 inline void MeasurementWidget::addDisplayAction(QAction* pAction)
 {
     m_qListDisplayActions.append(pAction);
 }
 
-//=============================================================================================================
-
-inline void MeasurementWidget::addControlWidget(QWidget* pWidget)
-{
-    m_qListDisplayWidgets.append(pWidget);
-}
 } //NAMESPACE
 
 #endif // NEWMEASUREMENTWIDGET_H

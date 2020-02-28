@@ -113,79 +113,79 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
         }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >())
-        {
-            QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
-            RealTimeSourceEstimateWidget* rtseWidget = new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, newDisp);//new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, pT, newDisp);
+//        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >())
+//        {
+//            QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
+//            RealTimeSourceEstimateWidget* rtseWidget = new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, newDisp);//new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, pT, newDisp);
 
-            qListActions.append(rtseWidget->getDisplayActions());
-            qListControlWidgets.append(rtseWidget->getControlWidgets());
+//            qListActions.append(rtseWidget->getDisplayActions());
+//            qListControlWidgets.append(rtseWidget->getControlWidgets());
 
-            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtseWidget, &RealTimeSourceEstimateWidget::update, Qt::BlockingQueuedConnection);
+//            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+//                    rtseWidget, &RealTimeSourceEstimateWidget::update, Qt::BlockingQueuedConnection);
 
-            vboxLayout->addWidget(rtseWidget);
-            rtseWidget->init();
-        }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >())
-        {
-            QSharedPointer<RealTimeConnectivityEstimate>* pRealTimeConnectivityEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >()->data();
-            RealTimeConnectivityEstimateWidget* rtseWidget = new RealTimeConnectivityEstimateWidget(*pRealTimeConnectivityEstimate, newDisp);//new RealTimeConnectivityEstimateWidget(*pRealTimeConnectivityEstimate, pT, newDisp);
+//            vboxLayout->addWidget(rtseWidget);
+//            rtseWidget->init();
+//        }
+//        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >())
+//        {
+//            QSharedPointer<RealTimeConnectivityEstimate>* pRealTimeConnectivityEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeConnectivityEstimate> >()->data();
+//            RealTimeConnectivityEstimateWidget* rtseWidget = new RealTimeConnectivityEstimateWidget(*pRealTimeConnectivityEstimate, newDisp);//new RealTimeConnectivityEstimateWidget(*pRealTimeConnectivityEstimate, pT, newDisp);
 
-            qListActions.append(rtseWidget->getDisplayActions());
-            qListControlWidgets.append(rtseWidget->getControlWidgets());
+//            qListActions.append(rtseWidget->getDisplayActions());
+//            qListControlWidgets.append(rtseWidget->getControlWidgets());
 
-            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtseWidget, &RealTimeConnectivityEstimateWidget::update, Qt::BlockingQueuedConnection);
+//            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+//                    rtseWidget, &RealTimeConnectivityEstimateWidget::update, Qt::BlockingQueuedConnection);
 
-            vboxLayout->addWidget(rtseWidget);
-            rtseWidget->init();
-        }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >())
-        {
-            QSharedPointer<RealTimeEvokedSet>* pRealTimeEvokedSet = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >()->data();
+//            vboxLayout->addWidget(rtseWidget);
+//            rtseWidget->init();
+//        }
+//        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >())
+//        {
+//            QSharedPointer<RealTimeEvokedSet>* pRealTimeEvokedSet = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >()->data();
 
-            RealTimeEvokedSetWidget* rtesWidget = new RealTimeEvokedSetWidget(*pRealTimeEvokedSet, pT, newDisp);
+//            RealTimeEvokedSetWidget* rtesWidget = new RealTimeEvokedSetWidget(*pRealTimeEvokedSet, pT, newDisp);
 
-            qListActions.append(rtesWidget->getDisplayActions());
-            qListControlWidgets.append(rtesWidget->getControlWidgets());
+//            qListActions.append(rtesWidget->getDisplayActions());
+//            qListControlWidgets.append(rtesWidget->getControlWidgets());
 
-            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtesWidget, &RealTimeEvokedSetWidget::update, Qt::BlockingQueuedConnection);
+//            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+//                    rtesWidget, &RealTimeEvokedSetWidget::update, Qt::BlockingQueuedConnection);
 
-            vboxLayout->addWidget(rtesWidget);
-            rtesWidget->init();
-        }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeCov> >())
-        {
-            QSharedPointer<RealTimeCov>* pRealTimeCov = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeCov> >()->data();
+//            vboxLayout->addWidget(rtesWidget);
+//            rtesWidget->init();
+//        }
+//        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeCov> >())
+//        {
+//            QSharedPointer<RealTimeCov>* pRealTimeCov = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeCov> >()->data();
 
-            RealTimeCovWidget* rtcWidget = new RealTimeCovWidget(*pRealTimeCov, pT, newDisp);
+//            RealTimeCovWidget* rtcWidget = new RealTimeCovWidget(*pRealTimeCov, pT, newDisp);
 
-            qListActions.append(rtcWidget->getDisplayActions());
-            qListControlWidgets.append(rtcWidget->getControlWidgets());
+//            qListActions.append(rtcWidget->getDisplayActions());
+//            qListControlWidgets.append(rtcWidget->getControlWidgets());
 
-            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtcWidget, &RealTimeCovWidget::update, Qt::BlockingQueuedConnection);
+//            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+//                    rtcWidget, &RealTimeCovWidget::update, Qt::BlockingQueuedConnection);
 
-            vboxLayout->addWidget(rtcWidget);
-            rtcWidget->init();
-        }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >())
-        {
-            QSharedPointer<RealTimeSpectrum>* pRealTimeSpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >()->data();
+//            vboxLayout->addWidget(rtcWidget);
+//            rtcWidget->init();
+//        }
+//        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >())
+//        {
+//            QSharedPointer<RealTimeSpectrum>* pRealTimeSpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSpectrum> >()->data();
 
-            RealTimeSpectrumWidget* fsWidget = new RealTimeSpectrumWidget(*pRealTimeSpectrum, pT, newDisp);
+//            RealTimeSpectrumWidget* fsWidget = new RealTimeSpectrumWidget(*pRealTimeSpectrum, pT, newDisp);
 
-            qListActions.append(fsWidget->getDisplayActions());
-            qListControlWidgets.append(fsWidget->getControlWidgets());
+//            qListActions.append(fsWidget->getDisplayActions());
+//            qListControlWidgets.append(fsWidget->getControlWidgets());
 
-            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    fsWidget, &RealTimeSpectrumWidget::update, Qt::BlockingQueuedConnection);
+//            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+//                    fsWidget, &RealTimeSpectrumWidget::update, Qt::BlockingQueuedConnection);
 
-            vboxLayout->addWidget(fsWidget);
-            fsWidget->init();
-        }
+//            vboxLayout->addWidget(fsWidget);
+//            fsWidget->init();
+//        }
     }
 
 //    // Add all widgets but NumericWidgets to layout and display them
