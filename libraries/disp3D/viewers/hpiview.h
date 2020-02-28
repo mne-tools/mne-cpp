@@ -52,6 +52,7 @@
 
 #include <QWidget>
 #include <QPointer>
+#include <Qt3DCore/QTransform>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -262,10 +263,15 @@ protected:
     bool                                        m_bUseComp;             /**< Use Comps's.*/
     bool                                        m_bLastFitGood;         /**< Flag specifying if last fit was ok or not.*/
 
+    float                                       m_scale;                /**< Scaling factor for average head*/
+
     Eigen::SparseMatrix<double>                 m_sparseMatCals;        /**< Sparse calibration matrix.*/
     Eigen::MatrixXd                             m_matValue;             /**< The current data block.*/
     Eigen::MatrixXd                             m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
     Eigen::MatrixXd                             m_matCompProjectors;    /**< Holds the matrix with the SSP and compensator projectors.*/
+
+    Qt3DCore::QTransform                        m_tFid;                 /**< Transformation matrix avr_tracked fiducials */
+    FIFFLIB::FiffCoordTrans                     m_tAvr;                 /**< Transformation matrix head_mri for average head */
 
     QSharedPointer<DISP3DLIB::View3D>           m_pView3D;              /**< The 3D view. */
     QSharedPointer<DISP3DLIB::Data3DTreeModel>  m_pData3DModel;         /**< The Disp3D model. */

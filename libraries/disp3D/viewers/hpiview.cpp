@@ -186,20 +186,26 @@ HpiView::HpiView(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
     gridLayout->addWidget(control3DWidget);
     ui->m_groupBox_3dControl->setLayout(gridLayout);
 
-    //Add sensor surface
+    // Add sensor surface BabyMeg
     QFile t_fileBabyMEGSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/BabyMEG.fif");
     MNEBem t_babyMEGsensorSurfaceBEM(t_fileBabyMEGSensorSurfaceBEM);
     m_pData3DModel->addMegSensorInfo("Device", "BabyMEG", QList<FiffChInfo>(), t_babyMEGsensorSurfaceBEM);
 
+    // Add sensor surface VectorView
     QFile t_fileVVSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m.fif");
     MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
     BemTreeItem* pVVItem = m_pData3DModel->addBemData("Device", "VectorView", t_sensorVVSurfaceBEM);
     pVVItem->setCheckState(Qt::Unchecked);
 
+    // Add average head surface
     QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif");;
     MNEBem t_BemHeadAvr(t_fileHeadAvr);
     m_pBemHeadAvr = m_pData3DModel->addBemData("Head", "Average", t_BemHeadAvr);
     m_pBemHeadAvr->setCheckState(Qt::Unchecked);
+
+    // load transformation matrix head_mri from average head
+    QFile file (QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-trans.fif");
+    FiffCoordTrans m_tAvr(file);
 
     //Always on top
     //this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -389,10 +395,6 @@ QList<FiffDigPoint> HpiView::readPolhemusDig(const QString& fileName)
 
 void HpiView::alignFiducials(const QString& fileNameDigData)
 {
-    QFile test(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
-    FiffDigPointSet testdata(test);
-    m_pData3DModel->addDigitizerData("Head", "avr", testdata);
-
     //Calculate the alignment of the fiducials
     MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
     QFile t_fileHeadAvr (QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif");
@@ -421,41 +423,46 @@ void HpiView::alignFiducials(const QString& fileNameDigData)
                                         1,
                                         0,
                                         scales);
+    m_scale = scales[0];
 
+    QMatrix4x4 eye;
     QMatrix4x4 mat;
     for(int r = 0; r < 3; ++r) {
         for(int c = 0; c < 3; ++c) {
             mat(r,c) = t_digData->head_mri_t_adj->rot(r,c);
         }
+        eye(r,r) = 1;
     }
     mat(0,3) = t_digData->head_mri_t_adj->move(0);
     mat(1,3) = t_digData->head_mri_t_adj->move(1);
     mat(2,3) = t_digData->head_mri_t_adj->move(2);
 
-    Qt3DCore::QTransform transform;
-    transform.setMatrix(mat);
+    Qt3DCore::QTransform identity;
+    identity.setMatrix(eye);
+    Qt3DCore::QTransform m_tFid;
+    m_tFid.setMatrix(mat);
 
-    //Update fast scan / tracked digitizer
+    // Update fast scan / tracked digitizer
     QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
     for(int j = 0; j < itemList.size(); ++j) {
         if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
-            pDigItem->setTransform(transform);
+            pDigItem->setTransform(m_tFid);
         }
     }
 
-    QFile file (QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-trans.fif");
-    FiffCoordTrans transAvr(file);
-
+    // Update average head - apply scaling and transformation
     QList<QStandardItem*> itemListB = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
     for(int j = 0; j < itemListB.size(); ++j) {
         if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemListB.at(j))) {
-            pBemItem->applyTransform(transAvr, true);
-            pBemItem->applyTransform(transform);
-            pBemItem->setScale(scales[0]);
+            pBemItem->setTransform(identity);
+//            pBemItem->applyTransform(m_tAvr, true);
+//            pBemItem->applyTransform(m_tFid);
+            pBemItem->setScale(m_scale);
         }
     }
 
-    delete surface;
+//    update3DView();
+    m_tFid.setMatrix(mat.inverted());
     delete pMneMshDisplaySurfaceSet;
 }
 
@@ -582,7 +589,7 @@ void HpiView::onSSPCompUsageChanged()
 
 void HpiView::updateErrorLabels()
 {
-    //Update gof labels and transform from m to mm
+    //Update gof labels and m_tFid from m to mm
     QString sGof("0mm");
     if(m_vGof.size() > 0) {
         sGof = QString::number(m_vGof[0]*1000,'f',2)+QString("mm");
@@ -685,14 +692,19 @@ void HpiView::storeResults(const FiffCoordTrans& devHeadTrans, const FiffDigPoin
 void HpiView::update3DView()
 {
     if(m_pTrackedDigitizer && m_pFiffInfo && m_pBemHeadAvr) {
-        //Prepare new transform
+        //Prepare new transform head->device
         QMatrix4x4 mat;
+        QMatrix4x4 eye;
+        eye.fill(0);
         for(int r = 0; r < 4; ++r) {
             for(int c = 0; c < 4; ++c) {
                 mat(r,c) = m_pFiffInfo->dev_head_t.invtrans(r,c);
             }
+            eye(r,r) = 1;
         }
 
+        Qt3DCore::QTransform identity;
+        identity.setMatrix(eye);
         Qt3DCore::QTransform transform;
         transform.setMatrix(mat);
 
@@ -708,7 +720,11 @@ void HpiView::update3DView()
         QList<QStandardItem*> itemListB = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
         for(int j = 0; j < itemListB.size(); ++j) {
             if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemListB.at(j))) {
-                pBemItem->setTransform(transform);
+                pBemItem->setTransform(identity);
+                pBemItem->applyTransform(m_tFid);
+//                pBemItem->applyTransform(m_tAvr, true);
+                pBemItem->applyTransform(transform);
+                pBemItem->setScale(m_scale);
             }
         }
     }
