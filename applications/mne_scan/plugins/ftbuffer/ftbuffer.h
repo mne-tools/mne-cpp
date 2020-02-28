@@ -44,7 +44,6 @@
 
 #include "FormFiles/ftbufferaboutwidget.h"
 #include "FormFiles/ftbuffersetupwidget.h"
-#include "FormFiles/ftbufferyourwidget.h"
 
 #include "ftbuffproducer.h"
 
@@ -197,12 +196,6 @@ protected:
 
     //=========================================================================================================
     /**
-     * Used in displaying the ftbuffer widget
-     */
-    void showYourWidget();
-
-    //=========================================================================================================
-    /**
      * Receives new data from producer, publishes to plugin output rtmsa
      *
      * @param[in] matData   New data from FtBuffProducer
@@ -235,8 +228,6 @@ private:
     QSharedPointer<FtBuffProducer>                                                      m_pFtBuffProducer;              /**< Pointer to producer object that handles data from FtConnector*/
 
     QSharedPointer<FIFFLIB::FiffInfo>                                                   m_pFiffInfo;                    /**< Fiff measurement info.*/
-
-    QSharedPointer<FtBufferYourWidget>                                                  m_pYourWidget;                  /**< Pointer used in the displaying of the widget */
 
     QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagHeadChunkData;       /**< Fiff into parser for header data collected from Neuromag extended header */
 
