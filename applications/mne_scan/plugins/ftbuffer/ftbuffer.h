@@ -218,6 +218,7 @@ protected:
 
 private:
     bool                                                                                m_bIsRunning;                   /**< Whether ftbuffer is running. */
+    bool                                                                                m_bIsConfigured;                /**< Whether the buffer output has been configured */
 
     QMutex                                                                              m_mutex;                        /**< Guards shared data from being accessed at the same time */
 
