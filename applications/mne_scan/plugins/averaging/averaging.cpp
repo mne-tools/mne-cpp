@@ -84,6 +84,14 @@ Averaging::~Averaging()
 
 //=============================================================================================================
 
+QList<QPointer<QWidget> > Averaging::getControlWidgets()
+{
+    // Return empty list since we do not have any control parameters for the FissSimulator during the ongoing measurement.
+    return QList<QPointer<QWidget> >();
+}
+
+//=============================================================================================================
+
 QSharedPointer<IPlugin> Averaging::clone() const
 {
     QSharedPointer<Averaging> pAveragingClone(new Averaging);
@@ -235,7 +243,7 @@ void Averaging::init()
     connect(m_pAveragingSettingsView.data(), &AveragingSettingsView::resetAverage,
             this, &Averaging::onResetAverage);
 
-    m_pAveragingOutput->data()->addControlWidget(m_pAveragingSettingsView);
+    //m_pAveragingOutput->data()->addControlWidget(m_pAveragingSettingsView);
 
     m_pArtifactSettingsView = ArtifactSettingsView::SPtr::create(QString("Plugin/%1").arg(this->getName()));
     m_pArtifactSettingsView->setObjectName("group_tab_Averaging_Artifact");
@@ -243,7 +251,7 @@ void Averaging::init()
     connect(m_pArtifactSettingsView.data(), &ArtifactSettingsView::changeArtifactThreshold,
             this, &Averaging::onChangeArtifactThreshold);
 
-    m_pAveragingOutput->data()->addControlWidget(m_pArtifactSettingsView);
+    //m_pAveragingOutput->data()->addControlWidget(m_pArtifactSettingsView);
 }
 
 //=============================================================================================================

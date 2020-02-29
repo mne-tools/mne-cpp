@@ -66,7 +66,7 @@ SUBDIRS += \
 #    dummytoolbox \
 #    rtcmne \
 #    rtcmusic \
-#    averaging \
+    averaging \
 #    covariance \
 #    noisereduction \
 #    neuronalconnectivity \

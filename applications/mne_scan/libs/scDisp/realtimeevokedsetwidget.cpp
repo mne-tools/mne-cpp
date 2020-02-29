@@ -39,7 +39,6 @@
 
 #include "realtimeevokedsetwidget.h"
 
-#include <disp/viewers/quickcontrolview.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/channelinfomodel.h>
 #include <disp/viewers/filterdesignview.h>
@@ -111,14 +110,6 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     addDisplayAction(m_pActionSelectSensors);
     m_pActionSelectSensors->setVisible(false);
 
-    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget (F9)"),this);
-    m_pActionQuickControl->setShortcut(tr("F9"));
-    m_pActionQuickControl->setStatusTip(tr("Show quick control widget (F9)"));
-    connect(m_pActionQuickControl.data(), &QAction::triggered,
-            this, &RealTimeEvokedSetWidget::showQuickControlWidget);
-    addDisplayAction(m_pActionQuickControl);
-    m_pActionQuickControl->setVisible(true);
-
     //Create GUI
     m_pRTESetLayout = new QVBoxLayout(this);
 
@@ -148,15 +139,6 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     m_pToolBox->insertItem(0, m_pAverageLayoutView, QIcon(), "2D Layout plot");
 
     m_pRTESetLayout->addWidget(m_pToolBox);
-
-    // Init quick control view
-    m_pQuickControlView = QSharedPointer<QuickControlView>::create(QString("RTESW/%1/viewOpacity").arg(m_pRTESet->getName()),
-                                                                   "RT Averaging",
-                                                                   Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
-                                                                   this);
-
-//    this->addControlWidgets(m_pQuickControlView,
-//                            m_pRTESet->getControlWidgets());
 
     //set layouts
     this->setLayout(m_pRTESetLayout);
@@ -225,8 +207,6 @@ void RealTimeEvokedSetWidget::getData()
 void RealTimeEvokedSetWidget::init()
 {
     if(m_pFiffInfo) {
-        m_pActionQuickControl->setVisible(true);
-
         QSettings settings;
         QString t_sRTESName = m_pRTESet->getName();
 
@@ -274,10 +254,14 @@ void RealTimeEvokedSetWidget::init()
         m_pAverageLayoutView->setChannelInfoModel(m_pChannelInfoModel);
         m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
+        //Init control widgets
+        QList<QWidget*> lControlWidgets;
+
         // Quick control scaling        
         ScalingView* pScalingView = new ScalingView(QString("RTESW/%1").arg(t_sRTESName),
                                                     m_pFiffInfo->chs);
-        m_pQuickControlView->addGroupBox(pScalingView, "Scaling", QString("RTESW/%1").arg(t_sRTESName));
+        pScalingView->setObjectName("group_Scaling");
+        lControlWidgets.append(pScalingView);
 
         connect(pScalingView, &ScalingView::scalingChanged,
                 m_pButterflyView.data(), &ButterflyView::setScaleMap);
@@ -290,7 +274,8 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control projectors
         ProjectorsView* pProjectorsView = new ProjectorsView(QString("RTESW/%1").arg(t_sRTESName));
-        m_pQuickControlView->addGroupBoxWithTabs(pProjectorsView, "Noise", "SSP", QString("RTESW/%1").arg(t_sRTESName));
+        pProjectorsView->setObjectName("group_tab_Noise_SSP");
+        lControlWidgets.append(pProjectorsView);
 
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::updateProjection);
@@ -302,7 +287,8 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control compensators
         CompensatorView* pCompensatorView = new CompensatorView(QString("RTESW/%1").arg(t_sRTESName));
-        m_pQuickControlView->addGroupBoxWithTabs(pCompensatorView, "Noise", "Comp", QString("RTESW/%1").arg(t_sRTESName));
+        pCompensatorView->setObjectName("group_tab_Noise_Comp");
+        lControlWidgets.append(pCompensatorView);
 
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::updateCompensator);
@@ -314,7 +300,8 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control filter settings
         FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("RTESW/%1").arg(t_sRTESName));
-        m_pQuickControlView->addGroupBoxWithTabs(pFilterSettingsView, "Noise", "Filter", QString("RTESW/%1").arg(t_sRTESName));
+        pFilterSettingsView->setObjectName("group_tab_Noise_Filter");
+        lControlWidgets.append(pFilterSettingsView);
 
         connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
                 m_pEvokedSetModel.data(), &EvokedSetModel::setFilterChannelType);
@@ -345,7 +332,8 @@ void RealTimeEvokedSetWidget::init()
         // Quick control channel data settings
         FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("RTESW/%1").arg(t_sRTESName));
         pChannelDataSettingsView->setWidgetList(QStringList() << "screenshot" << "backgroundColor");
-        m_pQuickControlView->addGroupBoxWithTabs(pChannelDataSettingsView, "Other", "View", QString("RTESW/%1").arg(t_sRTESName));
+        pChannelDataSettingsView->setObjectName("group_tab_Other_View");
+        lControlWidgets.append(pChannelDataSettingsView);
 
         connect(pChannelDataSettingsView, &FiffRawViewSettings::backgroundColorChanged,
                 m_pAverageLayoutView.data(), &AverageLayoutView::setBackgroundColor);
@@ -362,7 +350,8 @@ void RealTimeEvokedSetWidget::init()
         // Quick control modality selection
         ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView(m_pFiffInfo->chs,
                                                                                   QString("RTESW/%1").arg(t_sRTESName));
-        m_pQuickControlView->addGroupBoxWithTabs(pModalitySelectionView, "Other", "Modalities", QString("RTESW/%1").arg(t_sRTESName));
+        pModalitySelectionView->setObjectName("group_tab_Other_Modalities");
+        lControlWidgets.append(pModalitySelectionView);
 
         connect(pModalitySelectionView, &ModalitySelectionView::modalitiesChanged,
                 m_pButterflyView.data(), &ButterflyView::setModalityMap);
@@ -371,7 +360,8 @@ void RealTimeEvokedSetWidget::init()
 
         // Quick control average selection
         AverageSelectionView* pAverageSelectionView = new AverageSelectionView(QString("RTESW/%1").arg(t_sRTESName));
-        m_pQuickControlView->addGroupBoxWithTabs(pAverageSelectionView, "Averaging", "Selection", QString("RTESW/%1").arg(t_sRTESName));
+        pAverageSelectionView->setObjectName("group_tab_Averaging_Selection");
+        lControlWidgets.append(pAverageSelectionView);
 
         connect(m_pEvokedSetModel.data(), &EvokedSetModel::newAverageActivationMap,
                 pAverageSelectionView, &AverageSelectionView::setAverageActivation);
@@ -403,6 +393,8 @@ void RealTimeEvokedSetWidget::init()
         m_pAverageLayoutView->setAverageActivation(pAverageSelectionView->getAverageActivation());
         m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
 
+        emit pluginControlWidgetsChanged(lControlWidgets, t_sRTESName);
+
         //Initialized
         m_bInitialized = true;
     }
@@ -417,14 +409,6 @@ void RealTimeEvokedSetWidget::showSensorSelectionWidget()
     }
 
     m_pChannelSelectionView->show();
-}
-
-//=============================================================================================================
-
-void RealTimeEvokedSetWidget::showQuickControlWidget()
-{
-    m_pQuickControlView->raise();
-    m_pQuickControlView->show();
 }
 
 //=============================================================================================================
