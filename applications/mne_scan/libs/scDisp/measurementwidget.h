@@ -139,8 +139,10 @@ signals:
      *
      * @param [in] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender
      *                                  does not have ownership of these pointers.
+     * @param [in] sPluginName          The plugin name emmiting the signal.
      */
-    void pluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets);
+    void pluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
+                                     const QString& sPluginName);
 
 protected:
     //=========================================================================================================

@@ -150,7 +150,9 @@ void AbstractView::setQuickControlWidgets(const QList<QWidget*>& lControlWidgets
     if(m_pQuickControlView) {
         for(int i = 0; i < lControlWidgets.size(); i++) {
             if(lControlWidgets.at(i)) {
-                m_pQuickControlView->addGroupBox(lControlWidgets.at(i), lControlWidgets.at(i)->windowTitle());
+                m_pQuickControlView->addGroupBox(lControlWidgets.at(i),
+                                                 lControlWidgets.at(i)->windowTitle(),
+                                                 "AbstractView");
             }
         }
     }
@@ -168,7 +170,7 @@ void AbstractView::createGUI()
     m_pQuickControlView->setVisiblityHideOpacityClose(false);
 
     //Create widget GUI
-    m_pQuickControlView->addGroupBox(m_pControl3DView.data(), "3D View");
+    m_pQuickControlView->addGroupBox(m_pControl3DView.data(), "3D View", "AbstractView");
 
     QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView.data(), this, Qt::Widget);
     pWidgetContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

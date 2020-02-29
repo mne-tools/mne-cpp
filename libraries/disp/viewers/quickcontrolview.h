@@ -60,6 +60,8 @@ namespace Ui {
     class QuickControlViewWidget;
 }
 
+class QGridLayout;
+
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
@@ -112,21 +114,30 @@ public:
      */
     void clear();
 
+
+    QGridLayout* findTabWidgetLayout(const QString& sTabName);
+
     //=========================================================================================================
     /**
-     * Adds control widgets to a QuickControlView based on their set objects names. Takes ownership of the QWidgets.
+     * This convenience function adds control widgets to the QuickControlView based on their set objects names.
+     * Takes ownership of the QWidgets.
      *
-     * @param [in] lControlWidgets  The control widgets
+     * @param [in] lWidgets     The widget which are supposed to be added. The widgets will be categorized based on their
+     *                          object names: "widget_", "group_", "group_tab_".
+     * @param [in] sTabName     The tab to which the widgets are supposed to be added to.
      */
-    void addWidgets(const QList<QWidget*>& lWidgets);
+    void addWidgets(const QList<QWidget*>& lWidgets,
+                    const QString& sTabName);
 
     //=========================================================================================================
     /**
      * Add a new group box to this Widget. Takes ownership of the passed widget. Takes ownership of the QWidget.
      *
-     * @param [in] pWidget           The widgets which will be put into the new group box.
+     * @param [in] pWidget           The widget which is supposed to be added.
+     * @param [in] sTabName          The tab to which the widget is supposed to be added to.
      */
-    void addWidget(QWidget* pWidget);
+    void addWidget(QWidget* pWidget,
+                   const QString& sTabName);
 
     //=========================================================================================================
     /**
@@ -134,9 +145,11 @@ public:
      *
      * @param [in] pWidget           The widgets which will be put into the new group box.
      * @param [in] sGroupBoxName     The name of the new group box.
+     * @param [in] sTabName          The tab to which the group box is supposed to be added to.
      */
     void addGroupBox(QWidget* pWidget,
-                     const QString& sGroupBoxName);
+                     const QString& sGroupBoxName,
+                     const QString& sTabName);
 
     //=========================================================================================================
     /**
@@ -145,10 +158,12 @@ public:
      *
      * @param [in] pWidget           The widgets which will be put into the new group box.
      * @param [in] sGroupBoxName     The name of the new group box.
-     * @param [in] sTabName          The name of the new tab.
+     * @param [in] sTabNameGroupBox  The tab name inside the tab widget of the group box.
+     * @param [in] sTabName          The tab to which the group box with the tab widget is supposed to be added to.
      */
     void addGroupBoxWithTabs(QWidget* pWidget,
                              const QString& sGroupBoxName,
+                             const QString& sTabNameGroupBox,
                              const QString& sTabName);
 
     //=========================================================================================================

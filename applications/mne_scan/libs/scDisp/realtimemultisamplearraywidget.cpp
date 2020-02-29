@@ -193,7 +193,7 @@ void RealTimeMultiSampleArrayWidget::init()
         // Quick control scaling
         ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName),
                                                     m_pFiffInfo->chs);
-        pScalingView->setObjectName("widget_Scaling");
+        pScalingView->setObjectName("group_Scaling");
         lControlWidgets.append(pScalingView);
 
         connect(pScalingView, &ScalingView::scalingChanged,
@@ -298,7 +298,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         pTriggerDetectionView->init(m_pFiffInfo);
 
-        emit pluginControlWidgetsChanged(lControlWidgets);
+        emit pluginControlWidgetsChanged(lControlWidgets, QString("RTMSAW/%1").arg(sRTMSAWName));
 
         //Initialized
         m_bInitialized = true;
