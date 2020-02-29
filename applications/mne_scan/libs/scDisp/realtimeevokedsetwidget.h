@@ -71,7 +71,6 @@ namespace DISPLIB {
     class ChannelSelectionView;
     class ChannelInfoModel;
     class AverageLayoutView;
-    class QuickControlView;
 }
 
 class QVBoxLayout;
@@ -150,12 +149,6 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Shows quick control widget
-     */
-    void showQuickControlWidget();
-
-    //=========================================================================================================
-    /**
      * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
      *
      * @param[out] imageType     The current iamge type: png, svg.
@@ -171,7 +164,6 @@ private:
 
     QSharedPointer<DISPLIB::EvokedSetModel>             m_pEvokedSetModel;          /**< RTE data model */
     QSharedPointer<SCMEASLIB::RealTimeEvokedSet>        m_pRTESet;                  /**< The real-time evoked measurement. */
-    QSharedPointer<DISPLIB::QuickControlView>           m_pQuickControlView;        /**< Quick control widget. */
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< ChannelSelectionView. */
     QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Channel info model. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
@@ -185,7 +177,6 @@ private:
     qint32                              m_iMaxFilterTapSize;        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 
     QPointer<QAction>                   m_pActionSelectSensors;     /**< show roi select widget */
-    QPointer<QAction>                   m_pActionQuickControl;      /**< Show quick control widget. */
 
     QPointer<QVBoxLayout>               m_pRTESetLayout;            /**< RTE Widget layout */
     QPointer<QLabel>                    m_pLabelInit;               /**< Initialization Label */
