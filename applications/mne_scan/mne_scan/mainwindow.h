@@ -188,7 +188,7 @@ private:
     void updatePluginSetupWidget(QSharedPointer<SCSHAREDLIB::IPlugin> pPlugin);       /**< Sets the plugin setup widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
     void updateMultiViewWidget(QSharedPointer<SCSHAREDLIB::IPlugin> pPlugin);         /**< Adds the plugin visualization widget to central widget of MainWindow class if the pipeline was started.*/
 
-    void onControlWidgetsChanged(QList<QWidget*>& lControlWidgets);
+    void onPluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets);
 
     void updateConnectionWidget(QSharedPointer<SCSHAREDLIB::PluginConnectorConnection> pConnection); /**< Sets the connection widget to central widget of MainWindow class depending on the current arrow selected in m_pDockWidgetPlugins.*/
     void newConfiguration();            /**< Implements new configuration tasks.*/
