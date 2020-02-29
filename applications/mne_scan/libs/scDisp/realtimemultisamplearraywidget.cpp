@@ -187,21 +187,8 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
 
-        //Initialized
-        m_bInitialized = true;
-    }
-}
-
-//=============================================================================================================
-
-QList<QWidget*> RealTimeMultiSampleArrayWidget::getControlWidgets()
-{
-    QList<QWidget*> lControlWidgets;
-
-    if(m_pFiffInfo && m_bInitialized) {
-        //Init quick control widget
-        QSettings settings;
-        QString sRTMSAWName = m_pRTMSA->getName();
+        //Init control widgets
+        QList<QWidget*> lControlWidgets;
 
         // Quick control scaling
         ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName),
@@ -310,9 +297,12 @@ QList<QWidget*> RealTimeMultiSampleArrayWidget::getControlWidgets()
                 pTriggerDetectionView, &TriggerDetectionView::setNumberDetectedTriggersAndTypes);
 
         pTriggerDetectionView->init(m_pFiffInfo);
-    }
 
-    return lControlWidgets;
+        emit controlWidgetsChanged(lControlWidgets);
+
+        //Initialized
+        m_bInitialized = true;
+    }
 }
 
 //=============================================================================================================
