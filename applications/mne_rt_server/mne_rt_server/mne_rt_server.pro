@@ -11,8 +11,7 @@
 #
 # @section  LICENSE
 #
-#
-#                      Copyright (C) 2012, Robert Dicamillo, Christoph Dinh, Limin Sun, Lorenz Esch, Matti Hamalainen. All rights reserved.
+# Copyright (C) 2012, Robert Dicamillo, Christoph Dinh, Limin Sun, Lorenz Esch, Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -95,7 +94,6 @@ HEADERS += \
 
 RESOURCE_FILES += \
     $${ROOT_DIR}/resources/mne_rt_server_plugins/plugin.cfg \
-    $${ROOT_DIR}/resources/mne_rt_server_plugins/README \
 
 # Copy resource files from repository to bin resource folder
 COPY_CMD = $$copyResources($${RESOURCE_FILES})
