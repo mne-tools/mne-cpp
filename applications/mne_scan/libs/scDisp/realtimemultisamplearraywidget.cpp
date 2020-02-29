@@ -298,7 +298,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         pTriggerDetectionView->init(m_pFiffInfo);
 
-        emit pluginControlWidgetsChanged(lControlWidgets, QString("RTMSAW/%1").arg(sRTMSAWName));
+        emit pluginControlWidgetsChanged(lControlWidgets, sRTMSAWName);
 
         //Initialized
         m_bInitialized = true;

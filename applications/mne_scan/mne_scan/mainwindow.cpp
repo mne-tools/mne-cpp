@@ -445,7 +445,7 @@ void MainWindow::createToolBars()
 
     //Plugin
     if(!m_pDynamicPluginToolBar) {
-        m_pDynamicPluginToolBar = addToolBar(m_sCurPluginName + tr("Control"));
+        m_pDynamicPluginToolBar = addToolBar(tr("Plugin Control"));
         m_pDynamicPluginToolBar->addAction(m_pActionQuickControl);
     }
 
@@ -525,8 +525,6 @@ void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
         // Add Dynamic Plugin Actions
         m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
 
-        m_sCurPluginName = pPlugin->getName();
-
         if(pPlugin.isNull())
         {
             QWidget* pWidget = new QWidget;
@@ -549,24 +547,19 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
     m_qListDynamicDisplayActions.clear();
     m_qListDynamicControlWidgets.clear();
 
-    if(!pPlugin.isNull())
-    {
+    if(!pPlugin.isNull()) {
         // Add Dynamic Plugin Actions
         m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
 
-        m_sCurPluginName = pPlugin->getName();
+        QString sCurPluginName = pPlugin->getName();
 
-        if(pPlugin.isNull())
-        {
+        if(pPlugin.isNull()) {
             QWidget* pWidget = new QWidget;
             setCentralWidget(pWidget);
-        }
-        else
-        {
-            if(!m_bIsRunning)
+        } else {
+            if(!m_bIsRunning) {
                 setCentralWidget(pPlugin->setupWidget());
-            else
-            {
+            } else {
                 if(QWidget* pWidget = m_pDisplayManager->show(pPlugin->getOutputConnectors(),
                                                               m_pTime,
                                                               m_qListDynamicDisplayActions,
@@ -578,12 +571,12 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
                         }
                     }
 
-                    if(m_sCurPluginName == "Fiff Simulator" || m_sCurPluginName == "Noise Reduction") {
+                    if(sCurPluginName == "Fiff Simulator" || sCurPluginName == "Noise Reduction") {
                         m_pRunWidget->addWidgetV(pWidget,
-                                                 m_sCurPluginName);
+                                                 sCurPluginName);
                     } else {
                         m_pRunWidget->addWidgetH(pWidget,
-                                                 m_sCurPluginName);
+                                                 sCurPluginName);
                     }
                 }
 
@@ -591,9 +584,6 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
             }
         }
     }
-
-    qDebug() << "[MainWindow::updateMultiViewWidget] m_qListDynamicControlWidgets.size()" << m_qListDynamicControlWidgets.size();
-    qDebug() << "[MainWindow::updateMultiViewWidget] m_qListDynamicDisplayActions.size()" << m_qListDynamicDisplayActions.size();
 
     this->createToolBars();
 }
