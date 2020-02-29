@@ -9,7 +9,7 @@ MNE-CPP is an open-source project and is made better by contributions from our u
 
 1. Setup MNE-CPP to [build from source](../install/buildguide.md).
 2. Familiarize yourself with our [coding conventions](conv_style.md).
-3. Create a new branch ([do not develop on your forked master branch](https://blog.jasonmeridth.com/posts/do-not-issue-pull-requests-from-your-master-branch/)), make your changes and do a commit.
+3. Create a new branch ([do not develop on your forked master branch](https://blog.jasonmeridth.com/posts/do-not-issue-pull-requests-from-your-master-branch/{:target="_blank" rel="noopener"})), make your changes and do a commit.
 4. Push your changes to your remote (forked Git Hub) repository.
 5. Go to your remote (forked Git Hub) repository via the GitHub website and create a pull request:
    * Right next to the branch selection tool, look for the New pull request button and click it.
