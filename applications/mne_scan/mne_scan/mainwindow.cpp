@@ -600,11 +600,12 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 
 //=============================================================================================================
 
-void MainWindow::onPluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets)
+void MainWindow::onPluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
+                                               const QString& sPluginName)
 {
     //Quick Control Widget
     if(m_pQuickControlView) {
-        m_pQuickControlView->addWidgets(lControlWidgets);
+        m_pQuickControlView->addWidgets(lControlWidgets, sPluginName);
     }
 }
 
