@@ -132,13 +132,15 @@ public:
      */
     inline QList<QAction*> getDisplayActions();
 
+signals:
     //=========================================================================================================
     /**
-     * A list of display widgets for the current measurement widget.
+     * Signal to notify that new control widgets are available.
      *
-     * @return a list of display widgets
+     * @param [in] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender
+     *                                  does not have ownership of these pointers.
      */
-    virtual QList<QWidget*> getControlWidgets() = 0;
+    void controlWidgetsChanged(QList<QWidget*>& lControlWidgets);
 
 protected:
     //=========================================================================================================
