@@ -41,6 +41,8 @@
 #include <scShared/Management/pluginscenemanager.h>
 #include <scShared/Management/displaymanager.h>
 
+#include <scDisp/measurementwidget.h>
+
 #include <disp/viewers/multiview.h>
 
 #include <disp/viewers/quickcontrolview.h>
@@ -70,6 +72,7 @@
 
 using namespace MNESCAN;
 using namespace SCSHAREDLIB;
+using namespace SCDISPLIB;
 using namespace DISPLIB;
 
 //=============================================================================================================
@@ -149,6 +152,9 @@ MainWindow::~MainWindow()
 
     if(m_pDynamicPluginToolBar)
         delete m_pDynamicPluginToolBar;
+
+    if(m_pQuickControlView)
+        delete m_pQuickControlView;
 }
 
 //=============================================================================================================
@@ -454,12 +460,6 @@ void MainWindow::createToolBars()
             m_pDynamicPluginToolBar->addAction(m_qListDynamicDisplayActions[i]);
         }
     }
-
-    //Quick Control Widget
-    if(m_pQuickControlView) {
-        m_pQuickControlView->clear();
-        m_pQuickControlView->addWidgets(m_qListDynamicControlWidgets);
-    }
 }
 
 //=============================================================================================================
@@ -567,18 +567,24 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
                 setCentralWidget(pPlugin->setupWidget());
             else
             {
-                if(m_sCurPluginName == "Fiff Simulator" || m_sCurPluginName == "Noise Reduction") {
-                    m_pRunWidget->addWidgetV(m_pDisplayManager->show(pPlugin->getOutputConnectors(),
-                                                                     m_pTime,
-                                                                     m_qListDynamicDisplayActions,
-                                                                     m_qListDynamicControlWidgets),
-                                             m_sCurPluginName);
-                } else {
-                    m_pRunWidget->addWidgetH(m_pDisplayManager->show(pPlugin->getOutputConnectors(),
-                                                                     m_pTime,
-                                                                     m_qListDynamicDisplayActions,
-                                                                     m_qListDynamicControlWidgets),
-                                             m_sCurPluginName);
+                if(QWidget* pWidget = m_pDisplayManager->show(pPlugin->getOutputConnectors(),
+                                                              m_pTime,
+                                                              m_qListDynamicDisplayActions,
+                                                              m_qListDynamicControlWidgets)) {
+                    for (int i = 0; i < pWidget->layout()->count(); ++i) {
+                        if(MeasurementWidget* pMeasWidget = qobject_cast<MeasurementWidget *>(pWidget->layout()->itemAt(i)->widget())) {
+                            connect(pMeasWidget, &MeasurementWidget::controlWidgetsChanged,
+                                    this, &MainWindow::onControlWidgetsChanged);
+                        }
+                    }
+
+                    if(m_sCurPluginName == "Fiff Simulator" || m_sCurPluginName == "Noise Reduction") {
+                        m_pRunWidget->addWidgetV(pWidget,
+                                                 m_sCurPluginName);
+                    } else {
+                        m_pRunWidget->addWidgetH(pWidget,
+                                                 m_sCurPluginName);
+                    }
                 }
 
                 m_pRunWidget->show();
@@ -590,6 +596,16 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
     qDebug() << "[MainWindow::updateMultiViewWidget] m_qListDynamicDisplayActions.size()" << m_qListDynamicDisplayActions.size();
 
     this->createToolBars();
+}
+
+//=============================================================================================================
+
+void MainWindow::onControlWidgetsChanged(QList<QWidget*>& lControlWidgets)
+{
+    //Quick Control Widget
+    if(m_pQuickControlView) {
+        m_pQuickControlView->addWidgets(lControlWidgets);
+    }
 }
 
 //=============================================================================================================
@@ -641,6 +657,7 @@ void MainWindow::startMeasurement()
         return;
     }
 
+    m_pQuickControlView->clear();
     m_pActionQuickControl->setVisible(true);
 
     m_pPluginGui->uiSetupRunningState(true);
