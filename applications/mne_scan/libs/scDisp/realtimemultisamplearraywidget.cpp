@@ -298,7 +298,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         pTriggerDetectionView->init(m_pFiffInfo);
 
-        emit controlWidgetsChanged(lControlWidgets);
+        emit pluginControlWidgetsChanged(lControlWidgets);
 
         //Initialized
         m_bInitialized = true;

@@ -573,8 +573,8 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
                                                               m_qListDynamicControlWidgets)) {
                     for (int i = 0; i < pWidget->layout()->count(); ++i) {
                         if(MeasurementWidget* pMeasWidget = qobject_cast<MeasurementWidget *>(pWidget->layout()->itemAt(i)->widget())) {
-                            connect(pMeasWidget, &MeasurementWidget::controlWidgetsChanged,
-                                    this, &MainWindow::onControlWidgetsChanged);
+                            connect(pMeasWidget, &MeasurementWidget::pluginControlWidgetsChanged,
+                                    this, &MainWindow::onPluginControlWidgetsChanged);
                         }
                     }
 
@@ -600,7 +600,7 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 
 //=============================================================================================================
 
-void MainWindow::onControlWidgetsChanged(QList<QWidget*>& lControlWidgets)
+void MainWindow::onPluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets)
 {
     //Quick Control Widget
     if(m_pQuickControlView) {
