@@ -55,6 +55,13 @@
         <property name="topMargin">
          <number>0</number>
         </property>
+        <item row="0" column="0">
+         <widget class="QTabWidget" name="m_pTabWidget">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
