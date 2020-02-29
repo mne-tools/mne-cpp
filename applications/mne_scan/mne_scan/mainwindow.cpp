@@ -282,26 +282,6 @@ void MainWindow::about()
     }
 
     m_pAboutWindow->show();
-
-//    writeToLog(tr("Invoked <b>Help|About</b>"), _LogKndMessage, _LogLvMin);
-//    QMessageBox::about(this, CInfo::AppNameShort()+ ", "+tr("Version ")+CInfo::AppVersion(),
-//         tr("Copyright (C) 2015 Christoph Dinh, Lorenz Esch, Martin Luessi, Limin Sun, Jens Haueisen, Matti Hamalainen. All rights reserved.\n\n"
-//            "Redistribution and use in source and binary forms, with or without modification, are permitted provided that"
-//            " the following conditions are met:\n"
-//            "\t* Redistributions of source code must retain the above copyright notice, this list of conditions and the"
-//            " following disclaimer.\n"
-//            "\t* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and"
-//            " the following disclaimer in the documentation and/or other materials provided with the distribution.\n"
-//            "\t* Neither the name of MNE-CPP authors nor the names of its contributors may be used"
-//            " to endorse or promote products derived from this software without specific prior written permission.\n\n"
-//            "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED"
-//            " WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A"
-//            " PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,"
-//            " INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,"
-//            " PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)"
-//            " HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING"
-//            " NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE"
-//            " POSSIBILITY OF SUCH DAMAGE."));
 }
 
 //=============================================================================================================
@@ -410,7 +390,6 @@ void MainWindow::createActions()
     m_pActionQuickControl->setCheckable(true);
     connect(m_pActionQuickControl.data(), &QAction::toggled,
             m_pQuickControlView.data(), &QuickControlView::setVisible);
-    m_qListDynamicDisplayActions.append(m_pActionQuickControl);
     m_pActionQuickControl->setVisible(false);
 }
 
@@ -459,16 +438,20 @@ void MainWindow::createToolBars()
     }
 
     //Plugin
-    if(m_pDynamicPluginToolBar) {
-        removeToolBar(m_pDynamicPluginToolBar);
-        delete m_pDynamicPluginToolBar;
-        m_pDynamicPluginToolBar = NULL;
+    if(!m_pDynamicPluginToolBar) {
+        m_pDynamicPluginToolBar = addToolBar(m_sCurPluginName + tr("Control"));
+        m_pDynamicPluginToolBar->addAction(m_pActionQuickControl);
     }
 
     if(m_qListDynamicPluginActions.size() > 0) {
-        m_pDynamicPluginToolBar = addToolBar(m_sCurPluginName + tr("Control"));
         for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i) {
             m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
+        }
+    }
+
+    if(m_qListDynamicDisplayActions.size() > 0) {
+        for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i) {
+            m_pDynamicPluginToolBar->addAction(m_qListDynamicDisplayActions[i]);
         }
     }
 
@@ -603,6 +586,9 @@ void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
         }
     }
 
+    qDebug() << "[MainWindow::updateMultiViewWidget] m_qListDynamicControlWidgets.size()" << m_qListDynamicControlWidgets.size();
+    qDebug() << "[MainWindow::updateMultiViewWidget] m_qListDynamicDisplayActions.size()" << m_qListDynamicDisplayActions.size();
+
     this->createToolBars();
 }
 
@@ -669,10 +655,6 @@ void MainWindow::startMeasurement()
     for(int i = 0; i < lPlugin.size(); ++i) {
         updateMultiViewWidget(lPlugin.at(i));
     }
-
- //   updatePluginWidget(m_pPluginGui->getCurrentPlugin());
-
-//    CentralWidgetShowPlugin();
 }
 
 //=============================================================================================================
