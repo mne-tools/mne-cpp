@@ -65,7 +65,6 @@ namespace DISPLIB {
     class ChannelSelectionView;
     class ChannelInfoModel;
     class RtFiffRawView;
-    class QuickControlView;
     class ChannelDataViewNew;
 }
 
@@ -146,12 +145,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Shows quick control view
-     */
-    void showQuickControlView();
-
-    //=========================================================================================================
-    /**
      * Call this slot whenever you want to make a screenshot current view.
      *
      * @param[in] imageType  The current iamge type: png, svg.
@@ -176,7 +169,6 @@ private:
 
     QPointer<QAction>                                       m_pActionSelectSensors;         /**< show roi select widget */
     QPointer<QAction>                                       m_pActionHideBad;               /**< Hide bad channels. */
-    QPointer<QAction>                                       m_pActionQuickControl;          /**< Show quick control widget. */
 
     bool                                                    m_bInitialized;                 /**< Is Initialized */
     qint32                                                  m_iMaxFilterTapSize;            /**< Maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */

@@ -115,6 +115,14 @@ RtFiffRawView::~RtFiffRawView()
 
 //=============================================================================================================
 
+void RtFiffRawView::setSettingsPath(const QString& sSettingsPath)
+{
+    m_sSettingsPath = sSettingsPath;
+    loadSettings(m_sSettingsPath);
+}
+
+//=============================================================================================================
+
 void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
 {
     m_pFiffInfo = info;

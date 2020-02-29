@@ -40,7 +40,6 @@
 
 #include "realtimemultisamplearraywidget.h"
 
-#include <disp/viewers/quickcontrolview.h>
 #include <disp/viewers/filterdesignview.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/helpers/channelinfomodel.h>
@@ -104,13 +103,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<QT
     addDisplayAction(m_pActionHideBad);
     m_pActionHideBad->setVisible(true);
 
-    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
-    m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
-    connect(m_pActionQuickControl.data(), &QAction::triggered,
-            this, &RealTimeMultiSampleArrayWidget::showQuickControlView);
-    addDisplayAction(m_pActionQuickControl);
-    m_pActionQuickControl->setVisible(true);
-
     qRegisterMetaType<QMap<int,QList<QPair<int,double> > > >();
 }
 
@@ -161,16 +153,10 @@ void RealTimeMultiSampleArrayWidget::init()
         rtmsaLayout->addWidget(m_pChannelDataView);
         this->setLayout(rtmsaLayout);
 
-        // Quick control selection
-        m_pQuickControlView = QuickControlView::SPtr::create(QString("RTMSAW/%1").arg(m_pRTMSA->getName()),
-                                                             "RT Display",
-                                                             Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
-                                                             this);
-
+        // Init channel view
         QSettings settings;
         QString sRTMSAWName = m_pRTMSA->getName();
 
-        // Init channel view
         m_pChannelDataView->show();
         m_pChannelDataView->init(m_pFiffInfo);
 
@@ -210,12 +196,12 @@ void RealTimeMultiSampleArrayWidget::init()
 
 QList<QWidget*> RealTimeMultiSampleArrayWidget::getControlWidgets()
 {
+    QList<QWidget*> lControlWidgets;
+
     if(m_pFiffInfo && m_bInitialized) {
+        //Init quick control widget
         QSettings settings;
         QString sRTMSAWName = m_pRTMSA->getName();
-
-        //Init quick control widget
-        QList<QWidget*> lControlWidgets;
 
         // Quick control scaling
         ScalingView* pScalingView = new ScalingView(QString("RTMSAW/%1").arg(sRTMSAWName),
@@ -325,6 +311,8 @@ QList<QWidget*> RealTimeMultiSampleArrayWidget::getControlWidgets()
 
         pTriggerDetectionView->init(m_pFiffInfo);
     }
+
+    return lControlWidgets;
 }
 
 //=============================================================================================================
@@ -336,18 +324,6 @@ void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
     } else {
         m_pChannelSelectionView->activateWindow();
         m_pChannelSelectionView->show();
-    }
-}
-
-//=============================================================================================================
-
-void RealTimeMultiSampleArrayWidget::showQuickControlView()
-{
-    if(m_pQuickControlView->isActiveWindow()) {
-        m_pQuickControlView->hide();
-    } else {
-        m_pQuickControlView->activateWindow();
-        m_pQuickControlView->show();
     }
 }
 

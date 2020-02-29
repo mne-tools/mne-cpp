@@ -106,14 +106,23 @@ public:
      * @param [in] parent    The parent of widget.
      */
     RtFiffRawView(const QString& sSettingsPath = "",
-                    QWidget* parent = 0,
-                    Qt::WindowFlags f = Qt::Widget);
+                  QWidget* parent = 0,
+                  Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
      * Destroys the RtFiffRawView.
      */
     ~RtFiffRawView();
+
+    //=========================================================================================================
+    /**
+     * Set the path where to store the settings of this widget via QSettings. Note that this will also trigger
+     * a reload of the stored settings.
+     *
+     * @param [in] sSettingsPath    The new settings path.
+     */
+    void setSettingsPath(const QString& sSettingsPath);
 
     //=========================================================================================================
     /**
