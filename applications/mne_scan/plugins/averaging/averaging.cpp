@@ -69,8 +69,6 @@ using namespace RTPROCESSINGLIB;
 //=============================================================================================================
 
 Averaging::Averaging()
-: m_bIsRunning(false)
-, m_bProcessData(false)
 {
 }
 
@@ -100,15 +98,6 @@ void Averaging::unload()
 
 bool Averaging::start()
 {
-//    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-//    if(this->isRunning())
-//        QThread::wait();
-
-    m_qMutex.lock();
-    m_bIsRunning = true;
-    m_qMutex.unlock();
-
-    // Start threads
     QThread::start();
 
     return true;
@@ -117,22 +106,8 @@ bool Averaging::start()
 //=============================================================================================================
 
 bool Averaging::stop()
-{
-    //Wait until this thread is stopped
-    m_qMutex.lock();
-    m_bIsRunning = false;
-
-    if(m_bProcessData) {
-        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-        m_pAveragingBuffer->releaseFromPop();
-        m_pAveragingBuffer->releaseFromPush();
-        m_pAveragingBuffer->clear();
-//        m_pRTMSAOutput->data()->clear();
-    }
-
-    m_qMutex.unlock();
-
-    wait();
+{    
+    requestInterruption();
 
     return true;
 }
@@ -166,11 +141,6 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
     if(pRTMSA) {
-        //Check if buffer initialized
-        if(!m_pAveragingBuffer) {
-            m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
-        }
-
          //Fiff information
         if(!m_pFiffInfo) {
             m_pFiffInfo = pRTMSA->info();
@@ -189,10 +159,10 @@ void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         // Append new data
-        if(m_bProcessData) {
+        if(m_pFiffInfo) {
             for(qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 if(m_pRtAve) {
-                    m_pAveragingBuffer->push(&pRTMSA->getMultiSampleArray()[i]);
+                    m_pRtAve->append(pRTMSA->getMultiSampleArray()[i]);
                 }
             }
         }
@@ -284,7 +254,7 @@ void Averaging::initPluginControlWidgets()
                                        m_pFiffInfo);
 
         connect(m_pRtAve.data(), &RtAve::evokedStim,
-                this, &Averaging::appendEvoked);
+                this, &Averaging::onNewEvokedSet);
 
         m_pRtAve->setBaselineFrom(iBaselineFromSamples, pAveragingSettingsView->getBaselineFromSeconds());
         m_pRtAve->setBaselineTo(iBaselineToSamples, pAveragingSettingsView->getBaselineToSeconds());
@@ -409,16 +379,14 @@ void Averaging::onChangeBaselineActive(bool state)
 
 //=============================================================================================================
 
-void Averaging::appendEvoked(const FIFFLIB::FiffEvokedSet& evokedSet,
-                             const QStringList& lResponsibleTriggerTypes)
+void Averaging::onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
+                               const QStringList& lResponsibleTriggerTypes)
 {
-    m_qMutex.lock();
-    m_qVecEvokedData.push_back(evokedSet);
-    m_lResponsibleTriggerTypes = lResponsibleTriggerTypes;
-
     emit evokedSetChanged(evokedSet);
 
-    m_qMutex.unlock();
+    m_pAveragingOutput->data()->setValue(evokedSet,
+                                         m_pFiffInfo,
+                                         m_lResponsibleTriggerTypes);
 }
 
 //=============================================================================================================
@@ -437,49 +405,4 @@ void Averaging::onResetAverage(bool state)
 
 void Averaging::run()
 {
-    // Wait for fiff Info
-    while(!m_pFiffInfo) {
-        msleep(10);
-    }
-
-    if(m_mapStimChsIndexNames.isEmpty()) {
-        qDebug() << "Averaging::run() - No stim channels were found. Averaging plugin was not started.";
-        return;
-    }
-
-    m_bProcessData = true;
-
-    while(true) {
-        {
-            QMutexLocker locker(&m_qMutex);
-            if(!m_bIsRunning)
-                break;
-        }
-
-        bool doProcessing = false;
-
-        {
-            QMutexLocker locker(&m_qMutex);
-            doProcessing = m_bProcessData;
-        }
-
-        if(doProcessing) {
-            m_pRtAve->append(m_pAveragingBuffer->pop());
-
-            // Dispatch the inputs
-            m_qMutex.lock();
-            if(!m_qVecEvokedData.isEmpty()) {
-                FiffEvokedSet t_fiffEvokedSet = m_qVecEvokedData.takeFirst();
-
-                m_pAveragingOutput->data()->setValue(t_fiffEvokedSet,
-                                                     m_pFiffInfo,
-                                                     m_lResponsibleTriggerTypes);
-
-            }
-            m_qMutex.unlock();
-
-        }
-    }
-
-    m_pRtAve->stop();
 }
