@@ -106,8 +106,11 @@ bool PluginConnectorConnection::createConnection()
             QSharedPointer< PluginInputData<RealTimeMultiSampleArray> > receiverRTMSA = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeMultiSampleArray> >();
             if(senderRTMSA && receiverRTMSA)
             {
-                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(), m_pReceiver->getInputConnectors()[j]->getName()), connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
-                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
+                // We need to use BlockingQueuedConnection here because the FiffSimulator is still dispatching its data from a different thread via the run method
+                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(),
+                                                                 m_pReceiver->getInputConnectors()[j]->getName()),
+                                          connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                                                  m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
                 bConnected = true;
                 break;
             }
@@ -117,8 +120,11 @@ bool PluginConnectorConnection::createConnection()
             QSharedPointer< PluginInputData<RealTimeEvokedSet> > receiverRTESet = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeEvokedSet> >();
             if(senderRTESet && receiverRTESet)
             {
-                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(), m_pReceiver->getInputConnectors()[j]->getName()), connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
-                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
+                // We cannot use BlockingQueuedConnection here because Averaging is dispatching its data from the main thread via the onNewEvokedSet method
+                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(),
+                                                                 m_pReceiver->getInputConnectors()[j]->getName()),
+                                          connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                                                  m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::AutoConnection));
                 bConnected = true;
                 break;
             }
@@ -128,8 +134,10 @@ bool PluginConnectorConnection::createConnection()
             QSharedPointer< PluginInputData<RealTimeCov> > receiverRTC = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeCov> >();
             if(senderRTC && receiverRTC)
             {
-                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(), m_pReceiver->getInputConnectors()[j]->getName()), connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
-                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
+                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(),
+                                                                 m_pReceiver->getInputConnectors()[j]->getName()),
+                                          connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                                                  m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
                 bConnected = true;
                 break;
             }
@@ -139,8 +147,10 @@ bool PluginConnectorConnection::createConnection()
             QSharedPointer< PluginInputData<RealTimeSourceEstimate> > receiverRTSE = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeSourceEstimate> >();
             if(senderRTSE && receiverRTSE)
             {
-                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(), m_pReceiver->getInputConnectors()[j]->getName()), connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
-                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
+                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(),
+                                                                 m_pReceiver->getInputConnectors()[j]->getName()),
+                                          connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                                                  m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
                 bConnected = true;
                 break;
             }
