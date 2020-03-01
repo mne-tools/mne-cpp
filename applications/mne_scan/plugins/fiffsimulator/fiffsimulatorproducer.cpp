@@ -66,7 +66,6 @@ FiffSimulatorProducer::FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator)
 , m_iDataClientId(-1)
 , m_bFlagInfoRequest(false)
 , m_bFlagMeasuring(false)
-, m_bIsRunning(false)
 {
 }
 
@@ -124,7 +123,10 @@ void FiffSimulatorProducer::disconnectDataClient()
     if(m_bDataClientIsConnected)
     {
         m_pRtDataClient->disconnectFromHost();
-        m_pRtDataClient->waitForDisconnected();
+        if (m_pRtDataClient->state() != QAbstractSocket::UnconnectedState) {
+            m_pRtDataClient->waitForDisconnected();
+        }
+
         producerMutex.lock();
         m_iDataClientId = -1;
         m_bDataClientIsConnected = false;
@@ -138,7 +140,6 @@ void FiffSimulatorProducer::disconnectDataClient()
 void FiffSimulatorProducer::stop()
 {
     //Wait until this thread (Producer) is stopped
-    m_bIsRunning = false;
     m_bFlagMeasuring = false;
 
     if(m_pFiffSimulator->m_bCmdClientIsConnected) //ToDo replace this with is running
@@ -153,21 +154,15 @@ void FiffSimulatorProducer::stop()
         m_pFiffSimulator->m_pRawMatrixBuffer_In->releaseFromPush();
     }
 
-    this->disconnectDataClient();
-
-//    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-//    if(this->isRunning())
-//        QThread::wait();
+    requestInterruption();
+    wait();
 }
 
 //=============================================================================================================
 
 void FiffSimulatorProducer::run()
 {
-    m_bIsRunning = true;
-    //
     // Connect data client
-    //
     this->connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
 
     qint32 count = 0;
@@ -176,7 +171,7 @@ void FiffSimulatorProducer::run()
         msleep(100);
         this->connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
         ++count;
-        if(count > 10 || !m_bIsRunning)
+        if(count > 10)
             return;
     }
 
@@ -194,14 +189,8 @@ void FiffSimulatorProducer::run()
     qint32 from = 0;
     qint32 to = -1;
 
-    while(true)
+    while(!isInterruptionRequested())
     {
-        {
-            QMutexLocker locker(&producerMutex);
-            if(!m_bIsRunning)
-                break;
-        }
-
         producerMutex.lock();
         if(m_bFlagInfoRequest)
         {
@@ -228,4 +217,6 @@ void FiffSimulatorProducer::run()
                 m_bFlagMeasuring = false;
         }
     }
+
+    this->disconnectDataClient();
 }

@@ -84,7 +84,6 @@ FiffSimulator::FiffSimulator()
 , m_pFiffSimulatorProducer(new FiffSimulatorProducer(this))
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(0)
-, m_bIsRunning(false)
 , m_iActiveConnectorId(0)
 , m_bDoContinousHPI(false)
 {
@@ -164,7 +163,6 @@ bool FiffSimulator::start()
         // Buffer
         m_qMutex.lock();
         m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize));
-        m_bIsRunning = true;
         m_qMutex.unlock();
 
         // Start threads
@@ -196,7 +194,7 @@ bool FiffSimulator::stop()
 
     //Wait until this thread is stopped
     m_qMutex.lock();
-    m_bIsRunning = false;
+    //m_bIsRunning = false;
     m_qMutex.unlock();
 
     if(this->isRunning())
@@ -212,6 +210,8 @@ bool FiffSimulator::stop()
     if(m_pHPIWidget) {
         m_pHPIWidget->hide();
     }
+
+    requestInterruption();
 
     return true;
 }
@@ -245,12 +245,7 @@ void FiffSimulator::run()
 {
     MatrixXf matValue;
 
-    while(true) {
-        {
-            QMutexLocker locker(&m_qMutex);
-            if(!m_bIsRunning)
-                break;
-        }
+    while(!isInterruptionRequested()) {
         //pop matrix
         matValue = m_pRawMatrixBuffer_In->pop();
 
