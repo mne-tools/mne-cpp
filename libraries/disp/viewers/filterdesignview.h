@@ -285,9 +285,9 @@ protected:
      */
     void onBtnLoadFilter();
 
-    Ui::FilterDesignViewWidget*               ui;                         /**< Pointer to the qt designer generated ui class.*/
+    Ui::FilterDesignViewWidget*         ui;                   /**< Pointer to the qt designer generated ui class.*/
 
-    QSharedPointer<FilterPlotScene>     m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
+    QPointer<FilterPlotScene>           m_pFilterPlotScene;         /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
     UTILSLIB::FilterData                m_filterData;               /**< The current filter operator.*/
 
