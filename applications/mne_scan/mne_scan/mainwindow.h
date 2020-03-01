@@ -255,7 +255,7 @@ private:
     LogLevel                            m_eLogLevelCurrent;             /**< Holds the current log level.*/
 
     QSharedPointer<QWidget>             m_pAboutWindow;                 /**< Holds the widget containing the about information.*/
-    QPointer<DISPLIB::QuickControlView> m_pQuickControlView;            /**< quick control widget. */
+    QSharedPointer<DISPLIB::QuickControlView> m_pQuickControlView;            /**< quick control widget. */
 
 };
 }// NAMESPACE

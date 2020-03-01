@@ -74,6 +74,10 @@ FiffSimulatorProducer::FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator)
 
 FiffSimulatorProducer::~FiffSimulatorProducer()
 {
+    if(this->isRunning()) {
+        stop();
+        wait();
+    }
 }
 
 //=============================================================================================================

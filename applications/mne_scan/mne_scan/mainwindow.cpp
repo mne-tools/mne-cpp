@@ -120,10 +120,10 @@ MainWindow::MainWindow(QWidget *parent)
     m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
 
     // Quick control selection
-    m_pQuickControlView = new QuickControlView (QString("MNESCAN/MainWindow"),
-                                                        "MNE Scan",
-                                                        Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
-                                                        this);
+    m_pQuickControlView = QuickControlView::SPtr::create(QString("MNESCAN/MainWindow"),
+                                                         "MNE Scan",
+                                                         Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
+                                                         this);
     createActions();
     createMenus();
     createToolBars();
@@ -155,9 +155,6 @@ MainWindow::~MainWindow()
 
     if(m_pDynamicPluginToolBar)
         delete m_pDynamicPluginToolBar;
-
-    if(m_pQuickControlView)
-        delete m_pQuickControlView;
 }
 
 //=============================================================================================================
@@ -580,7 +577,6 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
 
                         // Sensor plugins are always displayed as the most lowet vertical widget in the multiview
                         if(lPlugins.at(i)->getType() == IPlugin::PluginType::_ISensor) {
-                            qDebug() << "ISensor" <<  sCurPluginName;
                             m_pRunWidget->addWidgetV(pWidget,
                                                      sCurPluginName);
                         } else {
