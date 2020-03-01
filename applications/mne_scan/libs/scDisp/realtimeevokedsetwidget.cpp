@@ -93,12 +93,10 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSet> pRTESet,
-                                                 QSharedPointer<QTime> &pTime,
+RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
                                                  QWidget* parent)
 : MeasurementWidget(parent)
 , m_bInitialized(false)
-, m_pRTESet(pRTESet)
 {
     Q_UNUSED(pTime)
 
@@ -144,13 +142,6 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<RealTimeEvokedSe
     //set layouts
     this->setLayout(m_pRTESetLayout);
 
-    //Initialize leftover scalars to default values
-    if(!m_pRTESet->getValue()->evoked.isEmpty()){
-        m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
-    } else {
-        m_iMaxFilterTapSize = 0;
-    }
-
     m_bHideBadChannels = false;
 }
 
@@ -172,34 +163,31 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
 //=============================================================================================================
 
-void RealTimeEvokedSetWidget::update(SCMEASLIB::Measurement::SPtr)
+void RealTimeEvokedSetWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    getData();
-}
+    m_pRTESet = qSharedPointerDynamicCast<RealTimeEvokedSet>(pMeasurement);
 
-//=============================================================================================================
+    if(m_pRTESet) {
+        if(!m_bInitialized) {
+            if(m_pRTESet->isInitialized()) {
+                m_pFiffInfo = m_pRTESet->info();
 
-void RealTimeEvokedSetWidget::getData()
-{
-    if(!m_bInitialized) {
-        if(m_pRTESet->isInitialized()) {
-            m_pFiffInfo = m_pRTESet->info();
-
-            init();
-        }
-    } else {
-        //Check if block size has changed, if yes update the filter
-        if(!m_pRTESet->getValue()->evoked.isEmpty()) {
-            if(m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {
-                m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
-
-                emit windowSizeChanged(m_iMaxFilterTapSize);
+                init();
             }
-        }
+        } else {
+            //Check if block size has changed, if yes update the filter
+            if(!m_pRTESet->getValue()->evoked.isEmpty()) {
+                if(m_iMaxFilterTapSize != m_pRTESet->getValue()->evoked.first().data.cols()) {
+                    m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
 
-        FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
-        pEvokedSet->info = *(m_pFiffInfo.data());
-        m_pEvokedSetModel->setEvokedSet(pEvokedSet);
+                    emit windowSizeChanged(m_iMaxFilterTapSize);
+                }
+            }
+
+            FiffEvokedSet::SPtr pEvokedSet = m_pRTESet->getValue();
+            pEvokedSet->info = *(m_pFiffInfo.data());
+            m_pEvokedSetModel->setEvokedSet(pEvokedSet);
+        }
     }
 }
 
@@ -210,6 +198,13 @@ void RealTimeEvokedSetWidget::init()
     if(m_pFiffInfo) {
         QSettings settings;
         QString t_sRTESName = m_pRTESet->getName();
+
+        //Initialize leftover scalars to default values
+        if(!m_pRTESet->getValue()->evoked.isEmpty()){
+            m_iMaxFilterTapSize = m_pRTESet->getValue()->evoked.first().data.cols();
+        } else {
+            m_iMaxFilterTapSize = 0;
+        }
 
         // Remove temporary label and show actual average display
         m_pRTESetLayout->removeWidget(m_pLabelInit);

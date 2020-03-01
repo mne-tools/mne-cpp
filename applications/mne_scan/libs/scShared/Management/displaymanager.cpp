@@ -106,6 +106,7 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
             qListActions.append(rtmsaWidget->getDisplayActions());
 
+            // We need to use BlockingQueuedConnection here because the FiffSimulator is still dispatching its data from a different thread via the run method
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtmsaWidget, &RealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);
 
@@ -142,14 +143,13 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 //        }
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >())
         {
-            QSharedPointer<RealTimeEvokedSet>* pRealTimeEvokedSet = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >()->data();
-
-            RealTimeEvokedSetWidget* rtesWidget = new RealTimeEvokedSetWidget(*pRealTimeEvokedSet, pT, newDisp);
+            RealTimeEvokedSetWidget* rtesWidget = new RealTimeEvokedSetWidget(pT, newDisp);
 
             qListActions.append(rtesWidget->getDisplayActions());
 
+            // We cannot use BlockingQueuedConnection here because Averaging is dispatching its data from the main thread via the onNewEvokedSet method
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtesWidget, &RealTimeEvokedSetWidget::update, Qt::BlockingQueuedConnection);
+                    rtesWidget, &RealTimeEvokedSetWidget::update, Qt::AutoConnection);
 
             vboxLayout->addWidget(rtesWidget);
             rtesWidget->init();

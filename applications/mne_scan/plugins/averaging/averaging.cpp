@@ -175,7 +175,8 @@ void Averaging::init()
 {
     // Input
     m_pAveragingInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
-    connect(m_pAveragingInput.data(), &PluginInputConnector::notify, this, &Averaging::update, Qt::DirectConnection);
+    connect(m_pAveragingInput.data(), &PluginInputConnector::notify,
+            this, &Averaging::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pAveragingInput);
 
     // Output

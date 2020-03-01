@@ -70,7 +70,8 @@ template <class T>
 void PluginInputData<T>::setCallbackMethod(callback_function pFunc)
 {
     m_pFunc = pFunc;
-    connect(this, &PluginInputConnector::notify, this, &PluginInputData<T>::notifyCallbackFunction);
+    connect(this, &PluginInputConnector::notify,
+            this, &PluginInputData<T>::notifyCallbackFunction);
 }
 
 //=============================================================================================================
