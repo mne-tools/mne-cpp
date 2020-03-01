@@ -41,7 +41,7 @@
 #include <scShared/Management/pluginscenemanager.h>
 #include <scShared/Management/displaymanager.h>
 
-#include <scShared/Interfaces/ISensor.h>
+#include <scShared/Interfaces/IPlugin.h>
 
 #include <scDisp/measurementwidget.h>
 #include <scDisp/realtimemultisamplearraywidget.h>
@@ -579,7 +579,8 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                         }
 
                         // Sensor plugins are always displayed as the most lowet vertical widget in the multiview
-                        if(qobject_cast<ISensor *>(lPlugins.at(i))) {
+                        if(lPlugins.at(i)->getType() == IPlugin::PluginType::_ISensor) {
+                            qDebug() << "ISensor" <<  sCurPluginName;
                             m_pRunWidget->addWidgetV(pWidget,
                                                      sCurPluginName);
                         } else {
