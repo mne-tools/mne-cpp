@@ -19,11 +19,11 @@ Before you can vosualize the head movement during your measurement you have to m
 The HpiView is a functionality that can be added to all Sensor Plugins like `FiffSimulator` or `FieldTripBuffer`. Following steps will show you the necessary steps to setup the real time Head Monitoring. To visualize a subjects head movement, you need to setup a datastream first. There are following usecases:
 
 1. Setup Datastream
-    * Streaming Simulated Data
-    
-    To visualize the head position in prerecordet data, follow the steps described [here](/prerecordeddata.md)
+    * Streaming Simulated Data:
 
-    * Streaming data from a MEG device in real-time
+    To visualize the head position in prerecordet data, follow the steps described [here](/prerecordeddata.md).
+
+    * Streaming data from a MEG device in real-time:
 
     To connect the VectorView MEG-Device to MNE-Scan you should use the [FieldTripBuffer](../development/ftbufferplugin.md).
 
@@ -31,7 +31,7 @@ The HpiView is a functionality that can be added to all Sensor Plugins like `Fif
 
     The `HPI` Icon appears after you clicked on your Sensor Plugin. To Open the HPI View click on this Icon.
 
-    ![](../../images/hpi_icon.png)
+    ![](../../images/mne_scan_hpi_icon.png)
 
 ## The HPI View
 
