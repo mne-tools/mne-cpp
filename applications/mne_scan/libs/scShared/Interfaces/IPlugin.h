@@ -39,8 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include "../Management/plugininputconnector.h"
-//#include "../Management/pluginoutputconnector.h"
+#include "../scshared_global.h"
+
 #include "../Management/pluginoutputdata.h"
 #include "../Management/plugininputdata.h"
 
@@ -65,11 +65,8 @@ namespace SCSHAREDLIB
 //=============================================================================================================
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// SCSHAREDLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-//class PluginInputConnector;
-//class PluginOutputConnector;
 
 //=============================================================================================================
 /**
@@ -77,9 +74,9 @@ namespace SCSHAREDLIB
  *
  * @brief The IPlugin class is the base interface class of all plugins.
  */
-class IPlugin : public QThread
+class SCSHAREDSHARED_EXPORT IPlugin : public QThread
 {
-//    Q_OBJECT
+    Q_OBJECT
 
 public:
     //=========================================================================================================
@@ -151,16 +148,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns a list containing the control widgets for this plugin. The control widgets can be used to change
-     * parameters in the plugin scope during the ongoing measurement. Please note that the plugin does not has
-     * ownership of the QWidgets.
-     *
-     * @return A list containting the plugin's control widgets
-     */
-    virtual QList<QPointer<QWidget> > getControlWidgets() = 0;
-
-    //=========================================================================================================
-    /**
      * Returns the plugin type.
      * Pure virtual method.
      *
@@ -196,6 +183,18 @@ public:
 
     inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
     inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
+
+signals:
+    //=========================================================================================================
+    /**
+     * Signal to notify that new plugin control widgets are available.
+     *
+     * @param [in] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender
+     *                                  does not have ownership of these pointers.
+     * @param [in] sPluginName          The plugin name emmiting the signal.
+     */
+    void pluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
+                                     const QString& sPluginName);
 
 protected:
     //=========================================================================================================

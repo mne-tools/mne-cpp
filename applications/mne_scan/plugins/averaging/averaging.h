@@ -64,11 +64,6 @@ namespace RTPROCESSINGLIB{
     class RtAve;
 }
 
-namespace DISPLIB{
-    class AveragingSettingsView;
-    class ArtifactSettingsView;
-}
-
 //=============================================================================================================
 // DEFINE NAMESPACE AVERAGINGPLUGIN
 //=============================================================================================================
@@ -110,13 +105,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns a list containing the control widgets for this plugin. The control widgets can be used to change
-     * parameters in the plugin scope during the ongoing measurement. Please note that the plugin does not has
-     * ownership of the QWidgets.
-     *
-     * @return A list containting the plugin's control widgets
+     * Inits widgets which are used to control this plugin, then emits them in form of a QList.
      */
-    virtual QList<QPointer<QWidget> > getControlWidgets();
+    virtual void initPluginControlWidgets();
 
     //=========================================================================================================
     /**
@@ -227,17 +218,13 @@ public:
      */
     void onResetAverage(bool state);
 
-protected:
+private:
     virtual void run();
 
-private:
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr           m_pAveragingOutput;     /**< The RealTimeEvoked of the Averaging output.*/
 
     IOBUFFER::CircularMatrixBuffer<double>::SPtr    m_pAveragingBuffer;
-
-    QSharedPointer<DISPLIB::AveragingSettingsView>  m_pAveragingSettingsView;           /**< Holds averaging settings widget.*/
-    QSharedPointer<DISPLIB::ArtifactSettingsView>   m_pArtifactSettingsView;            /**< Holds artifact settings widget.*/
 
     QVector<FIFFLIB::FiffEvokedSet>                 m_qVecEvokedData;                   /**< Evoked data set. */
 
@@ -255,6 +242,9 @@ private:
     QMap<QString,int>                               m_mapStimChsIndexNames;             /**< The currently available stim channels and their corresponding index in the data. */
 
 signals:
+    void stimChannelsChanged(const QMap<QString,int>& mapStimChsIndexNames);
+    void fiffChInfoChanged(const QList<FIFFLIB::FiffChInfo>& fiffChInfoList);
+    void evokedSetChanged(const FIFFLIB::FiffEvokedSet& evokedSet);
 };
 } // NAMESPACE
 

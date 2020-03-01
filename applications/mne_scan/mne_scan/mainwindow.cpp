@@ -541,57 +541,62 @@ void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
 
 //=============================================================================================================
 
-void MainWindow::updateMultiViewWidget(SCSHAREDLIB::IPlugin::SPtr pPlugin)
+void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> > lPlugins)
 {
-    m_qListDynamicPluginActions.clear();
-    m_qListDynamicDisplayActions.clear();
-    m_qListDynamicControlWidgets.clear();
+    for(int i = 0; i < lPlugins.size(); ++i) {
+        m_qListDynamicPluginActions.clear();
+        m_qListDynamicDisplayActions.clear();
+        m_qListDynamicControlWidgets.clear();
 
-    if(!pPlugin.isNull()) {
-        // Add Dynamic Plugin Actions
-        m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
+        if(!lPlugins.at(i).isNull()) {
+            // Add Dynamic Plugin Actions
+            m_qListDynamicPluginActions.append(lPlugins.at(i)->getPluginActions());
 
-        QString sCurPluginName = pPlugin->getName();
+            QString sCurPluginName = lPlugins.at(i)->getName();
 
-        if(pPlugin.isNull()) {
-            QWidget* pWidget = new QWidget;
-            setCentralWidget(pWidget);
-        } else {
-            if(!m_bIsRunning) {
-                setCentralWidget(pPlugin->setupWidget());
+            if(lPlugins.at(i).isNull()) {
+                QWidget* pWidget = new QWidget;
+                setCentralWidget(pWidget);
             } else {
-                if(QWidget* pWidget = m_pDisplayManager->show(pPlugin->getOutputConnectors(),
-                                                              m_pTime,
-                                                              m_qListDynamicDisplayActions,
-                                                              m_qListDynamicControlWidgets)) {
-                    for (int i = 0; i < pWidget->layout()->count(); ++i) {
-                        if(MeasurementWidget* pMeasWidget = qobject_cast<MeasurementWidget *>(pWidget->layout()->itemAt(i)->widget())) {
-                            connect(pMeasWidget, &MeasurementWidget::pluginControlWidgetsChanged,
-                                    this, &MainWindow::onPluginControlWidgetsChanged);
+                if(!m_bIsRunning) {
+                    setCentralWidget(lPlugins.at(i)->setupWidget());
+                } else {
+                    connect(lPlugins.at(i).data(), &IPlugin::pluginControlWidgetsChanged,
+                            this, &MainWindow::onControlWidgetsChanged);
+
+                    if(QWidget* pWidget = m_pDisplayManager->show(lPlugins.at(i)->getOutputConnectors(),
+                                                                  m_pTime,
+                                                                  m_qListDynamicDisplayActions,
+                                                                  m_qListDynamicControlWidgets)) {
+                        for (int i = 0; i < pWidget->layout()->count(); ++i) {
+                            if(MeasurementWidget* pMeasWidget = qobject_cast<MeasurementWidget *>(pWidget->layout()->itemAt(i)->widget())) {
+                                connect(pMeasWidget, &MeasurementWidget::pluginControlWidgetsChanged,
+                                        this, &MainWindow::onControlWidgetsChanged);
+                            }
+                        }
+
+                        if(sCurPluginName == "Fiff Simulator" || sCurPluginName == "Noise Reduction") {
+                            m_pRunWidget->addWidgetV(pWidget,
+                                                     sCurPluginName);
+                        } else {
+                            m_pRunWidget->addWidgetH(pWidget,
+                                                     sCurPluginName);
                         }
                     }
 
-                    if(sCurPluginName == "Fiff Simulator" || sCurPluginName == "Noise Reduction") {
-                        m_pRunWidget->addWidgetV(pWidget,
-                                                 sCurPluginName);
-                    } else {
-                        m_pRunWidget->addWidgetH(pWidget,
-                                                 sCurPluginName);
-                    }
+                    m_pRunWidget->show();
                 }
-
-                m_pRunWidget->show();
             }
         }
-    }
 
-    this->createToolBars();
+        this->createToolBars();
+    }
 }
 
 //=============================================================================================================
 
-void MainWindow::onPluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
-                                               const QString& sPluginName)
+void MainWindow::onControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
+                                         const QString& sPluginName)
 {
     //Quick Control Widget
     if(m_pQuickControlView) {
@@ -658,11 +663,7 @@ void MainWindow::startMeasurement()
     m_pRunWidget = new MultiView(this);
     setCentralWidget(m_pRunWidget);
 
-    PluginSceneManager::PluginList lPlugin = m_pPluginSceneManager->getPlugins();
-
-    for(int i = 0; i < lPlugin.size(); ++i) {
-        updateMultiViewWidget(lPlugin.at(i));
-    }
+    initMultiViewWidget(m_pPluginSceneManager->getPlugins());
 }
 
 //=============================================================================================================
@@ -675,6 +676,7 @@ void MainWindow::stopMeasurement()
     m_pDisplayManager->clean();
 
     m_pActionQuickControl->setVisible(false);
+    m_pQuickControlView->setVisible(false);
 
     m_pPluginGui->uiSetupRunningState(false);
     uiSetupRunningState(false);

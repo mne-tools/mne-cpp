@@ -92,7 +92,7 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
     QGridLayout *mainLayoutView = new QGridLayout;
     mainLayoutView->addWidget(m_pSourceEstimateView.data(),0,0);
 
-    //QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTSE->getControlWidgets();
+    //QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTSE->getPluginControlWidgets();
     //m_pSourceEstimateView->setQuickControlWidgets(lControlWidgets);
 
     m_pQuickControlView = m_pSourceEstimateView->getQuickControl();

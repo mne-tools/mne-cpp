@@ -89,7 +89,7 @@ RealTimeConnectivityEstimateWidget::RealTimeConnectivityEstimateWidget(QSharedPo
     addDisplayAction(m_pActionQuickControl);
     m_pActionQuickControl->setVisible(true);
 
-    //QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTCE->getControlWidgets();
+    //QList<QSharedPointer<QWidget> > lControlWidgets = m_pRTCE->getPluginControlWidgets();
     //m_pAbstractView->setQuickControlWidgets(lControlWidgets);
 
     m_pQuickControlView = m_pAbstractView->getQuickControl();

@@ -135,14 +135,14 @@ public:
 signals:
     //=========================================================================================================
     /**
-     * Signal to notify that new control widgets are available.
+     * Signal to notify that new display control widgets are available.
      *
      * @param [in] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender
      *                                  does not have ownership of these pointers.
-     * @param [in] sPluginName          The plugin name emmiting the signal.
+     * @param [in] sDisplayName         The display emmiting the signal.
      */
     void pluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
-                                     const QString& sPluginName);
+                                     const QString& sDisplayName);
 
 protected:
     //=========================================================================================================
