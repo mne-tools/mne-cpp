@@ -169,6 +169,8 @@ void MainWindow::clear()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    stopMeasurement();
+
     QMainWindow::closeEvent(event);
 }
 

@@ -227,7 +227,6 @@ protected:
     QAction*                m_pActionComputeHPI;            /**< Update HPI info into Fiff Info action */
 
     bool                    m_bCmdClientIsConnected;        /**< If the command client is connected.*/
-    bool                    m_bIsRunning;                   /**< Whether FiffSimulator is running.*/
     bool                    m_bDoContinousHPI;              /**< Whether to do continous HPI.*/
 
     QString                 m_sFiffSimulatorIP;             /**< The IP Adress of mne_rt_server.*/
