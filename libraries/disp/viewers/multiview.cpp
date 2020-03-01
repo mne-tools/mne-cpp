@@ -57,18 +57,22 @@ using namespace DISPLIB;
 MultiView::MultiView(QWidget *parent)
 : QWidget(parent)
 {
-    QHBoxLayout *layout = new QHBoxLayout;
     m_pSplitterHorizontal = new QSplitter(this);
     m_pSplitterHorizontal->setOrientation(Qt::Horizontal);
+
     m_pSplitterVertical = new QSplitter(this);
     m_pSplitterVertical->setOrientation(Qt::Vertical);
-    m_pVerticalTabWidget = new QTabWidget();
-    m_pVerticalTabWidget->setTabBarAutoHide(true);
-    m_pVerticalTabWidget->setMovable(true);
-    m_pSplitterVertical->addWidget(m_pSplitterHorizontal);
-    m_pSplitterVertical->addWidget(m_pVerticalTabWidget);
-    layout->addWidget(m_pSplitterVertical);
 
+//    m_pVerticalTabWidget = new QTabWidget();
+//    m_pVerticalTabWidget->setTabBarAutoHide(true);
+//    m_pVerticalTabWidget->setMovable(true);
+
+    m_pSplitterVertical->addWidget(m_pSplitterHorizontal);
+//    m_pSplitterVertical->addWidget(m_pVerticalTabWidget);
+
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addWidget(m_pSplitterVertical);
+    layout->setContentsMargins(0,0,3,0);
     this->setLayout(layout);
 }
 
@@ -88,7 +92,7 @@ MultiViewWindow* MultiView::addWidgetH(QWidget* pWidget,
     pDockWidget->setWidget(pWidget);
     pWidget->layout()->setContentsMargins(0,0,0,0);
     pDockWidget->layout()->setContentsMargins(0,0,0,0);
-    this->m_pSplitterHorizontal->addWidget(pDockWidget);
+    m_pSplitterHorizontal->addWidget(pDockWidget);
 
     return pDockWidget;
 }
@@ -103,7 +107,8 @@ MultiViewWindow* MultiView::addWidgetV(QWidget* pWidget,
     pDockWidget->setWidget(pWidget);
     pWidget->layout()->setContentsMargins(0,0,0,0);
     pDockWidget->layout()->setContentsMargins(0,0,0,0);
-    m_pVerticalTabWidget->addTab(pWidget, sName);
+//    m_pVerticalTabWidget->addTab(pDockWidget, sName);
+    m_pSplitterVertical->addWidget(pDockWidget);
 
     return pDockWidget;
 }

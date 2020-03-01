@@ -41,6 +41,8 @@
 #include <scShared/Management/pluginscenemanager.h>
 #include <scShared/Management/displaymanager.h>
 
+#include <scShared/Interfaces/ISensor.h>
+
 #include <scDisp/measurementwidget.h>
 #include <scDisp/realtimemultisamplearraywidget.h>
 
@@ -576,9 +578,8 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::IPlugin> 
                             }
                         }
 
-                        // RealTimeMultiSampleArrayWidget are always displayed as the most lowet vertical widget in the multiview.
-                        // Please note that multiple RealTimeMultiSampleArrayWidget are tabbified
-                        if(qobject_cast<RealTimeMultiSampleArrayWidget *>(pWidget)) {
+                        // Sensor plugins are always displayed as the most lowet vertical widget in the multiview
+                        if(qobject_cast<ISensor *>(lPlugins.at(i))) {
                             m_pRunWidget->addWidgetV(pWidget,
                                                      sCurPluginName);
                         } else {
