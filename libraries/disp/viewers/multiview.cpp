@@ -62,7 +62,11 @@ MultiView::MultiView(QWidget *parent)
     m_pSplitterHorizontal->setOrientation(Qt::Horizontal);
     m_pSplitterVertical = new QSplitter(this);
     m_pSplitterVertical->setOrientation(Qt::Vertical);
+    m_pVerticalTabWidget = new QTabWidget();
+    m_pVerticalTabWidget->setTabBarAutoHide(true);
+    m_pVerticalTabWidget->setMovable(true);
     m_pSplitterVertical->addWidget(m_pSplitterHorizontal);
+    m_pSplitterVertical->addWidget(m_pVerticalTabWidget);
     layout->addWidget(m_pSplitterVertical);
 
     this->setLayout(layout);
@@ -99,7 +103,7 @@ MultiViewWindow* MultiView::addWidgetV(QWidget* pWidget,
     pDockWidget->setWidget(pWidget);
     pWidget->layout()->setContentsMargins(0,0,0,0);
     pDockWidget->layout()->setContentsMargins(0,0,0,0);
-    this->m_pSplitterVertical->addWidget(pDockWidget);
+    m_pVerticalTabWidget->addTab(pWidget, sName);
 
     return pDockWidget;
 }
