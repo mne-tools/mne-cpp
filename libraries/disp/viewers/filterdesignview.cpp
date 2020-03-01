@@ -355,9 +355,9 @@ void FilterDesignView::initComboBoxes()
 
 void FilterDesignView::initFilterPlot()
 {
-    m_pFilterPlotScene = FilterPlotScene::SPtr::create(ui->m_graphicsView_filterPlot, this);
+    m_pFilterPlotScene = new FilterPlotScene(ui->m_graphicsView_filterPlot, this);
 
-    ui->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene.data());
+    ui->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene);
 
     updateFilterPlot();
 }
