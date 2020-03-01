@@ -86,7 +86,7 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         qmake -makefile brainflowboard.pro
         jom -j2
-        xcopy .\brainflow\installed\lib ..\..\..\bin
+        xcopy .\brainflow\installed\lib\* ..\..\..\bin\ /s /i
                         
   Tests:
     runs-on: ${{ matrix.os }}
